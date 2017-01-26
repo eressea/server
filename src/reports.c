@@ -57,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <stream.h>
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -659,15 +659,15 @@ size_t size)
         spellbook *book = unit_get_spellbook(u);
 
         if (book) {
-            quicklist *ql = book->spells;
+            selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
             int result = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
             if (wrptr(&bufp, &size, result) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
-            for (header = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-                spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+            for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+                spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 if (sbe->level <= maxlevel) {
                     int result = 0;
                     if (!header) {
@@ -973,8 +973,7 @@ int stealth_modifier(seen_mode mode)
     }
 }
 
-void transfer_seen(quicklist ** dst, quicklist ** src)
-{
+static void transfer_seen(selist ** dst, selist ** src) {
     assert(!*dst);
     *dst = *src;
     *src = NULL;
@@ -988,7 +987,7 @@ int cmp_faction(const void *lhs, const void *rhs) {
     return -1;
 }
 
-static void add_seen_faction_i(struct quicklist **flist, faction *f) {
+static void add_seen_faction_i(struct selist **flist, faction *f) {
     selist_set_insert(flist, f, cmp_faction);
 }
 
@@ -998,7 +997,7 @@ void add_seen_faction(faction *self, faction *seen) {
 
 typedef struct address_data {
     faction *f, *lastf;
-    quicklist **flist;
+    selist **flist;
     int stealthmod;
 } address_data;
 
@@ -1020,7 +1019,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
     }
 }
 
-static void add_travelthru_addresses(region *r, faction *f, quicklist **flist, int stealthmod) {
+static void add_travelthru_addresses(region *r, faction *f, selist **flist, int stealthmod) {
     // for each traveling unit: add the faction of any unit is can see
     address_data cbdata = { 0 };
     cbdata.f = f;
@@ -1034,18 +1033,18 @@ static void get_addresses(report_context * ctx)
     /* "TODO: travelthru" */
     region *r;
     const faction *lastf = NULL;
-    quicklist *flist = 0;
+    selist *flist = 0;
 
     transfer_seen(&flist, &ctx->f->seen_factions);
 
     ctx->f->seen_factions = NULL; /* do not delete it twice */
-    ql_push(&flist, ctx->f);
+    selist_push(&flist, ctx->f);
 
     if (f_get_alliance(ctx->f)) {
-        quicklist *ql = ctx->f->alliance->members;
+        selist *ql = ctx->f->alliance->members;
         int qi;
-        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            add_seen_faction_i(&flist, (faction *)ql_get(ql, qi));
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            add_seen_faction_i(&flist, (faction *)selist_get(ql, qi));
         }
     }
 
@@ -1130,31 +1129,31 @@ void reports_done(void) {
     }
 }
 
-static quicklist *get_regions_distance(region * root, int radius)
+static selist *get_regions_distance(region * root, int radius)
 {
-    quicklist *ql, *rlist = NULL;
+    selist *ql, *rlist = NULL;
     int qi = 0;
 
-    ql_push(&rlist, root);
+    selist_push(&rlist, root);
     fset(root, RF_MARK);
     ql = rlist;
 
     while (ql) {
-        region *r = (region *)ql_get(ql, qi);
+        region *r = (region *)selist_get(ql, qi);
         region * next[MAXDIRECTIONS];
         int d;
         get_neighbours(r, next);
 
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (next[d] && !fval(next[d], RF_MARK) && distance(next[d], root) <= radius) {
-                ql_push(&rlist, next[d]);
+                selist_push(&rlist, next[d]);
                 fset(next[d], RF_MARK);
             }
         }
-        ql_advance(&ql, &qi, 1);
+        selist_advance(&ql, &qi, 1);
     }
-    for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        region *r = (region *)ql_get(ql, qi);
+    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        region *r = (region *)selist_get(ql, qi);
         freset(r, RF_MARK);
     }
     return rlist;
@@ -1190,16 +1189,16 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
  */
 static void prepare_lighthouse(faction *f, region *r, int range)
 {
-    quicklist *ql, *rlist = get_regions_distance(r, range);
+    selist *ql, *rlist = get_regions_distance(r, range);
     int qi;
 
-    for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        region *rl = (region *)ql_get(ql, qi);
+    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        region *rl = (region *)selist_get(ql, qi);
         if (!fval(rl->terrain, FORBIDDEN_REGION)) {
             add_seen_nb(f, rl, seen_lighthouse);
         }
     }
-    ql_free(rlist);
+    selist_free(rlist);
 }
 
 void reorder_units(region * r)
@@ -1393,7 +1392,7 @@ void prepare_report(report_context *ctx, faction *f)
 
 void finish_reports(report_context *ctx) {
     region *r;
-    ql_free(ctx->addresses);
+    selist_free(ctx->addresses);
     for (r = ctx->first; r != ctx->last; r = r->next) {
         r->seen.mode = seen_none;
     }

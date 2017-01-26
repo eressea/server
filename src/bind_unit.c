@@ -46,7 +46,7 @@ without prior permission by the authors of Eressea.
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <tolua.h>
 
@@ -753,12 +753,12 @@ static int tolua_unit_get_spells(lua_State * L)
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
     sc_mage *mage = self ? get_mage(self) : 0;
     spellbook *sb = mage ? mage->spellbook : 0;
-    quicklist *slist = 0;
+    selist *slist = 0;
     if (sb) {
-        quicklist **slist_ptr = &sb->spells;
+        selist **slist_ptr = &sb->spells;
         slist = *slist_ptr;
     }
-    return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
+    return tolua_selist_push(L, "spellbook", "spell_entry", slist);
 }
 
 static int tolua_unit_get_orders(lua_State * L)

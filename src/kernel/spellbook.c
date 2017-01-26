@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/spell.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/log.h>
 #include <util/gamedata.h>
 
@@ -58,12 +58,12 @@ void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spe
 
 void write_spellbook(const struct spellbook *book, struct storage *store)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
     if (book) {
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             WRITE_TOK(store, sbe->sp->sname);
             WRITE_INT(store, sbe->level);
         }
@@ -84,30 +84,30 @@ void spellbook_add(spellbook *sb, struct spell * sp, int level)
     sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
     sbe->sp = sp;
     sbe->level = level;
-    ql_push(&sb->spells, sbe);
+    selist_push(&sb->spells, sbe);
 }
 
 void spellbook_clear(spellbook *sb)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
     assert(sb);
-    for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
         free(sbe);
     }
-    ql_free(sb->spells);
+    selist_free(sb->spells);
     free(sb->name);
 }
 
 int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
-    for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
         int result = callback(sbe, data);
         if (result) {
             return result;
@@ -119,11 +119,11 @@ int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), 
 spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp)
 {
     if (sb) {
-        quicklist *ql;
+        selist *ql;
         int qi;
 
-        for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sp == sbe->sp) {
                 return sbe;
             }

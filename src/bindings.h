@@ -15,15 +15,15 @@ extern "C" {
 #endif
 
     struct lua_State;
-    struct quicklist;
+    struct selist;
 
     int tolua_sqlite_open(struct lua_State *L);
     int tolua_bindings_open(struct lua_State *L);
     int tolua_spelllist_next(struct lua_State *L);
     int tolua_itemlist_next(struct lua_State *L);
     int tolua_orderlist_next(struct lua_State *L);
-    int tolua_quicklist_push(struct lua_State *L, const char *list_type,
-        const char *elem_type, struct quicklist *list);
+    int tolua_selist_push(struct lua_State *L, const char *list_type,
+        const char *elem_type, struct selist *list);
 
     int log_lua_error(struct lua_State *L);
 

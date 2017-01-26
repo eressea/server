@@ -64,7 +64,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -1248,7 +1248,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         rda = 0;
     else {
         int qi;
-        quicklist *ql;
+        selist *ql;
         unsigned int i = 0;
 
         if (u_race(du)->battle_flags & BF_RES_PIERCE)
@@ -1262,8 +1262,8 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             rda /= 2;
 
         /* Schilde */
-        for (qi = 0, ql = b->meffects; ql; ql_advance(&ql, &qi, 1)) {
-            meffect *me = (meffect *)ql_get(ql, qi);
+        for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
+            meffect *me = (meffect *)selist_get(ql, qi);
             if (meffect_protection(b, me, ds) != 0) {
                 assert(0 <= rda);       /* rda sollte hier immer mindestens 0 sein */
                 /* jeder Schaden wird um effect% reduziert bis der Schild duration
@@ -1603,11 +1603,11 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
     return dt;
 }
 
-quicklist *fighters(battle * b, const side * vs, int minrow, int maxrow,
+selist *fighters(battle * b, const side * vs, int minrow, int maxrow,
     int mask)
 {
     side *s;
-    quicklist *fightervp = 0;
+    selist *fightervp = 0;
 
     assert(vs != NULL);
 
@@ -1629,7 +1629,7 @@ quicklist *fighters(battle * b, const side * vs, int minrow, int maxrow,
         for (fig = s->fighters; fig; fig = fig->next) {
             int row = get_unitrow(fig, vs);
             if (row >= minrow && row <= maxrow) {
-                ql_push(&fightervp, fig);
+                selist_push(&fightervp, fig);
             }
         }
     }
@@ -1801,7 +1801,7 @@ static void do_combatspell(troop at)
     unit *caster = fi->unit;
     battle *b = fi->side->battle;
     region *r = b->region;
-    quicklist *ql;
+    selist *ql;
     int level, qi;
     double power;
     int fumblechance = 0;
@@ -1830,8 +1830,8 @@ static void do_combatspell(troop at)
         return;
     }
 
-    for (qi = 0, ql = b->meffects; ql; ql_advance(&ql, &qi, 1)) {
-        meffect *mblock = (meffect *)ql_get(ql, qi);
+    for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
+        meffect *mblock = (meffect *)selist_get(ql, qi);
         if (mblock->typ == SHIELD_BLOCK) {
             if (meffect_blocked(b, mblock, fi->side) != 0) {
                 fumblechance += mblock->duration;
@@ -2341,11 +2341,11 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
     if (value == 0 || value < ta->value)
         return;
     if (value > ta->value) {
-        ql_free(ta->fighters);
+        selist_free(ta->fighters);
         ta->fighters = 0;
     }
-    ql_push(&ta->fighters, fig);
-    ql_push(&fig->side->battle->leaders, fig);
+    selist_push(&ta->fighters, fig);
+    selist_push(&fig->side->battle->leaders, fig);
     ta->value = value;
 }
 
@@ -3091,7 +3091,7 @@ static void print_stats(battle * b)
     b->max_tactics = 0;
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        if (!ql_empty(s->leader.fighters)) {
+        if (!selist_empty(s->leader.fighters)) {
             b->max_tactics = _max(b->max_tactics, s->leader.value);
         }
     }
@@ -3099,11 +3099,11 @@ static void print_stats(battle * b)
     if (b->max_tactics > 0) {
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             if (s->leader.value == b->max_tactics) {
-                quicklist *ql;
+                selist *ql;
                 int qi;
 
-                for (qi = 0, ql = s->leader.fighters; ql; ql_advance(&ql, &qi, 1)) {
-                    fighter *tf = (fighter *)ql_get(ql, qi);
+                for (qi = 0, ql = s->leader.fighters; ql; selist_advance(&ql, &qi, 1)) {
+                    fighter *tf = (fighter *)selist_get(ql, qi);
                     unit *u = tf->unit;
                     message *m = NULL;
                     if (!is_attacker(tf)) {
@@ -3599,7 +3599,7 @@ battle *make_battle(region * r)
 
 static void free_side(side * si)
 {
-    ql_free(si->leader.fighters);
+    selist_free(si->leader.fighters);
 }
 
 static void free_fighter(fighter * fig)
@@ -3647,9 +3647,9 @@ void free_battle(battle * b)
         free(bf);
     }
 
-    ql_free(b->leaders);
-    ql_foreach(b->meffects, free);
-    ql_free(b->meffects);
+    selist_free(b->leaders);
+    selist_foreach(b->meffects, free);
+    selist_free(b->meffects);
 
     battle_free(b);
 }
@@ -4242,7 +4242,7 @@ void do_battle(region * r)
         freset(sh, SF_DAMAGED);
 
     /* Gibt es eine Taktikrunde ? */
-    if (!ql_empty(b->leaders)) {
+    if (!selist_empty(b->leaders)) {
         b->turn = 0;
         b->has_tactics_turn = true;
     }

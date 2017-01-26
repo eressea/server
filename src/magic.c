@@ -58,7 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -231,7 +231,7 @@ bool FactionSpells(void)
     return rule != 0;
 }
 
-void read_spells(struct quicklist **slistp, magic_t mtype, 
+void read_spells(struct selist **slistp, magic_t mtype, 
     struct storage *store)
 {
     for (;;) {
@@ -305,13 +305,13 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
     return AT_READ_OK;
 }
 
-void write_spells(struct quicklist *slist, struct storage *store)
+void write_spells(struct selist *slist, struct storage *store)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
-    for (ql = slist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)ql_get(ql, qi);
+    for (ql = slist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *)selist_get(ql, qi);
         WRITE_TOK(store, sp->sname);
     }
     WRITE_TOK(store, "end");
@@ -424,11 +424,11 @@ static bool already_seen(const faction * f, const spell * sp)
 void show_new_spells(faction * f, int level, const spellbook *book)
 {
     if (book) {
-        quicklist *ql = book->spells;
+        selist *ql = book->spells;
         int qi;
 
-        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= level) {
 
                 if (!already_seen(f, sbe->sp)) {
@@ -451,14 +451,14 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
 {
     spellbook_entry *commonspells[MAXSPELLS];
     int qi, numspells = 0;
-    quicklist *ql;
+    selist *ql;
 
     if (level <= f->max_spelllevel) {
         return;
     }
 
-    for (qi = 0, ql = book->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+    for (qi = 0, ql = book->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
         if (sbe->level <= level) {
             commonspells[numspells++] = sbe;
         }
@@ -2956,14 +2956,14 @@ const char *curse_name(const curse_type * ctype, const struct locale *lang)
 }
 
 static void select_spellbook(void **tokens, spellbook *sb, const struct locale * lang) {
-    quicklist * ql;
+    selist * ql;
     int qi;
 
     assert(sb);
     assert(lang);
 
-    for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
         spell *sp = sbe->sp;
 
         const char *n = spell_name(sp, lang);

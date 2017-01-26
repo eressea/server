@@ -348,8 +348,8 @@ extern "C" {
     struct order *ord, const struct spllprm *spobj);
     bool FactionSpells(void);
 
-    void write_spells(struct quicklist *slist, struct storage *store);
-    void read_spells(struct quicklist **slistp, magic_t mtype,
+    void write_spells(struct selist *slist, struct storage *store);
+    void read_spells(struct selist **slistp, magic_t mtype,
         struct storage *store);
 
     struct spellbook * get_spellbook(const char * name);

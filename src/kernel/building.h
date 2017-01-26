@@ -80,7 +80,7 @@ extern "C" {
         struct attrib *attribs;
     } building_type;
 
-    extern struct quicklist *buildingtypes;
+    extern struct selist *buildingtypes;
     extern struct attrib_type at_building_action;
 
     building_type *bt_get_or_create(const char *name);

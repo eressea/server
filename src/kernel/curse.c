@@ -287,10 +287,10 @@ attrib_type at_curse = {
 /* Spruch identifizieren */
 
 #include <util/umlaut.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #define MAXCTHASH 128
-static quicklist *cursetypes[MAXCTHASH];
+static selist *cursetypes[MAXCTHASH];
 static int ct_changes = 1;
 
 bool ct_changed(int *cache)
@@ -306,7 +306,7 @@ bool ct_changed(int *cache)
 void ct_register(const curse_type * ct)
 {
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
-    quicklist **ctlp = cursetypes + hash;
+    selist **ctlp = cursetypes + hash;
 
     selist_set_insert(ctlp, (void *)ct, NULL);
     ++ct_changes;
@@ -315,16 +315,16 @@ void ct_register(const curse_type * ct)
 void ct_remove(const char *c)
 {
     unsigned int hash = tolower(c[0]);
-    quicklist *ctl = cursetypes[hash];
+    selist *ctl = cursetypes[hash];
 
     if (ctl) {
         int qi;
 
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
 
             if (strcmp(c, type->cname) == 0) {
-                ql_delete(&ctl, qi);
+                selist_delete(&ctl, qi);
                 ++ct_changes;
                 break;
             }
@@ -335,14 +335,14 @@ void ct_remove(const char *c)
 const curse_type *ct_find(const char *c)
 {
     unsigned int hash = tolower(c[0]);
-    quicklist *ctl = cursetypes[hash];
+    selist *ctl = cursetypes[hash];
 
     if (ctl) {
         size_t c_len = strlen(c);
         int qi;
 
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
 
             if (strcmp(c, type->cname) == 0) {
                 return type;
@@ -360,12 +360,12 @@ const curse_type *ct_find(const char *c)
 
 void ct_checknames(void) {
     int i, qi;
-    quicklist *ctl;
+    selist *ctl;
 
     for (i = 0; i < MAXCTHASH; ++i) {
         ctl = cursetypes[i];
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
             curse_name(type, default_locale);
 
         }
@@ -847,7 +847,7 @@ double destr_curse(curse * c, int cast_level, double force)
 void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
-        ql_free(cursetypes[i]);
+        selist_free(cursetypes[i]);
         cursetypes[i] = 0;
     }
     ++ct_changes;

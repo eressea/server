@@ -41,7 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
@@ -62,18 +62,18 @@ typedef struct building_typelist {
     building_type *type;
 } building_typelist;
 
-quicklist *buildingtypes = NULL;
+selist *buildingtypes = NULL;
 
 /* Returns a building type for the (internal) name */
 static building_type *bt_find_i(const char *name)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
     assert(name);
 
-    for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
-        building_type *btype = (building_type *)ql_get(ql, qi);
+    for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
+        building_type *btype = (building_type *)selist_get(ql, qi);
         if (strcmp(btype->_name, name) == 0)
             return btype;
     }
@@ -102,7 +102,7 @@ void bt_register(building_type * type)
     if (type->init) {
         type->init(type);
     }
-    ql_push(&buildingtypes, (void *)type);
+    selist_push(&buildingtypes, (void *)type);
     ++bt_changes;
 }
 
@@ -115,8 +115,8 @@ static void free_buildingtype(void *ptr) {
 }
 
 void free_buildingtypes(void) {
-    ql_foreach(buildingtypes, free_buildingtype);
-    ql_free(buildingtypes);
+    selist_foreach(buildingtypes, free_buildingtype);
+    selist_free(buildingtypes);
     buildingtypes = 0;
     ++bt_changes;
 }
@@ -314,15 +314,15 @@ const building_type *findbuildingtype(const char *name,
         bn = bn->next;
     }
     if (!bn) {
-        quicklist *ql = buildingtypes;
+        selist *ql = buildingtypes;
         int qi;
 
         bn = (local_names *)calloc(sizeof(local_names), 1);
         bn->next = bnames;
         bn->lang = lang;
 
-        for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
-            building_type *btype = (building_type *)ql_get(ql, qi);
+        for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
+            building_type *btype = (building_type *)selist_get(ql, qi);
 
             const char *n = LOC(lang, btype->_name);
             type.v = (void *)btype;

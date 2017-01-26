@@ -38,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/xml.h>
 
 #include <attributes/movement.h>
@@ -51,7 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-quicklist *shiptypes = NULL;
+selist *shiptypes = NULL;
 
 static local_names *snames;
 
@@ -66,15 +66,15 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
         sn = sn->next;
     }
     if (!sn) {
-        quicklist *ql;
+        selist *ql;
         int qi;
 
         sn = (local_names *)calloc(sizeof(local_names), 1);
         sn->next = snames;
         sn->lang = lang;
 
-        for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
-            ship_type *stype = (ship_type *)ql_get(ql, qi);
+        for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
+            ship_type *stype = (ship_type *)selist_get(ql, qi);
             variant var2;
             const char *n = LOC(lang, stype->_name);
             var2.v = (void *)stype;
@@ -89,11 +89,11 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
 static ship_type *st_find_i(const char *name)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
-    for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
-        ship_type *stype = (ship_type *)ql_get(ql, qi);
+    for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
+        ship_type *stype = (ship_type *)selist_get(ql, qi);
         if (strcmp(stype->_name, name) == 0) {
             return stype;
         }
@@ -111,7 +111,7 @@ ship_type *st_get_or_create(const char * name) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = _strdup(name);
         st->storm = 1.0;
-        ql_push(&shiptypes, (void *)st);
+        selist_push(&shiptypes, (void *)st);
     }
     return st;
 }
@@ -250,8 +250,8 @@ static void free_shiptype(void *ptr) {
 }
 
 void free_shiptypes(void) {
-    ql_foreach(shiptypes, free_shiptype);
-    ql_free(shiptypes);
+    selist_foreach(shiptypes, free_shiptype);
+    selist_free(shiptypes);
     shiptypes = 0;
 }
 

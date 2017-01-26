@@ -29,7 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rng.h>
 
 #include <storage.h>
@@ -345,7 +345,7 @@ attrib_type at_countdown = {
 
 void age_borders(void)
 {
-    quicklist *deleted = NULL, *ql;
+    selist *deleted = NULL, *ql;
     int i;
 
     for (i = 0; i != BORDER_MAXHASH; ++i) {
@@ -355,17 +355,17 @@ void age_borders(void)
             for (; b; b = b->next) {
                 if (b->type->age) {
                     if (b->type->age(b) == AT_AGE_REMOVE) {
-                        ql_push(&deleted, b);
+                        selist_push(&deleted, b);
                     }
                 }
             }
         }
     }
-    for (ql = deleted, i = 0; ql; ql_advance(&ql, &i, 1)) {
-        connection *b = (connection *)ql_get(ql, i);
+    for (ql = deleted, i = 0; ql; selist_advance(&ql, &i, 1)) {
+        connection *b = (connection *)selist_get(ql, i);
         erase_border(b);
     }
-    ql_free(deleted);
+    selist_free(deleted);
 }
 
 /********

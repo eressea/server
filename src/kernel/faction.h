@@ -31,6 +31,7 @@ extern "C" {
     struct seen_region;
     struct attrib_type;
     struct gamedata;
+    struct selist;
     
     extern struct attrib_type at_maxmagicians;
 
@@ -95,7 +96,7 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct quicklist *seen_factions;
+        struct selist *seen_factions;
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 

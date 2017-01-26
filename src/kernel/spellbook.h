@@ -26,7 +26,7 @@ extern "C" {
     struct spell;
     struct storage;
     struct gamedata;
-    struct quicklist;
+    struct selist;
 
     typedef struct spellbook_entry {
         struct spell * sp;
@@ -36,7 +36,7 @@ extern "C" {
     typedef struct spellbook
     {
         char * name;
-        struct quicklist * spells;
+        struct selist * spells;
     } spellbook;
 
     spellbook * create_spellbook(const char * name);

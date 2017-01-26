@@ -27,6 +27,7 @@ extern "C" {
     struct unit;
     struct faction;
     struct region;
+    struct selist;
 
     enum {
         ALLIANCE_KICK,
@@ -46,7 +47,7 @@ extern "C" {
     typedef struct alliance {
         struct alliance *next;
         struct faction *_leader;
-        struct quicklist *members;
+        struct selist *members;
         int flags;
         int id;
         char *name;

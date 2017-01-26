@@ -23,7 +23,7 @@
 #include <util/lists.h>
 #include <util/message.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <stream.h>
 #include <memstream.h>
 
@@ -108,14 +108,14 @@ static void test_seen_faction(CuTest *tc) {
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
-    CuAssertPtrEquals(tc, f2, ql_get(f1->seen_factions, 0));
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertPtrEquals(tc, f2, selist_get(f1->seen_factions, 0));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f2);
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f1);
-    CuAssertIntEquals(tc, 2, ql_length(f1->seen_factions));
-    f2 = (faction *)ql_get(f1->seen_factions, 1);
-    f1 = (faction *)ql_get(f1->seen_factions, 0);
+    CuAssertIntEquals(tc, 2, selist_length(f1->seen_factions));
+    f2 = (faction *)selist_get(f1->seen_factions, 1);
+    f1 = (faction *)selist_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
     test_cleanup();
 }

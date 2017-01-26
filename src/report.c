@@ -82,7 +82,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rng.h>
 #include <filestream.h>
 #include <stream.h>
@@ -1733,16 +1733,16 @@ static void rpline(struct stream *out)
     swrite(line, sizeof(line), 1, out);
 }
 
-static void list_address(struct stream *out, const faction * uf, quicklist * seenfactions)
+static void list_address(struct stream *out, const faction * uf, selist * seenfactions)
 {
     int qi = 0;
-    quicklist *flist = seenfactions;
+    selist *flist = seenfactions;
 
     centre(out, LOC(uf->locale, "nr_addresses"), false);
     newline(out);
 
     while (flist != NULL) {
-        const faction *f = (const faction *)ql_get(flist, qi);
+        const faction *f = (const faction *)selist_get(flist, qi);
         if (!is_monsters(f)) {
             char buf[8192];
             char label = '-';
@@ -1757,7 +1757,7 @@ static void list_address(struct stream *out, const faction * uf, quicklist * see
                 label = '+';
             paragraph(out, buf, 4, 0, label);
         }
-        ql_advance(&flist, &qi, 1);
+        selist_advance(&flist, &qi, 1);
     }
     newline(out);
     rpline(out);

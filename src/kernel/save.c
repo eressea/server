@@ -71,7 +71,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -1266,7 +1266,7 @@ faction *read_faction(struct gamedata * data)
                 assert(!al->members
                     || !"non-allied dummy-alliance has more than one member");
             }
-            ql_push(&al->members, f);
+            selist_push(&al->members, f);
         }
         else if (rule_region_owners()) {
             /* compat fix for non-allied factions */

@@ -33,14 +33,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 
 #include <stream.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 #include <string.h>
 
 static void travel_done(attrib *a) {
-    quicklist *ql = (quicklist *)a->data.v;
-    ql_free(ql);
+    selist *ql = (selist *)a->data.v;
+    selist_free(ql);
 }
 
 /*********************/
@@ -67,7 +67,7 @@ void travelthru_add(region * r, unit * u)
     region *next[MAXDIRECTIONS];
     int d;
     attrib *a;
-    quicklist *ql;
+    selist *ql;
 
     assert(r);
     assert(u);
@@ -76,10 +76,10 @@ void travelthru_add(region * r, unit * u)
     if (!a) {
         a = a_add(&r->attribs, a_new(&at_travelunit));
     }
-    ql = (quicklist *)a->data.v;
+    ql = (selist *)a->data.v;
 
     fset(r, RF_TRAVELUNIT);
-    ql_push(&ql, u);
+    selist_push(&ql, u);
     a->data.v = ql;
 
     /* the first and last region of the faction gets reset, because travelthrough
@@ -122,7 +122,7 @@ void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void
     cbdata.r = r;
     a = a_find(r->attribs, &at_travelunit);
     if (a) {
-        quicklist *ql = (quicklist *)a->data.v;
+        selist *ql = (selist *)a->data.v;
         selist_foreach_ex(ql, cb_map, &cbdata);
     }
 }

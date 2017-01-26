@@ -17,7 +17,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 
 #include <util/attrib.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rng.h>
 
 #include <kernel/building.h>
@@ -92,7 +92,7 @@ bool markets_module(void)
 
 void do_markets(void)
 {
-    quicklist *traders = 0;
+    selist *traders = 0;
     unit *markets[MAX_MARKETS];
     region *r;
     for (r = regions; r; r = r->next) {
@@ -124,7 +124,7 @@ void do_markets(void)
                         attrib *a = a_find(u->attribs, &at_market);
                         if (a == NULL) {
                             a = a_add(&u->attribs, a_new(&at_market));
-                            ql_push(&traders, u);
+                            selist_push(&traders, u);
                         }
                         items = (item *)a->data.v;
                         i_change(&items, lux, 1);
@@ -138,7 +138,7 @@ void do_markets(void)
                         attrib *a = a_find(u->attribs, &at_market);
                         if (a == NULL) {
                             a = a_add(&u->attribs, a_new(&at_market));
-                            ql_push(&traders, u);
+                            selist_push(&traders, u);
                         }
                         items = (item *)a->data.v;
                         i_change(&items, herb, 1);
@@ -151,10 +151,10 @@ void do_markets(void)
     }
 
     if (traders) {
-        quicklist *qliter = traders;
+        selist *qliter = traders;
         int qli = 0;
-        for (qli = 0; qliter; ql_advance(&qliter, &qli, 1)) {
-            unit *u = (unit *)ql_get(qliter, qli);
+        for (qli = 0; qliter; selist_advance(&qliter, &qli, 1)) {
+            unit *u = (unit *)selist_get(qliter, qli);
             attrib *a = a_find(u->attribs, &at_market);
             item *items = (item *)a->data.v;
 
@@ -176,6 +176,6 @@ void do_markets(void)
 
             a_remove(&u->attribs, a);
         }
-        ql_free(traders);
+        selist_free(traders);
     }
 }

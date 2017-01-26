@@ -13,7 +13,7 @@
 #include "monster.h"
 #include <CuTest.h>
 #include <tests.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -47,10 +47,10 @@ static void test_remove_empty_factions_alliance(CuTest *tc) {
     al = makealliance(0, "Hodor");
     setalliance(f, al);
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
-    CuAssertIntEquals(tc, 1, ql_length(al->members));
+    CuAssertIntEquals(tc, 1, selist_length(al->members));
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, al->_leader);
-    CuAssertIntEquals(tc, 0, ql_length(al->members));
+    CuAssertIntEquals(tc, 0, selist_length(al->members));
     test_cleanup();
 }
 

@@ -27,7 +27,7 @@ extern "C" {
     struct region;
     struct spell;
     struct spell_component;
-    struct quicklist;
+    struct selist;
     struct attrib_type;
 
     typedef int(*spell_f)(struct castorder * co);
@@ -50,13 +50,13 @@ extern "C" {
     struct spell * create_spell(const char * name, unsigned int id);
     struct spell * find_spell(const char *name);
     struct spell * find_spellbyid(unsigned int i);
-    void add_spell(struct quicklist **slistp, spell * sp);
+    void add_spell(struct selist **slistp, spell * sp);
     void free_spells(void);
 
     /** globals **/
     extern struct attrib_type at_unitdissolve;
     extern struct attrib_type at_wdwpyramid;
-    extern struct quicklist * spells;
+    extern struct selist * spells;
 #ifdef __cplusplus
 }
 #endif
