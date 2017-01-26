@@ -136,10 +136,12 @@ static void update_faction(sqlite3 *db, const faction *f) {
 int db_update_factions(sqlite3 * db, bool force, int game_id) {
     quicklist *ql = read_factions(db, game_id);
     faction *f;
+    if (!ql) return SQLITE_OK;
     sqlite3_exec(db, "BEGIN", 0, 0, 0);
     for (f = factions; f; f = f->next) {
         bool update = force;
         db_faction *dbf = 0;
+#ifdef SELIST_TODO
         ql_iter it = qli_init(&ql);
         while (qli_more(it)) {
             db_faction *df = (db_faction*)qli_next(&it);
@@ -151,6 +153,7 @@ int db_update_factions(sqlite3 * db, bool force, int game_id) {
                 break;
             }
         }
+#endif
         if (dbf) {
             if (dbf->uid != f->subscription) {
                 log_warning("faction %s(%d) not found in database, but matches %d\n", itoa36(f->no), f->subscription, dbf->uid);
