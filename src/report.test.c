@@ -18,7 +18,6 @@
 #include <util/lists.h>
 #include <util/message.h>
 
-#include <quicklist.h>
 #include <stream.h>
 #include <memstream.h>
 

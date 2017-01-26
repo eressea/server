@@ -225,8 +225,13 @@ building * test_create_building(region * r, const building_type * btype)
 {
     building * b;
     assert(r);
-    b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
-    b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
+    if (!btype) {
+        building_type *bt_castle = test_create_buildingtype("castle");
+        bt_castle->protection = building_protection;
+        btype = bt_castle;
+    }
+    b = new_building(btype, r, default_locale);
+    b->size = btype->maxsize > 0 ? btype->maxsize : 1;
     return b;
 }
 

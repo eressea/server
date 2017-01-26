@@ -89,7 +89,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <iniparser.h>
 /* libc includes */
 #include <assert.h>
@@ -1538,16 +1538,6 @@ int prefix_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static cmp_building_cb get_cmp_region_owner(void)
-{
-    if (rule_region_owners()) {
-        return &cmp_current_owner;
-    }
-    else {
-        return &cmp_wage;
-    }
-}
-
 int display_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -1597,15 +1587,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_REGION:
-        if (!u->building) {
-            cmistake(u, ord, 145, MSG_EVENT);
-            break;
-        }
-        if (building_owner(u->building) != u) {
-            cmistake(u, ord, 148, MSG_EVENT);
-            break;
-        }
-        if (u->building != largestbuilding(r, get_cmp_region_owner(), false)) {
+        if (u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
@@ -1892,16 +1874,7 @@ int name_cmd(struct unit *u, struct order *ord)
         break;
 
     case P_REGION:
-        if (!b) {
-            cmistake(u, ord, 145, MSG_EVENT);
-            break;
-        }
-        if (building_owner(b) != u) {
-            cmistake(u, ord, 148, MSG_EVENT);
-            break;
-        }
-
-        if (b != largestbuilding(r, get_cmp_region_owner(), false)) {
+        if (u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
@@ -3480,10 +3453,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 {
     assert(dst);
     if (src && src->spells) {
-        quicklist *ql;
+        selist *ql;
         int qi;
-        for (qi = 0, ql = src->spells; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
                 if (!spellbook_get(dst, sbe->sp)) {
                     spellbook_add(dst, sbe->sp, sbe->level);

@@ -38,7 +38,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -295,15 +295,15 @@ int sp_stun(struct castorder * co)
 /** randomly shuffle an array
  * for correctness, see Donald E. Knuth, The Art of Computer Programming
  */
-static void scramble_fighters(quicklist * ql)
+static void scramble_fighters(selist * ql)
 {
-    int qi, qlen = ql_length(ql);
+    int qi, qlen = selist_length(ql);
 
     for (qi = 0; qi != qlen; ++qi) {
         int qj = qi + (rng_int() % (qlen - qi));
-        void *a = ql_get(ql, qi);
-        void *b = ql_replace(ql, qj, a);
-        ql_replace(ql, qi, b);
+        void *a = selist_get(ql, qi);
+        void *b = selist_replace(ql, qj, a);
+        selist_replace(ql, qi, b);
     }
 }
 
@@ -314,7 +314,7 @@ int sp_combatrosthauch(struct castorder * co)
     int level = co->level;
     double power = co->force;
     battle *b = fi->side->battle;
-    quicklist *ql, *fgs;
+    selist *ql, *fgs;
     int force = lovar(power * 15);
     int qi, k = 0;
 
@@ -329,8 +329,8 @@ int sp_combatrosthauch(struct castorder * co)
     fgs = fighters(b, fi->side, FIGHT_ROW, BEHIND_ROW - 1, FS_ENEMY);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
 
         if (df->alive == 0)
             continue;
@@ -378,7 +378,7 @@ int sp_combatrosthauch(struct castorder * co)
             }
         }
     }
-    ql_free(fgs);
+    selist_free(fgs);
 
     if (k == 0) {
         /* keine Waffen mehr da, die zerst�rt werden k�nnten */
@@ -720,7 +720,7 @@ int sp_immolation(struct castorder * co)
     troop at;
     int force, qi, killed = 0;
     const char *damage;
-    quicklist *fgs, *ql;
+    selist *fgs, *ql;
     message *m;
 
     /* 2d4 HP */
@@ -740,8 +740,8 @@ int sp_immolation(struct castorder * co)
     at.index = 0;
 
     fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
         int n = df->alive - df->removed;
         troop dt;
 
@@ -755,7 +755,7 @@ int sp_immolation(struct castorder * co)
         if (force == 0)
             break;
     }
-    ql_free(fgs);
+    selist_free(fgs);
 
     m =
         msg_message("battle::combatspell", "mage spell killed", fi->unit, sp,
@@ -987,7 +987,7 @@ int sp_chaosrow(struct castorder * co)
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    quicklist *fgs, *ql;
+    selist *fgs, *ql;
     message *m;
     const char *mtype;
     int qi, k = 0;
@@ -1007,8 +1007,8 @@ int sp_chaosrow(struct castorder * co)
     fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
         int n = df->unit->number;
 
         if (df->alive == 0)
@@ -1052,7 +1052,7 @@ int sp_chaosrow(struct castorder * co)
         }
         power = MAX(0, power - n);
     }
-    ql_free(fgs);
+    selist_free(fgs);
 
     if (sp->id == SPL_CHAOSROW) {
         mtype = (k > 0) ? "sp_chaosrow_effect_1" : "sp_chaosrow_effect_0";
@@ -1077,7 +1077,7 @@ int sp_flee(struct castorder * co)
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    quicklist *fgs, *ql;
+    selist *fgs, *ql;
     int force, n, qi;
     int panik = 0;
     message *msg;
@@ -1106,8 +1106,8 @@ int sp_flee(struct castorder * co)
     fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
 
         for (n = 0; n != df->alive; ++n) {
             if (force < 0)
@@ -1128,7 +1128,7 @@ int sp_flee(struct castorder * co)
             }
         }
     }
-    ql_free(fgs);
+    selist_free(fgs);
 
     msg = msg_message("sp_flee_effect_1", "mage spell amount", mage, sp, panik);
     message_all(b, msg);
@@ -1457,7 +1457,7 @@ static void do_meffect(fighter * af, int typ, int effect, int duration)
 {
     battle *b = af->side->battle;
     meffect *me = (meffect *)malloc(sizeof(struct meffect));
-    ql_push(&b->meffects, me);
+    selist_push(&b->meffects, me);
     me->magician = af;
     me->typ = typ;
     me->effect = effect;
@@ -1654,13 +1654,13 @@ int sp_keeploot(struct castorder * co)
     return level;
 }
 
-static int heal_fighters(quicklist * fgs, int *power, bool heal_monsters)
+static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
 {
     int healhp = *power, healed = 0, qi;
-    quicklist *ql;
+    selist *ql;
 
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
 
         if (healhp <= 0)
             break;
@@ -1705,7 +1705,7 @@ int sp_healing(struct castorder * co)
     unit *mage = fi->unit;
     int j = 0;
     int healhp = (int)power * 200;
-    quicklist *fgs;
+    selist *fgs;
     message *msg;
     bool use_item = has_ao_healing(mage);
 
@@ -1723,7 +1723,7 @@ int sp_healing(struct castorder * co)
     scramble_fighters(fgs);
     j += heal_fighters(fgs, &healhp, false);
     j += heal_fighters(fgs, &healhp, true);
-    ql_free(fgs);
+    selist_free(fgs);
 
     if (j <= 0) {
         level = j;
@@ -1750,7 +1750,7 @@ int sp_undeadhero(struct castorder * co)
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     region *r = b->region;
-    quicklist *fgs, *ql;
+    selist *fgs, *ql;
     int qi, n, undead = 0;
     message *msg;
     int force = (int)get_force(power, 0);
@@ -1760,8 +1760,8 @@ int sp_undeadhero(struct castorder * co)
     fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY | FS_HELP);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; ql_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)ql_get(ql, qi);
+    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+        fighter *df = (fighter *)selist_get(ql, qi);
         unit *du = df->unit;
 
         if (force <= 0)
@@ -1832,7 +1832,7 @@ int sp_undeadhero(struct castorder * co)
             }
         }
     }
-    ql_free(fgs);
+    selist_free(fgs);
 
     level = MIN(level, undead);
     if (undead == 0) {

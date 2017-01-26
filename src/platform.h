@@ -24,10 +24,11 @@
 #endif
 
 #define UNUSED_ARG(a) (void)(a)
-#define TOLUA_CAST (char*)
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
+#define TOLUA_CAST (char*)
 
 #ifdef NO_STRDUP
 char * strdup(const char *s);

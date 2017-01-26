@@ -4,18 +4,9 @@
 [submodule "cmake"]
 	path = cmake
 	url = https://github.com/ennorehling/cmake.git
-[submodule "quicklist"]
-	path = quicklist
-	url = https://github.com/ennorehling/quicklist.git
-[submodule "critbit"]
-	path = critbit
-	url = https://github.com/ennorehling/critbit.git
 [submodule "dlmalloc"]
 	path = dlmalloc
 	url = https://github.com/ennorehling/dlmalloc.git
-[submodule "cutest"]
-	path = cutest
-	url = https://github.com/ennorehling/cutest.git
 [submodule "iniparser"]
 	path = iniparser
 	url = https://github.com/ennorehling/iniparser.git
@@ -26,3 +17,6 @@
 	path = storage
 	url = https://github.com/ennorehling/storage.git
 	branch = master
+[submodule "clibs"]
+	path = clibs
+	url = https://github.com/ennorehling/clibs
