@@ -133,47 +133,59 @@ static void update_faction(sqlite3 *db, const faction *f) {
     sqlite3_finalize(stmt);
 }
 
+struct cb_data {
+    const faction *f;
+    sqlite3 *db;
+    db_faction *dbf;
+};
+
+static bool db_faction_cb(void *el, void *arg) {
+    db_faction *df = (db_faction *)el;
+    struct cb_data *cb = (struct cb_data *)arg;
+    const faction *f = cb->f;
+
+    if (f->no == df->no || strcmp(f->email, df->email) == 0 || strcmp(f->name, df->name) == 0) {
+        cb->dbf = df;
+    }
+    if (f->subscription == df->uid) {
+        cb->dbf = df;
+        return false;
+    }
+    return true;
+}
+
 int db_update_factions(sqlite3 * db, bool force, int game_id) {
     selist *ql = read_factions(db, game_id);
-    faction *f;
-    sqlite3_exec(db, "BEGIN", 0, 0, 0);
-    for (f = factions; f; f = f->next) {
-        bool update = force;
-        db_faction *dbf = 0;
-<<<<<<< HEAD
-        ql_iter it = qli_init(&ql);
-=======
-#ifdef SELIST_TODO
-        selist_iter it = qli_init(&ql);
->>>>>>> remove quicklist shim, use selist everywhere
-        while (qli_more(it)) {
-            db_faction *df = (db_faction*)qli_next(&it);
-            if (f->no == df->no || strcmp(f->email, df->email) == 0 || strcmp(f->name, df->name) == 0) {
-                dbf = df;
+    if (ql) {
+        faction *f;
+        struct cb_data cbdata;
+        cbdata.db = db;
+        cbdata.dbf = NULL;
+        sqlite3_exec(db, "BEGIN", 0, 0, 0);
+        for (f = factions; f; f = f->next) {
+            bool update = force;
+            cbdata.f = f;
+            selist_foreach_ex(ql, db_faction_cb, &cbdata);
+            if (cbdata.dbf) {
+                const db_faction *dbf = cbdata.dbf;
+                if (dbf->uid != f->subscription) {
+                    log_warning("faction %s(%d) not found in database, but matches %d\n", itoa36(f->no), f->subscription, dbf->uid);
+                    f->subscription = dbf->uid;
+                }
+                update = (dbf->no != f->no) || (strcmp(f->email, dbf->email) != 0) || (strcmp(f->name, dbf->name) != 0);
             }
-            if (f->subscription == df->uid) {
-                dbf = df;
-                break;
+            else {
+                f->subscription = insert_faction(db, game_id, f);
+                log_warning("faction %s not found in database, created as %d\n", itoa36(f->no), f->subscription);
+                update = true;
+            }
+            if (update) {
+                update_faction(db, f);
+                log_debug("faction %s updated\n", itoa36(f->no));
             }
         }
-        if (dbf) {
-            if (dbf->uid != f->subscription) {
-                log_warning("faction %s(%d) not found in database, but matches %d\n", itoa36(f->no), f->subscription, dbf->uid);
-                f->subscription = dbf->uid;
-            }
-            update = (dbf->no != f->no) || (strcmp(f->email, dbf->email) != 0) || (strcmp(f->name, dbf->name) != 0);
-        }
-        else {
-            f->subscription = insert_faction(db, game_id, f);
-            log_warning("faction %s not found in database, created as %d\n", itoa36(f->no), f->subscription);
-            update = true;
-        }
-        if (update) {
-            update_faction(db, f);
-            log_debug("faction %s updated\n", itoa36(f->no));
-        }
+        sqlite3_exec(db, "COMMIT", 0, 0, 0);
     }
-    sqlite3_exec(db, "COMMIT", 0, 0, 0);
     return SQLITE_OK;
 }
 

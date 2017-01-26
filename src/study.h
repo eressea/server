@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
     struct unit;
-    struct quicklist;
+    struct selist;
 
     int teach_cmd(struct unit *u, struct order *ord);
     int study_cmd(struct unit *u, struct order *ord);
@@ -48,7 +48,7 @@ extern "C" {
 
 #define TEACHNUMBER 10
     typedef struct teaching_info {
-        struct quicklist *teachers;
+        struct selist *teachers;
         int value;
     } teaching_info;
 

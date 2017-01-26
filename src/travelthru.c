@@ -105,10 +105,11 @@ struct cb_data {
     struct region *r;
 };
 
-void cb_map(void *data, void *ex) {
+static bool cb_map(void *data, void *ex) {
     struct cb_data *cb = (struct cb_data *)ex;
     struct unit *u = (struct unit *)data;
     cb->call(cb->r, u, cb->data);
+    return true;
 }
 
 void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *data)
