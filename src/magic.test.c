@@ -13,7 +13,7 @@
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/language.h>
 
 #include <CuTest.h>
@@ -41,7 +41,7 @@ void test_updatespells(CuTest * tc)
     CuAssertPtrEquals(tc, 0, f->spellbook);
     pick_random_spells(f, 1, book, 1);
     CuAssertPtrNotNull(tc, f->spellbook);
-    CuAssertIntEquals(tc, 1, ql_length(f->spellbook->spells));
+    CuAssertIntEquals(tc, 1, selist_length(f->spellbook->spells));
     CuAssertPtrNotNull(tc, spellbook_get(f->spellbook, sp));
     free_spellbook(book);
     test_cleanup();
@@ -370,10 +370,10 @@ void test_hasspell(CuTest * tc)
     test_cleanup();
 }
 
-static quicklist * casts;
+static selist * casts;
 
 static int cast_fireball(struct castorder * co) {
-    ql_push(&casts, co);
+    selist_push(&casts, co);
     return 0;
 }
 
@@ -401,8 +401,8 @@ void test_multi_cast(CuTest *tc) {
     CuAssertPtrEquals(tc, casts, 0);
     magic();
     CuAssertPtrNotNull(tc, casts);
-    CuAssertIntEquals(tc, 2, ql_length(casts));
-    ql_free(casts);
+    CuAssertIntEquals(tc, 2, selist_length(casts));
+    selist_free(casts);
     test_cleanup();
 }
 

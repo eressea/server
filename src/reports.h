@@ -25,11 +25,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include <stdbool.h>
 
-struct stream;
-struct seen_region;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    struct selist;
+    struct stream;
+    struct seen_region;
 
     /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
@@ -71,7 +73,7 @@ extern "C" {
 
     typedef struct report_context {
         struct faction *f;
-        struct quicklist *addresses;
+        struct selist *addresses;
         struct region *first, *last;
         void *userdata;
         time_t report_time;

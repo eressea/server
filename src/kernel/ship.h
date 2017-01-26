@@ -63,7 +63,7 @@ extern "C" {
         struct construction *construction;  /* how to build a ship */
     } ship_type;
 
-    extern struct quicklist *shiptypes;
+    extern struct selist *shiptypes;
 
     /* Alte Schiffstypen: */
 

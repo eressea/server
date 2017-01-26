@@ -33,8 +33,6 @@ if [ ! -d $ROOT/$BUILD ]; then
   exit
 fi
 
-git submodule update
-
 echo "build eressea"
 cd $ROOT/$BUILD
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')

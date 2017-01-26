@@ -68,7 +68,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <filestream.h>
 #include <stream.h>
 
@@ -712,11 +712,11 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 
     if (book) {
         const faction * f = u->faction;
-        quicklist *ql;
+        selist *ql;
         int qi, header = 0;
 
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
@@ -1027,12 +1027,12 @@ static void show_alliances_cr(FILE * F, const faction * f)
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 /* this is a copy of laws.c->find_address output changed. */
-static void cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
+static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
 {
     int i = 0;
-    quicklist *flist = addresses;
+    selist *flist = addresses;
     while (flist) {
-        const faction *f = (const faction *)ql_get(flist, i);
+        const faction *f = (const faction *)selist_get(flist, i);
         if (uf != f) {
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
@@ -1045,7 +1045,7 @@ static void cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
                 fprintf(F, "%d;alliance\n", f->alliance->id);
             }
         }
-        ql_advance(&flist, &i, 1);
+        selist_advance(&flist, &i, 1);
     }
 }
 

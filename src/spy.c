@@ -49,8 +49,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <quicklist.h>
-
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>

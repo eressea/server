@@ -89,7 +89,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <iniparser.h>
 /* libc includes */
 #include <assert.h>
@@ -3453,10 +3453,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 {
     assert(dst);
     if (src && src->spells) {
-        quicklist *ql;
+        selist *ql;
         int qi;
-        for (qi = 0, ql = src->spells; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
                 if (!spellbook_get(dst, sbe->sp)) {
                     spellbook_add(dst, sbe->sp, sbe->level);

@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <selist.h>
 
 #include <quicklist.h>
 
@@ -222,7 +223,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
-        ql_push(&teach->teachers, teacher);
+        selist_push(&teach->teachers, teacher);
         teach->value += n;
 
         if (student->building && teacher->building == student->building) {
@@ -531,6 +532,36 @@ static bool ExpensiveMigrants(void)
 	return rule;
 }
 
+struct teach_data {
+    unit *u;
+    skill_t sk;
+};
+
+static bool cb_msg_teach(void *el, void *arg) {
+    struct teach_data *td = (struct teach_data *)arg;
+    unit *ut = (unit *)el;
+    unit * u = td->u;
+    skill_t sk = td->sk;
+    if (ut->faction != u->faction) {
+        bool feedback = alliedunit(u, ut->faction, HELP_GUARD);
+        if (feedback) {
+            ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
+                "teacher student skill level", ut, u, sk,
+                effskill(u, sk, 0)));
+        }
+        ADDMSG(&u->faction->msgs, msg_message("teach_student",
+            "teacher student skill", ut, u, sk));
+    }
+    return true;
+}
+
+static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
+    struct teach_data cbdata;
+    cbdata.sk = sk;
+    cbdata.u = u;
+    selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
+}
+
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
@@ -755,19 +786,8 @@ int study_cmd(unit * u, order * ord)
 
     learn_skill(u, sk, days);
     if (a != NULL) {
-        ql_iter qli = qli_init(&teach->teachers);
-        while (qli_more(qli)) {
-            unit *teacher = (unit *)qli_next(&qli);
-            if (teacher->faction != u->faction) {
-                bool feedback = alliedunit(u, teacher->faction, HELP_GUARD);
-                if (feedback) {
-                    ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
-                        "teacher student skill level", teacher, u, sk,
-                        effskill(u, sk, 0)));
-                }
-                ADDMSG(&u->faction->msgs, msg_message("teach_student",
-                    "teacher student skill", teacher, u, sk));
-            }
+        if (teach->teachers) {
+            msg_teachers(teach->teachers, u, sk);
         }
         a_remove(&u->attribs, a);
         a = NULL;

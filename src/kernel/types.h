@@ -43,7 +43,7 @@ struct luxury_type;
 struct order;
 struct plane;
 struct potion_type;
-struct quicklist;
+struct selist;
 struct race;
 struct region;
 struct region_list;

@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "spell.h"
 
 /* util includes */
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -99,7 +99,7 @@ void equipment_addspell(equipment * eq, const char * name, int level)
         ls->sp = NULL;
         ls->level = level;
         ls->name = strdup(name);
-        ql_push(&eq->spells, ls);
+        selist_push(&eq->spells, ls);
     }
 }
 
@@ -156,12 +156,12 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
 
         if (mask & EQUIP_SPELLS) {
             if (eq->spells) {
-                quicklist * ql = eq->spells;
+                selist * ql = eq->spells;
                 int qi;
                 sc_mage * mage = get_mage(u);
 
-                for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-                    lazy_spell *sbe = (lazy_spell *)ql_get(ql, qi);
+                for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+                    lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
                     if (!sbe->sp) {
                         sbe->sp = find_spell(sbe->name);
                         free(sbe->name);
@@ -250,8 +250,8 @@ void equipment_done(void) {
         *eqp = eq->next;
         free(eq->name);
         if (eq->spells) {
-            ql_foreach(eq->spells, free_ls);
-            ql_free(eq->spells);
+            selist_foreach(eq->spells, free_ls);
+            selist_free(eq->spells);
         }
         while (eq->items) {
             itemdata *next = eq->items->next;
