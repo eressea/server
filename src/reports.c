@@ -989,7 +989,7 @@ int cmp_faction(const void *lhs, const void *rhs) {
 }
 
 static void add_seen_faction_i(struct quicklist **flist, faction *f) {
-    ql_set_insert_ex(flist, f, cmp_faction);
+    selist_set_insert(flist, f, cmp_faction);
 }
 
 void add_seen_faction(faction *self, faction *seen) {

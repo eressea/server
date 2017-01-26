@@ -4,7 +4,7 @@
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/messages.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +15,7 @@ typedef struct transfer {
     int amount;
 } transfer;
 
-static quicklist *transfers = 0;
+static selist *transfers = 0;
 
 int cmp_transfer(const void *v1, const void *v2) {
     const transfer *t1 = (const transfer *)v1;
@@ -35,22 +35,22 @@ int cmp_transfer(const void *v1, const void *v2) {
 void add_donation(faction * f1, faction * f2, int amount, region * r)
 {
     transfer tr, *tf;
-    quicklist *ql = transfers;
+    selist *ql = transfers;
     int qi = 0;
 
     tr.r = r;
     tr.f1 = f1;
     tr.f2 = f2;
     tr.amount = amount;
-    if (ql_set_find_ex(&ql, &qi, &tr, cmp_transfer)) {
-        tf = (transfer *)ql_get(ql, qi);
+    if (selist_set_find(&ql, &qi, &tr, cmp_transfer)) {
+        tf = (transfer *)selist_get(ql, qi);
         tf->amount += amount;
     }
     else {
         tf = malloc(sizeof(transfer));
         memcpy(tf, &tr, sizeof(transfer));
     }
-    ql_set_insert_ex(&transfers, tf, cmp_transfer);
+    selist_set_insert(&transfers, tf, cmp_transfer);
 }
 
 void free_donations(void) {
