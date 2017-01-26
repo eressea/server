@@ -215,7 +215,7 @@ const message_type *mt_register(message_type * type)
     unsigned int hash = hashstring(type->name) % MT_MAXHASH;
     quicklist **qlp = messagetypes + hash;
 
-    if (ql_set_insert(qlp, type)) {
+    if (selist_set_insert(qlp, type, NULL)) {
         type->key = mt_id(type);
     }
     return type;

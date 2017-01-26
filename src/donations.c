@@ -59,22 +59,18 @@ void free_donations(void) {
     transfers = 0;
 }
 
-static void report_transfer(faction *f1, faction *f2, region *r, int amount) {
-    struct message *msg = msg_message("donation",
-        "from to amount", f1, f2, amount);
-    r_addmessage(r, f1, msg);
-    r_addmessage(r, f2, msg);
-    msg_release(msg);
+static void report_transfer(void *data) {
+    transfer *tf = (transfer *)data;
+    if (tf->amount > 0) {
+        struct message *msg = msg_message("donation",
+             "from to amount", tf->f1, tf->f2, tf->amount);
+        r_addmessage(tf->r, tf->f1, msg);
+        r_addmessage(tf->r, tf->f2, msg);
+        msg_release(msg);
+    }
 }
 
 void report_donations(void)
 {
-    ql_iter qli = qli_init(&transfers);
-
-    while (qli_more(qli)) {
-        transfer *tf = (transfer *)qli_next(&qli);
-        if (tf->amount > 0) {
-            report_transfer(tf->f1, tf->f2, tf->r, tf->amount);
-        }
-    }
+    selist_foreach(transfers, report_transfer);
 }

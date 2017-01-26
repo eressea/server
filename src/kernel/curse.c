@@ -308,7 +308,7 @@ void ct_register(const curse_type * ct)
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
     quicklist **ctlp = cursetypes + hash;
 
-    ql_set_insert(ctlp, (void *)ct);
+    selist_set_insert(ctlp, (void *)ct, NULL);
     ++ct_changes;
 }
 

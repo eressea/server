@@ -99,18 +99,30 @@ bool travelthru_cansee(const struct region *r, const struct faction *f, const st
     return false;
 }
 
-void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *cbdata)
+struct cb_data {
+    void(*call)(region *, struct unit *, void *);
+    void *data;
+    struct region *r;
+};
+
+void cb_map(void *data, void *ex) {
+    struct cb_data *cb = (struct cb_data *)ex;
+    struct unit *u = (struct unit *)data;
+    cb->call(cb->r, u, cb->data);
+}
+
+void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *data)
 {
     attrib *a;
+    struct cb_data cbdata;
+    
     assert(r);
+    cbdata.call = cb;
+    cbdata.data = data;
+    cbdata.r = r;
     a = a_find(r->attribs, &at_travelunit);
     if (a) {
-        quicklist *ql;
-        ql_iter qi;
-        ql = (quicklist *)a->data.v;
-        for (qi = qli_init(&ql); qli_more(qi);) {
-            unit *u = (unit *)qli_next(&qi);
-            cb(r, u, cbdata);
-        }
+        quicklist *ql = (quicklist *)a->data.v;
+        selist_foreach_ex(ql, cb_map, &cbdata);
     }
 }
