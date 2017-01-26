@@ -6,7 +6,7 @@
 #include <util/log.h>
 #include <util/base36.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <sqlite3.h>
 #include <assert.h>
 #include <string.h>
@@ -72,10 +72,10 @@ typedef struct db_faction {
     char *name;
 } db_faction;
 
-static struct quicklist *
+static struct selist *
 read_factions(sqlite3 * db, int game_id) {
     int res;
-    quicklist *result = 0;
+    selist *result = 0;
     const char * sql =
         "SELECT f.id, fd.code, fd.name, fd.email FROM faction f"
         " LEFT OUTER JOIN faction_data fd"
@@ -97,7 +97,7 @@ read_factions(sqlite3 * db, int game_id) {
         if (text) dbf->name = strdup(text);
         text = (const char *)sqlite3_column_text(stmt, 3);
         if (text) dbf->email = strdup(text);
-        ql_push(&result, dbf);
+        selist_push(&result, dbf);
         res = sqlite3_step(stmt);
     }
     sqlite3_finalize(stmt);
@@ -134,13 +134,18 @@ static void update_faction(sqlite3 *db, const faction *f) {
 }
 
 int db_update_factions(sqlite3 * db, bool force, int game_id) {
-    quicklist *ql = read_factions(db, game_id);
+    selist *ql = read_factions(db, game_id);
     faction *f;
     sqlite3_exec(db, "BEGIN", 0, 0, 0);
     for (f = factions; f; f = f->next) {
         bool update = force;
         db_faction *dbf = 0;
+<<<<<<< HEAD
         ql_iter it = qli_init(&ql);
+=======
+#ifdef SELIST_TODO
+        selist_iter it = qli_init(&ql);
+>>>>>>> remove quicklist shim, use selist everywhere
         while (qli_more(it)) {
             db_faction *df = (db_faction*)qli_next(&it);
             if (f->no == df->no || strcmp(f->email, df->email) == 0 || strcmp(f->name, df->name) == 0) {
@@ -175,12 +180,12 @@ int db_update_factions(sqlite3 * db, bool force, int game_id) {
 int db_update_scores(sqlite3 * db, bool force)
 {
     /*
-    const char *sql_ins =
+    const char *sselist_ins =
     "INSERT OR FAIL INTO score (value,faction_id,turn) VALUES (?,?,?)";
-    sqlite3_stmt *stmt_ins = stmt_cache_get(db, sql_ins);
-    const char *sql_upd =
+    sqlite3_stmt *stmt_ins = stmt_cache_get(db, sselist_ins);
+    const char *sselist_upd =
     "UPDATE score set value=? WHERE faction_id=? AND turn=?";
-    sqlite3_stmt *stmt_upd = stmt_cache_get(db, sql_upd);
+    sqlite3_stmt *stmt_upd = stmt_cache_get(db, sselist_upd);
     faction *f;
     sqlite3_exec(db, "BEGIN", 0, 0, 0);
     for (f = factions; f; f = f->next) {

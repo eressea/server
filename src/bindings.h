@@ -15,8 +15,8 @@ extern "C" {
 #endif
 
     struct lua_State;
-    struct selist;
     struct _dictionary_;
+    struct selist;
 
     int tolua_sqlite_open(struct lua_State *L);
     int tolua_bindings_open(struct lua_State *L, const struct _dictionary_ *d);
