@@ -19,7 +19,7 @@
 #include <tests.h>
 
 #include <CuTest.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 
@@ -539,9 +539,9 @@ static void test_teach_message(CuTest *tc) {
     teach = (teaching_info *)a->data.v;
     CuAssertPtrNotNull(tc, teach->teachers);
     CuAssertIntEquals(tc, 600, teach->value);
-    CuAssertIntEquals(tc, 2, ql_length(teach->teachers));
-    CuAssertPtrEquals(tc, u1, ql_get(teach->teachers, 0));
-    CuAssertPtrEquals(tc, u2, ql_get(teach->teachers, 1));
+    CuAssertIntEquals(tc, 2, selist_length(teach->teachers));
+    CuAssertPtrEquals(tc, u1, selist_get(teach->teachers, 0));
+    CuAssertPtrEquals(tc, u2, selist_get(teach->teachers, 1));
     study_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u1->faction->msgs, "teach_teacher"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "teach_teacher"));

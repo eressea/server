@@ -51,7 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <storage.h>
 
 /* libc includes */
@@ -102,7 +102,7 @@ static void free_faction(faction * f)
     free(f->_password);
     free(f->name);
     if (f->seen_factions) {
-        ql_free(f->seen_factions);
+        selist_free(f->seen_factions);
         f->seen_factions = 0;
     }
 
@@ -366,7 +366,7 @@ void destroyfaction(faction ** fp)
     }
 
     if (f->seen_factions) {
-        ql_free(f->seen_factions);
+        selist_free(f->seen_factions);
         f->seen_factions = 0;
     }
 
@@ -593,11 +593,11 @@ static int allied_skillcount(const faction * f, skill_t sk)
 {
     int num = 0;
     alliance *a = f_get_alliance(f);
-    quicklist *members = a->members;
+    selist *members = a->members;
     int qi;
 
-    for (qi = 0; members; ql_advance(&members, &qi, 1)) {
-        faction *m = (faction *)ql_get(members, qi);
+    for (qi = 0; members; selist_advance(&members, &qi, 1)) {
+        faction *m = (faction *)selist_get(members, qi);
         num += count_skill(m, sk);
     }
     return num;

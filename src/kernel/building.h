@@ -82,7 +82,7 @@ extern "C" {
         struct attrib *attribs;
     } building_type;
 
-    extern struct quicklist *buildingtypes;
+    extern struct selist *buildingtypes;
     extern struct attrib_type at_building_action;
 
     int cmp_castle_size(const struct building * b, const struct building * a);

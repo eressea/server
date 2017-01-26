@@ -7,7 +7,7 @@
 #include "alliance.h"
 #include <CuTest.h>
 #include <tests.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 
@@ -76,10 +76,10 @@ static void test_alliance_dead_faction(CuTest *tc) {
     setalliance(f, al);
     setalliance(f2, al);
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
-    CuAssertIntEquals(tc, 2, ql_length(al->members));
+    CuAssertIntEquals(tc, 2, selist_length(al->members));
     CuAssertPtrEquals(tc, al, f->alliance);
     destroyfaction(&factions);
-    CuAssertIntEquals(tc, 1, ql_length(al->members));
+    CuAssertIntEquals(tc, 1, selist_length(al->members));
     CuAssertPtrEquals(tc, f2, alliance_get_leader(al));
     CuAssertPtrEquals(tc, NULL, f->alliance);
     CuAssertTrue(tc, !f->_alive);

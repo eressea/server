@@ -7,8 +7,6 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 
-#include <quicklist.h>
-
 #include <CuTest.h>
 #include <tests.h>
 

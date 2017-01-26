@@ -65,7 +65,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -451,11 +451,11 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 {
     int max_affinity = 0;
     region *max_region = NULL;
-    quicklist *ql, *rlist = regions_in_range(r, range, allowed_dragon);
+    selist *ql, *rlist = regions_in_range(r, range, allowed_dragon);
     int qi;
 
-    for (qi = 0, ql = rlist; ql; ql_advance(&ql, &qi, 1)) {
-        region *r2 = (region *)ql_get(ql, qi);
+    for (qi = 0, ql = rlist; ql; selist_advance(&ql, &qi, 1)) {
+        region *r2 = (region *)selist_get(ql, qi);
         int affinity = dragon_affinity_value(r2, u);
         if (affinity > max_affinity) {
             max_affinity = affinity;
@@ -463,7 +463,7 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
         }
     }
 
-    ql_free(rlist);
+    selist_free(rlist);
 
     if (max_region && max_region != r) {
         attrib *a = a_find(u->attribs, &at_targetregion);

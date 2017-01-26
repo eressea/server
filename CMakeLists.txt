@@ -6,7 +6,6 @@ endif(WIN32)
 
 project (eressea-server C)
 
-
 enable_testing()
 find_package (LibXml2)
 find_package (SQLite3)
@@ -14,12 +13,10 @@ find_package (Curses)
 find_package (Lua REQUIRED)
 find_package (ToLua REQUIRED)
 
-add_subdirectory (cutest)
 add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)
-add_subdirectory (quicklist)
-add_subdirectory (critbit)
+add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")

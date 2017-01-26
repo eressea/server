@@ -16,7 +16,7 @@
 
 #include "strings.h"
 #include "log.h"
-#include "quicklist.h"
+#include "selist.h"
 
 /* libc includes */
 #include <assert.h>
@@ -162,7 +162,7 @@ message *msg_create(const struct message_type *mtype, variant args[])
 }
 
 #define MT_MAXHASH 1021
-static quicklist *messagetypes[MT_MAXHASH];
+static selist *messagetypes[MT_MAXHASH];
 
 static void mt_free(void *val) {
     message_type *mtype = (message_type *)val;
@@ -179,9 +179,9 @@ static void mt_free(void *val) {
 void mt_clear(void) {
     int i;
     for (i = 0; i != MT_MAXHASH; ++i) {
-        quicklist *ql = messagetypes[i];
-        ql_foreach(ql, mt_free);
-        ql_free(ql);
+        selist *ql = messagetypes[i];
+        selist_foreach(ql, mt_free);
+        selist_free(ql);
         messagetypes[i] = 0;
     }
 }
@@ -189,11 +189,11 @@ void mt_clear(void) {
 const message_type *mt_find(const char *name)
 {
     unsigned int hash = hashstring(name) % MT_MAXHASH;
-    quicklist *ql = messagetypes[hash];
+    selist *ql = messagetypes[hash];
     int qi;
 
-    for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        message_type *data = (message_type *)ql_get(ql, qi);
+    for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        message_type *data = (message_type *)selist_get(ql, qi);
         if (strcmp(data->name, name) == 0) {
             return data;
         }
@@ -215,9 +215,9 @@ static unsigned int mt_id(const message_type * mtype)
 const message_type *mt_register(message_type * type)
 {
     unsigned int hash = hashstring(type->name) % MT_MAXHASH;
-    quicklist **qlp = messagetypes + hash;
+    selist **qlp = messagetypes + hash;
 
-    if (ql_set_insert(qlp, type)) {
+    if (selist_set_insert(qlp, type, NULL)) {
         type->key = mt_id(type);
     }
     return type;
