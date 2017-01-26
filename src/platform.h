@@ -3,7 +3,6 @@
 #ifndef UNILIB_H
 #define UNILIB_H
 
-#define _POSIX_C_SOURCE 200809L
 #ifdef _MSC_VER
 #ifndef __STDC__
 #define __STDC__ 1 // equivalent to /Za
@@ -17,6 +16,8 @@
 #pragma warning(disable: 4457) // declaration hides function parameter
 #pragma warning(disable: 4459) // declaration hides global
 #endif
+
+#define _POSIX_C_SOURCE 200809L
 
 #ifndef MAX_PATH
 # define MAX_PATH 4096
