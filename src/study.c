@@ -54,8 +54,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <selist.h>
 
-#include <quicklist.h>
-
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
