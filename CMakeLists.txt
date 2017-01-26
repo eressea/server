@@ -64,7 +64,6 @@ INCLUDE_DIRECTORIES (${CMAKE_BINARY_DIR}/include)
 ## skip compiler/libc detection and force cmake autoconf:
 #add_definitions(-DUSE_AUTOCONF)
 
-add_subdirectory (cutest)
 add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)

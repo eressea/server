@@ -7,9 +7,6 @@
 [submodule "dlmalloc"]
 	path = dlmalloc
 	url = https://github.com/ennorehling/dlmalloc.git
-[submodule "cutest"]
-	path = cutest
-	url = https://github.com/ennorehling/cutest.git
 [submodule "iniparser"]
 	path = iniparser
 	url = https://github.com/ennorehling/iniparser.git
