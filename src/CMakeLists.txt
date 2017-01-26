@@ -88,6 +88,7 @@ set (ERESSEA_SRC
   move.c
   piracy.c
   spells.c
+  quicklist.c
   battle.c
   alchemy.c
   academy.c

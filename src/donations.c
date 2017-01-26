@@ -54,8 +54,8 @@ void add_donation(faction * f1, faction * f2, int amount, region * r)
 }
 
 void free_donations(void) {
-    ql_foreach(transfers, free);
-    ql_free(transfers);
+    selist_foreach(transfers, free);
+    selist_free(transfers);
     transfers = 0;
 }
 
