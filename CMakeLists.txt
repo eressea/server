@@ -6,7 +6,6 @@ endif(WIN32)
 
 project (eressea-server C)
 
-
 enable_testing()
 find_package (LibXml2)
 find_package (SQLite3)
