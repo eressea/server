@@ -45,6 +45,15 @@ extern "C" {
         fumble_f fumble;
     } spell;
 
+    typedef struct spellref {
+        char * name;
+        struct spell *sp;
+    } spellref;
+
+    struct spellref *spellref_create(const char *name);
+    void spellref_free(struct spellref *spref);
+    struct spell *spellref_get(struct spellref *spref);
+
     int sp_antimagiczone(struct castorder *co);
 
     struct spell * create_spell(const char * name, unsigned int id);

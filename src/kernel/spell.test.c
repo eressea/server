@@ -69,9 +69,26 @@ static void test_create_spell_with_id(CuTest * tc)
     test_cleanup();
 }
 
+static void test_spellref(CuTest *tc)
+{
+    spellref *ref;
+    spell *sp;
+    test_setup();
+    ref = spellref_create("hodor");
+    CuAssertPtrNotNull(tc, ref);
+    CuAssertPtrEquals(tc, NULL, spellref_get(ref));
+    sp = create_spell("hodor", 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertPtrEquals(tc, sp, spellref_get(ref));
+    CuAssertPtrEquals(tc, NULL, ref->name);
+    spellref_free(ref);
+    test_cleanup();
+}
+
 CuSuite *get_spell_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_spellref);
     SUITE_ADD_TEST(suite, test_create_a_spell);
     SUITE_ADD_TEST(suite, test_create_duplicate_spell);
     SUITE_ADD_TEST(suite, test_create_spell_with_id);

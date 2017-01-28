@@ -560,8 +560,11 @@ const spell *get_combatspell(const unit * u, int nr)
     if (m) {
         return m->combatspells[nr].sp;
     }
-    else if (u_race(u)->precombatspell != NULL) {
-        return u_race(u)->precombatspell;
+    else {
+        const race * rc = u_race(u);
+        if (rc->precombatspell) {
+            return spellref_get(rc->precombatspell);
+        }
     }
 
     return NULL;

@@ -32,6 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
+#include "spell.h"
 #include "terrain.h"
 #include "unit.h"
 
@@ -182,6 +183,7 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 void free_races(void) {
     while (races) {
         race * rc = races->next;
+        spellref_free(races->precombatspell);
         free_params(&races->parameters);
         free(xrefs);
         xrefs = 0;

@@ -45,6 +45,7 @@ extern "C" {
 
     struct param;
     struct spell;
+    struct spellref;
     struct locale;
 
     extern int num_races;
@@ -137,7 +138,7 @@ extern "C" {
         int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
         int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
         struct param *parameters;   // additional properties, for an example see natural_armor
-        const struct spell *precombatspell;
+        struct spellref *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
         int battle_flags;

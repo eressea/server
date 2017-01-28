@@ -87,6 +87,17 @@ static const spell *xml_spell(xmlNode * node, const char *name)
     return sp;
 }
 
+static spellref *xml_spellref(xmlNode * node, const char *name)
+{
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+    if (propValue != NULL) {
+        spellref *ref = spellref_create((const char *)propValue);
+        xmlFree(propValue);
+        return ref;
+    }
+    return NULL;
+}
+
 static xmlChar *xml_cleanup_string(xmlChar * str)
 {
     xmlChar *read = str;
@@ -1853,7 +1864,7 @@ static int parse_races(xmlDocPtr doc)
             || !"precombatspell is already initialized");
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
-            rc->precombatspell = xml_spell(node, "spell");
+            rc->precombatspell = xml_spellref(node, "spell");
         }
         xmlXPathFreeObject(result);
 
@@ -2076,10 +2087,10 @@ void register_xmlreader(void)
 
     xml_register_callback(parse_buildings);       /* requires resources */
     xml_register_callback(parse_ships);   /* requires terrains */
+    xml_register_callback(parse_races);   /* requires spells */
     xml_register_callback(parse_spells);  /* requires resources */
     xml_register_callback(parse_spellbooks);  /* requires spells */
     xml_register_callback(parse_equipment);       /* requires spells */
-    xml_register_callback(parse_races);   /* requires spells */
     xml_register_callback(parse_calendar);
 }
 #endif
