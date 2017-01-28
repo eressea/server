@@ -25,6 +25,8 @@
         "jsreport"
     ],
     "settings": {
+        "game.name" : "Eressea",
+        "game.id" : 4,
         "orders.default": "work",
         "database.gameid": 7,
         "NewbieImmunity": 4,
