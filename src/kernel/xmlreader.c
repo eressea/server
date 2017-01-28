@@ -75,18 +75,6 @@ static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
     *text = xmlNodeListGetString(node->doc, node->children, 1);
 }
 
-static const spell *xml_spell(xmlNode * node, const char *name)
-{
-    const spell *sp = NULL;
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
-    if (propValue != NULL) {
-        sp = find_spell((const char *)propValue);
-        assert(sp);
-        xmlFree(propValue);
-    }
-    return sp;
-}
-
 static spellref *xml_spellref(xmlNode * node, const char *name)
 {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
