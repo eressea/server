@@ -182,7 +182,12 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 
 void free_races(void) {
     while (races) {
+        int i;
         race * rc = races->next;
+        
+        for (i = 0; races->attack[i].type!=AT_NONE; ++i) {
+            spellref_free(races->attack[i].data.sp);
+        }
         spellref_free(races->precombatspell);
         free_params(&races->parameters);
         free(xrefs);

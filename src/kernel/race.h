@@ -105,7 +105,7 @@ extern "C" {
         int type;
         union {
             const char *dice;
-            const struct spell *sp;
+            struct spellref *sp;
         } data;
         int flags;
         int level;
