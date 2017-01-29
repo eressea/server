@@ -385,6 +385,34 @@ static void test_study_cost(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_teach_magic(CuTest *tc) {
+    unit *u, *ut;
+    faction *f;
+    const struct item_type *itype;
+
+    test_setup();
+    init_resources();
+    itype = get_resourcetype(R_SILVER)->itype;
+    f = test_create_faction(0);
+    f->magiegebiet = M_GWYRRD;
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u->thisorder = create_order(K_STUDY, f->locale, "%s", skillnames[SK_MAGIC]);
+    i_change(&u->items, itype, study_cost(u, SK_MAGIC));
+    ut = test_create_unit(f, u->region);
+    set_level(ut, SK_MAGIC, TEACHDIFFERENCE);
+    create_mage(ut, M_GWYRRD);
+    ut->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(u->no));
+    learn_inject();
+    teach_cmd(ut, ut->thisorder);
+    study_cmd(u, u->thisorder);
+    learn_reset();
+    CuAssertPtrEquals(tc, u, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_MAGIC, log_learners[0].sk);
+    CuAssertIntEquals(tc, STUDYDAYS*2, log_learners[0].days);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    test_cleanup();
+}
+
 static void test_teach_cmd(CuTest *tc) {
     unit *u, *ut;
     test_setup();
@@ -596,6 +624,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_cost);
     SUITE_ADD_TEST(suite, test_study_magic);
     SUITE_ADD_TEST(suite, test_teach_cmd);
+    SUITE_ADD_TEST(suite, test_teach_magic);
     SUITE_ADD_TEST(suite, test_teach_two);
     SUITE_ADD_TEST(suite, test_teach_one_to_many);
     SUITE_ADD_TEST(suite, test_teach_many_to_one);
