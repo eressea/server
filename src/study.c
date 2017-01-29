@@ -462,8 +462,8 @@ int teach_cmd(unit * u, struct order *ord)
                  * Lehrer seines Gebietes */
                 sc_mage *mage1 = get_mage(u);
                 sc_mage *mage2 = get_mage(u2);
-                if (!mage2 || !mage1 || (mage2->magietyp != M_GRAY
-                    && mage1->magietyp != mage2->magietyp)) {
+                if (mage2 && mage1 && mage2->magietyp != M_GRAY
+                    && mage1->magietyp != mage2->magietyp) {
                     if (feedback) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                             "error_different_magic", "target", u2));
