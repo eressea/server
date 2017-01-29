@@ -1480,15 +1480,9 @@ void default_name(const unit *u, char name[], int len) {
 
 void name_unit(unit * u)
 {
-    if (u_race(u)->generate_name) {
-        char *gen_name = race_namegen(u_race(u), u);
-        if (gen_name) {
-            free(u->_name);
-            u->_name = gen_name;
-        }
-        else {
-            unit_setname(u, racename(u->faction->locale, u, u_race(u)));
-        }
+    const race *rc = u_race(u);
+    if (rc->generate_name) {
+        rc->generate_name(u);
     }
     else {
         char name[32];

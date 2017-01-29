@@ -221,11 +221,7 @@ const char *silbe3[SIL3] = {
 
 static void generic_name(unit * u)
 {
-    const char * name = rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL);
-    name = LOC(u->faction->locale, name);
-    if (name) {
-        unit_setname(u, name);
-    }
+    unit_setname(u, NULL);
 }
 
 static void dragon_name(unit * u)

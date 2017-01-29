@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <math.h>
 
-const attrib_type at_lighthouse = {
+attrib_type at_lighthouse = {
     "lighthouse"
     /* Rest ist NULL; tempor�res, nicht alterndes Attribut */
 };

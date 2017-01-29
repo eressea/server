@@ -571,7 +571,7 @@ direction_t reldirection(const region * from, const region * to)
     return NODIRECTION;
 }
 
-static void leave_trail(ship * sh, region * from, region_list * route)
+void leave_trail(ship * sh, region * from, region_list * route)
 {
     region *r = from;
 
@@ -595,7 +595,7 @@ static void leave_trail(ship * sh, region * from, region_list * route)
                 a = a->next;
             }
 
-            if (a == NULL) {
+            if (a == NULL || a->type != &at_shiptrail) {
                 a = a_add(&(r->attribs), a_new(&at_shiptrail));
                 td = (traveldir *)a->data.v;
                 td->no = sh->no;
