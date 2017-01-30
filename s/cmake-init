@@ -1,13 +1,6 @@
 #!/bin/sh
-ROOT=$(pwd)
-while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
-  if [ "$ROOT" == "/" ; then
-    echo "could not find root, are you in the git repository?"
-    exit
-  fi
-done
 
+ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
