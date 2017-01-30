@@ -15,6 +15,11 @@ set_source_files_properties(kernel/version.c PROPERTIES
 COMPILE_DEFINITIONS ERESSEA_VERSION="${ERESSEA_VERSION}")
 ENDIF()
 
+IF(DEFINED ERESSEA_BUILDNO)
+set_source_files_properties(kernel/version.c PROPERTIES
+COMPILE_DEFINITIONS ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
+ENDIF()
+
 IF (CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
 ENDIF()
