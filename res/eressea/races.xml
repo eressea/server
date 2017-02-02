@@ -1150,7 +1150,7 @@
     <attack type="6" spell="fiery_dragonbreath" level="3" />
     <attack type="8" damage="1d10"/>
   </race>
-  <race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="snotling" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="50" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="no" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="1"/>
