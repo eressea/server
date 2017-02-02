@@ -718,6 +718,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
+                // TODO: no need to deref spref here, spref->name == sp->sname
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
