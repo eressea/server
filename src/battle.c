@@ -1858,10 +1858,13 @@ static void do_combatspell(troop at)
 
 static void do_extra_spell(troop at, const att * a)
 {
-    const spell *sp = a->data.sp;
+    const spell *sp = spellref_get(a->data.sp);
 
-    if (sp->cast == NULL) {
-        log_error("spell '%s' has no function.\n", sp->sname);
+    if (!sp) {
+        log_error("no such spell: '%s'", a->data.sp->name);
+    }
+    else if (sp->cast == NULL) {
+        log_error("spell '%s' has no function.", sp->sname);
     }
     else {
         assert(a->level > 0);

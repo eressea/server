@@ -75,16 +75,15 @@ static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
     *text = xmlNodeListGetString(node->doc, node->children, 1);
 }
 
-static const spell *xml_spell(xmlNode * node, const char *name)
+static spellref *xml_spellref(xmlNode * node, const char *name)
 {
-    const spell *sp = NULL;
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
     if (propValue != NULL) {
-        sp = find_spell((const char *)propValue);
-        assert(sp);
+        spellref *ref = spellref_create(NULL, (const char *)propValue);
         xmlFree(propValue);
+        return ref;
     }
-    return sp;
+    return NULL;
 }
 
 static xmlChar *xml_cleanup_string(xmlChar * str)
@@ -1853,7 +1852,7 @@ static int parse_races(xmlDocPtr doc)
             || !"precombatspell is already initialized");
         for (k = 0; k != result->nodesetval->nodeNr; ++k) {
             xmlNodePtr node = result->nodesetval->nodeTab[k];
-            rc->precombatspell = xml_spell(node, "spell");
+            rc->precombatspell = xml_spellref(node, "spell");
         }
         xmlXPathFreeObject(result);
 
@@ -1878,11 +1877,11 @@ static int parse_races(xmlDocPtr doc)
                 xmlFree(propValue);
             }
             else {
-                attack->data.sp = xml_spell(node, "spell");
+                attack->data.sp = xml_spellref(node, "spell");
                 if (attack->data.sp) {
                     attack->level = xml_ivalue(node, "level", 0);
                     if (attack->level <= 0) {
-                        log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->sname, rc->_name, attack->level);
+                        log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->name, rc->_name, attack->level);
                     }
                 }
             }
@@ -2069,17 +2068,20 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_strings);
-    xml_register_callback(parse_messages);
-    xml_register_callback(parse_resources);
     xml_register_callback(parse_rules);
 
-    xml_register_callback(parse_buildings);       /* requires resources */
-    xml_register_callback(parse_ships);   /* requires terrains */
-    xml_register_callback(parse_spells);  /* requires resources */
-    xml_register_callback(parse_spellbooks);  /* requires spells */
-    xml_register_callback(parse_equipment);       /* requires spells */
-    xml_register_callback(parse_races);   /* requires spells */
+    xml_register_callback(parse_races);
     xml_register_callback(parse_calendar);
+    xml_register_callback(parse_resources);
+
+    xml_register_callback(parse_buildings); /* requires resources */
+    xml_register_callback(parse_ships);     /* requires resources, terrains */
+    xml_register_callback(parse_equipment); /* requires resources */
+
+    xml_register_callback(parse_spells); /* requires resources */
+    xml_register_callback(parse_spellbooks);  /* requires spells */
+
+    xml_register_callback(parse_strings);
+    xml_register_callback(parse_messages);
 }
 #endif

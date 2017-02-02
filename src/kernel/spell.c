@@ -145,3 +145,39 @@ spell *find_spellbyid(unsigned int id)
     log_warning("cannot find spell by id: %u\n", id);
     return NULL;
 }
+
+struct spellref *spellref_create(spell *sp, const char *name)
+{
+    spellref *spref = malloc(sizeof(spellref));
+
+    if (sp) {
+        spref->sp = sp;
+        spref->name = strdup(sp->sname);
+    }
+    else if (name) {
+        spref->name = strdup(name);
+        spref->sp = NULL;
+    }
+    return spref;
+}
+
+void spellref_free(spellref *spref)
+{
+    if (spref) {
+        free(spref->name);
+        free(spref);
+    }
+}
+
+struct spell *spellref_get(struct spellref *spref)
+{
+    if (!spref->sp) {
+        assert(spref->name);
+        spref->sp = find_spell(spref->name);
+        if (spref->sp) {
+            free(spref->name);
+            spref->name = NULL;
+        }
+    }
+    return spref->sp;
+}

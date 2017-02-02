@@ -430,7 +430,6 @@ void show_new_spells(faction * f, int level, const spellbook *book)
         for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= level) {
-
                 if (!already_seen(f, sbe->sp)) {
                     attrib * a = a_new(&at_reportspell);
                     spellbook_entry * entry = (spellbook_entry *)a->data.v;
@@ -481,13 +480,15 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                     commonspells[maxspell] = sbe;
                     sbe = 0;
                 }
-                else if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                    // already have this spell, remove it from the list of candidates
-                    commonspells[spellno] = commonspells[--numspells];
-                    if (maxspell > numspells) {
-                        maxspell = numspells;
+                else {
+                    if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
+                        // already have this spell, remove it from the list of candidates
+                        commonspells[spellno] = commonspells[--numspells];
+                        if (maxspell > numspells) {
+                            maxspell = numspells;
+                        }
+                        sbe = 0;
                     }
-                    sbe = 0;
                 }
             }
 
@@ -560,8 +561,11 @@ const spell *get_combatspell(const unit * u, int nr)
     if (m) {
         return m->combatspells[nr].sp;
     }
-    else if (u_race(u)->precombatspell != NULL) {
-        return u_race(u)->precombatspell;
+    else {
+        const race * rc = u_race(u);
+        if (rc->precombatspell) {
+            return spellref_get(rc->precombatspell);
+        }
     }
 
     return NULL;
@@ -2945,6 +2949,7 @@ const char *spell_info(const spell * sp, const struct locale *lang)
     return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
+// TODO: should take the name, not the spell (spellref optimizations)
 const char *spell_name(const spell * sp, const struct locale *lang)
 {
     return LOC(lang, mkname("spell", sp->sname));
@@ -2964,15 +2969,14 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
 
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-        spell *sp = sbe->sp;
 
-        const char *n = spell_name(sp, lang);
+        const char *n = spell_name(sbe->sp, lang);
         if (!n) {
-            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sbe->sp->sname);
         }
         else {
             variant token;
-            token.v = sp;
+            token.v = sbe->sp;
             addtoken((struct tnode **)tokens, n, token);
         }
     }

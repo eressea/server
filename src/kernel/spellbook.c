@@ -71,7 +71,7 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     WRITE_TOK(store, "end");
 }
 
-void spellbook_add(spellbook *sb, struct spell * sp, int level)
+void spellbook_add(spellbook *sb, spell *sp, int level)
 {
     spellbook_entry * sbe;
 
@@ -116,7 +116,7 @@ int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), 
     return 0;
 }
 
-spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp)
+spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp)
 {
     if (sb) {
         selist *ql;
@@ -124,11 +124,10 @@ spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp)
 
         for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            if (sp == sbe->sp) {
+            if (sbe->sp==sp) {
                 return sbe;
             }
         }
     }
     return 0;
 }
-

@@ -8,6 +8,8 @@
         "jsreport"
     ],
     "settings": {
+        "game.name" : "Eressea",
+        "game.id" : 2,
         "orders.default": "work",
         "NewbieImmunity": 8,
         "modules.wormholes": true,

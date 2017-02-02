@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+ROOT=`pwd`
+while [ ! -d $ROOT/.git ]; do
+  ROOT=`dirname $ROOT`
+done
+
+cd $ROOT
+git pull
+git submodule update
+s/build
+s/runtests
+s/install
