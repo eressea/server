@@ -15,7 +15,6 @@ cd $ROOT
 $ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests.lua
 $ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e2.lua
 $ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e3.lua
-$ROOT/$BUILD/eressea/eressea -v1 scripts/run-tests-e4.lua
 rm -rf data reports orders.txt score score.alliances datum turn
 
 cd $OLDWPD

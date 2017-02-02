@@ -116,6 +116,13 @@ static void test_unicode_bug2262(CuTest *tc) {
     CuAssertIntEquals(tc, EILSEQ, unicode_utf8_trim(name));
 }
 
+static void test_unicode_compare(CuTest *tc)
+{
+    CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("ABCDEFG", "abcdefg"));
+    CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("abcdefg123", "ABCDEFG123"));
+    CuAssertIntEquals(tc, 1, unicode_utf8_strcasecmp("bacdefg123", "ABCDEFG123"));
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -124,5 +131,6 @@ CuSuite *get_unicode_suite(void)
     SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
+    SUITE_ADD_TEST(suite, test_unicode_compare);
     return suite;
 }
