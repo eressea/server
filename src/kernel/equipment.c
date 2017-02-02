@@ -87,8 +87,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 }
 
 typedef struct lazy_spell {
-    char *name;
-    struct spell *sp;
+    struct spellref *spref;
     int level;
 } lazy_spell;
 
@@ -96,9 +95,8 @@ void equipment_addspell(equipment * eq, const char * name, int level)
 {
     if (eq) {
         lazy_spell *ls = malloc(sizeof(lazy_spell));
-        ls->sp = NULL;
+        ls->spref = spellref_create(NULL, name);
         ls->level = level;
-        ls->name = strdup(name);
         selist_push(&eq->spells, ls);
     }
 }
@@ -162,12 +160,8 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
 
                 for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                     lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
-                    if (!sbe->sp) {
-                        sbe->sp = find_spell(sbe->name);
-                        free(sbe->name);
-                        sbe->name = NULL;
-                    }
-                    unit_add_spell(u, mage, sbe->sp, sbe->level);
+                    spell *sp = spellref_get(sbe->spref);
+                    unit_add_spell(u, mage, sp, sbe->level);
                 }
             }
         }
@@ -238,7 +232,7 @@ void equip_items(struct item **items, const struct equipment *eq)
 
 void free_ls(void *arg) {
     lazy_spell *ls = (lazy_spell*)arg;
-    free(ls->name);
+    spellref_free(ls->spref);
     free(ls);
 }
 

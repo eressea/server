@@ -2068,17 +2068,20 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_strings);
-    xml_register_callback(parse_messages);
-    xml_register_callback(parse_resources);
     xml_register_callback(parse_rules);
 
-    xml_register_callback(parse_buildings);       /* requires resources */
-    xml_register_callback(parse_ships);   /* requires terrains */
     xml_register_callback(parse_races);
     xml_register_callback(parse_calendar);
-    xml_register_callback(parse_spells);  /* requires resources */
-    xml_register_callback(parse_equipment);       /* requires spells */
+    xml_register_callback(parse_resources);
+
+    xml_register_callback(parse_buildings); /* requires resources */
+    xml_register_callback(parse_ships);     /* requires resources, terrains */
+    xml_register_callback(parse_equipment); /* requires resources */
+
+    xml_register_callback(parse_spells); /* requires resources */
     xml_register_callback(parse_spellbooks);  /* requires spells */
+
+    xml_register_callback(parse_strings);
+    xml_register_callback(parse_messages);
 }
 #endif
