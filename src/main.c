@@ -186,13 +186,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'r':
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.path", arg);
-                break;
-            case 'r':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.rules", arg);
                 break;
             case 'f':
                 i = get_arg(argc, argv, 2, i, &luafile, 0);
