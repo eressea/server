@@ -2074,11 +2074,11 @@ void register_xmlreader(void)
     xml_register_callback(parse_rules);
 
     xml_register_callback(parse_buildings);       /* requires resources */
+    xml_register_callback(parse_spells);  /* requires resources */
     xml_register_callback(parse_ships);   /* requires terrains */
     xml_register_callback(parse_races);   /* requires spells */
     xml_register_callback(parse_spellbooks);  /* requires spells */
     xml_register_callback(parse_equipment);       /* requires spells */
-    xml_register_callback(parse_spells);  /* requires resources */
     xml_register_callback(parse_calendar);
 }
 #endif
