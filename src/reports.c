@@ -680,7 +680,8 @@ size_t size)
                     if (wrptr(&bufp, &size, result) != 0) {
                         WARN_STATIC_BUFFER();
                     }
-                    bufp = STRLCPY(bufp, spell_name(sbe->sp, f->locale), size);
+                    // TODO: no need to deref the spellref here (spref->name is good)
+                    bufp = STRLCPY(bufp, spell_name(spellref_get(sbe->spref), f->locale), size);
                 }
             }
 

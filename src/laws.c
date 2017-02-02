@@ -3458,8 +3458,8 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
         for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                if (!spellbook_get(dst, sbe->sp)) {
-                    spellbook_add(dst, sbe->sp, sbe->level);
+                if (!spellbook_get(dst, spellref_get(sbe->spref))) {
+                    spellbook_add(dst, sbe->spref, sbe->level);
                 }
             }
         }

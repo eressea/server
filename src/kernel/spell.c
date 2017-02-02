@@ -167,10 +167,15 @@ struct spell *spellref_get(struct spellref *spref)
 {
     if (!spref->sp) {
         spref->sp = find_spell(spref->name);
-        if (spref->sp) {
-            free(spref->name);
-            spref->name = NULL;
-        }
     }
     return spref->sp;
+}
+
+spellref *spellref_copy(spellref *spref)
+{
+    spellref *result = spellref_create(spref->name);
+    if (spref->sp) {
+        result->sp = spref->sp;
+    }
+    return result;
 }

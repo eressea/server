@@ -430,14 +430,14 @@ void show_new_spells(faction * f, int level, const spellbook *book)
         for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= level) {
-
-                if (!already_seen(f, sbe->sp)) {
+                spell *sp = spellref_get(sbe->spref);
+                if (!already_seen(f, sp)) {
                     attrib * a = a_new(&at_reportspell);
                     spellbook_entry * entry = (spellbook_entry *)a->data.v;
                     entry->level = sbe->level;
-                    entry->sp = sbe->sp;
+                    entry->spref = spellref_copy(sbe->spref);
                     a_add(&f->attribs, a);
-                    a_add(&f->attribs, a_new(&at_seenspell))->data.v = sbe->sp;
+                    a_add(&f->attribs, a_new(&at_seenspell))->data.v = sp;
                 }
             }
         }
@@ -481,13 +481,16 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                     commonspells[maxspell] = sbe;
                     sbe = 0;
                 }
-                else if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                    // already have this spell, remove it from the list of candidates
-                    commonspells[spellno] = commonspells[--numspells];
-                    if (maxspell > numspells) {
-                        maxspell = numspells;
+                else {
+                    spell *sp = spellref_get(sbe->spref);
+                    if (f->spellbook && spellbook_get(f->spellbook, sp)) {
+                        // already have this spell, remove it from the list of candidates
+                        commonspells[spellno] = commonspells[--numspells];
+                        if (maxspell > numspells) {
+                            maxspell = numspells;
+                        }
+                        sbe = 0;
                     }
-                    sbe = 0;
                 }
             }
 
@@ -495,7 +498,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 if (!f->spellbook) {
                     f->spellbook = create_spellbook(0);
                 }
-                spellbook_add(f->spellbook, sbe->sp, sbe->level);
+                spellbook_add(f->spellbook, sbe->spref, sbe->level);
                 commonspells[spellno] = commonspells[--numspells];
             }
         }
@@ -2948,6 +2951,7 @@ const char *spell_info(const spell * sp, const struct locale *lang)
     return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
+// TODO: should take the name, not the spell (spellref optimizations)
 const char *spell_name(const spell * sp, const struct locale *lang)
 {
     return LOC(lang, mkname("spell", sp->sname));
@@ -2967,7 +2971,7 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
 
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-        spell *sp = sbe->sp;
+        spell *sp = spellref_get(sbe->spref);
 
         const char *n = spell_name(sp, lang);
         if (!n) {

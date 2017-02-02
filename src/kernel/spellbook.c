@@ -50,7 +50,7 @@ void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spe
                 sb = *bookp;
             }
             if (level > 0 && (data->version >= SPELLBOOK_VERSION || !spellbook_get(sb, sp))) {
-                spellbook_add(sb, sp, level);
+                spellbook_add_spell(sb, sp, level);
             }
         }
     }
@@ -64,25 +64,43 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     if (book) {
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            WRITE_TOK(store, sbe->sp->sname);
+            WRITE_TOK(store, sbe->spref->name);
             WRITE_INT(store, sbe->level);
         }
     }
     WRITE_TOK(store, "end");
 }
 
-void spellbook_add(spellbook *sb, struct spell * sp, int level)
+void spellbook_add(spellbook *sb, spellref *spref, int level)
 {
     spellbook_entry * sbe;
 
-    assert(sb && sp && level > 0);
+    assert(sb && spref && level > 0);
+#ifndef NDEBUG
+    if (spellbook_get(sb, spellref_get(spref))) {
+        log_error("duplicate spell in spellbook '%s': '%s'\n", sb->name, spref->name);
+    }
+#endif  
+    sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
+    sbe->spref = spellref_copy(spref);
+    sbe->level = level;
+    selist_push(&sb->spells, sbe);
+}
+
+void spellbook_add_spell(spellbook *sb, spell *sp, int level)
+{
+    spellbook_entry * sbe;
+
+    assert(sb && sp->sname && level > 0);
 #ifndef NDEBUG
     if (spellbook_get(sb, sp)) {
         log_error("duplicate spell in spellbook '%s': '%s'\n", sb->name, sp->sname);
     }
 #endif  
     sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
-    sbe->sp = sp;
+    // FIXME: create a better API to create spellref from spell 
+    sbe->spref = spellref_create(sp->sname);
+    sbe->spref->sp = sp;
     sbe->level = level;
     selist_push(&sb->spells, sbe);
 }
@@ -95,6 +113,7 @@ void spellbook_clear(spellbook *sb)
     assert(sb);
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        spellref_free(sbe->spref);
         free(sbe);
     }
     selist_free(sb->spells);
@@ -124,11 +143,10 @@ spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp)
 
         for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            if (sp == sbe->sp) {
+            if (sp == spellref_get(sbe->spref)) {
                 return sbe;
             }
         }
     }
     return 0;
 }
-
