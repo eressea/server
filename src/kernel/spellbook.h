@@ -29,7 +29,7 @@ extern "C" {
     struct selist;
 
     typedef struct spellbook_entry {
-        struct spellref * spref;
+        struct spell *sp;
         int level;
     } spellbook_entry;
 
@@ -44,11 +44,10 @@ extern "C" {
     void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
     void write_spellbook(const struct spellbook *book, struct storage *store);
 
-    void spellbook_add(spellbook *sbp, struct spellref *spref, int level);
-    void spellbook_add_spell(spellbook *sb, struct spell *sp, int level);
+    void spellbook_add(spellbook *sbp, struct spell *sp, int level);
     int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data);
     void spellbook_clear(spellbook *sb);
-    spellbook_entry * spellbook_get(spellbook *sb, const struct spell * sp);
+    spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp);
 
 #ifdef __cplusplus
 }

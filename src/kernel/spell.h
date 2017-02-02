@@ -50,9 +50,8 @@ extern "C" {
         struct spell *sp;
     } spellref;
 
-    struct spellref *spellref_create(const char *name);
+    struct spellref *spellref_create(struct spell *sp, const char *name);
     void spellref_free(struct spellref *spref);
-    struct spellref *spellref_copy(struct spellref *spref);
     struct spell *spellref_get(struct spellref *spref);
 
     int sp_antimagiczone(struct castorder *co);

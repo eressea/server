@@ -719,7 +719,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
                 // TODO: no need to deref spref here, spref->name == sp->sname
-                spell * sp = spellref_get(sbe->spref);
+                spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
                     stream_printf(out, "SPRUECHE\n");
@@ -1622,7 +1622,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     a = a_find(f->attribs, &at_reportspell);
     while (a && a->type == &at_reportspell) {
         spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-        cr_reportspell(F, spellref_get(sbe->spref), sbe->level, f->locale);
+        cr_reportspell(F, sbe->sp, sbe->level, f->locale);
         a = a->next;
     }
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;

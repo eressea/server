@@ -79,7 +79,7 @@ static spellref *xml_spellref(xmlNode * node, const char *name)
 {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
     if (propValue != NULL) {
-        spellref *ref = spellref_create((const char *)propValue);
+        spellref *ref = spellref_create(NULL, (const char *)propValue);
         xmlFree(propValue);
         return ref;
     }
@@ -2075,10 +2075,10 @@ void register_xmlreader(void)
 
     xml_register_callback(parse_buildings);       /* requires resources */
     xml_register_callback(parse_ships);   /* requires terrains */
-    xml_register_callback(parse_races);   /* requires spells */
-    xml_register_callback(parse_spellbooks);  /* requires spells */
-    xml_register_callback(parse_equipment);       /* requires spells */
-    xml_register_callback(parse_spells);  /* requires resources */
+    xml_register_callback(parse_races);
     xml_register_callback(parse_calendar);
+    xml_register_callback(parse_spells);  /* requires resources */
+    xml_register_callback(parse_equipment);       /* requires spells */
+    xml_register_callback(parse_spellbooks);  /* requires spells */
 }
 #endif
