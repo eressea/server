@@ -76,10 +76,20 @@ static void load_inifile(dictionary * d)
 
 static dictionary *parse_config(const char *filename)
 {
-    dictionary *d = iniparser_load(filename);
+    char path[MAX_PATH];
+    dictionary *d;
+    const char *cfgpath = config_get("config.path");
+
+    if (cfgpath) {
+        join_path(cfgpath, filename, path, sizeof(path));
+        log_debug("reading from configuration file %s\n", path);
+        d  = iniparser_load(path);
+    } else {
+        log_debug("reading from configuration file %s\n", filename);
+        d  = iniparser_load(filename);        
+    }
     if (d) {
         load_inifile(d);
-        log_debug("reading from configuration file %s\n", filename);
         config_set_from(d);
 
         memdebug = iniparser_getint(d, "game:memcheck", memdebug);
@@ -176,6 +186,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'c':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                config_set("config.path", arg);
+                break;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.rules", arg);
@@ -270,15 +284,15 @@ int main(int argc, char **argv)
 {
     int err = 0;
     lua_State *L;
-    dictionary *d;
+    dictionary *d = 0;
     setup_signal_handler();
-    /* ini file sets defaults for arguments*/
+    /* parse arguments again, to override ini file */
+    parse_args(argc, argv, &err);
+
     d = parse_config(inifile);
     if (!d) {
         log_error("could not open ini configuration %s\n", inifile);
     }
-    /* parse arguments again, to override ini file */
-    parse_args(argc, argv, &err);
 
     locale_init();
 
