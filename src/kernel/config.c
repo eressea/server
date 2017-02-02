@@ -754,8 +754,8 @@ void config_set_from(const dictionary *d)
             assert(klen+slen+1<sizeof(key));
             memcpy(key+slen+1, keys[k]+slen+1, klen-slen);
             orig = config_get(key);
+            val = iniparser_getstring(d, keys[k], NULL);
             if (!orig) {
-                val = iniparser_getstring(d, keys[k], NULL);
                 if (val) {
                     config_set(key, val);
                 }
