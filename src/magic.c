@@ -719,7 +719,7 @@ static int use_item_aura(const region * r, const unit * u)
     int sk, n;
 
     sk = effskill(u, SK_MAGIC, r);
-    n = (int)(sk * sk * u_race(u)->maxaura / 4);
+    n = (int)(sk * sk * rc_maxaura(u_race(u)) / 4);
 
     return n;
 }
@@ -727,13 +727,13 @@ static int use_item_aura(const region * r, const unit * u)
 int max_spellpoints(const region * r, const unit * u)
 {
     int sk;
-    double n, msp;
+    double n, msp = 0;
     double potenz = 2.1;
     double divisor = 1.2;
     const struct resource_type *rtype;
 
     sk = effskill(u, SK_MAGIC, r);
-    msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
+    msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
 
     rtype = rt_find("aurafocus");
     if (rtype && i_get(u->items, rtype->itype) > 0) {

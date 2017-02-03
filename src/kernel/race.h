@@ -185,6 +185,7 @@ extern "C" {
     const char * rc_name(const race *rc, name_t n, char *name, size_t size);
 
     double rc_magres(const struct race *rc);
+    double rc_maxaura(const struct race *rc);
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
