@@ -1910,10 +1910,9 @@
   <message name="use_antimagiccrystal" section="magic">
     <type>
       <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
     </type>
-    <text locale="de">"$unit($unit) benutzt in $region($region) einen Antimagiekristall."</text>
-    <text locale="en">"$unit($unit) uses an antimagic crystal in $region($region)."</text>
+    <text locale="de">"$unit($unit) benutzt einen Antimagiekristall."</text>
+    <text locale="en">"$unit($unit) uses an antimagic crystal."</text>
   </message>
   <message name="magicboost_effect" section="magic">
     <type>
