@@ -354,7 +354,7 @@ static const char *parse(opstack ** stack, const char *inn,
             return parse_symbol(stack, ++b, userdata);
             break;
         default:
-            if (isdigit(*(unsigned char *)b) || *b == '-' || *b == '+') {
+            if (isdigit(*(const unsigned char *)b) || *b == '-' || *b == '+') {
                 return parse_int(stack, b);
             }
             else

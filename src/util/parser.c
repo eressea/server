@@ -6,7 +6,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <wctype.h>
 #include <memory.h>
 
@@ -251,7 +250,8 @@ unsigned int atoip(const char *s)
     int n;
 
     assert(s);
-    n = isdigit(s[0]) ? atoi(s) : 0;
+    n = (s[0] >='0' && s[0]<='9');
+    n = n ? atoi(s) : 0;
 
     if (n < 0)
         n = 0;

@@ -229,7 +229,7 @@ int setstealth_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    if (isdigit(s[0])) {
+    if (isdigit(*(const unsigned char *)s)) {
         /* Tarnungslevel setzen */
         level = atoi((const char *)s);
         if (level > effskill(u, SK_STEALTH, 0)) {
