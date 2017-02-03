@@ -2051,7 +2051,7 @@ double u_heal_factor(const unit * u)
 {
     const race * rc = u_race(u);
     if (rc->healing>0) {
-        return rc->healing;
+        return rc->healing / 100.0;
     }
     if (r_isforest(u->region)) {
         static int rc_cache;

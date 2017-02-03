@@ -498,9 +498,9 @@ static void test_heal_factor(CuTest *tc) {
     rsettrees(r, 2, 0);
     CuAssertTrue(tc, r_isforest(r));
     CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
-    rc->healing = 2.0;
+    rc->healing = 200;
     CuAssertDblEquals(tc, 2.0, u_heal_factor(u), 0.0);
-    rc->healing = 0.0;
+    rc->healing = 0;
     rc = rc_get_or_create("elf");
     CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_ELF));
     u_setrace(u, get_race(RC_ELF));
