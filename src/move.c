@@ -2061,7 +2061,9 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     route_end = cap_route(r, route_begin, route_end, movement_speed(u));
 
     route_end = travel_route(u, route_begin, route_end, ord, mode);
-    get_followers(u, r, route_end, followers);
+    if (u->flags&UFL_FOLLOWED) {
+        get_followers(u, r, route_end, followers);
+    }
 
     /* transportation */
     for (ord = u->orders; ord; ord = ord->next) {
