@@ -1573,17 +1573,6 @@ static int parse_spells(xmlDocPtr doc)
     return 0;
 }
 
-static void parse_param(struct param **params, xmlNodePtr node)
-{
-    xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST "value");
-
-    set_param(params, (const char *)propName, (const char *)propValue);
-
-    xmlFree(propName);
-    xmlFree(propValue);
-}
-
 static void parse_ai(race * rc, xmlNodePtr node)
 {
     int n;
@@ -1737,12 +1726,22 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "noattack", false))
             rc->battle_flags |= BF_NO_ATTACK;
 
+        rc->recruit_multi = 1.0;
         for (child = node->children; child; child = child->next) {
             if (strcmp((const char *)child->name, "ai") == 0) {
                 parse_ai(rc, child);
             }
             else if (strcmp((const char *)child->name, "param") == 0) {
-                parse_param(&rc->parameters, child);
+                xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
+                xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
+                if (strcmp((const char *)propName, "recruit_multi")==0) {
+                    rc->recruit_multi = atof((const char *)propValue);
+                }
+                else {
+                    set_param(&rc->parameters, (const char *)propName, (const char *)propValue);
+                }
+                xmlFree(propName);
+                xmlFree(propValue);
             }
         }
         rc->recruit_multi = get_param_flt(rc->parameters, "recruit_multi", 1.0);

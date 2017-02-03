@@ -758,7 +758,7 @@ int count_migrants(const faction * f)
 
 int count_maxmigrants(const faction * f)
 {
-    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
+    int formula = f->race->parameters ? get_param_int(f->race->parameters, "migrants.formula", MIGRANTS_NONE) : MIGRANTS_NONE;
 
     if (formula == MIGRANTS_LOG10) {
         int nsize = count_all(f);
