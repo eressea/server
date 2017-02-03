@@ -1637,7 +1637,7 @@ static int parse_races(xmlDocPtr doc)
 
         rc->magres = xml_ivalue(node, "magres", rc->magres);
         rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); // TODO: store as int in XML
-        rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
+        rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); // TODO: store as int in XML
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
         rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
         rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);

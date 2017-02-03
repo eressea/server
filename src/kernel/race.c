@@ -287,7 +287,7 @@ double rc_magres(const race *rc) {
 }
 
 double rc_maxaura(const race *rc) {
-    return rc->maxaura;
+    return rc->maxaura / 100.0;
 }
 
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
