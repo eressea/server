@@ -23,8 +23,9 @@ static void test_rc_defaults(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     CuAssertStrEquals(tc, "human", rc->_name);
-    CuAssertIntEquals(tc, 0, rc->_magres);
+    CuAssertIntEquals(tc, 0, rc->magres);
     CuAssertDblEquals(tc, 0.0, rc_magres(rc), 0.0);
+    CuAssertDblEquals(tc, 0.0, rc->healing, 0.0);
     CuAssertDblEquals(tc, 0.0, rc->maxaura, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->recruit_multi, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->regaura, 0.0);

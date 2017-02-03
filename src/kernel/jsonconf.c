@@ -458,7 +458,7 @@ static void json_race(cJSON *json, race *rc) {
             break;
         case cJSON_Number:
             if (strcmp(child->string, "magres") == 0) {
-                rc->_magres = child->valueint;
+                rc->magres = child->valueint;
             }
             else if (strcmp(child->string, "maxaura") == 0) {
                 rc->maxaura = (float)child->valuedouble;

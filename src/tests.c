@@ -217,6 +217,9 @@ terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+    if (flags & LAND_REGION) {
+        t->size = 1000;
+    }
     t->flags = flags;
     return t;
 }

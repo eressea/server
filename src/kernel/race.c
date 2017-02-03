@@ -283,7 +283,7 @@ bool r_insectstalled(const region * r)
 }
 
 double rc_magres(const struct race *rc) {
-    return rc->_magres / 100.0;
+    return rc->magres / 100.0;
 }
 
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {

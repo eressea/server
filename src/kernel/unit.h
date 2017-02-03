@@ -190,6 +190,7 @@ extern "C" {
     bool leave(struct unit *u, bool force);
     bool can_leave(struct unit *u);
 
+    double u_heal_factor(const struct unit * u);
     void u_set_building(struct unit * u, struct building * b);
     void u_set_ship(struct unit * u, struct ship * sh);
     void leave_ship(struct unit * u);
