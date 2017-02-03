@@ -282,6 +282,10 @@ bool r_insectstalled(const region * r)
     return fval(r->terrain, ARCTIC_REGION);
 }
 
+double rc_magres(const struct race *rc) {
+    return rc->_magres / 100.0;
+}
+
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     const char * postfix = 0;
     if (!rc) {

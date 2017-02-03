@@ -1149,7 +1149,7 @@ double magic_resistance(unit * target)
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     const race *rc = u_race(target);
-    double probability = rc->magres;
+    double probability = rc_magres(rc);
     const plane *pl = rplane(target->region);
 
     if (rc == get_race(RC_HIRNTOETER) && !pl) {

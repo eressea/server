@@ -1635,7 +1635,7 @@ static int parse_races(xmlDocPtr doc)
         rc->def_damage = strdup((const char *)propValue);
         xmlFree(propValue);
 
-        rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
+        rc->_magres = xml_ivalue(node, "magres", rc->_magres);
         rc->healing = (float)xml_fvalue(node, "healing", rc->healing);
         rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);

@@ -413,11 +413,11 @@ static void test_magic_resistance(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    CuAssertDblEquals(tc, rc->magres, magic_resistance(u), 0.01);
-    rc->magres = 1.0;
+    CuAssertDblEquals(tc, rc->_magres/100.0, magic_resistance(u), 0.01);
+    rc->_magres = 100;
     CuAssertDblEquals_Msg(tc, "magic resistance is capped at 0.9", 0.9, magic_resistance(u), 0.01);
     rc = test_create_race("braineater");
-    rc->magres = 1.0;
+    rc->_magres = 100;
     u_setrace(u, rc);
     CuAssertDblEquals_Msg(tc, "brain eaters outside astral space have 50% magres", 0.5, magic_resistance(u), 0.01);
     u->region->_plane = get_astralplane();

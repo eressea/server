@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<race name="zombie" magres="0.20000" maxaura="1.0" regaura="1.0"
+<race name="zombie" magres="20" maxaura="1.0" regaura="1.0"
 	recruitcost="-1" maintenance="0" weight="1000" capacity="440" speed="1.000000"
 	hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="no"
 	walk="yes" shapeshift="no" giveperson="no" giveunit="no"

@@ -352,12 +352,12 @@ static void test_magic_resistance(CuTest *tc)
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "skill bonus", 0.1, magic_resistance(du), 0.01);
     CuAssertDblEquals_Msg(tc, "skill reduction", 0.9, magres, 0.01);
-    rc->magres = 0.5; /* gets added to skill bonus */
+    rc->_magres = 50; /* percentage, gets added to skill bonus */
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "race bonus", 0.6, magic_resistance(du), 0.01);
     CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
 
-    rc->magres = 1.5; /* should not cause negative damage multiplier */
+    rc->_magres = 150; /* should not cause negative damage multiplier */
     CuAssertDblEquals_Msg(tc, "magic resistance is never > 0.9", 0.9, magic_resistance(du), 0.01);
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "damage reduction is never < 0.1", 0.1, magres, 0.01);
