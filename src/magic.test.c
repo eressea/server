@@ -425,6 +425,29 @@ static void test_magic_resistance(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_max_spellpoints(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("human");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    rc->maxaura = 1.0;
+    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    rc->maxaura = 2.0;
+    CuAssertIntEquals(tc, 2, max_spellpoints(u->region, u));
+    create_mage(u, M_GRAY);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
+    set_level(u, SK_MAGIC, 2);
+    CuAssertIntEquals(tc, 9, max_spellpoints(u->region, u));
+    // permanent aura loss:
+    CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
+    CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
+    test_cleanup();
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -441,5 +464,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_set_post_combatspell);
     SUITE_ADD_TEST(suite, test_hasspell);
     SUITE_ADD_TEST(suite, test_magic_resistance);
+    SUITE_ADD_TEST(suite, test_max_spellpoints);
     return suite;
 }
