@@ -8,7 +8,6 @@ getitem="yes" equipment="yes" healing="2.0">
   <function name="itemdrop" value="defaultdrops"/>
   <param name="hunger.damage" value="1d8+7"/>
   <param name="other_race" value="demon"/>
-  <param name="other_cost" value="500"/>
   <param name="recruit_multi" value="0.5"/>
   <skill name="building" modifier="1"/>
   <skill name="cartmaking" modifier="-1"/>

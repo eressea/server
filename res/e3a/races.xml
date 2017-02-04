@@ -36,7 +36,6 @@
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="elf"/>
-    <param name="other_cost" value="500"/>
     <skill name="riding" modifier="+1"/>
     <skill name="shipcraft" modifier="2"/>
     <skill name="sailing" modifier="2"/>
@@ -51,7 +50,6 @@
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="troll"/>
-    <param name="other_cost" value="500"/>
 
     <skill name="bow" speed="+5"/>
     <skill name="building" modifier="1"/>
@@ -80,7 +78,6 @@
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="dwarf"/>
-    <param name="other_cost" value="500"/>
     <param name="luxury_trade" value="600"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="1"/>
