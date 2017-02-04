@@ -2060,9 +2060,10 @@ double u_heal_factor(const unit * u)
             rc_elf = get_race(RC_ELF);
         }
         if (rc == rc_elf) {
-            double elf_regen = 1.0;
-            if (rc->parameters) {
-                elf_regen = get_param_flt(rc->parameters, "regen.forest", elf_regen);
+            static int cache;
+            static double elf_regen;
+            if (config_changed(&cache)) {
+                elf_regen = config_get_flt("healing.forest", 1.0);
             }
             return elf_regen;
         }

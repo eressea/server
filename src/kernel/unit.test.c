@@ -505,7 +505,7 @@ static void test_heal_factor(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_ELF));
     u_setrace(u, get_race(RC_ELF));
     CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
-    set_param(&rc->parameters, "regen.forest", "1.5");
+    config_set("healing.forest", "1.5");
     CuAssertDblEquals(tc, 1.5, u_heal_factor(u), 0.0);
     test_cleanup();
 }
