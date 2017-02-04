@@ -42,6 +42,7 @@
         "nmr.timeout": 5,
         "nmr.removenewbie": 0,
         "GiveRestriction": 3,
+        "healing.forest": 2.0,
         "hunger.long": false,
         "hunger.damage": "1d9+9",
         "hunger.demons.skill": true,

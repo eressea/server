@@ -3271,30 +3271,6 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 }
 
-static double heal_factor(const unit * u)
-{
-    const race * rc = u_race(u);
-    if (rc->healing>0) {    
-        return rc->healing;
-    }
-    if (r_isforest(u->region)) {
-        static int rc_cache;
-        static const race *rc_elf;
-        if (rc_changed(&rc_cache)) {
-            rc_elf = get_race(RC_ELF);
-        }
-        if (rc==rc_elf) {
-            static int config;
-            static double elf_regen = 1.0;
-            if (config_changed(&config)) {
-                elf_regen = get_param_flt(u_race(u)->parameters, "regen.forest", 1.0F);
-            }
-            return elf_regen;
-        }
-    }
-    return 1.0;
-}
-
 void monthly_healing(void)
 {
     region *r;
@@ -3334,7 +3310,7 @@ void monthly_healing(void)
                 continue;
             }
 
-            p *= heal_factor(u);
+            p *= u_heal_factor(u);
             if (u->hp < umhp) {
                 double maxheal = MAX(u->number, umhp / 20.0);
                 int addhp;

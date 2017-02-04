@@ -413,15 +413,38 @@ static void test_magic_resistance(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    CuAssertDblEquals(tc, rc->magres, magic_resistance(u), 0.01);
-    rc->magres = 1.0;
+    CuAssertDblEquals(tc, rc->magres/100.0, magic_resistance(u), 0.01);
+    rc->magres = 100;
     CuAssertDblEquals_Msg(tc, "magic resistance is capped at 0.9", 0.9, magic_resistance(u), 0.01);
     rc = test_create_race("braineater");
-    rc->magres = 1.0;
+    rc->magres = 100;
     u_setrace(u, rc);
     CuAssertDblEquals_Msg(tc, "brain eaters outside astral space have 50% magres", 0.5, magic_resistance(u), 0.01);
     u->region->_plane = get_astralplane();
     CuAssertDblEquals_Msg(tc, "brain eaters in astral space have full magres", 0.9, magic_resistance(u), 0.01);
+    test_cleanup();
+}
+
+static void test_max_spellpoints(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("human");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    rc->maxaura = 100;
+    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    rc->maxaura = 200;
+    CuAssertIntEquals(tc, 2, max_spellpoints(u->region, u));
+    create_mage(u, M_GRAY);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
+    set_level(u, SK_MAGIC, 2);
+    CuAssertIntEquals(tc, 9, max_spellpoints(u->region, u));
+    // permanent aura loss:
+    CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
+    CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
     test_cleanup();
 }
 
@@ -441,5 +464,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_set_post_combatspell);
     SUITE_ADD_TEST(suite, test_hasspell);
     SUITE_ADD_TEST(suite, test_magic_resistance);
+    SUITE_ADD_TEST(suite, test_max_spellpoints);
     return suite;
 }

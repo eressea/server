@@ -59,7 +59,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 }
 
 static const char *hunger_damage(const race *rc) {
-    const char * damage = get_param(rc->parameters, "hunger.damage");
+    const char * damage = rc->parameters ? get_param(rc->parameters, "hunger.damage") : NULL;
     if (!damage) {
         damage = config_get("hunger.damage");
     }

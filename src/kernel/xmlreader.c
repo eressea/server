@@ -1573,17 +1573,6 @@ static int parse_spells(xmlDocPtr doc)
     return 0;
 }
 
-static void parse_param(struct param **params, xmlNodePtr node)
-{
-    xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST "value");
-
-    set_param(params, (const char *)propName, (const char *)propValue);
-
-    xmlFree(propName);
-    xmlFree(propValue);
-}
-
 static void parse_ai(race * rc, xmlNodePtr node)
 {
     int n;
@@ -1635,9 +1624,9 @@ static int parse_races(xmlDocPtr doc)
         rc->def_damage = strdup((const char *)propValue);
         xmlFree(propValue);
 
-        rc->magres = (float)xml_fvalue(node, "magres", rc->magres);
-        rc->healing = (float)xml_fvalue(node, "healing", rc->healing);
-        rc->maxaura = (float)xml_fvalue(node, "maxaura", rc->maxaura);
+        rc->magres = xml_ivalue(node, "magres", rc->magres);
+        rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); // TODO: store as int in XML
+        rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); // TODO: store as int in XML
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
         rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
         rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
@@ -1737,12 +1726,27 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "noattack", false))
             rc->battle_flags |= BF_NO_ATTACK;
 
+        rc->recruit_multi = 1.0;
         for (child = node->children; child; child = child->next) {
             if (strcmp((const char *)child->name, "ai") == 0) {
                 parse_ai(rc, child);
             }
             else if (strcmp((const char *)child->name, "param") == 0) {
-                parse_param(&rc->parameters, child);
+                xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
+                xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
+                if (strcmp((const char *)propName, "recruit_multi")==0) {
+                    rc->recruit_multi = atof((const char *)propValue);
+                }
+                else if (strcmp((const char *)propName, "migrants.formula") == 0) {
+                    if (propValue[0] == '1') {
+                        rc->flags |= RCF_MIGRANTS;
+                    }
+                }
+                else {
+                    set_param(&rc->parameters, (const char *)propName, (const char *)propValue);
+                }
+                xmlFree(propName);
+                xmlFree(propValue);
             }
         }
         rc->recruit_multi = get_param_flt(rc->parameters, "recruit_multi", 1.0);

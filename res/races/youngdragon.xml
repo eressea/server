@@ -1,4 +1,4 @@
-<race name="youngdragon" magres="0.500000" maxaura="1.0" regaura="1.0"
+<race name="youngdragon" magres="50" maxaura="1.0" regaura="1.0"
 weight="8000" capacity="10000" speed="1.0" hp="300" ac="4"
 damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4"
 defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes"

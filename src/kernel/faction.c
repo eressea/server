@@ -565,7 +565,7 @@ bool valid_race(const struct faction *f, const struct race *rc)
     else {
         const char *str = get_param(f->race->parameters, "other_race");
         if (str)
-            return (bool)(rc_find(str) == rc);
+            return rc_find(str) == rc;
         return false;
     }
 }
@@ -753,12 +753,9 @@ int count_migrants(const faction * f)
     return count_faction(f, COUNT_MIGRANTS);
 }
 
-#define MIGRANTS_NONE 0
-#define MIGRANTS_LOG10 1
-
 int count_maxmigrants(const faction * f)
 {
-    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
+    int formula = rc_migrants_formula(f->race);
 
     if (formula == MIGRANTS_LOG10) {
         int nsize = count_all(f);

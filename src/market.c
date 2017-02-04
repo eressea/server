@@ -66,7 +66,7 @@ attrib_type at_market = {
     NULL, NULL, NULL, ATF_UNIQUE
 };
 
-static int rc_luxury_trade(const struct race *rc)
+int rc_luxury_trade(const struct race *rc)
 {
     if (rc) {
         return get_param_int(rc->parameters, "luxury_trade", 1000);
@@ -74,7 +74,7 @@ static int rc_luxury_trade(const struct race *rc)
     return 1000;
 }
 
-static int rc_herb_trade(const struct race *rc)
+int rc_herb_trade(const struct race *rc)
 {
     if (rc) {
         return get_param_int(rc->parameters, "herb_trade", 500);

@@ -136,8 +136,8 @@ static void test_races(CuTest * tc)
 {
     const char * data = "{\"races\": { \"orc\" : { "
         "\"damage\" : \"1d4\","
-        "\"magres\" : 1.0,"
-        "\"maxaura\" : 2.0,"
+        "\"magres\" : 100,"
+        "\"maxaura\" : 200,"
         "\"regaura\" : 3.0,"
         "\"speed\" : 4.0,"
         "\"recruitcost\" : 1,"
@@ -163,8 +163,10 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
-    CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
-    CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
+    CuAssertIntEquals(tc, 100, rc->magres);
+    CuAssertDblEquals(tc, 1.0, rc_magres(rc), 0.0);
+    CuAssertIntEquals(tc, 200, rc->maxaura);
+    CuAssertDblEquals(tc, 2.0, rc_maxaura(rc), 0.0);
     CuAssertDblEquals(tc, 3.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 4.0, rc->speed, 0.0);
     CuAssertIntEquals(tc, 1, rc->recruitcost);

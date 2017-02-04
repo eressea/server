@@ -3,9 +3,10 @@
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
+#include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/plane.h>
+#include <kernel/unit.h>
 #include <kernel/config.h>
 #include <util/language.h>
 #include <util/password.h>
@@ -191,9 +192,27 @@ static void test_set_origin_bug(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_max_migrants(CuTest *tc) {
+    faction *f;
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("human");
+    f = test_create_faction(rc);
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 0, count_maxmigrants(f));
+    rc->flags |= RCF_MIGRANTS;
+    CuAssertIntEquals(tc, 0, count_maxmigrants(f));
+    scale_number(u, 250);
+    CuAssertIntEquals(tc, 13, count_maxmigrants(f));
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_max_migrants);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);

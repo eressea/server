@@ -116,9 +116,9 @@ extern "C" {
 
     typedef struct race {
         char *_name;
-        float magres;
-        float healing;
-        double maxaura;            /* Faktor auf Maximale Aura */
+        int magres;
+        int healing;
+        int maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
         double recruit_multi;      /* Faktor f�r Bauernverbrauch */
         int index;
@@ -184,6 +184,14 @@ extern "C" {
     const char * rc_name_s(const race *rc, name_t n);
     const char * rc_name(const race *rc, name_t n, char *name, size_t size);
 
+    double rc_magres(const struct race *rc);
+    double rc_maxaura(const struct race *rc);
+    int rc_armor_bonus(const struct race *rc);
+
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+    int rc_migrants_formula(const race *rc);
+
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
@@ -215,6 +223,7 @@ extern "C" {
 #define RCF_STONEGOLEM     (1<<27)      /* race gets stonegolem properties */
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
 #define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
+#define RCF_MIGRANTS       (1<<30)      /* may have migrant units (human bonus) */
 
     /* Economic flags */
 #define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenst�nde weg */

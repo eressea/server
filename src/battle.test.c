@@ -223,10 +223,13 @@ static void test_natural_armor(CuTest * tc)
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     set_level(u, SK_STAMINA, 2);
+    CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
     set_param(&rc->parameters, "armor.stamina", "1");
+    CuAssertIntEquals(tc, 1, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 2, natural_armor(u));
     set_param(&rc->parameters, "armor.stamina", "2");
+    CuAssertIntEquals(tc, 2, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 1, natural_armor(u));
     test_cleanup();
 }
@@ -352,12 +355,12 @@ static void test_magic_resistance(CuTest *tc)
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "skill bonus", 0.1, magic_resistance(du), 0.01);
     CuAssertDblEquals_Msg(tc, "skill reduction", 0.9, magres, 0.01);
-    rc->magres = 0.5; /* gets added to skill bonus */
+    rc->magres = 50; /* percentage, gets added to skill bonus */
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "race bonus", 0.6, magic_resistance(du), 0.01);
     CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
 
-    rc->magres = 1.5; /* should not cause negative damage multiplier */
+    rc->magres = 150; /* should not cause negative damage multiplier */
     CuAssertDblEquals_Msg(tc, "magic resistance is never > 0.9", 0.9, magic_resistance(du), 0.01);
     calculate_armor(dt, 0, 0, &magres);
     CuAssertDblEquals_Msg(tc, "damage reduction is never < 0.1", 0.1, magres, 0.01);

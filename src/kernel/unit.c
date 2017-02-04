@@ -2047,3 +2047,26 @@ bool has_limited_skills(const struct unit * u)
     return false;
 }
 
+double u_heal_factor(const unit * u)
+{
+    const race * rc = u_race(u);
+    if (rc->healing>0) {
+        return rc->healing / 100.0;
+    }
+    if (r_isforest(u->region)) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (rc == rc_elf) {
+            static int cache;
+            static double elf_regen;
+            if (config_changed(&cache)) {
+                elf_regen = config_get_flt("healing.forest", 1.0);
+            }
+            return elf_regen;
+        }
+    }
+    return 1.0;
+}

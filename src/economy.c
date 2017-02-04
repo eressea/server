@@ -427,7 +427,6 @@ static int recruit_cost(const faction * f, const race * rc)
     }
     else if (valid_race(f, rc)) {
         return rc->recruitcost;
-        /*      return get_param_int(f->race->parameters, "other_cost", -1); */
     }
     return -1;
 }

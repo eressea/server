@@ -8,6 +8,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
+#include <kernel/terrain.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
@@ -483,6 +484,32 @@ static void test_name_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_heal_factor(CuTest *tc) {
+    unit * u;
+    region *r;
+    race *rc;
+    terrain_type *t_plain;
+
+    test_setup();
+    t_plain = test_create_terrain("plain", LAND_REGION|FOREST_REGION);
+    rc = rc_get_or_create("human");
+    u = test_create_unit(test_create_faction(rc), r = test_create_region(0, 0, t_plain));
+    rsettrees(r, 1, r->terrain->size / TREESIZE);
+    rsettrees(r, 2, 0);
+    CuAssertTrue(tc, r_isforest(r));
+    CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
+    rc->healing = 200;
+    CuAssertDblEquals(tc, 2.0, u_heal_factor(u), 0.0);
+    rc->healing = 0;
+    rc = rc_get_or_create("elf");
+    CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_ELF));
+    u_setrace(u, get_race(RC_ELF));
+    CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
+    config_set("healing.forest", "1.5");
+    CuAssertDblEquals(tc, 1.5, u_heal_factor(u), 0.0);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -507,5 +534,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_limited_skills);
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
+    SUITE_ADD_TEST(suite, test_heal_factor);
     return suite;
 }
