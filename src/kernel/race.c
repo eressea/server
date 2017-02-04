@@ -296,7 +296,7 @@ int rc_armor_bonus(const race *rc) {
 
 int rc_migrants_formula(const race *rc)
 {
-    return rc->parameters ? get_param_int(rc->parameters, "migrants.formula", MIGRANTS_NONE) : MIGRANTS_NONE;
+    return (rc->flags&RCF_MIGRANTS) ? MIGRANTS_LOG10 : MIGRANTS_NONE;
 }
 
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {

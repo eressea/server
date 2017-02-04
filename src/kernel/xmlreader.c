@@ -1737,6 +1737,11 @@ static int parse_races(xmlDocPtr doc)
                 if (strcmp((const char *)propName, "recruit_multi")==0) {
                     rc->recruit_multi = atof((const char *)propValue);
                 }
+                else if (strcmp((const char *)propName, "migrants.formula") == 0) {
+                    if (propValue[0] == '1') {
+                        rc->flags |= RCF_MIGRANTS;
+                    }
+                }
                 else {
                     set_param(&rc->parameters, (const char *)propName, (const char *)propValue);
                 }

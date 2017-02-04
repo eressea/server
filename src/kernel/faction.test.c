@@ -202,7 +202,7 @@ static void test_max_migrants(CuTest *tc) {
     f = test_create_faction(rc);
     u = test_create_unit(f, test_create_region(0, 0, 0));
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
-    set_param(&rc->parameters, "migrants.formula", "1");
+    rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
     scale_number(u, 250);
     CuAssertIntEquals(tc, 13, count_maxmigrants(f));
