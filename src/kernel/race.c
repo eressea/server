@@ -290,6 +290,15 @@ double rc_maxaura(const race *rc) {
     return rc->maxaura / 100.0;
 }
 
+int rc_armor_bonus(const race *rc) {
+    return get_param_int(rc->parameters, "armor.stamina", 0);
+}
+
+int rc_migrants_formula(const race *rc)
+{
+    return rc->parameters ? get_param_int(rc->parameters, "migrants.formula", MIGRANTS_NONE) : MIGRANTS_NONE;
+}
+
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     const char * postfix = 0;
     if (!rc) {

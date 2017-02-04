@@ -223,10 +223,13 @@ static void test_natural_armor(CuTest * tc)
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     set_level(u, SK_STAMINA, 2);
+    CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
     set_param(&rc->parameters, "armor.stamina", "1");
+    CuAssertIntEquals(tc, 1, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 2, natural_armor(u));
     set_param(&rc->parameters, "armor.stamina", "2");
+    CuAssertIntEquals(tc, 2, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 1, natural_armor(u));
     test_cleanup();
 }

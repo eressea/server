@@ -753,12 +753,9 @@ int count_migrants(const faction * f)
     return count_faction(f, COUNT_MIGRANTS);
 }
 
-#define MIGRANTS_NONE 0
-#define MIGRANTS_LOG10 1
-
 int count_maxmigrants(const faction * f)
 {
-    int formula = f->race->parameters ? get_param_int(f->race->parameters, "migrants.formula", MIGRANTS_NONE) : MIGRANTS_NONE;
+    int formula = rc_migrants_formula(f->race);
 
     if (formula == MIGRANTS_LOG10) {
         int nsize = count_all(f);

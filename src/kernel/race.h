@@ -186,6 +186,12 @@ extern "C" {
 
     double rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);
+    int rc_armor_bonus(const struct race *rc);
+
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+    int rc_migrants_formula(const race *rc);
+
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */

@@ -1014,17 +1014,13 @@ static void vampirism(troop at, int damage)
 
 #define MAXRACES 128
 
-static int armor_bonus(const race *rc) {
-    return get_param_int(rc->parameters, "armor.stamina", -1);
-}
-
 int natural_armor(unit * du)
 {
     const race *rc = u_race(du);
     int an;
 
     assert(rc);
-    an = armor_bonus(rc);
+    an = rc_armor_bonus(rc);
     if (an > 0) {
         int sk = effskill(du, SK_STAMINA, 0);
         return rc->armor + sk / an;

@@ -19,9 +19,13 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
     struct building;
+    struct race;
 
     bool markets_module(void);
     void do_markets(void);
+
+    int rc_luxury_trade(const struct race *rc);
+    int rc_herb_trade(const struct race *rc);
 
 #ifdef __cplusplus
 }
