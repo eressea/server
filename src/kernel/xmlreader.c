@@ -1575,13 +1575,12 @@ static int parse_spells(xmlDocPtr doc)
 
 static void parse_ai(race * rc, xmlNodePtr node)
 {
-    int n;
-
-    n = xml_ivalue(node, "scare", 0);
-    if (n>0) {
-        attrib *a = a_new(&at_scare);
-        a->data.i = n;
-        a_add(&rc->attribs, a);
+    xmlChar *propValue;
+    
+    propValue = xmlGetProp(node, BAD_CAST "scare");
+    if (propValue) {
+        rc_set_param(rc, "ai.scare", (const char *)propValue);
+        xmlFree(propValue);
     }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
     rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);

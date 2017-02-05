@@ -311,6 +311,11 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
     if (strcmp(key, "recruit_multi") == 0) {
         rc->recruit_multi = atof(value);
     }
+    else if (strcmp(key, "ai.scare") == 0) {
+        attrib *a = a_new(&at_scare);
+        a->data.i = atoi(value);
+        a_add(&rc->attribs, a);
+    }
     else if (strcmp(key, "migrants.formula") == 0) {
         if (value[0] == '1') {
             rc->flags |= RCF_MIGRANTS;

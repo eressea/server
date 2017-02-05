@@ -96,6 +96,8 @@ static void test_rc_set_param(CuTest *tc) {
     rc_set_param(rc, "migrants.formula", "1");
     CuAssertIntEquals(tc, RCF_MIGRANTS, rc->flags&RCF_MIGRANTS);
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
+    rc_set_param(rc, "ai.scare", "400");
+    CuAssertIntEquals(tc, 400, rc_scare(rc));
     test_cleanup();
 }
 
