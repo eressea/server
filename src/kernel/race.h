@@ -189,6 +189,7 @@ extern "C" {
     double rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);
     int rc_armor_bonus(const struct race *rc);
+    int rc_scare(const struct race *rc);
 
 #define MIGRANTS_NONE 0
 #define MIGRANTS_LOG10 1

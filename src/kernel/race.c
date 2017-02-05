@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <storage.h>
 
 /* attrib includes */
+#include <attributes/attributes.h>
 #include <attributes/raceprefix.h>
 
 /* libc includes */
@@ -290,8 +291,15 @@ double rc_maxaura(const race *rc) {
     return rc->maxaura / 100.0;
 }
 
-int rc_armor_bonus(const race *rc) {
+int rc_armor_bonus(const race *rc)
+{
     return get_param_int(rc->parameters, "armor.stamina", 0);
+}
+
+int rc_scare(const struct race *rc)
+{
+    attrib *a = a_find(rc->attribs, &at_scare);
+    return a ? a->data.i : 0;
 }
 
 int rc_migrants_formula(const race *rc)
