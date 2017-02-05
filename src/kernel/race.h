@@ -154,7 +154,6 @@ extern "C" {
         void(*init_familiar) (struct unit *);
 
         const struct race *familiars[MAXMAGIETYP];
-        struct attrib *attribs;
         struct race *next;
     } race;
 

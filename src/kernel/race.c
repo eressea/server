@@ -48,7 +48,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <storage.h>
 
 /* attrib includes */
-#include <attributes/attributes.h>
 #include <attributes/raceprefix.h>
 
 /* libc includes */
@@ -298,8 +297,7 @@ int rc_armor_bonus(const race *rc)
 
 int rc_scare(const struct race *rc)
 {
-    attrib *a = a_find(rc->attribs, &at_scare);
-    return a ? a->data.i : 0;
+    return get_param_int(rc->parameters, "ai.scare", 0);
 }
 
 int rc_migrants_formula(const race *rc)
@@ -310,11 +308,6 @@ int rc_migrants_formula(const race *rc)
 void rc_set_param(struct race *rc, const char *key, const char *value) {
     if (strcmp(key, "recruit_multi") == 0) {
         rc->recruit_multi = atof(value);
-    }
-    else if (strcmp(key, "ai.scare") == 0) {
-        attrib *a = a_new(&at_scare);
-        a->data.i = atoi(value);
-        a_add(&rc->attribs, a);
     }
     else if (strcmp(key, "migrants.formula") == 0) {
         if (value[0] == '1') {
