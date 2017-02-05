@@ -422,10 +422,7 @@ static void expandrecruit(region * r, request * recruitorders)
 
 static int recruit_cost(const faction * f, const race * rc)
 {
-    if (is_monsters(f) || f->race == rc) {
-        return rc->recruitcost;
-    }
-    else if (valid_race(f, rc)) {
+    if (is_monsters(f) || valid_race(f, rc)) {
         return rc->recruitcost;
     }
     return -1;

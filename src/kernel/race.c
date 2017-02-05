@@ -299,6 +299,20 @@ int rc_migrants_formula(const race *rc)
     return (rc->flags&RCF_MIGRANTS) ? MIGRANTS_LOG10 : MIGRANTS_NONE;
 }
 
+void rc_set_param(struct race *rc, const char *key, const char *value) {
+    if (strcmp(key, "recruit_multi") == 0) {
+        rc->recruit_multi = atof(value);
+    }
+    else if (strcmp(key, "migrants.formula") == 0) {
+        if (value[0] == '1') {
+            rc->flags |= RCF_MIGRANTS;
+        }
+    }
+    else {
+        set_param(&rc->parameters, key, value);
+    }
+}
+
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     const char * postfix = 0;
     if (!rc) {

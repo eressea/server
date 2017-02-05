@@ -86,8 +86,8 @@ static void test_rc_trade(CuTest *tc) {
     rc = test_create_race("human");
     CuAssertIntEquals(tc, 1000, rc_luxury_trade(rc));
     CuAssertIntEquals(tc, 500, rc_herb_trade(rc));
-    set_param(&rc->parameters, "luxury_trade", "100");
-    set_param(&rc->parameters, "herb_trade", "50");
+    rc_set_param(rc, "luxury_trade", "100");
+    rc_set_param(rc, "herb_trade", "50");
     CuAssertIntEquals(tc, 100, rc_luxury_trade(rc));
     CuAssertIntEquals(tc, 50, rc_herb_trade(rc));
     test_cleanup();

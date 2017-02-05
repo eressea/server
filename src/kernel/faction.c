@@ -558,15 +558,20 @@ void faction_setpassword(faction * f, const char *pwhash)
     f->_password = strdup(pwhash);
 }
 
+const race *other_race(const race *rc) {
+    if (rc->parameters) {
+        const char *str = get_param(rc->parameters, "other_race");
+        return str ? rc_find(str) : NULL;
+    }
+    return NULL;
+}
+
 bool valid_race(const struct faction *f, const struct race *rc)
 {
     if (f->race == rc)
         return true;
     else {
-        const char *str = get_param(f->race->parameters, "other_race");
-        if (str)
-            return rc_find(str) == rc;
-        return false;
+        return other_race(f->race) == rc;
     }
 }
 

@@ -1734,17 +1734,7 @@ static int parse_races(xmlDocPtr doc)
             else if (strcmp((const char *)child->name, "param") == 0) {
                 xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
                 xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
-                if (strcmp((const char *)propName, "recruit_multi")==0) {
-                    rc->recruit_multi = atof((const char *)propValue);
-                }
-                else if (strcmp((const char *)propName, "migrants.formula") == 0) {
-                    if (propValue[0] == '1') {
-                        rc->flags |= RCF_MIGRANTS;
-                    }
-                }
-                else {
-                    set_param(&rc->parameters, (const char *)propName, (const char *)propValue);
-                }
+                rc_set_param(rc, (const char *)propName, (const char *)propValue);
                 xmlFree(propName);
                 xmlFree(propValue);
             }

@@ -184,6 +184,8 @@ extern "C" {
     const char * rc_name_s(const race *rc, name_t n);
     const char * rc_name(const race *rc, name_t n, char *name, size_t size);
 
+    void rc_set_param(struct race *rc, const char *key, const char *value);
+
     double rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);
     int rc_armor_bonus(const struct race *rc);
