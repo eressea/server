@@ -81,7 +81,7 @@ VALGRIND=$(which valgrind)
 if [ ! -z $VALGRIND ]; then
 SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
-$SERVER -v$verbose -t$turn -re$game $SOURCE/scripts/run-turn.lua
+$SERVER -v$verbose -t$turn $SOURCE/scripts/run-turn.lua
 let turn=$turn+1
 [ -e data/$turn.dat ] || abort "no data file created"
 }
