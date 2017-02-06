@@ -31,7 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <assert.h>
 
-static double popularity()
+static double popularity(void)
 {
     return 1.0 / (MORALE_AVERAGE - MORALE_COOLDOWN); /* 10 turns average */
 }
