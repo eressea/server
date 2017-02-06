@@ -47,6 +47,7 @@ extern "C" {
     struct spell;
     struct spellref;
     struct locale;
+    struct rcoption;
 
     extern int num_races;
 
@@ -153,6 +154,8 @@ extern "C" {
         struct item *(*itemdrop) (const struct race *, int size);
         void(*init_familiar) (struct unit *);
 
+        struct rcoption *options; // rarely used properties
+
         const struct race *familiars[MAXMAGIETYP];
         struct race *next;
     } race;
@@ -189,6 +192,7 @@ extern "C" {
     double rc_maxaura(const struct race *rc);
     int rc_armor_bonus(const struct race *rc);
     int rc_scare(const struct race *rc);
+    const race *rc_otherrace(const race *rc);
 
 #define MIGRANTS_NONE 0
 #define MIGRANTS_LOG10 1

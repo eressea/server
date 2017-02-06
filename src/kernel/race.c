@@ -44,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/variant.h>
 
 #include <storage.h>
 
@@ -76,6 +77,59 @@ static const char *racenames[MAXRACES] = {
     "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
+
+#define MAXOPTIONS 4
+typedef struct rcoption {
+    unsigned char key[MAXOPTIONS];
+    variant value[MAXOPTIONS];
+} rcoption;
+
+enum {
+    RCO_NONE,
+    RCO_SCARE,
+    RCO_OTHER
+};
+
+static void rc_setoption(race *rc, int key, const char *value) {
+    int i;
+    variant *v = NULL;
+    if (!rc->options) {
+        rc->options = malloc(sizeof(rcoption));
+        rc->options->key[0] = key;
+        rc->options->key[1] = RCO_NONE;
+        v = rc->options->value;
+    } else {
+        for (i=0;!v && i < MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+            if (rc->options->key[i]==key) {
+                v = rc->options->value+i;
+            }
+        }
+        if (!v) {
+            assert(i<MAXOPTIONS || !"MAXOPTIONS too small for race");
+            v = rc->options->value+i;
+            rc->options->key[i] = key;
+        }
+    }
+    assert(v);
+    if (key == RCO_SCARE) {
+        v->i = atoi(value);
+    }
+    else if (key == RCO_OTHER) {
+        v->v = rc_get_or_create(value);
+    }
+}
+
+static variant *rc_getoption(const race *rc, int key) {
+    if (rc->options) {
+        int i;
+        for (i=0;i!=MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+            if (rc->options->key[i]==key) {
+                return rc->options->value+i;
+            }
+        }
+    }
+    return NULL;
+}
 
 const struct race *findrace(const char *s, const struct locale *lang)
 {
@@ -297,7 +351,14 @@ int rc_armor_bonus(const race *rc)
 
 int rc_scare(const struct race *rc)
 {
-    return get_param_int(rc->parameters, "ai.scare", 0);
+    variant *v = rc_getoption(rc, RCO_SCARE);
+    return v ? v->i : 0;
+}
+
+const race *rc_otherrace(const race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_OTHER);
+    return v ? (const race *)v->v : NULL;
 }
 
 int rc_migrants_formula(const race *rc)
@@ -313,6 +374,12 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
         if (value[0] == '1') {
             rc->flags |= RCF_MIGRANTS;
         }
+    }
+    else if (strcmp(key, "other_race")==0) {
+        rc_setoption(rc, RCO_OTHER, value);
+    }
+    else if (strcmp(key, "ai.scare")==0) {
+        rc_setoption(rc, RCO_SCARE, value);
     }
     else {
         set_param(&rc->parameters, key, value);
