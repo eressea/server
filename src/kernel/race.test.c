@@ -88,9 +88,7 @@ static void test_rc_set_param(CuTest *tc) {
     race *rc;
     test_setup();
     rc = test_create_race("human");
-    CuAssertPtrEquals(tc, NULL, rc->parameters);
-    rc_set_param(rc, "hodor", "HODOR");
-    CuAssertStrEquals(tc, "HODOR", get_param(rc->parameters, "hodor"));
+    CuAssertPtrEquals(tc, NULL, rc->options);
     rc_set_param(rc, "recruit_multi", "0.5");
     CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
     rc_set_param(rc, "migrants.formula", "1");
@@ -98,6 +96,8 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
     rc_set_param(rc, "ai.scare", "400");
     CuAssertIntEquals(tc, 400, rc_scare(rc));
+    rc_set_param(rc, "hunger.damage", "1d10+12");
+    CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
     test_cleanup();
 }
 

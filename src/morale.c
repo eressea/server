@@ -31,10 +31,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <assert.h>
 
-static double rc_popularity(const struct race *rc)
+static double popularity()
 {
-    int pop = get_param_int(rc->parameters, "morale", MORALE_AVERAGE);
-    return 1.0 / (pop - MORALE_COOLDOWN); /* 10 turns average */
+    return 1.0 / (MORALE_AVERAGE - MORALE_COOLDOWN); /* 10 turns average */
 }
 
 void morale_update(region *r) {
@@ -52,7 +51,7 @@ void morale_update(region *r) {
         if (morale < maxmorale) {
             if (stability > MORALE_COOLDOWN && r->land->ownership->owner
                 && morale < MORALE_MAX) {
-                double ch = rc_popularity(r->land->ownership->owner->race);
+                double ch = popularity();
                 if (is_cursed(r->attribs, C_GENEROUS, 0)) {
                     ch *= 1.2;            /* 20% improvement */
                 }

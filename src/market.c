@@ -66,22 +66,6 @@ attrib_type at_market = {
     NULL, NULL, NULL, ATF_UNIQUE
 };
 
-int rc_luxury_trade(const struct race *rc)
-{
-    if (rc) {
-        return get_param_int(rc->parameters, "luxury_trade", 1000);
-    }
-    return 1000;
-}
-
-int rc_herb_trade(const struct race *rc)
-{
-    if (rc) {
-        return get_param_int(rc->parameters, "herb_trade", 500);
-    }
-    return 500;
-}
-
 #define MAX_MARKETS 128
 #define MIN_PEASANTS 50         /* if there are at least this many peasants, you will get 1 good */
 

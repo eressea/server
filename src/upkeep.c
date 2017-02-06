@@ -59,7 +59,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 }
 
 static const char *hunger_damage(const race *rc) {
-    const char * damage = rc->parameters ? get_param(rc->parameters, "hunger.damage") : NULL;
+    const char * damage = rc_hungerdamage(rc);
     if (!damage) {
         damage = config_get("hunger.damage");
     }
@@ -98,11 +98,11 @@ static bool hunger(int number, unit * u)
         deathcounts(r, dead);
     }
     if (hpsub > 0) {
-        /* Jetzt die Schäden der nicht gestorbenen abziehen. */
+        /* Jetzt die Schï¿½den der nicht gestorbenen abziehen. */
         u->hp -= hpsub;
-        /* Meldung nur, wenn noch keine für Tote generiert. */
+        /* Meldung nur, wenn noch keine fï¿½r Tote generiert. */
         if (dead == 0) {
-            /* Durch unzureichende Ernährung wird %s geschwächt */
+            /* Durch unzureichende Ernï¿½hrung wird %s geschwï¿½cht */
             ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
         }
     }
@@ -125,13 +125,13 @@ void get_food(region * r)
         return;
     }
     /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
-    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
-    * jede Einheit genug Silber für ihren Unterhalt hat. */
+    * wird zunï¿½chst so auf die Einheiten aufgeteilt, dass idealerweise
+    * jede Einheit genug Silber fï¿½r ihren Unterhalt hat. */
 
     for (u = r->units; u; u = u->next) {
         int need = lifestyle(u);
 
-        /* Erstmal zurücksetzen */
+        /* Erstmal zurï¿½cksetzen */
         freset(u, UFL_HUNGER);
 
         if (u->ship && (u->ship->flags & SF_FISHING)) {
@@ -230,7 +230,7 @@ void get_food(region * r)
     }
 
     /* 3. bestimmen, wie viele Bauern gefressen werden.
-    * bei fehlenden Bauern den Dämon hungern lassen
+    * bei fehlenden Bauern den Dï¿½mon hungern lassen
     */
     for (u = r->units; u; u = u->next) {
         if (u_race(u) == rc_demon) {
@@ -293,7 +293,7 @@ void get_food(region * r)
     }
     rsetpeasants(r, peasantfood / 10);
 
-    /* 3. Von den überlebenden das Geld abziehen: */
+    /* 3. Von den ï¿½berlebenden das Geld abziehen: */
     for (u = r->units; u; u = u->next) {
         int need = MIN(get_money(u), lifestyle(u));
         change_money(u, -need);

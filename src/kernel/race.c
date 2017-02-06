@@ -86,8 +86,12 @@ typedef struct rcoption {
 
 enum {
     RCO_NONE,
-    RCO_SCARE,
-    RCO_OTHER
+    RCO_SCARE,   // races that scare and eat peasants
+    RCO_OTHER,   // may recruit from another race
+    RCO_STAMINA, // every n levels of stamina add +1 RC
+    RCO_HUNGER,  // custom hunger.damage override (char *)
+    RCO_TRADELUX,
+    RCO_TRADEHERB,
 };
 
 static void rc_setoption(race *rc, int key, const char *value) {
@@ -114,8 +118,20 @@ static void rc_setoption(race *rc, int key, const char *value) {
     if (key == RCO_SCARE) {
         v->i = atoi(value);
     }
+    else if (key == RCO_STAMINA) {
+        v->i = atoi(value);
+    }
     else if (key == RCO_OTHER) {
         v->v = rc_get_or_create(value);
+    }
+    else if (key == RCO_HUNGER) {
+        v->v = strdup(value);
+    }
+    else if (key == RCO_TRADEHERB) {
+        v->i = atoi(value);
+    }
+    else if (key == RCO_TRADELUX) {
+        v->i = atoi(value);
     }
 }
 
@@ -238,12 +254,20 @@ void free_races(void) {
     while (races) {
         int i;
         race * rc = races->next;
+        rcoption * opt = races->options;
         
+        if (opt) {
+            for (i=0;i!=MAXOPTIONS && opt->key[i]!=RCO_NONE;++i) {
+                if (opt->key[i]==RCO_HUNGER) {
+                    free(opt->value[i].v);
+                }
+            }
+            free(opt);
+        }
         for (i = 0; races->attack[i].type!=AT_NONE; ++i) {
             spellref_free(races->attack[i].data.sp);
         }
         spellref_free(races->precombatspell);
-        free_params(&races->parameters);
         free(xrefs);
         xrefs = 0;
         free(races->_name);
@@ -344,15 +368,40 @@ double rc_maxaura(const race *rc) {
     return rc->maxaura / 100.0;
 }
 
+const char * rc_hungerdamage(const race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_HUNGER);
+    return v ? (const char *)v->v : NULL;
+}
+
 int rc_armor_bonus(const race *rc)
 {
-    return get_param_int(rc->parameters, "armor.stamina", 0);
+    variant *v = rc_getoption(rc, RCO_STAMINA);
+    return v ? v->i : 0;
 }
 
 int rc_scare(const struct race *rc)
 {
     variant *v = rc_getoption(rc, RCO_SCARE);
     return v ? v->i : 0;
+}
+
+int rc_luxury_trade(const struct race *rc)
+{
+    if (rc) {
+        variant *v = rc_getoption(rc, RCO_TRADELUX);
+        if (v) return v->i;
+    }
+    return 1000;
+}
+
+int rc_herb_trade(const struct race *rc)
+{
+    if (rc) {
+        variant *v = rc_getoption(rc, RCO_TRADEHERB);
+        if (v) return v->i;
+    }
+    return 500;
 }
 
 const race *rc_otherrace(const race *rc)
@@ -381,8 +430,20 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
     else if (strcmp(key, "ai.scare")==0) {
         rc_setoption(rc, RCO_SCARE, value);
     }
+    else if (strcmp(key, "hunger.damage")==0) {
+        rc_setoption(rc, RCO_HUNGER, value);
+    }
+    else if (strcmp(key, "armor.stamina")==0) {
+        rc_setoption(rc, RCO_STAMINA, value);
+    }
+    else if (strcmp(key, "luxury_trade")==0) {
+        rc_setoption(rc, RCO_TRADELUX, value);
+    }
+    else if (strcmp(key, "herb_trade")==0) {
+        rc_setoption(rc, RCO_TRADEHERB, value);
+    }
     else {
-        set_param(&rc->parameters, key, value);
+        log_error("unknown property for race %s: %s=%s", rc->_name, key, value);
     }
 }
 

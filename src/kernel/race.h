@@ -138,7 +138,6 @@ extern "C" {
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
         int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
-        struct param *parameters;   // additional properties, for an example see natural_armor
         struct spellref *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
@@ -188,10 +187,13 @@ extern "C" {
 
     void rc_set_param(struct race *rc, const char *key, const char *value);
 
+    int rc_luxury_trade(const struct race *rc);
+    int rc_herb_trade(const struct race *rc);
     double rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);
     int rc_armor_bonus(const struct race *rc);
     int rc_scare(const struct race *rc);
+    const char * rc_hungerdamage(const race *rc);
     const race *rc_otherrace(const race *rc);
 
 #define MIGRANTS_NONE 0
