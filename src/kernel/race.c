@@ -94,7 +94,8 @@ enum {
     RCO_TRADEHERB,
 };
 
-static void rc_setoption(race *rc, int key, const char *value) {
+static void rc_setoption(race *rc, int k, const char *value) {
+    unsigned char key = (unsigned char)k;
     int i;
     variant *v = NULL;
     if (!rc->options) {
