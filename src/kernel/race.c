@@ -112,6 +112,9 @@ static void rc_setoption(race *rc, int key, const char *value) {
             assert(i<MAXOPTIONS || !"MAXOPTIONS too small for race");
             v = rc->options->value+i;
             rc->options->key[i] = key;
+            if (i+1<MAXOPTIONS) {
+                rc->options->key[i+1]=RCO_NONE;
+            }
         }
     }
     assert(v);
