@@ -359,7 +359,6 @@ static int parse_calendar(xmlDocPtr doc)
     xmlXPathObjectPtr xpathCalendars;
     xmlNodeSetPtr nsetCalendars;
 
-    /* reading eressea/buildings/building */
     xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
     nsetCalendars = xpathCalendars->nodesetval;
     months_per_year = 0;
@@ -374,7 +373,7 @@ static int parse_calendar(xmlDocPtr doc)
             xmlChar *start;
 
             start = xmlGetProp(calendar, BAD_CAST "start");
-            if (start && config_get("game.start")==NULL) {
+            if (start && config_get("game.start") == NULL) {
                 config_set("game.start", (const char *)start);
                 xmlFree(start);
             }
