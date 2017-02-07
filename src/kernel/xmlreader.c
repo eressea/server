@@ -361,7 +361,6 @@ static int parse_calendar(xmlDocPtr doc)
 
     xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
     nsetCalendars = xpathCalendars->nodesetval;
-    months_per_year = 0;
     if (nsetCalendars != NULL && nsetCalendars->nodeNr != 0) {
         int c;
         for (c = 0; c != nsetCalendars->nodeNr; ++c) {
