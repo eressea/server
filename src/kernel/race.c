@@ -269,7 +269,13 @@ void free_races(void) {
             free(opt);
         }
         for (i = 0; races->attack[i].type!=AT_NONE; ++i) {
-            spellref_free(races->attack[i].data.sp);
+            att *at = races->attack + i;
+            if (at->type == AT_SPELL) {
+                spellref_free(at->data.sp);
+            }
+            else {
+                free(at->data.dice);
+            }
         }
         spellref_free(races->precombatspell);
         free(xrefs);

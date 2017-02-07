@@ -105,7 +105,7 @@ extern "C" {
     typedef struct att {
         int type;
         union {
-            const char *dice;
+            char *dice;
             struct spellref *sp;
         } data;
         int flags;
