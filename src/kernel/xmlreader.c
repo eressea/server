@@ -358,16 +358,13 @@ static int parse_calendar(xmlDocPtr doc)
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr xpathCalendars;
     xmlNodeSetPtr nsetCalendars;
-    int c, rv = 0;
 
     /* reading eressea/buildings/building */
     xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
     nsetCalendars = xpathCalendars->nodesetval;
     months_per_year = 0;
-    if (nsetCalendars == NULL || nsetCalendars->nodeNr == 0) {
-        rv = -1;
-    }
-    else
+    if (nsetCalendars != NULL && nsetCalendars->nodeNr != 0) {
+        int c;
         for (c = 0; c != nsetCalendars->nodeNr; ++c) {
             xmlNodePtr calendar = nsetCalendars->nodeTab[c];
             xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
@@ -477,10 +474,11 @@ static int parse_calendar(xmlDocPtr doc)
             xmlFree(newyear);
             newyear = NULL;
         }
+    }
     xmlXPathFreeObject(xpathCalendars);
     xmlXPathFreeContext(xpath);
 
-    return rv;
+    return 0;
 }
 
 static int parse_ships(xmlDocPtr doc)
