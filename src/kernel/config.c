@@ -203,7 +203,7 @@ param_t findparam(const char *s, const struct locale * lang)
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
         if (!cb) {
-            log_error("no parameters defined in locale %s", locale_name(lang));
+            log_warning("no parameters defined in locale %s", locale_name(lang));
         }
         else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
             cb_get_kv(match, &i, sizeof(int));
