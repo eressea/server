@@ -301,7 +301,7 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
                 add_translation(cb, key, i);
             }
             else {
-                log_error("no translation for %s in locale %s", s, lang->name);
+                log_warning("no translation for %s in locale %s", s, lang->name);
             }
         }
     }
