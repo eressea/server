@@ -13,7 +13,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 
 #include "bind_unit.h"
-#include "bind_dict.h"
 #include "alchemy.h"
 #include "bindings.h"
 #include "move.h"
@@ -66,12 +65,6 @@ static int tolua_bufunit(lua_State * L) {
     tolua_pushstring(L, buf);
     return 1;
 
-}
-static int tolua_unit_get_objects(lua_State * L)
-{
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
-    return 1;
 }
 
 int tolua_unitlist_nextf(lua_State * L)
@@ -1013,7 +1006,6 @@ void tolua_unit_open(lua_State * L)
                 tolua_unit_set_race);
             tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
 
-            tolua_variable(L, TOLUA_CAST "objects", &tolua_unit_get_objects, 0);
             tolua_function(L, TOLUA_CAST "show", &tolua_bufunit);
         }
         tolua_endmodule(L);

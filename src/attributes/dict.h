@@ -26,13 +26,6 @@ extern "C" {
 
     extern struct attrib_type at_dict;
 
-    struct attrib *dict_create(const char *name, dict_type type,
-        variant value);
-    void dict_get(const struct attrib *a, dict_type * type,
-        variant * value);
-    void dict_set(struct attrib *a, dict_type type, variant value);
-    const char *dict_name(const struct attrib *a);
-
 #ifdef __cplusplus
 }
 #endif

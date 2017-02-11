@@ -66,7 +66,7 @@ attrib_type at_keys = {
     NULL
 };
 
-void a_upgradekeys(attrib **alist, attrib *abegin) {
+static void a_upgradekeys(attrib **alist, attrib *abegin) {
     int n = 0, *keys = 0;
     int i = 0, val[4];
     attrib *a, *ak = a_find(*alist, &at_keys);
