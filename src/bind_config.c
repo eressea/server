@@ -20,7 +20,6 @@
 #include "kernel/terrain.h"
 
 void config_reset(void) {
-    default_locale = 0;
     free_config();
     free_nrmesssages();
     free_spells();

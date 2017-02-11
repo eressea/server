@@ -1470,7 +1470,6 @@ int readgame(const char *filename)
     FILE *F;
     size_t sz;
 
-    init_locales();
     log_debug("- reading game data from %s", filename);
     join_path(datapath(), filename, path, sizeof(path));
 
