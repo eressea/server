@@ -330,17 +330,6 @@ function test_message()
   return msg
 end
 
-function test_hashtable()
-  local f = faction.create("noreply1@eressea.de", "human", "de")
-  f.objects:set("enno", "smart guy")
-  f.objects:set("age", 10)
-  assert(f.objects:get("jesus") == nil)
-  assert(f.objects:get("enno") == "smart guy")
-  assert(f.objects:get("age") == 10)
-  f.objects:set("age", nil)
-  assert(f.objects:get("age") == nil)
-end
-
 function test_events()
   local fail = 1
   local function msg_handler(u, evt)
