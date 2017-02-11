@@ -47,6 +47,7 @@ extern "C" {
     struct spell;
     struct spellref;
     struct locale;
+    struct rcoption;
 
     extern int num_races;
 
@@ -104,7 +105,7 @@ extern "C" {
     typedef struct att {
         int type;
         union {
-            const char *dice;
+            char *dice;
             struct spellref *sp;
         } data;
         int flags;
@@ -137,7 +138,6 @@ extern "C" {
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
         int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
-        struct param *parameters;   // additional properties, for an example see natural_armor
         struct spellref *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
@@ -153,8 +153,9 @@ extern "C" {
         struct item *(*itemdrop) (const struct race *, int size);
         void(*init_familiar) (struct unit *);
 
+        struct rcoption *options; // rarely used properties
+
         const struct race *familiars[MAXMAGIETYP];
-        struct attrib *attribs;
         struct race *next;
     } race;
 
@@ -184,9 +185,16 @@ extern "C" {
     const char * rc_name_s(const race *rc, name_t n);
     const char * rc_name(const race *rc, name_t n, char *name, size_t size);
 
+    void rc_set_param(struct race *rc, const char *key, const char *value);
+
+    int rc_luxury_trade(const struct race *rc);
+    int rc_herb_trade(const struct race *rc);
     double rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);
     int rc_armor_bonus(const struct race *rc);
+    int rc_scare(const struct race *rc);
+    const char * rc_hungerdamage(const race *rc);
+    const race *rc_otherrace(const race *rc);
 
 #define MIGRANTS_NONE 0
 #define MIGRANTS_LOG10 1

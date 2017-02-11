@@ -209,6 +209,22 @@ static void test_max_migrants(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_valid_race(CuTest *tc) {
+    race * rc1, *rc2;
+    faction *f;
+
+    test_setup();
+    rc1 = test_create_race("human");
+    rc2 = test_create_race("elf");
+    f = test_create_faction(rc1);
+    CuAssertTrue(tc, valid_race(f, rc1));
+    CuAssertTrue(tc, !valid_race(f, rc2));
+    rc_set_param(rc1, "other_race", "elf");
+    CuAssertTrue(tc, valid_race(f, rc1));
+    CuAssertTrue(tc, valid_race(f, rc2));
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -222,5 +238,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
     SUITE_ADD_TEST(suite, test_check_passwd);
+    SUITE_ADD_TEST(suite, test_valid_race);
     return suite;
 }

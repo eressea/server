@@ -20,9 +20,7 @@
 #include "kernel/terrain.h"
 
 void config_reset(void) {
-    default_locale = 0;
     free_config();
-    free_locales();
     free_nrmesssages();
     free_spells();
     free_buildingtypes();
@@ -37,7 +35,6 @@ int config_parse(const char *json)
     if (conf) {
         json_config(conf);
         cJSON_Delete(conf);
-        init_locales();
         return 0;
     }
     else {

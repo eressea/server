@@ -760,10 +760,6 @@ bool missile)
     if (is_riding(t) && (wtype == NULL || (fval(wtype, WTF_HORSEBONUS)
         && !fval(wtype, WTF_MISSILE)))) {
         skill += CavalryBonus(tu, enemy, BONUS_SKILL);
-        if (wtype)
-            skill =
-            skillmod(u_race(tu)->attribs, tu, tu->region, wtype->skill, skill,
-            SMF_RIDING);
     }
 
     if (t.index < tf->elvenhorses) {

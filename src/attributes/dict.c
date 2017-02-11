@@ -19,6 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "dict.h"
+#include "key.h"
 
 /* kernel includes */
 #include <kernel/building.h>
@@ -29,6 +30,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
+#include <util/log.h>
 #include <util/gamedata.h>
 #include <util/resolve.h>
 
@@ -53,46 +56,6 @@ typedef struct dict_data {
         struct faction *f;
     } data;
 } dict_data;
-
-static void
-dict_write(const attrib * a, const void *owner, struct storage *store)
-{
-    const dict_data *data = (dict_data *)a->data.v;
-    int type = (int)data->type;
-    WRITE_TOK(store, data->name);
-    WRITE_INT(store, type);
-    switch (data->type) {
-    case TINTEGER:
-        WRITE_INT(store, data->data.i);
-        break;
-    case TREAL:
-        WRITE_FLT(store, (float)data->data.real);
-        break;
-    case TSTRING:
-        WRITE_STR(store, data->data.str);
-        break;
-    case TUNIT:
-        write_unit_reference(data->data.u, store);
-        break;
-    case TFACTION:
-        write_faction_reference(data->data.f, store);
-        break;
-    case TBUILDING:
-        write_building_reference(data->data.b, store);
-        break;
-    case TSHIP:
-        /* write_ship_reference(data->data.sh, store); */
-        assert(!"not implemented");
-        break;
-    case TREGION:
-        write_region_reference(data->data.r, store);
-        break;
-    case TNONE:
-        break;
-    default:
-        assert(!"illegal type in object-attribute");
-    }
-}
 
 static int dict_read(attrib * a, void *owner, gamedata *data)
 {
@@ -164,7 +127,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     default:
         return AT_READ_FAIL;
     }
-    return AT_READ_OK;
+    return AT_READ_DEPR;
 }
 
 static void dict_init(attrib * a)
@@ -184,100 +147,46 @@ static void dict_done(attrib * a)
     free(a->data.v);
 }
 
+static void dict_upgrade(attrib **alist, attrib *abegin) {
+    int n = 0, *keys = 0;
+    int i = 0, val[4];
+    attrib *a, *ak = a_find(*alist, &at_keys);
+    if (ak) {
+        keys = (int *)ak->data.v;
+        if (keys) n = keys[0];
+    }
+    for (a = abegin; a && a->type == abegin->type; a = a->next) {
+        dict_data *dd = (dict_data *)a->data.v;
+        if (dd->type != TINTEGER) {
+            log_error("dict conversion, bad type %d for %s", dd->type, dd->name);
+        }
+        else {
+            if (strcmp(dd->name, "embassy_muschel")==0) {
+                val[i++] = atoi36("mupL");
+            }
+            else {
+                log_error("dict conversion, bad entry %s", dd->name);
+            }
+        }
+        if (i == 4) {
+            keys = realloc(keys, sizeof(int) * (n + i + 1));
+            memcpy(keys + n + 1, val, sizeof(int)*i);
+            n += i;
+            i = 0;
+        }
+    }
+    if (i > 0) {
+        keys = realloc(keys, sizeof(int) * (n + i + 1));
+        memcpy(keys + n + 1, val, sizeof(int)*i);
+        if (!ak) {
+            ak = a_add(alist, a_new(&at_keys));
+        }
+    }
+    ak->data.v = keys;
+    keys[0] = n + i;
+}
+
 attrib_type at_dict = {
     "object", dict_init, dict_done, NULL,
-    dict_write, dict_read
+    NULL, dict_read, dict_upgrade
 };
-
-const char *dict_name(const attrib * a)
-{
-    dict_data *data = (dict_data *)a->data.v;
-    return data->name;
-}
-
-struct attrib *dict_create(const char *name, dict_type type, variant value)
-{
-    attrib *a = a_new(&at_dict);
-    dict_data *data = (dict_data *)a->data.v;
-    data->name = strdup(name);
-
-    dict_set(a, type, value);
-    return a;
-}
-
-void dict_set(attrib * a, dict_type type, variant value)
-{
-    dict_data *data = (dict_data *)a->data.v;
-
-    if (data->type == TSTRING)
-        free(data->data.str);
-    data->type = type;
-    switch (type) {
-    case TSTRING:
-        data->data.str = value.v ? strdup(value.v) : NULL;
-        break;
-    case TINTEGER:
-        data->data.i = value.i;
-        break;
-    case TREAL:
-        data->data.real = value.f;
-        break;
-    case TREGION:
-        data->data.r = (region *)value.v;
-        break;
-    case TBUILDING:
-        data->data.b = (building *)value.v;
-        break;
-    case TFACTION:
-        data->data.f = (faction *)value.v;
-        break;
-    case TUNIT:
-        data->data.u = (unit *)value.v;
-        break;
-    case TSHIP:
-        data->data.sh = (ship *)value.v;
-        break;
-    case TNONE:
-        break;
-    default:
-        assert(!"invalid object-type");
-        break;
-    }
-}
-
-void dict_get(const struct attrib *a, dict_type * type, variant * value)
-{
-    dict_data *data = (dict_data *)a->data.v;
-    *type = data->type;
-    switch (data->type) {
-    case TSTRING:
-        value->v = data->data.str;
-        break;
-    case TINTEGER:
-        value->i = data->data.i;
-        break;
-    case TREAL:
-        value->f = (float)data->data.real;
-        break;
-    case TREGION:
-        value->v = data->data.r;
-        break;
-    case TBUILDING:
-        value->v = data->data.b;
-        break;
-    case TFACTION:
-        value->v = data->data.f;
-        break;
-    case TUNIT:
-        value->v = data->data.u;
-        break;
-    case TSHIP:
-        value->v = data->data.sh;
-        break;
-    case TNONE:
-        break;
-    default:
-        assert(!"invalid object-type");
-        break;
-    }
-}

@@ -31,7 +31,6 @@
 #include "study.h"
 
 /* attributes includes */
-#include <attributes/attributes.h>
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 
@@ -1013,11 +1012,11 @@ static void eaten_by_monster(unit * u)
     int horse = -1;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
-    attrib *a;
+    int scare;
 
-    a = a_find(rc->attribs, &at_scare);
-    if (a) {
-        n = rng_int() & a->data.i * u->number;
+    scare = rc_scare(rc);
+    if (scare>0) {
+        n = rng_int() % scare * u->number;
     } else {
         n = rng_int() % (u->number / 20 + 1);
         horse = 0;
@@ -1093,10 +1092,11 @@ static void scared_by_monster(unit * u)
 {
     int n;
     const race *rc = u_race(u);
-    attrib *a;
-    a = a_find(rc->attribs, &at_scare);
-    if (a) {
-        n = rng_int() & a->data.i * u->number;
+    int scare;
+    
+    scare = rc_scare(rc);
+    if (scare>0) {
+        n = rng_int() % scare * u->number;
     } else {
         n = rng_int() % (u->number / 4 + 1);
     }

@@ -225,10 +225,10 @@ static void test_natural_armor(CuTest * tc)
     set_level(u, SK_STAMINA, 2);
     CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
-    set_param(&rc->parameters, "armor.stamina", "1");
+    rc_set_param(rc, "armor.stamina", "1");
     CuAssertIntEquals(tc, 1, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 2, natural_armor(u));
-    set_param(&rc->parameters, "armor.stamina", "2");
+    rc_set_param(rc, "armor.stamina", "2");
     CuAssertIntEquals(tc, 2, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 1, natural_armor(u));
     test_cleanup();

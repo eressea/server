@@ -358,16 +358,12 @@ static int parse_calendar(xmlDocPtr doc)
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr xpathCalendars;
     xmlNodeSetPtr nsetCalendars;
-    int c, rv = 0;
 
-    /* reading eressea/buildings/building */
     xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
     nsetCalendars = xpathCalendars->nodesetval;
     months_per_year = 0;
-    if (nsetCalendars == NULL || nsetCalendars->nodeNr == 0) {
-        rv = -1;
-    }
-    else
+    if (nsetCalendars != NULL && nsetCalendars->nodeNr != 0) {
+        int c;
         for (c = 0; c != nsetCalendars->nodeNr; ++c) {
             xmlNodePtr calendar = nsetCalendars->nodeTab[c];
             xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
@@ -377,7 +373,7 @@ static int parse_calendar(xmlDocPtr doc)
             xmlChar *start;
 
             start = xmlGetProp(calendar, BAD_CAST "start");
-            if (start && config_get("game.start")==NULL) {
+            if (start && config_get("game.start") == NULL) {
                 config_set("game.start", (const char *)start);
                 xmlFree(start);
             }
@@ -477,10 +473,11 @@ static int parse_calendar(xmlDocPtr doc)
             xmlFree(newyear);
             newyear = NULL;
         }
+    }
     xmlXPathFreeObject(xpathCalendars);
     xmlXPathFreeContext(xpath);
 
-    return rv;
+    return 0;
 }
 
 static int parse_ships(xmlDocPtr doc)
@@ -1575,13 +1572,12 @@ static int parse_spells(xmlDocPtr doc)
 
 static void parse_ai(race * rc, xmlNodePtr node)
 {
-    int n;
-
-    n = xml_ivalue(node, "scare", 0);
-    if (n>0) {
-        attrib *a = a_new(&at_scare);
-        a->data.i = n;
-        a_add(&rc->attribs, a);
+    xmlChar *propValue;
+    
+    propValue = xmlGetProp(node, BAD_CAST "scare");
+    if (propValue) {
+        rc_set_param(rc, "ai.scare", (const char *)propValue);
+        xmlFree(propValue);
     }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
     rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
@@ -1734,22 +1730,11 @@ static int parse_races(xmlDocPtr doc)
             else if (strcmp((const char *)child->name, "param") == 0) {
                 xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
                 xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
-                if (strcmp((const char *)propName, "recruit_multi")==0) {
-                    rc->recruit_multi = atof((const char *)propValue);
-                }
-                else if (strcmp((const char *)propName, "migrants.formula") == 0) {
-                    if (propValue[0] == '1') {
-                        rc->flags |= RCF_MIGRANTS;
-                    }
-                }
-                else {
-                    set_param(&rc->parameters, (const char *)propName, (const char *)propValue);
-                }
+                rc_set_param(rc, (const char *)propName, (const char *)propValue);
                 xmlFree(propName);
                 xmlFree(propValue);
             }
         }
-        rc->recruit_multi = get_param_flt(rc->parameters, "recruit_multi", 1.0);
 
         /* reading eressea/races/race/skill */
         xpath->node = node;

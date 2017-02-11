@@ -563,10 +563,7 @@ bool valid_race(const struct faction *f, const struct race *rc)
     if (f->race == rc)
         return true;
     else {
-        const char *str = get_param(f->race->parameters, "other_race");
-        if (str)
-            return rc_find(str) == rc;
-        return false;
+        return rc_otherrace(f->race) == rc;
     }
 }
 

@@ -15,7 +15,6 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bind_storage.h"
 #include "bind_building.h"
-#include "bind_dict.h"
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
@@ -517,7 +516,7 @@ static void reset_game(void)
     for (f = factions; f; f = f->next) {
         f->flags &= FFL_SAVEMASK;
     }
-    init_locales();
+//    init_locales();
 }
 
 static int tolua_process_orders(lua_State * L)
@@ -1143,7 +1142,6 @@ lua_State *lua_init(const dictionary *inifile) {
     tolua_unit_open(L);
     tolua_message_open(L);
     tolua_order_open(L);
-    tolua_dict_open(L);
 #ifdef USE_CURSES
     tolua_gmtool_open(L);
 #endif

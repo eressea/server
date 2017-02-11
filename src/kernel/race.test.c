@@ -84,6 +84,23 @@ static void test_old_race(CuTest *tc)
     test_cleanup();
 }
 
+static void test_rc_set_param(CuTest *tc) {
+    race *rc;
+    test_setup();
+    rc = test_create_race("human");
+    CuAssertPtrEquals(tc, NULL, rc->options);
+    rc_set_param(rc, "recruit_multi", "0.5");
+    CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
+    rc_set_param(rc, "migrants.formula", "1");
+    CuAssertIntEquals(tc, RCF_MIGRANTS, rc->flags&RCF_MIGRANTS);
+    CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
+    rc_set_param(rc, "ai.scare", "400");
+    CuAssertIntEquals(tc, 400, rc_scare(rc));
+    rc_set_param(rc, "hunger.damage", "1d10+12");
+    CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
+    test_cleanup();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -92,6 +109,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
     SUITE_ADD_TEST(suite, test_rc_find);
+    SUITE_ADD_TEST(suite, test_rc_set_param);
     return suite;
 }
 

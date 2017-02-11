@@ -7,3 +7,4 @@ if config.rules then
     assert(0 == read_xml(confdir .. rules .. 'config.xml', confdir .. rules .. 'catalog.xml'), "could not load XML data, did you compile with LIBXML2 ?")
     assert(0 == eressea.config.read(rules .. 'config.json', confdir), "could not read JSON data")
 end
+eressea.game.reset()

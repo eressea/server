@@ -148,7 +148,6 @@ set(SERVER_SRC
   bind_locale.c
   bind_eressea.c
   bind_faction.c
-  bind_dict.c
   bind_order.c
   bindings.c
   bind_message.c
