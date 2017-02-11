@@ -13,7 +13,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "bind_ship.h"
 #include "bind_unit.h"
-#include "bind_dict.h"
 
 #include "move.h"
 
@@ -112,13 +111,6 @@ static int tolua_ship_get_units(lua_State * L)
     *unit_ptr = u;
 
     lua_pushcclosure(L, tolua_unitlist_nexts, 1);
-    return 1;
-}
-
-static int tolua_ship_get_objects(lua_State * L)
-{
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
 
@@ -233,8 +225,6 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
             tolua_variable(L, TOLUA_CAST "damage", tolua_ship_get_damage,
                 tolua_ship_set_damage);
-            tolua_variable(L, TOLUA_CAST "objects", tolua_ship_get_objects, 0);
-
             tolua_function(L, TOLUA_CAST "create", tolua_ship_create);
         }
         tolua_endmodule(L);
