@@ -95,7 +95,6 @@
 #include <triggers/createunit.h>
 #include <triggers/killunit.h>
 #include <triggers/timeout.h>
-#include <triggers/unitmessage.h>
 
 /* attributes includes */
 #include <attributes/targetregion.h>
