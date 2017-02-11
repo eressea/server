@@ -13,7 +13,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "bind_building.h"
 #include "bind_unit.h"
-#include "bind_dict.h"
 
 #include <kernel/config.h>
 #include <kernel/unit.h>
@@ -39,13 +38,6 @@ int tolua_buildinglist_next(lua_State * L)
     }
     else
         return 0;                   /* no more values to return */
-}
-
-static int tolua_building_get_objects(lua_State * L)
-{
-    building *self = (building *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
-    return 1;
 }
 
 static int tolua_building_set_working(lua_State * L)
@@ -258,7 +250,6 @@ void tolua_building_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "size", tolua_building_get_size,
                 tolua_building_set_size);
             tolua_function(L, TOLUA_CAST "get_typename", tolua_building_get_typename);
-            tolua_variable(L, TOLUA_CAST "objects", tolua_building_get_objects, 0);
             tolua_variable(L, TOLUA_CAST "working", tolua_building_get_working, tolua_building_set_working);
 
         }
