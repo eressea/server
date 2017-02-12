@@ -327,10 +327,10 @@ static int locale_init = 0;
 
 void init_locales(void)
 {
-    int l;
+    locale * lang;
     if (locale_init) return;
-    for (l = 0; localenames[l]; ++l) {
-        struct locale *lang = get_or_create_locale(localenames[l]);
+    assert(locales);
+    for (lang = locales; lang; lang = lang->next) {
         init_locale(lang);
     }
     locale_init = 1;

@@ -70,15 +70,13 @@ static void load_inifile(dictionary * d)
     lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
 
     verbosity = iniparser_getint(d, "game:verbose", 2);
-    str = iniparser_getstring(d, "game:locales", "de,en");
-    make_locales(str);
 }
 
 static dictionary *parse_config(const char *filename)
 {
     char path[MAX_PATH];
     dictionary *d;
-    const char *cfgpath = config_get("config.path");
+    const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
         join_path(cfgpath, filename, path, sizeof(path));
@@ -99,6 +97,8 @@ static dictionary *parse_config(const char *filename)
         gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
 #endif
     }
+    str = config_get("game.locales");
+    make_locales(str ? str : "de,en");
     return d;
 }
 
