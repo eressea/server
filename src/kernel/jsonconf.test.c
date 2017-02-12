@@ -600,9 +600,10 @@ static void test_infinitive_from_config(CuTest *tc) {
 
     cJSON *json = cJSON_Parse(data);
     CuAssertPtrNotNull(tc, json);
+    test_setup();
+    lang = get_or_create_locale("de");
     json_config(json);
 
-    lang = get_or_create_locale("de");
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));

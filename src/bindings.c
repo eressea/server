@@ -223,14 +223,6 @@ static int tolua_rng_int(lua_State * L)
     return 1;
 }
 
-static int tolua_read_orders(lua_State * L)
-{
-    const char *filename = tolua_tostring(L, 1, 0);
-    int result = readorders(filename);
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 static int tolua_message_unit(lua_State * L)
 {
     unit *sender = (unit *)tolua_tousertype(L, 1, 0);
@@ -1072,8 +1064,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
-//        tolua_function(L, TOLUA_CAST "write_map", &tolua_write_map);
-        tolua_function(L, TOLUA_CAST "read_orders", tolua_read_orders);
         tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
         tolua_function(L, TOLUA_CAST "write_reports", tolua_write_reports);
