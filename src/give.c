@@ -227,7 +227,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
     if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
-    else if (dst && (has_skill(u, SK_MAGIC) && dst->number > 0)) {
+    else if (has_skill(u, SK_MAGIC)) {
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
