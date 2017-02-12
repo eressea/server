@@ -4714,7 +4714,6 @@ static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
     int cast_level = co->level;
     double power = co->force;
     region *r = co_get_region(co);
-    curse *c;
 
     /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
      * also duration+2 */
@@ -4722,8 +4721,8 @@ static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
     duration = 2 + rng_int() % duration;
 
     /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-    c = create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, effect, 0);
-
+    create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, effect, 0);
+    
     /* Erfolg melden */
     ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
         "unit region command", mage, mage->region, co->order));
@@ -4841,7 +4840,6 @@ int sp_sweetdreams(castorder * co)
 
     /* Schleife ueber alle angegebenen Einheiten */
     for (n = 0; n < pa->length; n++) {
-        curse *c;
         unit *u;
         double effect;
         message *msg;
@@ -4865,7 +4863,7 @@ int sp_sweetdreams(castorder * co)
 
         /* Nichts machen als ein entsprechendes Attribut an die Einheit legen. */
         effect = 0.05f;
-        c = create_curse(mage, &u->attribs, ct_find("orcish"), power, duration, effect, men);
+        create_curse(mage, &u->attribs, ct_find("orcish"), power, duration, effect, men);
 
         msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
         r_addmessage(r, mage->faction, msg);
@@ -4886,10 +4884,9 @@ int sp_disturbingdreams(castorder * co)
     double power = co->force;
     int duration = 1 + (int)(power / 6);
     double effect;
-    curse *c;
 
     effect = 10;
-    c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
+    create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
 
     ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect",
         "mage region", mage, r));
