@@ -1,11 +1,7 @@
 #!/bin/bash
 set -e
 
-ROOT=$(pwd)
-while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
-done
-
+ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 
 if [ ! -e $ROOT/$BUILD ]; then
