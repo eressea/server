@@ -38,7 +38,10 @@ static void a_writekeys(const attrib *a, const void *o, storage *store) {
 static int a_readkeys(attrib * a, void *owner, gamedata *data) {
     int i, *p = 0;
     READ_INT(data->store, &i);
-    assert(i < 4096 && i>0);
+    assert(i < 4096 && i>=0);
+    if (i == 0) {
+        return AT_READ_FAIL;
+    }
     a->data.v = p = malloc(sizeof(int)*(i + 1));
     *p++ = i;
     while (i--) {
