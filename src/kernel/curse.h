@@ -210,7 +210,7 @@ extern "C" {
     typedef struct curse {
         variant data;               /* pointer auf spezielle curse-unterstructs */
         struct curse *nexthash;
-        const curse_type *type;      /* Zeiger auf ein curse_type-struct */
+        const curse_type *type;     /* Zeiger auf ein curse_type-struct */
         struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
         double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
         double effect;

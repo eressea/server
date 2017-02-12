@@ -4726,7 +4726,7 @@ static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
 
     /* Erfolg melden */
     ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
-        "unit region command", c->magician, mage->region, co->order));
+        "unit region command", mage, mage->region, co->order));
 
     return cast_level;
 }
@@ -4867,7 +4867,7 @@ int sp_sweetdreams(castorder * co)
         effect = 0.05f;
         c = create_curse(mage, &u->attribs, ct_find("orcish"), power, duration, effect, men);
 
-        msg = msg_message("sp_sweetdreams_effect", "mage unit region", c->magician, u, r);
+        msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
         r_addmessage(r, mage->faction, msg);
         if (u->faction != mage->faction) {
             r_addmessage(r, u->faction, msg);
@@ -4892,7 +4892,7 @@ int sp_disturbingdreams(castorder * co)
     c = create_curse(mage, &r->attribs, ct_find("badlearn"), power, duration, effect, 0);
 
     ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect",
-        "mage region", c->magician, r));
+        "mage region", mage, r));
     return cast_level;
 }
 
