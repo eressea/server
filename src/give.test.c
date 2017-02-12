@@ -124,12 +124,6 @@ static void test_give_men_magicians(CuTest * tc) {
     CuAssertIntEquals(tc, 1, env.src->number);
     msg_release(msg);
 
-
-    set_number(env.dst, 0);
-    CuAssertPtrEquals(tc, NULL, give_men(1, env.src, env.dst, NULL));
-    CuAssertIntEquals(tc, 1, env.dst->number);
-    CuAssertIntEquals(tc, 0, env.src->number);
-
     p = rpeasants(env.r);
     CuAssertPtrNotNull(tc, msg = disband_men(1, env.dst, NULL));
     CuAssertStrEquals(tc, "give_person_peasants", (const char *)msg->parameters[0].v);
