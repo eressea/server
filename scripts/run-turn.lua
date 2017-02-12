@@ -146,7 +146,7 @@ function process(rules, orders)
     init_summary()
 
     -- run the turn:
-    if read_orders(orders) ~= 0 then
+    if eressea.read_orders(orders) ~= 0 then
         print("could not read " .. orders)
         return -1
     end
