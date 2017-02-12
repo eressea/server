@@ -35,7 +35,7 @@ git submodule update
 echo "build eressea"
 cd $ROOT/$BUILD
 BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
-if [ "$BRANCH" == "master" ] ; then
+if [ "$BRANCH"=="master" ] ; then
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 cmake -DERESSEA_VERSION="$VERSION" ..
 else
