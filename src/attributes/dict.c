@@ -42,6 +42,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
+typedef enum {
+    TNONE = 0, TINTEGER = 1
+} dict_type;
+
 typedef struct dict_data {
     dict_type type;
     char *name;
@@ -62,94 +66,38 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     storage *store = data->store;
     char name[NAMESIZE];
     dict_data *dd = (dict_data *)a->data.v;
-    int result, n;
-    float flt;
+    int n;
 
     READ_STR(store, name, sizeof(name));
     dd->name = strdup(name);
     READ_INT(store, &n);
     dd->type = (dict_type)n;
-    switch (dd->type) {
-    case TINTEGER:
-        READ_INT(store, &dd->data.i);
-        break;
-    case TREAL:
-        READ_FLT(store, &flt);
-        if ((int)flt == flt) {
-            dd->type = TINTEGER;
-            dd->data.i = (int)flt;
-        }
-        else {
-            dd->data.real = flt;
-        }
-        break;
-    case TSTRING:
-        READ_STR(store, name, sizeof(name));
-        dd->data.str = strdup(name);
-        break;
-    case TBUILDING:
-        result =
-            read_reference(&dd->data.b, data, read_building_reference, 
-                resolve_building);
-        if (result == 0 && !dd->data.b) {
-            return AT_READ_FAIL;
-        }
-        break;
-    case TUNIT:
-        result =
-            read_reference(&dd->data.u, data, read_unit_reference, resolve_unit);
-        if (result == 0 && !dd->data.u) {
-            return AT_READ_FAIL;
-        }
-        break;
-    case TFACTION:
-        result =
-            read_reference(&dd->data.f, data, read_faction_reference,
-            resolve_faction);
-        if (result == 0 && !dd->data.f) {
-            return AT_READ_FAIL;
-        }
-        break;
-    case TREGION:
-        result =
-            read_reference(&dd->data.r, data, read_region_reference,
-            RESOLVE_REGION(data->version));
-        if (result == 0 && !dd->data.r) {
-            return AT_READ_FAIL;
-        }
-        break;
-    case TSHIP:
-        /* return read_ship_reference(&data->data.sh, store); */
-        assert(!"not implemented");
-        break;
-    case TNONE:
-        break;
-    default:
+    if (dd->type != TINTEGER) {
+        log_error("read dict, invalid type %d", n);
         return AT_READ_FAIL;
     }
+    READ_INT(store, &dd->data.i);
     return AT_READ_DEPR;
 }
 
 static void dict_init(attrib * a)
 {
-    dict_data *data;
+    dict_data *dd;
     a->data.v = malloc(sizeof(dict_data));
-    data = (dict_data *)a->data.v;
-    data->type = TNONE;
+    dd = (dict_data *)a->data.v;
+    dd->type = TNONE;
 }
 
 static void dict_done(attrib * a)
 {
-    dict_data *data = (dict_data *)a->data.v;
-    if (data->type == TSTRING)
-        free(data->data.str);
-    free(data->name);
+    dict_data *dd = (dict_data *)a->data.v;
+    free(dd->name);
     free(a->data.v);
 }
 
 static void dict_upgrade(attrib **alist, attrib *abegin) {
     int n = 0, *keys = 0;
-    int i = 0, val[4];
+    int i = 0, val[8];
     attrib *a, *ak = a_find(*alist, &at_keys);
     if (ak) {
         keys = (int *)ak->data.v;
@@ -162,7 +110,9 @@ static void dict_upgrade(attrib **alist, attrib *abegin) {
         }
         else {
             if (strcmp(dd->name, "embassy_muschel")==0) {
-                val[i++] = atoi36("mupL");
+                val[i * 2] = atoi36("mupL");
+                val[i * 2 + 1] = dd->data.i;
+                ++i;
             }
             else {
                 log_error("dict conversion, bad entry %s", dd->name);
@@ -170,14 +120,14 @@ static void dict_upgrade(attrib **alist, attrib *abegin) {
         }
         if (i == 4) {
             keys = realloc(keys, sizeof(int) * (n + i + 1));
-            memcpy(keys + n + 1, val, sizeof(int)*i);
+            memcpy(keys + n + 1, val, sizeof(val));
             n += i;
             i = 0;
         }
     }
     if (i > 0) {
-        keys = realloc(keys, sizeof(int) * (n + i + 1));
-        memcpy(keys + n + 1, val, sizeof(int)*i);
+        keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
+        memcpy(keys + n*2 + 1, val, sizeof(int)*i*2);
         if (!ak) {
             ak = a_add(alist, a_new(&at_keys));
         }
@@ -190,3 +140,11 @@ attrib_type at_dict = {
     "object", dict_init, dict_done, NULL,
     NULL, dict_read, dict_upgrade
 };
+
+void dict_set(attrib * a, const char * name, int value)
+{
+    dict_data *dd = (dict_data *)a->data.v;
+    dd->name = strdup(name);
+    dd->type = TINTEGER;
+    dd->data.i = value;
+}
