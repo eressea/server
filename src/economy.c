@@ -2707,7 +2707,7 @@ static void expandloot(region * r, request * lootorders)
 {
     unit *u;
     unsigned int i;
-    int looted = 0;
+    int m, looted = 0;
     int startmoney = rmoney(r);
 
     expandorders(r, lootorders);
@@ -2724,9 +2724,9 @@ static void expandloot(region * r, request * lootorders)
     free(g_requests);
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
-    if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
-        int m = region_get_morale(r);
-        if (m) {
+    m = region_get_morale(r);
+    if (m && startmoney>0) {
+        if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
             region_set_morale(r, m - 1, -1);
         }
