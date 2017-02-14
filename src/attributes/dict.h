@@ -13,18 +13,16 @@
 #ifndef H_ATTRIBUTE_OBJECT
 #define H_ATTRIBUTE_OBJECT
 
-#include <util/variant.h>
+struct attrib_type;
+struct attrib;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    typedef enum {
-        TNONE = 0, TINTEGER = 1, TREAL = 2, TSTRING = 3,
-        TUNIT = 10, TFACTION = 11, TREGION = 12, TBUILDING = 13, TSHIP = 14
-    } dict_type;
+    extern struct attrib_type at_dict; // DEPRECATED: at_dict has been replaced with at_keys
 
-    extern struct attrib_type at_dict;
+    void dict_set(struct attrib * a, const char * name, int value);
 
 #ifdef __cplusplus
 }

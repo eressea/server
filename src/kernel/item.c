@@ -939,7 +939,7 @@ struct order *ord)
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
 
-    key_set(&f->attribs, atoi36("mbst"));
+    key_set(&f->attribs, atoi36("mbst"), turn);
     set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
