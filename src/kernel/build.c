@@ -428,6 +428,76 @@ int roqf_factor(void)
     return value;
 }
 
+static int use_materials(unit *u, const construction *type, int n, int completed) {
+    if (type->materials) {
+        int c;
+        for (c = 0; type->materials[c].number; c++) {
+            const struct resource_type *rtype = type->materials[c].rtype;
+            int prebuilt =
+                required(completed, type->reqsize, type->materials[c].number);
+            int need =
+                required(completed + n, type->reqsize, type->materials[c].number);
+            int multi = 1;
+            int canuse = 100;       /* normalization */
+            if (building_is_active(u->building) && inside_building(u)) {
+                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+            }
+            if (canuse < 0) {
+                return canuse;        /* pass errors to caller */
+            }
+            canuse = matmod(type->attribs, u, rtype, canuse);
+
+            assert(canuse % 100 == 0
+                || !"only constant multipliers are implemented in build()");
+            multi = canuse / 100;
+            if (canuse < 0) {
+                return canuse;        /* pass errors to caller */
+            }
+            use_pooled(u, rtype, GET_DEFAULT,
+                (need - prebuilt + multi - 1) / multi);
+        }
+    }
+    return 0;
+}
+
+static int count_materials(unit *u, const construction *type, int n, int completed)
+{
+    if (type->materials) {
+        int c;
+        for (c = 0; n > 0 && type->materials[c].number; c++) {
+            const struct resource_type *rtype = type->materials[c].rtype;
+            int need, prebuilt;
+            int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+
+            if (building_is_active(u->building) && inside_building(u)) {
+                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+            }
+
+            if (canuse < 0)
+                return canuse;        /* pass errors to caller */
+            canuse = matmod(type->attribs, u, rtype, canuse);
+            if (type->reqsize > 1) {
+                prebuilt =
+                    required(completed, type->reqsize, type->materials[c].number);
+                for (; n;) {
+                    need =
+                        required(completed + n, type->reqsize, type->materials[c].number);
+                    if (need - prebuilt <= canuse)
+                        break;
+                    --n;                /* TODO: optimieren? */
+                }
+            }
+            else {
+                int maxn = canuse / type->materials[c].number;
+                if (maxn < n) {
+                    n = maxn;
+                }
+            }
+        }
+    }
+    return n;
+}
+
 /** Use up resources for building an object.
 * Build up to 'size' points of 'type', where 'completed'
 * of the first object have already been finished. return the
@@ -492,7 +562,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
         }
     }
     for (; want > 0 && skills > 0;) {
-        int c, n;
+        int err, n;
 
         /* skip over everything that's already been done:
          * type->improvement==NULL means no more improvements, but no size limits
@@ -559,67 +629,16 @@ int build(unit * u, const construction * ctype, int completed, int want)
             }
         }
 
-        if (type->materials)
-            for (c = 0; n > 0 && type->materials[c].number; c++) {
-                const struct resource_type *rtype = type->materials[c].rtype;
-                int need, prebuilt;
-                int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
-
-                if (building_is_active(u->building) && inside_building(u)) {
-                    canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-                }
-
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-                canuse = matmod(type->attribs, u, rtype, canuse);
-                if (type->reqsize > 1) {
-                    prebuilt =
-                        required(completed, type->reqsize, type->materials[c].number);
-                    for (; n;) {
-                        need =
-                            required(completed + n, type->reqsize, type->materials[c].number);
-                        if (need - prebuilt <= canuse)
-                            break;
-                        --n;                /* TODO: optimieren? */
-                    }
-                }
-                else {
-                    int maxn = canuse / type->materials[c].number;
-                    if (maxn < n)
-                        n = maxn;
-                }
-            }
+        n = count_materials(u, type, n, completed);
         if (n <= 0) {
             if (made == 0)
                 return ENOMATERIALS;
             else
                 break;
         }
-        if (type->materials) {
-            for (c = 0; type->materials[c].number; c++) {
-                const struct resource_type *rtype = type->materials[c].rtype;
-                int prebuilt =
-                    required(completed, type->reqsize, type->materials[c].number);
-                int need =
-                    required(completed + n, type->reqsize, type->materials[c].number);
-                int multi = 1;
-                int canuse = 100;       /* normalization */
-                if (building_is_active(u->building) && inside_building(u)) {
-                    canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-                }
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-                canuse = matmod(type->attribs, u, rtype, canuse);
-
-                assert(canuse % 100 == 0
-                    || !"only constant multipliers are implemented in build()");
-                multi = canuse / 100;
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-
-                use_pooled(u, rtype, GET_DEFAULT,
-                    (need - prebuilt + multi - 1) / multi);
-            }
+        err = use_materials(u, type, n, completed);
+        if (err < 0) {
+            return err;
         }
         made += n;
         skills -= n * type->minskill;
