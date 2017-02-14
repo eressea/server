@@ -11,6 +11,28 @@ function teardown()
     eressea.settings.set("rules.food.flags", "0")
 end
 
+function test_build_watch()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("e3build@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u.number = 20
+    u:add_item("log", 20)
+    u.id = 42
+
+    u:set_skill("building", 1)
+    u:add_order("MACHE Wache")
+    process_orders()
+    assert_not_nil(u.building)
+    assert_equal(5, u.building.size)
+
+    u:set_skill("building", 2)
+    u:add_order("MACHE Wache " .. itoa36(u.building.id))
+    process_orders()
+    assert_not_nil(u.building)
+    assert_equal(10, u.building.size)
+end
+
 function test_watch()
     local r = region.create(0, 0, "plain")
     local b = building.create(r, "watch")
