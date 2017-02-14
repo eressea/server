@@ -595,7 +595,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
             else
                 break;
         }
-        if (type->materials)
+        if (type->materials) {
             for (c = 0; type->materials[c].number; c++) {
                 const struct resource_type *rtype = type->materials[c].rtype;
                 int prebuilt =
@@ -620,6 +620,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
                 use_pooled(u, rtype, GET_DEFAULT,
                     (need - prebuilt + multi - 1) / multi);
             }
+        }
         made += n;
         skills -= n * type->minskill;
         want -= n;
