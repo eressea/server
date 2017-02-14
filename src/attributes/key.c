@@ -102,8 +102,12 @@ static void a_upgradekeys(attrib **alist, attrib *abegin) {
             ak = a_add(alist, a_new(&at_keys));
         }
     }
-    ak->data.v = keys;
-    keys[0] = n + i;
+    if (ak) {
+        ak->data.v = keys;
+        if (keys) {
+            keys[0] = n + i;
+        }
+    }
 }
 
 attrib_type at_key = {
