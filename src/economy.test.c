@@ -11,10 +11,12 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/attrib.h>
 #include <util/language.h>
 
 #include <CuTest.h>
@@ -345,11 +347,17 @@ static void test_make_item(CuTest *tc) {
     unit *u;
     struct item_type *itype;
     const struct resource_type *rt_silver;
+    resource_type *rtype;
+    attrib *a;
+    resource_limit *rdata;
 
     test_setup();
     init_resources();
+
+    /* make items from other items (turn silver to stone) */
     rt_silver = get_resourcetype(R_SILVER);
-    itype = test_create_itemtype("log");
+    itype = test_create_itemtype("stone");
+    rtype = itype->rtype;
     u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
     make_item(u, itype, 1);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
@@ -368,6 +376,32 @@ static void test_make_item(CuTest *tc) {
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 1, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rt_silver->itype));
+
+    /* make level-based raw materials, no materials used in construction */
+    free(itype->construction->materials);
+    itype->construction->materials = 0;
+    rtype->flags |= RTF_LIMITED;
+    a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
+    rdata = (resource_limit *)a->data.v;
+    rdata->value = 0;
+    rmt_create(rtype, "stone");
+    add_resource(u->region, 1, 300, 150, rtype);
+    u->region->resources->amount = 300; /* there are 300 stones at level 1 */
+    set_level(u, SK_ALCHEMY, 10);
+
+    make_item(u, itype, 10);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 11, get_item(u, itype));
+    CuAssertIntEquals(tc, 290, u->region->resources->amount); /* used 10 stones to make 10 stones */
+
+    rdata->modifiers = calloc(2, sizeof(resource_mod));
+    rdata->modifiers[0].flags = RMF_SAVEMATERIAL;
+    rdata->modifiers[0].race = u->_race;
+    rdata->modifiers[0].value.f = (float)0.6;
+    make_item(u, itype, 10);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 21, get_item(u, itype));
+    CuAssertIntEquals(tc, 284, u->region->resources->amount); /* 60% saving = 6 stones make 10 stones */
     test_cleanup();
 }
 
