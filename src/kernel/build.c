@@ -397,7 +397,7 @@ static int required(int size, int msize, int maxneed)
  * braucht man required von maxneed resourcen */
 {
     int used;
-
+    assert(msize > 0);
     used = size * maxneed / msize;
     if (size * maxneed % msize)
         ++used;

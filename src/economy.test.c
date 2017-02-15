@@ -341,12 +341,43 @@ static void test_income(CuTest *tc)
     test_cleanup();
 }
 
+static void test_make_item(CuTest *tc) {
+    unit *u;
+    struct item_type *itype;
+    const struct resource_type *rt_silver;
+
+    test_setup();
+    init_resources();
+    rt_silver = get_resourcetype(R_SILVER);
+    itype = test_create_itemtype("log");
+    u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
+    make_item(u, itype, 1);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
+    CuAssertIntEquals(tc, 0, get_item(u, itype));
+    test_clear_messages(u->faction);
+    itype->construction = calloc(1, sizeof(construction));
+    itype->construction->skill = SK_ALCHEMY;
+    itype->construction->minskill = 1;
+    itype->construction->maxsize = 1;
+    itype->construction->reqsize = 1;
+    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials[0].number = 1;
+    set_level(u, SK_ALCHEMY, 1);
+    set_item(u, rt_silver->itype, 1);
+    make_item(u, itype, 1);
+    CuAssertIntEquals(tc, 1, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rt_silver->itype));
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
     SUITE_ADD_TEST(suite, test_income);
+    SUITE_ADD_TEST(suite, test_make_item);
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);
