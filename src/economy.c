@@ -1038,8 +1038,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 static int required(int want, double save)
 {
     int req = (int)(want * save);
-    if (req < want * save)
-        ++req;
     return req;
 }
 
@@ -1095,14 +1093,14 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                         if (avail > 0) {
                             int want = required(al->want - al->get, al->save);
                             int x = avail * want / nreq;
-                            /* Wenn Rest, dann w�rfeln, ob ich was bekomme: */
-                            if (rng_int() % nreq < (avail * want) % nreq)
-                                ++x;
+                            int r = (avail * want) % nreq;
+                            /* Wenn Rest, dann wuerfeln, ob ich etwas bekomme: */
+                            if (r > 0 && rng_int() % nreq < r) ++x;
                             avail -= x;
                             use += x;
                             nreq -= want;
                             need -= x;
-                            al->get = MIN(al->want, al->get + (int)(x / al->save));
+                            al->get = MIN(al->want, al->get + (int)(1 + x / al->save));
                         }
                     }
                 if (use) {
