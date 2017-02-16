@@ -270,8 +270,6 @@ void syntax_error(const struct unit *u, struct order *ord)
     ADDMSG(&u->faction->msgs, result);
 }
 
-extern unsigned int new_hashstring(const char *s);
-
 void free_messagelist(mlist *msgs)
 {
     struct mlist **mlistptr;
