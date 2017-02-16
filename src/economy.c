@@ -883,6 +883,31 @@ enum {
     AFL_LOWSKILL = 1 << 1
 };
 
+struct message * get_modifiers(unit *u, const resource_mod *mod, double *savep, int *skillp) {
+    struct building *b = inside_building(u);
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+    double save = 1.0;
+    int skill = 0;
+
+    for (; mod->flags != 0; ++mod) {
+        if (mod->btype == NULL || mod->btype == btype) {
+            if (mod->race == NULL || mod->race == u_race(u)) {
+                if (mod->flags & RMF_SAVEMATERIAL) {
+                    save *= mod->value.f;
+                }
+                if (mod->flags & RMF_SKILL) {
+                    skill += mod->value.i;
+                }
+            }
+        } else if (mod->flags & RMF_REQUIREDBUILDING) {
+            return msg_error(u, u->thisorder, 104);
+        }
+    }
+    *skillp = skill;
+    *savep = save;
+    return NULL;
+}
+
 static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
@@ -893,7 +918,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     attrib *a = a_find(rtype->attribs, &at_resourcelimit);
     resource_limit *rdata = (resource_limit *)a->data.v;
     const resource_type *rring;
-    int amount, skill;
+    int amount, skill, skill_mod = 0;
+    double save_mod = 1.0;
 
     /* momentan kann man keine ressourcen abbauen, wenn man daf�r
      * Materialverbrauch hat: */
@@ -915,16 +941,10 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
 
     if (rdata->modifiers) {
-        resource_mod *mod = rdata->modifiers;
-        for (; mod->flags != 0; ++mod) {
-            if (mod->flags & RMF_REQUIREDBUILDING) {
-                struct building *b = inside_building(u);
-                const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-                if (mod->btype && mod->btype != btype) {
-                    cmistake(u, u->thisorder, 104, MSG_PRODUCE);
-                    return;
-                }
-            }
+        message *msg = get_modifiers(u, rdata->modifiers, &save_mod, &skill_mod);
+        if (msg) {
+            ADDMSG(&u->faction->msgs, msg);
+            return;
         }
     }
 
@@ -962,23 +982,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
                 itype->rtype));
         return;
     }
-    else {
-        struct building *b = inside_building(u);
-        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-
-        if (rdata->modifiers) {
-            resource_mod *mod = rdata->modifiers;
-            for (; mod->flags != 0; ++mod) {
-                if (mod->flags & RMF_SKILL) {
-                    if (mod->btype == NULL || mod->btype == btype) {
-                        if (mod->race == NULL || mod->race == u_race(u)) {
-                            skill += mod->value.i;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    skill += skill_mod;
     amount = skill * u->number;
     /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
 
@@ -1013,26 +1017,10 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
     al = new_allocation();
     al->want = amount;
-    al->save = 1.0;
+    al->save = save_mod;
     al->next = alist->data;
     al->unit = u;
     alist->data = al;
-
-    if (rdata->modifiers) {
-        struct building *b = inside_building(u);
-        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-
-        resource_mod *mod = rdata->modifiers;
-        for (; mod->flags != 0; ++mod) {
-            if (mod->flags & RMF_SAVEMATERIAL) {
-                if (mod->btype == NULL || mod->btype == btype) {
-                    if (mod->race == NULL || mod->race == u_race(u)) {
-                        al->save *= mod->value.f;
-                    }
-                }
-            }
-        }
-    }
 }
 
 static int required(int want, double save)
