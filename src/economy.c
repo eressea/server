@@ -891,9 +891,6 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, double *savep, 
 
     for (; mod->flags != 0; ++mod) {
         if (mod->btype == NULL || mod->btype == btype) {
-            if (mod->flags & RMF_REQUIREDBUILDING) {
-                return msg_error(u, u->thisorder, 104);;
-            }
             if (mod->race == NULL || mod->race == u_race(u)) {
                 if (mod->flags & RMF_SAVEMATERIAL) {
                     save *= mod->value.f;
@@ -902,6 +899,8 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, double *savep, 
                     skill += mod->value.i;
                 }
             }
+        } else if (mod->flags & RMF_REQUIREDBUILDING) {
+            return msg_error(u, u->thisorder, 104);
         }
     }
     *skillp = skill;
@@ -945,7 +944,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         message *msg = get_modifiers(u, rdata->modifiers, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
-            msg_release(msg);
             return;
         }
     }
