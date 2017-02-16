@@ -919,8 +919,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     attrib *a = a_find(rtype->attribs, &at_resourcelimit);
     resource_limit *rdata = (resource_limit *)a->data.v;
     const resource_type *rring;
-    int amount, skill, skill_mod;
-    double save_mod;
+    int amount, skill, skill_mod = 0;
+    double save_mod = 1.0;
 
     /* momentan kann man keine ressourcen abbauen, wenn man daf�r
      * Materialverbrauch hat: */
