@@ -1025,12 +1025,18 @@ static int parse_resources(xmlDocPtr doc)
                         rdata->modifiers[k].flags = RMF_SKILL;
                     }
                     else if (strcmp((const char *)propValue, "material") == 0) {
-                        rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
+                        int num, den = 100;
+                        double fval = xml_fvalue(node, "value", 0);
+                        // TODO: extract into a function for reading fractions?
+                        num = (int)(fval * den + 0.5);
+                        if (num % 10 == 0) {
+                            // TODO: calculating a GCD would be better than this
+                            num /= 10;
+                            den /= 10;
+                        }
+                        rdata->modifiers[k].value.sa[0] = (short)num;
+                        rdata->modifiers[k].value.sa[1] = (short)den;
                         rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
-                    }
-                    else if (strcmp((const char *)propValue, "resource") == 0) {
-                        rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
-                        rdata->modifiers[k].flags = RMF_SAVERESOURCE;
                     }
                     else if (strcmp((const char *)propValue, "require") == 0) {
                         xmlChar *propBldg = xmlGetProp(node, BAD_CAST "building");
