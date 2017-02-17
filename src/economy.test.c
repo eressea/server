@@ -350,6 +350,7 @@ static void test_make_item(CuTest *tc) {
     resource_type *rtype;
     attrib *a;
     resource_limit *rdata;
+    double d = 0.6;
 
     test_setup();
     init_resources();
@@ -397,7 +398,8 @@ static void test_make_item(CuTest *tc) {
     rdata->modifiers = calloc(2, sizeof(resource_mod));
     rdata->modifiers[0].flags = RMF_SAVEMATERIAL;
     rdata->modifiers[0].race = u->_race;
-    rdata->modifiers[0].value.f = (float)0.6;
+    rdata->modifiers[0].value.sa[0] = (short)(0.5+100*d);
+    rdata->modifiers[0].value.sa[1] = 100;
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 21, get_item(u, itype));

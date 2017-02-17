@@ -863,7 +863,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
 typedef struct allocation {
     struct allocation *next;
     int want, get;
-    double save;
+    variant save;
     unsigned int flags;
     unit *unit;
 } allocation;
@@ -883,17 +883,18 @@ enum {
     AFL_LOWSKILL = 1 << 1
 };
 
-struct message * get_modifiers(unit *u, const resource_mod *mod, double *savep, int *skillp) {
+struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep, int *skillp) {
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-    double save = 1.0;
+    int save_n = 1, save_d = 1;
     int skill = 0;
 
     for (; mod->flags != 0; ++mod) {
         if (mod->btype == NULL || mod->btype == btype) {
             if (mod->race == NULL || mod->race == u_race(u)) {
                 if (mod->flags & RMF_SAVEMATERIAL) {
-                    save *= mod->value.f;
+                    save_n *= mod->value.sa[0];
+                    save_d *= mod->value.sa[1];
                 }
                 if (mod->flags & RMF_SKILL) {
                     skill += mod->value.i;
@@ -904,7 +905,12 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, double *savep, 
         }
     }
     *skillp = skill;
-    *savep = save;
+    assert(save_n < SHRT_MAX);
+    assert(save_n > SHRT_MIN);
+    assert(save_d < SHRT_MAX);
+    assert(save_d > SHRT_MIN);
+    savep->sa[0] = (short)save_n;
+    savep->sa[1] = (short)save_d;
     return NULL;
 }
 
@@ -919,7 +925,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     resource_limit *rdata = (resource_limit *)a->data.v;
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
-    double save_mod = 1.0;
+    variant save_mod;
 
     /* momentan kann man keine ressourcen abbauen, wenn man daf�r
      * Materialverbrauch hat: */
@@ -946,6 +952,10 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
             ADDMSG(&u->faction->msgs, msg);
             return;
         }
+    }
+    else {
+        save_mod.sa[0] = 1;
+        save_mod.sa[1] = 1;
     }
 
     /* Bergw�chter k�nnen Abbau von Eisen/Laen durch Bewachen verhindern.
@@ -1023,9 +1033,9 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     alist->data = al;
 }
 
-static int required(int want, double save)
+static int required(int want, variant save)
 {
-    int req = (int)(want * save);
+    int req = (int)(want * save.sa[0] / save.sa[1]);
     return req;
 }
 
@@ -1088,7 +1098,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             use += x;
                             nreq -= want;
                             need -= x;
-                            al->get = MIN(al->want, al->get + (int)(1 + x / al->save));
+                            al->get = MIN(al->want, al->get + x * al->save.sa[1] / al->save.sa[0]);
                         }
                     }
                 if (use) {
@@ -1126,12 +1136,13 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
         if (avail > 0) {
             int want = required(al->want, al->save);
             int x = avail * want / nreq;
-            /* Wenn Rest, dann w�rfeln, ob ich was bekomme: */
-            if (rng_int() % nreq < (avail * want) % nreq)
-                ++x;
+            int rx = (avail * want) % nreq;
+            /* Wenn Rest, dann wuerfeln, ob ich was bekomme: */
+            if (rx>0 && rng_int() % nreq < rx) ++x;
             avail -= x;
             nreq -= want;
-            al->get = MIN(al->want, (int)(x / al->save));
+            al->get = x * al->save.sa[0] / al->save.sa[1];
+            al->get = MIN(al->want, al->get);
             if (rdata->produce) {
                 int use = required(al->get, al->save);
                 if (use)
@@ -2619,8 +2630,9 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
         if (jobs >= working)
             workers = u->number;
         else {
+            int r = (u->number * jobs) % working;
             workers = u->number * jobs / working;
-            if (rng_int() % working < (u->number * jobs) % working)
+            if (r > 0 && rng_int() % working < r)
                 workers++;
         }
 
