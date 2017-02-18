@@ -43,7 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 
 typedef enum {
-    TNONE = 0, TINTEGER = 1
+    TNONE = 0, TINTEGER = 1, TREAL = 2
 } dict_type;
 
 typedef struct dict_data {
@@ -72,11 +72,18 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     dd->name = strdup(name);
     READ_INT(store, &n);
     dd->type = (dict_type)n;
-    if (dd->type != TINTEGER) {
+    if (dd->type == TINTEGER) {
+        READ_INT(store, &dd->data.i);
+    }
+    else if (dd->type == TREAL) {
+        float flt;
+        READ_FLT(store, &flt);
+        dd->data.real = flt;
+    }
+    else {
         log_error("read dict, invalid type %d", n);
         return AT_READ_FAIL;
     }
-    READ_INT(store, &dd->data.i);
     return AT_READ_DEPR;
 }
 
@@ -95,6 +102,16 @@ static void dict_done(attrib * a)
     free(a->data.v);
 }
 
+static void upgrade_keyval(const dict_data *dd, int keyval[], int v) {
+    if (strcmp(dd->name, "embassy_muschel") == 0) {
+        keyval[0] = atoi36("mupL");
+        keyval[1] = v;
+    }
+    else {
+        log_error("dict conversion, bad entry %s", dd->name);
+    }
+}
+
 static void dict_upgrade(attrib **alist, attrib *abegin) {
     int n = 0, *keys = 0;
     int i = 0, val[8];
@@ -105,18 +122,17 @@ static void dict_upgrade(attrib **alist, attrib *abegin) {
     }
     for (a = abegin; a && a->type == abegin->type; a = a->next) {
         dict_data *dd = (dict_data *)a->data.v;
-        if (dd->type != TINTEGER) {
-            log_error("dict conversion, bad type %d for %s", dd->type, dd->name);
+        if (dd->type == TINTEGER) {
+            upgrade_keyval(dd, val + i * 2, dd->data.i);
+            ++i;
+        }
+        else if (dd->type == TREAL) {
+            upgrade_keyval(dd, val + i * 2, (int)dd->data.real);
+            ++i;
         }
         else {
-            if (strcmp(dd->name, "embassy_muschel")==0) {
-                val[i * 2] = atoi36("mupL");
-                val[i * 2 + 1] = dd->data.i;
-                ++i;
-            }
-            else {
-                log_error("dict conversion, bad entry %s", dd->name);
-            }
+            log_error("dict conversion, bad type %d for %s", dd->type, dd->name);
+            assert(!"invalid input");
         }
         if (i == 4) {
             keys = realloc(keys, sizeof(int) * (n + i + 1));
