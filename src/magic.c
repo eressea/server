@@ -1244,6 +1244,9 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
+        if (u_race(u)==get_race(RC_SPELL)) {
+            return true;
+        }
         at = effskill(magician, SK_MAGIC, 0);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
