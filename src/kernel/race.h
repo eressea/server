@@ -130,7 +130,6 @@ extern "C" {
         int capacity;
         int income;
         float speed;
-        float aggression;           /* chance that a monster will attack */
         int hitpoints;
         char *def_damage;
         int armor;
@@ -152,7 +151,7 @@ extern "C" {
         struct item *(*itemdrop) (const struct race *, int size);
         void(*init_familiar) (struct unit *);
 
-        struct rcoption *options; // rarely used properties
+        struct rcoption *options; /* rarely used properties */
 
         const struct race *familiars[MAXMAGIETYP];
         struct race *next;

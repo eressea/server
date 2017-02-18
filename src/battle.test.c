@@ -433,9 +433,9 @@ static void test_battle_skilldiff(CuTest *tc)
     td.fighter->person[0].flags |= FL_SLEEPING;
     CuAssertIntEquals(tc, 3, skilldiff(ta, td, 0));
 
-    // TODO: unarmed halfling vs. dragon: +5
-    // TODO: rule_goblin_bonus
-    // TODO: weapon modifiers, missiles, skill_formula
+    /* TODO: unarmed halfling vs. dragon: +5 */
+    /* TODO: rule_goblin_bonus */
+    /* TODO: weapon modifiers, missiles, skill_formula */
 
     free_battle(b);
     test_cleanup();

@@ -216,7 +216,7 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
         /* 5% chance, dass der drache aus einer laune raus attackiert */
-        if (!attacks || chance(1.0 - u_race(udragon)->aggression)) {
+        if (!attacks) {
             /* Drachen haben in E3 und E4 keine Einnahmen. Neuer Befehl Pluendern erstmal nur fuer Monster?*/
             return create_order(K_LOOT, default_locale, NULL);
         }
@@ -673,7 +673,7 @@ static order *plan_dragon(unit * u)
     }
     if (tr != NULL) {
         assert(long_order == NULL);
-        // TODO: per-race planning functions?
+        /* TODO: per-race planning functions? */
         if (rc == rc_wyrm) {
             long_order = make_movement_order(u, tr, 1, allowed_dragon);
         }

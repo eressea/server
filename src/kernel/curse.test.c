@@ -55,7 +55,6 @@ static void setup_curse(curse_fixture *fix, const char *name) {
 }
 
 static void cleanup_curse(curse_fixture *fix) {
-    // destroy_curse(fix->c);
     test_cleanup();
 }
 

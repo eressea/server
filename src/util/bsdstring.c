@@ -13,7 +13,7 @@ int wrptr(char **ptr, size_t * size, int result)
 {
     size_t bytes = (size_t)result;
     if (result < 0) {
-        // buffer was too small
+        /* buffer was too small */
         if (*size > 0) {
             **ptr = 0;
             *size = 0;

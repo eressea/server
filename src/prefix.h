@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
     int add_raceprefix(const char *);
-    char **race_prefixes; // zero-terminated array of valid prefixes
+    char **race_prefixes; /* zero-terminated array of valid prefixes */
     void free_prefixes(void);
 
 #ifdef __cplusplus

@@ -32,14 +32,14 @@ extern "C" {
     typedef struct attrib {
         const struct attrib_type *type;
         union {
-            afun f; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
-            void *v; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
+            afun f;
+            void *v;
             int i;
             float flt;
             char c;
             short s;
             short sa[2];
-            char ca[4]; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 4 used: char ca[4];.
+            char ca[4];
         } data;
         /* internal data, do not modify: */
         struct attrib *next;        /* next attribute in the list */

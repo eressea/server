@@ -78,7 +78,7 @@ static void test_readwrite_unit(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    move_unit(u, r, NULL); // this makes sure that u doesn't leak
+    move_unit(u, r, NULL); /* this makes sure that u doesn't leak */
     test_cleanup();
 }
 

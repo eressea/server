@@ -32,7 +32,7 @@ static void test_strlcpy(CuTest * tc)
     CuAssertIntEquals(tc, 4, (int)strlcpy(buffer, "herp", 4));
     CuAssertStrEquals(tc, "her", buffer);
 
-    CuAssertIntEquals(tc, 4, (int)strlcpy(buffer, "herp", 8)); //-V666
+    CuAssertIntEquals(tc, 4, (int)strlcpy(buffer, "herp", 8)); /*-V666 */
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
 

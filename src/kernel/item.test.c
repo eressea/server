@@ -19,7 +19,7 @@ static void test_resourcename_no_appearance(CuTest *tc) {
     const resource_type *rtype;
 
     test_cleanup();
-    init_resources(); // creates R_SILVER
+    init_resources(); /* creates R_SILVER */
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     assert(rtype->itype->_appearance[0] == 0);

@@ -47,8 +47,9 @@
 
 #define EFFECT_HEALING_SPELL     5
 
-// Some spells with a fixed, known ID (in XML).
-// TODO: this method of identifying spells is error-prone, do not use it for new spells.
+/* Some spells with a fixed, known ID (in XML).
+ * TODO: this method of identifying spells is error-prone,
+ * do not use it for new spells. */
 enum {
     SPL_FIREBALL = 4,
     SPL_HAGEL = 5,

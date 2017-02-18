@@ -291,10 +291,10 @@ void volcano_update(void)
                     r->terrain = t_volcano;
                 }
                 else if (r->uid == 1246051340 || outbreak_chance()) {
-                    // HACK: a fixed E4-only region-uid in Code.
-                    // FIXME: In E4 gibt es eine Ebene #1246051340, die Smalland heisst.
-                    // da das kein aktiver Vulkan ist, ist dieser Test da nicht idiotisch?
-                    // das sollte bestimmt rn betreffen?
+                    /* HACK: a fixed E4-only region-uid in Code.
+                     * FIXME: In E4 gibt es eine Ebene #1246051340, die Smalland heisst.
+                     * da das kein aktiver Vulkan ist, ist dieser Test da nicht idiotisch?
+                     * das sollte bestimmt rn betreffen? */
                     region *rn;
                     rn = rrandneighbour(r);
                     volcano_outbreak(r, rn);

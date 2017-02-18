@@ -146,6 +146,8 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
 
 static void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
+    construction * cons;
+    
     if (json->type == cJSON_Array) {
         int size = 0;
         for (child = json->child; child; child = child->next) {
@@ -164,7 +166,7 @@ static void json_construction(cJSON *json, construction **consp) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
-    construction * cons = (construction *)calloc(sizeof(construction), 1);
+    cons = (construction *)calloc(sizeof(construction), 1);
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
@@ -191,8 +193,8 @@ static void json_construction(cJSON *json, construction **consp) {
 }
 
 static void json_terrain_production(cJSON *json, terrain_production *prod) {
-    assert(json->type == cJSON_Object);
     cJSON *child;
+    assert(json->type == cJSON_Object);
     for (child = json->child; child; child = child->next) {
         char **dst = 0;
         switch (child->type) {
@@ -490,7 +492,7 @@ static void json_race(cJSON *json, race *rc) {
             else if (strcmp(child->string, "ac") == 0) {
                 rc->armor = child->valueint;
             }
-            // TODO: studyspeed (orcs only)
+            /* TODO: studyspeed (orcs only) */
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {

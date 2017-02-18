@@ -1111,7 +1111,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     ar += am;
 
     if (magres) {
-        // calculate damage multiplier for magical damage
+        /* calculate damage multiplier for magical damage */
         double res = 1.0 - magic_resistance(du);
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
@@ -1302,10 +1302,10 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
         if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
-            i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
             message *m = msg_message("battle::potionsave", "unit", du);
             message_faction(b, du->faction, m);
             msg_release(m);
+            i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
             fset(&df->person[dt.index], FL_HEALING_USED);
             df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
             return false;

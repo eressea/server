@@ -758,8 +758,9 @@ static void test_peasant_luck_effect(CuTest *tc) {
 
 static void test_luck_message(CuTest *tc) {
     region* r;
+    attrib *a;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, NULL);
     rsetpeasants(r, 1);
 
@@ -767,7 +768,7 @@ static void test_luck_message(CuTest *tc) {
 
     CuAssertPtrEquals_Msg(tc, "unexpected message", (void *)NULL, r->msgs);
 
-    attrib *a = (attrib *)a_find(r->attribs, &at_peasantluck);
+    a = (attrib *)a_find(r->attribs, &at_peasantluck);
     if (!a)
         a = a_add(&r->attribs, a_new(&at_peasantluck));
     a->data.i += 10;
@@ -782,7 +783,7 @@ static void test_luck_message(CuTest *tc) {
 static unit * setup_name_cmd(void) {
     faction *f;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     return test_create_unit(f, test_create_region(0, 0, 0));
 }
@@ -886,7 +887,7 @@ static void test_name_ship(CuTest *tc) {
 }
 
 static void test_long_order_normal(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     order *ord;
 
@@ -906,7 +907,7 @@ static void test_long_order_normal(CuTest *tc) {
 }
 
 static void test_long_order_none(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -918,7 +919,7 @@ static void test_long_order_none(CuTest *tc) {
 }
 
 static void test_long_order_cast(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -932,7 +933,7 @@ static void test_long_order_cast(CuTest *tc) {
 }
 
 static void test_long_order_buy_sell(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -947,7 +948,7 @@ static void test_long_order_buy_sell(CuTest *tc) {
 }
 
 static void test_long_order_multi_long(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -961,7 +962,7 @@ static void test_long_order_multi_long(CuTest *tc) {
 }
 
 static void test_long_order_multi_buy(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -975,7 +976,7 @@ static void test_long_order_multi_buy(CuTest *tc) {
 }
 
 static void test_long_order_multi_sell(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -990,7 +991,7 @@ static void test_long_order_multi_sell(CuTest *tc) {
 }
 
 static void test_long_order_buy_cast(CuTest *tc) {
-    // TODO: write more tests
+    /* TODO: write more tests */
     unit *u;
     test_cleanup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -1473,7 +1474,7 @@ static void test_demon_hunger(CuTest * tc)
 }
 
 static void test_armedmen(CuTest *tc) {
-    // TODO: test RCF_NOWEAPONS and SK_WEAPONLESS
+    /* TODO: test RCF_NOWEAPONS and SK_WEAPONLESS */
     unit *u;
     item_type *it_sword;
     weapon_type *wtype;

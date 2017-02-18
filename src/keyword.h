@@ -84,7 +84,6 @@ extern "C"
     bool keyword_disabled(keyword_t kwd);
     void enable_keyword(keyword_t kwd, bool enabled);
     const char *keyword(keyword_t kwd);
-    // #define keyword(kwd) mkname("keyword", keywords[kwd])
 
 #ifdef __cplusplus
 #endif

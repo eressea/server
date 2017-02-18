@@ -134,7 +134,7 @@ void key_set(attrib ** alist, int key, int val)
         n = keys[0];
     }
     keys = realloc(keys, sizeof(int) *(2 * n + 3));
-    // TODO: does insertion sort pay off here? prob. not.
+    /* TODO: does insertion sort pay off here? prob. not. */
     keys[0] = n + 1;
     keys[2 * n + 1] = key;
     keys[2 * n + 2] = val;

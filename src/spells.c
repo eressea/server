@@ -4194,7 +4194,7 @@ static int sp_seduce(castorder * co)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     unit *target;
-    item **itmp, *items = 0;;
+    item **itmp, *items = 0;
     unit *mage = co->magician.u;
     spellparameter *pa = co->par;
     int cast_level = co->level;

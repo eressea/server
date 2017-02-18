@@ -20,7 +20,7 @@ struct attrib;
 extern "C" {
 #endif
 
-    extern struct attrib_type at_dict; // DEPRECATED: at_dict has been replaced with at_keys
+    extern struct attrib_type at_dict; /* DEPRECATED: at_dict has been replaced with at_keys */
 
     void dict_set(struct attrib * a, const char * name, int value);
 

@@ -443,7 +443,7 @@ static void test_max_spellpoints(CuTest *tc) {
     CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
     set_level(u, SK_MAGIC, 2);
     CuAssertIntEquals(tc, 9, max_spellpoints(u->region, u));
-    // permanent aura loss:
+    /* permanent aura loss: */
     CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
     CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
     test_cleanup();

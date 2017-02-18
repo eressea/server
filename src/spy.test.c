@@ -60,6 +60,7 @@ static void set_factionstealth(unit *u, faction *f) {
 
 static void test_all_spy_message(CuTest *tc) {
     spy_fixture fix;
+    item_type *itype;
 
     setup_spy(&fix);
 
@@ -69,7 +70,6 @@ static void test_all_spy_message(CuTest *tc) {
     create_mage(fix.victim, M_DRAIG);
     set_factionstealth(fix.victim, fix.spy->faction);
 
-    item_type *itype;
     itype = it_get_or_create(rt_get_or_create("sword"));
     new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
     i_change(&fix.victim->items, itype, 1);

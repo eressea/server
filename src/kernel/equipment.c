@@ -253,7 +253,7 @@ void equipment_done(void) {
             free(eq->items);
             eq->items = next;
         }
-        // TODO: subsets, skills
+        /* TODO: subsets, skills */
         for (i=0;i!=MAXSKILLS;++i) {
             free(eq->skills[i]);
         }

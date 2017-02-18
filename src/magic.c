@@ -173,7 +173,7 @@ static void a_initicastle(struct attrib *a)
     a->data.v = calloc(sizeof(icastle_data), 1);
 }
 
-static void a_finalizeicastle(struct attrib *a) //-V524
+static void a_finalizeicastle(struct attrib *a) /*-V524 */
 {
     free(a->data.v);
 }
@@ -475,14 +475,14 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 spellno = rng_int() % maxspell;
                 sbe = commonspells[spellno];
                 if (sbe->level > f->max_spelllevel) {
-                    // not going to pick it in this round, move it to the end for later
+                    /* not going to pick it in this round, move it to the end for later */
                     commonspells[spellno] = commonspells[--maxspell];
                     commonspells[maxspell] = sbe;
                     sbe = 0;
                 }
                 else {
                     if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                        // already have this spell, remove it from the list of candidates
+                        /* already have this spell, remove it from the list of candidates */
                         commonspells[spellno] = commonspells[--numspells];
                         if (maxspell > numspells) {
                             maxspell = numspells;
@@ -2945,7 +2945,7 @@ const char *spell_info(const spell * sp, const struct locale *lang)
     return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
-// TODO: should take the name, not the spell (spellref optimizations)
+/* TODO: should take the name, not the spell (spellref optimizations) */
 const char *spell_name(const spell * sp, const struct locale *lang)
 {
     return LOC(lang, mkname("spell", sp->sname));
@@ -2987,7 +2987,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
     if (sb) {
         select_spellbook(&tokens, sb, lang);
     }
-#if 0 // TODO: some familiars can cast spells from the mage's spellbook?
+#if 0 /* TODO: some familiars can cast spells from the mage's spellbook? */
     u = get_familiar_mage(u);
     if (u) {
         sb = unit_get_spellbook(u);

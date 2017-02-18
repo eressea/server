@@ -52,9 +52,12 @@ void RunTests(CuSuite * suite, const char *name) {
 bool list = false;
 
 #define ADD_SUITE(name) \
-    CuSuite *get_##name##_suite(void); \
-    if (list) printf("%s\n", #name); \
-    if (!list || argc>0) add_suite(get_##name##_suite, #name, argc, argv)
+    do { \
+        CuSuite *get_##name##_suite(void); \
+        if (list) printf("%s\n", #name); \
+        if (!list || argc>0) add_suite(get_##name##_suite, #name, argc, argv); \
+    } while (0)
+
 
 int RunAllTests(int argc, char *argv[])
 {

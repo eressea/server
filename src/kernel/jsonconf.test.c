@@ -75,7 +75,7 @@ static void test_settings(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
 
     test_cleanup();
-    config_set("game.id", "42"); // should not be replaced
+    config_set("game.id", "42"); /* should not be replaced */
     json_config(json);
     CuAssertStrEquals(tc, "42", config_get("game.id"));
     CuAssertStrEquals(tc, "1", config_get("true"));
@@ -488,7 +488,7 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrEquals(tc, rt_get_or_create("h0"), ter->herbs[0]->rtype);
     CuAssertPtrEquals(tc, rt_get_or_create("h1"), ter->herbs[1]->rtype);
     CuAssertPtrEquals(tc, 0, (void *)ter->herbs[2]);
-    CuAssertPtrNotNull(tc, ter->name); // anything named "plain" uses plain_name()
+    CuAssertPtrNotNull(tc, ter->name); /* anything named "plain" uses plain_name() */
     CuAssertPtrNotNull(tc, ter->production);
     CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
     CuAssertDblEquals(tc, 0.1, ter->production[0].chance, 0.01);

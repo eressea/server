@@ -172,8 +172,7 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
 
 static int potion_truth(unit *u) {
     UNUSED_ARG(u);
-    // TODO: this potion does nothing!
-    // fset(u, UFL_DISBELIEVES);
+    /* TODO: this potion does nothing! */
     return 1;
 }
 
@@ -297,7 +296,7 @@ static void a_initeffect(attrib * a)
     a->data.v = calloc(sizeof(effect_data), 1);
 }
 
-static void a_finalizeeffect(attrib * a) //-V524
+static void a_finalizeeffect(attrib * a) /*-V524 */
 {
     free(a->data.v);
 }
@@ -328,7 +327,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
         return AT_READ_FAIL;
     }
     if (rtype->ptype==oldpotiontype[P_HEAL]) {
-        // healing potions used to have long-term effects
+        /* healing potions used to have long-term effects */
         return AT_READ_FAIL;
     }
     edata->type = rtype->ptype;

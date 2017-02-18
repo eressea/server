@@ -303,7 +303,7 @@ static void test_demon_skillchanges(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     set_level(u, SK_CROSSBOW, 1);
     demon_skillchange(u);
-    // TODO: sensing here
+    /* TODO: sensing here */
     test_cleanup();
 }
 

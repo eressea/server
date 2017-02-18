@@ -736,8 +736,8 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
 void immigration(void)
 {
     region *r;
-    log_info(" - Einwanderung...");
     int repopulate = config_get_int("rules.economy.repopulate_maximum", 90);
+    log_info(" - Einwanderung...");
     for (r = regions; r; r = r->next) {
         if (r->land && r->land->newpeasants) {
             int rp = rpeasants(r) + r->land->newpeasants;
@@ -2124,10 +2124,11 @@ int mail_cmd(unit * u, struct order *ord)
 
 int banner_cmd(unit * u, struct order *ord)
 {
-    init_order(ord);
-    const char * s = getstrtoken();
+    const char * s;
 
     free(u->faction->banner);
+    init_order(ord);
+    s = getstrtoken();
     u->faction->banner = s ? strdup(s) : 0;
     add_message(&u->faction->msgs, msg_message("changebanner", "value",
         u->faction->banner));
@@ -2414,12 +2415,12 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
         rc = findrace(s, u->faction->locale);
 
         if (itype) {
-            // if this is a potion, we need the right alchemy skill
+            /* if this is a potion, we need the right alchemy skill */
             int i = i_get(u->items, itype);
             
-            err = 36; // we do not have this item?
+            err = 36; /* we do not have this item? */
             if (i <= 0) {
-                // we don't have the item, but it may be a potion that we know
+                /* we don't have the item, but it may be a potion that we know */
                 const potion_type *ptype = resource2potion(item2resource(itype));
                 if (ptype) {
                     if (2 * ptype->level > effskill(u, SK_ALCHEMY, 0)) {
@@ -2724,13 +2725,13 @@ void sinkships(struct region * r)
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
             if (fval(r->terrain, SEA_REGION)) {
                 if (!enoughsailors(sh, crew_skill(sh))) {
-                    // ship is at sea, but not enough people to control it
+                    /* ship is at sea, but not enough people to control it */
                     double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);
                 }
             }
             else if (!ship_owner(sh)) {
-                // any ship lying around without an owner slowly rots
+                /* any ship lying around without an owner slowly rots */
                 double dmg = config_get_flt("rules.ship.damage.nocrew", 0.05);
                 damage_ship(sh, dmg);
             }
@@ -2971,7 +2972,7 @@ static void ageing(void)
             a_age(&u->attribs, u);
             if (u == *up) 
                 handle_event(u->attribs, "timer", u);
-            if (u == *up) //-V581
+            if (u == *up) /*-V581 */
                 up = &(*up)->next;
         }
 
@@ -2981,7 +2982,7 @@ static void ageing(void)
             a_age(&s->attribs, s);
             if (s == *sp)
                 handle_event(s->attribs, "timer", s);
-            if (s == *sp) //-V581
+            if (s == *sp) /*-V581 */
                 sp = &(*sp)->next;
         }
 
@@ -3109,7 +3110,7 @@ void new_units(void)
                     }
                     u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
                     if (name != NULL)
-                        free(name); // TODO: use a buffer on the stack instead?
+                        free(name); /* TODO: use a buffer on the stack instead? */
                     fset(u2, UFL_ISNEW);
 
                     a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
@@ -3158,10 +3159,10 @@ void update_long_order(unit * u)
             free_orders(&u->old_orders);
         }
 
-        // hungry units do not get long orders:
+        /* hungry units do not get long orders: */
         if (hunger) {
             if (u->old_orders) {
-                // keep looking for repeated orders that might clear the old_orders
+                /* keep looking for repeated orders that might clear the old_orders */
                 continue;
             }
             break;
@@ -3169,19 +3170,19 @@ void update_long_order(unit * u)
 
         if (is_long(kwd)) {
             if (thiskwd == NOKEYWORD) {
-                // we have found the (first) long order
-                // some long orders can have multiple instances:
+                /* we have found the (first) long order
+                 * some long orders can have multiple instances: */
                 switch (kwd) {
                     /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
-                    * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                    * muss das vorher abgefangen werden. Wir merken uns also
-                    * hier, ob die Einheit handelt. */
+                     * werden. Da Handel erst nach anderen langen Befehlen kommt,
+                     * muss das vorher abgefangen werden. Wir merken uns also
+                     * hier, ob die Einheit handelt. */
                 case K_BUY:
                 case K_SELL:
                 case K_CAST:
-                    // non-exclusive orders can be used with others. BUY can be paired with SELL,
-                    // CAST with other CAST orders. compatibility is checked once the second
-                    // long order is analyzed (below).
+                    /* non-exclusive orders can be used with others. BUY can be paired with SELL,
+                     * CAST with other CAST orders. compatibility is checked once the second
+                     * long order is analyzed (below). */
                     exclusive = false;
                     break;
 
@@ -3192,8 +3193,8 @@ void update_long_order(unit * u)
                 thiskwd = kwd;
             }
             else {
-                // we have found a second long order. this is okay for some, but not all commands.
-                // u->thisorder is already set, and should not have to be updated.
+                /* we have found a second long order. this is okay for some, but not all commands.
+                 * u->thisorder is already set, and should not have to be updated. */
                 switch (kwd) {
                 case K_CAST:
                     if (thiskwd != K_CAST) {
@@ -3214,9 +3215,8 @@ void update_long_order(unit * u)
                     }
                     break;
                 default:
-                    // TODO: decide https://bugs.eressea.de/view.php?id=2080#c6011
                     if (kwd > thiskwd) {
-                        // swap out thisorder for the new one
+                        /* swap out thisorder for the new one */
                         cmistake(u, u->thisorder, 52, MSG_EVENT);
                         set_order(&u->thisorder, copy_order(ord));
                     }
@@ -3229,11 +3229,11 @@ void update_long_order(unit * u)
         }
     }
     if (hunger) {
-        // Hungernde Einheiten führen NUR den default-Befehl aus
+        /* Hungernde Einheiten führen NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));
     }
     else if (!exclusive) {
-        // Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden.
+        /* Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden. */
         set_order(&u->thisorder, NULL);
     }
 }
@@ -3377,7 +3377,7 @@ void defaultorders(void)
                     free_order(ord);
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
-                        // TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL?
+                        /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
                         remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
                         neworders = true;
@@ -3522,7 +3522,7 @@ int use_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 50, MSG_PRODUCE);
         break;
     default:
-        // no error
+        /* no error */
         break;
     }
     return err;
@@ -3534,12 +3534,13 @@ int pay_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 6, MSG_EVENT);
     }
     else {
+        building *b = NULL;
         param_t p;
         int id;
+
         init_order(ord);
         p = getparam(u->faction->locale);
         id = getid();
-        building *b = NULL;
         if (p == P_NOT) {
             unit *owner = building_owner(u->building);
             /* If the unit is not the owner of the building: error */

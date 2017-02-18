@@ -1132,7 +1132,7 @@ void terraform_region(region * r, const terrain_type * terrain)
             }
         }
         if (!nb) {
-            // TODO: this is really lame
+            /* TODO: this is really lame */
             int i = get_maxluxuries();
             if (i > 0) {
                 i = rng_int() % i;

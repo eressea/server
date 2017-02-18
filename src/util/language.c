@@ -239,7 +239,7 @@ char *mkname_buf(const char *space, const char *name, char *buffer)
 
 const char *mkname(const char *space, const char *name)
 {
-    static char zBuffer[128]; // FIXME: static return value
+    static char zBuffer[128]; /* FIXME: static return value */
     return mkname_buf(space, name, zBuffer);
 }
 
@@ -272,7 +272,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
     if (str) {
         size_t len = strlen(str);
         if (!cb) {
-            // TODO: this will leak, because we do not know how to clean it up */
+            /* TODO: this will leak, because we do not know how to clean it up */
             *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
@@ -292,7 +292,7 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     assert(maxstrings > 0);
     tokens = get_translations(lang, ut);
     for (i = 0; i != maxstrings; ++i) {
-        // TODO: swap the name of s and key
+        /* TODO: swap the name of s and key */
         const char * s = string_cb(i);
         if (s) {
             const char * key = locale_string(lang, s, false);
@@ -349,7 +349,7 @@ void free_locales(void) {
         for (i = UT_PARAMS; i != UT_RACES; ++i) {
             struct critbit_tree ** cb = (struct critbit_tree **)get_translations(locales, i);
             if (*cb) {
-                // TODO: this crashes?
+                /* TODO: this crashes? */
                 cb_clear(*cb);
                 free(*cb);
             }
@@ -373,5 +373,5 @@ void free_locales(void) {
         free(locales);
         locales = next;
     }
-    memset(lstrs, 0, sizeof(lstrs)); // TODO: does this data need to be free'd?
+    memset(lstrs, 0, sizeof(lstrs)); /* TODO: does this data need to be free'd? */
 }

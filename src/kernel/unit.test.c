@@ -260,7 +260,7 @@ static void test_skillmod(CuTest *tc) {
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); // NOSKILL means any skill
+    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); /* NOSKILL means any skill */
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
@@ -296,7 +296,7 @@ static void test_skill_familiar(CuTest *tc) {
 
     test_cleanup();
 
-    // setup two units
+    /* setup two units */
     mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
     set_level(fam, SK_PERCEPTION, 6);
@@ -304,14 +304,14 @@ static void test_skill_familiar(CuTest *tc) {
     set_level(mag, SK_PERCEPTION, 6);
     CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
 
-    // make them mage and familiar to each other
+    /* make them mage and familiar to each other */
     CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
 
-    // when they are in the same region, the mage gets half their skill as a bonus
+    /* when they are in the same region, the mage gets half their skill as a bonus */
     CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
     CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, 0));
 
-    // when they are further apart, divide bonus by distance
+    /* when they are further apart, divide bonus by distance */
     r = test_create_region(3, 0, 0);
     move_unit(fam, r, &r->units);
     CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, 0));
@@ -323,7 +323,6 @@ static void test_age_familiar(CuTest *tc) {
 
     test_cleanup();
 
-    // setup two units
     mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
     CuAssertPtrEquals(tc, 0, get_familiar(mag));
@@ -426,28 +425,28 @@ static void test_remove_unit(CuTest *tc) {
     remove_unit(&r->units, u1);
     CuAssertIntEquals(tc, 0, u1->number);
     CuAssertPtrEquals(tc, 0, u1->region);
-    // money is given to a survivor:
+    /* money is given to a survivor: */
     CuAssertPtrEquals(tc, 0, u1->items);
     CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
 
-    // unit is removed from f->units:
+    /* unit is removed from f->units: */
     CuAssertPtrEquals(tc, 0, u1->nextF);
     CuAssertPtrEquals(tc, u2, f->units);
     CuAssertPtrEquals(tc, 0, u2->nextF);
     CuAssertPtrEquals(tc, 0, u2->prevF);
-    // unit is no longer in r->units:
+    /* unit is no longer in r->units: */
     CuAssertPtrEquals(tc, u2, r->units);
     CuAssertPtrEquals(tc, 0, u2->next);
 
-    // unit is in deleted_units:
+    /* unit is in deleted_units: */
     CuAssertPtrEquals(tc, 0, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
 
     remove_unit(&r->units, u2);
-    // no survivor, give money to peasants:
+    /* no survivor, give money to peasants: */
     CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
-    // there are now no more units:
+    /* there are now no more units: */
     CuAssertPtrEquals(tc, 0, r->units);
     CuAssertPtrEquals(tc, 0, f->units);
     test_cleanup();

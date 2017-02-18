@@ -275,7 +275,6 @@ unit *getnewunit(const region * r, const faction * f)
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
-// PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 static int *forbidden_ids;
 
 int forbiddenid(int id)
@@ -491,19 +490,19 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
 {
     int result = 0;
     const char *value = get_param(p, key);
+    char *v, *p_value;
     if (!value) {
         return 0;
     }
-    char *p_value = strdup(value);
-    const char *delimiter = " ,;";
-    char *v = strtok(p_value, delimiter);
+    p_value = strdup(value);
+    v = strtok(p_value, " ,;");
 
     while (v != NULL) {
         if (strcmp(v, searchvalue) == 0) {
             result = 1;
             break;
         }
-        v = strtok(NULL, delimiter);
+        v = strtok(NULL, " ,;");
     }
     free(p_value);
     return result;
@@ -836,7 +835,7 @@ const char * game_name(void)
 
 const char * game_name_upper(void)
 {
-    static char result[32]; // FIXME: static result
+    static char result[32]; /* FIXME: static result */
     char *r = result;
     const char *param = game_name();
     const char *c = param;

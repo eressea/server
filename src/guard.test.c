@@ -34,7 +34,7 @@ static void test_is_guarded(CuTest *tc) {
 }
 
 static void test_guard_unskilled(CuTest * tc)
-// TODO: it would be better to test armedmen()
+/* TODO: it would be better to test armedmen() */
 {
     unit *u, *ug;
     region *r;

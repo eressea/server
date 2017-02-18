@@ -15,6 +15,11 @@
 #pragma warning(disable: 4456) // declaration hides previous
 #pragma warning(disable: 4457) // declaration hides function parameter
 #pragma warning(disable: 4459) // declaration hides global
+#else /* assume gcc */
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+# define va_copy(a,b) __va_copy(a,b)
+#endif
+
 #endif
 
 #define _POSIX_C_SOURCE 200809L

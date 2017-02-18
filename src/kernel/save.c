@@ -94,7 +94,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
 
-// TODO: is this still important?
+/* TODO: is this still important? */
 int enc_gamedata = ENCODING_UTF8;
 
 /* local symbols */
@@ -467,7 +467,7 @@ void read_planes(gamedata *data) {
             }
         }
         read_attribs(data, &pl->attribs, pl);
-        if (pl->id != 1094969858) { // Regatta
+        if (pl->id != 1094969858) { /* Regatta */
             addlist(&planes, pl);
         }
     }
@@ -1206,7 +1206,7 @@ static void read_password(gamedata *data, faction *f) {
         char * pass = getpasswd(f->no);
         if (pass) {
             faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
-            free(pass); // TODO: remove this allocation!
+            free(pass); /* TODO: remove this allocation! */
         }
         else {
             log_error("data version is BADCRYPT but %s not in password.txt", itoa36(f->no));
@@ -1542,7 +1542,7 @@ struct building *read_building(gamedata *data) {
     b->type = bt_find(name);
     read_attribs(data, &b->attribs, b);
 
-    // repairs, bug 2221:
+    /* repairs, bug 2221: */
     if (b->type->maxsize>0 && b->size>b->type->maxsize) {
         log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
         b->size = b->type->maxsize;

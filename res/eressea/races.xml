@@ -1038,7 +1038,7 @@
     <attack type="1" damage="1d4"/>
   </race>
   <race name="ghast" magres="60" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
-    <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
+    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1074,7 +1074,7 @@
     <attack type="2" damage="1d30"/>
   </race>
   <race name="juju-zombie" magres="50" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
-    <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
+    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="namezombie"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1105,7 +1105,7 @@
     <attack type="1" damage="1d7"/>
   </race>
   <race name="skeletonlord" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
-    <ai splitsize="2000" aggression="0.02" killpeasants="yes" moverandom="yes"/>
+    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameskeleton"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>

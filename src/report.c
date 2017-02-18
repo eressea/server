@@ -100,7 +100,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
-# pragma warning(disable: 4774) // TODO: remove this
+# pragma warning(disable: 4774) /* TODO: remove this */
 #endif
 
 extern int *storms;
@@ -120,7 +120,7 @@ static void check_errno(const char * file, int line) {
 
 static char *gamedate_season(const struct locale *lang)
 {
-    static char buf[256]; // FIXME: static return value
+    static char buf[256]; /* FIXME: static return value */
     gamedate gd;
 
     get_gamedate(turn, &gd);
@@ -1195,7 +1195,7 @@ static void describe(struct stream *out, const region * r, faction * f)
             bufp = buf;
             size = sizeof(buf) - 1;
 
-            // this localization might not work for every language but is fine for de and en
+            /* this localization might not work for every language but is fine for de and en */
             bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_schemes_prefix"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1237,7 +1237,7 @@ static void describe(struct stream *out, const region * r, faction * f)
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (!e->exist[d])
                 continue;
-            // this localization might not work for every language but is fine for de and en
+            /* this localization might not work for every language but is fine for de and en */
             if (first)
                 bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_borderlist_prefix"), size);
             else if (e->lastd == d)
@@ -1251,8 +1251,8 @@ static void describe(struct stream *out, const region * r, faction * f)
                 WARN_STATIC_BUFFER();
             first = false;
         }
-        // TODO name is localized? Works for roads anyway...
-        // TODO: creating messages during reporting makes them not show up in CR?
+        /* TODO name is localized? Works for roads anyway... */
+        /* TODO: creating messages during reporting makes them not show up in CR? */
         msg = msg_message("nr_borderlist_postfix", "transparent object",
             e->transparent, e->name);
         bytes = (int)nr_render(msg, f->locale, bufp, size, f);
@@ -1987,7 +1987,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
                 }
             }
             if (len >= size || data->counter == data->maxtravel) {
-                // buffer is full
+                /* buffer is full */
                 *writep = 0;
                 paragraph(data->out, data->start, 0, 0, 0);
                 data->writep = data->start;
@@ -2332,7 +2332,6 @@ report_plaintext(const char *filename, report_context * ctx,
         /* Nachrichten an REGION in der Region */
 
         if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
-            // TODO: Bug 2073
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);

@@ -153,7 +153,7 @@ static unsigned int __at_hashkey(const char *s)
     while (i > 0) {
         key = (s[--i] + key * 37);
     }
-    return key & 0x7fffffff; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 0x7fffffff used: return key & 0x7fffffff;.
+    return key & 0x7fffffff;
 }
 
 void at_register(attrib_type * at)
@@ -161,7 +161,7 @@ void at_register(attrib_type * at)
     attrib_type *find;
 
     if (at->read == NULL) {
-        log_warning("registering non-persistent attribute %s.\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
+        log_warning("registering non-persistent attribute %s.\n", at->name);
     }
     at->hashkey = __at_hashkey(at->name);
     find = at_hash[at->hashkey % MAXATHASH];
@@ -169,7 +169,7 @@ void at_register(attrib_type * at)
         find = find->nexthash;
     }
     if (find && find == at) {
-        log_warning("attribute '%s' was registered more than once\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
+        log_warning("attribute '%s' was registered more than once\n", at->name);
         return;
     }
     else {

@@ -120,7 +120,7 @@ unit *findunitr(const region * r, int n)
     return (u && u->region == r) ? u : 0;
 }
 
-// TODO: deprecated, replace with findunit(n)
+/* TODO: deprecated, replace with findunit(n) */
 unit *findunitg(int n, const region * hint)
 {
     UNUSED_ARG(hint);
@@ -366,7 +366,7 @@ int gift_items(unit * u, int flags)
 static unit *deleted_units = NULL;
 
 #define DMAXHASH 7919
-#undef DMAXHASH // TODO: makes dfindhash slow!
+#undef DMAXHASH /* TODO: makes dfindhash slow! */
 #ifdef DMAXHASH
 typedef struct dead {
     struct dead *nexthash;
@@ -455,7 +455,6 @@ int remove_unit(unit ** ulist, unit * u)
 #ifdef DMAXHASH
     dhash(u->no, u->faction);
 #endif
-    // u_setfaction(u, NULL);
 
     u->region = NULL;
 
