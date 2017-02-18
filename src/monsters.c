@@ -673,7 +673,7 @@ static order *plan_dragon(unit * u)
     }
     if (tr != NULL) {
         assert(long_order == NULL);
-        // TODO: per-race planning functions?
+        /* TODO: per-race planning functions? */
         if (rc == rc_wyrm) {
             long_order = make_movement_order(u, tr, 1, allowed_dragon);
         }

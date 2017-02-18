@@ -47,7 +47,7 @@ static void test_unicode_tolower(CuTest * tc)
 
 static void test_unicode_utf8_to_other(CuTest *tc)
 {
-    const unsigned char uchar_str[] = { 0xc3, 0x98, 0xc5, 0xb8, 0xc2, 0x9d, 'l', 0 }; // &Oslash;&Yuml;&#157;l
+    const unsigned char uchar_str[] = { 0xc3, 0x98, 0xc5, 0xb8, 0xc2, 0x9d, 'l', 0 }; /* &Oslash;&Yuml;&#157;l */
     utf8_t *utf8_str = (utf8_t *)uchar_str;
     unsigned char ch;
     size_t sz;
@@ -111,7 +111,7 @@ static void test_unicode_bug2262(CuTest *tc) {
     CuAssertIntEquals(tc, 'u', ucs);
     CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
 
-    name[0] = -4; // latin1: &uuml; should fail to decode
+    name[0] = -4; /* latin1: &uuml; should fail to decode */
     CuAssertIntEquals(tc, EILSEQ, unicode_utf8_to_ucs4(&ucs, name, &sz));
     CuAssertIntEquals(tc, EILSEQ, unicode_utf8_trim(name));
 }

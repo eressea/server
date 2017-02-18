@@ -155,7 +155,7 @@ const char *resourcename(const resource_type * rtype, int flags)
             }
         }
         if (flags & NMF_PLURAL) {
-            static char name[64]; // FIXME: static return value
+            static char name[64]; /* FIXME: static return value */
             size_t len = strlen(rtype->_name);
             assert(len <= sizeof(name) - 3);
             memcpy(name, rtype->_name, len);
@@ -638,11 +638,14 @@ static const char *resourcenames[MAX_RESOURCES] = {
 const resource_type *get_resourcetype(resource_t type) {
     static int update;
     static struct resource_type * rtypes[MAX_RESOURCES];
+    const resource_type *rtype = NULL;
     if (update != num_resources) {
         memset(rtypes, 0, sizeof(rtypes));
         update = num_resources;
     }
-    const resource_type *rtype = rtypes[type];
+    else {
+        rtype = rtypes[type];
+    }
     if (!rtype) {
         rtype = rtypes[type] = rt_find(resourcenames[type]);
     }
@@ -975,27 +978,23 @@ void init_resources(void)
 {
     resource_type *rtype;
 
-    rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
+    rt_get_or_create(resourcenames[R_PERSON]); /* lousy hack */
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
 
-    // R_SILVER
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->give = give_money;
 
-    // R_PERMAURA
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
 
-    // R_LIFE
     rtype = rt_get_or_create(resourcenames[R_LIFE]);
     rtype->uchange = res_changehp;
 
-    // R_AURA
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
 

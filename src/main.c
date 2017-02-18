@@ -223,11 +223,11 @@ static int parse_args(int argc, char **argv, int *exitcode)
         }
     }
 
-    // open logfile on disk:
+    /* open logfile on disk: */
     log_flags = verbosity_to_flags(log_flags);
     log_open(logfile, log_flags);
 
-    // also log to stderr:
+    /* also log to stderr: */
     log_stderr = verbosity_to_flags(verbosity);
     if (log_stderr) {
         log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);

@@ -77,7 +77,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
-# pragma warning(disable: 4774) // TODO: remove this
+# pragma warning(disable: 4774) /* TODO: remove this */
 #endif
 
 #define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
@@ -680,7 +680,7 @@ size_t size)
                     if (wrptr(&bufp, &size, result) != 0) {
                         WARN_STATIC_BUFFER();
                     }
-                    // TODO: no need to deref the spellref here (spref->name is good)
+                    /* TODO: no need to deref the spellref here (spref->name is good) */
                     bufp = STRLCPY(bufp, spell_name(sbe->sp, f->locale), size);
                 }
             }
@@ -851,7 +851,7 @@ const struct unit * u, struct skill * sv, int *dh, int days)
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
     bool firstline;
-    static char buf[REPORTWIDTH + 1]; // FIXME: static buffer, artificial limit
+    static char buf[REPORTWIDTH + 1]; /* FIXME: static buffer, artificial limit */
     size_t len = strlen(s);
 
     assert(width <= REPORTWIDTH);
@@ -882,7 +882,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
         }
         memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
-        addstrlist(SP, buf); // TODO: too much string copying, cut out this function
+        addstrlist(SP, buf); /* TODO: too much string copying, cut out this function */
         while (*cut == ' ') {
             ++cut;
         }
@@ -1017,7 +1017,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
 }
 
 static void add_travelthru_addresses(region *r, faction *f, selist **flist, int stealthmod) {
-    // for each traveling unit: add the faction of any unit is can see
+    /* for each traveling unit: add the faction of any unit is can see */
     address_data cbdata = { 0 };
     cbdata.f = f;
     cbdata.flist = flist;
@@ -1338,7 +1338,7 @@ void prepare_report(report_context *ctx, faction *f)
 
     if (f->age<=2) {
         if ((f->flags&FFL_PWMSG)==0) {
-            // TODO: this assumes unencrypted passwords
+            /* TODO: this assumes unencrypted passwords */
             f->flags |= FFL_PWMSG;
             ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
         }
@@ -1348,7 +1348,7 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
     ctx->userdata = NULL;
-    // [first,last) interval of regions with a unit in it:
+    /* [first,last) interval of regions with a unit in it: */
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
 
@@ -1388,9 +1388,9 @@ void prepare_report(report_context *ctx, faction *f)
             travelthru_map(r, cb_add_seen, f);
         }
     }
-    // [fast,last) interval of seen regions (with lighthouses and travel)
-    // TODO: what about neighbours? when are they included? do we need
-    // them outside of the CR?
+    /* [fast,last) interval of seen regions (with lighthouses and travel)
+     * TODO: what about neighbours? when are they included? do we need
+     * them outside of the CR? */
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
 }
@@ -1582,7 +1582,7 @@ static void var_free_resources(variant x)
     x.v = 0;
 }
 
-static void var_free_regions(variant x) //-V524
+static void var_free_regions(variant x) /*-V524 */
 {
     free(x.v);
 }
@@ -1630,7 +1630,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 
 static char *f_regionid_s(const region * r, const faction * f)
 {
-    static char buf[NAMESIZE + 20]; // FIXME: static return value
+    static char buf[NAMESIZE + 20]; /* FIXME: static return value */
 
     f_regionid(r, f, buf, sizeof(buf));
     return buf;
@@ -1689,11 +1689,10 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
         sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
-    assert(c || !"spell without description!");
-    size_t len = strlen(c);
     variant var;
 
-    var.v = strcpy(balloc(len + 1), c);
+    assert(c || !"spell without description!");
+    var.v = strcpy(balloc(strlen(c) + 1), c);
     opush(stack, var);
 }
 
@@ -1703,11 +1702,10 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
     const char *c =
         sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
-    assert(c || !"spell effect without description!");
-    size_t len = strlen(c);
     variant var;
 
-    var.v = strcpy(balloc(len + 1), c);
+    assert(c || !"spell effect without description!");
+    var.v = strcpy(balloc(strlen(c) + 1), c);
     opush(stack, var);
 }
 
@@ -1947,7 +1945,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 
 const char *get_mailcmd(const struct locale *loc)
 {
-    static char result[64]; // FIXME: static return buffer
+    static char result[64]; /* FIXME: static return buffer */
     snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
     return result;
 }
@@ -2057,12 +2055,12 @@ int stream_printf(struct stream * out, const char *format, ...) {
     int result;
     char buffer[4096];
     size_t bytes = sizeof(buffer);
-    // TODO: should be in storage/stream.c (doesn't exist yet)
+    /* TODO: should be in storage/stream.c (doesn't exist yet) */
     va_start(args, format);
     result = vsnprintf(buffer, bytes, format, args);
     if (result >= 0 && (size_t)result < bytes) {
         bytes = (size_t)result;
-        // TODO: else = buffer too small
+        /* TODO: else = buffer too small */
     }
     out->api->write(out->handle, buffer, bytes);
     va_end(args);

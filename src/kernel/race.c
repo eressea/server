@@ -86,12 +86,12 @@ typedef struct rcoption {
 
 enum {
     RCO_NONE,
-    RCO_SCARE,   // races that scare and eat peasants
-    RCO_OTHER,   // may recruit from another race
-    RCO_STAMINA, // every n levels of stamina add +1 RC
-    RCO_HUNGER,  // custom hunger.damage override (char *)
+    RCO_SCARE,   /* races that scare and eat peasants */
+    RCO_OTHER,   /* may recruit from another race */
+    RCO_STAMINA, /* every n levels of stamina add +1 RC */
+    RCO_HUNGER,  /* custom hunger.damage override (char *) */
     RCO_TRADELUX,
-    RCO_TRADEHERB,
+    RCO_TRADEHERB
 };
 
 static void rc_setoption(race *rc, int k, const char *value) {
@@ -476,7 +476,7 @@ const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
 
 const char *rc_name_s(const race * rc, name_t n)
 {
-    static char name[64];  // FIXME: static return value
+    static char name[64];  /* FIXME: static return value */
     return rc_name(rc, n, name, sizeof(name));
 }
 
@@ -497,7 +497,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
     const char *str, *prefix = raceprefix(u);
 
     if (prefix != NULL) {
-        static char lbuf[80]; // FIXME: static return value
+        static char lbuf[80]; /* FIXME: static return value */
         char *bufp = lbuf;
         size_t size = sizeof(lbuf) - 1;
         int ch, bytes;

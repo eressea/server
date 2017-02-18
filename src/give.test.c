@@ -393,7 +393,7 @@ static void test_give_new_unit(CuTest * tc) {
 }
 
 static void test_give_invalid_target(CuTest *tc) {
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     struct give env = { 0 };
     order *ord;
 

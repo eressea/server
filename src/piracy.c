@@ -149,8 +149,8 @@ void piracy_cmd(unit * u)
             region *rc = rconnect(r, dir);
             aff[dir].value = 0;
             aff[dir].target = 0;
-            // TODO this could still result in an illegal movement order (through a wall or whatever)
-            // which will be prevented by move_cmd below
+            /* TODO this could still result in an illegal movement order (through a wall or whatever)
+             * which will be prevented by move_cmd below */
             if (rc &&
                 ((sh && !fval(rc->terrain, FORBIDDEN_REGION) && can_takeoff(sh, r, rc))
                     || (canswim(u) && fval(rc->terrain, SWIM_INTO) && fval(rc->terrain, SEA_REGION)))) {
@@ -161,7 +161,8 @@ void piracy_cmd(unit * u)
                         faction *f = visible_faction(cap->faction, cap);
                         if (alliedunit(u, f, HELP_FIGHT))
                             continue;
-                        if (!il || intlist_find(il, cap->faction->no)) { // TODO: shouldn't this be f->no?
+                        if (!il || intlist_find(il, cap->faction->no)) {
+                            /* TODO: shouldn't this be f->no? */
                             ++aff[dir].value;
                             if (rng_int() % aff[dir].value == 0) {
                                 aff[dir].target = f;
@@ -202,8 +203,8 @@ void piracy_cmd(unit * u)
         "ship unit region dir", sh, u, r, target_dir));
 
     /* Befehl konstruieren */
-    // TODO: why change u->thisorder?
-    // FIXME: when u->thisorder == ord, set_order calls free, destroys both.
+    /* TODO: why change u->thisorder? */
+    /* FIXME: when u->thisorder == ord, set_order calls free, destroys both. */
     ord = create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[target_dir]));
 
     /* Bewegung ausführen */

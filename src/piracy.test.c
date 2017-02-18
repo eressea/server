@@ -97,7 +97,7 @@ static void test_piracy_cmd(CuTest * tc) {
     CuAssertTrue(tc, u->region != r);
     CuAssertPtrEquals(tc, u2->region, u->region);
     CuAssertPtrEquals(tc, u2->region, u->ship->region);
-    CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); // FIXME: this is testing implementation, not interface
+    CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); /* FIXME: this is testing implementation, not interface */
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(f->msgs, "piratesawvictim"));
     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(f->msgs, "shipsail"));
 
@@ -183,14 +183,14 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
     t_plain = get_or_create_terrain("plain");
     stype = test_create_shiptype("boat");
 
-    // create a target:
+    /* create a target: */
     r = test_create_region(0, 0, t_plain);
     f = test_create_faction(0);
     u = test_create_unit(f, r);
     u->ship = test_create_ship(r, stype);
     target = f->no;
 
-    // create a pirate:
+    /* create a pirate: */
     r = test_create_region(1, 0, t_plain);
     f = test_create_faction(0);
     u = test_create_unit(f, r);

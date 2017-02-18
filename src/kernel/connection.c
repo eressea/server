@@ -640,7 +640,7 @@ int read_borders(gamedata *data)
         if (!to || !from) {
             log_error("%s connection %d has missing regions", zText, bid);
             if (type->read) {
-                // skip ahead
+                /* skip ahead */
                 connection dummy;
                 type->read(&dummy, data);
             }

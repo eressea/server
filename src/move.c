@@ -509,10 +509,10 @@ static double overload(const region * r, ship * sh)
     else {
         int n = 0, p = 0;
         int mcabins = sh->type->cabins;
+        double ovl;
 
         getshipweight(sh, &n, &p);
-
-        double ovl = n / (double)sh->type->cargo;
+        ovl = n / (double)sh->type->cargo;
         if (mcabins)
             ovl = MAX(ovl, p / (double)mcabins);
         return ovl;
@@ -801,7 +801,7 @@ region * drift_target(ship *sh) {
         if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
             rnext = rn;
             if (!fval(rnext->terrain, SEA_REGION)) {
-                // prefer drifting towards non-ocean regions
+                /* prefer drifting towards non-ocean regions */
                 break;
             }
         }
@@ -952,8 +952,8 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
             else if (sk >= stealth) {
-                guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
+                guard_count += u->number;
                 /* amulet counts at most once */
                 prob_u += MIN(1, MIN(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
@@ -1406,7 +1406,7 @@ static int movement_speed(unit * u)
         return BP_DRAGON;
     }
     switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON: // FIXME: catdragon has RCF_DRAGON, so this cannot happen
+    case RC_BIRTHDAYDRAGON: /* FIXME: catdragon has RCF_DRAGON, so this cannot happen */
     case RC_SONGDRAGON:
         mp = BP_DRAGON;
         break;
@@ -1473,9 +1473,9 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
 
     if (size > 0) {
         int i = 0;
+        arg_regions *dst;
         assert(size > 0);
-        arg_regions *dst =
-            (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
+        dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
         assert_alloc(dst);
         dst->nregions = size;
         dst->regions = (region **)(dst + 1);
@@ -1840,7 +1840,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                         }
                     }
                 }
-            } // storms_enabled
+            } /* storms_enabled */
             if (!fval(tthis, SEA_REGION)) {
                 if (!fval(tnext, SEA_REGION)) {
                     /* check that you're not traveling from one land region to another. */

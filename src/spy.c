@@ -303,9 +303,9 @@ int setstealth_cmd(unit * u, struct order *ord)
         }
         if (rule_stealth_other()) {
             if (get_keyword(s, u->faction->locale) == K_NUMBER) {
-                s = gettoken(token, sizeof(token));
                 int nr = -1;
 
+                s = gettoken(token, sizeof(token));
                 if (s) {
                     nr = atoi36(s);
                 }

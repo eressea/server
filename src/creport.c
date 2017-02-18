@@ -286,7 +286,7 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
 }
 
 static void cr_output_curses_compat(FILE *F, const faction * viewer, const void *obj, objtype_t typ) {
-    // TODO: eliminate this function
+    /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
     cr_output_curses(&strm, viewer, obj, typ);
@@ -718,7 +718,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                // TODO: no need to deref spref here, spref->name == sp->sname
+                /* TODO: no need to deref spref here, spref->name == sp->sname */
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
@@ -752,7 +752,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *prefix;
 
     assert(u && u->number);
-    assert(u->region == r); // TODO: if this holds true, then why did we pass in r?
+    assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
@@ -990,7 +990,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
 static void cr_output_unit_compat(FILE * F, const region * r, const faction * f,
     const unit * u, int mode)
 {
-    // TODO: eliminate this function
+    /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
     cr_output_unit(&strm, r, f, u, mode);

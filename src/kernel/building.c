@@ -461,8 +461,8 @@ void remove_building(building ** blist, building * b)
     bunhash(b);
 
     /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
-     * gebaute Stra�e zur H�lfte vernichtet */
-    // TODO: caravan, tunnel, dam modularization ? is_building_type ?
+     * gebaute Strasse zur Haelfte vernichtet */
+    /* TODO: caravan, tunnel, dam modularization ? is_building_type ? */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;
@@ -605,10 +605,11 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
 
 unit *building_owner(const building * bld)
 {
+    unit *owner;
     if (!bld) {
         return NULL;
     }
-    unit *owner = bld->_owner;
+    owner = bld->_owner;
     if (!owner || (owner->building != bld || owner->number <= 0)) {
         unit * heir = building_owner_ex(bld, owner ? owner->faction : 0);
         return (heir && heir->number > 0) ? heir : 0;

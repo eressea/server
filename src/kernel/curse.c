@@ -696,7 +696,7 @@ void transfer_curse(unit * u, unit * u2, int n)
 
 int curse_cansee(const curse *c, const faction *viewer, objtype_t typ, const void *obj, int self) {
     if (self < 3 && c->magician && c->magician->faction == viewer) {
-        // magicians can see their own curses better than anybody, no exceptions
+        /* magicians can see their own curses better than anybody, no exceptions */
         self = 3;
     }
     else if (c->type->cansee) {

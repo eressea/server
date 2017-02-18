@@ -168,7 +168,7 @@ void addtoken(tnode ** root, const char *str, variant id)
             next = next->nexthash;
         if (!next) {
             tref *ref;
-            tnode *node = mknode(); // TODO: what is the reason for this empty node to exist?
+            tnode *node = mknode(); /* TODO: what is the reason for this empty node to exist? */
 
             if (ucs < 'a' || ucs > 'z') {
                 lcs = towlower((wint_t)ucs);

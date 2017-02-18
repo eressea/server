@@ -114,7 +114,7 @@ terrain_type * get_or_create_terrain(const char *name) {
             terrain->next = registered_terrains;
             registered_terrains = terrain;
             if (strcmp("plain", name) == 0) {
-                // TODO: this is awful, it belongs in config
+                /* TODO: this is awful, it belongs in config */
                 terrain->name = &plain_name;
             }
         }

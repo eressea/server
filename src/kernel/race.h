@@ -151,7 +151,7 @@ extern "C" {
         struct item *(*itemdrop) (const struct race *, int size);
         void(*init_familiar) (struct unit *);
 
-        struct rcoption *options; // rarely used properties
+        struct rcoption *options; /* rarely used properties */
 
         const struct race *familiars[MAXMAGIETYP];
         struct race *next;

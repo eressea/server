@@ -280,7 +280,7 @@ static void dragon_name(unit * u)
     if (u->number > 1) {
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
-        // TODO: localization
+        /* TODO: localization */
         sprintf(name, "Die %sn von %s", no_article + 1, rname(u->region,
             default_locale));
     }

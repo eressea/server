@@ -70,8 +70,8 @@ static bool can_give(const unit * u, const unit * u2, const item_type * itype, i
 {
     if (u2) {
         if (u2->number==0 && !fval(u2, UFL_ISNEW)) {
-            // https://bugs.eressea.de/view.php?id=2230
-            // cannot give anything to dead units
+            /* https://bugs.eressea.de/view.php?id=2230
+             * cannot give anything to dead units */
             return false;
         } else if (u->faction != u2->faction) {
             int rule = rule_give();
@@ -258,7 +258,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     message * msg;
     int maxt = max_transfers();
 
-    assert(u2); // use disband_men for GIVE 0
+    assert(u2); /* use disband_men for GIVE 0 */
 
     if (!can_give_men(u, u2, ord, &msg)) {
         return msg;

@@ -1753,7 +1753,7 @@ static void expandselling(region * r, request * sellorders, int limit)
         int i;
         int use = 0;
         for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
-            // TODO: this is slow and lame!
+            /* TODO: this is slow and lame! */
             ++i;
         }
         if (counter[i] >= limit)
@@ -2444,8 +2444,8 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
         f = u2->faction;
     }
     else {
-        // TODO: is this really necessary? it's the only time we use faction.c/deadhash
-        // it allows stealing from a unit in a dead faction, but why?
+        /* TODO: is this really necessary? it's the only time we use faction.c/deadhash
+         * it allows stealing from a unit in a dead faction, but why? */
         f = dfindhash(id);
     }
 

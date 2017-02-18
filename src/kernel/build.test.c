@@ -200,7 +200,7 @@ static void test_build_with_potion(CuTest *tc) {
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    scale_number(u, 2); // OBS: this scales the effects, too:
+    scale_number(u, 2); /* OBS: this scales the effects, too: */
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));

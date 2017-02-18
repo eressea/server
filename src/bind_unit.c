@@ -857,13 +857,15 @@ static int tolua_unit_create(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     region *r = (region *)tolua_tousertype(L, 2, 0);
+    unit *u;
     const char *rcname = tolua_tostring(L, 4, NULL);
     int num = (int)tolua_tonumber(L, 3, 1);
     const race *rc;
+
     assert(f && r);
     rc = rcname ? rc_find(rcname) : f->race;
     assert(rc);
-    unit *u = create_unit(r, f, num, rc, 0, NULL, NULL);
+    u = create_unit(r, f, num, rc, 0, NULL, NULL);
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
     return 1;
 }

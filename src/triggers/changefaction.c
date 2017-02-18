@@ -92,7 +92,6 @@ static int changefaction_read(trigger * t, gamedata *data)
         return AT_READ_FAIL;
     }
     ur_add(var, &td->faction, resolve_faction);
-    // read_reference(&td->faction, store, read_faction_reference, resolve_faction);
     return AT_READ_OK;
 }
 

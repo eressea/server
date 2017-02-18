@@ -38,11 +38,11 @@ extern "C" {
     extern struct attrib_type at_maxmagicians;
 
     /* faction flags */
-#define FFL_NEWID         (1<<0)  // Die Partei hat bereits einmal ihre no gewechselt
+#define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
-#define FFL_PWMSG         (1<<2)  // received a "new password" message
+#define FFL_PWMSG         (1<<2)  /* received a "new password" message */
 #define FFL_QUIT          (1<<3)
-#define FFL_CURSED        (1<<4)  // you're going to have a bad time
+#define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */

@@ -659,7 +659,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         xmlFree(propValue);
 
         propValue = xmlGetProp(node, BAD_CAST "value");
-        wtype->damage[pos] = strdup((const char *)propValue); // TODO: this is a memory leak
+        wtype->damage[pos] = strdup((const char *)propValue); /* TODO: this is a memory leak */
         if (k == 0)
             wtype->damage[1 - pos] = wtype->damage[pos];
         xmlFree(propValue);
@@ -1043,7 +1043,7 @@ static int parse_resources(xmlDocPtr doc)
                     else if (strcmp((const char *)propValue, "material") == 0) {
                         int g, num, den = 100;
                         double fval = xml_fvalue(node, "value", 0);
-                        // TODO: extract into a function for reading fractions?
+                        /* TODO: extract into a function for reading fractions? */
                         num = (int)(fval * den + 0.5);
                         g = gcd(num, den);
                         num /= g;
@@ -1635,8 +1635,8 @@ static int parse_races(xmlDocPtr doc)
         xmlFree(propValue);
 
         rc->magres = xml_ivalue(node, "magres", rc->magres);
-        rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); // TODO: store as int in XML
-        rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); // TODO: store as int in XML
+        rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); /* TODO: store as int in XML */
+        rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); /* TODO: store as int in XML */
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
         rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
         rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
@@ -1722,7 +1722,7 @@ static int parse_races(xmlDocPtr doc)
             rc->ec_flags |= ECF_REC_UNLIMITED;
 
         if (xml_bvalue(node, "equipment", false))
-            rc->battle_flags |= BF_EQUIPMENT; // TODO: invert this flag, so rc_get_or_create gets simpler
+            rc->battle_flags |= BF_EQUIPMENT; /* TODO: invert this flag, so rc_get_or_create gets simpler */
         if (xml_bvalue(node, "noblock", false))
             rc->battle_flags |= BF_NOBLOCK;
         if (xml_bvalue(node, "invinciblenonmagic", false))

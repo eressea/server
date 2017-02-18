@@ -67,13 +67,13 @@ int json_export(stream * out, int flags) {
     cJSON *json, *root = cJSON_CreateObject();
     assert(out && out->api);
     if (regions && (flags & EXPORT_REGIONS)) {
-        char id[32]; // TODO: static_assert(INT_MAX < 10^32)
+        char id[32]; /* TODO: static_assert(INT_MAX < 10^32) */
         region * r;
         plane * p;
         cJSON_AddItemToObject(root, "planes", json = cJSON_CreateObject());
         for (p = planes; p; p = p->next) {
             cJSON *data;
-            sprintf(id, "%d", p->id); // safe, unless int is bigger than 64 bit
+            sprintf(id, "%d", p->id); /* safe, unless int is bigger than 64 bit */
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", p->minx);
             cJSON_AddNumberToObject(data, "y", p->miny);
@@ -85,7 +85,7 @@ int json_export(stream * out, int flags) {
         cJSON_AddItemToObject(root, "regions", json = cJSON_CreateObject());
         for (r = regions; r; r = r->next) {
             cJSON *data;
-            sprintf(id, "%d", r->uid); // safe, unless int is bigger than 64 bit
+            sprintf(id, "%d", r->uid); /* safe, unless int is bigger than 64 bit */
             cJSON_AddItemToObject(json, id, data = cJSON_CreateObject());
             cJSON_AddNumberToObject(data, "x", r->x);
             cJSON_AddNumberToObject(data, "y", r->y);

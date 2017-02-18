@@ -61,8 +61,8 @@ extern "C" {
     int newcontainerid(void);
 
     bool rule_region_owners(void);
-    bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
-    bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
+    bool rule_stealth_other(void); /* units can pretend to be another faction, TARNE PARTEI <no> */
+    bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
 #define HARVEST_WORK  0x00

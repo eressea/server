@@ -266,7 +266,7 @@ static void test_maintain_buildings(CuTest *tc) {
     b->size = btype->maxsize;
     u_set_building(u, b);
 
-    // this building has no upkeep, it just works:
+    /* this building has no upkeep, it just works: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
@@ -278,7 +278,7 @@ static void test_maintain_buildings(CuTest *tc) {
     req[0].rtype = itype->rtype;
     btype->maintenance = req;
 
-    // we cannot afford to pay:
+    /* we cannot afford to pay: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
@@ -287,7 +287,7 @@ static void test_maintain_buildings(CuTest *tc) {
     test_clear_messagelist(&f->msgs);
     test_clear_messagelist(&r->msgs);
     
-    // we can afford to pay:
+    /* we can afford to pay: */
     i_change(&u->items, itype, 100);
     b->flags = 0;
     maintain_buildings(r);
@@ -298,7 +298,7 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
-    // this building has no owner, it doesn't work:
+    /* this building has no owner, it doesn't work: */
     u_set_building(u, NULL);
     b->flags = 0;
     maintain_buildings(r);

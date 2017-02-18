@@ -51,7 +51,7 @@ static void test_read_unitid(CuTest *tc) {
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
     init_order(ord);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
@@ -98,14 +98,14 @@ static void test_getunit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "TEMP ##");
     init_order(ord);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
     init_order(ord);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
