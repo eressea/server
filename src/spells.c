@@ -6596,7 +6596,6 @@ static spelldata spell_functions[] = {
     { "powerful_dragonbreath", sp_dragonodem, 0 },
     { "drain_skills", sp_dragonodem, 0 },
     { "aura_of_fear", sp_flee, 0 },
-    { "shadowcall", sp_shadowcall, 0 },
     { "immolation", sp_immolation, 0 },
     { "firestorm", sp_immolation, 0 },
     { "coldfront", sp_immolation, 0 },

@@ -815,42 +815,6 @@ int sp_drainodem(fighter * fi, int level, double power, spell * sp)
 /* ------------------------------------------------------------- */
 /* PRECOMBAT */
 
-int sp_shadowcall(struct castorder * co)
-{
-    fighter * fi = co->magician.fig;
-    int level = co->level;
-    double power = co->force;
-    battle *b = fi->side->battle;
-    region *r = b->region;
-    unit *mage = fi->unit;
-    attrib *a;
-    int force = (int)(get_force(power, 3) / 2);
-    unit *u;
-    const char *rcnames[3] = { "shadowbat", "nightmare", "vampunicorn" };
-    const race *rc = rc_find(rcnames[rng_int() % 3]);
-    message *msg;
-
-    u = create_unit(r, mage->faction, force, rc, 0, NULL, mage);
-    setstatus(u, ST_FIGHT);
-
-    set_level(u, SK_WEAPONLESS, (int)(power / 2));
-    set_level(u, SK_STAMINA, (int)(power / 2));
-    u->hp = u->number * unit_max_hp(u);
-
-    a = a_new(&at_unitdissolve);
-    a->data.ca[0] = 0;
-    a->data.ca[1] = 100;
-    a_add(&u->attribs, a);
-
-    make_fighter(b, u, fi->side, is_attacker(fi));
-    msg =
-        msg_message("sp_shadowcall_effect", "mage amount race", mage, u->number,
-        u_race(u));
-    message_all(b, msg);
-    msg_release(msg);
-    return level;
-}
-
 static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     attrib *a;
     unit *mage = fi->unit;
