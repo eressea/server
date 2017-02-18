@@ -905,6 +905,22 @@ static int parse_rules(xmlDocPtr doc)
     return 0;
 }
 
+static int gcd(int num, int den) {
+    const int primes[] = { 3, 5, 7, 11, 0 };
+    int i=0, g = 1, p = 2;
+    while (p && p<=den && p<=num) {
+        if (num % p == 0 && den % p == 0) {
+            num /= p;
+            den /= p;
+            g *= p;
+        }
+        else {
+            p = primes[i++];
+        }
+    }
+    return g;
+}
+
 static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1025,15 +1041,13 @@ static int parse_resources(xmlDocPtr doc)
                         rdata->modifiers[k].flags = RMF_SKILL;
                     }
                     else if (strcmp((const char *)propValue, "material") == 0) {
-                        int num, den = 100;
+                        int g, num, den = 100;
                         double fval = xml_fvalue(node, "value", 0);
                         // TODO: extract into a function for reading fractions?
                         num = (int)(fval * den + 0.5);
-                        if (num % 10 == 0) {
-                            // TODO: calculating a GCD would be better than this
-                            num /= 10;
-                            den /= 10;
-                        }
+                        g = gcd(num, den);
+                        num /= g;
+                        den /= g;
                         rdata->modifiers[k].value.sa[0] = (short)num;
                         rdata->modifiers[k].value.sa[1] = (short)den;
                         rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
