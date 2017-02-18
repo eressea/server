@@ -27,7 +27,6 @@ IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89 -ansi -pedantic")
-    add_definitions(-DHAVE__BOOL)
 ELSEIF(MSVC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
