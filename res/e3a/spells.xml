@@ -665,9 +665,6 @@
   <spell name="aura_of_fear" rank="5" index="175" combat="2">
     <resource name="aura" amount="12" cost="fixed"/>
   </spell>
-  <spell name="shadowcall" rank="5" index="176" combat="1">
-    <resource name="aura" amount="24" cost="fixed"/>
-  </spell>
   <spell name="immolation" rank="5" index="180" combat="2">
     <resource name="aura" amount="24" cost="fixed"/>
   </spell>
