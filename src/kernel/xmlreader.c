@@ -1595,7 +1595,6 @@ static void parse_ai(race * rc, xmlNodePtr node)
         xmlFree(propValue);
     }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
-    rc->aggression = (float)xml_fvalue(node, "aggression", 0.04);
     if (xml_bvalue(node, "killpeasants", false))
         rc->flags |= RCF_KILLPEASANTS;
     if (xml_bvalue(node, "moverandom", false))

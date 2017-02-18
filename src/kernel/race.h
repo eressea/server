@@ -130,7 +130,6 @@ extern "C" {
         int capacity;
         int income;
         float speed;
-        float aggression;           /* chance that a monster will attack */
         int hitpoints;
         char *def_damage;
         int armor;
