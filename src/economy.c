@@ -1036,6 +1036,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 static int required(int want, variant save)
 {
     int req = (int)(want * save.sa[0] / save.sa[1]);
+    int r = want * save.sa[0] % save.sa[1];
+    if (r>0) ++req;
     return req;
 }
 
