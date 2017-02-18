@@ -3819,10 +3819,6 @@
       <text locale="de">Meteorregen</text>
       <text locale="en">Meteor Shower</text>
     </string>
-    <string name="shadowcall">
-      <text locale="de">Schattenruf</text>
-      <text locale="en">Shadow Call</text>
-    </string>
     <string name="create_ror">
       <text locale="de">Erschaffe einen Ring der Regeneration</text>
       <text locale="en">Create A Ring of Regeneration</text>
@@ -4502,10 +4498,6 @@
     <string name="immolation">
       <text locale="de">Verletzt alle Gegner.</text>
       <text locale="en">Injures all enemies.</text>
-    </string>
-    <string name="shadowcall">
-      <text locale="de">Ruft Schattenwesen.</text>
-      <text locale="en">Calls beings from shadow.</text>
     </string>
     <string name="aura_of_fear">
       <text locale="de">Panik.</text>
