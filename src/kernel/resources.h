@@ -55,18 +55,16 @@ extern "C" {
 
     extern struct rawmaterial_type *rawmaterialtypes;
 
-    extern void update_resources(struct region *r);
-    extern void terraform_resources(struct region *r);
-    extern void read_resources(struct region *r);
-    extern void write_resources(struct region *r);
-    extern struct rawmaterial *rm_get(struct region *,
+    void update_resources(struct region *r);
+    void terraform_resources(struct region *r);
+    struct rawmaterial *rm_get(struct region *,
         const struct resource_type *);
-    extern struct rawmaterial_type *rmt_find(const char *str);
-    extern struct rawmaterial_type *rmt_get(const struct resource_type *);
+    struct rawmaterial_type *rmt_find(const char *str);
+    struct rawmaterial_type *rmt_get(const struct resource_type *);
 
-    extern void add_resource(struct region *r, int level, int base, int divisor,
+    void add_resource(struct region *r, int level, int base, int divisor,
         const struct resource_type *rtype);
-    extern struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
+    struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
         const char *name);
 
 #ifdef __cplusplus

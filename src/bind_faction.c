@@ -248,7 +248,7 @@ static int tolua_faction_getkey(lua_State * L)
     const char *name = tolua_tostring(L, 2, 0);
     int flag = atoi36(name);
 
-    lua_pushboolean(L, key_get(self->attribs, flag));
+    lua_pushinteger(L, key_get(self->attribs, flag));
     return 1;
 }
 
@@ -256,11 +256,11 @@ static int tolua_faction_setkey(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-    int value = tolua_toboolean(L, 3, 0);
+    int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
 
     if (value) {
-        key_set(&self->attribs, flag);
+        key_set(&self->attribs, flag, value);
     }
     else {
         key_unset(&self->attribs, flag);

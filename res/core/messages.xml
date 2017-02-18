@@ -7521,16 +7521,6 @@
     <text locale="en">"$unit($mage) casts $spell($spell). $int($amount) fighters are temporarily losing some of their memories."</text>
   </message>
 
-  <message name="sp_shadowcall_effect" section="magic">
-    <type>
-      <arg name="mage" type="unit"/>
-      <arg name="amount" type="int"/>
-      <arg name="race" type="race"/>
-    </type>
-    <text locale="de">"$unit($mage) ruft $int($amount) $race($race, 0) zu Hilfe."</text>
-    <text locale="en">"$unit($mage) calls upon the help of $int($amount) $race($race, 0)."</text>
-  </message>
-
   <message name="battle::killed" section="battle">
     <type>
       <arg name="unit" type="unit"/>

@@ -11,8 +11,9 @@
 const char *eressea_version(void) {
 #ifdef ERESSEA_BUILDNO
     return ERESSEA_VERSION "-" ERESSEA_BUILDNO;
-#endif
+#else
     return ERESSEA_VERSION;
+#endif
 }
 
 int version_no(const char *str) {

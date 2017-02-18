@@ -277,7 +277,6 @@ void free_races(void) {
                 free(at->data.dice);
             }
         }
-        spellref_free(races->precombatspell);
         free(xrefs);
         xrefs = 0;
         free(races->_name);
@@ -337,7 +336,6 @@ race *rc_create(const char *zName)
         assert(strchr(zName, ' ') == NULL);
     }
     rc->_name = strdup(zName);
-    rc->precombatspell = NULL;
 
     rc->attack[0].type = AT_COMBATSPELL;
     for (i = 1; i < RACE_ATTACKS; ++i)

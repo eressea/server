@@ -70,7 +70,7 @@ extern "C" {
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
     typedef struct resource_type {
         /* --- constants --- */
-        char *_name;             /* wie es heißt */
+        char *_name;             /* wie es heiï¿½t */
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
@@ -91,8 +91,7 @@ extern "C" {
 
     /* resource-limits for regions */
 #define RMF_SKILL         0x01  /* int, bonus on resource production skill */
-#define RMF_SAVEMATERIAL  0x02  /* float, multiplier on resource usage */
-#define RMF_SAVERESOURCE  0x03  /* int, bonus on resource production skill */
+#define RMF_SAVEMATERIAL  0x02  /* fraction (sa[0]/sa[1]), multiplier on resource usage */
 #define RMF_REQUIREDBUILDING 0x04       /* building, required to build */
 
     typedef struct resource_mod {
@@ -136,7 +135,7 @@ extern "C" {
         int weight;
         int capacity;
         struct construction *construction;
-        char *_appearance[2];       /* wie es für andere aussieht */
+        char *_appearance[2];       /* wie es fï¿½r andere aussieht */
         /* --- functions --- */
         bool(*canuse) (const struct unit * user,
             const struct item_type * itype);
@@ -311,6 +310,8 @@ extern "C" {
     extern const struct potion_type *oldpotiontype[];
     const struct resource_type *get_resourcetype(resource_t rt);
 
+    int get_item(const struct unit * u, const struct item_type *itype);
+    int set_item(struct unit * u, const struct item_type *itype, int value);
     int get_money(const struct unit *);
     int set_money(struct unit *, int);
     int change_money(struct unit *, int);

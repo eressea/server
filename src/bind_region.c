@@ -544,11 +544,11 @@ static int tolua_region_setkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-    int value = tolua_toboolean(L, 3, 0);
+    int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
 
     if (value) {
-        key_set(&self->attribs, flag);
+        key_set(&self->attribs, flag, value);
     }
     else {
         key_unset(&self->attribs, flag);

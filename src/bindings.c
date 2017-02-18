@@ -206,10 +206,10 @@ static int tolua_translate(lua_State * L)
 static int tolua_setkey(lua_State * L)
 {
     const char *name = tolua_tostring(L, 1, 0);
-    int value = tolua_toboolean(L, 2, 0);
+    int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
     if (value) {
-        key_set(&global.attribs, flag);
+        key_set(&global.attribs, flag, value);
     }
     else {
         key_unset(&global.attribs, flag);

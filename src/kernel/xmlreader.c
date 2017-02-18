@@ -905,6 +905,22 @@ static int parse_rules(xmlDocPtr doc)
     return 0;
 }
 
+static int gcd(int num, int den) {
+    const int primes[] = { 3, 5, 7, 11, 0 };
+    int i=0, g = 1, p = 2;
+    while (p && p<=den && p<=num) {
+        if (num % p == 0 && den % p == 0) {
+            num /= p;
+            den /= p;
+            g *= p;
+        }
+        else {
+            p = primes[i++];
+        }
+    }
+    return g;
+}
+
 static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1025,12 +1041,16 @@ static int parse_resources(xmlDocPtr doc)
                         rdata->modifiers[k].flags = RMF_SKILL;
                     }
                     else if (strcmp((const char *)propValue, "material") == 0) {
-                        rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
+                        int g, num, den = 100;
+                        double fval = xml_fvalue(node, "value", 0);
+                        // TODO: extract into a function for reading fractions?
+                        num = (int)(fval * den + 0.5);
+                        g = gcd(num, den);
+                        num /= g;
+                        den /= g;
+                        rdata->modifiers[k].value.sa[0] = (short)num;
+                        rdata->modifiers[k].value.sa[1] = (short)den;
                         rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
-                    }
-                    else if (strcmp((const char *)propValue, "resource") == 0) {
-                        rdata->modifiers[k].value.f = (float)xml_fvalue(node, "value", 0);
-                        rdata->modifiers[k].flags = RMF_SAVERESOURCE;
                     }
                     else if (strcmp((const char *)propValue, "require") == 0) {
                         xmlChar *propBldg = xmlGetProp(node, BAD_CAST "building");
@@ -1826,17 +1846,6 @@ static int parse_races(xmlDocPtr doc)
                     rc->familiars[k] = frc;
                 }
             }
-        }
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/races/race/precombatspell */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "precombatspell", xpath);
-        assert(rc->precombatspell == NULL
-            || !"precombatspell is already initialized");
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            rc->precombatspell = xml_spellref(node, "spell");
         }
         xmlXPathFreeObject(result);
 

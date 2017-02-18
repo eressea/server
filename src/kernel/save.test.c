@@ -211,8 +211,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     attrib *a = NULL;
 
     test_setup();
-    key_set(&a, 41);
-    key_set(&a, 42);
+    key_set(&a, 41, 42);
+    key_set(&a, 42, 43);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_attribs(data.store, a, NULL);
@@ -223,8 +223,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     read_attribs(&data, &a, NULL);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    CuAssertTrue(tc, key_get(a, 41));
-    CuAssertTrue(tc, key_get(a, 42));
+    CuAssertIntEquals(tc, 42, key_get(a, 41));
+    CuAssertIntEquals(tc, 43, key_get(a, 42));
     a_removeall(&a, NULL);
 
     test_cleanup();

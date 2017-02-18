@@ -1283,31 +1283,5 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="drain_skills" level="12"/>
     <attack type="6" spell="aura_of_fear" level="12"/>
-    <precombatspell spell="shadowcall"/>
-  </race>
-  <race name="shadowbat" magres="80" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.000000" hp="1" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes">
-    <ai splitsize="5000" killpeasants="yes"/>
-    <function name="name" value="namegeneric"/>
-    <attack type="4" damage="1d6"/>
-    <attack type="3" damage="1d1"/>
-  </race>
-  <race name="nightmare" magres="50" maxaura="0.000000" regaura="0.000000" weight="100" capacity="540" speed="1.000000" hp="80" ac="10" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" invinciblenonmagic="yes">
-    <ai splitsize="500" killpeasants="yes"/>
-    <function name="name" value="namegeneric"/>
-    <attack type="4" damage="1d4"/>
-    <attack type="4" damage="1d4"/>
-    <attack type="4" damage="1d4"/>
-    <attack type="3" damage="1d4"/>
-    <attack type="2" damage="1d10"/>
-  </race>
-  <race name="vampunicorn" magres="100" maxaura="0.000000" regaura="0.000000" weight="5000" capacity="2000" speed="1.000000" hp="30" ac="4" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
-    <ai splitsize="5000" killpeasants="yes"/>
-    <function name="name" value="namegeneric"/>
-    <attack type="4" damage="2d10"/>
-    <attack type="3" damage="1d4"/>
-    <attack type="3" damage="1d4"/>
-    <attack type="3" damage="1d4"/>
-    <attack type="3" damage="1d4"/>
-    <attack type="2" damage="2d60"/>
   </race>
 </races>

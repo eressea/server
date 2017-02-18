@@ -3,7 +3,7 @@
 
   <xi:include href="config://default/buildings/castle-2.xml" />
 
-  <building name="watch" capacity="1" fort="yes">
+  <building name="watch" maxsize="10" capacity="1" fort="yes">
     <function name="name" value="fort_name"/>
     <function name="protection" value="building_protection"/>
     <function name="taxes" value="lua_building_taxes"/>
