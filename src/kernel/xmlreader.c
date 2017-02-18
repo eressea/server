@@ -1849,17 +1849,6 @@ static int parse_races(xmlDocPtr doc)
         }
         xmlXPathFreeObject(result);
 
-        /* reading eressea/races/race/precombatspell */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "precombatspell", xpath);
-        assert(rc->precombatspell == NULL
-            || !"precombatspell is already initialized");
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            rc->precombatspell = xml_spellref(node, "spell");
-        }
-        xmlXPathFreeObject(result);
-
         /* reading eressea/races/race/attack */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
