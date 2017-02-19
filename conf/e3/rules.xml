@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="config://core/messages.xml"/>
-  <xi:include href="config://core/de/strings.xml"/>
-  <xi:include href="config://core/en/strings.xml"/>
   <xi:include href="config://core/common/items.xml"/>
   <xi:include href="config://core/common/herbs.xml" />
   <xi:include href="config://core/spoils.xml"/>
@@ -15,8 +12,6 @@
   <xi:include href="config://game/shipnames.xml"/>
   <xi:include href="config://core/calendar.xml"/>
   <xi:include href="config://game/items.xml" />
-  <xi:include href="config://game/strings.xml"/>
-  <xi:include href="config://game/messages.xml"/>
   <xi:include href="config://game/races.xml"/>
   <xi:include href="config://game/buildings.xml"/>
   <xi:include href="config://game/equipment.xml"/>
