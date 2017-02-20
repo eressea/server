@@ -925,14 +925,12 @@ void kill_troop(troop dt)
     if (!df->alive) {
         char eqname[64];
         const struct equipment *eq;
-        if (u_race(du)->itemdrop) {
-            item *drops = u_race(du)->itemdrop(u_race(du), du->number - df->run.number);
-
-            if (drops != NULL) {
-                i_merge(&du->items, &drops);
-            }
+        const race *rc = u_race(du);
+        item *drops = item_spoil(rc, du->number - df->run.number);
+        if (drops != NULL) {
+            i_merge(&du->items, &drops);
         }
-        sprintf(eqname, "%s_spoils", u_race(du)->_name);
+        sprintf(eqname, "%s_spoils", rc->_name);
         eq = get_equipment(eqname);
         if (eq != NULL) {
             equip_items(&du->items, eq);

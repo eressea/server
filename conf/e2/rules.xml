@@ -1,11 +1,5 @@
 <?xml version="1.0"?>
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="config://core/messages.xml"/>
-
-  <!-- Localization -->
-  <xi:include href="config://core/de/strings.xml"/>
-  <xi:include href="config://core/en/strings.xml"/>
-  <xi:include href="config://game/spellinfo.xml" />
 
   <xi:include href="config://core/common/items.xml" />
   <xi:include href="config://core/common/armor.xml" />
@@ -26,7 +20,6 @@
   <xi:include href="config://game/equipment.xml"/>
   <xi:include href="config://game/items.xml"/>
   <xi:include href="config://game/spells.xml"/>
-  <xi:include href="config://game/strings.xml"/>
   <xi:include href="config://default/adamantium.xml"/>
   <equipment>
     <set name="autoseed_unit">
@@ -46,10 +39,4 @@
       <item name="adamantium" amount="1"/>
     </set>
   </equipment>
-
-  <xi:include href="config://default/names-undead.xml"/>
-  <xi:include href="config://default/names-skeletons.xml"/>
-  <xi:include href="config://default/names-zombies.xml"/>
-  <xi:include href="config://default/names-ghouls.xml"/>
-  <xi:include href="config://default/names-dragons.xml"/>
 </eressea>

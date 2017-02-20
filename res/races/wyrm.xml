@@ -5,7 +5,6 @@ defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes"
 teach="no" getitem="yes" resistbash="yes" dragon="yes" income="5000">
   <ai splitsize="1" killpeasants="yes" learn="yes" scare="1000"/>
   <function name="name" value="namedragon"/>
-  <function name="move" value="movedragon"/>
   <skill name="magic" modifier="12"/>
   <skill name="tactics" modifier="12"/>
   <attack type="4" damage="3d20"/>

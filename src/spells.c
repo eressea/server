@@ -34,10 +34,10 @@
 #include <spells/flyingship.h>
 
 /* kernel includes */
-#include <kernel/curse.h>
-#include <kernel/connection.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
+#include <kernel/connection.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -514,11 +514,16 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 static void make_familiar(unit * familiar, unit * mage)
 {
     /* skills and spells: */
-    if (u_race(familiar)->init_familiar != NULL) {
-        u_race(familiar)->init_familiar(familiar);
+    const struct equipment *eq;
+    char eqname[64];
+    const race * rc = u_race(familiar);
+    snprintf(eqname, sizeof(eqname), "%s_familiar", rc->_name);
+    eq = get_equipment(eqname);
+    if (eq != NULL) {
+        equip_items(&familiar->items, eq);
     }
     else {
-        log_error("could not perform initialization for familiar %s.\n", familiar->faction->race->_name);
+        log_error("could not perform initialization for familiar %s.\n", rc->_name);
     }
 
     /* triggers: */

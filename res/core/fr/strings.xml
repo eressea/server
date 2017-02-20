@@ -1912,10 +1912,10 @@
     <string name="zombie">
       <text locale="fr">zombie</text>
     </string>
-    <string name="juju-zombie_p">
+    <string name="juju_p">
       <text locale="fr">zombies juju</text>
     </string>
-    <string name="juju-zombie">
+    <string name="juju">
       <text locale="fr">zombie juju</text>
     </string>
     <string name="ghoul_p">

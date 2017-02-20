@@ -66,7 +66,7 @@ static int rc_changes = 1;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
     NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
@@ -74,7 +74,7 @@ static const char *racenames[MAXRACES] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, "seaserpent",
     "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
+    "juju", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
 
@@ -226,7 +226,7 @@ race_list *get_familiarraces(void)
     if (!init) {
         race *rc = races;
         for (; rc != NULL; rc = rc->next) {
-            if (rc->init_familiar != NULL) {
+            if (rc->flags & RCF_FAMILIAR) {
                 racelist_insert(&familiarraces, rc);
             }
         }
@@ -296,9 +296,16 @@ static race *rc_find_i(const char *name)
     while (rc && strcmp(rname, rc->_name) != 0) {
         rc = rc->next;
     }
-    if (!rc && strcmp(name, "uruk") == 0) {
-        rc = rc_find_i("orc");
-        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+    if (!rc) {
+        const char *rc_depr[] = { "uruk", "orc", "illusion", "template", "juju-zombie", "juju", NULL };
+        int i;
+        for (i = 0; rc_depr[i]; i += 2) {
+            if (strcmp(name, rc_depr[i]) == 0) {
+                rc = rc_find_i(rc_depr[i + 1]);
+                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                break;
+            }
+        }
     }
     return rc;
 }
@@ -320,6 +327,7 @@ race *rc_create(const char *zName)
 {
     race *rc;
     int i;
+    char zText[64];
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
@@ -343,6 +351,13 @@ race *rc_create(const char *zName)
     rc->index = num_races++;
     ++rc_changes;
     rc->next = races;
+
+    snprintf(zText, sizeof(zText), "age_%s", zName);
+    rc->age_unit = (race_func)get_function(zText);
+
+    snprintf(zText, sizeof(zText), "name_%s", zName);
+    rc->name_unit = (race_func)get_function(zText);
+
     return races = rc;
 }
 
@@ -542,10 +557,6 @@ variant read_race_reference(struct storage *store)
     return result;
 }
 
-void register_race_description_function(race_desc_func func, const char *name) {
-    register_function((pf_generic)func, name);
-}
-
-void register_race_name_function(race_name_func func, const char *name) {
+void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
 }

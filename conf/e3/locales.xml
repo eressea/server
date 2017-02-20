@@ -4,7 +4,7 @@
   <xi:include href="config://core/de/strings.xml"/>
   <xi:include href="config://core/en/strings.xml"/>
   <xi:include href="config://game/strings.xml"/>
-  <xi:include href="config://game/spellinfo.xml" />
+  <xi:include href="config://game/messages.xml"/>
   <xi:include href="config://default/names-undead.xml"/>
   <xi:include href="config://default/names-skeletons.xml"/>
   <xi:include href="config://default/names-zombies.xml"/>

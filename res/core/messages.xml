@@ -3266,20 +3266,6 @@
     <text locale="de">"$unit($unit) marschiert in eine Antimagiezone und löst sich auf."</text>
     <text locale="en">"$unit($unit) walks into an antimagical zone and dissolves."</text>
   </message>
-  <message name="illusiondissolve" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) hat sich unbemerkt verflüchtigt."</text>
-    <text locale="en">"$unit($unit) has dissolved without a trace."</text>
-  </message>
-  <message name="warnillusiondissolve" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) wird sich bald verflüchtigen."</text>
-    <text locale="en">"$unit($unit) will dissolve soon."</text>
-  </message>
   <message name="fleescared" section="events">
     <type>
       <arg name="amount" type="int"/>

@@ -531,8 +531,15 @@ const char *u_description(const unit * u, const struct locale *lang)
     if (u->display && u->display[0]) {
         return u->display;
     }
-    else if (u_race(u)->describe) {
-        return u_race(u)->describe(u->_race, lang);
+    else {
+        char zText[64];
+        const char * d;
+        const race * rc = u_race(u);
+        snprintf(zText, sizeof(zText), "describe_%s", rc->_name);
+        d = locale_getstring(lang, zText);
+        if (d) {
+            return d;
+        }
     }
     return NULL;
 }
@@ -1453,8 +1460,11 @@ void default_name(const unit *u, char name[], int len) {
 void name_unit(unit * u)
 {
     const race *rc = u_race(u);
-    if (rc->generate_name) {
-        rc->generate_name(u);
+    if (rc->name_unit) {
+        rc->name_unit(u);
+    }
+    else if (u->faction->flags & FFL_NPC) {
+        unit_setname(u, NULL);
     }
     else {
         char name[32];
@@ -1507,7 +1517,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (dname) {
         u->_name = strdup(dname);
     }
-    else if (urace->generate_name || playerrace(urace)) {
+    else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
     }
 
