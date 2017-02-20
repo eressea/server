@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <race name="human" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="trade" modifier="1"/>
     <skill name="herbalism" modifier="-1"/>
     <skill name="shipcraft" modifier="1"/>

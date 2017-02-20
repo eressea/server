@@ -1175,7 +1175,7 @@ attrib_type at_resourcelimit = {
     finalize_resourcelimit,
 };
 
-static item *default_spoil(const struct race *rc, int size)
+item *item_spoil(const struct race *rc, int size)
 {
     item *itm = NULL;
 
@@ -1303,7 +1303,6 @@ void register_resources(void)
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
-    register_function((pf_generic)default_spoil, "defaultdrops");
 
     register_item_use(use_potion, "usepotion");
     register_item_use(use_potion_delayed, "usepotion_delayed");

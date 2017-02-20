@@ -309,6 +309,7 @@ extern "C" {
 
     extern const struct potion_type *oldpotiontype[];
     const struct resource_type *get_resourcetype(resource_t rt);
+    struct item *item_spoil(const struct race *rc, int size);
 
     int get_item(const struct unit * u, const struct item_type *itype);
     int set_item(struct unit * u, const struct item_type *itype, int value);

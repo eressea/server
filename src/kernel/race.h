@@ -145,7 +145,6 @@ extern "C" {
 
         race_name_func generate_name;
         void(*age) (struct unit * u);
-        struct item *(*itemdrop) (const struct race *, int size);
         void(*init_familiar) (struct unit *);
 
         struct rcoption *options; /* rarely used properties */

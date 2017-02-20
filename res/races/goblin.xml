@@ -6,7 +6,6 @@ unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes"
 giveperson="yes" giveunit="yes" getitem="yes" equipment="yes"
 healing="2.0">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="building" modifier="1"/>

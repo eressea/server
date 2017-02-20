@@ -6,7 +6,6 @@ unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes"
 giveperson="yes" giveunit="yes" getitem="yes" equipment="yes"
 healing="1.5">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="2"/>
     <skill name="bow" modifier="-2"/>
     <skill name="building" modifier="2"/>

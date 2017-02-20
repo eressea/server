@@ -12,7 +12,6 @@
 
   <race name="human" maxaura="1.000000" regaura="1.000000" recruitcost="75" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="migrants.formula" value="1"/>
     <skill name="trade" modifier="1"/>
     <skill name="herbalism" modifier="-1"/>
@@ -780,7 +779,6 @@
   </race>
   <race name="aquarian" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" shipspeed="yes" playerrace="yes" coastal="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="-2"/>
     <skill name="building" modifier="-1"/>
     <skill name="trade" modifier="2"/>
@@ -799,7 +797,6 @@
   </race>
   <race name="cat" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" defensemodifier="1" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="-1"/>
     <skill name="mining" modifier="-2"/>
     <skill name="building" modifier="-1"/>
@@ -825,7 +822,6 @@
   </race>
   <race name="halfling" magres="5" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="hunger.damage" value="1d14+14"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="mining" modifier="1"/>
@@ -858,7 +854,6 @@
   </race>
   <race name="insect" magres="50" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="bow" modifier="-2"/>
@@ -888,7 +883,6 @@
   <race name="demon" magres="15" maxaura="1.000000" regaura="1.250000" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="initfamiliar" value="oldfamiliars"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="2"/>
     <skill name="trade" modifier="-3"/>
     <skill name="forestry" modifier="1"/>
@@ -919,7 +913,6 @@
   </race>
   <race name="troll" magres="10" maxaura="1.000000" regaura="1.000000" recruitcost="90" maintenance="10" weight="2000" capacity="1080" speed="1.000000" hp="30" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="2"/>
     <skill name="bow" modifier="-2"/>
     <skill name="building" modifier="2"/>
@@ -951,7 +944,6 @@
   <race name="goblin" magres="-0.050000" maxaura="1.000000" regaura="1.000000" recruitcost="40" maintenance="10" weight="600" capacity="440" speed="1.000000" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <function name="initfamiliar" value="oldfamiliars"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="building" modifier="1"/>
@@ -1149,7 +1141,6 @@
   <race name="snotling" magres="-5" maxaura="1.000000" regaura="1.000000" 
   maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="no" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="building" modifier="1"/>
@@ -1179,7 +1170,6 @@
   </race>
   <race name="elf" magres="10" maxaura="1.000000" regaura="1.250000" recruitcost="130" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="-1"/>
     <skill name="mining" modifier="-2"/>
     <skill name="bow" modifier="2"/>
@@ -1206,7 +1196,6 @@
   </race>
   <race name="dwarf" magres="5" maxaura="1.000000" regaura="0.500000" recruitcost="110" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="2"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="2"/>

@@ -34,7 +34,6 @@
 
   <race name="human" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="elf"/>
     <skill name="riding" modifier="+1"/>
     <skill name="shipcraft" modifier="2"/>
@@ -48,7 +47,6 @@
 
   <race name="orc" studyspeed="-5" magres="-5" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="troll"/>
 
     <skill name="bow" speed="+5"/>
@@ -76,7 +74,6 @@
 
   <race name="halfling" defensemodifier="1" magres="5" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="other_race" value="dwarf"/>
     <param name="luxury_trade" value="600"/>
     <skill name="bow" modifier="-1"/>
@@ -103,7 +100,6 @@
 
   <race name="demon" magres="15" maxaura="1.0" regaura="1.1" recruitcost="360" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="30" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="cartmaking" modifier="-2"/>
     <skill name="forestry" modifier="1"/>
     <skill name="melee" modifier="1"/>
@@ -123,7 +119,6 @@
 
   <race name="elf" magres="10" maxaura="1.0" regaura="1.1" recruitcost="200" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="armorer" modifier="-1"/>
     <skill name="bow" modifier="2"/>
     <skill name="building" modifier="-1"/>
@@ -142,7 +137,6 @@
 
   <race name="troll" magres="10" maxaura="1.0" regaura="1.0" recruitcost="260" maintenance="10" weight="2000" capacity="1080" speed="1.0" hp="20" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <param name="armor.stamina" value="4"/> <!-- +1 natural armor per X levels stamina -->
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-2"/>
@@ -165,7 +159,6 @@
 
   <race name="dwarf" magres="5" maxaura="1.0" regaura="0.9" recruitcost="240" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="2"/>

@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <race name="aquarian" maxaura="1.000000" regaura="1.000000" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" shipspeed="yes" playerrace="yes" coastal="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="mining" modifier="-2"/>
     <skill name="building" modifier="-1"/>
     <skill name="trade" modifier="2"/>
