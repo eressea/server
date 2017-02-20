@@ -699,7 +699,6 @@
   <race name="undead" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <function name="name" value="nameundead"/>
-    <function name="age" value="ageundead"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
   </race>
@@ -752,7 +751,6 @@
   <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameghoul"/>
-    <function name="age" value="ageghoul"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -788,7 +786,6 @@
   <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="namezombie"/>
-    <function name="age" value="agezombie"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -820,7 +817,6 @@
   <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <function name="name" value="nameskeleton"/>
-    <function name="age" value="ageskeleton"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>

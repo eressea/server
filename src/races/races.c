@@ -84,10 +84,10 @@ void register_races(void)
     register_function((pf_generic)equip_newunits, "equip_newunits");
 
     /* function age for race->age() */
-    register_function((pf_generic)age_undead, "ageundead");
-    register_function((pf_generic)age_skeleton, "ageskeleton");
-    register_function((pf_generic)age_zombie, "agezombie");
-    register_function((pf_generic)age_ghoul, "ageghoul");
-    register_function((pf_generic)age_dragon, "agedragon");
-    register_function((pf_generic)age_firedragon, "agefiredragon");
+    register_function((pf_generic)age_undead, "age_undead");
+    register_function((pf_generic)age_skeleton, "age_skeleton");
+    register_function((pf_generic)age_zombie, "age_zombie");
+    register_function((pf_generic)age_ghoul, "age_ghoul");
+    register_function((pf_generic)age_dragon, "age_dragon");
+    register_function((pf_generic)age_firedragon, "age_youngdragon");
 }

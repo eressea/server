@@ -327,6 +327,7 @@ race *rc_create(const char *zName)
 {
     race *rc;
     int i;
+    char zText[64];
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
@@ -350,6 +351,9 @@ race *rc_create(const char *zName)
     rc->index = num_races++;
     ++rc_changes;
     rc->next = races;
+
+    snprintf(zText, sizeof(zText), "age_%s", zName);
+    rc->age = (void(*) (struct unit *))get_function(zText);
     return races = rc;
 }
 

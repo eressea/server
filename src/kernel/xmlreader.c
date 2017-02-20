@@ -1795,9 +1795,6 @@ static int parse_races(xmlDocPtr doc)
             if (strcmp((const char *)propValue, "name") == 0) {
                 rc->generate_name = (race_name_func)fun;
             }
-            else if (strcmp((const char *)propValue, "age") == 0) {
-                rc->age = (void(*)(struct unit *))fun;
-            }
             else {
                 log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name);
             }
