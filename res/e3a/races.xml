@@ -415,7 +415,6 @@
   </race>
   <race name="wolf" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
-    <function name="name" value="namegeneric"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="-99"/>
@@ -588,7 +587,6 @@
   </race>
   <race name="braineater" magres="90" maxaura="1.0" regaura="1.0" weight="100" capacity="540" speed="1.0" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
     <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="name" value="namegeneric"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
@@ -643,19 +641,16 @@
   </race>
   <race name="mountainguard" unarmedguard="yes" magres="50" maxaura="1.0" regaura="0.500000" weight="10000" capacity="2000" speed="0.000000" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" canlearn="no" teach="no" noweapons="yes">
     <ai splitsize="1"/>
-    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d40"/>
   </race>
   <race name="shadowmaster" cansail="no" cansteal="no" canlearn="no" magres="75" maxaura="1.0" regaura="2.000000" weight="500" capacity="540" speed="1.0" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes">
     <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
   <race name="shadowdemon" cansail="no" cansteal="no" canlearn="no" magres="75" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes">
     <ai splitsize="1000" killpeasants="yes" moverandom="yes" learn="yes"/>
-    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
@@ -667,7 +662,6 @@
   </race>
   <race name="irongolem" irongolem="true" magres="25" maxaura="1.0" regaura="0.100000" weight="10000" capacity="2000" speed="1.0" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" canlearn="no" teach="no">
     <ai splitsize="50"/>
-    <function name="name" value="namegeneric"/>
     <skill name="armorer" modifier="14"/>
     <skill name="weaponsmithing" modifier="14"/>
     <attack type="4" damage="2d8+4"/>
@@ -683,7 +677,6 @@
 
   <race name="dracoid" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveperson="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="name" value="namedracoid"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
     <attack type="1" damage="1d5"/>
@@ -691,14 +684,12 @@
 
   <race name="ent" magres="25" maxaura="1.0" regaura="0.500000" weight="5000" capacity="2500" speed="1.0" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no">
     <ai splitsize="1000" moverandom="yes" learn="yes"/>
-    <function name="name" value="namegeneric"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
 
   <race name="undead" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes"/>
-    <function name="name" value="nameundead"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
   </race>
@@ -731,7 +722,6 @@
 
   <race name="ghast" magres="60" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="nameghoul"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -750,7 +740,6 @@
 
   <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="nameghoul"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -766,9 +755,8 @@
     <attack type="2" damage="1d30"/>
   </race>
 
-  <race name="juju-zombie" magres="50" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="juju" magres="50" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="namezombie"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -785,7 +773,6 @@
 
   <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="namezombie"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -800,7 +787,6 @@
 
   <race name="skeletonlord" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="nameskeleton"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -816,7 +802,6 @@
 
   <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
-    <function name="name" value="nameskeleton"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -831,13 +816,11 @@
 
   <race name="shadowknight" maxaura="0.000000" regaura="0.000000" weight="1000" capacity="540" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noblock="yes">
     <ai splitsize="20000" moverandom="yes"/>
-    <function name="name" value="namegeneric"/>
     <attack type="1" damage="1d1"/>
   </race>
 
   <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes"/>
-    <function name="name" value="namegeneric"/>
     <skill name="tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>

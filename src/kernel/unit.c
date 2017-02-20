@@ -1460,8 +1460,11 @@ void default_name(const unit *u, char name[], int len) {
 void name_unit(unit * u)
 {
     const race *rc = u_race(u);
-    if (rc->generate_name) {
-        rc->generate_name(u);
+    if (rc->name_unit) {
+        rc->name_unit(u);
+    }
+    else if (u->faction->flags & FFL_NPC) {
+        unit_setname(u, NULL);
     }
     else {
         char name[32];
@@ -1514,7 +1517,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (dname) {
         u->_name = strdup(dname);
     }
-    else if (urace->generate_name || playerrace(urace)) {
+    else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
     }
 

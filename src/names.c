@@ -212,11 +212,6 @@ const char *silbe3[SIL3] = {
     "bus",
 };
 
-static void generic_name(unit * u)
-{
-    unit_setname(u, NULL);
-}
-
 static void dragon_name(unit * u)
 {
     char name[NAMESIZE + 1];
@@ -469,12 +464,14 @@ void register_names(void)
 {
     /* function name
      * generate a name for a nonplayerunit
-     * race->generate_name() */
-    register_race_name_function(undead_name, "nameundead");
-    register_race_name_function(skeleton_name, "nameskeleton");
-    register_race_name_function(zombie_name, "namezombie");
-    register_race_name_function(ghoul_name, "nameghoul");
-    register_race_name_function(dracoid_name, "namedracoid");
-    register_race_name_function(dragon_name, "namedragon");
-    register_race_name_function(generic_name, "namegeneric");
+     * race->name_unit() */
+
+    register_race_function(undead_name, "name_undead");
+    register_race_function(skeleton_name, "name_skeleton");
+    register_race_function(zombie_name, "name_zombie");
+    register_race_function(ghoul_name, "name_ghoul");
+    register_race_function(dracoid_name, "name_dracoid");
+    register_race_function(dragon_name, "name_dragon");
+    register_race_function(dragon_name, "name_youngdragon");
+    register_race_function(dragon_name, "name_wyrm");
 }

@@ -487,7 +487,7 @@ static void test_name_unit(CuTest *tc) {
     test_setup();
     rc = test_create_race("skeleton");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    rc->generate_name = gen_name;
+    rc->name_unit = gen_name;
     name_unit(u);
     CuAssertStrEquals(tc, "Hodor", unit_getname(u));
     test_cleanup();

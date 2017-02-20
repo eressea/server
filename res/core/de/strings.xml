@@ -2379,19 +2379,19 @@
       <text locale="en">ghoul</text>
     </string>
 
-    <string name="juju-zombie">
+    <string name="juju">
       <text locale="de">Juju-Zombie</text>
       <text locale="en">juju-zombie</text>
     </string>
-    <string name="juju-zombie_p">
+    <string name="juju_p">
       <text locale="de">Juju-Zombies</text>
       <text locale="en">juju-zombies</text>
     </string>
-    <string name="juju-zombie_d">
+    <string name="juju_d">
       <text locale="de">Juju-Zombies</text>
       <text locale="en">juju-zombies</text>
     </string>
-    <string name="juju-zombie_x">
+    <string name="juju_x">
       <text locale="de">Juju-Zombie</text>
       <text locale="en">juju-zombie</text>
     </string>

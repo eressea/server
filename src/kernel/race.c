@@ -74,7 +74,7 @@ static const char *racenames[MAXRACES] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, "seaserpent",
     "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
+    "juju", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
 
@@ -297,7 +297,7 @@ static race *rc_find_i(const char *name)
         rc = rc->next;
     }
     if (!rc) {
-        const char *rc_depr[] = { "uruk", "orc", "illusion", "template", NULL };
+        const char *rc_depr[] = { "uruk", "orc", "illusion", "template", "juju-zombie", "juju", NULL };
         int i;
         for (i = 0; rc_depr[i]; i += 2) {
             if (strcmp(name, rc_depr[i]) == 0) {
@@ -353,7 +353,11 @@ race *rc_create(const char *zName)
     rc->next = races;
 
     snprintf(zText, sizeof(zText), "age_%s", zName);
-    rc->age = (void(*) (struct unit *))get_function(zText);
+    rc->age_unit = (race_func)get_function(zText);
+
+    snprintf(zText, sizeof(zText), "name_%s", zName);
+    rc->name_unit = (race_func)get_function(zText);
+
     return races = rc;
 }
 
@@ -553,6 +557,6 @@ variant read_race_reference(struct storage *store)
     return result;
 }
 
-void register_race_name_function(race_name_func func, const char *name) {
+void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
 }

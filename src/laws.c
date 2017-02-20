@@ -164,9 +164,10 @@ static void age_unit(region * r, unit * u)
         }
     }
     else {
+        const race *rc = u_race(u);
         ++u->age;
-        if (u->number > 0 && u_race(u)->age) {
-            u_race(u)->age(u);
+        if (u->number > 0 && rc->age_unit) {
+            rc->age_unit(u);
         }
     }
     if (u->region && is_astral(u->region)) {
