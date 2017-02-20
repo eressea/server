@@ -6,7 +6,6 @@ dragon="yes">
   <ai splitsize="2" killpeasants="yes" learn="yes" scare="400"/>
   <function name="name" value="namedragon"/>
   <function name="age" value="agedragon"/>
-  <function name="move" value="movedragon"/>
   <skill name="magic" modifier="8"/>
   <skill name="tactics" modifier="8"/>
   <attack type="4" damage="2d20"/>

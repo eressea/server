@@ -6,7 +6,6 @@ teach="no" getitem="yes" resistbash="yes" dragon="yes" income="150">
   <ai splitsize="6" killpeasants="yes" learn="yes" scare="160"/>
   <function name="name" value="namedragon"/>
   <function name="age" value="agefiredragon"/>
-  <function name="move" value="movedragon"/>
   <skill name="magic" modifier="4"/>
   <skill name="tactics" modifier="4"/>
   <attack type="4" damage="1d30"/>

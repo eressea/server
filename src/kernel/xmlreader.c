@@ -1798,10 +1798,6 @@ static int parse_races(xmlDocPtr doc)
             else if (strcmp((const char *)propValue, "age") == 0) {
                 rc->age = (void(*)(struct unit *))fun;
             }
-            else if (strcmp((const char *)propValue, "move") == 0) {
-                rc->move_allowed =
-                    (bool(*)(const struct region *, const struct region *))fun;
-            }
             else if (strcmp((const char *)propValue, "itemdrop") == 0) {
                 rc->itemdrop = (struct item * (*)(const struct race *, int))fun;
             }

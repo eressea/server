@@ -732,7 +732,6 @@
   <race name="wyrm" magres="90" maxaura="1.000000" regaura="3.000000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
-    <function name="move" value="movedragon"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
     <skill name="perception" modifier="10"/>
@@ -745,7 +744,6 @@
     <ai splitsize="2" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agedragon"/>
-    <function name="move" value="movedragon"/>
     <skill name="magic" modifier="8"/>
     <skill name="tactics" modifier="8"/>
     <skill name="perception" modifier="5"/>
@@ -758,7 +756,6 @@
     <ai splitsize="6" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
     <function name="age" value="agefiredragon"/>
-    <function name="move" value="movedragon"/>
     <skill name="magic" modifier="4"/>
     <skill name="tactics" modifier="4"/>
     <skill name="stealth" modifier="2"/>
@@ -1141,7 +1138,6 @@
   <race name="seaserpent" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes"/>
     <function name="name" value="namegeneric"/>
-    <function name="move" value="moveswimming"/>
     <skill name="tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
@@ -1273,7 +1269,6 @@
   <race name="shadowdragon" magres="95" maxaura="1.000000" regaura="3.000000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <function name="name" value="namedragon"/>
-    <function name="move" value="movedragon"/>
     <skill name="tactics" modifier="20"/>
     <skill name="perception" modifier="20"/>
     <attack type="4" damage="5d30"/>

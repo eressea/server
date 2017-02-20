@@ -88,14 +88,12 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     }
 }
 
-/* Die Funktionen werden über den hier registrierten Namen in races.xml
+/* Die Funktionen werden ï¿½ber den hier registrierten Namen in races.xml
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {
     /* function initfamiliar */
     register_function((pf_generic)oldfamiliars, "oldfamiliars");
-
-    register_function((pf_generic)allowed_dragon, "movedragon");
 
     register_function((pf_generic)allowed_swim, "moveswimming");
     register_function((pf_generic)allowed_fly, "moveflying");
