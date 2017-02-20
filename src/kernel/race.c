@@ -226,7 +226,7 @@ race_list *get_familiarraces(void)
     if (!init) {
         race *rc = races;
         for (; rc != NULL; rc = rc->next) {
-            if (rc->init_familiar != NULL) {
+            if (rc->flags & RCF_FAMILIAR) {
                 racelist_insert(&familiarraces, rc);
             }
         }

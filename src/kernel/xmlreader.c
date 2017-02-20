@@ -1798,9 +1798,6 @@ static int parse_races(xmlDocPtr doc)
             else if (strcmp((const char *)propValue, "age") == 0) {
                 rc->age = (void(*)(struct unit *))fun;
             }
-            else if (strcmp((const char *)propValue, "initfamiliar") == 0) {
-                rc->init_familiar = (void(*)(struct unit *))fun;
-            }
             else {
                 log_error("unknown function type '%s' for race %s\n", (const char *)propValue, rc->_name);
             }
@@ -1822,6 +1819,7 @@ static int parse_races(xmlDocPtr doc)
                     propValue = xmlGetProp(node, BAD_CAST "race");
                     assert(propValue != NULL);
                     frc = rc_get_or_create((const char *)propValue);
+                    frc->flags |= RCF_FAMILIAR;
                     if (xml_bvalue(node, "default", false)) {
                         rc->familiars[k] = rc->familiars[0];
                         rc->familiars[0] = frc;
