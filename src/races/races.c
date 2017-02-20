@@ -36,16 +36,6 @@ void age_skeleton(struct unit *u);
 void age_zombie(struct unit *u);
 void age_ghoul(struct unit *u);
 
-static void oldfamiliars(unit * u)
-{
-    char fname[64];
-    /* these familiars have no special skills.
-     */
-    snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
-    create_mage(u, M_GRAY);
-    equip_unit(u, get_equipment(fname));
-}
-
 static void equip_newunits(const struct equipment *eq, struct unit *u)
 {
     struct region *r = u->region;
@@ -91,12 +81,7 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {
-    /* function initfamiliar */
-    register_function((pf_generic)oldfamiliars, "oldfamiliars");
-
-    register_function((pf_generic)allowed_swim, "moveswimming");
-    register_function((pf_generic)allowed_fly, "moveflying");
-    register_function((pf_generic)allowed_walk, "movewalking");
+    register_function((pf_generic)equip_newunits, "equip_newunits");
 
     /* function age for race->age() */
     register_function((pf_generic)age_undead, "ageundead");
@@ -105,9 +90,4 @@ void register_races(void)
     register_function((pf_generic)age_ghoul, "ageghoul");
     register_function((pf_generic)age_dragon, "agedragon");
     register_function((pf_generic)age_firedragon, "agefiredragon");
-
-    /* function itemdrop
-     * to generate battle spoils
-     * race->itemdrop() */
-    register_function((pf_generic)equip_newunits, "equip_newunits");
 }
