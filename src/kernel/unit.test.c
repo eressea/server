@@ -390,14 +390,24 @@ static void test_limited_skills(CuTest *tc) {
 static void test_unit_description(CuTest *tc) {
     race *rc;
     unit *u;
+    struct locale *lang;
+
     test_setup();
+    lang = test_create_locale();
     rc = test_create_race("hodor");
     u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
+
     CuAssertPtrEquals(tc, 0, u->display);
-    CuAssertStrEquals(tc, 0, u_description(u, u->faction->locale));
+    CuAssertStrEquals(tc, 0, u_description(u, lang));
     u->display = strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
-    CuAssertStrEquals(tc, "Hodor", u_description(u, u->faction->locale));
+    CuAssertStrEquals(tc, "Hodor", u_description(u, lang));
+
+    free(u->display);
+    u->display = NULL;
+    locale_setstring(lang, "describe_hodor", "HODOR");
+    CuAssertStrEquals(tc, "HODOR", u_description(u, lang));
+
     test_cleanup();
 }
 

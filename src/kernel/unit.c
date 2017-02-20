@@ -531,8 +531,15 @@ const char *u_description(const unit * u, const struct locale *lang)
     if (u->display && u->display[0]) {
         return u->display;
     }
-    else if (u_race(u)->describe) {
-        return u_race(u)->describe(u->_race, lang);
+    else {
+        char zText[64];
+        const char * d;
+        const race * rc = u_race(u);
+        snprintf(zText, sizeof(zText), "describe_%s", rc->_name);
+        d = locale_getstring(lang, zText);
+        if (d) {
+            return d;
+        }
     }
     return NULL;
 }

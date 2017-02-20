@@ -112,7 +112,6 @@ extern "C" {
         int level;
     } att;
 
-    typedef const char *(*race_desc_func)(const struct race *rc, const struct locale *lang);
     typedef void (*race_name_func)(struct unit *);
 
     typedef struct race {
@@ -145,7 +144,6 @@ extern "C" {
         signed char bonus[MAXSKILLS];
 
         race_name_func generate_name;
-        race_desc_func describe;
         void(*age) (struct unit * u);
         bool(*move_allowed) (const struct region *, const struct region *);
         struct item *(*itemdrop) (const struct race *, int size);
@@ -267,7 +265,6 @@ extern "C" {
 
     const char *raceprefix(const struct unit *u);
     void register_race_name_function(race_name_func, const char *);
-    void register_race_description_function(race_desc_func, const char *);
 
 #ifdef __cplusplus
 }

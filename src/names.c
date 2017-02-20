@@ -45,13 +45,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <string.h>
 
-static const char *describe_race(const race * rc, const struct locale *lang)
-{
-    char zText[32];
-    sprintf(zText, "describe_%s", rc->_name);
-    return locale_getstring(lang, zText);
-}
-
 static void count_particles(const char *monster, int *num_prefix, int *num_name, int *num_postfix) 
 {
     char zText[32];
@@ -395,29 +388,29 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     int result;
 
     UNUSED_ARG(buflen);
-    /* Prüfen, ob Kurz genug */
+    /* Prï¿½fen, ob Kurz genug */
     if (strlen(s) <= maxchars) {
         return s;
     }
-    /* Anzahl der Wörter feststellen */
+    /* Anzahl der Wï¿½rter feststellen */
 
     while (*p != 0) {
 
         result = unicode_utf8_to_ucs4(&ucs, p, &size);
         assert(result == 0 || "damnit, we're not handling invalid input here!");
 
-        /* Leerzeichen überspringen */
+        /* Leerzeichen ï¿½berspringen */
         while (*p != 0 && !iswalnum((wint_t)ucs)) {
             p += size;
             result = unicode_utf8_to_ucs4(&ucs, p, &size);
             assert(result == 0 || "damnit, we're not handling invalid input here!");
         }
 
-        /* Counter erhöhen */
+        /* Counter erhï¿½hen */
         if (*p != 0)
             ++c;
 
-        /* alnums überspringen */
+        /* alnums ï¿½berspringen */
         while (*p != 0 && iswalnum((wint_t)ucs)) {
             p += size;
             result = unicode_utf8_to_ucs4(&ucs, p, &size);
@@ -425,10 +418,10 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
         }
     }
 
-    /* Buchstaben pro Teilkürzel = MAX(1,max/AnzWort) */
+    /* Buchstaben pro Teilkï¿½rzel = MAX(1,max/AnzWort) */
     bpt = (c > 0) ? MAX(1, maxchars / c) : 1;
 
-    /* Einzelne Wörter anspringen und jeweils die ersten BpT kopieren */
+    /* Einzelne Wï¿½rter anspringen und jeweils die ersten BpT kopieren */
 
     p = s;
     c = 0;
@@ -438,7 +431,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
     assert(result == 0 || "damnit, we're not handling invalid input here!");
 
     while (*p != 0 && c < maxchars) {
-        /* Leerzeichen überspringen */
+        /* Leerzeichen ï¿½berspringen */
 
         while (*p != 0 && !iswalnum((wint_t)ucs)) {
             p += size;
@@ -446,7 +439,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
             assert(result == 0 || "damnit, we're not handling invalid input here!");
         }
 
-        /* alnums übertragen */
+        /* alnums ï¿½bertragen */
 
         for (i = 0; i < bpt && *p != 0 && iswalnum((wint_t)ucs); ++i) {
             memcpy(bufp, p, size);
@@ -458,7 +451,7 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
             assert(result == 0 || "damnit, we're not handling invalid input here!");
         }
 
-        /* Bis zum nächsten Leerzeichen */
+        /* Bis zum nï¿½chsten Leerzeichen */
 
         while (c < maxchars && *p != 0 && iswalnum((wint_t)ucs)) {
             p += size;
@@ -474,7 +467,6 @@ const char *abkz(const char *s, char *buf, size_t buflen, size_t maxchars)
 
 void register_names(void)
 {
-    register_race_description_function(describe_race, "describe_race");
     /* function name
      * generate a name for a nonplayerunit
      * race->generate_name() */

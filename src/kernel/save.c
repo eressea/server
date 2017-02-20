@@ -695,17 +695,6 @@ unit *read_unit(struct gamedata *data)
     else
         u->irace = NULL;
 
-    if (rc->describe) {
-        const char *rcdisp = rc->describe(rc, u->faction->locale);
-        if (u->display && rcdisp) {
-            /* see if the data file contains old descriptions */
-            if (strcmp(rcdisp, u->display) == 0) {
-                free(u->display);
-                u->display = NULL;
-            }
-        }
-    }
-
     READ_INT(data->store, &n);
     if (n > 0) {
         building * b = findbuilding(n);
