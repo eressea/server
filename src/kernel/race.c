@@ -66,7 +66,7 @@ static int rc_changes = 1;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
     NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
@@ -296,9 +296,16 @@ static race *rc_find_i(const char *name)
     while (rc && strcmp(rname, rc->_name) != 0) {
         rc = rc->next;
     }
-    if (!rc && strcmp(name, "uruk") == 0) {
-        rc = rc_find_i("orc");
-        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+    if (!rc) {
+        const char *rc_depr[] = { "uruk", "orc", "illusion", "template", NULL };
+        int i;
+        for (i = 0; rc_depr[i]; i += 2) {
+            if (strcmp(name, rc_depr[i]) == 0) {
+                rc = rc_find_i(rc_depr[i + 1]);
+                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                break;
+            }
+        }
     }
     return rc;
 }

@@ -745,12 +745,6 @@
     <attack type="4" damage="1d30"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="illusion" maxaura="0.000000" regaura="0.000000" weight="0" capacity="0" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" walk="yes" canlearn="no" teach="no" noweapons="yes" illusionary="yes">
-    <ai splitsize="999999"/>
-    <function name="age" value="ageillusion"/>
-    <skill name="unarmed" modifier="-99"/>
-    <attack type="1" damage="1d1"/>
-  </race>
   <race name="undead" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <function name="name" value="nameundead"/>

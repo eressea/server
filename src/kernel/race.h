@@ -65,8 +65,8 @@ extern "C" {
         RC_ORC,
         RC_SNOTLING,
         RC_UNDEAD,
-        RC_ILLUSION,
-        RC_FIREDRAGON,
+
+        RC_FIREDRAGON = 15,
         RC_DRAGON,
         RC_WYRM,
         RC_TREEMAN,
