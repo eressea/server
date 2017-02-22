@@ -26,7 +26,7 @@ static void test_make_fighter(CuTest * tc)
     faction * f;
     const resource_type *rtype;
 
-    test_cleanup();
+    test_setup();
     test_create_horse();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(NULL);
@@ -84,7 +84,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     troop dt, at;
     building_type * btype;
 
-    test_cleanup();
+    test_setup();
     btype = setup_castle();
     r = test_create_region(0, 0, 0);
     bld = test_create_building(r, btype);
@@ -129,7 +129,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     side *as;
     building_type * btype;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     btype = setup_castle();
     btype->flags |= BTF_FORTIFICATION;
@@ -159,7 +159,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     building_type * btype;
     faction * f;
 
-    test_cleanup();
+    test_setup();
     btype = setup_castle();
     r = test_create_region(0, 0, 0);
     btype->flags |= BTF_FORTIFICATION;
@@ -189,7 +189,7 @@ static void test_building_defence_bonus(CuTest * tc)
 {
     building_type * btype;
 
-    test_cleanup();
+    test_setup();
     btype = setup_castle();
 
     btype->maxsize = -1; /* unlimited buildigs get the castle bonus */
@@ -225,7 +225,7 @@ static void test_natural_armor(CuTest * tc)
     race *rc;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     set_level(u, SK_STAMINA, 2);
@@ -252,7 +252,7 @@ static void test_calculate_armor(CuTest * tc)
     race *rc;
     double magres = 0.0;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
     ishield = it_get_or_create(rt_get_or_create("shield"));
@@ -321,7 +321,7 @@ static void test_magic_resistance(CuTest *tc)
     race *rc;
     double magres;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
@@ -386,7 +386,7 @@ static void test_projectile_armor(CuTest * tc)
     item_type *ishield, *ichain;
     race *rc;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
@@ -420,7 +420,7 @@ static void test_battle_skilldiff(CuTest *tc)
     unit *ua, *ud;
     battle *b = NULL;
 
-    test_cleanup();
+    test_setup();
 
     r = test_create_region(0, 0, 0);
     ud = test_create_unit(test_create_faction(0), r);
@@ -456,7 +456,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     building_type *btype;
     const curse_type *strongwall_ct, *magicwalls_ct;
 
-    test_cleanup();
+    test_setup();
     btype = setup_castle();
     strongwall_ct = ct_find("strongwall");
     magicwalls_ct = ct_find("magicwalls");
