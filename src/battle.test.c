@@ -60,10 +60,6 @@ static void test_make_fighter(CuTest * tc)
     test_cleanup();
 }
 
-static int add_two(const building * b, const unit * u) {
-    return 2;
-}
-
 static building_type * setup_castle(void) {
     building_type * btype;
     construction *cons;
