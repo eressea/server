@@ -167,9 +167,6 @@ construction ** consPtr)
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
-        con->defense_bonus = xml_ivalue(node, "defense_bonus", 0);
-        con->close_combat_bonus = xml_ivalue(node, "close_combat_bonus", 0);
-        con->ranged_bonus = xml_ivalue(node, "ranged_bonus", 0);
 
         propValue = xmlGetProp(node, BAD_CAST "building");
         if (propValue != NULL) {
@@ -300,9 +297,6 @@ static int parse_buildings(xmlDocPtr doc)
                 }
                 else if (strcmp((const char *)propValue, "age") == 0) {
                     btype->age = (void(*)(struct building *))fun;
-                }
-                else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;

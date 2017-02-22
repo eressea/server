@@ -230,7 +230,7 @@ building * test_create_building(region * r, const building_type * btype)
     assert(r);
     if (!btype) {
         building_type *bt_castle = test_create_buildingtype("castle");
-        bt_castle->protection = building_protection;
+        bt_castle->flags |= BTF_FORTIFICATION;
         btype = bt_castle;
     }
     b = new_building(btype, r, default_locale);

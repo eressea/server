@@ -376,7 +376,6 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertTrue(tc, !btype->name);
     CuAssertTrue(tc, !btype->init);
     CuAssertTrue(tc, !btype->age);
-    CuAssertTrue(tc, !btype->protection);
     CuAssertTrue(tc, !btype->taxes);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, -1, btype->maxsize);

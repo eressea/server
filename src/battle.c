@@ -1892,10 +1892,11 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (df->building) {
-        if (df->building->attribs) {
+        building *b = df->building;
+        if (b->attribs) {
             const curse_type *strongwall_ct = ct_find("strongwall");
             if (strongwall_ct) {
-                curse *c = get_curse(df->building->attribs, strongwall_ct);
+                curse *c = get_curse(b->attribs, strongwall_ct);
                 if (curse_active(c)) {
                     /* wirkt auf alle Geb�ude */
                     skdiff -= curse_geteffect_int(c);
@@ -1903,15 +1904,16 @@ int skilldiff(troop at, troop dt, int dist)
                 }
             }
         }
-        if (df->building->type->protection) {
-            int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
-            if (beff) {
+        if (b->type->flags & BTF_FORTIFICATION) {
+            int stage = buildingeffsize(b, false);
+            int beff = building_protection(b->type, stage);
+            if (beff > 0) {
                 skdiff -= beff;
                 is_protected = 2;
-                if (df->building->attribs) {
+                if (b->attribs) {
                     const curse_type *magicwalls_ct = ct_find("magicwalls");
                     if (magicwalls_ct
-                        && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+                        && curse_active(get_curse(b->attribs, magicwalls_ct))) {
                         /* Verdoppelt Burgenbonus */
                         skdiff -= beff;
                     }
@@ -2022,7 +2024,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
 
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
 
-    if (bldg->type->protection) {
+    if (bldg->type->flags & BTF_FORTIFICATION) {
         side *s;
 
         bldg->sizeleft = bldg->size;
