@@ -29,6 +29,7 @@ extern "C" {
     struct unit;
     struct attrib;
     struct attrib_type;
+    struct race;
     struct region;
     struct resource_type;
     struct locale;
@@ -37,6 +38,8 @@ extern "C" {
     struct order;
     struct storage;
     struct gamedata;
+    struct rawmaterial_type;
+    struct resource_limit;
 
     typedef struct item {
         struct item *next;
@@ -76,6 +79,8 @@ extern "C" {
         rtype_uchange uchange;
         rtype_uget uget;
         rtype_name name;
+        struct rawmaterial_type *raw;
+        struct resource_limit  *limit;
         /* --- pointers --- */
         struct attrib *attribs;
         struct item_type *itype;
@@ -93,25 +98,6 @@ extern "C" {
 #define RMF_SKILL         0x01  /* int, bonus on resource production skill */
 #define RMF_SAVEMATERIAL  0x02  /* fraction (sa[0]/sa[1]), multiplier on resource usage */
 #define RMF_REQUIREDBUILDING 0x04       /* building, required to build */
-
-    typedef struct resource_mod {
-        variant value;
-        const struct building_type *btype;
-        const struct race *race;
-        unsigned int flags;
-    } resource_mod;
-
-    extern struct attrib_type at_resourcelimit;
-    typedef int(*rlimit_limit) (const struct region * r,
-        const struct resource_type * rtype);
-    typedef void(*rlimit_produce) (struct region * r,
-        const struct resource_type * rtype, int n);
-    typedef struct resource_limit {
-        rlimit_limit limit;
-        rlimit_produce produce;
-        int value;
-        resource_mod *modifiers;
-    } resource_limit;
 
     /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000

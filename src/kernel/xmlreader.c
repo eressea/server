@@ -949,12 +949,6 @@ static int parse_resources(xmlDocPtr doc)
         rtype->flags |= flags;
         xmlFree(name);
 
-        name = xmlGetProp(node, BAD_CAST "material");
-        if (name) {
-            rmt_create(rtype, (const char *)name);
-            xmlFree(name);
-        }
-
         /* reading eressea/resources/resource/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
@@ -987,18 +981,20 @@ static int parse_resources(xmlDocPtr doc)
             }
         xmlXPathFreeObject(result);
 
+        name = xmlGetProp(node, BAD_CAST "material");
+        if (name) {
+            rmt_create(rtype, (const char *)name);
+            xmlFree(name);
+        }
+
         /* reading eressea/resources/resource/resourcelimit */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "resourcelimit", xpath);
         assert(result->nodesetval->nodeNr <= 1);
         if (result->nodesetval->nodeNr != 0) {
-            resource_limit *rdata;
-            attrib *a = a_find(rtype->attribs, &at_resourcelimit);
+            resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
             xmlNodePtr limit = result->nodesetval->nodeTab[0];
 
-            if (a == NULL)
-                a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-            rdata = (resource_limit *)a->data.v;
             rtype->flags |= RTF_LIMITED;
             xpath->node = limit;
             xmlXPathFreeObject(result);
@@ -1095,7 +1091,6 @@ static int parse_resources(xmlDocPtr doc)
                 }
         }
         xmlXPathFreeObject(result);
-
         /* reading eressea/resources/resource/resourcelimit/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);

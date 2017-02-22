@@ -915,8 +915,7 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep,
 }
 
 static resource_limit *get_resourcelimit(const resource_type *rtype) {
-    attrib *a = a_find(rtype->attribs, &at_resourcelimit);
-    return a ? (resource_limit *)a->data.v : NULL;
+    return rtype->limit;
 }
 
 static void allocate_resource(unit * u, const resource_type * rtype, int want)

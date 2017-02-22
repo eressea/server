@@ -1159,22 +1159,6 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     return 0;
 }
 
-static void init_resourcelimit(attrib * a)
-{
-    a->data.v = calloc(sizeof(resource_limit), 1);
-}
-
-static void finalize_resourcelimit(attrib * a)
-{
-    free(a->data.v);
-}
-
-attrib_type at_resourcelimit = {
-    "resourcelimit",
-    init_resourcelimit,
-    finalize_resourcelimit,
-};
-
 item *item_spoil(const struct race *rc, int size)
 {
     item *itm = NULL;

@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/build.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -31,6 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* libc includes */
 #include <assert.h>
+#include <stdlib.h>
 
 static void produce_seeds(region * r, const resource_type * rtype, int norders)
 {
@@ -48,14 +50,11 @@ static int limit_seeds(const region * r, const resource_type * rtype)
 
 void init_seed(void)
 {
-    attrib *a;
-    resource_limit *rdata;
     resource_type *rtype;
 
     rtype = rt_find("seed");
     if (rtype != NULL) {
-        a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-        rdata = (resource_limit *)a->data.v;
+        resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
         rdata->limit = limit_seeds;
         rdata->produce = produce_seeds;
     }
@@ -80,17 +79,14 @@ static int limit_mallornseeds(const region * r, const resource_type * rtype)
 
 void init_mallornseed(void)
 {
-    attrib *a;
-    resource_limit *rdata;
     resource_type *rtype;
 
     rtype = rt_find("mallornseed");
     if (rtype != NULL) {
+        resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
         rtype->flags |= RTF_LIMITED;
         rtype->flags |= RTF_POOLED;
 
-        a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-        rdata = (resource_limit *)a->data.v;
         rdata->limit = limit_mallornseeds;
         rdata->produce = produce_mallornseeds;
     }

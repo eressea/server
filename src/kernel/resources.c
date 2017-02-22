@@ -195,16 +195,16 @@ struct rawmaterial_type *rmt_find(const char *str)
 
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 {
-    rawmaterial_type *rmt = rawmaterialtypes;
-    while (rmt && rmt->rtype != rtype)
-        rmt = rmt->next;
-    return rmt;
+    return rtype->raw;
 }
 
-struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
+struct rawmaterial_type *rmt_create(struct resource_type *rtype,
     const char *name)
 {
-    rawmaterial_type *rmtype = malloc(sizeof(rawmaterial_type));
+    rawmaterial_type *rmtype;
+
+    assert(!rtype->raw);
+    rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
     rmtype->name = strdup(name);
     rmtype->rtype = rtype;
     rmtype->terraform = terraform_default;
