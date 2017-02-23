@@ -7,7 +7,6 @@
     </item>
     <resourcelimit>
       <modifier type="require" building="mine"/>
-      <guard flag="mining"/>
     </resourcelimit>
   </resource>
 

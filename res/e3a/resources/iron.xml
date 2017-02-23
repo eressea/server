@@ -6,6 +6,5 @@
   <resourcelimit>
     <modifier building="mine" type="skill" value="1"/>
     <modifier building="mine" type="material" value="0.5"/>
-    <guard flag="mining"/>
   </resourcelimit>
 </resource>
