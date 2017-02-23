@@ -47,7 +47,6 @@
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
-#include <items/itemtypes.h>
 
 #include <util/log.h>
 #include <util/unicode.h>
