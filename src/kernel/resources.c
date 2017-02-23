@@ -185,19 +185,9 @@ struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
 
 struct rawmaterial_type *rmt_find(const char *str)
 {
-    const char * replace[] = { "rm_tree", "log", NULL };
     resource_type *rtype = rt_find(str);
     if (!rtype && strncmp(str, "rm_", 3) == 0) {
-        int i;
-        for (i = 0; replace[i]; i+=2) {
-            if (strcmp(replace[i], str) == 0) {
-                rtype = rt_find(replace[i+1]);
-                break;
-            }
-        }
-        if (!rtype) {
-            rtype = rt_find(str+3);
-        }
+        rtype = rt_find(str+3);
     }
     assert(rtype);
     return rtype ? rtype->raw : NULL;
