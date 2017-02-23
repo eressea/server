@@ -983,7 +983,7 @@ static int parse_resources(xmlDocPtr doc)
 
         name = xmlGetProp(node, BAD_CAST "material");
         if (name) {
-            rmt_create(rtype, (const char *)name);
+            rmt_create(rtype);
             xmlFree(name);
         }
 

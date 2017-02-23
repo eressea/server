@@ -82,8 +82,7 @@ extern "C" {
 
     void add_resource(struct region *r, int level, int base, int divisor,
         const struct resource_type *rtype);
-    struct rawmaterial_type *rmt_create(struct resource_type *rtype,
-        const char *name);
+    struct rawmaterial_type *rmt_create(struct resource_type *rtype);
 
 #ifdef __cplusplus
 }

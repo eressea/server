@@ -382,7 +382,7 @@ static void test_make_item(CuTest *tc) {
     free(itype->construction->materials);
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
-    rmt = rmt_create(rtype, "rm_stone");
+    rmt = rmt_create(rtype);
     rdata = rtype->limit = calloc(1, sizeof(resource_limit));
     rdata->value = 0;
     add_resource(u->region, 1, 300, 150, rtype);
