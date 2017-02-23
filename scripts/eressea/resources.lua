@@ -38,8 +38,47 @@ function hp_changeresource(u, delta)
   return hp
 end
 
+local function mallorn_region(r)
+    return r:get_flag(1) -- RF_MALLORN
+end
+
+function seed_limit(r)
+    if mallorn_region(r) then
+        return 0
+    end
+    return r:get_resource("seed")
+end
+
+function seed_produce(r, n)
+    if not mallorn_region(r) then
+        local seeds = r:get_resource("seed")
+        if seeds>=n then
+            r:set_resource("seed", seeds-n)
+        else
+            r:set_resource("seed", 0)
+        end
+    end
+end
+
+function mallornseed_limit(r)
+    if mallorn_region(r) then
+        return r:get_resource("seed")
+    end
+    return 0
+end
+
+function mallornseed_produce(r, n)
+    if mallorn_region(r) then
+        local seeds = r:get_resource("seed")
+        if seeds>=n then
+            r:set_resource("seed", seeds-n)
+        else
+            r:set_resource("seed", 0)
+        end
+    end
+end
 function horse_limit(r)
-  return r:get_resource("horse")
+    return r:get_resource("horse")
 end
 
 function horse_produce(r, n)
@@ -52,9 +91,6 @@ function horse_produce(r, n)
 end
 
 function log_limit(r)
---  if r:get_flag(1) then -- RF_MALLORN
---    return 0
---  end
   return r:get_resource("tree") + r:get_resource("sapling")
 end
 
@@ -75,7 +111,7 @@ function log_produce(r, n)
 end
 
 function mallorn_limit(r)
-  if not r:get_flag(1) then -- RF_MALLORN
+  if not mallorn_region(r) then
     return 0
   end
   return r:get_resource("tree") + r:get_resource("sapling")

@@ -1061,7 +1061,7 @@ static int parse_resources(xmlDocPtr doc)
 
             /* reading eressea/resources/resource/resourcelimit/function */
             result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-            if (result->nodesetval != NULL)
+            if (result->nodesetval != NULL) {
                 for (k = 0; k != result->nodesetval->nodeNr; ++k) {
                     xmlNodePtr node = result->nodesetval->nodeTab[k];
                     pf_generic fun;
@@ -1089,6 +1089,7 @@ static int parse_resources(xmlDocPtr doc)
                     }
                     xmlFree(propValue);
                 }
+            }
         }
         xmlXPathFreeObject(result);
         /* reading eressea/resources/resource/resourcelimit/function */
@@ -1118,7 +1119,6 @@ static int parse_resources(xmlDocPtr doc)
 
     /* make sure old items (used in requirements) are available */
     init_resources();
-    init_itemtypes();
 
     return 0;
 }
