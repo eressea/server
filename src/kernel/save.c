@@ -1068,7 +1068,7 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rhorses(r));
 
         while (res) {
-            WRITE_TOK(data->store, res->type->name);
+            WRITE_TOK(data->store, res->type->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);

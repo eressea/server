@@ -63,16 +63,12 @@ extern "C" {
     } resource_limit;
 
     typedef struct rawmaterial_type {
-        char *name;
         const struct resource_type *rtype;
 
         void(*terraform) (struct rawmaterial *, const struct region *);
         void(*update) (struct rawmaterial *, const struct region *);
         void(*use) (struct rawmaterial *, const struct region *, int amount);
         int(*visible) (const struct rawmaterial *, int skilllevel);
-
-        /* no initialization required */
-        struct rawmaterial_type *next;
     } rawmaterial_type;
 
     extern struct rawmaterial_type *rawmaterialtypes;

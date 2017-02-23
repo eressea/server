@@ -183,14 +183,13 @@ struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
     return rm;
 }
 
-struct rawmaterial_type *rawmaterialtypes = 0;
-
 struct rawmaterial_type *rmt_find(const char *str)
 {
-    rawmaterial_type *rmt = rawmaterialtypes;
-    while (rmt && strcmp(rmt->name, str) != 0)
-        rmt = rmt->next;
-    return rmt;
+    resource_type *rtype = rt_find(str);
+    if (!rtype && strncmp(str, "rm_", 3) == 0) {
+        rtype = rt_find(str+3);
+    }
+    return rtype ? rtype->raw : NULL;
 }
 
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
@@ -205,13 +204,10 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype,
 
     assert(!rtype->raw);
     rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
-    rmtype->name = strdup(name);
     rmtype->rtype = rtype;
     rmtype->terraform = terraform_default;
     rmtype->update = NULL;
     rmtype->use = use_default;
     rmtype->visible = visible_default;
-    rmtype->next = rawmaterialtypes;
-    rawmaterialtypes = rmtype;
     return rmtype;
 }
