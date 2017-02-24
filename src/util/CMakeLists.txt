@@ -28,6 +28,7 @@ log.test.c
 # translation.test.c
 umlaut.test.c
 unicode.test.c
+variant.test.c
 # xml.test.c
 )
 

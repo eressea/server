@@ -21,6 +21,7 @@ extern "C" {
       VAR_FLOAT
   } variant_type;
 
+  variant frac_make(int num, int den);
   variant frac_add(variant a, variant b);
   variant frac_mul(variant a, variant b);
   variant frac_div(variant a, variant b);
