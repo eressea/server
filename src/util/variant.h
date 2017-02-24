@@ -23,6 +23,7 @@ extern "C" {
 
   variant frac_make(int num, int den);
   variant frac_add(variant a, variant b);
+  variant frac_sub(variant a, variant b);
   variant frac_mul(variant a, variant b);
   variant frac_div(variant a, variant b);
 

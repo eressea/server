@@ -18,6 +18,10 @@ static void test_fractions(CuTest *tc) {
     a = frac_div(b, b);
     CuAssertIntEquals(tc, 1, a.sa[0]);
     CuAssertIntEquals(tc, 1, a.sa[1]);
+    a = frac_sub(a, a);
+    CuAssertIntEquals(tc, 0, a.sa[0]);
+    a = frac_mul(a, b);
+    CuAssertIntEquals(tc, 0, a.sa[0]);
 }
 
 CuSuite *get_variant_suite(void)

@@ -49,6 +49,12 @@ variant frac_add(variant a, variant b)
     return frac_make(num, den);
 }
 
+variant frac_sub(variant a, variant b)
+{
+    b.sa[0] = -b.sa[0];
+    return frac_add(a, b);
+}
+
 variant frac_mul(variant a, variant b)
 {
     return frac_make(a.sa[0] * b.sa[0], a.sa[1] * b.sa[1]);
