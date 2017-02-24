@@ -20,8 +20,16 @@ static void test_fractions(CuTest *tc) {
     CuAssertIntEquals(tc, 1, a.sa[1]);
     a = frac_sub(a, a);
     CuAssertIntEquals(tc, 0, a.sa[0]);
-    a = frac_mul(a, b);
+    a = frac_sub(frac_one, a);
+    CuAssertIntEquals(tc, 1, a.sa[0]);
+    CuAssertIntEquals(tc, 1, a.sa[1]);
+    a = frac_mul(a, frac_zero);
     CuAssertIntEquals(tc, 0, a.sa[0]);
+    CuAssertIntEquals(tc, 1, frac_sign(frac_make(-1, -1)));
+    CuAssertIntEquals(tc, 1, frac_sign(frac_make(1, 1)));
+    CuAssertIntEquals(tc, -1, frac_sign(frac_make(-1, 1)));
+    CuAssertIntEquals(tc, -1, frac_sign(frac_make(1, -1)));
+    CuAssertIntEquals(tc, 0, frac_sign(frac_make(0, 1)));
 }
 
 CuSuite *get_variant_suite(void)

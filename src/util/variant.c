@@ -4,6 +4,9 @@
 #include <assert.h>
 #include <limits.h>
 
+const variant frac_zero = { .sa = { 0, 1 } };
+const variant frac_one = { .sa = { 1, 1 } };
+
 static int gcd(int a, int b) {
     const int primes[] = { 3, 5, 7, 11, 13, 17, 19, 23, 0 };
     int i = 0, g = 1, p = 2;
@@ -26,6 +29,10 @@ static int lcm(int a, int b) {
     x = (a * b);
     x = (x > 0 ? x : -x) / gcd(a, b);
     return x;
+}
+
+bool frac_equal(variant a, variant b) {
+    return frac_sign(frac_sub(a, b)) == 0;
 }
 
 variant frac_make(int num, int den)
@@ -63,4 +70,11 @@ variant frac_mul(variant a, variant b)
 variant frac_div(variant a, variant b)
 {
     return frac_make(a.sa[0] * b.sa[1], a.sa[1] * b.sa[0]);
+}
+
+int frac_sign(variant a) {
+    if (a.sa[0] == 0) return 0;
+    if (a.sa[0] > 0 && a.sa[1] > 0) return 1;
+    if (a.sa[0] < 0 && a.sa[1] < 0) return 1;
+    return -1;
 }
