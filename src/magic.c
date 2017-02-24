@@ -1135,27 +1135,29 @@ static int farcasting(unit * magician, region * r)
 
 /* allgemeine Magieresistenz einer Einheit,
  * reduziert magischen Schaden */
-double magic_resistance(unit * target)
+variant magic_resistance(unit * target)
 {
     attrib *a;
     curse *c;
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     const race *rc = u_race(target);
-    double probability = rc_magres(rc);
+    variant v, prob = rc_magres(rc);
     const plane *pl = rplane(target->region);
 
     if (rc == get_race(RC_HIRNTOETER) && !pl) {
-        probability /= 2;
+        prob.sa[1] *= 2;
     }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
-    probability += effskill(target, SK_MAGIC, 0) * 0.05;
+    prob = frac_add(prob, frac_make(effskill(target, SK_MAGIC, 0), 20));
 
     /* Auswirkungen von Zaubern auf der Einheit */
     c = get_curse(target->attribs, ct_find("magicresistance"));
     if (c) {
-        probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
+        /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+        int effect = curse_geteffect_int(c) * get_cursedmen(target, c);
+        prob = frac_add(prob, frac_make(effect, 100));
     }
 
     /* Unicorn +10 */
@@ -1163,7 +1165,7 @@ double magic_resistance(unit * target)
     if (rtype) {
         int n = i_get(target->items, rtype->itype);
         if (n) {
-            probability += n * 0.1 / target->number;
+            prob = frac_add(prob, frac_make(n, target->number * 10));
         }
     }
 
@@ -1180,13 +1182,15 @@ double magic_resistance(unit * target)
         if (mage != NULL) {
             if (ct_goodresist && c->type == ct_goodresist) {
                 if (alliedunit(mage, target->faction, HELP_GUARD)) {
-                    probability += curse_geteffect(c) * 0.01;
+                    /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+                    prob = frac_add(prob, frac_make(curse_geteffect_int(c), 100));
                     ct_goodresist = 0; /* only one effect per region */
                 }
             }
             else if (ct_badresist && c->type == ct_badresist) {
                 if (!alliedunit(mage, target->faction, HELP_GUARD)) {
-                    probability -= curse_geteffect(c) * 0.01;
+                    /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+                    prob = frac_sub(prob, frac_make(curse_geteffect_int(c), 100));
                     ct_badresist = 0; /* only one effect per region */
                 }
             }
@@ -1202,11 +1206,18 @@ double magic_resistance(unit * target)
         const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         /* gesegneter Steinkreis gibt 30% dazu */
-        if (btype)
-            probability += btype->magresbonus * 0.01;
+        if (btype) {
+            /* TODO: legacy. building-bonus is an integer-percentage */
+            prob = frac_add(prob, frac_make(btype->magresbonus, 100));
+        }
     }
 
-    return (probability<0.9) ? probability : 0.9;
+    /* resistance must never be more than 90% */
+    v = frac_make(9, 10);
+    if (frac_sign(frac_sub(prob, v)) > 0) { /* prob < 90% */
+        return v; /* at most 90% */
+    }
+    return prob;
 }
 
 /* ------------------------------------------------------------- */
@@ -1223,12 +1234,12 @@ double magic_resistance(unit * target)
 bool
 target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 {
-    double probability = 0.0;
+    variant v02p, v98p, prob = frac_make(t_bonus, 100);
+    attrib *a = NULL;
 
-    if (magician == NULL)
+    if (magician == NULL || obj == NULL) {
         return true;
-    if (obj == NULL)
-        return true;
+    }
 
     switch (objtyp) {
     case TYP_UNIT:
@@ -1248,43 +1259,56 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
                 pa = sk;
         }
 
-        /* Contest */
-        probability = 0.05 * (10 + pa - at);
-
-        probability += magic_resistance((unit *)obj);
+        /* Contest, probability = 0.05 * (10 + pa - at); */
+        prob = frac_add(prob, frac_make(10 + pa - at, 20));
+        prob = frac_add(prob, magic_resistance((unit *)obj));
         break;
     }
 
     case TYP_REGION:
-        /* Bonus durch Zauber */
+        /* Bonus durch Zauber
         probability +=
-            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
+            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((region *)obj)->attribs;
         break;
 
     case TYP_BUILDING:
-        /* Bonus durch Zauber */
+        /* Bonus durch Zauber
         probability +=
-            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
-
-        /* Bonus durch Typ */
-        probability += 0.01 * ((building *)obj)->type->magres;
-
+            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((building *)obj)->attribs;
+        /* Bonus durch Typ
+        probability += 0.01 * ((building *)obj)->type->magres; */
+        prob = frac_add(prob, ((building *)obj)->type->magres);
         break;
 
     case TYP_SHIP:
         /* Bonus durch Zauber */
-        probability +=
-            0.01 * get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
+        a = ((ship *)obj)->attribs;
         break;
     }
 
-    probability = MAX(0.02, probability + t_bonus * 0.01);
-    probability = MIN(0.98, probability);
+    if (a) {
+        const struct curse_type *ct_resist = ct_find(oldcursename(C_RESIST_MAGIC));
+        curse * c = get_curse(a, ct_resist);
+        int effect = curse_geteffect_int(c);
+        prob = frac_add(prob, frac_make(effect, 100));
+    }
+
+    /* ignore results < 2% and > 98% */
+    v02p = frac_make(1, 50);
+    v98p = frac_make(49, 50);
+    if (frac_sign(frac_sub(prob, v02p)) < 0) {
+        prob = v02p;
+    }
+    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
+        prob = v98p;
+    }
 
     /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
      * false, wenn sie gleich oder größer ist, dh je größer die
      * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
-    return chance(probability);
+    return rng_int() % prob.sa[1] < prob.sa[0];
 }
 
 /* ------------------------------------------------------------- */

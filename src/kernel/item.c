@@ -275,7 +275,7 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 }
 
 weapon_type *new_weapontype(item_type * itype,
-    int wflags, double magres, const char *damage[], int offmod, int defmod,
+    int wflags, variant magres, const char *damage[], int offmod, int defmod,
     int reload, skill_t sk, int minskill)
 {
     weapon_type *wtype;
@@ -301,7 +301,7 @@ weapon_type *new_weapontype(item_type * itype,
     return wtype;
 }
 
-armor_type *new_armortype(item_type * itype, double penalty, double magres,
+armor_type *new_armortype(item_type * itype, double penalty, variant magres,
     int prot, unsigned int flags)
 {
     armor_type *atype;

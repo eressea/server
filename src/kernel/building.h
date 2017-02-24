@@ -60,7 +60,7 @@ extern "C" {
         int capacity;               /* Kapazit�t pro Gr��enpunkt */
         int maxcapacity;            /* Max. Kapazit�t */
         int maxsize;                /* how big can it get, with all the extensions? */
-        int magres;                 /* how well it resists against spells */
+        variant magres;                 /* how well it resists against spells */
         int magresbonus;            /* bonus it gives the target against spells */
         int fumblebonus;            /* bonus that reduces fumbling */
         double auraregen;           /* modifier for aura regeneration inside building */

@@ -61,6 +61,19 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 #ifdef USE_LIBXML2
+
+static variant xml_fraction(xmlNodePtr node, const char *name) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+    if (propValue != NULL) {
+        int num, den = 100;
+        double fval = atof((const char *)propValue);
+        num = (int)(fval * den + 0.5);
+        xmlFree(propValue);
+        return frac_make(num, den);
+    }
+    return frac_make(0, 1);
+}
+
 static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
 {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");
@@ -245,7 +258,7 @@ static int parse_buildings(xmlDocPtr doc)
             btype->maxcapacity = xml_ivalue(node, "maxcapacity", btype->maxcapacity);
             btype->maxsize = xml_ivalue(node, "maxsize", btype->maxsize);
 
-            btype->magres = xml_ivalue(node, "magres", btype->magres);
+            btype->magres = frac_make(xml_ivalue(node, "magres", 0), 100);
             btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
             btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
             btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
@@ -582,7 +595,7 @@ static armor_type *xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
     unsigned int flags = ATF_NONE;
     int ac = xml_ivalue(node, "ac", 0);
     double penalty = xml_fvalue(node, "penalty", 0.0);
-    double magres = xml_fvalue(node, "magres", 0.0);
+    variant magres = xml_fraction(node, "magres");
 
     if (xml_bvalue(node, "laen", false))
         flags |= ATF_LAEN;
@@ -607,7 +620,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     int offmod = xml_ivalue(node, "offmod", 0);
     int defmod = xml_ivalue(node, "defmod", 0);
     int reload = xml_ivalue(node, "reload", 0);
-    double magres = xml_fvalue(node, "magres", 0.0);
+    variant magres = xml_fraction(node, "magres");
 
     if (xml_bvalue(node, "armorpiercing", false))
         flags |= WTF_ARMORPIERCING;
@@ -899,22 +912,6 @@ static int parse_rules(xmlDocPtr doc)
     return 0;
 }
 
-static int gcd(int num, int den) {
-    const int primes[] = { 3, 5, 7, 11, 0 };
-    int i=0, g = 1, p = 2;
-    while (p && p<=den && p<=num) {
-        if (num % p == 0 && den % p == 0) {
-            num /= p;
-            den /= p;
-            g *= p;
-        }
-        else {
-            p = primes[i++];
-        }
-    }
-    return g;
-}
-
 static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1031,15 +1028,7 @@ static int parse_resources(xmlDocPtr doc)
                         rdata->modifiers[k].flags = RMF_SKILL;
                     }
                     else if (strcmp((const char *)propValue, "material") == 0) {
-                        int g, num, den = 100;
-                        double fval = xml_fvalue(node, "value", 0);
-                        /* TODO: extract into a function for reading fractions? */
-                        num = (int)(fval * den + 0.5);
-                        g = gcd(num, den);
-                        num /= g;
-                        den /= g;
-                        rdata->modifiers[k].value.sa[0] = (short)num;
-                        rdata->modifiers[k].value.sa[1] = (short)den;
+                        rdata->modifiers[k].value = xml_fraction(node, "value");
                         rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
                     }
                     else if (strcmp((const char *)propValue, "require") == 0) {
@@ -1623,7 +1612,7 @@ static int parse_races(xmlDocPtr doc)
         rc->def_damage = strdup((const char *)propValue);
         xmlFree(propValue);
 
-        rc->magres = xml_ivalue(node, "magres", rc->magres);
+        rc->magres = frac_make(xml_ivalue(node, "magres", 100), 100);
         rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); /* TODO: store as int in XML */
         rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); /* TODO: store as int in XML */
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);

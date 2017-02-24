@@ -381,7 +381,7 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, -1, btype->maxsize);
     CuAssertIntEquals(tc, 1, btype->capacity);
     CuAssertIntEquals(tc, -1, btype->maxcapacity);
-    CuAssertIntEquals(tc, 0, btype->magres);
+    CuAssertIntEquals(tc, 0, btype->magres.sa[0]);
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
     CuAssertIntEquals(tc, 0, btype->flags);

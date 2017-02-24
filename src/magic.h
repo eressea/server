@@ -315,7 +315,7 @@ extern "C" {
     bool is_magic_resistant(struct unit *magician, struct unit *target, int
         resist_bonus);
     /*      Mapperfunktion für target_resists_magic() vom Typ struct unit. */
-    extern double magic_resistance(struct unit *target);
+    variant magic_resistance(struct unit *target);
     /*      gibt die Chance an, mit der einem Zauber widerstanden wird. Je
      *      größer, desto resistenter ist da Opfer */
     bool target_resists_magic(struct unit *magician, void *obj, int objtyp,

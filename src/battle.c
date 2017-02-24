@@ -1059,7 +1059,7 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     return modifier;
 }
 
-int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, double *magres) {
+int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, variant *magres) {
     fighter *df = dt.fighter;
     unit *du = df->unit;
     int ar = 0, an, am;
@@ -1110,21 +1110,31 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
 
     if (magres) {
         /* calculate damage multiplier for magical damage */
-        double res = 1.0 - magic_resistance(du);
+        variant res;
+        
+        res = frac_sub(frac_one, magic_resistance(du));
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
             /* der Effekt von Laen steigt nicht linear */
-            if (armor && fval(armor, ATF_LAEN))
-                res *= (1 - armor->magres);
-            if (shield && fval(shield, ATF_LAEN))
-                res *= (1 - shield->magres);
-            if (dwtype)
-                res *= (1 - dwtype->magres);
+            if (armor && fval(armor, ATF_LAEN)) {
+                res = frac_mul(res, frac_sub(frac_one, armor->magres));
+            }
+            if (shield && fval(shield, ATF_LAEN)) {
+                res = frac_mul(res, frac_sub(frac_one, shield->magres));
+            }
+            if (dwtype) {
+                res = frac_mul(res, frac_sub(frac_one, dwtype->magres));
+            }
         }
 
-        /* gegen Magie wirkt nur nat�rliche und magische R�stung */
+        /* gegen Magie wirkt nur natuerliche und magische Ruestung */
         ar = an + am;
-        *magres = res > 0 ? res : 0;
+        if (res.sa[0] >= 0) {
+            *magres = res;
+        }
+        else {
+            *magres = frac_make(0, 1);
+        }
     }
 
     return ar;
@@ -1147,7 +1157,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
-    double res = 1.0;
+    variant res = frac_make(1, 1);
 
     int rda, sk = 0, sd;
     bool magic = false;
@@ -1190,9 +1200,9 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
-    /* TODO not sure if res could be > 1 here */
     if (magic) {
-        da = (int)(MAX(da * res, 0));
+        res = frac_mul(frac_make(da, 1), res);
+        da = res.sa[0] / res.sa[1];
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {

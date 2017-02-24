@@ -331,6 +331,7 @@ race *rc_create(const char *zName)
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
+    rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
@@ -383,8 +384,8 @@ bool r_insectstalled(const region * r)
     return fval(r->terrain, ARCTIC_REGION);
 }
 
-double rc_magres(const race *rc) {
-    return rc->magres / 100.0;
+variant rc_magres(const race *rc) {
+    return rc->magres;
 }
 
 double rc_maxaura(const race *rc) {

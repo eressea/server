@@ -250,23 +250,24 @@ static void test_calculate_armor(CuTest * tc)
     armor_type *ashield, *achain;
     item_type *ibelt, *ishield, *ichain;
     race *rc;
-    double magres = 0.0;
+    variant magres = frac_zero;
+    variant v50p = frac_make(1, 2);
 
     test_setup();
     r = test_create_region(0, 0, 0);
     ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
 
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[0], magres.sa[1]);
     free_battle(b);
 
     b = NULL;
@@ -299,13 +300,13 @@ static void test_calculate_armor(CuTest * tc)
     wtype->flags = WTF_NONE;
 
     CuAssertIntEquals_Msg(tc, "magical attack", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[1], magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
     achain->flags |= ATF_LAEN;
-    magres = 1.0;
+    magres = frac_one;
     CuAssertIntEquals_Msg(tc, "laen armor", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "laen magres bonus", 0.25, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "laen magres bonus", 4, magres.sa[1]);
     free_battle(b);
     test_cleanup();
 }
@@ -319,38 +320,42 @@ static void test_magic_resistance(CuTest *tc)
     armor_type *ashield, *achain;
     item_type *ishield, *ichain;
     race *rc;
-    double magres;
+    variant magres;
+    variant v50p = frac_make(1, 2);
+    variant v10p = frac_make(1, 10);
 
     test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
 
+    i_change(&du->items, ishield, 1);
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "no magres bonus", 0.0, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "no magres reduction", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "no magres reduction", magres.sa[1], magres.sa[0]);
+    magres = magic_resistance(du);
+    CuAssertIntEquals_Msg(tc, "no magres reduction", 0, magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
-    ashield->magres = 0.1;
+    ashield->magres = v10p;
     calculate_armor(dt, 0, 0, &magres);
+    CuAssert(tc, "laen reduction => 10%%", frac_equal(frac_make(9, 10), magres));
     free_battle(b);
 
     b = NULL;
-    i_change(&du->items, ishield, 1);
     i_change(&du->items, ichain, 1);
     achain->flags |= ATF_LAEN;
-    achain->magres = 0.1;
+    achain->magres = v10p;
     ashield->flags |= ATF_LAEN;
-    ashield->magres = 0.1;
+    ashield->magres = v10p;
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "laen reduction", 0.81, magres, 0.01);
+    CuAssert(tc, "2x laen reduction => 81%%", frac_equal(frac_make(81, 100), magres));
     free_battle(b);
 
     b = NULL;
@@ -359,17 +364,20 @@ static void test_magic_resistance(CuTest *tc)
     set_level(du, SK_MAGIC, 2);
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "skill bonus", 0.1, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "skill reduction", 0.9, magres, 0.01);
-    rc->magres = 50; /* percentage, gets added to skill bonus */
+    CuAssert(tc, "skill reduction => 90%%", frac_equal(magres, frac_make(9, 10)));
+    magres = magic_resistance(du);
+    CuAssert(tc, "skill reduction", frac_equal(magres, v10p));
+    rc->magres = v50p; /* percentage, gets added to skill bonus */
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "race bonus", 0.6, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
+    CuAssert(tc, "race reduction => 40%%", frac_equal(magres, frac_make(4, 10)));
+    magres = magic_resistance(du);
+    CuAssert(tc, "race bonus => 60%%", frac_equal(magres, frac_make(60, 100)));
 
-    rc->magres = 150; /* should not cause negative damage multiplier */
-    CuAssertDblEquals_Msg(tc, "magic resistance is never > 0.9", 0.9, magic_resistance(du), 0.01);
+    rc->magres = frac_make(15, 10); /* 150% resistance should not cause negative damage multiplier */
+    magres = magic_resistance(du);
+    CuAssert(tc, "magic resistance is never > 0.9", frac_equal(magres, frac_make(9, 10)));
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "damage reduction is never < 0.1", 0.1, magres, 0.01);
+    CuAssert(tc, "damage reduction is never < 0.1", frac_equal(magres, frac_make(1, 10)));
 
     free_battle(b);
     test_cleanup();
@@ -385,14 +393,15 @@ static void test_projectile_armor(CuTest * tc)
     armor_type *ashield, *achain;
     item_type *ishield, *ichain;
     race *rc;
+    variant v50p = frac_make(1, 2);
 
     test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
     rc->battle_flags |= BF_EQUIPMENT;
     du = test_create_unit(test_create_faction(rc), r);

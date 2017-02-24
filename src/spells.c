@@ -2851,7 +2851,8 @@ static int dc_age(struct curse *c)
         while (*up != NULL) {
             unit *u = *up;
             int hp;
-            double damage = c->effect * u->number;
+            variant dmg = frac_make(u->number, 1);
+            double damage = c->effect;
 
             if (u->number <= 0 || target_resists_magic(mage, u, TYP_UNIT, 0)) {
                 up = &u->next;
@@ -2859,7 +2860,9 @@ static int dc_age(struct curse *c)
             }
 
             /* Reduziert durch Magieresistenz */
-            damage *= (1.0 - magic_resistance(u));
+            dmg = frac_mul(dmg, frac_sub(frac_make(1,1), magic_resistance(u)));
+            damage *= dmg.sa[0];
+            damage /= dmg.sa[1];
             hp = change_hitpoints(u, -(int)damage);
 
             ADDMSG(&u->faction->msgs, msg_message((hp>0)?"poison_damage":"poison_death", "region unit", r, u));
