@@ -324,7 +324,7 @@
   <string name="dam">
     <text locale="fr">barrage</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="fr">bâtiment</text>
   </string>
   <string name="harbour">

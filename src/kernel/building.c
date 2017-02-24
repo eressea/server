@@ -325,8 +325,13 @@ const building_type *findbuildingtype(const char *name,
             building_type *btype = (building_type *)selist_get(ql, qi);
 
             const char *n = LOC(lang, btype->_name);
-            type.v = (void *)btype;
-            addtoken((struct tnode **)&bn->names, n, type);
+            if (!n) {
+                log_error("building type %s has no translation in %s",
+                          btype->_name, locale_name(lang));
+            } else {
+                type.v = (void *)btype;
+                addtoken((struct tnode **)&bn->names, n, type);
+            }
         }
         bnames = bn;
     }

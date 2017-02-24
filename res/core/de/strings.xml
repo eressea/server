@@ -912,7 +912,7 @@
   <string name="illusioncastle">
     <text locale="de">Traumschlößchen</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="de">Struktur</text>
   </string>
   <string name="artacademy">

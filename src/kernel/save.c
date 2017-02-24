@@ -1529,6 +1529,11 @@ struct building *read_building(gamedata *data) {
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
+    if (!b->type) {
+        log_error("building %d has unknown type %s", b->no, name);
+        b->type = bt_find("building");
+        assert(b->type);
+    }
     read_attribs(data, &b->attribs, b);
 
     /* repairs, bug 2221: */
