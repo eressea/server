@@ -56,6 +56,7 @@ strings.c
 translation.c
 umlaut.c
 unicode.c
+variant.c
 xml.c
 )
 FOREACH(_FILE ${_FILES})

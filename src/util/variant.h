@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef STRUCT_VARIANT_H
 #define STRUCT_VARIANT_H
 #ifdef __cplusplus
@@ -18,6 +20,10 @@ extern "C" {
     VAR_NONE, VAR_INT, VAR_VOIDPTR, VAR_CHAR, VAR_SHORT, VAR_SHORTA, VAR_CHARA,
       VAR_FLOAT
   } variant_type;
+
+  variant frac_add(variant a, variant b);
+  variant frac_mul(variant a, variant b);
+  variant frac_div(variant a, variant b);
 
 #ifdef __cplusplus
 }
