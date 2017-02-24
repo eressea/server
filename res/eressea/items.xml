@@ -63,19 +63,6 @@
     </item>
   </resource>
 
-<!-- art rewards -->
-  <resource name="trappedairelemental">
-    <item weight="0">
-      <function name="use" value="use_trappedairelemental"/>
-    </item>
-  </resource>
-
-  <resource name="hornofdancing">
-    <item weight="0">
-      <function name="use" value="use_hornofdancing"/>
-    </item>
-  </resource>
-
 <!-- museum items -->
   <resource name="questkey1" appearance="key">
     <!-- Key for an old quest. placeholder item -->
