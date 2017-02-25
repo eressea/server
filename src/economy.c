@@ -1123,7 +1123,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     allocation *al;
     int nreq = 0;
     resource_limit *rdata = get_resourcelimit(rtype);
-    int avail = rdata->value;
+    int avail = 0;
 
     for (al = alist; al; al = al->next) {
         nreq += required(al->want, al->save);
@@ -1165,7 +1165,7 @@ static allocate_function get_allocator(const struct resource_type *rtype)
     resource_limit *rdata = get_resourcelimit(rtype);
 
     if (rdata) {
-        if (rdata->value > 0 || rdata->limit != NULL) {
+        if (rdata->limit != NULL) {
             return attrib_allocation;
         }
         return leveled_allocation;

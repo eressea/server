@@ -58,7 +58,6 @@ extern "C" {
     typedef struct resource_limit {
         rlimit_limit limit;
         rlimit_produce produce;
-        int value;
         resource_mod *modifiers;
     } resource_limit;
 
