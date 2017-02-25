@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resource name="mallorn" material="rm_mallorn">
+<resource name="mallorn">
   <item weight="500" score="30">
     <construction skill="forestry" minskill="2"/>
   </item>
