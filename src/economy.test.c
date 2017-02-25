@@ -348,7 +348,6 @@ static void test_make_item(CuTest *tc) {
     struct item_type *itype;
     const struct resource_type *rt_silver;
     resource_type *rtype;
-    rawmaterial_type *rmt;
     resource_limit *rdata;
     double d = 0.6;
 
@@ -382,7 +381,7 @@ static void test_make_item(CuTest *tc) {
     free(itype->construction->materials);
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
-    rmt = rmt_create(rtype);
+    rmt_create(rtype);
     rdata = rtype->limit = calloc(1, sizeof(resource_limit));
     add_resource(u->region, 1, 300, 150, rtype);
     u->region->resources->amount = 300; /* there are 300 stones at level 1 */

@@ -978,10 +978,8 @@ static int parse_resources(xmlDocPtr doc)
             }
         xmlXPathFreeObject(result);
 
-        name = xmlGetProp(node, BAD_CAST "material");
-        if (name) {
+        if (xml_bvalue(node, "material", false)) {
             rmt_create(rtype);
-            xmlFree(name);
         }
 
         /* reading eressea/resources/resource/resourcelimit */
