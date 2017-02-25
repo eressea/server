@@ -211,7 +211,7 @@ static void test_tax_cmd(CuTest *tc) {
     silver = get_resourcetype(R_SILVER)->itype;
 
     sword = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(sword, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 1);
+    new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 1);
     i_change(&u->items, sword, 1);
     set_level(u, SK_MELEE, 1);
 
@@ -348,7 +348,6 @@ static void test_make_item(CuTest *tc) {
     struct item_type *itype;
     const struct resource_type *rt_silver;
     resource_type *rtype;
-    attrib *a;
     resource_limit *rdata;
     double d = 0.6;
 
@@ -382,10 +381,8 @@ static void test_make_item(CuTest *tc) {
     free(itype->construction->materials);
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
-    a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-    rdata = (resource_limit *)a->data.v;
-    rdata->value = 0;
-    rmt_create(rtype, "stone");
+    rmt_create(rtype);
+    rdata = rtype->limit = calloc(1, sizeof(resource_limit));
     add_resource(u->region, 1, 300, 150, rtype);
     u->region->resources->amount = 300; /* there are 300 stones at level 1 */
     set_level(u, SK_ALCHEMY, 10);

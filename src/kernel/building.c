@@ -325,8 +325,13 @@ const building_type *findbuildingtype(const char *name,
             building_type *btype = (building_type *)selist_get(ql, qi);
 
             const char *n = LOC(lang, btype->_name);
-            type.v = (void *)btype;
-            addtoken((struct tnode **)&bn->names, n, type);
+            if (!n) {
+                log_error("building type %s has no translation in %s",
+                          btype->_name, locale_name(lang));
+            } else {
+                type.v = (void *)btype;
+                addtoken((struct tnode **)&bn->names, n, type);
+            }
         }
         bnames = bn;
     }
@@ -337,40 +342,24 @@ const building_type *findbuildingtype(const char *name,
 
 int cmp_castle_size(const building * b, const building * a)
 {
-    if (!b || !b->type->protection || !building_owner(b)) {
+    if (!b || !(b->type->flags & BTF_FORTIFICATION) || !building_owner(b)) {
         return -1;
     }
-    if (!a || !a->type->protection || !building_owner(a)) {
+    if (!a || !(a->type->flags & BTF_FORTIFICATION) || !building_owner(a)) {
         return 1;
     }
     return b->size - a->size;
 }
 
-int building_protection(const building * b, const unit * u, building_bonus bonus)
+static const int castle_bonus[6] = { 0, 1, 3, 5, 8, 12 };
+static const int watch_bonus[3] = { 0, 1, 2 };
+
+int building_protection(const building_type * btype, int stage)
 {
-    int i = 0;
-    int bsize = buildingeffsize(b, false);
-    const construction *cons = b->type->construction;
-    if (!cons) {
-        return 0;
+    if (btype->maxsize < 0) {
+        return castle_bonus[MIN(stage, 5)];
     }
-
-    for (i = 0; i < bsize; i++)
-    {
-        cons = cons->improvement;
-    }
-
-    switch (bonus)
-    {
-    case DEFENSE_BONUS:
-        return cons->defense_bonus;
-    case CLOSE_COMBAT_ATTACK_BONUS:
-        return cons->close_combat_bonus;
-    case RANGED_ATTACK_BONUS:
-        return cons->ranged_bonus;
-    default:
-        return 0;
-    }
+    return watch_bonus[MIN(stage, 2)];
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -925,8 +914,6 @@ int cmp_current_owner(const building * b, const building * a)
 void register_buildings(void)
 {
     register_function((pf_generic)minimum_wage, "minimum_wage");
-    register_function((pf_generic)building_protection,
-        "building_protection");
     register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");

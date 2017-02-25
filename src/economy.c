@@ -914,6 +914,10 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep,
     return NULL;
 }
 
+static resource_limit *get_resourcelimit(const resource_type *rtype) {
+    return rtype->limit;
+}
+
 static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
@@ -921,8 +925,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     int dm = 0;
     allocation_list *alist;
     allocation *al;
-    attrib *a = a_find(rtype->attribs, &at_resourcelimit);
-    resource_limit *rdata = (resource_limit *)a->data.v;
+    resource_limit *rdata = get_resourcelimit(rtype);
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
@@ -1119,9 +1122,8 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     allocation *al;
     int nreq = 0;
-    attrib *a = a_find(rtype->attribs, &at_resourcelimit);
-    resource_limit *rdata = (resource_limit *)a->data.v;
-    int avail = rdata->value;
+    resource_limit *rdata = get_resourcelimit(rtype);
+    int avail = 0;
 
     for (al = alist; al; al = al->next) {
         nreq += required(al->want, al->save);
@@ -1160,11 +1162,10 @@ typedef void(*allocate_function) (const resource_type *, struct region *,
 
 static allocate_function get_allocator(const struct resource_type *rtype)
 {
-    attrib *a = a_find(rtype->attribs, &at_resourcelimit);
+    resource_limit *rdata = get_resourcelimit(rtype);
 
-    if (a != NULL) {
-        resource_limit *rdata = (resource_limit *)a->data.v;
-        if (rdata->value > 0 || rdata->limit != NULL) {
+    if (rdata) {
+        if (rdata->limit != NULL) {
             return attrib_allocation;
         }
         return leveled_allocation;

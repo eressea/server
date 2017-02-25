@@ -4,9 +4,7 @@
   <building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild="yes"/>
   <building name="xmas_exit" maxsize="10" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes"/>
   <building name="caldera" capacity="1" nodestroy="yes" nobuild="yes"/>
-  <building name="genericbuilding" namechange="no" maxsize="1" nobuild="yes"/>
-  <building name="artacademy" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes"/>
-  <building name="artsculpture" namechange="no" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes"/>
+  <building name="building" namechange="no" maxsize="1" nobuild="yes"/>
 
   <building name="blessedstonecircle" maxcapacity="3" maxsize="100" nobuild="yes" magic="yes" magres="60" magresbonus="30" auraregen="1.50">
     <construction skill="building" minskill="2" reqsize="100" maxsize="100">

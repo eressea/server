@@ -28,6 +28,7 @@ log.test.c
 # translation.test.c
 umlaut.test.c
 unicode.test.c
+variant.test.c
 # xml.test.c
 )
 
@@ -56,6 +57,7 @@ strings.c
 translation.c
 umlaut.c
 unicode.c
+variant.c
 xml.c
 )
 FOREACH(_FILE ${_FILES})

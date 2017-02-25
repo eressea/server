@@ -1068,7 +1068,7 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rhorses(r));
 
         while (res) {
-            WRITE_TOK(data->store, res->type->name);
+            WRITE_TOK(data->store, res->type->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);
@@ -1529,6 +1529,11 @@ struct building *read_building(gamedata *data) {
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
+    if (!b->type) {
+        log_error("building %d has unknown type %s", b->no, name);
+        b->type = bt_find("building");
+        assert(b->type);
+    }
     read_attribs(data, &b->attribs, b);
 
     /* repairs, bug 2221: */

@@ -29,6 +29,7 @@ extern "C" {
     struct unit;
     struct attrib;
     struct attrib_type;
+    struct race;
     struct region;
     struct resource_type;
     struct locale;
@@ -37,6 +38,8 @@ extern "C" {
     struct order;
     struct storage;
     struct gamedata;
+    struct rawmaterial_type;
+    struct resource_limit;
 
     typedef struct item {
         struct item *next;
@@ -76,6 +79,8 @@ extern "C" {
         rtype_uchange uchange;
         rtype_uget uget;
         rtype_name name;
+        struct rawmaterial_type *raw;
+        struct resource_limit  *limit;
         /* --- pointers --- */
         struct attrib *attribs;
         struct item_type *itype;
@@ -93,25 +98,6 @@ extern "C" {
 #define RMF_SKILL         0x01  /* int, bonus on resource production skill */
 #define RMF_SAVEMATERIAL  0x02  /* fraction (sa[0]/sa[1]), multiplier on resource usage */
 #define RMF_REQUIREDBUILDING 0x04       /* building, required to build */
-
-    typedef struct resource_mod {
-        variant value;
-        const struct building_type *btype;
-        const struct race *race;
-        unsigned int flags;
-    } resource_mod;
-
-    extern struct attrib_type at_resourcelimit;
-    typedef int(*rlimit_limit) (const struct region * r,
-        const struct resource_type * rtype);
-    typedef void(*rlimit_produce) (struct region * r,
-        const struct resource_type * rtype, int n);
-    typedef struct resource_limit {
-        rlimit_limit limit;
-        rlimit_produce produce;
-        int value;
-        resource_mod *modifiers;
-    } resource_limit;
 
     /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
@@ -195,7 +181,7 @@ extern "C" {
         const item_type *itype;
         unsigned int flags;
         double penalty;
-        double magres;
+        variant magres;
         int prot;
         float projectile;           /* chance, dass ein projektil abprallt */
     } armor_type;
@@ -219,7 +205,7 @@ extern "C" {
         int minskill;
         int offmod;
         int defmod;
-        double magres;
+        variant magres;
         int reload;                 /* time to reload this weapon */
         weapon_mod *modifiers;
         /* --- functions --- */
@@ -258,14 +244,12 @@ extern "C" {
     /* creation */
     resource_type *rt_get_or_create(const char *name);
     item_type *it_get_or_create(resource_type *rtype);
-    item_type *new_itemtype(resource_type * rtype, int iflags, int weight,
-        int capacity);
     luxury_type *new_luxurytype(item_type * itype, int price);
     weapon_type *new_weapontype(item_type * itype, int wflags,
-        double magres, const char *damage[], int offmod, int defmod, int reload,
+        variant magres, const char *damage[], int offmod, int defmod, int reload,
         skill_t sk, int minskill);
     armor_type *new_armortype(item_type * itype, double penalty,
-        double magres, int prot, unsigned int flags);
+        variant magres, int prot, unsigned int flags);
     potion_type *new_potiontype(item_type * itype, int level);
 
     typedef enum {

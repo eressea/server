@@ -1059,7 +1059,7 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     return modifier;
 }
 
-int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, double *magres) {
+int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, variant *magres) {
     fighter *df = dt.fighter;
     unit *du = df->unit;
     int ar = 0, an, am;
@@ -1110,21 +1110,31 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
 
     if (magres) {
         /* calculate damage multiplier for magical damage */
-        double res = 1.0 - magic_resistance(du);
+        variant res;
+        
+        res = frac_sub(frac_one, magic_resistance(du));
 
         if (u_race(du)->battle_flags & BF_EQUIPMENT) {
             /* der Effekt von Laen steigt nicht linear */
-            if (armor && fval(armor, ATF_LAEN))
-                res *= (1 - armor->magres);
-            if (shield && fval(shield, ATF_LAEN))
-                res *= (1 - shield->magres);
-            if (dwtype)
-                res *= (1 - dwtype->magres);
+            if (armor && fval(armor, ATF_LAEN)) {
+                res = frac_mul(res, frac_sub(frac_one, armor->magres));
+            }
+            if (shield && fval(shield, ATF_LAEN)) {
+                res = frac_mul(res, frac_sub(frac_one, shield->magres));
+            }
+            if (dwtype) {
+                res = frac_mul(res, frac_sub(frac_one, dwtype->magres));
+            }
         }
 
-        /* gegen Magie wirkt nur nat�rliche und magische R�stung */
+        /* gegen Magie wirkt nur natuerliche und magische Ruestung */
         ar = an + am;
-        *magres = res > 0 ? res : 0;
+        if (res.sa[0] >= 0) {
+            *magres = res;
+        }
+        else {
+            *magres = frac_make(0, 1);
+        }
     }
 
     return ar;
@@ -1147,7 +1157,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
-    double res = 1.0;
+    variant res = frac_make(1, 1);
 
     int rda, sk = 0, sd;
     bool magic = false;
@@ -1190,9 +1200,9 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
-    /* TODO not sure if res could be > 1 here */
     if (magic) {
-        da = (int)(MAX(da * res, 0));
+        res = frac_mul(frac_make(da, 1), res);
+        da = res.sa[0] / res.sa[1];
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
@@ -1892,10 +1902,11 @@ int skilldiff(troop at, troop dt, int dist)
     }
 
     if (df->building) {
-        if (df->building->attribs) {
+        building *b = df->building;
+        if (b->attribs) {
             const curse_type *strongwall_ct = ct_find("strongwall");
             if (strongwall_ct) {
-                curse *c = get_curse(df->building->attribs, strongwall_ct);
+                curse *c = get_curse(b->attribs, strongwall_ct);
                 if (curse_active(c)) {
                     /* wirkt auf alle Geb�ude */
                     skdiff -= curse_geteffect_int(c);
@@ -1903,15 +1914,16 @@ int skilldiff(troop at, troop dt, int dist)
                 }
             }
         }
-        if (df->building->type->protection) {
-            int beff = df->building->type->protection(df->building, du, DEFENSE_BONUS);
-            if (beff) {
+        if (b->type->flags & BTF_FORTIFICATION) {
+            int stage = buildingeffsize(b, false);
+            int beff = building_protection(b->type, stage);
+            if (beff > 0) {
                 skdiff -= beff;
                 is_protected = 2;
-                if (df->building->attribs) {
+                if (b->attribs) {
                     const curse_type *magicwalls_ct = ct_find("magicwalls");
                     if (magicwalls_ct
-                        && curse_active(get_curse(df->building->attribs, magicwalls_ct))) {
+                        && curse_active(get_curse(b->attribs, magicwalls_ct))) {
                         /* Verdoppelt Burgenbonus */
                         skdiff -= beff;
                     }
@@ -2022,7 +2034,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
 
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
 
-    if (bldg->type->protection) {
+    if (bldg->type->flags & BTF_FORTIFICATION) {
         side *s;
 
         bldg->sizeleft = bldg->size;

@@ -2,6 +2,38 @@ require "lunit"
 
 module("tests.e2.e2features", package.seeall, lunit.testcase )
 
+function setup()
+    eressea.free_game()
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.ship.storms", "0")
+    eressea.settings.set("rules.encounters", "0")
+end
+
+function test_herbalism()
+-- OBS: herbalism is currently an E2-only skill
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("herbalism@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
+    u:add_item("money", u.number * 100)
+    u:set_skill("herbalism", 5)
+    r:set_resource("seed", 100)
+    r:set_flag(1, false) -- regular trees
+    u:clear_orders()
+    u:add_order("MACHE Samen")
+    process_orders()
+    assert_equal(1, u:get_item("seed"))
+    assert_equal(99, r:get_resource("seed"))
+    r:set_flag(1, true) -- mallorn
+    u:clear_orders()
+    u:add_order("MACHE Mallornsamen")
+    process_orders()
+    assert_equal(1, u:get_item("mallornseed"))
+    assert_equal(98, r:get_resource("seed"))
+end
+
 function test_build_harbour()
 -- try to reproduce mantis bug 2221
     local r = region.create(0, 0, "plain")
@@ -40,13 +72,6 @@ end
 
 local function two_units(r, f1, f2)
   return one_unit(r, f1), one_unit(r, f2)
-end
-
-function setup()
-    eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("rules.ship.storms", "0")
 end
 
 function test_learn()

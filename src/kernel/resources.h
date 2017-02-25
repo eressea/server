@@ -15,6 +15,9 @@
 extern "C" {
 #endif
 
+    struct building_type;
+    struct race;
+
     enum {
         RM_USED = 1 << 0,           /* resource has been used */
         RM_MALLORN = 1 << 1         /* this is not wood. it's mallorn */
@@ -40,17 +43,31 @@ extern "C" {
         struct rawmaterial *next;
     } rawmaterial;
 
+    typedef int(*rlimit_limit) (const struct region * r,
+        const struct resource_type * rtype);
+    typedef void(*rlimit_produce) (struct region * r,
+        const struct resource_type * rtype, int n);
+
+    typedef struct resource_mod {
+        variant value;
+        const struct building_type *btype;
+        const struct race *race;
+        unsigned int flags;
+    } resource_mod;
+
+    typedef struct resource_limit {
+        rlimit_limit limit;
+        rlimit_produce produce;
+        resource_mod *modifiers;
+    } resource_limit;
+
     typedef struct rawmaterial_type {
-        char *name;
         const struct resource_type *rtype;
 
         void(*terraform) (struct rawmaterial *, const struct region *);
         void(*update) (struct rawmaterial *, const struct region *);
         void(*use) (struct rawmaterial *, const struct region *, int amount);
         int(*visible) (const struct rawmaterial *, int skilllevel);
-
-        /* no initialization required */
-        struct rawmaterial_type *next;
     } rawmaterial_type;
 
     extern struct rawmaterial_type *rawmaterialtypes;
@@ -64,8 +81,7 @@ extern "C" {
 
     void add_resource(struct region *r, int level, int base, int divisor,
         const struct resource_type *rtype);
-    struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
-        const char *name);
+    struct rawmaterial_type *rmt_create(struct resource_type *rtype);
 
 #ifdef __cplusplus
 }

@@ -163,8 +163,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
-    CuAssertIntEquals(tc, 100, rc->magres);
-    CuAssertDblEquals(tc, 1.0, rc_magres(rc), 0.0);
+    CuAssertTrue(tc, frac_equal(frac_one, rc->magres));
     CuAssertIntEquals(tc, 200, rc->maxaura);
     CuAssertDblEquals(tc, 2.0, rc_maxaura(rc), 0.0);
     CuAssertDblEquals(tc, 3.0, rc->regaura, 0.0);

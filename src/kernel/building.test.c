@@ -376,13 +376,12 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertTrue(tc, !btype->name);
     CuAssertTrue(tc, !btype->init);
     CuAssertTrue(tc, !btype->age);
-    CuAssertTrue(tc, !btype->protection);
     CuAssertTrue(tc, !btype->taxes);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, -1, btype->maxsize);
     CuAssertIntEquals(tc, 1, btype->capacity);
     CuAssertIntEquals(tc, -1, btype->maxcapacity);
-    CuAssertIntEquals(tc, 0, btype->magres);
+    CuAssertIntEquals(tc, 0, btype->magres.sa[0]);
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
     CuAssertIntEquals(tc, 0, btype->flags);
@@ -515,6 +514,31 @@ static void test_cmp_castle_size(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_building_effsize(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    construction *cons;
+
+    test_setup();
+    btype = bt_get_or_create("castle");
+    cons = btype->construction = calloc(1, sizeof(construction));
+    cons->maxsize = 5;
+    cons = cons->improvement = calloc(1, sizeof(construction));
+    cons->maxsize = 5;
+    cons = cons->improvement = calloc(1, sizeof(construction));
+    cons->maxsize = -1;
+    b = test_create_building(test_create_region(0,0,0), btype);
+    b->size = 1;
+    CuAssertIntEquals(tc, 0, buildingeffsize(b, false));
+    b->size = 5;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b, false));
+    b->size = 10;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    b->size = 20;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -522,6 +546,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_register_building);
     SUITE_ADD_TEST(suite, test_btype_defaults);
     SUITE_ADD_TEST(suite, test_building_set_owner);
+    SUITE_ADD_TEST(suite, test_building_effsize);
     SUITE_ADD_TEST(suite, test_buildingowner_resets_when_empty);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_next_when_empty);
     SUITE_ADD_TEST(suite, test_buildingowner_goes_to_other_when_empty);

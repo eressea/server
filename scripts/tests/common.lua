@@ -438,10 +438,9 @@ function test_recruit()
   u:add_item("money", 110*n+20)
   u:add_order("REKRUTIERE " .. n)
   process_orders()
-  assert(u.number == n+1)
+  assert_equal(n+1, u.number)
   local p = r:get_resource("peasant")
-  assert(p<200 and p>=200-n)
-  -- assert(u:get_item("money")==10)
+  assert_true(p<200 and p>=200-n)
 end
 
 function test_produce()
@@ -468,7 +467,7 @@ function test_work()
   u:clear_orders()
   u:add_order("ARBEITEN")
   process_orders()
-  assert(u:get_item("money")>=10)
+  assert_equal(20, u:get_item("money"))
 end
 
 function test_upkeep()
@@ -480,7 +479,7 @@ function test_upkeep()
     u:clear_orders()
     u:add_order("LERNE Waffenbau")
     process_orders()
-    assert(u:get_item("money")==u.number)
+    assert_equal(u:get_item("money"), u.number)
 end
 
 function test_id()
@@ -488,50 +487,39 @@ function test_id()
 
   local f = faction.create("noreply11@eressea.de", "human", "de")
   f.id = atoi36("42")
-  assert(get_faction(42)~=f)
-  assert(get_faction("42")==f)
-  assert(get_faction(atoi36("42"))==f)
+  assert_not_equal(f, get_faction(42))
+  assert_equal(f, get_faction("42"))
+  assert_equal(f, get_faction(atoi36("42")))
 
   local u = unit.create(f, r, 1)
   u.id = atoi36("42")
-  assert(get_unit(42)~=u)
-  assert(get_unit("42")==u)
-  assert(get_unit(atoi36("42"))==u)
+  assert_not_equal(get_unit(42), u)
+  assert_equal(get_unit("42"), u)
+  assert_equal(get_unit(atoi36("42")), u)
 
   local b = building.create(r, "castle")
   -- <not working> b.id = atoi36("42")
   local fortytwo = itoa36(b.id)
-  assert(get_building(fortytwo)==b)
-  assert(get_building(atoi36(fortytwo))==b)
+  assert_equal(get_building(fortytwo), b)
+  assert_equal(get_building(atoi36(fortytwo)), b)
 
   local s = _test_create_ship(r)
   assert_not_nil(s)
   -- <not working> s.id = atoi36("42")
   local fortytwo = itoa36(s.id)
-  assert(get_ship(fortytwo)==s)
-  assert(get_ship(atoi36(fortytwo))==s)
-end
-
-function test_herbalism()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply12@eressea.de", "human", "de")
-  local u = unit.create(f, r, 1)
-  u:add_item("money", u.number * 100)
-  u:set_skill("herbalism", 5)
-  u:clear_orders()
-  u:add_order("MACHE Samen")
-  process_orders()
+  assert_equal(get_ship(fortytwo), s)
+  assert_equal(get_ship(atoi36(fortytwo)), s)
 end
 
 function test_mallorn()
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- not mallorn
     r:set_resource("tree", 100)
-    assert(r:get_resource("tree")==100)
+    assert_equal(100, r:get_resource("tree"))
     local m = region.create(0, 0, "plain")
     m:set_flag(1, true) -- mallorn
     m:set_resource("tree", 100)
-    assert(m:get_resource("tree")==100)
+    assert_equal(100, m:get_resource("tree"))
 
     local f = faction.create("noreply13@eressea.de", "human", "de")
 

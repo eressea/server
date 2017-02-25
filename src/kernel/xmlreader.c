@@ -61,6 +61,19 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 #ifdef USE_LIBXML2
+
+static variant xml_fraction(xmlNodePtr node, const char *name) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
+    if (propValue != NULL) {
+        int num, den = 100;
+        double fval = atof((const char *)propValue);
+        num = (int)(fval * den + 0.5);
+        xmlFree(propValue);
+        return frac_make(num, den);
+    }
+    return frac_make(0, 1);
+}
+
 static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
 {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");
@@ -167,9 +180,6 @@ construction ** consPtr)
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
-        con->defense_bonus = xml_ivalue(node, "defense_bonus", 0);
-        con->close_combat_bonus = xml_ivalue(node, "close_combat_bonus", 0);
-        con->ranged_bonus = xml_ivalue(node, "ranged_bonus", 0);
 
         propValue = xmlGetProp(node, BAD_CAST "building");
         if (propValue != NULL) {
@@ -248,7 +258,7 @@ static int parse_buildings(xmlDocPtr doc)
             btype->maxcapacity = xml_ivalue(node, "maxcapacity", btype->maxcapacity);
             btype->maxsize = xml_ivalue(node, "maxsize", btype->maxsize);
 
-            btype->magres = xml_ivalue(node, "magres", btype->magres);
+            btype->magres = frac_make(xml_ivalue(node, "magres", 0), 100);
             btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
             btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
             btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
@@ -300,9 +310,6 @@ static int parse_buildings(xmlDocPtr doc)
                 }
                 else if (strcmp((const char *)propValue, "age") == 0) {
                     btype->age = (void(*)(struct building *))fun;
-                }
-                else if (strcmp((const char *)propValue, "protection") == 0) {
-                    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))fun;
                 }
                 else if (strcmp((const char *)propValue, "taxes") == 0) {
                     btype->taxes = (double(*)(const struct building *, int))fun;
@@ -588,7 +595,7 @@ static armor_type *xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
     unsigned int flags = ATF_NONE;
     int ac = xml_ivalue(node, "ac", 0);
     double penalty = xml_fvalue(node, "penalty", 0.0);
-    double magres = xml_fvalue(node, "magres", 0.0);
+    variant magres = xml_fraction(node, "magres");
 
     if (xml_bvalue(node, "laen", false))
         flags |= ATF_LAEN;
@@ -613,7 +620,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     int offmod = xml_ivalue(node, "offmod", 0);
     int defmod = xml_ivalue(node, "defmod", 0);
     int reload = xml_ivalue(node, "reload", 0);
-    double magres = xml_fvalue(node, "magres", 0.0);
+    variant magres = xml_fraction(node, "magres");
 
     if (xml_bvalue(node, "armorpiercing", false))
         flags |= WTF_ARMORPIERCING;
@@ -905,22 +912,6 @@ static int parse_rules(xmlDocPtr doc)
     return 0;
 }
 
-static int gcd(int num, int den) {
-    const int primes[] = { 3, 5, 7, 11, 0 };
-    int i=0, g = 1, p = 2;
-    while (p && p<=den && p<=num) {
-        if (num % p == 0 && den % p == 0) {
-            num /= p;
-            den /= p;
-            g *= p;
-        }
-        else {
-            p = primes[i++];
-        }
-    }
-    return g;
-}
-
 static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -955,12 +946,6 @@ static int parse_resources(xmlDocPtr doc)
         rtype->flags |= flags;
         xmlFree(name);
 
-        name = xmlGetProp(node, BAD_CAST "material");
-        if (name) {
-            rmt_create(rtype, (const char *)name);
-            xmlFree(name);
-        }
-
         /* reading eressea/resources/resource/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
@@ -993,18 +978,18 @@ static int parse_resources(xmlDocPtr doc)
             }
         xmlXPathFreeObject(result);
 
+        if (xml_bvalue(node, "material", false)) {
+            rmt_create(rtype);
+        }
+
         /* reading eressea/resources/resource/resourcelimit */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "resourcelimit", xpath);
         assert(result->nodesetval->nodeNr <= 1);
         if (result->nodesetval->nodeNr != 0) {
-            resource_limit *rdata;
-            attrib *a = a_find(rtype->attribs, &at_resourcelimit);
+            resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
             xmlNodePtr limit = result->nodesetval->nodeTab[0];
 
-            if (a == NULL)
-                a = a_add(&rtype->attribs, a_new(&at_resourcelimit));
-            rdata = (resource_limit *)a->data.v;
             rtype->flags |= RTF_LIMITED;
             xpath->node = limit;
             xmlXPathFreeObject(result);
@@ -1041,15 +1026,7 @@ static int parse_resources(xmlDocPtr doc)
                         rdata->modifiers[k].flags = RMF_SKILL;
                     }
                     else if (strcmp((const char *)propValue, "material") == 0) {
-                        int g, num, den = 100;
-                        double fval = xml_fvalue(node, "value", 0);
-                        /* TODO: extract into a function for reading fractions? */
-                        num = (int)(fval * den + 0.5);
-                        g = gcd(num, den);
-                        num /= g;
-                        den /= g;
-                        rdata->modifiers[k].value.sa[0] = (short)num;
-                        rdata->modifiers[k].value.sa[1] = (short)den;
+                        rdata->modifiers[k].value = xml_fraction(node, "value");
                         rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
                     }
                     else if (strcmp((const char *)propValue, "require") == 0) {
@@ -1071,7 +1048,7 @@ static int parse_resources(xmlDocPtr doc)
 
             /* reading eressea/resources/resource/resourcelimit/function */
             result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-            if (result->nodesetval != NULL)
+            if (result->nodesetval != NULL) {
                 for (k = 0; k != result->nodesetval->nodeNr; ++k) {
                     xmlNodePtr node = result->nodesetval->nodeTab[k];
                     pf_generic fun;
@@ -1099,9 +1076,9 @@ static int parse_resources(xmlDocPtr doc)
                     }
                     xmlFree(propValue);
                 }
+            }
         }
         xmlXPathFreeObject(result);
-
         /* reading eressea/resources/resource/resourcelimit/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
@@ -1129,7 +1106,6 @@ static int parse_resources(xmlDocPtr doc)
 
     /* make sure old items (used in requirements) are available */
     init_resources();
-    init_itemtypes();
 
     return 0;
 }
@@ -1634,7 +1610,7 @@ static int parse_races(xmlDocPtr doc)
         rc->def_damage = strdup((const char *)propValue);
         xmlFree(propValue);
 
-        rc->magres = xml_ivalue(node, "magres", rc->magres);
+        rc->magres = frac_make(xml_ivalue(node, "magres", 100), 100);
         rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); /* TODO: store as int in XML */
         rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); /* TODO: store as int in XML */
         rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);

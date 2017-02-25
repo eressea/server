@@ -275,7 +275,7 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 }
 
 weapon_type *new_weapontype(item_type * itype,
-    int wflags, double magres, const char *damage[], int offmod, int defmod,
+    int wflags, variant magres, const char *damage[], int offmod, int defmod,
     int reload, skill_t sk, int minskill)
 {
     weapon_type *wtype;
@@ -301,7 +301,7 @@ weapon_type *new_weapontype(item_type * itype,
     return wtype;
 }
 
-armor_type *new_armortype(item_type * itype, double penalty, double magres,
+armor_type *new_armortype(item_type * itype, double penalty, variant magres,
     int prot, unsigned int flags)
 {
     armor_type *atype;
@@ -1159,22 +1159,6 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     return 0;
 }
 
-static void init_resourcelimit(attrib * a)
-{
-    a->data.v = calloc(sizeof(resource_limit), 1);
-}
-
-static void finalize_resourcelimit(attrib * a)
-{
-    free(a->data.v);
-}
-
-attrib_type at_resourcelimit = {
-    "resourcelimit",
-    init_resourcelimit,
-    finalize_resourcelimit,
-};
-
 item *item_spoil(const struct race *rc, int size)
 {
     item *itm = NULL;
@@ -1257,6 +1241,9 @@ void free_rtype(resource_type *rtype) {
     }
     if (rtype->itype) {
         free_itype(rtype->itype);
+    }
+    if (rtype->raw) {
+        free(rtype->raw);
     }
     free(rtype->_name);
     free(rtype);

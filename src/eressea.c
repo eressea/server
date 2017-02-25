@@ -21,7 +21,9 @@
 #include <kernel/xmlreader.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
-#include <items/itemtypes.h>
+#include <items/xerewards.h>
+#include <items/weapons.h>
+
 #include <attributes/attributes.h>
 #include <util/message.h>
 #include <races/races.h>
@@ -81,7 +83,8 @@ void game_init(void)
 #endif
     wormholes_register();
 
-    register_itemtypes();
+    register_weapons();
+    register_xerewards();
 #ifdef USE_LIBXML2
     register_xmlreader();
 #endif

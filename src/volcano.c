@@ -80,7 +80,6 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     int *hp, hpstack[20];
     int h;
     int i, dead = 0, hp_rem = 0, heiltrank;
-    double magres = magic_resistance(u);
 
     assert(u->number);
     if (fval(u_race(u), RCF_ILLUSIONARY) || u_race(u) == get_race(RC_SPELL)) {
@@ -105,10 +104,14 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     /* Schaden */
     for (i = 0; i < u->number; i++) {
         int damage = dice_rand(dam);
-        if (magic)
-            damage = (int)(damage * (1.0 - magres));
-        if (physical)
+        if (magic) {
+            variant magres = magic_resistance(u);
+            magres = frac_sub(frac_make(1, 1), magres);
+            damage = damage * magres.sa[0] / magres.sa[1];
+        }
+        if (physical) {
             damage -= nb_armor(u, i);
+        }
         hp[i] -= damage;
     }
 

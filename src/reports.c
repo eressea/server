@@ -412,32 +412,32 @@ const faction * viewer, bool see_unit)
         if (money) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_money", money, -1);
+            report_resource(result + n, "money", money, -1);
             ++n;
         }
         if (peasants) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_peasant", peasants, -1);
+            report_resource(result + n, "peasant", peasants, -1);
             ++n;
         }
         if (horses) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_horse", horses, -1);
+            report_resource(result + n, "horse", horses, -1);
             ++n;
         }
         if (saplings) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "rm_mallornsapling" : "rm_sapling",
+            report_resource(result + n, mallorn ? "mallornsapling" : "sapling",
                 saplings, -1);
             ++n;
         }
         if (trees) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "rm_mallorn" : "rm_tree", trees,
+            report_resource(result + n, mallorn ? "mallorn" : "tree", trees,
                 -1);
             ++n;
         }
@@ -469,7 +469,7 @@ const faction * viewer, bool see_unit)
             if (level >= 0 && visible >= 0) {
                 if (n >= size)
                     return -1;
-                report_resource(result + n, res->type->name, visible, level);
+                report_resource(result + n, res->type->rtype->_name, visible, level);
                 n++;
             }
             res = res->next;

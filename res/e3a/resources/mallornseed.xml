@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<resource name="mallornseed" limited="yes">
+<resource name="mallornseed">
   <item weight="10" score="100"/>
 </resource>
