@@ -25,6 +25,7 @@ end
 
 function use_stardust(u, amount)
   local p = u.region:get_resource("peasant")
+  assert(p>0)
   p = math.ceil(1.5 * p)
   u.region:set_resource("peasant", p)
   local msg = usepotion_message(u, "stardust")
