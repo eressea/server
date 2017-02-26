@@ -930,7 +930,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
      * Materialverbrauch hat: */
     assert(itype != NULL && (itype->construction == NULL
         || itype->construction->materials == NULL));
-    assert(rdata != NULL);
 
     if (!rtype->raw) {
         int avail = limit_resource(r, rtype);
@@ -945,7 +944,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         return;
     }
 
-    if (rdata->modifiers) {
+    if (rdata && rdata->modifiers) {
         message *msg = get_modifiers(u, rdata->modifiers, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);

@@ -4,8 +4,4 @@
     <construction skill="training" minskill="1"/>
     <function name="give" value="givehorses"/>
   </item>
-  <resourcelimit>
-    <function name="produce" value="lua_produceresource"/>
-    <function name="limit" value="lua_limitresource"/>
-  </resourcelimit>
 </resource>

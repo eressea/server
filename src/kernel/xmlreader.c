@@ -980,6 +980,9 @@ static int parse_resources(xmlDocPtr doc)
             rmt_create(rtype);
         }
 
+        if (xml_bvalue(node, "limited", false)) {
+            rtype->flags |= RTF_LIMITED;
+        }
         /* reading eressea/resources/resource/resourcelimit */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "resourcelimit", xpath);
@@ -988,7 +991,6 @@ static int parse_resources(xmlDocPtr doc)
             resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
             xmlNodePtr limit = result->nodesetval->nodeTab[0];
 
-            rtype->flags |= RTF_LIMITED;
             xpath->node = limit;
             xmlXPathFreeObject(result);
 

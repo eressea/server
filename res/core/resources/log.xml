@@ -1,12 +1,10 @@
 <?xml version="1.0"?>
-<resource name="log">
+<resource name="log" limited="yes">
   <item weight="500" score="10">
     <construction skill="forestry" minskill="1"/>
   </item>
   <resourcelimit>
     <modifier building="sawmill" type="skill" value="1"/>
     <modifier building="sawmill" type="material" value="0.5"/>
-    <function name="produce" value="lua_produceresource"/>
-    <function name="limit" value="lua_limitresource"/>
   </resourcelimit>
 </resource>
