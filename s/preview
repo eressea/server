@@ -27,7 +27,7 @@ git fetch || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
 git pull
 git submodule update
-s/build || abort "build failed."
+s/build > /dev/null || abort "build failed."
 }
 
 function assert_file() {
