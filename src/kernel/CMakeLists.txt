@@ -54,6 +54,7 @@ pool.c
 race.c
 region.c
 resources.c
+rules.c
 save.c
 ship.c
 skills.c
