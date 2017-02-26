@@ -25,9 +25,9 @@ cd $SOURCE
 rm -rf crypto tolua
 git fetch || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
-git pull
+git pull -q
 git submodule update
-s/build || abort "build failed."
+s/build > /dev/null || abort "build failed."
 }
 
 function assert_file() {
@@ -79,7 +79,7 @@ SUPP="$SOURCE/share/debian-7_8.supp"
 SERVER="$SOURCE/Debug/eressea/eressea"
 VALGRIND=$(which valgrind)
 if [ ! -z $VALGRIND ]; then
-SERVER="$VALGRIND --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
+SERVER="$VALGRIND --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
 $SERVER -v$verbose -t$turn $SOURCE/scripts/run-turn.lua
 let turn=$turn+1
@@ -160,7 +160,7 @@ case "$1" in
   done
   if [ $sent -eq 0 ]; then
     if [ -e ../$factions ]; then
-      for faction in $(cat ../$factions) ; do
+      for faction in $(grep -v -E '^#' ../$factions) ; do
         send $faction
       done
     fi
