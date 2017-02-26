@@ -230,6 +230,30 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
+function test_foolpotion()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("p7", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Dumpfbackenbrot 4242")
+    process_orders()
+    assert_equal(1, u:get_item("p7"))
+    assert_equal(1, f:count_msg_type('feedback_unit_not_found'))
+    local u2 = unit.create(f, r, 1)
+    
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Dumpfbackenbrot " .. itoa36(u2.id))
+    process_orders()
+    assert_equal(1, u:get_item("p7"))
+    assert_equal(1, f:count_msg_type('error64'))
+
+    u:set_skill("stealth", 1);
+    process_orders()
+    assert_equal(0, u:get_item("p7"))
+    assert_equal(1, f:count_msg_type('givedumb'))
+end
+
 function test_snowman()
     local r = region.create(0, 0, "glacier")
     local f = faction.create("noreply@eressea.de", "human", "de")

@@ -820,9 +820,8 @@ struct order *ord)
     return 0;
 }
 
-static int
-use_warmthpotion(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
+static int use_warmthpotion(unit *u, const item_type *itype,
+    int amount, struct order *ord)
 {
     if (u->faction->race == get_race(RC_INSECT)) {
         fset(u, UFL_WARMTH);
@@ -841,10 +840,10 @@ struct order *ord)
     return 0;
 }
 
-static int
-use_foolpotion(struct unit *u, int targetno, const struct item_type *itype,
-int amount, struct order *ord)
+static int use_foolpotion(unit *u, const item_type *itype, int amount,
+    struct order *ord)
 {
+    int targetno = read_unitid(u->faction, u->region);
     unit *target = findunit(targetno);
     if (target == NULL || u->region != target->region) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
@@ -1295,7 +1294,7 @@ void register_resources(void)
     register_item_use(use_warmthpotion, "usewarmthpotion");
     register_item_use(use_bloodpotion, "usebloodpotion");
     register_item_use(use_healingpotion, "usehealingpotion");
-    register_item_useonother(use_foolpotion, "usefoolpotion");
+    register_item_use(use_foolpotion, "usefoolpotion");
     register_item_use(use_mistletoe, "usemistletoe");
     register_item_use(use_magicboost, "usemagicboost");
     register_item_use(use_snowball, "usesnowball");

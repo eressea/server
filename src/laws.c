@@ -3242,11 +3242,6 @@ void update_long_order(unit * u)
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
-    int target = -1;
-
-    if (itype->useonother) {
-        target = read_unitid(u->faction, u->region);
-    }
 
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
     if (amount > i) {
@@ -3257,19 +3252,14 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
         return ENOITEM;
     }
 
-    if (target == -1) {
-        if (itype->use) {
-            int result = itype->use(u, itype, amount, ord);
-            if (result > 0) {
-                use_pooled(u, itype->rtype, GET_DEFAULT, result);
-            }
-            return result;
+    if (itype->use) {
+        int result = itype->use(u, itype, amount, ord);
+        if (result > 0) {
+            use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }
-        return EUNUSABLE;
+        return result;
     }
-    else {
-        return itype->useonother(u, target, itype, amount, ord);
-    }
+    return EUNUSABLE;
 }
 
 void monthly_healing(void)
