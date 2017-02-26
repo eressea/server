@@ -27,6 +27,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/faction.h>
 #include <kernel/spell.h>
 #include <kernel/race.h>
+#include <kernel/resources.h>
 #include <kernel/unit.h>
 #include <kernel/building.h>
 #include <kernel/item.h>
@@ -78,7 +79,7 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
     return result;
 }
 
-static int limit_resource(const region * r, const resource_type * rtype)
+static int limit_resource_lua(const region * r, const resource_type * rtype)
 {
     char fname[64];
     int result = -1;
@@ -110,7 +111,7 @@ static int limit_resource(const region * r, const resource_type * rtype)
 }
 
 static void
-produce_resource(region * r, const resource_type * rtype, int norders)
+produce_resource_lua(region * r, const resource_type * rtype, int norders)
 {
     lua_State *L = (lua_State *)global.vm_state;
     char fname[64];
@@ -564,9 +565,7 @@ void register_tolua_helpers(void)
     register_function((pf_generic)lua_maintenance,
         TOLUA_CAST "lua_maintenance");
 
-    register_function((pf_generic)produce_resource,
-        TOLUA_CAST "lua_produceresource");
-    register_function((pf_generic)limit_resource,
-        TOLUA_CAST "lua_limitresource");
+    res_produce_fun = produce_resource_lua;
+    res_limit_fun = limit_resource_lua;
     register_item_give(lua_giveitem, TOLUA_CAST "lua_giveitem");
 }

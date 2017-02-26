@@ -933,8 +933,6 @@ static int parse_resources(xmlDocPtr doc)
 
         if (xml_bvalue(node, "pooled", true))
             flags |= RTF_POOLED;
-        if (xml_bvalue(node, "limited", false))
-            flags |= RTF_LIMITED;
 
         name = xmlGetProp(node, BAD_CAST "name");
         if (!name) {
@@ -1040,39 +1038,6 @@ static int parse_resources(xmlDocPtr doc)
                     }
                     else {
                         log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name);
-                    }
-                    xmlFree(propValue);
-                }
-            }
-            xmlXPathFreeObject(result);
-
-            /* reading eressea/resources/resource/resourcelimit/function */
-            result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-            if (result->nodesetval != NULL) {
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    pf_generic fun;
-
-                    propValue = xmlGetProp(node, BAD_CAST "value");
-                    assert(propValue != NULL);
-                    fun = get_function((const char *)propValue);
-                    if (fun == NULL) {
-                        log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
-                        xmlFree(propValue);
-                        continue;
-                    }
-                    xmlFree(propValue);
-
-                    propValue = xmlGetProp(node, BAD_CAST "name");
-                    assert(propValue != NULL);
-                    if (strcmp((const char *)propValue, "produce") == 0) {
-                        rdata->produce = (rlimit_produce)fun;
-                    }
-                    else if (strcmp((const char *)propValue, "limit") == 0) {
-                        rdata->limit = (rlimit_limit)fun;
-                    }
-                    else {
-                        log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
                     }
                     xmlFree(propValue);
                 }

@@ -69,6 +69,7 @@ const resource_type * rtype)
     rm->divisor = divisor;
     rm->flags = 0;
     rm->type = rmt_get(rtype);
+    assert(rm->type);
     update_resource(rm, 1.0);
     rm->type->terraform(rm, r);
 }
@@ -210,4 +211,24 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype)
     rmtype->use = use_default;
     rmtype->visible = visible_default;
     return rmtype;
+}
+
+int(*res_limit_fun)(const struct region *, const struct resource_type *);
+void(*res_produce_fun)(struct region *, const struct resource_type *, int);
+
+int limit_resource(const struct region *r, const resource_type *rtype)
+{
+    assert(!rtype->raw);
+    if (res_limit_fun) {
+        return res_limit_fun(r, rtype);
+    }
+    return -1;
+}
+
+void produce_resource(struct region *r, const struct resource_type *rtype, int amount)
+{
+    assert(!rtype->raw);
+    if (res_produce_fun) {
+        res_produce_fun(r, rtype, amount);
+    }
 }
