@@ -57,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <stream.h>
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -77,7 +77,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
-# pragma warning(disable: 4774) // TODO: remove this
+# pragma warning(disable: 4774) /* TODO: remove this */
 #endif
 
 #define SCALEWEIGHT      100    /* Faktor, um den die Anzeige von Gewichten skaliert wird */
@@ -123,13 +123,12 @@ const char *options[MAXOPTIONS] = {
 
 bool omniscient(const faction *f)
 {
-    static const race *rc_template, *rc_illusion;
+    static const race *rc_template;
     static int cache;
     if (rc_changed(&cache)) {
-        rc_illusion = get_race(RC_ILLUSION);
         rc_template = get_race(RC_TEMPLATE);
     }
-    return (f->race == rc_template || f->race == rc_illusion);
+    return (f->race == rc_template);
 }
 
 
@@ -157,7 +156,7 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
 
     if (!status) {
         const char *lname = locale_name(lang);
-        struct locale *wloc = get_or_create_locale(lname);
+        struct locale *wloc = get_locale(lname);
         log_warning("no translation for combat status %s in %s", combatstatus[u->status], lname);
         locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]+7);
         len = strlcpy(fsbuf, combatstatus[u->status]+7, buflen);
@@ -413,32 +412,32 @@ const faction * viewer, bool see_unit)
         if (money) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_money", money, -1);
+            report_resource(result + n, "money", money, -1);
             ++n;
         }
         if (peasants) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_peasant", peasants, -1);
+            report_resource(result + n, "peasant", peasants, -1);
             ++n;
         }
         if (horses) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, "rm_horse", horses, -1);
+            report_resource(result + n, "horse", horses, -1);
             ++n;
         }
         if (saplings) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "rm_mallornsapling" : "rm_sapling",
+            report_resource(result + n, mallorn ? "mallornsapling" : "sapling",
                 saplings, -1);
             ++n;
         }
         if (trees) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "rm_mallorn" : "rm_tree", trees,
+            report_resource(result + n, mallorn ? "mallorn" : "tree", trees,
                 -1);
             ++n;
         }
@@ -470,7 +469,7 @@ const faction * viewer, bool see_unit)
             if (level >= 0 && visible >= 0) {
                 if (n >= size)
                     return -1;
-                report_resource(result + n, res->type->name, visible, level);
+                report_resource(result + n, res->type->rtype->_name, visible, level);
                 n++;
             }
             res = res->next;
@@ -529,7 +528,7 @@ size_t size)
                 if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
                     faction *f = get_otherfaction(a_otherfaction);
                     int result =
-                        _snprintf(bufp, size, ", %s (%s)", factionname(f),
+                        snprintf(bufp, size, ", %s (%s)", factionname(f),
                         factionname(u->faction));
                     if (wrptr(&bufp, &size, result) != 0)
                         WARN_STATIC_BUFFER();
@@ -544,7 +543,7 @@ size_t size)
 
     bufp = STRLCPY(bufp, ", ", size);
 
-    if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d ", u->number)))
+    if (wrptr(&bufp, &size, snprintf(bufp, size, "%d ", u->number)))
         WARN_STATIC_BUFFER();
 
     pzTmp = get_racename(u->attribs);
@@ -641,7 +640,7 @@ size_t size)
         bufp = STRLCPY(bufp, ", ", size);
 
         if (!dh) {
-            result = _snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
+            result = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
             if (wrptr(&bufp, &size, result) != 0)
                 WARN_STATIC_BUFFER();
             dh = 1;
@@ -650,7 +649,7 @@ size_t size)
             bufp = STRLCPY(bufp, ic, size);
         }
         else {
-            if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d %s", in, ic)))
+            if (wrptr(&bufp, &size, snprintf(bufp, size, "%d %s", in, ic)))
                 WARN_STATIC_BUFFER();
         }
     }
@@ -659,19 +658,19 @@ size_t size)
         spellbook *book = unit_get_spellbook(u);
 
         if (book) {
-            quicklist *ql = book->spells;
+            selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
-            int result = _snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+            int result = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
             if (wrptr(&bufp, &size, result) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
-            for (header = 0, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-                spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+            for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+                spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 if (sbe->level <= maxlevel) {
                     int result = 0;
                     if (!header) {
-                        result = _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        result = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
                         header = 1;
                     }
                     else {
@@ -680,6 +679,7 @@ size_t size)
                     if (wrptr(&bufp, &size, result) != 0) {
                         WARN_STATIC_BUFFER();
                     }
+                    /* TODO: no need to deref the spellref here (spref->name is good) */
                     bufp = STRLCPY(bufp, spell_name(sbe->sp, f->locale), size);
                 }
             }
@@ -690,7 +690,7 @@ size_t size)
             }
             if (i != MAXCOMBATSPELLS) {
                 int result =
-                    _snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
+                    snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
                 if (wrptr(&bufp, &size, result) != 0)
                     WARN_STATIC_BUFFER();
 
@@ -708,7 +708,7 @@ size_t size)
                         int sl = get_combatspelllevel(u, i);
                         bufp = STRLCPY(bufp, spell_name(sp, u->faction->locale), size);
                         if (sl > 0) {
-                            result = _snprintf(bufp, size, " (%d)", sl);
+                            result = snprintf(bufp, size, " (%d)", sl);
                             if (wrptr(&bufp, &size, result) != 0)
                                 WARN_STATIC_BUFFER();
                         }
@@ -819,13 +819,13 @@ const struct unit * u, struct skill * sv, int *dh, int days)
     if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
         i = u_geteffstealth(u);
         if (i >= 0) {
-            if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d/", i)) != 0)
+            if (wrptr(&bufp, &size, snprintf(bufp, size, "%d/", i)) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
 
     effsk = eff_skill(u, sv, 0);
-    if (wrptr(&bufp, &size, _snprintf(bufp, size, "%d", effsk)) != 0)
+    if (wrptr(&bufp, &size, snprintf(bufp, size, "%d", effsk)) != 0)
         WARN_STATIC_BUFFER();
 
     if (u->faction->options & want(O_SHOWSKCHANGE)) {
@@ -836,11 +836,11 @@ const struct unit * u, struct skill * sv, int *dh, int days)
             oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
         }
 
-        oldeff = _max(0, oldeff);
+        oldeff = MAX(0, oldeff);
         diff = effsk - oldeff;
 
         if (diff != 0) {
-            if (wrptr(&bufp, &size, _snprintf(bufp, size, " (%s%d)", (diff > 0) ? "+" : "", diff)) != 0)
+            if (wrptr(&bufp, &size, snprintf(bufp, size, " (%s%d)", (diff > 0) ? "+" : "", diff)) != 0)
                 WARN_STATIC_BUFFER();
         }
     }
@@ -849,12 +849,8 @@ const struct unit * u, struct skill * sv, int *dh, int days)
 
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
-
-    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
-    * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
-    * Vgl. spunit (). */
     bool firstline;
-    static char buf[REPORTWIDTH + 1]; // FIXME: static buffer, artificial limit
+    static char buf[REPORTWIDTH + 1]; /* FIXME: static buffer, artificial limit */
     size_t len = strlen(s);
 
     assert(width <= REPORTWIDTH);
@@ -881,11 +877,11 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
             firstline = false;
         }
         if (!cut) {
-            cut = s + _min(len, REPORTWIDTH);
+            cut = s + MIN(len, REPORTWIDTH);
         }
-        strncpy(buf + indent, s, cut - s);
+        memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
-        addstrlist(SP, buf); // TODO: too much string copying, cut out this function
+        addstrlist(SP, buf); /* TODO: too much string copying, cut out this function */
         while (*cut == ' ') {
             ++cut;
         }
@@ -973,8 +969,7 @@ int stealth_modifier(seen_mode mode)
     }
 }
 
-void transfer_seen(quicklist ** dst, quicklist ** src)
-{
+static void transfer_seen(selist ** dst, selist ** src) {
     assert(!*dst);
     *dst = *src;
     *src = NULL;
@@ -988,8 +983,8 @@ int cmp_faction(const void *lhs, const void *rhs) {
     return -1;
 }
 
-static void add_seen_faction_i(struct quicklist **flist, faction *f) {
-    ql_set_insert_ex(flist, f, cmp_faction);
+static void add_seen_faction_i(struct selist **flist, faction *f) {
+    selist_set_insert(flist, f, cmp_faction);
 }
 
 void add_seen_faction(faction *self, faction *seen) {
@@ -998,7 +993,7 @@ void add_seen_faction(faction *self, faction *seen) {
 
 typedef struct address_data {
     faction *f, *lastf;
-    quicklist **flist;
+    selist **flist;
     int stealthmod;
 } address_data;
 
@@ -1020,8 +1015,8 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
     }
 }
 
-static void add_travelthru_addresses(region *r, faction *f, quicklist **flist, int stealthmod) {
-    // for each traveling unit: add the faction of any unit is can see
+static void add_travelthru_addresses(region *r, faction *f, selist **flist, int stealthmod) {
+    /* for each traveling unit: add the faction of any unit is can see */
     address_data cbdata = { 0 };
     cbdata.f = f;
     cbdata.flist = flist;
@@ -1034,18 +1029,18 @@ static void get_addresses(report_context * ctx)
     /* "TODO: travelthru" */
     region *r;
     const faction *lastf = NULL;
-    quicklist *flist = 0;
+    selist *flist = 0;
 
     transfer_seen(&flist, &ctx->f->seen_factions);
 
     ctx->f->seen_factions = NULL; /* do not delete it twice */
-    ql_push(&flist, ctx->f);
+    selist_push(&flist, ctx->f);
 
     if (f_get_alliance(ctx->f)) {
-        quicklist *ql = ctx->f->alliance->members;
+        selist *ql = ctx->f->alliance->members;
         int qi;
-        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            add_seen_faction_i(&flist, (faction *)ql_get(ql, qi));
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            add_seen_faction_i(&flist, (faction *)selist_get(ql, qi));
         }
     }
 
@@ -1130,31 +1125,31 @@ void reports_done(void) {
     }
 }
 
-static quicklist *get_regions_distance(region * root, int radius)
+static selist *get_regions_distance(region * root, int radius)
 {
-    quicklist *ql, *rlist = NULL;
+    selist *ql, *rlist = NULL;
     int qi = 0;
 
-    ql_push(&rlist, root);
+    selist_push(&rlist, root);
     fset(root, RF_MARK);
     ql = rlist;
 
     while (ql) {
-        region *r = (region *)ql_get(ql, qi);
+        region *r = (region *)selist_get(ql, qi);
         region * next[MAXDIRECTIONS];
         int d;
         get_neighbours(r, next);
 
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (next[d] && !fval(next[d], RF_MARK) && distance(next[d], root) <= radius) {
-                ql_push(&rlist, next[d]);
+                selist_push(&rlist, next[d]);
                 fset(next[d], RF_MARK);
             }
         }
-        ql_advance(&ql, &qi, 1);
+        selist_advance(&ql, &qi, 1);
     }
-    for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        region *r = (region *)ql_get(ql, qi);
+    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        region *r = (region *)selist_get(ql, qi);
         freset(r, RF_MARK);
     }
     return rlist;
@@ -1190,16 +1185,16 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
  */
 static void prepare_lighthouse(faction *f, region *r, int range)
 {
-    quicklist *ql, *rlist = get_regions_distance(r, range);
+    selist *ql, *rlist = get_regions_distance(r, range);
     int qi;
 
-    for (ql = rlist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        region *rl = (region *)ql_get(ql, qi);
+    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        region *rl = (region *)selist_get(ql, qi);
         if (!fval(rl->terrain, FORBIDDEN_REGION)) {
             add_seen_nb(f, rl, seen_lighthouse);
         }
     }
-    ql_free(rlist);
+    selist_free(rlist);
 }
 
 void reorder_units(region * r)
@@ -1340,11 +1335,19 @@ void prepare_report(report_context *ctx, faction *f)
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
 
+    if (f->age<=2) {
+        if ((f->flags&FFL_PWMSG)==0) {
+            /* TODO: this assumes unencrypted passwords */
+            f->flags |= FFL_PWMSG;
+            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
+        }
+    }
+
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
     ctx->userdata = NULL;
-    // [first,last) interval of regions with a unit in it:
+    /* [first,last) interval of regions with a unit in it: */
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
 
@@ -1384,16 +1387,16 @@ void prepare_report(report_context *ctx, faction *f)
             travelthru_map(r, cb_add_seen, f);
         }
     }
-    // [fast,last) interval of seen regions (with lighthouses and travel)
-    // TODO: what about neighbours? when are they included? do we need
-    // them outside of the CR?
+    /* [fast,last) interval of seen regions (with lighthouses and travel)
+     * TODO: what about neighbours? when are they included? do we need
+     * them outside of the CR? */
     ctx->first = firstregion(f);
     ctx->last = lastregion(f);
 }
 
 void finish_reports(report_context *ctx) {
     region *r;
-    ql_free(ctx->addresses);
+    selist_free(ctx->addresses);
     for (r = ctx->first; r != ctx->last; r = r->next) {
         r->seen.mode = seen_none;
     }
@@ -1416,7 +1419,7 @@ int write_reports(faction * f, time_t ltime)
             int error = 0;
             do {
                 char filename[32];
-                char path[MAX_PATH];
+                char path[4096];
                 sprintf(filename, "%d-%s.%s", turn, itoa36(f->no),
                     rtype->extension);
                 join_path(reportpath(), filename, path, sizeof(path));
@@ -1486,7 +1489,7 @@ int reports(void)
     FILE *mailit;
     time_t ltime = time(NULL);
     int retval = 0;
-    char path[MAX_PATH];
+    char path[4096];
     const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
@@ -1513,7 +1516,7 @@ int reports(void)
 
 static variant var_copy_string(variant x)
 {
-    x.v = x.v ? _strdup((const char *)x.v) : 0;
+    x.v = x.v ? strdup((const char *)x.v) : 0;
     return x;
 }
 
@@ -1578,7 +1581,7 @@ static void var_free_resources(variant x)
     x.v = 0;
 }
 
-static void var_free_regions(variant x) //-V524
+static void var_free_regions(variant x) /*-V524 */
 {
     free(x.v);
 }
@@ -1617,7 +1620,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(f, &nx, &ny, pl);
         len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
-        _snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
+        snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;
         len = strlen(buffer);
     }
@@ -1626,7 +1629,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 
 static char *f_regionid_s(const region * r, const faction * f)
 {
-    static char buf[NAMESIZE + 20]; // FIXME: static return value
+    static char buf[NAMESIZE + 20]; /* FIXME: static return value */
 
     f_regionid(r, f, buf, sizeof(buf));
     return buf;
@@ -1685,11 +1688,10 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
         sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
-    assert(c || !"spell without description!");
-    size_t len = strlen(c);
     variant var;
 
-    var.v = strcpy(balloc(len + 1), c);
+    assert(c || !"spell without description!");
+    var.v = strcpy(balloc(strlen(c) + 1), c);
     opush(stack, var);
 }
 
@@ -1699,11 +1701,10 @@ static void eval_curse(struct opstack **stack, const void *userdata)
     const struct curse_type *sp = (const struct curse_type *)opop(stack).v;
     const char *c =
         sp ? curse_name(sp, f->locale) : LOC(f->locale, "an_unknown_curse");
-    assert(c || !"spell effect without description!");
-    size_t len = strlen(c);
     variant var;
 
-    var.v = strcpy(balloc(len + 1), c);
+    assert(c || !"spell effect without description!");
+    var.v = strcpy(balloc(strlen(c) + 1), c);
     opush(stack, var);
 }
 
@@ -1868,7 +1869,7 @@ static void eval_order(struct opstack **stack, const void *userdata)
     size_t len;
     variant var;
 
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     write_order(ord, buf, sizeof(buf));
     len = strlen(buf);
     var.v = strcpy(balloc(len + 1), buf);
@@ -1888,7 +1889,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     while (res != NULL && size > 4) {
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
-        int result = _snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
+        int result = snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
         if (wrptr(&bufp, &size, result) != 0 || size < sizeof(buf) / 2) {
             WARN_STATIC_BUFFER();
             break;
@@ -1911,23 +1912,23 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     const faction *report = (const faction *)userdata;
     int i = opop(stack).i;
     int end, begin = opop(stack).i;
-    const arg_regions *regions = (const arg_regions *)opop(stack).v;
+    const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[256];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
 
-    if (regions == NULL) {
+    if (aregs == NULL) {
         end = begin;
     }
     else {
         if (i >= 0)
             end = begin + i;
         else
-            end = regions->nregions + i;
+            end = aregs->nregions + i;
     }
     for (i = begin; i < end; ++i) {
-        const char *rname = (const char *)regionname(regions->regions[i], report);
+        const char *rname = (const char *)regionname(aregs->regions[i], report);
         bufp = STRLCPY(bufp, rname, size);
 
         if (i + 1 < end && size > 2) {
@@ -1941,29 +1942,36 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     opush(stack, var);
 }
 
+const char *get_mailcmd(const struct locale *loc)
+{
+    static char result[64]; /* FIXME: static return buffer */
+    snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
+    return result;
+}
+
 static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
     int i, end = 0, begin = 0;
-    const arg_regions *regions = (const arg_regions *)opop(stack).v;
+    const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[512];
     size_t size = sizeof(buf) - 1;
     variant var;
     char *bufp = buf;
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
-    /* stupid MS broke _snprintf */
+    /* stupid MS broke snprintf */
     int eold = errno;
 #endif
 
-    if (regions != NULL) {
-        end = regions->nregions;
+    if (aregs != NULL) {
+        end = aregs->nregions;
         for (i = begin; i < end; ++i) {
-            region *r = regions->regions[i];
+            region *r = aregs->regions[i];
             const char *trail = trailinto(r, lang);
             const char *rn = f_regionid_s(r, report);
 
-            if (wrptr(&bufp, &size, _snprintf(bufp, size, trail, rn)) != 0)
+            if (wrptr(&bufp, &size, snprintf(bufp, size, trail, rn)) != 0)
                 WARN_STATIC_BUFFER();
 
             if (i + 2 < end) {
@@ -2019,7 +2027,7 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 
     var.v = strcpy(balloc(len + 1), c);
     opush(stack, var);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 /*** END MESSAGE RENDERING ***/
@@ -2046,12 +2054,12 @@ int stream_printf(struct stream * out, const char *format, ...) {
     int result;
     char buffer[4096];
     size_t bytes = sizeof(buffer);
-    // TODO: should be in storage/stream.c (doesn't exist yet)
+    /* TODO: should be in storage/stream.c (doesn't exist yet) */
     va_start(args, format);
     result = vsnprintf(buffer, bytes, format, args);
     if (result >= 0 && (size_t)result < bytes) {
         bytes = (size_t)result;
-        // TODO: else = buffer too small
+        /* TODO: else = buffer too small */
     }
     out->api->write(out->handle, buffer, bytes);
     va_end(args);

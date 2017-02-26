@@ -31,21 +31,10 @@
 
 void age_firedragon(struct unit *u);
 void age_dragon(struct unit *u);
-void age_illusion(struct unit *u);
 void age_undead(struct unit *u);
 void age_skeleton(struct unit *u);
 void age_zombie(struct unit *u);
 void age_ghoul(struct unit *u);
-
-static void oldfamiliars(unit * u)
-{
-    char fname[64];
-    /* these familiars have no special skills.
-     */
-    _snprintf(fname, sizeof(fname), "%s_familiar", u_race(u)->_name);
-    create_mage(u, M_GRAY);
-    equip_unit(u, get_equipment(fname));
-}
 
 static void equip_newunits(const struct equipment *eq, struct unit *u)
 {
@@ -88,30 +77,17 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
     }
 }
 
-/* Die Funktionen werden über den hier registrierten Namen in races.xml
+/* Die Funktionen werden ï¿½ber den hier registrierten Namen in races.xml
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {
-    /* function initfamiliar */
-    register_function((pf_generic)oldfamiliars, "oldfamiliars");
-
-    register_function((pf_generic)allowed_dragon, "movedragon");
-
-    register_function((pf_generic)allowed_swim, "moveswimming");
-    register_function((pf_generic)allowed_fly, "moveflying");
-    register_function((pf_generic)allowed_walk, "movewalking");
+    register_function((pf_generic)equip_newunits, "equip_newunits");
 
     /* function age for race->age() */
-    register_function((pf_generic)age_undead, "ageundead");
-    register_function((pf_generic)age_illusion, "ageillusion");
-    register_function((pf_generic)age_skeleton, "ageskeleton");
-    register_function((pf_generic)age_zombie, "agezombie");
-    register_function((pf_generic)age_ghoul, "ageghoul");
-    register_function((pf_generic)age_dragon, "agedragon");
-    register_function((pf_generic)age_firedragon, "agefiredragon");
-
-    /* function itemdrop
-     * to generate battle spoils
-     * race->itemdrop() */
-    register_function((pf_generic)equip_newunits, "equip_newunits");
+    register_function((pf_generic)age_undead, "age_undead");
+    register_function((pf_generic)age_skeleton, "age_skeleton");
+    register_function((pf_generic)age_zombie, "age_zombie");
+    register_function((pf_generic)age_ghoul, "age_ghoul");
+    register_function((pf_generic)age_dragon, "age_dragon");
+    register_function((pf_generic)age_firedragon, "age_youngdragon");
 }

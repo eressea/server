@@ -70,7 +70,7 @@ static int changefaction_handle(trigger * t, void *data)
     else {
         log_error("could not perform changefaction::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 
@@ -92,7 +92,6 @@ static int changefaction_read(trigger * t, gamedata *data)
         return AT_READ_FAIL;
     }
     ur_add(var, &td->faction, resolve_faction);
-    // read_reference(&td->faction, store, read_faction_reference, resolve_faction);
     return AT_READ_OK;
 }
 

@@ -1,78 +1,9 @@
 <?xml version="1.0"?>
 <equipment>
 
-  <!-- equipment given to new units -->
-  <set name="new_demon_unit">
-    <!--skill name="stamina" level="6"/-->
-  </set>
-
-  <set name="new_troll_unit">
-    <!--skill name="stamina" level="2"/-->
-  </set>
-
   <set name="seaserpent_spoils">
     <item name="dragonblood" amount="2"/>
     <item name="seaserpenthead" amount="1"/>
-  </set>
-
-  <set name="goblin_1">
-    <skill name="melee" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="sword" amount="1"/>
-    <item name="shield" amount="1"/>
-    <item name="chainmail" amount="1"/>
-  </set>
-
-  <set name="troll_1">
-    <skill name="melee" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="sword" amount="1"/>
-    <item name="shield" amount="1"/>
-    <item name="plate" amount="1"/>
-  </set>
-
-  <set name="front_1">
-    <skill name="melee" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="sword" amount="1"/>
-    <item name="shield" amount="1"/>
-    <item name="plate" amount="1"/>
-  </set>
-
-  <set name="front_2">
-    <skill name="melee" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="sword" amount="1"/>
-    <item name="towershield" amount="1"/>
-    <item name="plate" amount="1"/>
-  </set>
-
-  <set name="rear_1">
-    <skill name="crossbow" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="crossbow" amount="1"/>
-    <item name="shield" amount="1"/>
-  </set>
-
-  <set name="rear_2">
-    <skill name="crossbow" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="crossbow" amount="1"/>
-    <item name="shield" amount="1"/>
-  </set>
-
-  <set name="dwarf_2">
-    <skill name="melee" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="sword" amount="1"/>
-    <item name="shield" amount="1"/>
-    <item name="plate" amount="1"/>
-  </set>
-
-  <set name="halfling_2">
-    <skill name="crossbow" level="7"/>
-    <skill name="stamina" level="3"/>
-    <item name="rep_crossbow" amount="1"/>
   </set>
 
 </equipment>

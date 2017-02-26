@@ -13,7 +13,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "bind_faction.h"
 #include "bind_unit.h"
-#include "bind_dict.h"
 #include "bindings.h"
 #include "helpers.h"
 
@@ -27,15 +26,16 @@ without prior permission by the authors of Eressea.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spellbook.h>
+#include <attributes/key.h>
 
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/password.h>
 
-#include <quicklist.h>
-
 #include <tolua.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct helpmode {
     const char *name;
@@ -242,6 +242,32 @@ static int tolua_faction_addnotice(lua_State * L)
     return 0;
 }
 
+static int tolua_faction_getkey(lua_State * L)
+{
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    int flag = atoi36(name);
+
+    lua_pushinteger(L, key_get(self->attribs, flag));
+    return 1;
+}
+
+static int tolua_faction_setkey(lua_State * L)
+{
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    int value = (int)tolua_tonumber(L, 3, 0);
+    int flag = atoi36(name);
+
+    if (value) {
+        key_set(&self->attribs, flag, value);
+    }
+    else {
+        key_unset(&self->attribs, flag);
+    }
+    return 0;
+}
+
 static int tolua_faction_count_msg_type(lua_State *L) {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char *str = tolua_tostring(L, 2, 0);
@@ -256,13 +282,6 @@ static int tolua_faction_count_msg_type(lua_State *L) {
         }
     }
     lua_pushinteger(L, n);
-    return 1;
-}
-
-static int tolua_faction_get_objects(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
     return 1;
 }
 
@@ -362,7 +381,7 @@ static int tolua_faction_get_origin(lua_State * L)
 static int tolua_faction_destroy(lua_State * L)
 {
     faction **fp, *f = (faction *)tolua_tousertype(L, 1, 0);
-    // TODO: this loop is slow af, but what can we do?
+    /* TODO: this loop is slow af, but what can we do? */
     for (fp = &factions; *fp; fp = &(*fp)->next) {
         if (*fp == f) {
             destroyfaction(fp);
@@ -619,8 +638,8 @@ void tolua_faction_open(lua_State * L)
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
 
-            tolua_variable(L, TOLUA_CAST "objects", tolua_faction_get_objects,
-                NULL);
+            tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
+            tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);
         }
         tolua_endmodule(L);
     }

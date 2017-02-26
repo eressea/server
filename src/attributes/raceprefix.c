@@ -41,7 +41,7 @@ void set_prefix(attrib ** ap, const char *str)
         free(a->data.v);
     }
     assert(a->type == &at_raceprefix);
-    a->data.v = _strdup(str);
+    a->data.v = strdup(str);
 }
 
 const char *get_prefix(attrib * a)
@@ -53,7 +53,7 @@ const char *get_prefix(attrib * a)
     str = (char *)a->data.v;
     /* conversion of old prefixes */
     if (strncmp(str, "prefix_", 7) == 0) {
-        ((attrib *)a)->data.v = _strdup(str + 7);
+        ((attrib *)a)->data.v = strdup(str + 7);
         free(str);
         str = (char *)a->data.v;
     }

@@ -1,5 +1,5 @@
 -- DEPRECATED
-
+if not config.eternath then return nil end
 -- implements parts of a quest in E2
 -- this module is deprecated, because it puts functions in the global environment for at_building_action
 

@@ -30,7 +30,7 @@
 #include <util/language.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <storage.h>
 
@@ -63,7 +63,7 @@ static int wormhole_age(struct attrib *a, void *owner)
     region *r = entry->region;
     unit *u = r->units;
 
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     for (; u != NULL && maxtransport != 0; u = u->next) {
         if (u->building == entry) {
             message *m = NULL;
@@ -155,8 +155,8 @@ make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
 
 #define WORMHOLE_CHANCE 10000
 
-static void select_wormhole_regions(quicklist **rlistp, int *countp) {
-    quicklist *rlist = 0;
+static void select_wormhole_regions(selist **rlistp, int *countp) {
+    selist *rlist = 0;
     region *r = regions;
     int count = 0;
 
@@ -170,7 +170,7 @@ static void select_wormhole_regions(quicklist **rlistp, int *countp) {
         }
         if (r == NULL)
             break;
-        ql_push(&rlist, r);
+        selist_push(&rlist, r);
         ++count;
         r = r->next;
     }
@@ -179,12 +179,12 @@ static void select_wormhole_regions(quicklist **rlistp, int *countp) {
     *rlistp = rlist;
 }
 
-void sort_wormhole_regions(quicklist *rlist, region **match, int count) {
-    quicklist *ql;
+void sort_wormhole_regions(selist *rlist, region **match, int count) {
+    selist *ql;
     int qi, i = 0;
 
-    for (ql = rlist, qi = 0; i != count; ql_advance(&ql, &qi, 1)) {
-        match[i++] = (region *)ql_get(ql, qi);
+    for (ql = rlist, qi = 0; i != count; selist_advance(&ql, &qi, 1)) {
+        match[i++] = (region *)selist_get(ql, qi);
     }
     qsort(match, count, sizeof(region *), cmp_age);
 }
@@ -200,7 +200,7 @@ void make_wormholes(region **match, int count, const building_type *bt_wormhole)
 void wormholes_update(void)
 {
     const building_type *bt_wormhole = bt_find("wormhole");
-    quicklist *rlist = 0;
+    selist *rlist = 0;
     int count = 0;
     region **match;
 
@@ -214,7 +214,7 @@ void wormholes_update(void)
     }
     match = (region **)malloc(sizeof(region *) * count);
     sort_wormhole_regions(rlist, match, count);
-    ql_free(rlist);
+    selist_free(rlist);
     make_wormholes(match, count, bt_wormhole);
     free(match);
 }

@@ -1,7 +1,6 @@
 PROJECT(races C)
 SET(_FILES
 dragons.c
-illusion.c
 races.c
 zombies.c
 )

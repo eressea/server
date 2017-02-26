@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 #include "objtypes.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -208,7 +210,7 @@ extern "C" {
     typedef struct curse {
         variant data;               /* pointer auf spezielle curse-unterstructs */
         struct curse *nexthash;
-        const curse_type *type;      /* Zeiger auf ein curse_type-struct */
+        const curse_type *type;     /* Zeiger auf ein curse_type-struct */
         struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
         double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
         double effect;

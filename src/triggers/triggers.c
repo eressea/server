@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/killunit.h>
 #include <triggers/shock.h>
 #include <triggers/timeout.h>
-#include <triggers/unitmessage.h>
 #include <triggers/clonedied.h>
 
 /* util includes */
@@ -47,7 +46,6 @@ void register_triggers(void)
     tt_register(&tt_giveitem);
     tt_register(&tt_killunit);
     tt_register(&tt_shock);
-    tt_register(&tt_unitmessage);
     tt_register(&tt_timeout);
     tt_register(&tt_clonedied);
 }

@@ -27,7 +27,7 @@ extern "C" {
     struct region;
     struct spell;
     struct spell_component;
-    struct quicklist;
+    struct selist;
     struct attrib_type;
 
     typedef int(*spell_f)(struct castorder * co);
@@ -45,23 +45,32 @@ extern "C" {
         fumble_f fumble;
     } spell;
 
+    typedef struct spellref {
+        char * name;
+        struct spell *sp;
+    } spellref;
+
+    struct spellref *spellref_create(struct spell *sp, const char *name);
+    void spellref_free(struct spellref *spref);
+    struct spell *spellref_get(struct spellref *spref);
+
     int sp_antimagiczone(struct castorder *co);
 
     struct spell * create_spell(const char * name, unsigned int id);
     struct spell * find_spell(const char *name);
     struct spell * find_spellbyid(unsigned int i);
-    void add_spell(struct quicklist **slistp, spell * sp);
+    void add_spell(struct selist **slistp, spell * sp);
     void free_spells(void);
 
     /** globals **/
     extern struct attrib_type at_unitdissolve;
     extern struct attrib_type at_wdwpyramid;
-    extern struct quicklist * spells;
+    extern struct selist * spells;
 #ifdef __cplusplus
 }
 #endif
 #endif
-/* ------------------------------------------------------------- *//* Erläuterungen zu den Spruchdefinitionen
+/* ------------------------------------------------------------- *//* Erlï¿½uterungen zu den Spruchdefinitionen
  *
  * Spruchstukturdefinition:
  * spell{
@@ -79,35 +88,35 @@ extern "C" {
  * id:
  * SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten sein,
  * denn nicht auf die Reihenfolge in der Liste sondern auf die id wird
- * geprüft
+ * geprï¿½ft
  *
  * sptyp:
  * besondere Spruchtypen und Flags
  *    (Regionszauber, Kampfzauber, Farcastbar, Stufe variable, ..)
  *
  * rank:
- * gibt die Priorität und damit die Reihenfolge an, in der der Spruch
+ * gibt die Prioritï¿½t und damit die Reihenfolge an, in der der Spruch
  * gezaubert wird.
- * 1: Aura übertragen
+ * 1: Aura ï¿½bertragen
  * 2: Antimagie
- * 3: Magierverändernde Sprüche (Magic Boost, ..)
+ * 3: Magierverï¿½ndernde Sprï¿½che (Magic Boost, ..)
  * 4: Monster erschaffen
  * 5: Standartlevel
  * 7: Teleport
  *
- * Komponenten[Anzahl mögl. Items][Art:Anzahl:Kostentyp]
+ * Komponenten[Anzahl mï¿½gl. Items][Art:Anzahl:Kostentyp]
  *
  * R_AURA:
- * Grundkosten für einen Zauber. Soviel Mp müssen mindestens investiert
- * werden, um den Spruch zu wirken. Zusätzliche Mp können unterschiedliche
+ * Grundkosten fï¿½r einen Zauber. Soviel Mp mï¿½ssen mindestens investiert
+ * werden, um den Spruch zu wirken. Zusï¿½tzliche Mp kï¿½nnen unterschiedliche
  * Auswirkungen haben, die in der Spruchfunktionsroutine definiert werden.
  *
  * R_PERMAURA:
  * Kosten an permantenter Aura
  *
  * Komponenten Kostentyp:
- * SPC_LEVEL == Spruch mit Levelabhängigen Magiekosten. Die angegeben
- * Kosten müssen für Stufe 1 berechnet sein.
+ * SPC_LEVEL == Spruch mit Levelabhï¿½ngigen Magiekosten. Die angegeben
+ * Kosten mï¿½ssen fï¿½r Stufe 1 berechnet sein.
  * SPC_FIX   == Feste Kosten
  *
  * Wenn keine spezielle Syntax angegeben ist, wird die
@@ -128,34 +137,34 @@ extern "C" {
  *
  * u : eine Einheitennummer
  * r : hier kommen zwei Regionskoordinaten x y
- * b : Gebäude- oder Burgnummer
+ * b : Gebï¿½ude- oder Burgnummer
  * s : Schiffsnummer
- * c : String, wird ohne Weiterverarbeitung übergeben
- * i : Zahl (int), wird ohne Weiterverarbeitung übergeben
+ * c : String, wird ohne Weiterverarbeitung ï¿½bergeben
+ * i : Zahl (int), wird ohne Weiterverarbeitung ï¿½bergeben
  * k : Keywort - dieser String gibt den Paramter an, der folgt. Der
  *     Parameter wird mit findparam() identifiziert.
- *     k muss immer von einem c als Platzhalter für das Objekt gefolgt
+ *     k muss immer von einem c als Platzhalter fï¿½r das Objekt gefolgt
  *     werden.
- *     Ein gutes Beispiel sind hierfür die Sprüche zur Magieanalyse.
+ *     Ein gutes Beispiel sind hierfï¿½r die Sprï¿½che zur Magieanalyse.
  * + : gibt an, das der vorherige Parameter mehrfach vorkommen kann. Da
  *     ein Ende nicht definiert werden kann, muss dies immer am Schluss
  *     kommen.
  *
- * Flags für das Parsing:
+ * Flags fï¿½r das Parsing:
  * TESTRESISTANCE : alle Zielobjekte, also alle Parameter vom Typ Unit,
  *		  Burg, Schiff oder Region, werden auf ihre
- *		  Magieresistenz überprüft
+ *		  Magieresistenz ï¿½berprï¿½ft
  * TESTCANSEE     : jedes Objekt vom Typ Einheit wird auf seine
- *		  Sichtbarkeit überprüft
+ *		  Sichtbarkeit ï¿½berprï¿½ft
  * SEARCHLOCAL   : die Zielobjekte werden nur regional gesucht
  * REGIONSPELL    : Ziel ist die Region, auch wenn kein Zielobjekt
  *		  angegeben wird. Ist TESTRESISTANCE gesetzt, so wird
- *		  die Magieresistenz der Region überprüft
+ *		  die Magieresistenz der Region ï¿½berprï¿½ft
  *
  * Bei fehlendem Ziel oder wenn dieses dem Zauber widersteht, wird die
  * Spruchfunktion nicht aufgerufen.
  * Sind zu wenig Parameter vorhanden, wird der Zauber ebenfalls nicht
- * ausgeführt.
+ * ausgefï¿½hrt.
  * Ist eins von mehreren Zielobjekten resistent, so wird das Flag
  * pa->param[n]->flag == TARGET_RESISTS
  * Ist eins von mehreren Zielobjekten nicht gefunden worden, so ist

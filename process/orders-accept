@@ -3,22 +3,53 @@
 
 from email.Utils import parseaddr
 from email.Parser import Parser
-from os import mkdir, rename, stat, utime, unlink, symlink
-from os.path import exists
+import os
+import os.path
+import ConfigParser
 from re import compile, IGNORECASE
 from stat import ST_MTIME
 from string import upper, split, replace
 import logging
-from sys import argv, stdin, exit
+import sys
+from sys import stdin
 from time import ctime, sleep, time
 from socket import gethostname
 from rfc822 import parsedate_tz, mktime_tz
 
-LOG_FILENAME='/home/eressea/log/orders.log'
+if 'ERESSEA' in os.environ:
+    dir = os.environ['ERESSEA']
+elif 'HOME' in os.environ:
+    dir = os.path.join(os.environ['HOME'], '/eressea')
+else: # WTF? No HOME?
+    dir = "/home/eressea/eressea"
+if not os.path.isdir(dir):
+    print "please set the ERESSEA environment variable to the install path"
+    sys.exit(1)
+rootdir = dir
+
+game = int(sys.argv[1])
+gamedir = os.path.join(rootdir, "game-%d" % (game, ))
+frommail = 'eressea-server@kn-bremen.de'
+gamename = 'Eressea'
+sender = '%s Server <%s>' % (gamename, frommail)
+
+inifile = os.path.join(gamedir, 'eressea.ini')
+if not os.path.exists(inifile):
+    print "no such file: " . inifile
+else:
+    config = ConfigParser.ConfigParser()
+    config.read(inifile)
+    if config.has_option('game', 'email'):
+        frommail = config.get('game', 'email')
+    if config.has_option('game', 'name'):
+        gamename = config.get('game', 'name')
+    if config.has_option('game', 'sender'):
+        sender = config.get('game', 'sender')
+    else:
+        sender = "%s Server <%s>" % (gamename, frommail)
+    config = None
 prefix = 'turn-'
 hostname = gethostname()
-# base directory for all your games:
-rootdir = "/home/eressea"
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
@@ -28,36 +59,21 @@ writeheaders = True
 # reject all html email?
 rejecthtml = True
 
-games = [
-    {
-        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
-        "prefix" : "Eressea"
-    },
-    {
-        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
-        "prefix": "E3"
-    },
-    {
-        "from" : "Eressea Server <eressea-server@eressea.kn-bremen.de>",
-        "prefix": "E4"
-    },
-]
-
 def unlock_file(filename):
     try:
-        unlink(filename+".lock")
+        os.unlink(filename+".lock")
     except:
         print "could not unlock %s.lock, file not found" % filename
 
 def lock_file(filename):
     i = 0
     wait = 1
-    if not exists(filename):
+    if not os.path.exists(filename):
         file=open(filename, "w")
         file.close()
     while True:
         try:
-            symlink(filename, filename+".lock")
+            os.symlink(filename, filename+".lock")
             return
         except:
             i = i+1
@@ -74,17 +90,17 @@ messages = {
                 "software and re-send the orders.",
 
         "multipart-de" :
-                "FEHLER: Die von dir eingeschickte Mail enthält keinen " \
+                "FEHLER: Die von dir eingeschickte Mail enthï¿½lt keinen " \
                 "Text. Evtl. hast Du den Zug als HTML oder als anderweitig " \
-                "ungültig formatierte Mail ingeschickt. Wir können ihn " \
-                "deshalb nicht berücksichtigen. Schicke den Zug nochmals " \
+                "ungï¿½ltig formatierte Mail ingeschickt. Wir kï¿½nnen ihn " \
+                "deshalb nicht berï¿½cksichtigen. Schicke den Zug nochmals " \
                 "als reinen Text ohne Formatierungen ein.",
 
         "maildate-de":
-                "Es erreichte uns bereits ein Zug mit einem späteren " \
+                "Es erreichte uns bereits ein Zug mit einem spï¿½teren " \
                 "Absendedatum (%s > %s). Entweder ist deine " \
                 "Systemzeit verstellt, oder ein Zug hat einen anderen Zug von " \
-                "dir auf dem Transportweg überholt. Entscheidend für die " \
+                "dir auf dem Transportweg ï¿½berholt. Entscheidend fï¿½r die " \
                 "Auswertungsreihenfolge ist das Absendedatum, d.h. der Date:-Header " \
                 "deiner Mail.",
 
@@ -173,8 +189,8 @@ def available_file(dirname, basename):
     ver = 0
     maxdate = 0
     filename = "%s/%s,%s,%d" % (dirname, basename, hostname, ver)
-    while exists(filename):
-        maxdate = max(stat(filename)[ST_MTIME], maxdate)
+    while os.path.exists(filename):
+        maxdate = max(os.stat(filename)[ST_MTIME], maxdate)
         ver = ver + 1
         filename = "%s/%s,%s,%d" % (dirname, basename, hostname, ver)
     if ver >= maxfiles:
@@ -234,7 +250,7 @@ def copy_orders(message, filename, sender):
         from os.path import split
         dirname, basename = split(filename)
         dirname = dirname + '/headers'
-        if not exists(dirname): mkdir(dirname)
+        if not os.path.exists(dirname): os.mkdir(dirname)
         outfile = open(dirname + '/' + basename, "w")
         for name, value in message.items():
             outfile.write(name + ": " + value + "\n")
@@ -265,104 +281,94 @@ def copy_orders(message, filename, sender):
 # create a file, containing:
 # game=0 locale=de file=/path/to/filename email=rcpt@domain.to
 def accept(game, locale, stream, extend=None):
-    global rootdir, orderbase
+    global rootdir, orderbase, gamedir, gamename, sender
     if extend is not None:
         orderbase = orderbase + ".pre-" + extend
-    gamename = games[game-2]["prefix"]
-    gamedir = rootdir+"/eressea/game-%d" % (game, )
-    savedir = gamedir+"/"+orderbase
+    savedir = os.path.join(gamedir, orderbase)
     # check if it's one of the pre-sent orders.
     # create the save-directories if they don't exist
-    if not exists(gamedir): mkdir(gamedir)
-    if not exists(savedir): mkdir(savedir)
+    if not os.path.exists(gamedir): os.mkdir(gamedir)
+    if not os.path.exists(savedir): os.mkdir(savedir)
     # parse message
     message = Parser().parse(stream)
-    sender = get_sender(message)
-    logger = logging.getLogger(sender)
+    email = get_sender(message)
+    logger = logging.getLogger(email)
     # write syslog
-    if sender is None or valid_email(sender)==0:
-        logger.warning("invalid email address: " + str(sender))
+    if email is None or valid_email(email)==0:
+        logger.warning("invalid email address: " + str(email))
         return -1
-    logger.info("received orders from " + sender)
+    logger.info("received orders from " + email)
     # get an available filename
     lock_file(gamedir + "/orders.queue")
-    maxdate, filename = available_file(savedir, prefix + sender)
+    maxdate, filename = available_file(savedir, prefix + email)
     if filename is None:
-        logger.warning("more than " + str(maxfiles) + " orders from " + sender)
+        logger.warning("more than " + str(maxfiles) + " orders from " + email)
         return -1
     # copy the orders to the file
-    text_ok = copy_orders(message, filename, sender)
+    text_ok = copy_orders(message, filename, email)
     unlock_file(gamedir + "/orders.queue")
 
     warning, msg, fail = None, "", False
     maildate = message.get("Date")
     if maildate != None:
         turndate = mktime_tz(parsedate_tz(maildate))
-        utime(filename, (turndate, turndate))
+        os.utime(filename, (turndate, turndate))
         logger.debug("mail date is '%s' (%d)" % (maildate, turndate))
         if turndate < maxdate:
-            logger.warning("inconsistent message date " + sender)
+            logger.warning("inconsistent message date " + email)
             warning = " (" + messages["warning-" + locale] + ")"
             msg = msg + formatpar(messages["maildate-" + locale] % (ctime(maxdate),ctime(turndate)), 76, 2) + "\n"
     else:
-        logger.warning("missing message date " + sender)
+        logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
         msg = msg + formatpar(messages["multipart-" + locale], 76, 2) + "\n"
-        logger.warning("rejected - no text/plain in orders from " + sender)
-        unlink(filename)
+        logger.warning("rejected - no text/plain in orders from " + email)
+        os.unlink(filename)
         savedir = savedir + "/rejected"
-        if not exists(savedir): mkdir(savedir)
+        if not os.path.exists(savedir): os.mkdir(savedir)
         lock_file(gamedir + "/orders.queue")
-        maxdate, filename = available_file(savedir, prefix + sender)
+        maxdate, filename = available_file(savedir, prefix + email)
         store_message(message, filename)
         unlock_file(gamedir + "/orders.queue")
         fail = True
 
     if sendmail and warning is not None:
-        frommail = games[key]["from"]
         subject = gamename + " " + messages["subject-"+locale] + warning
-        mail = "Subject: %s\nFrom: %s\nTo: %s\n\n" % (subject, frommail, sender) + msg
+        mail = "Subject: %s\nFrom: %s\nTo: %s\n\n" % (subject, sender, email) + msg
         from smtplib import SMTP
         server = SMTP("localhost")
-        server.sendmail(frommail, sender, mail)
+        server.sendmail(sender, email, mail)
         server.close()
 
     if not sendmail:
-        print text_ok, fail, sender
+        print text_ok, fail, email
         print filename
 
     if not fail:
         lock_file(gamedir + "/orders.queue")
         queue = open(gamedir + "/orders.queue", "a")
-        queue.write("email=%s file=%s locale=%s game=%s\n" % (sender, filename, locale, game))
+        queue.write("email=%s file=%s locale=%s game=%s\n" % (email, filename, locale, game))
         queue.close()
         unlock_file(gamedir + "/orders.queue")
 
-    logger.info("done - accepted orders from " + sender)
+    logger.info("done - accepted orders from " + email)
 
     return 0
 
 # the main body of the script:
+LOG_FILENAME=os.path.join(rootdir, 'log/orders.log')
 logging.basicConfig(level=logging.DEBUG, filename=LOG_FILENAME)
 logger = logging
 delay=None # TODO: parse the turn delay
-try:
-    game = int(argv[1])
-except:
-    game = argv[1]
-    if game[:3]=='e3a':
-        game = 3
-    elif game[:7]=='eressea':
-        game = 2
-locale = argv[2]
+locale = sys.argv[2]
 infile = stdin
-if len(argv)>3:
-    infile = open(argv[3], "r")
+if len(sys.argv)>3:
+    infile = open(sys.argv[3], "r")
 retval = accept(game, locale, infile, delay)
 if infile!=stdin:
     infile.close()
-exit(retval)
+sys.exit(retval)

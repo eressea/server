@@ -10,7 +10,6 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include "monster.h"
 #include "monsters.h"
 #include "guard.h"
 #include "reports.h"
@@ -91,7 +90,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
     unit *u, *m;
 
     create_monsters(&f, &f2, &u, &m);
-    r = findregion(-1, 0); // ocean
+    r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
@@ -126,7 +125,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     race *rc;
 
     create_monsters(&f, &f2, &u, &m);
-    r = findregion(-1, 0); // ocean
+    r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
@@ -199,7 +198,7 @@ static void test_dragon_moves(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
     rsetmoney(findregion(1, 0), 1000);
-    r = findregion(0, 0); // plain
+    r = findregion(0, 0); /* plain */
     rsetpeasants(r, 0);
     rsetmoney(r, 0);
 

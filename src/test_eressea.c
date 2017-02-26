@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/variant.h>
 
 #pragma warning(disable: 4210)
 
@@ -33,7 +34,7 @@ static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char
     }
     if (s) {
         s->next = suites;
-        s->name = _strdup(name);
+        s->name = strdup(name);
         s->csuite = csuite();
         suites = s;
     }
@@ -52,9 +53,12 @@ void RunTests(CuSuite * suite, const char *name) {
 bool list = false;
 
 #define ADD_SUITE(name) \
-    CuSuite *get_##name##_suite(void); \
-    if (list) printf("%s\n", #name); \
-    if (!list || argc>0) add_suite(get_##name##_suite, #name, argc, argv)
+    do { \
+        CuSuite *get_##name##_suite(void); \
+        if (list) printf("%s\n", #name); \
+        if (!list || argc>0) add_suite(get_##name##_suite, #name, argc, argv); \
+    } while (0)
+
 
 int RunAllTests(int argc, char *argv[])
 {
@@ -65,6 +69,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(direction);
     ADD_SUITE(skill);
     ADD_SUITE(keyword);
+    ADD_SUITE(message);
     ADD_SUITE(order);
     ADD_SUITE(race);
     /* util */
@@ -81,6 +86,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(unicode);
     ADD_SUITE(strings);
     ADD_SUITE(log);
+    ADD_SUITE(variant);
     ADD_SUITE(rng);
     /* items */
     ADD_SUITE(xerewards);

@@ -71,7 +71,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <stream.h>
 #include <filestream.h>
 #include <storage.h>
@@ -94,7 +94,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
 
-// TODO: is this still important?
+/* TODO: is this still important? */
 int enc_gamedata = ENCODING_UTF8;
 
 /* local symbols */
@@ -235,8 +235,7 @@ static faction *factionorders(void)
 
         if (!checkpasswd(f, (const char *)pass)) {
             log_debug("Invalid password for faction %s", itoa36(fid));
-            ADDMSG(&f->msgs, msg_message("wrongpasswd", "faction password",
-                f->no, pass));
+            ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", pass));
             return 0;
         }
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
@@ -280,7 +279,7 @@ int readorders(const char *filename)
         const char *s;
         init_tokens_str(b);
         s = gettoken(token, sizeof(token));
-        p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
+        p = findparam_block(s, lang, true);
         switch (p) {
         case P_GAMENAME:
         case P_FACTION:
@@ -309,7 +308,7 @@ int readorders(const char *filename)
                     p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
-	    }
+	        }
             break;
 
                 /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
@@ -436,7 +435,7 @@ void read_planes(gamedata *data) {
         }
         pl->id = id;
         READ_STR(store, name, sizeof(name));
-        pl->name = _strdup(name);
+        pl->name = strdup(name);
         READ_INT(store, &pl->minx);
         READ_INT(store, &pl->maxx);
         READ_INT(store, &pl->miny);
@@ -468,7 +467,7 @@ void read_planes(gamedata *data) {
             }
         }
         read_attribs(data, &pl->attribs, pl);
-        if (pl->id != 1094969858) { // Regatta
+        if (pl->id != 1094969858) { /* Regatta */
             addlist(&planes, pl);
         }
     }
@@ -668,7 +667,7 @@ unit *read_unit(struct gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? _strdup(obuf) : 0;
+    u->_name = obuf[0] ? strdup(obuf) : 0;
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
@@ -677,7 +676,7 @@ unit *read_unit(struct gamedata *data)
 		if (unicode_utf8_trim(obuf)!=0) {
 			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
 		}
-        u->display = obuf[0] ? _strdup(obuf) : 0;
+        u->display = obuf[0] ? strdup(obuf) : 0;
     }
     READ_INT(data->store, &number);
     set_number(u, number);
@@ -695,17 +694,6 @@ unit *read_unit(struct gamedata *data)
         u->irace = rc_find(rname);
     else
         u->irace = NULL;
-
-    if (rc->describe) {
-        const char *rcdisp = rc->describe(rc, u->faction->locale);
-        if (u->display && rcdisp) {
-            /* see if the data file contains old descriptions */
-            if (strcmp(rcdisp, u->display) == 0) {
-                free(u->display);
-                u->display = NULL;
-            }
-        }
-    }
 
     READ_INT(data->store, &n);
     if (n > 0) {
@@ -933,7 +921,7 @@ static region *readregion(struct gamedata *data, int x, int y)
 		if (unicode_utf8_trim(name)!=0) {
 			log_warning("trim region %d name to '%s'", uid, name);
 		};
-        r->land->name = _strdup(name);
+        r->land->name = strdup(name);
     }
     if (r->land) {
         int i;
@@ -1034,7 +1022,7 @@ static region *readregion(struct gamedata *data, int x, int y)
         read_items(data->store, &r->land->items);
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            region_set_morale(r, _max(0, (short)n), -1);
+            region_set_morale(r, MAX(0, (short)n), -1);
             read_owner(data, &r->land->ownership);
         }
     }
@@ -1080,7 +1068,7 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rhorses(r));
 
         while (res) {
-            WRITE_TOK(data->store, res->type->name);
+            WRITE_TOK(data->store, res->type->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);
@@ -1192,7 +1180,7 @@ static char * getpasswd(int fno) {
                 assert(line[slen] == '\n');
                 line[slen] = 0;
                 fclose(F);
-                return _strdup(line + len + 1);
+                return strdup(line + len + 1);
             }
         }
         fclose(F);
@@ -1207,7 +1195,7 @@ static void read_password(gamedata *data, faction *f) {
         char * pass = getpasswd(f->no);
         if (pass) {
             faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
-            free(pass); // TODO: remove this allocation!
+            free(pass); /* TODO: remove this allocation! */
         }
         else {
             log_error("data version is BADCRYPT but %s not in password.txt", itoa36(f->no));
@@ -1266,7 +1254,7 @@ faction *read_faction(struct gamedata * data)
                 assert(!al->members
                     || !"non-allied dummy-alliance has more than one member");
             }
-            ql_push(&al->members, f);
+            selist_push(&al->members, f);
         }
         else if (rule_region_owners()) {
             /* compat fix for non-allied factions */
@@ -1285,12 +1273,12 @@ faction *read_faction(struct gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
 	};
-    f->name = _strdup(name);
+    f->name = strdup(name);
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = _strdup(name);
+    f->banner = strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
@@ -1471,7 +1459,6 @@ int readgame(const char *filename)
     FILE *F;
     size_t sz;
 
-    init_locales();
     log_debug("- reading game data from %s", filename);
     join_path(datapath(), filename, path, sizeof(path));
 
@@ -1528,7 +1515,7 @@ struct building *read_building(gamedata *data) {
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
 	}
-    b->name = _strdup(name);
+    b->name = strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
@@ -1537,14 +1524,19 @@ struct building *read_building(gamedata *data) {
         if (unicode_utf8_trim(name)!=0) {
             log_warning("trim building %s info to '%s'", itoa36(b->no), name);
         }
-        b->display = _strdup(name);
+        b->display = strdup(name);
     }
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
+    if (!b->type) {
+        log_error("building %d has unknown type %s", b->no, name);
+        b->type = bt_find("building");
+        assert(b->type);
+    }
     read_attribs(data, &b->attribs, b);
 
-    // repairs, bug 2221:
+    /* repairs, bug 2221: */
     if (b->type->maxsize>0 && b->size>b->type->maxsize) {
         log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
         b->size = b->type->maxsize;
@@ -1581,7 +1573,7 @@ ship *read_ship(struct gamedata *data)
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
 	}
-    sh->name = _strdup(name);
+    sh->name = strdup(name);
     if (lomem) {
         READ_STR(store, NULL, 0);
     }
@@ -1590,7 +1582,7 @@ ship *read_ship(struct gamedata *data)
         if (unicode_utf8_trim(name)!=0) {
             log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
         }
-        sh->display = _strdup(name);
+        sh->display = strdup(name);
     }
     READ_STR(store, name, sizeof(name));
     sh->type = st_find(name);
@@ -1634,14 +1626,7 @@ int read_game(gamedata *data) {
 
         READ_INT(store, &gameid);
         if (gameid != game_id()) {
-            int c;
             log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
-            printf("WARNING: invalid game id. any key to continue, Ctrl-C to stop\n");
-            c = getchar();
-            if (c == EOF) {
-                log_error("aborting.");
-                abort();
-            }
         }
     }
     else {
@@ -1830,7 +1815,7 @@ int writegame(const char *filename)
     join_path(datapath(), filename, path, sizeof(path));
 #ifdef HAVE_UNISTD_H
     /* make sure we don't overwrite an existing file (hard links) */
-    if (unlink(path)!=0) {
+    if (remove(path)!=0) {
         if (errno==ENOENT) {
             errno = 0;
         }

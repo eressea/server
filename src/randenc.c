@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "volcano.h"
 #include "economy.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 #include "chaos.h"
 #include "study.h"
@@ -785,7 +785,7 @@ static void rotting_herbs(void)
                 if (fval(itm->type, ITF_HERB)) {
                     double nv = normalvariate(k, k / 4);
                     int inv = (int)nv;
-                    int delta = _min(n, inv);
+                    int delta = MIN(n, inv);
                     if (!i_change(itmp, itm->type, -delta)) {
                         continue;
                     }
@@ -814,7 +814,7 @@ void randomevents(void)
         while (*blist) {
             building *b = *blist;
             if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-                b->size -= _max(1, (b->size * 20) / 100);
+                b->size -= MAX(1, (b->size * 20) / 100);
                 if (b->size == 0) {
                     remove_building(blist, r->buildings);
                 }
@@ -826,22 +826,7 @@ void randomevents(void)
 
     /* monster-einheiten desertieren */
     if (monsters) {
-        for (r = regions; r; r = r->next) {
-            unit *u;
-
-            for (u = r->units; u; u = u->next) {
-                if (u->faction && !is_monsters(u->faction)
-                    && (u_race(u)->flags & RCF_DESERT)) {
-                    if (fval(u, UFL_ISNEW))
-                        continue;
-                    if (rng_int() % 100 < 5) {
-                        ADDMSG(&u->faction->msgs, msg_message("desertion",
-                            "unit region", u, r));
-                        u_setfaction(u, monsters);
-                    }
-                }
-            }
-        }
+        monsters_desert(monsters);
     }
 
     chaos_update();

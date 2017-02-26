@@ -60,8 +60,8 @@ static void do_shock(unit * u, const char *reason)
     if (u->number > 0) {
         /* HP - Verlust */
         int hp = (unit_max_hp(u) * u->number) / 10;
-        hp = _min(u->hp, hp);
-        u->hp = _max(1, hp);
+        hp = MIN(u->hp, hp);
+        u->hp = MAX(1, hp);
     }
 
     /* Aura - Verlust */
@@ -102,7 +102,7 @@ static int shock_handle(trigger * t, void *data)
     if (u && u->number) {
         do_shock(u, "trigger");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

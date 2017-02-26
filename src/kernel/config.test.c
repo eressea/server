@@ -9,6 +9,8 @@
 #include <util/base36.h>
 #include <util/attrib.h>
 
+#include <iniparser.h>
+
 #include <CuTest.h>
 #include <tests.h>
 
@@ -49,7 +51,7 @@ static void test_read_unitid(CuTest *tc) {
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
     init_order(ord);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
@@ -96,14 +98,14 @@ static void test_getunit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "TEMP ##");
     init_order(ord);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
-    // bug https://bugs.eressea.de/view.php?id=1685
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
     init_order(ord);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
@@ -233,9 +235,50 @@ static void test_rules(CuTest *tc) {
     CuAssertIntEquals(tc, 1000, rule_faction_limit());
 }
 
+static void test_config_inifile(CuTest *tc) {
+    dictionary *ini;
+    test_setup();
+    ini = dictionary_new(0);
+    dictionary_set(ini, "game", NULL);
+    iniparser_set(ini, "game:id", "42");
+    iniparser_set(ini, "game:name", "Eressea");
+    config_set_from(ini);
+    CuAssertStrEquals(tc, "Eressea", config_get("game.name"));
+    CuAssertStrEquals(tc, "Eressea", game_name());
+    CuAssertStrEquals(tc, "ERESSEA", game_name_upper());
+    CuAssertIntEquals(tc, 42, game_id());
+    iniparser_freedict(ini);
+    test_cleanup();
+}
+
+static void test_findparam(CuTest *tc) {
+    struct locale *en, *de;
+    test_setup();
+    en = get_or_create_locale("en");
+    locale_setstring(en, parameters[P_FACTION], "FACTION");
+    CuAssertIntEquals(tc, NOPARAM, findparam("FACTION", en));
+    init_parameters(en);
+    CuAssertIntEquals(tc, P_FACTION, findparam("FACTION", en));
+    de = get_or_create_locale("de");
+    locale_setstring(de, parameters[P_FACTION], "PARTEI");
+    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", de));
+    init_parameters(de);
+    CuAssertIntEquals(tc, P_FACTION, findparam("PARTEI", de));
+    CuAssertIntEquals(tc, NOPARAM, findparam("HODOR", de));
+
+    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", en));
+    CuAssertIntEquals(tc, NOPARAM, findparam_block("HODOR", de, false));
+    CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", de, true));
+    CuAssertIntEquals(tc, NOPARAM, findparam_block("PARTEI", en, false));
+    CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", en, true));
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_findparam);
+    SUITE_ADD_TEST(suite, test_config_inifile);
     SUITE_ADD_TEST(suite, test_config_cache);
     SUITE_ADD_TEST(suite, test_get_set_param);
     SUITE_ADD_TEST(suite, test_param_int);

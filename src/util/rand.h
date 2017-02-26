@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -18,6 +19,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef RAND_H
 #define RAND_H
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

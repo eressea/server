@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_MAGIC
 
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +59,7 @@ extern "C" {
         sppobj_t typ;
         int flag;
         union {
-            struct region *r; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
+            struct region *r;
             struct unit *u;
             struct building *b;
             struct ship *sh;
@@ -314,7 +315,7 @@ extern "C" {
     bool is_magic_resistant(struct unit *magician, struct unit *target, int
         resist_bonus);
     /*      Mapperfunktion für target_resists_magic() vom Typ struct unit. */
-    extern double magic_resistance(struct unit *target);
+    variant magic_resistance(struct unit *target);
     /*      gibt die Chance an, mit der einem Zauber widerstanden wird. Je
      *      größer, desto resistenter ist da Opfer */
     bool target_resists_magic(struct unit *magician, void *obj, int objtyp,
@@ -348,8 +349,8 @@ extern "C" {
     struct order *ord, const struct spllprm *spobj);
     bool FactionSpells(void);
 
-    void write_spells(struct quicklist *slist, struct storage *store);
-    void read_spells(struct quicklist **slistp, magic_t mtype,
+    void write_spells(struct selist *slist, struct storage *store);
+    void read_spells(struct selist **slistp, magic_t mtype,
         struct storage *store);
 
     struct spellbook * get_spellbook(const char * name);

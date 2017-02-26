@@ -1,12 +1,11 @@
 <?xml version="1.0" ?>
-<race name="goblin" magres="-0.050000" maxaura="1.000000"
+<race name="goblin" magres="-5" maxaura="1.000000"
 regaura="1.000000" recruitcost="40" maintenance="10" weight="600"
 capacity="440" speed="1.000000" hp="16" damage="1d5"
 unarmedattack="-2" unarmeddefense="0" playerrace="yes" walk="yes"
 giveperson="yes" giveunit="yes" getitem="yes" equipment="yes"
 healing="2.0">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="building" modifier="1"/>

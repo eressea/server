@@ -25,8 +25,11 @@ extern "C" {
 
     /* this should always be the first thing included after platform.h */
 #include <stddef.h>
+#include <stdbool.h>
 #include "types.h"
-struct param;
+
+    struct param;
+    struct _dictionary_;
 
 #define DISPLAYSIZE         8192        /* max. L�nge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
@@ -42,11 +45,13 @@ struct param;
     int findoption(const char *s, const struct locale *lang);
 
     param_t findparam(const char *s, const struct locale *lang);
+    param_t findparam_block(const char *s, const struct locale *lang, bool any_locale);
     param_t findparam_ex(const char *s, const struct locale * lang);
     bool isparam(const char *s, const struct locale * lang, param_t param);
     param_t getparam(const struct locale *lang);
 
     const char * game_name(void);
+    const char * game_name_upper(void);
     int game_id(void);
     /* returns a value between [0..xpct_2], generated with two dice */
 
@@ -56,8 +61,8 @@ struct param;
     int newcontainerid(void);
 
     bool rule_region_owners(void);
-    bool rule_stealth_other(void); // units can pretend to be another faction, TARNE PARTEI <no>
-    bool rule_stealth_anon(void);  // units can anonymize their faction, TARNE PARTEI [NICHT]
+    bool rule_stealth_other(void); /* units can pretend to be another faction, TARNE PARTEI <no> */
+    bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
 #define HARVEST_WORK  0x00
@@ -107,7 +112,6 @@ struct param;
         struct attrib *attribs;
         unsigned int data_turn;
         void *vm_state;
-        struct _dictionary_ *inifile;
         struct global_functions {
             int(*wage) (const struct region * r, const struct faction * f,
                 const struct race * rc, int in_turn);
@@ -122,6 +126,7 @@ struct param;
     void free_params(struct param **pp);
 
     void config_set(const char *key, const char *value);
+    void config_set_from(const struct _dictionary_ *d);
     const char *config_get(const char *key);
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);

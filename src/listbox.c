@@ -27,7 +27,7 @@ insert_selection(list_selection ** p_sel, list_selection * prev,
 const char *str, void *payload)
 {
     list_selection *sel = calloc(sizeof(list_selection), 1);
-    sel->str = _strdup(str);
+    sel->str = strdup(str);
     sel->data = payload;
     if (*p_sel) {
         list_selection *s;

@@ -23,7 +23,7 @@
 #include <util/lists.h>
 #include <util/message.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <stream.h>
 #include <memstream.h>
 
@@ -108,14 +108,14 @@ static void test_seen_faction(CuTest *tc) {
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
-    CuAssertPtrEquals(tc, f2, ql_get(f1->seen_factions, 0));
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertPtrEquals(tc, f2, selist_get(f1->seen_factions, 0));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f2);
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f1);
-    CuAssertIntEquals(tc, 2, ql_length(f1->seen_factions));
-    f2 = (faction *)ql_get(f1->seen_factions, 1);
-    f1 = (faction *)ql_get(f1->seen_factions, 0);
+    CuAssertIntEquals(tc, 2, selist_length(f1->seen_factions));
+    f2 = (faction *)selist_get(f1->seen_factions, 1);
+    f1 = (faction *)selist_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
     test_cleanup();
 }
@@ -223,6 +223,23 @@ static void test_arg_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 5, res->number);
     CuAssertPtrEquals(tc, 0, res->next);
     atype->release(v2);
+    test_cleanup();
+}
+
+static void test_newbie_password_message(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    test_setup();
+    f = test_create_faction(0);
+    f->age = 5;
+    f->flags = 0;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "changepasswd"));
+    f->age=2;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
     test_cleanup();
 }
 
@@ -465,6 +482,7 @@ static void test_seen_travelthru(CuTest *tc) {
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

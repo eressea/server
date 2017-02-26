@@ -48,7 +48,7 @@ extern "C" {
         char *name;
         struct itemdata *items;
         char *skills[MAXSKILLS];
-        struct quicklist *spells;
+        struct selist *spells;
         struct subset *subsets;
         struct equipment *next;
         void(*callback) (const struct equipment *, struct unit *);
@@ -56,7 +56,7 @@ extern "C" {
 
     void equipment_done(void);
 
-    struct equipment *create_equipment(const char *eqname);
+    struct equipment *get_or_create_equipment(const char *eqname);
     struct equipment *get_equipment(const char *eqname);
 
     void equipment_setitem(struct equipment *eq,

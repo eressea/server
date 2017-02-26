@@ -146,6 +146,8 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
 
 static void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
+    construction * cons;
+    
     if (json->type == cJSON_Array) {
         int size = 0;
         for (child = json->child; child; child = child->next) {
@@ -164,7 +166,7 @@ static void json_construction(cJSON *json, construction **consp) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
-    construction * cons = (construction *)calloc(sizeof(construction), 1);
+    cons = (construction *)calloc(sizeof(construction), 1);
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
@@ -191,8 +193,8 @@ static void json_construction(cJSON *json, construction **consp) {
 }
 
 static void json_terrain_production(cJSON *json, terrain_production *prod) {
-    assert(json->type == cJSON_Object);
     cJSON *child;
+    assert(json->type == cJSON_Object);
     for (child = json->child; child; child = child->next) {
         char **dst = 0;
         switch (child->type) {
@@ -224,7 +226,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
         if (dst) {
             free(*dst);
             assert(child->type == cJSON_String);
-            *dst = _strdup(child->valuestring);
+            *dst = strdup(child->valuestring);
         }
     }
 }
@@ -453,15 +455,15 @@ static void json_race(cJSON *json, race *rc) {
         switch (child->type) {
         case cJSON_String:
             if (strcmp(child->string, "damage") == 0) {
-                rc->def_damage = _strdup(child->valuestring);
+                rc->def_damage = strdup(child->valuestring);
             }
             break;
         case cJSON_Number:
             if (strcmp(child->string, "magres") == 0) {
-                rc->magres = (float)child->valuedouble;
+                rc->magres = frac_make(child->valueint, 100);
             }
             else if (strcmp(child->string, "maxaura") == 0) {
-                rc->maxaura = (float)child->valuedouble;
+                rc->maxaura = child->valueint;
             }
             else if (strcmp(child->string, "regaura") == 0) {
                 rc->regaura = (float)child->valuedouble;
@@ -490,7 +492,7 @@ static void json_race(cJSON *json, race *rc) {
             else if (strcmp(child->string, "ac") == 0) {
                 rc->armor = child->valueint;
             }
-            // TODO: studyspeed (orcs only)
+            /* TODO: studyspeed (orcs only) */
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
@@ -523,6 +525,8 @@ static void disable_feature(const char *str) {
     char name[32];
     int k;
     skill_t sk;
+    size_t len;
+
     sk = findskill(str);
     if (sk != NOSKILL) {
         enable_skill(sk, false);
@@ -534,7 +538,10 @@ static void disable_feature(const char *str) {
         enable_keyword(k, false);
         return;
     }
-    _snprintf(name, sizeof(name), "%s.enabled", str);
+    len = strlen(str);
+    assert(len <= sizeof(name) - 9);
+    memcpy(name, str, len);
+    strcpy(name+len, ".enabled");
     log_info("disable feature %s\n", name);
     config_set(name, "0");
 }
@@ -594,7 +601,7 @@ static void json_spells(cJSON *json) {
                     sp->fumble = (fumble_f)get_function(item->valuestring);
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
-                    sp->syntax = _strdup(item->valuestring);
+                    sp->syntax = strdup(item->valuestring);
                 }
             }
         }
@@ -649,7 +656,7 @@ static void json_strings(cJSON *json) {
     }
     for (child = json->child; child; child = child->next) {
         if (child->type == cJSON_Object) {
-            struct locale *lang = get_or_create_locale(child->string);
+            struct locale *lang = get_locale(child->string);
             json_locale(child, lang);
         }
         else {
@@ -690,7 +697,7 @@ static void json_directions(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        struct locale * lang = get_or_create_locale(child->string);
+        struct locale * lang = get_locale(child->string);
         json_direction(child, lang);
     }
 }
@@ -766,7 +773,7 @@ static void json_skills(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        struct locale * lang = get_or_create_locale(child->string);
+        struct locale * lang = get_locale(child->string);
         json_skill(child, lang);
     }
 }
@@ -778,7 +785,7 @@ static void json_keywords(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        struct locale * lang = get_or_create_locale(child->string);
+        struct locale * lang = get_locale(child->string);
         json_keyword(child, lang);
     }
 }
@@ -796,12 +803,14 @@ static void json_settings(cJSON *json) {
         else {
             char value[32];
             if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                _snprintf(value, sizeof(value), "%f", child->valuedouble);
+                sprintf(value, "%f", child->valuedouble);
             }
             else {
-                _snprintf(value, sizeof(value), "%d", child->valueint);
+                sprintf(value, "%d", child->valueint);
             }
-            config_set(child->string, value);
+            if (config_get(child->string) == NULL) {
+                config_set(child->string, value);
+            }
         }
     }
 }

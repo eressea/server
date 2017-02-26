@@ -38,8 +38,8 @@ message *cinfo_ship(const void *obj, objtype_t typ, const curse * c, int self)
 {
     message *msg;
 
-    unused_arg(typ);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(obj);
     assert(typ == TYP_SHIP);
 
     if (self != 0) {              /* owner or inside */
@@ -62,7 +62,7 @@ static message *cinfo_shipnodrift(const void *obj, objtype_t typ, const curse * 
 {
     ship *sh = (ship *)obj;
 
-    unused_arg(typ);
+    UNUSED_ARG(typ);
     assert(typ == TYP_SHIP);
 
     if (self != 0) {

@@ -206,7 +206,7 @@ struct region *from, struct region *to, bool routing)
     wall_data *fd = (wall_data *)b->data.v;
     if (!routing && fd->active) {
         int hp = dice(3, fd->force) * u->number;
-        hp = _min(u->hp, hp);
+        hp = MIN(u->hp, hp);
         u->hp -= hp;
         if (u->hp) {
             ADDMSG(&u->faction->msgs, msg_message("firewall_damage",
@@ -227,9 +227,9 @@ static const char *b_namefirewall(const connection * b, const region * r,
     const faction * f, int gflags)
 {
     const char *bname;
-    unused_arg(f);
-    unused_arg(r);
-    unused_arg(b);
+    UNUSED_ARG(f);
+    UNUSED_ARG(r);
+    UNUSED_ARG(b);
     if (gflags & GF_ARTICLE)
         bname = "a_firewall";
     else

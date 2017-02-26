@@ -99,9 +99,9 @@ order * ord)
     if (u->building != arena_tower(u->faction->magiegebiet) && leave_fail(u)) {
         return -1;
     }
-    unused_arg(amount);
-    unused_arg(ord);
-    unused_arg(itype);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(ord);
+    UNUSED_ARG(itype);
     assert(!"not implemented");
     return 0;
 }
@@ -120,9 +120,9 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
     region *r = u->region;
     unit *u2;
     int fee = 2000;
-    unused_arg(ord);
-    unused_arg(amount);
-    unused_arg(itype);
+    UNUSED_ARG(ord);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(itype);
     if (u->faction->score > fee * 5) {
         score_t score = u->faction->score / 5;
         if (score < INT_MAX) {
@@ -212,7 +212,7 @@ static int caldera_handle(trigger * t, void *data)
     else {
         log_error("could not perform caldera::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

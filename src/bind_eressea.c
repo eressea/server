@@ -9,6 +9,8 @@
 #include <kernel/config.h>
 #include <kernel/save.h>
 
+#include <util/language.h>
+
 #include <stream.h>
 #include <filestream.h>
 
@@ -16,6 +18,7 @@
 void eressea_free_game(void) {
     free_gamedata();
     init_resources();
+    init_locales();
 }
 
 int eressea_read_game(const char * filename) {

@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef MY_LOCALE_H
 #define MY_LOCALE_H
 
-#include <platform.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

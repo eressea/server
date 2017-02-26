@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <eressea xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="config://core/messages.xml"/>
-  <xi:include href="config://core/de/strings.xml"/>
-  <xi:include href="config://core/en/strings.xml"/>
   <xi:include href="config://core/common/items.xml"/>
   <xi:include href="config://core/common/herbs.xml" />
   <xi:include href="config://core/spoils.xml"/>
@@ -15,8 +12,6 @@
   <xi:include href="config://game/shipnames.xml"/>
   <xi:include href="config://core/calendar.xml"/>
   <xi:include href="config://game/items.xml" />
-  <xi:include href="config://game/strings.xml"/>
-  <xi:include href="config://game/messages.xml"/>
   <xi:include href="config://game/races.xml"/>
   <xi:include href="config://game/buildings.xml"/>
   <xi:include href="config://game/equipment.xml"/>
@@ -28,37 +23,12 @@
 
   <calendar name="thirdage" newyear="month_1" start="1"/>
 
-  <equipment>
-    <set name="first_unit">
-      <item name="log" amount="10"/>
-      <item name="stone" amount="10"/>
-      <item name="money" amount="5000"/>
-    </set>
-  </equipment>
-
   <xi:include href="config://default/names-undead.xml"/>
   <xi:include href="config://default/names-skeletons.xml"/>
   <xi:include href="config://default/names-zombies.xml"/>
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
-
   <rules>
     <function name="wage" value="minimum_wage"/>
   </rules>
-  <strings>
-    <string name="mailto">
-      <text locale="de">eressea-server@eressea.kn-bremen.de</text>
-      <text locale="en">eressea-server@eressea.kn-bremen.de</text>
-    </string>
-    <string name="newbie_info_game">
-      <text locale="de">Bitte denke daran, deine Befehle mit dem Betreff
-      ERESSEA 4 BEFEHLE an eressea-server@eressea.kn-bremen.de zu senden.</text>
-      <text locale="en">Remember to send your orders to
-      eressea-server@eressea.kn-bremen.de with the subject ERESSEA 4 ORDERS.</text>
-    </string>
-    <string name="mailcmd">
-      <text locale="de">ERESSEA 4 BEFEHLE</text>
-      <text locale="en">ERESSEA 4 ORDERS</text>
-    </string>
-  </strings>
 </eressea>

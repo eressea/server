@@ -8,6 +8,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
+#include <kernel/terrain.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
@@ -140,37 +141,34 @@ static void test_scale_number(CuTest *tc) {
 
 static void test_unit_name(CuTest *tc) {
     unit *u;
-    char name[32];
 
     test_cleanup();
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    renumber_unit(u, 666);
     unit_setname(u, "Hodor");
-    _snprintf(name, sizeof(name), "Hodor (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Hodor (ii)", unitname(u));
     test_cleanup();
 }
 
 static void test_unit_name_from_race(CuTest *tc) {
     unit *u;
-    char name[32];
     struct locale *lang;
 
     test_cleanup();
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    renumber_unit(u, 666);
     unit_setname(u, NULL);
     lang = get_or_create_locale("de");
     locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
     locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
-    _snprintf(name, sizeof(name), "Mensch (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Mensch (ii)", unitname(u));
     CuAssertStrEquals(tc, "Mensch", unit_getname(u));
 
     u->number = 2;
-    _snprintf(name, sizeof(name), "Menschen (%s)", itoa36(u->no));
-    CuAssertStrEquals(tc, name, unitname(u));
+    CuAssertStrEquals(tc, "Menschen (ii)", unitname(u));
     CuAssertStrEquals(tc, "Menschen", unit_getname(u));
 
     test_cleanup();
@@ -243,9 +241,9 @@ static void test_default_name(CuTest *tc) {
 }
 
 static int cb_skillmod(const unit *u, const region *r, skill_t sk, int level) {
-    unused_arg(u);
-    unused_arg(r);
-    unused_arg(sk);
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
+    UNUSED_ARG(sk);
     return level + 3;
 }
 
@@ -262,7 +260,7 @@ static void test_skillmod(CuTest *tc) {
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); // NOSKILL means any skill
+    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); /* NOSKILL means any skill */
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
@@ -298,7 +296,7 @@ static void test_skill_familiar(CuTest *tc) {
 
     test_cleanup();
 
-    // setup two units
+    /* setup two units */
     mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
     set_level(fam, SK_PERCEPTION, 6);
@@ -306,14 +304,14 @@ static void test_skill_familiar(CuTest *tc) {
     set_level(mag, SK_PERCEPTION, 6);
     CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
 
-    // make them mage and familiar to each other
+    /* make them mage and familiar to each other */
     CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
 
-    // when they are in the same region, the mage gets half their skill as a bonus
+    /* when they are in the same region, the mage gets half their skill as a bonus */
     CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
     CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, 0));
 
-    // when they are further apart, divide bonus by distance
+    /* when they are further apart, divide bonus by distance */
     r = test_create_region(3, 0, 0);
     move_unit(fam, r, &r->units);
     CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, 0));
@@ -325,7 +323,6 @@ static void test_age_familiar(CuTest *tc) {
 
     test_cleanup();
 
-    // setup two units
     mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
     CuAssertPtrEquals(tc, 0, get_familiar(mag));
@@ -393,14 +390,24 @@ static void test_limited_skills(CuTest *tc) {
 static void test_unit_description(CuTest *tc) {
     race *rc;
     unit *u;
+    struct locale *lang;
+
     test_setup();
+    lang = test_create_locale();
     rc = test_create_race("hodor");
     u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
+
     CuAssertPtrEquals(tc, 0, u->display);
-    CuAssertStrEquals(tc, 0, u_description(u, u->faction->locale));
-    u->display = _strdup("Hodor");
+    CuAssertStrEquals(tc, 0, u_description(u, lang));
+    u->display = strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
-    CuAssertStrEquals(tc, "Hodor", u_description(u, u->faction->locale));
+    CuAssertStrEquals(tc, "Hodor", u_description(u, lang));
+
+    free(u->display);
+    u->display = NULL;
+    locale_setstring(lang, "describe_hodor", "HODOR");
+    CuAssertStrEquals(tc, "HODOR", u_description(u, lang));
+
     test_cleanup();
 }
 
@@ -428,28 +435,28 @@ static void test_remove_unit(CuTest *tc) {
     remove_unit(&r->units, u1);
     CuAssertIntEquals(tc, 0, u1->number);
     CuAssertPtrEquals(tc, 0, u1->region);
-    // money is given to a survivor:
+    /* money is given to a survivor: */
     CuAssertPtrEquals(tc, 0, u1->items);
     CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
 
-    // unit is removed from f->units:
+    /* unit is removed from f->units: */
     CuAssertPtrEquals(tc, 0, u1->nextF);
     CuAssertPtrEquals(tc, u2, f->units);
     CuAssertPtrEquals(tc, 0, u2->nextF);
     CuAssertPtrEquals(tc, 0, u2->prevF);
-    // unit is no longer in r->units:
+    /* unit is no longer in r->units: */
     CuAssertPtrEquals(tc, u2, r->units);
     CuAssertPtrEquals(tc, 0, u2->next);
 
-    // unit is in deleted_units:
+    /* unit is in deleted_units: */
     CuAssertPtrEquals(tc, 0, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
 
     remove_unit(&r->units, u2);
-    // no survivor, give money to peasants:
+    /* no survivor, give money to peasants: */
     CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
-    // there are now no more units:
+    /* there are now no more units: */
     CuAssertPtrEquals(tc, 0, r->units);
     CuAssertPtrEquals(tc, 0, f->units);
     test_cleanup();
@@ -480,9 +487,35 @@ static void test_name_unit(CuTest *tc) {
     test_setup();
     rc = test_create_race("skeleton");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    rc->generate_name = gen_name;
+    rc->name_unit = gen_name;
     name_unit(u);
     CuAssertStrEquals(tc, "Hodor", unit_getname(u));
+    test_cleanup();
+}
+
+static void test_heal_factor(CuTest *tc) {
+    unit * u;
+    region *r;
+    race *rc;
+    terrain_type *t_plain;
+
+    test_setup();
+    t_plain = test_create_terrain("plain", LAND_REGION|FOREST_REGION);
+    rc = rc_get_or_create("human");
+    u = test_create_unit(test_create_faction(rc), r = test_create_region(0, 0, t_plain));
+    rsettrees(r, 1, r->terrain->size / TREESIZE);
+    rsettrees(r, 2, 0);
+    CuAssertTrue(tc, r_isforest(r));
+    CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
+    rc->healing = 200;
+    CuAssertDblEquals(tc, 2.0, u_heal_factor(u), 0.0);
+    rc->healing = 0;
+    rc = rc_get_or_create("elf");
+    CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_ELF));
+    u_setrace(u, get_race(RC_ELF));
+    CuAssertDblEquals(tc, 1.0, u_heal_factor(u), 0.0);
+    config_set("healing.forest", "1.5");
+    CuAssertDblEquals(tc, 1.5, u_heal_factor(u), 0.0);
     test_cleanup();
 }
 
@@ -510,5 +543,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_limited_skills);
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
+    SUITE_ADD_TEST(suite, test_heal_factor);
     return suite;
 }

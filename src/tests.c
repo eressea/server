@@ -40,7 +40,7 @@ struct race *test_create_race(const char *name)
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
     rc->hitpoints = 20;
-    rc->maxaura = 1.0;
+    rc->maxaura = 100;
     rc->ec_flags |= GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
@@ -217,6 +217,9 @@ terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+    if (flags & LAND_REGION) {
+        t->size = 1000;
+    }
     t->flags = flags;
     return t;
 }
@@ -225,8 +228,13 @@ building * test_create_building(region * r, const building_type * btype)
 {
     building * b;
     assert(r);
-    b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
-    b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
+    if (!btype) {
+        building_type *bt_castle = test_create_buildingtype("castle");
+        bt_castle->flags |= BTF_FORTIFICATION;
+        btype = bt_castle;
+    }
+    b = new_building(btype, r, default_locale);
+    b->size = btype->maxsize > 0 ? btype->maxsize : 1;
     return b;
 }
 

@@ -137,7 +137,7 @@ static int check_dupe(const char *format, int level)
     static char last_message[32]; /* STATIC_XCALL: used across calls */
     static int dupes = 0;         /* STATIC_XCALL: used across calls */
     if (strncmp(last_message, format, sizeof(last_message)) == 0) {
-        // TODO: C6054: String 'last_message' might not be zero - terminated.
+        /* TODO: C6054: String 'last_message' might not be zero - terminated. */
         ++dupes;
         return 1;
     }
@@ -197,16 +197,16 @@ static void log_write(int flags, const char *module, const char *format, va_list
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
             int dupe = 0;
-            va_list copy;
-
-            va_copy(copy, args);
             if (lg->flags & LOG_BRIEF) {
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
+                va_list copy;
+
+                va_copy(copy, args);
                 lg->log(lg->data, level, NULL, format, copy);
+                va_end(copy);
             }
-            va_end(copy);
         }
     }
 }
@@ -220,7 +220,7 @@ void log_fatal(const char *format, ...)
     va_end(args);
 }
 
-void log_error(const char *format, ...) //-V524
+void log_error(const char *format, ...) /*-V524 */
 {
     va_list args;
     va_start(args, format);

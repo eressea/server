@@ -434,8 +434,9 @@ static void test_follow_ship_msg(CuTest * tc) {
     order *ord;
     traveldir *td = NULL;
     attrib *a;
-
-    test_cleanup();
+    void *p;
+    
+    test_setup();
     test_create_world();
     f = test_create_faction(0);
     r = findregion(0, 0);
@@ -467,7 +468,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     follow_ship(u, ord);
 
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "error18"));
-    void *p = msg->parameters[2].v;
+    p = msg->parameters[2].v;
     CuAssertPtrNotNull(tc, p);
     CuAssertIntEquals(tc, K_FOLLOW, getkeyword((order *)p));
 

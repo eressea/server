@@ -2,6 +2,9 @@
 
 #ifndef H_GUARD
 #define H_GUARD
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

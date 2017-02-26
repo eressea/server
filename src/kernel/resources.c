@@ -111,7 +111,7 @@ static void terraform_default(struct rawmaterial *res, const region * r)
     res->amount = (int)(res->amount * modifier);  /* random adjustment, +/- 91% */
     if (res->amount < 1)
         res->amount = 1;
-    unused_arg(r);
+    UNUSED_ARG(r);
 }
 
 #ifdef RANDOM_CHANGE
@@ -183,35 +183,31 @@ struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
     return rm;
 }
 
-struct rawmaterial_type *rawmaterialtypes = 0;
-
 struct rawmaterial_type *rmt_find(const char *str)
 {
-    rawmaterial_type *rmt = rawmaterialtypes;
-    while (rmt && strcmp(rmt->name, str) != 0)
-        rmt = rmt->next;
-    return rmt;
+    resource_type *rtype = rt_find(str);
+    if (!rtype && strncmp(str, "rm_", 3) == 0) {
+        rtype = rt_find(str+3);
+    }
+    assert(rtype);
+    return rtype ? rtype->raw : NULL;
 }
 
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 {
-    rawmaterial_type *rmt = rawmaterialtypes;
-    while (rmt && rmt->rtype != rtype)
-        rmt = rmt->next;
-    return rmt;
+    return rtype->raw;
 }
 
-struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
-    const char *name)
+struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
-    rawmaterial_type *rmtype = malloc(sizeof(rawmaterial_type));
-    rmtype->name = _strdup(name);
+    rawmaterial_type *rmtype;
+
+    assert(!rtype->raw);
+    rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
     rmtype->rtype = rtype;
     rmtype->terraform = terraform_default;
     rmtype->update = NULL;
     rmtype->use = use_default;
     rmtype->visible = visible_default;
-    rmtype->next = rawmaterialtypes;
-    rawmaterialtypes = rmtype;
     return rmtype;
 }

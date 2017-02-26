@@ -63,7 +63,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/parser.h>
-#include <quicklist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/translation.h>
@@ -92,6 +91,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 struct settings global = {
     "Eressea",                    /* gamename */
@@ -203,7 +203,7 @@ param_t findparam(const char *s, const struct locale * lang)
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
         if (!cb) {
-            log_error("no parameters defined in locale %s", locale_name(lang));
+            log_warning("no parameters defined in locale %s", locale_name(lang));
         }
         else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
             cb_get_kv(match, &i, sizeof(int));
@@ -211,6 +211,27 @@ param_t findparam(const char *s, const struct locale * lang)
         }
     }
     return result;
+}
+
+param_t findparam_block(const char *s, const struct locale *lang, bool any_locale)
+{
+    param_t p;
+    if (!s || s[0] == '@') {
+        return NOPARAM;
+    }
+    p = findparam(s, lang);
+    if (any_locale && p==NOPARAM) {
+        const struct locale *loc;
+        for (loc=locales;loc;loc=nextlocale(loc)) {
+            if (loc!=lang) {
+                p = findparam(s, loc);
+                if (p==P_FACTION || p==P_GAMENAME) {
+                    break;
+                }
+            }
+        }
+    }
+    return p;
 }
 
 param_t findparam_ex(const char *s, const struct locale * lang)
@@ -254,7 +275,6 @@ unit *getnewunit(const region * r, const faction * f)
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
-// PEASANT: "b", "ba", "bau", "baue", "p", "pe", "pea", "peas"
 static int *forbidden_ids;
 
 int forbiddenid(int id)
@@ -362,7 +382,7 @@ void init_locale(struct locale *lang)
             str = "gwyrrd illaun draig cerddor tybied";
         }
 
-        sstr = _strdup(str);
+        sstr = strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
             const char *name;
@@ -470,19 +490,19 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
 {
     int result = 0;
     const char *value = get_param(p, key);
+    char *v, *p_value;
     if (!value) {
         return 0;
     }
-    char *p_value = _strdup(value);
-    const char *delimiter = " ,;";
-    char *v = strtok(p_value, delimiter);
+    p_value = strdup(value);
+    v = strtok(p_value, " ,;");
 
     while (v != NULL) {
         if (strcmp(v, searchvalue) == 0) {
             result = 1;
             break;
         }
-        v = strtok(NULL, delimiter);
+        v = strtok(NULL, " ,;");
     }
     free(p_value);
     return result;
@@ -536,7 +556,7 @@ static const char * relpath(char *buf, size_t sz, const char *path) {
 static const char *g_datadir;
 const char *datapath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[4096];
     if (g_datadir)
         return g_datadir;
     return relpath(zText, sizeof(zText), "data");
@@ -550,7 +570,7 @@ void set_datapath(const char *path)
 static const char *g_reportdir;
 const char *reportpath(void)
 {
-    static char zText[MAX_PATH];
+    static char zText[4096];
     if (g_reportdir)
         return g_reportdir;
     return relpath(zText, sizeof(zText), "reports");
@@ -563,12 +583,12 @@ void set_reportpath(const char *path)
 
 int create_directories(void) {
     int err;
-    err = _mkdir(datapath());
+    err = mkdir(datapath(), 0777);
     if (err) {
         if (errno == EEXIST) errno = 0;
         else return err;
     }
-    err = _mkdir(reportpath());
+    err = mkdir(reportpath(), 0777);
     if (err && errno == EEXIST) {
         errno = 0;
     }
@@ -712,6 +732,39 @@ bool config_changed(int *cache_key) {
     return false;
 }
 
+#define MAXKEYS 16
+void config_set_from(const dictionary *d)
+{
+    int s, nsec = iniparser_getnsec(d);
+    for (s=0;s!=nsec;++s) {
+        char key[128];
+        const char *sec = iniparser_getsecname(d, s);
+        int k, nkeys = iniparser_getsecnkeys(d, sec);
+        const char *keys[MAXKEYS];
+        size_t slen = strlen(sec);
+        assert(nkeys <= MAXKEYS);
+        assert(slen<sizeof(key));
+        memcpy(key, sec, slen);
+        key[slen] = '.';
+        iniparser_getseckeys(d, sec, keys);
+        for (k=0;k!=nkeys;++k) {
+            const char *val, *orig;
+            size_t klen = strlen(keys[k]);
+            assert(klen+slen+1<sizeof(key));
+            memcpy(key+slen+1, keys[k]+slen+1, klen-slen);
+            orig = config_get(key);
+            val = iniparser_getstring(d, keys[k], NULL);
+            if (!orig) {
+                if (val) {
+                    config_set(key, val);
+                }
+            } else {
+                log_debug("not overwriting %s=%s with %s", key, orig, val);
+            }
+        }
+    }
+}
+
 void config_set(const char *key, const char *value) {
     ++config_cache_key;
     set_param(&configuration, key, value);
@@ -774,12 +827,25 @@ void free_gamedata(void)
     }
 }
 
-const char * game_name(void) {
+const char * game_name(void)
+{
     const char * param = config_get("game.name");
     return param ? param : global.gamename;
+}
+
+const char * game_name_upper(void)
+{
+    static char result[32]; /* FIXME: static result */
+    char *r = result;
+    const char *param = game_name();
+    const char *c = param;
+    while (*c && (result+sizeof(result))>r) {
+        *r++ = (char)toupper(*c++);
+    }
+    *r = '\0';
+    return result;
 }
 
 int game_id(void) {
     return config_get_int("game.id", 0);
 }
-

@@ -310,7 +310,7 @@
   <string name="dam">
     <text locale="en">dam</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="en">structure</text>
   </string>
   <string name="harbour">

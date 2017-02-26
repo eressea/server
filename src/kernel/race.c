@@ -32,6 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "ship.h"
 #include "skill.h"
+#include "spell.h"
 #include "terrain.h"
 #include "unit.h"
 
@@ -43,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/variant.h>
 
 #include <storage.h>
 
@@ -64,7 +66,7 @@ static int rc_changes = 1;
 
 static const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", "illusion",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
     NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
@@ -72,9 +74,82 @@ static const char *racenames[MAXRACES] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, "seaserpent",
     "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
-    "juju-zombie", "ghoul", "ghast", NULL, NULL, "template",
+    "juju", "ghoul", "ghast", NULL, NULL, "template",
     "clone"
 };
+
+#define MAXOPTIONS 4
+typedef struct rcoption {
+    unsigned char key[MAXOPTIONS];
+    variant value[MAXOPTIONS];
+} rcoption;
+
+enum {
+    RCO_NONE,
+    RCO_SCARE,   /* races that scare and eat peasants */
+    RCO_OTHER,   /* may recruit from another race */
+    RCO_STAMINA, /* every n levels of stamina add +1 RC */
+    RCO_HUNGER,  /* custom hunger.damage override (char *) */
+    RCO_TRADELUX,
+    RCO_TRADEHERB
+};
+
+static void rc_setoption(race *rc, int k, const char *value) {
+    unsigned char key = (unsigned char)k;
+    int i;
+    variant *v = NULL;
+    if (!rc->options) {
+        rc->options = malloc(sizeof(rcoption));
+        rc->options->key[0] = key;
+        rc->options->key[1] = RCO_NONE;
+        v = rc->options->value;
+    } else {
+        for (i=0;!v && i < MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+            if (rc->options->key[i]==key) {
+                v = rc->options->value+i;
+            }
+        }
+        if (!v) {
+            assert(i<MAXOPTIONS || !"MAXOPTIONS too small for race");
+            v = rc->options->value+i;
+            rc->options->key[i] = key;
+            if (i+1<MAXOPTIONS) {
+                rc->options->key[i+1]=RCO_NONE;
+            }
+        }
+    }
+    assert(v);
+    if (key == RCO_SCARE) {
+        v->i = atoi(value);
+    }
+    else if (key == RCO_STAMINA) {
+        v->i = atoi(value);
+    }
+    else if (key == RCO_OTHER) {
+        v->v = rc_get_or_create(value);
+    }
+    else if (key == RCO_HUNGER) {
+        v->v = strdup(value);
+    }
+    else if (key == RCO_TRADEHERB) {
+        v->i = atoi(value);
+    }
+    else if (key == RCO_TRADELUX) {
+        v->i = atoi(value);
+    }
+}
+
+static variant *rc_getoption(const race *rc, int key) {
+    if (rc->options) {
+        int i;
+        for (i=0;i!=MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+            if (rc->options->key[i]==key) {
+                return rc->options->value+i;
+            }
+        }
+    }
+    return NULL;
+}
 
 const struct race *findrace(const char *s, const struct locale *lang)
 {
@@ -151,7 +226,7 @@ race_list *get_familiarraces(void)
     if (!init) {
         race *rc = races;
         for (; rc != NULL; rc = rc->next) {
-            if (rc->init_familiar != NULL) {
+            if (rc->flags & RCF_FAMILIAR) {
                 racelist_insert(&familiarraces, rc);
             }
         }
@@ -181,8 +256,27 @@ void racelist_insert(struct race_list **rl, const struct race *r)
 
 void free_races(void) {
     while (races) {
+        int i;
         race * rc = races->next;
-        free_params(&races->parameters);
+        rcoption * opt = races->options;
+        
+        if (opt) {
+            for (i=0;i!=MAXOPTIONS && opt->key[i]!=RCO_NONE;++i) {
+                if (opt->key[i]==RCO_HUNGER) {
+                    free(opt->value[i].v);
+                }
+            }
+            free(opt);
+        }
+        for (i = 0; races->attack[i].type!=AT_NONE; ++i) {
+            att *at = races->attack + i;
+            if (at->type == AT_SPELL) {
+                spellref_free(at->data.sp);
+            }
+            else {
+                free(at->data.dice);
+            }
+        }
         free(xrefs);
         xrefs = 0;
         free(races->_name);
@@ -202,9 +296,16 @@ static race *rc_find_i(const char *name)
     while (rc && strcmp(rname, rc->_name) != 0) {
         rc = rc->next;
     }
-    if (!rc && strcmp(name, "uruk") == 0) {
-        rc = rc_find_i("orc");
-        log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+    if (!rc) {
+        const char *rc_depr[] = { "uruk", "orc", "illusion", "template", "juju-zombie", "juju", NULL };
+        int i;
+        for (i = 0; rc_depr[i]; i += 2) {
+            if (strcmp(name, rc_depr[i]) == 0) {
+                rc = rc_find_i(rc_depr[i + 1]);
+                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                break;
+            }
+        }
     }
     return rc;
 }
@@ -226,9 +327,11 @@ race *rc_create(const char *zName)
 {
     race *rc;
     int i;
+    char zText[64];
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
+    rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
@@ -241,8 +344,7 @@ race *rc_create(const char *zName)
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
     }
-    rc->_name = _strdup(zName);
-    rc->precombatspell = NULL;
+    rc->_name = strdup(zName);
 
     rc->attack[0].type = AT_COMBATSPELL;
     for (i = 1; i < RACE_ATTACKS; ++i)
@@ -250,6 +352,13 @@ race *rc_create(const char *zName)
     rc->index = num_races++;
     ++rc_changes;
     rc->next = races;
+
+    snprintf(zText, sizeof(zText), "age_%s", zName);
+    rc->age_unit = (race_func)get_function(zText);
+
+    snprintf(zText, sizeof(zText), "name_%s", zName);
+    rc->name_unit = (race_func)get_function(zText);
+
     return races = rc;
 }
 
@@ -275,6 +384,93 @@ bool r_insectstalled(const region * r)
     return fval(r->terrain, ARCTIC_REGION);
 }
 
+variant rc_magres(const race *rc) {
+    return rc->magres;
+}
+
+double rc_maxaura(const race *rc) {
+    return rc->maxaura / 100.0;
+}
+
+const char * rc_hungerdamage(const race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_HUNGER);
+    return v ? (const char *)v->v : NULL;
+}
+
+int rc_armor_bonus(const race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_STAMINA);
+    return v ? v->i : 0;
+}
+
+int rc_scare(const struct race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_SCARE);
+    return v ? v->i : 0;
+}
+
+int rc_luxury_trade(const struct race *rc)
+{
+    if (rc) {
+        variant *v = rc_getoption(rc, RCO_TRADELUX);
+        if (v) return v->i;
+    }
+    return 1000;
+}
+
+int rc_herb_trade(const struct race *rc)
+{
+    if (rc) {
+        variant *v = rc_getoption(rc, RCO_TRADEHERB);
+        if (v) return v->i;
+    }
+    return 500;
+}
+
+const race *rc_otherrace(const race *rc)
+{
+    variant *v = rc_getoption(rc, RCO_OTHER);
+    return v ? (const race *)v->v : NULL;
+}
+
+int rc_migrants_formula(const race *rc)
+{
+    return (rc->flags&RCF_MIGRANTS) ? MIGRANTS_LOG10 : MIGRANTS_NONE;
+}
+
+void rc_set_param(struct race *rc, const char *key, const char *value) {
+    if (strcmp(key, "recruit_multi") == 0) {
+        rc->recruit_multi = atof(value);
+    }
+    else if (strcmp(key, "migrants.formula") == 0) {
+        if (value[0] == '1') {
+            rc->flags |= RCF_MIGRANTS;
+        }
+    }
+    else if (strcmp(key, "other_race")==0) {
+        rc_setoption(rc, RCO_OTHER, value);
+    }
+    else if (strcmp(key, "ai.scare")==0) {
+        rc_setoption(rc, RCO_SCARE, value);
+    }
+    else if (strcmp(key, "hunger.damage")==0) {
+        rc_setoption(rc, RCO_HUNGER, value);
+    }
+    else if (strcmp(key, "armor.stamina")==0) {
+        rc_setoption(rc, RCO_STAMINA, value);
+    }
+    else if (strcmp(key, "luxury_trade")==0) {
+        rc_setoption(rc, RCO_TRADELUX, value);
+    }
+    else if (strcmp(key, "herb_trade")==0) {
+        rc_setoption(rc, RCO_TRADEHERB, value);
+    }
+    else {
+        log_error("unknown property for race %s: %s=%s", rc->_name, key, value);
+    }
+}
+
 const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     const char * postfix = 0;
     if (!rc) {
@@ -288,7 +484,7 @@ const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     default: assert(!"invalid name_t enum in rc_name_s");
     }
     if (postfix) {
-        _snprintf(name, size, "race::%s%s", rc->_name, postfix);
+        snprintf(name, size, "race::%s%s", rc->_name, postfix);
         return name;
     }
     return NULL;
@@ -296,7 +492,7 @@ const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
 
 const char *rc_name_s(const race * rc, name_t n)
 {
-    static char name[64];  // FIXME: static return value
+    static char name[64];  /* FIXME: static return value */
     return rc_name(rc, n, name, sizeof(name));
 }
 
@@ -317,7 +513,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
     const char *str, *prefix = raceprefix(u);
 
     if (prefix != NULL) {
-        static char lbuf[80]; // FIXME: static return value
+        static char lbuf[80]; /* FIXME: static return value */
         char *bufp = lbuf;
         size_t size = sizeof(lbuf) - 1;
         int ch, bytes;
@@ -362,10 +558,6 @@ variant read_race_reference(struct storage *store)
     return result;
 }
 
-void register_race_description_function(race_desc_func func, const char *name) {
-    register_function((pf_generic)func, name);
-}
-
-void register_race_name_function(race_name_func func, const char *name) {
+void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
 }

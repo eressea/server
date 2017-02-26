@@ -30,8 +30,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static void a_writekeys(const attrib *a, const void *o, storage *store) {
     int i, *keys = (int *)a->data.v;
-    for (i = 0; i <= keys[0]; ++i) {
-        WRITE_INT(store, keys[i]);
+    WRITE_INT(store, keys[0]);
+    for (i = 0; i < keys[0]; ++i) {
+        WRITE_INT(store, keys[i * 2 + 1]);
+        WRITE_INT(store, keys[i * 2 + 2]);
     }
 }
 
@@ -42,10 +44,16 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
     if (i == 0) {
         return AT_READ_FAIL;
     }
-    a->data.v = p = malloc(sizeof(int)*(i + 1));
+    a->data.v = p = malloc(sizeof(int)*(i*2 + 1));
     *p++ = i;
     while (i--) {
         READ_INT(data->store, p++);
+        if (data->version >= KEYVAL_VERSION) {
+            READ_INT(data->store, p++);
+        }
+        else {
+            *p++ = 1;
+        }
     }
     return AT_READ_OK;
 }
@@ -69,32 +77,37 @@ attrib_type at_keys = {
     NULL
 };
 
-void a_upgradekeys(attrib **alist, attrib *abegin) {
+static void a_upgradekeys(attrib **alist, attrib *abegin) {
     int n = 0, *keys = 0;
-    int i = 0, val[4];
+    int i = 0, val[8];
     attrib *a, *ak = a_find(*alist, &at_keys);
     if (ak) {
         keys = (int *)ak->data.v;
         if (keys) n = keys[0];
     }
     for (a = abegin; a && a->type == abegin->type; a = a->next) {
-        val[i++] = a->data.i;
-        if (i == 4) {
-            keys = realloc(keys, sizeof(int) * (n + i + 1));
-            memcpy(keys + n + 1, val, sizeof(int)*i);
+        val[i * 2] = a->data.i;
+        val[i * 2 + 1] = 1;
+        if (++i == 4) {
+            keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
+            memcpy(keys + 2 * n + 1, val, sizeof(val));
             n += i;
             i = 0;
         }
     }
     if (i > 0) {
-        keys = realloc(keys, sizeof(int) * (n + i + 1));
-        memcpy(keys + n + 1, val, sizeof(int)*i);
+        keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
+        memcpy(keys + 2 * n + 1, val, sizeof(int)*i*2);
         if (!ak) {
             ak = a_add(alist, a_new(&at_keys));
         }
     }
-    ak->data.v = keys;
-    keys[0] = n + i;
+    if (ak) {
+        ak->data.v = keys;
+        if (keys) {
+            keys[0] = n + i;
+        }
+    }
 }
 
 attrib_type at_key = {
@@ -107,9 +120,9 @@ attrib_type at_key = {
     a_upgradekeys
 };
 
-void key_set(attrib ** alist, int key)
+void key_set(attrib ** alist, int key, int val)
 {
-    int *keys, n = 1;
+    int *keys, n = 0;
     attrib *a;
     assert(key != 0);
     a = a_find(*alist, &at_keys);
@@ -118,12 +131,13 @@ void key_set(attrib ** alist, int key)
     }
     keys = (int *)a->data.v;
     if (keys) {
-        n = keys[0] + 1;
+        n = keys[0];
     }
-    keys = realloc(keys, sizeof(int) *(n + 1));
-    // TODO: does insertion sort pay off here?
-    keys[0] = n;
-    keys[n] = key;
+    keys = realloc(keys, sizeof(int) *(2 * n + 3));
+    /* TODO: does insertion sort pay off here? prob. not. */
+    keys[0] = n + 1;
+    keys[2 * n + 1] = key;
+    keys[2 * n + 2] = val;
     a->data.v = keys;
 }
 
@@ -135,29 +149,31 @@ void key_unset(attrib ** alist, int key)
     if (a) {
         int i, *keys = (int *)a->data.v;
         if (keys) {
-            for (i = 1; i <= keys[0]; ++i) {
-                if (keys[i] == key) {
-                    keys[i] = keys[keys[0]];
+            int n = keys[0];
+            for (i = 0; i != n; ++i) {
+                if (keys[2 * i + 1] == key) {
+                    memmove(keys + 2 * i + 1, keys + 2 * n - 1, 2 * sizeof(int));
                     keys[0]--;
+                    break;
                 }
             }
         }
     }
 }
 
-bool key_get(attrib *alist, int key) {
+int key_get(attrib *alist, int key) {
     attrib *a;
     assert(key != 0);
     a = a_find(alist, &at_keys);
     if (a) {
         int i, *keys = (int *)a->data.v;
         if (keys) {
-            for (i = 1; i <= keys[0]; ++i) {
-                if (keys[i] == key) {
-                    return true;
+            for (i = 0; i != keys[0]; ++i) {
+                if (keys[i*2+1] == key) {
+                    return keys[i * 2 + 2];
                 }
             }
         }
     }
-    return false;
+    return 0;
 }

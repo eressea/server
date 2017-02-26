@@ -74,7 +74,7 @@ static int createunit_handle(trigger * t, void *data)
     else {
         log_error("could not perform createunit::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 
@@ -102,7 +102,6 @@ static int createunit_read(trigger * t, gamedata *data)
     else {
         result = AT_READ_FAIL;
     }
-    // read_reference(&td->f, store, read_faction_reference, resolve_faction);
 
     read_reference(&td->r, data, read_region_reference,
         RESOLVE_REGION(data->version));

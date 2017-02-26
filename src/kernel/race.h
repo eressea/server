@@ -45,7 +45,9 @@ extern "C" {
 
     struct param;
     struct spell;
+    struct spellref;
     struct locale;
+    struct rcoption;
 
     extern int num_races;
 
@@ -63,8 +65,8 @@ extern "C" {
         RC_ORC,
         RC_SNOTLING,
         RC_UNDEAD,
-        RC_ILLUSION,
-        RC_FIREDRAGON,
+
+        RC_FIREDRAGON = 15,
         RC_DRAGON,
         RC_WYRM,
         RC_TREEMAN,
@@ -103,21 +105,20 @@ extern "C" {
     typedef struct att {
         int type;
         union {
-            const char *dice;
-            const struct spell *sp;
+            char *dice;
+            struct spellref *sp;
         } data;
         int flags;
         int level;
     } att;
 
-    typedef const char *(*race_desc_func)(const struct race *rc, const struct locale *lang);
-    typedef void (*race_name_func)(struct unit *);
+    typedef void (*race_func) (struct unit *);
 
     typedef struct race {
         char *_name;
-        float magres;
-        float healing;
-        double maxaura;            /* Faktor auf Maximale Aura */
+        variant magres;
+        int healing;
+        int maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
         double recruit_multi;      /* Faktor f�r Bauernverbrauch */
         int index;
@@ -128,7 +129,6 @@ extern "C" {
         int capacity;
         int income;
         float speed;
-        float aggression;           /* chance that a monster will attack */
         int hitpoints;
         char *def_damage;
         int armor;
@@ -136,8 +136,6 @@ extern "C" {
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
         int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
         int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
-        struct param *parameters;   // additional properties, for an example see natural_armor
-        const struct spell *precombatspell;
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
         int battle_flags;
@@ -145,15 +143,12 @@ extern "C" {
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
-        race_name_func generate_name;
-        race_desc_func describe;
-        void(*age) (struct unit * u);
-        bool(*move_allowed) (const struct region *, const struct region *);
-        struct item *(*itemdrop) (const struct race *, int size);
-        void(*init_familiar) (struct unit *);
+        race_func name_unit;
+        race_func age_unit;
+
+        struct rcoption *options; /* rarely used properties */
 
         const struct race *familiars[MAXMAGIETYP];
-        struct attrib *attribs;
         struct race *next;
     } race;
 
@@ -182,6 +177,21 @@ extern "C" {
     typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
     const char * rc_name_s(const race *rc, name_t n);
     const char * rc_name(const race *rc, name_t n, char *name, size_t size);
+
+    void rc_set_param(struct race *rc, const char *key, const char *value);
+
+    int rc_luxury_trade(const struct race *rc);
+    int rc_herb_trade(const struct race *rc);
+    variant rc_magres(const struct race *rc);
+    double rc_maxaura(const struct race *rc);
+    int rc_armor_bonus(const struct race *rc);
+    int rc_scare(const struct race *rc);
+    const char * rc_hungerdamage(const race *rc);
+    const race *rc_otherrace(const race *rc);
+
+#define MIGRANTS_NONE 0
+#define MIGRANTS_LOG10 1
+    int rc_migrants_formula(const race *rc);
 
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
@@ -214,6 +224,8 @@ extern "C" {
 #define RCF_STONEGOLEM     (1<<27)      /* race gets stonegolem properties */
 #define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
 #define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
+#define RCF_MIGRANTS       (1<<30)      /* may have migrant units (human bonus) */
+#define RCF_FAMILIAR       (1<<31)      /* may be a familiar */
 
     /* Economic flags */
 #define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenst�nde weg */
@@ -250,8 +262,7 @@ extern "C" {
     variant read_race_reference(struct storage *store);
 
     const char *raceprefix(const struct unit *u);
-    void register_race_name_function(race_name_func, const char *);
-    void register_race_description_function(race_desc_func, const char *);
+    void register_race_function(race_func, const char *);
 
 #ifdef __cplusplus
 }

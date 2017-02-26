@@ -70,8 +70,8 @@ static bool can_give(const unit * u, const unit * u2, const item_type * itype, i
 {
     if (u2) {
         if (u2->number==0 && !fval(u2, UFL_ISNEW)) {
-            // https://bugs.eressea.de/view.php?id=2230
-            // cannot give anything to dead units
+            /* https://bugs.eressea.de/view.php?id=2230
+             * cannot give anything to dead units */
             return false;
         } else if (u->faction != u2->faction) {
             int rule = rule_give();
@@ -156,7 +156,7 @@ struct order *ord)
 
     assert(itype != NULL);
     n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
-    n = _min(want, n);
+    n = MIN(want, n);
     r = n;
     if (dest && src->faction != dest->faction
         && src->faction->age < GiveRestriction()) {
@@ -227,7 +227,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
     if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
-    else if (dst && (has_skill(u, SK_MAGIC) && dst->number > 0)) {
+    else if (has_skill(u, SK_MAGIC)) {
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
@@ -258,7 +258,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     message * msg;
     int maxt = max_transfers();
 
-    assert(u2); // use disband_men for GIVE 0
+    assert(u2); /* use disband_men for GIVE 0 */
 
     if (!can_give_men(u, u2, ord, &msg)) {
         return msg;
@@ -772,7 +772,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        n = _min(u->number, n);
+        n = MIN(u->number, n);
         msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);

@@ -352,37 +352,9 @@
   <!-- ending here: Wildente and Jadee's wedding  -->
 
   <!-- art rewards begin -->
-  <string name="hornofdancing">
-    <text locale="de">Horn des Tanzes</text>
-    <text locale="en">horn of dancing</text>
-  </string>
-  <string name="hornofdancing_p">
-    <text locale="de">Hörner des Tanzes</text>
-    <text locale="en">horns of dancing</text>
-  </string>
-  <string name="instantartacademy">
-    <text locale="de">Miniatur einer Akademie der Künste</text>
-    <text locale="en">academy of arts in a box</text>
-  </string>
-  <string name="instantartacademy_p">
-    <text locale="de">Miniaturen einer Akademie der Künste</text>
-    <text locale="en">academies of arts in a box</text>
-  </string>
-  <string name="instantartsculpture">
-    <text locale="de">Miniatur einer Skulptur</text>
-    <text locale="en">art sculpture in a box</text>
-  </string>
-  <string name="instantartsculpture_p">
-    <text locale="de">Miniaturen einer Skulptur</text>
-    <text locale="en">art sculptures in a box</text>
-  </string>
-  <string name="trappedairelemental">
-    <text locale="de">Gefangener Windgeist</text>
-    <text locale="en">trapped air elemental</text>
-  </string>
-  <string name="trappedairelemental_p">
-    <text locale="de">Gefangene Windgeister</text>
-    <text locale="en">trapped air elementals</text>
+  <string name="artacademy">
+    <text locale="de">Akademie der Künste</text>
+    <text locale="en">academy of arts</text>
   </string>
   <string name="aurapotion50">
     <text locale="de">Auratrank</text>

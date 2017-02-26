@@ -28,12 +28,13 @@ if [ -d $HOME/usr ]; then
   PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
 fi
 
+DEST=$(dirname $ROOT)/server
 ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
  -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
  -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
- -DCMAKE_INSTALL_PREFIX=$HOME/eressea/server"
+ -DCMAKE_INSTALL_PREFIX=$DEST"
 
 git submodule update --init
 

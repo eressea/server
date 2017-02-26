@@ -1,12 +1,14 @@
 -- Muschelplateau
 
+if not config.embassy then return nil end
+
 local embassy = {}
 local home = nil
 
 -- global exports (use item)
 function use_seashell(u, amount)
 -- Muschelplateau...
-    local visit = u.faction.objects:get("embassy_muschel")
+    local visit = u.faction:get_key('mupL')
     if visit and u.region~= home then
         local turns = get_turn() - visit
         local msg = message.create('msg_event')
@@ -32,10 +34,10 @@ function embassy.update()
     eressea.log.debug("updating embassies in " .. tostring(home))
     local u
     for u in home.units do
-        if u.faction.objects:get('embassy_muschel')==nil then
+        if u.faction:get_key('mupL')==0 then
             if (u.faction:add_item('seashell', 1)>0) then
                 eressea.log.debug("new seashell for " .. tostring(u.faction))
-                u.faction.objects:set('embassy_muschel', get_turn())
+                u.faction:set_key('mupL', get_turn())
             end
         end
     end

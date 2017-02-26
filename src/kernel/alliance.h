@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_KRNL_ALLIANCE
 #define H_KRNL_ALLIANCE
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,6 +30,7 @@ extern "C" {
     struct unit;
     struct faction;
     struct region;
+    struct selist;
 
     enum {
         ALLIANCE_KICK,
@@ -46,7 +50,7 @@ extern "C" {
     typedef struct alliance {
         struct alliance *next;
         struct faction *_leader;
-        struct quicklist *members;
+        struct selist *members;
         int flags;
         int id;
         char *name;

@@ -47,7 +47,6 @@
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
-#include <items/itemtypes.h>
 
 #include <util/log.h>
 #include <util/unicode.h>
@@ -184,7 +183,7 @@ map_region *mr_get(const view * vi, int xofs, int yofs)
 static point *coor2point(const coordinate * c, point * p)
 {
     assert(c && p);
-    p->x = c->x * TWIDTH + c->y * TWIDTH / 2; //-V537
+    p->x = c->x * TWIDTH + c->y * TWIDTH / 2; /*-V537 */
     p->y = c->y * THEIGHT;
     return p;
 }
@@ -262,7 +261,7 @@ static chtype mr_tile(const map_region * mr, int highlight)
         const region *r = mr->r;
         switch (r->terrain->_name[0]) {
         case 'o':
-            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD; //-V525
+            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD; /*-V525 */
         case 'd':
             return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
         case 't':
@@ -427,7 +426,7 @@ static void paint_info_region(window * wnd, const state * st)
     int line = 0, maxline = getmaxy(win) - 2;
     map_region *mr = cursor_region(&st->display, &st->cursor);
 
-    unused_arg(st);
+    UNUSED_ARG(st);
     werase(win);
     wxborder(win);
     if (mr && mr->r) {
@@ -1167,7 +1166,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
+                slprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(locate));
                 if (f == NULL) {
@@ -1398,7 +1397,7 @@ int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
 const char *prompt)
 {
-    unused_arg(L);
+    UNUSED_ARG(L);
     askstring(hstatus, prompt, buffer, size);
     return buffer[0] != 0;
 }

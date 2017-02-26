@@ -30,7 +30,7 @@ int add_raceprefix(const char *prefix)
         race_prefixes = tmp;
         size *= 2;
     }
-    race_prefixes[next++] = _strdup(prefix);
+    race_prefixes[next++] = strdup(prefix);
     race_prefixes[next] = NULL;
     return 0;
 }

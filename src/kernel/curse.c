@@ -109,7 +109,7 @@ int curse_age(attrib * a, void *owner)
     curse *c = (curse *)a->data.v;
     int result = 0;
 
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     c_clearflag(c, CURSE_ISNEW);
 
     if (c_flags(c) & CURSE_NOAGE) {
@@ -122,7 +122,7 @@ int curse_age(attrib * a, void *owner)
         c->duration = 0;
     }
     else if (c->duration != INT_MAX) {
-        c->duration = _max(0, c->duration - 1);
+        c->duration = MAX(0, c->duration - 1);
     }
     return (c->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -287,10 +287,10 @@ attrib_type at_curse = {
 /* Spruch identifizieren */
 
 #include <util/umlaut.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #define MAXCTHASH 128
-static quicklist *cursetypes[MAXCTHASH];
+static selist *cursetypes[MAXCTHASH];
 static int ct_changes = 1;
 
 bool ct_changed(int *cache)
@@ -306,25 +306,25 @@ bool ct_changed(int *cache)
 void ct_register(const curse_type * ct)
 {
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
-    quicklist **ctlp = cursetypes + hash;
+    selist **ctlp = cursetypes + hash;
 
-    ql_set_insert(ctlp, (void *)ct);
+    selist_set_insert(ctlp, (void *)ct, NULL);
     ++ct_changes;
 }
 
 void ct_remove(const char *c)
 {
     unsigned int hash = tolower(c[0]);
-    quicklist *ctl = cursetypes[hash];
+    selist *ctl = cursetypes[hash];
 
     if (ctl) {
         int qi;
 
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
 
             if (strcmp(c, type->cname) == 0) {
-                ql_delete(&ctl, qi);
+                selist_delete(&ctl, qi);
                 ++ct_changes;
                 break;
             }
@@ -335,20 +335,20 @@ void ct_remove(const char *c)
 const curse_type *ct_find(const char *c)
 {
     unsigned int hash = tolower(c[0]);
-    quicklist *ctl = cursetypes[hash];
+    selist *ctl = cursetypes[hash];
 
     if (ctl) {
         size_t c_len = strlen(c);
         int qi;
 
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
 
             if (strcmp(c, type->cname) == 0) {
                 return type;
             }
             else {
-                size_t k = _min(c_len, strlen(type->cname));
+                size_t k = MIN(c_len, strlen(type->cname));
                 if (!memcmp(c, type->cname, k)) {
                     return type;
                 }
@@ -360,12 +360,12 @@ const curse_type *ct_find(const char *c)
 
 void ct_checknames(void) {
     int i, qi;
-    quicklist *ctl;
+    selist *ctl;
 
     for (i = 0; i < MAXCTHASH; ++i) {
         ctl = cursetypes[i];
-        for (qi = 0; ctl; ql_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)ql_get(ctl, qi);
+        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
+            curse_type *type = (curse_type *)selist_get(ctl, qi);
             curse_name(type, default_locale);
 
         }
@@ -507,7 +507,7 @@ int get_cursedmen(unit * u, const curse * c)
         cursedmen = c->data.i;
     }
 
-    return _min(u->number, cursedmen);
+    return MIN(u->number, cursedmen);
 }
 
 /* setzt die Anzahl der betroffenen Personen auf cursedmen */
@@ -596,7 +596,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     /* es gibt schon eins diese Typs */
     if (c && ct->mergeflags != NO_MERGE) {
         if (ct->mergeflags & M_DURATION) {
-            c->duration = _max(c->duration, duration);
+            c->duration = MAX(c->duration, duration);
         }
         if (ct->mergeflags & M_SUMDURATION) {
             c->duration += duration;
@@ -605,10 +605,10 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
             c->effect += effect;
         }
         if (ct->mergeflags & M_MAXEFFECT) {
-            c->effect = _max(c->effect, effect);
+            c->effect = MAX(c->effect, effect);
         }
         if (ct->mergeflags & M_VIGOUR) {
-            c->vigour = _max(vigour, c->vigour);
+            c->vigour = MAX(vigour, c->vigour);
         }
         if (ct->mergeflags & M_VIGOUR_ADD) {
             c->vigour = vigour + c->vigour;
@@ -696,7 +696,7 @@ void transfer_curse(unit * u, unit * u2, int n)
 
 int curse_cansee(const curse *c, const faction *viewer, objtype_t typ, const void *obj, int self) {
     if (self < 3 && c->magician && c->magician->faction == viewer) {
-        // magicians can see their own curses better than anybody, no exceptions
+        /* magicians can see their own curses better than anybody, no exceptions */
         self = 3;
     }
     else if (c->type->cansee) {
@@ -792,9 +792,9 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 {
     struct message *msg;
 
-    unused_arg(typ);
-    unused_arg(self);
-    unused_arg(obj);
+    UNUSED_ARG(typ);
+    UNUSED_ARG(self);
+    UNUSED_ARG(obj);
 
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
     if (msg == NULL) {
@@ -847,7 +847,7 @@ double destr_curse(curse * c, int cast_level, double force)
 void curses_done(void) {
     int i;
     for (i = 0; i != MAXCTHASH; ++i) {
-        ql_free(cursetypes[i]);
+        selist_free(cursetypes[i]);
         cursetypes[i] = 0;
     }
     ++ct_changes;

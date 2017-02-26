@@ -122,7 +122,7 @@ struct order *ord)
         double force;
         spell *sp = find_spell("antimagiczone");
         attrib **ap = &r->attribs;
-        unused_arg(ord);
+        UNUSED_ARG(ord);
         assert(sp);
 
         /* Reduziert die Stärke jedes Spruchs um effect */
@@ -167,8 +167,7 @@ struct order *ord)
         }
     }
     use_pooled(u, rt_crystal, GET_DEFAULT, amount);
-    ADDMSG(&u->faction->msgs, msg_message("use_antimagiccrystal",
-        "unit region", u, r));
+    ADDMSG(&u->region->msgs, msg_message("use_antimagiccrystal", "unit", u));
     return 0;
 }
 

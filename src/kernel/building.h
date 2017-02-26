@@ -23,6 +23,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 
 #include <stddef.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,13 +51,7 @@ extern "C" {
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
-#define BTF_FORTIFICATION 0x200 /* safe from monsters */
-
-    typedef enum {
-        DEFENSE_BONUS,
-        CLOSE_COMBAT_ATTACK_BONUS, // TODO: only DEFENSE_BONUS is in use?
-        RANGED_ATTACK_BONUS,
-    } building_bonus;
+#define BTF_FORTIFICATION 0x200 /* building_protection, safe from monsters */
 
     typedef struct building_type {
         char *_name;
@@ -64,7 +60,7 @@ extern "C" {
         int capacity;               /* Kapazit�t pro Gr��enpunkt */
         int maxcapacity;            /* Max. Kapazit�t */
         int maxsize;                /* how big can it get, with all the extensions? */
-        int magres;                 /* how well it resists against spells */
+        variant magres;                 /* how well it resists against spells */
         int magresbonus;            /* bonus it gives the target against spells */
         int fumblebonus;            /* bonus that reduces fumbling */
         double auraregen;           /* modifier for aura regeneration inside building */
@@ -75,14 +71,15 @@ extern "C" {
             const struct building * b, int size);
         void(*init) (struct building_type *);
         void(*age) (struct building *);
-        int(*protection) (const struct building *, const struct unit *, building_bonus bonus);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;
     } building_type;
 
-    extern struct quicklist *buildingtypes;
+    extern struct selist *buildingtypes;
     extern struct attrib_type at_building_action;
 
+    int cmp_castle_size(const struct building *b, const struct building *a);
+    int building_protection(const struct building_type *btype, int stage);
     building_type *bt_get_or_create(const char *name);
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);

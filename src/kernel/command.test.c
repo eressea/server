@@ -10,7 +10,9 @@
  without prior permission by the authors of Eressea.
 
  */
+#include <platform.h>
 #include "command.h"
+
 #include "unit.h"
 #include "order.h"
 

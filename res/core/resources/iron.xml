@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resource name="iron" limited="yes" material="rm_iron">
+<resource name="iron" limited="yes" material="yes">
   <item weight="500" score="10">
     <construction skill="mining" minskill="1"/>
   </item>

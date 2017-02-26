@@ -51,7 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/otherfaction.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <storage.h>
 
 /* libc includes */
@@ -102,7 +102,7 @@ static void free_faction(faction * f)
     free(f->_password);
     free(f->name);
     if (f->seen_factions) {
-        ql_free(f->seen_factions);
+        selist_free(f->seen_factions);
         f->seen_factions = 0;
     }
 
@@ -247,10 +247,6 @@ faction *addfaction(const char *email, const char *password,
         log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
     }
 
-    if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
-    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
-
     f->alliance_joindate = turn;
     f->lastorders = turn;
     f->_alive = true;
@@ -259,7 +255,11 @@ faction *addfaction(const char *email, const char *password,
     f->magiegebiet = 0;
     f->locale = loc;
     f->subscription = subscription;
-    f->flags = FFL_ISNEW;
+    f->flags = FFL_ISNEW|FFL_PWMSG;
+
+    if (!password) password = itoa36(rng_int());
+    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->options =
         want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_COMPUTER) | want(O_COMPRESS) |
@@ -274,7 +274,7 @@ faction *addfaction(const char *email, const char *password,
     fhash(f);
 
     slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
-    f->name = _strdup(buf);
+    f->name = strdup(buf);
 
     if (!f->race) {
         log_warning("creating a faction that has no race", itoa36(f->no));
@@ -286,15 +286,15 @@ faction *addfaction(const char *email, const char *password,
 unit *addplayer(region * r, faction * f)
 {
     unit *u;
-    char buffer[32];
+    const struct equipment* eq;
 
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
-    equip_items(&u->faction->items, get_equipment("new_faction"));
-    equip_unit(u, get_equipment("first_unit"));
-    sprintf(buffer, "first_%s", u_race(u)->_name);
-    equip_unit(u, get_equipment(buffer));
+    eq = get_equipment("first_unit");
+    if (eq) {
+        equip_items(&u->items, eq);
+    }
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
@@ -366,7 +366,7 @@ void destroyfaction(faction ** fp)
     }
 
     if (f->seen_factions) {
-        ql_free(f->seen_factions);
+        selist_free(f->seen_factions);
         f->seen_factions = 0;
     }
 
@@ -449,7 +449,7 @@ void destroyfaction(faction ** fp)
     /* units of other factions that were disguised as this faction
      * have their disguise replaced by ordinary faction hiding. */
     if (rule_stealth_other()) {
-        // TODO: f.alive should be tested for in get_otherfaction
+        /* TODO: f.alive should be tested for in get_otherfaction */
         region *rc;
         for (rc = regions; rc; rc = rc->next) {
             for (u = rc->units; u; u = u->next) {
@@ -523,7 +523,7 @@ void faction_setname(faction * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = _strdup(name);
+        self->name = strdup(name);
 }
 
 const char *faction_getemail(const faction * self)
@@ -535,7 +535,7 @@ void faction_setemail(faction * self, const char *email)
 {
     free(self->email);
     if (email)
-        self->email = _strdup(email);
+        self->email = strdup(email);
 }
 
 const char *faction_getbanner(const faction * self)
@@ -547,15 +547,14 @@ void faction_setbanner(faction * self, const char *banner)
 {
     free(self->banner);
     if (banner)
-        self->banner = _strdup(banner);
+        self->banner = strdup(banner);
 }
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
     assert(pwhash);
-    // && pwhash[0] == '$');
     free(f->_password);
-    f->_password = _strdup(pwhash);
+    f->_password = strdup(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -563,10 +562,7 @@ bool valid_race(const struct faction *f, const struct race *rc)
     if (f->race == rc)
         return true;
     else {
-        const char *str = get_param(f->race->parameters, "other_race");
-        if (str)
-            return (bool)(rc_find(str) == rc);
-        return false;
+        return rc_otherrace(f->race) == rc;
     }
 }
 
@@ -593,11 +589,11 @@ static int allied_skillcount(const faction * f, skill_t sk)
 {
     int num = 0;
     alliance *a = f_get_alliance(f);
-    quicklist *members = a->members;
+    selist *members = a->members;
     int qi;
 
-    for (qi = 0; members; ql_advance(&members, &qi, 1)) {
-        faction *m = (faction *)ql_get(members, qi);
+    for (qi = 0; members; selist_advance(&members, &qi, 1)) {
+        faction *m = (faction *)selist_get(members, qi);
         num += count_skill(m, sk);
     }
     return num;
@@ -753,12 +749,9 @@ int count_migrants(const faction * f)
     return count_faction(f, COUNT_MIGRANTS);
 }
 
-#define MIGRANTS_NONE 0
-#define MIGRANTS_LOG10 1
-
 int count_maxmigrants(const faction * f)
 {
-    int formula = get_param_int(f->race->parameters, "migrants.formula", 0);
+    int formula = rc_migrants_formula(f->race);
 
     if (formula == MIGRANTS_LOG10) {
         int nsize = count_all(f);

@@ -35,7 +35,7 @@ void test_upkeep_default(CuTest * tc)
     config_set("rules.food.flags", "0");
     i_change(&u1->items, i_silver, 20);
     get_food(r);
-    // since u1 and u2 are not allied, u1 should not help u2 with upkeep
+    /* since u1 and u2 are not allied, u1 should not help u2 with upkeep */
     CuAssertIntEquals(tc, 10, i_get(u1->items, i_silver));
     CuAssertIntEquals(tc, 0, fval(u1, UFL_HUNGER));
     CuAssertIntEquals(tc, UFL_HUNGER, fval(u2, UFL_HUNGER));
@@ -63,7 +63,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     config_set("rules.food.flags", "0");
     u1->hp = 100;
     get_food(r);
-    // since u1 and u2 are not allied, u1 should not help u2 with upkeep
+    /* since u1 and u2 are not allied, u1 should not help u2 with upkeep */
     CuAssertTrue(tc, u1->hp < 100);
 
     test_cleanup();
@@ -152,7 +152,7 @@ void test_upkeep_free(CuTest * tc)
     u = test_create_unit(test_create_faction(test_create_race("human")), r);
     assert(r && u);
 
-    config_set("rules.food.flags", "4"); // FOOD_IS_FREE
+    config_set("rules.food.flags", "4"); /* FOOD_IS_FREE */
     get_food(r);
     CuAssertIntEquals(tc, 0, i_get(u->items, i_silver));
     CuAssertIntEquals(tc, 0, fval(u, UFL_HUNGER));

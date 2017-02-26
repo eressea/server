@@ -83,8 +83,8 @@ int lighthouse_range(const building * b, const faction * f)
                     }
                     else if (f == NULL || u->faction == f) {
                         int sk = effskill(u, SK_PERCEPTION, 0) / 3;
-                        d = _max(d, sk);
-                        d = _min(maxd, d);
+                        d = MAX(d, sk);
+                        d = MIN(maxd, d);
                         if (d == maxd)
                             break;
                     }

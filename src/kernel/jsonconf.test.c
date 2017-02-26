@@ -69,12 +69,15 @@ static void test_settings(CuTest * tc)
         "\"string\" : \"1d4\","
         "\"integer\" : 14,"
         "\"true\": true,"
+        "\"game.id\": 4,"
         "\"false\": false,"
         "\"float\" : 1.5 }}";
     cJSON *json = cJSON_Parse(data);
 
     test_cleanup();
+    config_set("game.id", "42"); /* should not be replaced */
     json_config(json);
+    CuAssertStrEquals(tc, "42", config_get("game.id"));
     CuAssertStrEquals(tc, "1", config_get("true"));
     CuAssertStrEquals(tc, "0", config_get("false"));
     CuAssertStrEquals(tc, "1d4", config_get("string"));
@@ -133,8 +136,8 @@ static void test_races(CuTest * tc)
 {
     const char * data = "{\"races\": { \"orc\" : { "
         "\"damage\" : \"1d4\","
-        "\"magres\" : 1.0,"
-        "\"maxaura\" : 2.0,"
+        "\"magres\" : 100,"
+        "\"maxaura\" : 200,"
         "\"regaura\" : 3.0,"
         "\"speed\" : 4.0,"
         "\"recruitcost\" : 1,"
@@ -160,8 +163,9 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, rc);
     CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
-    CuAssertDblEquals(tc, 1.0, rc->magres, 0.0);
-    CuAssertDblEquals(tc, 2.0, rc->maxaura, 0.0);
+    CuAssertTrue(tc, frac_equal(frac_one, rc->magres));
+    CuAssertIntEquals(tc, 200, rc->maxaura);
+    CuAssertDblEquals(tc, 2.0, rc_maxaura(rc), 0.0);
     CuAssertDblEquals(tc, 3.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 4.0, rc->speed, 0.0);
     CuAssertIntEquals(tc, 1, rc->recruitcost);
@@ -448,7 +452,7 @@ static void test_configs(CuTest * tc)
     CuAssertPtrEquals(tc, 0, buildingtypes);
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
-    if (unlink("test.json")!=0 && errno==ENOENT) {
+    if (remove("test.json")!=0 && errno==ENOENT) {
         errno = 0;
     }
     cJSON_Delete(json);
@@ -483,7 +487,7 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrEquals(tc, rt_get_or_create("h0"), ter->herbs[0]->rtype);
     CuAssertPtrEquals(tc, rt_get_or_create("h1"), ter->herbs[1]->rtype);
     CuAssertPtrEquals(tc, 0, (void *)ter->herbs[2]);
-    CuAssertPtrNotNull(tc, ter->name); // anything named "plain" uses plain_name()
+    CuAssertPtrNotNull(tc, ter->name); /* anything named "plain" uses plain_name() */
     CuAssertPtrNotNull(tc, ter->production);
     CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
     CuAssertDblEquals(tc, 0.1, ter->production[0].chance, 0.01);
@@ -595,9 +599,10 @@ static void test_infinitive_from_config(CuTest *tc) {
 
     cJSON *json = cJSON_Parse(data);
     CuAssertPtrNotNull(tc, json);
+    test_setup();
+    lang = get_or_create_locale("de");
     json_config(json);
 
-    lang = get_or_create_locale("de");
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERN", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNE", lang));
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));

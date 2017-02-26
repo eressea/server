@@ -41,7 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
@@ -62,18 +62,18 @@ typedef struct building_typelist {
     building_type *type;
 } building_typelist;
 
-quicklist *buildingtypes = NULL;
+selist *buildingtypes = NULL;
 
 /* Returns a building type for the (internal) name */
 static building_type *bt_find_i(const char *name)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
     assert(name);
 
-    for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
-        building_type *btype = (building_type *)ql_get(ql, qi);
+    for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
+        building_type *btype = (building_type *)selist_get(ql, qi);
         if (strcmp(btype->_name, name) == 0)
             return btype;
     }
@@ -102,7 +102,7 @@ void bt_register(building_type * type)
     if (type->init) {
         type->init(type);
     }
-    ql_push(&buildingtypes, (void *)type);
+    selist_push(&buildingtypes, (void *)type);
     ++bt_changes;
 }
 
@@ -115,8 +115,8 @@ static void free_buildingtype(void *ptr) {
 }
 
 void free_buildingtypes(void) {
-    ql_foreach(buildingtypes, free_buildingtype);
-    ql_free(buildingtypes);
+    selist_foreach(buildingtypes, free_buildingtype);
+    selist_free(buildingtypes);
     buildingtypes = 0;
     ++bt_changes;
 }
@@ -127,7 +127,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
-            btype->_name = _strdup(name);
+            btype->_name = strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;
@@ -143,7 +143,7 @@ int buildingcapacity(const building * b)
 {
     if (b->type->capacity >= 0) {
         if (b->type->maxcapacity >= 0) {
-            return _min(b->type->maxcapacity, b->size * b->type->capacity);
+            return MIN(b->type->maxcapacity, b->size * b->type->capacity);
         }
         return b->size * b->type->capacity;
     }
@@ -314,19 +314,24 @@ const building_type *findbuildingtype(const char *name,
         bn = bn->next;
     }
     if (!bn) {
-        quicklist *ql = buildingtypes;
+        selist *ql = buildingtypes;
         int qi;
 
         bn = (local_names *)calloc(sizeof(local_names), 1);
         bn->next = bnames;
         bn->lang = lang;
 
-        for (qi = 0, ql = buildingtypes; ql; ql_advance(&ql, &qi, 1)) {
-            building_type *btype = (building_type *)ql_get(ql, qi);
+        for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
+            building_type *btype = (building_type *)selist_get(ql, qi);
 
             const char *n = LOC(lang, btype->_name);
-            type.v = (void *)btype;
-            addtoken((struct tnode **)&bn->names, n, type);
+            if (!n) {
+                log_error("building type %s has no translation in %s",
+                          btype->_name, locale_name(lang));
+            } else {
+                type.v = (void *)btype;
+                addtoken((struct tnode **)&bn->names, n, type);
+            }
         }
         bnames = bn;
     }
@@ -335,31 +340,26 @@ const building_type *findbuildingtype(const char *name,
     return (const building_type *)type.v;
 }
 
-static int building_protection(const building * b, const unit * u, building_bonus bonus)
+int cmp_castle_size(const building * b, const building * a)
 {
-    int i = 0;
-    int bsize = buildingeffsize(b, false);
-    const construction *cons = b->type->construction;
-    if (!cons) {
-        return 0;
+    if (!b || !(b->type->flags & BTF_FORTIFICATION) || !building_owner(b)) {
+        return -1;
     }
+    if (!a || !(a->type->flags & BTF_FORTIFICATION) || !building_owner(a)) {
+        return 1;
+    }
+    return b->size - a->size;
+}
 
-    for (i = 0; i < bsize; i++)
-    {
-        cons = cons->improvement;
-    }
+static const int castle_bonus[6] = { 0, 1, 3, 5, 8, 12 };
+static const int watch_bonus[3] = { 0, 1, 2 };
 
-    switch (bonus)
-    {
-    case DEFENSE_BONUS:
-        return cons->defense_bonus;
-    case CLOSE_COMBAT_ATTACK_BONUS:
-        return cons->close_combat_bonus;
-    case RANGED_ATTACK_BONUS:
-        return cons->ranged_bonus;
-    default:
-        return 0;
+int building_protection(const building_type * btype, int stage)
+{
+    if (btype->maxsize < 0) {
+        return castle_bonus[MIN(stage, 5)];
     }
+    return watch_bonus[MIN(stage, 2)];
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -420,7 +420,7 @@ building *new_building(const struct building_type * btype, region * r,
     }
     assert(bname);
     slprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = _strdup(bname);
+    b->name = strdup(bname);
     return b;
 }
 
@@ -450,8 +450,8 @@ void remove_building(building ** blist, building * b)
     bunhash(b);
 
     /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
-     * gebaute Stra�e zur H�lfte vernichtet */
-    // TODO: caravan, tunnel, dam modularization ? is_building_type ?
+     * gebaute Strasse zur Haelfte vernichtet */
+    /* TODO: caravan, tunnel, dam modularization ? is_building_type ? */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;
@@ -594,10 +594,11 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
 
 unit *building_owner(const building * bld)
 {
+    unit *owner;
     if (!bld) {
         return NULL;
     }
-    unit *owner = bld->_owner;
+    owner = bld->_owner;
     if (!owner || (owner->building != bld || owner->number <= 0)) {
         unit * heir = building_owner_ex(bld, owner ? owner->faction : 0);
         return (heir && heir->number > 0) ? heir : 0;
@@ -619,7 +620,7 @@ void building_setname(building * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = _strdup(name);
+        self->name = strdup(name);
     else
         self->name = NULL;
 }
@@ -779,7 +780,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         /* Godcurse: Income -10 */
         ctype = ct_find("godcursezone");
         if (ctype && curse_active(get_curse(r->attribs, ctype))) {
-            wage = _max(0, wage - 10);
+            wage = MAX(0, wage - 10);
         }
 
         /* Bei einer D�rre verdient man nur noch ein Viertel  */
@@ -913,8 +914,6 @@ int cmp_current_owner(const building * b, const building * a)
 void register_buildings(void)
 {
     register_function((pf_generic)minimum_wage, "minimum_wage");
-    register_function((pf_generic)building_protection,
-        "building_protection");
     register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");

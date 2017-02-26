@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_REGION
 
 #include <stddef.h>
+#include <stdbool.h>
 #include "types.h"
 #include "direction.h"
 

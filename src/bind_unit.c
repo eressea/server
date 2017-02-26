@@ -13,7 +13,6 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 
 #include "bind_unit.h"
-#include "bind_dict.h"
 #include "alchemy.h"
 #include "bindings.h"
 #include "move.h"
@@ -46,7 +45,7 @@ without prior permission by the authors of Eressea.
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <tolua.h>
 
@@ -66,12 +65,6 @@ static int tolua_bufunit(lua_State * L) {
     tolua_pushstring(L, buf);
     return 1;
 
-}
-static int tolua_unit_get_objects(lua_State * L)
-{
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
-    return 1;
 }
 
 int tolua_unitlist_nextf(lua_State * L)
@@ -753,12 +746,12 @@ static int tolua_unit_get_spells(lua_State * L)
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
     sc_mage *mage = self ? get_mage(self) : 0;
     spellbook *sb = mage ? mage->spellbook : 0;
-    quicklist *slist = 0;
+    selist *slist = 0;
     if (sb) {
-        quicklist **slist_ptr = &sb->spells;
+        selist **slist_ptr = &sb->spells;
         slist = *slist_ptr;
     }
-    return tolua_quicklist_push(L, "spellbook", "spell_entry", slist);
+    return tolua_selist_push(L, "spellbook", "spell_entry", slist);
 }
 
 static int tolua_unit_get_orders(lua_State * L)
@@ -793,7 +786,7 @@ static int tolua_unit_set_flag(lua_State * L)
     int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
     if (value) {
-        key_set(&self->attribs, flag);
+        key_set(&self->attribs, flag, value);
     }
     else {
         key_unset(&self->attribs, flag);
@@ -864,13 +857,15 @@ static int tolua_unit_create(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     region *r = (region *)tolua_tousertype(L, 2, 0);
+    unit *u;
     const char *rcname = tolua_tostring(L, 4, NULL);
     int num = (int)tolua_tonumber(L, 3, 1);
     const race *rc;
+
     assert(f && r);
     rc = rcname ? rc_find(rcname) : f->race;
     assert(rc);
-    unit *u = create_unit(r, f, num, rc, 0, NULL, NULL);
+    u = create_unit(r, f, num, rc, 0, NULL, NULL);
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
     return 1;
 }
@@ -1013,7 +1008,6 @@ void tolua_unit_open(lua_State * L)
                 tolua_unit_set_race);
             tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
 
-            tolua_variable(L, TOLUA_CAST "objects", &tolua_unit_get_objects, 0);
             tolua_function(L, TOLUA_CAST "show", &tolua_bufunit);
         }
         tolua_endmodule(L);

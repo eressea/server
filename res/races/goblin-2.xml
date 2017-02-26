@@ -1,14 +1,12 @@
 <?xml version="1.0" ?>
-<race name="goblin" magres="-0.05" maxaura="1.0" regaura="1.0"
+<race name="goblin" magres="-5" maxaura="1.0" regaura="1.0"
 recruitcost="60" maintenance="6" weight="600" capacity="440"
 speed="1.0" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0"
 playerrace="yes" walk="yes" giveperson="yes" giveunit="yes"
 getitem="yes" equipment="yes" healing="2.0">
   <ai splitsize="10000" moverandom="yes" learn="yes"/>
-  <function name="itemdrop" value="defaultdrops"/>
   <param name="hunger.damage" value="1d8+7"/>
   <param name="other_race" value="demon"/>
-  <param name="other_cost" value="500"/>
   <param name="recruit_multi" value="0.5"/>
   <skill name="building" modifier="1"/>
   <skill name="cartmaking" modifier="-1"/>

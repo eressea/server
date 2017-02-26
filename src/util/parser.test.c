@@ -49,11 +49,11 @@ static void test_parse_token_limit_utf8(CuTest *tc) {
 
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
-    CuAssertStrEquals(tc, tok, "\xc3\xa4\xc3\xb6\xc3\xbc"); // just three letters fit, 6 bytes long
+    CuAssertStrEquals(tc, tok, "\xc3\xa4\xc3\xb6\xc3\xbc"); /* just three letters fit, 6 bytes long */
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, NULL, (void *)tok);
 
-    str = orig; // now with an extra byte in the front, maxing out lbuf exactly
+    str = orig; /* now with an extra byte in the front, maxing out lbuf exactly */
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
     CuAssertStrEquals(tc, tok, "a\xc3\xa4\xc3\xb6\xc3\xbc");

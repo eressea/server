@@ -120,10 +120,10 @@ unit *findunitr(const region * r, int n)
     return (u && u->region == r) ? u : 0;
 }
 
-// TODO: deprecated, replace with findunit(n)
+/* TODO: deprecated, replace with findunit(n) */
 unit *findunitg(int n, const region * hint)
 {
-    unused_arg(hint);
+    UNUSED_ARG(hint);
     /* Abfangen von Syntaxfehlern. */
     if (n <= 0)
         return NULL;
@@ -366,7 +366,7 @@ int gift_items(unit * u, int flags)
 static unit *deleted_units = NULL;
 
 #define DMAXHASH 7919
-#undef DMAXHASH // TODO: makes dfindhash slow!
+#undef DMAXHASH /* TODO: makes dfindhash slow! */
 #ifdef DMAXHASH
 typedef struct dead {
     struct dead *nexthash;
@@ -455,7 +455,6 @@ int remove_unit(unit ** ulist, unit * u)
 #ifdef DMAXHASH
     dhash(u->no, u->faction);
 #endif
-    // u_setfaction(u, NULL);
 
     u->region = NULL;
 
@@ -511,7 +510,7 @@ int a_readprivate(attrib * a, void *owner, gamedata *data)
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = _strdup(lbuf);
+    a->data.v = strdup(lbuf);
     return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
@@ -532,8 +531,15 @@ const char *u_description(const unit * u, const struct locale *lang)
     if (u->display && u->display[0]) {
         return u->display;
     }
-    else if (u_race(u)->describe) {
-        return u_race(u)->describe(u->_race, lang);
+    else {
+        char zText[64];
+        const char * d;
+        const race * rc = u_race(u);
+        snprintf(zText, sizeof(zText), "describe_%s", rc->_name);
+        d = locale_getstring(lang, zText);
+        if (d) {
+            return d;
+        }
     }
     return NULL;
 }
@@ -562,7 +568,7 @@ void usetprivate(unit * u, const char *str)
     if (a->data.v) {
         free(a->data.v);
     }
-    a->data.v = _strdup(str);
+    a->data.v = strdup(str);
 }
 
 /*********************/
@@ -809,8 +815,8 @@ void set_level(unit * u, skill_t sk, int value)
 static int leftship_age(struct attrib *a, void *owner)
 {
     /* must be aged, so it doesn't affect report generation (cansee) */
-    unused_arg(a);
-    unused_arg(owner);
+    UNUSED_ARG(a);
+    UNUSED_ARG(owner);
     return AT_AGE_REMOVE;         /* remove me */
 }
 
@@ -1245,24 +1251,6 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
-#ifdef NEWATSROI
-static int item_modification(const unit * u, skill_t sk, int val)
-{
-    if (sk == SK_STEALTH) {
-        if (item_invis(u) >= u->number) {
-            val += ROIBONUS;
-        }
-    }
-    if (sk == SK_PERCEPTION) {
-        const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
-        if (i_get(u->items, rtype->itype) >= u->number) {
-            val += ATSBONUS;
-        }
-    }
-    return val;
-}
-#endif
-
 static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
@@ -1301,7 +1289,7 @@ static int att_modification(const unit * u, skill_t sk)
             while (a && a->type == &at_curse) {
                 curse *c = (curse *)a->data.v;
 
-                if (curse_active(c) && c->type == gbdream_ct) {
+                if (c->magician && curse_active(c) && c->type == gbdream_ct) {
                     int effect = curse_geteffect_int(c);
                     bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
                     if (allied) {
@@ -1335,11 +1323,6 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
 
-#ifdef NEWATSROI
-    if (!noitem) {
-        skill = item_modification(u, sk, skill);
-    }
-#endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (fval(u, UFL_HUNGER)) {
@@ -1382,15 +1365,12 @@ int effskill_study(const unit * u, skill_t sk, const region * r)
 
 int invisible(const unit * target, const unit * viewer)
 {
-#ifdef NEWATSROI
-    return 0;
-#else
     if (viewer && viewer->faction == target->faction)
         return 0;
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = _min(hidden, target->number);
+            hidden = MIN(hidden, target->number);
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);
@@ -1398,7 +1378,6 @@ int invisible(const unit * target, const unit * viewer)
         }
         return hidden;
     }
-#endif
 }
 
 /** remove the unit from memory.
@@ -1481,8 +1460,11 @@ void default_name(const unit *u, char name[], int len) {
 void name_unit(unit * u)
 {
     const race *rc = u_race(u);
-    if (rc->generate_name) {
-        rc->generate_name(u);
+    if (rc->name_unit) {
+        rc->name_unit(u);
+    }
+    else if (u->faction->flags & FFL_NPC) {
+        unit_setname(u, NULL);
     }
     else {
         char name[32];
@@ -1533,9 +1515,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     u->hp = unit_max_hp(u) * number;
 
     if (dname) {
-        u->_name = _strdup(dname);
+        u->_name = strdup(dname);
     }
-    else if (urace->generate_name || playerrace(urace)) {
+    else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
     }
 
@@ -1640,7 +1622,7 @@ void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
     if (name && name[0])
-        u->_name = _strdup(name);
+        u->_name = strdup(name);
     else
         u->_name = NULL;
 }
@@ -1654,7 +1636,7 @@ void unit_setinfo(unit * u, const char *info)
 {
     free(u->display);
     if (info)
-        u->display = _strdup(info);
+        u->display = strdup(info);
     else
         u->display = NULL;
 }
@@ -2047,3 +2029,26 @@ bool has_limited_skills(const struct unit * u)
     return false;
 }
 
+double u_heal_factor(const unit * u)
+{
+    const race * rc = u_race(u);
+    if (rc->healing>0) {
+        return rc->healing / 100.0;
+    }
+    if (r_isforest(u->region)) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (rc == rc_elf) {
+            static int cache;
+            static double elf_regen;
+            if (config_changed(&cache)) {
+                elf_regen = config_get_flt("healing.forest", 1.0);
+            }
+            return elf_regen;
+        }
+    }
+    return 1.0;
+}

@@ -2,7 +2,7 @@
 
 #include "guard.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -34,7 +34,7 @@ static void test_is_guarded(CuTest *tc) {
 }
 
 static void test_guard_unskilled(CuTest * tc)
-// TODO: it would be better to test armedmen()
+/* TODO: it would be better to test armedmen() */
 {
     unit *u, *ug;
     region *r;
@@ -42,7 +42,7 @@ static void test_guard_unskilled(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(test_create_faction(0), r);
     ug = test_create_unit(test_create_faction(0), r);
@@ -61,7 +61,7 @@ static void test_guard_armed(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(test_create_faction(0), r);
     ug = test_create_unit(test_create_faction(0), r);
@@ -80,7 +80,7 @@ static void test_is_guard(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
     r = test_create_region(0, 0, 0);
     ug = test_create_unit(test_create_faction(0), r);
     i_change(&ug->items, itype, 1);

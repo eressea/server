@@ -155,8 +155,11 @@ const char *resourcename(const resource_type * rtype, int flags)
             }
         }
         if (flags & NMF_PLURAL) {
-            static char name[64]; // FIXME: static return value
-            _snprintf(name, sizeof(name), "%s_p", rtype->_name);
+            static char name[64]; /* FIXME: static return value */
+            size_t len = strlen(rtype->_name);
+            assert(len <= sizeof(name) - 3);
+            memcpy(name, rtype->_name, len);
+            strcpy(name + len, "_p");
             return name;
         }
         return rtype->_name;
@@ -186,7 +189,7 @@ resource_type *rt_get_or_create(const char *name) {
             perror("resource_type allocation failed");
         }
         else {
-            rtype->_name = _strdup(name);
+            rtype->_name = strdup(name);
             rt_register(rtype);
             return rt_find(name);
         }
@@ -272,7 +275,7 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 }
 
 weapon_type *new_weapontype(item_type * itype,
-    int wflags, double magres, const char *damage[], int offmod, int defmod,
+    int wflags, variant magres, const char *damage[], int offmod, int defmod,
     int reload, skill_t sk, int minskill)
 {
     weapon_type *wtype;
@@ -282,8 +285,8 @@ weapon_type *new_weapontype(item_type * itype,
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {
-        wtype->damage[0] = _strdup(damage[0]);
-        wtype->damage[1] = _strdup(damage[1]);
+        wtype->damage[0] = strdup(damage[0]);
+        wtype->damage[1] = strdup(damage[1]);
     }
     wtype->defmod = defmod;
     wtype->flags |= wflags;
@@ -298,7 +301,7 @@ weapon_type *new_weapontype(item_type * itype,
     return wtype;
 }
 
-armor_type *new_armortype(item_type * itype, double penalty, double magres,
+armor_type *new_armortype(item_type * itype, double penalty, variant magres,
     int prot, unsigned int flags)
 {
     armor_type *atype;
@@ -342,7 +345,7 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
-        itype->_appearance[0] = _strdup(appearance);
+        itype->_appearance[0] = strdup(appearance);
         itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
     } else {
         itype->_appearance[0] = 0;
@@ -635,11 +638,14 @@ static const char *resourcenames[MAX_RESOURCES] = {
 const resource_type *get_resourcetype(resource_t type) {
     static int update;
     static struct resource_type * rtypes[MAX_RESOURCES];
+    const resource_type *rtype = NULL;
     if (update != num_resources) {
         memset(rtypes, 0, sizeof(rtypes));
         update = num_resources;
     }
-    const resource_type *rtype = rtypes[type];
+    else {
+        rtype = rtypes[type];
+    }
     if (!rtype) {
         rtype = rtypes[type] = rt_find(resourcenames[type]);
     }
@@ -676,9 +682,9 @@ struct order *ord)
     direction_t d;
     message *msg = msg_message("meow", "");
 
-    unused_arg(ord);
-    unused_arg(amount);
-    unused_arg(itype);
+    UNUSED_ARG(ord);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(itype);
 
     add_message(&u->region->msgs, msg);
     for (d = 0; d < MAXDIRECTIONS; d++) {
@@ -717,7 +723,7 @@ struct order *ord)
         c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
             duration, effect, u->number);
         c->data.i = SK_TACTICS;
-        unused_arg(ord);
+        UNUSED_ARG(ord);
     }
     use_pooled(u, itype->rtype, GET_DEFAULT, amount);
     ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
@@ -746,14 +752,14 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
 {
     if (u_race(u) == get_race(RC_ELF))
         return value;
-    unused_arg(r);
+    UNUSED_ARG(r);
     return -118;
 }
 
 static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
-    unused_arg(r);
+    UNUSED_ARG(r);
     if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->flags & RCF_IRONGOLEM)) {
         return value;
     }
@@ -764,7 +770,7 @@ static int heal(unit * user, int effect)
 {
     int req = unit_max_hp(user) * user->number - user->hp;
     if (req > 0) {
-        req = _min(req, effect);
+        req = MIN(req, effect);
         effect -= req;
         user->hp += req;
     }
@@ -936,7 +942,7 @@ struct order *ord)
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
 
-    key_set(&f->attribs, atoi36("mbst"));
+    key_set(&f->attribs, atoi36("mbst"), turn);
     set_level(user, SK_MAGIC, 3);
 
     ADDMSG(&user->faction->msgs, msg_message("use_item",
@@ -972,27 +978,23 @@ void init_resources(void)
 {
     resource_type *rtype;
 
-    rt_get_or_create(resourcenames[R_PERSON]); // lousy hack
+    rt_get_or_create(resourcenames[R_PERSON]); /* lousy hack */
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
 
-    // R_SILVER
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->give = give_money;
 
-    // R_PERMAURA
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
 
-    // R_LIFE
     rtype = rt_get_or_create(resourcenames[R_LIFE]);
     rtype->uchange = res_changehp;
 
-    // R_AURA
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
 
@@ -1157,23 +1159,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     return 0;
 }
 
-static void init_resourcelimit(attrib * a)
-{
-    a->data.v = calloc(sizeof(resource_limit), 1);
-}
-
-static void finalize_resourcelimit(attrib * a)
-{
-    free(a->data.v);
-}
-
-attrib_type at_resourcelimit = {
-    "resourcelimit",
-    init_resourcelimit,
-    finalize_resourcelimit,
-};
-
-static item *default_spoil(const struct race *rc, int size)
+item *item_spoil(const struct race *rc, int size)
 {
     item *itm = NULL;
 
@@ -1256,6 +1242,9 @@ void free_rtype(resource_type *rtype) {
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
+    if (rtype->raw) {
+        free(rtype->raw);
+    }
     free(rtype->_name);
     free(rtype);
 }
@@ -1301,7 +1290,6 @@ void register_resources(void)
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
-    register_function((pf_generic)default_spoil, "defaultdrops");
 
     register_item_use(use_potion, "usepotion");
     register_item_use(use_potion_delayed, "usepotion_delayed");

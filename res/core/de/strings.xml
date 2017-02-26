@@ -6,6 +6,10 @@
     _x: preposition (15 /Schlumpf/schwerter)
     _a: including article (ein Schlumpf, a smurf)
    -->
+    <string name="mailcmd">
+      <text locale="de">BEFEHLE</text>
+      <text locale="en">ORDERS</text>
+    </string>
   <string name="vortex">
     <text locale="de">Wirbel</text>
     <text locale="en">vortex</text>
@@ -908,16 +912,8 @@
   <string name="illusioncastle">
     <text locale="de">Traumschlößchen</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="de">Struktur</text>
-  </string>
-  <string name="artacademy">
-    <text locale="de">Akademie der Künste</text>
-    <text locale="en">academy of arts</text>
-  </string>
-  <string name="artsculpture">
-    <text locale="de">Skulptur</text>
-    <text locale="en">sculpture</text>
   </string>
 
   <!--Testitem -->
@@ -2375,19 +2371,19 @@
       <text locale="en">ghoul</text>
     </string>
 
-    <string name="juju-zombie">
+    <string name="juju">
       <text locale="de">Juju-Zombie</text>
       <text locale="en">juju-zombie</text>
     </string>
-    <string name="juju-zombie_p">
+    <string name="juju_p">
       <text locale="de">Juju-Zombies</text>
       <text locale="en">juju-zombies</text>
     </string>
-    <string name="juju-zombie_d">
+    <string name="juju_d">
       <text locale="de">Juju-Zombies</text>
       <text locale="en">juju-zombies</text>
     </string>
-    <string name="juju-zombie_x">
+    <string name="juju_x">
       <text locale="de">Juju-Zombie</text>
       <text locale="en">juju-zombie</text>
     </string>
@@ -3815,10 +3811,6 @@
       <text locale="de">Meteorregen</text>
       <text locale="en">Meteor Shower</text>
     </string>
-    <string name="shadowcall">
-      <text locale="de">Schattenruf</text>
-      <text locale="en">Shadow Call</text>
-    </string>
     <string name="create_ror">
       <text locale="de">Erschaffe einen Ring der Regeneration</text>
       <text locale="en">Create A Ring of Regeneration</text>
@@ -4498,10 +4490,6 @@
     <string name="immolation">
       <text locale="de">Verletzt alle Gegner.</text>
       <text locale="en">Injures all enemies.</text>
-    </string>
-    <string name="shadowcall">
-      <text locale="de">Ruft Schattenwesen.</text>
-      <text locale="en">Calls beings from shadow.</text>
     </string>
     <string name="aura_of_fear">
       <text locale="de">Panik.</text>
@@ -6623,51 +6611,15 @@
     <text locale="de">EINLADEN</text>
     <text locale="en">INVITE</text>
   </string>
-  <string name="rm_stone">
-    <text locale="de">Steine</text>
-    <text locale="en">stones</text>
-  </string>
 
-  <string name="rm_horse">
-    <text locale="de">Pferde</text>
-    <text locale="en">horses</text>
-  </string>
-  <string name="rm_peasant">
-    <text locale="de">Bauern</text>
-    <text locale="en">peasants</text>
-  </string>
-  <string name="rm_money">
-    <text locale="de">Silber</text>
-    <text locale="en">silver</text>
-  </string>
-  <string name="rm_laen">
-    <text locale="de">Laen</text>
-    <text locale="en">laen</text>
-  </string>
-
-  <string name="rm_sapling">
+  <string name="sapling">
     <text locale="de">Schößlinge</text>
     <text locale="en">saplings</text>
   </string>
 
-  <string name="rm_mallornsapling">
+  <string name="mallornsapling">
     <text locale="de">Mallornschößlinge</text>
     <text locale="en">mallorn saplings</text>
-  </string>
-
-  <string name="rm_tree">
-    <text locale="de">Bäume</text>
-    <text locale="en">trees</text>
-  </string>
-
-  <string name="rm_mallorn">
-    <text locale="de">Mallorn</text>
-    <text locale="en">mallorn</text>
-  </string>
-
-  <string name="rm_iron">
-    <text locale="de">Eisen</text>
-    <text locale="en">iron</text>
   </string>
 
   <string name="Winter">

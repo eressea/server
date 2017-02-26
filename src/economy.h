@@ -56,6 +56,7 @@ extern "C" {
 
     enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT };
     void maintain_buildings(struct region *r);
+    void make_item(struct unit * u, const struct item_type * itype, int want);
     int make_cmd(struct unit *u, struct order *ord);
     void split_allocations(struct region *r);
     int give_control_cmd(struct unit *u, struct order *ord);

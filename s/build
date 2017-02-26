@@ -30,8 +30,6 @@ if [ ! -d $ROOT/$BUILD ]; then
   exit
 fi
 
-git submodule update
-
 echo "build eressea"
 cd $ROOT/$BUILD
 BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
@@ -40,7 +38,7 @@ VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 cmake -DERESSEA_VERSION="$VERSION" ..
 else
 REV=$(git rev-parse --short HEAD)
-cmake -DERESSEA_BUILDNO="$REV-$BUILD" ..
+cmake -DERESSEA_BUILDNO="$REV" ..
 fi
 make $MAKEOPTS && make test
 cd $OLDPWD

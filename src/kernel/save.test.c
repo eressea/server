@@ -78,7 +78,7 @@ static void test_readwrite_unit(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    move_unit(u, r, NULL); // this makes sure that u doesn't leak
+    move_unit(u, r, NULL); /* this makes sure that u doesn't leak */
     test_cleanup();
 }
 
@@ -91,7 +91,7 @@ static void test_readwrite_faction(CuTest * tc)
     test_setup();
     f = test_create_faction(0);
     free(f->name);
-    f->name = _strdup("  Hodor  ");
+    f->name = strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", f->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -120,7 +120,7 @@ static void test_readwrite_region(CuTest * tc)
     test_setup();
     r = test_create_region(0, 0, 0);
     free(r->land->name);
-    r->land->name = _strdup("  Hodor  ");
+    r->land->name = strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -150,7 +150,7 @@ static void test_readwrite_building(CuTest * tc)
     r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
     free(b->name);
-    b->name = _strdup("  Hodor  ");
+    b->name = strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", b->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -183,7 +183,7 @@ static void test_readwrite_ship(CuTest * tc)
     r = test_create_region(0, 0, 0);
     sh = test_create_ship(r, 0);
     free(sh->name);
-    sh->name = _strdup("  Hodor  ");
+    sh->name = strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", sh->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -211,8 +211,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     attrib *a = NULL;
 
     test_setup();
-    key_set(&a, 41);
-    key_set(&a, 42);
+    key_set(&a, 41, 42);
+    key_set(&a, 42, 43);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_attribs(data.store, a, NULL);
@@ -223,8 +223,8 @@ static void test_readwrite_attrib(CuTest *tc) {
     read_attribs(&data, &a, NULL);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    CuAssertTrue(tc, key_get(a, 41));
-    CuAssertTrue(tc, key_get(a, 42));
+    CuAssertIntEquals(tc, 42, key_get(a, 41));
+    CuAssertIntEquals(tc, 43, key_get(a, 42));
     a_removeall(&a, NULL);
 
     test_cleanup();

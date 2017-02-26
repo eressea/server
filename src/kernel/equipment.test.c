@@ -7,8 +7,6 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 
-#include <quicklist.h>
-
 #include <CuTest.h>
 #include <tests.h>
 
@@ -29,7 +27,7 @@ void test_equipment(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
 
     CuAssertPtrEquals(tc, 0, get_equipment("herpderp"));
-    eq = create_equipment("herpderp");
+    eq = get_or_create_equipment("herpderp");
     CuAssertPtrEquals(tc, eq, get_equipment("herpderp"));
 
     equipment_setitem(eq, it_horses, "1");

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resource name="laen" limited="yes" material="rm_laen">
+<resource name="laen" limited="yes" material="yes">
   <item weight="200" score="100">
     <construction skill="mining" minskill="7"/>
   </item>

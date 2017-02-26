@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "types.h"
 #include <modules/score.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,14 +33,16 @@ extern "C" {
     struct seen_region;
     struct attrib_type;
     struct gamedata;
+    struct selist;
     
     extern struct attrib_type at_maxmagicians;
 
     /* faction flags */
-#define FFL_NEWID (1<<0)        /* Die Partei hat bereits einmal ihre no gewechselt */
+#define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
+#define FFL_PWMSG         (1<<2)  /* received a "new password" message */
 #define FFL_QUIT          (1<<3)
-#define FFL_CURSED        (1<<4) /* you're going to have a bad time */
+#define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
@@ -95,7 +99,7 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct quicklist *seen_factions;
+        struct selist *seen_factions;
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 

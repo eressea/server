@@ -27,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
-#include "monster.h"
+#include "monsters.h"
 #include "lighthouse.h"
 #include "piracy.h"
 
@@ -151,8 +151,8 @@ static void shiptrail_finalize(attrib * a)
 static int shiptrail_age(attrib * a, void *owner)
 {
     traveldir *t = (traveldir *)(a->data.v);
-    unused_arg(owner);
 
+    (void)owner;
     t->age--;
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
@@ -163,6 +163,7 @@ static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
     int n;
     traveldir *t = (traveldir *)(a->data.v);
 
+    UNUSED_ARG(owner);
     READ_INT(store, &t->no);
     READ_INT(store, &n);
     t->dir = (direction_t)n;
@@ -174,6 +175,8 @@ static void
 shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 {
     traveldir *t = (traveldir *)(a->data.v);
+
+    UNUSED_ARG(owner);
     WRITE_INT(store, t->no);
     WRITE_INT(store, t->dir);
     WRITE_INT(store, t->age);
@@ -204,6 +207,8 @@ static bool entrance_allowed(const struct unit *u, const struct region *r)
         return true;
     return false;
 #else
+    UNUSED_ARG(u);
+    UNUSED_ARG(r);
     return true;
 #endif
 }
@@ -267,12 +272,12 @@ static int ridingcapacity(unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
+    animals = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    vehicles = _min(animals / HORSESNEEDED, vehicles);
+    vehicles = MIN(animals / HORSESNEEDED, vehicles);
 
     return vehicles * vcap + animals * acap;
 }
@@ -291,7 +296,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = _min(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
+    pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -301,7 +306,7 @@ int walkingcapacity(const struct unit *u)
     }
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    wagen_mit_pferden = _min(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+    wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
 
     n = wagen_mit_pferden * vcap;
 
@@ -311,7 +316,7 @@ int walkingcapacity(const struct unit *u)
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
-        wagen_mit_trollen = _min(u->number / 4, wagen_ohne_pferde);
+        wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
@@ -335,7 +340,7 @@ int walkingcapacity(const struct unit *u)
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
             int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
-            n += _min(people, belts) * (multi - 1) * u_race(u)->capacity;
+            n += MIN(people, belts) * (multi - 1) * u_race(u)->capacity;
         }
     }
 
@@ -366,7 +371,7 @@ static int canwalk(unit * u)
     effsk = effskill(u, SK_RIDING, 0);
     maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
-        maxwagen = _max(maxwagen, u->number / 4);
+        maxwagen = MAX(maxwagen, u->number / 4);
     }
     maxpferde = effsk * u->number * 4 + u->number;
 
@@ -466,6 +471,8 @@ static int canride(unit * u)
 
 static bool cansail(const region * r, ship * sh)
 {
+    UNUSED_ARG(r);
+
     /* sonst ist construction:: size nicht ship_type::maxsize */
     assert(!sh->type->construction
         || sh->type->construction->improvement == NULL);
@@ -490,6 +497,8 @@ static bool cansail(const region * r, ship * sh)
 
 static double overload(const region * r, ship * sh)
 {
+    UNUSED_ARG(r);
+
     /* sonst ist construction:: size nicht ship_type::maxsize */
     assert(!sh->type->construction
         || sh->type->construction->improvement == NULL);
@@ -500,12 +509,12 @@ static double overload(const region * r, ship * sh)
     else {
         int n = 0, p = 0;
         int mcabins = sh->type->cabins;
+        double ovl;
 
         getshipweight(sh, &n, &p);
-
-        double ovl = n / (double)sh->type->cargo;
+        ovl = n / (double)sh->type->cargo;
         if (mcabins)
-            ovl = _max(ovl, p / (double)mcabins);
+            ovl = MAX(ovl, p / (double)mcabins);
         return ovl;
     }
 }
@@ -752,7 +761,7 @@ double damage_overload(double overload)
     badness = overload - overload_worse();
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
-        damage += _min(badness, overload_worst() - overload_worse()) *
+        damage += MIN(badness, overload_worst() - overload_worse()) *
             (overload_max_damage() - damage) /
             (overload_worst() - overload_worse());
     }
@@ -792,7 +801,7 @@ region * drift_target(ship *sh) {
         if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
             rnext = rn;
             if (!fval(rnext->terrain, SEA_REGION)) {
-                // prefer drifting towards non-ocean regions
+                /* prefer drifting towards non-ocean regions */
                 break;
             }
         }
@@ -943,10 +952,10 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
             else if (sk >= stealth) {
-                guard_count += u->number;
                 double prob_u = (sk - stealth) * skill_prob;
+                guard_count += u->number;
                 /* amulet counts at most once */
-                prob_u += _min(1, _min(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += MIN(1, MIN(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -1397,7 +1406,7 @@ static int movement_speed(unit * u)
         return BP_DRAGON;
     }
     switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON: // FIXME: catdragon has RCF_DRAGON, so this cannot happen
+    case RC_BIRTHDAYDRAGON: /* FIXME: catdragon has RCF_DRAGON, so this cannot happen */
     case RC_SONGDRAGON:
         mp = BP_DRAGON;
         break;
@@ -1464,9 +1473,9 @@ static arg_regions *var_copy_regions(const region_list * begin, int size)
 
     if (size > 0) {
         int i = 0;
+        arg_regions *dst;
         assert(size > 0);
-        arg_regions *dst =
-            (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
+        dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
         assert_alloc(dst);
         dst->nregions = size;
         dst->regions = (region **)(dst + 1);
@@ -1761,8 +1770,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
      * befahrene Region. */
 
     while (next_point && current_point != next_point && step < k) {
-        const char *token;
-        int error;
         const terrain_type *tthis = current_point->terrain;
         /* these values need to be updated if next_point changes (due to storms): */
         const terrain_type *tnext = next_point->terrain;
@@ -1833,7 +1840,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                         }
                     }
                 }
-            } // storms_enabled
+            } /* storms_enabled */
             if (!fval(tthis, SEA_REGION)) {
                 if (!fval(tnext, SEA_REGION)) {
                     /* check that you're not traveling from one land region to another. */
@@ -1985,7 +1992,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
                                 int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
-                                st = _min(itm->number, st);
+                                st = MIN(itm->number, st);
 
                                 if (st > 0) {
                                     i_change(&u2->items, itm->type, -st);
@@ -2054,7 +2061,9 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     route_end = cap_route(r, route_begin, route_end, movement_speed(u));
 
     route_end = travel_route(u, route_begin, route_end, ord, mode);
-    get_followers(u, r, route_end, followers);
+    if (u->flags&UFL_FOLLOWED) {
+        get_followers(u, r, route_end, followers);
+    }
 
     /* transportation */
     for (ord = u->orders; ord; ord = ord->next) {

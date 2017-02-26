@@ -6,9 +6,8 @@ IF EXIST ..\build-vs14 SET BUILD=..\build-vs14\eressea\Debug
 SET SERVER=%BUILD%\eressea.exe
 %BUILD%\test_eressea.exe
 %SERVER% ..\scripts\run-tests.lua
-%SERVER% ..\scripts\run-tests-e2.lua
-%SERVER% ..\scripts\run-tests-e3.lua
-%SERVER% ..\scripts\run-tests-e4.lua
+%SERVER% -re2 ..\scripts\run-tests-e2.lua
+%SERVER% -re3 ..\scripts\run-tests-e3.lua
 PAUSE
 RMDIR /s /q reports
 DEL score score.alliances datum turn

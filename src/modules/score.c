@@ -67,7 +67,7 @@ void score(void)
     region *r;
     faction *fc;
     score_t allscores = 0;
-    char path[MAX_PATH];
+    char path[4096];
 
     for (fc = factions; fc; fc = fc->next)
         fc->score = 0;

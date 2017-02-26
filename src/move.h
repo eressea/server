@@ -16,10 +16,11 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#include "direction.h"
+#include <stdbool.h>
+
 #ifndef H_KRNL_MOVEMENT
 #define H_KRNL_MOVEMENT
-
-#include "direction.h"
 
 #ifdef __cplusplus
 extern "C" {

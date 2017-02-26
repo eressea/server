@@ -43,7 +43,7 @@ struct luxury_type;
 struct order;
 struct plane;
 struct potion_type;
-struct quicklist;
+struct selist;
 struct race;
 struct region;
 struct region_list;
@@ -146,9 +146,7 @@ typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_INCOME,
   MSG_COMMERCE,
   MSG_PRODUCE,
-  MSG_ORCVERMEHRUNG,
   MSG_MESSAGE,
-  MSG_COMMENT,
   MSG_MAGIC,
   MAX_MSG
 } msg_t;

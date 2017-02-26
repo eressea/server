@@ -14,7 +14,6 @@ without prior permission by the authors of Eressea.
 #include "bind_region.h"
 #include "bind_unit.h"
 #include "bind_ship.h"
-#include "bind_dict.h"
 #include "bind_building.h"
 
 #include "chaos.h"
@@ -36,9 +35,10 @@ without prior permission by the authors of Eressea.
 
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <critbit.h>
 #include <util/language.h>
 #include <util/log.h>
+
+#include <critbit.h>
 
 #include <tolua.h>
 
@@ -434,13 +434,6 @@ static int tolua_region_set_resource(lua_State * L)
     return 0;
 }
 
-static int tolua_region_get_objects(lua_State * L)
-{
-    region *self = (region *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, (void *)&self->attribs, USERTYPE_DICT);
-    return 1;
-}
-
 static int tolua_region_destroy(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
@@ -551,11 +544,11 @@ static int tolua_region_setkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-    int value = tolua_toboolean(L, 3, 0);
+    int value = (int)tolua_tonumber(L, 3, 0);
     int flag = atoi36(name);
 
     if (value) {
-        key_set(&self->attribs, flag);
+        key_set(&self->attribs, flag, value);
     }
     else {
         key_unset(&self->attribs, flag);
@@ -615,7 +608,7 @@ static int tolua_plane_set_name(lua_State * L)
     const char *str = tolua_tostring(L, 2, 0);
     free(self->name);
     if (str)
-        self->name = _strdup(str);
+        self->name = strdup(str);
     else
         self->name = 0;
     return 0;
@@ -733,8 +726,6 @@ void tolua_region_open(lua_State * L)
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
-
-            tolua_variable(L, TOLUA_CAST "objects", tolua_region_get_objects, 0);
         }
         tolua_endmodule(L);
 

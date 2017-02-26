@@ -20,10 +20,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_BATTLE
 
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    struct message;
+    struct selist;
 
     /** more defines **/
 #define FS_ENEMY 1
@@ -43,7 +47,6 @@ extern "C" {
 #define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
-    struct message;
 
     typedef struct bfaction {
         struct bfaction *next;
@@ -53,7 +56,7 @@ extern "C" {
     } bfaction;
 
     typedef struct tactics {
-        struct quicklist *fighters;
+        struct selist *fighters;
         int value;
     } tactics;
 
@@ -86,7 +89,7 @@ extern "C" {
     } side;
 
     typedef struct battle {
-        struct quicklist *leaders;
+        struct selist *leaders;
         struct region *region;
         struct plane *plane;
         bfaction *factions;
@@ -94,7 +97,7 @@ extern "C" {
         int nfighters;
         side sides[MAXSIDES];
         int nsides;
-        struct quicklist *meffects;
+        struct selist *meffects;
         int max_tactics;
         int turn;
         bool has_tactics_turn;
@@ -224,7 +227,6 @@ extern "C" {
     } meffect;
 
     extern const troop no_troop;
-    extern bool battledebug;
 
     /* BEGIN battle interface */
     side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);
@@ -246,14 +248,14 @@ extern "C" {
     int count_enemies(struct battle *b, const struct fighter *af,
         int minrow, int maxrow, int select);
     int natural_armor(struct unit * u);
-    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, double *magres);
+    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, union variant *magres);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
     extern void message_all(battle * b, struct message *m);
     extern int hits(troop at, troop dt, weapon * awp);
     extern void damage_building(struct battle *b, struct building *bldg,
         int damage_abs);
-    struct quicklist *fighters(struct battle *b, const struct side *vs,
+    struct selist *fighters(struct battle *b, const struct side *vs,
         int minrow, int maxrow, int mask);
     int count_allies(const struct side *as, int minrow, int maxrow,
         int select, int allytype);

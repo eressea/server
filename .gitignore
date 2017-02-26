@@ -1,3 +1,4 @@
+tolua/
 .vscode/
 *.orig
 eressea.ini
@@ -38,3 +39,6 @@ tmp/
 tests/config.lua
 tests/reports/
 tests/data/185.dat
+/quicklist/
+/cutest/
+/critbit/

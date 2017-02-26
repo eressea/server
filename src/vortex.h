@@ -1,5 +1,10 @@
+#pragma once
+
 #ifndef H_VORTEX
 #define H_VORTEX
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

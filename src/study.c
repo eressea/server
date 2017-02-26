@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "laws.h"
 #include "move.h"
-#include "monster.h"
+#include "monsters.h"
 #include "alchemy.h"
 #include "academy.h"
 
@@ -52,8 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
-
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -201,7 +200,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
      * steigen.
      *
      * n ist die Anzahl zusaetzlich gelernter Tage. n darf max. die Differenz
-     * von schon gelernten Tagen zum _max(30 Tage pro Mann) betragen. */
+     * von schon gelernten Tagen zum MAX(30 Tage pro Mann) betragen. */
 
     if (magic_lowskill(student)) {
         cmistake(teacher, teacher->thisorder, 292, MSG_EVENT);
@@ -215,14 +214,14 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         n -= teach->value;
     }
 
-    n = _min(n, nteaching);
+    n = MIN(n, nteaching);
 
     if (n != 0) {
         if (teach == NULL) {
             a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
-        ql_push(&teach->teachers, teacher);
+        selist_push(&teach->teachers, teacher);
         teach->value += n;
 
         if (student->building && teacher->building == student->building) {
@@ -267,7 +266,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
          * die Talentaenderung (enno).
          */
 
-        nteaching = _max(0, nteaching - student->number * 30);
+        nteaching = MAX(0, nteaching - student->number * 30);
 
     }
     return n;
@@ -303,7 +302,7 @@ int teach_cmd(unit * u, struct order *ord)
     teaching = u->number * 30 * TEACHNUMBER;
 
     if ((i = get_effect(u, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
-        i = _min(i, u->number * TEACHNUMBER);
+        i = MIN(i, u->number * TEACHNUMBER);
         /* Trank wirkt pro Schueler, nicht pro Lehrer */
         teaching -= i * 30;
         change_effect(u, oldpotiontype[P_FOOL], -i);
@@ -531,6 +530,36 @@ static bool ExpensiveMigrants(void)
 	return rule;
 }
 
+struct teach_data {
+    unit *u;
+    skill_t sk;
+};
+
+static bool cb_msg_teach(void *el, void *arg) {
+    struct teach_data *td = (struct teach_data *)arg;
+    unit *ut = (unit *)el;
+    unit * u = td->u;
+    skill_t sk = td->sk;
+    if (ut->faction != u->faction) {
+        bool feedback = alliedunit(u, ut->faction, HELP_GUARD);
+        if (feedback) {
+            ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
+                "teacher student skill level", ut, u, sk,
+                effskill(u, sk, 0)));
+        }
+        ADDMSG(&u->faction->msgs, msg_message("teach_student",
+            "teacher student skill", ut, u, sk));
+    }
+    return true;
+}
+
+static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
+    struct teach_data cbdata;
+    cbdata.sk = sk;
+    cbdata.u = u;
+    selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
+}
+
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
@@ -604,7 +633,7 @@ int study_cmd(unit * u, order * ord)
     }
     /* Akademie: */
     if (active_building(u, bt_find("academy"))) {
-        studycost = _max(50, studycost * 2);
+        studycost = MAX(50, studycost * 2);
     }
 
     if (sk == SK_MAGIC) {
@@ -691,11 +720,11 @@ int study_cmd(unit * u, order * ord)
     if (studycost) {
         int cost = studycost * u->number;
         money = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, cost);
-        money = _min(money, cost);
+        money = MIN(money, cost);
     }
     if (money < studycost * u->number) {
         studycost = p;              /* Ohne Univertreurung */
-        money = _min(money, studycost);
+        money = MIN(money, studycost);
         if (p > 0 && money < studycost * u->number) {
             cmistake(u, ord, 65, MSG_EVENT);
             multi = money / (double)(studycost * u->number);
@@ -715,12 +744,12 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (get_effect(u, oldpotiontype[P_WISE])) {
-        l = _min(u->number, get_effect(u, oldpotiontype[P_WISE]));
+        l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
         teach->value += l * 10;
         change_effect(u, oldpotiontype[P_WISE], -l);
     }
     if (get_effect(u, oldpotiontype[P_FOOL])) {
-        l = _min(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+        l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
         teach->value -= l * 30;
         change_effect(u, oldpotiontype[P_FOOL], -l);
     }
@@ -755,19 +784,8 @@ int study_cmd(unit * u, order * ord)
 
     learn_skill(u, sk, days);
     if (a != NULL) {
-        ql_iter qli = qli_init(&teach->teachers);
-        while (qli_more(qli)) {
-            unit *teacher = (unit *)qli_next(&qli);
-            if (teacher->faction != u->faction) {
-                bool feedback = alliedunit(u, teacher->faction, HELP_GUARD);
-                if (feedback) {
-                    ADDMSG(&teacher->faction->msgs, msg_message("teach_teacher",
-                        "teacher student skill level", teacher, u, sk,
-                        effskill(u, sk, 0)));
-                }
-                ADDMSG(&u->faction->msgs, msg_message("teach_student",
-                    "teacher student skill", teacher, u, sk));
-            }
+        if (teach->teachers) {
+            msg_teachers(teach->teachers, u, sk);
         }
         a_remove(&u->attribs, a);
         a = NULL;

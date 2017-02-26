@@ -4,6 +4,7 @@
 #include <util/log.h>
 #include <util/unicode.h>
 
+#include <stdbool.h>
 #include <ctype.h>
 #include <wctype.h>
 
@@ -30,7 +31,7 @@ static int eatwhite(const char *ptr, size_t * total_size)
         ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
         if (ret != 0)
             break;
-        if (!iswxspace((wint_t)ucs))
+        if (!iswspace((wint_t)ucs))
             break;
         *total_size += size;
         ptr += size;
@@ -52,7 +53,7 @@ static const char *getbuf_latin1(FILE * F)
 
         if (bp == NULL)
             return NULL;
-        while (*bp && isxspace(*(unsigned char *)bp))
+        while (*bp && isspace(*(unsigned char *)bp))
             ++bp;                     /* eatwhite */
 
         comment = (bool)(comment && cont);
@@ -113,15 +114,15 @@ static const char *getbuf_latin1(FILE * F)
 
             if (iscntrl(c)) {
                 if (!comment && cp < fbuf + MAXLINE) {
-                    *cp++ = isxspace(c) ? ' ' : '?';
+                    *cp++ = isspace(c) ? ' ' : '?';
                 }
                 ++bp;
                 continue;
             }
-            else if (isxspace(c)) {
+            else if (isspace(c)) {
                 if (!quote) {
                     ++bp;
-                    while (*bp && isxspace(*(unsigned char *)bp))
+                    while (*bp && isspace(*(unsigned char *)bp))
                         ++bp;               /* eatwhite */
                     if (!comment && *bp && *bp != COMMENT_CHAR && cp < fbuf + MAXLINE)
                         *(cp++) = ' ';
@@ -136,7 +137,7 @@ static const char *getbuf_latin1(FILE * F)
             }
             else if (c == CONTINUE_CHAR) {
                 const char *end = ++bp;
-                while (*end && isxspace(*(unsigned char *)end))
+                while (*end && isspace(*(unsigned char *)end))
                     ++end;                /* eatwhite */
                 if (*end == '\0') {
                     bp = end;
@@ -269,7 +270,7 @@ static const char *getbuf_utf8(FILE * F)
                 break;
             }
 
-            if (iswxspace((wint_t)ucs)) {
+            if (iswspace((wint_t)ucs)) {
                 if (!quote) {
                     bp += size;
                     ret = eatwhite(bp, &size);
