@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <resource name="iron" limited="yes" material="yes">
-  <item weight="500" score="10">
-    <construction skill="mining" minskill="1"/>
-  </item>
-  <resourcelimit>
+    <item weight="500" score="10">
+        <construction skill="mining" minskill="1"/>
+    </item>
     <modifier building="mine" type="skill" value="1"/>
     <modifier building="mine" type="material" value="0.5"/>
     <modifier race="dwarf" type="material" value="0.60"/>
-  </resourcelimit>
 </resource>
