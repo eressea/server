@@ -348,7 +348,6 @@ static void test_make_item(CuTest *tc) {
     struct item_type *itype;
     const struct resource_type *rt_silver;
     resource_type *rtype;
-    resource_limit *rdata;
     double d = 0.6;
 
     test_setup();
@@ -382,7 +381,6 @@ static void test_make_item(CuTest *tc) {
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
     rmt_create(rtype);
-    rdata = rtype->limit = calloc(1, sizeof(resource_limit));
     add_resource(u->region, 1, 300, 150, rtype);
     u->region->resources->amount = 300; /* there are 300 stones at level 1 */
     set_level(u, SK_ALCHEMY, 10);
@@ -392,11 +390,11 @@ static void test_make_item(CuTest *tc) {
     CuAssertIntEquals(tc, 11, get_item(u, itype));
     CuAssertIntEquals(tc, 290, u->region->resources->amount); /* used 10 stones to make 10 stones */
 
-    rdata->modifiers = calloc(2, sizeof(resource_mod));
-    rdata->modifiers[0].flags = RMF_SAVEMATERIAL;
-    rdata->modifiers[0].race = u->_race;
-    rdata->modifiers[0].value.sa[0] = (short)(0.5+100*d);
-    rdata->modifiers[0].value.sa[1] = 100;
+    rtype->modifiers = calloc(2, sizeof(resource_mod));
+    rtype->modifiers[0].flags = RMF_SAVEMATERIAL;
+    rtype->modifiers[0].race = u->_race;
+    rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
+    rtype->modifiers[0].value.sa[1] = 100;
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 21, get_item(u, itype));
@@ -407,9 +405,9 @@ static void test_make_item(CuTest *tc) {
     CuAssertIntEquals(tc, 22, get_item(u, itype));
     CuAssertIntEquals(tc, 283, u->region->resources->amount); /* no free lunches */
 
-    rdata->modifiers[0].flags = RMF_REQUIREDBUILDING;
-    rdata->modifiers[0].race = NULL;
-    rdata->modifiers[0].btype = bt_get_or_create("mine");
+    rtype->modifiers[0].flags = RMF_REQUIREDBUILDING;
+    rtype->modifiers[0].race = NULL;
+    rtype->modifiers[0].btype = bt_get_or_create("mine");
     make_item(u, itype, 10);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error104"));
 

@@ -39,7 +39,7 @@ extern "C" {
     struct storage;
     struct gamedata;
     struct rawmaterial_type;
-    struct resource_limit;
+    struct resource_mod;
 
     typedef struct item {
         struct item *next;
@@ -80,7 +80,7 @@ extern "C" {
         rtype_uget uget;
         rtype_name name;
         struct rawmaterial_type *raw;
-        struct resource_limit  *limit;
+        struct resource_mod *modifiers;
         /* --- pointers --- */
         struct attrib *attribs;
         struct item_type *itype;

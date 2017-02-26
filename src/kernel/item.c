@@ -1236,15 +1236,12 @@ void free_rtype(resource_type *rtype) {
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
-    if (rtype->atype) {
-        free(rtype->atype);
-    }
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
-    if (rtype->raw) {
-        free(rtype->raw);
-    }
+    free(rtype->atype);
+    free(rtype->modifiers);
+    free(rtype->raw);
     free(rtype->_name);
     free(rtype);
 }

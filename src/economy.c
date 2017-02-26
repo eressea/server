@@ -921,7 +921,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     int dm = 0;
     allocation_list *alist;
     allocation *al;
-    resource_limit *rdata = rtype->limit;
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
@@ -944,8 +943,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         return;
     }
 
-    if (rdata && rdata->modifiers) {
-        message *msg = get_modifiers(u, rdata->modifiers, &save_mod, &skill_mod);
+    if (rtype->modifiers) {
+        message *msg = get_modifiers(u, rtype->modifiers, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
             return;

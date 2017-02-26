@@ -50,10 +50,6 @@ extern "C" {
         unsigned int flags;
     } resource_mod;
 
-    typedef struct resource_limit {
-        resource_mod *modifiers;
-    } resource_limit;
-
     typedef struct rawmaterial_type {
         const struct resource_type *rtype;
 
