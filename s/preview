@@ -160,7 +160,7 @@ case "$1" in
   done
   if [ $sent -eq 0 ]; then
     if [ -e ../$factions ]; then
-      for faction in $(cat ../$factions) ; do
+      for faction in $(grep -v -E '^#' ../$factions) ; do
         send $faction
       done
     fi
