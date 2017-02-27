@@ -179,50 +179,6 @@ struct order *ord)
     return 0;
 }
 
-static int
-use_instantartsculpture(struct unit *u, const struct item_type *itype,
-int amount, struct order *ord)
-{
-    building *b;
-
-    if (u->region->land == NULL) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-        return -1;
-    }
-
-    b = new_building(bt_find("artsculpture"), u->region, u->faction->locale);
-    b->size = 100;
-
-    ADDMSG(&u->region->msgs, msg_message("artsculpture_create", "unit region",
-        u, u->region));
-
-    use_pooled(u, itype->rtype, GET_DEFAULT, 1);
-
-    return 0;
-}
-
-static int
-use_instantartacademy(struct unit *u, const struct item_type *itype,
-int amount, struct order *ord)
-{
-    building *b;
-
-    if (u->region->land == NULL) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-        return -1;
-    }
-
-    b = new_building(bt_find("artacademy"), u->region, u->faction->locale);
-    b->size = 100;
-
-    ADDMSG(&u->region->msgs, msg_message("artacademy_create", "unit region", u,
-        u->region));
-
-    use_pooled(u, itype->rtype, GET_DEFAULT, 1);
-
-    return 0;
-}
-
 #define BAGPIPEFRACTION dice_rand("2d4+2")
 #define BAGPIPEDURATION dice_rand("2d10+4")
 
@@ -388,10 +344,8 @@ void register_itemfunctions(void)
 {
     register_demonseye();
     register_item_use(use_antimagiccrystal, "use_antimagiccrystal");
-    register_item_use(use_instantartsculpture, "use_instantartsculpture");
     register_item_use(use_studypotion, "use_studypotion");
     register_item_use(use_speedsail, "use_speedsail");
-    register_item_use(use_instantartacademy, "use_instantartacademy");
     register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
 
     /* have tests: */
