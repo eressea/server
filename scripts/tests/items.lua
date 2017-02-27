@@ -11,6 +11,22 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
+function test_mistletoe()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item('mistletoe', 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Mistelzweig")
+    process_orders()
+    assert_equal(1, u:get_item('mistletoe'))
+    assert_equal(1, f:count_msg_type('use_item'))
+    u.number = 2
+    process_orders()
+    assert_equal(1, u:get_item('mistletoe'))
+    assert_equal(1, f:count_msg_type('use_singleperson'))
+end
+
 function test_dreameye()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
@@ -18,9 +34,14 @@ function test_dreameye()
     u:add_item("dreameye", 2)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Traumauge")
-    process_orders()
+    assert_false(u:is_cursed('skillmod'))
+    turn_begin()
+    turn_process()
+    assert_true(u:is_cursed('skillmod'))
     assert_equal(1, u:get_item("dreameye"))
     assert_equal(1, f:count_msg_type('use_tacticcrystal'))
+    turn_end()
+    assert_false(u:is_cursed('skillmod'))
 end
 
 function test_manacrystal()
@@ -33,10 +54,12 @@ function test_manacrystal()
     u:set_skill('magic', 1)
     u.aura = 0
     u:add_order("BENUTZEN 1 Astralkristall")
-    process_orders()
+    turn_begin()
+    turn_process()
     assert_equal(1, u:get_item("manacrystal"))
     assert_equal(25, u.aura)
     assert_equal(1, f:count_msg_type('manacrystal_use'))
+    turn_end()
 end
 
 function test_skillpotion()

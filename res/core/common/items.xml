@@ -110,20 +110,16 @@
 <!-- xmas items -->
   <resource name="mistletoe">
     <!-- Sets the chance of escape in a fight to 100 percent -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="usemistletoe"/>
-    </item>
+    <item notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="speedsail">
-    <item weight="0">
-      <function name="use" value="use_speedsail"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- items -->
   <resource name="antimagic" appearance="amulet">
-	  <item weight="0" score="2000" use="yes" />
+    <item weight="0" score="2000" use="yes" />
   </resource>
 
   <resource name="catapultammo">

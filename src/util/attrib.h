@@ -65,19 +65,19 @@ extern "C" {
         unsigned int hashkey;
     } attrib_type;
 
-    extern void at_register(attrib_type * at);
-    extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
+    void at_register(attrib_type * at);
+    void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
+    struct attrib_type *at_find(const char *name);
 
     void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
     int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
 
-    extern attrib *a_select(attrib * a, const void *data,
-        bool(*compare) (const attrib *, const void *));
-    extern attrib *a_find(attrib * a, const attrib_type * at);
-    extern attrib *a_add(attrib ** pa, attrib * at);
-    extern int a_remove(attrib ** pa, attrib * at);
-    extern void a_removeall(attrib ** a, const attrib_type * at);
-    extern attrib *a_new(const attrib_type * at);
+    attrib *a_select(attrib * a, const void *data, bool(*compare) (const attrib *, const void *));
+    attrib *a_find(attrib * a, const attrib_type * at);
+    attrib *a_add(attrib ** pa, attrib * at);
+    int a_remove(attrib ** pa, attrib * at);
+    void a_removeall(attrib ** a, const attrib_type * at);
+    attrib *a_new(const attrib_type * at);
     int a_age(attrib ** attribs, void *owner);
 
     int a_read_orig(struct gamedata *data, attrib ** attribs, void *owner);

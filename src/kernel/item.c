@@ -746,29 +746,6 @@ static int use_warmthpotion(unit *u, const item_type *itype,
     return 0;
 }
 
-#include <attributes/fleechance.h>
-static int
-use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int mtoes =
-        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-
-    if (user->number > mtoes) {
-        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-            "unit item region command", user, itype->rtype, user->region, ord));
-        return -1;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-    a_add(&user->attribs, make_fleechance((float)1.0));
-    ADDMSG(&user->faction->msgs,
-        msg_message("use_item", "unit item", user, itype->rtype));
-
-    return 0;
-}
-
 static int
 use_magicboost(struct unit *user, const struct item_type *itype, int amount,
 struct order *ord)
@@ -1137,7 +1114,6 @@ void register_resources(void)
 
     register_item_use(use_potion_delayed, "use_p2");
     register_item_use(use_warmthpotion, "use_nestwarmth");
-    register_item_use(use_mistletoe, "usemistletoe");
     register_item_use(use_magicboost, "usemagicboost");
     register_item_use(use_snowball, "usesnowball");
 

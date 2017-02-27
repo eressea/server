@@ -21,6 +21,8 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
+#include <attributes/fleechance.h>
+
 /* triggers includes */
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
@@ -347,7 +349,7 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
 {
     int i;
     for (i = 0; i != amount; ++i) {
-        int duration = 1;           /* wirkt nur eine Runde */
+        int duration = 1;           /* wirkt nur in dieser Runde */
         curse *c;
         float effect;
         float power = 5;            /* Widerstand gegen Antimagiesprueche, ist in diesem
@@ -366,9 +368,32 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
     return 0;
 }
 
+static int
+use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
+    struct order *ord)
+{
+    int mtoes =
+        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+            user->number);
+
+    if (user->number > mtoes) {
+        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
+            "unit item region command", user, itype->rtype, user->region, ord));
+        return -1;
+    }
+    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+        user->number);
+    a_add(&user->attribs, make_fleechance((float)1.0));
+    ADDMSG(&user->faction->msgs,
+        msg_message("use_item", "unit item", user, itype->rtype));
+
+    return 0;
+}
+
 void register_itemfunctions(void)
 {
     /* have tests: */
+    register_item_use(use_mistletoe, "use_mistletoe");
     register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
     register_item_use(use_antimagiccrystal, "use_antimagic");
