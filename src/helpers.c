@@ -529,9 +529,6 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     } else {
         log_error("no such callout: %s", fname);
     }
-    if (itype->use) {
-        return itype->use(u, itype, amount, ord);
-    }
     log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
     lua_pop(L, 1);
 

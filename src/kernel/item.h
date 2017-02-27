@@ -126,8 +126,6 @@ extern "C" {
         /* --- functions --- */
         bool(*canuse) (const struct unit * user,
             const struct item_type * itype);
-        int(*use) (struct unit * user, const struct item_type * itype, int amount,
-        struct order * ord);
         int(*give) (struct unit * src, struct unit * dest,
             const struct item_type * itm, int number, struct order * ord);
         int score;
@@ -309,8 +307,6 @@ extern "C" {
     void register_item_give(int(*foo) (struct unit *, struct unit *,
         const struct item_type *, int, struct order *), const char *name);
     void register_item_use(int(*foo) (struct unit *,
-        const struct item_type *, int, struct order *), const char *name);
-    void register_item_useonother(int(*foo) (struct unit *, int,
         const struct item_type *, int, struct order *), const char *name);
 
     void free_resources(void);

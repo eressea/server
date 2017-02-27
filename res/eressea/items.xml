@@ -54,30 +54,22 @@
 <!-- museum items -->
   <resource name="questkey1" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <item notlost="yes" weight="0" >
-      <function name="use" value="use_museumkey"/>
-    </item>
+    <item notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="questkey2" appearance="key">
     <!-- Key for an old quest. placeholder item -->
-    <item notlost="yes" weight="0" >
-      <function name="use" value="use_museumkey"/>
-    </item>
+    <item notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="museumexitticket">
     <!-- you get your stuff back when leaving the museum -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="use_museumexitticket"/>
-    </item>
+    <item notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="museumticket">
     <!-- you get your stuff back when leaving the museum -->
-    <item weight="0">
-      <function name="use" value="use_museumticket"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- gimmicks, etc. -->
