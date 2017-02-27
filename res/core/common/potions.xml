@@ -4,8 +4,7 @@
 
   <!-- potions -->
   <resource name="p0" appearance="vial">
-    <item weight="0" score="30">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="30" use="yes">
       <potion level="1"/>
       <construction skill="alchemy" minskill="2">
         <requirement type="h4"/>
@@ -15,8 +14,7 @@
   </resource>
 
   <resource name="goliathwater" appearance="vial">
-    <item weight="0" score="30">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="30" use="yes">
       <potion level="1"/>
       <construction skill="alchemy" minskill="2">
         <requirement type="h6"/>
@@ -26,8 +24,7 @@
   </resource>
 
   <resource name="truthpotion" appearance="vial">
-    <item weight="0" score="30">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="30" use="yes">
       <potion level="1"/>
       <construction skill="alchemy" minskill="2">
         <requirement type="h0"/>
@@ -37,8 +34,7 @@
   </resource>
 
   <resource name="p2" appearance="vial">
-    <item weight="0" score="30">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="30" use="yes">
       <potion level="1"/>
       <construction skill="alchemy" minskill="2">
         <requirement type="h5"/>
@@ -48,8 +44,7 @@
   </resource>
 
   <resource name="p3" appearance="vial">
-    <item weight="0" score="60">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="60" use="yes">
       <potion level="2"/>
       <construction skill="alchemy" minskill="4">
         <requirement type="h14"/>
@@ -61,8 +56,7 @@
 
   <resource name="ointment" appearance="vial">
     <!-- Wundsalbe -->
-    <item weight="0" score="60">
-      <function name="use" value="usehealingpotion"/>
+    <item weight="0" score="60" use="yes">
       <potion level="2"/>
       <construction skill="alchemy" minskill="4">
         <requirement type="h19"/>
@@ -74,8 +68,7 @@
 
   <resource name="peasantblood" appearance="vial">
     <!-- Bauernblut -->
-    <item weight="0" score="60">
-      <function name="use" value="usebloodpotion"/>
+    <item weight="0" score="60" use="yes">
       <potion level="2"/>
       <construction skill="alchemy" minskill="4">
         <requirement type="h17"/>
@@ -87,8 +80,7 @@
   </resource>
 
   <resource name="p6" appearance="vial">
-    <item weight="0" score="90">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="90" use="yes">
       <potion level="3"/>
       <construction skill="alchemy" minskill="6">
         <requirement type="h9"/>
@@ -100,8 +92,7 @@
   </resource>
 
   <resource name="p7" appearance="vial">
-    <item weight="0" score="90">
-      <function name="use" value="usefoolpotion"/>
+    <item weight="0" score="90" use="yes">
       <potion level="3"/>
       <construction skill="alchemy" minskill="6">
         <requirement type="h2"/>
@@ -113,8 +104,7 @@
   </resource>
 
   <resource name="nestwarmth" appearance="vial">
-    <item weight="0" score="90">
-      <function name="use" value="usewarmthpotion"/>
+    <item weight="0" score="90" use="yes">
       <potion level="3"/>
       <construction skill="alchemy" minskill="6">
         <requirement type="h18"/>
@@ -126,8 +116,7 @@
   </resource>
 
   <resource name="p9" appearance="vial">
-    <item weight="0" score="90">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="90" use="yes">
       <potion level="3"/>
       <construction skill="alchemy" minskill="6">
         <requirement type="h4"/>
@@ -139,8 +128,7 @@
   </resource>
 
   <resource name="p10" appearance="vial">
-    <item weight="0" score="90">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="90" use="yes">
       <potion level="3"/>
       <construction skill="alchemy" minskill="6">
         <requirement type="h19"/>
@@ -152,8 +140,7 @@
   </resource>
 
   <resource name="p11" appearance="vial">
-    <item weight="0" score="120">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="120" use="yes">
       <potion level="4"/>
       <construction skill="alchemy" minskill="8">
         <requirement type="h14"/>
@@ -166,8 +153,7 @@
   </resource>
 
   <resource name="p13" appearance="vial">
-    <item weight="0" score="120">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="120" use="yes">
       <potion level="4"/>
       <construction skill="alchemy" minskill="8">
         <requirement type="h5"/>
@@ -181,8 +167,7 @@
   </resource>
 
   <resource name="p14" appearance="vial">
-    <item weight="0" score="120">
-      <function name="use" value="usepotion"/>
+    <item weight="0" score="120" use="yes">
       <potion level="4"/>
       <construction skill="alchemy" minskill="8">
         <requirement type="h6"/>

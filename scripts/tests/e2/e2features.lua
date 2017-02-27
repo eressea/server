@@ -230,6 +230,21 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
+function test_ointment()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local hp = u.hp
+    u.hp = 0
+    u:add_item("ointment", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Wundsalbe")
+    process_orders()
+    assert_equal(0, u:get_item("ointment"))
+    assert_equal(1, f:count_msg_type('usepotion'))
+    assert_equal(hp, u.hp)
+end
+
 function test_bloodpotion_demon()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "demon", "de")

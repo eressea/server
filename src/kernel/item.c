@@ -1287,13 +1287,12 @@ void register_resources(void)
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
 
-    register_item_use(use_potion, "usepotion");
-    register_item_use(use_potion_delayed, "usepotion_delayed");
+    register_item_use(use_potion_delayed, "use_p2");
     register_item_use(use_tacticcrystal, "use_tacticcrystal");
     register_item_use(use_birthdayamulet, "use_birthdayamulet");
-    register_item_use(use_warmthpotion, "usewarmthpotion");
+    register_item_use(use_warmthpotion, "use_nestwarmth");
     register_item_use(use_bloodpotion, "use_peasantblood");
-    register_item_use(use_healingpotion, "usehealingpotion");
+    register_item_use(use_healingpotion, "use_ointment");
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_mistletoe, "usemistletoe");
     register_item_use(use_magicboost, "usemagicboost");
