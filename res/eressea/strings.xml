@@ -392,5 +392,14 @@
     <text locale="de">Adamantiumrüstungen</text>
     <text locale="en">adamantium plates</text>
   </string>
-
+    <string name="aoc">
+        <text locale="de">Katzenamulett</text>
+        <text locale="en">amulet of the kitten</text>
+        <text locale="fr">amulette du chaton</text>
+    </string>
+    <string name="aoc_p">
+        <text locale="en">amulets of the kitten</text>
+        <text locale="de">Katzenamulette</text>
+        <text locale="fr">amulettes du chaton</text>
+    </string>
 </strings>

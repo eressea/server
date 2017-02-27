@@ -16,7 +16,6 @@
 #include <kernel/command.h>
 
 /* misc includes */
-#include <items/demonseye.h>
 #include <attributes/key.h>
 #include <triggers/gate.h>
 

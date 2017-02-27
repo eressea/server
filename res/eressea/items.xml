@@ -86,6 +86,10 @@
     <item notlost="yes" cursed="true" weight="0"/>
   </resource>
 
+  <resource name="aoc" appearance="amulet">
+    <item weight="100" use="yes" />
+  </resource>
+
   <resource name="eyeofdragon">
     <!-- the arena gate, for one-time entry -->
     <item weight="0" score="0"/>

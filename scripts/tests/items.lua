@@ -8,61 +8,35 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
-end
-
-function test_meow()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u:add_item("aoc", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Katzenamulett")
-    process_orders()
-    assert_equal(1, u:get_item("aoc"))
-    assert_equal(1, r:count_msg_type('meow'))
-end
-
-function test_aurapotion50()
     eressea.settings.set("magic.regeneration.enable", "0")
+end
+
+function test_dreameye()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
-    u:add_item("aurapotion50", 1)
-    u:set_skill('magic', 10);
-    u.magic = 'gwyrrd'
+    u:add_item("dreameye", 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Traumauge")
+    process_orders()
+    assert_equal(1, u:get_item("dreameye"))
+    assert_equal(1, f:count_msg_type('use_tacticcrystal'))
+end
+
+function test_manacrystal()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("manacrystal", 2)
+    u:clear_orders()
+    u.magic = "gwyrrd"
+    u:set_skill('magic', 1)
     u.aura = 0
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Auratrank")
+    u:add_order("BENUTZEN 1 Astralkristall")
     process_orders()
-    assert_equal(0, u:get_item("aurapotion50"))
-    assert_equal(1, f:count_msg_type('aurapotion50'))
-    assert_equal(50, u.aura)
-end
-
-function test_bagpipe()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u:add_item("bagpipeoffear", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Dudelsack")
-    process_orders()
-    assert_equal(1, u:get_item("bagpipeoffear"))
-    assert_equal(1, f:count_msg_type('bagpipeoffear_faction'))
-    assert_equal(1, r:count_msg_type('bagpipeoffear_region'))
-end
-
-function test_speedsail()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u.ship = ship.create(r, "boat")
-    u:add_item("speedsail", 2)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Sonnensegel")
-    process_orders()
-    assert_equal(1, u:get_item("speedsail"))
-    assert_equal(1, f:count_msg_type('use_speedsail'))
+    assert_equal(1, u:get_item("manacrystal"))
+    assert_equal(25, u.aura)
+    assert_equal(1, f:count_msg_type('manacrystal_use'))
 end
 
 function test_skillpotion()
@@ -140,47 +114,4 @@ function test_bloodpotion_other()
     assert_equal(0, u:get_item("peasantblood"))
     assert_equal(1, f:count_msg_type('usepotion'))
     assert_equal("smurf", u.race)
-end
-
-function test_foolpotion()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u:add_item("p7", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Dumpfbackenbrot 4242")
-    process_orders()
-    assert_equal(1, u:get_item("p7"))
-    assert_equal(1, f:count_msg_type('feedback_unit_not_found'))
-    local u2 = unit.create(f, r, 1)
-    
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Dumpfbackenbrot " .. itoa36(u2.id))
-    process_orders()
-    assert_equal(1, u:get_item("p7"))
-    assert_equal(1, f:count_msg_type('error64'))
-
-    u:set_skill("stealth", 1);
-    process_orders()
-    assert_equal(0, u:get_item("p7"))
-    assert_equal(1, f:count_msg_type('givedumb'))
-end
-
-function test_snowman()
-    local r = region.create(0, 0, "glacier")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u:add_item("snowman", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Schneemann")
-    process_orders()
-    for u2 in r.units do
-        if u2.id~=u.id then
-            assert_equal("snowman", u2.race)
-            assert_equal(1000, u2.hp)
-            u = nil
-            break
-        end
-    end
-    assert_equal(nil, u)
 end

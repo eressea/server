@@ -1458,12 +1458,6 @@
   <string name="aots_p">
     <text locale="de">Amulette des wahren Sehens</text>
   </string>
-  <string name="aoc">
-    <text locale="de">Katzenamulett</text>
-  </string>
-  <string name="aoc_p">
-    <text locale="de">Katzenamulette</text>
-  </string>
   <string name="roi">
     <text locale="de">Ring der Unsichtbarkeit</text>
   </string>

@@ -61,14 +61,8 @@
     <item weight="0" score="6000"/>
   </resource>
 
-  <resource name="aoc" appearance="amulet">
-    <item weight="100" use="yes" />
-  </resource>
-
   <resource name="dreameye">
-    <item weight="100">
-      <function name="use" value="use_tacticcrystal"/>
-    </item>
+    <item weight="100" use="yes" />
   </resource>
 
   <resource name="pegasus">
@@ -105,16 +99,12 @@
 
   <resource name="skillpotion" appearance="vial">
     <!-- gives user one free learning attempt -->
-    <item weight="0">
-      <function name="use" value="use_skillpotion"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
   <resource name="manacrystal" appearance="amulet">
     <!-- gives user free aura -->
-    <item weight="0">
-      <function name="use" value="use_manacrystal"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- xmas items -->

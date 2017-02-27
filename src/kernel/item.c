@@ -677,34 +677,6 @@ int set_item(unit * u, const item_type *itype, int value)
 #define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
 #define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
 
-/* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
- * Runde um -1 - 4 Punkte. */
-static int
-use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int i;
-    for (i = 0; i != amount; ++i) {
-        int duration = 1;           /* wirkt nur eine Runde */
-        curse *c;
-        float effect;
-        float power = 5;            /* Widerstand gegen Antimagiesprueche, ist in diesem
-                                       Fall egal, da der curse fuer den Kampf gelten soll,
-                                       der vor den Antimagiezaubern passiert */
-
-        effect = (float)(rng_int() % 6 - 1);
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
-            duration, effect, u->number);
-        c->data.i = SK_TACTICS;
-        UNUSED_ARG(ord);
-    }
-    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
-    ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
-        "unit region", u, u->region));
-    return 0;
-}
-
 typedef struct t_item {
     const char *name;
     /* [0]: Einzahl fuer eigene; [1]: Mehrzahl fuer eigene;
@@ -1165,7 +1137,6 @@ void register_resources(void)
 
     register_item_use(use_potion_delayed, "use_p2");
     register_item_use(use_warmthpotion, "use_nestwarmth");
-    register_item_use(use_tacticcrystal, "use_tacticcrystal");
     register_item_use(use_mistletoe, "usemistletoe");
     register_item_use(use_magicboost, "usemagicboost");
     register_item_use(use_snowball, "usesnowball");

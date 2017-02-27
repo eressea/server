@@ -21,8 +21,6 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-#include <items/demonseye.h>
-
 /* triggers includes */
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
@@ -340,11 +338,38 @@ struct order *ord)
     return 0;
 }
 
+/* ------------------------------------------------------------- */
+/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
+* Runde um -1 - 4 Punkte. */
+static int
+use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
+    struct order *ord)
+{
+    int i;
+    for (i = 0; i != amount; ++i) {
+        int duration = 1;           /* wirkt nur eine Runde */
+        curse *c;
+        float effect;
+        float power = 5;            /* Widerstand gegen Antimagiesprueche, ist in diesem
+                                    Fall egal, da der curse fuer den Kampf gelten soll,
+                                    der vor den Antimagiezaubern passiert */
+
+        effect = (float)(rng_int() % 6 - 1);
+        c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
+            duration, effect, u->number);
+        c->data.i = SK_TACTICS;
+        UNUSED_ARG(ord);
+    }
+    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
+    ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
+        "unit region", u, u->region));
+    return 0;
+}
+
 void register_itemfunctions(void)
 {
-    register_demonseye();
-
     /* have tests: */
+    register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
     register_item_use(use_antimagiccrystal, "use_antimagic");
     register_item_use(use_speedsail, "use_speedsail");
