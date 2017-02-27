@@ -13,6 +13,7 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "helpers.h"
 #include "vortex.h"
+#include "alchemy.h"
 
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -491,19 +492,20 @@ static int lua_equipmentcallback(const struct equipment *eq, unit * u)
 
 /** callback for an item-use function written in lua. */
 static int
-use_item_lua(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
+use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
 {
     lua_State *L = (lua_State *)global.vm_state;
     int result = 0;
     char fname[64];
-
-    if (itype->use) {
-        return itype->use(u, itype, amount, ord);
-    }
+    int (*callout)(unit *, const item_type *, int, struct order *);
 
     strlcpy(fname, "use_", sizeof(fname));
     strlcat(fname, itype->rtype->_name, sizeof(fname));
+
+    callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
+    if (callout) {
+        return callout(u, itype, amount, ord);
+    }
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
@@ -520,11 +522,18 @@ struct order *ord)
             result = (int)lua_tonumber(L, -1);
             lua_pop(L, 1);
         }
+        return result;
     }
-    else {
-        log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
+    if (itype->rtype->ptype) {
+        return use_potion(u, itype, amount, ord);
+    } else {
+        log_error("no such callout: %s", fname);
     }
+    if (itype->use) {
+        return itype->use(u, itype, amount, ord);
+    }
+    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
+    lua_pop(L, 1);
 
     return result;
 }

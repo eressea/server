@@ -1292,9 +1292,9 @@ void register_resources(void)
     register_item_use(use_tacticcrystal, "use_tacticcrystal");
     register_item_use(use_birthdayamulet, "use_birthdayamulet");
     register_item_use(use_warmthpotion, "usewarmthpotion");
-    register_item_use(use_bloodpotion, "usebloodpotion");
+    register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_healingpotion, "usehealingpotion");
-    register_item_use(use_foolpotion, "usefoolpotion");
+    register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_mistletoe, "usemistletoe");
     register_item_use(use_magicboost, "usemagicboost");
     register_item_use(use_snowball, "usesnowball");

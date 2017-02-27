@@ -805,6 +805,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     result = xmlXPathEvalExpression(BAD_CAST "potion", xpath);
     assert(result->nodesetval->nodeNr <= 1);
     if (result->nodesetval->nodeNr != 0) {
+        if ((itype->flags & ITF_CANUSE) == 0) {
+            log_error("potion %s has no use attribute", rtype->_name);
+            itype->flags |= ITF_CANUSE;
+        }
         xpath->node = result->nodesetval->nodeTab[0];
         rtype->ptype = xml_readpotion(xpath, itype);
     }
