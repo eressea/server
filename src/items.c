@@ -70,9 +70,9 @@ struct order *ord)
             if (amount > MAXGAIN) {
                 amount = MAXGAIN;
             }
-            teach->value += amount * 30;
-            if (teach->value > MAXGAIN * 30) {
-                teach->value = MAXGAIN * 30;
+            teach->value += amount * STUDYDAYS;
+            if (teach->value > MAXGAIN * STUDYDAYS) {
+                teach->value = MAXGAIN * STUDYDAYS;
             }
             i_change(&u->items, itype, -amount);
             return 0;
@@ -80,7 +80,6 @@ struct order *ord)
     }
     return EUNUSABLE;
 }
-
 /* END studypotion */
 
 /* BEGIN speedsail */
@@ -344,9 +343,9 @@ struct order *ord)
 void register_itemfunctions(void)
 {
     register_demonseye();
-    register_item_use(use_studypotion, "use_studypotion");
 
     /* have tests: */
+    register_item_use(use_studypotion, "use_studypotion");
     register_item_use(use_antimagiccrystal, "use_antimagic");
     register_item_use(use_speedsail, "use_speedsail");
     register_item_use(use_bagpipeoffear, "use_bagpipeoffear");

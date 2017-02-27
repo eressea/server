@@ -98,6 +98,11 @@
   </resource>
 
 <!-- XE items -->
+  <resource name="studypotion" appearance="vial">
+    <!-- gives user one free learning attempt -->
+    <item weight="0" use="yes" />
+  </resource>
+
   <resource name="skillpotion" appearance="vial">
     <!-- gives user one free learning attempt -->
     <item weight="0">

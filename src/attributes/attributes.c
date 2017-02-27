@@ -112,6 +112,7 @@ void register_attributes(void)
 
     at_register(&at_germs);
 
+    at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */

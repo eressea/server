@@ -86,27 +86,9 @@
     <item notlost="yes" cursed="true" weight="0"/>
   </resource>
 
-  <resource name="ao_daemon">
-    <!-- summons igjarjuk -->
-    <item weight="0" score="6000" notlost="true" cursed="true">
-      <function name="use" value="useigjarjuk"/>
-      <function name="give" value="giveigjarjuk"/>
-    </item>
-  </resource>
-
-  <resource name="griphonwing">
-    <!-- this lets you leave the arena -->
-    <item weight="0" score="6000" notlost="true" cursed="true">
-      <function name="use" value="leave_arena"/>
-      <function name="give" value="giveigjarjuk"/>
-    </item>
-  </resource>
-
   <resource name="eyeofdragon">
     <!-- the arena gate, for one-time entry -->
-    <item weight="0" score="0">
-      <function name="use" value="enter_arena"/>
-    </item>
+    <item weight="0" score="0"/>
   </resource>
 
   <resource name="jadee_ring" appearance="ring">
