@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include "follow.h"
+#include "fleechance.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
@@ -57,6 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 
 #include <storage.h>
+
 
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
@@ -92,6 +94,7 @@ void register_attributes(void)
     at_register(&at_woodcount);
 
     /* neue UNIT-Attribute */
+    at_register(&at_fleechance);
     at_register(&at_siege);
     at_register(&at_effect);
     at_register(&at_private);

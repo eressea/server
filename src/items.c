@@ -43,7 +43,7 @@ static int
 use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
-    if (init_order(u->thisorder) == K_STUDY) {
+    if (u->thisorder && init_order(u->thisorder) == K_STUDY) {
         char token[128];
         skill_t sk = NOSKILL;
         skill *sv = 0;
@@ -97,9 +97,8 @@ struct order *ord)
     }
 
     effect = SPEEDSAIL_EFFECT;
-    c =
-        create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, effect,
-        0);
+    c = create_curse(u, &sh->attribs, ct_find("shipspeedup"), 20, INT_MAX, 
+        effect, 0);
     c_setflag(c, CURSE_NOAGE);
 
     ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit speed", u,

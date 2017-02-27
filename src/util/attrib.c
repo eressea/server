@@ -179,16 +179,6 @@ void at_register(attrib_type * at)
     at_hash[at->hashkey % MAXATHASH] = at;
 }
 
-struct attrib_type *at_find(const char *name) {
-    attrib_type *find;
-    unsigned int hash = __at_hashkey(name);
-    find = at_hash[hash % MAXATHASH];
-    while (find && hash != find->hashkey) {
-        find = find->nexthash;
-    }
-    return find;
-}
-
 static attrib_type *at_find_key(unsigned int hk)
 {
     const char *translate[3][2] = {
@@ -210,6 +200,11 @@ static attrib_type *at_find_key(unsigned int hk)
     return find;
 }
 
+struct attrib_type *at_find(const char *name) {
+    unsigned int hash = __at_hashkey(name);
+    return at_find_key(hash);
+}
+
 attrib *a_select(attrib * a, const void *data,
     bool(*compare) (const attrib *, const void *))
 {
@@ -220,6 +215,7 @@ attrib *a_select(attrib * a, const void *data,
 
 attrib *a_find(attrib * a, const attrib_type * at)
 {
+    assert(at);
     while (a && a->type != at)
         a = a->nexttype;
     return a;

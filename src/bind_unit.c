@@ -771,17 +771,23 @@ static int tolua_unit_get_orders(lua_State * L)
     return 1;
 }
 
-static int tolua_unit_is_cursed(lua_State *L) {
+static int tolua_unit_get_curse(lua_State *L) {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-    lua_pushboolean(L, self->attribs && curse_active(get_curse(self->attribs, ct_find(name))));
-    return 1;
+    if (self->attribs) {
+        curse * c = get_curse(self->attribs, ct_find(name));
+        if (c) {
+            lua_pushnumber(L, curse_geteffect(c));
+            return 1;
+        }
+    }
+    return 0;
 }
 
 static int tolua_unit_has_attrib(lua_State *L) {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
-    attrib * a = a_find(self->attribs, at_find(name));
+    attrib * a = self->attribs ? a_find(self->attribs, at_find(name)) : NULL;
     lua_pushboolean(L, a != NULL);
     return 1;
 }
@@ -972,7 +978,7 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "clear_orders", &tolua_unit_clear_orders);
             tolua_variable(L, TOLUA_CAST "orders", &tolua_unit_get_orders, 0);
 
-            tolua_function(L, TOLUA_CAST "is_cursed", &tolua_unit_is_cursed);
+            tolua_function(L, TOLUA_CAST "get_curse", &tolua_unit_get_curse);
             tolua_function(L, TOLUA_CAST "has_attrib", &tolua_unit_has_attrib);
 
             /*  key-attributes for named flags: */

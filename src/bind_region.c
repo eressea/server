@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include "chaos.h"
 
 #include <kernel/config.h>
+#include <kernel/curse.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/unit.h>
@@ -670,6 +671,27 @@ static int tolua_distance(lua_State * L)
     return 1;
 }
 
+static int tolua_region_get_curse(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    if (self->attribs) {
+        curse * c = get_curse(self->attribs, ct_find(name));
+        if (c) {
+            lua_pushnumber(L, curse_geteffect(c));
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int tolua_region_has_attrib(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    attrib * a = a_find(self->attribs, at_find(name));
+    lua_pushboolean(L, a != NULL);
+    return 1;
+}
+
 void tolua_region_open(lua_State * L)
 {
     /* register user types */
@@ -691,6 +713,8 @@ void tolua_region_open(lua_State * L)
 
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_region_count_msg_type);
 
+            tolua_function(L, TOLUA_CAST "get_curse", &tolua_region_get_curse);
+            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_region_has_attrib);
             /* flags */
             tolua_variable(L, TOLUA_CAST "blocked", tolua_region_get_blocked, tolua_region_set_blocked);
 
