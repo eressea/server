@@ -259,6 +259,58 @@ function test_aurapotion50()
     assert_equal(50, u.aura)
 end
 
+function test_bagpipe()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("bagpipeoffear", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Dudelsack")
+    process_orders()
+    assert_equal(1, u:get_item("bagpipeoffear"))
+    assert_equal(1, f:count_msg_type('bagpipeoffear_faction'))
+    assert_equal(1, r:count_msg_type('bagpipeoffear_region'))
+end
+
+function test_speedsail()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u.ship = ship.create(r, "boat")
+    u:add_item("speedsail", 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Sonnensegel")
+    process_orders()
+    assert_equal(1, u:get_item("speedsail"))
+    assert_equal(1, f:count_msg_type('use_speedsail'))
+end
+
+--[[
+function test_studypotion()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("studypotion", 2)
+    u:clear_orders()
+    u:add_order("LERNE Unterhaltung")
+    u:add_order("BENUTZEN 1 Lerntrank")
+    process_orders()
+    assert_equal(1, u:get_item("studypotion"))
+end
+]]--
+
+function test_antimagic()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("antimagic", 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Antimagiekristall")
+    process_orders()
+    assert_equal(1, r:count_msg_type('use_antimagiccrystal'))
+    assert_equal(1, u:get_item("antimagic"))
+end
+
 function test_ointment()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")

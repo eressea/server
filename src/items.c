@@ -29,6 +29,7 @@
 
 #include <util/attrib.h>
 #include <util/event.h>
+#include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -343,12 +344,12 @@ struct order *ord)
 void register_itemfunctions(void)
 {
     register_demonseye();
-    register_item_use(use_antimagiccrystal, "use_antimagiccrystal");
     register_item_use(use_studypotion, "use_studypotion");
-    register_item_use(use_speedsail, "use_speedsail");
-    register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
 
     /* have tests: */
+    register_item_use(use_antimagiccrystal, "use_antimagic");
+    register_item_use(use_speedsail, "use_speedsail");
+    register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
     register_item_use(use_aurapotion50, "use_aurapotion50");
     register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_foolpotion, "use_p7");
