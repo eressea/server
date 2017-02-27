@@ -58,7 +58,7 @@ function test_dreameye()
     assert_equal(1, u:get_item("dreameye"))
     assert_equal(1, f:count_msg_type('use_tacticcrystal'))
     turn_end()
-    assert_equal(nil, u:get_curse('skillmod'))
+    assert_nil(u:get_curse('skillmod'))
 end
 
 function test_manacrystal()

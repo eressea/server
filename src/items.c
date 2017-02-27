@@ -389,6 +389,26 @@ use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
     return 0;
 }
 
+static int use_warmthpotion(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    if (u->faction->race == get_race(RC_INSECT)) {
+        u->flags |= UFL_WARMTH;
+    }
+    else {
+        /* nur fuer insekten: */
+        cmistake(u, ord, 163, MSG_EVENT);
+        return ECUSTOM;
+    }
+    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+        amount);
+    usetpotionuse(u, itype->rtype->ptype);
+
+    ADDMSG(&u->faction->msgs, msg_message("usepotion",
+        "unit potion", u, itype->rtype));
+    return 0;
+}
+
 void register_itemfunctions(void)
 {
     /* have tests: */
@@ -403,4 +423,5 @@ void register_itemfunctions(void)
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_healingpotion, "use_ointment");
+    register_item_use(use_warmthpotion, "use_nestwarmth");
 }

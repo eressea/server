@@ -726,26 +726,6 @@ struct order *), const char *name)
     register_function((pf_generic)foo, name);
 }
 
-static int use_warmthpotion(unit *u, const item_type *itype,
-    int amount, struct order *ord)
-{
-    if (u->faction->race == get_race(RC_INSECT)) {
-        fset(u, UFL_WARMTH);
-    }
-    else {
-        /* nur fuer insekten: */
-        cmistake(u, ord, 163, MSG_EVENT);
-        return ECUSTOM;
-    }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(u, itype->rtype->ptype);
-
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-    return 0;
-}
-
 static int
 use_magicboost(struct unit *user, const struct item_type *itype, int amount,
 struct order *ord)
@@ -772,13 +752,6 @@ struct order *ord)
     ADDMSG(&user->faction->msgs, msg_message("use_item",
         "unit item", user, itype->rtype));
 
-    return 0;
-}
-
-static int
-use_snowball(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
     return 0;
 }
 
@@ -1113,9 +1086,7 @@ void register_resources(void)
     register_function((pf_generic)res_changeaura, "changeaura");
 
     register_item_use(use_potion_delayed, "use_p2");
-    register_item_use(use_warmthpotion, "use_nestwarmth");
     register_item_use(use_magicboost, "usemagicboost");
-    register_item_use(use_snowball, "usesnowball");
 
     register_item_give(give_horses, "givehorses");
 }

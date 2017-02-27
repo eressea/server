@@ -11,6 +11,38 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
+function test_nestwarmth_insect()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "insect", "de")
+    local u = unit.create(f, r, 1)
+    local flags = u.flags
+    u:add_item("nestwarmth", 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Nestwaerme")
+    turn_begin()
+    turn_process()
+    assert_equal(flags+64, u.flags) -- UFL_WARMTH
+    assert_equal(1, u:get_item("nestwarmth"))
+    assert_equal(1, f:count_msg_type('usepotion'))
+    turn_end()
+end
+
+function test_nestwarmth_other()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    local flags = u.flags
+    u:add_item("nestwarmth", 2)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Nestwaerme")
+    turn_begin()
+    turn_process()
+    assert_equal(flags, u.flags) -- nothing happens
+    assert_equal(2, u:get_item("nestwarmth"))
+    assert_equal(1, f:count_msg_type('error163'))
+    turn_end()
+end
+
 function test_meow()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
