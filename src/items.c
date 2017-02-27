@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "items.h"
 
+#include "alchemy.h"
 #include "study.h"
 #include "economy.h"
 #include "move.h"
@@ -14,6 +15,7 @@
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/pool.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
@@ -21,9 +23,15 @@
 
 #include <items/demonseye.h>
 
+/* triggers includes */
+#include <triggers/changerace.h>
+#include <triggers/timeout.h>
+
 #include <util/attrib.h>
+#include <util/event.h>
 #include <util/parser.h>
 #include <util/rand.h>
+#include <util/rng.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -125,15 +133,15 @@ struct order *ord)
         UNUSED_ARG(ord);
         assert(sp);
 
-        /* Reduziert die Stärke jedes Spruchs um effect */
+        /* Reduziert die Stï¿½rke jedes Spruchs um effect */
         effect = 5;
 
-        /* Hält Sprüche bis zu einem summierten Gesamtlevel von power aus.
+        /* Hï¿½lt Sprï¿½che bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
         force = effect * 20;     /* Stufe 5 =~ 100 */
 
-        /* Regionszauber auflösen */
+        /* Regionszauber auflï¿½sen */
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
@@ -145,7 +153,7 @@ struct order *ord)
             }
             c = (curse *)a->data.v;
 
-            /* Immunität prüfen */
+            /* Immunitï¿½t prï¿½fen */
             if (c_flags(c) & CURSE_IMMUNE) {
                 do {
                     ap = &(*ap)->next;
@@ -264,6 +272,118 @@ int amount, struct order *ord)
     return 0;
 }
 
+static int
+use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
+struct order *ord)
+{
+    direction_t d;
+    message *msg = msg_message("meow", "");
+
+    UNUSED_ARG(ord);
+    UNUSED_ARG(amount);
+    UNUSED_ARG(itype);
+
+    add_message(&u->region->msgs, msg);
+    for (d = 0; d < MAXDIRECTIONS; d++) {
+        region *tr = rconnect(u->region, d);
+        if (tr)
+            add_message(&tr->msgs, msg);
+    }
+    msg_release(msg);
+    return 0;
+}
+
+static int use_foolpotion(unit *u, const item_type *itype, int amount,
+    struct order *ord)
+{
+    int targetno = read_unitid(u->faction, u->region);
+    unit *target = findunit(targetno);
+    if (target == NULL || u->region != target->region) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
+            ""));
+        return ECUSTOM;
+    }
+    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
+        cmistake(u, ord, 64, MSG_EVENT);
+        return ECUSTOM;
+    }
+    ADDMSG(&u->faction->msgs, msg_message("givedumb",
+        "unit recipient amount", u, target, amount));
+
+    change_effect(target, itype->rtype->ptype, amount);
+    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
+    return 0;
+}
+
+static int
+use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
+struct order *ord)
+{
+    if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
+        change_effect(u, itype->rtype->ptype, 100 * amount);
+    }
+    else {
+        const race *irace = u_irace(u);
+        if (irace == u_race(u)) {
+            const race *rcfailure = rc_find("smurf");
+            if (!rcfailure) {
+                rcfailure = rc_find("toad");
+            }
+            if (rcfailure) {
+                trigger *trestore = trigger_changerace(u, u_race(u), irace);
+                if (trestore) {
+                    int duration = 2 + rng_int() % 8;
+
+                    add_trigger(&u->attribs, "timer", trigger_timeout(duration,
+                        trestore));
+                    u->irace = NULL;
+                    u_setrace(u, rcfailure);
+                }
+            }
+        }
+    }
+    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+        amount);
+    usetpotionuse(u, itype->rtype->ptype);
+
+    ADDMSG(&u->faction->msgs, msg_message("usepotion",
+        "unit potion", u, itype->rtype));
+    return 0;
+}
+
+static int heal(unit * user, int effect)
+{
+    int req = unit_max_hp(user) * user->number - user->hp;
+    if (req > 0) {
+        req = MIN(req, effect);
+        effect -= req;
+        user->hp += req;
+    }
+    return effect;
+}
+
+static int
+use_healingpotion(struct unit *user, const struct item_type *itype, int amount,
+struct order *ord)
+{
+    int effect = amount * 400;
+    unit *u = user->region->units;
+    effect = heal(user, effect);
+    while (effect > 0 && u != NULL) {
+        if (u->faction == user->faction) {
+            effect = heal(u, effect);
+        }
+        u = u->next;
+    }
+    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+        amount);
+    usetpotionuse(user, itype->rtype->ptype);
+
+    ADDMSG(&user->faction->msgs, msg_message("usepotion",
+        "unit potion", user, itype->rtype));
+    return 0;
+}
+
 void register_itemfunctions(void)
 {
     register_demonseye();
@@ -274,4 +394,10 @@ void register_itemfunctions(void)
     register_item_use(use_instantartacademy, "use_instantartacademy");
     register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
     register_item_use(use_aurapotion50, "use_aurapotion50");
+
+    /* have tests: */
+    register_item_use(use_birthdayamulet, "use_aoc");
+    register_item_use(use_foolpotion, "use_p7");
+    register_item_use(use_bloodpotion, "use_peasantblood");
+    register_item_use(use_healingpotion, "use_ointment");
 }
