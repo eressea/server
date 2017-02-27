@@ -424,4 +424,7 @@ void register_itemfunctions(void)
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_healingpotion, "use_ointment");
     register_item_use(use_warmthpotion, "use_nestwarmth");
+
+    /* ungetestet: Wasser des Lebens */
+    register_item_use(use_potion_delayed, "use_p2");
 }

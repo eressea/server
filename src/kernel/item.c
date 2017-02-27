@@ -726,35 +726,6 @@ struct order *), const char *name)
     register_function((pf_generic)foo, name);
 }
 
-static int
-use_magicboost(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int mtoes =
-        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-    faction *f = user->faction;
-    if (user->number > mtoes) {
-        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-            "unit item region command", user, itype->rtype, user->region, ord));
-        return -1;
-    }
-    if (!is_mage(user) || key_get(f->attribs, atoi36("mbst"))) {
-        cmistake(user, user->thisorder, 214, MSG_EVENT);
-        return -1;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-
-    key_set(&f->attribs, atoi36("mbst"), turn);
-    set_level(user, SK_MAGIC, 3);
-
-    ADDMSG(&user->faction->msgs, msg_message("use_item",
-        "unit item", user, itype->rtype));
-
-    return 0;
-}
-
 static void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
@@ -1084,9 +1055,6 @@ void register_resources(void)
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
-
-    register_item_use(use_potion_delayed, "use_p2");
-    register_item_use(use_magicboost, "usemagicboost");
 
     register_item_give(give_horses, "givehorses");
 }
