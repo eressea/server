@@ -62,9 +62,7 @@
   </resource>
 
   <resource name="aoc" appearance="amulet">
-    <item weight="100">
-      <function name="use" value="use_birthdayamulet"/>
-    </item>
+    <item weight="100" use="yes" />
   </resource>
 
   <resource name="dreameye">

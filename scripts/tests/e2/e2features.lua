@@ -230,12 +230,24 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
+function test_meow()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("aoc", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Katzenamulett")
+    process_orders()
+    assert_equal(1, u:get_item("aoc"))
+    assert_equal(1, r:count_msg_type('meow'))
+end
+
 function test_ointment()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
     local u = unit.create(f, r, 1)
     local hp = u.hp
-    u.hp = 0
+    u.hp = 1
     u:add_item("ointment", 1)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Wundsalbe")

@@ -1289,7 +1289,7 @@ void register_resources(void)
 
     register_item_use(use_potion_delayed, "use_p2");
     register_item_use(use_tacticcrystal, "use_tacticcrystal");
-    register_item_use(use_birthdayamulet, "use_birthdayamulet");
+    register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_warmthpotion, "use_nestwarmth");
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_healingpotion, "use_ointment");

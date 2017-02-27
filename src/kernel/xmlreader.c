@@ -855,6 +855,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             struct order *))fun;
         }
         else if (strcmp((const char *)propValue, "use") == 0) {
+            log_error("%s has a use function", rtype->_name);
             itype->flags |= ITF_CANUSE;
             itype->use =
                 (int(*)(struct unit *, const struct item_type *, int,

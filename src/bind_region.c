@@ -29,6 +29,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/ship.h>
 #include <kernel/plane.h>
 #include <kernel/terrain.h>
+#include <kernel/messages.h>
 #include <modules/autoseed.h>
 #include <attributes/key.h>
 #include <attributes/racename.h>
@@ -45,6 +46,23 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+static int tolua_region_count_msg_type(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *str = tolua_tostring(L, 2, 0);
+    int n = 0;
+    if (self->msgs) {
+        mlist * ml = self->msgs->begin;
+        while (ml) {
+            if (strcmp(str, ml->msg->type->name) == 0) {
+                ++n;
+            }
+            ml = ml->next;
+        }
+    }
+    lua_pushinteger(L, n);
+    return 1;
+}
 
 int tolua_regionlist_next(lua_State * L)
 {
@@ -670,6 +688,8 @@ void tolua_region_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "create", tolua_region_create);
             tolua_function(L, TOLUA_CAST "destroy", tolua_region_destroy);
             tolua_function(L, TOLUA_CAST "__tostring", tolua_region_tostring);
+
+            tolua_function(L, TOLUA_CAST "count_msg_type", tolua_region_count_msg_type);
 
             /* flags */
             tolua_variable(L, TOLUA_CAST "blocked", tolua_region_get_blocked, tolua_region_set_blocked);
