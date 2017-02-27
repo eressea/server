@@ -393,9 +393,9 @@ void register_itemfunctions(void)
     register_item_use(use_speedsail, "use_speedsail");
     register_item_use(use_instantartacademy, "use_instantartacademy");
     register_item_use(use_bagpipeoffear, "use_bagpipeoffear");
-    register_item_use(use_aurapotion50, "use_aurapotion50");
 
     /* have tests: */
+    register_item_use(use_aurapotion50, "use_aurapotion50");
     register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");

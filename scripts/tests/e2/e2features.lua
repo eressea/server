@@ -242,6 +242,23 @@ function test_meow()
     assert_equal(1, r:count_msg_type('meow'))
 end
 
+function test_aurapotion50()
+    eressea.settings.set("magic.regeneration.enable", "0")
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("aurapotion50", 1)
+    u:set_skill('magic', 10);
+    u.magic = 'gwyrrd'
+    u.aura = 0
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Auratrank")
+    process_orders()
+    assert_equal(0, u:get_item("aurapotion50"))
+    assert_equal(1, f:count_msg_type('aurapotion50'))
+    assert_equal(50, u.aura)
+end
+
 function test_ointment()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
