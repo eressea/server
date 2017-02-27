@@ -230,6 +230,32 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
+function test_bloodpotion_demon()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("peasantblood", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Bauernblut")
+    process_orders()
+    assert_equal(0, u:get_item("peasantblood"))
+    assert_equal(1, f:count_msg_type('usepotion'))
+    assert_equal("demon", u.race)
+end
+
+function test_bloodpotion_other()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+    u:add_item("peasantblood", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Bauernblut")
+    process_orders()
+    assert_equal(0, u:get_item("peasantblood"))
+    assert_equal(1, f:count_msg_type('usepotion'))
+    assert_equal("smurf", u.race)
+end
+
 function test_foolpotion()
     local r = region.create(0, 0, "plain")
     local f = faction.create("noreply@eressea.de", "human", "de")
