@@ -74,7 +74,8 @@ extern "C" {
 
     extern int(*res_limit_fun)(const struct region *, const struct resource_type *);
     extern void(*res_produce_fun)(struct region *, const struct resource_type *, int);
-
+    extern int (*item_use_fun)(struct unit *, const struct item_type *, int amount,
+        struct order *ord);
     int limit_resource(const struct region *r, const struct resource_type *rtype);
     void produce_resource(struct region *r, const struct resource_type *rtype, int amount);
 

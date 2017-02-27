@@ -17,21 +17,15 @@
   </resource>
 
   <resource name="snowman">
-    <item notlost="yes" weight="1">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item notlost="yes" weight="1" use="yes" />
   </resource>
 
   <resource name="snowglobe">
-    <item notlost="yes" weight="1">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item notlost="yes" weight="1" use="yes" />
   </resource>
 
   <resource name="ring_of_levitation" appearance="ring">
-    <item notlost="yes" weight="0" cursed="true">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item notlost="yes" weight="0" cursed="true" use="yes" />
   </resource>
 
   <resource name="birthdaycake">
@@ -44,23 +38,17 @@
 
 <!-- ambassador rewards -->
   <resource name="seashell">
-    <item cursed="true" weight="0">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item cursed="true" weight="0" use="yes" />
   </resource>
 
 <!-- xmas 2005 -->
   <resource name="stardust" appearance="vial">
-    <item weight="0">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- xmas 2006 -->
   <resource name="xmastree">
-    <item weight="0">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- museum items -->

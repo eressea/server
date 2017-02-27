@@ -107,6 +107,7 @@ extern "C" {
 #define ITF_BIG              0x0008     /* big item, e.g. does not fit in a bag of holding */
 #define ITF_ANIMAL           0x0010     /* an animal */
 #define ITF_VEHICLE          0x0020     /* a vehicle, drawn by two animals */
+#define ITF_CANUSE           0x0040     /* can be used with use_item_fun callout */
 
     /* error codes for item_type::use */
 #define ECUSTOM   -1

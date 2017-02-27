@@ -767,6 +767,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
     if (xml_bvalue(node, "cursed", false))
         flags |= ITF_CURSED;
+    if (xml_bvalue(node, "use", false))
+        flags |= ITF_CANUSE;
     if (xml_bvalue(node, "notlost", false))
         flags |= ITF_NOTLOST;
     if (xml_bvalue(node, "herb", false))
@@ -849,6 +851,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             struct order *))fun;
         }
         else if (strcmp((const char *)propValue, "use") == 0) {
+            itype->flags |= ITF_CANUSE;
             itype->use =
                 (int(*)(struct unit *, const struct item_type *, int,
             struct order *))fun;

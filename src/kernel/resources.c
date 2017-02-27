@@ -213,6 +213,8 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype)
     return rmtype;
 }
 
+int(*item_use_fun)(struct unit *u, const struct item_type *itype, int amount,
+    struct order *ord);
 int(*res_limit_fun)(const struct region *, const struct resource_type *);
 void(*res_produce_fun)(struct region *, const struct resource_type *, int);
 

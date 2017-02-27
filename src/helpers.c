@@ -490,13 +490,17 @@ static int lua_equipmentcallback(const struct equipment *eq, unit * u)
 }
 
 /** callback for an item-use function written in lua. */
-int
-lua_useitem(struct unit *u, const struct item_type *itype, int amount,
+static int
+use_item_lua(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     lua_State *L = (lua_State *)global.vm_state;
     int result = 0;
     char fname[64];
+
+    if (itype->use) {
+        return itype->use(u, itype, amount, ord);
+    }
 
     strlcpy(fname, "use_", sizeof(fname));
     strlcat(fname, itype->rtype->_name, sizeof(fname));
@@ -551,7 +555,6 @@ void register_tolua_helpers(void)
     register_function((pf_generic)lua_callspell, TOLUA_CAST "lua_castspell");
     register_function((pf_generic)lua_initfamiliar,
         TOLUA_CAST "lua_initfamiliar");
-    register_item_use(&lua_useitem, TOLUA_CAST "lua_useitem");
     register_function((pf_generic)lua_getresource,
         TOLUA_CAST "lua_getresource");
     register_function((pf_generic)lua_canuse_item,
@@ -565,6 +568,7 @@ void register_tolua_helpers(void)
     register_function((pf_generic)lua_maintenance,
         TOLUA_CAST "lua_maintenance");
 
+    item_use_fun = use_item_lua;
     res_produce_fun = produce_resource_lua;
     res_limit_fun = limit_resource_lua;
     register_item_give(lua_giveitem, TOLUA_CAST "lua_giveitem");

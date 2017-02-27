@@ -81,9 +81,7 @@
   </resource>
 
   <resource name="xmastree">
-    <item weight="0">
-      <function name="use" value="lua_useitem"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 </resources>

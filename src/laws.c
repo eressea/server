@@ -3252,8 +3252,8 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
         return ENOITEM;
     }
 
-    if (itype->use) {
-        int result = itype->use(u, itype, amount, ord);
+    if (itype->flags & ITF_CANUSE) {
+        int result = item_use_fun(u, itype, amount, ord);
         if (result > 0) {
             use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }
