@@ -782,6 +782,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
+    itype->mask_allow = xml_ivalue(node, "allow", 0);
+    itype->mask_deny = xml_ivalue(node, "deny", 0);
     itype->flags |= flags;
 
     /* reading item/construction */
@@ -1575,6 +1577,7 @@ static int parse_races(xmlDocPtr doc)
         rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
         rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
         rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
+        rc->mask_item = (char)xml_ivalue(node, "items", rc->mask_item);
         study_speed_base = xml_ivalue(node, "studyspeed", 0);
 
         rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
