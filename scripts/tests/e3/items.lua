@@ -26,7 +26,7 @@ function test_goblins()
     for k, v in ipairs(restricted) do
         u1:add_item(v, 1)
         u2:add_item(v, 1)
-        u2:add_item(v, 1)
+        u3:add_item(v, 1)
     end
 
     u1:add_order("ATTACKIERE " .. itoa36(u2.id))
