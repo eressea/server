@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<race name="goblin" magres="-5" maxaura="1.0" regaura="1.0"
+<race name="goblin" magres="-5" maxaura="1.0"
 recruitcost="60" maintenance="6" weight="600" capacity="440"
 speed="1.0" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0"
 playerrace="yes" walk="yes" giveperson="yes" giveunit="yes"
