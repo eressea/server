@@ -1,10 +1,13 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include "race.h"
-#include <CuTest.h>
+#include "item.h"
+
 #include <tests.h>
+#include <CuTest.h>
 
 #include <stdlib.h>
+#include <limits.h>
 #include <assert.h>
 
 static void test_rc_name(CuTest *tc) {
@@ -100,6 +103,54 @@ static void test_rc_set_param(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_rc_can_use(CuTest *tc) {
+    race *rc;
+    item_type *itype;
+
+    test_setup();
+    rc = test_create_race("goblin");
+    itype = test_create_itemtype("plate");
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+
+    /* default case. all items and races in E2 */
+    itype->mask_deny = 0;
+    rc->mask_item = 0;
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+
+    /* some race is forbidden from using this item. */
+    itype->mask_deny = 1;
+
+    /* we are not that race. */
+    rc->mask_item = 2;
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+
+    /* we are that race */
+    rc->mask_item = 1;
+    CuAssertTrue(tc, ! rc_can_use(rc, itype));
+
+    /* we are not a special race at all */
+    rc->mask_item = 0;
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+
+    /* only one race is allowed to use this item */
+    itype->mask_deny = 0;
+    itype->mask_allow = 1;
+
+    /* we are not that race */
+    rc->mask_item = 2;
+    CuAssertTrue(tc, ! rc_can_use(rc, itype));
+    
+    /* we are that race */
+    rc->mask_item = 1;
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+    
+    /* we are not special */
+    rc->mask_item = 0;
+    CuAssertTrue(tc, rc_can_use(rc, itype));
+    
+    test_cleanup();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -109,6 +160,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_rc_defaults);
     SUITE_ADD_TEST(suite, test_rc_find);
     SUITE_ADD_TEST(suite, test_rc_set_param);
+    SUITE_ADD_TEST(suite, test_rc_can_use);
     return suite;
 }
 
