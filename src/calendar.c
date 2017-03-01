@@ -18,7 +18,7 @@ int seasons = 0;
 
 int first_turn(void)
 {
-    return config_get_int("game.start", 1);
+    return config_get_int("game.start", 0);
 }
 
 const gamedate *get_gamedate(int turn, gamedate * gd)

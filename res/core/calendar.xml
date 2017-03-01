@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<calendar name="secondage" newyear="month_1" start="0">
+<calendar name="secondage" newyear="month_1">
   <season name="winter">
     <month name="month_4" storm="50" />
     <month name="month_5" storm="30" />
