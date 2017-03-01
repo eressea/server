@@ -2,6 +2,7 @@
 #include "reports.h"
 
 #include "move.h"
+#include "spy.h"
 #include "lighthouse.h"
 #include "travelthru.h"
 #include "keyword.h"
@@ -298,10 +299,39 @@ static void test_get_addresses(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
     CuAssertPtrNotNull(tc, ctx.addresses);
+    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f, NULL)));
+    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f1, NULL)));
+    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f2, NULL)));
     CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
+    test_cleanup();
+}
+
+static void test_get_addresses_fstealth(CuTest *tc) {
+    report_context ctx;
+    faction *f, *f2, *f1;
+    region *r;
+    unit *u;
+    int i;
+
+    test_setup();
+    f = test_create_faction(0);
+    f1 = test_create_faction(0);
+    f2 = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    test_create_unit(f, r);
+    test_create_unit(f1, r);
+    u = test_create_unit(f2, r);
+    set_factionstealth(u, f1);
+
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    get_addresses(&ctx);
+    CuAssertPtrNotNull(tc, ctx.addresses);
+    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f, NULL)));
     CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f1, NULL)));
     CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f2, NULL)));
-    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f, NULL)));
+    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     test_cleanup();
 }
 
@@ -517,6 +547,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_get_addresses);
+    SUITE_ADD_TEST(suite, test_get_addresses_fstealth);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);
