@@ -279,6 +279,32 @@ static void test_prepare_travelthru(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_get_addresses(CuTest *tc) {
+    report_context ctx;
+    faction *f, *f2, *f1;
+    region *r;
+    int i;
+
+    test_setup();
+    f = test_create_faction(0);
+    f1 = test_create_faction(0);
+    f2 = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    test_create_unit(f, r);
+    test_create_unit(f1, r);
+    test_create_unit(f2, r);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    get_addresses(&ctx);
+    CuAssertPtrNotNull(tc, ctx.addresses);
+    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
+    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f1, NULL)));
+    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f2, NULL)));
+    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f, NULL)));
+    test_cleanup();
+}
+
 void test_prepare_lighthouse_capacity(CuTest *tc) {
     building *b;
     building_type *btype;
@@ -490,6 +516,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_owners);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
+    SUITE_ADD_TEST(suite, test_get_addresses);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

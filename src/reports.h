@@ -81,6 +81,7 @@ extern "C" {
 
     void prepare_report(report_context *ctx, struct faction *f);
     void finish_reports(report_context *ctx);
+    void get_addresses(report_context * ctx);
 
     typedef int(*report_fun) (const char *filename, report_context * ctx,
         const char *charset);

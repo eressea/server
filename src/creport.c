@@ -764,7 +764,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     }
     /* print faction information */
     sf = visible_faction(NULL, u);
-    prefix = raceprefix(u);
     if (u->faction == f || omniscient(f)) {
         /* my own faction, full info */
         const attrib *a = NULL;
@@ -807,6 +806,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             }
         }
     }
+    prefix = raceprefix(u);
     if (prefix) {
         prefix = mkname("prefix", prefix);
         stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,

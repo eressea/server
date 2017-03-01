@@ -1024,7 +1024,7 @@ static void add_travelthru_addresses(region *r, faction *f, selist **flist, int 
     travelthru_map(r, cb_add_address, &cbdata);
 }
 
-static void get_addresses(report_context * ctx)
+void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
     region *r;
