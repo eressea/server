@@ -5,6 +5,7 @@
 #include "travelthru.h"
 #include "keyword.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -67,6 +68,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
+    ally *al;
 
     test_setup();
     mstream_init(&strm);
@@ -87,6 +89,14 @@ static void test_cr_factionstealth(CuTest *tc) {
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+
+    cr_output_unit(&strm, u->region, f2, u, seen_unit);
+    CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Verraeter", -1));
+
+    al = ally_add(&f1->allies, f2);
+    al->status = HELP_FSTEALTH;
 
     cr_output_unit(&strm, u->region, f2, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
