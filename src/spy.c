@@ -178,7 +178,7 @@ int spy_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-void set_factionstealth(unit * u, faction * f)
+static bool can_set_factionstealth(const unit * u, const faction * f)
 {
     region *lastr = NULL;
     /* for all units mu of our faction, check all the units in the region
@@ -194,7 +194,7 @@ void set_factionstealth(unit * u, faction * f)
                     faction *fv = visible_faction(f, ru);
                     if (fv == f) {
                         if (cansee(f, lastr, ru, 0))
-                            break;
+                            return true;
                     }
                 }
                 ru = ru->next;
@@ -204,13 +204,15 @@ void set_factionstealth(unit * u, faction * f)
         }
         mu = mu->nextF;
     }
-    if (mu != NULL) {
-        attrib *a = a_find(u->attribs, &at_otherfaction);
-        if (!a)
-            a = a_add(&u->attribs, make_otherfaction(f));
-        else
-            a->data.v = f;
-    }
+    return true;
+}
+
+void set_factionstealth(unit *u, faction *f) {
+    attrib *a = a_find(u->attribs, &at_otherfaction);
+    if (!a)
+        a = a_add(&u->attribs, make_otherfaction(f));
+    else
+        a->data.v = f;
 }
 
 int setstealth_cmd(unit * u, struct order *ord)
@@ -315,7 +317,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 }
                 else {
                     struct faction *f = findfaction(nr);
-                    if (f == NULL) {
+                    if (f == NULL || !can_set_factionstealth(u, f)) {
                         cmistake(u, ord, 66, MSG_EVENT);
                         break;
                     }
