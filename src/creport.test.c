@@ -64,7 +64,7 @@ static int cr_get_int(stream *strm, const char *match, int def)
 
 static void test_cr_factionstealth(CuTest *tc) {
     stream strm;
-    faction *f1, *f2, *fr;
+    faction *f1, *f2;
     region *r;
     unit *u;
 
@@ -72,7 +72,6 @@ static void test_cr_factionstealth(CuTest *tc) {
     mstream_init(&strm);
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
-    fr = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f1, r);
 
