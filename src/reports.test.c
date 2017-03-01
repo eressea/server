@@ -284,7 +284,6 @@ static void test_get_addresses(CuTest *tc) {
     report_context ctx;
     faction *f, *f2, *f1;
     region *r;
-    int i;
 
     test_setup();
     f = test_create_faction(0);
@@ -299,9 +298,9 @@ static void test_get_addresses(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
     CuAssertPtrNotNull(tc, ctx.addresses);
-    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f, NULL)));
-    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f1, NULL)));
-    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f2, NULL)));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f, NULL));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f1, NULL));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
     CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     test_cleanup();
 }
@@ -311,7 +310,6 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     faction *f, *f2, *f1;
     region *r;
     unit *u;
-    int i;
 
     test_setup();
     f = test_create_faction(0);
@@ -328,10 +326,10 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
     CuAssertPtrNotNull(tc, ctx.addresses);
-    CuAssertIntEquals(tc, 1, (i = 0, selist_find(&ctx.addresses, &i, f, NULL)));
-    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f1, NULL)));
-    CuAssertIntEquals(tc, 1, (i=0, selist_find(&ctx.addresses, &i, f2, NULL)));
-    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f, NULL));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f1, NULL));
+    CuAssertTrue(tc, ! selist_contains(ctx.addresses, f2, NULL));
+    CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
     test_cleanup();
 }
 
