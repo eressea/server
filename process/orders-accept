@@ -360,6 +360,10 @@ def accept(game, locale, stream, extend=None):
     return 0
 
 # the main body of the script:
+try:
+    os.mkdir(os.path.join(rootdir, 'log'))
+except:
+    pass # already exists?
 LOG_FILENAME=os.path.join(rootdir, 'log/orders.log')
 logging.basicConfig(level=logging.DEBUG, filename=LOG_FILENAME)
 logger = logging
