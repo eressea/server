@@ -24,17 +24,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 
 #include <kernel/ally.h>
-#include <kernel/unit.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/building.h>
+#include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 #include <assert.h>
 
 guard_t can_start_guarding(const unit * u)
 {
-    if (!u->region->land) {
+    if (u->region->terrain->flags & SEA_REGION) {
         return E_GUARD_TERRAIN;
     }
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
@@ -72,7 +73,6 @@ void setguard(unit * u, bool enabled)
     } else {
         assert(!fval(u, UFL_MOVED));
         assert(u->status < ST_FLEE);
-        assert(u->region->land);
         fset(u, UFL_GUARD);
         fset(u->region, RF_GUARDED);
     }

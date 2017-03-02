@@ -2699,12 +2699,7 @@ int guard_on_cmd(unit * u, struct order *ord)
             setguard(u, true);
         }
         else if (err == E_GUARD_TERRAIN) {
-            if (fval(u->region->terrain, SEA_REGION)) {
-                cmistake(u, ord, 2, MSG_EVENT);
-            }
-            else {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
-            }
+            cmistake(u, ord, 2, MSG_EVENT);
         }
         else if (err == E_GUARD_UNARMED) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));

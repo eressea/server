@@ -140,7 +140,7 @@ static void test_update_guard(CuTest * tc)
 
     test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
-    t_plain = test_create_terrain("plain", LAND_REGION);
+    t_plain = test_create_terrain("packice", ARCTIC_REGION);
     itype = it_get_or_create(rt_get_or_create("sword"));
     new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
     r = test_create_region(0, 0, t_plain);
@@ -181,6 +181,13 @@ static void test_guard_on(CuTest * tc)
     guard_on_cmd(ug, ug->thisorder);
     CuAssertTrue(tc, is_guard(ug));
 
+    terraform_region(r, test_create_terrain("packice", ARCTIC_REGION));
+
+    setguard(ug, false);
+    CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(ug));
+    guard_on_cmd(ug, ug->thisorder);
+    CuAssertTrue(tc, is_guard(ug));
+
     terraform_region(r, t_ocean);
 
     setguard(ug, false);
@@ -188,13 +195,6 @@ static void test_guard_on(CuTest * tc)
     guard_on_cmd(ug, ug->thisorder);
     CuAssertTrue(tc, !is_guard(ug));
     CuAssertPtrNotNull(tc, test_find_messagetype(ug->faction->msgs, "error2"));
-
-    setguard(ug, false);
-    t_ocean->flags &= ~ SEA_REGION;
-    CuAssertIntEquals(tc, E_GUARD_TERRAIN, can_start_guarding(ug));
-    guard_on_cmd(ug, ug->thisorder);
-    CuAssertTrue(tc, !is_guard(ug));
-    CuAssertPtrNotNull(tc, test_find_messagetype(ug->faction->msgs, "error_onlandonly"));
 
     terraform_region(r, t_plain);
 
