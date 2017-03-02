@@ -833,17 +833,21 @@ const char * game_name(void)
     return param ? param : global.gamename;
 }
 
-const char * game_name_upper(void)
+const char * game_mailcmd(void)
 {
-    static char result[32]; /* FIXME: static result */
-    char *r = result;
-    const char *param = game_name();
-    const char *c = param;
-    while (*c && (result+sizeof(result))>r) {
-        *r++ = (char)toupper(*c++);
+    const char *param = config_get("game.mailcmd");
+    if (!param) {
+        static char result[32]; /* FIXME: static result */
+        char *r = result;
+        const char *c;
+        param = game_name();
+        for (c = param; *c && (result + sizeof(result)) > r; ++c) {
+            *r++ = (char)toupper(*c);
+        }
+        *r = '\0';
+        return result;
     }
-    *r = '\0';
-    return result;
+    return param;
 }
 
 int game_id(void) {

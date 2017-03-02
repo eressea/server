@@ -1945,7 +1945,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 const char *get_mailcmd(const struct locale *loc)
 {
     static char result[64]; /* FIXME: static return buffer */
-    snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
+    snprintf(result, sizeof(result), "%s %d %s", game_mailcmd(), game_id(), LOC(loc, "mailcmd"));
     return result;
 }
 
