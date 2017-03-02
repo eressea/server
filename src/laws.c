@@ -2686,31 +2686,34 @@ int guard_on_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    if (fval(u->region->terrain, SEA_REGION)) {
-        cmistake(u, ord, 2, MSG_EVENT);
+    if (fval(u, UFL_MOVED)) {
+        cmistake(u, ord, 187, MSG_EVENT);
+    }
+    else if (fval(u_race(u), RCF_ILLUSIONARY)
+        || u_race(u) == get_race(RC_SPELL)) {
+        cmistake(u, ord, 95, MSG_EVENT);
     }
     else {
-        if (fval(u, UFL_MOVED)) {
-            cmistake(u, ord, 187, MSG_EVENT);
+        int err = can_start_guarding(u);
+        if (err == E_GUARD_OK) {
+            setguard(u, true);
         }
-        else if (fval(u_race(u), RCF_ILLUSIONARY)
-            || u_race(u) == get_race(RC_SPELL)) {
-            cmistake(u, ord, 95, MSG_EVENT);
+        else if (err == E_GUARD_TERRAIN) {
+            if (fval(u->region->terrain, SEA_REGION)) {
+                cmistake(u, ord, 2, MSG_EVENT);
+            }
+            else {
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
+            }
         }
-        else {
-            int err = can_start_guarding(u);
-            if (err == E_GUARD_OK) {
-                setguard(u, true);
-            }
-            else if (err == E_GUARD_UNARMED) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
-            }
-            else if (err == E_GUARD_FLEEING) {
-                cmistake(u, ord, 320, MSG_EVENT);
-            }
-            else if (err == E_GUARD_NEWBIE) {
-                cmistake(u, ord, 304, MSG_EVENT);
-            }
+        else if (err == E_GUARD_UNARMED) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "unit_unarmed", ""));
+        }
+        else if (err == E_GUARD_FLEEING) {
+            cmistake(u, ord, 320, MSG_EVENT);
+        }
+        else if (err == E_GUARD_NEWBIE) {
+            cmistake(u, ord, 304, MSG_EVENT);
         }
     }
     return 0;

@@ -34,6 +34,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 guard_t can_start_guarding(const unit * u)
 {
+    if (!u->region->land) {
+        return E_GUARD_TERRAIN;
+    }
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
     /* Monster der Monsterpartei duerfen immer bewachen */
