@@ -143,7 +143,7 @@ static void test_update_guard(CuTest * tc)
     t_plain = test_create_terrain("plain", LAND_REGION);
     itype = it_get_or_create(rt_get_or_create("sword"));
     new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
-    r = test_create_region(0, 0, t_ocean);
+    r = test_create_region(0, 0, t_plain);
     ug = test_create_unit(test_create_faction(0), r);
     i_change(&ug->items, itype, 1);
     set_level(ug, SK_MELEE, 2);

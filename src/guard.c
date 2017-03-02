@@ -72,6 +72,7 @@ void setguard(unit * u, bool enabled)
     } else {
         assert(!fval(u, UFL_MOVED));
         assert(u->status < ST_FLEE);
+        assert(u->region->land);
         fset(u, UFL_GUARD);
         fset(u->region, RF_GUARDED);
     }
