@@ -2,6 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from os import unlink, symlink, rename, popen, tmpfile
+import sys
 import os
 import os.path
 import ConfigParser
@@ -82,7 +83,7 @@ frommail = 'eressea-server@kn-bremen.de'
 gamename = 'Eressea'
 sender = '%s Server <%s>' % (gamename, frommail)
 
-inifile = os.path.join(gamedir, 'eressea.ini')
+inifile = os.path.join(game_dir, 'eressea.ini')
 if not os.path.exists(inifile):
     print "no such file: " . inifile
 else:
@@ -202,7 +203,7 @@ for line in lines:
     results = check_pwd(infile, email, pw_data)
     logfile = open(os.path.join(game_dir, "zug.log"), "a")
     dirname, filename = split_filename(infile)
-    msg = messages["validate-"+locale] + " " + infilename + "\n\n"
+    msg = messages["validate-"+locale] + " " + infile + "\n\n"
     for faction, game_email, success, pwd in results:
         msg = msg + messages["faction-"+locale] + " " + faction + "\n"
         if success: failed = False
