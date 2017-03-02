@@ -1123,7 +1123,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     allocation *al;
     int nreq = 0;
     resource_limit *rdata = get_resourcelimit(rtype);
-    int avail = 0;
+    int avail = INT_MAX;
 
     for (al = alist; al; al = al->next) {
         nreq += required(al->want, al->save);
@@ -1145,7 +1145,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             if (rx>0 && rng_int() % nreq < rx) ++x;
             avail -= x;
             nreq -= want;
-            al->get = x * al->save.sa[0] / al->save.sa[1];
+            al->get = x * al->save.sa[1] / al->save.sa[0];
             al->get = MIN(al->want, al->get);
             if (rdata->produce) {
                 int use = required(al->get, al->save);
