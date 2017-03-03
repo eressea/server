@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<resource name="axe">
+  <item weight="200" deny="goblin">
+    <function name="canuse" value="lua_canuse_item"/>
+    <construction skill="weaponsmithing" minskill="3">
+      <requirement type="log" quantity="1"/>
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <weapon cut="true" skill="melee" offmod="1" defmod="-2">
+      <damage type="rider" value="2d6+4"/>
+      <damage type="footman" value="2d6+4"/>
+    </weapon>
+  </item>
+</resource>
