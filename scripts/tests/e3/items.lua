@@ -8,6 +8,19 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
+function test_give_horses()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("horse", 0)
+    u:add_item("charger", 20)
+    u:add_order("GIB 0 10 Streitross")
+    process_orders()
+    assert_equal(10, r:get_resource("horse"))
+    assert_equal(10, u:get_item("charger"))
+end
+
 function test_goblins()
     local r = region.create(0, 0, "plain")
     assert(r)

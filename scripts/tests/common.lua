@@ -1028,3 +1028,16 @@ function test_recruit()
         assert_equal(6, u.number)
     end
 end
+
+function test_give_horses()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("horse", 0)
+    u:add_item("horse", 20)
+    u:add_order("GIB 0 10 PFERDE")
+    process_orders()
+    assert_equal(10, r:get_resource("horse"))
+    assert_equal(10, u:get_item("horse"))
+end
