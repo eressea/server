@@ -333,7 +333,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 
 #endif
 
-static void peasants(region * r)
+static void peasants(region * r, int rule)
 {
     int peasants = rpeasants(r);
     int money = rmoney(r);
@@ -341,7 +341,7 @@ static void peasants(region * r)
     int n, satiated;
     int dead = 0;
 
-    if (peasants > 0 && config_get_int("rules.peasants.growth", 1)) {
+    if (peasants > 0 && rule > 0) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
         int births = RAND_ROUND(fraction);
@@ -812,6 +812,8 @@ void demographics(void)
     static int last_weeks_season = -1;
     static int current_season = -1;
     int plant_rules = config_get_int("rules.grow.formula", 2);
+    int horse_rules = config_get_int("rules.horses.growth", 1);
+    int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
 
     if (current_season < 0) {
@@ -843,7 +845,8 @@ void demographics(void)
                  * und gewandert sind */
 
                 calculate_emigration(r);
-                peasants(r);
+                peasants(r, peasant_rules);
+
                 if (r->age > 20) {
                     double mwp = MAX(region_maxworkers(r), 1);
                     double prob =
@@ -854,7 +857,9 @@ void demographics(void)
                         plagues(r);
                     }
                 }
-                horses(r);
+                if (horse_rules > 0) {
+                    horses(r);
+                }
                 if (plant_rules == 2) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season);
                     growing_herbs(r, current_season, last_weeks_season);
