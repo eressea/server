@@ -873,12 +873,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             continue;
         }
         assert(propValue != NULL);
-        if (strcmp((const char *)propValue, "give") == 0) {
-            itype->give =
-                (int(*)(struct unit *, struct unit *, const struct item_type *, int,
-            struct order *))fun;
-        }
-        else if (strcmp((const char *)propValue, "canuse") == 0) {
+        if (strcmp((const char *)propValue, "canuse") == 0) {
             itype->canuse =
                 (bool(*)(const struct unit *, const struct item_type *))fun;
         }

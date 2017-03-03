@@ -70,9 +70,7 @@
   </resource>
 
   <resource name="elvenhorse">
-    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes">
-      <function name="give" value="givehorses"/>
-    </item>
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes"/>
   </resource>
 
   <resource name="dolphin">

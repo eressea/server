@@ -1035,14 +1035,14 @@ function test_give_horses()
     local u = unit.create(f, r, 1)
 
     r:set_resource("horse", 0)
-    u:add_item("horse", 20)
+    u:add_item("horse", 21)
     u:add_item("dolphin", 10)
-    u:add_order("GIB 0 10 PFERD")
+    u:add_order("GIB 0 7 PFERD")
     u:add_order("GIB 0 5 DELPHIN")
     process_orders()
-    assert_equal(10, r:get_resource("horse"))
+    assert_equal(7, r:get_resource("horse"))
     assert_equal(5, u:get_item("dolphin"))
-    assert_equal(10, u:get_item("horse"))
+    assert_equal(14, u:get_item("horse"))
 end
 
 function test_give_silver()

@@ -128,8 +128,6 @@ extern "C" {
         /* --- functions --- */
         bool(*canuse) (const struct unit * user,
             const struct item_type * itype);
-        int(*give) (struct unit * src, struct unit * dest,
-            const struct item_type * itm, int number, struct order * ord);
         int score;
     } item_type;
 

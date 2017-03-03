@@ -565,46 +565,6 @@ item *i_new(const item_type * itype, int size)
 
 #include "region.h"
 
-static int
-give_horses(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsethorses(r, rhorses(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
-static int
-give_money(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsetmoney(r, rmoney(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
 #define R_MINOTHER R_SILVER
 #define R_MINHERB R_PLAIN_1
 #define R_MINPOTION R_FAST
@@ -755,7 +715,6 @@ void init_resources(void)
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
-    rtype->itype->give = give_money;
 
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
@@ -1055,6 +1014,4 @@ void register_resources(void)
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
-
-    register_item_give(give_horses, "givehorses");
 }
