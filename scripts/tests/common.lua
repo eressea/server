@@ -1044,3 +1044,18 @@ function test_give_horses()
     assert_equal(5, u:get_item("dolphin"))
     assert_equal(10, u:get_item("horse"))
 end
+
+function test_give_silver()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("peasant", 0)
+    r:set_resource("money", 11)
+    u:clear_orders()
+    u:add_item("money", 20)
+    u:add_order("GIB 0 10 SILBER")
+    process_orders()
+    assert_equal(21, r:get_resource("money"))
+    assert_equal(10, u:get_item("money"))
+end
