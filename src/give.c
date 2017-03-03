@@ -148,32 +148,22 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     return n;
 }
 
-static int
-give_horses(unit * s, unit * d, const item_type * itype, int n,
-    struct order *ord)
+static void
+give_horses(unit * s, const item_type * itype, int n)
 {
-    if (d == NULL) {
-        region *r = s->region;
-        if (r->land) {
-            rsethorses(r, rhorses(r) + n);
-        }
-        return 0;
+    region *r = s->region;
+    if (r->land) {
+        rsethorses(r, rhorses(r) + n);
     }
-    return -1;                    /* use the mechanism */
 }
 
-static int
-give_money(unit * s, unit * d, const item_type * itype, int n,
-    struct order *ord)
+static void
+give_money(unit * s, const item_type * itype, int n)
 {
-    if (d == NULL) {
-        region *r = s->region;
-        if (r->land) {
-            rsetmoney(r, rmoney(r) + n);
-        }
-        return 0;
+    region *r = s->region;
+    if (r->land) {
+        rsetmoney(r, rmoney(r) + n);
     }
-    return -1;                    /* use the mechanism */
 }
 
 int
@@ -238,11 +228,11 @@ struct order *ord)
             /* return horses to the region */
             if (itype->construction && itype->flags & ITF_ANIMAL) {
                 if (itype->construction->skill == SK_HORSE_TRAINING) {
-                    give_horses(src, dest, itype, n, ord);
+                    give_horses(src, itype, n);
                 }
             }
             else if (itype->rtype == get_resourcetype(R_SILVER)) {
-                give_money(src, dest, itype, n, ord);
+                give_money(src, itype, n);
             }
         }
         handle_event(src->attribs, "give", dest);
