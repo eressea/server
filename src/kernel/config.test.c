@@ -245,7 +245,6 @@ static void test_config_inifile(CuTest *tc) {
     config_set_from(ini);
     CuAssertStrEquals(tc, "Eressea", config_get("game.name"));
     CuAssertStrEquals(tc, "Eressea", game_name());
-    CuAssertStrEquals(tc, "ERESSEA", game_name_upper());
     CuAssertIntEquals(tc, 42, game_id());
     iniparser_freedict(ini);
     test_cleanup();
@@ -274,6 +273,18 @@ static void test_findparam(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_game_mailcmd(CuTest *tc) {
+    test_setup();
+    CuAssertStrEquals(tc, "Eressea", game_name());
+    CuAssertStrEquals(tc, "ERESSEA", game_mailcmd());
+    config_set("game.name", "Hodor");
+    CuAssertStrEquals(tc, "Hodor", game_name());
+    CuAssertStrEquals(tc, "HODOR", game_mailcmd());
+    config_set("game.mailcmd", "ERESSEA");
+    CuAssertStrEquals(tc, "ERESSEA", game_mailcmd());
+    test_cleanup();
+}
+
 CuSuite *get_config_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -287,6 +298,7 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_default_order);
+    SUITE_ADD_TEST(suite, test_game_mailcmd);
     SUITE_ADD_TEST(suite, test_rules);
     return suite;
 }

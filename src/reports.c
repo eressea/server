@@ -1006,7 +1006,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
         for (u = r->units; u; u = u->next) {
             faction *sf = visible_faction(f, u);
             assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
-            if (data->lastf != sf && cansee_unit(u, ut, data->stealthmod)) {
+            if (data->lastf != sf && cansee_unit(ut, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
                 data->lastf = sf;
                 break;
@@ -1024,7 +1024,7 @@ static void add_travelthru_addresses(region *r, faction *f, selist **flist, int 
     travelthru_map(r, cb_add_address, &cbdata);
 }
 
-static void get_addresses(report_context * ctx)
+void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
     region *r;
@@ -1945,7 +1945,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 const char *get_mailcmd(const struct locale *loc)
 {
     static char result[64]; /* FIXME: static return buffer */
-    snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
+    snprintf(result, sizeof(result), "%s %d %s", game_mailcmd(), game_id(), LOC(loc, "mailcmd"));
     return result;
 }
 
