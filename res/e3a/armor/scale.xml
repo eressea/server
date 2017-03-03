@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <resource name="scale">
-  <item weight="300" score="150">
+  <item weight="300" score="150" allow="dwarf halfling">
     <function name="canuse" value="lua_canuse_item"/>
     <construction skill="armorer" minskill="5">
       <modifier function="mod_dwarves_only"/>

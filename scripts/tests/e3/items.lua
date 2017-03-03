@@ -22,8 +22,8 @@ function test_goblins()
 
     local restricted = {
     "towershield", "rep_crossbow", "plate", "lance",
-    "mllornlance", "greatbow", "greataxe", "axe", "scale",
-    "plate", "rustyhalberd", "halberd", "greatsword"
+    "mallornlance", "greatbow", "greataxe", "axe", "scale",
+    "plate", "halberd", "greatsword", "rustyhalberd"
     }
     for k, v in ipairs(restricted) do
         ud:add_item(v, 1)

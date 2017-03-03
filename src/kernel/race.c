@@ -328,7 +328,7 @@ bool rc_changed(int *cache) {
 bool rc_can_use(const struct race *rc, const struct item_type *itype)
 {
     if (itype->mask_allow) {
-        return (rc->mask_item==0 || (itype->mask_allow & rc->mask_item) != 0);
+        return (itype->mask_allow & rc->mask_item) != 0;
     }
     if (itype->mask_deny) {
         return (itype->mask_deny & rc->mask_item) == 0;

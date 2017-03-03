@@ -757,6 +757,27 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     return wtype;
 }
 
+static int race_mask = 1;
+
+static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
+    char *tok;
+    int mask = 0;
+    assert(maskp);
+    tok = strtok((char *)propValue, " ,");
+    while (tok) {
+        race * rc = rc_get_or_create(tok);
+        if (!rc->mask_item) {
+            rc->mask_item = race_mask;
+            race_mask = race_mask << 1;
+        }
+        mask |= rc->mask_item;
+        tok = strtok(NULL, " ,");
+    }
+    *maskp = mask;
+    xmlFree(propValue);
+}
+
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 {
     xmlNodePtr node = xpath->node;
@@ -782,8 +803,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
-    itype->mask_allow = xml_ivalue(node, "allow", 0);
-    itype->mask_deny = xml_ivalue(node, "deny", 0);
+    mask_races(node, "allow", &itype->mask_allow);
+    mask_races(node, "deny", &itype->mask_deny);
     itype->flags |= flags;
 
     /* reading item/construction */
@@ -1577,7 +1598,6 @@ static int parse_races(xmlDocPtr doc)
         rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
         rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
         rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
-        rc->mask_item = (char)xml_ivalue(node, "items", rc->mask_item);
         study_speed_base = xml_ivalue(node, "studyspeed", 0);
 
         rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);

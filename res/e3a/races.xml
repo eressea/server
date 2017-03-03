@@ -75,7 +75,7 @@
   regaura="1.0" recruitcost="100" maintenance="10" weight="1000"
   capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
-  giveunit="yes" getitem="yes" equipment="yes" items="8">
+  giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <param name="other_race" value="dwarf"/>
     <param name="luxury_trade" value="600"/>
@@ -124,7 +124,7 @@
   recruitcost="200" maintenance="10" weight="1000" capacity="540"
   speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
-  giveunit="yes" getitem="yes" equipment="yes" items="2">
+  giveunit="yes" getitem="yes" equipment="yes" >
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="armorer" modifier="-1"/>
     <skill name="bow" modifier="2"/>
@@ -168,7 +168,7 @@
   recruitcost="240" maintenance="10" weight="1000" capacity="540"
   speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
-  giveunit="yes" getitem="yes" equipment="yes" items="1">
+  giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-1"/>

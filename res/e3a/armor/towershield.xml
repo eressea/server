@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <resource name="towershield">
-  <item weight="200" score="60" allow="1">
+  <item weight="200" score="60" allow="dwarf">
     <function name="canuse" value="lua_canuse_item"/>
     <construction skill="armorer" minskill="4">
       <modifier function="mod_dwarves_only"/>

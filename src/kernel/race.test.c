@@ -146,7 +146,7 @@ static void test_rc_can_use(CuTest *tc) {
     
     /* we are not special */
     rc->mask_item = 0;
-    CuAssertTrue(tc, rc_can_use(rc, itype));
+    CuAssertTrue(tc, ! rc_can_use(rc, itype));
     
     test_cleanup();
 }
