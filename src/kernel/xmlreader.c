@@ -761,21 +761,22 @@ static int race_mask = 1;
 
 static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
-    char *tok;
     int mask = 0;
     assert(maskp);
-    tok = strtok((char *)propValue, " ,");
-    while (tok) {
-        race * rc = rc_get_or_create(tok);
-        if (!rc->mask_item) {
-            rc->mask_item = race_mask;
-            race_mask = race_mask << 1;
+    if (propValue) {
+        char * tok = strtok((char *)propValue, " ,");
+        while (tok) {
+            race * rc = rc_get_or_create(tok);
+            if (!rc->mask_item) {
+                rc->mask_item = race_mask;
+                race_mask = race_mask << 1;
+            }
+            mask |= rc->mask_item;
+            tok = strtok(NULL, " ,");
         }
-        mask |= rc->mask_item;
-        tok = strtok(NULL, " ,");
+        xmlFree(propValue);
     }
     *maskp = mask;
-    xmlFree(propValue);
 }
 
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
