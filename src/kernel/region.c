@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/gamedata.h>
@@ -697,6 +698,7 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
     d = *dp;
     if (!d) {
         d = *dp = malloc(sizeof(struct demand));
+        assert_alloc(d);
         d->next = NULL;
         d->type = ltype;
     }
@@ -768,6 +770,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
         return r;
     }
     r = calloc(1, sizeof(region));
+    assert_alloc(r);
     r->x = x;
     r->y = y;
     r->uid = uid;

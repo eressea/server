@@ -4,13 +4,13 @@
   <xi:include href="config://core/weapons/catapult.xml"/>
   <xi:include href="config://core/weapons/mallornbow.xml"/>
   <xi:include href="config://core/weapons/mallornspear.xml"/>
-  <xi:include href="config://core/weapons/rep_crossbow.xml"/>
   <xi:include href="config://core/weapons/runesword.xml"/>
   <xi:include href="config://core/weapons/rustyaxe.xml"/>
   <xi:include href="config://core/weapons/rustysword.xml"/>
   <xi:include href="config://core/weapons/spear.xml"/>
   <xi:include href="config://core/weapons/sword.xml"/>
   <xi:include href="config://core/weapons/firesword.xml"/>
+  <xi:include href="config://game/weapons/rep_crossbow.xml"/>
   <xi:include href="config://game/weapons/lance.xml"/>
   <xi:include href="config://game/weapons/axe.xml"/>
   <xi:include href="config://game/weapons/crossbow.xml"/>

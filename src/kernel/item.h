@@ -68,8 +68,6 @@ extern "C" {
 
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
-    typedef int(*rtype_uget) (const struct unit * user,
-        const struct resource_type * rtype);
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
     typedef struct resource_type {
         /* --- constants --- */
@@ -77,7 +75,6 @@ extern "C" {
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
-        rtype_uget uget;
         rtype_name name;
         struct rawmaterial_type *raw;
         struct resource_mod *modifiers;

@@ -496,13 +496,13 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
         }
         return result;
     }
+    lua_pop(L, 1);
     if (itype->rtype->ptype) {
         return use_potion(u, itype, amount, ord);
     } else {
         log_error("no such callout: %s", fname);
     }
     log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
-    lua_pop(L, 1);
 
     return result;
 }

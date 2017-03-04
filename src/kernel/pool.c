@@ -40,11 +40,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 int get_resource(const unit * u, const resource_type * rtype)
 {
     assert(rtype);
-    if (rtype->uget) {
-        /* this resource is probably special */
-        int i = rtype->uget(u, rtype);
-        if (i >= 0)
-            return i;
+    if (rtype == get_resourcetype(R_PEASANT)) {
+        return u->region->land ? u->region->land->peasants : 0;
+    }
+    else if (rtype == rt_find("hp")) {
+        return u->hp;
     }
     else if (rtype->uchange) {
         /* this resource is probably special */
@@ -176,7 +176,7 @@ int count)
     }
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
         for (v = r->units; v && use < count; v = v->next)
-            if (u != v && (v->items || rtype->uget)) {
+            if (u != v) {
                 int mask;
 
                 if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
@@ -233,8 +233,6 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
             if (u != v) {
                 int mask;
                 if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
-                if (v->items == NULL && rtype->uget == NULL)
                     continue;
 
                 if (v->faction == f) {

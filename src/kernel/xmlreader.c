@@ -972,9 +972,6 @@ static int parse_resources(xmlDocPtr doc)
                 if (strcmp((const char *)propValue, "change") == 0) {
                     rtype->uchange = (rtype_uchange)fun;
                 }
-                else if (strcmp((const char *)propValue, "get") == 0) {
-                    rtype->uget = (rtype_uget)fun;
-                }
                 else if (strcmp((const char *)propValue, "name") == 0) {
                     rtype->name = (rtype_name)fun;
                 }

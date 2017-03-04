@@ -1,9 +1,5 @@
 -- global functions used in items.xml
 
-function peasant_getresource(u)
-  return u.region:get_resource("peasant")
-end
-
 function peasant_changeresource(u, delta)
   local p = u.region:get_resource("peasant")
   p = p + delta
@@ -12,10 +8,6 @@ function peasant_changeresource(u, delta)
   end
   u.region:set_resource("peasant", p)
   return p
-end
-
-function hp_getresource(u)
-  return u.hp
 end
 
 function hp_changeresource(u, delta)

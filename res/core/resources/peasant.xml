@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
 <resource name="peasant" pooled="false">
   <function name="change" value="lua_changeresource"/>
-  <function name="get" value="lua_getresource"/>
 </resource>
