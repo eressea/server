@@ -230,25 +230,6 @@ function test_no_uruk()
   assert_equal(f1.race, "orc")
 end
 
-function test_snowman()
-    local r = region.create(0, 0, "glacier")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u:add_item("snowman", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Schneemann")
-    process_orders()
-    for u2 in r.units do
-        if u2.id~=u.id then
-            assert_equal("snowman", u2.race)
-            assert_equal(1000, u2.hp)
-            u = nil
-            break
-        end
-    end
-    assert_equal(nil, u)
-end
-
 function test_block_movement()
   eressea.settings.set("rules.guard.base_stop_prob", "0.3")
   eressea.settings.set("rules.guard.amulet_stop_prob", "0.0")

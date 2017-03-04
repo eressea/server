@@ -1028,3 +1028,34 @@ function test_recruit()
         assert_equal(6, u.number)
     end
 end
+
+function test_give_horses()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("horse", 0)
+    u:add_item("horse", 21)
+    u:add_item("dolphin", 10)
+    u:add_order("GIB 0 7 PFERD")
+    u:add_order("GIB 0 5 DELPHIN")
+    process_orders()
+    assert_equal(7, r:get_resource("horse"))
+    assert_equal(5, u:get_item("dolphin"))
+    assert_equal(14, u:get_item("horse"))
+end
+
+function test_give_silver()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("peasant", 0)
+    r:set_resource("money", 11)
+    u:clear_orders()
+    u:add_item("money", 20)
+    u:add_order("GIB 0 10 SILBER")
+    process_orders()
+    assert_equal(21, r:get_resource("money"))
+    assert_equal(10, u:get_item("money"))
+end

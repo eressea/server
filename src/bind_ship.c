@@ -16,11 +16,13 @@ without prior permission by the authors of Eressea.
 
 #include "move.h"
 
+#include <kernel/curse.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 #include <kernel/build.h>
 
+#include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
 
@@ -198,6 +200,27 @@ static int tolua_ship_set_damage(lua_State * L)
     return 0;
 }
 
+static int tolua_ship_get_curse(lua_State *L) {
+    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    if (self->attribs) {
+        curse * c = get_curse(self->attribs, ct_find(name));
+        if (c) {
+            lua_pushnumber(L, curse_geteffect(c));
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int tolua_ship_has_attrib(lua_State *L) {
+    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    attrib * a = a_find(self->attribs, at_find(name));
+    lua_pushboolean(L, a != NULL);
+    return 1;
+}
+
 void tolua_ship_open(lua_State * L)
 {
     /* register user types */
@@ -225,6 +248,10 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
             tolua_variable(L, TOLUA_CAST "damage", tolua_ship_get_damage,
                 tolua_ship_set_damage);
+
+            tolua_function(L, TOLUA_CAST "get_curse", &tolua_ship_get_curse);
+            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_ship_has_attrib);
+
             tolua_function(L, TOLUA_CAST "create", tolua_ship_create);
         }
         tolua_endmodule(L);

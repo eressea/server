@@ -914,10 +914,6 @@ struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep,
     return NULL;
 }
 
-static resource_limit *get_resourcelimit(const resource_type *rtype) {
-    return rtype->limit;
-}
-
 static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
@@ -925,7 +921,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     int dm = 0;
     allocation_list *alist;
     allocation *al;
-    resource_limit *rdata = get_resourcelimit(rtype);
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
@@ -934,10 +929,9 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
      * Materialverbrauch hat: */
     assert(itype != NULL && (itype->construction == NULL
         || itype->construction->materials == NULL));
-    assert(rdata != NULL);
 
-    if (rdata->limit != NULL) {
-        int avail = rdata->limit(r, rtype);
+    if (!rtype->raw) {
+        int avail = limit_resource(r, rtype);
         if (avail <= 0) {
             cmistake(u, u->thisorder, 121, MSG_PRODUCE);
             return;
@@ -949,8 +943,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         return;
     }
 
-    if (rdata->modifiers) {
-        message *msg = get_modifiers(u, rdata->modifiers, &save_mod, &skill_mod);
+    if (rtype->modifiers) {
+        message *msg = get_modifiers(u, rtype->modifiers, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
             return;
@@ -1122,17 +1116,17 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     allocation *al;
     int nreq = 0;
-    resource_limit *rdata = get_resourcelimit(rtype);
     int avail = 0;
 
     for (al = alist; al; al = al->next) {
         nreq += required(al->want, al->save);
     }
 
-    if (rdata->limit) {
-        avail = rdata->limit(r, rtype);
-        if (avail < 0)
+    if (!rtype->raw) {
+        avail = limit_resource(r, rtype);
+        if (avail < 0) {
             avail = 0;
+        }
     }
 
     avail = MIN(avail, nreq);
@@ -1147,10 +1141,11 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             nreq -= want;
             al->get = x * al->save.sa[0] / al->save.sa[1];
             al->get = MIN(al->want, al->get);
-            if (rdata->produce) {
+            if (!rtype->raw) {
                 int use = required(al->get, al->save);
-                if (use)
-                    rdata->produce(r, rtype, use);
+                if (use) {
+                    produce_resource(r, rtype, use);
+                }
             }
         }
     }
@@ -1162,15 +1157,10 @@ typedef void(*allocate_function) (const resource_type *, struct region *,
 
 static allocate_function get_allocator(const struct resource_type *rtype)
 {
-    resource_limit *rdata = get_resourcelimit(rtype);
-
-    if (rdata) {
-        if (rdata->limit != NULL) {
-            return attrib_allocation;
-        }
+    if (rtype->raw) {
         return leveled_allocation;
     }
-    return NULL;
+    return attrib_allocation;
 }
 
 void split_allocations(region * r)

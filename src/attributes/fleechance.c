@@ -38,8 +38,3 @@ attrib *make_fleechance(float fleechance)
     a->data.flt = fleechance;
     return a;
 }
-
-void init_fleechance(void)
-{
-    at_register(&at_fleechance);
-}

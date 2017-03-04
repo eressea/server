@@ -187,6 +187,15 @@ target_link_libraries(eressea
   ${INIPARSER_LIBRARIES}
 )
 
+add_executable(convert convert.c)
+target_link_libraries(convert
+  game
+  ${LUA_MATH_LIBRARY}
+  ${STORAGE_LIBRARIES}
+  ${CLIBS_LIBRARIES}
+  ${INIPARSER_LIBRARIES}
+)
+
 set(TESTS_SRC
   monsters.test.c
   names.test.c
@@ -268,6 +277,7 @@ endif(CURSES_FOUND)
 if (LIBXML2_FOUND)
 include_directories (${LIBXML2_INCLUDE_DIR})
 target_link_libraries(eressea ${LIBXML2_LIBRARIES})
+target_link_libraries(convert ${LIBXML2_LIBRARIES})
 target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
 add_definitions(-DUSE_LIBXML2)
 endif (LIBXML2_FOUND)

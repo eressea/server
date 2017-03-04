@@ -26,9 +26,6 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if ARENA_MODULE
-#include <modules/arena.h>
-#endif
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>

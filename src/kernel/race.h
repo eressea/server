@@ -48,6 +48,7 @@ extern "C" {
     struct spellref;
     struct locale;
     struct rcoption;
+    struct item_type;
 
     extern int num_races;
 
@@ -140,6 +141,7 @@ extern "C" {
         int flags;
         int battle_flags;
         int ec_flags;
+        int mask_item;
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
 
@@ -173,6 +175,8 @@ extern "C" {
     bool rc_changed(int *cache);
     const race *rc_find(const char *);
     void free_races(void);
+
+    bool rc_can_use(const struct race *rc, const struct item_type *itype);
 
     typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
     const char * rc_name_s(const race *rc, name_t n);

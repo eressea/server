@@ -61,16 +61,8 @@
     <item weight="0" score="6000"/>
   </resource>
 
-  <resource name="aoc" appearance="amulet">
-    <item weight="100">
-      <function name="use" value="use_birthdayamulet"/>
-    </item>
-  </resource>
-
   <resource name="dreameye">
-    <item weight="100">
-      <function name="use" value="use_tacticcrystal"/>
-    </item>
+    <item weight="100" use="yes" />
   </resource>
 
   <resource name="pegasus">
@@ -78,9 +70,7 @@
   </resource>
 
   <resource name="elvenhorse">
-    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes">
-      <function name="give" value="givehorses"/>
-    </item>
+    <item weight="5000" notlost="yes" big="yes" score="6000" capacity="7000" animal="yes"/>
   </resource>
 
   <resource name="dolphin">
@@ -100,39 +90,34 @@
   </resource>
 
 <!-- XE items -->
+  <resource name="studypotion" appearance="vial">
+    <!-- gives user one free learning attempt -->
+    <item weight="0" use="yes" />
+  </resource>
+
   <resource name="skillpotion" appearance="vial">
     <!-- gives user one free learning attempt -->
-    <item weight="0">
-      <function name="use" value="use_skillpotion"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
   <resource name="manacrystal" appearance="amulet">
     <!-- gives user free aura -->
-    <item weight="0">
-      <function name="use" value="use_manacrystal"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- xmas items -->
   <resource name="mistletoe">
     <!-- Sets the chance of escape in a fight to 100 percent -->
-    <item notlost="yes" weight="0">
-      <function name="use" value="usemistletoe"/>
-    </item>
+    <item notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="speedsail">
-    <item weight="0">
-      <function name="use" value="use_speedsail"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
 <!-- items -->
   <resource name="antimagic" appearance="amulet">
-    <item weight="0" score="2000">
-      <function name="use" value="use_antimagiccrystal"/>
-    </item>
+    <item weight="0" score="2000" use="yes" />
   </resource>
 
   <resource name="catapultammo">

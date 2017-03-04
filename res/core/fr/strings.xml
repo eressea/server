@@ -458,12 +458,6 @@
   <string name="ao_chastity_p">
     <text locale="fr">amulettes de chasteté</text>
   </string>
-  <string name="aoc">
-    <text locale="fr">amulette du chaton</text>
-  </string>
-  <string name="aoc_p">
-    <text locale="fr">amulettes du chaton</text>
-  </string>
   <string name="aod">
     <text locale="fr">amulette de ténčbres</text>
   </string>

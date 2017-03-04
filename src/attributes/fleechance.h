@@ -25,7 +25,6 @@ extern "C" {
     extern struct attrib_type at_fleechance;
 
     struct attrib *make_fleechance(float fleechance);
-    void init_fleechance(void);
 
 #ifdef __cplusplus
 }

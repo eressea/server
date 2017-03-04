@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/timeout.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
@@ -646,6 +647,7 @@ unit *read_unit(struct gamedata *data)
     }
     else {
         u = calloc(sizeof(unit), 1);
+        assert_alloc(u);
         u->no = n;
         uhash(u);
     }

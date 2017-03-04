@@ -43,23 +43,12 @@ extern "C" {
         struct rawmaterial *next;
     } rawmaterial;
 
-    typedef int(*rlimit_limit) (const struct region * r,
-        const struct resource_type * rtype);
-    typedef void(*rlimit_produce) (struct region * r,
-        const struct resource_type * rtype, int n);
-
     typedef struct resource_mod {
         variant value;
         const struct building_type *btype;
         const struct race *race;
         unsigned int flags;
     } resource_mod;
-
-    typedef struct resource_limit {
-        rlimit_limit limit;
-        rlimit_produce produce;
-        resource_mod *modifiers;
-    } resource_limit;
 
     typedef struct rawmaterial_type {
         const struct resource_type *rtype;
@@ -82,6 +71,13 @@ extern "C" {
     void add_resource(struct region *r, int level, int base, int divisor,
         const struct resource_type *rtype);
     struct rawmaterial_type *rmt_create(struct resource_type *rtype);
+
+    extern int(*res_limit_fun)(const struct region *, const struct resource_type *);
+    extern void(*res_produce_fun)(struct region *, const struct resource_type *, int);
+    extern int (*item_use_fun)(struct unit *, const struct item_type *, int amount,
+        struct order *ord);
+    int limit_resource(const struct region *r, const struct resource_type *rtype);
+    void produce_resource(struct region *r, const struct resource_type *rtype, int amount);
 
 #ifdef __cplusplus
 }

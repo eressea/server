@@ -179,7 +179,7 @@ void at_register(attrib_type * at)
     at_hash[at->hashkey % MAXATHASH] = at;
 }
 
-static attrib_type *at_find(unsigned int hk)
+static attrib_type *at_find_key(unsigned int hk)
 {
     const char *translate[3][2] = {
         { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
@@ -193,11 +193,16 @@ static attrib_type *at_find(unsigned int hk)
         int i = 0;
         while (translate[i][0]) {
             if (__at_hashkey(translate[i][0]) == hk)
-                return at_find(__at_hashkey(translate[i][1]));
+                return at_find_key(__at_hashkey(translate[i][1]));
             ++i;
         }
     }
     return find;
+}
+
+struct attrib_type *at_find(const char *name) {
+    unsigned int hash = __at_hashkey(name);
+    return at_find_key(hash);
 }
 
 attrib *a_select(attrib * a, const void *data,
@@ -210,6 +215,7 @@ attrib *a_select(attrib * a, const void *data,
 
 attrib *a_find(attrib * a, const attrib_type * at)
 {
+    assert(at);
     while (a && a->type != at)
         a = a->nexttype;
     return a;
@@ -408,7 +414,7 @@ void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamed
 static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int key) {
     int retval = AT_READ_OK;
     int(*reader)(attrib *, void *, struct gamedata *) = 0;
-    attrib_type *at = at_find(key);
+    attrib_type *at = at_find_key(key);
     attrib * na = 0;
 
     if (at) {

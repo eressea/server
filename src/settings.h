@@ -31,7 +31,6 @@
  * or both. We don't want separate binaries for different games
  */
 #define MUSEUM_MODULE 1
-#define ARENA_MODULE 1
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
 

@@ -1,6 +1,5 @@
 PROJECT(modules C)
 SET(_FILES
-arena.c
 autoseed.c
 gmcmd.c
 museum.c
