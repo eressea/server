@@ -125,9 +125,6 @@ extern "C" {
         int mask_deny;
         struct construction *construction;
         char *_appearance[2];       /* wie es f�r andere aussieht */
-        /* --- functions --- */
-        bool(*canuse) (const struct unit * user,
-            const struct item_type * itype);
         int score;
     } item_type;
 

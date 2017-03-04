@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <resource name="lance">
   <item weight="200">
-    <function name="canuse" value="lua_canuse_item"/>
     <construction skill="weaponsmithing" minskill="2">
       <requirement type="log" quantity="2"/>
     </construction>

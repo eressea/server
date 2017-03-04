@@ -1,12 +1,5 @@
 -- global functions used in items.xml
 
-if not item_canuse then
-    -- define a default, everyone can use everything
-    function item_canuse(u, iname)
-        return true
-    end
-end
-
 function peasant_getresource(u)
   return u.region:get_resource("peasant")
 end

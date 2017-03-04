@@ -873,13 +873,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             continue;
         }
         assert(propValue != NULL);
-        if (strcmp((const char *)propValue, "canuse") == 0) {
-            itype->canuse =
-                (bool(*)(const struct unit *, const struct item_type *))fun;
-        }
-        else {
-            log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
-        }
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
         xmlFree(propValue);
     }
     itype->score = xml_ivalue(node, "score", 0);
