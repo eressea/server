@@ -27,7 +27,8 @@ extern "C" {
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
-    void write_travelthru(struct stream *out, struct region * r, const struct faction * f);
+    void report_travelthru(struct stream *out, struct region * r, const struct faction * f);
+    void report_region(struct stream *out, const struct region * r, struct faction * f);
 
     void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
     void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);

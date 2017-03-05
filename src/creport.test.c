@@ -65,8 +65,8 @@ static void test_cr_resources(CuTest *tc) {
     locale_setstring(lang, "horse_p", "Pferde");
     locale_setstring(lang, "peasant", "Bauer");
     locale_setstring(lang, "peasant_p", "Bauern");
-    locale_setstring(lang, "tree", "Baum");
-    locale_setstring(lang, "tree_p", "B?ume");
+    locale_setstring(lang, "tree", "Blume");
+    locale_setstring(lang, "tree_p", "Blumen");
     locale_setstring(lang, "sapling", "Schoessling");
     locale_setstring(lang, "sapling_p", "Schoesslinge");
 
@@ -118,7 +118,7 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "\"B?ume\";type", line);
+    CuAssertStrEquals(tc, "\"Blumen\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "3;number", line);
 

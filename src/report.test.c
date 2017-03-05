@@ -56,7 +56,52 @@ static void test_write_many_spaces(CuTest *tc) {
     mstream_done(&out);
 }
 
-static void test_write_travelthru(CuTest *tc) {
+static void test_report_region(CuTest *tc) {
+    char buf[1024];
+    region *r;
+    faction *f;
+    stream out = { 0 };
+    size_t len;
+    struct locale *lang;
+
+    test_setup();
+    init_resources();
+    lang = get_or_create_locale("de"); /* CR tags are translated from this */
+    locale_setstring(lang, "money", "Silber");
+    locale_setstring(lang, "money_p", "Silber");
+    locale_setstring(lang, "horse", "Pferd");
+    locale_setstring(lang, "horse_p", "Pferde");
+    locale_setstring(lang, "peasant", "Bauer");
+    locale_setstring(lang, "peasant_p", "Bauern");
+    locale_setstring(lang, "tree", "Blume");
+    locale_setstring(lang, "tree_p", "Blumen");
+    locale_setstring(lang, "stone", "Stein");
+    locale_setstring(lang, "stone_p", "Steine");
+    locale_setstring(lang, "sapling", "Schoessling");
+    locale_setstring(lang, "sapling_p", "Schoesslinge");
+    locale_setstring(lang, "plain", "Ebene");
+
+    mstream_init(&out);
+    r = test_create_region(0, 0, 0);
+    r->land->peasants = 100;
+    r->land->horses = 200;
+    rsettrees(r, 0, 1);
+    rsettrees(r, 1, 2);
+    rsettrees(r, 2, 3);
+    region_setname(r, "Hodor");
+    f = test_create_faction(0);
+    f->locale = lang;
+
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 100 Bauern, 200 Pferde.\n", buf);
+    mstream_done(&out);
+    test_cleanup();
+}
+
+static void test_report_travelthru(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
     size_t len;
@@ -65,7 +110,7 @@ static void test_write_travelthru(CuTest *tc) {
     unit *u;
     struct locale *lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
     mstream_init(&out);
@@ -77,7 +122,7 @@ static void test_write_travelthru(CuTest *tc) {
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
-    write_travelthru(&out, r, f);
+    report_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
@@ -85,7 +130,7 @@ static void test_write_travelthru(CuTest *tc) {
 
     mstream_init(&out);
     travelthru_add(r, u);
-    write_travelthru(&out, r, f);
+    report_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
@@ -94,7 +139,7 @@ static void test_write_travelthru(CuTest *tc) {
 
     mstream_init(&out);
     move_unit(u, r, 0);
-    write_travelthru(&out, r, f);
+    report_travelthru(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
@@ -234,7 +279,8 @@ CuSuite *get_report_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_write_spaces);
     SUITE_ADD_TEST(suite, test_write_many_spaces);
-    SUITE_ADD_TEST(suite, test_write_travelthru);
+    SUITE_ADD_TEST(suite, test_report_travelthru);
+    SUITE_ADD_TEST(suite, test_report_region);
     SUITE_ADD_TEST(suite, test_write_spell_syntax);
     return suite;
 }

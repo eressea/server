@@ -610,12 +610,6 @@ struct order *ord)
     return -1;                    /* use the mechanism */
 }
 
-#define R_MINOTHER R_SILVER
-#define R_MINHERB R_PLAIN_1
-#define R_MINPOTION R_FAST
-#define R_MINITEM R_IRON
-#define MAXHERBSPERPOTION 6
-
 const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
@@ -982,21 +976,25 @@ void init_resources(void)
      * which can be used in a construction recipe or as a spell ingredient.
      */
 
+    /* special resources needed in report_region */
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->give = give_money;
 
+    rtype = rt_get_or_create(resourcenames[R_HORSE]);
+    rtype->flags |= RTF_ITEM | RTF_LIMITED;
+    rtype->itype = it_get_or_create(rtype);
+    rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
+
+    /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
-
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
-
     rtype = rt_get_or_create(resourcenames[R_LIFE]);
     rtype->uchange = res_changehp;
-
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
 

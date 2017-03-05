@@ -117,14 +117,14 @@ void test_findresourcetype(CuTest * tc)
     test_setup();
 
     lang = get_or_create_locale("de");
-    locale_setstring(lang, "horse", "Pferd");
+    locale_setstring(lang, "log", "Holz");
     locale_setstring(lang, "peasant", "Bauer");
     init_resources();
     CuAssertPtrNotNull(tc, rt_find("peasant"));
-    CuAssertPtrEquals(tc, 0, rt_find("horse"));
-    itype = test_create_itemtype("horse");
+    CuAssertPtrEquals(tc, 0, rt_find("log"));
+    itype = test_create_itemtype("log");
 
-    CuAssertPtrEquals(tc, (void*)itype->rtype, (void*)findresourcetype("Pferd", lang));
+    CuAssertPtrEquals(tc, (void*)itype->rtype, (void*)findresourcetype("Holz", lang));
     CuAssertPtrEquals(tc, (void *)rt_find("peasant"), (void *)findresourcetype("Bauer", lang));
     test_cleanup();
 }
