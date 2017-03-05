@@ -2,6 +2,7 @@
 #include "variant.h"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <limits.h>
 
 const variant frac_zero = { .sa = { 0, 1 } };
@@ -41,8 +42,13 @@ variant frac_make(int num, int den)
     int g = gcd(num, den);
     num /= g;
     den /= g;
-    assert(num >= SHRT_MIN && num <= SHRT_MAX);
-    assert(den >= SHRT_MIN && den <= SHRT_MAX);
+    if (num < SHRT_MIN || num > SHRT_MAX || den < SHRT_MIN || den > SHRT_MAX) {
+        int a = abs(num/SHRT_MIN) + 1;
+        int b = abs(den/SHRT_MIN) + 1;
+        if (b>a) a = b;
+        num /= a;
+        den /= a;
+    }
     v.sa[0] = (short)num;
     v.sa[1] = (short)den;
     return v;
