@@ -125,6 +125,19 @@ static void test_report_region(CuTest *tc) {
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 135 Steine/1, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
+    r->resources->amount = 1;
+    r->land->peasants = 1;
+    r->land->horses = 1;
+    r->land->money = 1;
+
+    r->seen.mode = seen_unit;
+    out.api->rewind(out.handle);
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
+
     mstream_done(&out);
     test_cleanup();
 }
