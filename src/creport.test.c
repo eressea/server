@@ -58,6 +58,7 @@ static void test_cr_resources(CuTest *tc) {
     struct locale *lang;
 
     test_setup();
+    init_resources();
     lang = get_or_create_locale("de"); /* CR tags are translated from this */
     locale_setstring(lang, "money", "Silber");
     locale_setstring(lang, "money_p", "Silber");

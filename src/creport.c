@@ -1094,12 +1094,12 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
     }
 }
 
-static char *cr_output_resource(char *buf, const char *name,
+static char *cr_output_resource(char *buf, const resource_type *rtype,
     const struct locale *loc, int amount, int level)
 {
-    assert(name);
-    buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
-    buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, name)));
+    assert(rtype);
+    buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
+    buf += sprintf(buf, "\"%s\";type\n", translate(rtype->_name, LOC(loc, rtype->_name)));
     if (amount >= 0) {
         if (level >= 0)
             buf += sprintf(buf, "%d;skill\n", level);
@@ -1180,7 +1180,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
-            stream_printf(out, "%d;%s\n", result[n].number, crtag(result[n].name));
+/*            stream_printf(out, "%d;%s\n", result[n].number, crtag(result[n].name)); */
         }
     }
 #endif
@@ -1188,7 +1188,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     for (n = 0; n < size; ++n) {
         if (result[n].number >= 0) {
             pos =
-                cr_output_resource(pos, result[n].name, f->locale, result[n].number,
+                cr_output_resource(pos, result[n].rtype, f->locale, result[n].number,
                 result[n].level);
         }
     }

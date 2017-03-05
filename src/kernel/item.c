@@ -988,6 +988,11 @@ void init_resources(void)
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
 
+    rtype = rt_get_or_create(resourcenames[R_SAPLING]);
+    rtype = rt_get_or_create(resourcenames[R_TREE]);
+    rtype = rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
+    rtype = rt_get_or_create(resourcenames[R_MALLORN_TREE]);
+
     /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
