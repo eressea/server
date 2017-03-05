@@ -6570,15 +6570,6 @@
     </string>
   </namespace>
 
-  <string name="nr_tree">
-    <text locale="de">Baum</text>
-    <text locale="en">tree</text>
-  </string>
-  <string name="nr_tree_p">
-    <text locale="de">Bäume</text>
-    <text locale="en">trees</text>
-  </string>
-
   <string name="nr_mallorntree">
     <text locale="de">Mallornbaum</text>
     <text locale="en">mallorn tree</text>

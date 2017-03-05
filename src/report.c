@@ -987,10 +987,10 @@ static void describe(struct stream *out, const region * r, faction * f)
                 }
             }
             else if (trees == 1) {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree"), size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "tree"), size);
             }
             else {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "tree_p"), size);
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
