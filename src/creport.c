@@ -417,6 +417,7 @@ static int cr_resources(variant var, char *buffer, const void *userdata)
     char *wp = buffer;
     if (rlist != NULL) {
         const char *name = resourcename(rlist->type, rlist->number != 1);
+        assert(name);
         wp +=
             sprintf(wp, "\"%d %s", rlist->number, translate(name, LOC(f->locale,
             name)));
@@ -425,6 +426,7 @@ static int cr_resources(variant var, char *buffer, const void *userdata)
             if (rlist == NULL)
                 break;
             name = resourcename(rlist->type, rlist->number != 1);
+            assert(name);
             wp +=
                 sprintf(wp, ", %d %s", rlist->number, translate(name,
                 LOC(f->locale, name)));
@@ -1100,6 +1102,7 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
     const char * name;
     assert(rtype);
     name = resourcename(rtype, 1);
+    assert(name);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
     buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, rtype->_name)));
     if (amount >= 0) {
@@ -1183,6 +1186,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
             const char * name = resourcename(result[n].rtype, result[n].number != 1);
+            assert(name);
             stream_printf(out, "%d;%s\n", result[n].number, crtag(name));
         }
     }
