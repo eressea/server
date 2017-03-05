@@ -50,6 +50,32 @@ static void test_cr_unit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_cr_resources(CuTest *tc) {
+    stream strm;
+    char line[1024];
+    faction *f;
+    region *r;
+
+    test_cleanup();
+    f = test_create_faction(0);
+    r = test_create_region(0, 0, 0);
+    r->land->horses = 100;
+    r->land->peasants = 200;
+    r->land->money = 300;
+
+    mstream_init(&strm);
+    cr_output_resources(&strm, f, r, false);
+    strm.api->rewind(strm.handle);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Silber\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "300;number", line);
+    mstream_done(&strm);
+    test_cleanup();
+}
+
 static int cr_get_int(stream *strm, const char *match, int def)
 {
     char line[1024];
@@ -111,6 +137,7 @@ CuSuite *get_creport_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_cr_unit);
+    SUITE_ADD_TEST(suite, test_cr_resources);
     SUITE_ADD_TEST(suite, test_cr_factionstealth);
     return suite;
 }

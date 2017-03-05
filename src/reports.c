@@ -2049,7 +2049,8 @@ static void log_orders(const struct message *msg)
     }
 }
 
-int stream_printf(struct stream * out, const char *format, ...) {
+int stream_printf(struct stream * out, const char *format, ...)
+{
     va_list args;
     int result;
     char buffer[4096];

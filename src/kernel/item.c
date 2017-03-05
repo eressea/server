@@ -982,14 +982,14 @@ void init_resources(void)
      * which can be used in a construction recipe or as a spell ingredient.
      */
 
-    rtype = rt_get_or_create(resourcenames[R_PEASANT]);
-    rtype->uchange = res_changepeasants;
-
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->give = give_money;
+
+    rtype = rt_get_or_create(resourcenames[R_AURA]);
+    rtype->uchange = res_changeaura;
 
     rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
     rtype->uchange = res_changepermaura;
@@ -997,8 +997,8 @@ void init_resources(void)
     rtype = rt_get_or_create(resourcenames[R_LIFE]);
     rtype->uchange = res_changehp;
 
-    rtype = rt_get_or_create(resourcenames[R_AURA]);
-    rtype->uchange = res_changeaura;
+    rtype = rt_get_or_create(resourcenames[R_PEASANT]);
+    rtype->uchange = res_changepeasants;
 
     /* alte typen registrieren: */
     init_oldpotions();
