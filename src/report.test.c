@@ -9,6 +9,7 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
@@ -60,12 +61,22 @@ static void test_report_region(CuTest *tc) {
     char buf[1024];
     region *r;
     faction *f;
+    unit *u;
     stream out = { 0 };
     size_t len;
     struct locale *lang;
+    struct resource_type *rt_stone;
+    construction *cons;
 
     test_setup();
     init_resources();
+    rt_stone = rt_get_or_create("stone");
+    rt_stone->itype = it_get_or_create(rt_stone);
+    cons = rt_stone->itype->construction = calloc(1, sizeof(construction));
+    cons->minskill = 1;
+    cons->skill = SK_QUARRYING;
+    rmt_create(rt_stone);
+
     lang = get_or_create_locale("de"); /* CR tags are translated from this */
     locale_setstring(lang, "money", "Silber");
     locale_setstring(lang, "money_p", "Silber");
@@ -80,23 +91,40 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "sapling", "Schoessling");
     locale_setstring(lang, "sapling_p", "Schoesslinge");
     locale_setstring(lang, "plain", "Ebene");
+    locale_setstring(lang, "see_travel", "durchgereist");
 
     mstream_init(&out);
     r = test_create_region(0, 0, 0);
-    r->land->peasants = 100;
-    r->land->horses = 200;
+    add_resource(r, 1, 100, 10, rt_stone);
+    CuAssertIntEquals(tc, 135, r->resources->amount);
+    CuAssertIntEquals(tc, 1, r->resources->level);
+    r->land->peasants = 5;
+    r->land->horses = 7;
+    r->land->money = 2;
     rsettrees(r, 0, 1);
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
     region_setname(r, "Hodor");
     f = test_create_faction(0);
     f->locale = lang;
+    u = test_create_unit(f, r);
+    set_level(u, SK_QUARRYING, 1);
 
+    r->seen.mode = seen_travel;
     report_region(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
-    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 100 Bauern, 200 Pferde.\n", buf);
+    CuAssertStrEquals(tc, "Hodor (0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
+    r->seen.mode = seen_unit;
+    out.api->rewind(out.handle);
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 135 Steine/1, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
     mstream_done(&out);
     test_cleanup();
 }

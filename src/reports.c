@@ -448,17 +448,19 @@ const faction * viewer, bool see_unit)
         while (res) {
             int maxskill = 0;
             const item_type *itype = resource2item(res->type->rtype);
-            int level = res->level + itype->construction->minskill - 1;
+            int minskill = itype->construction->minskill;
+            skill_t skill = itype->construction->skill;
+            int level = res->level + minskill - 1;
             int visible = -1;
             if (res->type->visible == NULL) {
                 visible = res->amount;
-                level = res->level + itype->construction->minskill - 1;
+                level = res->level + minskill - 1;
             }
             else {
                 const unit *u;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
-                        int s = effskill(u, itype->construction->skill, 0);
+                        int s = effskill(u, skill, 0);
                         if (s > maxskill) {
                             maxskill = s;
                             visible = res->type->visible(res, maxskill);
