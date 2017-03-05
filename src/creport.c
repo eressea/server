@@ -1178,7 +1178,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
         stream_printf(out, "%d;Schoesslinge\n", saplings);
     }
     if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0)) {
-        sputs("1;Mallorn\n", out);
+        sputs("1;Mallorn", out);
     }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
@@ -1196,7 +1196,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
         }
     }
     if (pos != cbuf) {
-        sputs(cbuf, out);
+        swrite(cbuf, 1, pos - cbuf, out);
     }
 }
 
