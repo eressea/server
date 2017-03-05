@@ -1004,8 +1004,9 @@ void report_region(struct stream *out, const region * r, faction * f)
 
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
+                const char * name = resourcename(result[n].rtype, result[n].number!=1);
                 bytes = snprintf(bufp, size, ", %d %s/%d", result[n].number,
-                    LOC(f->locale, result[n].rtype->_name), result[n].level);
+                    LOC(f->locale, name), result[n].level);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
