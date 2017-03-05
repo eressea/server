@@ -73,7 +73,7 @@ static void test_cr_resources(CuTest *tc) {
 
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
-    r->land->horses = 100;
+    r->land->horses = 1;
     r->land->peasants = 200;
     r->land->money = 300;
     rsettrees(r, 0, 1);
@@ -107,7 +107,7 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "\"Pferde\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "300;number", line);
+    CuAssertStrEquals(tc, "1;number", line);
 
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));

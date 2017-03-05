@@ -1097,9 +1097,11 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
 static char *cr_output_resource(char *buf, const resource_type *rtype,
     const struct locale *loc, int amount, int level)
 {
+    const char * name;
     assert(rtype);
+    name = resourcename(rtype, 1);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
-    buf += sprintf(buf, "\"%s\";type\n", translate(rtype->_name, LOC(loc, rtype->_name)));
+    buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, rtype->_name)));
     if (amount >= 0) {
         if (level >= 0)
             buf += sprintf(buf, "%d;skill\n", level);
@@ -1180,7 +1182,8 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
-/*            stream_printf(out, "%d;%s\n", result[n].number, crtag(result[n].name)); */
+            const char * name = resourcename(result[n].rtype, result[n].number != 1);
+            stream_printf(out, "%d;%s\n", result[n].number, crtag(name));
         }
     }
 #endif
