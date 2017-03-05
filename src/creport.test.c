@@ -55,23 +55,73 @@ static void test_cr_resources(CuTest *tc) {
     char line[1024];
     faction *f;
     region *r;
+    struct locale *lang;
 
-    test_cleanup();
+    test_setup();
+    lang = get_or_create_locale("de"); /* CR tags are translated from this */
+    locale_setstring(lang, "money", "Silber");
+    locale_setstring(lang, "money_p", "Silber");
+    locale_setstring(lang, "horse", "Pferd");
+    locale_setstring(lang, "horse_p", "Pferde");
+    locale_setstring(lang, "peasant", "Bauer");
+    locale_setstring(lang, "peasant_p", "Bauern");
+    locale_setstring(lang, "tree", "Baum");
+    locale_setstring(lang, "tree_p", "B?ume");
+    locale_setstring(lang, "sapling", "Schoessling");
+    locale_setstring(lang, "sapling_p", "Schoesslinge");
+
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     r->land->horses = 100;
     r->land->peasants = 200;
     r->land->money = 300;
+    rsettrees(r, 0, 1);
+    rsettrees(r, 1, 2);
+    rsettrees(r, 2, 3);
 
     mstream_init(&strm);
     cr_output_resources(&strm, f, r, false);
     strm.api->rewind(strm.handle);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "3;Baeume", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "2;Schoesslinge", line);
+
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "\"Silber\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "300;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Bauern\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "200;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Pferde\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "300;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Schoesslinge\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "2;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"B?ume\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "3;number", line);
+
     mstream_done(&strm);
     test_cleanup();
 }

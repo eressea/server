@@ -91,10 +91,11 @@ bool opt_cr_absolute_coords = false;
 #ifdef TAG_LOCALE
 static const char *crtag(const char *key)
 {
-    static const struct locale *lang = NULL;
-    if (!lang)
-        lang = get_locale(TAG_LOCALE);
-    return LOC(lang, key);
+    /* TODO: those locale lookups are shit, but static kills testing */
+    const char *result;
+    const struct locale *lang = get_locale(TAG_LOCALE);
+    result = LOC(lang, key);
+    return result;
 }
 #else
 #define crtag(x) (x)
@@ -1096,6 +1097,7 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
 static char *cr_output_resource(char *buf, const char *name,
     const struct locale *loc, int amount, int level)
 {
+    assert(name);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
     buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, name)));
     if (amount >= 0) {
@@ -1171,7 +1173,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
         stream_printf(out, "%d;Baeume\n", trees);
     }
     if (saplings > 0) {
-        stream_printf(out, "%d;Schoesslinge\n", trees);
+        stream_printf(out, "%d;Schoesslinge\n", saplings);
     }
     if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0)) {
         sputs("1;Mallorn\n", out);
