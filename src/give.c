@@ -121,6 +121,28 @@ const resource_type * rtype, struct order *ord, int error)
     }
 }
 
+static void add_give_person(unit * u, unit * u2, int given,
+    struct order *ord, int error)
+{
+    assert(u2);
+    if (error) {
+        cmistake(u, ord, error, MSG_COMMERCE);
+    }
+    else if (u2->faction != u->faction) {
+        message *msg;
+
+        msg = msg_message("give_person", "unit target resource amount",
+            u, u2, given);
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
+
+        msg = msg_message("receive_person", "unit target resource amount",
+            u, u2, given);
+        add_message(&u2->faction->msgs, msg);
+        msg_release(msg);
+    }
+}
+
 static bool limited_give(const item_type * type)
 {
     /* trade only money 2:1, if at all */
@@ -531,7 +553,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, u->number, u->number, get_resourcetype(R_PERSON), ord, 0);
+    add_give_person(u, u2, u->number, ord, 0);
     u_setfaction(u, u2->faction);
     u2->faction->newbies += u->number;
 }

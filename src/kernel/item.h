@@ -265,7 +265,6 @@ extern "C" {
         R_PERMAURA,                 /* Permanente Aura */
         R_LIFE,
         R_PEASANT,
-        R_PERSON,
         R_SAPLING,
         R_MALLORN_SAPLING,
         R_TREE,

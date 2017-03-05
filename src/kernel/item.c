@@ -622,7 +622,7 @@ const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 static const char *resourcenames[MAX_RESOURCES] = {
     "money", "aura", "permaura",
-    "hp", "peasant", "person",
+    "hp", "peasant",
     "sapling", "mallornsapling", 
     "tree", "mallorntree",
     "seed", "mallornseed",
@@ -981,8 +981,6 @@ void init_resources(void)
      * these are not items, but things like trees or hitpoints
      * which can be used in a construction recipe or as a spell ingredient.
      */
-
-    rt_get_or_create(resourcenames[R_PERSON]); /* lousy hack */
 
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;

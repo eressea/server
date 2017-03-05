@@ -165,8 +165,6 @@ static void test_core_resources(CuTest *tc) {
     CuAssertPtrNotNull(tc, rtype->itype->give);
     CuAssertPtrNotNull(tc, rtype = rt_find("peasant"));
     CuAssertPtrEquals(tc, 0, rtype->itype);
-    CuAssertPtrNotNull(tc, rtype = rt_find("person"));
-    CuAssertPtrEquals(tc, 0, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("permaura"));
     CuAssertPtrEquals(tc, 0, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("hp"));
