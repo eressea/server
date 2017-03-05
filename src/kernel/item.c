@@ -614,25 +614,24 @@ struct order *ord)
 #define R_MINHERB R_PLAIN_1
 #define R_MINPOTION R_FAST
 #define R_MINITEM R_IRON
-#define MAXITEMS MAX_ITEMS
-#define MAXRESOURCES MAX_RESOURCES
-#define MAXHERBS MAX_HERBS
-#define MAXPOTIONS MAX_POTIONS
 #define MAXHERBSPERPOTION 6
 
-const potion_type *oldpotiontype[MAXPOTIONS + 1];
+const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
 
 static const char *resourcenames[MAX_RESOURCES] = {
+    "money", "aura", "permaura",
+    "hp", "peasant", "person",
+    "sapling", "mallornsapling", 
+    "tree", "mallorntree",
+    "seed", "mallornseed",
     "iron", "stone", "horse", "ao_healing",
     "aots", "roi", "rop", "ao_chastity",
     "laen", "fairyboot", "aoc", "pegasus",
     "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
     "aurafocus", "sphereofinv", "magicbag",
-    "magicherbbag", "dreameye", "p2", "seed", "mallornseed",
-    "money", "aura", "permaura",
-    "hp", "peasant", "person"
+    "magicherbbag", "dreameye", "p2"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -966,7 +965,7 @@ static void init_oldpotions(void)
     };
     int p;
 
-    for (p = 0; p != MAXPOTIONS; ++p) {
+    for (p = 0; p != MAX_POTIONS; ++p) {
         item_type *itype = it_find(potionnames[p]);
         if (itype != NULL) {
             oldpotiontype[p] = itype->rtype->ptype;
@@ -977,6 +976,11 @@ static void init_oldpotions(void)
 void init_resources(void)
 {
     resource_type *rtype;
+
+    /* there are resources that are special and must be hard-coded.
+     * these are not items, but things like trees or hitpoints
+     * which can be used in a construction recipe or as a spell ingredient.
+     */
 
     rt_get_or_create(resourcenames[R_PERSON]); /* lousy hack */
 

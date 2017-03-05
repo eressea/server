@@ -149,7 +149,7 @@ enter_arena(unit * u, const item_type * itype, int amount, order * ord)
 
     assert(!"not implemented");
     /*
-            for (res=0;res!=MAXRESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
+            for (res=0;res!=MAX_RESOURCES;++res) if (res!=R_SILVER && res!=R_ARENA_GATE && (is_item(res) || is_herb(res) || is_potion(res))) {
             int x = get_resource(u, res);
             if (x) {
             if (u2) {
