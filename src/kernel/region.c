@@ -1217,7 +1217,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
-            peasants = (region_maxworkers(r) * (20 + dice_rand("6d10"))) / 100;
+            peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
             rsetpeasants(r, MAX(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));

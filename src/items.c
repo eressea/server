@@ -178,8 +178,8 @@ struct order *ord)
     return 0;
 }
 
-#define BAGPIPEFRACTION dice_rand("2d4+2")
-#define BAGPIPEDURATION dice_rand("2d10+4")
+#define BAGPIPEFRACTION (dice(2,4)+2)
+#define BAGPIPEDURATION (dice(2,10)+4)
 
 static int
 use_bagpipeoffear(struct unit *u, const struct item_type *itype,
