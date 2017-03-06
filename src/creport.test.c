@@ -148,39 +148,44 @@ static void test_cr_factionstealth(CuTest *tc) {
     ally *al;
 
     test_setup();
-    mstream_init(&strm);
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f1, r);
 
+    mstream_init(&strm);
     cr_output_unit(&strm, u->region, f1, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    mstream_done(&strm);
 
     set_factionstealth(u, f2);
     CuAssertPtrNotNull(tc, u->attribs);
 
+    mstream_init(&strm);
     cr_output_unit(&strm, u->region, f1, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    mstream_done(&strm);
 
+    mstream_init(&strm);
     cr_output_unit(&strm, u->region, f2, u, seen_unit);
-    CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
-    CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Verraeter", -1));
+    mstream_done(&strm);
 
     al = ally_add(&f1->allies, f2);
     al->status = HELP_FSTEALTH;
-
+    mstream_init(&strm);
     cr_output_unit(&strm, u->region, f2, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
-    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Verraeter", -1));
-
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
     mstream_done(&strm);
+
     test_cleanup();
 }
 

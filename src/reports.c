@@ -500,7 +500,6 @@ size_t size)
     bufp = STRLCPY(bufp, unitname(u), size);
     fv = visible_faction(f, u);
     if (!isbattle) {
-        attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
         if (u->faction == f) {
             if (fval(u, UFL_GROUP)) {
                 attrib *a = a_find(u->attribs, &at_group);
@@ -514,11 +513,11 @@ size_t size)
                 bufp = STRLCPY(bufp, ", ", size);
                 bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
             }
-            else if (a_otherfaction) {
-                faction *otherfaction = get_otherfaction(a_otherfaction);
-                if (otherfaction) {
+            else if (u->attribs) {
+                faction *otherf = get_otherfaction(u);
+                if (otherf) {
                     bufp = STRLCPY(bufp, ", ", size);
-                    bufp = STRLCPY(bufp, factionname(otherfaction), size);
+                    bufp = STRLCPY(bufp, factionname(otherf), size);
                 }
             }
         }
@@ -528,13 +527,15 @@ size_t size)
                 bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
             }
             else {
-                if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
-                    faction *f = get_otherfaction(a_otherfaction);
-                    int result =
-                        snprintf(bufp, size, ", %s (%s)", factionname(f),
-                        factionname(u->faction));
-                    if (wrptr(&bufp, &size, result) != 0)
-                        WARN_STATIC_BUFFER();
+                if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
+                    faction *otherf = get_otherfaction(u);
+                    if (otherf) {
+                        int result =
+                            snprintf(bufp, size, ", %s (%s)", factionname(otherf),
+                                factionname(u->faction));
+                        if (wrptr(&bufp, &size, result) != 0)
+                            WARN_STATIC_BUFFER();
+                    }
                 }
                 else {
                     bufp = STRLCPY(bufp, ", ", size);
