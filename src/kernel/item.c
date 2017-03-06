@@ -565,46 +565,6 @@ item *i_new(const item_type * itype, int size)
 
 #include "region.h"
 
-static int
-give_horses(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsethorses(r, rhorses(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
-static int
-give_money(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsetmoney(r, rmoney(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
 const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
