@@ -131,12 +131,12 @@ static void add_give_person(unit * u, unit * u2, int given,
     else if (u2->faction != u->faction) {
         message *msg;
 
-        msg = msg_message("give_person", "unit target resource amount",
+        msg = msg_message("give_person", "unit target amount",
             u, u2, given);
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
 
-        msg = msg_message("receive_person", "unit target resource amount",
+        msg = msg_message("receive_person", "unit target amount",
             u, u2, given);
         add_message(&u2->faction->msgs, msg);
         msg_release(msg);
