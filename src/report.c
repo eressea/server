@@ -878,7 +878,7 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
-static void describe(struct stream *out, const region * r, faction * f)
+void report_region(struct stream *out, const region * r, faction * f)
 {
     int n;
     bool dh;
@@ -987,10 +987,10 @@ static void describe(struct stream *out, const region * r, faction * f)
                 }
             }
             else if (trees == 1) {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree"), size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "tree"), size);
             }
             else {
-                bytes = (int)strlcpy(bufp, LOC(f->locale, "nr_tree_p"), size);
+                bytes = (int)strlcpy(bufp, LOC(f->locale, "tree_p"), size);
             }
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1004,8 +1004,9 @@ static void describe(struct stream *out, const region * r, faction * f)
 
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
+                const char * name = resourcename(result[n].rtype, result[n].number!=1);
                 bytes = snprintf(bufp, size, ", %d %s/%d", result[n].number,
-                    LOC(f->locale, result[n].name), result[n].level);
+                    LOC(f->locale, name), result[n].level);
                 if (wrptr(&bufp, &size, bytes) != 0)
                     WARN_STATIC_BUFFER();
             }
@@ -1181,7 +1182,6 @@ static void describe(struct stream *out, const region * r, faction * f)
             dh = 1;
         }
     }
-    newline(out);
     *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 
@@ -1999,7 +1999,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     }
 }
 
-void write_travelthru(struct stream *out, region *r, const faction *f)
+void report_travelthru(struct stream *out, region *r, const faction *f)
 {
     int maxtravel;
     char buf[8192];
@@ -2281,7 +2281,8 @@ report_plaintext(const char *filename, report_context * ctx,
 
         if (r->seen.mode == seen_unit) {
             anyunits = 1;
-            describe(out, r, f);
+            newline(out);
+            report_region(out, r, f);
             if (markets_module() && r->land) {
                 const item_type *lux = r_luxury(r);
                 const item_type *herb = r->land->herbtype;
@@ -2308,20 +2309,22 @@ report_plaintext(const char *filename, report_context * ctx,
             }
             guards(out, r, f);
             newline(out);
-            write_travelthru(out, r, f);
+            report_travelthru(out, r, f);
         }
         else {
             if (r->seen.mode == seen_far) {
-                describe(out, r, f);
+                newline(out);
+                report_region(out, r, f);
                 newline(out);
                 guards(out, r, f);
                 newline(out);
-                write_travelthru(out, r, f);
+                report_travelthru(out, r, f);
             }
             else {
-                describe(out, r, f);
                 newline(out);
-                write_travelthru(out, r, f);
+                report_region(out, r, f);
+                newline(out);
+                report_travelthru(out, r, f);
             }
         }
         /* Statistik */

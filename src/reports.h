@@ -107,7 +107,7 @@ extern "C" {
     } arg_regions;
 
     typedef struct resource_report {
-        const char *name;
+        const struct resource_type *rtype;
         int number;
         int level;
     } resource_report;

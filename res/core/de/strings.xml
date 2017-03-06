@@ -6570,15 +6570,6 @@
     </string>
   </namespace>
 
-  <string name="nr_tree">
-    <text locale="de">Baum</text>
-    <text locale="en">tree</text>
-  </string>
-  <string name="nr_tree_p">
-    <text locale="de">Bäume</text>
-    <text locale="en">trees</text>
-  </string>
-
   <string name="nr_mallorntree">
     <text locale="de">Mallornbaum</text>
     <text locale="en">mallorn tree</text>
@@ -6613,11 +6604,21 @@
   </string>
 
   <string name="sapling">
+    <text locale="de">Schößling</text>
+    <text locale="en">sapling</text>
+  </string>
+
+  <string name="sapling_p">
     <text locale="de">Schößlinge</text>
     <text locale="en">saplings</text>
   </string>
 
   <string name="mallornsapling">
+    <text locale="de">Mallornschößling</text>
+    <text locale="en">mallorn sapling</text>
+  </string>
+
+  <string name="mallornsapling_p">
     <text locale="de">Mallornschößlinge</text>
     <text locale="en">mallorn saplings</text>
   </string>
