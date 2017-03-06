@@ -796,13 +796,13 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         else {
             /* other unit. show visible faction, not u->faction */
             stream_printf(out, "%d;Partei\n", sf ? sf->no : f->no);
-            if (sf == f) {
-                stream_printf(out, "1;Verraeter\n");
-            }
-            if (sf && sf != u->faction) {
-                if (alliedunit(u, f, HELP_FSTEALTH)) {
+            if (alliedunit(u, f, HELP_FSTEALTH)) {
+                if (sf && sf != u->faction) {
                     stream_printf(out, "%d;Anderepartei\n", sf->no);
                 }
+            }
+            else if (sf == f) {
+                stream_printf(out, "1;Verraeter\n");
             }
         }
     }
