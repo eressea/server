@@ -50,14 +50,6 @@ static void test_simple_spy_message(CuTest *tc) {
     test_cleanup();
 }
 
-static void set_factionstealth(unit *u, faction *f) {
-    attrib *a = a_find(u->attribs, &at_otherfaction);
-    if (!a)
-        a = a_add(&u->attribs, make_otherfaction(f));
-    else
-        a->data.v = f;
-}
-
 static void test_all_spy_message(CuTest *tc) {
     spy_fixture fix;
     item_type *itype;

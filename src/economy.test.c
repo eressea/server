@@ -405,9 +405,16 @@ static void test_make_item(CuTest *tc) {
     CuAssertIntEquals(tc, 22, get_item(u, itype));
     CuAssertIntEquals(tc, 283, u->region->resources->amount); /* no free lunches */
 
+    rtype->modifiers[0].value = frac_make(1, 2);
+    make_item(u, itype, 6);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 28, get_item(u, itype));
+    CuAssertIntEquals(tc, 280, u->region->resources->amount); /* 50% saving = 3 stones make 6 stones */
+
     rtype->modifiers[0].flags = RMF_REQUIREDBUILDING;
     rtype->modifiers[0].race = NULL;
     rtype->modifiers[0].btype = bt_get_or_create("mine");
+
     make_item(u, itype, 10);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error104"));
 

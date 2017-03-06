@@ -51,7 +51,7 @@ extern "C" {
     param_t getparam(const struct locale *lang);
 
     const char * game_name(void);
-    const char * game_name_upper(void);
+    const char * game_mailcmd(void);
     int game_id(void);
     /* returns a value between [0..xpct_2], generated with two dice */
 

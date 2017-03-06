@@ -127,6 +127,20 @@ function test_ironkeeper_guards_iron()
     assert_equal(level, u:get_item("iron"))
 end
 
+function test_sawmill()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("tree", 100)
+    local u = unit.create(faction.create("human"), r)
+    u:add_item("money", 250) -- sawmill maintenance
+    u:set_skill("forestry", 6)
+    u.building = building.create(r, "sawmill")
+    u.building.size = 1
+    u:add_order("MACHE 6 HOLZ")
+    process_orders()
+    assert_equal(6, u:get_item("log"))
+    assert_equal(97, r:get_resource("tree"))
+end
+
 function test_ent_guards_trees()
     local r = region.create(0, 0, "plain")
     r:set_resource("tree", 100)

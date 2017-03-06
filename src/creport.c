@@ -763,12 +763,8 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         stream_printf(out, "\"%s\";Beschr\n", str);
     }
     /* print faction information */
-    sf = visible_faction(f, u);
-    prefix = raceprefix(u);
+    sf = visible_faction(NULL, u);
     if (u->faction == f || omniscient(f)) {
-        const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
-        const faction *otherfaction =
-            a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
         /* my own faction, full info */
         const attrib *a = NULL;
         unit *mage;
@@ -780,12 +776,12 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
         stream_printf(out, "%d;Partei\n", u->faction->no);
-        if (sf != u->faction)
+        if (sf && sf != u->faction) {
             stream_printf(out, "%d;Verkleidung\n", sf->no);
-        if (fval(u, UFL_ANON_FACTION))
-            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION)!=0);
-        if (otherfaction && otherfaction != u->faction) {
-            stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
+            stream_printf(out, "%d;Anderepartei\n", sf->no);
+        }
+        if (fval(u, UFL_ANON_FACTION)) {
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
         }
         mage = get_familiar_mage(u);
         if (mage) {
@@ -798,21 +794,19 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
         }
         else {
-            const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
-            const faction *otherfaction =
-                a_otherfaction ? get_otherfaction(a_otherfaction) : NULL;
             /* other unit. show visible faction, not u->faction */
-            stream_printf(out, "%d;Partei\n", sf->no);
+            stream_printf(out, "%d;Partei\n", sf ? sf->no : f->no);
             if (sf == f) {
                 stream_printf(out, "1;Verraeter\n");
             }
-            if (otherfaction && otherfaction != u->faction) {
+            if (sf && sf != u->faction) {
                 if (alliedunit(u, f, HELP_FSTEALTH)) {
-                    stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
+                    stream_printf(out, "%d;Anderepartei\n", sf->no);
                 }
             }
         }
     }
+    prefix = raceprefix(u);
     if (prefix) {
         prefix = mkname("prefix", prefix);
         stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
