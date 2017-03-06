@@ -748,8 +748,9 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *pzTmp;
     skill *sv;
     item result[MAX_INVENTORY];
-    const faction *sf;
+    const faction *fother, *fseen;
     const char *prefix;
+    bool allied;
 
     assert(u && u->number);
     assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
@@ -762,10 +763,8 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (str) {
         stream_printf(out, "\"%s\";Beschr\n", str);
     }
-    /* print faction information */
-    sf = visible_faction(NULL, u);
-    if (u->faction == f || omniscient(f)) {
-        /* my own faction, full info */
+
+    if (u->faction == f) {
         const attrib *a = NULL;
         unit *mage;
 
@@ -775,36 +774,29 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             const group *g = (const group *)a->data.v;
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
-        stream_printf(out, "%d;Partei\n", u->faction->no);
-        if (sf && sf != u->faction) {
-            stream_printf(out, "%d;Verkleidung\n", sf->no);
-            stream_printf(out, "%d;Anderepartei\n", sf->no);
-        }
-        if (fval(u, UFL_ANON_FACTION)) {
-            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
-        }
         mage = get_familiar_mage(u);
         if (mage) {
             stream_printf(out, "%u;familiarmage\n", mage->no);
         }
     }
-    else {
-        if (fval(u, UFL_ANON_FACTION)) {
-            /* faction info is hidden */
-            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
-        }
-        else {
-            /* other unit. show visible faction, not u->faction */
-            stream_printf(out, "%d;Partei\n", sf ? sf->no : f->no);
-            if (alliedunit(u, f, HELP_FSTEALTH)) {
-                if (sf && sf != u->faction) {
-                    stream_printf(out, "%d;Anderepartei\n", sf->no);
-                }
-            }
-            else if (sf == f) {
-                stream_printf(out, "1;Verraeter\n");
-            }
-        }
+
+    fseen = u->faction;
+    fother = get_otherfaction(u);
+    allied = u->faction == f || alliedunit(u, f, HELP_FSTEALTH);
+    if (fother && f != u->faction && !allied) {
+        /* getarnt, keine eigene, und kein HELFE fuer uns: wir sehen den fake */
+        fseen = fother;
+    }
+    stream_printf(out, "%d;Partei\n", fseen->no);
+    if (fother && fother!=fseen) {
+        stream_printf(out, "%d;Anderepartei\n", fother->no);
+    }
+    if (fseen==f && fval(u, UFL_ANON_FACTION)) {
+        sputs("1;Parteitarnung", out);
+    }
+    if (!allied && fother == f) {
+        /* sieht aus wie unsere, ist es aber nicht. */
+        stream_printf(out, "1;Verraeter\n");
     }
     prefix = raceprefix(u);
     if (prefix) {
