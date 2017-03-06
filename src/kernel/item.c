@@ -565,29 +565,62 @@ item *i_new(const item_type * itype, int size)
 
 #include "region.h"
 
-#define R_MINOTHER R_SILVER
-#define R_MINHERB R_PLAIN_1
-#define R_MINPOTION R_FAST
-#define R_MINITEM R_IRON
-#define MAXITEMS MAX_ITEMS
-#define MAXRESOURCES MAX_RESOURCES
-#define MAXHERBS MAX_HERBS
-#define MAXPOTIONS MAX_POTIONS
-#define MAXHERBSPERPOTION 6
+static int
+give_horses(unit * s, unit * d, const item_type * itype, int n,
+struct order *ord)
+{
+    if (d == NULL) {
+        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
+        region *r = s->region;
+        if (use < n) {
+            use +=
+            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
+            n - use);
+        }
+        if (r->land) {
+            rsethorses(r, rhorses(r) + use);
+        }
+        return 0;
+    }
+    return -1;                    /* use the mechanism */
+}
 
-const potion_type *oldpotiontype[MAXPOTIONS + 1];
+static int
+give_money(unit * s, unit * d, const item_type * itype, int n,
+struct order *ord)
+{
+    if (d == NULL) {
+        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
+        region *r = s->region;
+        if (use < n) {
+            use +=
+            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
+            n - use);
+        }
+        if (r->land) {
+            rsetmoney(r, rmoney(r) + use);
+        }
+        return 0;
+    }
+    return -1;                    /* use the mechanism */
+}
+
+const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
 
 static const char *resourcenames[MAX_RESOURCES] = {
+    "money", "aura", "permaura",
+    "hp", "peasant",
+    "sapling", "mallornsapling", 
+    "tree", "mallorntree",
+    "seed", "mallornseed",
     "iron", "stone", "horse", "ao_healing",
     "aots", "roi", "rop", "ao_chastity",
     "laen", "fairyboot", "aoc", "pegasus",
     "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
     "aurafocus", "sphereofinv", "magicbag",
-    "magicherbbag", "dreameye", "p2", "seed", "mallornseed",
-    "money", "aura", "permaura",
-    "hp", "peasant", "person"
+    "magicherbbag", "dreameye", "p2"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -694,7 +727,7 @@ static void init_oldpotions(void)
     };
     int p;
 
-    for (p = 0; p != MAXPOTIONS; ++p) {
+    for (p = 0; p != MAX_POTIONS; ++p) {
         item_type *itype = it_find(potionnames[p]);
         if (itype != NULL) {
             oldpotiontype[p] = itype->rtype->ptype;
@@ -706,24 +739,36 @@ void init_resources(void)
 {
     resource_type *rtype;
 
-    rt_get_or_create(resourcenames[R_PERSON]); /* lousy hack */
+    /* there are resources that are special and must be hard-coded.
+     * these are not items, but things like trees or hitpoints
+     * which can be used in a construction recipe or as a spell ingredient.
+     */
 
-    rtype = rt_get_or_create(resourcenames[R_PEASANT]);
-    rtype->uchange = res_changepeasants;
-
+    /* special resources needed in report_region */
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
 
-    rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
-    rtype->uchange = res_changepermaura;
+    rtype = rt_get_or_create(resourcenames[R_HORSE]);
+    rtype->flags |= RTF_ITEM | RTF_LIMITED;
+    rtype->itype = it_get_or_create(rtype);
+    rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
 
-    rtype = rt_get_or_create(resourcenames[R_LIFE]);
-    rtype->uchange = res_changehp;
+    rtype = rt_get_or_create(resourcenames[R_SAPLING]);
+    rtype = rt_get_or_create(resourcenames[R_TREE]);
+    rtype = rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
+    rtype = rt_get_or_create(resourcenames[R_MALLORN_TREE]);
 
+    /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
+    rtype = rt_get_or_create(resourcenames[R_PERMAURA]);
+    rtype->uchange = res_changepermaura;
+    rtype = rt_get_or_create(resourcenames[R_LIFE]);
+    rtype->uchange = res_changehp;
+    rtype = rt_get_or_create(resourcenames[R_PEASANT]);
+    rtype->uchange = res_changepeasants;
 
     /* alte typen registrieren: */
     init_oldpotions();

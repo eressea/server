@@ -16,10 +16,10 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
 
-set -e
+#set -e
 cd $ROOT/tests
 setup
-cleanup
+#cleanup
 VALGRIND=`which valgrind`
 TESTS=../Debug/eressea/test_eressea
 SERVER=../Debug/eressea/eressea
@@ -34,6 +34,14 @@ $VALGRIND $SERVER -t 184 ../scripts/reports.lua
 [ -d reports ] || quit 4 "no reports directory created"
 CRFILE=184-zvto.cr
 grep -q PARTEI reports/$CRFILE || quit 1 "CR did not contain any factions"
+grep -q -E '"B.ume";type' reports/$CRFILE || \
+	quit 1 "regions did not contain trees"
+grep -q -E '"Silber";type' reports/$CRFILE || \
+	quit 1 "regions did not contain silver"
+grep -q '"Bauern";type' reports/$CRFILE || \
+	quit 1 "regions did not contain peasants"
+grep -q '"Sch..linge";type' reports/$CRFILE || \
+	quit 1 "regions did not contain saplings"
 grep -q REGION reports/$CRFILE || quit 2 "CR did not contain any regions"
 grep -q SCHIFF reports/$CRFILE || quit 3 "CR did not contain any ships"
 grep -q BURG reports/$CRFILE || quit 4 "CR did not contain any buildings"

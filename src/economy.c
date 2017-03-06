@@ -2120,7 +2120,7 @@ static void planttrees(unit * u, int raw)
     }
 
     /* Mallornb�ume kann man nur in Mallornregionen z�chten */
-    rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
+    rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORN_SEED : R_SEED);
 
     /* Skill pr�fen */
     skill = effskill(u, SK_HERBALISM, 0);
@@ -2185,7 +2185,7 @@ static void breedtrees(unit * u, int raw)
     }
 
     /* Mallornb�ume kann man nur in Mallornregionen z�chten */
-    rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORNSEED : R_SEED);
+    rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORN_SEED : R_SEED);
 
     /* Skill pr�fen */
     skill = effskill(u, SK_HERBALISM, 0);
@@ -2303,7 +2303,7 @@ static void breed_cmd(unit * u, struct order *ord)
     default:
         if (p != P_ANY) {
             rtype = findresourcetype(s, u->faction->locale);
-            if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORNSEED)) {
+            if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORN_SEED)) {
                 breedtrees(u, m);
                 break;
             }

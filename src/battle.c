@@ -3123,8 +3123,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     int speeded = 0, speed = 1;
     int rest;
     const group *g = NULL;
-    const attrib *a = a_find(u->attribs, &at_otherfaction);
-    const faction *stealthfaction = a ? get_otherfaction(a) : NULL;
+    const faction *stealthfaction = get_otherfaction(u);
     unsigned int flags = 0;
 
     assert(u->number);

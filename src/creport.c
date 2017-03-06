@@ -91,10 +91,11 @@ bool opt_cr_absolute_coords = false;
 #ifdef TAG_LOCALE
 static const char *crtag(const char *key)
 {
-    static const struct locale *lang = NULL;
-    if (!lang)
-        lang = get_locale(TAG_LOCALE);
-    return LOC(lang, key);
+    /* TODO: those locale lookups are shit, but static kills testing */
+    const char *result;
+    const struct locale *lang = get_locale(TAG_LOCALE);
+    result = LOC(lang, key);
+    return result;
 }
 #else
 #define crtag(x) (x)
@@ -416,6 +417,7 @@ static int cr_resources(variant var, char *buffer, const void *userdata)
     char *wp = buffer;
     if (rlist != NULL) {
         const char *name = resourcename(rlist->type, rlist->number != 1);
+        assert(name);
         wp +=
             sprintf(wp, "\"%d %s", rlist->number, translate(name, LOC(f->locale,
             name)));
@@ -424,6 +426,7 @@ static int cr_resources(variant var, char *buffer, const void *userdata)
             if (rlist == NULL)
                 break;
             name = resourcename(rlist->type, rlist->number != 1);
+            assert(name);
             wp +=
                 sprintf(wp, ", %d %s", rlist->number, translate(name,
                 LOC(f->locale, name)));
@@ -748,8 +751,9 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *pzTmp;
     skill *sv;
     item result[MAX_INVENTORY];
-    const faction *sf;
+    const faction *fother, *fseen;
     const char *prefix;
+    bool allied;
 
     assert(u && u->number);
     assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
@@ -762,10 +766,8 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     if (str) {
         stream_printf(out, "\"%s\";Beschr\n", str);
     }
-    /* print faction information */
-    sf = visible_faction(NULL, u);
-    if (u->faction == f || omniscient(f)) {
-        /* my own faction, full info */
+
+    if (u->faction == f) {
         const attrib *a = NULL;
         unit *mage;
 
@@ -775,36 +777,29 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             const group *g = (const group *)a->data.v;
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
-        stream_printf(out, "%d;Partei\n", u->faction->no);
-        if (sf && sf != u->faction) {
-            stream_printf(out, "%d;Verkleidung\n", sf->no);
-            stream_printf(out, "%d;Anderepartei\n", sf->no);
-        }
-        if (fval(u, UFL_ANON_FACTION)) {
-            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
-        }
         mage = get_familiar_mage(u);
         if (mage) {
             stream_printf(out, "%u;familiarmage\n", mage->no);
         }
     }
-    else {
-        if (fval(u, UFL_ANON_FACTION)) {
-            /* faction info is hidden */
-            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
-        }
-        else {
-            /* other unit. show visible faction, not u->faction */
-            stream_printf(out, "%d;Partei\n", sf ? sf->no : f->no);
-            if (sf == f) {
-                stream_printf(out, "1;Verraeter\n");
-            }
-            if (sf && sf != u->faction) {
-                if (alliedunit(u, f, HELP_FSTEALTH)) {
-                    stream_printf(out, "%d;Anderepartei\n", sf->no);
-                }
-            }
-        }
+
+    fseen = u->faction;
+    fother = get_otherfaction(u);
+    allied = u->faction == f || alliedunit(u, f, HELP_FSTEALTH);
+    if (fother && f != u->faction && !allied) {
+        /* getarnt, keine eigene, und kein HELFE fuer uns: wir sehen den fake */
+        fseen = fother;
+    }
+    stream_printf(out, "%d;Partei\n", fseen->no);
+    if (fother && fother!=fseen) {
+        stream_printf(out, "%d;Anderepartei\n", fother->no);
+    }
+    if (fseen==f && fval(u, UFL_ANON_FACTION)) {
+        sputs("1;Parteitarnung", out);
+    }
+    if (!allied && fother == f) {
+        /* sieht aus wie unsere, ist es aber nicht. */
+        stream_printf(out, "1;Verraeter\n");
     }
     prefix = raceprefix(u);
     if (prefix) {
@@ -1093,11 +1088,15 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
     }
 }
 
-static char *cr_output_resource(char *buf, const char *name,
+static char *cr_output_resource(char *buf, const resource_type *rtype,
     const struct locale *loc, int amount, int level)
 {
-    buf += sprintf(buf, "RESOURCE %u\n", hashstring(name));
-    buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, name)));
+    const char * name;
+    assert(rtype);
+    name = resourcename(rtype, 1);
+    assert(name);
+    buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
+    buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, rtype->_name)));
     if (amount >= 0) {
         if (level >= 0)
             buf += sprintf(buf, "%d;skill\n", level);
@@ -1157,11 +1156,9 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
     }
 }
 
-static void
-cr_output_resources(FILE * F, report_context * ctx, region *r, bool see_unit)
+void cr_output_resources(stream *out, const faction * f, const region *r, bool see_unit)
 {
     char cbuf[BUFFERSIZE], *pos = cbuf;
-    faction *f = ctx->f;
     resource_report result[MAX_RAWMATERIALS];
     int n, size = report_resources(r, result, MAX_RAWMATERIALS, f, see_unit);
 
@@ -1169,15 +1166,20 @@ cr_output_resources(FILE * F, report_context * ctx, region *r, bool see_unit)
     int trees = rtrees(r, 2);
     int saplings = rtrees(r, 1);
 
-    if (trees > 0)
-        fprintf(F, "%d;Baeume\n", trees);
-    if (saplings > 0)
-        fprintf(F, "%d;Schoesslinge\n", saplings);
-    if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0))
-        fprintf(F, "1;Mallorn\n");
+    if (trees > 0) {
+        stream_printf(out, "%d;Baeume\n", trees);
+    }
+    if (saplings > 0) {
+        stream_printf(out, "%d;Schoesslinge\n", saplings);
+    }
+    if (fval(r, RF_MALLORN) && (trees > 0 || saplings > 0)) {
+        sputs("1;Mallorn", out);
+    }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
-            fprintf(F, "%d;%s\n", result[n].number, crtag(result[n].name));
+            const char * name = resourcename(result[n].rtype, result[n].number != 1);
+            assert(name);
+            stream_printf(out, "%d;%s\n", result[n].number, crtag(name));
         }
     }
 #endif
@@ -1185,13 +1187,24 @@ cr_output_resources(FILE * F, report_context * ctx, region *r, bool see_unit)
     for (n = 0; n < size; ++n) {
         if (result[n].number >= 0) {
             pos =
-                cr_output_resource(pos, result[n].name, f->locale, result[n].number,
+                cr_output_resource(pos, result[n].rtype, f->locale, result[n].number,
                 result[n].level);
         }
     }
-    if (pos != cbuf)
-        fputs(cbuf, F);
+    if (pos != cbuf) {
+        swrite(cbuf, 1, pos - cbuf, out);
+    }
 }
+
+static void cr_output_resources_compat(FILE *F, report_context * ctx,
+    region *r, bool see_unit)
+{
+    /* TODO: eliminate this function */
+    stream strm;
+    fstream_init(&strm, F);
+    cr_output_resources(&strm, ctx->f, r, see_unit);
+}
+
 
 static void
 cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
@@ -1357,7 +1370,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
             /* this writes both some tags (RESOURCECOMPAT) and a block.
              * must not write any blocks before it */
-            cr_output_resources(F, ctx, r, r->seen.mode >= seen_unit);
+            cr_output_resources_compat(F, ctx, r, r->seen.mode >= seen_unit);
 
             if (r->seen.mode >= seen_unit) {
                 /* trade */
