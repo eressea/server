@@ -751,7 +751,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *pzTmp;
     skill *sv;
     item result[MAX_INVENTORY];
-    const faction *fother, *fseen;
+    const faction *fother;
     const char *prefix;
     bool allied;
 
@@ -783,23 +783,26 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         }
     }
 
-    fseen = u->faction;
     fother = get_otherfaction(u);
     allied = u->faction == f || alliedunit(u, f, HELP_FSTEALTH);
-    if (fother && f != u->faction && !allied) {
-        /* getarnt, keine eigene, und kein HELFE fuer uns: wir sehen den fake */
-        fseen = fother;
+    if (allied) {
+        /* allies can tell that the unit is anonymous */
+        /* the true faction is visible to allies */
+        stream_printf(out, "%d;Partei\n", u->faction->no);
+        if (fother) {
+            stream_printf(out, "%d;Anderepartei\n", fother->no);
+        }
+    } else if (!fval(u, UFL_ANON_FACTION)) {
+        /* OBS: anonymity overrides everything */
+        /* we have no alliance, so we get duped */
+        stream_printf(out, "%d;Partei\n", (fother ? fother : u->faction)->no);
+        if (fother==f) {
+            /* sieht aus wie unsere, ist es aber nicht. */
+            stream_printf(out, "1;Verraeter\n");
+        }
     }
-    stream_printf(out, "%d;Partei\n", fseen->no);
-    if (fother && fother!=fseen) {
-        stream_printf(out, "%d;Anderepartei\n", fother->no);
-    }
-    if (fseen==f && fval(u, UFL_ANON_FACTION)) {
+    if (fval(u, UFL_ANON_FACTION)) {
         sputs("1;Parteitarnung", out);
-    }
-    if (!allied && fother == f) {
-        /* sieht aus wie unsere, ist es aber nicht. */
-        stream_printf(out, "1;Verraeter\n");
     }
     prefix = raceprefix(u);
     if (prefix) {
