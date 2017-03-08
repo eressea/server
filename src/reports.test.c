@@ -7,6 +7,7 @@
 #include "travelthru.h"
 #include "keyword.h"
 
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -20,9 +21,12 @@
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 
+#include <util/attrib.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
+
+#include <attributes/key.h>
 
 #include <selist.h>
 #include <stream.h>
@@ -153,6 +157,42 @@ static void test_sparagraph(CuTest *tc) {
     freestrlist(sp);
 }
 
+static void test_bufunit_bug_2305(CuTest *tc) {
+    unit *u;
+    faction *f1, *f2;
+    region *r;
+    ally *al;
+    char buf[1024];
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    f1 = test_create_faction(0);
+    f2 = test_create_faction(0);
+    u = test_create_unit(f1, r);
+    faction_setname(u->faction, "UFO");
+    renumber_faction(u->faction, 1);
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+    key_set(&u->attribs, 42, 42);
+
+    /* report to self */
+    bufunit(f1, u, 0, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressive.", buf);
+
+    /* report to another faction */
+    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buf);
+
+    al = ally_add(&f1->allies, f2);
+    al->status = HELP_FSTEALTH;
+
+    /* report to an allied faction (bug 2305) */
+    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buf);
+
+    test_cleanup();
+}
+
 static void test_write_unit(CuTest *tc) {
     unit *u;
     faction *f;
@@ -160,7 +200,7 @@ static void test_write_unit(CuTest *tc) {
     struct locale *lang;
     char buffer[1024];
 
-    test_cleanup();
+    test_setup();
     rc = rc_get_or_create("human");
     rc->bonus[SK_ALCHEMY] = 1;
     lang = get_or_create_locale("de");
@@ -581,6 +621,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_regionid);
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_write_unit);
+    SUITE_ADD_TEST(suite, test_bufunit_bug_2305);
     SUITE_ADD_TEST(suite, test_arg_resources);
     return suite;
 }
