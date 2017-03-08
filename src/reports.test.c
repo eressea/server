@@ -231,7 +231,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     /* fstealth has no influence when we are allies, same results again */
     set_factionstealth(u, NULL);
     bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), UFO(1), 1 human.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buf);
 
     u->flags |= UFL_ANON_FACTION;
     bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
