@@ -231,7 +231,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     /* ... also when they are anonymous */
     u->flags |= UFL_ANON_FACTION;
     mstream_init(&strm);
-    cr_output_unit(&strm, u->region, f1, u, seen_unit);
+    cr_output_unit(&strm, u->region, f2, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
