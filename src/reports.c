@@ -536,6 +536,10 @@ size_t size)
                         if (wrptr(&bufp, &size, result) != 0)
                             WARN_STATIC_BUFFER();
                     }
+                    else {
+                        bufp = STRLCPY(bufp, ", ", size);
+                        bufp = STRLCPY(bufp, factionname(fv), size);
+                    }
                 }
                 else {
                     bufp = STRLCPY(bufp, ", ", size);

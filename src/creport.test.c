@@ -130,10 +130,12 @@ static void test_cr_resources(CuTest *tc) {
 static int cr_get_int(stream *strm, const char *match, int def)
 {
     char line[1024];
+    size_t len = strlen(match);
 
     strm->api->rewind(strm->handle);
     while (strm->api->readln(strm->handle, line, sizeof(line))==0) {
-        if (strstr(line, match)) {
+        const char * pos = strstr(line, match);
+        if (pos && pos[len]=='\0') {
             return atoi(line);
         }
     }
@@ -153,30 +155,69 @@ static void test_cr_factionstealth(CuTest *tc) {
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f1, r);
 
+    /* report to ourselves */
     mstream_init(&strm);
     cr_output_unit(&strm, u->region, f1, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Parteitarnung", -1));
     mstream_done(&strm);
 
+    /* ... also when we are anonymous */
+    u->flags |= UFL_ANON_FACTION;
+    mstream_init(&strm);
+    cr_output_unit(&strm, u->region, f1, u, seen_unit);
+    CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Parteitarnung", -1));
+    u->flags &= ~UFL_ANON_FACTION;
+    mstream_done(&strm);
+
+    /* we see that our unit is cloaked */
     set_factionstealth(u, f2);
     CuAssertPtrNotNull(tc, u->attribs);
-
     mstream_init(&strm);
     cr_output_unit(&strm, u->region, f1, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Parteitarnung", -1));
     mstream_done(&strm);
 
+    /* ... also when we are anonymous */
+    u->flags |= UFL_ANON_FACTION;
+    mstream_init(&strm);
+    cr_output_unit(&strm, u->region, f1, u, seen_unit);
+    CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Parteitarnung", -1));
+    u->flags &= ~UFL_ANON_FACTION;
+    mstream_done(&strm);
+
+    /* we can tell that someone is presenting as us */
     mstream_init(&strm);
     cr_output_unit(&strm, u->region, f2, u, seen_unit);
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Parteitarnung", -1));
     mstream_done(&strm);
 
+    /* ... but not if they are anonymous */
+    u->flags |= UFL_ANON_FACTION;
+    mstream_init(&strm);
+    cr_output_unit(&strm, u->region, f2, u, seen_unit);
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Parteitarnung", -1));
+    u->flags &= ~UFL_ANON_FACTION;
+    mstream_done(&strm);
+
+    /* we see the same thing as them when we are an ally */
     al = ally_add(&f1->allies, f2);
     al->status = HELP_FSTEALTH;
     mstream_init(&strm);
@@ -184,6 +225,18 @@ static void test_cr_factionstealth(CuTest *tc) {
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
     CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
     CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Parteitarnung", -1));
+    mstream_done(&strm);
+
+    /* ... also when they are anonymous */
+    u->flags |= UFL_ANON_FACTION;
+    mstream_init(&strm);
+    cr_output_unit(&strm, u->region, f2, u, seen_unit);
+    CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
+    CuAssertIntEquals(tc, f2->no, cr_get_int(&strm, ";Anderepartei", -1));
+    CuAssertIntEquals(tc, -1, cr_get_int(&strm, ";Verraeter", -1));
+    CuAssertIntEquals(tc, 1, cr_get_int(&strm, ";Parteitarnung", -1));
+    u->flags &= ~UFL_ANON_FACTION;
     mstream_done(&strm);
 
     test_cleanup();
