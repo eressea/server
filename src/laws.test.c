@@ -52,7 +52,7 @@ static void test_rename_building(CuTest * tc)
     building_type *btype;
 
     test_setup();
-
+    test_create_locale();
     btype = test_create_buildingtype("castle");
     r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
@@ -74,7 +74,7 @@ static void test_rename_building_twice(CuTest * tc)
     building_type *btype;
 
     test_setup();
-
+    test_create_locale();
     btype = test_create_buildingtype("castle");
     r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
@@ -98,7 +98,7 @@ static void test_contact(CuTest * tc)
     ally *al;
 
     test_setup();
-
+    test_create_locale();
     btype = test_create_buildingtype("castle");
     r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
@@ -127,9 +127,9 @@ static void test_enter_building(CuTest * tc)
     race * rc;
 
     test_setup();
-
+    test_create_locale();
     r = test_create_region(0, 0, 0);
-    rc = rc_get_or_create("human");
+    rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), r);
     b = test_create_building(r, test_create_buildingtype("castle"));
 
@@ -1270,7 +1270,6 @@ static void test_show_without_item(CuTest *tc)
     unit *u;
     order *ord;
     item_type *itype;
-    item *i;
     struct locale *loc;
 
     test_setup();
@@ -1283,26 +1282,26 @@ static void test_show_without_item(CuTest *tc)
     f = test_create_faction(test_create_race("human"));
     u = test_create_unit(f, r);
 
+    itype = it_get_or_create(rt_get_or_create("testitem"));
+
     ord = create_order(K_RESHOW, f->locale, "testname");
 
-    itype = it_get_or_create(rt_get_or_create("testitem"));
-    i = i_new(itype, 1);
-
     reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(f->msgs, "error21") != NULL);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error21"));
     test_clear_messages(f);
 
     locale_setstring(loc, "testitem", "testname");
     locale_setstring(loc, "iteminfo::testitem", "testdescription");
+
     reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(f->msgs, "error21") == NULL);
-    CuAssertTrue(tc, test_find_messagetype(f->msgs, "error36") != NULL);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error21"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error36"));
     test_clear_messages(f);
 
-    i_add(&(u->items), i);
+    i_add(&(u->items), i_new(itype, 1));
     reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(f->msgs, "error21") == NULL);
-    CuAssertTrue(tc, test_find_messagetype(f->msgs, "error36") == NULL);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error21"));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error36"));
     test_clear_messages(f);
 
     free_order(ord);

@@ -264,10 +264,10 @@ struct drift_fixture {
 
 void setup_drift (struct drift_fixture *fix) {
     test_setup();
+    test_create_locale();
     config_set("rules.ship.storms", "0");
 
-    test_create_shiptype("drifter");
-    fix->st_boat = st_get_or_create("drifter");
+    fix->st_boat = test_create_shiptype("boat");
     fix->st_boat->cabins = 20000;
 
     test_create_ocean(0, 0);
