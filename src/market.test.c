@@ -31,9 +31,7 @@ static void test_market_curse(CuTest * tc)
     luxury_type *lux;
     building_type *btype;
 
-    free_gamedata();
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;

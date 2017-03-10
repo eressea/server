@@ -34,15 +34,12 @@ static void test_new_building_can_be_renamed(CuTest * tc)
 {
     region *r;
     building *b;
-    building_type *btype;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
+    test_create_locale();
+    r = test_create_region(0, 0, 0);
 
-    btype = bt_get_or_create("castle");
-    r = findregion(-1, 0);
-
-    b = new_building(btype, r, default_locale);
+    b = test_create_building(r, NULL);
     CuAssertTrue(tc, !renamed_building(b));
 }
 
@@ -54,12 +51,10 @@ static void test_rename_building(CuTest * tc)
     faction *f;
     building_type *btype;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
-    btype = bt_get_or_create("castle");
-
-    r = findregion(-1, 0);
+    btype = test_create_buildingtype("castle");
+    r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
@@ -78,12 +73,10 @@ static void test_rename_building_twice(CuTest * tc)
     building *b;
     building_type *btype;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
-    btype = bt_get_or_create("castle");
-
-    r = findregion(-1, 0);
+    btype = test_create_buildingtype("castle");
+    r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
@@ -104,11 +97,10 @@ static void test_contact(CuTest * tc)
     building_type *btype;
     ally *al;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
-    btype = bt_get_or_create("castle");
-    r = findregion(0, 0);
+    btype = test_create_buildingtype("castle");
+    r = test_create_region(0, 0, 0);
     b = new_building(btype, r, default_locale);
     u1 = test_create_unit(test_create_faction(0), r);
     u2 = test_create_unit(test_create_faction(0), r);
@@ -134,13 +126,12 @@ static void test_enter_building(CuTest * tc)
     building *b;
     race * rc;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     rc = rc_get_or_create("human");
     u = test_create_unit(test_create_faction(rc), r);
-    b = test_create_building(r, bt_get_or_create("castle"));
+    b = test_create_building(r, test_create_buildingtype("castle"));
 
     rc->flags = RCF_WALK;
     u->building = 0;
@@ -489,7 +480,7 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f);
-    btcastle = bt_get_or_create("castle");
+    btcastle = test_create_buildingtype("castle");
     btcastle->taxes = level_taxes;
     b = test_create_building(r, btcastle);
     assert(b);
@@ -530,7 +521,8 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     test_setup();
     setup_pay_cmd(&fix);
     f = fix.u1->faction;
-    b = test_create_building(fix.u1->region, bt_get_or_create("lighthouse"));
+    /* lighthouse is not in the test locale, so we're using castle */
+    b = test_create_building(fix.u1->region, test_create_buildingtype("lighthouse"));
     config_set("rules.region_owners", "1");
     config_set("rules.region_owner_pay_building", "lighthouse");
     update_owners(b->region);
@@ -569,14 +561,13 @@ static void test_new_units(CuTest *tc) {
     region *r;
     const struct locale *loc;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
     f = test_create_faction(NULL);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     assert(r && f);
     u = test_create_unit(f, r);
     assert(u && !u->next);
-    loc = get_locale("de");
+    loc = test_create_locale();
     assert(loc);
     u->orders = create_order(K_MAKETEMP, loc, "hurr");
     new_units();
@@ -598,11 +589,10 @@ void setup_guard(guard_fixture *fix, bool armed) {
     faction *f;
     unit * u;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
     f = test_create_faction(NULL);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     assert(r && f);
     u = test_create_unit(f, r);
     fset(u, UFL_GUARD);
@@ -707,18 +697,18 @@ static void test_reserve_self(CuTest *tc) {
     const resource_type *rtype;
     const struct locale *loc;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
+    init_resources();
 
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     f = test_create_faction(NULL);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     assert(r && f);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
     assert(u1 && u2);
-    loc = get_locale("de");
+    loc = test_create_locale();
     assert(loc);
     ord = create_order(K_RESERVE, loc, "200 SILBER");
     assert(ord);
@@ -741,7 +731,7 @@ static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
 }
 
 static void test_peasant_luck_effect(CuTest *tc) {
-    test_cleanup();
+    test_setup();
 
     config_set("rules.peasants.peasantluck.factor", "10");
     config_set("rules.peasants.growth.factor", "0.001");
@@ -891,7 +881,7 @@ static void test_long_order_normal(CuTest *tc) {
     unit *u;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fset(u, UFL_MOVED);
     fset(u, UFL_LONGACTION);
@@ -909,7 +899,7 @@ static void test_long_order_normal(CuTest *tc) {
 static void test_long_order_none(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     update_long_order(u);
     CuAssertPtrEquals(tc, 0, u->thisorder);
@@ -921,7 +911,7 @@ static void test_long_order_none(CuTest *tc) {
 static void test_long_order_cast(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
@@ -935,7 +925,7 @@ static void test_long_order_cast(CuTest *tc) {
 static void test_long_order_buy_sell(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
@@ -950,7 +940,7 @@ static void test_long_order_buy_sell(CuTest *tc) {
 static void test_long_order_multi_long(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
     unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
@@ -964,7 +954,7 @@ static void test_long_order_multi_long(CuTest *tc) {
 static void test_long_order_multi_buy(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
@@ -978,7 +968,7 @@ static void test_long_order_multi_buy(CuTest *tc) {
 static void test_long_order_multi_sell(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
@@ -993,7 +983,7 @@ static void test_long_order_multi_sell(CuTest *tc) {
 static void test_long_order_buy_cast(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
@@ -1006,7 +996,7 @@ static void test_long_order_buy_cast(CuTest *tc) {
 
 static void test_long_order_hungry(CuTest *tc) {
     unit *u;
-    test_cleanup();
+    test_setup();
     config_set("hunger.long", "1");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     fset(u, UFL_HUNGER);
@@ -1145,7 +1135,7 @@ static void test_ally_cmd(CuTest *tc) {
 
 static void test_nmr_warnings(CuTest *tc) {
     faction *f1, *f2;
-    test_cleanup();
+    test_setup();
     config_set("nmr.timeout", "3");
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
@@ -1166,7 +1156,7 @@ static void test_nmr_warnings(CuTest *tc) {
 static unit * setup_mail_cmd(void) {
     faction *f;
     
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     return test_create_unit(f, test_create_region(0, 0, 0));
 }
@@ -1283,7 +1273,7 @@ static void test_show_without_item(CuTest *tc)
     item *i;
     struct locale *loc;
 
-    test_cleanup();
+    test_setup();
 
     loc = get_or_create_locale("de");
     locale_setstring(loc, parameters[P_ANY], "ALLE");
@@ -1326,7 +1316,7 @@ static void test_show_elf(CuTest *tc) {
     struct locale *loc;
     message * msg;
 
-    test_cleanup();
+    test_setup();
 
     mt_register(mt_new_va("msg_event", "string:string", 0));
     rc = test_create_race("elf");
@@ -1362,7 +1352,7 @@ static void test_show_race(CuTest *tc) {
     struct locale *loc;
     message * msg;
 
-    test_cleanup();
+    test_setup();
 
     mt_register(mt_new_va("msg_event", "string:string", 0));
     test_create_race("human");
@@ -1406,9 +1396,8 @@ static void test_immigration(CuTest * tc)
     double inject[] = { 1 };
     int (*old_wage)(const region*, const faction*, const race*, int) = global.functions.wage;
 
-    test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    test_setup();
+    r = test_create_region(0, 0, 0);
 
     rsetpeasants(r, 0);
     config_set("rules.economy.repopulate_maximum", 0);
@@ -1442,9 +1431,9 @@ static void test_demon_hunger(CuTest * tc)
     unit *u;
     message* msg;
 
-    test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    test_setup();
+    init_resources();
+    r = test_create_region(0, 0, 0);
     rc = test_create_race("demon");
     f = test_create_faction(rc);
     u = test_create_unit(f, r);

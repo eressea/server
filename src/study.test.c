@@ -63,8 +63,6 @@ static void setup_locale(struct locale *lang) {
         if (!locale_getstring(lang, mkname("skill", skillnames[i])))
             locale_setstring(lang, mkname("skill", skillnames[i]), skillnames[i]);
     }
-    locale_setstring(lang, parameters[P_ANY], "ALLE");
-    init_parameters(lang);
     init_skills(lang);
 }
 
@@ -76,10 +74,9 @@ static void setup_study(study_fixture *fix, skill_t sk) {
     assert(fix);
     test_setup();
     config_set("study.random_progress", "0");
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
-    lang = get_or_create_locale(locale_name(f->locale));
+    f->locale = lang = test_create_locale();
     setup_locale(lang);
     fix->u = test_create_unit(f, r);
     assert(fix->u);
@@ -145,7 +142,7 @@ static void test_study_bug_2194(CuTest *tc) {
     test_setup();
     random_source_inject_constant(0.0);
     init_resources();
-    loc = get_or_create_locale("de");
+    loc = test_create_locale();
     setup_locale(loc);
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 2);
@@ -219,7 +216,7 @@ static void test_academy_building(CuTest *tc) {
 
     random_source_inject_constant(0.0);
     init_resources();
-    loc = get_or_create_locale("de");
+    loc = test_create_locale();
     setup_locale(loc);
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 2);

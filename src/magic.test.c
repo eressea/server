@@ -87,8 +87,8 @@ void test_pay_spell(CuTest * tc)
     int level;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    init_resources();
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
@@ -121,8 +121,8 @@ void test_pay_spell_failure(CuTest * tc)
     int level;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    init_resources();
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
@@ -159,8 +159,7 @@ void test_getspell_unit(CuTest * tc)
     struct locale * lang;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     u = test_create_unit(f, r);
     create_mage(u, M_GRAY);
@@ -168,7 +167,7 @@ void test_getspell_unit(CuTest * tc)
 
     set_level(u, SK_MAGIC, 1);
 
-    lang = get_locale("de");
+    lang = test_create_locale();
     sp = create_spell("testspell", 0);
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
@@ -188,8 +187,7 @@ void test_getspell_faction(CuTest * tc)
     struct locale * lang;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -198,7 +196,7 @@ void test_getspell_faction(CuTest * tc)
 
     set_level(u, SK_MAGIC, 1);
 
-    lang = get_locale("de");
+    lang = test_create_locale();
     sp = create_spell("testspell", 0);
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
@@ -220,8 +218,7 @@ void test_getspell_school(CuTest * tc)
     struct spellbook * book;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -229,7 +226,7 @@ void test_getspell_school(CuTest * tc)
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
 
-    lang = get_locale("de");
+    lang = test_create_locale();
     sp = create_spell("testspell", 0);
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
@@ -251,8 +248,7 @@ void test_set_pre_combatspell(CuTest * tc)
     const int index = 0;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -284,8 +280,7 @@ void test_set_main_combatspell(CuTest * tc)
     const int index = 1;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -317,8 +312,7 @@ void test_set_post_combatspell(CuTest * tc)
     const int index = 2;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -349,8 +343,7 @@ void test_hasspell(CuTest * tc)
     struct region * r;
 
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(0);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);

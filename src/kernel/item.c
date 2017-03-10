@@ -981,6 +981,7 @@ void init_resources(void)
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
+    rtype->itype->weight = 1;
     rtype->itype->give = give_money;
 
     rtype = rt_get_or_create(resourcenames[R_HORSE]);

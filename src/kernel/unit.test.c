@@ -225,12 +225,12 @@ static void test_default_name(CuTest *tc) {
     struct locale* lang;
     char buf[32], compare[32];
 
-    test_cleanup();
-    test_create_world();
-    lang = get_or_create_locale("de");
+    test_setup();
+
+    lang = test_create_locale();
     locale_setstring(lang, "unitdefault", "Zweiheit");
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
 
     default_name(u, buf, sizeof(buf));
 
