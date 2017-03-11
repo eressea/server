@@ -1279,8 +1279,8 @@ static void remove_idle_players(void)
             }
             else if (turn != f->lastorders) {
                 char info[256];
-                sprintf(info, "%d Einheiten, %d Personen, %d Silber",
-                    f->no_units, f->num_total, f->money);
+                sprintf(info, "%d Einheiten, %d Personen",
+                    f->no_units, f->num_total);
             }
             fp = &f->next;
         }
