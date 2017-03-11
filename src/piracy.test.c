@@ -116,7 +116,7 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     st_boat = st_get_or_create("boat");
     r = test_create_race("pirates");
     u = test_create_unit(f = test_create_faction(r), test_create_region(0, 0, get_or_create_terrain("ocean")));
-    f->locale = get_or_create_locale("de");
+    f->locale = test_create_locale();
     u->thisorder = create_order(K_PIRACY, f->locale, "");
     assert(u && u->thisorder);
 
