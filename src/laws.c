@@ -3028,8 +3028,6 @@ int checkunitnumber(const faction * f, int add)
 
     alimit = rule_alliance_limit();
     if (alimit) {
-        /* if unitsperalliance is true, maxunits returns the
-         number of units allowed in an alliance */
         faction *f2;
         int unitsinalliance = fno;
         if (unitsinalliance > alimit) {

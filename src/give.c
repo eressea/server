@@ -533,6 +533,23 @@ void give_unit(unit * u, unit * u2, order * ord)
             }
         }
         return;
+    } else {
+        int err = checkunitnumber(u2->faction, 1);
+        if (err) {
+            if (err == 1) {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord,
+                        "too_many_units_in_alliance",
+                        "allowed", rule_alliance_limit()));
+            }
+            else {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord,
+                        "too_many_units_in_faction",
+                        "allowed", rule_faction_limit()));
+            }
+            return;
+        }
     }
 
     if (!alliedunit(u2, u->faction, HELP_GIVE) && ucontact(u2, u) == 0) {

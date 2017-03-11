@@ -5,6 +5,7 @@
 #include "monsters.h"
 
 #include <kernel/ally.h>
+#include <kernel/alliance.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -427,7 +428,51 @@ static void test_unit_limit(CuTest * tc)
     test_cleanup();
 }
 
-extern int checkunitnumber(const faction * f, int add);
+static void test_limit_new_units(CuTest * tc)
+{
+    faction *f;
+    unit *u;
+    alliance *al;
+
+    test_setup();
+    al = makealliance(1, "Hodor");
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    scale_number(u, 10);
+    CuAssertIntEquals(tc, 10, f->num_people);
+    config_set("rules.limit.faction", "2");
+
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
+    new_units();
+    CuAssertPtrNotNull(tc, u->next);
+    CuAssertIntEquals(tc, 2, f->num_units);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_faction"));
+
+    setalliance(f, al);
+
+    config_set("rules.limit.faction", "3");
+    config_set("rules.limit.alliance", "2");
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
+
+    config_set("rules.limit.alliance", "3");
+    u = test_create_unit(test_create_faction(NULL), u->region);
+    setalliance(u->faction, al);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
+
+    test_cleanup();
+}
+
 static void test_cannot_create_unit_above_limit(CuTest * tc)
 {
     faction *f;
@@ -1535,6 +1580,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_fishing_does_not_give_goblins_money);
     SUITE_ADD_TEST(suite, test_fishing_gets_reset);
     SUITE_ADD_TEST(suite, test_unit_limit);
+    SUITE_ADD_TEST(suite, test_limit_new_units);
     SUITE_ADD_TEST(suite, test_update_guards);
     SUITE_ADD_TEST(suite, test_newbie_cannot_guard);
     SUITE_ADD_TEST(suite, test_unarmed_cannot_guard);

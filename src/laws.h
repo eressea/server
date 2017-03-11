@@ -58,6 +58,7 @@ extern "C" {
     void turn_process(void);
     void turn_end(void);
 
+    int checkunitnumber(const struct faction * f, int add);
     void new_units(void);
     void defaultorders(void);
     void quit(void);

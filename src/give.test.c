@@ -54,26 +54,12 @@ static void setup_give(struct give *env) {
     }
 }
 
-static void test_give_unit_to_peasants(CuTest * tc) {
-    struct give env = { 0 };
-    test_setup_ex(tc);
-    env.f1 = test_create_faction(0);
-    env.f2 = 0;
-    setup_give(&env);
-    rsetpeasants(env.r, 0);
-    give_unit(env.src, NULL, NULL);
-    CuAssertIntEquals(tc, 0, env.src->number);
-    CuAssertIntEquals(tc, 1, rpeasants(env.r));
-    test_cleanup();
-}
-
 static void test_give_unit(CuTest * tc) {
     struct give env = { 0 };
     test_setup_ex(tc);
     env.f1 = test_create_faction(0);
     env.f2 = test_create_faction(0);
     setup_give(&env);
-    env.r->terrain = test_create_terrain("ocean", SEA_REGION);
     config_set("rules.give.max_men", "0");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f1, env.src->faction);
@@ -88,7 +74,37 @@ static void test_give_unit(CuTest * tc) {
     test_cleanup();
 }
 
-static void test_give_unit_in_ocean(CuTest * tc) {
+static void test_give_unit_limits(CuTest * tc) {
+    struct give env = { 0 };
+    test_setup_ex(tc);
+    env.f1 = test_create_faction(0);
+    env.f2 = test_create_faction(0);
+    setup_give(&env);
+    CuAssertIntEquals(tc, 1, env.f1->num_units);
+    CuAssertIntEquals(tc, 1, env.f2->num_units);
+    config_set("rules.limit.faction", "1");
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+    CuAssertIntEquals(tc, 1, env.f1->num_units);
+    CuAssertIntEquals(tc, 1, env.f2->num_units);
+    test_cleanup();
+}
+
+static void test_give_unit_to_peasants(CuTest * tc) {
+    struct give env = { 0 };
+    test_setup_ex(tc);
+    env.f1 = test_create_faction(0);
+    env.f2 = 0;
+    setup_give(&env);
+    rsetpeasants(env.r, 0);
+    give_unit(env.src, NULL, NULL);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertIntEquals(tc, 1, rpeasants(env.r));
+    test_cleanup();
+}
+
+static void test_give_unit_to_ocean(CuTest * tc) {
     struct give env = { 0 };
     test_setup_ex(tc);
     env.f1 = test_create_faction(0);
@@ -429,7 +445,8 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
     SUITE_ADD_TEST(suite, test_give_unit);
-    SUITE_ADD_TEST(suite, test_give_unit_in_ocean);
+    SUITE_ADD_TEST(suite, test_give_unit_limits);
+    SUITE_ADD_TEST(suite, test_give_unit_to_ocean);
     SUITE_ADD_TEST(suite, test_give_unit_to_peasants);
     SUITE_ADD_TEST(suite, test_give_peasants);
     SUITE_ADD_TEST(suite, test_give_herbs);
