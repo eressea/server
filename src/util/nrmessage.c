@@ -40,7 +40,7 @@ nrmessage_type *nrt_find(const struct locale * lang,
     const struct message_type * mtype)
 {
     nrmessage_type *found = NULL;
-    unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+    unsigned int hash = mtype->key % NRT_MAXHASH;
     nrmessage_type *type = nrtypes[hash];
     while (type) {
         if (type->mtype == mtype) {
@@ -101,7 +101,7 @@ void
 nrt_register(const struct message_type *mtype, const struct locale *lang,
 const char *string, int level, const char *section)
 {
-    unsigned int hash = hashstring(mtype->name) % NRT_MAXHASH;
+    unsigned int hash = mtype->key % NRT_MAXHASH;
     nrmessage_type *nrt = nrtypes[hash];
     while (nrt && (nrt->lang != lang || nrt->mtype != mtype)) {
         nrt = nrt->next;

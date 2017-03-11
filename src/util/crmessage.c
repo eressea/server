@@ -81,7 +81,7 @@ static crmessage_type *crtypes[CRMAXHASH];
 
 static crmessage_type *crt_find(const struct message_type *mtype)
 {
-    unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
+    unsigned int hash = mtype->key % CRMAXHASH;
     crmessage_type *found = NULL;
     crmessage_type *type = crtypes[hash];
     while (type) {
@@ -94,7 +94,7 @@ static crmessage_type *crt_find(const struct message_type *mtype)
 
 void crt_register(const struct message_type *mtype)
 {
-    unsigned int hash = hashstring(mtype->name) % CRMAXHASH;
+    unsigned int hash = mtype->key % CRMAXHASH;
     crmessage_type *crt = crtypes[hash];
     while (crt && crt->mtype != mtype) {
         crt = crt->next;
