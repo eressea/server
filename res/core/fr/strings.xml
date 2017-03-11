@@ -324,7 +324,7 @@
   <string name="dam">
     <text locale="fr">barrage</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="fr">bâtiment</text>
   </string>
   <string name="harbour">
@@ -457,12 +457,6 @@
   </string>
   <string name="ao_chastity_p">
     <text locale="fr">amulettes de chasteté</text>
-  </string>
-  <string name="aoc">
-    <text locale="fr">amulette du chaton</text>
-  </string>
-  <string name="aoc_p">
-    <text locale="fr">amulettes du chaton</text>
   </string>
   <string name="aod">
     <text locale="fr">amulette de ténčbres</text>
@@ -1912,10 +1906,10 @@
     <string name="zombie">
       <text locale="fr">zombie</text>
     </string>
-    <string name="juju-zombie_p">
+    <string name="juju_p">
       <text locale="fr">zombies juju</text>
     </string>
-    <string name="juju-zombie">
+    <string name="juju">
       <text locale="fr">zombie juju</text>
     </string>
     <string name="ghoul_p">

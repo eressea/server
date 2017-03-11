@@ -3,7 +3,6 @@
 #include "types.h"
 #include "ally.h"
 
-#include "save.h"
 #include "unit.h"
 #include "region.h"
 #include "group.h"
@@ -77,7 +76,7 @@ int AllianceAuto(void)
     const char *str = config_get("alliance.auto");
     value = 0;
     if (str != NULL) {
-        char *sstr = _strdup(str);
+        char *sstr = strdup(str);
         char *tok = strtok(sstr, " ");
         while (tok) {
             value |= ally_flag(tok, -1);
@@ -133,19 +132,21 @@ attrib_type at_npcfaction = {
 */
 int HelpMask(void)
 {
-    const char *str = config_get("rules.help.mask");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = _strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
+    static int config, rule = 0;
+    if (config_changed(&config)) {
+        const char *str = config_get("rules.help.mask");
+        if (str != NULL) {
+            char *sstr = strdup(str);
+            char *tok = strtok(sstr, " ");
+            while (tok) {
+                rule |= ally_flag(tok, -1);
+                tok = strtok(NULL, " ");
+            }
+            free(sstr);
         }
-        free(sstr);
-    }
-    else {
-        rule = HELP_ALL;
+        else {
+            rule = HELP_ALL;
+        }
     }
     return rule;
 }
@@ -155,7 +156,7 @@ static int AllianceRestricted(void)
     const char *str = config_get("alliance.restricted");
     int rule = 0;
     if (str != NULL) {
-        char *sstr = _strdup(str);
+        char *sstr = strdup(str);
         char *tok = strtok(sstr, " ");
         while (tok) {
             rule |= ally_flag(tok, -1);

@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "volcano.h"
 #include "economy.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 #include "chaos.h"
 #include "study.h"
@@ -67,10 +67,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/iceberg.h>
 extern struct attrib_type at_unitdissolve;
-extern struct attrib_type at_orcification;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
- * auflöst, in a->data.ca[0] kann angegeben werden, wohin die Personen
+ * auflï¿½st, in a->data.ca[0] kann angegeben werden, wohin die Personen
  * verschwinden. Passiert bereits in der ersten Runde! */
 static void dissolve_units(void)
 {
@@ -443,12 +442,12 @@ static void melt_iceberg(region * r)
             ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
         }
 
-    /* driftrichtung löschen */
+    /* driftrichtung lï¿½schen */
     a = a_find(r->attribs, &at_iceberg);
     if (a)
         a_remove(&r->attribs, a);
 
-    /* Gebäude löschen */
+    /* Gebï¿½ude lï¿½schen */
     while (r->buildings) {
         remove_building(&r->buildings, r->buildings);
     }
@@ -456,7 +455,7 @@ static void melt_iceberg(region * r)
     /* in Ozean wandeln */
     terraform_region(r, newterrain(T_OCEAN));
 
-    /* Einheiten, die nicht schwimmen können oder in Schiffen sind,
+    /* Einheiten, die nicht schwimmen kï¿½nnen oder in Schiffen sind,
      * ertrinken */
     drown(r);
 }
@@ -520,13 +519,13 @@ static void move_iceberg(region * r)
                 freset(sh, SF_SELECT);
 
             for (sh = r->ships; sh; sh = sh->next) {
-                /* Meldung an Kapitän */
+                /* Meldung an Kapitï¿½n */
                 double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
 
-            /* Personen, Schiffe und Gebäude verschieben */
+            /* Personen, Schiffe und Gebï¿½ude verschieben */
             while (rc->buildings) {
                 rc->buildings->region = r;
                 translist(&rc->buildings, &r->buildings, rc->buildings);
@@ -545,7 +544,7 @@ static void move_iceberg(region * r)
                 u_set_building(u, b); /* undo leave-prevention */
             }
 
-            /* Beschädigte Schiffe können sinken */
+            /* Beschï¿½digte Schiffe kï¿½nnen sinken */
 
             for (sh = r->ships; sh;) {
                 shn = sh->next;
@@ -726,16 +725,21 @@ static void orc_growth(void)
     }
 }
 
-/** Talente von Dämonen verschieben sich.
+/** Talente von Dï¿½monen verschieben sich.
  */
 static void demon_skillchanges(void)
 {
     region *r;
+    static const race *rc_demon;
+    static int rc_cache;
 
+    if (rc_changed(&rc_cache)) {
+        rc_demon = get_race(RC_DAEMON);
+    }
     for (r = regions; r; r = r->next) {
         unit *u;
         for (u = r->units; u; u = u->next) {
-            if (u_race(u) == get_race(RC_DAEMON)) {
+            if (u_race(u) == rc_demon) {
                 demon_skillchange(u);
             }
         }
@@ -756,7 +760,7 @@ static void icebergs(void)
 }
 
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
-#define HERBROTCHANCE 5         /* Verrottchance für Kräuter (ifdef HERBS_ROT) */
+#define HERBROTCHANCE 5         /* Verrottchance fï¿½r Krï¿½uter (ifdef HERBS_ROT) */
 #ifdef HERBS_ROT
 static void rotting_herbs(void)
 {
@@ -781,7 +785,7 @@ static void rotting_herbs(void)
                 if (fval(itm->type, ITF_HERB)) {
                     double nv = normalvariate(k, k / 4);
                     int inv = (int)nv;
-                    int delta = _min(n, inv);
+                    int delta = MIN(n, inv);
                     if (!i_change(itmp, itm->type, -delta)) {
                         continue;
                     }
@@ -802,44 +806,6 @@ void randomevents(void)
     godcurse();
     orc_growth();
     demon_skillchanges();
-
-    /* Orkifizierte Regionen mutieren und mutieren zurück */
-
-    for (r = regions; r; r = r->next) {
-        if (fval(r, RF_ORCIFIED)) {
-            direction_t dir;
-            double probability = 0.0;
-            for (dir = 0; dir < MAXDIRECTIONS; dir++) {
-                region *rc = rconnect(r, dir);
-                if (rc && rpeasants(rc) > 0 && !fval(rc, RF_ORCIFIED))
-                    probability += 0.02;
-            }
-            if (chance(probability)) {
-                ADDMSG(&r->msgs, msg_message("deorcified", "region", r));
-                freset(r, RF_ORCIFIED);
-            }
-        }
-        else {
-            attrib *a = a_find(r->attribs, &at_orcification);
-            if (a != NULL) {
-                double probability = 0.0;
-                if (rpeasants(r) <= 0)
-                    continue;
-                probability = a->data.i / (double)rpeasants(r);
-                if (chance(probability)) {
-                    fset(r, RF_ORCIFIED);
-                    a_remove(&r->attribs, a);
-                    ADDMSG(&r->msgs, msg_message("orcified", "region", r));
-                }
-                else {
-                    a->data.i -= _max(10, a->data.i / 10);
-                    if (a->data.i <= 0)
-                        a_remove(&r->attribs, a);
-                }
-            }
-        }
-    }
-    
     volcano_update();
     /* Monumente zerfallen, Schiffe verfaulen */
 
@@ -848,7 +814,7 @@ void randomevents(void)
         while (*blist) {
             building *b = *blist;
             if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-                b->size -= _max(1, (b->size * 20) / 100);
+                b->size -= MAX(1, (b->size * 20) / 100);
                 if (b->size == 0) {
                     remove_building(blist, r->buildings);
                 }
@@ -860,22 +826,7 @@ void randomevents(void)
 
     /* monster-einheiten desertieren */
     if (monsters) {
-        for (r = regions; r; r = r->next) {
-            unit *u;
-
-            for (u = r->units; u; u = u->next) {
-                if (u->faction && !is_monsters(u->faction)
-                    && (u_race(u)->flags & RCF_DESERT)) {
-                    if (fval(u, UFL_ISNEW))
-                        continue;
-                    if (rng_int() % 100 < 5) {
-                        ADDMSG(&u->faction->msgs, msg_message("desertion",
-                            "unit region", u, r));
-                        u_setfaction(u, monsters);
-                    }
-                }
-            }
-        }
+        monsters_desert(monsters);
     }
 
     chaos_update();

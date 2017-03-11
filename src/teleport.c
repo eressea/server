@@ -34,7 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 #include "skill.h"
-#include "monster.h"
+#include "monsters.h"
 
 /* libc includes */
 #include <assert.h>
@@ -176,14 +176,16 @@ bool is_astral(const region * r)
 plane *get_astralplane(void)
 {
     plane *astralspace = 0;
-    int rule_astralplane = config_get_int("modules.astralspace", 1);
-
+    static int config;
+    static bool rule_astralplane;
+    
+    if (config_changed(&config)) {
+        rule_astralplane = config_get_int("modules.astralspace", 1) != 0;
+    }
     if (!rule_astralplane) {
         return NULL;
     }
-    if (!astralspace) {
-        astralspace = getplanebyname("Astralraum");
-    }
+    astralspace = getplanebyname("Astralraum");
     if (!astralspace) {
         astralspace = create_new_plane(1, "Astralraum",
             TE_CENTER_X - 500, TE_CENTER_X + 500,

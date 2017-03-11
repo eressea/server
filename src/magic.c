@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2014,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -59,7 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/resolve.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -119,7 +118,7 @@ static double MagicPower(double force)
     if (force > 0) {
         const char *str = config_get("magic.power");
         double value = str ? atof(str) : 1.0;
-        return _max(value * force, 1.0f);
+        return MAX(value * force, 1.0f);
     }
     return 0;
 }
@@ -147,7 +146,7 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->time);
 }
@@ -174,7 +173,7 @@ static void a_initicastle(struct attrib *a)
     a->data.v = calloc(sizeof(icastle_data), 1);
 }
 
-static void a_finalizeicastle(struct attrib *a)
+static void a_finalizeicastle(struct attrib *a) /*-V524 */
 {
     free(a->data.v);
 }
@@ -225,10 +224,14 @@ static void free_mage(attrib * a)
 
 bool FactionSpells(void)
 {
-    return config_get_int("rules.magic.factionlist", 0) != 0;
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.magic.factionlist", 0);
+    }
+    return rule != 0;
 }
 
-void read_spells(struct quicklist **slistp, magic_t mtype, 
+void read_spells(struct selist **slistp, magic_t mtype, 
     struct storage *store)
 {
     for (;;) {
@@ -302,13 +305,13 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
     return AT_READ_OK;
 }
 
-void write_spells(struct quicklist *slist, struct storage *store)
+void write_spells(struct selist *slist, struct storage *store)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
-    for (ql = slist, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)ql_get(ql, qi);
+    for (ql = slist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *)selist_get(ql, qi);
         WRITE_TOK(store, sp->sname);
     }
     WRITE_TOK(store, "end");
@@ -344,7 +347,7 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return i2b(get_mage(u) != NULL);
+    return get_mage(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
@@ -373,7 +376,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoi(token);
+    i = atoip(token);
     if (i != 0) {
         sp = find_spellbyid((unsigned int)i);
     }
@@ -421,13 +424,12 @@ static bool already_seen(const faction * f, const spell * sp)
 void show_new_spells(faction * f, int level, const spellbook *book)
 {
     if (book) {
-        quicklist *ql = book->spells;
+        selist *ql = book->spells;
         int qi;
 
-        for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= level) {
-
                 if (!already_seen(f, sbe->sp)) {
                     attrib * a = a_new(&at_reportspell);
                     spellbook_entry * entry = (spellbook_entry *)a->data.v;
@@ -448,14 +450,14 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
 {
     spellbook_entry *commonspells[MAXSPELLS];
     int qi, numspells = 0;
-    quicklist *ql;
+    selist *ql;
 
     if (level <= f->max_spelllevel) {
         return;
     }
 
-    for (qi = 0, ql = book->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+    for (qi = 0, ql = book->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
         if (sbe->level <= level) {
             commonspells[numspells++] = sbe;
         }
@@ -473,18 +475,20 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 spellno = rng_int() % maxspell;
                 sbe = commonspells[spellno];
                 if (sbe->level > f->max_spelllevel) {
-                    // not going to pick it in this round, move it to the end for later
+                    /* not going to pick it in this round, move it to the end for later */
                     commonspells[spellno] = commonspells[--maxspell];
                     commonspells[maxspell] = sbe;
                     sbe = 0;
                 }
-                else if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                    // already have this spell, remove it from the list of candidates
-                    commonspells[spellno] = commonspells[--numspells];
-                    if (maxspell > numspells) {
-                        maxspell = numspells;
+                else {
+                    if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
+                        /* already have this spell, remove it from the list of candidates */
+                        commonspells[spellno] = commonspells[--numspells];
+                        if (maxspell > numspells) {
+                            maxspell = numspells;
+                        }
+                        sbe = 0;
                     }
-                    sbe = 0;
                 }
             }
 
@@ -540,7 +544,7 @@ int get_combatspelllevel(const unit * u, int nr)
     assert(nr < MAXCOMBATSPELLS);
     if (m) {
         int level = effskill(u, SK_MAGIC, 0);
-        return _min(m->combatspells[nr].level, level);
+        return MIN(m->combatspells[nr].level, level);
     }
     return -1;
 }
@@ -557,10 +561,6 @@ const spell *get_combatspell(const unit * u, int nr)
     if (m) {
         return m->combatspells[nr].sp;
     }
-    else if (u_race(u)->precombatspell != NULL) {
-        return u_race(u)->precombatspell;
-    }
-
     return NULL;
 }
 
@@ -676,7 +676,7 @@ int change_spellpoints(unit * u, int mp)
     }
 
     /* verhindere negative Magiepunkte */
-    sp = _max(m->spellpoints + mp, 0);
+    sp = MAX(m->spellpoints + mp, 0);
     m->spellpoints = sp;
 
     return sp;
@@ -712,7 +712,7 @@ static int use_item_aura(const region * r, const unit * u)
     int sk, n;
 
     sk = effskill(u, SK_MAGIC, r);
-    n = (int)(sk * sk * u_race(u)->maxaura / 4);
+    n = (int)(sk * sk * rc_maxaura(u_race(u)) / 4);
 
     return n;
 }
@@ -720,13 +720,13 @@ static int use_item_aura(const region * r, const unit * u)
 int max_spellpoints(const region * r, const unit * u)
 {
     int sk;
-    double n, msp;
+    double n, msp = 0;
     double potenz = 2.1;
     double divisor = 1.2;
     const struct resource_type *rtype;
 
     sk = effskill(u, SK_MAGIC, r);
-    msp = u_race(u)->maxaura * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
+    msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
 
     rtype = rt_find("aurafocus");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
@@ -736,7 +736,7 @@ int max_spellpoints(const region * r, const unit * u)
     if (n > 0) {
         msp = (msp * n) / 100;
     }
-    return _max((int)msp, 0);
+    return MAX((int)msp, 0);
 }
 
 int change_maxspellpoints(unit * u, int csp)
@@ -771,7 +771,7 @@ int countspells(unit * u, int step)
     count = m->spellcount + step;
 
     /* negative Werte abfangen. */
-    m->spellcount = _max(0, count);
+    m->spellcount = MAX(0, count);
 
     return m->spellcount;
 }
@@ -864,7 +864,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
             }
             else if (sp->components[k].cost == SPC_LEVEL) {
                 costtyp = SPC_LEVEL;
-                cast_level = _min(cast_level, maxlevel);
+                cast_level = MIN(cast_level, maxlevel);
                 /* bei Typ Linear müssen die Kosten in Höhe der Stufe vorhanden
                  * sein, ansonsten schlägt der Spruch fehl */
             }
@@ -882,7 +882,7 @@ int eff_spelllevel(unit * u, const spell * sp, int cast_level, int range)
         if (sb) {
             spellbook_entry * sbe = spellbook_get(sb, sp);
             if (sbe) {
-                return _min(cast_level, sbe->level);
+                return MIN(cast_level, sbe->level);
             }
         }
         log_error("spell %s is not in the spellbook for %s\n", sp->sname, unitname(u));
@@ -1027,9 +1027,8 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
 double
 spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order *ord)
 {
-    curse *c;
     double force = cast_level;
-    int elf_power;
+    static int elf_power, config;
     const struct resource_type *rtype;
 
     if (sp == NULL) {
@@ -1042,55 +1041,66 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         if (btype && btype->flags & BTF_MAGIC) ++force;
     }
 
-    elf_power = config_get_int("rules.magic.elfpower", 0);
-
-    if (elf_power && u_race(u) == get_race(RC_ELF) && r_isforest(r)) {
-        ++force;
+    if (config_changed(&config)) {
+        elf_power = config_get_int("rules.magic.elfpower", 0);
+    }
+    if (elf_power) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (u_race(u) == rc_elf && r_isforest(r)) {
+            ++force;
+        }
     }
     rtype = rt_find("rop");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
         ++force;
     }
 
-    /* Antimagie in der Zielregion */
-    c = get_curse(r->attribs, ct_find("antimagiczone"));
-    if (curse_active(c)) {
-        unit *mage = c->magician;
-        force -= curse_geteffect(c);
-        curse_changevigour(&r->attribs, c, -cast_level);
-        cmistake(u, ord, 185, MSG_MAGIC);
-        if (mage != NULL && mage->faction != NULL) {
-            if (force > 0) {
-                ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
-                    "self mage region", mage, u, r));
+    if (r->attribs) {
+        curse *c;
+
+        /* Antimagie in der Zielregion */
+        c = get_curse(r->attribs, ct_find("antimagiczone"));
+        if (curse_active(c)) {
+            unit *mage = c->magician;
+            force -= curse_geteffect(c);
+            curse_changevigour(&r->attribs, c, -cast_level);
+            cmistake(u, ord, 185, MSG_MAGIC);
+            if (mage != NULL && mage->faction != NULL) {
+                if (force > 0) {
+                    ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
+                        "self mage region", mage, u, r));
+                }
+                else {
+                    ADDMSG(&mage->faction->msgs, msg_message("block_spell",
+                        "self mage region", mage, u, r));
+                }
             }
-            else {
-                ADDMSG(&mage->faction->msgs, msg_message("block_spell",
-                    "self mage region", mage, u, r));
+        }
+
+        /* Patzerfluch-Effekt: */
+        c = get_curse(r->attribs, ct_find("fumble"));
+        if (curse_active(c)) {
+            unit *mage = c->magician;
+            force -= curse_geteffect(c);
+            curse_changevigour(&u->attribs, c, -1);
+            cmistake(u, ord, 185, MSG_MAGIC);
+            if (mage != NULL && mage->faction != NULL) {
+                if (force > 0) {
+                    ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
+                        "self mage region", mage, u, r));
+                }
+                else {
+                    ADDMSG(&mage->faction->msgs, msg_message("block_spell",
+                        "self mage region", mage, u, r));
+                }
             }
         }
     }
-
-    /* Patzerfluch-Effekt: */
-    c = get_curse(r->attribs, ct_find("fumble"));
-    if (curse_active(c)) {
-        unit *mage = c->magician;
-        force -= curse_geteffect(c);
-        curse_changevigour(&u->attribs, c, -1);
-        cmistake(u, ord, 185, MSG_MAGIC);
-        if (mage != NULL && mage->faction != NULL) {
-            if (force > 0) {
-                ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
-                    "self mage region", mage, u, r));
-            }
-            else {
-                ADDMSG(&mage->faction->msgs, msg_message("block_spell",
-                    "self mage region", mage, u, r));
-            }
-        }
-    }
-
-    return _max(force, 0);
+    return MAX(force, 0);
 }
 
 /* ------------------------------------------------------------- */
@@ -1125,27 +1135,29 @@ static int farcasting(unit * magician, region * r)
 
 /* allgemeine Magieresistenz einer Einheit,
  * reduziert magischen Schaden */
-double magic_resistance(unit * target)
+variant magic_resistance(unit * target)
 {
     attrib *a;
     curse *c;
     const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     const race *rc = u_race(target);
-    double probability = rc->magres;
+    variant v, prob = rc_magres(rc);
     const plane *pl = rplane(target->region);
 
     if (rc == get_race(RC_HIRNTOETER) && !pl) {
-        probability /= 2;
+        prob.sa[1] *= 2;
     }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
-    probability += effskill(target, SK_MAGIC, 0) * 0.05;
+    prob = frac_add(prob, frac_make(effskill(target, SK_MAGIC, 0), 20));
 
     /* Auswirkungen von Zaubern auf der Einheit */
     c = get_curse(target->attribs, ct_find("magicresistance"));
     if (c) {
-        probability += 0.01 * curse_geteffect(c) * get_cursedmen(target, c);
+        /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+        int effect = curse_geteffect_int(c) * get_cursedmen(target, c);
+        prob = frac_add(prob, frac_make(effect, 100));
     }
 
     /* Unicorn +10 */
@@ -1153,7 +1165,7 @@ double magic_resistance(unit * target)
     if (rtype) {
         int n = i_get(target->items, rtype->itype);
         if (n) {
-            probability += n * 0.1 / target->number;
+            prob = frac_add(prob, frac_make(n, target->number * 10));
         }
     }
 
@@ -1170,13 +1182,15 @@ double magic_resistance(unit * target)
         if (mage != NULL) {
             if (ct_goodresist && c->type == ct_goodresist) {
                 if (alliedunit(mage, target->faction, HELP_GUARD)) {
-                    probability += curse_geteffect(c) * 0.01;
+                    /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+                    prob = frac_add(prob, frac_make(curse_geteffect_int(c), 100));
                     ct_goodresist = 0; /* only one effect per region */
                 }
             }
             else if (ct_badresist && c->type == ct_badresist) {
                 if (!alliedunit(mage, target->faction, HELP_GUARD)) {
-                    probability -= curse_geteffect(c) * 0.01;
+                    /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
+                    prob = frac_sub(prob, frac_make(curse_geteffect_int(c), 100));
                     ct_badresist = 0; /* only one effect per region */
                 }
             }
@@ -1192,11 +1206,18 @@ double magic_resistance(unit * target)
         const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         /* gesegneter Steinkreis gibt 30% dazu */
-        if (btype)
-            probability += btype->magresbonus * 0.01;
+        if (btype) {
+            /* TODO: legacy. building-bonus is an integer-percentage */
+            prob = frac_add(prob, frac_make(btype->magresbonus, 100));
+        }
     }
 
-    return (probability<0.9) ? probability : 0.9;
+    /* resistance must never be more than 90% */
+    v = frac_make(9, 10);
+    if (frac_sign(frac_sub(prob, v)) > 0) { /* prob < 90% */
+        return v; /* at most 90% */
+    }
+    return prob;
 }
 
 /* ------------------------------------------------------------- */
@@ -1213,12 +1234,12 @@ double magic_resistance(unit * target)
 bool
 target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 {
-    double probability = 0.0;
+    variant v02p, v98p, prob = frac_make(t_bonus, 100);
+    attrib *a = NULL;
 
-    if (magician == NULL)
+    if (magician == NULL || obj == NULL) {
         return true;
-    if (obj == NULL)
-        return true;
+    }
 
     switch (objtyp) {
     case TYP_UNIT:
@@ -1227,6 +1248,9 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
+        if (u_race(u)==get_race(RC_SPELL)) {
+            return true;
+        }
         at = effskill(magician, SK_MAGIC, 0);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
@@ -1235,43 +1259,56 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
                 pa = sk;
         }
 
-        /* Contest */
-        probability = 0.05 * (10 + pa - at);
-
-        probability += magic_resistance((unit *)obj);
+        /* Contest, probability = 0.05 * (10 + pa - at); */
+        prob = frac_add(prob, frac_make(10 + pa - at, 20));
+        prob = frac_add(prob, magic_resistance((unit *)obj));
         break;
     }
 
     case TYP_REGION:
-        /* Bonus durch Zauber */
+        /* Bonus durch Zauber
         probability +=
-            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0);
+            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((region *)obj)->attribs;
         break;
 
     case TYP_BUILDING:
-        /* Bonus durch Zauber */
+        /* Bonus durch Zauber
         probability +=
-            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0);
-
-        /* Bonus durch Typ */
-        probability += 0.01 * ((building *)obj)->type->magres;
-
+            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((building *)obj)->attribs;
+        /* Bonus durch Typ
+        probability += 0.01 * ((building *)obj)->type->magres; */
+        prob = frac_add(prob, ((building *)obj)->type->magres);
         break;
 
     case TYP_SHIP:
         /* Bonus durch Zauber */
-        probability +=
-            0.01 * get_curseeffect(((ship *)obj)->attribs, C_RESIST_MAGIC, 0);
+        a = ((ship *)obj)->attribs;
         break;
     }
 
-    probability = _max(0.02, probability + t_bonus * 0.01);
-    probability = _min(0.98, probability);
+    if (a) {
+        const struct curse_type *ct_resist = ct_find(oldcursename(C_RESIST_MAGIC));
+        curse * c = get_curse(a, ct_resist);
+        int effect = curse_geteffect_int(c);
+        prob = frac_add(prob, frac_make(effect, 100));
+    }
+
+    /* ignore results < 2% and > 98% */
+    v02p = frac_make(1, 50);
+    v98p = frac_make(49, 50);
+    if (frac_sign(frac_sub(prob, v02p)) < 0) {
+        prob = v02p;
+    }
+    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
+        prob = v98p;
+    }
 
     /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
      * false, wenn sie gleich oder größer ist, dh je größer die
      * Magieresistenz (chance) desto eher gibt die Funktion true zurück */
-    return chance(probability);
+    return rng_int() % prob.sa[1] < prob.sa[0];
 }
 
 /* ------------------------------------------------------------- */
@@ -1408,7 +1445,7 @@ static void do_fumble(castorder * co)
 
     case 2:
         /* temporary skill loss */
-        duration = _max(rng_int() % level / 2, 2);
+        duration = MAX(rng_int() % level / 2, 2);
         effect = level / -2.0;
         c = create_curse(u, &u->attribs, ct_find("skillmod"), level,
             duration, effect, 1);
@@ -1516,14 +1553,14 @@ void regenerate_aura(void)
                     reg_aura -= regen;
                     if (chance(reg_aura))
                         ++regen;
-                    regen = _max(1, regen);
-                    regen = _min((auramax - aura), regen);
+                    regen = MAX(1, regen);
+                    regen = MIN((auramax - aura), regen);
 
                     aura += regen;
                     ADDMSG(&u->faction->msgs, msg_message("regenaura",
                         "unit region amount", u, r, regen));
                 }
-                set_spellpoints(u, _min(aura, auramax));
+                set_spellpoints(u, MIN(aura, auramax));
             }
         }
     }
@@ -1840,7 +1877,7 @@ static int addparam_string(const char *const param[], spllprm ** spobjp)
 
     spobj->flag = 0;
     spobj->typ = SPP_STRING;
-    spobj->data.xs = _strdup(param[0]);
+    spobj->data.xs = strdup(param[0]);
     return 1;
 }
 
@@ -2154,7 +2191,7 @@ typedef struct familiar_data {
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
-    return i2b(a != NULL);
+    return a != NULL;
 }
 
 static void
@@ -2415,7 +2452,7 @@ static int age_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     return (u != NULL && u->number > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
@@ -2554,7 +2591,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     /* für Syntax ' STUFE x REGION y z ' */
     if (param == P_LEVEL) {
         int p = getint();
-        level = _min(p, level);
+        level = MIN(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
             syntax_error(u, ord);
@@ -2584,7 +2621,7 @@ static castorder *cast_cmd(unit * u, order * ord)
      * hier nach REGION nochmal auf STUFE prüfen */
     if (param == P_LEVEL) {
         int p = getint();
-        level = _min(p, level);
+        level = MIN(p, level);
         if (level < 1) {
             /* Fehler "Das macht wenig Sinn" */
             syntax_error(u, ord);
@@ -2715,7 +2752,7 @@ static castorder *cast_cmd(unit * u, order * ord)
              * löschen, zaubern kann er noch */
             range *= 2;
             set_order(&caster->thisorder, NULL);
-            level = _min(level, effskill(caster, SK_MAGIC, 0) / 2);
+            level = MIN(level, effskill(caster, SK_MAGIC, 0) / 2);
         }
     }
     /* Weitere Argumente zusammenbasteln */
@@ -2738,7 +2775,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                     break;
                 }
             }
-            params[p++] = _strdup(s);
+            params[p++] = strdup(s);
         }
         params[p] = 0;
         args =
@@ -2780,6 +2817,8 @@ void magic(void)
     int rank;
     castorder *co;
     spellrank spellranks[MAX_SPELLRANK];
+    const race *rc_spell = get_race(RC_SPELL);
+    const race *rc_insect = get_race(RC_INSECT);
 
     memset(spellranks, 0, sizeof(spellranks));
 
@@ -2788,10 +2827,10 @@ void magic(void)
         for (u = r->units; u; u = u->next) {
             order *ord;
 
-            if (u->number <= 0 || u_race(u) == get_race(RC_SPELL))
+            if (u->number <= 0 || u_race(u) == rc_spell)
                 continue;
 
-            if (u_race(u) == get_race(RC_INSECT) && r_insectstalled(r) &&
+            if (u_race(u) == rc_insect && r_insectstalled(r) &&
                 !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
                 continue;
 
@@ -2930,6 +2969,7 @@ const char *spell_info(const spell * sp, const struct locale *lang)
     return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
+/* TODO: should take the name, not the spell (spellref optimizations) */
 const char *spell_name(const spell * sp, const struct locale *lang)
 {
     return LOC(lang, mkname("spell", sp->sname));
@@ -2941,23 +2981,22 @@ const char *curse_name(const curse_type * ctype, const struct locale *lang)
 }
 
 static void select_spellbook(void **tokens, spellbook *sb, const struct locale * lang) {
-    quicklist * ql;
+    selist * ql;
     int qi;
 
     assert(sb);
     assert(lang);
 
-    for (qi = 0, ql = sb->spells; ql; ql_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-        spell *sp = sbe->sp;
+    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
+        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
 
-        const char *n = spell_name(sp, lang);
+        const char *n = spell_name(sbe->sp, lang);
         if (!n) {
-            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sbe->sp->sname);
         }
         else {
             variant token;
-            token.v = sp;
+            token.v = sbe->sp;
             addtoken((struct tnode **)tokens, n, token);
         }
     }
@@ -2972,7 +3011,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
     if (sb) {
         select_spellbook(&tokens, sb, lang);
     }
-#if 0 // TODO: some familiars can cast spells from the mage's spellbook?
+#if 0 /* TODO: some familiars can cast spells from the mage's spellbook? */
     u = get_familiar_mage(u);
     if (u) {
         sb = unit_get_spellbook(u);

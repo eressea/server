@@ -200,7 +200,7 @@ static void test_build_with_potion(CuTest *tc) {
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    scale_number(u, 2); // OBS: this scales the effects, too:
+    scale_number(u, 2); /* OBS: this scales the effects, too: */
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
     CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
@@ -318,7 +318,7 @@ unit *test_create_guard(region *r, faction *f, race *rc) {
         f = test_create_faction(rc);
     }
     ug = test_create_unit(f, r);
-    guard(ug, GUARD_TAX);
+    setguard(ug, true);
 
     return ug;
 }
@@ -345,7 +345,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
 
     test_clear_messages(f);
-    guard(ug, GUARD_NONE);
+    setguard(ug, false);
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 99, rroad(r, D_EAST));

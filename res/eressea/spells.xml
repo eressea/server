@@ -471,9 +471,6 @@
   <spell name="aura_of_fear" rank="5" index="175" combat="2">
     <resource name="aura" amount="12" cost="fixed"/>
   </spell>
-  <spell name="shadowcall" rank="5" index="176" combat="1">
-    <resource name="aura" amount="24" cost="fixed"/>
-  </spell>
   <spell name="mallorntreegrow" rank="5" index="177" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
     <resource name="mallorn" amount="1" cost="level"/>

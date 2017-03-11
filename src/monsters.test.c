@@ -10,7 +10,6 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include "monster.h"
 #include "monsters.h"
 #include "guard.h"
 #include "reports.h"
@@ -74,7 +73,7 @@ static void test_monsters_attack(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
 
-    guard(m, GUARD_TAX);
+    setguard(m, true);
 
     config_set("rules.monsters.attack_chance", "1");
 
@@ -91,7 +90,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
     unit *u, *m;
 
     create_monsters(&f, &f2, &u, &m);
-    r = findregion(-1, 0); // ocean
+    r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
@@ -111,7 +110,7 @@ static void test_monsters_waiting(CuTest * tc)
     unit *u, *m;
 
     create_monsters(&f, &f2, &u, &m);
-    guard(m, GUARD_TAX);
+    setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false, false);
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
@@ -126,7 +125,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     race *rc;
 
     create_monsters(&f, &f2, &u, &m);
-    r = findregion(-1, 0); // ocean
+    r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
@@ -150,8 +149,8 @@ static void test_monsters_attack_not(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
 
-    guard(m, GUARD_TAX);
-    guard(u, GUARD_TAX);
+    setguard(m, true);
+    setguard(u, true);
 
     config_set("rules.monsters.attack_chance", "0");
 
@@ -170,7 +169,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     create_monsters(&f, &f2, &u, &m);
     init_resources();
 
-    guard(m, GUARD_TAX);
+    setguard(m, true);
     set_level(m, SK_WEAPONLESS, 10);
 
     rsetmoney(findregion(0, 0), 1);
@@ -199,7 +198,7 @@ static void test_dragon_moves(CuTest * tc)
 
     create_monsters(&f, &f2, &u, &m);
     rsetmoney(findregion(1, 0), 1000);
-    r = findregion(0, 0); // plain
+    r = findregion(0, 0); /* plain */
     rsetpeasants(r, 0);
     rsetmoney(r, 0);
 

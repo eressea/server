@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 #include "objtypes.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +32,8 @@ extern "C" {
     struct curse_type;
     struct gamedata;
     struct storage;
+    struct attrib;
+    struct faction;
 
     /* Sprueche in der struct region und auf Einheiten, Schiffen oder Burgen
      * (struct attribute)
@@ -206,7 +210,7 @@ extern "C" {
     typedef struct curse {
         variant data;               /* pointer auf spezielle curse-unterstructs */
         struct curse *nexthash;
-        const curse_type *type;      /* Zeiger auf ein curse_type-struct */
+        const curse_type *type;     /* Zeiger auf ein curse_type-struct */
         struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
         double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
         double effect;
@@ -280,7 +284,6 @@ extern "C" {
      * */
     struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
-    int find_cursebyname(const char *c);
     const curse_type *ct_find(const char *c);
     bool ct_changed(int *cache);
     void ct_register(const curse_type *);

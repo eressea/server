@@ -64,11 +64,11 @@ void log_destroy(log_t *handle) {
 #define LOG_MAXBACKUPS 5
 
 static int
-cp_convert(const char *format, char *buffer, size_t length, int codepage)
+cp_convert(const char *format, unsigned char *buffer, size_t length, int codepage)
 {
     /* when console output on MSDOS, convert to codepage */
     const char *input = format;
-    char *pos = buffer;
+    unsigned char *pos = buffer;
 
     while (pos + 1 < buffer + length && *input) {
         size_t size = 0;
@@ -137,7 +137,7 @@ static int check_dupe(const char *format, int level)
     static char last_message[32]; /* STATIC_XCALL: used across calls */
     static int dupes = 0;         /* STATIC_XCALL: used across calls */
     if (strncmp(last_message, format, sizeof(last_message)) == 0) {
-        // TODO: C6054: String 'last_message' might not be zero - terminated.
+        /* TODO: C6054: String 'last_message' might not be zero - terminated. */
         ++dupes;
         return 1;
     }
@@ -157,10 +157,10 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
 {
     if (codepage) {
         char buffer[MAXLENGTH];
-        char converted[MAXLENGTH];
+        unsigned char converted[MAXLENGTH];
         vsnprintf(buffer, sizeof(buffer), format, args);
         if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
-            fputs(converted, stream);
+            fputs((char *)converted, stream);
         }
         else {
             /* fall back to non-converted output */
@@ -197,16 +197,16 @@ static void log_write(int flags, const char *module, const char *format, va_list
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
             int dupe = 0;
-            va_list copy;
-
-            va_copy(copy, args);
             if (lg->flags & LOG_BRIEF) {
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
+                va_list copy;
+
+                va_copy(copy, args);
                 lg->log(lg->data, level, NULL, format, copy);
+                va_end(copy);
             }
-            va_end(copy);
         }
     }
 }
@@ -220,7 +220,7 @@ void log_fatal(const char *format, ...)
     va_end(args);
 }
 
-void log_error(const char *format, ...)
+void log_error(const char *format, ...) /*-V524 */
 {
     va_list args;
     va_start(args, format);

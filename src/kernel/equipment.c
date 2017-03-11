@@ -25,10 +25,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 #include "faction.h"
 #include "race.h"
-#include "spellbook.h"
+#include "spell.h"
 
 /* util includes */
-#include <quicklist.h>
+#include <selist.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -39,7 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static equipment *equipment_sets;
 
-equipment *create_equipment(const char *eqname)
+equipment *get_or_create_equipment(const char *eqname)
 {
     equipment **eqp = &equipment_sets;
     for (;;) {
@@ -47,7 +47,7 @@ equipment *create_equipment(const char *eqname)
         int i = eq ? strcmp(eq->name, eqname) : 1;
         if (i > 0) {
             eq = (equipment *)calloc(1, sizeof(equipment));
-            eq->name = _strdup(eqname);
+            eq->name = strdup(eqname);
             eq->next = *eqp;
             memset(eq->skills, 0, sizeof(eq->skills));
             *eqp = eq;
@@ -78,7 +78,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
     if (eq != NULL) {
         if (value != NULL) {
-            eq->skills[sk] = _strdup(value);
+            eq->skills[sk] = strdup(value);
         }
         else if (eq->skills[sk]) {
             free(eq->skills[sk]);
@@ -86,13 +86,18 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
     }
 }
 
-void equipment_addspell(equipment * eq, struct spell * sp, int level)
+typedef struct lazy_spell {
+    struct spellref *spref;
+    int level;
+} lazy_spell;
+
+void equipment_addspell(equipment * eq, const char * name, int level)
 {
     if (eq) {
-        if (!eq->spellbook) {
-            eq->spellbook = create_spellbook(0);
-        }
-        spellbook_add(eq->spellbook, sp, level);
+        lazy_spell *ls = malloc(sizeof(lazy_spell));
+        ls->spref = spellref_create(NULL, name);
+        ls->level = level;
+        selist_push(&eq->spells, ls);
     }
 }
 
@@ -108,7 +113,7 @@ equipment_setitem(equipment * eq, const item_type * itype, const char *value)
             if (idata == NULL) {
                 idata = (itemdata *)malloc(sizeof(itemdata));
                 idata->itype = itype;
-                idata->value = _strdup(value);
+                idata->value = strdup(value);
                 idata->next = eq->items;
                 eq->items = idata;
             }
@@ -148,14 +153,15 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
         }
 
         if (mask & EQUIP_SPELLS) {
-            if (eq->spellbook) {
-                quicklist * ql = eq->spellbook->spells;
+            if (eq->spells) {
+                selist * ql = eq->spells;
                 int qi;
                 sc_mage * mage = get_mage(u);
 
-                for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-                    spellbook_entry *sbe = (spellbook_entry *)ql_get(ql, qi);
-                    unit_add_spell(u, mage, sbe->sp, sbe->level);
+                for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+                    lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
+                    spell *sp = spellref_get(sbe->spref);
+                    unit_add_spell(u, mage, sp, sbe->level);
                 }
             }
         }
@@ -224,6 +230,12 @@ void equip_items(struct item **items, const struct equipment *eq)
     }
 }
 
+void free_ls(void *arg) {
+    lazy_spell *ls = (lazy_spell*)arg;
+    spellref_free(ls->spref);
+    free(ls);
+}
+
 void equipment_done(void) {
     equipment **eqp = &equipment_sets;
     while (*eqp) {
@@ -231,9 +243,9 @@ void equipment_done(void) {
         equipment *eq = *eqp;
         *eqp = eq->next;
         free(eq->name);
-        if (eq->spellbook) {
-            spellbook_clear(eq->spellbook);
-            free(eq->spellbook);
+        if (eq->spells) {
+            selist_foreach(eq->spells, free_ls);
+            selist_free(eq->spells);
         }
         while (eq->items) {
             itemdata *next = eq->items->next;
@@ -241,7 +253,7 @@ void equipment_done(void) {
             free(eq->items);
             eq->items = next;
         }
-        // TODO: subsets, skills
+        /* TODO: subsets, skills */
         for (i=0;i!=MAXSKILLS;++i) {
             free(eq->skills[i]);
         }

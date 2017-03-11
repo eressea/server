@@ -40,7 +40,7 @@ struct race *test_create_race(const char *name)
     race *rc = rc_get_or_create(name);
     rc->maintenance = 10;
     rc->hitpoints = 20;
-    rc->maxaura = 1.0;
+    rc->maxaura = 100;
     rc->ec_flags |= GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
@@ -196,9 +196,15 @@ static void test_reset(void) {
     }
 }
 
-void test_setup(void) {
+void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
+    if (tc) {
+        log_debug("start test: %s", tc->name);
+    }
+    else {
+        log_debug("start test in %s:%d", file, line);
+    }
 }
 
 void test_cleanup(void)
@@ -211,14 +217,24 @@ terrain_type *
 test_create_terrain(const char * name, unsigned int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+    if (flags & LAND_REGION) {
+        t->size = 1000;
+    }
     t->flags = flags;
     return t;
 }
 
 building * test_create_building(region * r, const building_type * btype)
 {
-    building * b = new_building(btype ? btype : test_create_buildingtype("castle"), r, default_locale);
-    b->size = b->type->maxsize > 0 ? b->type->maxsize : 1;
+    building * b;
+    assert(r);
+    if (!btype) {
+        building_type *bt_castle = test_create_buildingtype("castle");
+        bt_castle->flags |= BTF_FORTIFICATION;
+        btype = bt_castle;
+    }
+    b = new_building(btype, r, default_locale);
+    b->size = btype->maxsize > 0 ? btype->maxsize : 1;
     return b;
 }
 
@@ -450,6 +466,14 @@ struct message * test_find_messagetype_ex(struct message_list *msgs, const char 
 struct message * test_find_messagetype(struct message_list *msgs, const char *name)
 {
     return test_find_messagetype_ex(msgs, name, NULL);
+}
+
+void test_clear_messagelist(message_list **msgs) {
+    if (*msgs) {
+        free_messagelist((*msgs)->begin);
+        free(*msgs);
+        *msgs = NULL;
+    }
 }
 
 void test_clear_messages(faction *f) {

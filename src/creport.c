@@ -1,4 +1,4 @@
-﻿/*
+/*
 +-------------------+  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
 | (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -11,6 +11,8 @@ without prior permission by the authors of Eressea.
 #include <kernel/config.h>
 #include <kernel/version.h>
 #include "creport.h"
+#include "market.h"
+#include "guard.h"
 #include "travelthru.h"
 
 /* tweakable features */
@@ -23,7 +25,6 @@ without prior permission by the authors of Eressea.
 
 /* attributes include */
 #include <attributes/follow.h>
-#include <attributes/orcification.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
@@ -57,7 +58,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/save.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -68,8 +68,9 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <filestream.h>
+#include <stream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -124,7 +125,7 @@ static const char *translate(const char *key, const char *value)
         }
         else
             t = malloc(sizeof(translation));
-        t->key = _strdup(key);
+        t->key = strdup(key);
         t->value = value;
         t->next = translation_table[kk];
         translation_table[kk] = t;
@@ -177,7 +178,7 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
 }
 
 static void
-cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t typ)
+cr_output_curses(struct stream *out, const faction * viewer, const void *obj, objtype_t typ)
 {
     bool header = false;
     attrib *a = NULL;
@@ -185,9 +186,9 @@ cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-     * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+     * Gebaeuden und Schiffen je nach, ob man Besitzer ist, verschieden.
      * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-     * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+     * Spezialfaelle (besonderes Talent, verursachender Magier usw. werde
      * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -285,7 +286,7 @@ cr_output_curses(stream *out, const faction * viewer, const void *obj, objtype_t
 }
 
 static void cr_output_curses_compat(FILE *F, const faction * viewer, const void *obj, objtype_t typ) {
-    // TODO: eliminate this function
+    /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
     cr_output_curses(&strm, viewer, obj, typ);
@@ -360,7 +361,7 @@ static int cr_race(variant var, char *buffer, const void *userdata)
 static int cr_alliance(variant var, char *buffer, const void *userdata)
 {
     const alliance *al = (const alliance *)var.v;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (al != NULL) {
         sprintf(buffer, "%d", al->id);
     }
@@ -371,7 +372,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (sk != NOSKILL)
         sprintf(buffer, "\"%s\"",
         translate(mkname("skill", skillnames[sk]), skillname(sk,
@@ -384,7 +385,7 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 static int cr_order(variant var, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
     if (ord != NULL) {
         char cmd[ORDERSIZE];
         char *wp = buffer;
@@ -711,12 +712,13 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 
     if (book) {
         const faction * f = u->faction;
-        quicklist *ql;
+        selist *ql;
         int qi, header = 0;
 
-        for (ql = book->spells, qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)ql_get(ql, qi);
+        for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
+                /* TODO: no need to deref spref here, spref->name == sp->sname */
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
@@ -750,7 +752,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const char *prefix;
 
     assert(u && u->number);
-    assert(u->region == r); // TODO: if this holds true, then why did we pass in r?
+    assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
@@ -781,7 +783,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         if (sf != u->faction)
             stream_printf(out, "%d;Verkleidung\n", sf->no);
         if (fval(u, UFL_ANON_FACTION))
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION)!=0);
         if (otherfaction && otherfaction != u->faction) {
             stream_printf(out, "%d;Anderepartei\n", otherfaction->no);
         }
@@ -793,7 +795,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     else {
         if (fval(u, UFL_ANON_FACTION)) {
             /* faction info is hidden */
-            stream_printf(out, "%d;Parteitarnung\n", i2b(fval(u, UFL_ANON_FACTION)));
+            stream_printf(out, "%d;Parteitarnung\n", (u->flags & UFL_ANON_FACTION) != 0);
         }
         else {
             const attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
@@ -849,7 +851,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         assert(u->ship->region);
         stream_printf(out, "%d;Schiff\n", u->ship->no);
     }
-    if (is_guard(u, GUARD_ALL) != 0) {
+    if (is_guard(u)) {
         stream_printf(out, "%d;bewacht\n", 1);
     }
     if ((b = usiege(u)) != NULL) {
@@ -988,7 +990,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
 static void cr_output_unit_compat(FILE * F, const region * r, const faction * f,
     const unit * u, int mode)
 {
-    // TODO: eliminate this function
+    /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
     cr_output_unit(&strm, r, f, u, mode);
@@ -1026,12 +1028,12 @@ static void show_alliances_cr(FILE * F, const faction * f)
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 /* this is a copy of laws.c->find_address output changed. */
-static void cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
+static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
 {
     int i = 0;
-    quicklist *flist = addresses;
+    selist *flist = addresses;
     while (flist) {
-        const faction *f = (const faction *)ql_get(flist, i);
+        const faction *f = (const faction *)selist_get(flist, i);
         if (uf != f) {
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
@@ -1044,7 +1046,7 @@ static void cr_find_address(FILE * F, const faction * uf, quicklist * addresses)
                 fprintf(F, "%d;alliance\n", f->alliance->id);
             }
         }
-        ql_advance(&flist, &i, 1);
+        selist_advance(&flist, &i, 1);
     }
 }
 
@@ -1328,9 +1330,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));
-            if (fval(r, RF_ORCIFIED)) {
-                fprintf(F, "1;Verorkt\n");
-            }
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
             if (r->seen.mode >= seen_unit) {
@@ -1470,14 +1469,14 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
 /* main function of the creport. creates the header and traverses all regions */
 static int
-report_computer(const char *filename, report_context * ctx, const char *charset)
+report_computer(const char *filename, report_context * ctx, const char *bom)
 {
     static int era = -1;
     int i;
     faction *f = ctx->f;
     const char *prefix;
     region *r;
-    const char *mailto = LOC(f->locale, "mailto");
+    const char *mailto = config_get("game.email");
     const attrib *a;
     FILE *F = fopen(filename, "w");
     static const race *rc_human;
@@ -1490,9 +1489,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
         perror(filename);
         return -1;
     }
-    else if (_strcmpl(charset, "utf-8") == 0 || _strcmpl(charset, "utf8") == 0) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
+    else if (bom) {
+        fwrite(bom, 1, strlen(bom), F);
     }
 
     /* must call this to get all the neighbour regions */
@@ -1500,8 +1498,8 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     /* initialisations, header and lists */
 
     fprintf(F, "VERSION %d\n", C_REPORT_VERSION);
-    fprintf(F, "\"%s\";charset\n", charset);
-    fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
+    fprintf(F, "\"UTF-8\";charset\n\"%s\";locale\n",
+            locale_name(f->locale));
     fprintf(F, "%d;noskillpoints\n", 1);
     fprintf(F, "%lld;date\n", (long long)ctx->report_time);
     fprintf(F, "\"%s\";Spiel\n", game_name());
@@ -1513,8 +1511,9 @@ report_computer(const char *filename, report_context * ctx, const char *charset)
     fprintf(F, "%d;Zeitalter\n", era);
     fprintf(F, "\"%s\";Build\n", eressea_version());
     if (mailto != NULL) {
+        const char * mailcmd = get_mailcmd(f->locale);
         fprintf(F, "\"%s\";mailto\n", mailto);
-        fprintf(F, "\"%s\";mailcmd\n", LOC(f->locale, "mailcmd"));
+        fprintf(F, "\"%s\";mailcmd\n", mailcmd);
     }
 
     show_alliances_cr(F, f);

@@ -29,12 +29,17 @@ extern "C" {
     struct unit;
     struct attrib;
     struct attrib_type;
+    struct race;
     struct region;
     struct resource_type;
     struct locale;
     struct troop;
     struct item;
     struct order;
+    struct storage;
+    struct gamedata;
+    struct rawmaterial_type;
+    struct resource_mod;
 
     typedef struct item {
         struct item *next;
@@ -63,17 +68,16 @@ extern "C" {
 
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
-    typedef int(*rtype_uget) (const struct unit * user,
-        const struct resource_type * rtype);
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
     typedef struct resource_type {
         /* --- constants --- */
-        char *_name;             /* wie es heißt */
+        char *_name;             /* wie es heiï¿½t */
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
-        rtype_uget uget;
         rtype_name name;
+        struct rawmaterial_type *raw;
+        struct resource_mod *modifiers;
         /* --- pointers --- */
         struct attrib *attribs;
         struct item_type *itype;
@@ -89,29 +93,8 @@ extern "C" {
 
     /* resource-limits for regions */
 #define RMF_SKILL         0x01  /* int, bonus on resource production skill */
-#define RMF_SAVEMATERIAL  0x02  /* float, multiplier on resource usage */
-#define RMF_SAVERESOURCE  0x03  /* int, bonus on resource production skill */
+#define RMF_SAVEMATERIAL  0x02  /* fraction (sa[0]/sa[1]), multiplier on resource usage */
 #define RMF_REQUIREDBUILDING 0x04       /* building, required to build */
-
-    typedef struct resource_mod {
-        variant value;
-        const struct building_type *btype;
-        const struct race *race;
-        unsigned int flags;
-    } resource_mod;
-
-    extern struct attrib_type at_resourcelimit;
-    typedef int(*rlimit_limit) (const struct region * r,
-        const struct resource_type * rtype);
-    typedef void(*rlimit_produce) (struct region * r,
-        const struct resource_type * rtype, int n);
-    typedef struct resource_limit {
-        rlimit_limit limit;
-        rlimit_produce produce;
-        unsigned int guard;         /* how to guard against theft */
-        int value;
-        resource_mod *modifiers;
-    } resource_limit;
 
     /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
@@ -121,6 +104,7 @@ extern "C" {
 #define ITF_BIG              0x0008     /* big item, e.g. does not fit in a bag of holding */
 #define ITF_ANIMAL           0x0010     /* an animal */
 #define ITF_VEHICLE          0x0020     /* a vehicle, drawn by two animals */
+#define ITF_CANUSE           0x0040     /* can be used with use_item_fun callout */
 
     /* error codes for item_type::use */
 #define ECUSTOM   -1
@@ -134,17 +118,10 @@ extern "C" {
         unsigned int flags;
         int weight;
         int capacity;
+        int mask_allow;
+        int mask_deny;
         struct construction *construction;
-        char *_appearance[2];       /* wie es für andere aussieht */
-        /* --- functions --- */
-        bool(*canuse) (const struct unit * user,
-            const struct item_type * itype);
-        int(*use) (struct unit * user, const struct item_type * itype, int amount,
-        struct order * ord);
-        int(*useonother) (struct unit * user, int targetno,
-            const struct item_type * itype, int amount, struct order * ord);
-        int(*give) (struct unit * src, struct unit * dest,
-            const struct item_type * itm, int number, struct order * ord);
+        char *_appearance[2];       /* wie es fï¿½r andere aussieht */
         int score;
     } item_type;
 
@@ -195,7 +172,7 @@ extern "C" {
         const item_type *itype;
         unsigned int flags;
         double penalty;
-        double magres;
+        variant magres;
         int prot;
         float projectile;           /* chance, dass ein projektil abprallt */
     } armor_type;
@@ -219,7 +196,7 @@ extern "C" {
         int minskill;
         int offmod;
         int defmod;
-        double magres;
+        variant magres;
         int reload;                 /* time to reload this weapon */
         weapon_mod *modifiers;
         /* --- functions --- */
@@ -248,6 +225,9 @@ extern "C" {
     void i_freeall(item ** i);
     item *i_new(const item_type * it, int number);
 
+    void read_items(struct storage *store, struct item **it);
+    void write_items(struct storage *store, struct item *it);
+
     /* convenience: */
     item *i_change(item ** items, const item_type * it, int delta);
     int i_get(const item * i, const item_type * it);
@@ -255,14 +235,12 @@ extern "C" {
     /* creation */
     resource_type *rt_get_or_create(const char *name);
     item_type *it_get_or_create(resource_type *rtype);
-    item_type *new_itemtype(resource_type * rtype, int iflags, int weight,
-        int capacity);
     luxury_type *new_luxurytype(item_type * itype, int price);
     weapon_type *new_weapontype(item_type * itype, int wflags,
-        double magres, const char *damage[], int offmod, int defmod, int reload,
+        variant magres, const char *damage[], int offmod, int defmod, int reload,
         skill_t sk, int minskill);
     armor_type *new_armortype(item_type * itype, double penalty,
-        double magres, int prot, unsigned int flags);
+        variant magres, int prot, unsigned int flags);
     potion_type *new_potiontype(item_type * itype, int level);
 
     typedef enum {
@@ -306,7 +284,10 @@ extern "C" {
 
     extern const struct potion_type *oldpotiontype[];
     const struct resource_type *get_resourcetype(resource_t rt);
+    struct item *item_spoil(const struct race *rc, int size);
 
+    int get_item(const struct unit * u, const struct item_type *itype);
+    int set_item(struct unit * u, const struct item_type *itype, int value);
     int get_money(const struct unit *);
     int set_money(struct unit *, int);
     int change_money(struct unit *, int);
@@ -320,8 +301,6 @@ extern "C" {
     void register_item_give(int(*foo) (struct unit *, struct unit *,
         const struct item_type *, int, struct order *), const char *name);
     void register_item_use(int(*foo) (struct unit *,
-        const struct item_type *, int, struct order *), const char *name);
-    void register_item_useonother(int(*foo) (struct unit *, int,
         const struct item_type *, int, struct order *), const char *name);
 
     void free_resources(void);

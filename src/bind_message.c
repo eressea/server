@@ -1,6 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
-
 #include "spells.h"
 
 /* kernel includes */

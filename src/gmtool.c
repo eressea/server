@@ -26,9 +26,6 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if ARENA_MODULE
-#include <modules/arena.h>
-#endif
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>
@@ -47,7 +44,6 @@
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
-#include <items/itemtypes.h>
 
 #include <util/log.h>
 #include <util/unicode.h>
@@ -87,7 +83,7 @@ static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
         if (gm_codepage >=0 && *rp & 0x80) {
             size_t sz = 0;
-            char ch;
+            unsigned char ch;
             switch (gm_codepage) {
             case 1252:
                 unicode_utf8_to_cp1252(&ch, rp, &sz);
@@ -100,7 +96,7 @@ static void unicode_remove_diacritics(const char *rp, char *wp) {
                 break;
             }
             rp += sz;
-            *wp++ = ch;
+            *wp++ = (char)ch;
         }
         else {
             *wp++ = *rp++;
@@ -184,7 +180,7 @@ map_region *mr_get(const view * vi, int xofs, int yofs)
 static point *coor2point(const coordinate * c, point * p)
 {
     assert(c && p);
-    p->x = c->x * TWIDTH + c->y * TWIDTH / 2;
+    p->x = c->x * TWIDTH + c->y * TWIDTH / 2; /*-V537 */
     p->y = c->y * THEIGHT;
     return p;
 }
@@ -262,7 +258,7 @@ static chtype mr_tile(const map_region * mr, int highlight)
         const region *r = mr->r;
         switch (r->terrain->_name[0]) {
         case 'o':
-            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD;
+            return '.' | COLOR_PAIR(hl + COLOR_CYAN) | A_BOLD; /*-V525 */
         case 'd':
             return 'D' | COLOR_PAIR(hl + COLOR_YELLOW) | A_BOLD;
         case 't':
@@ -427,7 +423,7 @@ static void paint_info_region(window * wnd, const state * st)
     int line = 0, maxline = getmaxy(win) - 2;
     map_region *mr = cursor_region(&st->display, &st->cursor);
 
-    unused_arg(st);
+    UNUSED_ARG(st);
     werase(win);
     wxborder(win);
     if (mr && mr->r) {
@@ -823,8 +819,7 @@ void loaddata(state *st)  {
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
-        create_backup(datafile);
-        readgame(datafile, false);
+        readgame(datafile);
         st->modified = 0;
     }
 }
@@ -834,7 +829,6 @@ void savedata(state *st)  {
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
-        create_backup(datafile);
         remove_empty_units();
         writegame(datafile);
         st->modified = 0;
@@ -1169,7 +1163,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                sprintf(sbuffer, "find-faction: %s", locate);
+                slprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(locate));
                 if (f == NULL) {
@@ -1400,7 +1394,7 @@ int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
 const char *prompt)
 {
-    unused_arg(L);
+    UNUSED_ARG(L);
     askstring(hstatus, prompt, buffer, size);
     return buffer[0] != 0;
 }

@@ -2,7 +2,6 @@
 
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <quicklist.h>
 #include <util/language.h>
 
 #include <CuTest.h>

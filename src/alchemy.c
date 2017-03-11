@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "alchemy.h"
-#include "move.h"
+#include "guard.h"
 #include "skill.h"
 #include "study.h"
 
@@ -61,7 +61,7 @@ void herbsearch(unit * u, int max)
         return;
     }
 
-    if (is_guarded(r, u, GUARD_PRODUCE)) {
+    if (is_guarded(r, u)) {
         cmistake(u, u->thisorder, 70, MSG_EVENT);
         return;
     }
@@ -73,12 +73,12 @@ void herbsearch(unit * u, int max)
     }
 
     if (max)
-        max = _min(max, rherbs(r));
+        max = MIN(max, rherbs(r));
     else
         max = rherbs(r);
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
-    herbsfound = _min(herbsfound, max);
+    herbsfound = MIN(herbsfound, max);
     rsetherbs(r, (short) (rherbs(r) - herbsfound));
 
     if (herbsfound) {
@@ -156,12 +156,13 @@ static int potion_water_of_life(unit * u, region *r, int amount) {
 }
 
 static int potion_healing(unit * u, int amount) {
-    u->hp = _min(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+    u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
     return amount;
 }
 
 static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     attrib *a = (attrib *)a_find(r->attribs, atype);
+    UNUSED_ARG(u);
     if (!a) {
         a = a_add(&r->attribs, a_new(atype));
     }
@@ -170,8 +171,8 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
 }
 
 static int potion_truth(unit *u) {
-    // TODO: this potion does nothing!
-    // fset(u, UFL_DISBELIEVES);
+    UNUSED_ARG(u);
+    /* TODO: this potion does nothing! */
     return 1;
 }
 
@@ -181,8 +182,8 @@ static int potion_power(unit *u, int amount) {
         if (u->number % 10 > 0) ++use;
         amount = use;
     }
-    /* Verfünffacht die HP von max. 10 Personen in der Einheit */
-    u->hp += _min(u->number, 10 * amount) * unit_max_hp(u) * 4;
+    /* Verfï¿½nffacht die HP von max. 10 Personen in der Einheit */
+    u->hp += MIN(u->number, 10 * amount) * unit_max_hp(u) * 4;
     return amount;
 }
 
@@ -241,15 +242,14 @@ static void init_potiondelay(attrib * a)
     a->data.v = malloc(sizeof(potiondelay));
 }
 
-static void free_potiondelay(attrib * a)
-{
+static void free_potiondelay(attrib * a) {
     free(a->data.v);
 }
 
 static int age_potiondelay(attrib * a, void *owner)
 {
     potiondelay *pd = (potiondelay *)a->data.v;
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     pd->amount = do_potion(pd->u, pd->r, pd->ptype, pd->amount);
     return AT_AGE_REMOVE;
 }
@@ -296,7 +296,7 @@ static void a_initeffect(attrib * a)
     a->data.v = calloc(sizeof(effect_data), 1);
 }
 
-static void a_finalizeeffect(attrib * a)
+static void a_finalizeeffect(attrib * a) /*-V524 */
 {
     free(a->data.v);
 }
@@ -305,6 +305,7 @@ static void
 a_writeeffect(const attrib * a, const void *owner, struct storage *store)
 {
     effect_data *edata = (effect_data *)a->data.v;
+    UNUSED_ARG(owner);
     WRITE_TOK(store, resourcename(edata->type->itype->rtype, 0));
     WRITE_INT(store, edata->value);
 }
@@ -317,6 +318,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
     effect_data *edata = (effect_data *)a->data.v;
     char zText[32];
 
+    UNUSED_ARG(owner);
     READ_TOK(store, zText, sizeof(zText));
     rtype = rt_find(zText);
 
@@ -325,7 +327,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
         return AT_READ_FAIL;
     }
     if (rtype->ptype==oldpotiontype[P_HEAL]) {
-        // healing potions used to have long-term effects
+        /* healing potions used to have long-term effects */
         return AT_READ_FAIL;
     }
     edata->type = rtype->ptype;

@@ -16,10 +16,11 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#include "direction.h"
+#include <stdbool.h>
+
 #ifndef H_KRNL_MOVEMENT
 #define H_KRNL_MOVEMENT
-
-#include "direction.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,11 +61,11 @@ extern "C" {
     int personcapacity(const struct unit *u);
     void movement(void);
     void run_to(struct unit *u, struct region *to);
-    struct unit *is_guarded(struct region *r, struct unit *u, unsigned int mask);
-    bool is_guard(const struct unit *u, unsigned int mask);
     int enoughsailors(const struct ship *sh, int sumskill);
     bool canswim(struct unit *u);
     bool canfly(struct unit *u);
+    void leave_trail(struct ship *sh, struct region *from,
+                            struct region_list *route);
     struct ship *move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);

@@ -222,14 +222,6 @@
                     "div": "100"
                 }
             }
-        },
-        "default": {
-            "size": 0,
-            "herbs": [],
-            "seed": 0,
-            "road": 0,
-            "flags": [ "land", "walk", "sail", "fly" ],
-            "production": {}
         }
     }
 }

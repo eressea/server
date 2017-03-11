@@ -2,7 +2,15 @@
 #include "parser.h"
 
 #include <string.h>
+#include <errno.h>
 #include <CuTest.h>
+
+static void test_atoip(CuTest *tc) {
+    CuAssertIntEquals(tc, 0, atoip("ALLES"));
+    CuAssertIntEquals(tc, 0, errno);
+    CuAssertIntEquals(tc, 42, atoip("42"));
+    CuAssertIntEquals(tc, 0, atoip("-1"));
+}
 
 static void test_parse_token(CuTest *tc) {
     char lbuf[8];
@@ -41,11 +49,11 @@ static void test_parse_token_limit_utf8(CuTest *tc) {
 
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
-    CuAssertStrEquals(tc, tok, "\xc3\xa4\xc3\xb6\xc3\xbc"); // just three letters fit, 6 bytes long
+    CuAssertStrEquals(tc, tok, "\xc3\xa4\xc3\xb6\xc3\xbc"); /* just three letters fit, 6 bytes long */
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, NULL, (void *)tok);
 
-    str = orig; // now with an extra byte in the front, maxing out lbuf exactly
+    str = orig; /* now with an extra byte in the front, maxing out lbuf exactly */
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
     CuAssertStrEquals(tc, tok, "a\xc3\xa4\xc3\xb6\xc3\xbc");
@@ -101,12 +109,6 @@ static void test_getstrtoken(CuTest *tc) {
     CuAssertStrEquals(tc, "TWO", getstrtoken());
     CuAssertStrEquals(tc, "THREE", getstrtoken());
     CuAssertPtrEquals(tc, NULL, (void *)getstrtoken());
-}
-
-static void test_atoip(CuTest *tc) {
-    CuAssertIntEquals(tc, 42, atoip("42"));
-    CuAssertIntEquals(tc, 0, atoip("-42"));
-    CuAssertIntEquals(tc, 0, atoip("NOPE"));
 }
 
 CuSuite *get_parser_suite(void)

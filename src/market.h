@@ -12,12 +12,20 @@ without prior permission by the authors of Eressea.
 */
 #ifndef H_GC_MARKET
 #define H_GC_MARKET
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
     struct building;
+    struct race;
 
-    extern void do_markets(void);
+    bool markets_module(void);
+    void do_markets(void);
+
+    int rc_luxury_trade(const struct race *rc);
+    int rc_herb_trade(const struct race *rc);
 
 #ifdef __cplusplus
 }

@@ -12,11 +12,14 @@
 
 #ifndef KRNL_ORDER_H
 #define KRNL_ORDER_H
+
+#include "keyword.h"
+#include <stddef.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "keyword.h"
 
     /* Encapsulation of an order
      *

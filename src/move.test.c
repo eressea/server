@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "move.h"
 
-#include "guard.h"
 #include "keyword.h"
+#include "lighthouse.h"
 
 #include <kernel/config.h>
 #include <kernel/ally.h>
@@ -201,30 +201,6 @@ static void test_walkingcapacity(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_is_guarded(CuTest *tc) {
-    unit *u1, *u2;
-    region *r;
-    race *rc;
-
-    test_cleanup();
-    rc = rc_get_or_create("dragon");
-    rc->flags |= RCF_UNARMEDGUARD;
-    r = test_create_region(0, 0, 0);
-    u1 = test_create_unit(test_create_faction(0), r);
-    u2 = test_create_unit(test_create_faction(rc), r);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_PRODUCE));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    guard(u2, GUARD_MINING | GUARD_PRODUCE);
-    CuAssertIntEquals(tc, GUARD_CREWS | GUARD_LANDING | GUARD_TRAVELTHRU | GUARD_TAX | GUARD_PRODUCE | GUARD_RECRUIT, guard_flags(u2));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TRAVELTHRU));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_TREES));
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1, GUARD_MINING));
-    CuAssertPtrEquals(tc, u2, is_guarded(r, u1, GUARD_PRODUCE));
-    test_cleanup();
-}
-
 static void test_ship_trails(CuTest *tc) {
     ship *sh;
     region *r1, *r2, *r3;
@@ -298,10 +274,10 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
-    assert(fix->r);
+    assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
-    assert(fix->f && fix->u && fix->sh);
+    assert(fix->sh);
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -458,8 +434,9 @@ static void test_follow_ship_msg(CuTest * tc) {
     order *ord;
     traveldir *td = NULL;
     attrib *a;
-
-    test_cleanup();
+    void *p;
+    
+    test_setup();
     test_create_world();
     f = test_create_faction(0);
     r = findregion(0, 0);
@@ -491,7 +468,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     follow_ship(u, ord);
 
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "error18"));
-    void *p = msg->parameters[2].v;
+    p = msg->parameters[2].v;
     CuAssertPtrNotNull(tc, p);
     CuAssertIntEquals(tc, K_FOLLOW, getkeyword((order *)p));
 
@@ -503,7 +480,7 @@ static void test_drifting_ships(CuTest *tc) {
     region *r1, *r2, *r3;
     terrain_type *t_ocean, *t_plain;
     ship_type *st_boat;
-    test_cleanup();
+    test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
     r1 = test_create_region(0, 0, t_ocean);
@@ -516,17 +493,46 @@ static void test_drifting_ships(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_ship_leave_trail(CuTest *tc) {
+    ship *s1, *s2;
+    region *r1, *r2;
+    terrain_type *t_ocean;
+    ship_type *st_boat;
+    region_list *route = NULL;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    r1 = test_create_region(0, 0, t_ocean);
+    add_regionlist(&route, test_create_region(2, 0, t_ocean));
+    add_regionlist(&route, r2 = test_create_region(1, 0, t_ocean));
+    st_boat = test_create_shiptype("boat");
+    s1 = test_create_ship(r1, st_boat);
+    s2 = test_create_ship(r1, st_boat);
+    leave_trail(s1, r1, route);
+    a_add(&r1->attribs, a_new(&at_lighthouse));
+    leave_trail(s2, r1, route);
+    a_add(&r2->attribs, a_new(&at_lighthouse));
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r1->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r1->attribs->next->next->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->type);
+    CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->next->type);
+    CuAssertPtrEquals(tc, &at_lighthouse, (void *)r2->attribs->next->next->type);
+    free_regionlist(route);
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
+    SUITE_ADD_TEST(suite, test_ship_leave_trail);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
-    SUITE_ADD_TEST(suite, test_is_guarded);
     SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);

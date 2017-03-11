@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef LIGHTHOUSE_H
 #define LIGHTHOUSE_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +31,7 @@ extern "C" {
     struct building;
     struct attrib;
 
-    extern const struct attrib_type at_lighthouse;
+    extern struct attrib_type at_lighthouse;
     /* leuchtturm */
     bool check_leuchtturm(struct region *r, struct faction *f);
     void update_lighthouse(struct building *lh);

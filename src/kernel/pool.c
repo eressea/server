@@ -40,11 +40,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 int get_resource(const unit * u, const resource_type * rtype)
 {
     assert(rtype);
-    if (rtype->uget) {
-        /* this resource is probably special */
-        int i = rtype->uget(u, rtype);
-        if (i >= 0)
-            return i;
+    if (rtype == get_resourcetype(R_PEASANT)) {
+        return u->region->land ? u->region->land->peasants : 0;
+    }
+    else if (rtype == rt_find("hp")) {
+        return u->hp;
     }
     else if (rtype->uchange) {
         /* this resource is probably special */
@@ -168,7 +168,7 @@ int count)
         use = have;
     else if (rtype->itype && mode & (GET_SLACK | GET_RESERVE)) {
         int reserve = get_reservation(u, rtype->itype);
-        int slack = _max(0, have - reserve);
+        int slack = MAX(0, have - reserve);
         if (mode & GET_RESERVE)
             use = have - slack;
         else if (mode & GET_SLACK)
@@ -176,10 +176,10 @@ int count)
     }
     if (rtype->flags & RTF_POOLED && mode & ~(GET_SLACK | GET_RESERVE)) {
         for (v = r->units; v && use < count; v = v->next)
-            if (u != v && (v->items || rtype->uget)) {
+            if (u != v) {
                 int mask;
 
-                if ((urace(v)->ec_flags & ECF_KEEP_ITEM))
+                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
                     continue;
 
                 if (v->faction == f) {
@@ -209,18 +209,18 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     }
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
-        n = _min(use, have);
+        n = MIN(use, have);
     }
     else if (rtype->itype) {
         int reserve = get_reservation(u, rtype->itype);
-        int slack = _max(0, have - reserve);
+        int slack = MAX(0, have - reserve);
         if (mode & GET_RESERVE) {
             n = have - slack;
-            n = _min(use, n);
+            n = MIN(use, n);
             change_reservation(u, rtype->itype, -n);
         }
         else if (mode & GET_SLACK) {
-            n = _min(use, slack);
+            n = MIN(use, slack);
         }
     }
     if (n > 0) {
@@ -232,9 +232,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
         for (v = r->units; use > 0 && v != NULL; v = v->next) {
             if (u != v) {
                 int mask;
-                if ((urace(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
-                if (v->items == NULL && rtype->uget == NULL)
+                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
                     continue;
 
                 if (v->faction == f) {

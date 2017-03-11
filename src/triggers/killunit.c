@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "killunit.h"
 
 #include <kernel/region.h>
@@ -49,7 +48,7 @@ static int killunit_handle(trigger * t, void *data)
         /* we can't remove_unit() here, because that's what's calling us. */
         set_number(u, 0);
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

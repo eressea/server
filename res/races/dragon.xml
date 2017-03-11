@@ -1,11 +1,10 @@
-<race name="dragon" magres="0.700000" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac=
+<race name="dragon" magres="70" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac=
 "6" damage="2d30" unarmedattack="0" unarmeddefense="0"
 attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes"
-walk="yes" teach="no" getitem="yes" resistbash="yes" dragon="yes">
+income="1000" walk="yes" teach="no" getitem="yes" resistbash="yes"
+dragon="yes">
   <ai splitsize="2" killpeasants="yes" learn="yes" scare="400"/>
   <function name="name" value="namedragon"/>
-  <function name="age" value="agedragon"/>
-  <function name="move" value="movedragon"/>
   <skill name="magic" modifier="8"/>
   <skill name="tactics" modifier="8"/>
   <attack type="4" damage="2d20"/>

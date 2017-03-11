@@ -32,7 +32,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
@@ -311,7 +310,7 @@ order * ord)
     unit *warden = findunit(atoi36("mwar"));
     int unit_cookie;
 
-    unused_arg(amount);
+    UNUSED_ARG(amount);
 
     /* Prüfen ob in Eingangshalle */
     if (u->region->x != 9525 || u->region->y != 9525) {
@@ -366,7 +365,7 @@ order * ord)
     region *r = u->region;
     plane *pl = rplane(r);
 
-    unused_arg(amount);
+    UNUSED_ARG(amount);
 
     /* Pruefen ob in normaler Plane und nur eine Person */
     if (pl != get_homeplane()) {
@@ -418,8 +417,8 @@ static const char *b_namequestportal(const connection * b, const region * r,
 {
     const char *bname;
     int lock = b->data.i;
-    unused_arg(b);
-    unused_arg(r);
+    UNUSED_ARG(b);
+    UNUSED_ARG(r);
 
     if (gflags & GF_ARTICLE) {
         if (lock > 0) {
@@ -498,9 +497,10 @@ void register_museum(void)
     at_register(&at_museumgivebackcookie);
     at_register(&at_museumgiveback);
 
-    register_item_use(use_museumticket, "use_museumticket");
-    register_item_use(use_museumkey, "use_museumkey");
     register_item_use(use_museumexitticket, "use_museumexitticket");
+    register_item_use(use_museumticket, "use_museumticket");
+    register_item_use(use_museumkey, "use_questkey1");
+    register_item_use(use_museumkey, "use_questkey2");
 }
 
 #endif

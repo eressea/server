@@ -28,6 +28,119 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
+
+int read_attribs(gamedata *data, attrib **alist, void *owner) {
+    int result;
+    if (data->version < ATHASH_VERSION) {
+        result = a_read_orig(data, alist, owner);
+    }
+    else {
+        result = a_read(data, alist, owner);
+    }
+    if (result == AT_READ_DEPR) {
+        /* handle deprecated attributes */
+        attrib *a = *alist;
+        while (a) {
+            if (a->type->upgrade) {
+                a->type->upgrade(alist, a);
+            }
+            a = a->nexttype;
+        }
+    }
+    return result;
+}
+
+void write_attribs(storage *store, attrib *alist, const void *owner)
+{
+#if RELEASE_VERSION < ATHASH_VERSION
+    a_write_orig(store, alist, owner);
+#else
+    a_write(store, alist, owner);
+#endif
+}
+
+int a_readint(attrib * a, void *owner, struct gamedata *data)
+{
+    int n;
+    READ_INT(data->store, &n);
+    if (a) a->data.i = n;
+    return AT_READ_OK;
+}
+
+void a_writeint(const attrib * a, const void *owner, struct storage *store)
+{
+    WRITE_INT(store, a->data.i);
+}
+
+int a_readshorts(attrib * a, void *owner, struct gamedata *data)
+{
+    int n;
+    READ_INT(data->store, &n);
+    a->data.sa[0] = (short)n;
+    READ_INT(data->store, &n);
+    a->data.sa[1] = (short)n;
+    return AT_READ_OK;
+}
+
+void a_writeshorts(const attrib * a, const void *owner, struct storage *store)
+{
+    WRITE_INT(store, a->data.sa[0]);
+    WRITE_INT(store, a->data.sa[1]);
+}
+
+int a_readchars(attrib * a, void *owner, struct gamedata *data)
+{
+    int i;
+    for (i = 0; i != 4; ++i) {
+        int n;
+        READ_INT(data->store, &n);
+        a->data.ca[i] = (char)n;
+    }
+    return AT_READ_OK;
+}
+
+void a_writechars(const attrib * a, const void *owner, struct storage *store)
+{
+    int i;
+
+    for (i = 0; i != 4; ++i) {
+        WRITE_INT(store, a->data.ca[i]);
+    }
+}
+
+#define DISPLAYSIZE 8192
+int a_readstring(attrib * a, void *owner, struct gamedata *data)
+{
+    char buf[DISPLAYSIZE];
+    char * result = 0;
+    int e;
+    size_t len = 0;
+    do {
+        e = READ_STR(data->store, buf, sizeof(buf));
+        if (result) {
+            result = realloc(result, len + DISPLAYSIZE - 1);
+            strcpy(result + len, buf);
+            len += DISPLAYSIZE - 1;
+        }
+        else {
+            result = strdup(buf);
+        }
+    } while (e == ENOMEM);
+    a->data.v = result;
+    return AT_READ_OK;
+}
+
+void a_writestring(const attrib * a, const void *owner, struct storage *store)
+{
+    assert(a->data.v);
+    WRITE_STR(store, (const char *)a->data.v);
+}
+
+void a_finalizestring(attrib * a)
+{
+    free(a->data.v);
+}
 
 #define MAXATHASH 61
 static attrib_type *at_hash[MAXATHASH];
@@ -40,7 +153,7 @@ static unsigned int __at_hashkey(const char *s)
     while (i > 0) {
         key = (s[--i] + key * 37);
     }
-    return key & 0x7fffffff; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 0x7fffffff used: return key & 0x7fffffff;.
+    return key & 0x7fffffff;
 }
 
 void at_register(attrib_type * at)
@@ -48,7 +161,7 @@ void at_register(attrib_type * at)
     attrib_type *find;
 
     if (at->read == NULL) {
-        log_warning("registering non-persistent attribute %s.\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
+        log_warning("registering non-persistent attribute %s.\n", at->name);
     }
     at->hashkey = __at_hashkey(at->name);
     find = at_hash[at->hashkey % MAXATHASH];
@@ -56,7 +169,7 @@ void at_register(attrib_type * at)
         find = find->nexthash;
     }
     if (find && find == at) {
-        log_warning("attribute '%s' was registered more than once\n", at->name); //TODO: V111 http://www.viva64.com/en/V111 Call of function 'log_warning' with variable number of arguments. Second argument has memsize type.
+        log_warning("attribute '%s' was registered more than once\n", at->name);
         return;
     }
     else {
@@ -66,7 +179,7 @@ void at_register(attrib_type * at)
     at_hash[at->hashkey % MAXATHASH] = at;
 }
 
-static attrib_type *at_find(unsigned int hk)
+static attrib_type *at_find_key(unsigned int hk)
 {
     const char *translate[3][2] = {
         { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
@@ -80,11 +193,16 @@ static attrib_type *at_find(unsigned int hk)
         int i = 0;
         while (translate[i][0]) {
             if (__at_hashkey(translate[i][0]) == hk)
-                return at_find(__at_hashkey(translate[i][1]));
+                return at_find_key(__at_hashkey(translate[i][1]));
             ++i;
         }
     }
     return find;
+}
+
+struct attrib_type *at_find(const char *name) {
+    unsigned int hash = __at_hashkey(name);
+    return at_find_key(hash);
 }
 
 attrib *a_select(attrib * a, const void *data,
@@ -97,6 +215,7 @@ attrib *a_select(attrib * a, const void *data,
 
 attrib *a_find(attrib * a, const attrib_type * at)
 {
+    assert(at);
     while (a && a->type != at)
         a = a->nexttype;
     return a;
@@ -295,7 +414,7 @@ void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamed
 static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int key) {
     int retval = AT_READ_OK;
     int(*reader)(attrib *, void *, struct gamedata *) = 0;
-    attrib_type *at = at_find(key);
+    attrib_type *at = at_find_key(key);
     attrib * na = 0;
 
     if (at) {

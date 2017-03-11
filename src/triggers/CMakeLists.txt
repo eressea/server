@@ -11,8 +11,6 @@ killunit.c
 shock.c
 timeout.c
 triggers.c
-unguard.c
-unitmessage.c
 )
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})

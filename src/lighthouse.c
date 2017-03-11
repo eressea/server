@@ -14,9 +14,9 @@
 #include <assert.h>
 #include <math.h>
 
-const attrib_type at_lighthouse = {
+attrib_type at_lighthouse = {
     "lighthouse"
-    /* Rest ist NULL; temporäres, nicht alterndes Attribut */
+    /* Rest ist NULL; temporï¿½res, nicht alterndes Attribut */
 };
 
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
@@ -73,20 +73,18 @@ int lighthouse_range(const building * b, const faction * f)
             region *r = b->region;
             int c = 0;
             int cap = buildingcapacity(b);
-            unit *u;
+            unit *u, *uown = building_owner(b);
 
             for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == building_owner(b)) {
-                    if (u->building == b) {
-                        c += u->number;
-                    }
+                if (u->building == b || u == uown) {
+                    c += u->number;
                     if (c > cap) {
                         break;
                     }
                     else if (f == NULL || u->faction == f) {
                         int sk = effskill(u, SK_PERCEPTION, 0) / 3;
-                        d = _max(d, sk);
-                        d = _min(maxd, d);
+                        d = MAX(d, sk);
+                        d = MIN(maxd, d);
                         if (d == maxd)
                             break;
                     }
@@ -129,7 +127,7 @@ bool check_leuchtturm(region * r, faction * f)
                         c += u->number;
                         if (c > buildingcapacity(b))
                             break;
-                        if (f == NULL || u->faction == f) {
+                        if (u->faction == f) {
                             if (!d)
                                 d = distance(r, r2);
                             if (maxd < d)

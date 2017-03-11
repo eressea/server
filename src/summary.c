@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -14,7 +14,7 @@
 
 #include "summary.h"
 #include "laws.h"
-#include "monster.h"
+#include "monsters.h"
 #include "calendar.h"
 
 #include <kernel/alliance.h>
@@ -22,7 +22,6 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -59,7 +58,6 @@ typedef struct summary {
     int landregionen;
     int regionen_mit_spielern;
     int landregionen_mit_spielern;
-    int orkifizierte_regionen;
     int inactive_volcanos;
     int active_volcanos;
     int spielerpferde;
@@ -98,12 +96,12 @@ int update_nmrs(void)
             int nmr = turn - f->lastorders + 1;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
-                    log_error("faction %s has %d NMR", factionid(f), nmr);
-                    nmr = _max(0, nmr);
-                    nmr = _min(nmr, timeout);
+                    log_error("faction %s has %d NMR", itoa36(f->no), nmr);
+                    nmr = MAX(0, nmr);
+                    nmr = MIN(nmr, timeout);
                 }
                 if (nmr > 0) {
-                    log_debug("faction %s has %d NMR", factionid(f), nmr);
+                    log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
                 }
                 ++nmrs[nmr];
             }
@@ -166,7 +164,7 @@ static char *gamedate2(const struct locale *lang)
 
 static void writeturn(void)
 {
-    char zText[MAX_PATH];
+    char zText[4096];
     FILE *f;
 
     join_path(basepath(), "datum", zText, sizeof(zText));
@@ -192,7 +190,7 @@ void report_summary(summary * s, summary * o, bool full)
     FILE *F = NULL;
     int i, newplayers = 0;
     faction *f;
-    char zText[MAX_PATH];
+    char zText[4096];
     int timeout = NMRTimeout();
 
     if (full) {
@@ -222,12 +220,11 @@ void report_summary(summary * s, summary * o, bool full)
     fprintf(F, " Helden:               %s\n", pcomp(s->heroes, o->heroes));
 
     if (full) {
-        fprintf(F, "Regionen:              %d\n", listlen(regions));
+        fprintf(F, "Regionen:              %d\n", (int)listlen(regions));
         fprintf(F, "Bewohnte Regionen:     %d\n", s->inhabitedregions);
         fprintf(F, "Landregionen:          %d\n", s->landregionen);
         fprintf(F, "Spielerregionen:       %d\n", s->regionen_mit_spielern);
         fprintf(F, "Landspielerregionen:   %d\n", s->landregionen_mit_spielern);
-        fprintf(F, "Orkifizierte Regionen: %d\n", s->orkifizierte_regionen);
         fprintf(F, "Inaktive Vulkane:      %d\n", s->inactive_volcanos);
         fprintf(F, "Aktive Vulkane:        %d\n\n", s->active_volcanos);
     }
@@ -421,9 +418,6 @@ summary *make_summary(void)
             s->landregionen++;
             if (r->units) {
                 s->landregionen_mit_spielern++;
-            }
-            if (fval(r, RF_ORCIFIED)) {
-                s->orkifizierte_regionen++;
             }
             if (r->terrain == newterrain(T_VOLCANO)) {
                 s->inactive_volcanos++;

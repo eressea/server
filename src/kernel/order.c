@@ -285,7 +285,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     order *ord = NULL;
     int lindex;
 
-    if ((int)kwd > 0 && keyword_disabled(kwd)) {
+    if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
     }
@@ -405,10 +405,10 @@ order *parse_order(const char *s, const struct locale * lang)
             }
         }
         if (kwd != NOKEYWORD) {
-            while (isxspace(*(unsigned char *)sptr)) ++sptr;
+            while (isspace(*(unsigned char *)sptr)) ++sptr;
             s = sptr;
+            return create_order_i(kwd, s, persistent, lang);
         }
-        return create_order_i(kwd, s, persistent, lang);
     }
     return NULL;
 }

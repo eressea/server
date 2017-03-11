@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CRITBIT_INCLUDE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
+include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
-include_directories (${QUICKLIST_INCLUDE_DIR})
-include_directories (${CUTEST_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${BSON_INCLUDE_DIR})
@@ -17,12 +15,18 @@ set_source_files_properties(kernel/version.c PROPERTIES
 COMPILE_DEFINITIONS ERESSEA_VERSION="${ERESSEA_VERSION}")
 ENDIF()
 
-IF(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
-#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+IF(DEFINED ERESSEA_BUILDNO)
+set_source_files_properties(kernel/version.c PROPERTIES
+COMPILE_DEFINITIONS ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
+ENDIF()
+
+IF (CMAKE_COMPILER_IS_GNUCC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-    add_definitions(-DHAVE__BOOL)
+ENDIF()
+IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
@@ -82,6 +86,7 @@ TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
 set (ERESSEA_SRC
+  vortex.c
   calendar.c
   move.c
   piracy.c
@@ -90,7 +95,6 @@ set (ERESSEA_SRC
   alchemy.c
   academy.c
   upkeep.c
-  vortex.c
   names.c
   lighthouse.c
   reports.c
@@ -99,7 +103,6 @@ set (ERESSEA_SRC
   prefix.c
   donations.c
   eressea.c
-  callback.c
   direction.c
   keyword.c
   skill.c
@@ -113,8 +116,8 @@ set (ERESSEA_SRC
   magic.c
   market.c
   morale.c
-  monster.c
   randenc.c
+  renumber.c
   volcano.c
   chaos.c
   spy.c
@@ -144,7 +147,6 @@ set(SERVER_SRC
   bind_locale.c
   bind_eressea.c
   bind_faction.c
-  bind_dict.c
   bind_order.c
   bindings.c
   bind_message.c
@@ -179,10 +181,18 @@ target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
-  ${QUICKLIST_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CRITBIT_LIBRARIES}
+  ${CLIBS_LIBRARIES}
   ${CJSON_LIBRARIES}
+  ${INIPARSER_LIBRARIES}
+)
+
+add_executable(convert convert.c)
+target_link_libraries(convert
+  game
+  ${LUA_MATH_LIBRARY}
+  ${STORAGE_LIBRARIES}
+  ${CLIBS_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
 
@@ -192,6 +202,7 @@ set(TESTS_SRC
   donations.test.c
   wormhole.test.c
   alchemy.test.c
+  guard.test.c
   test_eressea.c
   tests.c
   battle.test.c
@@ -203,7 +214,6 @@ set(TESTS_SRC
   report.test.c
   summary.test.c
   travelthru.test.c
-  callback.test.c
   direction.test.c
   economy.test.c
   json.test.c
@@ -217,6 +227,7 @@ set(TESTS_SRC
   move.test.c
   piracy.test.c
   prefix.test.c
+  renumber.test.c
   skill.test.c
   spells.test.c
   spy.test.c
@@ -234,11 +245,10 @@ set(TESTS_SRC
 add_executable(test_eressea ${TESTS_SRC})
 target_link_libraries(test_eressea
   game
-  ${CUTEST_LIBRARIES}
+  cutest
   ${LUA_LIBRARIES}
-  ${QUICKLIST_LIBRARIES}
+  ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CRITBIT_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )
@@ -267,6 +277,7 @@ endif(CURSES_FOUND)
 if (LIBXML2_FOUND)
 include_directories (${LIBXML2_INCLUDE_DIR})
 target_link_libraries(eressea ${LIBXML2_LIBRARIES})
+target_link_libraries(convert ${LIBXML2_LIBRARIES})
 target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
 add_definitions(-DUSE_LIBXML2)
 endif (LIBXML2_FOUND)

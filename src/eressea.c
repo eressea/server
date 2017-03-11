@@ -8,9 +8,6 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if ARENA_MODULE
-#include <modules/arena.h>
-#endif
 #include <triggers/triggers.h>
 #include <util/language.h>
 #include <util/functions.h>
@@ -21,7 +18,9 @@
 #include <kernel/xmlreader.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
-#include <items/itemtypes.h>
+#include <items/xerewards.h>
+#include <items/weapons.h>
+
 #include <attributes/attributes.h>
 #include <util/message.h>
 #include <races/races.h>
@@ -76,12 +75,10 @@ void game_init(void)
 #if MUSEUM_MODULE
     register_museum();
 #endif
-#if ARENA_MODULE
-    register_arena();
-#endif
     wormholes_register();
 
-    register_itemtypes();
+    register_weapons();
+    register_xerewards();
 #ifdef USE_LIBXML2
     register_xmlreader();
 #endif

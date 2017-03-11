@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_BORDER
 
 #include <util/variant.h>
-
+#include <stdbool.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

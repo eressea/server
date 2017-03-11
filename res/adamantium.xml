@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
 
-  <resource name="adamantium" limited="yes" material="rm_adamantium">
+  <resource name="adamantium" limited="yes" material="yes">
     <item weight="200" score="200">
       <construction skill="mining" minskill="8"/>
     </item>
-    <resourcelimit>
-      <modifier type="require" building="mine"/>
-      <guard flag="mining"/>
-    </resourcelimit>
+    <modifier type="require" building="mine"/>
   </resource>
 
   <resource name="adamantiumaxe">

@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <config.h>
 #include "creport.h"
 #include "move.h"
 #include "travelthru.h"
@@ -19,7 +18,6 @@
 #include <util/lists.h>
 #include <util/message.h>
 
-#include <quicklist.h>
 #include <stream.h>
 #include <memstream.h>
 

@@ -26,7 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/umlaut.h>
-#include <quicklist.h>
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -34,7 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 static critbit_tree cb_spells;
-quicklist * spells;
+selist * spells;
 
 static void free_spell(spell *sp) {
     free(sp->syntax);
@@ -50,14 +50,14 @@ static void free_spell_cb(void *cbdata) {
 
 void free_spells(void) {
     cb_clear(&cb_spells);
-    ql_foreach(spells, free_spell_cb);
-    ql_free(spells);
+    selist_foreach(spells, free_spell_cb);
+    selist_free(spells);
     spells = 0;
 }
 
-void add_spell(struct quicklist **slistp, spell * sp)
+void add_spell(struct selist **slistp, spell * sp)
 {
-    if (!ql_set_insert(slistp, sp)) {
+    if (!selist_set_insert(slistp, sp, NULL)) {
         log_error("add_spell: the list already contains the spell '%s'.\n", sp->sname);
     }
 }
@@ -78,7 +78,7 @@ spell * create_spell(const char * name, unsigned int id)
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
     if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
         sp->id = id ? id : hashstring(name);
-        sp->sname = _strdup(name);
+        sp->sname = strdup(name);
         add_spell(&spells, sp);
         return sp;
     }
@@ -123,19 +123,19 @@ spell *find_spell(const char *name)
 
 spell *find_spellbyid(unsigned int id)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
     if (id == 0)
         return NULL;
-    for (qi = 0, ql = spells; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)ql_get(ql, qi);
+    for (qi = 0, ql = spells; ql; selist_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *)selist_get(ql, qi);
         if (sp->id == id) {
             return sp;
         }
     }
-    for (qi = 0, ql = spells; ql; ql_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)ql_get(ql, qi);
+    for (qi = 0, ql = spells; ql; selist_advance(&ql, &qi, 1)) {
+        spell *sp = (spell *)selist_get(ql, qi);
         unsigned int hashid = hashstring(sp->sname);
         if (hashid == id) {
             return sp;
@@ -144,4 +144,40 @@ spell *find_spellbyid(unsigned int id)
 
     log_warning("cannot find spell by id: %u\n", id);
     return NULL;
+}
+
+struct spellref *spellref_create(spell *sp, const char *name)
+{
+    spellref *spref = malloc(sizeof(spellref));
+
+    if (sp) {
+        spref->sp = sp;
+        spref->name = strdup(sp->sname);
+    }
+    else if (name) {
+        spref->name = strdup(name);
+        spref->sp = NULL;
+    }
+    return spref;
+}
+
+void spellref_free(spellref *spref)
+{
+    if (spref) {
+        free(spref->name);
+        free(spref);
+    }
+}
+
+struct spell *spellref_get(struct spellref *spref)
+{
+    if (!spref->sp) {
+        assert(spref->name);
+        spref->sp = find_spell(spref->name);
+        if (spref->sp) {
+            free(spref->name);
+            spref->name = NULL;
+        }
+    }
+    return spref->sp;
 }

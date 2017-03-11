@@ -21,6 +21,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 
+#include <stdlib.h>
+
 attrib_type at_fleechance = {
     "fleechance",
     NULL,
@@ -35,9 +37,4 @@ attrib *make_fleechance(float fleechance)
     attrib *a = a_new(&at_fleechance);
     a->data.flt = fleechance;
     return a;
-}
-
-void init_fleechance(void)
-{
-    at_register(&at_fleechance);
 }

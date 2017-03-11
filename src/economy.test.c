@@ -11,10 +11,12 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <util/attrib.h>
 #include <util/language.h>
 
 #include <CuTest.h>
@@ -209,7 +211,7 @@ static void test_tax_cmd(CuTest *tc) {
     silver = get_resourcetype(R_SILVER)->itype;
 
     sword = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(sword, 0, 0.0, NULL, 0, 0, 0, SK_MELEE, 1);
+    new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 1);
     i_change(&u->items, sword, 1);
     set_level(u, SK_MELEE, 1);
 
@@ -241,11 +243,15 @@ static void test_tax_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+/** 
+ * see https://bugs.eressea.de/view.php?id=2234
+ */
 static void test_maintain_buildings(CuTest *tc) {
     region *r;
     building *b;
     building_type *btype;
     unit *u;
+    faction *f;
     maintenance *req;
     item_type *itype;
 
@@ -253,39 +259,53 @@ static void test_maintain_buildings(CuTest *tc) {
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    f = test_create_faction(0);
+    u = test_create_unit(f, r);
     b = test_create_building(r, btype);
     itype = test_create_itemtype("money");
     b->size = btype->maxsize;
     u_set_building(u, b);
 
-    // this building has no upkeep, it just works:
+    /* this building has no upkeep, it just works: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, 0, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
     req[0].rtype = itype->rtype;
     btype->maintenance = req;
 
-    // we cannot afford to pay:
+    /* we cannot afford to pay: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-
-    // we can afford to pay:
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
+    
+    /* we can afford to pay: */
     i_change(&u->items, itype, 100);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
 
-    // this building has no owner, it doesn't work:
+    /* this building has no owner, it doesn't work: */
     u_set_building(u, NULL);
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    test_clear_messagelist(&r->msgs);
 
     test_cleanup();
 }
@@ -310,11 +330,97 @@ static void test_recruit(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_income(CuTest *tc)
+{
+    race *rc;
+    unit *u;
+    test_setup();
+    rc = test_create_race("nerd");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 20, income(u));
+    u->number = 5;
+    CuAssertIntEquals(tc, 100, income(u));
+    test_cleanup();
+}
+
+static void test_make_item(CuTest *tc) {
+    unit *u;
+    struct item_type *itype;
+    const struct resource_type *rt_silver;
+    resource_type *rtype;
+    double d = 0.6;
+
+    test_setup();
+    init_resources();
+
+    /* make items from other items (turn silver to stone) */
+    rt_silver = get_resourcetype(R_SILVER);
+    itype = test_create_itemtype("stone");
+    rtype = itype->rtype;
+    u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
+    make_item(u, itype, 1);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
+    CuAssertIntEquals(tc, 0, get_item(u, itype));
+    test_clear_messages(u->faction);
+    itype->construction = calloc(1, sizeof(construction));
+    itype->construction->skill = SK_ALCHEMY;
+    itype->construction->minskill = 1;
+    itype->construction->maxsize = 1;
+    itype->construction->reqsize = 1;
+    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials[0].number = 1;
+    set_level(u, SK_ALCHEMY, 1);
+    set_item(u, rt_silver->itype, 1);
+    make_item(u, itype, 1);
+    CuAssertIntEquals(tc, 1, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rt_silver->itype));
+
+    /* make level-based raw materials, no materials used in construction */
+    free(itype->construction->materials);
+    itype->construction->materials = 0;
+    rtype->flags |= RTF_LIMITED;
+    rmt_create(rtype);
+    add_resource(u->region, 1, 300, 150, rtype);
+    u->region->resources->amount = 300; /* there are 300 stones at level 1 */
+    set_level(u, SK_ALCHEMY, 10);
+
+    make_item(u, itype, 10);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 11, get_item(u, itype));
+    CuAssertIntEquals(tc, 290, u->region->resources->amount); /* used 10 stones to make 10 stones */
+
+    rtype->modifiers = calloc(2, sizeof(resource_mod));
+    rtype->modifiers[0].flags = RMF_SAVEMATERIAL;
+    rtype->modifiers[0].race = u->_race;
+    rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
+    rtype->modifiers[0].value.sa[1] = 100;
+    make_item(u, itype, 10);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 21, get_item(u, itype));
+    CuAssertIntEquals(tc, 284, u->region->resources->amount); /* 60% saving = 6 stones make 10 stones */
+
+    make_item(u, itype, 1);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 22, get_item(u, itype));
+    CuAssertIntEquals(tc, 283, u->region->resources->amount); /* no free lunches */
+
+    rtype->modifiers[0].flags = RMF_REQUIREDBUILDING;
+    rtype->modifiers[0].race = NULL;
+    rtype->modifiers[0].btype = bt_get_or_create("mine");
+    make_item(u, itype, 10);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error104"));
+
+    test_cleanup();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
+    SUITE_ADD_TEST(suite, test_income);
+    SUITE_ADD_TEST(suite, test_make_item);
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);

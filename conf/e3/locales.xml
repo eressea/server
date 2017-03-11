@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="config://core/messages.xml"/>
+  <xi:include href="config://core/de/strings.xml"/>
+  <xi:include href="config://core/en/strings.xml"/>
+  <xi:include href="config://game/strings.xml"/>
+  <xi:include href="config://game/messages.xml"/>
+  <xi:include href="config://default/names-undead.xml"/>
+  <xi:include href="config://default/names-skeletons.xml"/>
+  <xi:include href="config://default/names-zombies.xml"/>
+  <xi:include href="config://default/names-ghouls.xml"/>
+  <xi:include href="config://default/names-dragons.xml"/>
+</eressea>

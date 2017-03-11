@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 
 /* triggers includes */
 #include <triggers/changefaction.h>
@@ -25,12 +24,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/createcurse.h>
 #include <triggers/createunit.h>
 #include <triggers/gate.h>
-#include <triggers/unguard.h>
 #include <triggers/giveitem.h>
 #include <triggers/killunit.h>
 #include <triggers/shock.h>
 #include <triggers/timeout.h>
-#include <triggers/unitmessage.h>
 #include <triggers/clonedied.h>
 
 /* util includes */
@@ -46,11 +43,9 @@ void register_triggers(void)
     tt_register(&tt_createcurse);
     tt_register(&tt_createunit);
     tt_register(&tt_gate);
-    tt_register(&tt_unguard);
     tt_register(&tt_giveitem);
     tt_register(&tt_killunit);
     tt_register(&tt_shock);
-    tt_register(&tt_unitmessage);
     tt_register(&tt_timeout);
     tt_register(&tt_clonedied);
 }

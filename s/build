@@ -1,8 +1,5 @@
 #!/bin/sh
-ROOT=`pwd`
-while [ ! -d $ROOT/.git ]; do
-  ROOT=`dirname $ROOT`
-done
+ROOT=$(git rev-parse --show-toplevel)
 
 [ -z "$BUILD" ] && BUILD=Debug
 if [ -z "$JOBS" ] ; then
@@ -33,16 +30,15 @@ if [ ! -d $ROOT/$BUILD ]; then
   exit
 fi
 
-git submodule update
-
-if [ -z `which tolua` ]; then
-echo "build tolua"
-cd $ROOT/tolua ; make
-fi
-
 echo "build eressea"
 cd $ROOT/$BUILD
+BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
+if [ "$BRANCH"=="master" ] ; then
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 cmake -DERESSEA_VERSION="$VERSION" ..
+else
+REV=$(git rev-parse --short HEAD)
+cmake -DERESSEA_BUILDNO="$REV" ..
+fi
 make $MAKEOPTS && make test
 cd $OLDPWD

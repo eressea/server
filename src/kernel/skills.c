@@ -21,7 +21,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 
 #include "curse.h"
-#include "item.h"
 #include "race.h"
 #include "region.h"
 #include "terrain.h"
@@ -184,9 +183,13 @@ void sk_set(skill * sv, int level)
     sv->level = level;
 }
 
-static int rule_random_progress(void)
+static bool rule_random_progress(void)
 {
-    return config_get_int("study.random_progress", 1);
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("study.random_progress", 1);
+    }
+    return rule != 0;
 }
 
 int skill_weeks(int level)

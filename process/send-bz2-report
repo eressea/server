@@ -8,7 +8,6 @@ if [ ! -f reports.txt ]; then
   exit -2
 fi
 source $HOME/bin/functions.sh
-source $ERESSEA/etc/eressea.conf
 
 TEMPLATE=report-mail.txt
 if [ "$1" == "-Lde" ]

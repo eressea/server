@@ -2,18 +2,18 @@
 <equipment>
 
   <!-- one equipment-set per player-race for the first unit in a faction -->
-  <set name="first_dwarf">
+  <set name="autoseed_dwarf">
     <item name="axe" amount="1"/>
     <item name="chainmail" amount="1"/>
     <skill name="melee" level="1"/>
   </set>
 
-  <set name="first_elf">
+  <set name="autoseed_elf">
     <item name="fairyboot" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="first_orc">
+  <set name="autoseed_orc">
     <skill name="polearm" level="4"/>
     <skill name="melee" level="4"/>
     <skill name="crossbow" level="4"/>
@@ -21,30 +21,30 @@
     <skill name="bow" level="4"/>
   </set>
 
-  <set name="first_goblin">
+  <set name="autoseed_goblin">
     <item name="roi" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="first_human">
+  <set name="autoseed_human">
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="first_troll">
+  <set name="autoseed_troll">
     <skill name="building" level="1"/>
     <skill name="perception" level="3"/>
     <item name="stone" amount="50"/>
   </set>
 
-  <set name="first_demon">
+  <set name="autoseed_demon">
     <skill name="stamina" level="15"/>
   </set>
 
-  <set name="first_insect">
+  <set name="autoseed_insect">
     <item name="nestwarmth" amount="9"/>
   </set>
 
-  <set name="first_halfling">
+  <set name="autoseed_halfling">
     <skill name="trade" level="1"/>
     <skill name="riding" level="2"/>
     <item name="horse" amount="2"/>
@@ -58,12 +58,12 @@
     <item name="incense" amount="5"/>
   </set>
 
-  <set name="first_cat">
+  <set name="autoseed_cat">
     <item name="roi" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="first_aquarian">
+  <set name="autoseed_aquarian">
     <skill name="sailing" level="1"/>
     <callback name="equip_newunits"/>
   </set>
@@ -265,11 +265,6 @@
   </set>
 
   <set name="new_orc_unit">
-    <skill name="polearm" level="1"/>
-    <skill name="melee" level="1"/>
-  </set>
-
-  <set name="new_centaur_unit">
     <skill name="polearm" level="1"/>
     <skill name="melee" level="1"/>
   </set>

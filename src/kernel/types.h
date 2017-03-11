@@ -19,14 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef ERESSEA_TYPES_H
 #define ERESSEA_TYPES_H
 
-/*
- * Features enabled:
- * If you are lacking the settings.h, create a new file common/settings.h,
- * and write #include <settings-config.h> (or whatever settings you want
- * your game to use) in there.
- * !!! DO NOT COMMIT THE SETTINGS.H FILE TO CVS !!!
- * settings.h should always be the first thing you include (after platform.h).
- */
 #include <settings.h>
 #include <util/variant.h>
 
@@ -51,7 +43,7 @@ struct luxury_type;
 struct order;
 struct plane;
 struct potion_type;
-struct quicklist;
+struct selist;
 struct race;
 struct region;
 struct region_list;
@@ -144,7 +136,7 @@ typedef enum {
   P_TREES,
   P_ALLIANCE,
   MAXPARAMS,
-  NOPARAM = -1
+  NOPARAM 
 } param_t;
 
 typedef enum {                  /* Fehler und Meldungen im Report */
@@ -154,9 +146,7 @@ typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_INCOME,
   MSG_COMMERCE,
   MSG_PRODUCE,
-  MSG_ORCVERMEHRUNG,
   MSG_MESSAGE,
-  MSG_COMMENT,
   MSG_MAGIC,
   MAX_MSG
 } msg_t;

@@ -1,8 +1,13 @@
 #include <platform.h>
 #include "attrib.h"
 
+#include <util/gamedata.h>
+
+#include <storage.h>
+#include <memstream.h>
 #include <CuTest.h>
 #include <tests.h>
+#include <string.h>
 
 static void test_attrib_new(CuTest * tc)
 {
@@ -15,7 +20,6 @@ static void test_attrib_new(CuTest * tc)
     a_remove(&a, a);
     CuAssertPtrEquals(tc, 0, a);
 }
-
 
 static void test_attrib_add(CuTest * tc)
 {
@@ -51,7 +55,6 @@ static void test_attrib_remove_self(CuTest * tc) {
     CuAssertPtrEquals(tc, a, alist);
     a_removeall(&alist, NULL);
 }
-
 
 static void test_attrib_removeall(CuTest * tc) {
     const attrib_type at_foo = { "foo" };
@@ -110,6 +113,86 @@ static void test_attrib_nexttype(CuTest * tc)
     a_removeall(&alist, &at_bar);
 }
 
+static void test_attrib_rwstring(CuTest *tc) {
+    gamedata data;
+    storage store;
+    attrib a = { 0 };
+
+    test_setup();
+    a.data.v = strdup("Hello World");
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    a_writestring(&a, NULL, &store);
+    a_finalizestring(&a);
+    data.strm.api->rewind(data.strm.handle);
+    a_readstring(&a, NULL, &data);
+    CuAssertStrEquals(tc, "Hello World", (const char *)a.data.v);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_attrib_rwint(CuTest *tc) {
+    gamedata data;
+    storage store;
+    attrib a = { 0 };
+
+    test_setup();
+    a.data.i = 42;
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    a_writeint(&a, NULL, &store);
+    a.data.i = 0;
+    data.strm.api->rewind(data.strm.handle);
+    a_readint(&a, NULL, &data);
+    CuAssertIntEquals(tc, 42, a.data.i);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_attrib_rwchars(CuTest *tc) {
+    gamedata data;
+    storage store;
+    attrib a = { 0 };
+
+    test_setup();
+    a.data.ca[0] = 1;
+    a.data.ca[3] = 42;
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    a_writeint(&a, NULL, &store);
+    memset(a.data.ca, 0, 4);
+    data.strm.api->rewind(data.strm.handle);
+    a_readint(&a, NULL, &data);
+    CuAssertIntEquals(tc, 1, a.data.ca[0]);
+    CuAssertIntEquals(tc, 42, a.data.ca[3]);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
+static void test_attrib_rwshorts(CuTest *tc) {
+    gamedata data;
+    storage store;
+    attrib a = { 0 };
+    a.data.sa[0] = -4;
+    a.data.sa[1] = 42;
+
+    test_setup();
+    mstream_init(&data.strm);
+    gamedata_init(&data, &store, RELEASE_VERSION);
+    a_writeint(&a, NULL, &store);
+    memset(a.data.ca, 0, 4);
+    data.strm.api->rewind(data.strm.handle);
+    a_readint(&a, NULL, &data);
+    CuAssertIntEquals(tc, -4, a.data.sa[0]);
+    CuAssertIntEquals(tc, 42, a.data.sa[1]);
+    mstream_done(&data.strm);
+    gamedata_done(&data);
+    test_cleanup();
+}
+
 CuSuite *get_attrib_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -119,5 +202,9 @@ CuSuite *get_attrib_suite(void)
     SUITE_ADD_TEST(suite, test_attrib_removeall);
     SUITE_ADD_TEST(suite, test_attrib_remove_self);
     SUITE_ADD_TEST(suite, test_attrib_nexttype);
+    SUITE_ADD_TEST(suite, test_attrib_rwstring);
+    SUITE_ADD_TEST(suite, test_attrib_rwint);
+    SUITE_ADD_TEST(suite, test_attrib_rwchars);
+    SUITE_ADD_TEST(suite, test_attrib_rwshorts);
     return suite;
 }

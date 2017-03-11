@@ -67,7 +67,7 @@ void score(void)
     region *r;
     faction *fc;
     score_t allscores = 0;
-    char path[MAX_PATH];
+    char path[4096];
 
     for (fc = factions; fc; fc = fc->next)
         fc->score = 0;
@@ -169,7 +169,7 @@ void score(void)
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
                     f->race->_name,
-                    factionid(f),
+                    itoa36(f->no),
                     f->age);
             }
         fclose(scoreFP);

@@ -23,7 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include "ally.h"
 #include "faction.h"
-#include "save.h"
 #include "unit.h"
 
 /* attrib includes */
@@ -58,8 +57,8 @@ group *new_group(faction * f, const char *name, int gid)
         gp = &(*gp)->next;
     *gp = g;
 
-    maxgid = _max(gid, maxgid);
-    g->name = _strdup(name);
+    maxgid = MAX(gid, maxgid);
+    g->name = strdup(name);
     g->gid = gid;
 
     g->nexthash = ghash[index];

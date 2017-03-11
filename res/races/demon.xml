@@ -1,12 +1,11 @@
 <?xml version="1.0" ?>
-<race name="demon" magres="0.150000" maxaura="1.000000"
+<race name="demon" magres="15" maxaura="1.000000"
 regaura="1.250000" recruitcost="150" maintenance="10" weight="1000"
 capacity="540" speed="1.000000" hp="50" ac="2" damage="1d5"
 unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes"
 shapeshift="yes" giveperson="yes" giveunit="yes" getitem="yes"
 recruitethereal="yes" equipment="yes" healing="1.5">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <function name="itemdrop" value="defaultdrops"/>
     <skill name="alchemy" modifier="2"/>
     <skill name="trade" modifier="-3"/>
     <skill name="forestry" modifier="1"/>

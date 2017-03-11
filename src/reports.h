@@ -20,16 +20,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_REPORTS
 #define H_KRNL_REPORTS
 
-#include <platform.h>
 #include <time.h>
 #include <kernel/objtypes.h>
 #include <kernel/types.h>
+#include <stdbool.h>
 
-struct stream;
-struct seen_region;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    struct selist;
+    struct stream;
+    struct seen_region;
 
     /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
@@ -43,13 +45,14 @@ extern "C" {
     extern bool nocr;
     extern bool noreports;
     extern const char *visibility[];
+    extern const char *options[MAXOPTIONS];    /* report options */
 
     void reports_done(void);
 
     struct unit *can_find(struct faction *, struct faction *);
 
     bool omniscient(const struct faction *f);
-    struct quicklist *get_regions_distance(struct region * root, int radius);
+    struct selist *get_regions_distance(struct region * root, int radius);
     int get_regions_distance_arr(struct region *r, int radius, struct region *result[], int size);
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
@@ -71,7 +74,7 @@ extern "C" {
 
     typedef struct report_context {
         struct faction *f;
-        struct quicklist *addresses;
+        struct selist *addresses;
         struct region *first, *last;
         void *userdata;
         time_t report_time;
@@ -129,6 +132,7 @@ extern "C" {
     int stream_printf(struct stream * out, const char *format, ...);
 
     int count_travelthru(struct region *r, const struct faction *f);
+    const char *get_mailcmd(const struct locale *loc);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

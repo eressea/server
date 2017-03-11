@@ -49,7 +49,6 @@ extern "C" {
     int sp_armorshield(struct castorder * co);
     int sp_stun(struct castorder * co);
     int sp_undeadhero(struct castorder * co);
-    int sp_shadowcall(struct castorder * co);
     int sp_immolation(struct castorder * co);
 
 #ifdef __cplusplus

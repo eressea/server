@@ -19,7 +19,7 @@ static void test_resourcename_no_appearance(CuTest *tc) {
     const resource_type *rtype;
 
     test_cleanup();
-    init_resources(); // creates R_SILVER
+    init_resources(); /* creates R_SILVER */
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     assert(rtype->itype->_appearance[0] == 0);
@@ -162,7 +162,6 @@ static void test_core_resources(CuTest *tc) {
     CuAssertPtrNotNull(tc, rtype = rt_find("money"));
     CuAssertPtrNotNull(tc, rtype->itype);
     CuAssertPtrNotNull(tc, rtype->uchange);
-    CuAssertPtrNotNull(tc, rtype->itype->give);
     CuAssertPtrNotNull(tc, rtype = rt_find("peasant"));
     CuAssertPtrEquals(tc, 0, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("person"));

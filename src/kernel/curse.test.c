@@ -5,6 +5,7 @@
 #include <kernel/save.h>
 #include <kernel/unit.h>
 #include <util/attrib.h>
+#include <util/rng.h>
 #include <util/gamedata.h>
 #include <util/message.h>
 #include <binarystore.h>
@@ -54,7 +55,6 @@ static void setup_curse(curse_fixture *fix, const char *name) {
 }
 
 static void cleanup_curse(curse_fixture *fix) {
-    // destroy_curse(fix->c);
     test_cleanup();
 }
 
@@ -175,6 +175,43 @@ static void test_curse_cache(CuTest *tc)
     test_cleanup();
 }
 
+static void test_curse_ids(CuTest *tc) {
+    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
+    curse *c1, *c2;
+    attrib *a1 = 0, *a2 = 0;
+
+    test_setup();
+    rng_init(0);
+    c1 = create_curse(NULL, &a1, &ct_dummy, 1, 1, 1, 1);
+    rng_init(0);
+    c2 = create_curse(NULL, &a2, &ct_dummy, 1, 1, 1, 1);
+    CuAssertTrue(tc, c1->no != c2->no);
+    a_remove(&a1, a1);
+    a_remove(&a2, a2);
+    test_cleanup();
+}
+
+static void test_curse_flags(CuTest *tc) {
+    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
+    curse *c1, *c2;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    c1 = create_curse(u, &u->attribs, &ct_dummy, 1, 1, 1, 0);
+    CuAssertPtrEquals(tc, u, c1->magician);
+    CuAssertIntEquals(tc, 1, (int)c1->effect);
+    CuAssertIntEquals(tc, 1, (int)c1->vigour);
+    CuAssertIntEquals(tc, 1, c1->duration);
+    c2 = create_curse(u, &u->attribs, &ct_dummy, 1, 1, 1, 0);
+    CuAssertPtrEquals(tc, c1, c2);
+    CuAssertPtrEquals(tc, u, c1->magician);
+    CuAssertIntEquals(tc, 2, (int)c1->effect);
+    CuAssertIntEquals(tc, 1, (int)c1->vigour);
+    CuAssertIntEquals(tc, 1, c1->duration);
+    test_cleanup();
+}
+
 CuSuite *get_curse_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -186,5 +223,7 @@ CuSuite *get_curse_suite(void)
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_memstream);
     SUITE_ADD_TEST(suite, test_write_flag);
+    SUITE_ADD_TEST(suite, test_curse_flags);
+    SUITE_ADD_TEST(suite, test_curse_ids);
     return suite;
 }

@@ -1,16 +1,21 @@
+#pragma once
+
 #ifndef STRUCT_VARIANT_H
 #define STRUCT_VARIANT_H
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
   typedef union variant {
-    void *v; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
+    void *v;
     int i;
     char c;
     short s;
     short sa[2];
-    char ca[4]; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 4 used: char ca[4];.
+    char ca[4];
     float f;
   } variant;
 
@@ -18,6 +23,17 @@ extern "C" {
     VAR_NONE, VAR_INT, VAR_VOIDPTR, VAR_CHAR, VAR_SHORT, VAR_SHORTA, VAR_CHARA,
       VAR_FLOAT
   } variant_type;
+
+  extern const variant frac_zero;
+  extern const variant frac_one;
+
+  variant frac_make(int num, int den);
+  variant frac_add(variant a, variant b);
+  variant frac_sub(variant a, variant b);
+  variant frac_mul(variant a, variant b);
+  variant frac_div(variant a, variant b);
+  int frac_sign(variant a);
+  bool frac_equal(variant a, variant b);
 
 #ifdef __cplusplus
 }

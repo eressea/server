@@ -1,9 +1,9 @@
 {
-	"include": [
-		"keywords.json",
+    "include": [
+        "keywords.json",
         "prefixes.json",
         "e3/terrains.json"
-	],
+    ],
     "disabled": [
         "herbalism",
         "alchemy",
@@ -25,8 +25,8 @@
         "jsreport"
     ],
     "settings": {
-        "game.id": 3,
-        "game.name": "E3",
+        "game.name" : "Eressea",
+        "game.id" : 3,
         "orders.default": "work",
         "database.gameid": 7,
         "NewbieImmunity": 4,
@@ -42,6 +42,7 @@
         "nmr.timeout": 5,
         "nmr.removenewbie": 0,
         "GiveRestriction": 3,
+        "healing.forest": 2.0,
         "hunger.long": false,
         "hunger.damage": "1d9+9",
         "hunger.demons.skill": true,

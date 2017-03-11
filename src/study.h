@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
     struct unit;
+    struct selist;
 
     int teach_cmd(struct unit *u, struct order *ord);
     int study_cmd(struct unit *u, struct order *ord);
@@ -45,10 +46,9 @@ extern "C" {
 
     void demon_skillchange(struct unit *u);
 
-#define MAXTEACHERS 20
 #define TEACHNUMBER 10
     typedef struct teaching_info {
-        struct unit *teachers[MAXTEACHERS];
+        struct selist *teachers;
         int value;
     } teaching_info;
 

@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>

@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <config.h>
 #include "reports.h"
 
 #include "move.h"
@@ -7,6 +6,7 @@
 #include "travelthru.h"
 #include "keyword.h"
 
+#include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -23,7 +23,7 @@
 #include <util/lists.h>
 #include <util/message.h>
 
-#include <quicklist.h>
+#include <selist.h>
 #include <stream.h>
 #include <memstream.h>
 
@@ -108,14 +108,14 @@ static void test_seen_faction(CuTest *tc) {
     f1 = test_create_faction(rc);
     f2 = test_create_faction(rc);
     add_seen_faction(f1, f2);
-    CuAssertPtrEquals(tc, f2, ql_get(f1->seen_factions, 0));
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertPtrEquals(tc, f2, selist_get(f1->seen_factions, 0));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f2);
-    CuAssertIntEquals(tc, 1, ql_length(f1->seen_factions));
+    CuAssertIntEquals(tc, 1, selist_length(f1->seen_factions));
     add_seen_faction(f1, f1);
-    CuAssertIntEquals(tc, 2, ql_length(f1->seen_factions));
-    f2 = (faction *)ql_get(f1->seen_factions, 1);
-    f1 = (faction *)ql_get(f1->seen_factions, 0);
+    CuAssertIntEquals(tc, 2, selist_length(f1->seen_factions));
+    f2 = (faction *)selist_get(f1->seen_factions, 1);
+    f1 = (faction *)selist_get(f1->seen_factions, 0);
     CuAssertTrue(tc, f1->no < f2->no);
     test_cleanup();
 }
@@ -223,6 +223,23 @@ static void test_arg_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 5, res->number);
     CuAssertPtrEquals(tc, 0, res->next);
     atype->release(v2);
+    test_cleanup();
+}
+
+static void test_newbie_password_message(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    test_setup();
+    f = test_create_faction(0);
+    f->age = 5;
+    f->flags = 0;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "changepasswd"));
+    f->age=2;
+    prepare_report(&ctx, f);
+    CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
     test_cleanup();
 }
 
@@ -335,6 +352,43 @@ static void test_prepare_lighthouse(CuTest *tc) {
     u = test_create_unit(f, r1);
     u->building = b;
     set_level(u, SK_PERCEPTION, 3);
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    test_cleanup();
+}
+
+static void test_prepare_lighthouse_owners(CuTest *tc) {
+    report_context ctx;
+    faction *f;
+    region *r1, *r2, *r3;
+    unit *u;
+    building *b;
+    building_type *btype;
+    const struct terrain_type *t_ocean, *t_plain;
+
+    test_setup();
+    config_set("rules.region_owner_pay_building", "lighthouse");
+    config_set("rules.region_owners", "1");
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_ocean);
+    r3 = test_create_region(2, 0, t_ocean);
+    btype = test_create_buildingtype("lighthouse");
+    b = test_create_building(r1, btype);
+    b->flags |= BLD_MAINTAINED;
+    b->size = 10;
+    update_lighthouse(b);
+    u = test_create_unit(f, r1);
+    u = test_create_unit(test_create_faction(0), r1);
+    u->building = b;
+    set_level(u, SK_PERCEPTION, 3);
+    region_set_owner(b->region, f, 0);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
@@ -463,21 +517,21 @@ static void test_region_distance(CuTest *tc) {
 
 static void test_region_distance_ql(CuTest *tc) {
     region *r;
-    quicklist *ql;
+    selist *ql;
     test_setup();
     r = test_create_region(0, 0, 0);
     ql = get_regions_distance(r, 0);
-    CuAssertIntEquals(tc, 1, ql_length(ql));
-    CuAssertPtrEquals(tc, r, ql_get(ql, 0));
-    ql_free(ql);
+    CuAssertIntEquals(tc, 1, selist_length(ql));
+    CuAssertPtrEquals(tc, r, selist_get(ql, 0));
+    selist_free(ql);
     test_create_region(1, 0, 0);
     test_create_region(0, 1, 0);
     ql = get_regions_distance(r, 1);
-    CuAssertIntEquals(tc, 3, ql_length(ql));
-    ql_free(ql);
+    CuAssertIntEquals(tc, 3, selist_length(ql));
+    selist_free(ql);
     ql = get_regions_distance(r, 2);
-    CuAssertIntEquals(tc, 3, ql_length(ql));
-    ql_free(ql);
+    CuAssertIntEquals(tc, 3, selist_length(ql));
+    selist_free(ql);
     test_cleanup();
 }
 
@@ -487,10 +541,12 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_region_distance);
     SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
+    SUITE_ADD_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse_owners);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_reorder_units);

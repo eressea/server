@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<resource name="seed" limited="yes">
+<resource name="seed">
   <item weight="10" score="50"/>
 </resource>

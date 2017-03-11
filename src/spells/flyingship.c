@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include "flyingship.h"
 
 #include <kernel/build.h>
@@ -27,8 +26,8 @@
 * Stufe:      6
 *
 * Wirkung:
-* Laeßt ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
-* bis Kapazität 50.
+* Laeï¿½t ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
+* bis Kapazitï¿½t 50.
 * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
 *
 * Flag:
@@ -81,18 +80,20 @@ int sp_flying_ship(castorder * co)
 
     /* melden, 1x pro Partei */
     for (u = r->units; u; u = u->next)
-        freset(u->faction, FFL_SELECT);
+        u->faction->flags &= ~FFL_SELECT;
     for (u = r->units; u; u = u->next) {
         /* das sehen natuerlich auch die Leute an Land */
-        if (!fval(u->faction, FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-            if (!m)
+        if (!(u->faction->flags & FFL_SELECT)) {
+            u->faction->flags |= FFL_SELECT;
+            if (!m) {
                 m = msg_message("flying_ship_result", "mage ship", mage, sh);
+            }
             add_message(&u->faction->msgs, m);
         }
     }
-    if (m)
+    if (m) {
         msg_release(m);
+    }
     return cast_level;
 }
 
@@ -120,7 +121,7 @@ static int flyingship_age(curse * c)
 {
     ship *sh = (ship *)c->data.v;
     if (sh && c->duration == 1) {
-        freset(sh, SF_FLYING);
+        sh->flags &= ~SF_FLYING;
         return 1;
     }
     return 0;

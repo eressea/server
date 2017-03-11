@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "racename.h"
 
-#include <kernel/save.h>
 #include <util/attrib.h>
 
 /* libc includes */
@@ -44,7 +43,7 @@ void set_racename(attrib ** palist, const char *name)
     attrib *a = a_find(*palist, &at_racename);
     if (!a && name) {
         a = a_add(palist, a_new(&at_racename));
-        a->data.v = _strdup(name);
+        a->data.v = strdup(name);
     }
     else if (a && !name) {
         a_remove(palist, a);
@@ -52,7 +51,7 @@ void set_racename(attrib ** palist, const char *name)
     else if (a) {
         if (strcmp(a->data.v, name) != 0) {
             free(a->data.v);
-            a->data.v = _strdup(name);
+            a->data.v = strdup(name);
         }
     }
 }

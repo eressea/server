@@ -12,6 +12,9 @@
 
 #ifndef H_UTIL_NRMESSAGE
 #define H_UTIL_NRMESSAGE
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,18 +31,20 @@ extern "C" {
 
     extern nrsection *sections;
 
-    extern void nrt_register(const struct message_type *mtype,
+    void free_nrmesssages(void);
+
+    void nrt_register(const struct message_type *mtype,
         const struct locale *lang, const char *script,
         int level, const char *section);
-    extern struct nrmessage_type *nrt_find(const struct locale *,
+    struct nrmessage_type *nrt_find(const struct locale *,
         const struct message_type *);
-    extern const char *nrt_string(const struct nrmessage_type *type);
-    extern const char *nrt_section(const struct nrmessage_type *mt);
+    const char *nrt_string(const struct nrmessage_type *type);
+    const char *nrt_section(const struct nrmessage_type *mt);
 
-    extern size_t nr_render(const struct message *msg, const struct locale *lang,
+    size_t nr_render(const struct message *msg, const struct locale *lang,
         char *buffer, size_t size, const void *userdata);
-    extern int nr_level(const struct message *msg);
-    extern const char *nr_section(const struct message *msg);
+    int nr_level(const struct message *msg);
+    const char *nr_section(const struct message *msg);
 
     /* before:
      * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.

@@ -12,7 +12,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "buildingcurse.h"
 
 /* kernel includes */
@@ -37,7 +36,7 @@ message *cinfo_building(const void *obj, objtype_t typ, const curse * c,
     int self)
 {
     const building *b = (const building *)obj;
-    unused_arg(typ);
+    UNUSED_ARG(typ);
     assert(typ == TYP_BUILDING);
     assert(obj);
     assert(c);

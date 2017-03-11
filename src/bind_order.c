@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
 
 /* kernel includes */
 #include <kernel/order.h>
