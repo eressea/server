@@ -484,13 +484,13 @@
   </string>
 
   <string name="mallorntree">
-    <text locale="de">Mallornbaum</text>
-    <text locale="en">mallorn tree</text>
+    <text locale="de">Mallorn</text>
+    <text locale="en">mallorn</text>
   </string>
 
   <string name="mallorntree_p">
-    <text locale="de">Mallornbäume</text>
-    <text locale="en">mallorn trees</text>
+    <text locale="de">Mallorn</text>
+    <text locale="en">mallorn</text>
   </string>
 
   <!--Küsten -->

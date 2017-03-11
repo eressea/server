@@ -1094,12 +1094,16 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
 static char *cr_output_resource(char *buf, const resource_type *rtype,
     const struct locale *loc, int amount, int level)
 {
-    const char * name;
+    const char *name, *tname;
     assert(rtype);
     name = resourcename(rtype, 1);
     assert(name);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
-    buf += sprintf(buf, "\"%s\";type\n", translate(name, LOC(loc, rtype->_name)));
+    tname = LOC(loc, rtype->_name);
+    assert(tname);
+    tname = translate(name, tname);
+    assert(tname);
+    buf += sprintf(buf, "\"%s\";type\n", tname);
     if (amount >= 0) {
         if (level >= 0)
             buf += sprintf(buf, "%d;skill\n", level);
