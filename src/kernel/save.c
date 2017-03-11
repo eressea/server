@@ -657,10 +657,7 @@ unit *read_unit(struct gamedata *data)
     if (f != u->faction) {
         u_setfaction(u, f);
     }
-    if (u->faction) {
-        ++u->faction->no_units;
-    }
-    else {
+    if (!u->faction) {
         log_error("unit %s has faction == NULL", itoa36(u->no));
         return 0;
     }

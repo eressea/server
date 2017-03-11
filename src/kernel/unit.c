@@ -1129,7 +1129,7 @@ void u_setfaction(unit * u, faction * f)
     if (u->faction == f)
         return;
     if (u->faction) {
-        --u->faction->no_units;
+        --u->faction->num_units;
         set_number(u, 0);
         join_group(u, NULL);
         free_orders(&u->orders);
@@ -1166,7 +1166,7 @@ void u_setfaction(unit * u, faction * f)
         set_number(u, cnt);
     }
     if (f) {
-        ++f->no_units;
+        ++f->num_units;
     }
 }
 
@@ -1581,7 +1581,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
 int maxheroes(const struct faction *f)
 {
-    int nsize = count_all(f);
+    int nsize = f->num_people;
     if (nsize == 0)
         return 0;
     else {

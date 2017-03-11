@@ -1280,7 +1280,7 @@ static void remove_idle_players(void)
             else if (turn != f->lastorders) {
                 char info[256];
                 sprintf(info, "%d Einheiten, %d Personen",
-                    f->no_units, f->num_total);
+                    f->num_units, f->num_people);
             }
             fp = &f->next;
         }
@@ -2519,7 +2519,7 @@ int promotion_cmd(unit * u, struct order *ord)
             u_race(u)));
         return 0;
     }
-    people = count_all(u->faction) * u->number;
+    people = u->faction->num_people * u->number;
     money = get_pooled(u, rsilver, GET_ALL, people);
 
     if (people > money) {
@@ -3020,8 +3020,7 @@ static int maxunits(const faction * f)
 int checkunitnumber(const faction * f, int add)
 {
     int alimit, flimit;
-    int flags = COUNT_DEFAULT | COUNT_MIGRANTS | COUNT_UNITS;
-    int fno = count_faction(f, flags) + add;
+    int fno = f->num_units + add;
     flimit = rule_faction_limit();
     if (flimit && fno > flimit) {
         return 2;
@@ -3039,7 +3038,7 @@ int checkunitnumber(const faction * f, int add)
 
         for (f2 = factions; f2; f2 = f2->next) {
             if (f != f2 && f->alliance == f2->alliance) {
-                unitsinalliance += count_faction(f2, flags);
+                unitsinalliance += f2->num_units;
                 if (unitsinalliance > alimit) {
                     return 1;
                 }
