@@ -1279,8 +1279,8 @@ static void remove_idle_players(void)
             }
             else if (turn != f->lastorders) {
                 char info[256];
-                sprintf(info, "%d Einheiten, %d Personen, %d Silber",
-                    f->no_units, f->num_total, f->money);
+                sprintf(info, "%d Einheiten, %d Personen",
+                    f->num_units, f->num_people);
             }
             fp = &f->next;
         }
@@ -2519,7 +2519,7 @@ int promotion_cmd(unit * u, struct order *ord)
             u_race(u)));
         return 0;
     }
-    people = count_all(u->faction) * u->number;
+    people = u->faction->num_people * u->number;
     money = get_pooled(u, rsilver, GET_ALL, people);
 
     if (people > money) {
@@ -3020,8 +3020,7 @@ static int maxunits(const faction * f)
 int checkunitnumber(const faction * f, int add)
 {
     int alimit, flimit;
-    int flags = COUNT_DEFAULT | COUNT_MIGRANTS | COUNT_UNITS;
-    int fno = count_faction(f, flags) + add;
+    int fno = f->num_units + add;
     flimit = rule_faction_limit();
     if (flimit && fno > flimit) {
         return 2;
@@ -3029,21 +3028,9 @@ int checkunitnumber(const faction * f, int add)
 
     alimit = rule_alliance_limit();
     if (alimit) {
-        /* if unitsperalliance is true, maxunits returns the
-         number of units allowed in an alliance */
-        faction *f2;
-        int unitsinalliance = fno;
-        if (unitsinalliance > alimit) {
+        int unitsinalliance = alliance_size(f->alliance);
+        if (unitsinalliance + add > alimit) {
             return 1;
-        }
-
-        for (f2 = factions; f2; f2 = f2->next) {
-            if (f != f2 && f->alliance == f2->alliance) {
-                unitsinalliance += count_faction(f2, flags);
-                if (unitsinalliance > alimit) {
-                    return 1;
-                }
-            }
         }
     }
 
@@ -4285,12 +4272,18 @@ void update_subscriptions(void)
     fclose(F);
 }
 
-bool
-cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um Durchreisen geht,
+/** determine if unit can be seen by faction
+ * @param f -- the observiong faction
+ * @param u -- the unit that is observed
+ * @param r -- the region that u is obesrved in (see below)
+ * @param m -- terrain modifier to stealth
+ * 
+ * r kann != u->region sein, wenn es um Durchreisen geht,
  * oder Zauber (sp_generous, sp_fetchastral).
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
+bool
+cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
     unit *u2 = r->units;

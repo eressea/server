@@ -77,13 +77,11 @@ extern "C" {
         magic_t magiegebiet;
         int newbies;
         int num_people;             /* Anzahl Personen ohne Monster */
-        int num_total;              /* Anzahl Personen mit Monstern */
+        int num_units;
         int options;
-        int no_units;
         struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
         struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
         int nregions;
-        int money;
         score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
@@ -166,14 +164,10 @@ extern "C" {
 #define COUNT_MONSTERS 0x01
 #define COUNT_MIGRANTS 0x02
 #define COUNT_DEFAULT  0x04
-#define COUNT_ALL      0x07
-#define COUNT_UNITS    0x10
 
     int count_faction(const struct faction * f, int flags);
     int count_migrants(const struct faction * f);
     int count_maxmigrants(const struct faction * f);
-    int count_all(const struct faction * f);
-    int count_units(const struct faction * f);
     int max_magicians(const struct faction * f);
 
     struct faction *getfaction(void);

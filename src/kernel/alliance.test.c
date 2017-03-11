@@ -112,6 +112,29 @@ static void test_alliance_cmd(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_alliance_limits(CuTest *tc) {
+    unit *u1, *u2;
+    struct region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    u1 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(0), r);
+
+    config_set("rules.limit.alliance", "1");
+    unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
+    unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_INVITE], itoa36(u2->faction->no)));
+    unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
+    CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
+    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    alliance_cmd();
+    CuAssertPtrNotNull(tc, f_get_alliance(u1->faction));
+    CuAssertPtrEquals(tc, 0, f_get_alliance(u2->faction));
+    CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "too_many_units_in_alliance"));
+    test_cleanup();
+}
+
 static void test_alliance_cmd_kick(CuTest *tc) {
     unit *u1, *u2;
     struct region *r;
@@ -200,6 +223,7 @@ CuSuite *get_alliance_suite(void)
     SUITE_ADD_TEST(suite, test_alliance_dead_faction);
     SUITE_ADD_TEST(suite, test_alliance_make);
     SUITE_ADD_TEST(suite, test_alliance_join);
+    SUITE_ADD_TEST(suite, test_alliance_limits);
     SUITE_ADD_TEST(suite, test_alliance_cmd);
     SUITE_ADD_TEST(suite, test_alliance_cmd_no_invite);
     SUITE_ADD_TEST(suite, test_alliance_cmd_kick);

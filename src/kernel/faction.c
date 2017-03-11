@@ -712,7 +712,7 @@ int count_faction(const faction * f, int flags)
     int n = 0;
     for (u = f->units; u; u = u->nextF) {
         const race *rc = u_race(u);
-        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        int x = u->number;
         if (f->race != rc) {
             if (!playerrace(rc)) {
                 if (flags&COUNT_MONSTERS) {
@@ -732,16 +732,6 @@ int count_faction(const faction * f, int flags)
     return n;
 }
 
-int count_units(const faction * f)
-{
-    return count_faction(f, COUNT_ALL | COUNT_UNITS);
-}
-
-int count_all(const faction * f)
-{
-    return count_faction(f, COUNT_ALL);
-}
-
 int count_migrants(const faction * f)
 {
     return count_faction(f, COUNT_MIGRANTS);
@@ -752,7 +742,7 @@ int count_maxmigrants(const faction * f)
     int formula = rc_migrants_formula(f->race);
 
     if (formula == MIGRANTS_LOG10) {
-        int nsize = count_all(f);
+        int nsize = f->num_people;
         if (nsize > 0) {
             int x = (int)(log10(nsize / 50.0) * 20);
             if (x < 0) x = 0;

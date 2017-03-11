@@ -1558,7 +1558,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             translate(prefix, LOC(f->locale, prefix)));
     }
     fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
-    fprintf(F, "%d;Anzahl Personen\n", count_all(f));
+    fprintf(F, "%d;Anzahl Personen\n", f->num_people);
     fprintf(F, "\"%s\";Magiegebiet\n", magic_school[f->magiegebiet]);
 
     if (rc_changed(&rc_cache)) {

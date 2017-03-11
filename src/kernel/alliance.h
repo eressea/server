@@ -67,7 +67,7 @@ extern "C" {
     struct faction *alliance_get_leader(struct alliance *al);
     void alliance_cmd(void);
     bool is_allied(const struct faction *f1, const struct faction *f2);
-
+    int alliance_size(const struct alliance *al); /* #units in the alliance */
     void alliance_setname(alliance * self, const char *name);
     /* execute commands */
 

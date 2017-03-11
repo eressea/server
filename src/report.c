@@ -2106,14 +2106,8 @@ report_plaintext(const char *filename, report_context * ctx,
         RENDER(f, buf, sizeof(buf), ("nr_score", "score average", score, avg));
         centre(out, buf, true);
     }
-    no_units = count_units(f);
-    no_people = count_all(f);
-    if (f->flags & FFL_NPC) {
-        no_people = f->num_total;
-    }
-    else {
-        no_people = f->num_people;
-    }
+    no_units = f->num_units;
+    no_people = f->num_people;
     m = msg_message("nr_population", "population units limit", no_people, no_units, rule_faction_limit());
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);

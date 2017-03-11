@@ -239,8 +239,25 @@ static void perform_transfer(void)
     }
 }
 
+bool num_units_cb(void *entry, void *more) {
+    faction *f = (faction *)entry;
+    int *num = (int *)more;
+    *num += f->num_units;
+    return true;
+}
+
+int alliance_size(const alliance *al)
+{
+    int num = 0;
+    if (al) {
+        selist_foreach_ex(al->members, num_units_cb, &num);
+    }
+    return num;
+}
+
 static void perform_join(void)
 {
+    int alimit = rule_alliance_limit();
     alliance_transaction **tap = transactions + ALLIANCE_JOIN;
     while (*tap) {
         alliance_transaction *ta = *tap;
@@ -270,7 +287,16 @@ static void perform_join(void)
                     ti = *tip;
                 }
                 if (ti) {
-                    setalliance(fj, al);
+                    int maxsize = (alimit > 0) ? (alimit - alliance_size(al)) : 0;
+                    if (alimit > 0 && fj->num_units > maxsize) {
+                        ADDMSG(&fj->msgs,
+                            msg_feedback(ta->u, ta->ord,
+                                "too_many_units_in_alliance",
+                                "allowed", alimit));
+                    }
+                    else {
+                        setalliance(fj, al);
+                    }
                     *tip = ti->next;
                     free(ti);
                 }
