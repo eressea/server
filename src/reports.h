@@ -20,16 +20,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_REPORTS
 #define H_KRNL_REPORTS
 
-#include <platform.h>
 #include <time.h>
 #include <kernel/objtypes.h>
 #include <kernel/types.h>
+#include <stdbool.h>
 
-struct stream;
-struct seen_region;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    struct selist;
+    struct stream;
+    struct seen_region;
 
     /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
@@ -43,10 +45,13 @@ extern "C" {
     extern bool nocr;
     extern bool noreports;
     extern const char *visibility[];
+    extern const char *options[MAXOPTIONS];    /* report options */
 
     void reports_done(void);
 
     struct unit *can_find(struct faction *, struct faction *);
+
+    bool omniscient(const struct faction *f);
 
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
@@ -54,9 +59,8 @@ extern "C" {
     const char *hp_status(const struct unit *u);
     size_t spskill(char *pbuf, size_t siz, const struct locale *lang, const struct unit *u, struct skill *sv, int *dh, int days);  /* mapper */
     void spunit(struct strlist **SP, const struct faction *f,
-        const struct unit *u, unsigned int indent, int mode);
+        const struct unit *u, unsigned int indent, seen_mode mode);
 
-    void prepare_seen(struct faction *f);
     int reports(void);
     int write_reports(struct faction *f, time_t ltime);
     int init_reports(void);
@@ -65,15 +69,19 @@ extern "C" {
     const struct unit *ucansee(const struct faction *f,
         const struct unit *u, const struct unit *x);
 
-    int stealth_modifier(int seen_mode);
+    int stealth_modifier(seen_mode seen_mode);
 
     typedef struct report_context {
         struct faction *f;
-        struct quicklist *addresses;
+        struct selist *addresses;
         struct region *first, *last;
         void *userdata;
         time_t report_time;
     } report_context;
+
+    void prepare_report(report_context *ctx, struct faction *f);
+    void finish_reports(report_context *ctx);
+    void get_addresses(report_context * ctx);
 
     typedef int(*report_fun) (const char *filename, report_context * ctx,
         const char *charset);
@@ -81,7 +89,7 @@ extern "C" {
         int flag);
 
     int bufunit(const struct faction *f, const struct unit *u, unsigned int indent,
-        int mode, char *buf, size_t size);
+        seen_mode mode, char *buf, size_t size);
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);
@@ -99,14 +107,12 @@ extern "C" {
     } arg_regions;
 
     typedef struct resource_report {
-        const char *name;
+        const struct resource_type *rtype;
         int number;
         int level;
     } resource_report;
-    void view_default(struct seen_region **seen, struct region * r, struct faction * f);
-    void view_neighbours(struct seen_region **seen, struct region * r, struct faction * f);
-    int report_resources(const struct seen_region *sr,
-    struct resource_report *result, int size, const struct faction *viewer);
+    int report_resources(const struct region *r, struct resource_report *res,
+        int size, const struct faction *viewer, bool see_unit);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_item(const struct unit *owner, const struct item *i,
@@ -126,6 +132,7 @@ extern "C" {
     int stream_printf(struct stream * out, const char *format, ...);
 
     int count_travelthru(struct region *r, const struct faction *f);
+    const char *get_mailcmd(const struct locale *loc);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

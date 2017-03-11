@@ -3,6 +3,8 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/jsonconf.h>
+#include <util/bsdstring.h>
+#include <util/nrmessage.h>
 #include <util/log.h>
 #include <util/language.h>
 #include <cJSON.h>
@@ -18,8 +20,8 @@
 #include "kernel/terrain.h"
 
 void config_reset(void) {
-    default_locale = 0;
-    free_locales();
+    free_config();
+    free_nrmesssages();
     free_spells();
     free_buildingtypes();
     free_shiptypes();
@@ -33,7 +35,6 @@ int config_parse(const char *json)
     if (conf) {
         json_config(conf);
         cJSON_Delete(conf);
-        init_locales();
         return 0;
     }
     else {
@@ -45,7 +46,7 @@ int config_parse(const char *json)
             if (xp >= ep) break;
         }
         xp = (ep > json + 10) ? ep - 10 : json;
-        strncpy(buffer, xp, sizeof(buffer));
+        strlcpy(buffer, xp, sizeof(buffer));
         buffer[9] = 0;
         log_error("json parse error in line %d, position %d, near `%s`\n", line, ep - lp, buffer);
     }

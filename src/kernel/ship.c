@@ -38,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/umlaut.h>
-#include <quicklist.h>
+#include <selist.h>
 #include <util/xml.h>
 
 #include <attributes/movement.h>
@@ -51,7 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-quicklist *shiptypes = NULL;
+selist *shiptypes = NULL;
 
 static local_names *snames;
 
@@ -66,15 +66,15 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
         sn = sn->next;
     }
     if (!sn) {
-        quicklist *ql;
+        selist *ql;
         int qi;
 
         sn = (local_names *)calloc(sizeof(local_names), 1);
         sn->next = snames;
         sn->lang = lang;
 
-        for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
-            ship_type *stype = (ship_type *)ql_get(ql, qi);
+        for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
+            ship_type *stype = (ship_type *)selist_get(ql, qi);
             variant var2;
             const char *n = LOC(lang, stype->_name);
             var2.v = (void *)stype;
@@ -89,11 +89,11 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
 static ship_type *st_find_i(const char *name)
 {
-    quicklist *ql;
+    selist *ql;
     int qi;
 
-    for (qi = 0, ql = shiptypes; ql; ql_advance(&ql, &qi, 1)) {
-        ship_type *stype = (ship_type *)ql_get(ql, qi);
+    for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
+        ship_type *stype = (ship_type *)selist_get(ql, qi);
         if (strcmp(stype->_name, name) == 0) {
             return stype;
         }
@@ -109,9 +109,9 @@ ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
-        st->_name = _strdup(name);
+        st->_name = strdup(name);
         st->storm = 1.0;
-        ql_push(&shiptypes, (void *)st);
+        selist_push(&shiptypes, (void *)st);
     }
     return st;
 }
@@ -201,8 +201,8 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
         sname = parameters[P_SHIP];
     }
     assert(sname);
-    slprintf(buffer, sizeof(buffer), "%s %s", sname, shipid(sh));
-    sh->name = _strdup(buffer);
+    slprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
+    sh->name = strdup(buffer);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);
@@ -250,8 +250,8 @@ static void free_shiptype(void *ptr) {
 }
 
 void free_shiptypes(void) {
-    ql_foreach(shiptypes, free_shiptype);
-    ql_free(shiptypes);
+    selist_foreach(shiptypes, free_shiptype);
+    selist_free(shiptypes);
     shiptypes = 0;
 }
 
@@ -297,10 +297,9 @@ int crew_skill(const ship *sh) {
 
 int shipspeed(const ship * sh, const unit * u)
 {
-    int k = sh->type->range;
     attrib *a;
     struct curse *c;
-    int bonus;
+    int k, bonus;
 
     assert(sh);
     if (!u) u = ship_owner(sh);
@@ -310,6 +309,7 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
     assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
+    k = sh->type->range;
     if (sh->size != sh->type->construction->maxsize)
         return 0;
 
@@ -333,8 +333,8 @@ int shipspeed(const ship * sh, const unit * u)
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
-            bonus = _min(bonus, crew_bonus);
-            bonus = _min(bonus, sh->type->range_max - sh->type->range);
+            bonus = MIN(bonus, crew_bonus);
+            bonus = MIN(bonus, sh->type->range_max - sh->type->range);
         }
         else {
             bonus = 0;
@@ -417,7 +417,7 @@ static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
 
-    /* Eigentümer tot oder kein Eigentümer vorhanden. Erste lebende Einheit
+    /* Eigentï¿½mer tot oder kein Eigentï¿½mer vorhanden. Erste lebende Einheit
       * nehmen. */
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
@@ -458,7 +458,7 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
 void ship_setname(ship * self, const char *name)
 {
     free(self->name);
-    self->name = name ? _strdup(name) : 0;
+    self->name = name ? strdup(name) : 0;
 }
 
 const char *ship_getname(const ship * self)

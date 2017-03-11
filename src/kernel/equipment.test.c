@@ -7,8 +7,6 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 
-#include <quicklist.h>
-
 #include <CuTest.h>
 #include <tests.h>
 
@@ -29,12 +27,12 @@ void test_equipment(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
 
     CuAssertPtrEquals(tc, 0, get_equipment("herpderp"));
-    eq = create_equipment("herpderp");
+    eq = get_or_create_equipment("herpderp");
     CuAssertPtrEquals(tc, eq, get_equipment("herpderp"));
 
     equipment_setitem(eq, it_horses, "1");
     equipment_setskill(eq, SK_MAGIC, "5");
-    equipment_addspell(eq, sp, 1);
+    equipment_addspell(eq, sp->sname, 1);
 
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     equip_unit_mask(u, eq, EQUIP_ALL);

@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <resource name="plate">
-  <item weight="400" score="150">
-    <function name="canuse" value="lua_canuse_item"/>
+  <item weight="400" score="150" deny="goblin">
     <construction skill="armorer" minskill="4">
       <requirement type="iron" quantity="4"/>
     </construction>

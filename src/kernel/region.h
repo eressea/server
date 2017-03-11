@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_REGION
 
 #include <stddef.h>
+#include <stdbool.h>
 #include "types.h"
 #include "direction.h"
 
@@ -44,7 +45,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define RF_ENCOUNTER   (1<<9) /* persistent */
 #define RF_MAPPER_HIGHLIGHT (1<<10)
 #define RF_LIGHTHOUSE  (1<<11) /* this region may contain a lighthouse */
-#define RF_ORCIFIED    (1<<12) /* persistent */
 #define RF_MIGRATION   (1<<13)
 
 #define RF_UNUSED_14 (1<<14)
@@ -58,7 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define RF_ALL 0xFFFFFF
 
-#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_ORCIFIED|RF_GUARDED)
+#define RF_SAVEMASK (RF_CHAOTIC|RF_MALLORN|RF_BLOCKED|RF_ENCOUNTER|RF_GUARDED|RF_LIGHTHOUSE)
     struct message;
     struct message_list;
     struct rawmaterial;
@@ -137,6 +137,9 @@ extern "C" {
 #ifdef FAST_CONNECT
         struct region *connect[MAXDIRECTIONS];      /* use rconnect(r, dir) to access */
 #endif
+        struct {
+            seen_mode mode;
+        } seen;
     } region;
 
     extern struct region *regions;
@@ -157,6 +160,7 @@ extern "C" {
 
 #define reg_hashkey(r) (r->index)
 
+    extern int fix_demand(struct region *r);
     int distance(const struct region *, const struct region *);
     int koor_distance(int ax, int ay, int bx, int by);
     struct region *findregion(int x, int y);
@@ -261,6 +265,7 @@ extern "C" {
 
     const char *regionname(const struct region *r, const struct faction *f);
 
+	int region_maxworkers(const struct region *r);
     const char *region_getname(const struct region *self);
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
@@ -271,7 +276,7 @@ extern "C" {
         int value);
     int owner_change(const region * r);
     bool is_mourning(const region * r, int in_turn);
-    const struct item_type *r_luxury(struct region *r);
+    const struct item_type *r_luxury(const struct region *r);
     void get_neighbours(const struct region *r, struct region **list);
 
     struct faction *update_owners(struct region *r);

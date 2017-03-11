@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_GC_LAWS
 
 #include <kernel/types.h>
-#include "guard.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,14 +53,15 @@ extern "C" {
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
     int enter_ship(struct unit *u, struct order *ord, int id, bool report);
 
-    /* eressea-specific. put somewhere else, please. */
     void processorders(void);
+    void turn_begin(void);
+    void turn_process(void);
+    void turn_end(void);
 
     void new_units(void);
     void defaultorders(void);
     void quit(void);
     void monthly_healing(void);
-    void renumber_factions(void);
     void restack_units(void);
     void update_long_order(struct unit *u);
     void sinkships(struct region * r);
@@ -84,7 +85,6 @@ extern "C" {
     int leave_cmd(struct unit *u, struct order *ord);
     int pay_cmd(struct unit *u, struct order *ord);
     int promotion_cmd(struct unit *u, struct order *ord);
-    int renumber_cmd(struct unit *u, struct order *ord);
     int combatspell_cmd(struct unit *u, struct order *ord);
     int contact_cmd(struct unit *u, struct order *ord);
     int guard_on_cmd(struct unit *u, struct order *ord);
@@ -111,8 +111,11 @@ extern "C" {
     #define FORCE_LEAVE_POSTCOMBAT 1
     #define FORCE_LEAVE_ALL 2
     bool rule_force_leave(int flag);
+    bool LongHunger(const struct unit *u);
+    int NMRTimeout(void);
+    int NewbieImmunity(void);
+    bool IsImmune(const struct faction *f);
     bool help_enter(struct unit *uo, struct unit *u);
-    guard_t can_start_guarding(const struct unit * u);
 
 #ifdef __cplusplus
 }

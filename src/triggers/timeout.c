@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "timeout.h"
 
 /* util includes */
@@ -62,7 +61,7 @@ static int timeout_handle(trigger * t, void *data)
         handle_triggers(&td->triggers, NULL);
         return -1;
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

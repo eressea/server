@@ -4,8 +4,7 @@
      * has lower damage
 -->
 <resource name="greatbow">
-  <item weight="100">
-    <function name="canuse" value="lua_canuse_item"/>
+  <item weight="100" allow="elf">
     <construction skill="weaponsmithing" minskill="5">
       <modifier function="mod_elves_only"/>
       <requirement type="mallorn" quantity="2"/>

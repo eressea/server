@@ -11,6 +11,9 @@
  */
 #ifndef H_GC_CREPORT
 #define H_GC_CREPORT
+
+#include <kernel/types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,8 +27,10 @@ extern "C" {
     void register_cr(void);
 
     int crwritemap(const char *filename);
-    void cr_output_unit(struct stream *out, const struct region * r, const struct faction * f, const struct unit * u, int mode);
-
+    void cr_output_unit(struct stream *out, const struct region * r,
+        const struct faction * f, const struct unit * u, seen_mode mode);
+    void cr_output_resources(struct stream *out, const struct faction * f,
+        const struct region *r, bool see_unit);
 #ifdef __cplusplus
 }
 #endif

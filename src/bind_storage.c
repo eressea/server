@@ -11,7 +11,6 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "bind_storage.h"
 
 #include <kernel/save.h>
@@ -101,7 +100,10 @@ static int tolua_storage_tostring(lua_State * L)
 {
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     char name[64];
-    _snprintf(name, sizeof(name), "<gamedata %p ver=%d>", (void *)data, data->version);
+    /* safe to use sprintf here, because:
+     * %p is at most 16 characters, %d 20, text is 16,
+     * comes to 53 with \0 */
+    sprintf(name, "<gamedata %p ver=%d>", (void *)data, data->version);
     lua_pushstring(L, name);
     return 1;
 }

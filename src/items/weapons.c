@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "weapons.h"
 #include "battle.h"
 
@@ -107,7 +106,7 @@ int *casualties)
     }
 
     enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
-    enemies = _min(enemies, CATAPULT_ATTACKS);
+    enemies = MIN(enemies, CATAPULT_ATTACKS);
     if (enemies == 0) {
         return true;                /* allow further attacks */
     }

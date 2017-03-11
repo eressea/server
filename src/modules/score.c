@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 
 /* libc includes */
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -66,7 +67,7 @@ void score(void)
     region *r;
     faction *fc;
     score_t allscores = 0;
-    char path[MAX_PATH];
+    char path[4096];
 
     for (fc = factions; fc; fc = fc->next)
         fc->score = 0;
@@ -105,14 +106,14 @@ void score(void)
             int itemscore = 0;
             int i;
             faction *f = u->faction;
+            const race *rc = u_race(u);
 
-            if (f == NULL || u_race(u) == get_race(RC_SPELL)
-                || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
+            if (f == NULL) {
                 continue;
             }
-
-            if (old_race(u_race(u)) <= RC_AQUARIAN) {
-                f->score += (u_race(u)->recruitcost * u->number) / 50;
+            else if (rc->recruitcost>0) {
+                assert(playerrace(rc));
+                f->score += (rc->recruitcost * u->number) / 50;
             }
             f->score += get_money(u) / 50;
             for (itm = u->items; itm; itm = itm->next) {
@@ -168,7 +169,7 @@ void score(void)
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
                     f->race->_name,
-                    factionid(f),
+                    itoa36(f->no),
                     f->age);
             }
         fclose(scoreFP);

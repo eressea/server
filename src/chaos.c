@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "chaos.h"
-#include "monster.h"
+#include "monsters.h"
 #include "move.h"
 
 #include <kernel/building.h>
@@ -28,7 +28,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/messages.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -86,7 +85,7 @@ static const terrain_type *chaosterrain(void)
     if (numtypes == 0) {
         const terrain_type *terrain;
         for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-            if (fval(terrain, LAND_REGION) && terrain->herbs) {
+            if ((terrain->flags & LAND_REGION) && terrain->herbs) {
                 ++numtypes;
             }
         }
@@ -94,7 +93,7 @@ static const terrain_type *chaosterrain(void)
             types = malloc(sizeof(terrain_type *) * numtypes);
             numtypes = 0;
             for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-                if (fval(terrain, LAND_REGION) && terrain->herbs) {
+                if ((terrain->flags & LAND_REGION) && terrain->herbs) {
                     types[numtypes++] = terrain;
                 }
             }
@@ -140,7 +139,7 @@ static void chaos(region * r)
     if (rng_int() % 100 < 8) {
         switch (rng_int() % 3) {
         case 0:                  /* Untote */
-            if (!fval(r->terrain, SEA_REGION)) {
+            if (!(r->terrain->flags & SEA_REGION)) {
                 unit *u = random_unit(r);
                 if (u && playerrace(u_race(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
@@ -162,29 +161,28 @@ static void chaos(region * r)
                     break;
                 case 1:
                     mfac = 500;
-                    u =
-                        create_unit(r, get_monsters(), rng_int() % 4 + 1,
+                    u = create_unit(r, get_monsters(), rng_int() % 4 + 1,
                         get_race(RC_DRAGON), 0, NULL, NULL);
                     break;
                 default:
                     mfac = 1000;
-                    u =
-                        create_unit(r, get_monsters(), rng_int() % 2 + 1,
+                    u = create_unit(r, get_monsters(), rng_int() % 2 + 1,
                         get_race(RC_WYRM), 0, NULL, NULL);
                     break;
                 }
-                if (mfac)
+                if (mfac) {
                     set_money(u, u->number * (rng_int() % mfac));
-                fset(u, UFL_ISNEW | UFL_MOVED);
+                }
+                u->flags |= (UFL_ISNEW | UFL_MOVED);
             }
             break;
-        case 2:                  /* Terrainveränderung */
-            if (!fval(r->terrain, FORBIDDEN_REGION)) {
-                if (!fval(r->terrain, SEA_REGION)) {
+        case 2:                  /* Terrainverï¿½nderung */
+            if (!(r->terrain->flags & FORBIDDEN_REGION)) {
+                if (!(r->terrain->flags & SEA_REGION)) {
                     direction_t dir;
                     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
                         region *rn = rconnect(r, dir);
-                        if (rn && fval(rn->terrain, SEA_REGION))
+                        if (rn && (rn->terrain->flags & SEA_REGION))
                             break;
                     }
                     if (dir != MAXDIRECTIONS) {
@@ -225,7 +223,7 @@ static void chaos(region * r)
                     direction_t dir;
                     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
                         region *rn = rconnect(r, dir);
-                        if (rn && fval(rn->terrain, SEA_REGION))
+                        if (rn && (rn->terrain->flags & SEA_REGION))
                             break;
                     }
                     if (dir != MAXDIRECTIONS) {
@@ -243,7 +241,7 @@ void chaos_update(void) {
     for (r = regions; r; r = r->next) {
         int i;
 
-        if (fval(r, RF_CHAOTIC)) {
+        if ((r->flags & RF_CHAOTIC)) {
             chaos(r);
         }
         i = get_chaoscount(r);

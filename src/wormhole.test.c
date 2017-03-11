@@ -10,11 +10,11 @@
 
 #include <util/attrib.h>
 
-#include <quicklist.h>
+#include <selist.h>
 
 #include <CuTest.h>
 
-void sort_wormhole_regions(quicklist *rlist, region **match, int count);
+void sort_wormhole_regions(selist *rlist, region **match, int count);
 void make_wormholes(region **match, int count, const building_type *bt_wormhole);
 
 static void test_make_wormholes(CuTest *tc) {
@@ -42,7 +42,7 @@ static void test_make_wormholes(CuTest *tc) {
 static void test_sort_wormhole_regions(CuTest *tc) {
     region *r1, *r2, *match[2];
     terrain_type *t_plain;
-    quicklist *rlist = 0;
+    selist *rlist = 0;
 
     test_setup();
     t_plain = test_create_terrain("plain", LAND_REGION);
@@ -50,12 +50,12 @@ static void test_sort_wormhole_regions(CuTest *tc) {
     r2 = test_create_region(1, 0, t_plain);
     r1->age = 4;
     r2->age = 2;
-    ql_push(&rlist, r1);
-    ql_push(&rlist, r2);
+    selist_push(&rlist, r1);
+    selist_push(&rlist, r2);
     sort_wormhole_regions(rlist, match, 2);
     CuAssertPtrEquals(tc, r2, match[0]);
     CuAssertPtrEquals(tc, r1, match[1]);
-    ql_free(rlist);
+    selist_free(rlist);
     test_cleanup();
 }
 

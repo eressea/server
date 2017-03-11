@@ -23,7 +23,7 @@ static void test_move_to_vortex(CuTest *tc) {
     struct locale *lang;
 
     test_setup();
-    lang = get_or_create_locale("en");
+    lang = test_create_locale();
     locale_setstring(lang, "vortex", "wirbel");
     init_locale(lang);
     t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION);

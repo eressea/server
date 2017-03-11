@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef ATTRIB_H
 #define ATTRIB_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,14 +32,14 @@ extern "C" {
     typedef struct attrib {
         const struct attrib_type *type;
         union {
-            afun f; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
-            void *v; //TODO: V117 http://www.viva64.com/en/V117 Memsize type is used in the union.
+            afun f;
+            void *v;
             int i;
             float flt;
             char c;
             short s;
             short sa[2];
-            char ca[4]; //TODO: V112 http://www.viva64.com/en/V112 Dangerous magic number 4 used: char ca[4];.
+            char ca[4];
         } data;
         /* internal data, do not modify: */
         struct attrib *next;        /* next attribute in the list */
@@ -63,16 +65,19 @@ extern "C" {
         unsigned int hashkey;
     } attrib_type;
 
-    extern void at_register(attrib_type * at);
-    extern void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
+    void at_register(attrib_type * at);
+    void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
+    struct attrib_type *at_find(const char *name);
 
-    extern attrib *a_select(attrib * a, const void *data,
-        bool(*compare) (const attrib *, const void *));
-    extern attrib *a_find(attrib * a, const attrib_type * at);
-    extern attrib *a_add(attrib ** pa, attrib * at);
-    extern int a_remove(attrib ** pa, attrib * at);
-    extern void a_removeall(attrib ** a, const attrib_type * at);
-    extern attrib *a_new(const attrib_type * at);
+    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
+    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
+
+    attrib *a_select(attrib * a, const void *data, bool(*compare) (const attrib *, const void *));
+    attrib *a_find(attrib * a, const attrib_type * at);
+    attrib *a_add(attrib ** pa, attrib * at);
+    int a_remove(attrib ** pa, attrib * at);
+    void a_removeall(attrib ** a, const attrib_type * at);
+    attrib *a_new(const attrib_type * at);
     int a_age(attrib ** attribs, void *owner);
 
     int a_read_orig(struct gamedata *data, attrib ** attribs, void *owner);
@@ -80,6 +85,20 @@ extern "C" {
 
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
+
+    int a_readint(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeint(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
+    void a_writeshorts(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
+    void a_writechars(const struct attrib *a, const void *owner,
+        struct storage *store);
+    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
+    void a_writestring(const struct attrib *a, const void *owner,
+        struct storage *);
+    void a_finalizestring(struct attrib *a);
 
     void attrib_done(void);
 

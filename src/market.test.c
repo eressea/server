@@ -31,9 +31,7 @@ static void test_market_curse(CuTest * tc)
     luxury_type *lux;
     building_type *btype;
 
-    free_gamedata();
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;
@@ -46,7 +44,7 @@ static void test_market_curse(CuTest * tc)
     config_set("rules.region_owners", "1");
 
     btype = (building_type *)calloc(1, sizeof(building_type));
-    btype->_name = _strdup("market");
+    btype->_name = strdup("market");
     bt_register(btype);
 
     terrain = get_terrain("plain");
@@ -78,11 +76,26 @@ static void test_market_curse(CuTest * tc)
 
     CuAssertIntEquals(tc, 70, i_get(u->items, htype));
     CuAssertIntEquals(tc, 35, i_get(u->items, ltype));
+    test_cleanup();
+}
+
+static void test_rc_trade(CuTest *tc) {
+    race *rc;
+    test_setup();
+    rc = test_create_race("human");
+    CuAssertIntEquals(tc, 1000, rc_luxury_trade(rc));
+    CuAssertIntEquals(tc, 500, rc_herb_trade(rc));
+    rc_set_param(rc, "luxury_trade", "100");
+    rc_set_param(rc, "herb_trade", "50");
+    CuAssertIntEquals(tc, 100, rc_luxury_trade(rc));
+    CuAssertIntEquals(tc, 50, rc_herb_trade(rc));
+    test_cleanup();
 }
 
 CuSuite *get_market_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_market_curse);
+    SUITE_ADD_TEST(suite, test_rc_trade);
     return suite;
 }

@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "shock.h"
 
 #include "magic.h"
@@ -61,8 +60,8 @@ static void do_shock(unit * u, const char *reason)
     if (u->number > 0) {
         /* HP - Verlust */
         int hp = (unit_max_hp(u) * u->number) / 10;
-        hp = _min(u->hp, hp);
-        u->hp = _max(1, hp);
+        hp = MIN(u->hp, hp);
+        u->hp = MAX(1, hp);
     }
 
     /* Aura - Verlust */
@@ -84,7 +83,7 @@ static void do_shock(unit * u, const char *reason)
         }
 
     /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
-     * zu löschen wenn der Familiar getötet wird. Da sollten wir über eine
+     * zu lï¿½schen wenn der Familiar getï¿½tet wird. Da sollten wir ï¿½ber eine
      * saubere Implementation nachdenken. */
 
     if (strcmp(reason, "trigger") == 0) {
@@ -103,7 +102,7 @@ static int shock_handle(trigger * t, void *data)
     if (u && u->number) {
         do_shock(u, "trigger");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 
@@ -118,7 +117,7 @@ static void shock_write(const trigger * t, struct storage *store)
         next = next->next;
     }
     if (next && u) {
-        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", unitid(u));
+        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", itoa36(u->no));
         write_unit_reference(NULL, store);
     }
     else {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -19,6 +19,7 @@
 
 /* kernel includes */
 #include <kernel/ally.h>
+#include <kernel/build.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -34,7 +35,6 @@
 
 /* attributes includes */
 #include <attributes/racename.h>
-#include <attributes/orcification.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -71,8 +71,8 @@ static bool can_give(const unit * u, const unit * u2, const item_type * itype, i
 {
     if (u2) {
         if (u2->number==0 && !fval(u2, UFL_ISNEW)) {
-            // https://bugs.eressea.de/view.php?id=2230
-            // cannot give anything to dead units
+            /* https://bugs.eressea.de/view.php?id=2230
+             * cannot give anything to dead units */
             return false;
         } else if (u->faction != u2->faction) {
             int rule = rule_give();
@@ -122,6 +122,28 @@ const resource_type * rtype, struct order *ord, int error)
     }
 }
 
+static void add_give_person(unit * u, unit * u2, int given,
+    struct order *ord, int error)
+{
+    assert(u2);
+    if (error) {
+        cmistake(u, ord, error, MSG_COMMERCE);
+    }
+    else if (u2->faction != u->faction) {
+        message *msg;
+
+        msg = msg_message("give_person", "unit target amount",
+            u, u2, given);
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
+
+        msg = msg_message("receive_person", "unit target amount",
+            u, u2, given);
+        add_message(&u2->faction->msgs, msg);
+        msg_release(msg);
+    }
+}
+
 static bool limited_give(const item_type * type)
 {
     /* trade only money 2:1, if at all */
@@ -138,7 +160,7 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     }
     if (dst && src && src->faction != dst->faction) {
         divisor = config_get_flt("rules.items.give_divisor", 1);
-        assert(divisor == 0 || divisor >= 1);
+        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
             int x = (int)(n / divisor);
@@ -148,17 +170,35 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     return n;
 }
 
+static void
+give_horses(unit * s, const item_type * itype, int n)
+{
+    region *r = s->region;
+    if (r->land) {
+        rsethorses(r, rhorses(r) + n);
+    }
+}
+
+static void
+give_money(unit * s, const item_type * itype, int n)
+{
+    region *r = s->region;
+    if (r->land) {
+        rsetmoney(r, rmoney(r) + n);
+    }
+}
+
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest,
 struct order *ord)
 {
     short error = 0;
-    int n, r;
+    int n, delta;
 
     assert(itype != NULL);
     n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
-    n = _min(want, n);
-    r = n;
+    n = MIN(want, n);
+    delta = n;
     if (dest && src->faction != dest->faction
         && src->faction->age < GiveRestriction()) {
         if (ord != NULL) {
@@ -179,18 +219,19 @@ struct order *ord)
     else if (itype->flags & ITF_CURSED) {
         error = 25;
     }
-    else if (itype->give == NULL || itype->give(src, dest, itype, n, ord) != 0) {
+    else {
         int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
+
         if (use < n)
             use +=
             use_pooled(src, item2resource(itype), GET_POOLED_SLACK,
             n - use);
         if (dest) {
-            r = give_quota(src, dest, itype, n);
-            i_change(&dest->items, itype, r);
+            delta = give_quota(src, dest, itype, n);
+            i_change(&dest->items, itype, delta);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-            change_reservation(dest, itype, r);
+            change_reservation(dest, itype, delta);
 #else
             if (src->faction == dest->faction) {
                 change_reservation(dest, item2resource(itype), r);
@@ -200,14 +241,25 @@ struct order *ord)
 #if MUSEUM_MODULE && defined(TODO)
             /* TODO: use a trigger for the museum warden! */
             if (a_find(dest->attribs, &at_warden)) {
-                warden_add_give(src, dest, itype, r);
+                warden_add_give(src, dest, itype, delta);
             }
 #endif
             handle_event(dest->attribs, "receive", src);
         }
+        else {
+            /* return horses to the region */
+            if (itype->construction && itype->flags & ITF_ANIMAL) {
+                if (itype->construction->skill == SK_HORSE_TRAINING) {
+                    give_horses(src, itype, n);
+                }
+            }
+            else if (itype->rtype == get_resourcetype(R_SILVER)) {
+                give_money(src, itype, n);
+            }
+        }
         handle_event(src->attribs, "give", dest);
     }
-    add_give(src, dest, n, r, item2resource(itype), ord, error);
+    add_give(src, dest, n, delta, item2resource(itype), ord, error);
     if (error)
         return -1;
     return 0;
@@ -224,12 +276,8 @@ static bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static bool can_give_men(const unit *u, order *ord, message **msg) {
-    if (u_race(u) == get_race(RC_SNOTLING)) {
-        /* snotlings may not be given to the peasants. */
-        if (msg) *msg = msg_error(u, ord, 307);
-    }
-    else if (unit_has_cursed_item(u)) {
+static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+    if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
     else if (has_skill(u, SK_MAGIC)) {
@@ -263,9 +311,9 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     message * msg;
     int maxt = max_transfers();
 
-    assert(u2);
+    assert(u2); /* use disband_men for GIVE 0 */
 
-    if (!can_give_men(u, ord, &msg)) {
+    if (!can_give_men(u, u2, ord, &msg)) {
         return msg;
     }
 
@@ -400,20 +448,21 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 
 message * disband_men(int n, unit * u, struct order *ord) {
     message * msg;
+    static const race *rc_snotling;
+    static int rccache;
 
-    if (!can_give_men(u, ord, &msg)) {
+    if (rc_changed(&rccache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
+
+    if (u_race(u) == rc_snotling) {
+        /* snotlings may not be given to the peasants. */
+        return msg_error(u, ord, 307);
+    }
+    if (!can_give_men(u, NULL, ord, &msg)) {
         return msg;
     }
     transfermen(u, NULL, n);
-#ifdef ORCIFICATION
-    if (u_race(u) == get_race(RC_SNOTLING) && !fval(u->region, RF_ORCIFIED)) {
-        attrib *a = a_find(u->region->attribs, &at_orcification);
-        if (!a) {
-            a = a_add(&u->region->attribs, a_new(&at_orcification));
-        }
-        a->data.i += n;
-    }
-#endif
     if (fval(u->region->terrain, SEA_REGION)) {
         return msg_message("give_person_ocean", "unit amount", u, n);
     }
@@ -535,7 +584,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
-    add_give(u, u2, u->number, u->number, get_resourcetype(R_PERSON), ord, 0);
+    add_give_person(u, u2, u->number, ord, 0);
     u_setfaction(u, u2->faction);
     u2->faction->newbies += u->number;
 }
@@ -604,16 +653,19 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 && u_race(u2) == get_race(RC_SPELL)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            "feedback_unit_not_found", ""));
         return;
     }
-
     else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
         cmistake(u, ord, 40, MSG_COMMERCE);
         return;
     }
-
+    else if (p == NOPARAM) {
+        /* the most likely case: giving items to someone.
+         * let's catch this and save ourselves the rest of the param_t checks.
+         */
+    } 
     else if (p == P_HERBS) {
         bool given = false;
         if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
@@ -773,7 +825,7 @@ void give_cmd(unit * u, order * ord)
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        n = _min(u->number, n);
+        n = MIN(u->number, n);
         msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
@@ -782,7 +834,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
+        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             return;

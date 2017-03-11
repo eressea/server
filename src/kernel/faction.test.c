@@ -3,17 +3,18 @@
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
+#include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/plane.h>
+#include <kernel/unit.h>
 #include <kernel/config.h>
 #include <util/language.h>
 #include <util/password.h>
 
-#include "monster.h"
+#include "monsters.h"
 #include <CuTest.h>
 #include <tests.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -47,10 +48,10 @@ static void test_remove_empty_factions_alliance(CuTest *tc) {
     al = makealliance(0, "Hodor");
     setalliance(f, al);
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
-    CuAssertIntEquals(tc, 1, ql_length(al->members));
+    CuAssertIntEquals(tc, 1, selist_length(al->members));
     remove_empty_factions();
     CuAssertPtrEquals(tc, 0, al->_leader);
-    CuAssertIntEquals(tc, 0, ql_length(al->members));
+    CuAssertIntEquals(tc, 0, selist_length(al->members));
     test_cleanup();
 }
 
@@ -117,7 +118,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, 1234, f->subscription);
-    CuAssertIntEquals(tc, FFL_ISNEW, f->flags);
+    CuAssertIntEquals(tc, FFL_ISNEW|FFL_PWMSG, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
     CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
@@ -152,8 +153,7 @@ static void test_set_origin(CuTest *tc) {
     int x = 0, y = 0;
     plane *pl;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     CuAssertPtrEquals(tc, 0, f->ursprung);
@@ -178,8 +178,7 @@ static void test_set_origin_bug(CuTest *tc) {
     plane *pl;
     int x = 17, y = 10;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     faction_setorigin(f, 0, -10, 3);
@@ -191,9 +190,43 @@ static void test_set_origin_bug(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_max_migrants(CuTest *tc) {
+    faction *f;
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("human");
+    f = test_create_faction(rc);
+    u = test_create_unit(f, test_create_region(0, 0, 0));
+    CuAssertIntEquals(tc, 0, count_maxmigrants(f));
+    rc->flags |= RCF_MIGRANTS;
+    CuAssertIntEquals(tc, 0, count_maxmigrants(f));
+    scale_number(u, 250);
+    CuAssertIntEquals(tc, 13, count_maxmigrants(f));
+    test_cleanup();
+}
+
+static void test_valid_race(CuTest *tc) {
+    race * rc1, *rc2;
+    faction *f;
+
+    test_setup();
+    rc1 = test_create_race("human");
+    rc2 = test_create_race("elf");
+    f = test_create_faction(rc1);
+    CuAssertTrue(tc, valid_race(f, rc1));
+    CuAssertTrue(tc, !valid_race(f, rc2));
+    rc_set_param(rc1, "other_race", "elf");
+    CuAssertTrue(tc, valid_race(f, rc1));
+    CuAssertTrue(tc, valid_race(f, rc2));
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_max_migrants);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);
@@ -203,5 +236,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
     SUITE_ADD_TEST(suite, test_check_passwd);
+    SUITE_ADD_TEST(suite, test_valid_race);
     return suite;
 }

@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/variant.h>
 #include "types.h"
 #include "skills.h"
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +38,6 @@ extern "C" {
 #define UFL_LONGACTION    (1<<2)        /* 4 */
 #define UFL_OWNER         (1<<3)        /* 8 */
 #define UFL_ANON_FACTION  (1<<4)        /* 16 */
-#define UFL_DISBELIEVES   (1<<5)        /* 32 */
 #define UFL_WARMTH        (1<<6)        /* 64 */
 #define UFL_HERO          (1<<7)
 #define UFL_MOVED         (1<<8)
@@ -142,8 +143,6 @@ extern "C" {
     struct unit *utarget(const struct unit *u);
     void usettarget(struct unit *u, const struct unit *b);
 
-    extern const struct race *urace(const struct unit *u);
-
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
 
@@ -191,6 +190,7 @@ extern "C" {
     bool leave(struct unit *u, bool force);
     bool can_leave(struct unit *u);
 
+    double u_heal_factor(const struct unit * u);
     void u_set_building(struct unit * u, struct building * b);
     void u_set_ship(struct unit * u, struct ship * sh);
     void leave_ship(struct unit * u);
@@ -259,7 +259,6 @@ extern "C" {
 #define GET_PEASANTS 2
 
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-    int newunitid(void);
     int read_unitid(const struct faction *f, const struct region *r);
 
     void setstatus(struct unit *u, int status);

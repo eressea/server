@@ -23,7 +23,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <kernel/item.h>
 #include <kernel/command.h>
 
 /* util includes */
@@ -32,9 +31,10 @@ without prior permission by the authors of Eressea.
 #include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/parser.h>
-#include <quicklist.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+
+#include <selist.h>
 
 /* libc includes */
 #include <assert.h>
@@ -50,7 +50,7 @@ void free_alliances(void)
         alliances = al->next;
         free(al->name);
         if (al->members) {
-            ql_free(al->members);
+            selist_free(al->members);
         }
         free(al);
     }
@@ -83,7 +83,7 @@ alliance *new_alliance(int id, const char *name) {
     al = calloc(1, sizeof(alliance));
     al->id = id;
     if (name) {
-        al->name = _strdup(name);
+        al->name = strdup(name);
     }
     else {
         al->flags |= ALF_NON_ALLIED;
@@ -116,7 +116,7 @@ faction *alliance_get_leader(alliance * al)
 {
     if (!al->_leader) {
         if (al->members) {
-            al->_leader = (faction *)ql_get(al->members, 0);
+            al->_leader = (faction *)selist_get(al->members, 0);
         }
     }
     return al->_leader;
@@ -357,19 +357,19 @@ void setalliance(faction * f, alliance * al)
         return;
     if (f->alliance != NULL) {
         int qi;
-        quicklist **flistp = &f->alliance->members;
+        selist **flistp = &f->alliance->members;
 
-        for (qi = 0; *flistp; ql_advance(flistp, &qi, 1)) {
-            faction *data = (faction *)ql_get(*flistp, qi);
+        for (qi = 0; *flistp; selist_advance(flistp, &qi, 1)) {
+            faction *data = (faction *)selist_get(*flistp, qi);
             if (data == f) {
-                ql_delete(flistp, qi);
+                selist_delete(flistp, qi);
                 break;
             }
         }
 
         if (f->alliance->_leader == f) {
             if (f->alliance->members) {
-                f->alliance->_leader = (faction *)ql_get(f->alliance->members, 0);
+                f->alliance->_leader = (faction *)selist_get(f->alliance->members, 0);
             }
             else {
                 f->alliance->_leader = NULL;
@@ -379,7 +379,7 @@ void setalliance(faction * f, alliance * al)
     f->alliance = al;
     f->alliance_joindate = turn;
     if (al != NULL) {
-        ql_push(&al->members, f);
+        selist_push(&al->members, f);
         if (al->_leader == NULL) {
             al->_leader = f;
         }
@@ -447,7 +447,7 @@ void alliance_setname(alliance * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = _strdup(name);
+        self->name = strdup(name);
     else
         self->name = NULL;
 }

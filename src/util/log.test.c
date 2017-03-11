@@ -9,10 +9,10 @@
 void log_string(void *data, int level, const char *module, const char *format, va_list args) {
     char *str = (char *)data;
     const char *arg = va_arg(args, const char *);
-    unused_arg(format);
-    unused_arg(module);
-    unused_arg(level);
-    strncpy(str, arg, 32);
+    UNUSED_ARG(format);
+    UNUSED_ARG(module);
+    UNUSED_ARG(level);
+    strcpy(str, arg);
 }
 
 static void test_logging(CuTest * tc)

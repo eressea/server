@@ -21,6 +21,7 @@
  /* libc includes */
 #include <ctype.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -353,7 +354,7 @@ static const char *parse(opstack ** stack, const char *inn,
             return parse_symbol(stack, ++b, userdata);
             break;
         default:
-            if (isdigit(*(unsigned char *)b) || *b == '-' || *b == '+') {
+            if (isdigit(*(const unsigned char *)b) || *b == '-' || *b == '+') {
                 return parse_int(stack, b);
             }
             else
@@ -414,7 +415,7 @@ static void eval_lt(opstack ** stack, const void *userdata)
     int b = opop_i(stack);
     int rval = (b < a) ? 1 : 0;
     opush_i(stack, rval);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 static void eval_eq(opstack ** stack, const void *userdata)
@@ -423,7 +424,7 @@ static void eval_eq(opstack ** stack, const void *userdata)
     int b = opop_i(stack);
     int rval = (a == b) ? 1 : 0;
     opush_i(stack, rval);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 static void eval_add(opstack ** stack, const void *userdata)
@@ -431,14 +432,14 @@ static void eval_add(opstack ** stack, const void *userdata)
     int a = opop_i(stack);
     int b = opop_i(stack);
     opush_i(stack, a + b);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 static void eval_isnull(opstack ** stack, const void *userdata)
 {                               /* (int, int) -> int */
     void *a = opop_v(stack);
     opush_i(stack, (a == NULL) ? 1 : 0);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 static void eval_if(opstack ** stack, const void *userdata)
@@ -447,14 +448,14 @@ static void eval_if(opstack ** stack, const void *userdata)
     void *b = opop_v(stack);
     int cond = opop_i(stack);
     opush_v(stack, cond ? b : a);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 static void eval_strlen(opstack ** stack, const void *userdata)
 {                               /* string -> int */
     const char *c = (const char *)opop_v(stack);
     opush_i(stack, c ? (int)strlen(c) : 0);
-    unused_arg(userdata);
+    UNUSED_ARG(userdata);
 }
 
 #include "base36.h"

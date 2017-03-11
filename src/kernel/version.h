@@ -1,16 +1,17 @@
+#pragma once
 /* 
  +-------------------+  
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2007   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |
+ | (c) 1998 - 2016   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
+ |                   |  https://github.com/eressea/server
  +-------------------+
-
- This program may not be used, modified or distributed 
- without prior permission by the authors of Eressea.
  */
 
-#ifndef ERESSEA_VERSION
-// the version number, if it was not passed to make with -D
-#define ERESSEA_VERSION "3.10.0-devel"
+#ifndef H_KERNEL_VERSION
+#define H_KERNEL_VERSION
+
+const char *eressea_version(void);
+int version_no(const char *str);
+
 #endif

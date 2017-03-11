@@ -3,6 +3,8 @@
 #ifndef FLYINGSHIP_H
 #define FLYINGSHIP_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,3 +25,4 @@ extern "C" {
 #endif
 
 #endif
+

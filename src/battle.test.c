@@ -26,7 +26,7 @@ static void test_make_fighter(CuTest * tc)
     faction * f;
     const resource_type *rtype;
 
-    test_cleanup();
+    test_setup();
     test_create_horse();
     r = test_create_region(0, 0, 0);
     f = test_create_faction(NULL);
@@ -60,8 +60,17 @@ static void test_make_fighter(CuTest * tc)
     test_cleanup();
 }
 
-static int add_two(const building * b, const unit * u, building_bonus bonus) {
-    return 2;
+static building_type * setup_castle(void) {
+    building_type * btype;
+    construction *cons;
+
+    btype = bt_get_or_create("castle");
+    btype->flags |= BTF_FORTIFICATION;
+    cons = btype->construction = calloc(1, sizeof(construction));
+    cons->maxsize = 5;
+    cons = cons->improvement = calloc(1, sizeof(construction));
+    cons->maxsize = -1;
+    return btype;
 }
 
 static void test_defenders_get_building_bonus(CuTest * tc)
@@ -72,16 +81,13 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     fighter *df, *af;
     battle *b;
     side *ds, *as;
-    int diff;
     troop dt, at;
     building_type * btype;
 
-    test_cleanup();
+    test_setup();
+    btype = setup_castle();
     r = test_create_region(0, 0, 0);
-    btype = bt_get_or_create("castle");
-    btype->protection = &add_two;
     bld = test_create_building(r, btype);
-    bld->size = 10;
 
     du = test_create_unit(test_create_faction(NULL), r);
     au = test_create_unit(test_create_faction(NULL), r);
@@ -101,11 +107,14 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     at.fighter = af;
     at.index = 0;
 
-    diff = skilldiff(at, dt, 0);
-    CuAssertIntEquals(tc, -2, diff);
+    bld->size = 10; /* stage 1 building */
+    CuAssertIntEquals(tc, -1, skilldiff(at, dt, 0));
+    CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
-    diff = skilldiff(dt, at, 0);
-    CuAssertIntEquals(tc, 0, diff);
+    bld->size = 1; /* stage 0 building */
+    CuAssertIntEquals(tc, 0, skilldiff(at, dt, 0));
+    CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
+
     free_battle(b);
     test_cleanup();
 }
@@ -120,10 +129,10 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     side *as;
     building_type * btype;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
-    btype = bt_get_or_create("castle");
-    btype->protection = &add_two;
+    btype = setup_castle();
+    btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -150,10 +159,10 @@ static void test_building_bonus_respects_size(CuTest * tc)
     building_type * btype;
     faction * f;
 
-    test_cleanup();
+    test_setup();
+    btype = setup_castle();
     r = test_create_region(0, 0, 0);
-    btype = bt_get_or_create("castle");
-    btype->protection = &add_two;
+    btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
     bld->size = 10;
 
@@ -178,28 +187,25 @@ static void test_building_bonus_respects_size(CuTest * tc)
 
 static void test_building_defence_bonus(CuTest * tc)
 {
-    unit *au;
-    region *r;
-    building * bld;
     building_type * btype;
-    faction * f;
-    int def;
 
-    test_cleanup();
-    r = test_create_region(0, 0, 0);
-    btype = test_create_buildingtype("castle");
-    btype->protection = (int(*)(const struct building *, const struct unit *, building_bonus))get_function("building_protection");
-    btype->construction->defense_bonus = 3;
-    bld = test_create_building(r, btype);
-    bld->size = 1;
+    test_setup();
+    btype = setup_castle();
 
-    f = test_create_faction(NULL);
-    au = test_create_unit(f, r);
-    scale_number(au, 1);
-    u_set_building(au, bld);
+    btype->maxsize = -1; /* unlimited buildigs get the castle bonus */
+    CuAssertIntEquals(tc, 0, building_protection(btype, 0));
+    CuAssertIntEquals(tc, 1, building_protection(btype, 1));
+    CuAssertIntEquals(tc, 3, building_protection(btype, 2));
+    CuAssertIntEquals(tc, 5, building_protection(btype, 3));
+    CuAssertIntEquals(tc, 8, building_protection(btype, 4));
+    CuAssertIntEquals(tc, 12, building_protection(btype, 5));
+    CuAssertIntEquals(tc, 12, building_protection(btype, 6));
 
-    def = btype->protection(bld, au, DEFENSE_BONUS);
-    CuAssertIntEquals(tc, 3, def);
+    btype->maxsize = 10; /* limited-size buildings are treated like an E3 watchtower */
+    CuAssertIntEquals(tc, 0, building_protection(btype, 0));
+    CuAssertIntEquals(tc, 1, building_protection(btype, 1));
+    CuAssertIntEquals(tc, 2, building_protection(btype, 2));
+    CuAssertIntEquals(tc, 2, building_protection(btype, 3));
     test_cleanup();
 }
 
@@ -219,14 +225,17 @@ static void test_natural_armor(CuTest * tc)
     race *rc;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
     set_level(u, SK_STAMINA, 2);
+    CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
-    set_param(&rc->parameters, "armor.stamina", "1");
+    rc_set_param(rc, "armor.stamina", "1");
+    CuAssertIntEquals(tc, 1, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 2, natural_armor(u));
-    set_param(&rc->parameters, "armor.stamina", "2");
+    rc_set_param(rc, "armor.stamina", "2");
+    CuAssertIntEquals(tc, 2, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 1, natural_armor(u));
     test_cleanup();
 }
@@ -241,23 +250,24 @@ static void test_calculate_armor(CuTest * tc)
     armor_type *ashield, *achain;
     item_type *ibelt, *ishield, *ichain;
     race *rc;
-    double magres = 0.0;
+    variant magres = frac_zero;
+    variant v50p = frac_make(1, 2);
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
 
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[0], magres.sa[1]);
     free_battle(b);
 
     b = NULL;
@@ -290,13 +300,13 @@ static void test_calculate_armor(CuTest * tc)
     wtype->flags = WTF_NONE;
 
     CuAssertIntEquals_Msg(tc, "magical attack", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "magres unmodified", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[1], magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
     achain->flags |= ATF_LAEN;
-    magres = 1.0;
+    magres = frac_one;
     CuAssertIntEquals_Msg(tc, "laen armor", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertDblEquals_Msg(tc, "laen magres bonus", 0.25, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "laen magres bonus", 4, magres.sa[1]);
     free_battle(b);
     test_cleanup();
 }
@@ -310,38 +320,42 @@ static void test_magic_resistance(CuTest *tc)
     armor_type *ashield, *achain;
     item_type *ishield, *ichain;
     race *rc;
-    double magres;
+    variant magres;
+    variant v50p = frac_make(1, 2);
+    variant v10p = frac_make(1, 10);
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
 
+    i_change(&du->items, ishield, 1);
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "no magres bonus", 0.0, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "no magres reduction", 1.0, magres, 0.01);
+    CuAssertIntEquals_Msg(tc, "no magres reduction", magres.sa[1], magres.sa[0]);
+    magres = magic_resistance(du);
+    CuAssertIntEquals_Msg(tc, "no magres reduction", 0, magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
-    ashield->magres = 0.1;
+    ashield->magres = v10p;
     calculate_armor(dt, 0, 0, &magres);
+    CuAssert(tc, "laen reduction => 10%%", frac_equal(frac_make(9, 10), magres));
     free_battle(b);
 
     b = NULL;
-    i_change(&du->items, ishield, 1);
     i_change(&du->items, ichain, 1);
     achain->flags |= ATF_LAEN;
-    achain->magres = 0.1;
+    achain->magres = v10p;
     ashield->flags |= ATF_LAEN;
-    ashield->magres = 0.1;
+    ashield->magres = v10p;
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "laen reduction", 0.81, magres, 0.01);
+    CuAssert(tc, "2x laen reduction => 81%%", frac_equal(frac_make(81, 100), magres));
     free_battle(b);
 
     b = NULL;
@@ -350,17 +364,20 @@ static void test_magic_resistance(CuTest *tc)
     set_level(du, SK_MAGIC, 2);
     dt.fighter = setup_fighter(&b, du);
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "skill bonus", 0.1, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "skill reduction", 0.9, magres, 0.01);
-    rc->magres = 0.5; /* gets added to skill bonus */
+    CuAssert(tc, "skill reduction => 90%%", frac_equal(magres, frac_make(9, 10)));
+    magres = magic_resistance(du);
+    CuAssert(tc, "skill reduction", frac_equal(magres, v10p));
+    rc->magres = v50p; /* percentage, gets added to skill bonus */
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "race bonus", 0.6, magic_resistance(du), 0.01);
-    CuAssertDblEquals_Msg(tc, "race reduction", 0.4, magres, 0.01);
+    CuAssert(tc, "race reduction => 40%%", frac_equal(magres, frac_make(4, 10)));
+    magres = magic_resistance(du);
+    CuAssert(tc, "race bonus => 60%%", frac_equal(magres, frac_make(60, 100)));
 
-    rc->magres = 1.5; /* should not cause negative damage multiplier */
-    CuAssertDblEquals_Msg(tc, "magic resistance is never > 0.9", 0.9, magic_resistance(du), 0.01);
+    rc->magres = frac_make(15, 10); /* 150% resistance should not cause negative damage multiplier */
+    magres = magic_resistance(du);
+    CuAssert(tc, "magic resistance is never > 0.9", frac_equal(magres, frac_make(9, 10)));
     calculate_armor(dt, 0, 0, &magres);
-    CuAssertDblEquals_Msg(tc, "damage reduction is never < 0.1", 0.1, magres, 0.01);
+    CuAssert(tc, "damage reduction is never < 0.1", frac_equal(magres, frac_make(1, 10)));
 
     free_battle(b);
     test_cleanup();
@@ -376,14 +393,15 @@ static void test_projectile_armor(CuTest * tc)
     armor_type *ashield, *achain;
     item_type *ishield, *ichain;
     race *rc;
+    variant v50p = frac_make(1, 2);
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
-    ashield = new_armortype(ishield, 0.0, 0.5, 1, ATF_SHIELD);
+    ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
-    achain = new_armortype(ichain, 0.0, 0.5, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, 0.5, 0, 0, 0, 0, SK_MELEE, 1);
+    achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
     rc = test_create_race("human");
     rc->battle_flags |= BF_EQUIPMENT;
     du = test_create_unit(test_create_faction(rc), r);
@@ -411,7 +429,7 @@ static void test_battle_skilldiff(CuTest *tc)
     unit *ua, *ud;
     battle *b = NULL;
 
-    test_cleanup();
+    test_setup();
 
     r = test_create_region(0, 0, 0);
     ud = test_create_unit(test_create_faction(0), r);
@@ -430,16 +448,12 @@ static void test_battle_skilldiff(CuTest *tc)
     td.fighter->person[0].flags |= FL_SLEEPING;
     CuAssertIntEquals(tc, 3, skilldiff(ta, td, 0));
 
-    // TODO: unarmed halfling vs. dragon: +5
-    // TODO: rule_goblin_bonus
-    // TODO: weapon modifiers, missiles, skill_formula
+    /* TODO: unarmed halfling vs. dragon: +5 */
+    /* TODO: rule_goblin_bonus */
+    /* TODO: weapon modifiers, missiles, skill_formula */
 
     free_battle(b);
     test_cleanup();
-}
-
-static int protect(const building *b, const unit *u, building_bonus bonus) {
-    return (bonus == DEFENSE_BONUS) ? 4 : 0;
 }
 
 static void test_battle_skilldiff_building(CuTest *tc)
@@ -451,8 +465,8 @@ static void test_battle_skilldiff_building(CuTest *tc)
     building_type *btype;
     const curse_type *strongwall_ct, *magicwalls_ct;
 
-    test_cleanup();
-    btype = test_create_buildingtype("castle");
+    test_setup();
+    btype = setup_castle();
     strongwall_ct = ct_find("strongwall");
     magicwalls_ct = ct_find("magicwalls");
 
@@ -467,14 +481,14 @@ static void test_battle_skilldiff_building(CuTest *tc)
     ua = test_create_unit(test_create_faction(0), r);
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
-    btype->protection = protect;
-    CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
+    ud->building->size = 10;
+    CuAssertIntEquals(tc, -1, skilldiff(ta, td, 0));
 
     create_curse(NULL, &ud->building->attribs, magicwalls_ct, 1, 1, 1, 1);
-    CuAssertIntEquals(tc, -8, skilldiff(ta, td, 0));
+    CuAssertIntEquals(tc, -2, skilldiff(ta, td, 0));
 
     create_curse(NULL, &ud->building->attribs, strongwall_ct, 1, 1, 2, 1);
-    CuAssertIntEquals(tc, -10, skilldiff(ta, td, 0));
+    CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
 
     free_battle(b);
     test_cleanup();

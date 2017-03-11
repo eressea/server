@@ -32,13 +32,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "plane.h"
 #include "region.h"
 #include "resources.h"
-#include "save.h"
 #include "ship.h"
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/gamedata.h>
@@ -133,6 +133,13 @@ const char *regionname(const region * r, const faction * f)
     static char buf[2][NAMESIZE];
     index = 1 - index;
     return write_regionname(r, f, buf[index], sizeof(buf[index]));
+}
+
+int region_maxworkers(const region *r)
+{
+    int size = production(r);
+    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    return MAX(size - treespace, MIN(size / 10, 200));
 }
 
 int deathcount(const region * r)
@@ -397,7 +404,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     int dx = x1 - x2;
     int dy = y1 - y2;
     int result, dist;
-    int mindist = _min(width, height) >> 1;
+    int mindist = MIN(width, height) >> 1;
 
     /* Bei negativem dy am Ursprung spiegeln, das veraendert
      * den Abstand nicht
@@ -420,13 +427,13 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
         if (result <= mindist)
             return result;
     }
-    dist = _max(dx, height - dy);
+    dist = MAX(dx, height - dy);
     if (dist >= 0 && dist < result) {
         result = dist;
         if (result <= mindist)
             return result;
     }
-    dist = _max(width - dx, dy);
+    dist = MAX(width - dx, dy);
     if (dist >= 0 && dist < result)
         result = dist;
     return result;
@@ -691,19 +698,18 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
     d = *dp;
     if (!d) {
         d = *dp = malloc(sizeof(struct demand));
+        assert_alloc(d);
         d->next = NULL;
         d->type = ltype;
     }
     d->value = value;
 }
 
-const item_type *r_luxury(region * r)
+const item_type *r_luxury(const region * r)
 {
     struct demand *dmd;
     if (r->land) {
-        if (!r->land->demands) {
-            fix_demand(r);
-        }
+        assert(r->land->demands || !"need to call fix_demands on a region");
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value == 0)
                 return dmd->type->itype;
@@ -764,6 +770,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
         return r;
     }
     r = calloc(1, sizeof(region));
+    assert_alloc(r);
     r->x = x;
     r->y = y;
     r->uid = uid;
@@ -1011,6 +1018,20 @@ void setluxuries(region * r, const luxury_type * sale)
     }
 }
 
+int fix_demand(region * rd) {
+    luxury_type * ltype;
+    int maxluxuries = get_maxluxuries();
+    if (maxluxuries > 0) {
+        int sale = rng_int() % maxluxuries;
+        for (ltype = luxurytypes; sale != 0 && ltype; ltype = ltype->next) {
+            --sale;
+        }
+        setluxuries(rd, ltype);
+        return 0;
+    }
+    return -1;
+}
+
 void terraform_region(region * r, const terrain_type * terrain)
 {
     /* Resourcen, die nicht mehr vorkommen können, löschen */
@@ -1059,7 +1080,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsetmoney(r, 0);
         freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
-        /* Beschreibung und Namen löschen */
         return;
     }
 
@@ -1084,6 +1104,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
+        fix_demand(r);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *nr = rconnect(r, d);
             if (nr && nr->land) {
@@ -1114,7 +1135,7 @@ void terraform_region(region * r, const terrain_type * terrain)
             }
         }
         if (!nb) {
-            // TODO: this is really lame
+            /* TODO: this is really lame */
             int i = get_maxluxuries();
             if (i > 0) {
                 i = rng_int() % i;
@@ -1196,8 +1217,8 @@ void terraform_region(region * r, const terrain_type * terrain)
 
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
-            peasants = (maxworkingpeasants(r) * (20 + dice_rand("6d10"))) / 100;
-            rsetpeasants(r, _max(100, peasants));
+            peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
+            rsetpeasants(r, MAX(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));
         }
@@ -1306,9 +1327,17 @@ struct message *msg)
 
 struct faction *region_get_owner(const struct region *r)
 {
-    assert(rule_region_owners());
-    if (r->land && r->land->ownership) {
-        return r->land->ownership->owner;
+    if (r->land) {
+        if (rule_region_owners()) {
+            if (r->land->ownership) {
+                return r->land->ownership->owner;
+            }
+        }
+        else {
+            building *b = largestbuilding(r, cmp_castle_size, false);
+            unit * u = b ? building_owner(b) : NULL;
+            return u ? u->faction : NULL;
+        }
     }
     return NULL;
 }
@@ -1377,7 +1406,7 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = _max(0, region_get_morale(r) - MORALE_TRANSFER);
+                            int morale = MAX(0, region_get_morale(r) - MORALE_TRANSFER);
                             region_set_morale(r, morale, turn);
                         }
                         else {
@@ -1400,7 +1429,7 @@ faction *update_owners(region * r)
 void region_setinfo(struct region *r, const char *info)
 {
     free(r->display);
-    r->display = info ? _strdup(info) : 0;
+    r->display = info ? strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1412,7 +1441,7 @@ void region_setname(struct region *r, const char *name)
 {
     if (r->land) {
         free(r->land->name);
-        r->land->name = name ? _strdup(name) : 0;
+        r->land->name = name ? strdup(name) : 0;
     }
 }
 

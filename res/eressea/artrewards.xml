@@ -1,32 +1,14 @@
 <?xml version="1.0"?>
 <resources>
 
-  <resource name="instantartsculpture">
-    <function name="change" value="changeitem"/>
-    <item weight="0">
-      <function name="use" value="use_instantartsculpture"/>
-    </item>
-  </resource>
-
-  <resource name="instantartacademy">
-    <function name="change" value="changeitem"/>
-    <item weight="0">
-      <function name="use" value="use_instantartacademy"/>
-    </item>
-  </resource>
-
   <resource name="aurapotion50">
     <function name="change" value="changeitem"/>
-    <item weight="0">
-      <function name="use" value="use_aurapotion50"/>
-    </item>
+    <item weight="0" use="yes" />
   </resource>
 
   <resource name="bagpipeoffear">
     <function name="change" value="changeitem"/>
-    <item weight="0">
-      <function name="use" value="use_bagpipeoffear"/>
-    </item>
+    <item weight="0" use="yes"/>
   </resource>
 
 </resources>

@@ -20,17 +20,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_BATTLE
 
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    struct message;
+    struct selist;
 
     /** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
 
     /***** Verteidigungslinien.
-    * Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthält Summen
+    * Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthaelt Summen
     */
 
 #define NUMROWS 5
@@ -43,7 +47,6 @@ extern "C" {
 #define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
-    struct message;
 
     typedef struct bfaction {
         struct bfaction *next;
@@ -53,7 +56,7 @@ extern "C" {
     } bfaction;
 
     typedef struct tactics {
-        struct quicklist *fighters;
+        struct selist *fighters;
         int value;
     } tactics;
 
@@ -72,9 +75,9 @@ extern "C" {
         unsigned char relations[MAXSIDES];
         struct side *enemies[MAXSIDES];
         struct fighter *fighters;
-        int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
+        unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
         int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
-        int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kämpfer, z.B. Schattenritter. */
+        int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
         int alive;                  /* Die Partei hat den Kampf verlassen */
         int removed;                /* stoned */
         int flee;
@@ -86,7 +89,7 @@ extern "C" {
     } side;
 
     typedef struct battle {
-        struct quicklist *leaders;
+        struct selist *leaders;
         struct region *region;
         struct plane *plane;
         bfaction *factions;
@@ -94,7 +97,7 @@ extern "C" {
         int nfighters;
         side sides[MAXSIDES];
         int nsides;
-        struct quicklist *meffects;
+        struct selist *meffects;
         int max_tactics;
         int turn;
         bool has_tactics_turn;
@@ -131,7 +134,7 @@ extern "C" {
 
     /*** fighter::person::flags ***/
 #define FL_TIRED      1
-#define FL_DAZZLED  2           /* durch Untote oder Dämonen eingeschüchtert */
+#define FL_DAZZLED  2           /* durch Untote oder Daemonen eingeschuechtert */
 #define FL_PANICED  4
 #define FL_COURAGE  8           /* Helden fliehen nie */
 #define FL_SLEEPING 16
@@ -156,17 +159,17 @@ extern "C" {
     typedef struct fighter {
         struct fighter *next;
         struct side *side;
-        struct unit *unit;          /* Die Einheit, die hier kämpft */
-        struct building *building;  /* Gebäude, in dem die Einheit evtl. steht */
+        struct unit *unit;          /* Die Einheit, die hier kaempft */
+        struct building *building;  /* Gebaeude, in dem die Einheit evtl. steht */
         status_t status;            /* Kampfstatus */
         struct weapon *weapons;
-        struct armor *armors;       /* Anzahl Rüstungen jeden Typs */
+        struct armor *armors;       /* Anzahl Ruestungen jeden Typs */
         int alive;                  /* Anzahl der noch nicht Toten in der Einheit */
-        int fighting;               /* Anzahl der Kämpfer in der aktuellen Runde */
+        int fighting;               /* Anzahl der Kaempfer in der aktuellen Runde */
         int removed;                /* Anzahl Kaempfer, die nicht tot sind, aber
                                        aus dem Kampf raus sind (zB weil sie
                                        versteinert wurden).  Diese werden auch
-                                       in alive noch mitgezählt! */
+                                       in alive noch mitgezaehlt! */
         int magic;                  /* Magietalent der Einheit  */
         int horses;                 /* Anzahl brauchbarer Pferde der Einheit */
         int elvenhorses;            /* Anzahl brauchbarer Elfenpferde der Einheit */
@@ -179,7 +182,7 @@ extern "C" {
             int defence : 8;            /* (Magie) Paradenbonus der Personen */
             int damage : 8;             /* (Magie) Schadensbonus der Personen im Nahkampf */
             int damage_rear : 8;        /* (Magie) Schadensbonus der Personen im Fernkampf */
-            int flags : 8;              /* (Magie) Diverse Flags auf Kämpfern */
+            int flags : 8;              /* (Magie) Diverse Flags auf Kaempfern */
             int speed : 8;              /* (Magie) Geschwindigkeitsmultiplkator. */
             int reload : 4;             /* Anzahl Runden, die die Waffe x noch laden muss.
                                        * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
@@ -245,14 +248,14 @@ extern "C" {
     int count_enemies(struct battle *b, const struct fighter *af,
         int minrow, int maxrow, int select);
     int natural_armor(struct unit * u);
-    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, double *magres);
+    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, union variant *magres);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
     extern void message_all(battle * b, struct message *m);
     extern int hits(troop at, troop dt, weapon * awp);
     extern void damage_building(struct battle *b, struct building *bldg,
         int damage_abs);
-    struct quicklist *fighters(struct battle *b, const struct side *vs,
+    struct selist *fighters(struct battle *b, const struct side *vs,
         int minrow, int maxrow, int mask);
     int count_allies(const struct side *as, int minrow, int maxrow,
         int select, int allytype);

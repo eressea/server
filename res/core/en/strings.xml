@@ -310,7 +310,7 @@
   <string name="dam">
     <text locale="en">dam</text>
   </string>
-  <string name="genericbuilding">
+  <string name="building">
     <text locale="en">structure</text>
   </string>
   <string name="harbour">
@@ -443,12 +443,6 @@
   </string>
   <string name="ao_chastity_p">
     <text locale="en">amulets of chastity</text>
-  </string>
-  <string name="aoc">
-    <text locale="en">amulet of the kitten</text>
-  </string>
-  <string name="aoc_p">
-    <text locale="en">amulets of the kitten</text>
   </string>
   <string name="aod">
     <text locale="en">amulet of darkness</text>

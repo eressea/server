@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="config://core/common/items.xml"/>
+  <xi:include href="config://core/common/herbs.xml" />
+  <xi:include href="config://core/spoils.xml"/>
+  <xi:include href="config://core/common/buildings.xml"/>
+  <xi:include href="config://game/familiars.xml"/>
+
+  <xi:include href="config://default/adamantium.xml" />
+
+  <xi:include href="config://game/ships.xml"/>
+  <xi:include href="config://game/shipnames.xml"/>
+  <xi:include href="config://core/calendar.xml"/>
+  <xi:include href="config://game/items.xml" />
+  <xi:include href="config://game/races.xml"/>
+  <xi:include href="config://game/buildings.xml"/>
+  <xi:include href="config://game/equipment.xml"/>
+  <xi:include href="config://game/spells.xml"/>
+  <xi:include href="config://game/luxuries.xml" />
+  <xi:include href="config://game/weapons.xml" />
+  <xi:include href="config://game/armor.xml" />
+  <xi:include href="config://game/resources.xml" />
+
+  <calendar name="thirdage" newyear="month_1" start="1"/>
+
+  <xi:include href="config://default/names-undead.xml"/>
+  <xi:include href="config://default/names-skeletons.xml"/>
+  <xi:include href="config://default/names-zombies.xml"/>
+  <xi:include href="config://default/names-ghouls.xml"/>
+  <xi:include href="config://default/names-dragons.xml"/>
+  <rules>
+    <function name="wage" value="minimum_wage"/>
+  </rules>
+</eressea>

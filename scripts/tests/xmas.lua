@@ -6,6 +6,10 @@ function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.grow.formula", "0")
+    eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("volcano.active.percent", "0")
+    eressea.settings.set("volcano.outbreak.percent", "0")
+    eressea.settings.set("volcano.stop.percent", "0")
 end
 
 function test_snowglobe_fail()
@@ -42,23 +46,17 @@ function test_snowglobe()
     local r2 = region.create(1, 0, "ocean")
     local f = faction.create("snowglobe2@eressea.de", "human", "de")
     local u = unit.create(f, r1, 1)
-    local have = 6
     local fail = 0
     u:add_item("snowglobe", have)
-    local xform = { ocean = "glacier", glacier = "glacier", firewall = "volcano", volcano = "mountain", desert = "plain", plain = "plain" }
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Schneekugel Ost")
+    local xform = { ocean = "glacier", glacier = "glacier", firewall = "volcano", desert = "plain", volcano = "mountain", plain = "plain" }
     for k, v in pairs(xform) do
         r2.terrain = k
-        process_orders()
-        -- TODO: re-enable! assert_equal(v, r2.terrain)
-        if k~=v then
-            have=have - 1 
-        else
+        use_snowglobe(u, 1, "Ost", nil)
+        assert_equal(v, r2.terrain)
+        if k==v then
             fail = fail + 1
             assert_equal(fail, f:count_msg_type('target_region_invalid'))
         end
-        assert_equal(have, u:get_item("snowglobe"))
     end
 end
 

@@ -27,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int age_moved(attrib * a, void *owner)
 {
-    unused_arg(owner);
+    UNUSED_ARG(owner);
     --a->data.i;
     return a->data.i > 0;
 }

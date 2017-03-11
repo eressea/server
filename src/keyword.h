@@ -2,6 +2,8 @@
 #define H_KEYWORD_H
 
 #include "kernel/types.h"
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -70,7 +72,7 @@ extern "C"
         K_PAY,
         K_LOOT,
         MAXKEYWORDS,
-        NOKEYWORD = -1
+        NOKEYWORD
     } keyword_t;
 
     extern const char *keywords[MAXKEYWORDS];
@@ -82,7 +84,6 @@ extern "C"
     bool keyword_disabled(keyword_t kwd);
     void enable_keyword(keyword_t kwd, bool enabled);
     const char *keyword(keyword_t kwd);
-    // #define keyword(kwd) mkname("keyword", keywords[kwd])
 
 #ifdef __cplusplus
 #endif

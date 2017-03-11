@@ -22,6 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "types.h"
 #include <modules/score.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,24 +33,23 @@ extern "C" {
     struct seen_region;
     struct attrib_type;
     struct gamedata;
+    struct selist;
     
     extern struct attrib_type at_maxmagicians;
-    /* SMART_INTERVALS: define to speed up finding the interval of regions that a
-       faction is in. defining this speeds up the turn by 30-40% */
-#define SMART_INTERVALS
 
     /* faction flags */
-#define FFL_NEWID (1<<0)        /* Die Partei hat bereits einmal ihre no gewechselt */
+#define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
+#define FFL_PWMSG         (1<<2)  /* received a "new password" message */
 #define FFL_QUIT          (1<<3)
-#define FFL_CURSED        (1<<4) /* you're going to have a bad time */
+#define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
 #define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
-#define FFL_MARK          (1<<23)       /* für markierende algorithmen, die das 
-                                             * hinterher auch wieder löschen müssen!
+#define FFL_MARK          (1<<23)       /* fï¿½r markierende algorithmen, die das 
+                                             * hinterher auch wieder lï¿½schen mï¿½ssen!
                                              * (FFL_SELECT muss man vorher initialisieren,
-                                             * FL_MARK hinterher löschen) */
+                                             * FL_MARK hinterher lï¿½schen) */
 #define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
@@ -57,10 +58,8 @@ extern "C" {
         struct faction *next;
         struct faction *nexthash;
 
-#ifdef SMART_INTERVALS
         struct region *first;
         struct region *last;
-#endif
         int no;
         int subscription;
         int flags;
@@ -100,12 +99,13 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct seen_region **seen;
-        struct quicklist *seen_factions;
+        struct selist *seen_factions;
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 
     extern struct faction *factions;
+
+#define want(option) (1<<option)
 
     void fhash(struct faction *f);
     void funhash(struct faction *f);
@@ -139,9 +139,7 @@ extern "C" {
     void free_factions(void);
     void remove_empty_factions(void);
 
-#ifdef SMART_INTERVALS
     void update_interval(struct faction *f, struct region *r);
-#endif
 
     const char *faction_getbanner(const struct faction *self);
     void faction_setbanner(struct faction *self, const char *name);

@@ -43,7 +43,6 @@ extern "C" {
 #define PFL_FRIENDLY     4096   /* everyone is your ally */
 #define PFL_NOORCGROWTH  8192   /* orcs don't grow */
 #define PFL_NOMONSTERS  16384   /* no monster randenc */
-#define PFL_SEESPECIAL  32768   /* far seeing */
 
     typedef struct plane {
         struct plane *next;

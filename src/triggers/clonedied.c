@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "clonedied.h"
 
 #include "magic.h"
@@ -59,7 +58,7 @@ static int clonedied_handle(trigger * t, void *data)
     }
     else
         log_error("could not perform clonedied::handle()\n");
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

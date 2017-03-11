@@ -11,11 +11,13 @@
 static void test_init_keywords(CuTest *tc) {
     struct locale *lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("en");
     locale_setstring(lang, "keyword::move", "MOVE");
     init_keywords(lang);
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
+    CuAssertStrEquals(tc, "keyword::move", keyword(K_MOVE));
+    CuAssertPtrEquals(tc, NULL, (void *)keyword(NOKEYWORD));
     test_cleanup();
 }
 

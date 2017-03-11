@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_LUA_CONSOLE
 #define H_LUA_CONSOLE
+
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

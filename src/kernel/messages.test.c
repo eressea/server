@@ -39,7 +39,7 @@ void test_message(CuTest *tc) {
 
 static void test_merge_split(CuTest *tc) {
     message_list *mlist = 0, *append = 0;
-    struct mlist **split; // TODO: why is this a double asterisk?
+    struct mlist **split; /* TODO: why is this a double asterisk? */
     message_type *mtype = mt_new("custom", NULL);
     message *msg;
 
@@ -75,3 +75,4 @@ CuSuite *get_messages_suite(void) {
     SUITE_ADD_TEST(suite, test_message);
     return suite;
 }
+

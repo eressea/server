@@ -30,56 +30,42 @@ extern "C" {
     struct spell;
     struct spellbook;
     struct unit;
+    struct building;
+    struct faction;
+    struct region;
+    struct ship;
     struct gamedata;
 
 #define MAX_INPUT_SIZE	DISPLAYSIZE*2
     /* Nach MAX_INPUT_SIZE brechen wir das Einlesen der Zeile ab und nehmen an,
      * dass hier ein Fehler (fehlende ") vorliegt */
 
-    extern int data_version;
+    /* TODO: is this *really* still in use? */
     extern int enc_gamedata;
 
     int readorders(const char *filename);
-    int creategame(void);
-    int readgame(const char *filename, bool backup);
+    int readgame(const char *filename);
     int writegame(const char *filename);
 
     int current_turn(void);
 
-    void read_items(struct storage *store, struct item **it);
-    void write_items(struct storage *store, struct item *it);
-
-    void read_spellbook(struct spellbook **bookp, struct gamedata *data, int(*get_level)(const struct spell * sp, void *), void * cbdata);
-    void write_spellbook(const struct spellbook *book, struct storage *store);
-
-    void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
-    int read_attribs(struct gamedata *store, struct attrib **alist, void *owner);
-
     void write_unit(struct gamedata *data, const struct unit *u);
     struct unit *read_unit(struct gamedata *data);
+    
+    void write_faction(struct gamedata *data, const struct faction *f);
+    struct faction *read_faction(struct gamedata *data);
 
-    int a_readint(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeint(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeshorts(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
-    void a_writechars(const struct attrib *a, const void *owner,
-        struct storage *store);
-    int a_readvoid(struct attrib *a, void *owner, struct gamedata *);
-    void a_writevoid(const struct attrib *a, const void *owner,
-        struct storage *);
-    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
-    void a_writestring(const struct attrib *a, const void *owner,
-    struct storage *);
-    void a_finalizestring(struct attrib *a);
+    void write_region(struct gamedata *data, const struct region *r);
+    struct region *read_region(struct gamedata *data);
 
-    void create_backup(char *file);
+    void write_building(struct gamedata *data, const struct building *b);
+    struct building *read_building(struct gamedata *data);
+
+    void write_ship(struct gamedata *data, const struct ship *sh);
+    struct ship *read_ship(struct gamedata *data);
 
     int write_game(struct gamedata *data);
     int read_game(struct gamedata *data);
-    int version_no(const char *str);
 
     /* test-only functions that give access to internal implementation details (BAD) */
     void _test_write_password(struct gamedata *data, const struct faction *f);

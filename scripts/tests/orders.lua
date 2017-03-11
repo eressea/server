@@ -165,7 +165,7 @@ end
 
 function test_process_renumber()
     u:add_order("NUMMER EINHEIT 'ii'")
-    eressea.process.renumber()
+    process_orders()
     assert_equal(666, u.id)
 end
 

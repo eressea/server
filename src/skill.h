@@ -3,7 +3,7 @@
 #ifndef H_SKILL_H
 #define H_SKILL_H
 
-#include <platform.h>
+#include <stdbool.h>
 struct locale;
 
 typedef enum {

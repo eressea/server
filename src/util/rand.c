@@ -28,6 +28,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <float.h>
 #include <ctype.h>
 
+int lovar(double xpct_x2)
+{
+    int n = (int)(xpct_x2 * 500) + 1;
+    if (n == 0)
+        return 0;
+    return (rng_int() % n + rng_int() % n) / 1000;
+}
+
 /* NormalRand aus python, random.py geklaut, dort ist Referenz auf
 * den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
 * http://de.wikipedia.org/wiki/Standardabweichung#Diskrete_Gleichverteilung.2C_W.C3.BCrfel
@@ -95,13 +103,13 @@ void random_source_inject_constant(double value) {
     r_source = &constant_provider;
 }
 
-static int i = 0;
 static double *values;
-static int value_size = 0;
+static int value_size;
+static int value_index;
 
 static double array_source (void) {
-    assert(i<value_size);
-    return values[i++];
+    assert(value_index<value_size);
+    return values[value_index++];
 }
 
 struct random_source array_provider = {
@@ -109,6 +117,7 @@ struct random_source array_provider = {
 };
 
 void random_source_inject_array(double inject[], int size) {
+    int i;
     assert(size > 0);
     value_size = size;
     if (values)
@@ -117,7 +126,7 @@ void random_source_inject_array(double inject[], int size) {
     for (i=0; i < size; ++i) {
         values[i] = inject[i];
     }
-    i = 0;
+    value_index = 0;
     r_source = &array_provider;
 }
 

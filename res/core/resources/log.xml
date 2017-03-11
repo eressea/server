@@ -1,13 +1,8 @@
 <?xml version="1.0"?>
-<resource name="log" material="rm_tree">
-  <item weight="500" score="10">
-    <construction skill="forestry" minskill="1"/>
-  </item>
-  <resourcelimit>
+<resource name="log" limited="yes">
+    <item weight="500" score="10">
+        <construction skill="forestry" minskill="1"/>
+    </item>
     <modifier building="sawmill" type="skill" value="1"/>
     <modifier building="sawmill" type="material" value="0.5"/>
-    <guard flag="logging"/>
-    <function name="produce" value="lua_produceresource"/>
-    <function name="limit" value="lua_limitresource"/>
-  </resourcelimit>
 </resource>

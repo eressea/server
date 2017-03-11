@@ -22,6 +22,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/types.h>
 #include <util/variant.h>
 
+#include <stddef.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,7 +34,6 @@ extern "C" {
     /* maintenance::flags */
 #define MTF_NONE     0x00
 #define MTF_VARIABLE 0x01       /* resource usage scales with size */
-#define MTF_VITAL    0x02       /* if resource missing, building may crash */
 
     typedef struct maintenance {
         const struct resource_type *rtype;  /* type of resource required */
@@ -49,22 +51,16 @@ extern "C" {
 #define BTF_MAGIC          0x40 /* magical effect */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
 #define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
-#define BTF_FORTIFICATION 0x200 /* safe from monsters */
-
-    typedef enum {
-        DEFENSE_BONUS,
-        CLOSE_COMBAT_ATTACK_BONUS, // TODO: only DEFENSE_BONUS is in use?
-        RANGED_ATTACK_BONUS,
-    } building_bonus;
+#define BTF_FORTIFICATION 0x200 /* building_protection, safe from monsters */
 
     typedef struct building_type {
         char *_name;
 
         int flags;                  /* flags */
-        int capacity;               /* Kapazität pro Größenpunkt */
-        int maxcapacity;            /* Max. Kapazität */
+        int capacity;               /* Kapazitï¿½t pro Grï¿½ï¿½enpunkt */
+        int maxcapacity;            /* Max. Kapazitï¿½t */
         int maxsize;                /* how big can it get, with all the extensions? */
-        int magres;                 /* how well it resists against spells */
+        variant magres;                 /* how well it resists against spells */
         int magresbonus;            /* bonus it gives the target against spells */
         int fumblebonus;            /* bonus that reduces fumbling */
         double auraregen;           /* modifier for aura regeneration inside building */
@@ -75,15 +71,17 @@ extern "C" {
             const struct building * b, int size);
         void(*init) (struct building_type *);
         void(*age) (struct building *);
-        int(*protection) (const struct building *, const struct unit *, building_bonus bonus);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;
     } building_type;
 
-    extern struct quicklist *buildingtypes;
+    extern struct selist *buildingtypes;
     extern struct attrib_type at_building_action;
 
+    int cmp_castle_size(const struct building *b, const struct building *a);
+    int building_protection(const struct building_type *btype, int stage);
     building_type *bt_get_or_create(const char *name);
+    bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
     void free_buildingtypes(void);
     void register_buildings(void);
@@ -131,7 +129,17 @@ extern "C" {
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
 
-    /* Alte Gebäudetypen: */
+    int wage(const struct region *r, const struct faction *f,
+        const struct race *rc, int in_turn);
+
+    typedef int(*cmp_building_cb) (const struct building * b,
+        const struct building * a);
+    struct building *largestbuilding(const struct region *r, cmp_building_cb,
+        bool imaginary);
+    int cmp_wage(const struct building *b, const struct building *bother);
+    int cmp_taxes(const struct building *b, const struct building *bother);
+    int cmp_current_owner(const struct building *b,
+        const struct building *bother);
 
     /* old functions, still in build.c: */
     int buildingeffsize(const building * b, int imaginary);

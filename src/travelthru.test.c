@@ -1,4 +1,4 @@
-﻿#include <platform.h>
+#include <platform.h>
 #include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -15,7 +15,7 @@ struct attrib;
 
 static void count_travelers(region *r, unit *u, void *cbdata) {
     int *n = (int *)cbdata;
-    unused_arg(r);
+    UNUSED_ARG(r);
     *n += u->number;
 }
 

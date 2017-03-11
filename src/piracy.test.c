@@ -83,12 +83,12 @@ static void test_piracy_cmd(CuTest * tc) {
     t_ocean = get_or_create_terrain("ocean");
     st_boat = st_get_or_create("boat");
     u2 = test_create_unit(test_create_faction(0), test_create_region(1, 0, t_ocean));
-    u_set_ship(u2, test_create_ship(u2->region, st_boat));
     assert(u2);
+    u_set_ship(u2, test_create_ship(u2->region, st_boat));
     u = test_create_unit(f = test_create_faction(0), r = test_create_region(0, 0, t_ocean));
+    assert(f && u);
     set_level(u, SK_SAILING, st_boat->sumskill);
     u_set_ship(u, test_create_ship(u->region, st_boat));
-    assert(f && u);
     f->locale = get_or_create_locale("de");
     u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(u2->faction->no));
 
@@ -97,7 +97,7 @@ static void test_piracy_cmd(CuTest * tc) {
     CuAssertTrue(tc, u->region != r);
     CuAssertPtrEquals(tc, u2->region, u->region);
     CuAssertPtrEquals(tc, u2->region, u->ship->region);
-    CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); // FIXME: this is testing implementation, not interface
+    CuAssertPtrNotNullMsg(tc, "successful PIRACY sets attribute", r->attribs); /* FIXME: this is testing implementation, not interface */
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(f->msgs, "piratesawvictim"));
     CuAssertPtrNotNullMsg(tc, "successful PIRACY movement", test_find_messagetype(f->msgs, "shipsail"));
 
@@ -116,7 +116,7 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     st_boat = st_get_or_create("boat");
     r = test_create_race("pirates");
     u = test_create_unit(f = test_create_faction(r), test_create_region(0, 0, get_or_create_terrain("ocean")));
-    f->locale = get_or_create_locale("de");
+    f->locale = test_create_locale();
     u->thisorder = create_order(K_PIRACY, f->locale, "");
     assert(u && u->thisorder);
 
@@ -183,14 +183,14 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
     t_plain = get_or_create_terrain("plain");
     stype = test_create_shiptype("boat");
 
-    // create a target:
+    /* create a target: */
     r = test_create_region(0, 0, t_plain);
     f = test_create_faction(0);
     u = test_create_unit(f, r);
     u->ship = test_create_ship(r, stype);
     target = f->no;
 
-    // create a pirate:
+    /* create a pirate: */
     r = test_create_region(1, 0, t_plain);
     f = test_create_faction(0);
     u = test_create_unit(f, r);

@@ -37,6 +37,10 @@ function teardown()
     set_rule("rules.ship.storms")
 end
 
+function test_calendar()
+    assert_equal(get_season(396), "calendar::winter")
+end
+
 function disable_test_bug_1738_build_castle_e3()
     local r = region.create(0, 0, "plain")    
     local f = faction.create("bug_1738@eressea.de", "human", "de")
@@ -626,11 +630,7 @@ function test_give_50_percent_of_money()
     u1:add_order("GIB " .. itoa36(u2.id) .. " 221 Silber")
     u2:clear_orders()
     u2:add_order("HELFEN " .. itoa36(u1.faction.id) .. " GIB")
-    u2:add_item("horse", 100)
-    u2:add_order("GIB 0 ALLES PFERD")
-    local h = r:get_resource("horse")
     process_orders()
-    assert_true(r:get_resource("horse")>=h+100)
     assert_equal(m1-221, u1:get_item("money"))
     assert_equal(m2+110, u2:get_item("money"))
 end

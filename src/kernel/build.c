@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "direction.h"
 #include "move.h"
 #include "study.h"
+#include "guard.h"
 #include "laws.h"
 #include "skill.h"
 #include "lighthouse.h"
@@ -113,7 +114,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         }
 
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != u->faction && is_guard(u2, GUARD_TAX)
+            if (u2->faction != u->faction && is_guard(u2)
                 && cansee(u2->faction, u->region, u, 0)
                 && !alliedunit(u, u2->faction, HELP_GUARD)) {
                 cmistake(u, ord, 70, MSG_EVENT);
@@ -122,11 +123,11 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         }
 
         road = rroad(r, d);
-        n = _min(n, road);
+        n = MIN(n, road);
         if (n != 0) {
             region *r2 = rconnect(r, d);
             int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
-            willdo = _min(willdo, n);
+            willdo = MIN(willdo, n);
             if (willdo == 0) {
                 /* TODO: error message */
             }
@@ -248,7 +249,7 @@ int destroy_cmd(unit * u, struct order *ord)
     }
 
     if (con) {
-        /* TODO: Nicht an ZERSTÖRE mit Punktangabe angepasst! */
+        /* TODO: Nicht an ZERSTï¿½RE mit Punktangabe angepasst! */
         int c;
         for (c = 0; con->materials[c].number; ++c) {
             const requirement *rq = con->materials + c;
@@ -326,7 +327,7 @@ void build_road(unit * u, int size, direction_t d)
     }
 
     if (size > 0)
-        left = _min(size, left);
+        left = MIN(size, left);
     /* baumaximum anhand der rohstoffe */
     if (u_race(u) == get_race(RC_STONEGOLEM)) {
         n = u->number * GOLEM_STONE;
@@ -338,7 +339,7 @@ void build_road(unit * u, int size, direction_t d)
             return;
         }
     }
-    left = _min(n, left);
+    left = MIN(n, left);
 
     /* n = maximum by skill. try to maximize it */
     n = u->number * effsk;
@@ -346,7 +347,7 @@ void build_road(unit * u, int size, direction_t d)
         const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
         item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
         if (itm != NULL && itm->number > 0) {
-            int rings = _min(u->number, itm->number);
+            int rings = MIN(u->number, itm->number);
             n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
         }
     }
@@ -354,15 +355,15 @@ void build_road(unit * u, int size, direction_t d)
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
         if (dm != 0) {
             int todo = (left - n + effsk - 1) / effsk;
-            todo = _min(todo, u->number);
-            dm = _min(dm, todo);
+            todo = MIN(todo, u->number);
+            dm = MIN(dm, todo);
             change_effect(u, oldpotiontype[P_DOMORE], -dm);
             n += dm * effsk;
         }                           /* Auswirkung Schaffenstrunk */
     }
 
     /* make minimum of possible and available: */
-    n = _min(left, n);
+    n = MIN(left, n);
 
     /* n is now modified by several special effects, so we have to
      * minimize it again to make sure the road will not grow beyond
@@ -379,7 +380,7 @@ void build_road(unit * u, int size, direction_t d)
     else {
         use_pooled(u, get_resourcetype(R_STONE), GET_DEFAULT, n);
         /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-        produceexp(u, SK_ROAD_BUILDING, _min(n, u->number));
+        produceexp(u, SK_ROAD_BUILDING, MIN(n, u->number));
     }
     ADDMSG(&u->faction->msgs, msg_message("buildroad",
         "region unit size", r, u, n));
@@ -396,7 +397,7 @@ static int required(int size, int msize, int maxneed)
  * braucht man required von maxneed resourcen */
 {
     int used;
-
+    assert(msize > 0);
     used = size * maxneed / msize;
     if (size * maxneed % msize)
         ++used;
@@ -425,6 +426,76 @@ int roqf_factor(void)
         value = config_get_int("rules.economy.roqf", 10);
     }
     return value;
+}
+
+static int use_materials(unit *u, const construction *type, int n, int completed) {
+    if (type->materials) {
+        int c;
+        for (c = 0; type->materials[c].number; c++) {
+            const struct resource_type *rtype = type->materials[c].rtype;
+            int prebuilt =
+                required(completed, type->reqsize, type->materials[c].number);
+            int need =
+                required(completed + n, type->reqsize, type->materials[c].number);
+            int multi = 1;
+            int canuse = 100;       /* normalization */
+            if (building_is_active(u->building) && inside_building(u)) {
+                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+            }
+            if (canuse < 0) {
+                return canuse;        /* pass errors to caller */
+            }
+            canuse = matmod(type->attribs, u, rtype, canuse);
+
+            assert(canuse % 100 == 0
+                || !"only constant multipliers are implemented in build()");
+            multi = canuse / 100;
+            if (canuse < 0) {
+                return canuse;        /* pass errors to caller */
+            }
+            use_pooled(u, rtype, GET_DEFAULT,
+                (need - prebuilt + multi - 1) / multi);
+        }
+    }
+    return 0;
+}
+
+static int count_materials(unit *u, const construction *type, int n, int completed)
+{
+    if (type->materials) {
+        int c;
+        for (c = 0; n > 0 && type->materials[c].number; c++) {
+            const struct resource_type *rtype = type->materials[c].rtype;
+            int need, prebuilt;
+            int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+
+            if (building_is_active(u->building) && inside_building(u)) {
+                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
+            }
+
+            if (canuse < 0)
+                return canuse;        /* pass errors to caller */
+            canuse = matmod(type->attribs, u, rtype, canuse);
+            if (type->reqsize > 1) {
+                prebuilt =
+                    required(completed, type->reqsize, type->materials[c].number);
+                for (; n;) {
+                    need =
+                        required(completed + n, type->reqsize, type->materials[c].number);
+                    if (need - prebuilt <= canuse)
+                        break;
+                    --n;                /* TODO: optimieren? */
+                }
+            }
+            else {
+                int maxn = canuse / type->materials[c].number;
+                if (maxn < n) {
+                    n = maxn;
+                }
+            }
+        }
+    }
+    return n;
 }
 
 /** Use up resources for building an object.
@@ -485,13 +556,13 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
         if (dm != 0) {
             /* Auswirkung Schaffenstrunk */
-            dm = _min(dm, u->number);
+            dm = MIN(dm, u->number);
             change_effect(u, oldpotiontype[P_DOMORE], -dm);
             skills += dm * effsk;
         }
     }
     for (; want > 0 && skills > 0;) {
-        int c, n;
+        int err, n;
 
         /* skip over everything that's already been done:
          * type->improvement==NULL means no more improvements, but no size limits
@@ -512,8 +583,8 @@ int build(unit * u, const construction * ctype, int completed, int want)
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
-         *  (enno): Nein, das ist für Dinge, bei denen die nächste Ausbaustufe
-         *  die gleiche wie die vorherige ist. z.b. gegenstände.
+         *  (enno): Nein, das ist fï¿½r Dinge, bei denen die nï¿½chste Ausbaustufe
+         *  die gleiche wie die vorherige ist. z.b. gegenstï¿½nde.
          */
         if (type->maxsize > 0) {
             completed = completed % type->maxsize;
@@ -544,7 +615,7 @@ int build(unit * u, const construction * ctype, int completed, int want)
             item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
             int i = itm ? itm->number : 0;
             if (i > 0) {
-                int rings = _min(u->number, i);
+                int rings = MIN(u->number, i);
                 n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
             }
         }
@@ -552,80 +623,30 @@ int build(unit * u, const construction * ctype, int completed, int want)
         if (want < n) n = want;
 
         if (type->maxsize > 0) {
-            n = _min(type->maxsize - completed, n);
+            n = MIN(type->maxsize - completed, n);
             if (type->improvement == NULL) {
                 want = n;
             }
         }
 
-        if (type->materials)
-            for (c = 0; n > 0 && type->materials[c].number; c++) {
-                const struct resource_type *rtype = type->materials[c].rtype;
-                int need, prebuilt;
-                int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
-
-                if (building_is_active(u->building) && inside_building(u)) {
-                    canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-                }
-
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-                canuse = matmod(type->attribs, u, rtype, canuse);
-                if (type->reqsize > 1) {
-                    prebuilt =
-                        required(completed, type->reqsize, type->materials[c].number);
-                    for (; n;) {
-                        need =
-                            required(completed + n, type->reqsize, type->materials[c].number);
-                        if (need - prebuilt <= canuse)
-                            break;
-                        --n;                /* TODO: optimieren? */
-                    }
-                }
-                else {
-                    int maxn = canuse / type->materials[c].number;
-                    if (maxn < n)
-                        n = maxn;
-                }
-            }
+        n = count_materials(u, type, n, completed);
         if (n <= 0) {
             if (made == 0)
                 return ENOMATERIALS;
             else
                 break;
         }
-        if (type->materials)
-            for (c = 0; type->materials[c].number; c++) {
-                const struct resource_type *rtype = type->materials[c].rtype;
-                int prebuilt =
-                    required(completed, type->reqsize, type->materials[c].number);
-                int need =
-                    required(completed + n, type->reqsize, type->materials[c].number);
-                int multi = 1;
-                int canuse = 100;       /* normalization */
-                if (building_is_active(u->building) && inside_building(u)) {
-                    canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-                }
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-                canuse = matmod(type->attribs, u, rtype, canuse);
-
-                assert(canuse % 100 == 0
-                    || !"only constant multipliers are implemented in build()");
-                multi = canuse / 100;
-                if (canuse < 0)
-                    return canuse;        /* pass errors to caller */
-
-                use_pooled(u, rtype, GET_DEFAULT,
-                    (need - prebuilt + multi - 1) / multi);
-            }
+        err = use_materials(u, type, n, completed);
+        if (err < 0) {
+            return err;
+        }
         made += n;
         skills -= n * type->minskill;
         want -= n;
         completed = completed + n;
     }
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, ctype->skill, _min(made, u->number));
+    produceexp(u, ctype->skill, MIN(made, u->number));
 
     return made;
 }
@@ -670,7 +691,7 @@ int maxbuild(const unit * u, const construction * cons)
             return 0;
         }
         else
-            maximum = _min(maximum, have / need);
+            maximum = MIN(maximum, have / need);
     }
     return maximum;
 }
@@ -758,10 +779,8 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
                 return 0;
             }
         }
-    }
-
-    if (b)
         built = b->size;
+    }
     if (n <= 0 || n == INT_MAX) {
         if (b == NULL) {
             if (btype->maxsize > 0) {
@@ -816,11 +835,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     btname = LOC(lang, btype->_name);
 
     if (want - built <= 0) {
-        /* gebäude fertig */
+        /* gebï¿½ude fertig */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX && btname) {
-        /* reduzierte restgröße */
+        /* reduzierte restgrï¿½ï¿½e */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order =
@@ -832,7 +851,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
     else if (btname) {
-        /* Neues Haus, Befehl mit Gebäudename */
+        /* Neues Haus, Befehl mit Gebï¿½udename */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
@@ -880,7 +899,7 @@ static void build_ship(unit * u, ship * sh, int want)
     }
 
     if (sh->damage && can) {
-        int repair = _min(sh->damage, can * DAMAGE_SCALE);
+        int repair = MIN(sh->damage, can * DAMAGE_SCALE);
         n += repair / DAMAGE_SCALE;
         if (repair % DAMAGE_SCALE)
             ++n;
@@ -924,7 +943,7 @@ order * ord)
         return;
     }
     if (want > 0)
-        want = _min(want, msize);
+        want = MIN(want, msize);
     else
         want = msize;
 
@@ -983,7 +1002,7 @@ void continue_ship(unit * u, int want)
         return;
     }
     if (want > 0)
-        want = _min(want, msize);
+        want = MIN(want, msize);
     else
         want = msize;
 

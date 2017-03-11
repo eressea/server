@@ -15,6 +15,9 @@
 extern "C" {
 #endif
 
+    struct building_type;
+    struct race;
+
     enum {
         RM_USED = 1 << 0,           /* resource has been used */
         RM_MALLORN = 1 << 1         /* this is not wood. it's mallorn */
@@ -40,34 +43,41 @@ extern "C" {
         struct rawmaterial *next;
     } rawmaterial;
 
+    typedef struct resource_mod {
+        variant value;
+        const struct building_type *btype;
+        const struct race *race;
+        unsigned int flags;
+    } resource_mod;
+
     typedef struct rawmaterial_type {
-        char *name;
         const struct resource_type *rtype;
 
         void(*terraform) (struct rawmaterial *, const struct region *);
         void(*update) (struct rawmaterial *, const struct region *);
         void(*use) (struct rawmaterial *, const struct region *, int amount);
         int(*visible) (const struct rawmaterial *, int skilllevel);
-
-        /* no initialization required */
-        struct rawmaterial_type *next;
     } rawmaterial_type;
 
     extern struct rawmaterial_type *rawmaterialtypes;
 
-    extern void update_resources(struct region *r);
-    extern void terraform_resources(struct region *r);
-    extern void read_resources(struct region *r);
-    extern void write_resources(struct region *r);
-    extern struct rawmaterial *rm_get(struct region *,
+    void update_resources(struct region *r);
+    void terraform_resources(struct region *r);
+    struct rawmaterial *rm_get(struct region *,
         const struct resource_type *);
-    extern struct rawmaterial_type *rmt_find(const char *str);
-    extern struct rawmaterial_type *rmt_get(const struct resource_type *);
+    struct rawmaterial_type *rmt_find(const char *str);
+    struct rawmaterial_type *rmt_get(const struct resource_type *);
 
-    extern void add_resource(struct region *r, int level, int base, int divisor,
+    void add_resource(struct region *r, int level, int base, int divisor,
         const struct resource_type *rtype);
-    extern struct rawmaterial_type *rmt_create(const struct resource_type *rtype,
-        const char *name);
+    struct rawmaterial_type *rmt_create(struct resource_type *rtype);
+
+    extern int(*res_limit_fun)(const struct region *, const struct resource_type *);
+    extern void(*res_produce_fun)(struct region *, const struct resource_type *, int);
+    extern int (*item_use_fun)(struct unit *, const struct item_type *, int amount,
+        struct order *ord);
+    int limit_resource(const struct region *r, const struct resource_type *rtype);
+    void produce_resource(struct region *r, const struct resource_type *rtype, int amount);
 
 #ifdef __cplusplus
 }

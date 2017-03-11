@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "createcurse.h"
 
 /* kernel includes */
@@ -77,7 +76,7 @@ static int createcurse_handle(trigger * t, void *data)
     else {
         log_error("could not perform createcurse::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

@@ -16,7 +16,7 @@
 
 #include "strings.h"
 #include "log.h"
-#include "quicklist.h"
+#include "selist.h"
 
 /* libc includes */
 #include <assert.h>
@@ -73,7 +73,7 @@ message_type *mt_new(const char *name, const char *args[])
         while (args[nparameters]) ++nparameters;
     }
     mtype->key = 0;
-    mtype->name = _strdup(name);
+    mtype->name = strdup(name);
     mtype->nparameters = nparameters;
     if (nparameters > 0) {
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
@@ -87,19 +87,21 @@ message_type *mt_new(const char *name, const char *args[])
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
-            if (spos == NULL) {
-                mtype->pnames[i] = _strdup(x);
-                mtype->types[i] = NULL;
+            struct arg_type *atype = NULL;
+            if (spos != NULL) {
+                atype = find_argtype(spos + 1);
+            }
+            if (!atype) {
+                log_error("unknown argument type %s for message type %s\n", spos + 1, mtype->name);
+                assert(atype);
             }
             else {
-                char *cp = strncpy((char *)malloc(spos - x + 1), x, spos - x);
+                char *cp;
+                cp = malloc(spos - x + 1);
+                memcpy(cp, x, spos - x);
                 cp[spos - x] = '\0';
                 mtype->pnames[i] = cp;
-                mtype->types[i] = find_argtype(spos + 1);
-                if (mtype->types[i] == NULL) {
-                    log_error("unknown argument type %s for message type %s\n", spos + 1, mtype->name);
-                }
-                assert(mtype->types[i]);
+                mtype->types[i] = atype;
             }
         }
     }
@@ -160,7 +162,7 @@ message *msg_create(const struct message_type *mtype, variant args[])
 }
 
 #define MT_MAXHASH 1021
-static quicklist *messagetypes[MT_MAXHASH];
+static selist *messagetypes[MT_MAXHASH];
 
 static void mt_free(void *val) {
     message_type *mtype = (message_type *)val;
@@ -177,9 +179,9 @@ static void mt_free(void *val) {
 void mt_clear(void) {
     int i;
     for (i = 0; i != MT_MAXHASH; ++i) {
-        quicklist *ql = messagetypes[i];
-        ql_foreach(ql, mt_free);
-        ql_free(ql);
+        selist *ql = messagetypes[i];
+        selist_foreach(ql, mt_free);
+        selist_free(ql);
         messagetypes[i] = 0;
     }
 }
@@ -187,11 +189,11 @@ void mt_clear(void) {
 const message_type *mt_find(const char *name)
 {
     unsigned int hash = hashstring(name) % MT_MAXHASH;
-    quicklist *ql = messagetypes[hash];
+    selist *ql = messagetypes[hash];
     int qi;
 
-    for (qi = 0; ql; ql_advance(&ql, &qi, 1)) {
-        message_type *data = (message_type *)ql_get(ql, qi);
+    for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+        message_type *data = (message_type *)selist_get(ql, qi);
         if (strcmp(data->name, name) == 0) {
             return data;
         }
@@ -213,9 +215,9 @@ static unsigned int mt_id(const message_type * mtype)
 const message_type *mt_register(message_type * type)
 {
     unsigned int hash = hashstring(type->name) % MT_MAXHASH;
-    quicklist **qlp = messagetypes + hash;
+    selist **qlp = messagetypes + hash;
 
-    if (ql_set_insert(qlp, type)) {
+    if (selist_set_insert(qlp, type, NULL)) {
         type->key = mt_id(type);
     }
     return type;

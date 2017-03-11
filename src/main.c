@@ -54,50 +54,52 @@ static void load_inifile(dictionary * d)
 
     assert(d);
 
-    str = iniparser_getstring(d, "eressea:base", basedir);
+    str = iniparser_getstring(d, "game:base", basedir);
     if (str != basedir) {
         set_basepath(str);
     }
-    str = iniparser_getstring(d, "eressea:report", reportdir);
+    str = iniparser_getstring(d, "game:report", reportdir);
     if (str != reportdir) {
         set_reportpath(str);
     }
-    str = iniparser_getstring(d, "eressea:data", datadir);
+    str = iniparser_getstring(d, "game:data", datadir);
     if (str != datadir) {
         set_datapath(str);
     }
 
-    lomem = iniparser_getint(d, "eressea:lomem", lomem) ? 1 : 0;
+    lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
 
-    str = iniparser_getstring(d, "eressea:encoding", NULL);
-    if (str && (_strcmpl(str, "utf8") == 0 || _strcmpl(str, "utf-8") == 0)) {
-        enc_gamedata = ENCODING_UTF8;
-    }
-
-    verbosity = iniparser_getint(d, "eressea:verbose", 2);
-    battledebug = iniparser_getint(d, "eressea:debug", battledebug) ? 1 : 0;
-
-    str = iniparser_getstring(d, "eressea:locales", "de,en");
-    make_locales(str);
-
-    if (global.inifile) iniparser_freedict(global.inifile);
-    global.inifile = d;
+    verbosity = iniparser_getint(d, "game:verbose", 2);
 }
 
-static void parse_config(const char *filename)
+static dictionary *parse_config(const char *filename)
 {
-    dictionary *d = iniparser_load(filename);
+    char path[MAX_PATH];
+    dictionary *d;
+    const char *str, *cfgpath = config_get("config.path");
+
+    if (cfgpath) {
+        join_path(cfgpath, filename, path, sizeof(path));
+        log_debug("reading from configuration file %s\n", path);
+        d  = iniparser_load(path);
+    } else {
+        log_debug("reading from configuration file %s\n", filename);
+        d  = iniparser_load(filename);        
+    }
     if (d) {
         load_inifile(d);
-        log_debug("reading from configuration file %s\n", filename);
+        config_set_from(d);
 
-        memdebug = iniparser_getint(d, "eressea:memcheck", memdebug);
+        memdebug = iniparser_getint(d, "game:memcheck", memdebug);
 #ifdef USE_CURSES
         /* only one value in the [editor] section */
         force_color = iniparser_getint(d, "editor:color", force_color);
         gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
 #endif
     }
+    str = config_get("game.locales");
+    make_locales(str ? str : "de,en");
+    return d;
 }
 
 static int usage(const char *prog, const char *arg)
@@ -166,7 +168,7 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 printf("\n%s PBEM host\n"
                     "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
                     "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %s\n\n",
-                    game_name(), ERESSEA_VERSION);
+                    game_name(), eressea_version());
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
@@ -184,6 +186,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'c':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                config_set("config.path", arg);
+                break;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.rules", arg);
@@ -217,11 +223,11 @@ static int parse_args(int argc, char **argv, int *exitcode)
         }
     }
 
-    // open logfile on disk:
+    /* open logfile on disk: */
     log_flags = verbosity_to_flags(log_flags);
     log_open(logfile, log_flags);
 
-    // also log to stderr:
+    /* also log to stderr: */
     log_stderr = verbosity_to_flags(verbosity);
     if (log_stderr) {
         log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
@@ -262,27 +268,6 @@ static int setup_signal_handler(void)
 }
 #endif
 
-#undef CRTDBG
-#ifdef CRTDBG
-#include <crtdbg.h>
-void init_crtdbg(void)
-{
-#if (defined(_MSC_VER))
-    int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-    if (memdebug == 1) {
-        flags |= _CRTDBG_CHECK_ALWAYS_DF;   /* expensive */
-    } else if (memdebug == 2) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_16_DF;
-    } else if (memdebug == 3) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_128_DF;
-    } else if (memdebug == 4) {
-        flags = (flags & 0x0000FFFF) | _CRTDBG_CHECK_EVERY_1024_DF;
-    }
-    _CrtSetDbgFlag(flags);
-#endif
-}
-#endif
-
 void locale_init(void)
 {
     setlocale(LC_CTYPE, "");
@@ -299,22 +284,19 @@ int main(int argc, char **argv)
 {
     int err = 0;
     lua_State *L;
+    dictionary *d = 0;
     setup_signal_handler();
-    /* ini file sets defaults for arguments*/
-    parse_config(inifile);
-    if (!global.inifile) {
-        log_error("could not open ini configuration %s\n", inifile);
-    }
     /* parse arguments again, to override ini file */
     parse_args(argc, argv, &err);
 
+    d = parse_config(inifile);
+    if (!d) {
+        log_error("could not open ini configuration %s\n", inifile);
+    }
+
     locale_init();
 
-#ifdef CRTDBG
-    init_crtdbg();
-#endif
-
-    L = lua_init();
+    L = lua_init(d);
     game_init();
     bind_monsters(L);
     err = eressea_run(L, luafile);
@@ -325,8 +307,8 @@ int main(int argc, char **argv)
     game_done();
     lua_done(L);
     log_close();
-    if (global.inifile) {
-        iniparser_freedict(global.inifile);
+    if (d) {
+        iniparser_freedict(d);
     }
     return 0;
 }

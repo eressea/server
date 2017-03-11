@@ -1,10 +1,11 @@
+#include <platform.h>
 #include <kernel/types.h>
 #include "donations.h"
 
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/messages.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +16,7 @@ typedef struct transfer {
     int amount;
 } transfer;
 
-static quicklist *transfers = 0;
+static selist *transfers = 0;
 
 int cmp_transfer(const void *v1, const void *v2) {
     const transfer *t1 = (const transfer *)v1;
@@ -35,46 +36,42 @@ int cmp_transfer(const void *v1, const void *v2) {
 void add_donation(faction * f1, faction * f2, int amount, region * r)
 {
     transfer tr, *tf;
-    quicklist *ql = transfers;
+    selist *ql = transfers;
     int qi = 0;
 
     tr.r = r;
     tr.f1 = f1;
     tr.f2 = f2;
     tr.amount = amount;
-    if (ql_set_find_ex(&ql, &qi, &tr, cmp_transfer)) {
-        tf = (transfer *)ql_get(ql, qi);
+    if (selist_set_find(&ql, &qi, &tr, cmp_transfer)) {
+        tf = (transfer *)selist_get(ql, qi);
         tf->amount += amount;
     }
     else {
         tf = malloc(sizeof(transfer));
         memcpy(tf, &tr, sizeof(transfer));
     }
-    ql_set_insert_ex(&transfers, tf, cmp_transfer);
+    selist_set_insert(&transfers, tf, cmp_transfer);
 }
 
 void free_donations(void) {
-    ql_foreach(transfers, free);
-    ql_free(transfers);
+    selist_foreach(transfers, free);
+    selist_free(transfers);
     transfers = 0;
 }
 
-static void report_transfer(faction *f1, faction *f2, region *r, int amount) {
-    struct message *msg = msg_message("donation",
-        "from to amount", f1, f2, amount);
-    r_addmessage(r, f1, msg);
-    r_addmessage(r, f2, msg);
-    msg_release(msg);
+static void report_transfer(void *data) {
+    transfer *tf = (transfer *)data;
+    if (tf->amount > 0) {
+        struct message *msg = msg_message("donation",
+             "from to amount", tf->f1, tf->f2, tf->amount);
+        r_addmessage(tf->r, tf->f1, msg);
+        r_addmessage(tf->r, tf->f2, msg);
+        msg_release(msg);
+    }
 }
 
 void report_donations(void)
 {
-    ql_iter qli = qli_init(&transfers);
-
-    while (qli_more(qli)) {
-        transfer *tf = (transfer *)qli_next(&qli);
-        if (tf->amount > 0) {
-            report_transfer(tf->f1, tf->f2, tf->r, tf->amount);
-        }
-    }
+    selist_foreach(transfers, report_transfer);
 }

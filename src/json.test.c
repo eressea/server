@@ -16,7 +16,7 @@
 
 static char *strip(char *str) {
     char *s = str, *b = str, *e = str;
-    // b is where text begins, e where it ends, s where we insert it.
+    /* b is where text begins, e where it ends, s where we insert it. */
     for (; *b && isspace(*b); ++b) {};
     for (e = b; *e && !isspace(*e); ++e) {};
     while (*b) {

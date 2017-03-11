@@ -86,7 +86,7 @@ locale *get_or_create_locale(const char *name)
     *lp = l = (locale *)calloc(sizeof(locale), 1);
     assert_alloc(l);
     l->hashkey = hkey;
-    l->name = _strdup(name);
+    l->name = strdup(name);
     l->index = nextlocaleindex++;
     assert(nextlocaleindex <= MAXLOCALES);
     if (default_locale == NULL) default_locale = l;
@@ -101,16 +101,23 @@ locale *get_or_create_locale(const char *name)
 void make_locales(const char *str)
 {
     const char *tok = str;
-    while (*tok) {
-        char zText[32];
-        while (*tok && *tok != ',')
-            ++tok;
-        strncpy(zText, str, tok - str);
-        zText[tok - str] = 0;
-        get_or_create_locale(zText);
-        if (*tok) {
-            str = ++tok;
+    while (tok) {
+        char zText[16];
+        size_t len;
+
+        tok = strchr(str, ',');
+        if (tok) {
+            len = tok - str;
+            assert(sizeof(zText) > len);
+            memcpy(zText, str, len);
+            str = tok + 1;
         }
+        else {
+            len = strlen(str);
+            memcpy(zText, str, len);
+        }
+        zText[len] = 0;
+        get_or_create_locale(zText);
     }
 }
 
@@ -202,15 +209,15 @@ void locale_setstring(locale * lang, const char *key, const char *value)
         find->nexthash = lang->strings[id];
         lang->strings[id] = find;
         find->hashkey = hkey;
-        find->key = _strdup(key);
-        find->str = _strdup(value);
+        find->key = strdup(key);
+        find->str = strdup(value);
     }
     else {
         if (strcmp(find->str, value) != 0) {
             log_warning("multiple translations for key %s\n", key);
         }
         free(find->str);
-        find->str = _strdup(value);
+        find->str = strdup(value);
     }
 }
 
@@ -232,7 +239,7 @@ char *mkname_buf(const char *space, const char *name, char *buffer)
 
 const char *mkname(const char *space, const char *name)
 {
-    static char zBuffer[128]; // FIXME: static return value
+    static char zBuffer[128]; /* FIXME: static return value */
     return mkname_buf(space, name, zBuffer);
 }
 
@@ -265,7 +272,7 @@ void add_translation(struct critbit_tree **cbp, const char *key, int i) {
     if (str) {
         size_t len = strlen(str);
         if (!cb) {
-            // TODO: this will leak, because we do not know how to clean it up */
+            /* TODO: this will leak, because we do not know how to clean it up */
             *cbp = cb = (struct critbit_tree *)calloc(1, sizeof(struct critbit_tree));
         }
         len = cb_new_kv(str, len, &i, sizeof(int), buffer);
@@ -285,13 +292,17 @@ void init_translations(const struct locale *lang, int ut, const char * (*string_
     assert(maxstrings > 0);
     tokens = get_translations(lang, ut);
     for (i = 0; i != maxstrings; ++i) {
-        // TODO: swap the name of s and key
+        /* TODO: swap the name of s and key */
         const char * s = string_cb(i);
         if (s) {
-            struct critbit_tree ** cb = (struct critbit_tree **)tokens;
             const char * key = locale_string(lang, s, false);
-            if (!key) key = s;
-            add_translation(cb, key, i);
+            if (key) {
+                struct critbit_tree ** cb = (struct critbit_tree **)tokens;
+                add_translation(cb, key, i);
+            }
+            else {
+                log_warning("no translation for %s in locale %s", s, lang->name);
+            }
         }
     }
 }
@@ -316,10 +327,10 @@ static int locale_init = 0;
 
 void init_locales(void)
 {
-    int l;
+    locale * lang;
     if (locale_init) return;
-    for (l = 0; localenames[l]; ++l) {
-        struct locale *lang = get_or_create_locale(localenames[l]);
+    assert(locales);
+    for (lang = locales; lang; lang = lang->next) {
         init_locale(lang);
     }
     locale_init = 1;
@@ -338,7 +349,7 @@ void free_locales(void) {
         for (i = UT_PARAMS; i != UT_RACES; ++i) {
             struct critbit_tree ** cb = (struct critbit_tree **)get_translations(locales, i);
             if (*cb) {
-                // TODO: this crashes?
+                /* TODO: this crashes? */
                 cb_clear(*cb);
                 free(*cb);
             }
@@ -362,5 +373,5 @@ void free_locales(void) {
         free(locales);
         locales = next;
     }
-    memset(lstrs, 0, sizeof(lstrs)); // TODO: does this data need to be free'd?
+    memset(lstrs, 0, sizeof(lstrs)); /* TODO: does this data need to be free'd? */
 }

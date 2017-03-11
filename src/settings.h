@@ -10,10 +10,6 @@
  without prior permission by the authors of Eressea.
  */
 
-/*
- * Contains defines for the "free" game (Eressea) .
- * Include this file from settings.h to make eressea work.
- */
 #define ENTERTAINFRACTION 20
 #define TEACHDIFFERENCE 2
 #define GUARD_DISABLES_RECRUIT 1
@@ -24,7 +20,7 @@
 #undef NEWATSROI
 
 /* Vermehrungsrate Bauern in 1/10000.
-* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen höher. */
+* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen hoeher. */
 #define PEASANTGROWTH 10
 #define PEASANTLUCK 10
 
@@ -35,28 +31,26 @@
  * or both. We don't want separate binaries for different games
  */
 #define MUSEUM_MODULE 1
-#define ARENA_MODULE 1
 
 #undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
 
  /* experimental gameplay features (that don't affect the savefile) */
  /* TODO: move these settings to settings.h or into configuration files */
-#define GOBLINKILL              /* Goblin-Spezialklau kann tödlich enden */
-#define INSECT_POTION           /* Spezialtrank für Insekten */
-#define ORCIFICATION            /* giving snotlings to the peasants gets counted */
+#define GOBLINKILL              /* Goblin-Spezialklau kann toedlich enden */
+#define INSECT_POTION           /* Spezialtrank fuer Insekten */
 
 #define TREESIZE (8)            /* space used by trees (in #peasants) */
 
 #define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 
- /* Gebäudegröße = Minimalbelagerer */
+ /* Gebaeudegroesse = Minimalbelagerer */
 #define SIEGEFACTOR     2
 
  /** Magic */
 #define MAXMAGICIANS    3
 #define MAXALCHEMISTS   3
 
-#define ENCCHANCE           10  /* %-Chance für einmalige Zufallsbegegnung */
-#define BAGCAPACITY         20000   /* soviel paßt in einen Bag of Holding */
+#define ENCCHANCE           10  /* %-Chance fuer einmalige Zufallsbegegnung */
+#define BAGCAPACITY         20000   /* soviel passt in einen Bag of Holding */
 #define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
 #define STAMINA_AFFECTS_HP 1<<0

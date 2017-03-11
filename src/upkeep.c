@@ -16,7 +16,7 @@
 
 #include "alchemy.h"
 #include "economy.h"
-#include "monster.h"
+#include "monsters.h"
 #include "donations.h"
 
 #include <assert.h>
@@ -47,7 +47,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 {
     int need = *need_p;
     int give = get_money(donor) - lifestyle(donor);
-    give = _min(need, give);
+    give = MIN(need, give);
 
     if (give > 0) {
         change_money(donor, -give);
@@ -59,7 +59,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 }
 
 static const char *hunger_damage(const race *rc) {
-    const char * damage = get_param(rc->parameters, "hunger.damage");
+    const char * damage = rc_hungerdamage(rc);
     if (!damage) {
         damage = config_get("hunger.damage");
     }
@@ -98,11 +98,11 @@ static bool hunger(int number, unit * u)
         deathcounts(r, dead);
     }
     if (hpsub > 0) {
-        /* Jetzt die Schäden der nicht gestorbenen abziehen. */
+        /* Jetzt die Schï¿½den der nicht gestorbenen abziehen. */
         u->hp -= hpsub;
-        /* Meldung nur, wenn noch keine für Tote generiert. */
+        /* Meldung nur, wenn noch keine fï¿½r Tote generiert. */
         if (dead == 0) {
-            /* Durch unzureichende Ernährung wird %s geschwächt */
+            /* Durch unzureichende Ernï¿½hrung wird %s geschwï¿½cht */
             ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
         }
     }
@@ -115,18 +115,23 @@ void get_food(region * r)
     unit *u;
     int peasantfood = rpeasants(r) * 10;
     int food_rules = config_get_int("rules.food.flags", 0);
-
+    static const race *rc_demon;
+    static int rc_cache;
+    
+    if (rc_changed(&rc_cache)) {
+        rc_demon = get_race(RC_DAEMON);
+    }
     if (food_rules & FOOD_IS_FREE) {
         return;
     }
     /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
-    * wird zunächst so auf die Einheiten aufgeteilt, dass idealerweise
-    * jede Einheit genug Silber für ihren Unterhalt hat. */
+    * wird zunï¿½chst so auf die Einheiten aufgeteilt, dass idealerweise
+    * jede Einheit genug Silber fï¿½r ihren Unterhalt hat. */
 
     for (u = r->units; u; u = u->next) {
         int need = lifestyle(u);
 
-        /* Erstmal zurücksetzen */
+        /* Erstmal zurï¿½cksetzen */
         freset(u, UFL_HUNGER);
 
         if (u->ship && (u->ship->flags & SF_FISHING)) {
@@ -156,7 +161,7 @@ void get_food(region * r)
             * food from the peasants - should not be used with WORK */
             if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
                 int rm = rmoney(r);
-                int use = _min(rm, need);
+                int use = MIN(rm, need);
                 rsetmoney(r, rm - use);
                 need -= use;
             }
@@ -169,7 +174,7 @@ void get_food(region * r)
             for (v = r->units; need && v; v = v->next) {
                 if (v->faction == u->faction && help_money(v)) {
                     int give = get_money(v) - lifestyle(v);
-                    give = _min(need, give);
+                    give = MIN(need, give);
                     if (give > 0) {
                         change_money(v, -give);
                         change_money(u, give);
@@ -186,7 +191,7 @@ void get_food(region * r)
         int need = lifestyle(u);
         faction *f = u->faction;
 
-        need -= _max(0, get_money(u));
+        need -= MAX(0, get_money(u));
 
         if (need > 0) {
             unit *v;
@@ -225,10 +230,10 @@ void get_food(region * r)
     }
 
     /* 3. bestimmen, wie viele Bauern gefressen werden.
-    * bei fehlenden Bauern den Dämon hungern lassen
+    * bei fehlenden Bauern den Dï¿½mon hungern lassen
     */
     for (u = r->units; u; u = u->next) {
-        if (u_race(u) == get_race(RC_DAEMON)) {
+        if (u_race(u) == rc_demon) {
             int hungry = u->number;
 
             /* use peasantblood before eating the peasants themselves */
@@ -242,7 +247,7 @@ void get_food(region * r)
                 unit *donor = u;
                 while (donor != NULL && hungry > 0) {
                     int blut = get_effect(donor, pt_blood);
-                    blut = _min(blut, hungry);
+                    blut = MIN(blut, hungry);
                     if (blut) {
                         change_effect(donor, pt_blood, -blut);
                         hungry -= blut;
@@ -250,7 +255,7 @@ void get_food(region * r)
                     if (donor == u)
                         donor = r->units;
                     while (donor != NULL) {
-                        if (u_race(donor) == get_race(RC_DAEMON) && donor != u) {
+                        if (u_race(donor) == rc_demon && donor != u) {
                             if (get_effect(donor, pt_blood)) {
                                 /* if he's in our faction, drain him: */
                                 if (donor->faction == u->faction)
@@ -288,9 +293,9 @@ void get_food(region * r)
     }
     rsetpeasants(r, peasantfood / 10);
 
-    /* 3. Von den überlebenden das Geld abziehen: */
+    /* 3. Von den ï¿½berlebenden das Geld abziehen: */
     for (u = r->units; u; u = u->next) {
-        int need = _min(get_money(u), lifestyle(u));
+        int need = MIN(get_money(u), lifestyle(u));
         change_money(u, -need);
     }
 }

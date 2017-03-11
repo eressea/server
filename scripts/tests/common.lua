@@ -330,17 +330,6 @@ function test_message()
   return msg
 end
 
-function test_hashtable()
-  local f = faction.create("noreply1@eressea.de", "human", "de")
-  f.objects:set("enno", "smart guy")
-  f.objects:set("age", 10)
-  assert(f.objects:get("jesus") == nil)
-  assert(f.objects:get("enno") == "smart guy")
-  assert(f.objects:get("age") == 10)
-  f.objects:set("age", nil)
-  assert(f.objects:get("age") == nil)
-end
-
 function test_events()
   local fail = 1
   local function msg_handler(u, evt)
@@ -378,6 +367,21 @@ function test_events()
   u:add_order(msg)
   process_orders()
   assert(fail==0)
+end
+
+function test_renumber_ship()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply4@eressea.de", "human", "de")
+    local u = unit.create(f, r)
+    local s = ship.create(r, config.ships[1])
+    u.ship = s
+    u:add_order("NUMMER SCHIFF 1")
+    process_orders()
+    assert_equal(1, s.id)
+    u:clear_orders()
+    u:add_order("NUMMER SCHIFF 2")
+    process_orders()
+    assert_equal(2, s.id)
 end
 
 function test_recruit2()
@@ -434,10 +438,9 @@ function test_recruit()
   u:add_item("money", 110*n+20)
   u:add_order("REKRUTIERE " .. n)
   process_orders()
-  assert(u.number == n+1)
+  assert_equal(n+1, u.number)
   local p = r:get_resource("peasant")
-  assert(p<200 and p>=200-n)
-  -- assert(u:get_item("money")==10)
+  assert_true(p<200 and p>=200-n)
 end
 
 function test_produce()
@@ -464,7 +467,7 @@ function test_work()
   u:clear_orders()
   u:add_order("ARBEITEN")
   process_orders()
-  assert(u:get_item("money")>=10)
+  assert_equal(20, u:get_item("money"))
 end
 
 function test_upkeep()
@@ -476,7 +479,7 @@ function test_upkeep()
     u:clear_orders()
     u:add_order("LERNE Waffenbau")
     process_orders()
-    assert(u:get_item("money")==u.number)
+    assert_equal(u:get_item("money"), u.number)
 end
 
 function test_id()
@@ -484,50 +487,39 @@ function test_id()
 
   local f = faction.create("noreply11@eressea.de", "human", "de")
   f.id = atoi36("42")
-  assert(get_faction(42)~=f)
-  assert(get_faction("42")==f)
-  assert(get_faction(atoi36("42"))==f)
+  assert_not_equal(f, get_faction(42))
+  assert_equal(f, get_faction("42"))
+  assert_equal(f, get_faction(atoi36("42")))
 
   local u = unit.create(f, r, 1)
   u.id = atoi36("42")
-  assert(get_unit(42)~=u)
-  assert(get_unit("42")==u)
-  assert(get_unit(atoi36("42"))==u)
+  assert_not_equal(get_unit(42), u)
+  assert_equal(get_unit("42"), u)
+  assert_equal(get_unit(atoi36("42")), u)
 
   local b = building.create(r, "castle")
   -- <not working> b.id = atoi36("42")
   local fortytwo = itoa36(b.id)
-  assert(get_building(fortytwo)==b)
-  assert(get_building(atoi36(fortytwo))==b)
+  assert_equal(get_building(fortytwo), b)
+  assert_equal(get_building(atoi36(fortytwo)), b)
 
   local s = _test_create_ship(r)
   assert_not_nil(s)
   -- <not working> s.id = atoi36("42")
   local fortytwo = itoa36(s.id)
-  assert(get_ship(fortytwo)==s)
-  assert(get_ship(atoi36(fortytwo))==s)
-end
-
-function test_herbalism()
-  local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply12@eressea.de", "human", "de")
-  local u = unit.create(f, r, 1)
-  u:add_item("money", u.number * 100)
-  u:set_skill("herbalism", 5)
-  u:clear_orders()
-  u:add_order("MACHE Samen")
-  process_orders()
+  assert_equal(get_ship(fortytwo), s)
+  assert_equal(get_ship(atoi36(fortytwo)), s)
 end
 
 function test_mallorn()
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- not mallorn
     r:set_resource("tree", 100)
-    assert(r:get_resource("tree")==100)
+    assert_equal(100, r:get_resource("tree"))
     local m = region.create(0, 0, "plain")
     m:set_flag(1, true) -- mallorn
     m:set_resource("tree", 100)
-    assert(m:get_resource("tree")==100)
+    assert_equal(100, m:get_resource("tree"))
 
     local f = faction.create("noreply13@eressea.de", "human", "de")
 
@@ -673,8 +665,6 @@ function test_laen2()
   local laen = r:get_resource("laen")
  
   process_orders()
-  init_reports()
---  write_report(u1.faction)
   assert_equal(laen - 2, r:get_resource("laen"))
   assert_equal(2, u1:get_item("laen"))
 end
@@ -965,120 +955,6 @@ function test_bug_1795_demons()
   assert_equal(peasants, r:get_resource("peasant"))
 end
 
-module("tests.report", package.seeall, lunit.testcase)
-
-function setup()
-    eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-local function find_in_report(f, pattern, extension)
-    extension = extension or "nr"
-    local filename = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(f.id) .. "." .. extension
-    local report = io.open(filename, 'r');
-    assert_not_nil(report)
-    t = report:read("*all")
-    report:close()
-
-    local start, _ = string.find(t, pattern)
-    return start~=nil
-end
-
-local function remove_report(faction)
-    local filetrunk = config.reportpath .. "/" .. get_turn() .. "-" .. itoa36(faction.id)
-    os.remove(filetrunk .. ".nr")    
-    os.remove(filetrunk .. ".cr")    
-    os.remove(filetrunk .. ".txt")    
-end
-
-function test_coordinates_no_plane()
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noplane@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_show_shadowmaster_attacks()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    u.race = "shadowmaster"
-    u:clear_orders()
-    u:add_order("ZEIGE Schattenmeister")
-    process_orders()
-    init_reports()
-    write_report(f)
-    assert_false(find_in_report(f, ", ,"))
-    remove_report(f)
-end
-
-function test_coordinates_named_plane()
-    local p = plane.create(0, -3, -3, 7, 7, "Hell")
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0,Hell%), Berg"))
-    remove_report(f)
-end
-
-function test_coordinates_unnamed_plane()
-    local p = plane.create(0, -3, -3, 7, 7)
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_coordinates_noname_plane()
-    local p = plane.create(0, -3, -3, 7, 7, "")
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local u = unit.create(f, r, 1)
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, r.name .. " %(0,0%), Berg"))
-    remove_report(f)
-end
-
-function test_lighthouse()
-    eressea.free_game()
-    local r = region.create(0, 0, "mountain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    region.create(1, 0, "mountain")
-    region.create(2, 0, "ocean")
-    region.create(0, 1, "firewall")
-    region.create(3, 0, "mountain")
-    region.create(4, 0, "plain")
-    local u = unit.create(f, r, 1)
-    local b = building.create(r, "lighthouse")
-    b.size = 100
-    b.working = true
-    u.building = b
-    u:set_skill("perception", 9)
-    u:add_item("money", 1000)
-    assert_not_nil(b)
-
-    init_reports()
-    write_report(f)
-    assert_true(find_in_report(f, " %(1,0%) %(vom Turm erblickt%)"))
-    assert_true(find_in_report(f, " %(2,0%) %(vom Turm erblickt%)"))
-    assert_true(find_in_report(f, " %(3,0%) %(vom Turm erblickt%)"))
-
-    assert_false(find_in_report(f, " %(0,0%) %(vom Turm erblickt%)"))
-    assert_false(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
-    assert_false(find_in_report(f, " %(4,0%) %(vom Turm erblickt%)"))
-    remove_report(f)
-end
-
 module("tests.parser", package.seeall, lunit.testcase)
 
 function setup()
@@ -1138,4 +1014,48 @@ function test_prefix()
     assert_not_nil(u1:show():find("Erzelf"))
     u1.faction.locale = "en"
     assert_not_nil(u1:show():find("archelf"))
+end
+
+function test_recruit()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    u:add_item("money", 1000)
+    set_order(u, "REKRUTIERE 5")
+    process_orders()
+    for u in f.units do
+        assert_equal(6, u.number)
+    end
+end
+
+function test_give_horses()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("horse", 0)
+    u:add_item("horse", 21)
+    u:add_item("dolphin", 10)
+    u:add_order("GIB 0 7 PFERD")
+    u:add_order("GIB 0 5 DELPHIN")
+    process_orders()
+    assert_equal(7, r:get_resource("horse"))
+    assert_equal(5, u:get_item("dolphin"))
+    assert_equal(14, u:get_item("horse"))
+end
+
+function test_give_silver()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("noreply@eressea.de", "human", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("peasant", 0)
+    r:set_resource("money", 11)
+    u:clear_orders()
+    u:add_item("money", 20)
+    u:add_order("GIB 0 10 SILBER")
+    process_orders()
+    assert_equal(21, r:get_resource("money"))
+    assert_equal(10, u:get_item("money"))
 end

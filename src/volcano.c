@@ -55,7 +55,7 @@ static int nb_armor(const unit * u, int index)
     if (!(u_race(u)->battle_flags & BF_EQUIPMENT))
         return 0;
 
-    /* Normale Rüstung */
+    /* Normale Rï¿½stung */
 
     for (itm = u->items; itm; itm = itm->next) {
         const armor_type *atype = itm->type->rtype->atype;
@@ -80,7 +80,6 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     int *hp, hpstack[20];
     int h;
     int i, dead = 0, hp_rem = 0, heiltrank;
-    double magres = magic_resistance(u);
 
     assert(u->number);
     if (fval(u_race(u), RCF_ILLUSIONARY) || u_race(u) == get_race(RC_SPELL)) {
@@ -105,10 +104,14 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     /* Schaden */
     for (i = 0; i < u->number; i++) {
         int damage = dice_rand(dam);
-        if (magic)
-            damage = (int)(damage * (1.0 - magres));
-        if (physical)
+        if (magic) {
+            variant magres = magic_resistance(u);
+            magres = frac_sub(frac_make(1, 1), magres);
+            damage = damage * magres.sa[0] / magres.sa[1];
+        }
+        if (physical) {
             damage -= nb_armor(u, i);
+        }
         hp[i] -= damage;
     }
 
@@ -118,7 +121,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
             heiltrank = 0;
 
             /* Sieben Leben */
-            if (old_race(u_race(u)) == RC_CAT && (chance(1.0 / 7))) {
+            if (u_race(u) == get_race(RC_CAT) && (chance(1.0 / 7))) {
                 hp[i] = u->hp / u->number;
                 hp_rem += hp[i];
                 continue;
@@ -169,11 +172,11 @@ static region *rrandneighbour(region * r)
     for (i = 0; i != MAXDIRECTIONS; i++) {
         c++;
     }
-    /* Zufällig eine auswählen */
+    /* Zufï¿½llig eine auswï¿½hlen */
 
     rr = rng_int() % c;
 
-    /* Durchzählen */
+    /* Durchzï¿½hlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -204,7 +207,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     else {
         /* Produktion vierteln ... */
         a->data.sa[0] = (short)percent;
-        /* Für 6-17 Runden */
+        /* Fï¿½r 6-17 Runden */
         a->data.sa[1] = (short)(a->data.sa[1] + time);
     }
 
@@ -255,6 +258,22 @@ void volcano_outbreak(region * r, region *rn)
     }
 }
 
+static bool stop_smoke_chance(void) {
+    static int cache, percent = 0;
+    if (config_changed(&cache)) {
+        percent = config_get_int("volcano.stop.percent", 12);
+    }
+    return percent!=0 && (rng_int() % 100) < percent;
+}
+
+static bool outbreak_chance(void) {
+    static int cache, percent = 0;
+    if (config_changed(&cache)) {
+        percent = config_get_int("volcano.outbreak.percent", 8);
+    }
+    return percent!=0 && (rng_int() % 100) < percent;
+}
+
 void volcano_update(void) 
 {
     region *r; 
@@ -270,13 +289,16 @@ void volcano_update(void)
                 r->terrain = t_volcano;
             }
             else {
-                if (rng_int() % 100 < 12) {
+                if (stop_smoke_chance()) {
                     ADDMSG(&r->msgs, msg_message("volcanostopsmoke", "region", r));
                     r->terrain = t_volcano;
                 }
-                else if (r->uid == 1246051340 || (r->age > 20 && rng_int() % 100 < 8)) {
+                else if (r->uid == 1246051340 || outbreak_chance()) {
+                    /* HACK: a fixed E4-only region-uid in Code.
+                     * FIXME: In E4 gibt es eine Ebene #1246051340, die Smalland heisst.
+                     * da das kein aktiver Vulkan ist, ist dieser Test da nicht idiotisch?
+                     * das sollte bestimmt rn betreffen? */
                     region *rn;
-                    /* Zufällige Nachbarregion verwüsten */
                     rn = rrandneighbour(r);
                     volcano_outbreak(r, rn);
                     r->terrain = t_volcano;
@@ -284,7 +306,8 @@ void volcano_update(void)
             }
         }
         else if (r->terrain == t_volcano) {
-            if (rng_int() % 100 < 4) {
+            int volcano_chance = config_get_int("volcano.active.percent", 4);
+            if (rng_int() % 100 < volcano_chance) {
                 ADDMSG(&r->msgs, msg_message("volcanostartsmoke", "region", r));
                 r->terrain = t_active;
             }

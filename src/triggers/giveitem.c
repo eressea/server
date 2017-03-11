@@ -17,7 +17,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "giveitem.h"
 
 /* kernel includes */
@@ -71,7 +70,7 @@ static int giveitem_handle(trigger * t, void *data)
     else {
         log_error("could not perform giveitem::handle()\n");
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

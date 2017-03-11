@@ -20,9 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "overrideroads.h"
 
-#include <kernel/save.h>
 #include <util/attrib.h>
 
 attrib_type at_overrideroads = {
-    "roads_override", NULL, NULL, NULL, &a_writestring, &a_readstring
+    "roads_override", NULL, NULL, NULL, a_writestring, a_readstring
 };

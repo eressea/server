@@ -10,7 +10,6 @@
  without prior permission by the authors of Eressea.
  */
 #include <platform.h>
-#include <kernel/config.h>
 #include "gate.h"
 
  /* kernel includes */
@@ -58,7 +57,7 @@ static int gate_handle(trigger * t, void *data)
         log_error("could not perform gate::handle()\n");
         return -1;
     }
-    unused_arg(data);
+    UNUSED_ARG(data);
     return 0;
 }
 

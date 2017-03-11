@@ -531,30 +531,6 @@ static int tolua_process_eressea_process_promote00(lua_State* tolua_S)
 #endif
 }
 
-/* function: process_renumber */
-static int tolua_process_eressea_process_renumber00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  process_renumber();
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'renumber'.",&tolua_err);
- return 0;
-#endif
-}
-
 /* function: process_restack */
 static int tolua_process_eressea_process_restack00(lua_State* tolua_S)
 {
@@ -1021,7 +997,6 @@ LUALIB_API int luaopen_process (lua_State* tolua_S)
  tolua_function(tolua_S,"leave",tolua_process_eressea_process_leave00);
  tolua_function(tolua_S,"maintenance",tolua_process_eressea_process_maintenance00);
  tolua_function(tolua_S,"promote",tolua_process_eressea_process_promote00);
- tolua_function(tolua_S,"renumber",tolua_process_eressea_process_renumber00);
  tolua_function(tolua_S,"restack",tolua_process_eressea_process_restack00);
  tolua_function(tolua_S,"set_spells",tolua_process_eressea_process_set_spells00);
  tolua_function(tolua_S,"set_help",tolua_process_eressea_process_set_help00);

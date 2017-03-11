@@ -7,7 +7,7 @@
 #include "alliance.h"
 #include <CuTest.h>
 #include <tests.h>
-#include <quicklist.h>
+#include <selist.h>
 
 #include <assert.h>
 
@@ -17,7 +17,7 @@ typedef struct alliance_fixture {
 } alliance_fixture;
 
 static void setup_alliance(alliance_fixture *fix) {
-    test_create_world();
+    test_setup();
     fix->rc = test_create_race("human");
     fix->f1 = test_create_faction(fix->rc);
     fix->f2 = test_create_faction(fix->rc);
@@ -49,7 +49,6 @@ static void test_alliance_join(CuTest *tc) {
     alliance_fixture fix;
     alliance * al;
 
-    test_setup();
     setup_alliance(&fix);
     CuAssertPtrEquals(tc, 0, fix.f1->alliance);
     CuAssertPtrEquals(tc, 0, fix.f2->alliance);
@@ -76,10 +75,10 @@ static void test_alliance_dead_faction(CuTest *tc) {
     setalliance(f, al);
     setalliance(f2, al);
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
-    CuAssertIntEquals(tc, 2, ql_length(al->members));
+    CuAssertIntEquals(tc, 2, selist_length(al->members));
     CuAssertPtrEquals(tc, al, f->alliance);
     destroyfaction(&factions);
-    CuAssertIntEquals(tc, 1, ql_length(al->members));
+    CuAssertIntEquals(tc, 1, selist_length(al->members));
     CuAssertPtrEquals(tc, f2, alliance_get_leader(al));
     CuAssertPtrEquals(tc, NULL, f->alliance);
     CuAssertTrue(tc, !f->_alive);

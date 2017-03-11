@@ -22,10 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "laws.h"
 #include "move.h"
-#include "guard.h"
 
 /* attributes includes */
 #include "follow.h"
+#include "fleechance.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
@@ -34,7 +34,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "moved.h"
 #include "movement.h"
 #include "dict.h"
-#include "orcification.h"
 #include "otherfaction.h"
 #include "overrideroads.h"
 #include "racename.h"
@@ -50,7 +49,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/region.h>
-#include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/building.h>
 
@@ -60,6 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 
 #include <storage.h>
+
 
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
@@ -95,12 +94,12 @@ void register_attributes(void)
     at_register(&at_woodcount);
 
     /* neue UNIT-Attribute */
+    at_register(&at_fleechance);
     at_register(&at_siege);
     at_register(&at_effect);
     at_register(&at_private);
 
     at_register(&at_icastle);
-    at_register(&at_guard);
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
@@ -116,9 +115,12 @@ void register_attributes(void)
 
     at_register(&at_germs);
 
+    at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
+    at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */
     at_deprecate("gm", a_readint);
+    at_deprecate("guard", a_readint); /* used to contain guard-flags (v3.10.0-259-g8597e8b) */
     at_register(&at_stealth);
     at_register(&at_dict);
     at_register(&at_unitdissolve);
@@ -129,7 +131,6 @@ void register_attributes(void)
     at_register(&at_keys);
     at_register(&at_follow);
     at_register(&at_targetregion);
-    at_register(&at_orcification);
     at_register(&at_hate);
     at_register(&at_reduceproduction);
     at_register(&at_otherfaction);

@@ -25,9 +25,9 @@ extern "C" {
     struct attrib;
     extern struct attrib_type at_otherfaction;
 
-    extern struct faction *get_otherfaction(const struct attrib *a);
-    extern struct attrib *make_otherfaction(struct faction *f);
-    extern struct faction *visible_faction(const struct faction *f,
+    struct faction *get_otherfaction(const struct unit *u);
+    struct attrib *make_otherfaction(struct faction *f);
+    struct faction *visible_faction(const struct faction *f,
         const struct unit *u);
 
 #ifdef __cplusplus

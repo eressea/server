@@ -91,7 +91,7 @@ const nrsection *section_add(const char *name)
     }
     if (!*mcp) {
         nrsection *mc = calloc(sizeof(nrsection), 1);
-        mc->name = _strdup(name);
+        mc->name = strdup(name);
         *mcp = mc;
     }
     return *mcp;
@@ -130,14 +130,14 @@ const char *string, int level, const char *section)
             nrt->section = NULL;
         nrtypes[hash] = nrt;
         assert(string && *string);
-        nrt->string = _strdup(string);
+        nrt->string = strdup(string);
         *c = '\0';
         for (i = 0; i != mtype->nparameters; ++i) {
             if (i != 0)
                 *c++ = ' ';
             c += strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
         }
-        nrt->vars = _strdup(zNames);
+        nrt->vars = strdup(zNames);
     }
 }
 
@@ -177,4 +177,17 @@ const char *nr_section(const struct message *msg)
 const char *nrt_section(const nrmessage_type * nrt)
 {
     return nrt ? nrt->section : NULL;
+}
+
+void free_nrmesssages(void) {
+    int i;
+    for (i = 0; i != NRT_MAXHASH; ++i) {
+        while (nrtypes[i]) {
+            nrmessage_type *nr = nrtypes[i];
+            nrtypes[i] = nr->next;
+            free(nr->string);
+            free(nr->vars);
+            free(nr);
+        }
+    }
 }

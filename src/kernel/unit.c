@@ -34,7 +34,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "spell.h"
 #include "spellbook.h"
-#include "save.h"
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
@@ -121,10 +120,10 @@ unit *findunitr(const region * r, int n)
     return (u && u->region == r) ? u : 0;
 }
 
-// TODO: deprecated, replace with findunit(n)
+/* TODO: deprecated, replace with findunit(n) */
 unit *findunitg(int n, const region * hint)
 {
-    unused_arg(hint);
+    UNUSED_ARG(hint);
     /* Abfangen von Syntaxfehlern. */
     if (n <= 0)
         return NULL;
@@ -367,7 +366,7 @@ int gift_items(unit * u, int flags)
 static unit *deleted_units = NULL;
 
 #define DMAXHASH 7919
-#undef DMAXHASH // TODO: makes dfindhash slow!
+#undef DMAXHASH /* TODO: makes dfindhash slow! */
 #ifdef DMAXHASH
 typedef struct dead {
     struct dead *nexthash;
@@ -439,6 +438,9 @@ int remove_unit(unit ** ulist, unit * u)
         *ulist = u->next;
     }
 
+    if (u->faction && u->faction->units == u) {
+        u->faction->units = u->nextF;
+    }
     if (u->prevF) {
         u->prevF->nextF = u->nextF;
     }
@@ -453,7 +455,6 @@ int remove_unit(unit ** ulist, unit * u)
 #ifdef DMAXHASH
     dhash(u->no, u->faction);
 #endif
-    // u_setfaction(u, NULL);
 
     u->region = NULL;
 
@@ -492,6 +493,10 @@ attrib_type at_alias = {
     NO_READ
 };
 
+/** remember old unit.no (for the creport, mostly)
+ * if alias is positive, then this unit was a TEMP
+ * if alias is negative, then this unit has been RENUMBERed
+ */
 int ualias(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_alias);
@@ -505,7 +510,7 @@ int a_readprivate(attrib * a, void *owner, gamedata *data)
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = _strdup(lbuf);
+    a->data.v = strdup(lbuf);
     return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
@@ -526,8 +531,15 @@ const char *u_description(const unit * u, const struct locale *lang)
     if (u->display && u->display[0]) {
         return u->display;
     }
-    else if (u_race(u)->describe) {
-        return u_race(u)->describe(u->_race, lang);
+    else {
+        char zText[64];
+        const char * d;
+        const race * rc = u_race(u);
+        snprintf(zText, sizeof(zText), "describe_%s", rc->_name);
+        d = locale_getstring(lang, zText);
+        if (d) {
+            return d;
+        }
     }
     return NULL;
 }
@@ -556,7 +568,7 @@ void usetprivate(unit * u, const char *str)
     if (a->data.v) {
         free(a->data.v);
     }
-    a->data.v = _strdup(str);
+    a->data.v = strdup(str);
 }
 
 /*********************/
@@ -803,8 +815,8 @@ void set_level(unit * u, skill_t sk, int value)
 static int leftship_age(struct attrib *a, void *owner)
 {
     /* must be aged, so it doesn't affect report generation (cansee) */
-    unused_arg(a);
-    unused_arg(owner);
+    UNUSED_ARG(a);
+    UNUSED_ARG(owner);
     return AT_AGE_REMOVE;         /* remove me */
 }
 
@@ -880,15 +892,16 @@ void leave_building(unit * u)
 
 bool can_leave(unit * u)
 {
-    int rule_leave;
+    static int config;
+    static bool rule_leave;
 
     if (!u->building) {
         return true;
     }
-
-    rule_leave = config_get_int("rules.move.owner_leave", 0);
-
-    if (rule_leave != 0 && u->building && u == building_owner(u->building)) {
+    if (config_changed(&config)) {
+        rule_leave = config_get_int("rules.move.owner_leave", 0) != 0;
+    }
+    if (rule_leave && u->building && u == building_owner(u->building)) {
         return false;
     }
     return true;
@@ -908,11 +921,6 @@ bool leave(unit * u, bool force)
         leave_ship(u);
     }
     return true;
-}
-
-const struct race *urace(const struct unit *u)
-{
-    return u->_race;
 }
 
 bool can_survive(const unit * u, const region * r)
@@ -944,7 +952,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
     if (!ulist)
         ulist = (&r->units);
     if (u->region) {
-        setguard(u, GUARD_NONE);
+        setguard(u, false);
         fset(u, UFL_MOVED);
         if (u->ship || u->building) {
             /* can_leave must be checked in travel_i */
@@ -961,9 +969,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
         addlist(ulist, u);
     }
 
-#ifdef SMART_INTERVALS
     update_interval(u->faction, r);
-#endif
     u->region = r;
 }
 
@@ -1082,15 +1088,9 @@ void transfermen(unit * u, unit * dst, int n)
     else if (r->land) {
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
             const race *rc = u_race(u);
-            if (rc->ec_flags & ECF_REC_HORSES) {      /* Zentauren an die Pferde */
-                int h = rhorses(r) + n;
-                rsethorses(r, h);
-            }
-            else {
-                int p = rpeasants(r);
-                p += (int)(n * rc->recruit_multi);
-                rsetpeasants(r, p);
-            }
+            int p = rpeasants(r);
+            p += (int)(n * rc->recruit_multi);
+            rsetpeasants(r, p);
         }
     }
 }
@@ -1170,7 +1170,6 @@ void u_setfaction(unit * u, faction * f)
     }
 }
 
-/* vorsicht Sprueche koennen u->number == RS_FARVISION haben! */
 void set_number(unit * u, int count)
 {
     assert(count >= 0);
@@ -1252,32 +1251,18 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
-#ifdef NEWATSROI
-static int item_modification(const unit * u, skill_t sk, int val)
-{
-    if (sk == SK_STEALTH) {
-        if (item_invis(u) >= u->number) {
-            val += ROIBONUS;
-        }
-    }
-    if (sk == SK_PERCEPTION) {
-        const struct resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
-        if (i_get(u->items, rtype->itype) >= u->number) {
-            val += ATSBONUS;
-        }
-    }
-    return val;
-}
-#endif
-
 static int att_modification(const unit * u, skill_t sk)
 {
     double result = 0;
 
     if (u->attribs) {
         curse *c;
-        const curse_type *skillmod_ct = ct_find("skillmod");
-        const curse_type *worse_ct = ct_find("worse");
+        static int cache;
+        static const curse_type *skillmod_ct, *worse_ct;
+        if (ct_changed(&cache)) {
+            skillmod_ct = ct_find("skillmod");
+            worse_ct = ct_find("worse");
+        }
         c = get_curse(u->attribs, worse_ct);
         if (c != NULL)
             result += curse_geteffect(c);
@@ -1304,7 +1289,7 @@ static int att_modification(const unit * u, skill_t sk)
             while (a && a->type == &at_curse) {
                 curse *c = (curse *)a->data.v;
 
-                if (curse_active(c) && c->type == gbdream_ct) {
+                if (c->magician && curse_active(c) && c->type == gbdream_ct) {
                     int effect = curse_geteffect_int(c);
                     bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
                     if (allied) {
@@ -1338,11 +1323,6 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
 
-#ifdef NEWATSROI
-    if (!noitem) {
-        skill = item_modification(u, sk, skill);
-    }
-#endif
     skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
 
     if (fval(u, UFL_HUNGER)) {
@@ -1385,15 +1365,12 @@ int effskill_study(const unit * u, skill_t sk, const region * r)
 
 int invisible(const unit * target, const unit * viewer)
 {
-#ifdef NEWATSROI
-    return 0;
-#else
     if (viewer && viewer->faction == target->faction)
         return 0;
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = _min(hidden, target->number);
+            hidden = MIN(hidden, target->number);
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);
@@ -1401,7 +1378,6 @@ int invisible(const unit * target, const unit * viewer)
         }
         return hidden;
     }
-#endif
 }
 
 /** remove the unit from memory.
@@ -1430,6 +1406,26 @@ void free_unit(unit * u)
         u->reservations = res->next;
         free(res);
     }
+}
+
+static int newunitid(void)
+{
+    int random_unit_no;
+    int start_random_no;
+    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    start_random_no = random_unit_no;
+
+    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
+        || forbiddenid(random_unit_no)) {
+        random_unit_no++;
+        if (random_unit_no == MAX_UNIT_NR + 1) {
+            random_unit_no = 1;
+        }
+        if (random_unit_no == start_random_no) {
+            random_unit_no = (int)MAX_UNIT_NR + 1;
+        }
+    }
+    return random_unit_no;
 }
 
 static void createunitid(unit * u, int id)
@@ -1463,15 +1459,12 @@ void default_name(const unit *u, char name[], int len) {
 
 void name_unit(unit * u)
 {
-    if (u_race(u)->generate_name) {
-        char *gen_name = race_namegen(u_race(u), u);
-        if (gen_name) {
-            free(u->_name);
-            u->_name = gen_name;
-        }
-        else {
-            unit_setname(u, racename(u->faction->locale, u, u_race(u)));
-        }
+    const race *rc = u_race(u);
+    if (rc->name_unit) {
+        rc->name_unit(u);
+    }
+    else if (u->faction->flags & FFL_NPC) {
+        unit_setname(u, NULL);
     }
     else {
         char name[32];
@@ -1522,9 +1515,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     u->hp = unit_max_hp(u) * number;
 
     if (dname) {
-        u->_name = _strdup(dname);
+        u->_name = strdup(dname);
     }
-    else if (urace->generate_name || playerrace(urace)) {
+    else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
     }
 
@@ -1572,9 +1565,11 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
                 set_group(u, g);
             }
         }
-        a = a_find(creator->attribs, &at_otherfaction);
-        if (a) {
-            a_add(&u->attribs, make_otherfaction(get_otherfaction(a)));
+        if (creator->attribs) {
+            faction *otherf = get_otherfaction(creator);
+            if (otherf) {
+                a_add(&u->attribs, make_otherfaction(otherf));
+            }
         }
 
         a = a_add(&u->attribs, a_new(&at_creator));
@@ -1629,7 +1624,7 @@ void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
     if (name && name[0])
-        u->_name = _strdup(name);
+        u->_name = strdup(name);
     else
         u->_name = NULL;
 }
@@ -1643,7 +1638,7 @@ void unit_setinfo(unit * u, const char *info)
 {
     free(u->display);
     if (info)
-        u->display = _strdup(info);
+        u->display = strdup(info);
     else
         u->display = NULL;
 }
@@ -1694,6 +1689,7 @@ int unit_getcapacity(const unit * u)
 }
 
 void renumber_unit(unit *u, int no) {
+    if (no == 0) no = newunitid();
     uunhash(u);
     if (!ualias(u)) {
         attrib *a = a_add(&u->attribs, a_new(&at_alias));
@@ -1716,9 +1712,13 @@ int unit_max_hp(const unit * u)
 {
     int h;
     double p;
-    int rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+    static int config;
+    static int rule_stamina;
     h = u_race(u)->hitpoints;
 
+    if (config_changed(&config)) {
+        rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+    }
     if (rule_stamina & 1) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
@@ -1726,7 +1726,11 @@ int unit_max_hp(const unit * u)
 
     /* der healing curse veraendert die maximalen hp */
     if (u->region && u->region->attribs) {
-        const curse_type *heal_ct = ct_find("healingzone");
+        static int cache;
+        static const curse_type *heal_ct;
+        if (ct_changed(&cache)) {
+            heal_ct = ct_find("healingzone");
+        }
         if (heal_ct) {
             curse *c = get_curse(u->region->attribs, heal_ct);
             if (c) {
@@ -1916,27 +1920,6 @@ bool unit_can_study(const unit *u) {
     return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
 }
 
-/* ID's für Einheiten und Zauber */
-int newunitid(void)
-{
-    int random_unit_no;
-    int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
-    start_random_no = random_unit_no;
-
-    while (ufindhash(random_unit_no) || dfindhash(random_unit_no)
-        || forbiddenid(random_unit_no)) {
-        random_unit_no++;
-        if (random_unit_no == MAX_UNIT_NR + 1) {
-            random_unit_no = 1;
-        }
-        if (random_unit_no == start_random_no) {
-            random_unit_no = (int)MAX_UNIT_NR + 1;
-        }
-    }
-    return random_unit_no;
-}
-
 static int read_newunitid(const faction * f, const region * r)
 {
     int n;
@@ -2048,3 +2031,26 @@ bool has_limited_skills(const struct unit * u)
     return false;
 }
 
+double u_heal_factor(const unit * u)
+{
+    const race * rc = u_race(u);
+    if (rc->healing>0) {
+        return rc->healing / 100.0;
+    }
+    if (r_isforest(u->region)) {
+        static int rc_cache;
+        static const race *rc_elf;
+        if (rc_changed(&rc_cache)) {
+            rc_elf = get_race(RC_ELF);
+        }
+        if (rc == rc_elf) {
+            static int cache;
+            static double elf_regen;
+            if (config_changed(&cache)) {
+                elf_regen = config_get_flt("healing.forest", 1.0);
+            }
+            return elf_regen;
+        }
+    }
+    return 1.0;
+}
