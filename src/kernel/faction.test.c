@@ -153,8 +153,7 @@ static void test_set_origin(CuTest *tc) {
     int x = 0, y = 0;
     plane *pl;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     CuAssertPtrEquals(tc, 0, f->ursprung);
@@ -179,8 +178,7 @@ static void test_set_origin_bug(CuTest *tc) {
     plane *pl;
     int x = 17, y = 10;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(0);
     faction_setorigin(f, 0, -10, 3);

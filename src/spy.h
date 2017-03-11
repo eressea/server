@@ -26,12 +26,15 @@ extern "C" {
     struct region;
     struct strlist;
     struct order;
+    struct faction;
 
-    extern int setstealth_cmd(struct unit *u, struct order *ord);
-    extern int spy_cmd(struct unit *u, struct order *ord);
-    extern int sabotage_cmd(struct unit *u, struct order *ord);
-    extern void spy_message(int spy, const struct unit *u,
+    int setstealth_cmd(struct unit *u, struct order *ord);
+    int spy_cmd(struct unit *u, struct order *ord);
+    int sabotage_cmd(struct unit *u, struct order *ord);
+    void spy_message(int spy, const struct unit *u,
         const struct unit *target);
+    void set_factionstealth(struct unit * u, struct faction * f);
+    
 
 #define OCEAN_SWIMMER_CHANCE 0.1
 #define CANAL_SWIMMER_CHANCE 0.9

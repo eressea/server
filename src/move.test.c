@@ -158,16 +158,14 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
 }
 
 static void test_walkingcapacity(CuTest *tc) {
-    region *r;
     unit *u;
     int cap;
     const struct item_type *itype;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
+    init_resources();
 
-    r = findregion(0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     cap = u->number * (u->_race->capacity + u->_race->weight);
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
     scale_number(u, 2);
@@ -183,7 +181,7 @@ static void test_walkingcapacity(CuTest *tc) {
     cap += itype->capacity;
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
 
-    itype = it_find("cart");
+    itype = test_create_itemtype("cart");
     assert(itype);
     i_change(&u->items, itype, 1);
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
@@ -265,15 +263,15 @@ struct drift_fixture {
 };
 
 void setup_drift (struct drift_fixture *fix) {
-    test_cleanup();
+    test_setup();
+    test_create_locale();
     config_set("rules.ship.storms", "0");
 
-    test_create_world();
-    test_create_shiptype("drifter");
-    fix->st_boat = st_get_or_create("drifter");
+    fix->st_boat = test_create_shiptype("boat");
     fix->st_boat->cabins = 20000;
 
-    fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r=findregion(-1,0));
+    test_create_ocean(0, 0);
+    fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r = test_create_ocean(-1, 0));
     assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
@@ -437,9 +435,11 @@ static void test_follow_ship_msg(CuTest * tc) {
     void *p;
     
     test_setup();
-    test_create_world();
+    init_resources();
+
     f = test_create_faction(0);
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
+    test_create_ocean(-1, 1); /* D_NORTHWEST */
 
     stype = st_find("boat");
     sh = test_create_ship(r, stype);
@@ -452,7 +452,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     assert(ord);
     unit_addorder(u, ord);
 
-    set_money(u, 999999);
+    set_money(u, 999999); /* overloaded ship */
 
     a = a_add(&(r->attribs), a_new(&at_shiptrail));
     td = (traveldir *)a->data.v;

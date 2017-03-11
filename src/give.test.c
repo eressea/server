@@ -83,6 +83,8 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
     CuAssertPtrEquals(tc, 0, env.f1->units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
     test_cleanup();
 }
 
@@ -322,8 +324,7 @@ static void test_give_herbs(CuTest * tc) {
     struct order *ord;
 
     test_setup_ex(tc);
-    test_create_world();
-    env.f2 = env.f1 = test_create_faction(0);
+    env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 

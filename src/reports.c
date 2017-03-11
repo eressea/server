@@ -346,11 +346,11 @@ report_items(const unit *u, item * result, int size, const unit * owner,
     return n;
 }
 
-static void
-report_resource(resource_report * result, const char *name, int number,
-int level)
+static void report_resource(resource_report * result, const resource_type *rtype, 
+    int number, int level)
 {
-    result->name = name;
+    assert(rtype);
+    result->rtype = rtype;
     result->number = number;
     result->level = level;
 }
@@ -408,37 +408,38 @@ const faction * viewer, bool see_unit)
         int trees = rtrees(r, 2);
         int saplings = rtrees(r, 1);
         bool mallorn = fval(r, RF_MALLORN) != 0;
+        const resource_type *rtype;
 
-        if (money) {
-            if (n >= size)
-                return -1;
-            report_resource(result + n, "money", money, -1);
-            ++n;
-        }
-        if (peasants) {
-            if (n >= size)
-                return -1;
-            report_resource(result + n, "peasant", peasants, -1);
-            ++n;
-        }
-        if (horses) {
-            if (n >= size)
-                return -1;
-            report_resource(result + n, "horse", horses, -1);
-            ++n;
-        }
         if (saplings) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "mallornsapling" : "sapling",
-                saplings, -1);
+            rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
+            report_resource(result + n, rtype, saplings, -1);
             ++n;
         }
         if (trees) {
             if (n >= size)
                 return -1;
-            report_resource(result + n, mallorn ? "mallorn" : "tree", trees,
-                -1);
+            rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
+            report_resource(result + n, rtype, trees, -1);
+            ++n;
+        }
+        if (money) {
+            if (n >= size)
+                return -1;
+            report_resource(result + n, get_resourcetype(R_SILVER), money, -1);
+            ++n;
+        }
+        if (peasants) {
+            if (n >= size)
+                return -1;
+            report_resource(result + n, get_resourcetype(R_PEASANT), peasants, -1);
+            ++n;
+        }
+        if (horses) {
+            if (n >= size)
+                return -1;
+            report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
             ++n;
         }
     }
@@ -448,17 +449,19 @@ const faction * viewer, bool see_unit)
         while (res) {
             int maxskill = 0;
             const item_type *itype = resource2item(res->type->rtype);
-            int level = res->level + itype->construction->minskill - 1;
+            int minskill = itype->construction->minskill;
+            skill_t skill = itype->construction->skill;
+            int level = res->level + minskill - 1;
             int visible = -1;
             if (res->type->visible == NULL) {
                 visible = res->amount;
-                level = res->level + itype->construction->minskill - 1;
+                level = res->level + minskill - 1;
             }
             else {
                 const unit *u;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
-                        int s = effskill(u, itype->construction->skill, 0);
+                        int s = effskill(u, skill, 0);
                         if (s > maxskill) {
                             maxskill = s;
                             visible = res->type->visible(res, maxskill);
@@ -469,7 +472,7 @@ const faction * viewer, bool see_unit)
             if (level >= 0 && visible >= 0) {
                 if (n >= size)
                     return -1;
-                report_resource(result + n, res->type->rtype->_name, visible, level);
+                report_resource(result + n, res->type->rtype, visible, level);
                 n++;
             }
             res = res->next;
@@ -497,7 +500,6 @@ size_t size)
     bufp = STRLCPY(bufp, unitname(u), size);
     fv = visible_faction(f, u);
     if (!isbattle) {
-        attrib *a_otherfaction = a_find(u->attribs, &at_otherfaction);
         if (u->faction == f) {
             if (fval(u, UFL_GROUP)) {
                 attrib *a = a_find(u->attribs, &at_group);
@@ -511,11 +513,11 @@ size_t size)
                 bufp = STRLCPY(bufp, ", ", size);
                 bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
             }
-            else if (a_otherfaction) {
-                faction *otherfaction = get_otherfaction(a_otherfaction);
-                if (otherfaction) {
+            else if (u->attribs) {
+                faction *otherf = get_otherfaction(u);
+                if (otherf) {
                     bufp = STRLCPY(bufp, ", ", size);
-                    bufp = STRLCPY(bufp, factionname(otherfaction), size);
+                    bufp = STRLCPY(bufp, factionname(otherf), size);
                 }
             }
         }
@@ -525,13 +527,19 @@ size_t size)
                 bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
             }
             else {
-                if (a_otherfaction && alliedunit(u, f, HELP_FSTEALTH)) {
-                    faction *f = get_otherfaction(a_otherfaction);
-                    int result =
-                        snprintf(bufp, size, ", %s (%s)", factionname(f),
-                        factionname(u->faction));
-                    if (wrptr(&bufp, &size, result) != 0)
-                        WARN_STATIC_BUFFER();
+                if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
+                    faction *otherf = get_otherfaction(u);
+                    if (otherf) {
+                        int result =
+                            snprintf(bufp, size, ", %s (%s)", factionname(otherf),
+                                factionname(u->faction));
+                        if (wrptr(&bufp, &size, result) != 0)
+                            WARN_STATIC_BUFFER();
+                    }
+                    else {
+                        bufp = STRLCPY(bufp, ", ", size);
+                        bufp = STRLCPY(bufp, factionname(fv), size);
+                    }
                 }
                 else {
                     bufp = STRLCPY(bufp, ", ", size);
@@ -1006,7 +1014,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
         for (u = r->units; u; u = u->next) {
             faction *sf = visible_faction(f, u);
             assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
-            if (data->lastf != sf && cansee_unit(u, ut, data->stealthmod)) {
+            if (data->lastf != sf && cansee_unit(ut, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
                 data->lastf = sf;
                 break;
@@ -1024,7 +1032,7 @@ static void add_travelthru_addresses(region *r, faction *f, selist **flist, int 
     travelthru_map(r, cb_add_address, &cbdata);
 }
 
-static void get_addresses(report_context * ctx)
+void get_addresses(report_context * ctx)
 {
     /* "TODO: travelthru" */
     region *r;
@@ -1945,7 +1953,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 const char *get_mailcmd(const struct locale *loc)
 {
     static char result[64]; /* FIXME: static return buffer */
-    snprintf(result, sizeof(result), "%s %d %s", game_name_upper(), game_id(), LOC(loc, "mailcmd"));
+    snprintf(result, sizeof(result), "%s %d %s", game_mailcmd(), game_id(), LOC(loc, "mailcmd"));
     return result;
 }
 
@@ -2049,7 +2057,8 @@ static void log_orders(const struct message *msg)
     }
 }
 
-int stream_printf(struct stream * out, const char *format, ...) {
+int stream_printf(struct stream * out, const char *format, ...)
+{
     va_list args;
     int result;
     char buffer[4096];

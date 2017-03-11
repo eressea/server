@@ -12,7 +12,7 @@ extern "C" {
     struct unit;
     struct region;
     
-    typedef enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING } guard_t;
+    typedef enum { E_GUARD_OK, E_GUARD_UNARMED, E_GUARD_NEWBIE, E_GUARD_FLEEING, E_GUARD_TERRAIN } guard_t;
 
     guard_t can_start_guarding(const struct unit * u);
     void update_guards(void);

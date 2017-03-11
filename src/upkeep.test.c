@@ -20,11 +20,10 @@ void test_upkeep_default(CuTest * tc)
     const item_type *i_silver;
 
     test_setup();
-    test_create_world();
-
+    init_resources();
     i_silver = it_find("money");
     assert(i_silver);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(test_create_race("human"));
     f2 = test_create_faction(test_create_race("human"));
     assert(f1 && f2);
@@ -51,11 +50,11 @@ void test_upkeep_hunger_damage(CuTest * tc)
     const item_type *i_silver;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(test_create_race("human"));
     u1 = test_create_unit(f1, r);
     assert(r && u1);
@@ -76,11 +75,11 @@ void test_upkeep_from_pool(CuTest * tc)
     const item_type *i_silver;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     assert(r);
     u1 = test_create_unit(test_create_faction(test_create_race("human")), r);
 	assert(u1);
@@ -110,11 +109,11 @@ void test_upkeep_from_friend(CuTest * tc)
     const item_type *i_silver;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(test_create_race("human"));
     f2 = test_create_faction(test_create_race("human"));
     assert(f1 && f2);
@@ -144,11 +143,11 @@ void test_upkeep_free(CuTest * tc)
     const item_type *i_silver;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     u = test_create_unit(test_create_faction(test_create_race("human")), r);
     assert(r && u);
 

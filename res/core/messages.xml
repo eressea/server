@@ -6882,6 +6882,7 @@
     <text locale="de">"$string"</text>
     <text locale="en">"$string"</text>
   </message>
+
   <message name="give_person" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -6890,6 +6891,16 @@
     </type>
     <text locale="de">"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),"","en") an $unit($target)."</text>
     <text locale="en">"$unit($unit) transfers $int($amount) person$if($eq($amount,1),"","s") to $unit($target)."</text>
+  </message>
+
+  <message name="receive_person" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="amount" type="int"/>
+      <arg name="target" type="unit"/>
+    </type>
+    <text locale="de">"$unit($target) erhält $int($amount) Person$if($eq($amount,1),"","en") von $unit($unit)."</text>
+    <text locale="en">"$unit($target) receives $int($amount) person$if($eq($amount,1),"","s") from $unit($unit)."</text>
   </message>
 
   <message name="give" section="economy">
@@ -6913,6 +6924,7 @@
     <text locale="de">"$unit($target) erhält $int($amount) $resource($resource,$amount) von $unit($unit)."</text>
     <text locale="en">"$unit($target) receives $int($amount) $resource($resource,$amount) from $unit($unit)."</text>
   </message>
+
   <message name="give_person_ocean" section="economy">
     <type>
       <arg name="unit" type="unit"/>

@@ -10,6 +10,11 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
 end
 
+function test_calendar()
+    assert_equal(get_season(1011), "calendar::winter")
+    assert_equal(get_season(1012), "calendar::spring")
+end
+
 function test_herbalism()
 -- OBS: herbalism is currently an E2-only skill
     local r = region.create(0, 0, "plain")

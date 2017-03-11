@@ -797,18 +797,18 @@ static void json_settings(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        if (child->valuestring) {
-            config_set(child->string, child->valuestring);
-        }
-        else {
-            char value[32];
-            if (child->type == cJSON_Number && child->valuedouble && child->valueint<child->valuedouble) {
-                sprintf(value, "%f", child->valuedouble);
+        if (config_get(child->string) == NULL) {
+            if (child->valuestring) {
+                config_set(child->string, child->valuestring);
             }
             else {
-                sprintf(value, "%d", child->valueint);
-            }
-            if (config_get(child->string) == NULL) {
+                char value[32];
+                if (child->type == cJSON_Number && child->valuedouble && child->valueint < child->valuedouble) {
+                    sprintf(value, "%f", child->valuedouble);
+                }
+                else {
+                    sprintf(value, "%d", child->valueint);
+                }
                 config_set(child->string, value);
             }
         }

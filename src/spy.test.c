@@ -50,14 +50,6 @@ static void test_simple_spy_message(CuTest *tc) {
     test_cleanup();
 }
 
-static void set_factionstealth(unit *u, faction *f) {
-    attrib *a = a_find(u->attribs, &at_otherfaction);
-    if (!a)
-        a = a_add(&u->attribs, make_otherfaction(f));
-    else
-        a->data.v = f;
-}
-
 static void test_all_spy_message(CuTest *tc) {
     spy_fixture fix;
     item_type *itype;
@@ -85,23 +77,12 @@ static void test_all_spy_message(CuTest *tc) {
     test_cleanup();
 }
 
-static void setup_sabotage(void) {
-    struct locale *lang;
-
-    test_setup();
-    lang = get_or_create_locale("de");
-    locale_setstring(lang, parameters[P_SHIP], "SCHIFF");
-    locale_setstring(lang, parameters[P_ANY], "ALLE");
-    init_parameters(lang);
-    init_locales();
-}
-
 static void test_sabotage_self(CuTest *tc) {
     unit *u;
     region *r;
     order *ord;
 
-    setup_sabotage();
+    test_setup();
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -123,7 +104,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     order *ord;
     message *msg;
 
-    setup_sabotage();
+    test_setup();
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -172,7 +153,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     region *r;
     order *ord;
 
-    setup_sabotage();
+    test_setup();
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);

@@ -37,6 +37,10 @@ function teardown()
     set_rule("rules.ship.storms")
 end
 
+function test_calendar()
+    assert_equal(get_season(396), "calendar::winter")
+end
+
 function disable_test_bug_1738_build_castle_e3()
     local r = region.create(0, 0, "plain")    
     local f = faction.create("bug_1738@eressea.de", "human", "de")

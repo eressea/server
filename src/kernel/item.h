@@ -243,8 +243,26 @@ extern "C" {
         variant magres, int prot, unsigned int flags);
     potion_type *new_potiontype(item_type * itype, int level);
 
+
+    /* these constants are used with get_resourcetype.
+     * The order of the enum is not important for stored data.
+     * The resourcenames array must be updated to match.
+     */
+
     typedef enum {
+        /* SPECIAL */
+        R_SILVER,
+        R_AURA,                     /* Aura */
+        R_PERMAURA,                 /* Permanente Aura */
+        R_LIFE,
+        R_PEASANT,
+        R_SAPLING,
+        R_MALLORN_SAPLING,
+        R_TREE,
+        R_MALLORN_TREE,
         /* ITEMS: */
+        R_SEED,
+        R_MALLORN_SEED,
         R_IRON,
         R_STONE,
         R_HORSE,
@@ -268,15 +286,7 @@ extern "C" {
         R_SACK_OF_CONSERVATION,
         R_TACTICCRYSTAL,
         R_WATER_OF_LIFE,
-        R_SEED,
-        R_MALLORNSEED,
         /* SONSTIGE */
-        R_SILVER,
-        R_AURA,                     /* Aura */
-        R_PERMAURA,                 /* Permanente Aura */
-        R_LIFE,
-        R_PEASANT,
-        R_PERSON,
 
         MAX_RESOURCES,              /* do not use outside item.c ! */
         NORESOURCE = -1
