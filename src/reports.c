@@ -410,6 +410,20 @@ const faction * viewer, bool see_unit)
         bool mallorn = fval(r, RF_MALLORN) != 0;
         const resource_type *rtype;
 
+        if (saplings) {
+            if (n >= size)
+                return -1;
+            rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
+            report_resource(result + n, rtype, saplings, -1);
+            ++n;
+        }
+        if (trees) {
+            if (n >= size)
+                return -1;
+            rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
+            report_resource(result + n, rtype, trees, -1);
+            ++n;
+        }
         if (money) {
             if (n >= size)
                 return -1;
@@ -426,20 +440,6 @@ const faction * viewer, bool see_unit)
             if (n >= size)
                 return -1;
             report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
-            ++n;
-        }
-        if (saplings) {
-            if (n >= size)
-                return -1;
-            rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
-            report_resource(result + n, rtype, saplings, -1);
-            ++n;
-        }
-        if (trees) {
-            if (n >= size)
-                return -1;
-            rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
-            report_resource(result + n, rtype, trees, -1);
             ++n;
         }
     }
@@ -535,6 +535,10 @@ size_t size)
                                 factionname(u->faction));
                         if (wrptr(&bufp, &size, result) != 0)
                             WARN_STATIC_BUFFER();
+                    }
+                    else {
+                        bufp = STRLCPY(bufp, ", ", size);
+                        bufp = STRLCPY(bufp, factionname(fv), size);
                     }
                 }
                 else {
