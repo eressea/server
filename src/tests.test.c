@@ -34,46 +34,9 @@ static void test_resources(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
 }
 
-static void test_recreate_world(CuTest * tc)
-{
-    test_setup();
-    CuAssertPtrEquals(tc, 0, get_locale("de"));
-    CuAssertPtrEquals(tc, 0, (void *)rt_find("horse"));
-
-    test_create_world();
-    CuAssertPtrEquals(tc, default_locale, get_locale("de"));
-    CuAssertPtrNotNull(tc, default_locale);
-    CuAssertPtrNotNull(tc, findregion(0, 0));
-    CuAssertPtrNotNull(tc, get_terrain("plain"));
-    CuAssertPtrNotNull(tc, get_terrain("ocean"));
-    CuAssertPtrNotNull(tc, (void *)rt_find("horse"));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_HORSE));
-    CuAssertPtrNotNull(tc, (void *)rt_find("money"));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_LIFE));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_SILVER));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_AURA));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_PERMAURA));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_PEASANT));
-
-    test_cleanup();
-    CuAssertPtrEquals(tc, 0, get_locale("de"));
-    CuAssertPtrEquals(tc, 0, (void*)get_terrain("plain"));
-    CuAssertPtrEquals(tc, 0, (void*)get_terrain("ocean"));
-    CuAssertPtrEquals(tc, 0, (void*)rt_find("horse"));
-    CuAssertPtrEquals(tc, 0, (void*)get_resourcetype(R_HORSE));
-    CuAssertPtrEquals(tc, 0, (void *)rt_find("money"));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_LIFE));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_SILVER));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_AURA));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_PERMAURA));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_PEASANT));
-    CuAssertPtrEquals(tc, 0, findregion(0, 0));
-}
-
 CuSuite *get_tests_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_resources);
-    SUITE_ADD_TEST(suite, test_recreate_world);
     return suite;
 }

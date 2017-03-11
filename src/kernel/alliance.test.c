@@ -17,7 +17,7 @@ typedef struct alliance_fixture {
 } alliance_fixture;
 
 static void setup_alliance(alliance_fixture *fix) {
-    test_create_world();
+    test_setup();
     fix->rc = test_create_race("human");
     fix->f1 = test_create_faction(fix->rc);
     fix->f2 = test_create_faction(fix->rc);
@@ -49,7 +49,6 @@ static void test_alliance_join(CuTest *tc) {
     alliance_fixture fix;
     alliance * al;
 
-    test_setup();
     setup_alliance(&fix);
     CuAssertPtrEquals(tc, 0, fix.f1->alliance);
     CuAssertPtrEquals(tc, 0, fix.f2->alliance);

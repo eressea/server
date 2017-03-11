@@ -53,9 +53,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
         r = new_region(x, y, findplane(x, y), 0);
     }
     if (!terrain) {
-        terrain_type *t = get_or_create_terrain("plain");
-        t->size = 1000;
-        fset(t, LAND_REGION|CAVALRY_REGION|FOREST_REGION|FLY_INTO|WALK_INTO);
+        terrain_type *t = test_create_terrain("plain", LAND_REGION | CAVALRY_REGION | FOREST_REGION | FLY_INTO | WALK_INTO);
         terraform_region(r, t);
     }
     else {
@@ -69,12 +67,37 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     return r;
 }
 
+region *test_create_ocean(int x, int y)
+{
+    terrain_type *ter = test_create_terrain("ocean", SEA_REGION | FLY_INTO | SWIM_INTO);
+    return test_create_region(x, y, ter);
+}
+
+region *test_create_plain(int x, int y) {
+    return test_create_region(x, y, NULL);
+}
+
 struct locale * test_create_locale(void) {
     struct locale *loc = get_locale("test");
     if (!loc) {
         int i;
         loc = get_or_create_locale("test");
         locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
+        locale_setstring(loc, "unitdefault", parameters[P_UNIT]);
+        locale_setstring(loc, "money", "Silber");
+        locale_setstring(loc, "money_p", "Silber");
+        locale_setstring(loc, "cart", "Wagen");
+        locale_setstring(loc, "cart_p", "Wagen");
+        locale_setstring(loc, "horse", "Pferd");
+        locale_setstring(loc, "horse_p", "Pferde");
+        locale_setstring(loc, "iron", "Eisen");
+        locale_setstring(loc, "iron_p", "Eisen");
+        locale_setstring(loc, "stone", "Stein");
+        locale_setstring(loc, "stone_p", "Steine");
+        locale_setstring(loc, "plain", "Ebene");
+        locale_setstring(loc, "ocean", "Ozean");
+        locale_setstring(loc, "race::human", "Mensch");
+        locale_setstring(loc, "race::human_p", "Menschen");
         for (i = 0; i < MAXSKILLS; ++i) {
             if (!locale_getstring(loc, mkname("skill", skillnames[i])))
                 locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
@@ -314,7 +337,7 @@ void test_create_castorder(castorder *co, unit *u, int level, float force, int r
     struct locale * lang;
     order *ord;
 
-    lang = get_or_create_locale("en");
+    lang = test_create_locale();
     create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), par);
     free_order(ord);
 }
@@ -373,7 +396,7 @@ void test_create_world(void)
     item_type * itype;
     struct locale * loc;
 
-    loc = get_or_create_locale("de");
+    loc = test_create_locale();
 
     locale_setstring(loc, parameters[P_SHIP], "SCHIFF");
     locale_setstring(loc, parameters[P_ANY], "ALLE");
@@ -381,7 +404,18 @@ void test_create_world(void)
 
     locale_setstring(loc, "status_aggressive", "aggressiv");
     locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
-    locale_setstring(loc, "money", "SILBER");
+    locale_setstring(loc, "money", "Silber");
+    locale_setstring(loc, "money_p", "Silber");
+    locale_setstring(loc, "cart", "Wagen");
+    locale_setstring(loc, "cart_p", "Wagen");
+    locale_setstring(loc, "horse", "Pferd");
+    locale_setstring(loc, "horse_p", "Pferde");
+    locale_setstring(loc, "iron", "Eisen");
+    locale_setstring(loc, "iron_p", "Eisen");
+    locale_setstring(loc, "stone", "Stein");
+    locale_setstring(loc, "stone_p", "Steine");
+    locale_setstring(loc, "plain", "Ebene");
+    locale_setstring(loc, "ocean", "Ozean");
     init_resources();
     get_resourcetype(R_SILVER)->itype->weight = 1;
 

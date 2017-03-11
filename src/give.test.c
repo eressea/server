@@ -324,8 +324,7 @@ static void test_give_herbs(CuTest * tc) {
     struct order *ord;
 
     test_setup_ex(tc);
-    test_create_world();
-    env.f2 = env.f1 = test_create_faction(0);
+    env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 

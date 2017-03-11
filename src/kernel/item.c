@@ -563,8 +563,6 @@ item *i_new(const item_type * itype, int size)
     return i;
 }
 
-#include "region.h"
-
 const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
@@ -709,6 +707,7 @@ void init_resources(void)
     rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
+    rtype->itype->weight = 1;
 
     rtype = rt_get_or_create(resourcenames[R_HORSE]);
     rtype->flags |= RTF_ITEM | RTF_LIMITED;
