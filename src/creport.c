@@ -1096,10 +1096,10 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
 {
     const char *name, *tname;
     assert(rtype);
-    name = resourcename(rtype, 1);
+    name = resourcename(rtype, NMF_PLURAL);
     assert(name);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
-    tname = LOC(loc, rtype->_name);
+    tname = LOC(loc, name);
     assert(tname);
     tname = translate(name, tname);
     assert(tname);
