@@ -88,6 +88,7 @@ static void test_give_unit_limits(CuTest * tc) {
     CuAssertIntEquals(tc, 0, env.f2->newbies);
     CuAssertIntEquals(tc, 1, env.f1->num_units);
     CuAssertIntEquals(tc, 1, env.f2->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "too_many_units_in_faction"));
     test_cleanup();
 }
 
