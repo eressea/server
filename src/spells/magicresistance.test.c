@@ -28,13 +28,12 @@ static void test_magicresistance_unit(CuTest *tc) {
     message *msg;
     curse *c;
 
-    test_cleanup();
-    test_create_world();
-    r=findregion(0, 0);
-    f1 = test_create_faction(test_create_race("human"));
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);
 
-    f2 = test_create_faction(test_create_race("human"));
+    f2 = test_create_faction(NULL);
     u2 = test_create_unit(f2, r);
 
     c = create_curse(u1, &u2->attribs, ct_find("magicresistance"), 10, 20, 30, u2->number);
@@ -56,13 +55,12 @@ static void test_magicresistance_building(CuTest *tc) {
     message *msg;
     curse *c;
 
-    test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
-    f1 = test_create_faction(test_create_race("human"));
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);
 
-    b1 = test_create_building(r, test_create_buildingtype("castle"));
+    b1 = test_create_building(r, NULL);
 
     c = create_curse(u1, &b1->attribs, ct_find("magicresistance"), 10, 20, 30, 0);
     CuAssertPtrNotNull(tc, b1->attribs);
