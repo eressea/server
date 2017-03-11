@@ -41,6 +41,7 @@ static void test_new_building_can_be_renamed(CuTest * tc)
 
     b = test_create_building(r, NULL);
     CuAssertTrue(tc, !renamed_building(b));
+    test_cleanup();
 }
 
 static void test_rename_building(CuTest * tc)
@@ -63,6 +64,7 @@ static void test_rename_building(CuTest * tc)
     rename_building(u, NULL, b, "Villa Nagel");
     CuAssertStrEquals(tc, "Villa Nagel", b->name);
     CuAssertTrue(tc, renamed_building(b));
+    test_cleanup();
 }
 
 static void test_rename_building_twice(CuTest * tc)
@@ -87,6 +89,7 @@ static void test_rename_building_twice(CuTest * tc)
 
     rename_building(u, NULL, b, "Villa Kunterbunt");
     CuAssertStrEquals(tc, "Villa Kunterbunt", b->name);
+    test_cleanup();
 }
 
 static void test_contact(CuTest * tc)
@@ -117,6 +120,7 @@ static void test_contact(CuTest * tc)
     CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
     u_set_building(u2, b);
     CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
+    test_cleanup();
 }
 
 static void test_enter_building(CuTest * tc)
@@ -229,6 +233,7 @@ static void test_display_cmd(CuTest *tc) {
 }
 
 static void test_rule_force_leave(CuTest *tc) {
+    test_setup();
     config_set("rules.owners.force_leave", "0");
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, false, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
@@ -241,6 +246,7 @@ static void test_rule_force_leave(CuTest *tc) {
     config_set("rules.owners.force_leave", "3");
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
+    test_cleanup();
 }
 
 static void test_force_leave_buildings(CuTest *tc) {
@@ -249,7 +255,8 @@ static void test_force_leave_buildings(CuTest *tc) {
     unit *u1, *u2, *u3;
     building * b;
     message *msg;
-    test_cleanup();
+
+    test_setup();
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(u1->faction, r);
@@ -279,7 +286,8 @@ static void test_force_leave_ships(CuTest *tc) {
     unit *u1, *u2;
     ship *sh;
     message *msg;
-    test_cleanup();
+
+    test_setup();
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -298,7 +306,8 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
     region *r;
     unit *u1, *u2;
     ship *sh;
-    test_cleanup();
+
+    test_setup();
     r = test_create_region(0, 0, test_create_terrain("ocean", SEA_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -319,7 +328,7 @@ static void test_fishing_feeds_2_people(CuTest * tc)
     unit *u;
     ship *sh;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     r = findregion(-1, 0);
     CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
@@ -344,6 +353,7 @@ static void test_fishing_feeds_2_people(CuTest * tc)
     sh->flags |= SF_FISHING;
     get_food(r);
     CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
+    test_cleanup();
 }
 
 static void test_fishing_does_not_give_goblins_money(CuTest * tc)
@@ -354,7 +364,7 @@ static void test_fishing_does_not_give_goblins_money(CuTest * tc)
     unit *u;
     ship *sh;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     rtype = get_resourcetype(R_SILVER);
 
@@ -370,6 +380,7 @@ static void test_fishing_does_not_give_goblins_money(CuTest * tc)
     sh->flags |= SF_FISHING;
     get_food(r);
     CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    test_cleanup();
 }
 
 static void test_fishing_gets_reset(CuTest * tc)
@@ -380,7 +391,7 @@ static void test_fishing_gets_reset(CuTest * tc)
     unit *u;
     ship *sh;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     rtype = get_resourcetype(R_SILVER);
     r = findregion(-1, 0);
@@ -399,10 +410,12 @@ static void test_fishing_gets_reset(CuTest * tc)
     scale_number(u, 1);
     get_food(r);
     CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
+    test_cleanup();
 }
 
 static void test_unit_limit(CuTest * tc)
 {
+    test_setup();
     config_set("rules.limit.faction", "250");
     CuAssertIntEquals(tc, 250, rule_faction_limit());
 
@@ -411,7 +424,7 @@ static void test_unit_limit(CuTest * tc)
 
     config_set("rules.limit.alliance", "250");
     CuAssertIntEquals(tc, 250, rule_alliance_limit());
-
+    test_cleanup();
 }
 
 extern int checkunitnumber(const faction * f, int add);
@@ -419,7 +432,7 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
 {
     faction *f;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     f = test_create_faction(NULL);
     config_set("rules.limit.faction", "4");
@@ -430,6 +443,7 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
     config_set("rules.limit.alliance", "3");
     CuAssertIntEquals(tc, 0, checkunitnumber(f, 3));
     CuAssertIntEquals(tc, 1, checkunitnumber(f, 4));
+    test_cleanup();
 }
 
 static void test_reserve_cmd(CuTest *tc) {
@@ -439,7 +453,7 @@ static void test_reserve_cmd(CuTest *tc) {
     order *ord;
     const resource_type *rtype;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     rtype = get_resourcetype(R_SILVER);
@@ -499,7 +513,7 @@ static void test_pay_cmd(CuTest *tc) {
     faction *f;
     building *b;
 
-    test_cleanup();
+    test_setup();
     setup_pay_cmd(&fix);
     b = fix.u1->building;
     f = fix.u1->faction;
@@ -542,7 +556,7 @@ static void test_pay_cmd_must_be_owner(CuTest *tc) {
     faction *f;
     building *b;
 
-    test_cleanup();
+    test_setup();
     setup_pay_cmd(&fix);
     b = fix.u1->building;
     f = fix.u1->faction;
@@ -1321,7 +1335,7 @@ static void test_show_elf(CuTest *tc) {
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
-    loc = get_or_create_locale("de");
+    loc = test_create_locale();
     locale_setstring(loc, "elvenhorse", "Elfenpferd");
     locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
     locale_setstring(loc, "race::elf_p", "Elfen");
