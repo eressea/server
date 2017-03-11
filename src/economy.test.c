@@ -128,12 +128,9 @@ static struct unit *create_recruiter(void) {
     unit *u;
     const resource_type* rtype;
 
-    test_cleanup();
-    test_create_world();
-
-    r=findregion(0, 0);
+    r=test_create_region(0, 0, NULL);
     rsetpeasants(r, 999);
-    f = test_create_faction(rc_find("human"));
+    f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     rtype = get_resourcetype(R_SILVER);
     change_resource(u, rtype, 1000);
@@ -143,9 +140,10 @@ static struct unit *create_recruiter(void) {
 static void test_heroes_dont_recruit(CuTest * tc) {
     unit *u;
 
-    test_cleanup();
-
+    test_setup();
+    init_resources();
     u = create_recruiter();
+
     fset(u, UFL_HERO);
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
@@ -160,8 +158,8 @@ static void test_heroes_dont_recruit(CuTest * tc) {
 static void test_normals_recruit(CuTest * tc) {
     unit *u;
 
-    test_cleanup();
-
+    test_setup();
+    init_resources();
     u = create_recruiter();
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
@@ -193,11 +191,11 @@ static void test_tax_cmd(CuTest *tc) {
     request *taxorders = 0;
 
 
-    test_cleanup();
+    test_setup();
+    init_resources();
     config_set("taxing.perlevel", "20");
-    test_create_world();
     f = test_create_faction(NULL);
-    r = findregion(0, 0);
+    r = test_create_region(0, 0, NULL);
     assert(r && f);
     u = test_create_unit(f, r);
 
@@ -210,7 +208,7 @@ static void test_tax_cmd(CuTest *tc) {
 
     silver = get_resourcetype(R_SILVER)->itype;
 
-    sword = it_get_or_create(rt_get_or_create("sword"));
+    sword = test_create_itemtype("sword");
     new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 1);
     i_change(&u->items, sword, 1);
     set_level(u, SK_MELEE, 1);

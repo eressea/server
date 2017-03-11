@@ -31,9 +31,7 @@ static void test_market_curse(CuTest * tc)
     luxury_type *lux;
     building_type *btype;
 
-    free_gamedata();
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;
@@ -78,6 +76,7 @@ static void test_market_curse(CuTest * tc)
 
     CuAssertIntEquals(tc, 70, i_get(u->items, htype));
     CuAssertIntEquals(tc, 35, i_get(u->items, ltype));
+    test_cleanup();
 }
 
 static void test_rc_trade(CuTest *tc) {

@@ -45,18 +45,11 @@ static void test_reorder_units(CuTest * tc)
     ship * s;
     unit *u0, *u1, *u2, *u3, *u4;
     struct faction * f;
-    const building_type *btype;
-    const ship_type *stype;
 
-    test_cleanup();
-    test_create_world();
-
-    btype = bt_find("castle");
-    stype = st_find("boat");
-
-    r = findregion(-1, 0);
-    b = test_create_building(r, btype);
-    s = test_create_ship(r, stype);
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    b = test_create_building(r, NULL);
+    s = test_create_ship(r, NULL);
     f = test_create_faction(0);
 
     u0 = test_create_unit(f, r);
