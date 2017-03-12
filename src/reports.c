@@ -1242,7 +1242,6 @@ static void prepare_lighthouse_ql(faction *f, selist *rlist) {
             add_seen_nb(f, rl, seen_lighthouse);
         }
     }
-    selist_free(rlist);
 }
 
 static void prepare_lighthouse(faction *f, region *r, int range)
