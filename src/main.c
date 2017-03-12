@@ -68,8 +68,13 @@ static void load_inifile(dictionary * d)
     }
 
     lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
-
     verbosity = iniparser_getint(d, "game:verbose", 2);
+    memdebug = iniparser_getint(d, "game:memcheck", memdebug);
+#ifdef USE_CURSES
+    /* only one value in the [editor] section */
+    force_color = iniparser_getint(d, "editor:color", force_color);
+    gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
+#endif
 }
 
 static dictionary *parse_config(const char *filename)
@@ -89,13 +94,6 @@ static dictionary *parse_config(const char *filename)
     if (d) {
         load_inifile(d);
         config_set_from(d);
-
-        memdebug = iniparser_getint(d, "game:memcheck", memdebug);
-#ifdef USE_CURSES
-        /* only one value in the [editor] section */
-        force_color = iniparser_getint(d, "editor:color", force_color);
-        gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
-#endif
     }
     str = config_get("game.locales");
     make_locales(str ? str : "de,en");
