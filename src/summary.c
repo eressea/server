@@ -393,7 +393,6 @@ summary *make_summary(void)
             plang->locale = lang;
         }
         ++plang->number;
-        f->nregions = 0;
         if (f->units) {
             s->factions++;
             /* Problem mit Monsterpartei ... */
@@ -432,11 +431,6 @@ summary *make_summary(void)
             s->peasants += rpeasants(r);
             s->peasantmoney += rmoney(r);
 
-            /* Einheiten Info. nregions darf nur einmal pro Partei
-             * incrementiert werden. */
-
-            for (u = r->units; u; u = u->next)
-                freset(u->faction, FFL_SELECT);
             for (u = r->units; u; u = u->next) {
                 int orace;
                 f = u->faction;
@@ -468,10 +462,6 @@ summary *make_summary(void)
                         int aktskill = effskill(u, sk, r);
                         if (aktskill > s->maxskill)
                             s->maxskill = aktskill;
-                    }
-                    if (!fval(f, FFL_SELECT)) {
-                        f->nregions++;
-                        fset(f, FFL_SELECT);
                     }
                 }
 
