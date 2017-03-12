@@ -732,19 +732,8 @@ bool config_changed(int *cache_key) {
     return false;
 }
 
-static const char * valid_keys[] = {
-    "game.id",
-    "game.name",
-    "game.locale",
-    "game.verbose",
-    "game.email",
-    "game.mailcmd",
-    "game.sender",
-    NULL
-};
-
 #define MAXKEYS 16
-void config_set_from(const dictionary *d)
+void config_set_from(const dictionary *d, const char *valid_keys[])
 {
     int s, nsec = iniparser_getnsec(d);
     for (s=0;s!=nsec;++s) {
@@ -753,7 +742,6 @@ void config_set_from(const dictionary *d)
         int k, nkeys = iniparser_getsecnkeys(d, sec);
         const char *keys[MAXKEYS];
         size_t slen = strlen(sec);
-        bool check = strcmp(sec, "game") == 0;
 
         assert(nkeys <= MAXKEYS);
         assert(slen<sizeof(key));
@@ -769,13 +757,14 @@ void config_set_from(const dictionary *d)
             val = iniparser_getstring(d, keys[k], NULL);
             if (!orig) {
                 if (val) {
-                    if (check) {
+                    if (valid_keys) {
                         int i;
                         for (i = 0; valid_keys[i]; ++i) {
-                            if (strcmp(key, valid_keys[i]) == 0) break;
+                            size_t vlen = strlen(valid_keys[i]);
+                            if (strncmp(key, valid_keys[i], vlen) == 0) break;
                         }
                         if (!valid_keys[i]) {
-                            log_error("unknown key in ini-section %s: %s = %s", sec, key, val);
+                            log_error("unknown key in ini-section %s: %s = %s", sec, key+slen+1, val);
                         }
                     }
                     config_set(key, val);
