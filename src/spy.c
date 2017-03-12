@@ -199,8 +199,6 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
                 }
                 ru = ru->next;
             }
-            if (ru != NULL)
-                break;
         }
         mu = mu->nextF;
     }
