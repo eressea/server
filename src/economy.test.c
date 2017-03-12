@@ -316,8 +316,12 @@ static void test_recruit(CuTest *tc) {
     f = test_create_faction(0);
     u = test_create_unit(f, test_create_region(0, 0, 0));
     CuAssertIntEquals(tc, 1, u->number);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    CuAssertIntEquals(tc, 1, f->num_units);
     add_recruits(u, 1, 1);
     CuAssertIntEquals(tc, 2, u->number);
+    CuAssertIntEquals(tc, 2, f->num_people);
+    CuAssertIntEquals(tc, 1, f->num_units);
     CuAssertPtrEquals(tc, u, f->units);
     CuAssertPtrEquals(tc, NULL, u->nextF);
     CuAssertPtrEquals(tc, NULL, u->prevF);
