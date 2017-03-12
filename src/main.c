@@ -45,32 +45,49 @@ static const char *inifile = "eressea.ini";
 static int memdebug = 0;
 static int verbosity = 1;
 
-static void load_inifile(dictionary * d)
+static void load_inifile(void)
 {
-    const char *reportdir = reportpath();
-    const char *datadir = datapath();
-    const char *basedir = basepath();
     const char *str;
 
-    assert(d);
-
-    str = iniparser_getstring(d, "game:base", basedir);
-    if (str != basedir) {
+    str = config_get("game.base");
+    if (str) {
         set_basepath(str);
     }
-    str = iniparser_getstring(d, "game:report", reportdir);
-    if (str != reportdir) {
+    str = config_get("game.report");
+    if (str) {
         set_reportpath(str);
     }
-    str = iniparser_getstring(d, "game:data", datadir);
-    if (str != datadir) {
+    str = config_get("game.data");
+    if (str) {
         set_datapath(str);
     }
 
-    lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
-
-    verbosity = iniparser_getint(d, "game:verbose", 2);
+    lomem = config_get_int("game.lomem", lomem) ? 1 : 0;
+    verbosity = config_get_int("game.verbose", 2);
+    memdebug = config_get_int("game.memcheck", memdebug);
+#ifdef USE_CURSES
+    /* only one value in the [editor] section */
+    force_color = config_get_int("editor.color", force_color);
+    gm_codepage = config_get_int("editor.codepage", gm_codepage);
+#endif
 }
+
+static const char * valid_keys[] = {
+    "game.id",
+    "game.name",
+    "game.locale",
+    "game.verbose",
+    "game.report",
+    "game.lomem",
+    "game.memcheck",
+    "game.email",
+    "game.mailcmd",
+    "game.sender",
+    "editor.color",
+    "editor.codepage",
+    "lua.",
+    NULL
+};
 
 static dictionary *parse_config(const char *filename)
 {
@@ -87,15 +104,8 @@ static dictionary *parse_config(const char *filename)
         d  = iniparser_load(filename);        
     }
     if (d) {
-        load_inifile(d);
-        config_set_from(d);
-
-        memdebug = iniparser_getint(d, "game:memcheck", memdebug);
-#ifdef USE_CURSES
-        /* only one value in the [editor] section */
-        force_color = iniparser_getint(d, "editor:color", force_color);
-        gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
-#endif
+        config_set_from(d, valid_keys);
+        load_inifile();
     }
     str = config_get("game.locales");
     make_locales(str ? str : "de,en");

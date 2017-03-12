@@ -242,7 +242,7 @@ static void test_config_inifile(CuTest *tc) {
     dictionary_set(ini, "game", NULL);
     iniparser_set(ini, "game:id", "42");
     iniparser_set(ini, "game:name", "Eressea");
-    config_set_from(ini);
+    config_set_from(ini, NULL);
     CuAssertStrEquals(tc, "Eressea", config_get("game.name"));
     CuAssertStrEquals(tc, "Eressea", game_name());
     CuAssertIntEquals(tc, 42, game_id());
