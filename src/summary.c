@@ -394,7 +394,6 @@ summary *make_summary(void)
         }
         ++plang->number;
         f->nregions = 0;
-        f->num_people = 0;
         if (f->units) {
             s->factions++;
             /* Problem mit Monsterpartei ... */
@@ -476,7 +475,6 @@ summary *make_summary(void)
                     }
                 }
 
-                f->num_people += u->number;
                 orace = (int)old_race(u_race(u));
                 if (orace >= 0) {
                     s->poprace[orace] += u->number;
