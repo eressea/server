@@ -531,7 +531,7 @@ static void test_unlimited_units(CuTest *tc) {
     CuAssertIntEquals(tc, 0, f->num_units);
     CuAssertIntEquals(tc, 0, f->num_people);
     u = test_create_unit(f, test_create_region(0, 0, NULL));
-//    CuAssertTrue(tc, count_unit(u));
+    CuAssertTrue(tc, count_unit(u));
     CuAssertIntEquals(tc, 1, f->num_units);
     CuAssertIntEquals(tc, 1, f->num_people);
     u_setfaction(u, NULL);
@@ -541,6 +541,7 @@ static void test_unlimited_units(CuTest *tc) {
     CuAssertIntEquals(tc, 1, f->num_units);
     CuAssertIntEquals(tc, 1, f->num_people);
     u_setrace(u, rc);
+    CuAssertTrue(tc, !count_unit(u));
     CuAssertIntEquals(tc, 0, f->num_units);
     CuAssertIntEquals(tc, 0, f->num_people);
     scale_number(u, 10);
@@ -549,6 +550,9 @@ static void test_unlimited_units(CuTest *tc) {
     u_setrace(u, f->race);
     CuAssertIntEquals(tc, 1, f->num_units);
     CuAssertIntEquals(tc, 10, f->num_people);
+    remove_unit(&u->region->units, u);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
     test_cleanup();
 }
 

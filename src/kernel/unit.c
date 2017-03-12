@@ -439,7 +439,9 @@ int remove_unit(unit ** ulist, unit * u)
     }
 
     if (u->faction) {
-        --u->faction->num_units;
+        if (count_unit(u)) {
+            --u->faction->num_units;
+        }
         if (u->faction->units == u) {
             u->faction->units = u->nextF;
         }
@@ -1128,12 +1130,13 @@ struct building *inside_building(const struct unit *u)
 
 void u_setfaction(unit * u, faction * f)
 {
-    int cnt = u->number;
     if (u->faction == f)
         return;
     if (u->faction) {
-        --u->faction->num_units;
-        set_number(u, 0);
+        if (count_unit(u)) {
+            --u->faction->num_units;
+            u->faction->num_people -= u->number;
+        }
         join_group(u, NULL);
         free_orders(&u->orders);
         set_order(&u->thisorder, NULL);
@@ -1165,12 +1168,17 @@ void u_setfaction(unit * u, faction * f)
     if (u->region) {
         update_interval(f, u->region);
     }
-    if (cnt) {
-        set_number(u, cnt);
-    }
-    if (f) {
+    if (f && count_unit(u)) {
         ++f->num_units;
+        f->num_people += u->number;
     }
+}
+
+bool count_unit(const unit *u)
+{
+    const race *rc = u_race(u);
+    /* spells are invisible. units we cannot see do not count to our limit */
+    return rc == NULL || (rc->flags & RCF_INVISIBLE) == 0;
 }
 
 void set_number(unit * u, int count)
@@ -1181,10 +1189,10 @@ void set_number(unit * u, int count)
     if (count == 0) {
         u->flags &= ~(UFL_HERO);
     }
-    if (u->faction) {
+    if (u->faction && count_unit(u)) {
         u->faction->num_people += count - u->number;
     }
-    u->number = (unsigned short)count;
+    u->number = count;
 }
 
 void remove_skill(unit * u, skill_t sk)
@@ -1487,6 +1495,8 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     unit *u = (unit *)calloc(1, sizeof(unit));
 
     assert(urace);
+    u_setrace(u, urace);
+    u->irace = NULL;
     if (f) {
         assert(faction_alive(f));
         u_setfaction(u, f);
@@ -1499,8 +1509,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
             }
         }
     }
-    u_setrace(u, urace);
-    u->irace = NULL;
 
     set_number(u, number);
 
@@ -1806,7 +1814,23 @@ const struct race *u_race(const struct unit *u)
 void u_setrace(struct unit *u, const struct race *rc)
 {
     assert(rc);
-    u->_race = rc;
+    if (!u->faction) {
+        u->_race = rc;
+    }
+    else {
+        int n = 0;
+        if (count_unit(u)) {
+            --n;
+        }
+        u->_race = rc;
+        if (count_unit(u)) {
+            ++n;
+        }
+        if (n != 0) {
+            u->faction->num_units += n;
+            u->faction->num_people += n * u->number;
+        }
+    }
 }
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
