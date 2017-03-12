@@ -519,6 +519,43 @@ static void test_heal_factor(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_unlimited_units(CuTest *tc) {
+    race *rc;
+    faction *f;
+    unit *u;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    rc = test_create_race("spell");
+    rc->flags |= RCF_INVISIBLE;
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    CuAssertTrue(tc, count_unit(u));
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    u_setfaction(u, NULL);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u_setfaction(u, f);
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    u_setrace(u, rc);
+    CuAssertTrue(tc, !count_unit(u));
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    scale_number(u, 10);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u_setrace(u, f->race);
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 10, f->num_people);
+    remove_unit(&u->region->units, u);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -534,6 +571,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_units_with_dead_faction);
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     SUITE_ADD_TEST(suite, test_names);
+    SUITE_ADD_TEST(suite, test_unlimited_units);
     SUITE_ADD_TEST(suite, test_default_name);
     SUITE_ADD_TEST(suite, test_skillmod);
     SUITE_ADD_TEST(suite, test_skill_hunger);

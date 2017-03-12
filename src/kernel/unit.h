@@ -130,6 +130,7 @@ extern "C" {
     int weight(const struct unit *u);
 
     void renumber_unit(struct unit *u, int no);
+    bool count_unit(const unit *u); /* unit counts towards faction.num_units and faction.num_people */
 
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);

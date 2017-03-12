@@ -81,7 +81,6 @@ extern "C" {
         int options;
         struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
         struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
-        int nregions;
         score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
