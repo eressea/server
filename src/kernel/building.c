@@ -811,8 +811,8 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
 * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
-    if (global.functions.wage) {
-        return global.functions.wage(r, f, rc, in_turn);
+    if (global.wage) {
+        return global.wage(r, f, rc, in_turn);
     }
     return default_wage(r, f, rc, in_turn);
 }

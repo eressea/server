@@ -1452,7 +1452,7 @@ static void test_immigration(CuTest * tc)
 {
     region *r;
     double inject[] = { 1 };
-    int (*old_wage)(const region*, const faction*, const race*, int) = global.functions.wage;
+    int (*old_wage)(const region*, const faction*, const race*, int) = global.wage;
 
     test_setup();
     r = test_create_region(0, 0, 0);
@@ -1472,10 +1472,10 @@ static void test_immigration(CuTest * tc)
 
     random_source_inject_array(inject, 2);
 
-    global.functions.wage = low_wage;
+    global.wage = low_wage;
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
-    global.functions.wage = old_wage;
+    global.wage = old_wage;
 
     test_cleanup();
 }
