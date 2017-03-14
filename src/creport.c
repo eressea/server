@@ -87,19 +87,23 @@ bool opt_cr_absolute_coords = false;
 /* globals */
 #define C_REPORT_VERSION 66
 
-#define TAG_LOCALE "de"
-#ifdef TAG_LOCALE
+struct locale *crtag_locale(void) {
+    static struct locale * lang;
+    static int config;
+    if (config_changed(&config)) {
+        const char *lname = config_get("creport.tags");
+        lang = get_locale(lname ? lname : "de");
+    }
+    return lang;
+}
+
 static const char *crtag(const char *key)
 {
     /* TODO: those locale lookups are shit, but static kills testing */
     const char *result;
-    const struct locale *lang = get_locale(TAG_LOCALE);
-    result = LOC(lang, key);
+    result = LOC(crtag_locale(), key);
     return result;
 }
-#else
-#define crtag(x) (x)
-#endif
 /*
  * translation table
  */
@@ -134,7 +138,7 @@ static const char *translate(const char *key, const char *value)
     return crtag(key);
 }
 
-static void write_translations(FILE * F)
+static void report_translations(FILE * F)
 {
     int i;
     fputs("TRANSLATION\n", F);
@@ -1680,7 +1684,9 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
         }
     }
     report_crtypes(F, f->locale);
-    write_translations(F);
+    if (f->locale!=crtag_locale()) {
+        report_translations(F);
+    }
     reset_translations();
     fclose(F);
     return 0;
