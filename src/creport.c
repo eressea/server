@@ -276,7 +276,7 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
                     stream_printf(out, "EFFECTS\n");
                 }
                 stream_printf(out, "\"%d %s\"\n", data->value, translate(key,
-                    LOC(default_locale, key)));
+                    LOC(viewer->locale, key)));
             }
             a = a->next;
         }
@@ -1148,7 +1148,7 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
                 const char *bname = border_name(b, r, f, GF_PURE);
                 bname = mkname("border", bname);
                 fprintf(F, "GRENZE %d\n", ++g);
-                fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
+                fprintf(F, "\"%s\";typ\n", LOC(f->locale, bname));
                 fprintf(F, "%d;richtung\n", d);
                 if (!b->type->transparent(b, f))
                     fputs("1;opaque\n", F);
