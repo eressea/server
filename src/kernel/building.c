@@ -767,13 +767,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
     }
 
-    /* Artsculpture: Income +5 */
-    for (b = r->buildings; b; b = b->next) {
-        if (is_building_type(b->type, "artsculpture")) {
-            wage += 5;
-        }
-    }
-
     if (r->attribs) {
         attrib *a;
         const struct curse_type *ctype;
