@@ -1444,15 +1444,10 @@ static void test_show_race(CuTest *tc) {
     test_cleanup();
 }
 
-static int low_wage(const region * r, const faction * f, const race * rc, int in_turn) {
-    return 1;
-}
-
 static void test_immigration(CuTest * tc)
 {
     region *r;
     double inject[] = { 1 };
-    int (*old_wage)(const region*, const faction*, const race*, int) = global.wage;
 
     test_setup();
     r = test_create_region(0, 0, 0);
@@ -1472,10 +1467,9 @@ static void test_immigration(CuTest * tc)
 
     random_source_inject_array(inject, 2);
 
-    global.wage = low_wage;
+    config_set("rules.wage.function", "0");
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
-    global.wage = old_wage;
 
     test_cleanup();
 }

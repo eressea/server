@@ -110,8 +110,6 @@ extern "C" {
     typedef struct settings {
         struct attrib *attribs;
         void *vm_state;
-        int(*wage) (const struct region * r, const struct faction * f,
-            const struct race * rc, int in_turn);
     } settings;
 
     void set_param(struct param **p, const char *key, const char *value);

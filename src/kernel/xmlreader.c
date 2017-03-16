@@ -883,44 +883,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     return itype;
 }
 
-static int parse_rules(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr functions;
-    xmlNodeSetPtr nodes;
-    int i;
-
-    /* reading eressea/resources/resource */
-    functions = xmlXPathEvalExpression(BAD_CAST "/eressea/rules/function", xpath);
-    nodes = functions->nodesetval;
-    for (i = 0; i != nodes->nodeNr; ++i) {
-        xmlNodePtr node = nodes->nodeTab[i];
-        xmlChar *propValue;
-        pf_generic fun;
-
-        parse_function(node, &fun, &propValue);
-
-        if (fun == NULL) {
-            log_error("unknown function for rule '%s' %s\n", (const char *)propValue);
-            xmlFree(propValue);
-            continue;
-        }
-        assert(propValue != NULL);
-        if (strcmp((const char *)propValue, "wage") == 0) {
-            global.wage =
-                (int(*)(const struct region *, const struct faction *,
-                const struct race *, int))fun;
-        }
-        else {
-            log_error("unknown function for rule '%s'\n", (const char *)propValue);
-        }
-        xmlFree(propValue);
-    }
-    xmlXPathFreeObject(functions);
-    xmlXPathFreeContext(xpath);
-    return 0;
-}
-
 static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1960,8 +1922,6 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_rules);
-
     xml_register_callback(parse_races);
     xml_register_callback(parse_calendar);
     xml_register_callback(parse_resources);

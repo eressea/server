@@ -796,7 +796,6 @@ bool config_token(const char *key, const char *tok) {
 }
 
 void free_config(void) {
-    global.wage = NULL;
     free_params(&configuration);
     ++config_cache_key;
 }
