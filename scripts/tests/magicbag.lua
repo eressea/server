@@ -6,7 +6,7 @@ local u
 
 function setup()
     eressea.free_game()
-    u = unit.create(faction.create("test@example.com", "human", "de"), region.create(0, 0, "plain"), 1)
+    u = unit.create(faction.create("human", "test@example.com", "de"), region.create(0, 0, "plain"), 1)
 end
 
 function test_magicbag_weight()

@@ -12,7 +12,7 @@ function setup()
     }]]
     eressea.config.reset()
     assert(eressea.config.parse(conf)==0)
-    f = faction.create("faction@eressea.de", "human", "de")
+    f = faction.create("human", "faction@eressea.de", "de")
     assert(f~=nil)
 end
 

@@ -11,7 +11,7 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
 
     r = region.create(0, 0, "plain")
-    f = faction.create("spell_payment@eressea.de", "elf", "de")
+    f = faction.create("elf", "spell_payment@eressea.de", "de")
     u = unit.create(f, r, 1)
     u.magic = "gray"
     u:set_skill("magic", 12)

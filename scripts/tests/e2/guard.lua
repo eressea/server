@@ -11,7 +11,7 @@ end
 
 function test_guard_unarmed()
     local r1 = region.create(0, 0, "plain")
-    local f1 = faction.create("hodor@eressea.de", "human", "de")
+    local f1 = faction.create("human", "hodor@eressea.de", "de")
     local u1 = unit.create(f1, r1, 1)
     assert_equal(false, u1.guard)
     u1:clear_orders()
@@ -22,7 +22,7 @@ end
 
 function test_guard_armed()
     local r1 = region.create(0, 0, "plain")
-    local f1 = faction.create("hodor@eressea.de", "human", "de")
+    local f1 = faction.create("human", "hodor@eressea.de", "de")
     local u1 = unit.create(f1, r1, 1)
     assert_equal(false, u1.guard)
     u1:add_item("sword", 1)
@@ -36,10 +36,10 @@ end
 function test_guard_allows_move_after_combat() -- bug 1493
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
-    local f1 = faction.create("bernd@eressea.de", "human", "de")
+    local f1 = faction.create("human", "bernd@eressea.de", "de")
     local u1 = unit.create(f1, r1, 10)
     local uid1 = u1.id
-    local f2 = faction.create("horst@eressea.de", "human", "de")
+    local f2 = faction.create("human", "horst@eressea.de", "de")
     local u2 = unit.create(f2, r1, 1)
     u1:add_order("BEWACHE")
     u1:add_item("sword", 10)
@@ -59,10 +59,10 @@ end
 function test_no_guard_no_move_after_combat() -- bug 1493
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
-    local f1 = faction.create("bernd@eressea.de", "human", "de")
+    local f1 = faction.create("human", "bernd@eressea.de", "de")
     local u1 = unit.create(f1, r1, 10)
     local uid1 = u1.id
-    local f2 = faction.create("horst@eressea.de", "human", "de")
+    local f2 = faction.create("human", "horst@eressea.de", "de")
     local u2 = unit.create(f2, r1, 1)
     u1:add_order("BEWACHE")
     u1:add_item("sword", 10)

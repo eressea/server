@@ -11,7 +11,7 @@ end
 
 function test_blessedharvest_lasts_n_turn()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "halfling", "de")
+    local f = faction.create("halfling", "noreply@eressea.de", "de")
     local u = unit.create(f, r)
     local err = 0
     r:set_resource("peasant", 100)
@@ -46,7 +46,7 @@ end
 
 function test_magic()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "halfling", "de")
+    local f = faction.create("halfling", "noreply@eressea.de", "de")
     local u = unit.create(f, r)
     local b = building.create(r, "castle")
 

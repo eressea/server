@@ -12,7 +12,7 @@ local r, f, u
 function setup()
     eressea.free_game()
     r = _G.region.create(0, 0, "mountain")
-    f = _G.faction.create("noreply@eressea.de", "human", "de")
+    f = _G.faction.create("human", "noreply@eressea.de", "de")
     u = _G.unit.create(f, r, 1)
     u:clear_orders()
     eressea.settings.set("rules.food.flags", "4")

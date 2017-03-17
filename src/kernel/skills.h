@@ -15,6 +15,12 @@
 
 #include <skill.h>
 
+struct race;
+struct unit;
+struct region;
+struct attrib;
+struct attrib_type;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -13,7 +13,7 @@ end
 
 function test_mistletoe_okay()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item('mistletoe', 2)
@@ -29,7 +29,7 @@ end
 
 function test_mistletoe_fail()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item('mistletoe', 1)
@@ -46,7 +46,7 @@ end
 
 function test_dreameye()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:add_item("dreameye", 2)
     u:clear_orders()
@@ -63,7 +63,7 @@ end
 
 function test_manacrystal()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:add_item("manacrystal", 2)
     u:clear_orders()
@@ -81,7 +81,7 @@ end
 
 function test_skillpotion()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:add_item("skillpotion", 2)
     u:clear_orders()
@@ -93,7 +93,7 @@ end
 
 function test_studypotion()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item("studypotion", 2)
@@ -109,7 +109,7 @@ end
 
 function test_antimagic()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -129,7 +129,7 @@ end
 
 function test_ointment()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     local hp = u.hp
     u.hp = 1
@@ -144,7 +144,7 @@ end
 
 function test_bloodpotion_demon()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local f = faction.create("demon", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:add_item("peasantblood", 1)
     u:clear_orders()
@@ -157,7 +157,7 @@ end
 
 function test_bloodpotion_other()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:add_item("peasantblood", 1)
     u:clear_orders()

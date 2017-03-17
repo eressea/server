@@ -813,7 +813,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
 
     skill = effskill(u, sk, 0);
     skill =
-        skillmod(itype->rtype->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
+        skillmod(itype->construction->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
 
     if (skill < 0) {
         /* an error occured */

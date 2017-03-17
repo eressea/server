@@ -79,7 +79,6 @@ extern "C" {
         struct rawmaterial_type *raw;
         struct resource_mod *modifiers;
         /* --- pointers --- */
-        struct attrib *attribs;
         struct item_type *itype;
         struct potion_type *ptype;
         struct luxury_type *ltype;

@@ -7,7 +7,7 @@ local u, r, f,turn
 function setup()
     eressea.free_game()
     r = region.create(0, 0, "plain")
-    f = faction.create("bernd@eressea.de", "human", "de")
+    f = faction.create("human", "bernd@eressea.de", "de")
     u = unit.create(f, r, 1)
     u:add_item("money", 10)
     turn = get_turn()

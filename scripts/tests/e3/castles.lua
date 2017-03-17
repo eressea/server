@@ -13,7 +13,7 @@ end
 
 function test_build_watch()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("e3build@eressea.de", "human", "de")
+    local f = faction.create("human", "e3build@eressea.de", "de")
     local u = unit.create(f, r, 1)
 
     u.number = 20
@@ -46,9 +46,9 @@ end
 
 function test_small_castles()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r, 1)
-    local f2 = faction.create("noreply@eressea.de", "halfling", "de")
+    local f2 = faction.create("halfling", "noreply@eressea.de", "de")
     local u2 = unit.create(f2, r, 1)
 
     local b = building.create(r, "castle")
@@ -65,7 +65,7 @@ end
 
 function test_build_normal()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:clear_orders()
     u:add_item("stone", 10)
@@ -78,7 +78,7 @@ end
 
 function test_build_packice()
     local r = region.create(0, 0, "packice")
-    local f = faction.create("packice@eressea.de", "human", "de")
+    local f = faction.create("human", "packice@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:clear_orders()
     u:add_item("stone", 10)
@@ -90,7 +90,7 @@ end
 
 function test_build_castle_stages()
     local r = region.create(0,0, "plain")
-    local f = faction.create("castle@eressea.de", "human", "de")
+    local f = faction.create("human", "castle@eressea.de", "de")
     local u = unit.create(f, r, 1000)
     local b = building.create(r, "castle")
 

@@ -123,6 +123,7 @@ void free_buildingtypes(void) {
 
 building_type *bt_get_or_create(const char *name)
 {
+    assert(name && name[0]);
     if (name != NULL) {
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {

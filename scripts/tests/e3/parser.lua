@@ -8,7 +8,7 @@ end
 
 function test_set_status_en()
     local r = region.create(0, 0, "plain")    
-    local f = faction.create("bug_1882@eressea.de", "human", "en")
+    local f = faction.create("human", "bug_1882@eressea.de", "en")
     local u = unit.create(f, r, 1)
     u.status = 1
     u:clear_orders()
@@ -23,7 +23,7 @@ end
 
 function test_set_status_de()
     local r = region.create(0, 0, "plain")    
-    local f = faction.create("bug_1882@eressea.de", "human", "de")
+    local f = faction.create("human", "bug_1882@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u.status = 1
     u:clear_orders()
@@ -34,7 +34,7 @@ end
 
 function test_breed_horses()
     local r = region.create(0, 0, "plain")    
-    local f = faction.create("bug_1886@eressea.de", "human", "en")
+    local f = faction.create("human", "bug_1886@eressea.de", "en")
     local u = unit.create(f, r, 1)
     local b = building.create(r, "stables")
     b.size = 10

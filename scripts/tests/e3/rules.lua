@@ -43,7 +43,7 @@ end
 
 function disable_test_bug_1738_build_castle_e3()
     local r = region.create(0, 0, "plain")    
-    local f = faction.create("bug_1738@eressea.de", "human", "de")
+    local f = faction.create("human", "bug_1738@eressea.de", "de")
 
     local c = building.create(r, "castle")
     c.size = 228
@@ -73,10 +73,10 @@ end
 
 function disable_test_alliance()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r, 1)
     u1:add_item("money", u1.number * 100)
-    local f2 = faction.create("info@eressea.de", "human", "de")
+    local f2 = faction.create("human", "info@eressea.de", "de")
     local u2 = unit.create(f2, r, 1)
     u2:add_item("money", u2.number * 100)
     assert(f1.alliance==nil)
@@ -125,7 +125,7 @@ end
 
 function test_no_stealth()
     local r = region.create(0,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
 
     u:set_skill("stealth", 1)
@@ -138,7 +138,7 @@ end
 
 function test_no_teach()
     local r = region.create(0,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
 
@@ -160,7 +160,7 @@ function test_seecast()
     for i = 1,10 do
         region.create(i, 0, "ocean")
     end
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local s1 = ship.create(r, "cutter")
     local u1 = unit.create(f, r, 2)
     u1:set_skill("sailing", 3)
@@ -193,7 +193,7 @@ function test_fishing()
     eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0,0, "ocean")
     local r2 = region.create(1,0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local s1 = ship.create(r, "cutter")
     local u1 = unit.create(f, r, 3)
     u1.ship = s1
@@ -219,8 +219,8 @@ function test_ship_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
-    local f = faction.create("noreply@eressea.de", "human", "de")
-    local f2 = faction.create("noreply@eressea.de", "goblin", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f2 = faction.create("goblin", "noreply@eressea.de", "de")
 
     -- u1 is at the limit and moves
     local s1 = ship.create(r, "cutter")
@@ -273,9 +273,9 @@ end
     
 function test_owners()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r, 1)
-    local f2 = faction.create("noreply@eressea.de", "human", "de")
+    local f2 = faction.create("human", "noreply@eressea.de", "de")
     local u2 = unit.create(f2, r, 1)
     local u3 = unit.create(f2, r, 1)
 
@@ -304,7 +304,7 @@ function test_taxes()
     local r = region.create(0, 0, "plain")
     r:set_resource("peasant", 1000)
     r:set_resource("money", 5000)
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:clear_orders()
     u:add_order("LERNE Holzfaellen") -- do not work
@@ -320,7 +320,7 @@ end
 
 function test_region_owner_cannot_leave_castle()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     f.id = 42
     local b1 = building.create(r, "castle")
     b1.size = 10
@@ -366,7 +366,7 @@ function market_fixture()
     b.size = 10
     b.working = true
 
-    local f = faction.create("market1@eressea.de", "human", "de")
+    local f = faction.create("human", "market1@eressea.de", "de")
     f.id = 42
     local u = unit.create(f, r, 1)
     u.building = b
@@ -424,7 +424,7 @@ end
 function test_multiple_markets()
    local r, u1, b, herbnames, luxurynames, herbtable, luxurytable = market_fixture()
    local r2 = get_region(1,0)
-   local f = faction.create("multim@eressea.de", "human", "de")
+   local f = faction.create("human", "multim@eressea.de", "de")
    local u2 = unit.create(f, r2, 1)
    local b2 = building.create(r2, "market")
    b2.size = 10
@@ -444,7 +444,7 @@ end
 
 function test_market()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("market2@eressea.de", "human", "de")
+  local f1 = faction.create("human", "market2@eressea.de", "de")
   local u1 = unit.create(f1, r, 1)
 
   local b = building.create(r, "market")
@@ -541,7 +541,7 @@ function test_market_gives_items()
     r = get_region(0, 0)
     local b = building.create(r, "market")
     b.size = 10
-    local f = faction.create("market0@eressea.de", "human", "de")
+    local f = faction.create("human", "market0@eressea.de", "de")
     f.id = 42
     local u = unit.create(f, r, 1)
     u.building = b
@@ -559,7 +559,7 @@ end
 
 function test_spells()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u.race = "elf"
     u:clear_orders()
@@ -587,7 +587,7 @@ function test_spells()
 end
 
 function test_canoe_passes_through_land()
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local src = region.create(0, 0, "ocean")
     local land = region.create(1, 0, "plain")
     region.create(2, 0, "ocean")
@@ -610,8 +610,8 @@ end
 
 function test_give_50_percent_of_money()
     local r = region.create(0, 0, "plain")
-    local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
-    local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
+    local u1 = unit.create(faction.create("human", "noreply@eressea.de", "de"), r, 1)
+    local u2 = unit.create(faction.create("orc", "noreply@eressea.de", "de"), r, 1)
     u1.faction.age = 10
     u2.faction.age = 10
     u1:add_item("money", 500)
@@ -637,8 +637,8 @@ end
 
 function test_give_100_percent_of_items()
     r = region.create(0, 0, "plain")
-    local u1 = unit.create(faction.create("noreply@eressea.de", "human", "de"), r, 1)
-    local u2 = unit.create(faction.create("noreply@eressea.de", "orc", "de"), r, 1)
+    local u1 = unit.create(faction.create("human", "noreply@eressea.de", "de"), r, 1)
+    local u2 = unit.create(faction.create("orc", "noreply@eressea.de", "de"), r, 1)
     u1.faction.age = 10
     u2.faction.age = 10
     u1:add_item("money", 500)
@@ -656,8 +656,8 @@ end
 
 function test_cannot_give_person()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
-    local f2 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
+    local f2 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r, 10)
     local u2 = unit.create(f2, r, 10)
     u1.faction.age = 10
@@ -675,8 +675,8 @@ end
 
 function test_cannot_give_unit()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
-    local f2 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
+    local f2 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r, 10)
     local u2 = unit.create(f2, r, 10)
     u1.faction.age = 10
@@ -694,9 +694,9 @@ end
 function test_guard_by_owners()
     -- http://bugs.eressea.de/view.php?id=1756
     local r = region.create(0,0, "mountain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     f1.age=20
-    local f2 = faction.create("noreply@eressea.de", "human", "de")
+    local f2 = faction.create("human", "noreply@eressea.de", "de")
     f2.age=20
     local u1 = unit.create(f1, r, 1)
     local b = building.create(r, "castle")
@@ -717,7 +717,7 @@ function test_guard_by_owners()
 end
 
 local function setup_packice(x, onfoot)
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local plain = region.create(0,0, "plain")
     local ice = region.create(1,0, "packice")
     local ocean = region.create(2,0, "ocean")
@@ -778,7 +778,7 @@ function test_cannot_walk_into_ocean()
 end
 
 function test_p2()
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local r = region.create(0, 0, "plain")
     local u = unit.create(f, r, 1)
     r:set_resource("tree", 0)
@@ -795,7 +795,7 @@ end
 
 function test_p2_move()
     -- http://bugs.eressea.de/view.php?id=1855
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local r = region.create(0, 0, "plain")
     region.create(1, 0, "plain")
     local u = unit.create(f, r, 1)
@@ -814,7 +814,7 @@ end
 
 function test_golem_use_four_iron()
     local r0 = region.create(0, 0, "plain")
-    local f1 = faction.create("noreply@eressea.de", "halfling", "de")
+    local f1 = faction.create("halfling", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r0, 3)
     u1.race = "irongolem"
     u1:set_skill("weaponsmithing", 1)
@@ -832,7 +832,7 @@ function test_silver_weight_stops_movement()
     local r1 = region.create(1, 1, "plain")
     local r2 = region.create(2, 1, "plain")
     region.create(3, 1, "plain")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")    
+    local f1 = faction.create("human", "noreply@eressea.de", "de")    
     local u1 = unit.create(f1, r1, 1)
     u1:clear_orders()
     u1:add_order("NACH OST")
@@ -849,7 +849,7 @@ function test_silver_weight_stops_ship()
     local r1 = region.create(1, 1, "ocean")
     local r2 = region.create(2, 1, "ocean")
     region.create(3, 1, "ocean")
-    local f1 = faction.create("noreply@eressea.de", "human", "de")    
+    local f1 = faction.create("human", "noreply@eressea.de", "de")    
     local u1 = unit.create(f1, r1, 1)
     u1:set_skill("sailing", 3)
     local s1 = ship.create(r1, "canoe")
@@ -866,7 +866,7 @@ end
 
 function test_building_owner_can_enter_ship()
     local r1 = region.create(1, 2, "plain")    
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     local b1 = building.create(r1, "castle")    
     b1.size = 10    
     local s1 = ship.create(r1, "cutter")        
@@ -889,7 +889,7 @@ end
 
 function test_only_building_owner_can_set_not_paid()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("human", "noreply@eressea.de", "de")
   local u1 = unit.create(f, r, 1)
   local u2 = unit.create(f, r, 1)
   local mine = building.create(r, "mine")
@@ -913,7 +913,7 @@ end
 
 function test_spyreport_message()
     local r1 = region.create(1, 2, "plain")    
-    local f1 = faction.create("noreply@eressea.de", "human", "de")
+    local f1 = faction.create("human", "noreply@eressea.de", "de")
     local u1 = unit.create(f1, r1, 1)
     local u2 = unit.create(f1, r1, 1)
     msg = message.create("spyreport")
@@ -940,7 +940,7 @@ function test_bug2083()
     r:set_resource("peasant", 2000) 
     r.luxury = "balm"
 
-    local f = faction.create("2083@eressea.de", "human", "de")
+    local f = faction.create("human", "2083@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:set_skill("building", 8)
     u:add_item("stone", 100)
@@ -967,7 +967,7 @@ function test_bug2083()
 end
 
 function test_no_uruk()
-  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
+  local f1 = faction.create("uruk", "noreply@eressea.de", "de")
   assert_equal(f1.race, "orc")
 end
 
@@ -975,7 +975,7 @@ function test_bug2187()
   set_rule("rules.food.flags", "0")
 
   local r = region.create(0,0,"plain")
-  local f = faction.create("2187@eressea.de", "goblin", "de")
+  local f = faction.create("goblin", "2187@eressea.de", "de")
   local u = unit.create(f, r, 1)
   u.race = "demon"
   u.hp = u.hp_max * u.number
