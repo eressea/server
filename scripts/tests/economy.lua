@@ -32,29 +32,6 @@ function test_mine_bonus()
     assert_equal(80, r:get_resource("iron"))
 end
 
-function test_mine_example()
-    local r = region.create(0, 0, "mountain")
-    r:set_resource("iron", 100)
-    local level = r:get_resourcelevel("iron")
-    assert_equal(1, level)
-    local u = unit.create(faction.create("dwarf"), r)
-    assert_equal("dwarf", u.faction.race)
-    assert_equal("dwarf", u.race)
-    u.faction.name = "Zwerge"
-    u.number = 10
-    u:set_skill("mining", 1)
-    u:add_order("MACHE EISEN")
-    process_orders()
-    assert_equal(30, u:get_item("iron"))
-    assert_equal(82, r:get_resource("iron"))
-    u.building = building.create(r, "mine")
-    u.building.size = 10
-    u:add_item("money", 500) -- maintenance
-    process_orders()
-    assert_equal(70, u:get_item("iron"))
-    assert_equal(70, r:get_resource("iron"))
-end
-
 function test_no_guards()
     local r = region.create(0, 0, "plain")
     r:set_resource("tree", 100)
