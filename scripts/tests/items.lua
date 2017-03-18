@@ -230,6 +230,27 @@ function test_use_domore()
     assert_equal(2, u:get_item("sword"))
 end
 
+function test_make_greatbow()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "greatbow@eressea.de", "de")
+    local u = unit.create(f, r, 1)
+    turn_begin()
+    u:add_item('mallorn', 2)
+    u:set_skill('weaponsmithing', 5)
+    u:clear_orders()
+    u:add_order("MACHE 1 Elfenbogen")
+    turn_process()
+    assert_equal(2, u:get_item('mallorn'))
+    assert_equal(0, u:get_item('greatbow'))
+    assert_equal(1, f:count_msg_type('error117'))
+
+    u.race='elf'
+    turn_process()
+    assert_equal(0, u:get_item('mallorn'))
+    assert_equal(1, u:get_item('greatbow'))
+    turn_end()
+end
+
 function test_bloodpotion_demon()
     local r = region.create(0, 0, "plain")
     local f = faction.create("demon")
