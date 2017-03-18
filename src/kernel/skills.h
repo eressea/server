@@ -28,7 +28,6 @@ extern "C" {
     /* skillmod_data::flags -- wann gilt der modifier? */
 #define SMF_ALWAYS     (1<<0)   /* immer */
 #define SMF_PRODUCTION (1<<1)   /* für Produktion - am gebäude, an der einheit */
-#define SMF_RIDING     (1<<2)   /* Bonus für berittene - an der rasse */
 
     typedef struct skill {
 #ifdef LOMEM
