@@ -1502,9 +1502,6 @@
   <string name="prefix">
     <text locale="en">PREFIX</text>
   </string>
-  <string name="promote">
-    <text locale="en">PROMOTION</text>
-  </string>
   <string name="claim">
     <text locale="en">CLAIM</text>
   </string>
