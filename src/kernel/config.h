@@ -108,14 +108,8 @@ extern "C" {
 
     /* globale settings des Spieles */
     typedef struct settings {
-        const char *gamename;
         struct attrib *attribs;
-        unsigned int data_turn;
         void *vm_state;
-        struct global_functions {
-            int(*wage) (const struct region * r, const struct faction * f,
-                const struct race * rc, int in_turn);
-        } functions;
     } settings;
 
     void set_param(struct param **p, const char *key, const char *value);

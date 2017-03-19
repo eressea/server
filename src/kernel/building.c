@@ -123,6 +123,7 @@ void free_buildingtypes(void) {
 
 building_type *bt_get_or_create(const char *name)
 {
+    assert(name && name[0]);
     if (name != NULL) {
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
@@ -767,13 +768,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
     }
 
-    /* Artsculpture: Income +5 */
-    for (b = r->buildings; b; b = b->next) {
-        if (is_building_type(b->type, "artsculpture")) {
-            wage += 5;
-        }
-    }
-
     if (r->attribs) {
         attrib *a;
         const struct curse_type *ctype;
@@ -811,10 +805,18 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
 * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
-    if (global.functions.wage) {
-        return global.functions.wage(r, f, rc, in_turn);
+    static int config;
+    static int rule_wage;
+    if (config_changed(&config)) {
+        rule_wage = config_get_int("rules.wage.function", 1);
     }
-    return default_wage(r, f, rc, in_turn);
+    if (rule_wage==0) {
+        return 0;
+    }
+    if (rule_wage==1) {
+        return default_wage(r, f, rc, in_turn);
+    }
+    return minimum_wage(r, f, rc, in_turn);
 }
 
 int cmp_wage(const struct building *b, const building * a)
@@ -913,7 +915,6 @@ int cmp_current_owner(const building * b, const building * a)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)minimum_wage, "minimum_wage");
     register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");

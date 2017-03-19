@@ -18,7 +18,7 @@ end
 function test_herbalism()
 -- OBS: herbalism is currently an E2-only skill
     local r = region.create(0, 0, "plain")
-    local f = faction.create("herbalism@eressea.de", "human", "de")
+    local f = faction.create("human", "herbalism@eressea.de", "de")
     local u = unit.create(f, r, 1)
 
     eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
@@ -39,10 +39,33 @@ function test_herbalism()
     assert_equal(98, r:get_resource("seed"))
 end
 
+function test_dwarf_bonus()
+    local r = region.create(0, 0, "mountain")
+    r:set_resource("iron", 100)
+    local level = r:get_resourcelevel("iron")
+    assert_equal(1, level)
+    local u = unit.create(faction.create("dwarf"), r)
+    assert_equal("dwarf", u.faction.race)
+    assert_equal("dwarf", u.race)
+    u.faction.name = "Zwerge"
+    u.number = 10
+    u:set_skill("mining", 1)
+    u:add_order("MACHE EISEN")
+    process_orders()
+    assert_equal(30, u:get_item("iron"))
+    assert_equal(82, r:get_resource("iron"))
+    u.building = building.create(r, "mine")
+    u.building.size = 10
+    u:add_item("money", 500) -- maintenance
+    process_orders()
+    assert_equal(70, u:get_item("iron"))
+    assert_equal(70, r:get_resource("iron"))
+end
+
 function test_build_harbour()
 -- try to reproduce mantis bug 2221
     local r = region.create(0, 0, "plain")
-    local f = faction.create("harbour@eressea.de", "human", "de")
+    local f = faction.create("human", "harbour@eressea.de", "de")
     local u = unit.create(f, r)
     size = 30
     u.number = 20
@@ -70,8 +93,8 @@ local function one_unit(r, f)
 end
 
 local function two_factions()
-  local f1 = faction.create("one@eressea.de", "human", "de")
-  local f2 = faction.create("two@eressea.de", "human", "de")
+  local f1 = faction.create("human", "one@eressea.de", "de")
+  local f2 = faction.create("human", "two@eressea.de", "de")
   return f1, f2
 end
 
@@ -82,7 +105,7 @@ end
 function test_learn()
     eressea.settings.set("study.random_progress", "0")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     f.age = 20
     local u = unit.create(f, r)
     u:clear_orders()
@@ -101,7 +124,7 @@ end
 function test_teach()
     eressea.settings.set("study.random_progress", "0")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     f.age = 20
     local u = unit.create(f, r, 10)
     local u2 = unit.create(f, r)
@@ -118,7 +141,7 @@ end
 
 function test_rename()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("human", "noreply@eressea.de", "de")
   local u = unit.create(f, r)
   u:add_item("aoh", 1)
   assert_equal(u:get_item("ao_healing"), 1)
@@ -126,7 +149,7 @@ end
 
 function test_unit_limit_is_1500()
   local r = region.create(0,0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("human", "noreply@eressea.de", "de")
   for i = 1,1500 do
     unit.create(f, r, 1)
   end
@@ -142,7 +165,7 @@ function test_ship_capacity()
     local r = region.create(0,0, "ocean")
     region.create(1,0, "ocean")
     local r2 = region.create(2,0, "ocean")
-    local f = faction.create("capacity@eressea.de", "human", "de")
+    local f = faction.create("human", "capacity@eressea.de", "de")
 
     -- u1 is at the limit and moves
     local s1 = ship.create(r, "boat")
@@ -179,7 +202,7 @@ end
 
 function test_levitate()
   local r = region.create(0,0, "plain")
-  local f = faction.create("noreply@eressea.de", "human", "de")
+  local f = faction.create("human", "noreply@eressea.de", "de")
   local u = unit.create(f, r, 2)
   local s = ship.create(r, "boat")
   u.ship = s
@@ -205,15 +228,15 @@ end
 function test_races()
   local races = { "wolf", "orc", "human", "demon" }
   for k,v in ipairs(races) do
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     assert_not_equal(nil, f)
   end
 end
 
 function test_can_give_person()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("noreply@eressea.de", "human", "de")
-  local f2 = faction.create("noreply@eressea.de", "human", "de")
+  local f1 = faction.create("human", "noreply@eressea.de", "de")
+  local f2 = faction.create("human", "noreply@eressea.de", "de")
   local u1 = unit.create(f1, r, 10)
   local u2 = unit.create(f2, r, 10)
   u1.faction.age = 10
@@ -231,7 +254,7 @@ function test_can_give_person()
 end
 
 function test_no_uruk()
-  local f1 = faction.create("noreply@eressea.de", "uruk", "de")
+  local f1 = faction.create("uruk", "noreply@eressea.de", "de")
   assert_equal(f1.race, "orc")
 end
 
@@ -326,7 +349,7 @@ end
 
 function test_stonegolems()
   local r0 = region.create(0, 0, "plain")
-  local f1 = faction.create("noreply@eressea.de", "stonegolem", "de")
+  local f1 = faction.create("stonegolem", "noreply@eressea.de", "de")
   local u1 = unit.create(f1, r0, 1)
   local u2 = unit.create(f1, r0, 2)
   local c1 = building.create(r0, "castle")
@@ -355,7 +378,7 @@ end
 
 function test_birthdaycake()
   r = region.create(0,0, "plain")
-  f = faction.create("cake@eressea.de", "human", "de")
+  f = faction.create("human", "cake@eressea.de", "de")
   u = unit.create(f, r, 1)
   u:add_item("birthdaycake", 1)
   u:clear_orders()

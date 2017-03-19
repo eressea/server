@@ -11,7 +11,7 @@ end
 function test_ship_requires_skill()
     local r1 = region.create(0, 0, "ocean")
     local r2 = region.create(1, 0, "ocean")
-    local f = faction.create("fake@eressea.de", "human", "de")
+    local f = faction.create("human", "fake@eressea.de", "de")
     local u1 = unit.create(f, r1, 1)
 	u1.name = "fake"
     u1.ship = ship.create(r1, "longboat")
@@ -25,7 +25,7 @@ end
 function no_test_ship_happy_case()
     local r1 = region.create(0, 0, "ocean")
     local r2 = region.create(1, 0, "ocean")
-    local f = faction.create("hodor@eressea.de", "human", "de")
+    local f = faction.create("human", "hodor@eressea.de", "de")
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f, r1, 1)
     u1.ship = ship.create(r1, "longboat")

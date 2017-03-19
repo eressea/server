@@ -93,9 +93,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 #include <sys/stat.h>
 
-struct settings global = {
-    "Eressea",                    /* gamename */
-};
+struct settings global;
 
 bool lomem = false;
 int turn = -1;
@@ -798,7 +796,6 @@ bool config_token(const char *key, const char *tok) {
 }
 
 void free_config(void) {
-    global.functions.wage = NULL;
     free_params(&configuration);
     ++config_cache_key;
 }
@@ -841,7 +838,7 @@ void free_gamedata(void)
 const char * game_name(void)
 {
     const char * param = config_get("game.name");
-    return param ? param : global.gamename;
+    return param ? param : "Eressea";
 }
 
 const char * game_mailcmd(void)

@@ -401,8 +401,8 @@ static int tolua_faction_get(lua_State * L)
 
 static int tolua_faction_create(lua_State * L)
 {
-    const char *email = tolua_tostring(L, 1, 0);
-    const char *racename = tolua_tostring(L, 2, 0);
+    const char *racename = tolua_tostring(L, 1, 0);
+    const char *email = tolua_tostring(L, 2, 0);
     const char *lang = tolua_tostring(L, 3, 0);
     struct locale *loc = lang ? get_locale(lang) : default_locale;
     faction *f = NULL;

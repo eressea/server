@@ -10,7 +10,7 @@ end
 
 function test_give_horses()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
 
     r:set_resource("horse", 0)
@@ -23,9 +23,9 @@ end
 
 function test_goblins()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("goblin@eressea.de", "goblin", "de")
-    local f2 = faction.create("dwarf@eressea.de", "dwarf", "de")
-    local f3 = faction.create("elf@eressea.de", "elf", "de")
+    local f1 = faction.create("goblin", "goblin@eressea.de", "de")
+    local f2 = faction.create("dwarf", "dwarf@eressea.de", "de")
+    local f3 = faction.create("elf", "elf@eressea.de", "de")
     local ud = unit.create(f1, r, 1)
     local uh = unit.create(f1, r, 1)
     uh.race = "halfling"
@@ -54,7 +54,7 @@ end
 function test_make_horse()
     eressea.settings.set("rules.horses.growth", "0")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("horses@eressea.de", "human", "de")
+    local f = faction.create("human", "horses@eressea.de", "de")
     local u = unit.create(f, r, 1)
     u:set_skill("training", 4)
     r:set_resource("horse", 100)

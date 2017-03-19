@@ -76,7 +76,6 @@ int update_nmrs(void)
 {
     int i, newplayers = 0;
     faction *f;
-    int turn = global.data_turn;
     int timeout = NMRTimeout();
 
     if (timeout>0) {

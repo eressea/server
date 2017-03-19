@@ -8,7 +8,7 @@ end
 
 function test_store_unit()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("noreply15@eressea.de", "human", "de")
+    local f = faction.create("human", "noreply15@eressea.de", "de")
     local u = unit.create(f, r, 1)
     local fid = f.id
     u:add_item("money", u.number * 100)
@@ -20,7 +20,7 @@ function test_store_unit()
     eressea.free_game()
     -- recreate world:
     r = region.create(0, 0, "plain")
-    f = faction.create("noreply16@eressea.de", "human", "de")
+    f = faction.create("human", "noreply16@eressea.de", "de")
     f.id = fid
     store = storage.create(filename, "rb")
     assert_not_nil(store)

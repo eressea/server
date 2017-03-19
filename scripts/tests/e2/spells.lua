@@ -12,7 +12,7 @@ end
 
 function test_shapeshift()
     local r = region.create(42, 0, "plain")
-    local f = faction.create("noreply@eressea.de", "demon", "de")
+    local f = faction.create("demon", "noreply@eressea.de", "de")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     u1:clear_orders()

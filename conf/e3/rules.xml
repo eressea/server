@@ -28,7 +28,4 @@
   <xi:include href="config://default/names-zombies.xml"/>
   <xi:include href="config://default/names-ghouls.xml"/>
   <xi:include href="config://default/names-dragons.xml"/>
-  <rules>
-    <function name="wage" value="minimum_wage"/>
-  </rules>
 </eressea>

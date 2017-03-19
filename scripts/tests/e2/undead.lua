@@ -8,7 +8,7 @@ end
 
 function test_undead_give_item()
     local r1 = region.create(0, 0, "plain")
-    local f1 = faction.create("hodor@eressea.de", "human", "de")
+    local f1 = faction.create("human", "hodor@eressea.de", "de")
     local u1 = unit.create(f1, r1, 1)
     u1.race = "undead"
     u1:clear_orders()
@@ -20,7 +20,7 @@ end
 
 function test_undead_dont_give_person()
     local r1 = region.create(0, 0, "plain")
-    local f1 = faction.create("hodor@eressea.de", "human", "de")
+    local f1 = faction.create("human", "hodor@eressea.de", "de")
     local u1 = unit.create(f1, r1, 2)
     u1.race = "undead"
     u1:clear_orders()

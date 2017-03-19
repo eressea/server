@@ -244,7 +244,7 @@ static faction *factionorders(void)
 
          /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
           * incrementiert wird. */
-        f->lastorders = global.data_turn + 1;
+        f->lastorders = turn + 1;
 
     }
     else {
@@ -1633,7 +1633,6 @@ int read_game(gamedata *data) {
     }
     read_attribs(data, &global.attribs, NULL);
     READ_INT(store, &turn);
-    global.data_turn = turn;
     log_debug(" - reading turn %d", turn);
     rng_init(turn);
     READ_INT(store, NULL);          /* max_unique_id = ignore */

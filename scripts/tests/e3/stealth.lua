@@ -10,9 +10,9 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
 
     local r = region.create(0,0, "plain")
-    f = faction.create("stealth1@eressea.de", "human", "de")
+    f = faction.create("human", "stealth1@eressea.de", "de")
     u = unit.create(f, r, 1)
-    f = faction.create("stealth2@eressea.de", "human", "de")
+    f = faction.create("human", "stealth2@eressea.de", "de")
 end
 
 function test_stealth_faction_on()

@@ -87,19 +87,23 @@ bool opt_cr_absolute_coords = false;
 /* globals */
 #define C_REPORT_VERSION 66
 
-#define TAG_LOCALE "de"
-#ifdef TAG_LOCALE
+struct locale *crtag_locale(void) {
+    static struct locale * lang;
+    static int config;
+    if (config_changed(&config)) {
+        const char *lname = config_get("creport.tags");
+        lang = get_locale(lname ? lname : "de");
+    }
+    return lang;
+}
+
 static const char *crtag(const char *key)
 {
     /* TODO: those locale lookups are shit, but static kills testing */
     const char *result;
-    const struct locale *lang = get_locale(TAG_LOCALE);
-    result = LOC(lang, key);
+    result = LOC(crtag_locale(), key);
     return result;
 }
-#else
-#define crtag(x) (x)
-#endif
 /*
  * translation table
  */
@@ -134,7 +138,7 @@ static const char *translate(const char *key, const char *value)
     return crtag(key);
 }
 
-static void write_translations(FILE * F)
+static void report_translations(FILE * F)
 {
     int i;
     fputs("TRANSLATION\n", F);
@@ -276,7 +280,7 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
                     stream_printf(out, "EFFECTS\n");
                 }
                 stream_printf(out, "\"%d %s\"\n", data->value, translate(key,
-                    LOC(default_locale, key)));
+                    LOC(viewer->locale, key)));
             }
             a = a->next;
         }
@@ -1148,7 +1152,7 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
                 const char *bname = border_name(b, r, f, GF_PURE);
                 bname = mkname("border", bname);
                 fprintf(F, "GRENZE %d\n", ++g);
-                fprintf(F, "\"%s\";typ\n", LOC(default_locale, bname));
+                fprintf(F, "\"%s\";typ\n", LOC(f->locale, bname));
                 fprintf(F, "%d;richtung\n", d);
                 if (!b->type->transparent(b, f))
                     fputs("1;opaque\n", F);
@@ -1680,7 +1684,9 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
         }
     }
     report_crtypes(F, f->locale);
-    write_translations(F);
+    if (f->locale!=crtag_locale()) {
+        report_translations(F);
+    }
     reset_translations();
     fclose(F);
     return 0;
