@@ -955,11 +955,11 @@ static region *readregion(struct gamedata *data, int x, int y)
             if (strcmp(name, "end") == 0)
                 break;
             res = malloc(sizeof(rawmaterial));
-            res->type = rmt_find(name);
-            if (res->type == NULL) {
+            res->rtype = rt_find(name);
+            if (!res->rtype || !res->rtype->raw) {
                 log_error("invalid resourcetype %s in data.", name);
             }
-            assert(res->type != NULL);
+            assert(res->rtype);
             READ_INT(data->store, &n);
             res->level = n;
             READ_INT(data->store, &n);
@@ -1068,7 +1068,7 @@ void writeregion(struct gamedata *data, const region * r)
         WRITE_INT(data->store, rhorses(r));
 
         while (res) {
-            WRITE_TOK(data->store, res->type->rtype->_name);
+            WRITE_TOK(data->store, res->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);

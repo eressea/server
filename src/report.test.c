@@ -95,8 +95,7 @@ static void test_report_region(CuTest *tc) {
 
     mstream_init(&out);
     r = test_create_region(0, 0, 0);
-    add_resource(r, 1, 100, 10, rt_stone);
-    r->resources->amount = 135;
+    add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
     r->land->peasants = 5;
     r->land->horses = 7;
