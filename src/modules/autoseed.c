@@ -81,20 +81,6 @@ const terrain_type *random_terrain(const terrain_type * terrains[],
     return terrain;
 }
 
-int seed_adamantium(region * r, int base)
-{
-    const resource_type *rtype = rt_find("adamantium");
-    rawmaterial *rm;
-    for (rm = r->resources; rm; rm = rm->next) {
-        if (rm->type->rtype == rtype)
-            break;
-    }
-    if (!rm) {
-        add_resource(r, 1, base, 150, rtype);
-    }
-    return 0;
-}
-
 static int count_demand(const region * r)
 {
     struct demand *dmd;

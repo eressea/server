@@ -826,7 +826,7 @@ void region_setresource(region * r, const resource_type * rtype, int value)
 {
     rawmaterial *rm = r->resources;
     while (rm) {
-        if (rm->type->rtype == rtype) {
+        if (rm->rtype == rtype) {
             rm->amount = value;
             break;
         }
@@ -840,13 +840,26 @@ void region_setresource(region * r, const resource_type * rtype, int value)
         else if (rtype == get_resourcetype(R_HORSE))
             rsethorses(r, value);
         else {
-            int i;
-            for (i = 0; r->terrain->production[i].type; ++i) {
-                const terrain_production *production = r->terrain->production + i;
-                if (production->type == rtype) {
-                    add_resource(r, 1, value, dice_rand(production->divisor), rtype);
-                    break;
+            rawmaterial *rm;
+            if (r->terrain->production) {
+                int i;
+                for (i = 0; r->terrain->production[i].type; ++i) {
+                    const terrain_production *production = r->terrain->production + i;
+                    if (production->type == rtype) {
+                        add_resource(r, 1, value, dice_rand(production->divisor), rtype);
+                        return;
+                    }
                 }
+            }
+            /* adamantium etc are not usually terraformed: */
+            for (rm = r->resources; rm; rm = rm->next) {
+                if (rm->rtype == rtype) {
+                    rm->amount = value;
+                    return;
+                }
+            }
+            if (!rm) {
+                add_resource(r, 1, value, 150, rtype);
             }
         }
     }
@@ -856,7 +869,7 @@ int region_getresource(const region * r, const resource_type * rtype)
 {
     const rawmaterial *rm;
     for (rm = r->resources; rm; rm = rm->next) {
-        if (rm->type->rtype == rtype) {
+        if (rm->rtype == rtype) {
             return rm->amount;
         }
     }
@@ -1047,8 +1060,8 @@ void terraform_region(region * r, const terrain_type * terrain)
         if (terrain->production != NULL) {
             int i;
             for (i = 0; terrain->production[i].type; ++i) {
-                if (rm->type->rtype == terrain->production[i].type) {
-                    rtype = rm->type->rtype;
+                if (rm->rtype == terrain->production[i].type) {
+                    rtype = rm->rtype;
                     break;
                 }
             }

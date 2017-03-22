@@ -36,8 +36,10 @@ void update_resources(region * r)
 {
     struct rawmaterial *res = r->resources;
     while (res) {
-        if (res->type->update)
-            res->type->update(res, r);
+        struct rawmaterial_type *raw = rmt_get(res->rtype);
+        if (raw && raw->update) {
+            raw->update(res, r);
+        }
         res = res->next;
     }
 }
@@ -55,7 +57,7 @@ static void update_resource(struct rawmaterial *res, double modifier)
     assert(res->amount > 0);
 }
 
-void
+struct rawmaterial *
 add_resource(region * r, int level, int base, int divisor,
 const resource_type * rtype)
 {
@@ -66,12 +68,11 @@ const resource_type * rtype)
     rm->level = level;
     rm->startlevel = level;
     rm->base = base;
+    rm->amount = base;
     rm->divisor = divisor;
     rm->flags = 0;
-    rm->type = rmt_get(rtype);
-    assert(rm->type);
-    update_resource(rm, 1.0);
-    rm->type->terraform(rm, r);
+    rm->rtype = rtype;
+    return rm;
 }
 
 void terraform_resources(region * r)
@@ -88,7 +89,7 @@ void terraform_resources(region * r)
         const resource_type *rtype = production->type;
 
         for (rm = r->resources; rm; rm = rm->next) {
-            if (rm->type->rtype == rtype)
+            if (rm->rtype == rtype)
                 break;
         }
         if (rm) {
@@ -96,9 +97,16 @@ void terraform_resources(region * r)
         }
 
         if (terraform_all || chance(production->chance)) {
-            add_resource(r, dice_rand(production->startlevel),
+            rawmaterial *rm;
+            rawmaterial_type *raw;
+            rm = add_resource(r, dice_rand(production->startlevel),
                 dice_rand(production->base), dice_rand(production->divisor),
                 production->type);
+            update_resource(rm, 1.0);
+            raw = rmt_get(rm->rtype);
+            if (raw && raw->terraform) {
+                raw->terraform(rm, r);
+            }
         }
     }
 }
@@ -143,7 +151,7 @@ static int visible_default(const rawmaterial * res, int skilllevel)
 /* resources are visible, if skill equals minimum skill to mine them
  * plus current level of difficulty */
 {
-    const struct item_type *itype = res->type->rtype->itype;
+    const struct item_type *itype = res->rtype->itype;
     if (res->level <= 1
         && res->level + itype->construction->minskill <= skilllevel + 1) {
         assert(res->amount > 0);
@@ -167,7 +175,7 @@ static void use_default(rawmaterial * res, const region * r, int amount)
         int i;
 
         for (i = 0; r->terrain->production[i].type; ++i) {
-            if (res->type->rtype == r->terrain->production[i].type)
+            if (res->rtype == r->terrain->production[i].type)
                 break;
         }
 
@@ -179,8 +187,9 @@ static void use_default(rawmaterial * res, const region * r, int amount)
 struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
 {
     struct rawmaterial *rm = r->resources;
-    while (rm && rm->type->rtype != rtype)
+    while (rm && rm->rtype != rtype) {
         rm = rm->next;
+    }
     return rm;
 }
 
