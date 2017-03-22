@@ -193,16 +193,6 @@ struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
     return rm;
 }
 
-struct rawmaterial_type *rmt_find(const char *str)
-{
-    resource_type *rtype = rt_find(str);
-    if (!rtype && strncmp(str, "rm_", 3) == 0) {
-        rtype = rt_find(str+3);
-    }
-    assert(rtype);
-    return rtype ? rtype->raw : NULL;
-}
-
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 {
     return rtype->raw;

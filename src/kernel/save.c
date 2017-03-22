@@ -955,6 +955,9 @@ static region *readregion(struct gamedata *data, int x, int y)
                 break;
             res = malloc(sizeof(rawmaterial));
             res->rtype = rt_find(name);
+            if (!res->rtype && strncmp("rm_", name, 3) == 0) {
+                res->rtype = rt_find(name + 3);
+            }
             if (!res->rtype || !res->rtype->raw) {
                 log_error("invalid resourcetype %s in data.", name);
             }

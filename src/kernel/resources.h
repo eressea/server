@@ -65,7 +65,6 @@ extern "C" {
     void terraform_resources(struct region *r);
     struct rawmaterial *rm_get(struct region *,
         const struct resource_type *);
-    struct rawmaterial_type *rmt_find(const char *str);
     struct rawmaterial_type *rmt_get(const struct resource_type *);
 
     struct rawmaterial *add_resource(struct region *r, int level, 
