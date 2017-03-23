@@ -73,6 +73,7 @@ extern "C" {
         void(*age) (struct building *);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;
+        struct resource_mod *modifiers;
     } building_type;
 
     extern struct selist *buildingtypes;

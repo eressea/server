@@ -49,5 +49,11 @@ function test_adamantium2()
   process_orders()
   assert_equal(1, u1:get_item("adamantium"))
   assert_equal(adamantium - 1, r:get_resource("adamantium"))
+
+  -- mines give +1 to mining. mining 16 should give 2 adamantium
+  u1:set_skill("mining", 15)
+  process_orders()
+  assert_equal(3, u1:get_item("adamantium"))
+  assert_equal(adamantium - 3, r:get_resource("adamantium"))
 end
 
