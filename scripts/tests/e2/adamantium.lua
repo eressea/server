@@ -22,21 +22,22 @@ end
 
 function test_adamantium1()
   local r, u1 = _test_create_adamantium()
-  
+
   u1:add_item("money", 1000)
-  u1:set_skill("mining", 14)
+  u1:set_skill("mining", 8)
   u1:clear_orders()
   u1:add_order("MACHEN Adamantium")
  
   process_orders()
+  -- adamantium needs a mine, so nothing happens:
   assert_equal(0, u1:get_item("adamantium"))
 end
 
 function test_adamantium2()
   local r, u1 = _test_create_adamantium()
-  
+  u1.id = 42
   u1:add_item("money", 1000)
-  u1:set_skill("mining", 15)
+  u1:set_skill("mining", 8)
   u1:clear_orders()
   u1:add_order("MACHEN Adamantium")
 
