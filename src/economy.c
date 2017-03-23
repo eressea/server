@@ -923,7 +923,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     allocation *al;
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
-    variant save_mod = frac_make(1, 1);
+    variant save_mod;
 
     /* momentan kann man keine ressourcen abbauen, wenn man daf�r
      * Materialverbrauch hat: */
@@ -950,15 +950,9 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
             return;
         }
     }
-    if (u->building && u->building->type->modifiers) {
-        building *b = inside_building(u);
-        if (b) {
-            message *msg = get_modifiers(u, b->type->modifiers, &save_mod, &skill_mod);
-            if (msg) {
-                ADDMSG(&u->faction->msgs, msg);
-                return;
-            }
-        }
+    else {
+        save_mod.sa[0] = 1;
+        save_mod.sa[1] = 1;
     }
 
     /* Bergw�chter k�nnen Abbau von Eisen/Laen durch Bewachen verhindern.
