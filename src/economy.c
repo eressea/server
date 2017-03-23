@@ -1170,7 +1170,6 @@ static allocate_function get_allocator(const struct resource_type *rtype)
 void split_allocations(region * r)
 {
     allocation_list **p_alist = &allocations;
-    freset(r, RF_SELECT);
     while (*p_alist) {
         allocation_list *alist = *p_alist;
         const resource_type *rtype = alist->type;
@@ -1178,7 +1177,6 @@ void split_allocations(region * r)
         const item_type *itype = resource2item(rtype);
         allocation **p_al = &alist->data;
 
-        freset(r, RF_SELECT);
         alloc(rtype, r, alist->data);
 
         while (*p_al) {
@@ -1187,7 +1185,6 @@ void split_allocations(region * r)
                 assert(itype || !"not implemented for non-items");
                 i_change(&al->unit->items, itype, al->get);
                 produceexp(al->unit, itype->construction->skill, al->unit->number);
-                fset(r, RF_SELECT);
             }
             if (al->want == INT_MAX)
                 al->want = al->get;
