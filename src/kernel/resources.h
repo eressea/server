@@ -24,7 +24,7 @@ extern "C" {
     };
 
     typedef struct rawmaterial {
-        const struct rawmaterial_type *type;
+        const struct resource_type *rtype;
 #ifdef LOMEM
         int amount:16;
         int level:8;
@@ -65,11 +65,10 @@ extern "C" {
     void terraform_resources(struct region *r);
     struct rawmaterial *rm_get(struct region *,
         const struct resource_type *);
-    struct rawmaterial_type *rmt_find(const char *str);
     struct rawmaterial_type *rmt_get(const struct resource_type *);
 
-    void add_resource(struct region *r, int level, int base, int divisor,
-        const struct resource_type *rtype);
+    struct rawmaterial *add_resource(struct region *r, int level, 
+        int base, int divisor, const struct resource_type *rtype);
     struct rawmaterial_type *rmt_create(struct resource_type *rtype);
 
     extern int(*res_limit_fun)(const struct region *, const struct resource_type *);

@@ -383,14 +383,14 @@ static void test_make_item(CuTest *tc) {
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
     rmt_create(rtype);
-    add_resource(u->region, 1, 300, 150, rtype);
-    u->region->resources->amount = 300; /* there are 300 stones at level 1 */
+    add_resource(u->region, 1, 300, 150, rtype); /* there are 300 stones at level 1 */
+    CuAssertIntEquals(tc, 300, region_getresource(u->region, rtype));
     set_level(u, SK_ALCHEMY, 10);
 
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 11, get_item(u, itype));
-    CuAssertIntEquals(tc, 290, u->region->resources->amount); /* used 10 stones to make 10 stones */
+    CuAssertIntEquals(tc, 290, region_getresource(u->region, rtype)); /* used 10 stones to make 10 stones */
 
     rtype->modifiers = calloc(2, sizeof(resource_mod));
     rtype->modifiers[0].flags = RMF_SAVEMATERIAL;
@@ -400,18 +400,18 @@ static void test_make_item(CuTest *tc) {
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 21, get_item(u, itype));
-    CuAssertIntEquals(tc, 284, u->region->resources->amount); /* 60% saving = 6 stones make 10 stones */
+    CuAssertIntEquals(tc, 284, region_getresource(u->region, rtype)); /* 60% saving = 6 stones make 10 stones */
 
     make_item(u, itype, 1);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 22, get_item(u, itype));
-    CuAssertIntEquals(tc, 283, u->region->resources->amount); /* no free lunches */
+    CuAssertIntEquals(tc, 283, region_getresource(u->region, rtype)); /* no free lunches */
 
     rtype->modifiers[0].value = frac_make(1, 2);
     make_item(u, itype, 6);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 28, get_item(u, itype));
-    CuAssertIntEquals(tc, 280, u->region->resources->amount); /* 50% saving = 3 stones make 6 stones */
+    CuAssertIntEquals(tc, 280, region_getresource(u->region, rtype)); /* 50% saving = 3 stones make 6 stones */
 
     rtype->modifiers[0].flags = RMF_REQUIREDBUILDING;
     rtype->modifiers[0].race = NULL;

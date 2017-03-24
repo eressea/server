@@ -448,12 +448,13 @@ const faction * viewer, bool see_unit)
         rawmaterial *res = r->resources;
         while (res) {
             int maxskill = 0;
-            const item_type *itype = resource2item(res->type->rtype);
+            const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
             skill_t skill = itype->construction->skill;
             int level = res->level + minskill - 1;
             int visible = -1;
-            if (res->type->visible == NULL) {
+            rawmaterial_type *raw = rmt_get(res->rtype);
+            if (raw->visible == NULL) {
                 visible = res->amount;
                 level = res->level + minskill - 1;
             }
@@ -464,7 +465,7 @@ const faction * viewer, bool see_unit)
                         int s = effskill(u, skill, 0);
                         if (s > maxskill) {
                             maxskill = s;
-                            visible = res->type->visible(res, maxskill);
+                            visible = raw->visible(res, maxskill);
                         }
                     }
                 }
@@ -472,7 +473,7 @@ const faction * viewer, bool see_unit)
             if (level >= 0 && visible >= 0) {
                 if (n >= size)
                     return -1;
-                report_resource(result + n, res->type->rtype, visible, level);
+                report_resource(result + n, res->rtype, visible, level);
                 n++;
             }
             res = res->next;
