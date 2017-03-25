@@ -1,5 +1,7 @@
 #pragma once
 
+#define _LP64 0 /* fix a warning in pdcurses 3.4 */
+
 #ifndef UNILIB_H
 #define UNILIB_H
 
