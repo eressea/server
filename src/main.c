@@ -82,9 +82,11 @@ static const char * valid_keys[] = {
     "game.memcheck",
     "game.email",
     "game.mailcmd",
+    "game.era",
     "game.sender",
     "editor.color",
     "editor.codepage",
+    "editor.population.",
     "lua.",
     NULL
 };

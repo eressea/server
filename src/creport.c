@@ -1501,7 +1501,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     static int rc_cache;
 
     if (era < 0) {
-        era = config_get_int("world.era", 1);
+        era = config_get_int("game.era", 1);
     }
     if (F == NULL) {
         perror(filename);
