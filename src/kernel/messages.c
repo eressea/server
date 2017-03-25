@@ -86,9 +86,6 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     variant var;
     memset(args, 0, sizeof(args));
 
-    if (ord == NULL)
-        ord = u->thisorder;
-
     if (!mtype) {
         log_warning("trying to create message of unknown type \"%s\"\n", name);
         if (!mt_find("missing_feedback")) {
@@ -248,8 +245,12 @@ void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 message * msg_error(const unit * u, struct order *ord, int mno) {
     static char msgname[20];
 
-    if (fval(u->faction, FFL_NPC))
-        return 0;
+    if (ord && ord->_noerror) {
+        return NULL;
+    }
+    if (fval(u->faction, FFL_NPC)) {
+        return NULL;
+    }
     sprintf(msgname, "error%d", mno);
     return msg_feedback(u, ord, msgname, "");
 }
@@ -259,7 +260,9 @@ message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
     message * result;
     UNUSED_ARG(mtype);
     result = msg_error(u, ord, mno);
-    ADDMSG(&u->faction->msgs, result);
+    if (result) {
+        ADDMSG(&u->faction->msgs, result);
+    }
     return result;
 }
 
@@ -267,7 +270,9 @@ void syntax_error(const struct unit *u, struct order *ord)
 {
     message * result;
     result = msg_error(u, ord, 10);
-    ADDMSG(&u->faction->msgs, result);
+    if (result) {
+        ADDMSG(&u->faction->msgs, result);
+    }
 }
 
 void free_messagelist(mlist *msgs)

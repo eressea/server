@@ -137,6 +137,7 @@ static void test_piracy_cmd_errors(CuTest * tc) {
     u_set_ship(u, test_create_ship(u->region, st_boat));
 
     u2 = test_create_unit(u->faction, u->region);
+    u2->thisorder = create_order(K_PIRACY, f->locale, "");
     u_set_ship(u2, u->ship);
 
     test_clear_messages(f);

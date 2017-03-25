@@ -16,6 +16,7 @@ function setup()
                 "attack" : "ATTACKIERE",
                 "maketemp" : "MACHETEMP",
                 "end" : "ENDE",
+                "use" : "BENUTZEN",
                 "recruit" : "REKRUTIERE"
             }
         },
