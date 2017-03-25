@@ -82,6 +82,7 @@ static void test_noerror(CuTest *tc) {
     CuAssertTrue(tc, u->thisorder->_persistent);
     CuAssertTrue(tc, u->thisorder->_noerror);
     CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
+    CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
     test_cleanup();
 }
 
