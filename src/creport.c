@@ -1184,7 +1184,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
-            const char * name = resourcename(result[n].rtype, result[n].number != 1);
+            const char * name = resourcename(result[n].rtype, 1);
             assert(name);
             stream_printf(out, "%d;%s\n", result[n].number, crtag(name));
         }
