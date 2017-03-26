@@ -38,7 +38,7 @@ function test_laen_needs_mine()
     turn_end()
 end
 
-function bad_test_mine_laen_bonus()
+function test_mine_laen_bonus()
     -- some buildings grant a bonus on the production skill
     -- i.e. a mine adds +1 to mining
     local r = region.create(0, 0, 'mountain')
