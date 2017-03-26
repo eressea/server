@@ -11,6 +11,46 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
 end
 
+function test_mine_bonus()
+    local r = region.create(0, 0, "mountain")
+    r:set_resource("iron", 100)
+    local level = r:get_resourcelevel("iron")
+    assert_equal(1, level)
+    local u = unit.create(faction.create("human"), r)
+    u.number = 10
+    u:set_skill("mining", 1)
+    u:add_order("MACHE EISEN")
+    process_orders()
+    assert_equal(10, u:get_item("iron"))
+    assert_equal(90, r:get_resource("iron"))
+
+    u.building = building.create(r, "mine")
+    u.building.size = 10
+    u:add_item("money", 500) -- maintenance
+    process_orders()
+    assert_equal(30, u:get_item("iron"))
+    assert_equal(80, r:get_resource("iron"))
+end
+
+function test_smithy_bonus()
+    local r = region.create(0, 0, "mountain")
+    local u = unit.create(faction.create("human"), r)
+    u:set_skill("weaponsmithing", 5)
+    u:add_item("iron", 20)
+    u:add_order("MACHE SCHWERT")
+    process_orders()
+    assert_equal(1, u:get_item('sword'))
+    assert_equal(19, u:get_item('iron'))
+
+    u.building = building.create(r, "smithy")
+    u.building.size = 10
+    u:add_item("money", 300) -- maintenance
+    u:add_item("log", 1) -- maintenance
+    process_orders()
+    assert_equal(3, u:get_item('sword'))
+    assert_equal(18, u:get_item('iron'))
+end
+
 function test_no_guards()
     local r = region.create(0, 0, "plain")
     r:set_resource("tree", 100)

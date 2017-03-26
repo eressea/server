@@ -4,6 +4,7 @@
     <construction skill="mining" minskill="7"/>
   </item>
   <resourcelimit>
+    <modifier building="mine" type="skill" value="1"/>
     <modifier type="require" building="mine"/>
   </resourcelimit>
 </resource>

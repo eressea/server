@@ -26,6 +26,7 @@ without prior permission by the authors of Eressea.
 /*  kernel includes */
 #include <kernel/building.h>
 #include <kernel/config.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -770,6 +771,21 @@ static int tolua_unit_get_orders(lua_State * L)
     return 1;
 }
 
+static int tolua_unit_is_cursed(lua_State *L) {
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    lua_pushboolean(L, self->attribs && curse_active(get_curse(self->attribs, ct_find(name))));
+    return 1;
+}
+
+static int tolua_unit_has_attrib(lua_State *L) {
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    attrib * a = a_find(self->attribs, at_find(name));
+    lua_pushboolean(L, a != NULL);
+    return 1;
+}
+
 static int tolua_unit_get_flag(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -955,6 +971,9 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "add_order", &tolua_unit_add_order);
             tolua_function(L, TOLUA_CAST "clear_orders", &tolua_unit_clear_orders);
             tolua_variable(L, TOLUA_CAST "orders", &tolua_unit_get_orders, 0);
+
+            tolua_function(L, TOLUA_CAST "is_cursed", &tolua_unit_is_cursed);
+            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_unit_has_attrib);
 
             /*  key-attributes for named flags: */
             tolua_function(L, TOLUA_CAST "set_flag", &tolua_unit_set_flag);

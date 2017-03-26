@@ -1091,7 +1091,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
             avail = MIN(avail, nreq);
             if (need > 0) {
                 int use = 0;
-                for (al = alist; al; al = al->next)
+                for (al = alist; al; al = al->next) {
                     if (!fval(al, AFL_DONE)) {
                         if (avail > 0) {
                             int want = required(al->want - al->get, al->save);
@@ -1106,9 +1106,13 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             al->get = MIN(al->want, al->get + x * al->save.sa[1] / al->save.sa[0]);
                         }
                     }
+                }
                 if (use) {
-                    assert(use <= rm->amount);
-                    rm->type->use(rm, r, use);
+                    rawmaterial_type *raw = rmt_get(rm->rtype);
+                    if (raw && raw->use) {
+                        assert(use <= rm->amount);
+                        raw->use(rm, r, use);
+                    }
                 }
                 assert(avail == 0 || nreq == 0);
             }

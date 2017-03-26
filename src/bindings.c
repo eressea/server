@@ -480,41 +480,27 @@ static int tolua_write_reports(lua_State * L)
     return 1;
 }
 
-static void reset_game(void)
-{
-    region *r;
-    faction *f;
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        building *b;
-        r->flags &= RF_SAVEMASK;
-        for (u = r->units; u; u = u->next) {
-            u->flags &= UFL_SAVEMASK;
-        }
-        for (b = r->buildings; b; b = b->next) {
-            b->flags &= BLD_SAVEMASK;
-        }
-        if (r->land && r->land->ownership && r->land->ownership->owner) {
-            faction *owner = r->land->ownership->owner;
-            if (owner == get_monsters()) {
-                /* some compat-fix, i believe. */
-                owner = update_owners(r);
-            }
-            if (owner) {
-                fset(r, RF_GUARDED);
-            }
-        }
-    }
-    for (f = factions; f; f = f->next) {
-        f->flags &= FFL_SAVEMASK;
-    }
-}
-
 static int tolua_process_orders(lua_State * L)
 {
-    ++turn;
-    reset_game();
     processorders();
+    return 0;
+}
+
+static int tolua_turn_begin(lua_State * L)
+{
+    turn_begin();
+    return 0;
+}
+
+static int tolua_turn_process(lua_State * L)
+{
+    turn_process();
+    return 0;
+}
+
+static int tolua_turn_end(lua_State * L)
+{
+    turn_end();
     return 0;
 }
 
@@ -1063,6 +1049,9 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
+        tolua_function(L, TOLUA_CAST "turn_begin", tolua_turn_begin);
+        tolua_function(L, TOLUA_CAST "turn_process", tolua_turn_process);
+        tolua_function(L, TOLUA_CAST "turn_end", tolua_turn_end);
         tolua_function(L, TOLUA_CAST "process_orders", tolua_process_orders);
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
         tolua_function(L, TOLUA_CAST "write_reports", tolua_write_reports);
