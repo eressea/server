@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include "region.h"
+#include "resources.h"
 #include "building.h"
 #include "unit.h"
 #include "terrain.h"
@@ -52,10 +53,36 @@ static void test_region_get_owner(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_region_getset_resource(CuTest *tc) {
+    region *r;
+    item_type *itype;
+
+    test_setup();
+    init_resources();
+    itype = test_create_itemtype("iron");
+    itype->construction = calloc(1, sizeof(construction));
+    rmt_create(itype->rtype);
+    r = test_create_region(0, 0, NULL);
+
+    region_setresource(r, itype->rtype, 50);
+    CuAssertIntEquals(tc, 50, region_getresource(r, itype->rtype));
+
+    region_setresource(r, get_resourcetype(R_HORSE), 10);
+    CuAssertIntEquals(tc, 10, region_getresource(r, get_resourcetype(R_HORSE)));
+    CuAssertIntEquals(tc, 10, rhorses(r));
+
+    region_setresource(r, get_resourcetype(R_PEASANT), 10);
+    CuAssertIntEquals(tc, 10, region_getresource(r, get_resourcetype(R_PEASANT)));
+    CuAssertIntEquals(tc, 10, rpeasants(r));
+
+    test_cleanup();
+}
+
 CuSuite *get_region_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_terraform);
+    SUITE_ADD_TEST(suite, test_region_getset_resource);
     SUITE_ADD_TEST(suite, test_region_get_owner);
     return suite;
 }
