@@ -5,6 +5,10 @@ local function _test_create_ship(r)
     return s
 end
 
+local function create_faction(race)
+    return faction.create(race, race .. '@eressea.de', "de")
+end
+
 local function one_unit(r, f)
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 100)
@@ -17,8 +21,8 @@ local function two_units(r, f1, f2)
 end
 
 local function two_factions()
-  local f1 = faction.create("human", "one@eressea.de", "de")
-  local f2 = faction.create("elf", "two@eressea.de", "de")
+  local f1 = create_faction('human')
+  local f2 = create_faction('elf')
   return f1, f2
 end
 
@@ -44,7 +48,7 @@ end
 
 function test_flags()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("halfling", "flags@eressea.de", "de")
+    local f = create_faction('halfling')
     local u = unit.create(f, r, 1)
     local no = itoa36(f.id)
     local flags = 50332673
@@ -62,7 +66,7 @@ function test_elvenhorse_requires_riding_5()
     local r = region.create(0, 0, "plain")
     region.create(1, 0, "plain")
     local goal = region.create(2, 0, "plain")
-    local f = faction.create("halfling", "riding@eressea.de", "de")
+    local f = create_faction('halfling')
     local u = unit.create(f, r, 1)
     u:add_item("elvenhorse", 1)
     u:set_skill("riding", 6)-- halfling has -1 modifier
@@ -76,7 +80,7 @@ function test_cannot_ride_elvenhorse_without_enough_skill()
     local r = region.create(0, 0, "plain")
     local goal = region.create(1, 0, "plain")
     region.create(2, 0, "plain")
-    local f = faction.create("halfling", "elvenhorse@eressea.de", "de")
+    local f = create_faction('halfling')
     local u = unit.create(f, r, 1)
     u:add_item("elvenhorse", 1)
     u:set_skill("riding", 5) -- halfling has -1 modifier
@@ -96,7 +100,7 @@ end
 
 function test_demon_food()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("demon", "demonfood@eressea.de", "de")
+    local f = create_faction('demon')
     local u = unit.create(f, r, 1)
     local p = r:get_resource("peasant")
     r:set_resource("peasant", 2000)
@@ -136,7 +140,7 @@ function test_plane()
   local nx, ny = plane.normalize(pl, 4, 4)
   assert_equal(nx, -3, "normalization failed")
   assert_equal(ny, -3, "normalization failed")
-  local f = faction.create("human", "plan@eressea.de", "de")
+  local f = create_faction('human')
   f.id = atoi36("tpla")
   local r, x, y
   for x = -3, 3 do for y = -3, 3 do
@@ -155,7 +159,7 @@ end
 
 function test_read_write()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "readwrite@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r)
   u.number = 2
   local fno = f.id
@@ -184,7 +188,7 @@ end
 function test_descriptions()
     local info = "Descriptions can be very long. Bug 1984 behauptet, dass es Probleme gibt mit Beschreibungen die laenger als 120 Zeichen sind. This description is longer than 120 characters."
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "descriptions@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
     local s = _test_create_ship(r)
     local b = building.create(r, "castle")
@@ -236,7 +240,7 @@ end
 
 function test_faction()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "testfaction@eressea.de", "de")
+    local f = create_faction('human')
     assert(f)
     f.info = "Spazz"
     assert(f.info=="Spazz")
@@ -259,7 +263,7 @@ end
 
 function test_unit()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "testunit@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r)
     u.number = 20
     u.name = "Enno"
@@ -292,7 +296,7 @@ end
 
 function test_building()
   local u
-  local f = faction.create("human", "testbuilding@eressea.de", "de")
+  local f = create_faction('human')
   local r = region.create(0, 0, "plain")
   local b = building.create(r, "castle")
   u = unit.create(f, r)
@@ -318,7 +322,7 @@ end
 
 function test_message()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "testmessage@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r)
   local msg = message.create("item_create_spell")
   msg:set_unit("mage", u)
@@ -346,7 +350,7 @@ function test_events()
   plain = region.create(0, 0, "plain")
   skill = 8
 
-  f = faction.create("elf", "noreply2@eressea.de", "de")
+  f = create_faction('elf')
   f.age = 20
 
   u = unit.create(f, plain)
@@ -356,7 +360,7 @@ function test_events()
   u:add_order("NUMMER PARTEI test")
   u:add_handler("message", msg_handler)
   msg = "BOTSCHAFT EINHEIT " .. itoa36(u.id) .. " Du~Elf~stinken"
-  f = faction.create("elf", "noreply3@eressea.de", "de")
+  f = create_faction('elf')
   f.age = 20
 
   u = unit.create(f, plain)
@@ -371,7 +375,7 @@ end
 
 function test_renumber_ship()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply4@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r)
     local s = ship.create(r, config.ships[1])
     u.ship = s
@@ -386,7 +390,7 @@ end
 
 function test_recruit2()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply4@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r)
     u.number = 1
     u:add_item("money", 2000)
@@ -401,7 +405,7 @@ end
 function test_guard()
   region.create(1, 0, "plain")
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("human", "noreply5@eressea.de", "de")
+  local f1 = create_faction('human')
   f1.age = 20
   local u1 = unit.create(f1, r, 10)
   u1:add_item("sword", 10)
@@ -411,7 +415,7 @@ function test_guard()
   u1:add_order("NACH O")
   u1.name="Kalle Pimp"
 
-  local f2 = faction.create("human", "noreply6@eressea.de", "de")
+  local f2 = create_faction('human')
   f2.age = 20
   local u2 = unit.create(f2, r, 1)
   local u3 = unit.create(f2, r, 1)
@@ -429,7 +433,7 @@ end
 
 function test_recruit()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "noreply7@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r)
   u.number = 1
   local n = 3
@@ -445,7 +449,7 @@ end
 
 function test_produce()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "noreply8@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r, 1)
   u:clear_orders()
   local sword = config.get_resource('sword')
@@ -460,7 +464,7 @@ end
 
 function test_work()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "noreply9@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r, 1)
   u:add_item("money", u.number * 10) -- humans cost 10
   u:set_skill("herbalism", 5)
@@ -473,7 +477,7 @@ end
 function test_upkeep()
     eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply10@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 5)
     u:add_item("money", u.number * 11)
     u:clear_orders()
@@ -485,7 +489,7 @@ end
 function test_id()
   local r = region.create(0, 0, "plain")
 
-  local f = faction.create("human", "noreply11@eressea.de", "de")
+  local f = create_faction('human')
   f.id = atoi36("42")
   assert_not_equal(f, get_faction(42))
   assert_equal(f, get_faction("42"))
@@ -521,7 +525,7 @@ function test_mallorn()
     m:set_resource("tree", 100)
     assert_equal(100, m:get_resource("tree"))
 
-    local f = faction.create("human", "noreply13@eressea.de", "de")
+    local f = create_faction('human')
 
     local u1 = unit.create(f, r, 1)
     u1:add_item("money", u1.number * 100)
@@ -558,7 +562,7 @@ function test_coordinate_translation()
     local pl = plane.create(1, 500, 500, 1001, 1001) -- astralraum
     local pe = plane.create(1, -8761, 3620, 23, 23) -- eternath
     local r = region.create(1000, 1000, "plain")
-    local f = faction.create("human", "noreply14@eressea.de", "de")
+    local f = create_faction('human')
     assert_not_equal(nil, r)
     assert_equal(r.x, 1000)
     assert_equal(r.y, 1000)
@@ -604,8 +608,8 @@ end
 
 function test_building_other()
     local r = region.create(0,0, "plain")
-    local f1 = faction.create("human", "noreply17@eressea.de", "de")
-    local f2 = faction.create("human", "noreply18@eressea.de", "de")
+    local f1 = create_faction('human')
+    local f2 = create_faction('human')
     local b = building.create(r, "castle")
     b.size = 10
     local u1 = unit.create(f1, r, 3)
@@ -632,7 +636,7 @@ end
 local function _test_create_laen()
     eressea.settings.set("rules.terraform.all", "1")
     local r = region.create(0,0, "mountain")
-    local f1 = faction.create("human", "noreply19@eressea.de", "de")
+    local f1 = create_faction('human')
     local u1 = unit.create(f1, r, 1)
     r:set_resource("laen", 50)
     return r, u1
@@ -671,7 +675,7 @@ end
 
 function test_mine()
   local r = region.create(0,0, "mountain")
-  local f1 = faction.create("human", "noreply20@eressea.de", "de")
+  local f1 = create_faction('human')
   local u1 = unit.create(f1, r, 1)
   
   u1:add_item("money", 1000)
@@ -692,9 +696,9 @@ end
 function test_guard_resources()
   -- this is not quite http://bugs.eressea.de/view.php?id=1756
   local r = region.create(0,0, "mountain")
-  local f1 = faction.create("human", "noreply21@eressea.de", "de")
+  local f1 = create_faction('human')
   f1.age=20
-  local f2 = faction.create("human", "noreply22@eressea.de", "de")
+  local f2 = create_faction('human')
   f2.age=20
   local u1 = unit.create(f1, r, 1)
   u1:add_item("money", 100)
@@ -722,7 +726,7 @@ end
 
 function test_hero_hero_transfer()
   local r = region.create(0,0, "mountain")
-  local f = faction.create("human", "noreply23@eressea.de", "de")
+  local f = create_faction('human')
   f.age=20
   local UFL_HERO = 128
   
@@ -743,7 +747,7 @@ end
 
 function test_hero_normal_transfer()
   local r = region.create(0,0, "mountain")
-  local f = faction.create("human", "noreply24@eressea.de", "de")
+  local f = create_faction('human')
   f.age=20
   local UFL_HERO = 128
   
@@ -762,7 +766,7 @@ end
 
 function test_expensive_skills_cost_money()
   local r = region.create(0,0, "mountain")
-  local f = faction.create("elf", "noreply25@eressea.de", "de")
+  local f = create_faction('elf')
   local u = unit.create(f, r, 1)
   u:add_item("money", 10000)
   u:clear_orders()
@@ -775,7 +779,7 @@ end
 
 function test_food_is_consumed()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "noreply26@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r, 1)
   u:add_item("money", 100)
   u:clear_orders()
@@ -787,7 +791,7 @@ end
 
 function test_food_can_override()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "noreply27@eressea.de", "de")
+  local f = create_faction('human')
   local u = unit.create(f, r, 1)
   u:add_item("money", 100)
   u:clear_orders()
@@ -799,7 +803,7 @@ end
 
 function test_swim_and_survive()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply28@eressea.de", "de")
+    local f = create_faction('human')
     f.nam = "chaos"
     local u = unit.create(f, r, 1)
     process_orders()
@@ -813,7 +817,7 @@ end
 
 function test_swim_and_die()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply29@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
     local uid = u.id
     process_orders()
@@ -828,7 +832,7 @@ function test_ride_with_horse()
     region.create(1, 0, "plain")
     region.create(2, 0, "plain")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply30@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
     u:add_item("horse", 1)
     local horse_cfg = config.get_resource("horse")
@@ -851,7 +855,7 @@ function test_ride_with_horses_and_cart()
     region.create(1, 0, "plain")
     region.create(2, 0, "plain")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply31@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
     local horse_cfg = config.get_resource("horse")
     local cart_cfg = config.get_resource("cart")
@@ -904,7 +908,7 @@ function test_walk_and_carry_the_cart()
     region.create(1, 0, "plain")
     local r = region.create(2, 0, "plain")
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply32@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 10)
     u:add_item("cart", 1)
 
@@ -925,7 +929,7 @@ end
 
 function test_bug_1795_limit()
   local r = region.create(0, 0, "plain")    
-  local f = faction.create("human", "noreply@eressea.de", "de")
+  local f = create_faction('human')
   local u1 = one_unit(r,f) 
   u1:add_item("money", 100000000)
   u1:add_order("REKRUTIEREN 9999")
@@ -940,7 +944,7 @@ end
 
 function test_bug_1795_demons()
   local r = region.create(0, 0, "plain")    
-  local f = faction.create("demon", "noreply@eressea.de", "de")
+  local f = create_faction('demon')
   local u1 = one_unit(r,f) 
   r:set_resource("peasant", 2000)
   local peasants = r:get_resource("peasant")
@@ -966,7 +970,7 @@ end
 
 function test_parser()
     local r = region.create(0, 0, "mountain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
     local filename = "orders.txt"
     
@@ -991,7 +995,7 @@ end
 
 function test_prefix()
     local r0 = region.create(0, 0, "plain")
-    local f1 = faction.create("human", "noreply@eressea.de", "de")
+    local f1 = create_faction('human')
     local u1 = unit.create(f1, r0, 1)
 
     set_order(u1, "PRAEFIX See")
@@ -1018,7 +1022,7 @@ end
 
 function test_recruit()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = create_faction('human')
     local u = unit.create(f, r, 1)
 
     u:add_item("money", 1000)
