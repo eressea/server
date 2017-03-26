@@ -50,7 +50,7 @@ function test_adamantium2()
   local adamantium = r:get_resource("adamantium")
 
   process_orders()
-  assert_equal(1, u1:get_item("adamantium"))
-  assert_equal(adamantium - 1, r:get_resource("adamantium"))
+  assert_equal(2, u1:get_item("adamantium"))
+  assert_equal(adamantium - 2, r:get_resource("adamantium"))
 end
 
