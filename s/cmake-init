@@ -10,6 +10,7 @@ ROOT=$(git rev-parse --show-toplevel)
 MACHINE=`$CC -dumpmachine`
 [ -z $MACHINE ] && MACHINE=`uname -m`
 BIN_DIR="$ROOT/build-$MACHINE-$CC-$BUILD"
+rm -rf $BIN_DIR
 mkdir -p $BIN_DIR
 rm -f $BUILD
 ln -sf $BIN_DIR $BUILD
@@ -29,10 +30,8 @@ if [ -d $HOME/usr ]; then
 fi
 
 DEST=$(dirname $ROOT)/server
-ARGS=" -DCMAKE_MODULE_PATH=$ROOT/cmake/Modules \
- -DCMAKE_BUILD_TYPE=$BUILD \
+ARGS=" -DCMAKE_BUILD_TYPE=$BUILD \
  -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
- -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH \
  -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
  -DCMAKE_INSTALL_PREFIX=$DEST"
 
