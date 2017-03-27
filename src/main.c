@@ -75,6 +75,7 @@ static void load_inifile(void)
 static const char * valid_keys[] = {
     "game.id",
     "game.name",
+    "game.start",
     "game.locale",
     "game.verbose",
     "game.report",
