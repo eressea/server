@@ -1,6 +1,9 @@
 #include <platform.h>
 #include "messages.h"
 
+#include "unit.h"
+#include "order.h"
+
 #include <CuTest.h>
 #include <tests.h>
 
@@ -68,11 +71,27 @@ static void test_merge_split(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_noerror(CuTest *tc) {
+    unit *u;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->thisorder = parse_order("!@move", lang);
+    CuAssertTrue(tc, u->thisorder->_persistent);
+    CuAssertTrue(tc, u->thisorder->_noerror);
+    CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
+    CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    test_cleanup();
+}
+
 CuSuite *get_messages_suite(void) {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_missing_message);
     SUITE_ADD_TEST(suite, test_merge_split);
     SUITE_ADD_TEST(suite, test_message);
+    SUITE_ADD_TEST(suite, test_noerror);
     return suite;
 }
 

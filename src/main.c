@@ -75,6 +75,7 @@ static void load_inifile(void)
 static const char * valid_keys[] = {
     "game.id",
     "game.name",
+    "game.start",
     "game.locale",
     "game.verbose",
     "game.report",
@@ -82,9 +83,11 @@ static const char * valid_keys[] = {
     "game.memcheck",
     "game.email",
     "game.mailcmd",
+    "game.era",
     "game.sender",
     "editor.color",
     "editor.codepage",
+    "editor.population.",
     "lua.",
     NULL
 };

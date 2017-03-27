@@ -1100,10 +1100,10 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
 {
     const char *name, *tname;
     assert(rtype);
-    name = resourcename(rtype, 1);
+    name = resourcename(rtype, NMF_PLURAL);
     assert(name);
     buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
-    tname = LOC(loc, rtype->_name);
+    tname = LOC(loc, name);
     assert(tname);
     tname = translate(name, tname);
     assert(tname);
@@ -1188,7 +1188,7 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
     }
     for (n = 0; n < size; ++n) {
         if (result[n].level >= 0 && result[n].number >= 0) {
-            const char * name = resourcename(result[n].rtype, result[n].number != 1);
+            const char * name = resourcename(result[n].rtype, 1);
             assert(name);
             stream_printf(out, "%d;%s\n", result[n].number, crtag(name));
         }
@@ -1501,7 +1501,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     static int rc_cache;
 
     if (era < 0) {
-        era = config_get_int("world.era", 1);
+        era = config_get_int("game.era", 1);
     }
     if (F == NULL) {
         perror(filename);

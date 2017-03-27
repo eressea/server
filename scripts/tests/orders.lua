@@ -20,6 +20,18 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
+function test_no_errors()
+    turn_begin()
+    u:add_order("!BENUTZEN 23 Yanxspirit")
+    turn_process()
+    assert_equal(0, f:count_msg_type('error43'))
+    u:clear_orders()
+    u:add_order("BENUTZEN 23 Yanxspirit")
+    turn_process()
+    assert_equal(1, f:count_msg_type('error43'))
+    turn_end()
+end
+
 function test_learn()
     u:add_order("LERNEN Hiebwaffen")
     _G.process_orders()
