@@ -6,7 +6,7 @@ endif(WIN32)
 
 project (eressea-server C)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 
 enable_testing()
 find_package (LibXml2)
@@ -14,10 +14,10 @@ find_package (SQLite3)
 find_package (Curses)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
-if (${TOLUA_VERSION_STRING} VERSION_EQUAL "5.2")
+if (${TOLUA_VERSION_STRING} VERSION_GREATER "5.2")
 find_package (Lua 5.2 REQUIRED)
-elseif (${TOLUA_VERSION_STRING} VERSION_EQUAL "5.1")
-find_package (Lua 5.2 REQUIRED)
+elseif (${TOLUA_VERSION_STRING} VERSION_GREATER "5.1")
+find_package (Lua 5.1 REQUIRED)
 endif()
 endif(TOLUA_FOUND)
 
