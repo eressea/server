@@ -1610,10 +1610,12 @@ int display_cmd(unit * u, struct order *ord)
 
         free(*s);
         if (s2) {
-            *s = strdup(s2);
-            if (strlen(s2) >= DISPLAYSIZE) {
-                (*s)[DISPLAYSIZE] = 0;
+            char * str = strdup(s2);
+            unicode_utf8_trim(str);
+            if (strlen(str) >= DISPLAYSIZE) {
+                str[DISPLAYSIZE-1] = 0;
             }
+            *s = str;
         }
         else {
             *s = 0;

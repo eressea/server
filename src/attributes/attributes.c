@@ -94,7 +94,6 @@ void register_attributes(void)
     at_register(&at_woodcount);
 
     /* neue UNIT-Attribute */
-    at_register(&at_fleechance);
     at_register(&at_siege);
     at_register(&at_effect);
     at_register(&at_private);
