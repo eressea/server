@@ -187,12 +187,10 @@ target_link_libraries(eressea
   ${INIPARSER_LIBRARIES}
 )
 
-find_library(C_MATH_LIBRARY m)
-
 add_executable(convert convert.c)
 target_link_libraries(convert
   game
-  ${C_MATH_LIBRARY}
+  ${LUA_MATH_LIBRARY}
   ${STORAGE_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${INIPARSER_LIBRARIES}
