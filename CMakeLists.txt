@@ -1,15 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
+project (eressea-server C)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
+
 if (WIN32)
 FILE(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 FILE(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
 endif(WIN32)
 
-project (eressea-server C)
+if (MSVC)
+include(MSVC)
+endif (MSVC)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
-
-enable_testing()
-find_package (LibXml2)
 find_package (SQLite3)
 find_package (Curses)
 find_package (ToLua REQUIRED)
@@ -21,14 +22,18 @@ find_package (Lua 5.1 REQUIRED)
 endif()
 endif(TOLUA_FOUND)
 
+enable_testing()
+
 add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)
 add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
+
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.json")
 install(DIRECTORY scripts DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.lua")
 install(DIRECTORY lunit DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.lua")
 install(DIRECTORY share DESTINATION ${CMAKE_INSTALL_PREFIX})
+
