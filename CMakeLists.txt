@@ -13,6 +13,7 @@ endif (MSVC)
 
 find_package (SQLite3)
 find_package (Curses)
+find_package (LibXml2)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
 if (${TOLUA_VERSION_STRING} VERSION_GREATER "5.2")
