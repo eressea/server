@@ -8,6 +8,7 @@ SET SERVER=%BUILD%\eressea.exe
 %SERVER% ..\scripts\run-tests.lua
 %SERVER% -re2 ..\scripts\run-tests-e2.lua
 %SERVER% -re3 ..\scripts\run-tests-e3.lua
+%SERVER% --version
 PAUSE
 RMDIR /s /q reports
 DEL score score.alliances datum turn
