@@ -323,6 +323,7 @@ static void test_newbie_password_message(CuTest *tc) {
     prepare_report(&ctx, f);
     CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -359,6 +360,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     CuAssertPtrEquals(tc, f2, ctx.f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -384,6 +386,7 @@ static void test_get_addresses(CuTest *tc) {
     CuAssertTrue(tc, selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
     CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -411,6 +414,7 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
     CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -441,6 +445,7 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
     CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -523,6 +528,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -560,6 +566,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    finish_reports(&ctx);
     test_cleanup();
 }
 
@@ -585,7 +592,6 @@ static void test_prepare_report(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r->seen.mode);
     finish_reports(&ctx);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
-    finish_reports(&ctx);
 
     r = test_create_region(2, 0, 0);
     CuAssertPtrEquals(tc, r, regions->next);
@@ -593,6 +599,7 @@ static void test_prepare_report(CuTest *tc) {
     CuAssertPtrEquals(tc, regions, ctx.first);
     CuAssertPtrEquals(tc, r, ctx.last);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
+    finish_reports(&ctx);
     test_cleanup();
 }
 

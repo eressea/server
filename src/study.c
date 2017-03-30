@@ -163,6 +163,8 @@ static void init_learning(struct attrib *a)
 
 static void done_learning(struct attrib *a)
 {
+	teaching_info *teach = (teaching_info *)a->data.v;
+	selist_free(teach->teachers);
     free(a->data.v);
 }
 
