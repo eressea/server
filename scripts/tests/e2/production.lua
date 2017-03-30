@@ -59,5 +59,22 @@ end
 function test_dwarf_mining_bonus()
 -- Von Zwergen abgebautes Eisen wird nur zu 60% vom "Regionsvorrat" abgezogen. 
 -- Dieser Effekt ist kumulativ zu einem Bergwerk (siehe hier und hier).
+    local r = region.create(0, 0, 'mountain')
+    local f = create_faction('human')
+    local u = unit.create(f, r, 1)
 
+    turn_begin()
+    r:set_resource('iron', 100)
+    u:set_skill('mining', 10)
+    u:add_order('MACHE Eisen')
+    turn_process() -- humans get no bonus
+    write_report(f)
+    assert_equal(10, u:get_item('iron'))
+    assert_equal(90, r:get_resource('iron'))
+
+    u.race = 'dwarf'
+    u:set_skill('mining', 8)
+    turn_process() -- dwarves have +2 to mining, and save 40%
+    assert_equal(20, u:get_item('iron'))
+    assert_equal(84, r:get_resource('iron'))
 end
