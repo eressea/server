@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.e3.production", package.seeall, lunit.testcase )
+module("tests.production", package.seeall, lunit.testcase )
 
 function setup()
     eressea.game.reset()
