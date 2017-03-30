@@ -5539,15 +5539,6 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur Elfen können diese Bögen herstellen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only elves can make these bows."</text>
   </message>
-  <message name="error117" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur die EMail-Adresse angeben!"</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Please provide only an email address!"</text>
-  </message>
   <message name="error116" section="errors">
     <type>
       <arg name="unit" type="unit"/>
