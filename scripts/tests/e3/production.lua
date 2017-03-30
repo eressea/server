@@ -44,7 +44,6 @@ function test_troll_no_quarrying_bonus()
     u:set_skill('quarrying', 2) -- +2 Rassenbonus
     u:add_order("MACHE Steine")
     turn_process()
-    write_report(f)
     assert_equal(4, u:get_item('stone'))
     assert_equal(96, r:get_resource('stone'))
 end
@@ -60,7 +59,6 @@ function test_dwarf_no_mining_bonus()
     u:set_skill('mining', 8) -- +2 skill bonus
     u:add_order('MACHE Eisen')
     turn_process()
-    write_report(f)
     assert_equal(10, u:get_item('iron'))
     assert_equal(90, r:get_resource('iron'))
 end

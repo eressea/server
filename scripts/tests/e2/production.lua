@@ -45,7 +45,6 @@ function test_troll_quarrying_bonus()
     u:set_skill('quarrying', 4)
     u:add_order("MACHE Steine")
     turn_process() -- humans get no bonus
-    write_report(f)
     assert_equal(4, u:get_item('stone'))
     assert_equal(96, r:get_resource('stone'))
 
@@ -68,7 +67,6 @@ function test_dwarf_mining_bonus()
     u:set_skill('mining', 10)
     u:add_order('MACHE Eisen')
     turn_process() -- humans get no bonus
-    write_report(f)
     assert_equal(10, u:get_item('iron'))
     assert_equal(90, r:get_resource('iron'))
 
