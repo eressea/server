@@ -284,31 +284,6 @@ static double peasant_growth_factor(void)
     return config_get_flt("rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
 }
 
-#ifdef SLOWLUCK
-int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
-    int n, births = 0;
-    double factor = peasant_growth_factor();
-    for (n = peasants; n && luck; --n) {
-        int chances = 0;
-
-        if (luck > 0) {
-            --luck;
-            chances += PEASANTLUCK;
-        }
-
-        while (chances--) {
-            if (rng_double() < factor) {
-                /* Only raise with 75% chance if peasants have
-                * reached 90% of maxpopulation */
-                if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
-                    ++births;
-                }
-            }
-        }
-    }
-    return births;
-}
-#else
 static double peasant_luck_factor(void)
 {
     return config_get_flt("rules.peasants.peasantluck.factor", PEASANTLUCK);
@@ -330,8 +305,6 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
         births = peasants / 2 + 1;
     return births;
 }
-
-#endif
 
 static void peasants(region * r, int rule)
 {

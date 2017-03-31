@@ -468,7 +468,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     assert(rc);
     u_setrace(u, rc);
 
-#if GUARD_DISABLES_RECRUIT
     /* this is a very special case because the recruiting unit may be empty
      * at this point and we have to look at the creating unit instead. This
      * is done in cansee, which is called indirectly by is_guarded(). */
@@ -476,7 +475,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         cmistake(u, ord, 70, MSG_EVENT);
         return;
     }
-#endif
 
     if (rc == get_race(RC_INSECT)) {
         gamedate date;

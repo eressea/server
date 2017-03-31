@@ -12,7 +12,6 @@
 
 #define ENTERTAINFRACTION 20
 #define TEACHDIFFERENCE 2
-#define GUARD_DISABLES_RECRUIT 1
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 #define COMBAT_TURNS 5
@@ -30,8 +29,6 @@
  * or both. We don't want separate binaries for different games
  */
 #define MUSEUM_MODULE 1
-
-#undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
 
  /* experimental gameplay features (that don't affect the savefile) */
  /* TODO: move these settings to settings.h or into configuration files */
