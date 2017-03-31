@@ -35,8 +35,6 @@ extern "C" {
     struct gamedata;
     struct selist;
     
-    extern struct attrib_type at_maxmagicians;
-
     /* faction flags */
 #define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)

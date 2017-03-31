@@ -1724,13 +1724,13 @@ int unit_max_hp(const unit * u)
     int h;
     double p;
     static int config;
-    static int rule_stamina;
+    static bool rule_stamina;
     h = u_race(u)->hitpoints;
 
     if (config_changed(&config)) {
-        rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+        rule_stamina = config_get_int("rules.stamina", 1)!=0;
     }
-    if (rule_stamina & 1) {
+    if (rule_stamina) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }

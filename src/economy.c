@@ -480,7 +480,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         gamedate date;
         get_gamedate(turn, &date);
         if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
-#ifdef INSECT_POTION
             bool usepotion = false;
             unit *u2;
 
@@ -490,7 +489,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
                     break;
                 }
             if (!usepotion)
-#endif
             {
                 cmistake(u, ord, 98, MSG_EVENT);
                 return;
@@ -2016,20 +2014,6 @@ static void expandstealing(region * r, request * stealorders)
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
         }
-#ifndef GOBLINKILL
-        if (oa[i].type.goblin) {    /* Goblin-Spezialklau */
-            int uct = 0;
-            unit *u2;
-            assert(effskill(oa[i].unit, SK_STEALTH) >= 4
-                || !"this goblin\'s skill is too low");
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (u2->faction == u->faction) {
-                    uct += maintenance_cost(u2);
-                }
-            }
-            n -= uct * 2;
-        }
-#endif
         if (n > 10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
             /* In Questen nur reduziertes Klauen */
             n = 10;
