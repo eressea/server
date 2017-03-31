@@ -1242,12 +1242,10 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
 void make_item(unit * u, const item_type * itype, int want)
 {
     if (itype->construction && fval(itype->rtype, RTF_LIMITED)) {
-#if GUARD_DISABLES_PRODUCTION == 1
         if (is_guarded(u->region, u)) {
             cmistake(u, u->thisorder, 70, MSG_EVENT);
             return;
         }
-#endif
         allocate_resource(u, itype->rtype, want);
     }
     else {
