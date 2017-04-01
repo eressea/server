@@ -879,13 +879,14 @@ enum {
     AFL_LOWSKILL = 1 << 1
 };
 
-struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep, int *skillp) {
+struct message * get_modifiers(unit *u, const resource_type *rtype, variant *savep, int *skillp) {
     struct building *b = inside_building(u);
     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
     int save_n = 1, save_d = 1;
     int skill = 0;
+    resource_mod *mod;
 
-    for (; mod->flags != 0; ++mod) {
+    for (mod = rtype->modifiers; mod && mod->flags != 0; ++mod) {
         if (mod->btype == NULL || mod->btype == btype) {
             if (mod->race == NULL || mod->race == u_race(u)) {
                 if (mod->flags & RMF_SAVEMATERIAL) {
@@ -940,7 +941,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
 
     if (rtype->modifiers) {
-        message *msg = get_modifiers(u, rtype->modifiers, &save_mod, &skill_mod);
+        message *msg = get_modifiers(u, rtype, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
             return;

@@ -123,13 +123,8 @@ extern "C" {
     typedef struct weapon {
         int count, used;
         const struct weapon_type *type;
-# ifdef LOMEM
-        int attackskill : 8;
-        int defenseskill : 8;
-# else
         int attackskill;
         int defenseskill;
-# endif
     } weapon;
 
     /*** fighter::person::flags ***/

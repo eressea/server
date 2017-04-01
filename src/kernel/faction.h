@@ -42,8 +42,8 @@ extern "C" {
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
-#define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
+#define FFL_SELECT        (1<<22)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_MARK          (1<<23)       /* f�r markierende algorithmen, die das 
                                              * hinterher auch wieder l�schen m�ssen!
                                              * (FFL_SELECT muss man vorher initialisieren,

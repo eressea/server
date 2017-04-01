@@ -30,17 +30,10 @@ extern "C" {
 #define SMF_PRODUCTION (1<<1)   /* für Produktion - am gebäude, an der einheit */
 
     typedef struct skill {
-#ifdef LOMEM
-        int id:8;
-        unsigned int level:8;
-        unsigned int weeks:8;
-        unsigned int old:8;
-#else
         int id;
         int level;
         int weeks;
         int old;
-#endif
     } skill;
 
     typedef int(*skillmod_fun) (const struct unit *, const struct region *,

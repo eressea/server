@@ -44,13 +44,8 @@ static struct locale_data *locale_array[MAXLOCALES];
 
 typedef struct order_data {
     const char *_str;
-# ifdef LOMEM
-    int _refcount:20;
-    int _lindex:4;
-# else
     int _refcount;
     int _lindex;
-# endif
     keyword_t _keyword;
 } order_data;
 
