@@ -43,6 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -66,9 +67,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-/* attributes inclues */
-#include <attributes/matmod.h>
 
 struct building *getbuilding(const struct region *r)
 {
@@ -404,16 +402,26 @@ static int required(int size, int msize, int maxneed)
     return used;
 }
 
-static int
-matmod(const attrib * a, const unit * u, const resource_type * material,
-int value)
+static int matmod(const unit * u, const resource_type * rtype, int value)
 {
-    for (a = a_find((attrib *)a, &at_matmod); a && a->type == &at_matmod;
-        a = a->next) {
-        mm_fun fun = (mm_fun)a->data.f;
-        value = fun(u, material, value);
-        if (value < 0)
-            return value;             /* pass errors to caller */
+    if (rtype->modifiers) {
+        variant save = frac_make(1, 1);
+        const struct building_type *btype = NULL;
+        const struct race *rc = u_race(u);
+        resource_mod *mod;
+        if (u->building && inside_building(u)) {
+            btype = u->building->type;
+        }
+        for (mod = rtype->modifiers; mod->type != RMT_END; ++mod) {
+            if (mod->type == RMT_USE_SAVE) {
+                if (!mod->btype || mod->btype == btype) {
+                    if (!mod->race || mod->race == rc) {
+                        save = frac_mul(save, mod->value);
+                    }
+                }
+            }
+        }
+        return value * save.sa[0] / save.sa[1];
     }
     return value;
 }
@@ -439,14 +447,8 @@ static int use_materials(unit *u, const construction *type, int n, int completed
                 required(completed + n, type->reqsize, type->materials[c].number);
             int multi = 1;
             int canuse = 100;       /* normalization */
-            if (building_is_active(u->building) && inside_building(u)) {
-                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-            }
-            if (canuse < 0) {
-                return canuse;        /* pass errors to caller */
-            }
-            canuse = matmod(type->attribs, u, rtype, canuse);
-
+            canuse = matmod(u, rtype, canuse);
+            assert(canuse >= 0);
             assert(canuse % 100 == 0
                 || !"only constant multipliers are implemented in build()");
             multi = canuse / 100;
@@ -468,14 +470,9 @@ static int count_materials(unit *u, const construction *type, int n, int complet
             const struct resource_type *rtype = type->materials[c].rtype;
             int need, prebuilt;
             int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+            canuse = matmod(u, rtype, canuse);
 
-            if (building_is_active(u->building) && inside_building(u)) {
-                canuse = matmod(u->building->type->attribs, u, rtype, canuse);
-            }
-
-            if (canuse < 0)
-                return canuse;        /* pass errors to caller */
-            canuse = matmod(type->attribs, u, rtype, canuse);
+            assert(canuse >= 0);
             if (type->reqsize > 1) {
                 prebuilt =
                     required(completed, type->reqsize, type->materials[c].number);
@@ -503,7 +500,7 @@ static int count_materials(unit *u, const construction *type, int n, int complet
 * of the first object have already been finished. return the
 * actual size that could be built.
 */
-int build(unit * u, const construction * ctype, int completed, int want)
+int build(unit * u, const construction * ctype, int completed, int want, int skill_mod)
 {
     const construction *type = ctype;
     int skills = INT_MAX;         /* number of skill points remainig */
@@ -536,17 +533,8 @@ int build(unit * u, const construction * ctype, int completed, int want)
         if (basesk == 0)
             return ENEEDSKILL;
 
-        effsk = basesk;
-        if (building_is_active(u->building) && inside_building(u)) {
-            effsk = skillmod(u->building->type->attribs, u, u->region, type->skill,
-                effsk, SMF_PRODUCTION);
-        }
-        effsk = skillmod(type->attribs, u, u->region, type->skill,
-            effsk, SMF_PRODUCTION);
-        if (effsk < 0)
-            return effsk;             /* pass errors to caller */
-        if (effsk == 0)
-            return ENEEDSKILL;
+        effsk = basesk + skill_mod;
+        assert(effsk >= 0);
 
         skills = effsk * u->number;
 
@@ -799,7 +787,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
             }
         }
     }
-    built = build(u, btype->construction, built, n);
+    built = build(u, btype->construction, built, n, 0);
 
     switch (built) {
     case ECOMPLETE:
@@ -884,7 +872,7 @@ static void build_ship(unit * u, ship * sh, int want)
     const construction *construction = sh->type->construction;
     int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
     int n;
-    int can = build(u, construction, size, want);
+    int can = build(u, construction, size, want, 0);
 
     if ((n = construction->maxsize - sh->size) > 0 && can > 0) {
         if (can >= n) {

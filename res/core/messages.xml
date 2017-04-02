@@ -5539,6 +5539,15 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Gegenstand kann die Einheit nicht herstellen."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot produce that."</text>
   </message>
+  <message name="error117" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann das nicht herstellen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This race cannot produce that."</text>
+  </message>
   <message name="error116" section="errors">
     <type>
       <arg name="unit" type="unit"/>

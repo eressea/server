@@ -124,6 +124,33 @@ function test_quarry_bonus()
     turn_end()
 end
 
+function test_smithy_no_bonus()
+-- a smithy does not give a bonus to other skills
+-- five cartmakers make 5 carts, no matter what
+    local r = region.create(0, 0, 'mountain')
+    local f = create_faction('human')
+    local u = unit.create(f, r, 1)
+
+    turn_begin()
+    u.building = building.create(u.region, 'smithy')
+    u.building.working = false
+    u.building.size = 10
+    u.number = 5
+    u:set_skill('cartmaking', 1) -- needs 1 min
+    u:add_item('log', 100)
+    u:add_order("MACHE Wagen")
+    turn_process() -- building disabled
+    assert_equal(5, u:get_item('cart'))
+    assert_equal(75, u:get_item('log'))
+
+    u.building.working = true
+    turn_process() -- building active
+    assert_equal(10, u:get_item('cart'))
+    assert_equal(50, u:get_item('log'))
+
+    turn_end()
+end
+
 function test_smithy_bonus_iron()
 -- a smithy adds +1 to weaponsmithing, and saves 50% iron
     local r = region.create(0, 0, 'mountain')

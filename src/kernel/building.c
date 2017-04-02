@@ -55,7 +55,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/reduceproduction.h>
-#include <attributes/matmod.h>
 
 typedef struct building_typelist {
     struct building_typelist *next;
@@ -99,9 +98,6 @@ bool bt_changed(int *cache)
 
 void bt_register(building_type * type)
 {
-    if (type->init) {
-        type->init(type);
-    }
     selist_push(&buildingtypes, (void *)type);
     ++bt_changes;
 }
@@ -222,31 +218,6 @@ static building *bfindhash(int i)
 building *findbuilding(int i)
 {
     return bfindhash(i);
-}
-
-/* ** old building types ** */
-
-static int sm_smithy(const unit * u, const region * r, skill_t sk, int value)
-{                               /* skillmod */
-    if (sk == SK_WEAPONSMITH || sk == SK_ARMORER) {
-        if (u->region == r)
-            return value + 1;
-    }
-    return value;
-}
-
-static int mm_smithy(const unit * u, const resource_type * rtype, int value)
-{                               /* material-mod */
-    if (rtype == get_resourcetype(R_IRON))
-        return value * 2;
-    return value;
-}
-
-static void init_smithy(struct building_type *bt)
-{
-    a_add(&bt->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION, sm_smithy, 1.0,
-        0));
-    a_add(&bt->attribs, make_matmod(mm_smithy));
 }
 
 static const char *castle_name_i(const struct building_type *btype,
@@ -915,7 +886,6 @@ int cmp_current_owner(const building * b, const building * a)
 
 void register_buildings(void)
 {
-    register_function((pf_generic)init_smithy, "init_smithy");
     register_function((pf_generic)castle_name, "castle_name");
     register_function((pf_generic)castle_name_2, "castle_name_2");
     register_function((pf_generic)fort_name, "fort_name");

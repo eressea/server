@@ -66,10 +66,10 @@ extern "C" {
         double auraregen;           /* modifier for aura regeneration inside building */
         struct maintenance *maintenance;    /* array of requirements */
         struct construction *construction;  /* construction of 1 building-level */
+        struct resource_mod *modifiers; /* modify production skills */
 
         const char *(*name) (const struct building_type *,
             const struct building * b, int size);
-        void(*init) (struct building_type *);
         void(*age) (struct building *);
         double(*taxes) (const struct building *, int size);
         struct attrib *attribs;

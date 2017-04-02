@@ -3,7 +3,8 @@
     <item weight="500" score="10">
         <construction skill="mining" minskill="1"/>
     </item>
+    <modifier building="smithy" type="save" value="2"/>
     <modifier building="mine" type="skill" value="1"/>
     <modifier building="mine" type="material" value="0.5"/>
-    <modifier race="dwarf" type="material" value="0.60"/>
+    <modifier race="dwarf" type="material" value="0.6"/>
 </resource>

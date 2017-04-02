@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <resource name="towershield">
+  <modifier type="require" race="dwarf"/>
   <item weight="200" score="60" allow="dwarf">
     <construction skill="armorer" minskill="4">
-      <modifier function="mod_dwarves_only"/>
       <requirement type="iron" quantity="1"/>
     </construction>
     <armor ac="0" penalty="-0.15" projectile="0.25" magres="0.0" shield="yes">

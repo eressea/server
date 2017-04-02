@@ -34,8 +34,17 @@ extern "C" {
         struct rawmaterial *next;
     } rawmaterial;
 
+    /* resource-limits for regions */
+    typedef enum resource_modifier_type {
+        RMT_END, /* array terminator */
+        RMT_PROD_SKILL, /* bonus on resource production skill */
+        RMT_PROD_SAVE,   /* fractional multiplier when produced */
+        RMT_PROD_REQUIRE, /* building or race is required to produce this item */
+        RMT_USE_SAVE,  /* fractional multiplier when used to manufacture something */
+    } resource_modifier_type;
+
     typedef struct resource_mod {
-        int flags;
+        resource_modifier_type type;
         variant value;
         const struct building_type *btype;
         const struct race *race;

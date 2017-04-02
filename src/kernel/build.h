@@ -55,9 +55,6 @@ extern "C" {
          * last level of a building points to NULL, as do objects of
          * an unlimited size.
          */
-        struct attrib *attribs;
-        /* stores skill modifiers and other attributes */
-
     } construction;
 
     void free_construction(struct construction *cons);
@@ -76,7 +73,7 @@ extern "C" {
     void sunhash(struct ship *sh);
     int roqf_factor(void);
 
-    int build(struct unit *u, const construction * ctype, int completed, int want);
+    int build(struct unit *u, const construction * ctype, int completed, int want, int skill_mod);
     int maxbuild(const struct unit *u, const construction * cons);
     struct message *msg_materials_required(struct unit *u, struct order *ord,
         const struct construction *ctype, int multi);

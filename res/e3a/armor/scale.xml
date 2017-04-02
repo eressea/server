@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <resource name="scale">
+  <modifier type="require" race="dwarf"/>
   <item weight="300" score="150" allow="dwarf halfling">
     <construction skill="armorer" minskill="5">
-      <modifier function="mod_dwarves_only"/>
       <requirement type="iron" quantity="2"/>
     </construction>
     <armor ac="3" penalty="0.10" projectile="0.05" magres="0.0"/>
