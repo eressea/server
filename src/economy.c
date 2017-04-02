@@ -865,7 +865,6 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
 static void manufacture(unit * u, const item_type * itype, int want)
 {
     int n;
-    int skill;
     int minskill = itype->construction->minskill;
     skill_t sk = itype->construction->skill;
     message *msg;
@@ -877,7 +876,6 @@ static void manufacture(unit * u, const item_type * itype, int want)
         return;
     }
 
-    skill = effskill(u, sk, 0);
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
