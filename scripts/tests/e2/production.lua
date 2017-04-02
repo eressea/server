@@ -23,7 +23,7 @@ function test_greatbow_needs_elf()
     u:add_item('mallorn', 2)
     u:add_order("MACHE Elfenbogen")
     turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error118"))
+    assert_equal(1, f:count_msg_type("error117"))
     assert_equal(0, u:get_item('greatbow'))
     assert_equal(2, u:get_item('mallorn'))
 

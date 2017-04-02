@@ -23,7 +23,7 @@ function test_greatbow_needs_elf()
     u:add_item('mallorn', 2)
     u:add_order("MACHE Elfenbogen")
     turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error118"))
+    assert_equal(1, f:count_msg_type("error117"))
     assert_equal(0, u:get_item('greatbow'))
     assert_equal(2, u:get_item('mallorn'))
 
@@ -75,7 +75,7 @@ function test_dwarf_towershield()
     u:add_item('iron', 1)
     u:add_order("MACHE Turmschild")
     turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error118"))
+    assert_equal(1, f:count_msg_type("error117"))
     assert_equal(0, u:get_item('towershield'))
     assert_equal(1, u:get_item('iron'))
 
@@ -99,7 +99,7 @@ function test_dwarf_scale()
     u:add_item('iron', 2)
     u:add_order("MACHE Schuppenpanzer")
     turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error118"))
+    assert_equal(1, f:count_msg_type("error117"))
     assert_equal(0, u:get_item('scale'))
     assert_equal(2, u:get_item('iron'))
 
@@ -123,7 +123,7 @@ function test_dwarf_rep_xbow()
     u:add_item('log', 1)
     u:add_order("MACHE Repetierarmbrust")
     turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error118"))
+    assert_equal(1, f:count_msg_type("error117"))
     assert_equal(0, u:get_item('rep_crossbow'))
     assert_equal(1, u:get_item('iron'))
     assert_equal(1, u:get_item('log'))
