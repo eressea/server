@@ -30,7 +30,7 @@ extern "C" {
 #define SMF_PRODUCTION (1<<1)   /* für Produktion - am gebäude, an der einheit */
 
     typedef struct skill {
-        int id;
+        skill_t id;
         int level;
         int weeks;
         int old;
@@ -46,23 +46,25 @@ extern "C" {
         int bonus;
         int flags;
     } skillmod_data;
+
     extern struct attrib_type at_skillmod;
-    extern int rc_skillmod(const struct race *rc, const struct region *r,
+
+    int rc_skillmod(const struct race *rc, const struct region *r,
         skill_t sk);
-    extern int skillmod(const struct attrib *a, const struct unit *u,
+    int skillmod(const struct attrib *a, const struct unit *u,
         const struct region *r, skill_t sk, int value, int flags);
-    extern struct attrib *make_skillmod(skill_t sk, unsigned int flags,
+    struct attrib *make_skillmod(skill_t sk, unsigned int flags,
         skillmod_fun special, double multiplier, int bonus);
 
-    extern int level_days(int level);
-    extern int level(int days);
+    int level_days(int level);
+    int level(int days);
 
 #define skill_level(level) (level)
-    extern void reduce_skill(struct unit *u, skill * sv, unsigned int change);
-    extern int skill_weeks(int level);
-    extern int skill_compare(const skill * sk, const skill * sc);
+    void reduce_skill(struct unit *u, skill * sv, unsigned int change);
+    int skill_weeks(int level);
+    int skill_compare(const skill * sk, const skill * sc);
 
-    extern void sk_set(skill * sv, int level);
+    void sk_set(skill * sv, int level);
 
 #ifdef __cplusplus
 }
