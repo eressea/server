@@ -1333,8 +1333,9 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
-
-    skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
+    if (u->attribs) {
+        skill = skillmod(u, r, sk, skill);
+    }
 
     if (fval(u, UFL_HUNGER)) {
         if (sk == SK_SAILING && skill > 2) {

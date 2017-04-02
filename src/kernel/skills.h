@@ -25,10 +25,6 @@ struct attrib_type;
 extern "C" {
 #endif
 
-    /* skillmod_data::flags -- wann gilt der modifier? */
-#define SMF_ALWAYS     (1<<0)   /* immer */
-#define SMF_PRODUCTION (1<<1)   /* für Produktion - am gebäude, an der einheit */
-
     typedef struct skill {
         skill_t id;
         int level;
@@ -44,17 +40,13 @@ extern "C" {
         double multiplier;
         int number;
         int bonus;
-        int flags;
     } skillmod_data;
 
     extern struct attrib_type at_skillmod;
 
-    int rc_skillmod(const struct race *rc, const struct region *r,
-        skill_t sk);
-    int skillmod(const struct attrib *a, const struct unit *u,
-        const struct region *r, skill_t sk, int value, int flags);
-    struct attrib *make_skillmod(skill_t sk, unsigned int flags,
-        skillmod_fun special, double multiplier, int bonus);
+    int rc_skillmod(const struct race *rc, const struct region *r, skill_t sk);
+    int skillmod(const struct unit *u, const struct region *r, skill_t sk, int value);
+    struct attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus);
 
     int level_days(int level);
     int level(int days);

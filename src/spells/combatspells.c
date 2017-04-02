@@ -556,7 +556,7 @@ int sp_mindblast_temp(struct castorder * co)
                 skill_t sk = random_skill(du, true);
                 if (sk != NOSKILL) {
                     int n = 1 + rng_int() % maxloss;
-                    attrib *a = make_skillmod(sk, SMF_ALWAYS, NULL, 0.0, n);
+                    attrib *a = make_skillmod(sk, NULL, 0.0, n);
                     /* neat: you can add a whole lot of these to a unit, they stack */
                     a_add(&du->attribs, a);
                 }

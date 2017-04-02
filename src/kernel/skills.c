@@ -62,8 +62,7 @@ attrib_type at_skillmod = {
     ATF_PRESERVE
 };
 
-attrib *make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special,
-    double multiplier, int bonus)
+attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus)
 {
     attrib *a = a_new(&at_skillmod);
     skillmod_data *smd = (skillmod_data *)a->data.v;
@@ -72,21 +71,18 @@ attrib *make_skillmod(skill_t sk, unsigned int flags, skillmod_fun special,
     smd->special = special;
     smd->bonus = bonus;
     smd->multiplier = multiplier;
-    smd->flags = flags;
 
     return a;
 }
 
 int
-skillmod(const attrib * a, const unit * u, const region * r, skill_t sk,
-int value, int flags)
+skillmod(const unit * u, const region * r, skill_t sk, int value)
 {
+    const attrib * a = u->attribs;
     for (a = a_find((attrib *)a, &at_skillmod); a && a->type == &at_skillmod;
         a = a->next) {
         skillmod_data *smd = (skillmod_data *)a->data.v;
         if (smd->skill != NOSKILL && smd->skill != sk)
-            continue;
-        if (flags != SMF_ALWAYS && (smd->flags & flags) == 0)
             continue;
         if (smd->special) {
             value = smd->special(u, r, sk, value);
