@@ -824,8 +824,8 @@ function test_golem_use_four_iron()
 
     process_orders()
 
-    assert_equal(2, u1.number)
     assert_equal(4, u1:get_item("towershield"))
+    assert_equal(2, u1.number)
 end
 
 function test_silver_weight_stops_movement()

@@ -1121,9 +1121,7 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     ally *sf;
 
     state &= ~HELP_OBSERVE;
-#ifndef REGIONOWNERS
     state &= ~HELP_TRAVEL;
-#endif
     state &= HelpMask();
 
     if (state == 0)

@@ -120,6 +120,72 @@ static xmlChar *xml_cleanup_string(xmlChar * str)
     return str;
 }
 
+static resource_mod * xml_readmodifiers(xmlXPathObjectPtr result, xmlNodePtr node) {
+    /* reading eressea/resources/resource/modifier */
+    if (result->nodesetval != NULL && result->nodesetval->nodeNr > 0) {
+        int k;
+        resource_mod * modifiers =
+            calloc(result->nodesetval->nodeNr + 1, sizeof(resource_mod));
+        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+            xmlNodePtr node = result->nodesetval->nodeTab[k];
+            xmlChar *propValue;
+            building_type *btype = NULL;
+            const race *rc = NULL;
+
+            propValue = xmlGetProp(node, BAD_CAST "race");
+            if (propValue != NULL) {
+                rc = rc_find((const char *)propValue);
+                if (rc == NULL)
+                    rc = rc_get_or_create((const char *)propValue);
+                xmlFree(propValue);
+            }
+            modifiers[k].race = rc;
+
+            propValue = xmlGetProp(node, BAD_CAST "building");
+            if (propValue != NULL) {
+                btype = bt_get_or_create((const char *)propValue);
+                xmlFree(propValue);
+            }
+            modifiers[k].btype = btype;
+
+            propValue = xmlGetProp(node, BAD_CAST "type");
+            assert(propValue != NULL);
+            if (strcmp((const char *)propValue, "skill") == 0) {
+                xmlChar *propSkill;
+                skill_t sk = NOSKILL;
+
+                modifiers[k].type = RMT_PROD_SKILL;
+                propSkill = xmlGetProp(node, BAD_CAST "skill");
+                if (propSkill) {
+                    sk = findskill((const char *)propSkill);
+                    xmlFree(propSkill);
+                }
+                modifiers[k].value.sa[0] = (short)sk;
+                modifiers[k].value.sa[1] = (short)xml_ivalue(node, "value", 0);
+            }
+            else if (strcmp((const char *)propValue, "material") == 0) {
+                modifiers[k].value = xml_fraction(node, "value");
+                modifiers[k].type = RMT_PROD_SAVE;
+            }
+            else {
+                if (strcmp((const char *)propValue, "require") == 0) {
+                    modifiers[k].type = RMT_PROD_REQUIRE;
+                }
+                else if (strcmp((const char *)propValue, "save") == 0) {
+                    modifiers[k].type = RMT_USE_SAVE;
+                    modifiers[k].value = xml_fraction(node, "value");
+                }
+                else {
+                    log_error("unknown type '%s' for resourcelimit-modifier", (const char *)propValue);
+                }
+            }
+            xmlFree(propValue);
+        }
+        return modifiers;
+    }
+    return NULL;
+}
+
 static void
 xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 {
@@ -157,7 +223,6 @@ construction ** consPtr)
         xmlChar *propValue;
         construction *con;
         xmlXPathObjectPtr req;
-        int m;
         skill_t sk = NOSKILL;
 
         propValue = xmlGetProp(node, BAD_CAST "skill");
@@ -192,23 +257,6 @@ construction ** consPtr)
         req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
         xml_readrequirements(req->nodesetval->nodeTab,
             req->nodesetval->nodeNr, &con->materials);
-        xmlXPathFreeObject(req);
-
-        /* read construction/modifier */
-        xpath->node = node;
-        req = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
-        for (m = 0; m != req->nodesetval->nodeNr; ++m) {
-            xmlNodePtr node = req->nodesetval->nodeTab[m];
-
-            propValue = xmlGetProp(node, BAD_CAST "function");
-            if (propValue != NULL) {
-                pf_generic foo = get_function((const char *)propValue);
-                a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION,
-                    (skillmod_fun)foo, 1.0, 0));
-                xmlFree(propValue);
-            }
-
-        }
         xmlXPathFreeObject(req);
     }
     xpath->node = pushNode;
@@ -280,6 +328,12 @@ static int parse_buildings(xmlDocPtr doc)
             if (xml_bvalue(node, "fort", false))
                 btype->flags |= BTF_FORTIFICATION;
 
+            /* reading eressea/buildings/building/modifier */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+            btype->modifiers = xml_readmodifiers(result, node);
+            xmlXPathFreeObject(result);
+
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
@@ -304,9 +358,6 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->name =
                         (const char *(*)(const struct building_type *,
                         const struct building *, int))fun;
-                }
-                else if (strcmp((const char *)propValue, "init") == 0) {
-                    btype->init = (void(*)(struct building_type *))fun;
                 }
                 else if (strcmp((const char *)propValue, "age") == 0) {
                     btype->age = (void(*)(struct building *))fun;
@@ -344,10 +395,6 @@ static int parse_buildings(xmlDocPtr doc)
                     mt->flags |= MTF_VARIABLE;
             }
             xmlXPathFreeObject(result);
-
-            /* finally, initialize the new building type */
-            if (btype->init)
-                btype->init(btype);
         }
     }
     xmlXPathFreeObject(buildings);
@@ -951,58 +998,9 @@ static int parse_resources(xmlDocPtr doc)
         if (xml_bvalue(node, "limited", false)) {
             rtype->flags |= RTF_LIMITED;
         }
-        /* reading eressea/resources/resource/modifier */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
-        if (result->nodesetval != NULL && result->nodesetval->nodeNr > 0) {
-            rtype->modifiers =
-                calloc(result->nodesetval->nodeNr + 1, sizeof(resource_mod));
-            for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                xmlNodePtr node = result->nodesetval->nodeTab[k];
-                building_type *btype = NULL;
-                const race *rc = NULL;
-
-                propValue = xmlGetProp(node, BAD_CAST "race");
-                if (propValue != NULL) {
-                    rc = rc_find((const char *)propValue);
-                    if (rc == NULL)
-                        rc = rc_get_or_create((const char *)propValue);
-                    xmlFree(propValue);
-                }
-                rtype->modifiers[k].race = rc;
-
-                propValue = xmlGetProp(node, BAD_CAST "building");
-                if (propValue != NULL) {
-                    btype = bt_get_or_create((const char *)propValue);
-                    xmlFree(propValue);
-                }
-                rtype->modifiers[k].btype = btype;
-
-                propValue = xmlGetProp(node, BAD_CAST "type");
-                assert(propValue != NULL);
-                if (strcmp((const char *)propValue, "skill") == 0) {
-                    rtype->modifiers[k].value.i = xml_ivalue(node, "value", 0);
-                    rtype->modifiers[k].flags = RMF_SKILL;
-                }
-                else if (strcmp((const char *)propValue, "material") == 0) {
-                    rtype->modifiers[k].value = xml_fraction(node, "value");
-                    rtype->modifiers[k].flags = RMF_SAVEMATERIAL;
-                }
-                else if (strcmp((const char *)propValue, "require") == 0) {
-                    xmlChar *propBldg = xmlGetProp(node, BAD_CAST "building");
-                    if (propBldg != NULL) {
-                        btype = bt_get_or_create((const char *)propBldg);
-                        rtype->modifiers[k].btype = btype;
-                        rtype->modifiers[k].flags = RMF_REQUIREDBUILDING;
-                        xmlFree(propBldg);
-                    }
-                }
-                else {
-                    log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name);
-                }
-                xmlFree(propValue);
-            }
-        }
+        rtype->modifiers = xml_readmodifiers(result, node);
         xmlXPathFreeObject(result);
         /* reading eressea/resources/resource/resourcelimit/function */
         xpath->node = node;

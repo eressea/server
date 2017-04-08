@@ -1333,8 +1333,9 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
 
     skill += rc_skillmod(u_race(u), r, sk);
     skill += att_modification(u, sk);
-
-    skill = skillmod(u->attribs, u, r, sk, skill, SMF_ALWAYS);
+    if (u->attribs) {
+        skill = skillmod(u, r, sk, skill);
+    }
 
     if (fval(u, UFL_HUNGER)) {
         if (sk == SK_SAILING && skill > 2) {
@@ -1724,13 +1725,13 @@ int unit_max_hp(const unit * u)
     int h;
     double p;
     static int config;
-    static int rule_stamina;
+    static bool rule_stamina;
     h = u_race(u)->hitpoints;
 
     if (config_changed(&config)) {
-        rule_stamina = config_get_int("rules.stamina", STAMINA_AFFECTS_HP);
+        rule_stamina = config_get_int("rules.stamina", 1)!=0;
     }
-    if (rule_stamina & 1) {
+    if (rule_stamina) {
         p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }

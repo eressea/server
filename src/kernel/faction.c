@@ -644,7 +644,7 @@ int skill_limit(faction * f, skill_t sk)
         m = max_magicians(f);
     }
     else if (sk == SK_ALCHEMY) {
-        m = config_get_int("rules.maxskills.alchemy", MAXALCHEMISTS);
+        m = config_get_int("rules.maxskills.alchemy", 3);
     }
     return m;
 }
@@ -752,22 +752,6 @@ int count_maxmigrants(const faction * f)
     return 0;
 }
 
-static void init_maxmagicians(struct attrib *a)
-{
-    a->data.i = MAXMAGICIANS;
-}
-
-attrib_type at_maxmagicians = {
-    "maxmagicians",
-    init_maxmagicians,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
-
 int max_magicians(const faction * f)
 {
     static int rule, config, rc_cache;
@@ -775,15 +759,9 @@ int max_magicians(const faction * f)
     int m;
 
     if (config_changed(&config)) {
-        rule = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
+        rule = config_get_int("rules.maxskills.magic", 3);
     }
     m = rule;
-    if (f->attribs) {
-        attrib *a = a_find(f->attribs, &at_maxmagicians);
-        if (a) {
-            m = a->data.i;
-        }
-    }
     if (rc_changed(&rc_cache)) {
         rc_elf = get_race(RC_ELF);
     }

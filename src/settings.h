@@ -12,8 +12,6 @@
 
 #define ENTERTAINFRACTION 20
 #define TEACHDIFFERENCE 2
-#define GUARD_DISABLES_RECRUIT 1
-#define GUARD_DISABLES_PRODUCTION 1
 #define RESOURCE_QUANTITY 0.5
 #define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 #define COMBAT_TURNS 5
@@ -32,25 +30,13 @@
  */
 #define MUSEUM_MODULE 1
 
-#undef REGIONOWNERS             /* (WIP) region-owner uses HELP_TRAVEL to control entry to region */
-
- /* experimental gameplay features (that don't affect the savefile) */
  /* TODO: move these settings to settings.h or into configuration files */
-#define GOBLINKILL              /* Goblin-Spezialklau kann toedlich enden */
-#define INSECT_POTION           /* Spezialtrank fuer Insekten */
-
 #define TREESIZE (8)            /* space used by trees (in #peasants) */
-
 #define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 
- /* Gebaeudegroesse = Minimalbelagerer */
+/* Gebaeudegroesse = Minimalbelagerer */
 #define SIEGEFACTOR     2
-
- /** Magic */
-#define MAXMAGICIANS    3
-#define MAXALCHEMISTS   3
 
 #define ENCCHANCE           10  /* %-Chance fuer einmalige Zufallsbegegnung */
 #define BAGCAPACITY         20000   /* soviel passt in einen Bag of Holding */
 #define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
-#define STAMINA_AFFECTS_HP 1<<0

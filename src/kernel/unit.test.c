@@ -256,19 +256,19 @@ static void test_skillmod(CuTest *tc) {
     set_level(u, SK_ARMORER, 5);
     CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, 0));
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 2.0, 0));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 2.0, 0));
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); /* NOSKILL means any skill */
+    a_add(&u->attribs, a = make_skillmod(NOSKILL, 0, 2.0, 0)); /* NOSKILL means any skill */
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 0, 2));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 0, 2));
     CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, cb_skillmod, 0, 0));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, cb_skillmod, 0, 0));
     CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 

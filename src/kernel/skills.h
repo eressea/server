@@ -25,23 +25,11 @@ struct attrib_type;
 extern "C" {
 #endif
 
-    /* skillmod_data::flags -- wann gilt der modifier? */
-#define SMF_ALWAYS     (1<<0)   /* immer */
-#define SMF_PRODUCTION (1<<1)   /* für Produktion - am gebäude, an der einheit */
-#define SMF_RIDING     (1<<2)   /* Bonus für berittene - an der rasse */
-
     typedef struct skill {
-#ifdef LOMEM
-        int id:8;
-        unsigned int level:8;
-        unsigned int weeks:8;
-        unsigned int old:8;
-#else
-        int id;
+        skill_t id;
         int level;
         int weeks;
         int old;
-#endif
     } skill;
 
     typedef int(*skillmod_fun) (const struct unit *, const struct region *,
@@ -52,25 +40,23 @@ extern "C" {
         double multiplier;
         int number;
         int bonus;
-        int flags;
     } skillmod_data;
-    extern struct attrib_type at_skillmod;
-    extern int rc_skillmod(const struct race *rc, const struct region *r,
-        skill_t sk);
-    extern int skillmod(const struct attrib *a, const struct unit *u,
-        const struct region *r, skill_t sk, int value, int flags);
-    extern struct attrib *make_skillmod(skill_t sk, unsigned int flags,
-        skillmod_fun special, double multiplier, int bonus);
 
-    extern int level_days(int level);
-    extern int level(int days);
+    extern struct attrib_type at_skillmod;
+
+    int rc_skillmod(const struct race *rc, const struct region *r, skill_t sk);
+    int skillmod(const struct unit *u, const struct region *r, skill_t sk, int value);
+    struct attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus);
+
+    int level_days(int level);
+    int level(int days);
 
 #define skill_level(level) (level)
-    extern void reduce_skill(struct unit *u, skill * sv, unsigned int change);
-    extern int skill_weeks(int level);
-    extern int skill_compare(const skill * sk, const skill * sc);
+    void reduce_skill(struct unit *u, skill * sv, unsigned int change);
+    int skill_weeks(int level);
+    int skill_compare(const skill * sk, const skill * sc);
 
-    extern void sk_set(skill * sv, int level);
+    void sk_set(skill * sv, int level);
 
 #ifdef __cplusplus
 }

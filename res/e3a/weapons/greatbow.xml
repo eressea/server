@@ -4,9 +4,9 @@
      * has lower damage
 -->
 <resource name="greatbow">
+  <modifier type="require" race="elf"/>
   <item weight="100" allow="elf">
     <construction skill="weaponsmithing" minskill="5">
-      <modifier function="mod_elves_only"/>
       <requirement type="mallorn" quantity="2"/>
     </construction>
     <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.0">

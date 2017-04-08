@@ -94,7 +94,6 @@ void register_attributes(void)
     at_register(&at_woodcount);
 
     /* neue UNIT-Attribute */
-    at_register(&at_fleechance);
     at_register(&at_siege);
     at_register(&at_effect);
     at_register(&at_private);
@@ -103,7 +102,6 @@ void register_attributes(void)
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
-    at_register(&at_maxmagicians);
     at_register(&at_npcfaction);
 
     /* connection-typen */
@@ -115,6 +113,7 @@ void register_attributes(void)
 
     at_register(&at_germs);
 
+    at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
     at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("orcification", a_readint);    /* required for old datafiles */

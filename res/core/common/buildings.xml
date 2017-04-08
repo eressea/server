@@ -93,7 +93,6 @@
   </building>
 
   <building name="smithy" capacity="1">
-    <function name="init" value="init_smithy"/>
     <maintenance type="money" amount="300"/>
     <maintenance type="log" amount="1"/>
     <construction skill="building" minskill="3">
@@ -102,6 +101,8 @@
       <requirement type="iron" quantity="2"/>
       <requirement type="money" quantity="200"/>
     </construction>
+    <modifier type="skill" skill="weaponsmithing" value="1"/>
+    <modifier type="skill" skill="armorer" value="1"/>
   </building>
 
   <building name="magictower" maxcapacity="2" maxsize="50" magic="yes" magres="40" fumblebonus="10" auraregen="1.75">

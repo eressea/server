@@ -468,7 +468,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     assert(rc);
     u_setrace(u, rc);
 
-#if GUARD_DISABLES_RECRUIT
     /* this is a very special case because the recruiting unit may be empty
      * at this point and we have to look at the creating unit instead. This
      * is done in cansee, which is called indirectly by is_guarded(). */
@@ -476,13 +475,11 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
         cmistake(u, ord, 70, MSG_EVENT);
         return;
     }
-#endif
 
     if (rc == get_race(RC_INSECT)) {
         gamedate date;
         get_gamedate(turn, &date);
         if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
-#ifdef INSECT_POTION
             bool usepotion = false;
             unit *u2;
 
@@ -492,7 +489,6 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
                     break;
                 }
             if (!usepotion)
-#endif
             {
                 cmistake(u, ord, 98, MSG_EVENT);
                 return;
@@ -802,30 +798,88 @@ void economics(region * r)
 
 }
 
-/* ------------------------------------------------------------- */
+static void mod_skill(const resource_mod *mod, skill_t sk, int *skill) {
+    skill_t msk;
+    assert(mod->type == RMT_PROD_SKILL);
+    msk = (skill_t)mod->value.sa[0];
+    if (msk == NOSKILL || msk == sk) {
+        *skill += mod->value.sa[1];
+    }
+}
+
+static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *rtype, variant *savep, int *skillp) {
+    struct building *b = inside_building(u);
+    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+    int save_n = 1, save_d = 1;
+    int skill = 0;
+    int need_race = 0, need_bldg = 0;
+    resource_mod *mod;
+
+    if (btype && btype->modifiers) {
+        for (mod = btype->modifiers; mod && mod->type != RMT_END; ++mod) {
+            if (mod->type == RMT_PROD_SKILL) {
+                mod_skill(mod, sk, &skill);
+            }
+        }
+    }
+
+    for (mod = rtype->modifiers; mod && mod->type != RMT_END; ++mod) {
+        if (mod->btype == NULL || mod->btype == btype) {
+            if (mod->race == NULL || mod->race == u_race(u)) {
+                switch (mod->type) {
+                case RMT_PROD_SAVE:
+                    if (savep) {
+                        save_n *= mod->value.sa[0];
+                        save_d *= mod->value.sa[1];
+                    }
+                    break;
+                case RMT_PROD_SKILL:
+                    mod_skill(mod, sk, &skill);
+                    break;
+                case RMT_PROD_REQUIRE:
+                    if (mod->race) need_race |= 1;
+                    if (mod->btype) need_bldg |= 1;
+                    break;
+                default:
+                    /* is not a production modifier, ignore it */
+                    break;
+                }
+            }
+        }
+        if (mod->type == RMT_PROD_REQUIRE) {
+            if (mod->race) need_race |= 2;
+            if (mod->btype) need_bldg |= 2;
+        }
+    }
+    if (need_race == 2) {
+        return msg_error(u, u->thisorder, 117);
+    }
+    if (need_bldg == 2) {
+        return msg_error(u, u->thisorder, 104);
+    }
+    *skillp = skill;
+    if (savep) *savep = frac_make(save_n, save_d);
+    return NULL;
+}
 
 static void manufacture(unit * u, const item_type * itype, int want)
 {
     int n;
-    int skill;
     int minskill = itype->construction->minskill;
     skill_t sk = itype->construction->skill;
+    message *msg;
+    int skill_mod;
 
-    skill = effskill(u, sk, 0);
-    skill =
-        skillmod(itype->construction->attribs, u, u->region, sk, skill, SMF_PRODUCTION);
-
-    if (skill < 0) {
-        /* an error occured */
-        int err = -skill;
-        cmistake(u, u->thisorder, err, MSG_PRODUCE);
+    msg = get_modifiers(u, sk, itype->rtype, NULL, &skill_mod);
+    if (msg) {
+        ADDMSG(&u->faction->msgs, msg);
         return;
     }
 
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    n = build(u, itype->construction, 0, want);
+    n = build(u, itype->construction, 0, want, skill_mod);
     switch (n) {
     case ENEEDSKILL:
         ADDMSG(&u->faction->msgs,
@@ -883,37 +937,6 @@ enum {
     AFL_LOWSKILL = 1 << 1
 };
 
-struct message * get_modifiers(unit *u, const resource_mod *mod, variant *savep, int *skillp) {
-    struct building *b = inside_building(u);
-    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-    int save_n = 1, save_d = 1;
-    int skill = 0;
-
-    for (; mod->flags != 0; ++mod) {
-        if (mod->btype == NULL || mod->btype == btype) {
-            if (mod->race == NULL || mod->race == u_race(u)) {
-                if (mod->flags & RMF_SAVEMATERIAL) {
-                    save_n *= mod->value.sa[0];
-                    save_d *= mod->value.sa[1];
-                }
-                if (mod->flags & RMF_SKILL) {
-                    skill += mod->value.i;
-                }
-            }
-        } else if (mod->flags & RMF_REQUIREDBUILDING) {
-            return msg_error(u, u->thisorder, 104);
-        }
-    }
-    *skillp = skill;
-    assert(save_n < SHRT_MAX);
-    assert(save_n > SHRT_MIN);
-    assert(save_d < SHRT_MAX);
-    assert(save_d > SHRT_MIN);
-    savep->sa[0] = (short)save_n;
-    savep->sa[1] = (short)save_d;
-    return NULL;
-}
-
 static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
@@ -924,12 +947,14 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
+    skill_t sk;
 
     /* momentan kann man keine ressourcen abbauen, wenn man daf�r
      * Materialverbrauch hat: */
     assert(itype != NULL && (itype->construction == NULL
         || itype->construction->materials == NULL));
 
+    sk = itype->construction->skill;
     if (!rtype->raw) {
         int avail = limit_resource(r, rtype);
         if (avail <= 0) {
@@ -944,7 +969,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
 
     if (rtype->modifiers) {
-        message *msg = get_modifiers(u, rtype->modifiers, &save_mod, &skill_mod);
+        message *msg = get_modifiers(u, sk, rtype, &save_mod, &skill_mod);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);
             return;
@@ -972,17 +997,14 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         }
     }
 
-    assert(itype->construction->skill != 0
-        || "limited resource needs a required skill for making it");
-    skill = effskill(u, itype->construction->skill, 0);
+    assert(sk != NOSKILL || "limited resource needs a required skill for making it");
+    skill = effskill(u, sk, 0);
     if (skill == 0) {
-        skill_t sk = itype->construction->skill;
         add_message(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
         return;
     }
     if (skill < itype->construction->minskill) {
-        skill_t sk = itype->construction->skill;
         add_message(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "manufacture_skills",
                 "skill minskill product", sk, itype->construction->minskill,
@@ -1207,7 +1229,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     if (want == 0) {
         want = maxbuild(u, ptype->itype->construction);
     }
-    built = build(u, ptype->itype->construction, 0, want);
+    built = build(u, ptype->itype->construction, 0, want, 0);
     switch (built) {
     case ELOWSKILL:
     case ENEEDSKILL:
@@ -1242,12 +1264,10 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
 void make_item(unit * u, const item_type * itype, int want)
 {
     if (itype->construction && fval(itype->rtype, RTF_LIMITED)) {
-#if GUARD_DISABLES_PRODUCTION == 1
         if (is_guarded(u->region, u)) {
             cmistake(u, u->thisorder, 70, MSG_EVENT);
             return;
         }
-#endif
         allocate_resource(u, itype->rtype, want);
     }
     else {
@@ -2020,20 +2040,6 @@ static void expandstealing(region * r, request * stealorders)
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
         }
-#ifndef GOBLINKILL
-        if (oa[i].type.goblin) {    /* Goblin-Spezialklau */
-            int uct = 0;
-            unit *u2;
-            assert(effskill(oa[i].unit, SK_STEALTH) >= 4
-                || !"this goblin\'s skill is too low");
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (u2->faction == u->faction) {
-                    uct += maintenance_cost(u2);
-                }
-            }
-            n -= uct * 2;
-        }
-#endif
         if (n > 10 && rplane(r) && (rplane(r)->flags & PFL_NOALLIANCES)) {
             /* In Questen nur reduziertes Klauen */
             n = 10;
