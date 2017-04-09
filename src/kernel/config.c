@@ -123,7 +123,7 @@ const char *parameters[MAXPARAMS] = {
     "TEMP",
     "FLIEHE",
     "GEBAEUDE",
-    "GIB",                        /* F�r HELFE */
+    "GIB",                        /* HELFE GIB */
     "KAEMPFE",
     "DURCHREISE",
     "BEWACHE",
