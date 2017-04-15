@@ -57,7 +57,7 @@ int unicode_utf8_trim(utf8_t *buf)
         if (op == buf && iswspace(wc)) {
             ++result;
         }
-        else if (iswprint(wc)) {
+        else if (wc>255 || !iscntrl(wc)) {
             if (op != ip) {
                 memmove(op, ip, size);
             }
@@ -67,7 +67,8 @@ int unicode_utf8_trim(utf8_t *buf)
                 lc = op;
                 ts = 0;
             }
-        } else {
+        }
+        else {
             ++result;
         }
         ip += size;

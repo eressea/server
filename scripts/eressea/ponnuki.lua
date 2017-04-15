@@ -14,8 +14,10 @@ local function ponnuki_brain(u)
   u:add_notice("Eine Botschaft von " .. tostring(u) .. ": " ..jokes[i])
   local d = math.random(6)
   local r = u.region:next(d-1)
-  u:clear_orders()
-  u:add_order("NACH " .. directions[d])
+  if r.terrain == 'glacier' then
+    u:clear_orders()
+    u:add_order("NACH " .. directions[d])
+  end
 end
 
 function ponnuki.init()
@@ -26,11 +28,18 @@ function ponnuki.init()
         local home = get_region(-67, -5)
         local f = get_faction(666)
         if home and f then
-            u = unit.create(f, home, 1, "illusion")
-            u.id = atoi36("ponn")
-            u.name = "Ponnuki"
-            u.info = "Go, Ponnuki, Go!"
-            u:set_racename("Ritter von Go")
+            if home.terrain~="glacier" then
+                home.terrain="glacier"
+                home.name = 'Magrathea'
+            end
+            u = unit.create(f, home, 1, "template")
+            if u then
+                u.id = atoi36("ponn")
+                u.name = "Ponnuki"
+                u.info = "Go, Ponnuki, Go!"
+                u.race_name = "Ritter von Go"
+                print(u:show())
+            end
         else
             eressea.log.error("Ponnuki cannot find Magrathea")
         end
