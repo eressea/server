@@ -1505,6 +1505,7 @@ int owner_change(const region * r)
 bool is_mourning(const region * r, int in_turn)
 {
     int change = owner_change(r);
-    return (change == in_turn - 1 && r->land->ownership->last_owner && r->land->ownership->owner
-        && r->land->ownership->last_owner != r->land->ownership->owner);
+    return (change == in_turn - 1 && r->land &&
+        r->land->ownership->last_owner && r->land->ownership->owner &&
+        r->land->ownership->last_owner != r->land->ownership->owner);
 }
