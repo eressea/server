@@ -523,7 +523,7 @@ static void make_familiar(unit * familiar, unit * mage)
         equip_items(&familiar->items, eq);
     }
     else {
-        log_error("could not perform initialization for familiar %s.\n", rc->_name);
+        log_info("could not perform initialization for familiar %s.\n", rc->_name);
     }
 
     /* triggers: */
