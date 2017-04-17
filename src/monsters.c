@@ -738,7 +738,7 @@ void plan_monsters(faction * f)
             order *long_order = NULL;
 
             /* Ab hier nur noch Befehle für NPC-Einheiten. */
-            if (!is_monsters(u->faction))
+            if (u->faction!=f)
                 continue;
 
             /* Befehle müssen jede Runde neu gegeben werden: */

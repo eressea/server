@@ -701,7 +701,7 @@
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
-  <race name="wyrm" magres="90" maxaura="1.000000" regaura="3.000000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
+  <race name="wyrm" magres="90" maxaura="1.000000" regaura="3.000000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" dragon="yes" unarmedguard="yes">
     <ai splitsize="1" killpeasants="yes" learn="yes"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
