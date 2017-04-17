@@ -65,7 +65,7 @@ race *races;
 int num_races = 0;
 static int rc_changes = 1;
 
-static const char *racenames[MAXRACES] = {
+const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
     "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
@@ -168,6 +168,7 @@ const struct race *findrace(const char *s, const struct locale *lang)
 const struct race *get_race(race_t rt) {
     const char * name;
 
+    assert(rt >= 0);
     assert(rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
@@ -484,11 +485,9 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
     }
 }
 
-const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
+const char* rc_key(const char *rcname, name_t n, char *name, size_t size)
+{
     const char * postfix = 0;
-    if (!rc) {
-        return NULL;
-    }
     switch (n) {
     case NAME_SINGULAR: postfix = ""; break;
     case NAME_PLURAL: postfix = "_p"; break;
@@ -497,10 +496,18 @@ const char* rc_name(const race * rc, name_t n, char *name, size_t size) {
     default: assert(!"invalid name_t enum in rc_name_s");
     }
     if (postfix) {
-        snprintf(name, size, "race::%s%s", rc->_name, postfix);
+        snprintf(name, size, "race::%s%s", rcname, postfix);
         return name;
     }
     return NULL;
+}
+
+const char* rc_name(const race * rc, name_t n, char *name, size_t size)
+{
+    if (!rc) {
+        return NULL;
+    }
+    return rc_key(rc->_name, n, name, size);
 }
 
 const char *rc_name_s(const race * rc, name_t n)

@@ -96,8 +96,19 @@ struct locale * test_create_locale(void) {
         locale_setstring(loc, "stone_p", "Steine");
         locale_setstring(loc, "plain", "Ebene");
         locale_setstring(loc, "ocean", "Ozean");
-        locale_setstring(loc, "race::human", "Mensch");
-        locale_setstring(loc, "race::human_p", "Menschen");
+        for (i = 0; i < MAXRACES; ++i) {
+            if (racenames[i]) {
+                char name[64];
+                rc_key(racenames[i], NAME_PLURAL, name, sizeof(name));
+                if (!locale_getstring(loc, name)) {
+                    locale_setstring(loc, name, name + 6);
+                }
+                rc_key(racenames[i], NAME_SINGULAR, name, sizeof(name));
+                if (!locale_getstring(loc, name)) {
+                    locale_setstring(loc, name, name + 6);
+                }
+            }
+        }
         for (i = 0; i < MAXSKILLS; ++i) {
             if (!locale_getstring(loc, mkname("skill", skillnames[i])))
                 locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);

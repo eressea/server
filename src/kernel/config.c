@@ -365,13 +365,26 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-void init_locale(struct locale *lang)
+void init_races(struct locale *lang)
 {
-    variant var;
-    int i;
     const struct race *rc;
     void **tokens;
 
+    tokens = get_translations(lang, UT_RACES);
+    for (rc = races; rc; rc = rc->next) {
+        const char *name;
+        variant var;
+        var.v = (void *)rc;
+        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
+        if (name) addtoken((struct tnode **)tokens, name, var);
+        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
+        if (name) addtoken((struct tnode **)tokens, name, var);
+    }
+}
+
+static void init_magic(struct locale *lang)
+{
+    void **tokens;
     tokens = get_translations(lang, UT_MAGIC);
     if (tokens) {
         const char *str = config_get("rules.magic.playerschools");
@@ -383,7 +396,9 @@ void init_locale(struct locale *lang)
         sstr = strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
+            variant var;
             const char *name;
+            int i;
             for (i = 0; i != MAXMAGIETYP; ++i) {
                 if (strcmp(tok, magic_school[i]) == 0) break;
             }
@@ -400,21 +415,14 @@ void init_locale(struct locale *lang)
         }
         free(sstr);
     }
-
+}
+void init_locale(struct locale *lang)
+{
+    init_magic(lang);
     init_directions(lang);
     init_keywords(lang);
     init_skills(lang);
-
-    tokens = get_translations(lang, UT_RACES);
-    for (rc = races; rc; rc = rc->next) {
-        const char *name;
-        var.v = (void *)rc;
-        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-    }
-
+    init_races(lang);
     init_parameters(lang);
 
     init_options_translation(lang);
