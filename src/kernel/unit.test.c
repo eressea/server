@@ -171,12 +171,10 @@ static void test_unit_name_from_race(CuTest *tc) {
 
 static void test_update_monster_name(CuTest *tc) {
     unit *u;
-    struct locale *lang;
     race *rc;
 
     test_setup();
     rc = test_create_race("human");
-    lang = test_create_locale();
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
     unit_setname(u, "Hodor");
