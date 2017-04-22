@@ -56,6 +56,7 @@ extern "C" {
     /* returns a value between [0..xpct_2], generated with two dice */
 
     void init_locale(struct locale *lang);
+    void init_races(struct locale *lang);
 
     int forbiddenid(int id);
     int newcontainerid(void);

@@ -254,7 +254,7 @@ function test_can_give_person()
 end
 
 function test_no_uruk()
-  local f1 = faction.create("uruk", "noreply@eressea.de", "de")
+  local f1 = faction.create("uruk")
   assert_equal(f1.race, "orc")
 end
 
@@ -349,7 +349,7 @@ end
 
 function test_stonegolems()
   local r0 = region.create(0, 0, "plain")
-  local f1 = faction.create("stonegolem", "noreply@eressea.de", "de")
+  local f1 = faction.create("stonegolem")
   local u1 = unit.create(f1, r0, 1)
   local u2 = unit.create(f1, r0, 2)
   local c1 = building.create(r0, "castle")
@@ -378,10 +378,29 @@ end
 
 function test_birthdaycake()
   r = region.create(0,0, "plain")
-  f = faction.create("human", "cake@eressea.de", "de")
+  f = faction.create("human")
   u = unit.create(f, r, 1)
   u:add_item("birthdaycake", 1)
   u:clear_orders()
   u:add_order("ZEIGE Geburtstagstorte")
   process_orders()
+end
+
+function test_demonstealth()
+  local desc, r, f, u
+  r = region.create(0, 0, "plain")
+  f = faction.create("demon")
+  u = unit.create(f, r, 1)
+
+  u:clear_orders()
+  u:add_order("TARNE Zwerg")
+  process_orders()
+  desc = u:show()
+  assert_not_nil(string.find(desc, "Zwerg"))
+
+  u:clear_orders()
+  u:add_order("TARNE Drache")
+  process_orders()
+  desc = u:show()
+  assert_equal(nil, string.find(desc, "Drache"))
 end

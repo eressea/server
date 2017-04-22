@@ -3,6 +3,7 @@
 #include <magic.h>
 #include <kernel/config.h>
 #include <kernel/types.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
@@ -130,21 +131,55 @@ static void test_sabotage_other_fail(CuTest *tc) {
 static void test_setstealth_cmd(CuTest *tc) {
     unit *u;
     const struct locale *lang;
-    
+
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     lang = u->faction->locale;
-    u->flags = UFL_ANON_FACTION|UFL_SIEGE;
+    u->flags = UFL_ANON_FACTION | UFL_SIEGE;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
-            LOC(lang, parameters[P_FACTION]),
-            LOC(lang, parameters[P_NOT]));
+        LOC(lang, parameters[P_FACTION]),
+        LOC(lang, parameters[P_NOT]));
     setstealth_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, UFL_SIEGE, u->flags);
     free_order(u->thisorder);
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s",
-            LOC(lang, parameters[P_FACTION]));
+        LOC(lang, parameters[P_FACTION]));
     setstealth_cmd(u, u->thisorder);
-    CuAssertIntEquals(tc, UFL_SIEGE|UFL_ANON_FACTION, u->flags);
+    CuAssertIntEquals(tc, UFL_SIEGE | UFL_ANON_FACTION, u->flags);
+    test_cleanup();
+}
+
+static void test_setstealth_demon(CuTest *tc) {
+    unit *u;
+    struct locale *lang;
+    struct race *rc;
+
+    test_setup();
+    lang = test_create_locale();
+    rc = test_create_race("demon");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    rc = test_create_race("dwarf");
+    init_races(lang);
+    u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, (void *)rc, (void *)u->irace);
+    test_cleanup();
+}
+
+static void test_setstealth_demon_bad(CuTest *tc) {
+    unit *u;
+    struct locale *lang;
+    struct race *rc;
+
+    test_setup();
+    lang = test_create_locale();
+    rc = test_create_race("demon");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    rc = test_create_race("smurf");
+    init_races(lang);
+    u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, (void *)u->irace);
     test_cleanup();
 }
 
@@ -180,6 +215,8 @@ CuSuite *get_spy_suite(void)
     SUITE_ADD_TEST(suite, test_all_spy_message);
     SUITE_ADD_TEST(suite, test_sabotage_self);
     SUITE_ADD_TEST(suite, test_setstealth_cmd);
+    SUITE_ADD_TEST(suite, test_setstealth_demon);
+    SUITE_ADD_TEST(suite, test_setstealth_demon_bad);
     SUITE_ADD_TEST(suite, test_sabotage_other_fail);
     SUITE_ADD_TEST(suite, test_sabotage_other_success);
     return suite;

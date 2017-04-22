@@ -1584,7 +1584,9 @@ int display_cmd(unit * u, struct order *ord)
         free(*s);
         if (s2) {
             char * str = strdup(s2);
-            unicode_utf8_trim(str);
+            if (unicode_utf8_trim(str) != 0) {
+                log_info("trimming info: %s", s2);
+            }
             if (strlen(str) >= DISPLAYSIZE) {
                 str[DISPLAYSIZE-1] = 0;
             }
@@ -1626,7 +1628,9 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
     strlcpy(name, s2, sizeof(name));
-    unicode_utf8_trim(name);
+    if (unicode_utf8_trim(name) != 0) {
+        log_info("trimming name: %s", s2);
+    }
 
     free(*s);
     *s = strdup(name);
