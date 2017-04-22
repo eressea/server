@@ -249,14 +249,14 @@ int setstealth_cmd(unit * u, struct order *ord)
             if (u_race(u) == get_race(RC_DAEMON)) {
                 if (playerrace(trace)) {
                     u->irace = trace;
-                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs)) {
                         set_racename(&u->attribs, NULL);
+                    }
                 }
                 return 0;
             }
-
             /* Singdrachen koennen sich nur als Drachen tarnen */
-            if (u_race(u) == get_race(RC_SONGDRAGON)
+            else if (u_race(u) == get_race(RC_SONGDRAGON)
                 || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
                 if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
                     || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
