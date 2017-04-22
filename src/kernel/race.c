@@ -166,7 +166,7 @@ const struct race *findrace(const char *s, const struct locale *lang)
 const struct race *get_race(race_t rt) {
     const char * name;
 
-    assert(rt < MAXRACES);
+    assert(rt>=0 && rt < MAXRACES);
     name = racenames[rt];
     if (!name) {
         return NULL;

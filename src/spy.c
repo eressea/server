@@ -254,19 +254,18 @@ int setstealth_cmd(unit * u, struct order *ord)
                     NORACE
                 };
                 int i;
-                for (i = 0; allowed[i] != NORACE; ++i)
-                    if (get_race(allowed[i]) == trace)
+                for (i = 0; allowed[i] != NORACE; ++i) {
+                    if (get_race(allowed[i]) == trace) {
+                        u->irace = trace;
+                        if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
+                            set_racename(&u->attribs, NULL);
                         break;
-                if (get_race(allowed[i]) == trace) {
-                    u->irace = trace;
-                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-                        set_racename(&u->attribs, NULL);
+                    }
                 }
                 return 0;
             }
-
             /* Singdrachen koennen sich nur als Drachen tarnen */
-            if (u_race(u) == get_race(RC_SONGDRAGON)
+            else if (u_race(u) == get_race(RC_SONGDRAGON)
                 || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
                 if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
                     || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
