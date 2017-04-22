@@ -404,3 +404,22 @@ function test_birthdaycake()
   u:add_order("ZEIGE Geburtstagstorte")
   process_orders()
 end
+
+function test_demonstealth()
+  local desc, r, f, u
+  r = region.create(0, 0, "plain")
+  f = faction.create("demon@eressea.de", "demon", "de")
+  u = unit.create(f, r, 1)
+
+  u:clear_orders()
+  u:add_order("TARNE Zwerg")
+  process_orders()
+  desc = u:show()
+  assert_not_nil(string.find(desc, "Zwerg"))
+
+  u:clear_orders()
+  u:add_order("TARNE Drache")
+  process_orders()
+  desc = u:show()
+  assert_equal(nil, string.find(desc, "Drache"))
+end

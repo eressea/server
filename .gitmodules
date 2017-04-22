@@ -1,9 +1,6 @@
 [submodule "lunit"]
 	path = lunit
 	url = https://github.com/ennorehling/lunit.git
-[submodule "cmake"]
-	path = cmake
-	url = https://github.com/ennorehling/cmake.git
 [submodule "dlmalloc"]
 	path = dlmalloc
 	url = https://github.com/ennorehling/dlmalloc.git
