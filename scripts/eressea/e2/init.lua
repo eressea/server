@@ -9,7 +9,7 @@ return {
     require('eressea.wedding'),
     require('eressea.embassy'),
     require('eressea.tunnels'),
---    require('eressea.ponnuki'),
+    require('eressea.ponnuki'),
     require('eressea.astral'),
 --    require('eressea.locales'),
     require('eressea.jsreport'),
