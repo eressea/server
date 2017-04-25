@@ -1,3 +1,4 @@
+require 'tests.e2.buildings'
 require 'tests.e2.production'
 require 'tests.e2.adamantium'
 require 'tests.e2.undead'

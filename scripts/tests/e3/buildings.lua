@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.e3.castles", package.seeall, lunit.testcase )
+module("tests.e3.buildings", package.seeall, lunit.testcase )
 
 function setup()
     eressea.game.reset()
@@ -9,6 +9,23 @@ end
 
 function teardown()
     eressea.settings.set("rules.food.flags", "0")
+end
+
+function test_castle_names()
+    local r = region.create(0, 0, "plain")
+    local b = building.create(r, "castle")
+
+    assert_equal("site", b:get_typename(1))
+    assert_equal("site", b:get_typename(9))
+    assert_equal("fortification", b:get_typename(10))
+    assert_equal("fortification", b:get_typename(49))
+    assert_equal("tower", b:get_typename(50))
+    assert_equal("tower", b:get_typename(249))
+    assert_equal("castle", b:get_typename(250))
+    assert_equal("castle", b:get_typename(1249))
+    assert_equal("fortress", b:get_typename(1250))
+    assert_equal("fortress", b:get_typename(6249))
+    assert_equal("citadel", b:get_typename(6250))
 end
 
 function test_build_watch()
@@ -33,7 +50,7 @@ function test_build_watch()
     assert_equal(10, u.building.size)
 end
 
-function test_watch()
+function test_watch_names()
     local r = region.create(0, 0, "plain")
     local b = building.create(r, "watch")
 
