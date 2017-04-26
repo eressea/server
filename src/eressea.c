@@ -70,7 +70,6 @@ void game_init(void)
     register_spells();
     register_names();
     register_resources();
-    register_buildings();
     register_itemfunctions();
 #if MUSEUM_MODULE
     register_museum();

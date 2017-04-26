@@ -888,7 +888,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-                itype->construction->btype->_name));
+                itype->construction->extra.btype->_name));
         return;
     case ELOWSKILL:
         ADDMSG(&u->faction->msgs,
@@ -1239,7 +1239,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-                ptype->itype->construction->btype->_name));
+                ptype->itype->construction->extra.btype->_name));
         break;
     case ECOMPLETE:
         assert(0);
