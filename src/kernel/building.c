@@ -784,6 +784,16 @@ bool is_owner_building(const struct building * b)
     return false;
 }
 
+double building_taxes(const building *b, int bsize) {
+    assert(b);
+    if (!b->type->taxes) return 0;
+    else {
+        int level = buildingeffsize(b, false);
+        return b->type->taxes(b, level);
+    }
+}
+
+
 int cmp_taxes(const building * b, const building * a)
 {
     faction *f = region_get_owner(b->region);
@@ -793,10 +803,8 @@ int cmp_taxes(const building * b, const building * a)
             return -1;
         }
         else if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
+            double newtaxes = building_taxes(b, b->size);
+            double oldtaxes = building_taxes(a, a->size);
 
             if (newtaxes < oldtaxes)
                 return -1;
