@@ -71,7 +71,7 @@ extern "C" {
         const char *(*name) (const struct building_type *,
             const struct building * b, int size);
         void(*age) (struct building *);
-        double(*taxes) (const struct building *, int size);
+        double(*taxes) (const struct building *, int level);
         struct attrib *attribs;
     } building_type;
 
@@ -139,6 +139,7 @@ extern "C" {
     int cmp_taxes(const struct building *b, const struct building *bother);
     int cmp_current_owner(const struct building *b,
         const struct building *bother);
+    int building_taxes(const building *b, int bsize);
 
     /* old functions, still in build.c: */
     int buildingeffsize(const building * b, int imaginary);

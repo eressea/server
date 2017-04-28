@@ -2949,8 +2949,8 @@ static void peasant_taxes(region * r)
 
     maxsize = buildingeffsize(b, false);
     if (maxsize > 0) {
-        double taxfactor = money * b->type->taxes(b, maxsize);
-        double morale = MORALE_TAX_FACTOR * money * region_get_morale(r);
+        double taxfactor = money / building_taxes(b, maxsize);
+        double morale = money * region_get_morale(r) / MORALE_TAX_FACTOR;
         if (taxfactor > morale) {
             taxfactor = morale;
         }

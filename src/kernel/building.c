@@ -784,12 +784,12 @@ bool is_owner_building(const struct building * b)
     return false;
 }
 
-double building_taxes(const building *b, int bsize) {
+int building_taxes(const building *b, int bsize) {
     assert(b);
     if (!b->type->taxes) return 0;
     else {
         int level = buildingeffsize(b, false);
-        return b->type->taxes(b, level);
+        return (int)(0.5+1/b->type->taxes(b, level));
     }
 }
 
@@ -803,12 +803,12 @@ int cmp_taxes(const building * b, const building * a)
             return -1;
         }
         else if (a) {
-            double newtaxes = building_taxes(b, b->size);
-            double oldtaxes = building_taxes(a, a->size);
+            int newtaxes = building_taxes(b, b->size);
+            int oldtaxes = building_taxes(a, a->size);
 
-            if (newtaxes < oldtaxes)
+            if (newtaxes > oldtaxes)
                 return -1;
-            else if (newtaxes > oldtaxes)
+            else if (newtaxes < oldtaxes)
                 return 1;
             else if (b->size < a->size)
                 return -1;
@@ -840,20 +840,18 @@ int cmp_current_owner(const building * b, const building * a)
         if (!u || u->faction != f)
             return -1;
         if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
+            int newtaxes = building_taxes(b, b->size);
+            int oldtaxes = building_taxes(a, a->size);
 
-            if (newtaxes > oldtaxes) {
+            if (newtaxes < oldtaxes) {
                 return 1;
             }
-            if (newtaxes < oldtaxes) {
+            if (newtaxes > oldtaxes) {
                 return -1;
             }
-            if (newsize != oldsize) {
-                return newsize - oldsize;
-            }
+            //if (newsize != oldsize) {
+            //    return newsize - oldsize;
+            //}
             return (b->size - a->size);
         }
         else {
