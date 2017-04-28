@@ -43,7 +43,7 @@ void morale_update(region *r) {
     if (r->land->ownership && r->land->ownership->owner) {
         int stability = turn - r->land->ownership->morale_turn;
         int maxmorale = MORALE_DEFAULT;
-        building *b = largestbuilding(r, &cmp_taxes, false);
+        building *b = largestbuilding(r, cmp_taxes, false);
         if (b) {
             int bsize = buildingeffsize(b, false);
             maxmorale = (int)(0.5 + b->type->taxes(b, bsize + 1) * MORALE_TAX_FACTOR);

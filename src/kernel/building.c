@@ -523,10 +523,10 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
     }
     if (!heir && config_token("rules.region_owner_pay_building", bld->type->_name)) {
         if (rule_region_owners()) {
-            u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
+            u = building_owner(largestbuilding(bld->region, cmp_taxes, false));
         }
         else {
-            u = building_owner(largestbuilding(bld->region, &cmp_wage, false));
+            u = building_owner(largestbuilding(bld->region, cmp_wage, false));
         }
         if (u) {
             heir = u;
@@ -643,9 +643,12 @@ bool is_building_type(const struct building_type *btype, const char *name) {
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     bool imaginary)
 {
-    building *b, *best = NULL;
+    building *b, *best = r->buildings;
 
-    for (b = rbuildings(r); b; b = b->next) {
+    if (!best) {
+        return NULL;
+    }
+    for (b = best->next; b; b = b->next) {
         if (cmp_gt(b, best) <= 0)
             continue;
         if (!imaginary) {
@@ -673,7 +676,7 @@ static const int wagetable[7][4] = {
 static int
 default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
-    building *b = largestbuilding(r, &cmp_wage, false);
+    building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
     double wage;
     static int ct_cache;
@@ -786,11 +789,14 @@ bool is_owner_building(const struct building * b)
 
 int building_taxes(const building *b, int bsize) {
     assert(b);
-    if (!b->type->taxes) return 0;
-    else {
+    if (b->type->taxes) {
         int level = buildingeffsize(b, false);
-        return (int)(0.5+1/b->type->taxes(b, level));
+        double tax = b->type->taxes(b, level);
+        if (tax > 0) {
+            return (int)(0.5 + 1 / tax);
+        }
     }
+    return 0;
 }
 
 
@@ -817,8 +823,9 @@ int cmp_taxes(const building * b, const building * a)
             else {
                 if (u && u->faction == f) {
                     u = building_owner(a);
-                    if (u && u->faction == f)
-                        return -1;
+                    if (u && u->faction == f) {
+                        return 0;
+                    }
                     return 1;
                 }
             }
@@ -827,7 +834,7 @@ int cmp_taxes(const building * b, const building * a)
             return 1;
         }
     }
-    return -1;
+    return 0;
 }
 
 int cmp_current_owner(const building * b, const building * a)
@@ -843,10 +850,10 @@ int cmp_current_owner(const building * b, const building * a)
             int newtaxes = building_taxes(b, b->size);
             int oldtaxes = building_taxes(a, a->size);
 
-            if (newtaxes < oldtaxes) {
+            if (newtaxes > oldtaxes) {
                 return 1;
             }
-            if (newtaxes > oldtaxes) {
+            if (newtaxes < oldtaxes) {
                 return -1;
             }
             //if (newsize != oldsize) {
@@ -858,5 +865,5 @@ int cmp_current_owner(const building * b, const building * a)
             return 1;
         }
     }
-    return -1;
+    return 0;
 }

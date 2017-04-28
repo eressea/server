@@ -112,7 +112,7 @@ static bool is_guardian_r(const unit * guard)
     if (guard->building && rule_region_owners() && guard == building_owner(guard->building)) {
         faction *owner = region_get_owner(guard->region);
         if (owner == guard->faction) {
-            building *bowner = largestbuilding(guard->region, &cmp_taxes, false);
+            building *bowner = largestbuilding(guard->region, cmp_taxes, false);
             if (bowner == guard->building) {
                 return true;
             }

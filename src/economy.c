@@ -575,7 +575,7 @@ void give_control(unit * u, unit * u2)
 
             assert(u->building == u2->building);
             if (f == u->faction) {
-                building *b = largestbuilding(r, &cmp_current_owner, false);
+                building *b = largestbuilding(r, cmp_current_owner, false);
                 if (b == u->building) {
                     friendly_takeover(r, u2->faction);
                 }
