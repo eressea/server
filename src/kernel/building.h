@@ -70,7 +70,6 @@ extern "C" {
 
         const char *(*name) (const struct building_type *,
             const struct building * b, int size);
-        void(*age) (struct building *);
         double(*taxes) (const struct building *, int level);
         struct attrib *attribs;
     } building_type;

@@ -2883,10 +2883,6 @@ static building *age_building(building * b)
     a_age(&b->attribs, b);
     handle_event(b->attribs, "timer", b);
 
-    if (b->type->age) {
-        b->type->age(b);
-    }
-
     return b;
 }
 
