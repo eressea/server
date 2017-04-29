@@ -536,7 +536,8 @@ static void test_building_effsize(CuTest *tc) {
 }
 
 static int cmp_size(const building *lhs, const building *rhs) {
-    return lhs->size - rhs->size;
+    assert(lhs);
+    return rhs ? lhs->size - rhs->size : 1;
 }
 
 static void test_largestbuilding(CuTest *tc) {

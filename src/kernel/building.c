@@ -643,12 +643,9 @@ bool is_building_type(const struct building_type *btype, const char *name) {
 building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     bool imaginary)
 {
-    building *b, *best = r->buildings;
+    building *b, *best = NULL;
 
-    if (!best) {
-        return NULL;
-    }
-    for (b = best->next; b; b = b->next) {
+    for (b = r->buildings; b; b = b->next) {
         if (cmp_gt(b, best) <= 0)
             continue;
         if (!imaginary) {
