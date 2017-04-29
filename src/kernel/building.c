@@ -469,7 +469,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
         bsize = adjust_size(b, bsize);
     }
 
-    if (!cons || !cons->improvement) {
+    if (!cons) {
         return 0;
     }
 
@@ -784,16 +784,9 @@ bool is_owner_building(const struct building * b)
     return false;
 }
 
-int building_taxes(const building *b, int bsize) {
+int building_taxes(const building *b) {
     assert(b);
-    if (b->type->taxes) {
-        int level = buildingeffsize(b, false);
-        double tax = b->type->taxes(b, level);
-        if (tax > 0) {
-            return (int)(0.5 + 1 / tax);
-        }
-    }
-    return 0;
+    return b->type->taxes;
 }
 
 
@@ -806,8 +799,8 @@ int cmp_taxes(const building * b, const building * a)
             return -1;
         }
         else if (a) {
-            int newtaxes = building_taxes(b, b->size);
-            int oldtaxes = building_taxes(a, a->size);
+            int newtaxes = building_taxes(b);
+            int oldtaxes = building_taxes(a);
 
             if (newtaxes > oldtaxes)
                 return -1;
@@ -844,8 +837,8 @@ int cmp_current_owner(const building * b, const building * a)
         if (!u || u->faction != f)
             return -1;
         if (a) {
-            int newtaxes = building_taxes(b, b->size);
-            int oldtaxes = building_taxes(a, a->size);
+            int newtaxes = building_taxes(b);
+            int oldtaxes = building_taxes(a);
 
             if (newtaxes > oldtaxes) {
                 return 1;

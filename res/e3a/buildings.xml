@@ -3,8 +3,7 @@
 
   <xi:include href="config://default/buildings/castle-2.xml" />
 
-  <building name="watch" maxsize="10" capacity="1" fort="yes">
-    <function name="taxes" value="lua_building_taxes"/>
+  <building name="watch" maxsize="10" capacity="1" fort="yes" taxes="200">
     <construction skill="building" minskill="1" maxsize="5" name="scaffolding">
       <requirement type="log" quantity="1"/>
     </construction>

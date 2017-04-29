@@ -320,6 +320,7 @@ static int parse_buildings(xmlDocPtr doc)
             btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
             btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
             btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
+            btype->taxes = xml_ivalue(node, "taxes", btype->taxes);
 
             if (xml_bvalue(node, "nodestroy", false))
                 btype->flags |= BTF_INDESTRUCTIBLE;
@@ -368,9 +369,6 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->name =
                         (const char *(*)(const struct building_type *,
                         const struct building *, int))fun;
-                }
-                else if (strcmp((const char *)propValue, "taxes") == 0) {
-                    btype->taxes = (double(*)(const struct building *, int))fun;
                 }
                 else {
                     log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);

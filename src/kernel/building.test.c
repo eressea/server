@@ -432,11 +432,6 @@ static void test_cmp_castle_size(CuTest *tc) {
     test_cleanup();
 }
 
-static double tax_cb(const building *b, int level) {
-    UNUSED_ARG(level);
-    return b->size * 0.01;
-}
-
 static void test_cmp_wage(CuTest *tc) {
     region *r;
     building *b1, *b2;
@@ -444,7 +439,7 @@ static void test_cmp_wage(CuTest *tc) {
 
     test_setup();
     btype = test_create_buildingtype("castle");
-    btype->taxes = tax_cb;
+    btype->taxes = 100;
     r = test_create_region(0, 0, 0);
     b1 = test_create_building(r, btype);
     b2 = test_create_building(r, btype);
@@ -465,7 +460,7 @@ static void test_cmp_taxes(CuTest *tc) {
 
     test_setup();
     btype = test_create_buildingtype("castle");
-    btype->taxes = tax_cb;
+    btype->taxes = 100;
     r = test_create_region(0, 0, 0);
     b1 = test_create_building(r, btype);
     b2 = test_create_building(r, btype);
@@ -490,13 +485,19 @@ static void test_cmp_current_owner(CuTest *tc) {
 
     test_setup();
     config_set("rules.region_owners", "1");
-    btype = test_create_buildingtype("castle");
-    btype->taxes = tax_cb;
     r = test_create_region(0, 0, 0);
+    btype = test_create_buildingtype("watch");
+    btype->construction->maxsize = 1;
+    btype->taxes = 200;
     b1 = test_create_building(r, btype);
+    btype = test_create_buildingtype("castle");
+    btype->construction->maxsize = 1;
+    btype->taxes = 100;
     b2 = test_create_building(r, btype);
-    b1->size = 5;
-    b2->size = 10;
+    b1->size = 1;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b1, false));
+    b2->size = 1;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b2, false));
     u1 = test_create_unit(test_create_faction(0), r);
     u_set_building(u1, b1);
     u2 = test_create_unit(test_create_faction(0), r);

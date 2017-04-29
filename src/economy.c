@@ -2929,7 +2929,7 @@ static void peasant_taxes(region * r)
     unit *u;
     building *b;
     int money;
-    int maxsize;
+    int level;
 
     f = region_get_owner(r);
     if (f == NULL || is_mourning(r, turn)) {
@@ -2947,9 +2947,9 @@ static void peasant_taxes(region * r)
     if (u == NULL || u->faction != f)
         return;
 
-    maxsize = buildingeffsize(b, false);
-    if (maxsize > 0) {
-        double taxfactor = money / building_taxes(b, maxsize);
+    level = buildingeffsize(b, false);
+    if (level > 0) {
+        double taxfactor = money * level / building_taxes(b);
         double morale = money * region_get_morale(r) / MORALE_TAX_FACTOR;
         if (taxfactor > morale) {
             taxfactor = morale;
