@@ -525,10 +525,6 @@ struct pay_fixture {
     unit *u2;
 };
 
-static double level_taxes(const building * b, int level) {
-    return b->size * level * 2.0;
-}
-
 static void setup_pay_cmd(struct pay_fixture *fix) {
     faction *f;
     region *r;
@@ -540,7 +536,7 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     r = findregion(0, 0);
     assert(r && f);
     btcastle = test_create_buildingtype("castle");
-    btcastle->taxes = level_taxes;
+    btcastle->taxes = 100;
     b = test_create_building(r, btcastle);
     assert(b);
     fix->u1 = test_create_unit(f, r);

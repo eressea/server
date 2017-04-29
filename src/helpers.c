@@ -352,58 +352,6 @@ lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
     return result;
 }
 
-static void lua_agebuilding(building * b)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    char fname[64];
-
-    strlcpy(fname, "age_", sizeof(fname));
-    strlcat(fname, b->type->_name, sizeof(fname));
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-
-        if (lua_pcall(L, 1, 0, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("agebuilding(%s) calling '%s': %s.\n", buildingname(b), fname, error);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("agebuilding(%s) calling '%s': not a function.\n", buildingname(b), fname);
-        lua_pop(L, 1);
-    }
-}
-
-static double lua_building_taxes(building * b, int level)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    const char *fname = "building_taxes";
-    double result = 0.0F;
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
-        lua_pushinteger(L, level);
-
-        if (lua_pcall(L, 2, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("building_taxes(%s) calling '%s': %s.\n", buildingname(b), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (double)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("building_taxes(%s) calling '%s': not a function.\n", buildingname(b), fname);
-        lua_pop(L, 1);
-    }
-    return result;
-}
-
 static int lua_maintenance(const unit * u)
 {
     lua_State *L = (lua_State *)global.vm_state;
@@ -526,10 +474,6 @@ void register_tolua_helpers(void)
     at_register(&at_direction);
     at_register(&at_building_action);
 
-    register_function((pf_generic)lua_building_taxes,
-        TOLUA_CAST "lua_building_taxes");
-    register_function((pf_generic)lua_agebuilding,
-        TOLUA_CAST "lua_agebuilding");
     register_function((pf_generic)lua_callspell, TOLUA_CAST "lua_castspell");
     register_function((pf_generic)lua_initfamiliar,
         TOLUA_CAST "lua_initfamiliar");

@@ -575,7 +575,7 @@ void give_control(unit * u, unit * u2)
 
             assert(u->building == u2->building);
             if (f == u->faction) {
-                building *b = largestbuilding(r, &cmp_current_owner, false);
+                building *b = largestbuilding(r, cmp_current_owner, false);
                 if (b == u->building) {
                     friendly_takeover(r, u2->faction);
                 }
@@ -888,7 +888,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-                itype->construction->btype->_name));
+                itype->construction->extra.btype->_name));
         return;
     case ELOWSKILL:
         ADDMSG(&u->faction->msgs,
@@ -1239,7 +1239,7 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case EBUILDINGREQ:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "building_needed", "building",
-                ptype->itype->construction->btype->_name));
+                ptype->itype->construction->extra.btype->_name));
         break;
     case ECOMPLETE:
         assert(0);
@@ -2929,7 +2929,7 @@ static void peasant_taxes(region * r)
     unit *u;
     building *b;
     int money;
-    int maxsize;
+    int level;
 
     f = region_get_owner(r);
     if (f == NULL || is_mourning(r, turn)) {
@@ -2947,10 +2947,10 @@ static void peasant_taxes(region * r)
     if (u == NULL || u->faction != f)
         return;
 
-    maxsize = buildingeffsize(b, false);
-    if (maxsize > 0) {
-        double taxfactor = money * b->type->taxes(b, maxsize);
-        double morale = MORALE_TAX_FACTOR * money * region_get_morale(r);
+    level = buildingeffsize(b, false);
+    if (level > 0) {
+        double taxfactor = money * level / building_taxes(b);
+        double morale = money * region_get_morale(r) / MORALE_TAX_FACTOR;
         if (taxfactor > morale) {
             taxfactor = morale;
         }

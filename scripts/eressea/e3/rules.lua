@@ -1,13 +1,3 @@
-function building_taxes(b, blevel)
-  btype = b.type
-  if btype=="castle" then
-    return blevel * 0.01
-  elseif btype=="watch" then
-    return blevel * 0.005
-  end
-  return 0.0
-end
-
 -- the "raindance" spell
 function raindance(r, mage, level, force)
   if (create_curse(mage, r, "blessedharvest", force, 1+force*2, 100 * force)) then

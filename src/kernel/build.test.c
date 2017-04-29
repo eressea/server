@@ -81,7 +81,8 @@ static void test_build_requires_building(CuTest *tc) {
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, 2);
-    bf.cons.btype = btype = bt_get_or_create("hodor");
+    bf.cons.type = CONS_ITEM;
+    bf.cons.extra.btype = btype = bt_get_or_create("hodor");
     btype->maxcapacity = 1;
     btype->capacity = 1;
     CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1, 0));

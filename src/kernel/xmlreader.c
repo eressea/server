@@ -214,7 +214,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 
 void
 xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
-construction ** consPtr)
+construction ** consPtr, construct_t type)
 {
     xmlNodePtr pushNode = xpath->node;
     int k;
@@ -241,15 +241,25 @@ construction ** consPtr)
         *consPtr = con = (construction *)calloc(sizeof(construction), 1);
         consPtr = &con->improvement;
 
+        con->type = type;
         con->skill = sk;
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
 
-        propValue = xmlGetProp(node, BAD_CAST "building");
-        if (propValue != NULL) {
-            con->btype = bt_get_or_create((const char *)propValue);
-            xmlFree(propValue);
+        if (type == CONS_ITEM) {
+            propValue = xmlGetProp(node, BAD_CAST "building");
+            if (propValue != NULL) {
+                con->extra.btype = bt_get_or_create((const char *)propValue);
+                xmlFree(propValue);
+            }
+        }
+        else if (type == CONS_BUILDING) {
+            propValue = xmlGetProp(node, BAD_CAST "name");
+            if (propValue != NULL) {
+                con->extra.name = strdup((const char *)propValue);
+                xmlFree(propValue);
+            }
         }
 
         /* read construction/requirement */
@@ -310,6 +320,7 @@ static int parse_buildings(xmlDocPtr doc)
             btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
             btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
             btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
+            btype->taxes = xml_ivalue(node, "taxes", btype->taxes);
 
             if (xml_bvalue(node, "nodestroy", false))
                 btype->flags |= BTF_INDESTRUCTIBLE;
@@ -337,7 +348,7 @@ static int parse_buildings(xmlDocPtr doc)
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &btype->construction);
+            xml_readconstruction(xpath, result->nodesetval, &btype->construction, CONS_BUILDING);
             xmlXPathFreeObject(result);
 
             /* reading eressea/buildings/building/function */
@@ -358,12 +369,6 @@ static int parse_buildings(xmlDocPtr doc)
                     btype->name =
                         (const char *(*)(const struct building_type *,
                         const struct building *, int))fun;
-                }
-                else if (strcmp((const char *)propValue, "age") == 0) {
-                    btype->age = (void(*)(struct building *))fun;
-                }
-                else if (strcmp((const char *)propValue, "taxes") == 0) {
-                    btype->taxes = (double(*)(const struct building *, int))fun;
                 }
                 else {
                     log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
@@ -572,7 +577,7 @@ static int parse_ships(xmlDocPtr doc)
             /* reading eressea/ships/ship/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &st->construction);
+            xml_readconstruction(xpath, result->nodesetval, &st->construction, CONS_OTHER);
             xmlXPathFreeObject(result);
 
             for (child = node->children; child; child = child->next) {
@@ -858,7 +863,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     /* reading item/construction */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval, &itype->construction);
+    xml_readconstruction(xpath, result->nodesetval, &itype->construction, CONS_ITEM);
     xmlXPathFreeObject(result);
 
     /* reading item/weapon */

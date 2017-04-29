@@ -1398,8 +1398,8 @@ faction *update_owners(region * r)
     faction *f = NULL;
     assert(rule_region_owners());
     if (r->land) {
-        building *bowner = largestbuilding(r, &cmp_current_owner, false);
-        building *blargest = largestbuilding(r, &cmp_taxes, false);
+        building *bowner = largestbuilding(r, cmp_current_owner, false);
+        building *blargest = largestbuilding(r, cmp_taxes, false);
         if (blargest) {
             if (!bowner || bowner->size < blargest->size) {
                 /* region owners update? */

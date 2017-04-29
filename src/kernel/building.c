@@ -157,27 +157,52 @@ attrib_type at_building_generic_type = {
     ATF_UNIQUE
 };
 
+/* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
+static int adjust_size(const building *b, int bsize) {
+    assert(b);
+    if (config_get_int("rules.dwarf_castles", 0)
+        && strcmp(b->type->_name, "castle") == 0) {
+        unit *u = building_owner(b);
+        if (u && u->faction->race == get_race(RC_HALFLING)) {
+            return bsize * 5 / 4;
+        }
+    }
+    return bsize;
+}
+
 /* Returns the (internal) name for a building of given size and type. Especially, returns the correct
  * name if it depends on the size (as for Eressea castles).
  */
 const char *buildingtype(const building_type * btype, const building * b, int bsize)
 {
-    const char *s;
+    const construction *con;
+
     assert(btype);
 
-    s = btype->_name;
-    if (btype->name) {
-        s = btype->name(btype, b, bsize);
-    }
     if (b && b->attribs) {
         if (is_building_type(btype, "generic")) {
             const attrib *a = a_find(b->attribs, &at_building_generic_type);
             if (a) {
-                s = (const char *)a->data.v;
+                return (const char *)a->data.v;
             }
         }
     }
-    return s;
+    if (btype->name) {
+        return btype->name(btype, b, bsize);
+    }
+    if (btype->construction->extra.name) {
+        if (b) {
+            assert(b->type == btype);
+            bsize = adjust_size(b, bsize);
+        }
+        for (con = btype->construction; con; con = con->improvement) {
+            bsize -= con->maxsize;
+            if (!con->improvement || bsize <0) {
+                return con->extra.name;
+            }
+        }
+    }
+    return btype->_name;
 }
 
 #define BMAXHASH 7919
@@ -219,55 +244,6 @@ building *findbuilding(int i)
 {
     return bfindhash(i);
 }
-
-static const char *castle_name_i(const struct building_type *btype,
-    const struct building *b, int bsize, const char *fname[])
-{
-    int i = bt_effsize(btype, b, bsize);
-
-    return fname[i];
-}
-
-static const char *castle_name_2(const struct building_type *btype,
-    const struct building *b, int bsize)
-{
-    const char *fname[] = {
-        "site",
-        "fortification",
-        "tower",
-        "castle",
-        "fortress",
-        "citadel"
-    };
-    return castle_name_i(btype, b, bsize, fname);
-}
-
-static const char *castle_name(const struct building_type *btype,
-    const struct building *b, int bsize)
-{
-    const char *fname[] = {
-        "site",
-        "tradepost",
-        "fortification",
-        "tower",
-        "castle",
-        "fortress",
-        "citadel"
-    };
-    return castle_name_i(btype, b, bsize, fname);
-}
-
-static const char *fort_name(const struct building_type *btype,
-    const struct building *b, int bsize)
-{
-    const char *fname[] = {
-        "scaffolding",
-        "guardhouse",
-        "guardtower",
-    };
-    return castle_name_i(btype, b, bsize, fname);
-}
-
 /* for finding out what was meant by a particular building string */
 
 static local_names *bnames;
@@ -486,24 +462,19 @@ int buildingeffsize(const building * b, int img)
 
 int bt_effsize(const building_type * btype, const building * b, int bsize)
 {
-    int i = bsize, n = 0;
+    int n = 0;
     const construction *cons = btype->construction;
 
-    /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
-    if (b && config_get_int("rules.dwarf_castles", 0)
-        && strcmp(btype->_name, "castle") == 0) {
-        unit *u = building_owner(b);
-        if (u && u->faction->race == get_race(RC_HALFLING)) {
-            i = bsize * 10 / 8;
-        }
+    if (b) {
+        bsize = adjust_size(b, bsize);
     }
 
-    if (!cons || !cons->improvement) {
+    if (!cons) {
         return 0;
     }
 
-    while (cons && cons->maxsize != -1 && i >= cons->maxsize) {
-        i -= cons->maxsize;
+    while (cons && cons->maxsize != -1 && bsize >= cons->maxsize) {
+        bsize -= cons->maxsize;
         cons = cons->improvement;
         ++n;
     }
@@ -552,10 +523,10 @@ static unit *building_owner_ex(const building * bld, const struct faction * last
     }
     if (!heir && config_token("rules.region_owner_pay_building", bld->type->_name)) {
         if (rule_region_owners()) {
-            u = building_owner(largestbuilding(bld->region, &cmp_taxes, false));
+            u = building_owner(largestbuilding(bld->region, cmp_taxes, false));
         }
         else {
-            u = building_owner(largestbuilding(bld->region, &cmp_wage, false));
+            u = building_owner(largestbuilding(bld->region, cmp_wage, false));
         }
         if (u) {
             heir = u;
@@ -674,7 +645,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
 {
     building *b, *best = NULL;
 
-    for (b = rbuildings(r); b; b = b->next) {
+    for (b = r->buildings; b; b = b->next) {
         if (cmp_gt(b, best) <= 0)
             continue;
         if (!imaginary) {
@@ -702,7 +673,7 @@ static const int wagetable[7][4] = {
 static int
 default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
-    building *b = largestbuilding(r, &cmp_wage, false);
+    building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
     double wage;
     static int ct_cache;
@@ -813,6 +784,12 @@ bool is_owner_building(const struct building * b)
     return false;
 }
 
+int building_taxes(const building *b) {
+    assert(b);
+    return b->type->taxes;
+}
+
+
 int cmp_taxes(const building * b, const building * a)
 {
     faction *f = region_get_owner(b->region);
@@ -822,14 +799,12 @@ int cmp_taxes(const building * b, const building * a)
             return -1;
         }
         else if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
+            int newtaxes = building_taxes(b);
+            int oldtaxes = building_taxes(a);
 
-            if (newtaxes < oldtaxes)
+            if (newtaxes > oldtaxes)
                 return -1;
-            else if (newtaxes > oldtaxes)
+            else if (newtaxes < oldtaxes)
                 return 1;
             else if (b->size < a->size)
                 return -1;
@@ -838,8 +813,9 @@ int cmp_taxes(const building * b, const building * a)
             else {
                 if (u && u->faction == f) {
                     u = building_owner(a);
-                    if (u && u->faction == f)
-                        return -1;
+                    if (u && u->faction == f) {
+                        return 0;
+                    }
                     return 1;
                 }
             }
@@ -848,7 +824,7 @@ int cmp_taxes(const building * b, const building * a)
             return 1;
         }
     }
-    return -1;
+    return 0;
 }
 
 int cmp_current_owner(const building * b, const building * a)
@@ -861,10 +837,8 @@ int cmp_current_owner(const building * b, const building * a)
         if (!u || u->faction != f)
             return -1;
         if (a) {
-            int newsize = buildingeffsize(b, false);
-            double newtaxes = b->type->taxes(b, newsize);
-            int oldsize = buildingeffsize(a, false);
-            double oldtaxes = a->type->taxes(a, oldsize);
+            int newtaxes = building_taxes(b);
+            int oldtaxes = building_taxes(a);
 
             if (newtaxes > oldtaxes) {
                 return 1;
@@ -872,21 +846,11 @@ int cmp_current_owner(const building * b, const building * a)
             if (newtaxes < oldtaxes) {
                 return -1;
             }
-            if (newsize != oldsize) {
-                return newsize - oldsize;
-            }
             return (b->size - a->size);
         }
         else {
             return 1;
         }
     }
-    return -1;
-}
-
-void register_buildings(void)
-{
-    register_function((pf_generic)castle_name, "castle_name");
-    register_function((pf_generic)castle_name_2, "castle_name_2");
-    register_function((pf_generic)fort_name, "fort_name");
+    return 0;
 }
