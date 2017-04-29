@@ -853,9 +853,6 @@ int cmp_current_owner(const building * b, const building * a)
             if (newtaxes < oldtaxes) {
                 return -1;
             }
-            //if (newsize != oldsize) {
-            //    return newsize - oldsize;
-            //}
             return (b->size - a->size);
         }
         else {
