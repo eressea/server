@@ -231,26 +231,6 @@ bool FactionSpells(void)
     return rule != 0;
 }
 
-void read_spells(struct selist **slistp, magic_t mtype, 
-    struct storage *store)
-{
-    for (;;) {
-        spell *sp;
-        char spname[64];
-
-        READ_TOK(store, spname, sizeof(spname));
-        if (strcmp(spname, "end") == 0)
-            break;
-        sp = find_spell(spname);
-        if (!sp) {
-            log_error("read_spells: could not find spell '%s' in school '%s'\n", spname, magic_school[mtype]);
-        }
-        if (sp) {
-            add_spell(slistp, sp);
-        }
-    }
-}
-
 int get_spell_level_mage(const spell * sp, void * cbdata)
 {
     sc_mage *mage = (sc_mage *)cbdata;
@@ -303,18 +283,6 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
         read_spellbook(0, data, 0, mage);
     }
     return AT_READ_OK;
-}
-
-void write_spells(struct selist *slist, struct storage *store)
-{
-    selist *ql;
-    int qi;
-
-    for (ql = slist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)selist_get(ql, qi);
-        WRITE_TOK(store, sp->sname);
-    }
-    WRITE_TOK(store, "end");
 }
 
 static void
