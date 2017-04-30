@@ -1312,11 +1312,8 @@ static int parse_spellbooks(xmlDocPtr doc)
 static int parse_spells(xmlDocPtr doc)
 {
     pf_generic cast = 0;
-    pf_generic fumble = 0;
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr spells;
-    char zText[32];
-    strcpy(zText, "fumble_");
 
     /* reading eressea/spells/spell */
     spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
@@ -1404,8 +1401,6 @@ static int parse_spells(xmlDocPtr doc)
                 if (!cast) {
                     log_error("no spell cast function registered for '%s'\n", sp->sname);
                 }
-                strlcpy(zText + 7, sp->sname, sizeof(zText) - 7);
-                fumble = get_function(zText);
             }
             else {
                 for (k = 0; k != result->nodesetval->nodeNr; ++k) {
@@ -1422,9 +1417,6 @@ static int parse_spells(xmlDocPtr doc)
                             log_error("unknown function name '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
                         }
                     }
-                    else if (fun && strcmp((const char *)propValue, "fumble") == 0) {
-                        fumble = fun;
-                    }
                     else {
                         log_error("unknown function type '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
                     }
@@ -1432,7 +1424,6 @@ static int parse_spells(xmlDocPtr doc)
                 }
             }
             sp->cast = (spell_f)cast;
-            sp->fumble = (fumble_f)fumble;
             xmlXPathFreeObject(result);
 
             /* reading eressea/spells/spell/resource */

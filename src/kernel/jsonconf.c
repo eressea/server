@@ -597,9 +597,6 @@ static void json_spells(cJSON *json) {
                 else if (strcmp(item->string, "cast") == 0) {
                     sp->cast = (spell_f)get_function(item->valuestring);
                 }
-                else if (strcmp(item->string, "fumble") == 0) {
-                    sp->fumble = (fumble_f)get_function(item->valuestring);
-                }
                 else if (strcmp(item->string, "syntax") == 0) {
                     sp->syntax = strdup(item->valuestring);
                 }
