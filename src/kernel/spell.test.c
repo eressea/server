@@ -86,18 +86,24 @@ static void test_spellref(CuTest *tc)
     test_cleanup();
 }
 
-void my_fumble(const struct castorder *co) {
+void fumble_foo(const struct castorder *co) {
+    UNUSED_ARG(co);
+}
+
+void fumble_bar(const struct castorder *co) {
     UNUSED_ARG(co);
 }
 
 static void test_fumbles(CuTest *tc)
 {
     test_setup();
-    CuAssertTrue(tc, NULL==get_fumble("hodor"));
-    add_fumble("hodor", my_fumble);
-    CuAssertTrue(tc, my_fumble==get_fumble("hodor"));
+    CuAssertTrue(tc, NULL==get_fumble("foo"));
+    add_fumble("foone", fumble_foo);
+    add_fumble("foozle", fumble_bar);
+    CuAssertTrue(tc, fumble_foo==get_fumble("foone"));
+    CuAssertTrue(tc, fumble_bar==get_fumble("foozle"));
+    CuAssertTrue(tc, NULL==get_fumble("foo"));
     test_cleanup();
-    CuAssertTrue(tc, NULL==get_fumble("hodor"));
 }
 
 CuSuite *get_spell_suite(void)
