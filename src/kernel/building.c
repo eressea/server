@@ -190,7 +190,7 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
     if (btype->name) {
         return btype->name(btype, b, bsize);
     }
-    if (btype->construction->extra.name) {
+    if (btype->construction && btype->construction->extra.name) {
         if (b) {
             assert(b->type == btype);
             bsize = adjust_size(b, bsize);

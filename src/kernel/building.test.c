@@ -558,9 +558,24 @@ static void test_largestbuilding(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_buildingtype(CuTest *tc) {
+    building_type *btype;
+    test_setup();
+    btype = test_create_buildingtype("hodor");
+    CuAssertPtrNotNull(tc, btype->construction);
+    CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
+    btype->construction->extra.name = strdup("castle");
+    CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
+    btype = bt_get_or_create("portal");
+    CuAssertPtrEquals(tc, NULL, btype->construction);
+    CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_buildingtype);
     SUITE_ADD_TEST(suite, test_largestbuilding);
     SUITE_ADD_TEST(suite, test_cmp_castle_size);
     SUITE_ADD_TEST(suite, test_cmp_taxes);
