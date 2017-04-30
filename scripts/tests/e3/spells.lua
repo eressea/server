@@ -82,25 +82,25 @@ function test_earn_silver()
 
     u:clear_orders()
     u:add_order("ZAUBERE STUFE 1 Viehheilung")
-    r:set_resource("money", 250)
+    r:set_resource("money", 200)
     r:set_resource("peasant", 0)
     process_orders() -- get 50 silver
     assert_equal(50, u:get_item("money"))
-    assert_equal(200, r:get_resource("money"))
+    assert_equal(150, r:get_resource("money"))
 
-    u:clear_orders() -- get 75 silver
+    u:clear_orders() -- get 50 silver
     u:add_order("ZAUBERE STUFE 2 Viehheilung")
     process_orders()
-    assert_equal(125, u:get_item("money"))
-    assert_equal(125, r:get_resource("money"))
+    assert_equal(100, u:get_item("money"))
+    assert_equal(100, r:get_resource("money"))
 
-    u:clear_orders() -- get 100 silver
+    u:clear_orders() -- get 75 silver
     u:add_order("ZAUBERE STUFE 3 Viehheilung")
     process_orders()
-    assert_equal(225, u:get_item("money"))
+    assert_equal(175, u:get_item("money"))
     assert_equal(25, r:get_resource("money"))
 
     process_orders() -- not enough
-    assert_equal(250, u:get_item("money"))
+    assert_equal(200, u:get_item("money"))
     assert_equal(0, r:get_resource("money"))
 end
