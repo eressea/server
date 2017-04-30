@@ -3006,11 +3006,24 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
 
 int cast_spell(struct castorder *co)
 {
+    const char *fname = co->sp->sname;
+    const char *hashpos = strchr(fname, '#');
+    char fbuf[64];
+
     const spell *sp = co->sp;
     if (sp->cast_fun) {
         return sp->cast_fun(co);
     }
-    return callbacks.cast_spell(co);
+
+    if (hashpos != NULL) {
+        ptrdiff_t len = hashpos - fname;
+        assert(len < (ptrdiff_t) sizeof(fbuf));
+        memcpy(fbuf, fname, len);
+        fbuf[len] = '\0';
+        fname = fbuf;
+    }
+
+    return callbacks.cast_spell(co, fname);
 }
 
 static critbit_tree cb_spellbooks;

@@ -1399,7 +1399,7 @@ static int parse_spells(xmlDocPtr doc)
             if (result->nodesetval->nodeNr == 0) {
                 cast = get_function(sp->sname);
                 if (!cast) {
-                    log_error("no spell cast function registered for '%s'\n", sp->sname);
+                    log_info("no spell cast function registered for '%s'\n", sp->sname);
                 }
             }
             else {

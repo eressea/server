@@ -157,23 +157,12 @@ static void push_param(lua_State * L, char c, spllprm * param)
 }
 
 /** callback to use lua for spell functions */
-static int lua_callspell(castorder * co)
+static int lua_callspell(castorder * co, const char *fname)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    const char *fname = co->sp->sname;
     unit *caster = co_get_caster(co);
     region * r = co_get_region(co);
     int result = -1;
-    const char *hashpos = strchr(fname, '#');
-    char fbuf[64];
-
-    if (hashpos != NULL) {
-        ptrdiff_t len = hashpos - fname;
-        assert(len < (ptrdiff_t) sizeof(fbuf));
-        memcpy(fbuf, fname, len);
-        fbuf[len] = '\0';
-        fname = fbuf;
-    }
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {

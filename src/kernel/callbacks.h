@@ -26,7 +26,7 @@ extern "C" {
     struct castorder;
 
     extern struct callbacks {
-        int (*cast_spell)(struct castorder *co);
+        int (*cast_spell)(struct castorder *co, const char *fname);
     } callbacks;
 
 #ifdef __cplusplus
