@@ -63,8 +63,8 @@ function test_magic()
 end
 
 -- E3: earn 50 per every TWO levels of spell
-function test_earn_silber()
-    local r = region.create(0, 0, "plain")
+function test_earn_silver()
+    local r = region.create(0, 0, "mountain")
     local f = faction.create("human")
     local u = unit.create(f, r)
 
