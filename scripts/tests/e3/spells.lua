@@ -9,20 +9,17 @@ function setup()
     eressea.settings.set("rules.peasants.growth", "0")
 end
 
-function test_blessedharvest_lasts_n_turn()
+function test_raindance()
     local r = region.create(0, 0, "plain")
     local f = faction.create("halfling", "noreply@eressea.de", "de")
     local u = unit.create(f, r)
-    local err = 0
     r:set_resource("peasant", 100)
     r:set_resource("money", 0)
-    u:add_item("money", 1000)
     u.magic = "gwyrrd"
     u.race = "dwarf"
     u:set_skill("magic", 20)
     u.aura = 200
-    err = err + u:add_spell("raindance")
-    err = err + u:add_spell("blessedharvest")
+    local err = u:add_spell("raindance")
     assert_equal(0, err)
     
     u:clear_orders()

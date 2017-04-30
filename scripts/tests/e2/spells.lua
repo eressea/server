@@ -27,7 +27,39 @@ function test_shapeshift()
     assert_equal("1 Goblin", string.sub(s, string.find(s, "1 Goblin")))
 end
 
--- E3: earn 50 per level of spell
+function test_raindance()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("halfling", "noreply@eressea.de", "de")
+    local u = unit.create(f, r)
+    local err = 0
+    r:set_resource("peasant", 100)
+    r:set_resource("money", 0)
+    u.magic = "gwyrrd"
+    u.race = "dwarf"
+    u:set_skill("magic", 20)
+    u.aura = 200
+    err = err + u:add_spell("raindance")
+    assert_equal(0, err)
+    
+    u:clear_orders()
+    u:add_order("ZAUBERE STUFE 1 Regentanz")
+    assert_equal(0, r:get_resource("money"))
+    
+    process_orders()
+    assert_equal(200, r:get_resource("money"))
+    assert_equal(0, u:get_item("money"))
+
+    u:clear_orders()
+    u:add_order("ARBEITEN")
+    process_orders()
+    assert_equal(10, u:get_item("money")) -- only peasants benefit
+    assert_equal(400, r:get_resource("money"))
+    -- this is where the spell ends
+    process_orders()
+    process_orders()
+    assert_equal(600, r:get_resource("money"))
+end
+
 function test_earn_silver()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("human")
