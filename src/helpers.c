@@ -24,6 +24,7 @@ without prior permission by the authors of Eressea.
 #include <util/resolve.h>
 
 #include <kernel/config.h>
+#include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/spell.h>
@@ -460,7 +461,8 @@ void register_tolua_helpers(void)
     at_register(&at_direction);
     at_register(&at_building_action);
 
-    register_function((pf_generic)lua_callspell, TOLUA_CAST "lua_castspell");
+    callbacks.cast_spell = lua_callspell;
+
     register_function((pf_generic)lua_initfamiliar,
         TOLUA_CAST "lua_initfamiliar");
     register_function((pf_generic)lua_getresource,

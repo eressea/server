@@ -10,14 +10,12 @@
 
   <!-- shared spells -->
   <spell name="create_roi" ship="true" rank="5" index="130">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_aots" ship="true" rank="5" index="125">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
@@ -39,7 +37,6 @@
   </spell>
   <spell name="earn_silver#illaun" ship="true" variable="true" rank="5" index="159">
     <!-- Wahrsagen -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="flee" rank="5" index="20" variable="true" combat="1">
@@ -106,7 +103,6 @@
   </spell>
   <spell name="create_dreameye" ship="true" rank="5" index="149">
     <!-- Erschaffe ein Traumauge -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="dragonhead" amount="1" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
@@ -119,7 +115,6 @@
   </spell>
   <spell name="earn_silver#draig" ship="true" variable="true" rank="5" index="159">
     <!-- Kleine Flüche -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="fireball" rank="5" index="4" variable="true" combat="2">
@@ -189,7 +184,6 @@
   </spell>
   <spell name="create_firesword" ship="true" rank="5" index="148">
     <!-- Erschaffe ein Flammenschwert -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="oil" amount="10" cost="fixed"/>
     <resource name="sword" amount="1" cost="fixed"/>
@@ -205,7 +199,6 @@
   <!-- new cerddor -->
   <spell name="earn_silver#cerddor" ship="true" variable="true" rank="5" index="159">
     <!-- Gaukeleien -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="song_of_healing" rank="5" index="10" variable="true" combat="3">
@@ -269,7 +262,6 @@
   </spell>
   <spell name="create_roqf" ship="true" rank="5" index="63">
     <!-- Miriams flinke Finger -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="20" cost="fixed"/>
     <resource name="money" amount="1000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
@@ -304,12 +296,10 @@
   <!-- new gwyrrd -->
   <spell name="blessedharvest" rank="5" index="25" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5" index="159">
     <!-- Viehheilung -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="stonegolem" rank="4" index="32" variable="true">
@@ -394,21 +384,18 @@
   <!-- new tybied - spells known to all schools -->
   <spell name="create_potion_p2" ship="true" rank="5" variable="true">
     <!-- Wasser des Lebens -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="2" cost="linear"/>
     <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
     <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
   </spell>
   <spell name="create_potion_p0" ship="true" rank="5" variable="true">
     <!-- Siebenmeilentee -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="2" cost="linear"/>
     <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
     <resource name="h17" amount="1" cost="linear"/><!-- Höhlenglimm -->
   </spell>
   <spell name="create_potion_p9" ship="true" rank="5" variable="true">
     <!-- Pferdeglück -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="3" cost="linear"/>
     <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
@@ -416,7 +403,6 @@
   </spell>
   <spell name="create_potion_peasantblood" ship="true" rank="5" variable="true">
     <!-- Bauernblut -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="3" cost="linear"/>
     <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
     <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
@@ -426,7 +412,6 @@
 
   <spell name="create_potion_ointment" ship="true" rank="5" variable="true">
     <!-- Wundsalbe -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="4" cost="linear"/>
     <resource name="h4" amount="1" cost="linear"/><!-- Baumringel -->
     <resource name="h15" amount="1" cost="linear"/><!-- Steinbeißer -->
@@ -435,7 +420,6 @@
   </spell>
   <spell name="create_potion_p3" ship="true" rank="5" variable="true">
     <!-- Schaffenstrunk -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="4" cost="linear"/>
     <resource name="h12" amount="1" cost="linear"/><!-- Windbeutel -->
     <resource name="h6" amount="1" cost="linear"/><!-- Gurgelkraut -->
@@ -444,7 +428,6 @@
   </spell>
   <spell name="create_potion_p14" ship="true" rank="5" variable="true">
     <!-- Heiltrank -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="5" cost="linear"/>
     <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
@@ -454,7 +437,6 @@
   </spell>
   <spell name="create_potion_p13" ship="true" rank="5" variable="true">
     <!-- Elixier der Macht -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="5" cost="linear"/>
     <resource name="h14" amount="1" cost="linear"/><!-- Alraune -->
     <resource name="h8" amount="1" cost="linear"/><!-- Blasenmorchel -->
@@ -472,39 +454,33 @@
 
   <!-- common spells: randomly given, one per level -->
   <spell name="create_trollbelt" ship="true" rank="5" index="48">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="20" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_antimagic" ship="true" rank="5" index="38">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
   </spell>
 
   <spell name="create_rop" ship="true" rank="5" index="1">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="4000" cost="fixed"/>
   </spell>
 
   <spell name="create_bagofholding" ship="true" rank="5" index="155">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="5000" cost="fixed"/>
   </spell>
 
   <spell name="create_focus" ship="true" rank="5" index="2">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <spell name="create_ror" ship="true" rank="5" index="3">
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
@@ -518,7 +494,6 @@
   </spell>
   <spell name="raindance" rank="5" index="26" ship="true" far="true" variable="true">
     <!-- Regentanz -->
-    <function name="cast" value="lua_castspell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="irongolem" rank="4" index="33" variable="true">
