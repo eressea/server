@@ -41,7 +41,7 @@ extern "C" {
         int sptyp;
         int rank;                   /* Reihenfolge der Zauber */
         struct spell_component *components;
-        spell_f cast;
+        spell_f cast_fun;
     } spell;
 
     typedef struct spellref {

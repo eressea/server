@@ -286,6 +286,7 @@ extern "C" {
     /* Hänge c-order co an die letze c-order von cll an */
     void free_castorders(struct castorder *co);
     /* Speicher wieder freigeben */
+    int cast_spell(struct castorder *co);
 
     /* Prüfroutinen für Zaubern */
     int countspells(struct unit *u, int step);

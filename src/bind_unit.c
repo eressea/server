@@ -512,15 +512,10 @@ static void unit_castspell(unit * u, const char *name, int level)
     if (sp) {
         spellbook *book = unit_get_spellbook(u);
         if (spellbook_get(book, sp)) {
-            if (!sp->cast) {
-                log_error("spell '%s' has no function.\n", sp->sname);
-            }
-            else {
-                castorder co;
-                create_castorder(&co, u, 0, sp, u->region, level, (double)level, 0, 0, 0);
-                sp->cast(&co);
-                free_castorder(&co);
-            }
+            castorder co;
+            create_castorder(&co, u, 0, sp, u->region, level, (double)level, 0, 0, 0);
+            cast_spell(&co);
+            free_castorder(&co);
         }
     }
 }

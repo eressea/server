@@ -1423,7 +1423,7 @@ static int parse_spells(xmlDocPtr doc)
                     xmlFree(propValue);
                 }
             }
-            sp->cast = (spell_f)cast;
+            sp->cast_fun = (spell_f)cast;
             xmlXPathFreeObject(result);
 
             /* reading eressea/spells/spell/resource */

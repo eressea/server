@@ -1433,7 +1433,7 @@ static void do_fumble(castorder * co)
     case 5:
     case 6:
         /* Spruch gelingt, aber alle Magiepunkte weg */
-        co->level = sp->cast(co);
+        co->level = cast_spell(co);
         set_spellpoints(u, 0);
         ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
             u, r, sp));
@@ -1444,7 +1444,7 @@ static void do_fumble(castorder * co)
     case 9:
     default:
         /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-        co->level = sp->cast(co);
+        co->level = cast_spell(co);
         ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
             u, r, sp));
         countspells(u, 3);
@@ -2900,7 +2900,7 @@ void magic(void)
                     fumbled = true;
                 }
                 else {
-                    co->level = sp->cast(co);
+                    co->level = cast_spell(co);
                     if (co->level <= 0) {
                         /* Kosten nur für real benötige Stufe berechnen */
                         continue;
@@ -3001,6 +3001,12 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
     }
 
     return 0;
+}
+
+int cast_spell(struct castorder *co)
+{
+    const spell *sp = co->sp;
+    return sp->cast_fun(co);
 }
 
 static critbit_tree cb_spellbooks;
