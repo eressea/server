@@ -2931,10 +2931,6 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
     }
     return AT_READ_FAIL;          /* we don't care for the attribute. */
 }
-
-attrib_type at_deathcloud_compat = {
-    "zauber_todeswolke", NULL, NULL, NULL, NULL, dc_read_compat
-};
 #endif
 
 /* ------------------------------------------------------------- */
@@ -6725,7 +6721,9 @@ void register_spells(void)
 {
     register_borders();
 
-    at_register(&at_deathcloud_compat);
+#ifdef COMPAT_DEATHCLOUD
+    at_deprecate("zauber_todeswolke", dc_read_compat);
+#endif
 
     /* init_firewall(); */
     ct_register(&ct_firewall);
