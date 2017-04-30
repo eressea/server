@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
+#include <kernel/callbacks.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -3006,7 +3007,10 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
 int cast_spell(struct castorder *co)
 {
     const spell *sp = co->sp;
-    return sp->cast_fun(co);
+    if (sp->cast_fun) {
+        return sp->cast_fun(co);
+    }
+    return callbacks.cast_spell(co);
 }
 
 static critbit_tree cb_spellbooks;

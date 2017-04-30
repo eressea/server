@@ -455,20 +455,6 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     return result;
 }
 
-int tolua_toid(lua_State * L, int idx, int def)
-{
-    int no = 0;
-    int type = lua_type(L, idx);
-    if (type == LUA_TNUMBER) {
-        no = (int)tolua_tonumber(L, idx, def);
-    }
-    else {
-        const char *str = tolua_tostring(L, idx, NULL);
-        no = str ? atoi36(str) : def;
-    }
-    return no;
-}
-
 void register_tolua_helpers(void)
 {
     at_register(&at_direction);
