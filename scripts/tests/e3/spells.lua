@@ -32,10 +32,9 @@ function test_raindance()
     u:add_order("ARBEITEN")
     process_orders()
     process_orders()
+    assert_equal(500, r:get_resource("money"))
     process_orders()
-    assert_equal(800, r:get_resource("money"))
-    process_orders()
-    assert_equal(900, r:get_resource("money"))
+    assert_equal(600, r:get_resource("money"))
 end
 
 function test_magic()

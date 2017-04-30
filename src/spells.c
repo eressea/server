@@ -1104,8 +1104,9 @@ static int sp_blessedharvest(castorder * co)
 
     if (create_curse(mage, &r->attribs, ct_find("blessedharvest"), co->force,
         duration, 1.0, 0)) {
-        message *seen = msg_message("harvest_effect", "mage", mage);
-        message *unseen = msg_message("harvest_effect", "mage", NULL);
+        const char * effect = co->sp->sname[0]=='b' ? "harvest_effect" : "raindance_effect";
+        message *seen = msg_message(effect, "mage", mage);
+        message *unseen = msg_message(effect, "mage", NULL);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);

@@ -296,6 +296,7 @@
   <!-- new gwyrrd -->
   <spell name="blessedharvest" rank="5" index="25" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
+    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5" index="159">
@@ -494,6 +495,7 @@
   </spell>
   <spell name="raindance" rank="5" index="26" ship="true" far="true" variable="true">
     <!-- Regentanz -->
+    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="irongolem" rank="4" index="33" variable="true">
