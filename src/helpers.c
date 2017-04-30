@@ -23,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include <util/parser.h>
 #include <util/resolve.h>
 
+#include <kernel/callbacks.h>
 #include <kernel/config.h>
 #include <kernel/callbacks.h>
 #include <kernel/equipment.h>
@@ -452,21 +453,16 @@ void register_tolua_helpers(void)
 
     callbacks.cast_spell = lua_callspell;
 
-    register_function((pf_generic)lua_initfamiliar,
-        TOLUA_CAST "lua_initfamiliar");
-    register_function((pf_generic)lua_getresource,
-        TOLUA_CAST "lua_getresource");
-    register_function((pf_generic)lua_changeresource,
-        TOLUA_CAST "lua_changeresource");
-    register_function((pf_generic)lua_equipmentcallback,
-        TOLUA_CAST "lua_equip");
+    register_function((pf_generic)lua_initfamiliar, "lua_initfamiliar");
+    register_function((pf_generic)lua_getresource, "lua_getresource");
+    register_function((pf_generic)lua_changeresource, "lua_changeresource");
+    register_function((pf_generic)lua_equipmentcallback, "lua_equip");
 
-    register_function((pf_generic)lua_wage, TOLUA_CAST "lua_wage");
-    register_function((pf_generic)lua_maintenance,
-        TOLUA_CAST "lua_maintenance");
+    register_function((pf_generic)lua_wage, "lua_wage");
+    register_function((pf_generic)lua_maintenance, "lua_maintenance");
 
     item_use_fun = use_item_lua;
     res_produce_fun = produce_resource_lua;
     res_limit_fun = limit_resource_lua;
-    register_item_give(lua_giveitem, TOLUA_CAST "lua_giveitem");
+    register_item_give(lua_giveitem, "lua_giveitem");
 }

@@ -377,8 +377,8 @@ void test_multi_cast(CuTest *tc) {
     struct locale * lang;
 
     test_setup();
+    add_spellcast("fireball", cast_fireball);
     sp = create_spell("fireball", 0);
-    sp->cast_fun = cast_fireball;
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
 
     lang = test_create_locale();

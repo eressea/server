@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "study.h"
+#include "helpers.h"
 #include "laws.h"
 
 #include <kernel/ally.h>
@@ -3009,12 +3010,9 @@ int cast_spell(struct castorder *co)
     const char *fname = co->sp->sname;
     const char *hashpos = strchr(fname, '#');
     char fbuf[64];
+    spell_f fun;
 
     const spell *sp = co->sp;
-    if (sp->cast_fun) {
-        return sp->cast_fun(co);
-    }
-
     if (hashpos != NULL) {
         ptrdiff_t len = hashpos - fname;
         assert(len < (ptrdiff_t) sizeof(fbuf));
@@ -3023,7 +3021,12 @@ int cast_spell(struct castorder *co)
         fname = fbuf;
     }
 
-    return callbacks.cast_spell(co, fname);
+    fun = get_spellcast(sp->sname);
+    if (!fun) {
+        log_warning("no spell function for %s, try callback", sp->sname);
+        return callbacks.cast_spell(co, fname);
+    }
+    return fun(co);
 }
 
 static critbit_tree cb_spellbooks;

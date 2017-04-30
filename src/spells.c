@@ -6615,12 +6615,10 @@ static spelldata spell_functions[] = {
 static void register_spelldata(void)
 {
     int i;
-    char zText[32];
-    strcpy(zText, "fumble_");
     for (i = 0; spell_functions[i].sname; ++i) {
         spelldata *data = spell_functions + i;
         if (data->cast) {
-            register_function((pf_generic)data->cast, data->sname);
+            add_spellcast(data->sname, data->cast);
         }
         if (data->fumble) {
             add_fumble(data->sname, data->fumble);
@@ -6733,11 +6731,14 @@ void register_spells(void)
     ct_register(&ct_firewall);
     ct_register(&ct_deathcloud);
 
-    register_function((pf_generic)sp_blessedharvest, "cast_blessedharvest");
-    register_function((pf_generic)sp_summon_familiar, "cast_familiar");
-    register_function((pf_generic)sp_babbler, "cast_babbler");
-    register_function((pf_generic)sp_readmind, "cast_readmind");
-    register_function((pf_generic)sp_kampfzauber, "combat_spell");
+    add_spellcast("blabbermouth", sp_babbler);
+    add_spellcast("summon_familiar", sp_summon_familiar);
+    add_spellcast("meteor_rain", sp_kampfzauber);
+    add_spellcast("fireball", sp_kampfzauber);
+    add_spellcast("hail", sp_kampfzauber);
+    add_spellcast("readmind", sp_readmind);
+    add_spellcast("blessedharvest", sp_blessedharvest);
+    add_spellcast("raindance", sp_blessedharvest);
 
     register_spelldata();
 
