@@ -29,9 +29,6 @@ function test_blessedharvest_lasts_n_turn()
     u:add_order("ZAUBERE STUFE 3 Regentanz")
     assert_equal(0, r:get_resource("money"), 0)
     
-    local m = 0
-    local p = 100
-
     process_orders()
     assert_equal(200, r:get_resource("money"))
     u:clear_orders()
@@ -63,4 +60,47 @@ function test_magic()
     process_orders()
 --  there used to be a SEGFAULT when writing reports here:
 --    write_reports()
+end
+
+-- E3: earn 50 per every TWO levels of spell
+function test_earn_silber()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+
+    eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("rules.peasants.growth", "0")
+    eressea.settings.set("rules.economy.repopulate_maximum", "0")
+
+    u.magic = "gwyrrd"
+    u.race = "elf"
+    u:set_skill("magic", 10)
+    u.aura = 100
+    local err = u:add_spell("earn_silver#gwyrrd")
+    assert_equal(0, err)
+
+    u:clear_orders()
+    u:add_order("ZAUBERE STUFE 1 Viehheilung")
+    r:set_resource("money", 250)
+    r:set_resource("peasant", 0)
+    process_orders() -- get 50 silver
+    assert_equal(50, u:get_item("money"))
+    assert_equal(200, r:get_resource("money"))
+
+    u:clear_orders() -- get 75 silver
+    u:add_order("ZAUBERE STUFE 2 Viehheilung")
+    process_orders()
+    assert_equal(125, u:get_item("money"))
+    assert_equal(125, r:get_resource("money"))
+
+    u:clear_orders() -- get 100 silver
+    u:add_order("ZAUBERE STUFE 3 Viehheilung")
+    process_orders()
+    assert_equal(225, u:get_item("money"))
+    assert_equal(25, r:get_resource("money"))
+
+    process_orders() -- not enough
+    assert_equal(250, u:get_item("money"))
+    assert_equal(0, r:get_resource("money"))
 end

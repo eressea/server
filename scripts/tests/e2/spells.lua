@@ -26,3 +26,46 @@ function test_shapeshift()
     s = u2:show()
     assert_equal("1 Goblin", string.sub(s, string.find(s, "1 Goblin")))
 end
+
+-- E3: earn 50 per level of spell
+function test_earn_silber()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+
+    eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("rules.peasants.growth", "0")
+    eressea.settings.set("rules.economy.repopulate_maximum", "0")
+
+    u.magic = "gwyrrd"
+    u.race = "elf"
+    u:set_skill("magic", 10)
+    u.aura = 100
+    local err = u:add_spell("earn_silver#gwyrrd")
+    assert_equal(0, err)
+
+    u:clear_orders()
+    u:add_order("ZAUBERE STUFE 1 Viehheilung")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    process_orders() -- get 50 silver
+    assert_equal(50, u:get_item("money"))
+    assert_equal(300, r:get_resource("money"))
+
+    u:clear_orders() -- get 100 silver
+    u:add_order("ZAUBERE STUFE 2 Viehheilung")
+    process_orders()
+    assert_equal(150, u:get_item("money"))
+    assert_equal(200, r:get_resource("money"))
+
+    u:clear_orders() -- get 150 silver
+    u:add_order("ZAUBERE STUFE 3 Viehheilung")
+    process_orders()
+    assert_equal(300, u:get_item("money"))
+    assert_equal(50, r:get_resource("money"))
+
+    process_orders() -- not enough
+    assert_equal(350, u:get_item("money"))
+    assert_equal(0, r:get_resource("money"))
+end
