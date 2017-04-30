@@ -1370,14 +1370,16 @@ static void do_fumble(castorder * co)
     double effect;
 	static const race *rc_toad;
     static int rc_cache;
+    fumble_f fun;
     
     ADDMSG(&u->faction->msgs,
         msg_message("patzer", "unit region spell", u, r, sp));
     switch (rng_int() % 10) {
     case 0:
         /* wenn vorhanden spezieller Patzer, ansonsten nix */
-        if (sp->fumble) {
-            sp->fumble(co);
+        fun = get_fumble(sp->sname);
+        if (fun) {
+            fun(co);
         }
         else {
             fumble_default(co);

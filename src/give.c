@@ -244,7 +244,6 @@ struct order *ord)
                 warden_add_give(src, dest, itype, delta);
             }
 #endif
-            handle_event(dest->attribs, "receive", src);
         }
         else {
             /* return horses to the region */
@@ -257,7 +256,6 @@ struct order *ord)
                 give_money(src, itype, n);
             }
         }
-        handle_event(src->attribs, "give", dest);
     }
     add_give(src, dest, n, delta, item2resource(itype), ord, error);
     if (error)

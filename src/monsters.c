@@ -799,10 +799,6 @@ void plan_monsters(faction * f)
             if (long_order == NULL) {
                 /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
 
-                if (!u->orders) {
-                    handle_event(u->attribs, "ai_move", u);
-                }
-
                 if (fval(rc, RCF_DRAGON)) {
                     long_order = plan_dragon(u);
                 }

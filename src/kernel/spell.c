@@ -33,6 +33,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
+static critbit_tree cb_fumbles;
+void add_fumble(const char *sname, fumble_f fun)
+{
+    size_t len;
+    char data[64];
+
+    len = cb_new_kv(sname, strlen(sname), &fun, sizeof(fun), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_fumbles, data, len);
+}
+
+fumble_f get_fumble(const char *sname)
+{
+    void * match;
+    fumble_f result = NULL;
+
+    if (cb_find_prefix(&cb_fumbles, sname, strlen(sname) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
+    }
+    return result;
+}
+
 static critbit_tree cb_spells;
 selist * spells;
 
@@ -49,6 +71,7 @@ static void free_spell_cb(void *cbdata) {
 }
 
 void free_spells(void) {
+    cb_clear(&cb_fumbles);
     cb_clear(&cb_spells);
     selist_foreach(spells, free_spell_cb);
     selist_free(spells);

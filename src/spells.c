@@ -6622,8 +6622,7 @@ static void register_spelldata(void)
             register_function((pf_generic)data->cast, data->sname);
         }
         if (data->fumble) {
-            strlcpy(zText + 7, data->sname, sizeof(zText) - 7);
-            register_function((pf_generic)data->fumble, zText);
+            add_fumble(data->sname, data->fumble);
         }
     }
 }
