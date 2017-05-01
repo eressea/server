@@ -18,6 +18,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/event.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -446,8 +447,23 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     return result;
 }
 
+/* compat code for old data files */
+static int caldera_read(trigger * t, struct gamedata *data)
+{
+    UNUSED_ARG(t);
+    read_building_reference(data);
+    return AT_READ_FAIL;
+}
+
+struct trigger_type tt_caldera = {
+    "caldera",
+    NULL, NULL, NULL, NULL,
+    caldera_read
+};
+
 void register_tolua_helpers(void)
 {
+    tt_register(&tt_caldera);
     at_register(&at_direction);
     at_register(&at_building_action);
 
