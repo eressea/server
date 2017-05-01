@@ -268,6 +268,23 @@ static int tolua_faction_setkey(lua_State * L)
     return 0;
 }
 
+static int tolua_faction_get_messages(lua_State * L)
+{
+    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    int i = 1;
+    mlist *ml;
+    if (!self->msgs) {
+        return 0;
+    }
+    lua_newtable(L);
+    for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
+        lua_pushnumber(L, i);
+        lua_pushstring(L, ml->msg->type->name);
+        lua_rawset(L, -3);
+    }
+    return 1;
+}
+
 static int tolua_faction_count_msg_type(lua_State *L) {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char *str = tolua_tostring(L, 2, 0);
@@ -637,6 +654,7 @@ void tolua_faction_open(lua_State * L)
 
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
+            tolua_variable(L, TOLUA_CAST "messages", tolua_faction_get_messages, NULL);
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);
