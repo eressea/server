@@ -19,7 +19,7 @@ static void test_create_a_spell(CuTest * tc)
     CuAssertPtrEquals(tc, 0, spells);
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
 
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
     CuAssertPtrNotNull(tc, spells);
     test_cleanup();
@@ -37,34 +37,12 @@ static void test_create_duplicate_spell(CuTest * tc)
 
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
 
-    sp = create_spell("testspell", 0);
-    CuAssertPtrEquals(tc, 0, create_spell("testspell", 0));
+    sp = create_spell("testspell");
+    CuAssertPtrEquals(tc, 0, create_spell("testspell"));
     CuAssertPtrNotNull(tc, sl);
     CuAssertStrEquals(tc, "create_spell: duplicate name '%s'", sl->s);
     CuAssertPtrEquals(tc, 0, sl->next);
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
-    test_log_stop(log, sl);
-    test_cleanup();
-}
-
-static void test_create_spell_with_id(CuTest * tc)
-{
-    spell *sp;
-    struct log_t *log;
-    strlist *sl = 0;
-
-    test_setup();
-    test_log_stderr(0);
-    log = test_log_start(LOG_CPERROR, &sl);
-
-    CuAssertPtrEquals(tc, 0, find_spellbyid(42));
-    sp = create_spell("testspell", 42);
-    CuAssertPtrEquals(tc, sp, find_spellbyid(42));
-    CuAssertPtrEquals(tc, 0, create_spell("testspell", 47));
-    CuAssertPtrEquals(tc, 0, find_spellbyid(47));
-    CuAssertPtrNotNull(tc, sl);
-    CuAssertStrEquals(tc, "create_spell: duplicate name '%s'", sl->s);
-    CuAssertPtrEquals(tc, 0, sl->next);
     test_log_stop(log, sl);
     test_cleanup();
 }
@@ -79,7 +57,7 @@ static void test_spellref(CuTest *tc)
     CuAssertPtrEquals(tc, NULL, ref->sp);
     CuAssertStrEquals(tc, "hodor", ref->name);
     CuAssertPtrEquals(tc, NULL, spellref_get(ref));
-    sp = create_spell("hodor", 0);
+    sp = create_spell("hodor");
     CuAssertPtrNotNull(tc, sp);
     CuAssertPtrEquals(tc, sp, spellref_get(ref));
     spellref_free(ref);
@@ -113,6 +91,5 @@ CuSuite *get_spell_suite(void)
     SUITE_ADD_TEST(suite, test_fumbles);
     SUITE_ADD_TEST(suite, test_create_a_spell);
     SUITE_ADD_TEST(suite, test_create_duplicate_spell);
-    SUITE_ADD_TEST(suite, test_create_spell_with_id);
     return suite;
 }

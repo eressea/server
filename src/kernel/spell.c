@@ -85,7 +85,7 @@ void add_spell(struct selist **slistp, spell * sp)
     }
 }
 
-spell * create_spell(const char * name, unsigned int id)
+spell * create_spell(const char * name)
 {
     spell * sp;
     char buffer[64];
@@ -100,7 +100,6 @@ spell * create_spell(const char * name, unsigned int id)
     sp = (spell *)calloc(1, sizeof(spell));
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
     if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
-        sp->id = id ? id : hashstring(name);
         sp->sname = strdup(name);
         add_spell(&spells, sp);
         return sp;
@@ -142,31 +141,6 @@ spell *find_spell(const char *name)
         log_debug("find_spell: could not find spell '%s'\n", name);
     }
     return sp;
-}
-
-spell *find_spellbyid(unsigned int id)
-{
-    selist *ql;
-    int qi;
-
-    if (id == 0)
-        return NULL;
-    for (qi = 0, ql = spells; ql; selist_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)selist_get(ql, qi);
-        if (sp->id == id) {
-            return sp;
-        }
-    }
-    for (qi = 0, ql = spells; ql; selist_advance(&ql, &qi, 1)) {
-        spell *sp = (spell *)selist_get(ql, qi);
-        unsigned int hashid = hashstring(sp->sname);
-        if (hashid == id) {
-            return sp;
-        }
-    }
-
-    log_warning("cannot find spell by id: %u\n", id);
-    return NULL;
 }
 
 struct spellref *spellref_create(spell *sp, const char *name)

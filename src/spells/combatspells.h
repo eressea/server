@@ -23,12 +23,10 @@ extern "C" {
     int sp_fumbleshield(struct castorder * co);
     int sp_shadowknights(struct castorder * co);
     int sp_combatrosthauch(struct castorder * co);
-    int sp_kampfzauber(struct castorder * co);
     int sp_healing(struct castorder * co);
     int sp_keeploot(struct castorder * co);
     int sp_reanimate(struct castorder * co);
     int sp_chaosrow(struct castorder * co);
-    int sp_flee(struct castorder * co);
     int sp_berserk(struct castorder * co);
     int sp_tiredsoldiers(struct castorder * co);
     int sp_reeling_arrows(struct castorder * co);
@@ -50,6 +48,10 @@ extern "C" {
     int sp_stun(struct castorder * co);
     int sp_undeadhero(struct castorder * co);
     int sp_immolation(struct castorder * co);
+
+    int flee_spell(struct castorder * co, int strength);
+    int damage_spell(struct castorder * co, int dmg, int strength);
+    int armor_spell(struct castorder * co, int per_level, int time_multi);
 
 #ifdef __cplusplus
 }

@@ -34,7 +34,6 @@ extern "C" {
     typedef void(*fumble_f)(const struct castorder * co);
 
     typedef struct spell {
-        unsigned int id;
         char *sname;
         char *syntax;
         char *parameter;
@@ -58,9 +57,8 @@ extern "C" {
 
     int sp_antimagiczone(struct castorder *co);
 
-    struct spell * create_spell(const char * name, unsigned int id);
+    struct spell * create_spell(const char * name);
     struct spell * find_spell(const char *name);
-    struct spell * find_spellbyid(unsigned int i);
     void add_spell(struct selist **slistp, spell * sp);
     void free_spells(void);
 

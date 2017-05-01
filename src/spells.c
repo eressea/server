@@ -6444,6 +6444,54 @@ int sp_break_curse(castorder * co)
     return cast_level;
 }
 
+static int sp_flee(castorder *co) {
+    if (co->force <= 0) {
+        return 0;
+    }
+    return flee_spell(co, 4);
+}
+
+static int sp_song_of_fear(castorder *co) {
+    if (co->force <= 0) {
+        return 0;
+    }
+    return flee_spell(co, 3);
+}
+
+static int sp_aura_of_fear(castorder *co) {
+    if (co->force <= 0) {
+        return 0;
+    }
+    return flee_spell(co, 5);
+}
+
+static int sp_armor_shield(struct castorder * co) {
+    return armor_spell(co, 3, 20);
+}
+
+static int sp_bark_skin(struct castorder * co) {
+    return armor_spell(co, 4, 1);
+}
+
+static int sp_kampfzauber(castorder *co) {
+    const spell * sp = co->sp;
+    if (co->force <= 0) {
+        return 0;
+    }
+    else if (strcmp(sp->sname, "fireball") == 0) {
+        return damage_spell(co, 0, 0);
+    }
+    else if (strcmp(sp->sname, "hail") == 0) {
+        return damage_spell(co, 2, 4);
+    }
+    else if (strcmp(sp->sname, "meteor_rain") == 0) {
+        return damage_spell(co, 1, 1);
+    }
+    else {
+        return damage_spell(co, 10, 10);
+    }
+}
+
 /* ------------------------------------------------------------- */
 int sp_becomewyrm(castorder * co)
 {
@@ -6486,7 +6534,7 @@ static spelldata spell_functions[] = {
     { "holyground", sp_holyground, 0 },
     { "summonent", sp_summonent, 0 },
     { "blessstonecircle", sp_blessstonecircle, 0 },
-    { "barkskin", sp_armorshield, 0 },
+    { "barkskin", sp_bark_skin, 0 },
     { "summonfireelemental", sp_drought, 0 },
     { "maelstrom", sp_maelstrom, 0 },
     { "magic_roots", sp_mallorn, 0 },
@@ -6539,7 +6587,7 @@ static spelldata spell_functions[] = {
     { "appeasement", sp_denyattack, 0 },
     { "song_of_healing", sp_healing, 0 },
     { "generous", sp_generous, 0 },
-    { "song_of_fear", sp_flee, 0 },
+    { "song_of_fear", sp_song_of_fear, 0 },
     { "courting", sp_recruit, 0 },
     { "song_of_confusion", sp_chaosrow, 0 },
     { "heroic_song", sp_hero, 0 },
@@ -6591,7 +6639,7 @@ static spelldata spell_functions[] = {
     { "combat_speed", sp_speed, 0 },
     { "view_reality", sp_viewreality, 0 },
     { "double_time", sp_speed2, 0 },
-    { "armor_shield", sp_armorshield, 0 },
+    { "armor_shield", sp_armor_shield, 0 },
     { "living_rock", sp_movecastle, 0 },
     { "astral_disruption", sp_disruptastral, 0 },
     { "sacrifice_strength", sp_permtransfer, 0 },
@@ -6603,7 +6651,7 @@ static spelldata spell_functions[] = {
     { "icy_dragonbreath", sp_dragonodem, 0 },
     { "powerful_dragonbreath", sp_dragonodem, 0 },
     { "drain_skills", sp_dragonodem, 0 },
-    { "aura_of_fear", sp_flee, 0 },
+    { "aura_of_fear", sp_aura_of_fear, 0 },
     { "immolation", sp_immolation, 0 },
     { "firestorm", sp_immolation, 0 },
     { "coldfront", sp_immolation, 0 },

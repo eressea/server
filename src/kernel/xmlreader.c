@@ -1328,14 +1328,12 @@ static int parse_spells(xmlDocPtr doc)
             int k;
             spell_component *component;
             spell *sp;
-            unsigned int index;
             static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
             /* spellname */
-            index = xml_ivalue(node, "index", 0);
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            sp = create_spell((const char *)propValue, index);
+            sp = create_spell((const char *)propValue);
             xmlFree(propValue);
             if (!sp) {
                 continue;

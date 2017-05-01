@@ -339,23 +339,16 @@ sc_mage *get_mage(const unit * u)
 static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    int i;
     spell *sp = 0;
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoip(token);
-    if (i != 0) {
-        sp = find_spellbyid((unsigned int)i);
+    if (data->version < UNIQUE_SPELLS_VERSION) {
+        READ_INT(store, 0); /* ignore mtype */
     }
-    else {
-        if (data->version < UNIQUE_SPELLS_VERSION) {
-            READ_INT(store, 0); /* ignore mtype */
-        }
-        sp = find_spell(token);
-        if (!sp) {
-            log_warning("read_seenspell: could not find spell '%s'\n", token);
-        }
+    sp = find_spell(token);
+    if (!sp) {
+        log_warning("read_seenspell: could not find spell '%s'\n", token);
     }
     if (!sp) {
         return AT_READ_FAIL;
@@ -898,9 +891,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
 bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
     /* Ist überhaupt ein gültiger Spruch angegeben? */
-    if (!sp || sp->id == 0) {
-        return false;
-    }
+    assert(sp);
     /* steht der Spruch in der Spruchliste? */
     return u_hasspell(u, sp) != 0;
 }

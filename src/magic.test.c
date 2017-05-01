@@ -34,7 +34,7 @@ void test_updatespells(CuTest * tc)
     test_create_race("human");
 
     f = test_create_faction(0);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     CuAssertPtrNotNull(tc, sp);
 
     book = create_spellbook("spells");
@@ -67,7 +67,7 @@ void test_spellbooks(CuTest * tc)
     CuAssertStrEquals(tc, "herp", herp->name);
     CuAssertStrEquals(tc, "derp", derp->name);
 
-    sp = create_spell(sname, 0);
+    sp = create_spell(sname);
     spellbook_add(herp, sp, 1);
     CuAssertPtrNotNull(tc, sp);
     entry = spellbook_get(herp, sp);
@@ -170,7 +170,7 @@ void test_getspell_unit(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -199,7 +199,7 @@ void test_getspell_faction(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -229,7 +229,7 @@ void test_getspell_school(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -256,7 +256,7 @@ void test_set_pre_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= PRECOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -288,7 +288,7 @@ void test_set_main_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= COMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -320,7 +320,7 @@ void test_set_post_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -350,7 +350,7 @@ void test_hasspell(CuTest * tc)
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 2);
@@ -379,7 +379,7 @@ void test_multi_cast(CuTest *tc) {
     struct locale * lang;
 
     test_setup();
-    sp = create_spell("fireball", 0);
+    sp = create_spell("fireball");
     sp->cast_fun = cast_fireball;
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
 
