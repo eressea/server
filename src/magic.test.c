@@ -4,7 +4,7 @@
 #include "teleport.h"
 #include "give.h"
 
-#include <kernel/config.h>
+#include <kernel/building.h>
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
@@ -14,10 +14,12 @@
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
-#include <selist.h>
+
+#include <util/attrib.h>
 #include <util/language.h>
 
 #include <CuTest.h>
+#include <selist.h>
 #include <tests.h>
 
 #include <stdlib.h>
@@ -460,6 +462,27 @@ static void test_familiar_mage(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_illusioncastle(CuTest *tc)
+{
+    building *b;
+    building_type *btype, *bt_icastle;
+    const attrib *a;
+    test_setup();
+    btype = test_create_buildingtype("castle");
+    bt_icastle = test_create_buildingtype("illusioncastle");
+    b = test_create_building(test_create_region(0, 0, NULL), bt_icastle);
+    b->size = 1;
+    make_icastle(b, btype, 10);
+    a = a_find(b->attribs, &at_icastle);
+    CuAssertPtrNotNull(tc, a);
+    CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
+    CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
+    CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
+    btype->construction->extra.name = strdup("site");
+    CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
+    test_cleanup();
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -477,6 +500,7 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_hasspell);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
+    SUITE_ADD_TEST(suite, test_illusioncastle);
     DISABLE_TEST(suite, test_familiar_mage);
     return suite;
 }
