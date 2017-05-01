@@ -23,6 +23,7 @@
 #include <tests.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 void test_updatespells(CuTest * tc)
 {
