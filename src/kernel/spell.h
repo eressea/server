@@ -40,7 +40,6 @@ extern "C" {
         int sptyp;
         int rank;                   /* Reihenfolge der Zauber */
         struct spell_component *components;
-        spell_f cast_fun;
     } spell;
 
     typedef struct spellref {
@@ -50,6 +49,9 @@ extern "C" {
 
     void add_fumble(const char *sname, fumble_f fun);
     fumble_f get_fumble(const char *sname);
+
+    void add_spellcast(const char *sname, spell_f fun);
+    spell_f get_spellcast(const char *sname);
 
     struct spellref *spellref_create(struct spell *sp, const char *name);
     void spellref_free(struct spellref *spref);

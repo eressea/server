@@ -27,6 +27,7 @@ extern "C" {
     struct unit;
     struct message;
 
+    void register_magicresistance(void);
     void register_spells(void);
     void set_spelldata(struct spell *sp);
 

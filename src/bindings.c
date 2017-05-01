@@ -92,6 +92,20 @@ TOLUA_PKG(locale);
 TOLUA_PKG(log);
 TOLUA_PKG(game);
 
+int tolua_toid(lua_State * L, int idx, int def)
+{
+    int no = 0;
+    int type = lua_type(L, idx);
+    if (type == LUA_TNUMBER) {
+        no = (int)tolua_tonumber(L, idx, def);
+    }
+    else {
+        const char *str = tolua_tostring(L, idx, NULL);
+        no = str ? atoi36(str) : def;
+    }
+    return no;
+}
+
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);

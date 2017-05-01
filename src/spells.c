@@ -1104,8 +1104,9 @@ static int sp_blessedharvest(castorder * co)
 
     if (create_curse(mage, &r->attribs, ct_find("blessedharvest"), co->force,
         duration, 1.0, 0)) {
-        message *seen = msg_message("harvest_effect", "mage", mage);
-        message *unseen = msg_message("harvest_effect", "mage", NULL);
+        const char * effect = co->sp->sname[0]=='b' ? "harvest_effect" : "raindance_effect";
+        message *seen = msg_message(effect, "mage", mage);
+        message *unseen = msg_message(effect, "mage", NULL);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -2930,10 +2931,6 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
     }
     return AT_READ_FAIL;          /* we don't care for the attribute. */
 }
-
-attrib_type at_deathcloud_compat = {
-    "zauber_todeswolke", NULL, NULL, NULL, NULL, dc_read_compat
-};
 #endif
 
 /* ------------------------------------------------------------- */
@@ -6499,6 +6496,99 @@ int sp_becomewyrm(castorder * co)
     return 0;
 }
 
+/* ------------------------------------------------------------- */
+/* Name:       Plappermaul
+* Stufe:      4
+* Gebiet:     Cerddor
+* Kategorie:  Einheit
+*
+* Wirkung:
+*  Einheit ausspionieren. Gibt auch Zauber und Kampfstatus aus.  Wirkt
+*  gegen Magieresistenz. Ist diese zu hoch, so wird der Zauber entdeckt
+*  (Meldung) und der Zauberer erhaelt nur die Talente, nicht die Werte
+*  der Einheit und auch keine Zauber.
+*
+* Flag:
+*  (UNITSPELL | TESTCANSEE)
+*/
+static int sp_babbler(castorder * co)
+{
+    unit *target;
+    region *r = co_get_region(co);
+    unit *mage = co->magician.u;
+    int cast_level = co->level;
+    spellparameter *pa = co->par;
+    message *msg;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag == TARGET_NOTFOUND)
+        return 0;
+
+    target = pa->param[0]->data.u;
+
+    if (target->faction == mage->faction) {
+        /* Die Einheit ist eine der unsrigen */
+        cmistake(mage, co->order, 45, MSG_MAGIC);
+    }
+
+    /* Magieresistenz Unit */
+    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
+        spy_message(5, mage, target);
+        msg = msg_message("babbler_resist", "unit mage", target, mage);
+    }
+    else {
+        spy_message(100, mage, target);
+        msg = msg_message("babbler_effect", "unit", target);
+    }
+    r_addmessage(r, target->faction, msg);
+    msg_release(msg);
+    return cast_level;
+}
+
+/* ------------------------------------------------------------- */
+/* Name:     Traumdeuten
+* Stufe:   7
+* Kategorie:      Einheit
+*
+* Wirkung:
+*  Wirkt gegen Magieresistenz.  Spioniert die Einheit aus. Gibt alle
+*  Gegenstaende, Talente mit Stufe, Zauber und Kampfstatus an.
+*
+*  Magieresistenz hier pruefen, wegen Fehlermeldung
+*
+* Flag:
+* (UNITSPELL)
+*/
+static int sp_readmind(castorder * co)
+{
+    unit *target;
+    unit *mage = co->magician.u;
+    int cast_level = co->level;
+    spellparameter *pa = co->par;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag == TARGET_NOTFOUND)
+        return 0;
+
+    target = pa->param[0]->data.u;
+
+    if (target->faction == mage->faction) {
+        /* Die Einheit ist eine der unsrigen */
+        cmistake(mage, co->order, 45, MSG_MAGIC);
+    }
+
+    /* Magieresistenz Unit */
+    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
+        cmistake(mage, co->order, 180, MSG_MAGIC);
+        /* "Fuehlt sich beobachtet" */
+        ADDMSG(&target->faction->msgs, msg_message("stealdetect", "unit", target));
+        return 0;
+    }
+    spy_message(2, mage, target);
+
+    return cast_level;
+}
+
 typedef struct spelldata {
     const char *sname;
     spell_f cast;
@@ -6618,7 +6708,7 @@ static spelldata spell_functions[] = {
     { "concealing_aura", sp_itemcloak, 0 },
     { "tybiedfumbleshield", sp_fumbleshield, 0 },
 #ifdef SHOWASTRAL_NOT_BORKED
-    { "show_astral", sp_showastral, 0},
+    { "show_astral", sp_showastral, 0 },
 #endif
     { "resist_magic", sp_resist_magic_bonus, 0 },
     { "keeploot", sp_keeploot, 0 },
@@ -6656,18 +6746,24 @@ static spelldata spell_functions[] = {
     { "firestorm", sp_immolation, 0 },
     { "coldfront", sp_immolation, 0 },
     { "acidrain", sp_immolation, 0 },
+    { "blabbermouth", sp_babbler, NULL },
+    { "summon_familiar", sp_summon_familiar, NULL },
+    { "meteor_rain", sp_kampfzauber, NULL },
+    { "fireball", sp_kampfzauber, NULL },
+    { "hail", sp_kampfzauber, NULL },
+    { "readmind", sp_readmind, NULL },
+    { "blessedharvest", sp_blessedharvest, NULL },
+    { "raindance", sp_blessedharvest, NULL },
     { 0, 0, 0 }
 };
 
 static void register_spelldata(void)
 {
     int i;
-    char zText[32];
-    strcpy(zText, "fumble_");
     for (i = 0; spell_functions[i].sname; ++i) {
         spelldata *data = spell_functions + i;
         if (data->cast) {
-            register_function((pf_generic)data->cast, data->sname);
+            add_spellcast(data->sname, data->cast);
         }
         if (data->fumble) {
             add_fumble(data->sname, data->fumble);
@@ -6675,116 +6771,17 @@ static void register_spelldata(void)
     }
 }
 
-/* ------------------------------------------------------------- */
-/* Name:       Plappermaul
-* Stufe:      4
-* Gebiet:     Cerddor
-* Kategorie:  Einheit
-*
-* Wirkung:
-*  Einheit ausspionieren. Gibt auch Zauber und Kampfstatus aus.  Wirkt
-*  gegen Magieresistenz. Ist diese zu hoch, so wird der Zauber entdeckt
-*  (Meldung) und der Zauberer erhaelt nur die Talente, nicht die Werte
-*  der Einheit und auch keine Zauber.
-*
-* Flag:
-*  (UNITSPELL | TESTCANSEE)
-*/
-static int sp_babbler(castorder * co)
-{
-    unit *target;
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    spellparameter *pa = co->par;
-    message *msg;
-
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
-    target = pa->param[0]->data.u;
-
-    if (target->faction == mage->faction) {
-        /* Die Einheit ist eine der unsrigen */
-        cmistake(mage, co->order, 45, MSG_MAGIC);
-    }
-
-    /* Magieresistenz Unit */
-    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
-        spy_message(5, mage, target);
-        msg = msg_message("babbler_resist", "unit mage", target, mage);
-    }
-    else {
-        spy_message(100, mage, target);
-        msg = msg_message("babbler_effect", "unit", target);
-    }
-    r_addmessage(r, target->faction, msg);
-    msg_release(msg);
-    return cast_level;
-}
-
-/* ------------------------------------------------------------- */
-/* Name:     Traumdeuten
-* Stufe:   7
-* Kategorie:      Einheit
-*
-* Wirkung:
-*  Wirkt gegen Magieresistenz.  Spioniert die Einheit aus. Gibt alle
-*  Gegenstaende, Talente mit Stufe, Zauber und Kampfstatus an.
-*
-*  Magieresistenz hier pruefen, wegen Fehlermeldung
-*
-* Flag:
-* (UNITSPELL)
-*/
-static int sp_readmind(castorder * co)
-{
-    unit *target;
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    spellparameter *pa = co->par;
-
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
-    target = pa->param[0]->data.u;
-
-    if (target->faction == mage->faction) {
-        /* Die Einheit ist eine der unsrigen */
-        cmistake(mage, co->order, 45, MSG_MAGIC);
-    }
-
-    /* Magieresistenz Unit */
-    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
-        cmistake(mage, co->order, 180, MSG_MAGIC);
-        /* "Fuehlt sich beobachtet" */
-        ADDMSG(&target->faction->msgs, msg_message("stealdetect", "unit", target));
-        return 0;
-    }
-    spy_message(2, mage, target);
-
-    return cast_level;
-}
-
-void register_magicresistance(void);
-
 void register_spells(void)
 {
     register_borders();
 
-    at_register(&at_deathcloud_compat);
+#ifdef COMPAT_DEATHCLOUD
+    at_deprecate("zauber_todeswolke", dc_read_compat);
+#endif
 
     /* init_firewall(); */
     ct_register(&ct_firewall);
     ct_register(&ct_deathcloud);
-
-    register_function((pf_generic)sp_blessedharvest, "cast_blessedharvest");
-    register_function((pf_generic)sp_summon_familiar, "cast_familiar");
-    register_function((pf_generic)sp_babbler, "cast_babbler");
-    register_function((pf_generic)sp_readmind, "cast_readmind");
-    register_function((pf_generic)sp_kampfzauber, "combat_spell");
 
     register_spelldata();
 

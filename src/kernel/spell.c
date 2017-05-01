@@ -33,7 +33,30 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-static critbit_tree cb_fumbles;
+
+static critbit_tree cb_spell_fun;
+void add_spellcast(const char *sname, spell_f fun)
+{
+    size_t len;
+    char data[64];
+
+    len = cb_new_kv(sname, strlen(sname), &fun, sizeof(fun), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_spell_fun, data, len);
+}
+
+spell_f get_spellcast(const char *sname)
+{
+    void * match;
+    spell_f result = NULL;
+
+    if (cb_find_prefix(&cb_spell_fun, sname, strlen(sname) + 1, &match, 1, 0)) {
+        cb_get_kv(match, &result, sizeof(result));
+    }
+    return result;
+}
+
+static critbit_tree cb_fumble_fun;
 void add_fumble(const char *sname, fumble_f fun)
 {
     size_t len;
@@ -41,7 +64,7 @@ void add_fumble(const char *sname, fumble_f fun)
 
     len = cb_new_kv(sname, strlen(sname), &fun, sizeof(fun), data);
     assert(len <= sizeof(data));
-    cb_insert(&cb_fumbles, data, len);
+    cb_insert(&cb_fumble_fun, data, len);
 }
 
 fumble_f get_fumble(const char *sname)
@@ -49,7 +72,7 @@ fumble_f get_fumble(const char *sname)
     void * match;
     fumble_f result = NULL;
 
-    if (cb_find_prefix(&cb_fumbles, sname, strlen(sname) + 1, &match, 1, 0)) {
+    if (cb_find_prefix(&cb_fumble_fun, sname, strlen(sname) + 1, &match, 1, 0)) {
         cb_get_kv(match, &result, sizeof(result));
     }
     return result;
@@ -71,7 +94,8 @@ static void free_spell_cb(void *cbdata) {
 }
 
 void free_spells(void) {
-    cb_clear(&cb_fumbles);
+    cb_clear(&cb_fumble_fun);
+    cb_clear(&cb_spell_fun);
     cb_clear(&cb_spells);
     selist_foreach(spells, free_spell_cb);
     selist_free(spells);

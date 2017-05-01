@@ -279,11 +279,8 @@ parse_function(xmlNodePtr node, pf_generic * funPtr, xmlChar ** namePtr)
     xmlChar *propValue = xmlGetProp(node, BAD_CAST "value");
     assert(propValue != NULL);
     fun = get_function((const char *)propValue);
-    if (fun != NULL) {
-        xmlFree(propValue);
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-    }
+    xmlFree(propValue);
+    propValue = xmlGetProp(node, BAD_CAST "name");
     *namePtr = propValue;
     *funPtr = fun;
     return 0;
@@ -1311,7 +1308,6 @@ static int parse_spellbooks(xmlDocPtr doc)
 
 static int parse_spells(xmlDocPtr doc)
 {
-    pf_generic cast = 0;
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr spells;
 
@@ -1386,44 +1382,9 @@ static int parse_spells(xmlDocPtr doc)
                 sp->sptyp |= REGIONSPELL;
 
             k = xml_ivalue(node, "combat", 0);
-            if (k >= 0 && k <= 3)
+            if (k >= 0 && k <= 3) {
                 sp->sptyp |= modes[k];
-
-            /* reading eressea/spells/spell/function */
-
-            xpath->node = node;
-            result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-
-            if (result->nodesetval->nodeNr == 0) {
-                cast = get_function(sp->sname);
-                if (!cast) {
-                    log_error("no spell cast function registered for '%s'\n", sp->sname);
-                }
             }
-            else {
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    pf_generic fun;
-
-                    parse_function(node, &fun, &propValue);
-                    assert(propValue != NULL);
-                    if (strcmp((const char *)propValue, "cast") == 0) {
-                        if (fun) {
-                            cast = fun;
-                        }
-                        else {
-                            log_error("unknown function name '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
-                        }
-                    }
-                    else {
-                        log_error("unknown function type '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
-                    }
-                    xmlFree(propValue);
-                }
-            }
-            sp->cast_fun = (spell_f)cast;
-            xmlXPathFreeObject(result);
-
             /* reading eressea/spells/spell/resource */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
