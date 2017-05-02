@@ -1205,11 +1205,12 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (rule_damage & DAMAGE_CRITICAL) {
             double kritchance = (sk * 3 - sd) / 200.0;
+            int maxk = 4;
 
             kritchance = MAX(kritchance, 0.005);
             kritchance = MIN(0.9, kritchance);
 
-            while (chance(kritchance)) {
+            while (maxk-- && chance(kritchance)) {
                 da += dice_rand(damage);
             }
         }
