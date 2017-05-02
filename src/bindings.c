@@ -990,6 +990,12 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     }
 }
 
+static int lua_rng_default(lua_State *L) {
+    UNUSED_ARG(L);
+    random_source_inject_constant(0);
+    return 0;
+}
+
 void tolua_bind_open(lua_State * L);
 
 int tolua_bindings_open(lua_State * L, const dictionary *inifile)
@@ -1060,6 +1066,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_ship", tolua_get_ship);
         tolua_function(L, TOLUA_CAST "get_building", tolua_get_building);
         tolua_function(L, TOLUA_CAST "get_region", tolua_get_region);
+	tolua_function(L, TOLUA_CAST "rng_default", lua_rng_default);
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);

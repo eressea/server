@@ -218,6 +218,9 @@ function test_gmtool()
     local r1 = region.create(1, 0, "plain")
     local r2 = region.create(1, 1, "plain")
     local r3 = region.create(1, 2, "plain")
+    if not gmtool then
+        return
+    end
     gmtool.open()
     gmtool.select(r1, true)
     gmtool.select_at(0, 1, true)

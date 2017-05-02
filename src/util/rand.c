@@ -46,7 +46,7 @@ double normalvariate(double mu, double sigma)
     double z;
     for (;;) {
         double u1 = rng_double();
-        double u2 = 1.0 - rng_double();
+        double u2 = rng_double();
         z = NV_MAGICCONST * (u1 - 0.5) / u2;
         if (z * z / 4.0 <= -log(u2)) {
             break;
@@ -73,7 +73,7 @@ bool chance(double x)
 {
     if (x >= 1.0)
         return true;
-    return rng_double() < x;
+    return (1-rng_double()) < x;
 }
 
 typedef struct random_source {
