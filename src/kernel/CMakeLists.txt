@@ -17,7 +17,7 @@ group.test.c
 item.test.c
 messages.test.c
 order.test.c
-# pathdinder.test.c
+# pathfinder.test.c
 plane.test.c
 pool.test.c
 race.test.c

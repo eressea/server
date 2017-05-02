@@ -25,11 +25,13 @@ extern "C" {
 
     struct castorder;
 
-    extern struct callbacks {
+    struct callback_struct {
         int (*cast_spell)(struct castorder *co, const char *fname);
-    } callbacks;
+    };
 
+    extern struct callback_struct callbacks;
 #ifdef __cplusplus
 }
 #endif
 #endif /* H_KRNL_CALLBACKS_H */
+
