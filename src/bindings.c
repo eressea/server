@@ -231,7 +231,7 @@ static int tolua_setkey(lua_State * L)
     return 0;
 }
 
-static int tolua_rng_int(lua_State * L)
+static int tolua_random(lua_State * L)
 {
     lua_pushinteger(L, rng_int());
     return 1;
@@ -1017,6 +1017,14 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
+        tolua_module(L, TOLUA_CAST "rng", 1);
+        tolua_beginmodule(L, TOLUA_CAST "rng");
+        {
+            tolua_function(L, TOLUA_CAST "inject", lua_rng_default);
+            tolua_function(L, TOLUA_CAST "random", tolua_random);
+        }
+        tolua_endmodule(L);
+        tolua_function(L, TOLUA_CAST "rng_int", tolua_random);
         tolua_cclass(L, TOLUA_CAST "alliance", TOLUA_CAST "alliance",
             TOLUA_CAST "", NULL);
         tolua_beginmodule(L, TOLUA_CAST "alliance");
@@ -1066,7 +1074,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_ship", tolua_get_ship);
         tolua_function(L, TOLUA_CAST "get_building", tolua_get_building);
         tolua_function(L, TOLUA_CAST "get_region", tolua_get_region);
-	tolua_function(L, TOLUA_CAST "rng_default", lua_rng_default);
         tolua_function(L, TOLUA_CAST "factions", tolua_get_factions);
         tolua_function(L, TOLUA_CAST "regions", tolua_get_regions);
         tolua_function(L, TOLUA_CAST "read_turn", tolua_read_turn);
@@ -1107,7 +1114,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
         tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
-        tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
     } tolua_endmodule(L);
