@@ -14,6 +14,7 @@
 #define NO_STRDUP
 #define NO_MKDIR
 #define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
 #pragma warning(disable: 4456) // declaration hides previous

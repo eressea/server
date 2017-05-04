@@ -17,7 +17,7 @@ require 'eressea.xmlconf'
 require 'tests.e3'
 require 'lunit'
 
-rng_default(0)
+rng.inject(0)
 eressea.settings.set("rules.alliances", "0")
 rules = require('eressea.' .. config.rules)
 result = lunit.main()

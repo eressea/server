@@ -36,23 +36,27 @@ int lovar(double xpct_x2)
     return (rng_int() % n + rng_int() % n) / 1000;
 }
 
-/* NormalRand aus python, random.py geklaut, dort ist Referenz auf
-* den Algorithmus. mu = Mittelwert, sigma = Standardabweichung.
-* http://de.wikipedia.org/wiki/Standardabweichung#Diskrete_Gleichverteilung.2C_W.C3.BCrfel
-*/
+/* gaussian distribution
+ * taken from http://c-faq.com/lib/gaussian.html
+ */
+
 double normalvariate(double mu, double sigma)
 {
-    static const double NV_MAGICCONST = 1.7155277699214135;
-    double z;
-    for (;;) {
-        double u1 = rng_double();
-        double u2 = rng_double();
-        z = NV_MAGICCONST * (u1 - 0.5) / u2;
-        if (z * z / 4.0 <= -log(u2)) {
-            break;
-        }
+    static double U, V;
+    static int phase = 0;
+    double Z;
+
+    if (phase == 0) {
+        U = (rng_int() + 1.) / (RNG_RAND_MAX + 2.);
+        V = rng_int() / (RNG_RAND_MAX + 1.);
+        Z = sqrt(-2 * log(U)) * sin(2 * M_PI * V);
     }
-    return mu + z * sigma;
+    else {
+        Z = sqrt(-2 * log(U)) * cos(2 * M_PI * V);
+    }
+    phase = 1 - phase;
+
+    return mu + Z *sigma;
 }
 
 int ntimespprob(int n, double p, double mod)
