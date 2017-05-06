@@ -83,7 +83,6 @@ extern "C" {
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
     void free_buildingtypes(void);
-    void bt_register(struct building_type *type);
     int bt_effsize(const struct building_type *btype,
         const struct building *b, int bsize);
 

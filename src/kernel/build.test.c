@@ -71,29 +71,6 @@ static void test_build_requires_materials(CuTest *tc) {
     teardown_build(&bf);
 }
 
-static void test_build_requires_building(CuTest *tc) {
-    build_fixture bf = { 0 };
-    unit *u;
-    const struct resource_type *rtype;
-    building_type *btype;
-
-    u = setup_build(&bf);
-    rtype = bf.cons.materials[0].rtype;
-    i_change(&u->items, rtype->itype, 1);
-    set_level(u, SK_ARMORER, 2);
-    bf.cons.type = CONS_ITEM;
-    bf.cons.extra.btype = btype = bt_get_or_create("hodor");
-    btype->maxcapacity = 1;
-    btype->capacity = 1;
-    CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1, 0));
-    u->building = test_create_building(u->region, btype);
-    fset(u->building, BLD_MAINTAINED);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1, 0));
-    btype->maxcapacity = 0;
-    CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1, 0));
-    teardown_build(&bf);
-}
-
 static void test_build_failure_missing_skill(CuTest *tc) {
     build_fixture bf = { 0 };
     unit *u;
@@ -411,7 +388,6 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_failure_low_skill);
     SUITE_ADD_TEST(suite, test_build_failure_missing_skill);
     SUITE_ADD_TEST(suite, test_build_requires_materials);
-    SUITE_ADD_TEST(suite, test_build_requires_building);
     SUITE_ADD_TEST(suite, test_build_failure_completed);
     SUITE_ADD_TEST(suite, test_build_with_ring);
     SUITE_ADD_TEST(suite, test_build_with_potion);

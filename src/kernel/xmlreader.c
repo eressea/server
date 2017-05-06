@@ -247,17 +247,10 @@ construction ** consPtr, construct_t type)
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
 
-        if (type == CONS_ITEM) {
-            propValue = xmlGetProp(node, BAD_CAST "building");
-            if (propValue != NULL) {
-                con->extra.btype = bt_get_or_create((const char *)propValue);
-                xmlFree(propValue);
-            }
-        }
-        else if (type == CONS_BUILDING) {
+        if (type == CONS_BUILDING) {
             propValue = xmlGetProp(node, BAD_CAST "name");
             if (propValue != NULL) {
-                con->extra.name = strdup((const char *)propValue);
+                con->name = strdup((const char *)propValue);
                 xmlFree(propValue);
             }
         }

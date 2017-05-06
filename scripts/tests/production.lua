@@ -27,7 +27,7 @@ function test_laen_needs_mine()
     turn_process()
     assert_equal(0, u:get_item('laen'))
     assert_equal(100, r:get_resource('laen'))
-    assert_equal(1, f:count_msg_type("error104")) -- requires building
+    assert_equal(1, f:count_msg_type("building_needed")) -- requires building
 
     u.building = building.create(u.region, "mine")
     u.building.working = true

@@ -52,13 +52,8 @@ extern "C" {
         int reqsize;                /* size of object using up 1 set of requirement. */
         requirement *materials;     /* material req'd to build one object */
 
-        union {
-            /* CONS_BUILDING: */
-            char * name; /* building level name */
-            /* CONS_ITEM: */
-            const struct building_type *btype; /* building required to build item */
-        } extra;
-
+        /* only used by CONS_BUILDING: */
+        char * name; /* building level name */
         struct construction *improvement;
         /* next level, if upgradable. */
     } construction;
@@ -89,7 +84,6 @@ extern "C" {
 #define ENEEDSKILL -2
 #define ECOMPLETE -3
 #define ENOMATERIALS -4
-#define EBUILDINGREQ -5
 
 #ifdef __cplusplus
 }
