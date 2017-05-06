@@ -41,11 +41,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <selist.h>
 #include <util/resolve.h>
 #include <util/umlaut.h>
 
 #include <storage.h>
+#include <selist.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <assert.h>
@@ -62,21 +63,22 @@ typedef struct building_typelist {
 } building_typelist;
 
 selist *buildingtypes = NULL;
+static critbit_tree cb_bldgtypes;
 
 /* Returns a building type for the (internal) name */
 static building_type *bt_find_i(const char *name)
 {
-    selist *ql;
-    int qi;
+    const char *match;
+    building_type *btype = NULL;
 
-    assert(name);
-
-    for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
-        building_type *btype = (building_type *)selist_get(ql, qi);
-        if (strcmp(btype->_name, name) == 0)
-            return btype;
+    match = cb_find_str(&cb_bldgtypes, name);
+    if (match) {
+        cb_get_kv(match, &btype, sizeof(btype));
     }
-    return NULL;
+    else {
+        log_warning("st_find: could not find ship '%s'\n", name);
+    }
+    return btype;
 }
 
 const building_type *bt_find(const char *name)
@@ -96,9 +98,15 @@ bool bt_changed(int *cache)
     return false;
 }
 
-void bt_register(building_type * type)
+void bt_register(building_type * btype)
 {
-    selist_push(&buildingtypes, (void *)type);
+    size_t len;
+    char data[64];
+
+    selist_push(&buildingtypes, (void *)btype);
+    len = cb_new_kv(btype->_name, strlen(btype->_name), &btype, sizeof(btype), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_bldgtypes, data, len);
     ++bt_changes;
 }
 
@@ -111,6 +119,7 @@ static void free_buildingtype(void *ptr) {
 }
 
 void free_buildingtypes(void) {
+    cb_clear(&cb_bldgtypes);
     selist_foreach(buildingtypes, free_buildingtype);
     selist_free(buildingtypes);
     buildingtypes = 0;
