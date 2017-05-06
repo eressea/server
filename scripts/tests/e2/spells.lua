@@ -8,6 +8,7 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
 function test_shapeshift()
@@ -44,7 +45,7 @@ function test_raindance()
     u:clear_orders()
     u:add_order("ZAUBERE STUFE 1 Regentanz")
     assert_equal(0, r:get_resource("money"))
-    
+
     process_orders()
     assert_equal(200, r:get_resource("money"))
     assert_equal(0, u:get_item("money"))
