@@ -43,9 +43,7 @@ static void test_market_curse(CuTest * tc)
 
     config_set("rules.region_owners", "1");
 
-    btype = (building_type *)calloc(1, sizeof(building_type));
-    btype->_name = strdup("market");
-    bt_register(btype);
+    btype = bt_get_or_create("market");
 
     terrain = get_terrain("plain");
 

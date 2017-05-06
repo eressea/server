@@ -107,21 +107,25 @@ const ship_type *st_find(const char *name) {
     return st_find_i(name);
 }
 
+static void st_register(ship_type *stype) {
+    size_t len;
+    char data[64];
+
+    selist_push(&shiptypes, (void *)stype);
+
+    len = cb_new_kv(stype->_name, strlen(stype->_name), &stype, sizeof(stype), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_shiptypes, data, len);
+}
+
 ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     assert(!snames);
     if (!st) {
-        size_t len;
-        char data[64];
-
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = strdup(name);
         st->storm = 1.0;
-        selist_push(&shiptypes, (void *)st);
-
-        len = cb_new_kv(name, strlen(name), &st, sizeof(st), data);
-        assert(len <= sizeof(data));
-        cb_insert(&cb_shiptypes, data, len);
+        st_register(st);
     }
     return st;
 }

@@ -98,7 +98,7 @@ bool bt_changed(int *cache)
     return false;
 }
 
-void bt_register(building_type * btype)
+static void bt_register(building_type * btype)
 {
     size_t len;
     char data[64];
