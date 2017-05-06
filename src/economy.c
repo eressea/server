@@ -814,6 +814,7 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
     int skill = 0;
     int need_race = 0, need_bldg = 0;
     resource_mod *mod;
+    const struct building_type *btype_needed = NULL;
 
     if (btype && btype->modifiers) {
         for (mod = btype->modifiers; mod && mod->type != RMT_END; ++mod) {
@@ -838,7 +839,9 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
                     break;
                 case RMT_PROD_REQUIRE:
                     if (mod->race) need_race |= 1;
-                    if (mod->btype) need_bldg |= 1;
+                    if (mod->btype) {
+                        need_bldg |= 1;
+                    }
                     break;
                 default:
                     /* is not a production modifier, ignore it */
@@ -848,14 +851,17 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
         }
         if (mod->type == RMT_PROD_REQUIRE) {
             if (mod->race) need_race |= 2;
-            if (mod->btype) need_bldg |= 2;
+            if (mod->btype) {
+                btype_needed = mod->btype;
+                need_bldg |= 2;
+            }
         }
     }
     if (need_race == 2) {
         return msg_error(u, u->thisorder, 117);
     }
-    if (need_bldg == 2) {
-        return msg_error(u, u->thisorder, 104);
+    if (btype_needed && need_bldg == 2) {
+        return msg_feedback(u, u->thisorder, "building_needed", "building", btype_needed->_name);
     }
     *skillp = skill;
     if (savep) *savep = frac_make(save_n, save_d);
@@ -884,11 +890,6 @@ static void manufacture(unit * u, const item_type * itype, int want)
     case ENEEDSKILL:
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
-        return;
-    case EBUILDINGREQ:
-        ADDMSG(&u->faction->msgs,
-            msg_feedback(u, u->thisorder, "building_needed", "building",
-                itype->construction->extra.btype->_name));
         return;
     case ELOWSKILL:
         ADDMSG(&u->faction->msgs,
@@ -1235,11 +1236,6 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case ENEEDSKILL:
         /* no skill, or not enough skill points to build */
         cmistake(u, u->thisorder, 50, MSG_PRODUCE);
-        break;
-    case EBUILDINGREQ:
-        ADDMSG(&u->faction->msgs,
-            msg_feedback(u, u->thisorder, "building_needed", "building",
-                ptype->itype->construction->extra.btype->_name));
         break;
     case ECOMPLETE:
         assert(0);
@@ -2948,8 +2944,8 @@ static void peasant_taxes(region * r)
 
     level = buildingeffsize(b, false);
     if (level > 0) {
-        double taxfactor = money * level / building_taxes(b);
-        double morale = money * region_get_morale(r) / MORALE_TAX_FACTOR;
+        double taxfactor = (double)money * level / building_taxes(b);
+        double morale = (double)money * region_get_morale(r) / MORALE_TAX_FACTOR;
         if (taxfactor > morale) {
             taxfactor = morale;
         }

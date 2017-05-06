@@ -527,7 +527,7 @@ static void test_modify_production(CuTest *tc) {
     test_clear_messages(u->faction);
     make_item(u, itype, 10);
     CuAssertIntEquals(tc, 28, get_item(u, itype));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error104"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "building_needed"));
 
     rtype->modifiers[0].type = RMT_PROD_REQUIRE;
     rtype->modifiers[0].race = test_create_race("smurf");
