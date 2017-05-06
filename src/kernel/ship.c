@@ -53,8 +53,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-selist *shiptypes = NULL;
-static critbit_tree cb_shiptypes;
+selist *shiptypes = NULL; /* do not use this list for searching*/
+static critbit_tree cb_shiptypes; /* use this trie instead */
 
 static local_names *snames;
 
@@ -63,9 +63,7 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
     local_names *sn = snames;
     variant var;
 
-    while (sn) {
-        if (sn->lang == lang)
-            break;
+    while (sn && sn->lang != lang) {
         sn = sn->next;
     }
     if (!sn) {
@@ -111,6 +109,7 @@ const ship_type *st_find(const char *name) {
 
 ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
+    assert(!snames);
     if (!st) {
         size_t len;
         char data[64];
