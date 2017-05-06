@@ -248,8 +248,9 @@ void remove_ship(ship ** slist, ship * sh)
 
 void free_ship(ship * s)
 {
-    while (s->attribs)
+    while (s->attribs) {
         a_remove(&s->attribs, s->attribs);
+    }
     free(s->name);
     free(s->display);
     free(s);

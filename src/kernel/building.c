@@ -199,14 +199,14 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
     if (btype->name) {
         return btype->name(btype, b, bsize);
     }
-    if (btype->construction && btype->construction->extra.name) {
+    if (btype->construction && btype->construction->name) {
         if (b) {
             bsize = adjust_size(b, bsize);
         }
         for (con = btype->construction; con; con = con->improvement) {
             bsize -= con->maxsize;
             if (!con->improvement || bsize <0) {
-                return con->extra.name;
+                return con->name;
             }
         }
     }

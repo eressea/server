@@ -479,7 +479,7 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
     CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->construction->extra.name = strdup("site");
+    btype->construction->name = strdup("site");
     CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
     test_cleanup();
 }

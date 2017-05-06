@@ -563,7 +563,7 @@ static void test_buildingtype(CuTest *tc) {
     btype = test_create_buildingtype("hodor");
     CuAssertPtrNotNull(tc, btype->construction);
     CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
-    btype->construction->extra.name = strdup("castle");
+    btype->construction->name = strdup("castle");
     CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
     btype = bt_get_or_create("portal");
     CuAssertPtrEquals(tc, NULL, btype->construction);
