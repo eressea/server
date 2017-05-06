@@ -48,4 +48,10 @@ char * strdup(const char *s);
 int mkdir(const char *pathname, int mode);
 #endif
 
+/* do not use M_PI, use one of these instead: */
+#define PI_F 3.1415926535897932384626433832795F
+#define PI_D 3.1415926535897932384626433832795
+#define PI_L 3.1415926535897932384626433832795L
+
+
 #endif
