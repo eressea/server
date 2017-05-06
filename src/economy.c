@@ -2944,8 +2944,8 @@ static void peasant_taxes(region * r)
 
     level = buildingeffsize(b, false);
     if (level > 0) {
-        double taxfactor = money * level / building_taxes(b);
-        double morale = money * region_get_morale(r) / MORALE_TAX_FACTOR;
+        double taxfactor = (double)money * level / building_taxes(b);
+        double morale = (double)money * region_get_morale(r) / MORALE_TAX_FACTOR;
         if (taxfactor > morale) {
             taxfactor = morale;
         }
