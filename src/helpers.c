@@ -18,12 +18,15 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
+#include <util/event.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 
+#include <kernel/callbacks.h>
 #include <kernel/config.h>
+#include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/spell.h>
@@ -156,23 +159,12 @@ static void push_param(lua_State * L, char c, spllprm * param)
 }
 
 /** callback to use lua for spell functions */
-static int lua_callspell(castorder * co)
+static int lua_callspell(castorder * co, const char *fname)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    const char *fname = co->sp->sname;
     unit *caster = co_get_caster(co);
     region * r = co_get_region(co);
     int result = -1;
-    const char *hashpos = strchr(fname, '#');
-    char fbuf[64];
-
-    if (hashpos != NULL) {
-        ptrdiff_t len = hashpos - fname;
-        assert(len < (ptrdiff_t) sizeof(fbuf));
-        memcpy(fbuf, fname, len);
-        fbuf[len] = '\0';
-        fname = fbuf;
-    }
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
@@ -455,41 +447,39 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     return result;
 }
 
-int tolua_toid(lua_State * L, int idx, int def)
+
+/* compat code for old data files */
+static int caldera_read(trigger *t, struct gamedata *data)
 {
-    int no = 0;
-    int type = lua_type(L, idx);
-    if (type == LUA_TNUMBER) {
-        no = (int)tolua_tonumber(L, idx, def);
-    }
-    else {
-        const char *str = tolua_tostring(L, idx, NULL);
-        no = str ? atoi36(str) : def;
-    }
-    return no;
+    UNUSED_ARG(t);
+    read_building_reference(data);
+    return AT_READ_FAIL;
 }
+
+struct trigger_type tt_caldera = {
+    "caldera",
+    NULL, NULL, NULL, NULL,
+    caldera_read
+};
 
 void register_tolua_helpers(void)
 {
+    tt_register(&tt_caldera);
     at_register(&at_direction);
     at_register(&at_building_action);
 
-    register_function((pf_generic)lua_callspell, TOLUA_CAST "lua_castspell");
-    register_function((pf_generic)lua_initfamiliar,
-        TOLUA_CAST "lua_initfamiliar");
-    register_function((pf_generic)lua_getresource,
-        TOLUA_CAST "lua_getresource");
-    register_function((pf_generic)lua_changeresource,
-        TOLUA_CAST "lua_changeresource");
-    register_function((pf_generic)lua_equipmentcallback,
-        TOLUA_CAST "lua_equip");
+    callbacks.cast_spell = lua_callspell;
 
-    register_function((pf_generic)lua_wage, TOLUA_CAST "lua_wage");
-    register_function((pf_generic)lua_maintenance,
-        TOLUA_CAST "lua_maintenance");
+    register_function((pf_generic)lua_initfamiliar, "lua_initfamiliar");
+    register_function((pf_generic)lua_getresource, "lua_getresource");
+    register_function((pf_generic)lua_changeresource, "lua_changeresource");
+    register_function((pf_generic)lua_equipmentcallback, "lua_equip");
+
+    register_function((pf_generic)lua_wage, "lua_wage");
+    register_function((pf_generic)lua_maintenance, "lua_maintenance");
 
     item_use_fun = use_item_lua;
     res_produce_fun = produce_resource_lua;
     res_limit_fun = limit_resource_lua;
-    register_item_give(lua_giveitem, TOLUA_CAST "lua_giveitem");
+    register_item_give(lua_giveitem, "lua_giveitem");
 }

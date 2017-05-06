@@ -23,7 +23,7 @@ void test_equipment(CuTest * tc)
     enable_skill(SK_MAGIC, true);
     it_horses = test_create_itemtype("horse");
     CuAssertPtrNotNull(tc, it_horses);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     CuAssertPtrNotNull(tc, sp);
 
     CuAssertPtrEquals(tc, 0, get_equipment("herpderp"));

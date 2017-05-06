@@ -33,7 +33,7 @@ void test_named_spellbooks(CuTest * tc)
     CuAssertPtrNotNull(tc, sb);
     CuAssertStrEquals(tc, "spells", sb->name);
 
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     spellbook_add(sb, sp, 1);
     CuAssertPtrNotNull(tc, sb->spells);
 

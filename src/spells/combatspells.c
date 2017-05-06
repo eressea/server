@@ -47,31 +47,6 @@
 
 #define EFFECT_HEALING_SPELL     5
 
-/* Some spells with a fixed, known ID (in XML).
- * TODO: this method of identifying spells is error-prone,
- * do not use it for new spells. */
-enum {
-    SPL_FIREBALL = 4,
-    SPL_HAGEL = 5,
-    SPL_CHAOSROW = 18,
-    SPL_FLEE = 20,
-    SPL_SONG_OF_FEAR = 21,
-    SPL_BERSERK = 22,
-    SPL_BLOODTHIRST = 23,
-    SPL_WINDSHIELD = 59,
-    SPL_HERO = 76,
-    SPL_METEORRAIN = 108,
-    SPL_REDUCESHIELD = 109,
-    SPL_ARMORSHIELD = 110,
-    SPL_DRAIG_FUMBLESHIELD = 143,
-    SPL_GWYRRD_FUMBLESHIELD = 144,
-    SPL_CERDDOR_FUMBLESHIELD = 145,
-    SPL_TYBIED_FUMBLESHIELD = 146,
-    SPL_SHADOWKNIGHTS = 147,
-    SPL_SHOCKWAVE = 163,
-    SPL_AURA_OF_FEAR = 175
-};
-
 /* ------------------------------------------------------------------ */
 /* Kampfzauberfunktionen */
 
@@ -134,43 +109,22 @@ static double get_force(double power, int formel)
 }
 
 /* Generischer Kampfzauber */
-int sp_kampfzauber(struct castorder * co)
+int damage_spell(struct castorder * co, int dmg, int strength)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
-    double power = co->force;
     const spell * sp = co->sp;
+    double power = co->force;
     battle *b = fi->side->battle;
     troop at, dt;
     message *m;
     /* Immer aus der ersten Reihe nehmen */
-    int force, enemies;
-    int killed = 0;
-    const char *damage;
+    int enemies, killed = 0;
+    int force = lovar(get_force(power, strength));
+    const char *damage = spell_damage(dmg);
 
-    if (power <= 0)
-        return 0;
     at.fighter = fi;
     at.index = 0;
-
-    switch (sp->id) {
-        /* lovar halbiert im Schnitt! */
-    case SPL_FIREBALL:
-        damage = spell_damage(0);
-        force = lovar(get_force(power, 0));
-        break;
-    case SPL_HAGEL:
-        damage = spell_damage(2);
-        force = lovar(get_force(power, 4));
-        break;
-    case SPL_METEORRAIN:
-        damage = spell_damage(1);
-        force = lovar(get_force(power, 1));
-        break;
-    default:
-        damage = spell_damage(10);
-        force = lovar(get_force(power, 10));
-    }
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (enemies == 0) {
@@ -257,13 +211,7 @@ int sp_stun(struct castorder * co)
     if (power <= 0)
         return 0;
 
-    switch (sp->id) {
-    case SPL_SHOCKWAVE:
-        force = lovar(get_force(power, 1));
-        break;
-    default:
-        assert(0);
-    }
+    force = lovar(get_force(power, 1));
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
@@ -956,6 +904,7 @@ int sp_chaosrow(struct castorder * co)
     message *m;
     const char *mtype;
     int qi, k = 0;
+    bool chaosrow = strcmp(sp->sname, "chaosrow") == 0;
 
     if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
         m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
@@ -964,10 +913,7 @@ int sp_chaosrow(struct castorder * co)
         return 0;
     }
 
-    if (sp->id == SPL_CHAOSROW)
-        power *= 40;
-    else
-        power = get_force(power, 5);
+    power = chaosrow ? (power * 40) : get_force(power, 5);
 
     fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
     scramble_fighters(fgs);
@@ -1019,7 +965,7 @@ int sp_chaosrow(struct castorder * co)
     }
     selist_free(fgs);
 
-    if (sp->id == SPL_CHAOSROW) {
+    if (chaosrow) {
         mtype = (k > 0) ? "sp_chaosrow_effect_1" : "sp_chaosrow_effect_0";
     }
     else {
@@ -1034,33 +980,20 @@ int sp_chaosrow(struct castorder * co)
 /* Gesang der Furcht (Kampfzauber) */
 /* Panik (Pr�kampfzauber) */
 
-int sp_flee(struct castorder * co)
+int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
-    double power = co->force;
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     selist *fgs, *ql;
-    int force, n, qi;
-    int panik = 0;
+    int n, qi, panik = 0;
     message *msg;
+    double power = co->force;
+    int force;
 
-    switch (sp->id) {
-    case SPL_FLEE:
-        force = (int)get_force(power, 4);
-        break;
-    case SPL_SONG_OF_FEAR:
-        force = (int)get_force(power, 3);
-        break;
-    case SPL_AURA_OF_FEAR:
-        force = (int)get_force(power, 5);
-        break;
-    default:
-        force = (int)get_force(power, 10);
-    }
-
+    force = (int)get_force(power, strength);
     if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
         msg = msg_message("sp_flee_effect_0", "mage spell", mage, sp);
         message_all(b, msg);
@@ -1116,16 +1049,8 @@ int sp_hero(struct castorder * co)
     int targets = 0;
     message *m;
 
-    switch (sp->id) {
-    case SPL_HERO:
-        df_bonus = (int)(power / 5);
-        force = MAX(1, lovar(get_force(power, 4)));
-        break;
-
-    default:
-        df_bonus = 1;
-        force = MAX(1, (int)power);
-    }
+    df_bonus = (int)(power / 5);
+    force = MAX(1, lovar(get_force(power, 4)));
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
@@ -1170,19 +1095,9 @@ int sp_berserk(struct castorder * co)
     int targets = 0;
     message *m;
 
-    switch (sp->id) {
-    case SPL_BERSERK:
-    case SPL_BLOODTHIRST:
-        at_bonus = MAX(1, level / 3);
-        df_malus = 2;
-        force = (int)get_force(power, 2);
-        break;
-
-    default:
-        at_bonus = 1;
-        df_malus = 0;
-        force = (int)power;
-    }
+    at_bonus = MAX(1, level / 3);
+    df_malus = 2;
+    force = (int)get_force(power, 2);
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE, ALLY_ANY);
@@ -1327,16 +1242,9 @@ int sp_windshield(struct castorder * co)
     int enemies;
     message *m;
 
-    switch (sp->id) {
-    case SPL_WINDSHIELD:
-        force = (int)get_force(power, 4);
-        at_malus = level / 4;
-        break;
+    force = (int)get_force(power, 4);
+    at_malus = level / 4;
 
-    default:
-        force = (int)power;
-        at_malus = 2;
-    }
     enemies = count_enemies(b, fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
@@ -1429,7 +1337,7 @@ static void do_meffect(fighter * af, int typ, int effect, int duration)
     me->duration = duration;
 }
 
-int sp_armorshield(struct castorder * co)
+int armor_spell(struct castorder * co, int per_level, int time_multi)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
@@ -1445,16 +1353,8 @@ int sp_armorshield(struct castorder * co)
 
     /* gibt R�stung +effect f�r duration Treffer */
 
-    switch (sp->id) {
-    case SPL_ARMORSHIELD:
-        effect = level / 3;
-        duration = (int)(20 * power * power);
-        break;
-
-    default:
-        effect = level / 4;
-        duration = (int)(power * power);
-    }
+    effect = level / per_level;
+    duration = (int)(time_multi * power * power);
     do_meffect(fi, SHIELD_ARMOR, effect, duration);
     return level;
 }
@@ -1475,16 +1375,9 @@ int sp_reduceshield(struct castorder * co)
     /* jeder Schaden wird um effect% reduziert bis der Schild duration
      * Trefferpunkte aufgefangen hat */
 
-    switch (sp->id) {
-    case SPL_REDUCESHIELD:
-        effect = 50;
-        duration = (int)(50 * power * power);
-        break;
+    effect = 50;
+    duration = (int)(50 * power * power);
 
-    default:
-        effect = level * 3;
-        duration = (int)get_force(power, 5);
-    }
     do_meffect(fi, SHIELD_REDUCE, effect, duration);
     return level;
 }
@@ -1503,20 +1396,9 @@ int sp_fumbleshield(struct castorder * co)
     msg_release(m);
 
     /* der erste Zauber schl�gt mit 100% fehl  */
+    duration = 100;
+    effect = MAX(1, 25 - level);
 
-    switch (sp->id) {
-    case SPL_DRAIG_FUMBLESHIELD:
-    case SPL_GWYRRD_FUMBLESHIELD:
-    case SPL_CERDDOR_FUMBLESHIELD:
-    case SPL_TYBIED_FUMBLESHIELD:
-        duration = 100;
-        effect = MAX(1, 25 - level);
-        break;
-
-    default:
-        duration = 100;
-        effect = 10;
-    }
     do_meffect(fi, SHIELD_BLOCK, effect, duration);
     return level;
 }

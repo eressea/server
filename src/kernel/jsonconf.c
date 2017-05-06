@@ -588,14 +588,11 @@ static void json_spells(cJSON *json) {
     for (child = json->child; child; child = child->next) {
         if (child->type == cJSON_Object) {
             spell *sp;
-            cJSON * item = cJSON_GetObjectItem(child, "index");
-            sp = create_spell(child->string, item ? item->valueint : 0);
+            cJSON * item;
+            sp = create_spell(child->string);
             for (item = child->child; item; item = item->next) {
                 if (strcmp(item->string, "index") == 0) {
                     continue;
-                }
-                else if (strcmp(item->string, "cast") == 0) {
-                    sp->cast = (spell_f)get_function(item->valuestring);
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
                     sp->syntax = strdup(item->valuestring);

@@ -17,6 +17,7 @@ require 'eressea.path'
 require 'tests.e2'
 require 'lunit'
 
+rng.inject(0)
 rules = require('eressea.' .. config.rules)
 result = lunit.main()
 return result.errors + result.failed

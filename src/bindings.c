@@ -92,6 +92,20 @@ TOLUA_PKG(locale);
 TOLUA_PKG(log);
 TOLUA_PKG(game);
 
+int tolua_toid(lua_State * L, int idx, int def)
+{
+    int no = 0;
+    int type = lua_type(L, idx);
+    if (type == LUA_TNUMBER) {
+        no = (int)tolua_tonumber(L, idx, def);
+    }
+    else {
+        const char *str = tolua_tostring(L, idx, NULL);
+        no = str ? atoi36(str) : def;
+    }
+    return no;
+}
+
 int log_lua_error(lua_State * L)
 {
     const char *error = lua_tostring(L, -1);
@@ -217,7 +231,7 @@ static int tolua_setkey(lua_State * L)
     return 0;
 }
 
-static int tolua_rng_int(lua_State * L)
+static int tolua_random(lua_State * L)
 {
     lua_pushinteger(L, rng_int());
     return 1;
@@ -976,6 +990,12 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     }
 }
 
+static int lua_rng_default(lua_State *L) {
+    UNUSED_ARG(L);
+    random_source_inject_constant(0);
+    return 0;
+}
+
 void tolua_bind_open(lua_State * L);
 
 int tolua_bindings_open(lua_State * L, const dictionary *inifile)
@@ -997,6 +1017,14 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
+        tolua_module(L, TOLUA_CAST "rng", 1);
+        tolua_beginmodule(L, TOLUA_CAST "rng");
+        {
+            tolua_function(L, TOLUA_CAST "inject", lua_rng_default);
+            tolua_function(L, TOLUA_CAST "random", tolua_random);
+        }
+        tolua_endmodule(L);
+        tolua_function(L, TOLUA_CAST "rng_int", tolua_random);
         tolua_cclass(L, TOLUA_CAST "alliance", TOLUA_CAST "alliance",
             TOLUA_CAST "", NULL);
         tolua_beginmodule(L, TOLUA_CAST "alliance");
@@ -1086,7 +1114,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
         tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
-        tolua_function(L, TOLUA_CAST "rng_int", tolua_rng_int);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
     } tolua_endmodule(L);

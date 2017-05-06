@@ -60,13 +60,7 @@ extern "C" {
         } extra;
 
         struct construction *improvement;
-        /* next level, if upgradable. if more than one of these items
-         * can be built (weapons, armour) per turn, must not be NULL,
-         * but point to the same type again:
-         *   const_sword.improvement = &const_sword
-         * last level of a building points to NULL, as do objects of
-         * an unlimited size.
-         */
+        /* next level, if upgradable. */
     } construction;
 
     void free_construction(struct construction *cons);

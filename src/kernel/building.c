@@ -192,7 +192,6 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
     }
     if (btype->construction && btype->construction->extra.name) {
         if (b) {
-            assert(b->type == btype);
             bsize = adjust_size(b, bsize);
         }
         for (con = btype->construction; con; con = con->improvement) {
@@ -704,7 +703,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         else {
             wage = wagetable[esize][2];
         }
-        if (rule_blessed_harvest() == HARVEST_WORK) {
+        if (r->attribs && rule_blessed_harvest() == HARVEST_WORK) {
             /* E1 rules */
             wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
         }

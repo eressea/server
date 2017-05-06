@@ -6,6 +6,7 @@ alliance.test.c
 ally.test.c
 build.test.c
 building.test.c
+# callbacks.test.c
 command.test.c
 config.test.c
 # connection.test.c
@@ -16,7 +17,7 @@ group.test.c
 item.test.c
 messages.test.c
 order.test.c
-# pathdinder.test.c
+# pathfinder.test.c
 plane.test.c
 pool.test.c
 race.test.c
@@ -38,6 +39,7 @@ alliance.c
 ally.c
 build.c
 building.c
+callbacks.c
 command.c
 config.c
 connection.c

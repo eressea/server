@@ -356,7 +356,7 @@ void test_create_castorder(castorder *co, unit *u, int level, float force, int r
 spell * test_create_spell(void)
 {
     spell *sp;
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
     assert_alloc(sp->components);

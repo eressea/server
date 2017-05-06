@@ -14,6 +14,7 @@
 #define NO_STRDUP
 #define NO_MKDIR
 #define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
 #pragma warning(disable: 4456) // declaration hides previous
@@ -46,5 +47,11 @@ char * strdup(const char *s);
 #ifdef NO_MKDIR
 int mkdir(const char *pathname, int mode);
 #endif
+
+/* do not use M_PI, use one of these instead: */
+#define PI_F 3.1415926535897932384626433832795F
+#define PI_D 3.1415926535897932384626433832795
+#define PI_L 3.1415926535897932384626433832795L
+
 
 #endif

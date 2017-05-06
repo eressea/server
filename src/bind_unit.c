@@ -193,6 +193,13 @@ static int tolua_unit_set_id(lua_State * L)
     return 0;
 }
 
+static int tolua_unit_get_auramax(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    lua_pushinteger(L, max_spellpoints(self->region, self));
+    return 1;
+}
+
 static int tolua_unit_get_hpmax(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -512,15 +519,10 @@ static void unit_castspell(unit * u, const char *name, int level)
     if (sp) {
         spellbook *book = unit_get_spellbook(u);
         if (spellbook_get(book, sp)) {
-            if (!sp->cast) {
-                log_error("spell '%s' has no function.\n", sp->sname);
-            }
-            else {
-                castorder co;
-                create_castorder(&co, u, 0, sp, u->region, level, (double)level, 0, 0, 0);
-                sp->cast(&co);
-                free_castorder(&co);
-            }
+            castorder co;
+            create_castorder(&co, u, 0, sp, u->region, level, (double)level, 0, 0, 0);
+            cast_spell(&co);
+            free_castorder(&co);
         }
     }
 }
@@ -1038,6 +1040,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "race", &tolua_unit_get_race,
                 tolua_unit_set_race);
             tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
+            tolua_variable(L, TOLUA_CAST "aura_max", &tolua_unit_get_auramax, 0);
 
             tolua_function(L, TOLUA_CAST "show", &tolua_bufunit);
         }

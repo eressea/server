@@ -23,10 +23,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "study.h"
+#include "helpers.h"
 #include "laws.h"
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
+#include <kernel/callbacks.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -339,23 +341,16 @@ sc_mage *get_mage(const unit * u)
 static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    int i;
     spell *sp = 0;
     char token[32];
 
     READ_TOK(store, token, sizeof(token));
-    i = atoip(token);
-    if (i != 0) {
-        sp = find_spellbyid((unsigned int)i);
+    if (data->version < UNIQUE_SPELLS_VERSION) {
+        READ_INT(store, 0); /* ignore mtype */
     }
-    else {
-        if (data->version < UNIQUE_SPELLS_VERSION) {
-            READ_INT(store, 0); /* ignore mtype */
-        }
-        sp = find_spell(token);
-        if (!sp) {
-            log_warning("read_seenspell: could not find spell '%s'\n", token);
-        }
+    sp = find_spell(token);
+    if (!sp) {
+        log_warning("read_seenspell: could not find spell '%s'\n", token);
     }
     if (!sp) {
         return AT_READ_FAIL;
@@ -898,9 +893,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
 bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
     /* Ist überhaupt ein gültiger Spruch angegeben? */
-    if (!sp || sp->id == 0) {
-        return false;
-    }
+    assert(sp);
     /* steht der Spruch in der Spruchliste? */
     return u_hasspell(u, sp) != 0;
 }
@@ -1433,7 +1426,7 @@ static void do_fumble(castorder * co)
     case 5:
     case 6:
         /* Spruch gelingt, aber alle Magiepunkte weg */
-        co->level = sp->cast(co);
+        co->level = cast_spell(co);
         set_spellpoints(u, 0);
         ADDMSG(&u->faction->msgs, msg_message("patzer4", "unit region spell",
             u, r, sp));
@@ -1444,7 +1437,7 @@ static void do_fumble(castorder * co)
     case 9:
     default:
         /* Spruch gelingt, alle nachfolgenden Sprüche werden 2^4 so teuer */
-        co->level = sp->cast(co);
+        co->level = cast_spell(co);
         ADDMSG(&u->faction->msgs, msg_message("patzer5", "unit region spell",
             u, r, sp));
         countspells(u, 3);
@@ -2900,7 +2893,7 @@ void magic(void)
                     fumbled = true;
                 }
                 else {
-                    co->level = sp->cast(co);
+                    co->level = cast_spell(co);
                     if (co->level <= 0) {
                         /* Kosten nur für real benötige Stufe berechnen */
                         continue;
@@ -3001,6 +2994,30 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
     }
 
     return 0;
+}
+
+int cast_spell(struct castorder *co)
+{
+    const char *fname = co->sp->sname;
+    const char *hashpos = strchr(fname, '#');
+    char fbuf[64];
+    spell_f fun;
+
+    const spell *sp = co->sp;
+    if (hashpos != NULL) {
+        ptrdiff_t len = hashpos - fname;
+        assert(len < (ptrdiff_t) sizeof(fbuf));
+        memcpy(fbuf, fname, len);
+        fbuf[len] = '\0';
+        fname = fbuf;
+    }
+
+    fun = get_spellcast(sp->sname);
+    if (!fun) {
+        log_warning("no spell function for %s, try callback", sp->sname);
+        return callbacks.cast_spell(co, fname);
+    }
+    return fun(co);
 }
 
 static critbit_tree cb_spellbooks;

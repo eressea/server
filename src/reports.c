@@ -386,7 +386,7 @@ const char **illusion)
     if (illusion) {
         *illusion = NULL;
 
-        if (is_building_type(b->type, "illusioncastle")) {
+        if (b->attribs && is_building_type(b->type, "illusioncastle")) {
             const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);
