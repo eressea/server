@@ -37,13 +37,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/umlaut.h>
-#include <selist.h>
 #include <util/xml.h>
 
 #include <attributes/movement.h>
 
 #include <storage.h>
+#include <selist.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <assert.h>
@@ -52,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 selist *shiptypes = NULL;
+static critbit_tree cb_shiptypes;
 
 static local_names *snames;
 
@@ -89,16 +92,17 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
 static ship_type *st_find_i(const char *name)
 {
-    selist *ql;
-    int qi;
+    const char *match;
+    ship_type *st = NULL;
 
-    for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
-        ship_type *stype = (ship_type *)selist_get(ql, qi);
-        if (strcmp(stype->_name, name) == 0) {
-            return stype;
-        }
+    match = cb_find_str(&cb_shiptypes, name);
+    if (match) {
+        cb_get_kv(match, &st, sizeof(st));
     }
-    return NULL;
+    else {
+        log_warning("st_find: could not find ship '%s'\n", name);
+    }
+    return st;
 }
 
 const ship_type *st_find(const char *name) {
@@ -108,10 +112,17 @@ const ship_type *st_find(const char *name) {
 ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     if (!st) {
+        size_t len;
+        char data[64];
+
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = strdup(name);
         st->storm = 1.0;
         selist_push(&shiptypes, (void *)st);
+
+        len = cb_new_kv(name, strlen(name), &st, sizeof(st), data);
+        assert(len <= sizeof(data));
+        cb_insert(&cb_shiptypes, data, len);
     }
     return st;
 }
@@ -250,6 +261,7 @@ static void free_shiptype(void *ptr) {
 }
 
 void free_shiptypes(void) {
+    cb_clear(&cb_shiptypes);
     selist_foreach(shiptypes, free_shiptype);
     selist_free(shiptypes);
     shiptypes = 0;
