@@ -21,8 +21,6 @@
   <xi:include href="config://game/armor.xml" />
   <xi:include href="config://game/resources.xml" />
 
-  <calendar name="thirdage" newyear="month_1" start="1"/>
-
   <xi:include href="config://default/names-undead.xml"/>
   <xi:include href="config://default/names-skeletons.xml"/>
   <xi:include href="config://default/names-zombies.xml"/>

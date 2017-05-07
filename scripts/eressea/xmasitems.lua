@@ -87,7 +87,7 @@ local self = {}
 function self.update()
     local turn = get_turn()
     local season = get_season(turn)
-    if season == "calendar::winter" then
+    if season == "winter" then
         eressea.log.debug("it is " .. season .. ", the christmas trees do their magic")
         local msg = message.create("xmastree_effect")
         for r in regions() do
@@ -103,7 +103,7 @@ function self.update()
         end
     else
         local prevseason = get_season(turn-1)
-        if prevseason == "calendar::winter" then
+        if prevseason == "winter" then
             -- we celebrate knut and kick out the trees.
             for r in regions() do
                 if r:get_key("xm06") then

@@ -11,8 +11,8 @@ function setup()
 end
 
 function test_calendar()
-    assert_equal(get_season(1011), "calendar::winter")
-    assert_equal(get_season(1012), "calendar::spring")
+    assert_equal("winter", get_season(1011))
+    assert_equal("spring", get_season(1012))
 end
 
 function test_herbalism()
