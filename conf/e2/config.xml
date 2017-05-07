@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<eressea xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="config://game/familiars.xml"/>
+  <xi:include href="config://game/equipment.xml"/>
+  <equipment>
+    <set name="autoseed_unit">
+      <item name="log" amount="50"/>
+      <item name="stone" amount="50"/>
+      <item name="iron" amount="50"/>
+      <item name="laen" amount="10"/>
+      <item name="sword" amount="1"/>
+      <item name="mallorn" amount="10"/>
+      <item name="skillpotion" amount="5"/>
+      <item name="p2" amount="5"/>
+      <item name="money" amount="20000"/>
+      <skill name="perception" level="30"/>
+      <skill name="melee" level="1"/>
+    </set>
+    <set name="autoseed_faction">
+      <item name="adamantium" amount="1"/>
+    </set>
+  </equipment>
+</eressea>
