@@ -782,9 +782,16 @@ void config_set_from(const dictionary *d, const char *valid_keys[])
     }
 }
 
-void config_set(const char *key, const char *value) {
+void config_set(const char *key, const char *value)
+{
     ++config_cache_key;
     set_param(&configuration, key, value);
+}
+
+void config_set_int(const char *key, int value)
+{
+    ++config_cache_key;
+    set_param(&configuration, key, itoa10(value));
 }
 
 const char *config_get(const char *key) {
