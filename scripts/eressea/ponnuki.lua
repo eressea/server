@@ -38,6 +38,7 @@ function ponnuki.init()
                 u.name = "Ponnuki"
                 u.info = "Go, Ponnuki, Go!"
                 u.race_name = "Ritter von Go"
+                u.status = 5 -- FLIEHE
                 print(u:show())
             end
         else
