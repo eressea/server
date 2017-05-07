@@ -38,12 +38,6 @@
     <text locale="en">adamantium plates</text>
   </string>
 
-  <!--Fort-Ausbaustufen -->
-  <string name="calendar::thirdage">
-    <text locale="de">des dritten Zeitalters</text>
-    <text locale="en">the third age</text>
-  </string>
-
   <string name="packice">
     <text locale="de">Packeis</text>
     <text locale="en">fast ice</text>
@@ -87,6 +81,7 @@
     <text locale="en">repeating crossbows</text>
   </string>
 
+  <!--Fort-Ausbaustufen -->
   <string name="scaffolding">
     <text locale="de">Gerüst</text>
     <text locale="en">scaffolding</text>
@@ -103,6 +98,7 @@
     <text locale="de">Wache</text>
     <text locale="en">watch</text>
   </string>
+
   <string name="market">
     <text locale="de">Marktplatz</text>
     <text locale="en">marketplace</text>

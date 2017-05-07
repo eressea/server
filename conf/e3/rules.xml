@@ -10,7 +10,6 @@
 
   <xi:include href="config://game/ships.xml"/>
   <xi:include href="config://game/shipnames.xml"/>
-  <xi:include href="config://core/calendar.xml"/>
   <xi:include href="config://game/items.xml" />
   <xi:include href="config://game/races.xml"/>
   <xi:include href="config://game/buildings.xml"/>
@@ -20,8 +19,6 @@
   <xi:include href="config://game/weapons.xml" />
   <xi:include href="config://game/armor.xml" />
   <xi:include href="config://game/resources.xml" />
-
-  <calendar name="thirdage" newyear="month_1" start="1"/>
 
   <xi:include href="config://default/names-undead.xml"/>
   <xi:include href="config://default/names-skeletons.xml"/>

@@ -1,0 +1,21 @@
+{
+    "calendar" : {
+        "months" : [
+            { "storm" : 60, "season" : 2 },
+            { "storm" : 10, "season" : 2 },
+
+            { "storm" : 60, "season" : 3 },
+            { "storm" : 10, "season" : 3 },
+
+            { "storm" : 60, "season" : 0 },
+            { "storm" : 80, "season" : 0 },
+
+            { "storm" : 50, "season" : 1 },
+            { "storm" : 30, "season" : 1 },
+            { "storm" : 60, "season" : 1 }
+        ],
+        "weeks" : [
+            "firstweek", "secondweek", "thirdweek"
+        ]
+    }
+}

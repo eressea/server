@@ -38,7 +38,7 @@ function teardown()
 end
 
 function test_calendar()
-    assert_equal(get_season(396), "calendar::winter")
+    assert_equal("winter", get_season(396))
 end
 
 function disable_test_bug_1738_build_castle_e3()

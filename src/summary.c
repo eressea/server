@@ -151,13 +151,12 @@ static char *gamedate2(const struct locale *lang)
     if (weeknames2) {
         week = weeknames2[gd.week];
     }
-    if (monthnames) {
-        month = monthnames[gd.month];
-    }
+    month = calendar_month(gd.month);
     sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-        LOC(lang, week),
-        LOC(lang, month),
-        gd.year, agename ? LOC(lang, agename) : "");
+        LOC(lang, mkname("calendar", week)),
+        LOC(lang, mkname("calendar", month)),
+        gd.year,
+        LOC(lang, mkname("calendar", calendar_era())));
     return buf;
 }
 

@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
+#include "calendar.h"
 
 #include <kernel/config.h>
 #include <kernel/alliance.h>
@@ -192,7 +193,7 @@ void test_log_stderr(int flags) {
 
 static void test_reset(void) {
     int i;
-    turn = 0;
+    turn = 1;
     default_locale = 0;
 
     if (errno) {
@@ -206,6 +207,7 @@ static void test_reset(void) {
     free_resources();
     free_config();
     default_locale = 0;
+    calendar_cleanup();
     close_orders();
     free_locales();
     free_spells();

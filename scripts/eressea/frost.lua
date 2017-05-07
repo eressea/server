@@ -1,11 +1,11 @@
 local function is_winter(turn)
     local season = get_season(turn)
-    return season == "calendar::winter"
+    return season == "winter"
 end
 
 local function is_spring(turn)
     local season = get_season(turn)
-    return season == "calendar::spring"
+    return season == "spring"
 end
 
 local function freeze(r, chance)

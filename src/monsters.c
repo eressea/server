@@ -748,10 +748,6 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (u->status > ST_BEHIND) {
-                setstatus(u, ST_FIGHT);
-                /* all monsters fight */
-            }
             if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, true, false);
             }

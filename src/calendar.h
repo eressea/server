@@ -11,17 +11,12 @@ extern "C" {
         SEASON_SUMMER,
         SEASON_AUTUMN
     };
-
-    extern char *agename;
-    extern int first_month;
-
-    extern int seasons;
-    extern char **seasonnames;
+#define CALENDAR_SEASONS 4
+    extern const char *seasonnames[CALENDAR_SEASONS];
 
     extern int months_per_year;
-    extern char **monthnames;
     extern int *month_season;
-    extern int *storms;           /* in movement.c */
+    extern int first_month;
 
     extern char **weeknames;
     extern char **weeknames2;
@@ -36,6 +31,8 @@ extern "C" {
 
 const gamedate *get_gamedate(int turn, gamedate * gd);
 void calendar_cleanup(void);
+const char *calendar_month(int index);
+const char *calendar_era(void);
 int first_turn(void);
 
 #ifdef __cplusplus

@@ -197,42 +197,42 @@ target_link_libraries(convert
 )
 
 set(TESTS_SRC
-  monsters.test.c
-  names.test.c
-  donations.test.c
-  wormhole.test.c
-  alchemy.test.c
-  guard.test.c
   test_eressea.c
   tests.c
+  alchemy.test.c
   battle.test.c
-  vortex.test.c
-  tests.test.c
-  volcano.test.c
-  reports.test.c
+  calendar.test.c
   creport.test.c
-  report.test.c
-  summary.test.c
-  travelthru.test.c
   direction.test.c
+  donations.test.c
   economy.test.c
+  give.test.c
+  guard.test.c
   json.test.c
   keyword.test.c
-  give.test.c
   laws.test.c
   lighthouse.test.c
   magic.test.c
   market.test.c
   monsters.test.c
   move.test.c
+  names.test.c
   piracy.test.c
   prefix.test.c
   renumber.test.c
+  reports.test.c
+  report.test.c
+  summary.test.c
   skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
+  tests.test.c
+  travelthru.test.c
   upkeep.test.c
+  volcano.test.c
+  vortex.test.c
+  wormhole.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
