@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 int first_month = 0;
-int weeks_per_month = 4;
+int weeks_per_month = 3;
 int months_per_year = 12;
 char **seasonnames = NULL;
 char **weeknames = NULL;
@@ -73,4 +73,8 @@ void calendar_cleanup(void)
     weeknames = 0;
     free(weeknames2);
     weeknames2 = 0;
+
+    first_month = 0;
+    weeks_per_month = 3;
+    months_per_year = 12;
 }

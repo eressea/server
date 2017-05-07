@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
+#include "calendar.h"
 
 #include <kernel/config.h>
 #include <kernel/alliance.h>
@@ -206,6 +207,7 @@ static void test_reset(void) {
     free_resources();
     free_config();
     default_locale = 0;
+    calendar_cleanup();
     close_orders();
     free_locales();
     free_spells();
