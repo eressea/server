@@ -15,7 +15,6 @@
   <xi:include href="config://game/familiars.xml"/>
   <xi:include href="config://game/artrewards.xml"/>
   <xi:include href="config://game/buildings.xml"/>
-  <xi:include href="config://core/calendar.xml"/>
   <xi:include href="config://game/equipment.xml"/>
   <xi:include href="config://game/items.xml"/>
   <xi:include href="config://game/spells.xml"/>

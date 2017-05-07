@@ -10,7 +10,6 @@
 
   <xi:include href="config://game/ships.xml"/>
   <xi:include href="config://game/shipnames.xml"/>
-  <xi:include href="config://core/calendar.xml"/>
   <xi:include href="config://game/items.xml" />
   <xi:include href="config://game/races.xml"/>
   <xi:include href="config://game/buildings.xml"/>
