@@ -193,7 +193,7 @@ void test_log_stderr(int flags) {
 
 static void test_reset(void) {
     int i;
-    turn = 0;
+    turn = 1;
     default_locale = 0;
 
     if (errno) {
