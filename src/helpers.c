@@ -310,11 +310,10 @@ void register_tolua_helpers(void)
     at_register(&at_building_action);
 
     callbacks.cast_spell = lua_callspell;
-
-    register_function((pf_generic)lua_changeresource, "lua_changeresource");
-
-    item_use_fun = use_item_lua;
+    callbacks.use_item = use_item_lua;
     res_produce_fun = produce_resource_lua;
     res_limit_fun = limit_resource_lua;
+
+    register_function((pf_generic)lua_changeresource, "lua_changeresource");
     register_item_give(lua_giveitem, "lua_giveitem");
 }
