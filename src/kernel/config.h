@@ -121,6 +121,7 @@ extern "C" {
     void free_params(struct param **pp);
 
     void config_set(const char *key, const char *value);
+    void config_set_int(const char *key, int value);
     void config_set_from(const struct _dictionary_ *d, const char *keys[]);
     const char *config_get(const char *key);
     int config_get_int(const char *key, int def);

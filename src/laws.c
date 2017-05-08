@@ -4183,6 +4183,7 @@ static void reset_game(void)
 
 void turn_begin(void)
 {
+    assert(turn >= 0);
     ++turn;
     reset_game();
 }

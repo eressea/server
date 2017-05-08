@@ -1,6 +1,7 @@
 {
     "include": [
         "keywords.json",
+        "calendar.json",
         "prefixes.json",
         "e3/terrains.json"
     ],
@@ -52,6 +53,7 @@
         "study.expensivemigrants": true,
         "study.speedup": 2,
         "game.era": 3,
+        "game.start": 1,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,
         "rules.wage.function": 2,

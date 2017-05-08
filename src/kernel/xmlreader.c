@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 #include "prefix.h"
+#include "move.h"
 
 #include "vortex.h"
 
@@ -398,6 +399,7 @@ static int parse_buildings(xmlDocPtr doc)
     return 0;
 }
 
+#if 0
 static int parse_calendar(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -523,7 +525,7 @@ static int parse_calendar(xmlDocPtr doc)
 
     return 0;
 }
-
+#endif
 static int parse_ships(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1869,7 +1871,6 @@ static int parse_strings(xmlDocPtr doc)
 void register_xmlreader(void)
 {
     xml_register_callback(parse_races);
-    xml_register_callback(parse_calendar);
     xml_register_callback(parse_resources);
 
     xml_register_callback(parse_buildings); /* requires resources */

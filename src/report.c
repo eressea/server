@@ -123,13 +123,15 @@ static char *gamedate_season(const struct locale *lang)
     static char buf[256]; /* FIXME: static return value */
     gamedate gd;
 
+    assert(weeknames);
+
     get_gamedate(turn, &gd);
 
     sprintf(buf, (const char *)LOC(lang, "nr_calendar_season"),
-        LOC(lang, weeknames[gd.week]),
-        LOC(lang, monthnames[gd.month]),
+        LOC(lang, mkname("calendar", weeknames[gd.week])),
+        LOC(lang, mkname("calendar", calendar_month(gd.month))),
         gd.year,
-        agename ? LOC(lang, agename) : "", LOC(lang, seasonnames[gd.season]));
+        LOC(lang, mkname("calendar", calendar_era())), LOC(lang, mkname("calendar", seasonnames[gd.season])));
 
     return buf;
 }

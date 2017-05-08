@@ -34,6 +34,7 @@ extern "C" {
     struct order;
 
     extern struct attrib_type at_shiptrail;
+    extern int *storms;
 
     /* die Zahlen sind genau äquivalent zu den race Flags */
 #define MV_CANNOTMOVE     (1<<5)
