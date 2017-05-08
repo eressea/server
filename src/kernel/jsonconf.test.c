@@ -13,6 +13,8 @@
 #include "order.h"
 #include "terrain.h"
 
+#include "move.h"
+#include "calendar.h"
 #include "prefix.h"
 
 #include "util/language.h"
@@ -75,7 +77,7 @@ static void test_settings(CuTest * tc)
         "\"float\" : 1.5 }}";
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     config_set("game.id", "42"); /* should not be replaced */
     config_set("game.name", "Eressea"); /* should not be replaced */
     json_config(json);
@@ -99,7 +101,7 @@ static void test_prefixes(CuTest * tc)
         "]}";
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     json_config(json);
     CuAssertPtrNotNull(tc, race_prefixes);
     CuAssertStrEquals(tc, "snow", race_prefixes[0]);
@@ -119,7 +121,7 @@ static void test_disable(CuTest * tc)
         "]}";
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     CuAssertTrue(tc, skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
@@ -131,6 +133,31 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, keyword_disabled(K_PAY));
     CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
     CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
+    cJSON_Delete(json);
+    test_cleanup();
+}
+
+static void test_calendar(CuTest * tc)
+{
+    const char * data = "{\"calendar\": { "
+        "\"weeks\" : [ \"one\", \"two\", \"three\" ],"
+        "\"months\" : ["
+        "{ \"storm\" : 99, \"season\" : 1 },"
+        "{ \"storm\" : 22, \"season\" : 2 }"
+        "]"
+        "}}";
+    cJSON *json = cJSON_Parse(data);
+
+    test_setup();
+    json_config(json);
+    CuAssertPtrNotNull(tc, storms);
+    CuAssertIntEquals(tc, 2, months_per_year);
+    CuAssertIntEquals(tc, 3, weeks_per_month);
+    CuAssertIntEquals(tc, 99, storms[0]);
+    CuAssertIntEquals(tc, 22, storms[1]);
+    CuAssertPtrNotNull(tc, month_season);
+    CuAssertIntEquals(tc, 1, month_season[0]);
+    CuAssertIntEquals(tc, 2, month_season[1]);
     cJSON_Delete(json);
     test_cleanup();
 }
@@ -155,7 +182,7 @@ static void test_races(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
     const struct race *rc;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, races);
@@ -189,7 +216,7 @@ static void test_findrace(CuTest *tc) {
     const race *rc;
 
     CuAssertPtrNotNull(tc, json);
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrEquals(tc, 0, (void *)findrace("Zwerg", lang));
 
@@ -211,7 +238,7 @@ static void test_items(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
     const item_type * itype;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, it_find("axe"));
@@ -249,7 +276,7 @@ static void test_ships(CuTest * tc)
     const ship_type *st;
     const terrain_type *ter;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, shiptypes);
@@ -286,7 +313,7 @@ static void test_castles(CuTest *tc) {
     cJSON *json = cJSON_Parse(data);
     const building_type *bt;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, buildingtypes);
@@ -311,7 +338,7 @@ static void test_spells(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
     const spell *sp;
 
-    test_cleanup();
+    test_setup();
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, find_spell("fireball"));
 
@@ -350,7 +377,7 @@ static void test_buildings(CuTest * tc)
     cJSON *json = cJSON_Parse(building_data);
     const building_type *bt;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, buildingtypes);
@@ -400,7 +427,7 @@ static void test_buildings_default(CuTest * tc)
     const building_type *bt;
     building_type clone;
 
-    test_cleanup();
+    test_setup();
 
     bt = bt_get_or_create("house");
     clone = *bt;
@@ -425,7 +452,7 @@ static void test_ships_default(CuTest * tc)
     const ship_type *st;
     ship_type clone;
 
-    test_cleanup();
+    test_setup();
 
     st = st_get_or_create("hodor");
     clone = *st;
@@ -446,7 +473,7 @@ static void test_configs(CuTest * tc)
     FILE *F;
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
 
     F = fopen("test.json", "w");
     fwrite(building_data, 1, strlen(building_data), F);
@@ -475,7 +502,7 @@ static void test_terrains(CuTest * tc)
 
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, 0, (void *)get_terrain("plain"));
 
@@ -511,7 +538,7 @@ static void test_directions(CuTest * tc)
 
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, json);
     CuAssertIntEquals(tc, NODIRECTION, get_direction("ost", lang));
@@ -533,7 +560,7 @@ static void test_skills(CuTest * tc)
 
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, json);
     CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
@@ -558,7 +585,7 @@ static void test_keywords(CuTest * tc)
 
     cJSON *json = cJSON_Parse(data);
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, json);
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
@@ -583,7 +610,7 @@ static void test_strings(CuTest * tc)
     cJSON *json = cJSON_Parse(data);
     CuAssertPtrNotNull(tc, json);
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, lang);
     CuAssertPtrEquals(tc, NULL, (void *)LOC(lang, "move"));
@@ -640,6 +667,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_prefixes);
     SUITE_ADD_TEST(suite, test_disable);
     SUITE_ADD_TEST(suite, test_infinitive_from_config);
+    SUITE_ADD_TEST(suite, test_calendar);
     return suite;
 }
 
