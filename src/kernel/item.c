@@ -911,25 +911,27 @@ void read_items(struct storage *store, item ** ilist)
 {
     for (;;) {
         char ibuf[32];
-        const item_type *itype;
         int i;
         READ_STR(store, ibuf, sizeof(ibuf));
         if (!strcmp("end", ibuf)) {
             break;
         }
-        itype = it_find(ibuf);
         READ_INT(store, &i);
-        if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, ibuf);
-        }
-        else {
-            if (itype && itype->rtype) {
-                i_change(ilist, itype, i);
+        if (ilist) {
+            const item_type *itype;
+            itype = it_find(ibuf);
+            if (i <= 0) {
+                log_error("data contains an entry with %d %s", i, ibuf);
             }
             else {
-                log_error("data contains unknown item type %s.", ibuf);
+                if (itype && itype->rtype) {
+                    i_change(ilist, itype, i);
+                }
+                else {
+                    log_error("data contains unknown item type %s.", ibuf);
+                }
+                assert(itype && itype->rtype);
             }
-            assert(itype && itype->rtype);
         }
     }
 }

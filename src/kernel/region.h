@@ -105,7 +105,6 @@ extern "C" {
         int peasants;
         int newpeasants;
         int money;
-        struct item *items;         /* items that can be claimed */
         struct region_owner *ownership;
     } land_region;
 
