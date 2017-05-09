@@ -24,9 +24,15 @@ extern "C" {
 #endif
 
     struct castorder;
+    struct order;
+    struct unit;
+    struct item_type;
 
     struct callback_struct {
         int (*cast_spell)(struct castorder *co, const char *fname);
+        int (*use_item)(struct unit *u, const struct item_type *itype,
+            int amount, struct order *ord);
+
     };
 
     extern struct callback_struct callbacks;

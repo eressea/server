@@ -50,11 +50,4 @@
    obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
    obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
    fun:lua_isnumber
-   fun:class_index_event
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
-   obj:/usr/lib/x86_64-linux-gnu/liblua5.2.so.0.0.0
 }
