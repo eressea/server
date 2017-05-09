@@ -15,8 +15,11 @@
 extern "C" {
 #endif
 
+#include <util/variant.h>
+
     struct building_type;
     struct race;
+    struct region;
 
     enum {
         RM_USED = 1 << 0,           /* resource has been used */
@@ -71,8 +74,6 @@ extern "C" {
         int base, int divisor, const struct resource_type *rtype);
     struct rawmaterial_type *rmt_create(struct resource_type *rtype);
 
-    extern int(*res_limit_fun)(const struct region *, const struct resource_type *);
-    extern void(*res_produce_fun)(struct region *, const struct resource_type *, int);
     int limit_resource(const struct region *r, const struct resource_type *rtype);
     void produce_resource(struct region *r, const struct resource_type *rtype, int amount);
 
