@@ -68,14 +68,11 @@ extern "C" {
         struct maintenance *maintenance;    /* array of requirements */
         struct construction *construction;  /* construction of 1 building-level */
         struct resource_mod *modifiers; /* modify production skills */
-
-        const char *(*name) (const struct building_type *,
-            const struct building * b, int size);
-        struct attrib *attribs;
     } building_type;
 
     extern struct selist *buildingtypes;
     extern struct attrib_type at_building_action;
+    extern struct attrib_type at_building_generic_type;
 
     int cmp_castle_size(const struct building *b, const struct building *a);
     int building_protection(const struct building_type *btype, int stage);
@@ -114,13 +111,13 @@ extern "C" {
         int flags;
     } building;
 
-    extern struct attrib_type at_building_generic_type;
-    extern const char *buildingtype(const building_type * btype,
+
+    const char *buildingtype(const building_type * btype,
         const struct building *b, int bsize);
-    extern const char *write_buildingname(const building * b, char *ibuf,
+    const char *write_buildingname(const building * b, char *ibuf,
         size_t size);
-    extern int buildingcapacity(const struct building *b);
-    extern struct building *new_building(const struct building_type *typ,
+    int buildingcapacity(const struct building *b);
+    struct building *new_building(const struct building_type *typ,
     struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
@@ -145,9 +142,9 @@ extern "C" {
     void bunhash(struct building *b);
     int buildingcapacity(const struct building *b);
 
-    extern void remove_building(struct building **blist, struct building *b);
-    extern void free_building(struct building *b);
-    extern void free_buildings(void);
+    void remove_building(struct building **blist, struct building *b);
+    void free_building(struct building *b);
+    void free_buildings(void);
 
     const struct building_type *findbuildingtype(const char *name,
         const struct locale *lang);
@@ -155,16 +152,16 @@ extern "C" {
 #include "build.h"
 #define NOBUILDING NULL
 
-    extern int resolve_building(variant data, void *address);
-    extern void write_building_reference(const struct building *b,
+    int resolve_building(variant data, void *address);
+    void write_building_reference(const struct building *b,
     struct storage *store);
-    extern variant read_building_reference(struct gamedata *data);
+    variant read_building_reference(struct gamedata *data);
 
-    extern struct building *findbuilding(int n);
+    struct building *findbuilding(int n);
 
-    extern struct unit *building_owner(const struct building *b);
-    extern void building_set_owner(struct unit * u);
-    extern void building_update_owner(struct building * bld);
+    struct unit *building_owner(const struct building *b);
+    void building_set_owner(struct unit * u);
+    void building_update_owner(struct building * bld);
 
     bool buildingtype_exists(const struct region *r,
         const struct building_type *bt, bool working);
@@ -172,10 +169,10 @@ extern "C" {
     bool is_building_type(const struct building_type *btype, const char *name);
     struct building *active_building(const struct unit *u, const struct building_type *btype);
 
-    extern const char *buildingname(const struct building *b);
+    const char *buildingname(const struct building *b);
 
-    extern const char *building_getname(const struct building *b);
-    extern void building_setname(struct building *self, const char *name);
+    const char *building_getname(const struct building *b);
+    void building_setname(struct building *self, const char *name);
 
     struct region *building_getregion(const struct building *b);
     void building_setregion(struct building *bld, struct region *r);

@@ -56,7 +56,7 @@ done
 [ -z $INIFILE ] && INIFILE=$TOOLS/inifile
 [ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile
 
-[ -e $SOURCE/conf/$rules/config.xml ] || abort "cannot find conf/$rules/config.xml"
+[ -e $SOURCE/conf/$rules/config.json ] || abort "cannot find conf/$rules/config.json"
 
 cd $ERESSEA
 if [ -d $dir ] ; then

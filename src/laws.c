@@ -45,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
+#include <kernel/callbacks.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
@@ -3218,7 +3219,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 
     if (itype->flags & ITF_CANUSE) {
-        int result = item_use_fun(u, itype, amount, ord);
+        int result = callbacks.use_item(u, itype, amount, ord);
         if (result > 0) {
             use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }

@@ -11,10 +11,11 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "resources.h"
 
 /* kernel includes */
+#include <kernel/config.h>
+#include <kernel/callbacks.h>
 #include "build.h"
 #include "item.h"
 #include "region.h"
@@ -213,16 +214,11 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype)
     return rmtype;
 }
 
-int(*item_use_fun)(struct unit *u, const struct item_type *itype, int amount,
-    struct order *ord);
-int(*res_limit_fun)(const struct region *, const struct resource_type *);
-void(*res_produce_fun)(struct region *, const struct resource_type *, int);
-
 int limit_resource(const struct region *r, const resource_type *rtype)
 {
     assert(!rtype->raw);
-    if (res_limit_fun) {
-        return res_limit_fun(r, rtype);
+    if (callbacks.limit_resource) {
+        return callbacks.limit_resource(r, rtype);
     }
     return -1;
 }
@@ -230,7 +226,7 @@ int limit_resource(const struct region *r, const resource_type *rtype)
 void produce_resource(struct region *r, const struct resource_type *rtype, int amount)
 {
     assert(!rtype->raw);
-    if (res_produce_fun) {
-        res_produce_fun(r, rtype, amount);
+    if (callbacks.produce_resource) {
+        callbacks.produce_resource(r, rtype, amount);
     }
 }

@@ -4534,12 +4534,7 @@ int sp_icastle(castorder * co)
         b->size = ((rng_int() % (int)(power)) + 1) * 5;
     }
 
-    if (type->name == NULL) {
-        bname = LOC(mage->faction->locale, type->_name);
-    }
-    else {
-        bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
-    }
+    bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
     building_setname(b, bname);
 
     /* TODO: Auf timeout und action_destroy umstellen */

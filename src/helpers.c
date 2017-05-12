@@ -211,43 +211,6 @@ static int lua_callspell(castorder * co, const char *fname)
     return result;
 }
 
-/** callback to initialize a familiar from lua. */
-static int lua_initfamiliar(unit * u)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    char fname[64];
-    int result = -1;
-
-    strlcpy(fname, "initfamiliar_", sizeof(fname));
-    strlcat(fname, u_race(u)->_name, sizeof(fname));
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, u, TOLUA_CAST "unit");
-
-        if (lua_pcall(L, 1, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("familiar(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_warning("familiar(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
-    }
-
-    create_mage(u, M_GRAY);
-
-    strlcpy(fname, u_race(u)->_name, sizeof(fname));
-    strlcat(fname, "_familiar", sizeof(fname));
-    equip_unit(u, get_equipment(fname));
-    return result;
-}
-
 static int
 lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 {
@@ -278,127 +241,6 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
         lua_pop(L, 1);
     }
 
-    return result;
-}
-
-static int lua_getresource(unit * u, const struct resource_type *rtype)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    int result = -1;
-    char fname[64];
-
-    strlcpy(fname, rtype->_name, sizeof(fname));
-    strlcat(fname, "_getresource", sizeof(fname));
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, u, TOLUA_CAST "unit");
-
-        if (lua_pcall(L, 1, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("get(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("get(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
-    }
-
-    return result;
-}
-
-static int
-lua_wage(const region * r, const faction * f, const race * rc, int in_turn)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    const char *fname = "wage";
-    int result = -1;
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
-        tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
-        tolua_pushstring(L, rc ? rc->_name : 0);
-        lua_pushinteger(L, in_turn);
-
-        if (lua_pcall(L, 3, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("wage(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("wage(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
-        lua_pop(L, 1);
-    }
-
-    return result;
-}
-
-static int lua_maintenance(const unit * u)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    const char *fname = "maintenance";
-    int result = -1;
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-
-        if (lua_pcall(L, 1, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("maintenance(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("maintenance(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
-    }
-
-    return result;
-}
-
-static int lua_equipmentcallback(const struct equipment *eq, unit * u)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    char fname[64];
-    int result = -1;
-
-    strlcpy(fname, "equip_", sizeof(fname));
-    strlcat(fname, eq->name, sizeof(fname));
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-
-        if (lua_pcall(L, 1, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("equip(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
-        }
-        else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-        }
-    }
-    else {
-        log_error("equip(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
-    }
     return result;
 }
 
@@ -447,7 +289,6 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     return result;
 }
 
-
 /* compat code for old data files */
 static int caldera_read(trigger *t, struct gamedata *data)
 {
@@ -469,17 +310,10 @@ void register_tolua_helpers(void)
     at_register(&at_building_action);
 
     callbacks.cast_spell = lua_callspell;
+    callbacks.use_item = use_item_lua;
+    callbacks.produce_resource = produce_resource_lua;
+    callbacks.limit_resource = limit_resource_lua;
 
-    register_function((pf_generic)lua_initfamiliar, "lua_initfamiliar");
-    register_function((pf_generic)lua_getresource, "lua_getresource");
     register_function((pf_generic)lua_changeresource, "lua_changeresource");
-    register_function((pf_generic)lua_equipmentcallback, "lua_equip");
-
-    register_function((pf_generic)lua_wage, "lua_wage");
-    register_function((pf_generic)lua_maintenance, "lua_maintenance");
-
-    item_use_fun = use_item_lua;
-    res_produce_fun = produce_resource_lua;
-    res_limit_fun = limit_resource_lua;
     register_item_give(lua_giveitem, "lua_giveitem");
 }

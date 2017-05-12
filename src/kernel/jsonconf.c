@@ -339,11 +339,6 @@ static void json_building(cJSON *json, building_type *bt) {
             }
             break;
         case cJSON_String:
-            if (strcmp(child->string, "name") == 0) {
-                bt->name = (const char *(*)(const struct building_type *,
-                    const struct building *, int))get_function(child->valuestring);
-                break;
-            }
             log_error("building %s contains unknown attribute %s", json->string, child->string);
             break;
         default:

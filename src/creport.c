@@ -1416,9 +1416,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 }
             }
         }
-        if (r->land) {
-            print_items(F, r->land->items, f->locale);
-        }
         cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(r, f, r->seen.mode, F);
         if (r->seen.mode == seen_unit && is_astral(r)

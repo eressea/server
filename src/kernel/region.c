@@ -1080,8 +1080,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (!fval(terrain, LAND_REGION)) {
         region_setinfo(r, NULL);
-        if (r->land != NULL) {
-            i_freeall(&r->land->items);
+        if (r->land) {
             free_land(r->land);
             r->land = NULL;
         }
@@ -1101,7 +1100,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             rsetroad(r, d, 0);
         }
-        i_freeall(&r->land->items);
     }
     else {
         static struct surround {
@@ -1176,11 +1174,6 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (fval(terrain, LAND_REGION)) {
         const item_type *itype = NULL;
-        char equip_hash[64];
-
-        /* TODO: put the equipment in struct terrain, faster */
-        sprintf(equip_hash, "terrain_%s", terrain->_name);
-        equip_items(&r->land->items, get_equipment(equip_hash));
 
         if (r->terrain->herbs) {
             int len = 0;

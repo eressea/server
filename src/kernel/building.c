@@ -196,9 +196,6 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             }
         }
     }
-    if (btype->name) {
-        return btype->name(btype, b, bsize);
-    }
     if (btype->construction && btype->construction->name) {
         if (b) {
             bsize = adjust_size(b, bsize);
@@ -362,9 +359,6 @@ building *new_building(const struct building_type * btype, region * r,
     *bptr = b;
 
     update_lighthouse(b);
-    if (b->type->name) {
-        bname = LOC(lang, buildingtype(btype, b, 0));
-    }
     if (!bname) {
         bname = LOC(lang, btype->_name);
     }

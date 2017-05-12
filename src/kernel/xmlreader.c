@@ -356,14 +356,7 @@ static int parse_buildings(xmlDocPtr doc)
                     continue;
                 }
                 assert(propValue != NULL);
-                if (strcmp((const char *)propValue, "name") == 0) {
-                    btype->name =
-                        (const char *(*)(const struct building_type *,
-                        const struct building *, int))fun;
-                }
-                else {
-                    log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
-                }
+                log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
                 xmlFree(propValue);
             }
             xmlXPathFreeObject(result);
