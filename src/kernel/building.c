@@ -406,9 +406,6 @@ building *new_building(const struct building_type * btype, region * r,
     *bptr = b;
 
     update_lighthouse(b);
-    if (b->type->name) {
-        bname = LOC(lang, buildingtype(btype, b, 0));
-    }
     if (!bname) {
         bname = LOC(lang, btype->_name);
     }
