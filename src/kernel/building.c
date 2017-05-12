@@ -196,9 +196,6 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             }
         }
     }
-    if (btype->name) {
-        return btype->name(btype, b, bsize);
-    }
     if (btype->construction && btype->construction->name) {
         if (b) {
             bsize = adjust_size(b, bsize);

@@ -68,10 +68,6 @@ extern "C" {
         struct maintenance *maintenance;    /* array of requirements */
         struct construction *construction;  /* construction of 1 building-level */
         struct resource_mod *modifiers; /* modify production skills */
-
-        const char *(*name) (const struct building_type *,
-            const struct building * b, int size);
-        struct attrib *attribs;
     } building_type;
 
     extern struct selist *buildingtypes;
