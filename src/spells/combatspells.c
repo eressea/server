@@ -1668,11 +1668,8 @@ int sp_undeadhero(struct castorder * co)
                 }
 
                 /* transfer dead people to new unit, set hitpoints to those of old unit */
-                transfermen(du, u, j);
+                clone_men(du, u, j); /* for reporting reasons, do not remove the dead */
                 u->hp = u->number * unit_max_hp(du);
-                assert(j <= df->side->casualties);
-                df->side->casualties -= j;
-                df->side->dead -= j;
 
                 /* counting total number of undead */
                 undead += j;

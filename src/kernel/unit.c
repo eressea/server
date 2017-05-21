@@ -981,7 +981,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void transfermen(unit * u, unit * dst, int n)
+void clone_men(unit * u, unit * dst, int n)
 {
     const attrib *a;
     int hp = u->hp;
@@ -1074,7 +1074,6 @@ void transfermen(unit * u, unit * dst, int n)
             transfer_curse(u, dst, n);
         }
     }
-    scale_number(u, u->number - n);
     if (dst) {
         set_number(dst, dst->number + n);
         hp -= u->hp;
@@ -1098,6 +1097,12 @@ void transfermen(unit * u, unit * dst, int n)
             rsetpeasants(r, p);
         }
     }
+}
+
+void transfermen(unit * u, unit * dst, int n)
+{
+    clone_men(u, dst, n);
+    scale_number(u, u->number - n);
 }
 
 struct building *inside_building(const struct unit *u)
