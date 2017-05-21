@@ -1,4 +1,4 @@
-/* 
+/*
  *
  *
  * Eressea PB(E)M host Copyright (C) 1998-2015
@@ -437,40 +437,40 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  *
  */
 
-/* ------------------------------------------------------------- */
-/* Name:    Vertrauter
- * Stufe:   10
- *
- * Wirkung:
- * Der Magier beschwoert einen Vertrauten, ein kleines Tier, welches
- * dem Magier zu Diensten ist.  Der Magier kann durch die Augen des
- * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
- * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
- * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
- * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflu�t.
- * "Tierische" Vertraute brauchen keinen Unterhalt.
- *
- * Ein paar Moeglichkeiten:
- *       Magieg.  Rasse Besonderheiten
- * Eule   Tybied  -/-   fliegt, Auraregeneration
- * Rabe  Ilaun  -/-   fliegt
- * Imp    Draig -/-   Magieresistenz?
- * Fuchs  Gwyrrd  -/-   Wahrnehmung
- * ????   Cerddor -/-   ???? (Singvogel?, Papagei?)
- * Adler  -/-   -/-   fliegt, +Wahrnehmung, =^=Adlerauge-Spruch?
- * Kraehe  -/-   -/-   fliegt, +Tarnung (weil unauffaellig)
- * Delphin  -/-   Meerm.  schwimmt
- * Wolf   -/-   Ork
- * Hund   -/-   Mensch  kann evtl BEWACHE ausfuehren
- * Ratte  -/-   Goblin
- * Albatros -/-   -/-   fliegt, kann auf Ozean "landen"
- * Affe   -/-   -/-   kann evtl BEKLAUE ausfuehren
- * Goblin -/-   !Goblin normale Einheit
- * Katze  -/-   !Katze  normale Einheit
- * Daemon  -/-   !Daemon  normale Einheit
- *
- * Spezielle V. fuer Katzen, Trolle, Elfen, Daemonen, Insekten, Zwerge?
- */
+ /* ------------------------------------------------------------- */
+ /* Name:    Vertrauter
+  * Stufe:   10
+  *
+  * Wirkung:
+  * Der Magier beschwoert einen Vertrauten, ein kleines Tier, welches
+  * dem Magier zu Diensten ist.  Der Magier kann durch die Augen des
+  * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
+  * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
+  * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
+  * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
+  * "Tierische" Vertraute brauchen keinen Unterhalt.
+  *
+  * Ein paar Moeglichkeiten:
+  *       Magieg.  Rasse Besonderheiten
+  * Eule   Tybied  -/-   fliegt, Auraregeneration
+  * Rabe  Ilaun  -/-   fliegt
+  * Imp    Draig -/-   Magieresistenz?
+  * Fuchs  Gwyrrd  -/-   Wahrnehmung
+  * ????   Cerddor -/-   ???? (Singvogel?, Papagei?)
+  * Adler  -/-   -/-   fliegt, +Wahrnehmung, =^=Adlerauge-Spruch?
+  * Kraehe  -/-   -/-   fliegt, +Tarnung (weil unauffaellig)
+  * Delphin  -/-   Meerm.  schwimmt
+  * Wolf   -/-   Ork
+  * Hund   -/-   Mensch  kann evtl BEWACHE ausfuehren
+  * Ratte  -/-   Goblin
+  * Albatros -/-   -/-   fliegt, kann auf Ozean "landen"
+  * Affe   -/-   -/-   kann evtl BEKLAUE ausfuehren
+  * Goblin -/-   !Goblin normale Einheit
+  * Katze  -/-   !Katze  normale Einheit
+  * Daemon  -/-   !Daemon  normale Einheit
+  *
+  * Spezielle V. fuer Katzen, Trolle, Elfen, Daemonen, Insekten, Zwerge?
+  */
 
 static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 {
@@ -606,7 +606,7 @@ static int sp_summon_familiar(castorder * co)
                 if (dh == 0) {
                     bytes =
                         strlcpy(bufp, (const char *)LOC(mage->faction->locale,
-                        "list_and"), size);
+                            "list_and"), size);
                 }
                 else {
                     bytes = strlcpy(bufp, (const char *)", ", size);
@@ -617,7 +617,7 @@ static int sp_summon_familiar(castorder * co)
             }
             bytes =
                 strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
-                size);
+                    size);
             assert(bytes <= INT_MAX);
             if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1249,7 +1249,7 @@ static void fumble_ents(const castorder * co)
  * Flag:
  * (FARCASTING | SPELLLEVEL | UNITSPELL | TESTCANSEE | TESTRESISTANCE)
  */
-/* Syntax: ZAUBER [REGION x y] [STUFE 2] "Rosthauch" 1111 2222 3333 */
+ /* Syntax: ZAUBER [REGION x y] [STUFE 2] "Rosthauch" 1111 2222 3333 */
 
 typedef struct iron_weapon {
     const struct item_type *type;
@@ -1262,7 +1262,7 @@ static iron_weapon *ironweapons = NULL;
 
 void
 add_ironweapon(const struct item_type *type, const struct item_type *rusty,
-float chance)
+    float chance)
 {
     iron_weapon *iweapon = malloc(sizeof(iron_weapon));
     assert_alloc(iweapon);
@@ -1369,7 +1369,7 @@ static int sp_rosthauch(castorder * co)
  * Flag:
  * (UNITSPELL | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
  */
-/* Syntax: ZAUBER [STUFE n] "Kaelteschutz" eh1 [eh2 [eh3 [...]]] */
+ /* Syntax: ZAUBER [STUFE n] "Kaelteschutz" eh1 [eh2 [eh3 [...]]] */
 
 static int sp_kaelteschutz(castorder * co)
 {
@@ -1413,7 +1413,7 @@ static int sp_kaelteschutz(castorder * co)
             u));
         if (u->faction != mage->faction)
             ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
-            cansee(u->faction, r, mage, 0) ? mage : NULL, u));
+                cansee(u->faction, r, mage, 0) ? mage : NULL, u));
         i = cast_level;
     }
     /* Erstattung? */
@@ -1433,7 +1433,7 @@ static int sp_kaelteschutz(castorder * co)
  * Flag:
  * (UNITSPELL | TESTCANSEE | SPELLLEVEL)
  */
-/* Syntax: ZAUBER "Funkenregen" eh1 */
+ /* Syntax: ZAUBER "Funkenregen" eh1 */
 
 static int sp_sparkle(castorder * co)
 {
@@ -1506,11 +1506,11 @@ static int sp_create_irongolem(castorder * co)
     int number = lovar(force * 8 * RESOURCE_QUANTITY);
     static int cache;
     static const race * golem_rc;
-    
+
     if (rc_changed(&cache)) {
         golem_rc = rc_find("irongolem");
     }
-    
+
     if (number < 1) {
         number = 1;
     }
@@ -1532,8 +1532,8 @@ static int sp_create_irongolem(castorder * co)
 
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
-        mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+            mage->region, co->order, mage, number,
+            LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -1575,7 +1575,7 @@ static int sp_create_stonegolem(castorder * co)
     int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
     static int cache;
     static const race * golem_rc;
-    
+
     if (rc_changed(&cache)) {
         golem_rc = rc_find("stonegolem");
     }
@@ -1599,8 +1599,8 @@ static int sp_create_stonegolem(castorder * co)
 
     ADDMSG(&mage->faction->msgs,
         msg_message("magiccreate_effect", "region command unit amount object",
-        mage->region, co->order, mage, number,
-        LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
+            mage->region, co->order, mage, number,
+            LOC(mage->faction->locale, rc_name_s(golem_rc, (u2->number == 1) ? NAME_SINGULAR : NAME_PLURAL))));
 
     return cast_level;
 }
@@ -2206,17 +2206,17 @@ static int sp_ironkeeper(castorder * co)
         fset(keeper, UFL_ANON_FACTION);
     }
 
-  {
-      trigger *tkill = trigger_killunit(keeper);
-      add_trigger(&keeper->attribs, "timer", trigger_timeout(cast_level + 2,
-          tkill));
-  }
+    {
+        trigger *tkill = trigger_killunit(keeper);
+        add_trigger(&keeper->attribs, "timer", trigger_timeout(cast_level + 2,
+            tkill));
+    }
 
-  msg = msg_message("summon_effect", "mage amount race", mage, 1, u_race(keeper));
-  r_addmessage(r, NULL, msg);
-  msg_release(msg);
+    msg = msg_message("summon_effect", "mage amount race", mage, 1, u_race(keeper));
+    r_addmessage(r, NULL, msg);
+    msg_release(msg);
 
-  return cast_level;
+    return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -2387,7 +2387,7 @@ void patzer_peasantmob(const castorder * co)
 
         u =
             create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
-            NULL);
+                NULL);
         fset(u, UFL_ISNEW);
         addlist(&u->orders, create_order(K_GUARD, lang, NULL));
         set_order(&u->thisorder, default_order(lang));
@@ -2459,7 +2459,7 @@ static int sp_forest_fire(castorder * co)
         freset(u->faction, FFL_SELECT);
     msg =
         msg_message("forestfire_effect", "mage region amount", mage, r,
-        destroyed + vernichtet_schoesslinge);
+            destroyed + vernichtet_schoesslinge);
     r_addmessage(r, NULL, msg);
     add_message(&mage->faction->msgs, msg);
     msg_release(msg);
@@ -2629,10 +2629,10 @@ static int sp_summondragon(castorder * co)
                 number = 6;
                 break;
             }
-      {
-          trigger *tsummon = trigger_createunit(r, f, race, number);
-          add_trigger(&r->attribs, "timer", trigger_timeout(time, tsummon));
-      }
+            {
+                trigger *tsummon = trigger_createunit(r, f, race, number);
+                add_trigger(&r->attribs, "timer", trigger_timeout(time, tsummon));
+            }
         }
     }
 
@@ -2707,15 +2707,15 @@ static int sp_firewall(castorder * co)
     }
 
     /* melden, 1x pro Partei */
-  {
-      message *seen = msg_message("firewall_effect", "mage region", mage, r);
-      message *unseen = msg_message("firewall_effect", "mage region", NULL, r);
-      report_effect(r, mage, seen, unseen);
-      msg_release(seen);
-      msg_release(unseen);
-  }
+    {
+        message *seen = msg_message("firewall_effect", "mage region", mage, r);
+        message *unseen = msg_message("firewall_effect", "mage region", NULL, r);
+        report_effect(r, mage, seen, unseen);
+        msg_release(seen);
+        msg_release(unseen);
+    }
 
-  return cast_level;
+    return cast_level;
 }
 
 /* ------------------------------------------------------------- */
@@ -2866,7 +2866,7 @@ static int dc_age(struct curse *c)
             damage /= dmg.sa[1];
             hp = change_hitpoints(u, -(int)damage);
 
-            ADDMSG(&u->faction->msgs, msg_message((hp>0)?"poison_damage":"poison_death", "region unit", r, u));
+            ADDMSG(&u->faction->msgs, msg_message((hp > 0) ? "poison_damage" : "poison_death", "region unit", r, u));
             if (*up == u)
                 up = &u->next;
         }
@@ -2923,7 +2923,7 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
         effect = strength;
         c =
             create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration,
-            effect, 0);
+                effect, 0);
         c->data.v = r;
         if (u == NULL) {
             ur_add(var, &c->magician, resolve_unit);
@@ -3321,7 +3321,7 @@ static int sp_bloodsacrifice(castorder * co)
     change_spellpoints(mage, aura);
     ADDMSG(&mage->faction->msgs,
         msg_message("sp_bloodsacrifice_effect",
-        "unit region command amount", mage, mage->region, co->order, aura));
+            "unit region command amount", mage, mage->region, co->order, aura));
     return cast_level;
 }
 
@@ -3815,7 +3815,7 @@ static int sp_raisepeasantmob(castorder * co)
 
     u =
         create_unit(r, monsters, n, get_race(RC_PEASANT), 0, LOC(monsters->locale,
-        "furious_mob"), NULL);
+            "furious_mob"), NULL);
     fset(u, UFL_ISNEW);
     setguard(u, true);
     a = a_new(&at_unitdissolve);
@@ -4115,6 +4115,94 @@ static int sp_bigrecruit(castorder * co)
     return cast_level;
 }
 
+typedef struct obs_data {
+    faction *f;
+    int skill;
+    int timer;
+} obs_data;
+
+static void obs_init(struct attrib *a)
+{
+    a->data.v = malloc(sizeof(obs_data));
+}
+
+static void obs_done(struct attrib *a)
+{
+    free(a->data.v);
+}
+
+static int obs_age(struct attrib *a, void *owner)
+{
+    obs_data *od = (obs_data *)a->data.v;
+    update_interval(od->f, (region *)owner);
+    return --od->timer;
+}
+
+static void obs_write(const struct attrib *a, const void *owner, struct storage *store)
+{
+    obs_data *od = (obs_data *)a->data.v;
+    write_faction_reference(od->f, store);
+    WRITE_INT(store, od->skill);
+    WRITE_INT(store, od->timer);
+}
+
+static int obs_read(struct attrib *a, void *owner, struct gamedata *data)
+{
+    obs_data *od = (obs_data *)a->data.v;
+
+    read_reference(&od->f, data, read_faction_reference, resolve_faction);
+    READ_INT(data->store, &od->skill);
+    READ_INT(data->store, &od->timer);
+    return AT_READ_OK;
+}
+
+attrib_type at_observer = { "observer", obs_init, obs_done, obs_age, obs_write, obs_read };
+
+static attrib *make_observer(faction *f, int perception)
+{
+    attrib * a = a_new(&at_observer);
+    obs_data *od = (obs_data *)a->data.v;
+    od->f = f;
+    od->skill = perception;
+    od->timer = 2;
+    return a;
+}
+
+int get_observer(region *r, faction *f) {
+    if (fval(r, RF_OBSERVER)) {
+        attrib *a = a_find(r->attribs, &at_observer);
+        while (a && a->type == &at_observer) {
+            obs_data *od = (obs_data *)a->data.v;
+            if (od->f == f) {
+                return od->skill;
+            }
+            a = a->next;
+        }
+    }
+    return -1;
+}
+
+void set_observer(region *r, faction *f, int skill)
+{
+    update_interval(f, r);
+    if (fval(r, RF_OBSERVER)) {
+        attrib *a = a_find(r->attribs, &at_observer);
+        while (a && a->type == &at_observer) {
+            obs_data *od = (obs_data *)a->data.v;
+            if (od->f == f && od->skill < skill) {
+                od->skill = skill;
+                od->timer = 2;
+                return;
+            }
+            a = a->nexttype;
+        }
+    }
+    else {
+        fset(r, RF_OBSERVER);
+    }
+    a_add(&r->attribs, make_observer(f, skill));
+}
+
 /* ------------------------------------------------------------- */
 /* Name:     Aushorchen
  * Stufe:   7
@@ -4128,7 +4216,7 @@ static int sp_bigrecruit(castorder * co)
  *   (UNITSPELL | TESTCANSEE)
  */
 
-/* restistenz der einheit pruefen */
+ /* restistenz der einheit pruefen */
 static int sp_pump(castorder * co)
 {
     unit *u, *target;
@@ -4171,12 +4259,7 @@ static int sp_pump(castorder * co)
         return cast_level / 2;
     }
 
-    u =
-        create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
-        "spell/pump", NULL);
-    u->age = 2;
-    set_level(u, SK_PERCEPTION, effskill(target, SK_PERCEPTION, 0));
-
+    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, 0));
     return cast_level;
 }
 
@@ -4400,7 +4483,7 @@ static int sp_raisepeasants(castorder * co)
 
     u2 =
         create_unit(r, mage->faction, bauern, get_race(RC_PEASANT), 0,
-        LOC(mage->faction->locale, "furious_mob"), mage);
+            LOC(mage->faction->locale, "furious_mob"), mage);
 
     fset(u2, UFL_LOCKED);
     if (rule_stealth_anon()) {
@@ -4414,7 +4497,7 @@ static int sp_raisepeasants(castorder * co)
 
     msg =
         msg_message("sp_raisepeasants_effect", "mage region amount", mage, r,
-        u2->number);
+            u2->number);
     r_addmessage(r, NULL, msg);
     if (mage->region != r) {
         add_message(&mage->faction->msgs, msg);
@@ -4527,7 +4610,7 @@ int sp_icastle(castorder * co)
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
-    else if (type->maxsize >0) {
+    else if (type->maxsize > 0) {
         b->size = type->maxsize;
     }
     else {
@@ -4760,7 +4843,7 @@ int sp_clonecopy(castorder * co)
         "clone_of"), unitname(mage));
     clone =
         create_unit(target_region, mage->faction, 1, get_race(RC_CLONE), 0, name,
-        mage);
+            mage);
     setstatus(clone, ST_FLEE);
     fset(clone, UFL_LOCKED);
 
@@ -4776,7 +4859,7 @@ int sp_clonecopy(castorder * co)
 /* ------------------------------------------------------------- */
 int sp_dreamreading(castorder * co)
 {
-    unit *u, *u2;
+    unit *u;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -4809,16 +4892,11 @@ int sp_dreamreading(castorder * co)
         return 0;
     }
 
-    u2 =
-        create_unit(u->region, mage->faction, 1, get_race(RC_SPELL), 0,
-        "spell/dreamreading", NULL);
-    set_number(u2, 1);
-    u2->age = 2;                  /* Nur fuer diese Runde. */
-    set_level(u2, SK_PERCEPTION, effskill(u, SK_PERCEPTION, u2->region));
+    set_observer(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region));
 
     msg =
         msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
-        u->region);
+            u->region);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
     return cast_level;
@@ -5609,7 +5687,7 @@ int sp_showastral(castorder * co)
         region *r2 = rl2->data;
         if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
             for (u = r2->units; u; u = u->next) {
-                if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL))
+                if (u_race(u) != get_race(RC_SPELL))
                     n++;
             }
         }
@@ -5619,7 +5697,8 @@ int sp_showastral(castorder * co)
         /* sprintf(buf, "%s kann niemanden im astralen Nebel entdecken.",
            unitname(mage)); */
         cmistake(mage, co->order, 220, MSG_MAGIC);
-    } else {
+    }
+    else {
 
         /* Ausgeben */
 
@@ -5629,7 +5708,7 @@ int sp_showastral(castorder * co)
         for (rl2 = rl; rl2; rl2 = rl2->next) {
             if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
                 for (u = rl2->data->units; u; u = u->next) {
-                    if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL)) {
+                    if (u_race(u) != get_race(RC_SPELL)) {
                         c++;
                         scat(unitname(u));
                         scat(" (");
@@ -5639,13 +5718,14 @@ int sp_showastral(castorder * co)
                         }
                         icat(u->number);
                         scat(" ");
-                        scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number==1) ? NAME_SINGULAR:NAME_PLURAL)));
+                        scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)));
                         scat(", Entfernung ");
                         icat(distance(rl2->data, rt));
                         scat(")");
                         if (c == n - 1) {
                             scat(" und ");
-                        } else if (c < n - 1) {
+                        }
+                        else if (c < n - 1) {
                             scat(", ");
                         }
                     }
@@ -5667,7 +5747,6 @@ int sp_showastral(castorder * co)
 int sp_viewreality(castorder * co)
 {
     region_list *rl, *rl2;
-    unit *u;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -5686,11 +5765,7 @@ int sp_viewreality(castorder * co)
     for (rl2 = rl; rl2; rl2 = rl2->next) {
         region *rt = rl2->data;
         if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-            u =
-                create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
-                "spell/viewreality", NULL);
-            set_level(u, SK_PERCEPTION, co->level / 2);
-            u->age = 2;
+            set_observer(rt, mage->faction, co->level / 2);
         }
     }
 
@@ -6264,8 +6339,8 @@ int sp_speed2(castorder * co)
  * Flags:
  *   (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
  */
-/* Jeder gebrochene Zauber verbraucht c->vigour an Zauberkraft
- * (force) */
+ /* Jeder gebrochene Zauber verbraucht c->vigour an Zauberkraft
+  * (force) */
 int sp_q_antimagie(castorder * co)
 {
     attrib **ap;
@@ -6413,7 +6488,7 @@ int sp_break_curse(castorder * co)
             /* Es wurde kein Ziel gefunden */
             ADDMSG(&mage->faction->msgs,
                 msg_message("spelltargetnotfound", "unit region command",
-                mage, mage->region, co->order));
+                    mage, mage->region, co->order));
         }
 
         /* curse aufloesen, wenn zauber staerker (force > vigour) */

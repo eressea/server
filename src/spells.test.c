@@ -3,6 +3,7 @@
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
@@ -108,9 +109,28 @@ static void test_bad_dreams(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_watch_region(CuTest *tc) {
+    region *r;
+    faction *f;
+    test_setup();
+    test_create_race("spell");
+    CuAssertPtrNotNull(tc, get_race(RC_SPELL));
+    r = test_create_region(0, 0, 0);
+    f = test_create_faction(0);
+    CuAssertIntEquals(tc, -1, get_observer(r, f));
+    set_observer(r, f, 0);
+    CuAssertIntEquals(tc, 0, get_observer(r, f));
+    set_observer(r, f, 10);
+    CuAssertIntEquals(tc, 10, get_observer(r, f));
+    CuAssertIntEquals(tc, RF_OBSERVER, fval(r, RF_OBSERVER));
+    CuAssertPtrNotNull(tc, r->attribs);
+    test_cleanup();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);

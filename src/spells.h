@@ -25,11 +25,15 @@ extern "C" {
     struct ship;
     struct curse;
     struct unit;
+    struct faction;
+    struct region;
     struct message;
 
     void register_magicresistance(void);
     void register_spells(void);
-    void set_spelldata(struct spell *sp);
+
+    void set_observer(struct region *r, struct faction *f, int perception);
+    int get_observer(struct region *r, struct faction *f);
 
     int sp_baddreams(castorder * co);
     int sp_gooddreams(castorder * co);

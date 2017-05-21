@@ -35,7 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define RF_MALLORN     (1<<1) /* persistent */
 #define RF_BLOCKED     (1<<2) /* persistent */
 
-#define RF_UNUSED_3  (1<<3)
+#define RF_OBSERVER  (1<<3) /* persistent */
 #define RF_UNUSED_4  (1<<4)
 #define RF_UNUSED_5  (1<<5)
 #define RF_UNUSED_6  (1<<6)

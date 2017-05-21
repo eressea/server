@@ -1636,11 +1636,51 @@ static castorder * create_castorder_combat(castorder *co, fighter *fig, const sp
     return co;
 }
 
+#ifdef FFL_CURSED
+static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
+    side *s;
+    castorder *co;
+
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        fighter *fig = 0;
+        if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
+            spell *sp = find_spell("igjarjuk");
+            if (sp) {
+                int si;
+                for (si = 0; s->enemies[si]; ++si) {
+                    side *se = s->enemies[si];
+                    if (se && !fval(se->faction, FFL_NPC)) {
+                        fighter *fi;
+                        for (fi = se->fighters; fi; fi = fi->next) {
+                            if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                fig = fi;
+                                if (fig->unit->number == 1) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (fig && fig->unit->number == 1) {
+                            break;
+                        }
+                    }
+                }
+                if (fig) {
+                    co = create_castorder_combat(0, fig, sp, 10, 10);
+                    co->magician.fig = fig;
+                    add_castorder(&spellranks[sp->rank], co);
+                    break;
+                }
+            }
+        }
+    }
+}
+#endif
+
 void do_combatmagic(battle * b, combatmagic_t was)
 {
     side *s;
-    region *r = b->region;
     castorder *co;
+    region *r = b->region;
     int level, rank, sl;
     spellrank spellranks[MAX_SPELLRANK];
 
@@ -1648,38 +1688,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
 #ifdef FFL_CURSED
     if (was == DO_PRECOMBATSPELL) {
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
-            fighter *fig = 0;
-            if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
-                spell *sp = find_spell("igjarjuk");
-                if (sp) {
-                    int si;
-                    for (si = 0; s->enemies[si]; ++si) {
-                        side *se = s->enemies[si];
-                        if (se && !fval(se->faction, FFL_NPC)) {
-                            fighter *fi;
-                            for (fi = se->fighters; fi; fi = fi->next) {
-                                if (fi && (!fig || fig->unit->number > fi->unit->number)) {
-                                    fig = fi;
-                                    if (fig->unit->number == 1) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (fig && fig->unit->number == 1) {
-                                break;
-                            }
-                        }
-                    }
-                    if (fig) {
-                        co = create_castorder_combat(0, fig, sp, 10, 10);
-                        co->magician.fig = fig;
-                        add_castorder(&spellranks[sp->rank], co);
-                        break;
-                    }
-                }
-            }
-        }
+        summon_igjarjuk(b, spellranks);
     }
 #endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
