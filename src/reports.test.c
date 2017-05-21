@@ -714,16 +714,14 @@ static void test_region_distance_ql(CuTest *tc) {
 }
 
 static void test_report_far_vision(CuTest *tc) {
-    unit *u1;
     faction *f;
     region *r1, *r2;
-    const race *rc;
     test_setup();
     f = test_create_faction(0);
     r1 = test_create_region(0, 0, 0);
-    u1 = test_create_unit(f, r1);
+    test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
-    rc = test_create_race("spell");
+    test_create_race("spell");
     set_observer(r2, f, 10);
     CuAssertPtrEquals(tc, r1, f->first);
     CuAssertPtrEquals(tc, r2, f->last);

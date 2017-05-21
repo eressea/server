@@ -1446,10 +1446,6 @@ static void test_show_both(CuTest *tc) {
     test_cleanup();
 }
 
-static int low_wage(const region * r, const faction * f, const race * rc, int in_turn) {
-    return 1;
-}
-
 static void test_immigration(CuTest * tc)
 {
     region *r;
