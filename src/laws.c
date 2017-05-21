@@ -2390,6 +2390,7 @@ static void display_race(unit * u, const race * rc)
 
 static void reshow_other(unit * u, struct order *ord, const char *s) {
     int err = 21;
+    bool found = false;
 
     if (s) {
         const spell *sp = 0;
@@ -2426,7 +2427,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             else {
                 display_item(u, itype);
             }
-            return;
+            found = true;
         }
 
         if (sp) {
@@ -2437,15 +2438,16 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             if (a != NULL) {
                 a_remove(&u->faction->attribs, a);
             }
-            return;
+            found = true;
         }
 
         if (rc && u_race(u) == rc) {
             display_race(u, rc);
-            return;
+            found = true;
         }
     }
-    cmistake(u, ord, err, MSG_EVENT);
+    if (!found)
+      cmistake(u, ord, err, MSG_EVENT);
 }
 
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)
