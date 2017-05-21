@@ -1363,53 +1363,6 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 }
 
-static void test_show_elf(CuTest *tc) {
-    order *ord;
-    race * rc;
-    unit *u;
-    struct locale *loc;
-    message * msg;
-    const struct item_type *itype;
-
-    test_setup();
-
-    mt_register(mt_new_va("msg_event", "string:string", 0));
-    rc = test_create_race("elf");
-    itype = test_create_itemtype("elvenhorse");
-
-    loc = test_create_locale();
-    locale_setstring(loc, "elvenhorse", "Elfenpferd");
-    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    init_locale(loc);
-
-    CuAssertPtrNotNull(tc, finditemtype("elf", loc));
-    CuAssertPtrNotNull(tc, findrace("elf", loc));
-
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    u->faction->locale = loc;
-    ord = create_order(K_RESHOW, loc, "Elf");
-
-    reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
-    msg = test_find_messagetype(u->faction->msgs, "msg_event");
-    CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
-    test_clear_messages(u->faction);
-
-    i_change(&u->items, itype, 1);
-    reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
-    msg = test_find_messagetype(u->faction->msgs, "msg_event");
-    CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
-    test_clear_messages(u->faction);
-
-    free_order(ord);
-    test_cleanup();
-}
-
 static void test_show_race(CuTest *tc) {
     order *ord;
     race * rc;
@@ -1664,7 +1617,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
-    SUITE_ADD_TEST(suite, test_show_elf);
     SUITE_ADD_TEST(suite, test_show_race);
     SUITE_ADD_TEST(suite, test_show_both);
     SUITE_ADD_TEST(suite, test_immigration);
