@@ -6848,7 +6848,8 @@ void register_spells(void)
 #ifdef COMPAT_DEATHCLOUD
     at_deprecate("zauber_todeswolke", dc_read_compat);
 #endif
-
+    at_register(&at_observer);
+    
     /* init_firewall(); */
     ct_register(&ct_firewall);
     ct_register(&ct_deathcloud);
