@@ -547,6 +547,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     const struct terrain_type *t_ocean, *t_plain;
 
     test_setup();
+    enable_skill(SK_PERCEPTION, false);
     config_set("rules.region_owner_pay_building", "lighthouse");
     config_set("rules.region_owners", "1");
     t_ocean = test_create_terrain("ocean", SEA_REGION);
@@ -555,6 +556,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
+    r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
@@ -564,8 +566,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     u = test_create_unit(test_create_faction(0), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
-    set_level(u, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, f, NULL));
+    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
