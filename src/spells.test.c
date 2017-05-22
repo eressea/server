@@ -113,8 +113,6 @@ static void test_watch_region(CuTest *tc) {
     region *r;
     faction *f;
     test_setup();
-    test_create_race("spell");
-    CuAssertPtrNotNull(tc, get_race(RC_SPELL));
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
