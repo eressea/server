@@ -1425,7 +1425,8 @@ void prepare_report(report_context *ctx, faction *f)
 
     for (r = ctx->first; r!=ctx->last; r = r->next) {
         unit *u;
-        int range = 0;
+        building *b;
+        int br = 0, c = 0, range = 0;
         if (fval(r, RF_OBSERVER)) {
             int skill = get_observer(r, f);
             if (skill >= 0) {
@@ -1435,7 +1436,6 @@ void prepare_report(report_context *ctx, faction *f)
         if (fval(r, RF_LIGHTHOUSE)) {
             /* region owners get the report from lighthouses */
             if (rule_region_owners && f == region_get_owner(r)) {
-                building *b;
                 for (b = rbuildings(r); b; b = b->next) {
                     if (b && b->type == bt_lighthouse) {
                         /* region owners get maximm range */
@@ -1445,6 +1445,8 @@ void prepare_report(report_context *ctx, faction *f)
                 }
             }
         }
+
+        b = NULL;
         for (u = r->units; u; u = u->next) {
             /* if we have any unit in this region, then we get seen_unit access */
             if (u->faction == f) {
@@ -1453,13 +1455,27 @@ void prepare_report(report_context *ctx, faction *f)
                  * or the size, if perception is not a skill
                  */
                 if (!fval(r, RF_LIGHTHOUSE)) {
-                    /* it's enough to mark the region once, and if there are
+                    /* it's enough to add the region once, and if there are
                     * no lighthouses, there is no need to look at more units */
                     break;
                 }
-                if (range == 0 && u->building && u->building->type == bt_lighthouse && inside_building(u)) {
-                    int br = lighthouse_range(u->building, f, u);
-                    if (br > range) range = br;
+            }
+            if (range == 0 && u->building && u->building->type == bt_lighthouse) {
+                if (u->building && b != u->building) {
+                    b = u->building;
+                    c = buildingcapacity(b);
+                    br = 0;
+                }
+                c -= u->number;
+                if (u->faction == f && c >= 0) {
+                    /* unit is one of ours, and inside the current lighthouse */
+                    if (br == 0) {
+                        /* lazy-calculate the range */
+                        br = lighthouse_range(u->building, f, u);
+                    }
+                    if (br > range) {
+                        range = br;
+                    }
                 }
             }
         }
