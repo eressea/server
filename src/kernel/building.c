@@ -75,15 +75,16 @@ static building_type *bt_find_i(const char *name)
     if (match) {
         cb_get_kv(match, &btype, sizeof(btype));
     }
-    else {
-        log_warning("st_find: could not find ship '%s'\n", name);
-    }
     return btype;
 }
 
 const building_type *bt_find(const char *name)
 {
-    return bt_find_i(name);
+    building_type *btype = bt_find_i(name);
+    if (!btype) {
+        log_warning("bt_find: could not find building '%s'\n", name);
+    }
+    return btype;
 }
 
 static int bt_changes = 1;
