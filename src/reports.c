@@ -70,6 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <time.h>
 
 /* attributes includes */
+#include <attributes/attributes.h>
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>

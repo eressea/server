@@ -1,4 +1,7 @@
 #include <platform.h>
+
+#include "spells.h"
+
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -10,7 +13,8 @@
 #include <util/language.h>
 #include <util/attrib.h>
 #include <spells/regioncurse.h>
-#include "spells.h"
+
+#include <attributes/attributes.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -116,9 +120,9 @@ static void test_watch_region(CuTest *tc) {
     r = test_create_region(0, 0, 0);
     f = test_create_faction(0);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
-    set_observer(r, f, 0);
+    set_observer(r, f, 0, 2);
     CuAssertIntEquals(tc, 0, get_observer(r, f));
-    set_observer(r, f, 10);
+    set_observer(r, f, 10, 2);
     CuAssertIntEquals(tc, 10, get_observer(r, f));
     CuAssertIntEquals(tc, RF_OBSERVER, fval(r, RF_OBSERVER));
     CuAssertPtrNotNull(tc, r->attribs);

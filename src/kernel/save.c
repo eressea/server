@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 
 /* attributes includes */
+#include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <triggers/timeout.h>
 
@@ -1621,6 +1622,7 @@ int read_game(gamedata *data) {
     int rmax = maxregions;
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    const struct race *rc_spell = rc_find("spell");
 
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
@@ -1705,19 +1707,24 @@ int read_game(gamedata *data) {
         while (--p >= 0) {
             unit *u = read_unit(data);
 
-            if (data->version < JSON_REPORT_VERSION) {
-                if (u->_name && fval(u->faction, FFL_NPC)) {
-                    if (!u->_name[0] || unit_name_equals_race(u)) {
-                        unit_setname(u, NULL);
+            if (u_race(u) == rc_spell) {
+                set_observer(r, u->faction, get_level(u, SK_PERCEPTION), u->age);
+                free_unit(u);
+            }
+            else {
+                if (data->version < JSON_REPORT_VERSION) {
+                    if (u->_name && fval(u->faction, FFL_NPC)) {
+                        if (!u->_name[0] || unit_name_equals_race(u)) {
+                            unit_setname(u, NULL);
+                        }
                     }
                 }
+                assert(u->region == NULL);
+                u->region = r;
+                *up = u;
+                up = &u->next;
+                update_interval(u->faction, r);
             }
-            assert(u->region == NULL);
-            u->region = r;
-            *up = u;
-            up = &u->next;
-
-            update_interval(u->faction, r);
         }
 
         if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */

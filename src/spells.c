@@ -25,6 +25,8 @@
 #include "monsters.h"
 #include "teleport.h"
 
+#include <attributes/attributes.h>
+
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
@@ -4115,94 +4117,6 @@ static int sp_bigrecruit(castorder * co)
     return cast_level;
 }
 
-typedef struct obs_data {
-    faction *f;
-    int skill;
-    int timer;
-} obs_data;
-
-static void obs_init(struct attrib *a)
-{
-    a->data.v = malloc(sizeof(obs_data));
-}
-
-static void obs_done(struct attrib *a)
-{
-    free(a->data.v);
-}
-
-static int obs_age(struct attrib *a, void *owner)
-{
-    obs_data *od = (obs_data *)a->data.v;
-    update_interval(od->f, (region *)owner);
-    return --od->timer;
-}
-
-static void obs_write(const struct attrib *a, const void *owner, struct storage *store)
-{
-    obs_data *od = (obs_data *)a->data.v;
-    write_faction_reference(od->f, store);
-    WRITE_INT(store, od->skill);
-    WRITE_INT(store, od->timer);
-}
-
-static int obs_read(struct attrib *a, void *owner, struct gamedata *data)
-{
-    obs_data *od = (obs_data *)a->data.v;
-
-    read_reference(&od->f, data, read_faction_reference, resolve_faction);
-    READ_INT(data->store, &od->skill);
-    READ_INT(data->store, &od->timer);
-    return AT_READ_OK;
-}
-
-attrib_type at_observer = { "observer", obs_init, obs_done, obs_age, obs_write, obs_read };
-
-static attrib *make_observer(faction *f, int perception)
-{
-    attrib * a = a_new(&at_observer);
-    obs_data *od = (obs_data *)a->data.v;
-    od->f = f;
-    od->skill = perception;
-    od->timer = 2;
-    return a;
-}
-
-int get_observer(region *r, faction *f) {
-    if (fval(r, RF_OBSERVER)) {
-        attrib *a = a_find(r->attribs, &at_observer);
-        while (a && a->type == &at_observer) {
-            obs_data *od = (obs_data *)a->data.v;
-            if (od->f == f) {
-                return od->skill;
-            }
-            a = a->next;
-        }
-    }
-    return -1;
-}
-
-void set_observer(region *r, faction *f, int skill)
-{
-    update_interval(f, r);
-    if (fval(r, RF_OBSERVER)) {
-        attrib *a = a_find(r->attribs, &at_observer);
-        while (a && a->type == &at_observer) {
-            obs_data *od = (obs_data *)a->data.v;
-            if (od->f == f && od->skill < skill) {
-                od->skill = skill;
-                od->timer = 2;
-                return;
-            }
-            a = a->nexttype;
-        }
-    }
-    else {
-        fset(r, RF_OBSERVER);
-    }
-    a_add(&r->attribs, make_observer(f, skill));
-}
-
 /* ------------------------------------------------------------- */
 /* Name:     Aushorchen
  * Stufe:   7
@@ -4259,7 +4173,7 @@ static int sp_pump(castorder * co)
         return cast_level / 2;
     }
 
-    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, 0));
+    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, 0), 2);
     return cast_level;
 }
 
@@ -4892,7 +4806,7 @@ int sp_dreamreading(castorder * co)
         return 0;
     }
 
-    set_observer(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region));
+    set_observer(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region), 2);
 
     msg =
         msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
@@ -5765,7 +5679,7 @@ int sp_viewreality(castorder * co)
     for (rl2 = rl; rl2; rl2 = rl2->next) {
         region *rt = rl2->data;
         if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
-            set_observer(rt, mage->faction, co->level / 2);
+            set_observer(rt, mage->faction, co->level / 2, 2);
         }
     }
 
@@ -6848,7 +6762,6 @@ void register_spells(void)
 #ifdef COMPAT_DEATHCLOUD
     at_deprecate("zauber_todeswolke", dc_read_compat);
 #endif
-    at_register(&at_observer);
     
     /* init_firewall(); */
     ct_register(&ct_firewall);

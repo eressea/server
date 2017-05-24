@@ -27,6 +27,7 @@
 #include <util/lists.h>
 #include <util/message.h>
 
+#include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <attributes/otherfaction.h>
 
@@ -722,8 +723,7 @@ static void test_report_far_vision(CuTest *tc) {
     r1 = test_create_region(0, 0, 0);
     test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
-    test_create_race("spell");
-    set_observer(r2, f, 10);
+    set_observer(r2, f, 10, 2);
     CuAssertPtrEquals(tc, r1, f->first);
     CuAssertPtrEquals(tc, r2, f->last);
     report_context ctx;
