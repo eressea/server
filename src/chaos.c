@@ -112,9 +112,7 @@ static unit *random_unit(const region * r)
     unit *u;
 
     for (u = r->units; u; u = u->next) {
-        if (u_race(u) != get_race(RC_SPELL)) {
-            c += u->number;
-        }
+        c += u->number;
     }
 
     if (c == 0) {
@@ -125,9 +123,7 @@ static unit *random_unit(const region * r)
     u = r->units;
 
     while (u && c < n) {
-        if (u_race(u) != get_race(RC_SPELL)) {
-            c += u->number;
-        }
+        c += u->number;
         u = u->next;
     }
 
@@ -203,7 +199,7 @@ static void chaos(region * r)
 
                         for (up = &r->units; *up;) {
                             unit *u = *up;
-                            if (u_race(u) != get_race(RC_SPELL) && u->ship == 0 && !canfly(u)) {
+                            if (u->ship == 0 && !canfly(u)) {
                                 ADDMSG(&u->faction->msgs, msg_message("tidalwave_kill",
                                     "region unit", r, u));
                                 remove_unit(up, u);

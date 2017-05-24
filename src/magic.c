@@ -1209,9 +1209,6 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
-        if (u_race(u)==get_race(RC_SPELL)) {
-            return true;
-        }
         at = effskill(magician, SK_MAGIC, 0);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
@@ -2780,7 +2777,6 @@ void magic(void)
     int rank;
     castorder *co;
     spellrank spellranks[MAX_SPELLRANK];
-    const race *rc_spell = get_race(RC_SPELL);
     const race *rc_insect = get_race(RC_INSECT);
 
     memset(spellranks, 0, sizeof(spellranks));
@@ -2790,7 +2786,7 @@ void magic(void)
         for (u = r->units; u; u = u->next) {
             order *ord;
 
-            if (u->number <= 0 || u_race(u) == rc_spell)
+            if (u->number <= 0)
                 continue;
 
             if (u_race(u) == rc_insect && r_insectstalled(r) &&

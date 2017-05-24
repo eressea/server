@@ -69,7 +69,7 @@ const char *racenames[MAXRACES] = {
     "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
     "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    NULL, "spell", "irongolem", "stonegolem", "shadowdemon",
+    NULL, NULL, "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
     "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,

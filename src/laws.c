@@ -154,22 +154,11 @@ static bool RemoveNMRNewbie(void)
 static void age_unit(region * r, unit * u)
 {
     static int rc_cache;
-    static const race *rc_spell;
+    const race *rc = u_race(u);
 
-    if (rc_changed(&rc_cache)) {
-        rc_spell = get_race(RC_SPELL);
-    }
-    if (u_race(u) == rc_spell) {
-        if (--u->age <= 0) {
-            remove_unit(&r->units, u);
-        }
-    }
-    else {
-        const race *rc = u_race(u);
-        ++u->age;
-        if (u->number > 0 && rc->age_unit) {
-            rc->age_unit(u);
-        }
+    ++u->age;
+    if (u->number > 0 && rc->age_unit) {
+        rc->age_unit(u);
     }
     if (u->region && is_astral(u->region)) {
         item **itemp = &u->items;
@@ -2676,8 +2665,7 @@ int guard_on_cmd(unit * u, struct order *ord)
     if (fval(u, UFL_MOVED)) {
         cmistake(u, ord, 187, MSG_EVENT);
     }
-    else if (fval(u_race(u), RCF_ILLUSIONARY)
-        || u_race(u) == get_race(RC_SPELL)) {
+    else if (fval(u_race(u), RCF_ILLUSIONARY)) {
         cmistake(u, ord, 95, MSG_EVENT);
     }
     else {

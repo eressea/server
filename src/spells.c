@@ -1694,7 +1694,7 @@ static int sp_great_drought(castorder * co)
                 rsetterrain(r, T_OCEAN);
                 /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
                 for (u = r->units; u; u = u->next) {
-                    if (u_race(u) != get_race(RC_SPELL) && u->ship == 0) {
+                    if (!u->ship) {
                         set_number(u, 0);
                     }
                 }
@@ -5601,8 +5601,7 @@ int sp_showastral(castorder * co)
         region *r2 = rl2->data;
         if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
             for (u = r2->units; u; u = u->next) {
-                if (u_race(u) != get_race(RC_SPELL))
-                    n++;
+                n++;
             }
         }
     }
@@ -5622,26 +5621,24 @@ int sp_showastral(castorder * co)
         for (rl2 = rl; rl2; rl2 = rl2->next) {
             if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
                 for (u = rl2->data->units; u; u = u->next) {
-                    if (u_race(u) != get_race(RC_SPELL)) {
-                        c++;
-                        scat(unitname(u));
-                        scat(" (");
-                        if (!fval(u, UFL_ANON_FACTION)) {
-                            scat(factionname(u->faction));
-                            scat(", ");
-                        }
-                        icat(u->number);
-                        scat(" ");
-                        scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)));
-                        scat(", Entfernung ");
-                        icat(distance(rl2->data, rt));
-                        scat(")");
-                        if (c == n - 1) {
-                            scat(" und ");
-                        }
-                        else if (c < n - 1) {
-                            scat(", ");
-                        }
+                    c++;
+                    scat(unitname(u));
+                    scat(" (");
+                    if (!fval(u, UFL_ANON_FACTION)) {
+                        scat(factionname(u->faction));
+                        scat(", ");
+                    }
+                    icat(u->number);
+                    scat(" ");
+                    scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)));
+                    scat(", Entfernung ");
+                    icat(distance(rl2->data, rt));
+                    scat(")");
+                    if (c == n - 1) {
+                        scat(" und ");
+                    }
+                    else if (c < n - 1) {
+                        scat(", ");
                     }
                 }
             }
@@ -5758,24 +5755,22 @@ int sp_disruptastral(castorder * co)
 
         if (trl != NULL) {
             for (u = r2->units; u; u = u->next) {
-                if (u_race(u) != get_race(RC_SPELL)) {
-                    region_list *trl2 = trl;
-                    region *tr;
-                    int c = rng_int() % inhab_regions;
+                region_list *trl2 = trl;
+                region *tr;
+                int c = rng_int() % inhab_regions;
 
-                    /* Zufaellige Zielregion suchen */
-                    while (c-- != 0)
-                        trl2 = trl2->next;
-                    tr = trl2->data;
+                /* Zufaellige Zielregion suchen */
+                while (c-- != 0)
+                    trl2 = trl2->next;
+                tr = trl2->data;
 
-                    if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
-                        message *msg = msg_message("disrupt_astral", "unit region", u, tr);
-                        add_message(&u->faction->msgs, msg);
-                        add_message(&tr->msgs, msg);
-                        msg_release(msg);
+                if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
+                    message *msg = msg_message("disrupt_astral", "unit region", u, tr);
+                    add_message(&u->faction->msgs, msg);
+                    add_message(&tr->msgs, msg);
+                    msg_release(msg);
 
-                        move_unit(u, tr, NULL);
-                    }
+                    move_unit(u, tr, NULL);
                 }
             }
             free_regionlist(trl);

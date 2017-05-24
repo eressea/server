@@ -132,8 +132,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
     i = getid();
     u = findunitg(i, NULL);
 
-    if (u && u_race(u) == get_race(RC_SPELL))
-        return NULL;
     if (u && u->faction == f) {
         order **ordp;
 
@@ -852,7 +850,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
-    if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
+    if (u->hp == 0 && data->version < NORCSPELL_VERSION) {
         log_error("unit %s has 0 hitpoints, adjusting.", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
@@ -1707,7 +1705,7 @@ int read_game(gamedata *data) {
         while (--p >= 0) {
             unit *u = read_unit(data);
 
-            if (u_race(u) == rc_spell) {
+            if (data->version < NORCSPELL_VERSION && u_race(u) == rc_spell) {
                 set_observer(r, u->faction, get_level(u, SK_PERCEPTION), u->age);
                 free_unit(u);
             }
