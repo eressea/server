@@ -153,7 +153,6 @@ static bool RemoveNMRNewbie(void)
 
 static void age_unit(region * r, unit * u)
 {
-    static int rc_cache;
     const race *rc = u_race(u);
 
     ++u->age;
