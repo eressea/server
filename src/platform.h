@@ -15,11 +15,13 @@
 #define NO_MKDIR
 #define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
+#if _MSC_VER >= 1900
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
 #pragma warning(disable: 4456) // declaration hides previous
 #pragma warning(disable: 4457) // declaration hides function parameter
 #pragma warning(disable: 4459) // declaration hides global
+#endif
 #else /* assume gcc */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 # define va_copy(a,b) __va_copy(a,b)
