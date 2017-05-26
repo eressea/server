@@ -404,3 +404,7 @@ function test_demonstealth()
   desc = u:show()
   assert_equal(nil, string.find(desc, "Drache"))
 end
+
+function test_calendar_season_2328()
+    assert_equal("fall", get_season(1026))
+end
