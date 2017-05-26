@@ -97,14 +97,15 @@ static ship_type *st_find_i(const char *name)
     if (match) {
         cb_get_kv(match, &st, sizeof(st));
     }
-    else {
-        log_warning("st_find: could not find ship '%s'\n", name);
-    }
     return st;
 }
 
 const ship_type *st_find(const char *name) {
-    return st_find_i(name);
+    ship_type *st = st_find_i(name);
+    if (!st) {
+        log_warning("st_find: could not find ship '%s'\n", name);
+    }
+    return st;
 }
 
 static void st_register(ship_type *stype) {
