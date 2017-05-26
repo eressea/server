@@ -16,8 +16,3 @@ BIN_DIR="Debug"
 
 cd $ROOT/$BIN_DIR
 make install
-
-# install crontab, but only on the eressea server:
-# in fact, never do this, because it overwrites hand-edits
-#WHOAMI=`whoami`@`hostname`
-#[ "eressea@gruenbaer" = "$WHOAMI" ] && crontab $ROOT/process/cron/crontab

@@ -1107,7 +1107,7 @@ variant magic_resistance(unit * target)
     const plane *pl = rplane(target->region);
 
     if (rc == get_race(RC_HIRNTOETER) && !pl) {
-        prob.sa[1] *= 2;
+	prob = frac_mul(prob, frac_make(1, 2));        
     }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
