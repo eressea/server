@@ -1,3 +1,5 @@
+#!/bin/sh
+
 GAME=$1
 TURN=$2
 
@@ -12,3 +14,4 @@ echo "running turn $TURN, game $GAME"
 $ERESSEA/server/bin/eressea -v3 -t $TURN run-turn.lua
 mkdir -p log
 ln -f eressea.log log/eressea.log.$TURN
+

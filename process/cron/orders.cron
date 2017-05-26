@@ -5,6 +5,10 @@
 # this here script to make a non-blocking syntax check and reject or
 # accept the order file.
 
+if [ "yes" != "$CONFIRM" ] ; then
+  exit
+fi
+
 for GAME in $*
 do
   if [ "$GAME" == "eressea" ]; then GAME=2 ; fi

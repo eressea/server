@@ -1,0 +1,14 @@
+Freust Du Dich, dass es diese Woche wieder einen Eressea-Report gibt?
+Möchtest Du dazu beitragen, dass das auch nächste Woche wieder passiert?
+Eressea ist ein freiwilliges gratis-Angebot, und die Spielleitung bezahlt
+seit Jahren die Entwicklung und das Hosting aus eigener Tasche. Wenn Dir
+das etwas wert ist, kannst Du das auf
+https://flattr.com/thing/681354/Eressea zum Ausdruck bringen.
+
+Diese Mail enthält ein Attachment mit Deinem Eressea-Report in
+komprimierter Form. Um ihn zu entpacken benötigst Du ein Programm,
+das ZIP-Archive öffnen kann, wie z.B. 7-Zip (http://www.7-zip.org/)
+
+This email contains an attachment with your Eressea report in compressed
+form. To open the attachment, you will need a program that can extract
+ZIP files, e.g. 7-Zip (http://www.7-zip.org/).
