@@ -439,7 +439,7 @@ static int get_row(const side * s, int row, const side * vs)
     return result;
 }
 
-static int get_unitrow(const fighter * af, const side * vs)
+int get_unitrow(const fighter * af, const side * vs)
 {
     int row = statusrow(af->status);
     if (vs == NULL) {
@@ -1589,8 +1589,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
     return dt;
 }
 
-selist *fighters(battle * b, const side * vs, int minrow, int maxrow,
-    int mask)
+selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     side *s;
     selist *fightervp = 0;
@@ -1613,14 +1612,33 @@ selist *fighters(battle * b, const side * vs, int minrow, int maxrow,
             assert(mask == (FS_HELP | FS_ENEMY) || !"invalid alliance state");
         }
         for (fig = s->fighters; fig; fig = fig->next) {
-            int row = get_unitrow(fig, vs);
-            if (row >= minrow && row <= maxrow) {
+            if (cb(vs, fig, cbdata)) {
                 selist_push(&fightervp, fig);
             }
         }
     }
 
     return fightervp;
+}
+
+struct selector {
+    int minrow;
+    int maxrow;
+};
+
+static bool select_row(const side *vs, const fighter *fig, void *cbdata)
+{
+    struct selector *sel = (struct selector *)cbdata;
+    int row = get_unitrow(fig, vs);
+    return (row >= sel->minrow && row <= sel->maxrow);
+}
+
+selist *fighters(battle * b, const side * vs, int minrow, int maxrow, int mask)
+{
+    struct selector sel;
+    sel.maxrow = maxrow;
+    sel.minrow = minrow;
+    return select_fighters(b, vs, mask, select_row, &sel);
 }
 
 static void report_failed_spell(struct battle * b, struct unit * mage, const struct spell *sp)
