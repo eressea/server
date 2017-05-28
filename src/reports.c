@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "guard.h"
 #include "laws.h"
+#include "spells.h"
 #include "travelthru.h"
 #include "lighthouse.h"
 #include "donations.h"
@@ -69,6 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <time.h>
 
 /* attributes includes */
+#include <attributes/attributes.h>
 #include <attributes/follow.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
@@ -93,6 +95,7 @@ const char *visibility[] = {
     "travel",
     "far",
     "unit",
+    "spell",
     "battle"
 };
 
@@ -966,9 +969,9 @@ const struct unit *ucansee(const struct faction *f, const struct unit *u,
 int stealth_modifier(seen_mode mode)
 {
     switch (mode) {
+    case seen_spell:
     case seen_unit:
         return 0;
-    case seen_far:
     case seen_lighthouse:
         return -2;
     case seen_travel:
@@ -1422,28 +1425,57 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->last = lastregion(f);
 
     for (r = ctx->first; r!=ctx->last; r = r->next) {
-        int range = 0;
         unit *u;
-        if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
+        building *b;
+        int br = 0, c = 0, range = 0;
+        if (fval(r, RF_OBSERVER)) {
+            int skill = get_observer(r, f);
+            if (skill >= 0) {
+                add_seen_nb(f, r, seen_spell);
+            }
+        }
+        if (fval(r, RF_LIGHTHOUSE)) {
+            /* region owners get the report from lighthouses */
             if (rule_region_owners && f == region_get_owner(r)) {
-                /* region owners get the report from lighthouses */
-                building *b;
-
-                for (b = r->buildings; b; b = b->next) {
-                    if (b->type == bt_lighthouse) {
-                        int br = lighthouse_range(b, NULL);
+                for (b = rbuildings(r); b; b = b->next) {
+                    if (b && b->type == bt_lighthouse) {
+                        /* region owners get maximm range */
+                        int br = lighthouse_range(b, NULL, NULL);
                         if (br > range) range = br;
                     }
                 }
             }
         }
+
+        b = NULL;
         for (u = r->units; u; u = u->next) {
+            /* if we have any unit in this region, then we get seen_unit access */
             if (u->faction == f) {
                 add_seen_nb(f, r, seen_unit);
-                if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
-                    if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
-                        int br = lighthouse_range(u->building, f);
-                        if (br > range) range = br;
+                /* units inside the lighthouse get range based on their perception
+                 * or the size, if perception is not a skill
+                 */
+                if (!fval(r, RF_LIGHTHOUSE)) {
+                    /* it's enough to add the region once, and if there are
+                    * no lighthouses, there is no need to look at more units */
+                    break;
+                }
+            }
+            if (range == 0 && u->building && u->building->type == bt_lighthouse) {
+                if (u->building && b != u->building) {
+                    b = u->building;
+                    c = buildingcapacity(b);
+                    br = 0;
+                }
+                c -= u->number;
+                if (u->faction == f && c >= 0) {
+                    /* unit is one of ours, and inside the current lighthouse */
+                    if (br == 0) {
+                        /* lazy-calculate the range */
+                        br = lighthouse_range(u->building, f, u);
+                    }
+                    if (br > range) {
+                        range = br;
                     }
                 }
             }

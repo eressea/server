@@ -2978,13 +2978,12 @@ void produce(struct region *r)
     static int bt_cache;
     static const struct building_type *caravan_bt;
     static int rc_cache;
-    static const race *rc_spell, *rc_insect, *rc_aquarian;
+    static const race *rc_insect, *rc_aquarian;
     
     if (bt_changed(&bt_cache)) {
         caravan_bt = bt_find("caravan");
     }
     if (rc_changed(&rc_cache)) {
-        rc_spell = get_race(RC_SPELL);
         rc_insect = get_race(RC_INSECT);
         rc_aquarian = get_race(RC_AQUARIAN);
     }
@@ -3022,7 +3021,7 @@ void produce(struct region *r)
         bool trader = false;
         keyword_t todo;
 
-        if (u_race(u) == rc_spell || fval(u, UFL_LONGACTION))
+        if (fval(u, UFL_LONGACTION))
             continue;
 
         if (u_race(u) == rc_insect && r_insectstalled(r) &&

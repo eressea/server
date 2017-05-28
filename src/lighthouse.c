@@ -63,42 +63,21 @@ void update_lighthouse(building * lh)
     }
 }
 
-int lighthouse_range(const building * b, const faction * f)
+int lighthouse_range(const building * b, const faction * f, const unit *u)
 {
-    int d = 0;
     if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
         int maxd = (int)log10(b->size) + 1;
 
-        if (skill_enabled(SK_PERCEPTION)) {
-            region *r = b->region;
-            int c = 0;
-            int cap = buildingcapacity(b);
-            unit *u, *uown = building_owner(b);
-
-            for (u = r->units; u; u = u->next) {
-                if (u->building == b || u == uown) {
-                    c += u->number;
-                    if (c > cap) {
-                        break;
-                    }
-                    else if (f == NULL || u->faction == f) {
-                        int sk = effskill(u, SK_PERCEPTION, 0) / 3;
-                        d = MAX(d, sk);
-                        d = MIN(maxd, d);
-                        if (d == maxd)
-                            break;
-                    }
-                }
-                else if (c)
-                    break;                /* first unit that's no longer in the house ends the search */
-            }
+        if (u && skill_enabled(SK_PERCEPTION)) {
+            int sk = effskill(u, SK_PERCEPTION, 0) / 3;
+            assert(u->building == b);
+            assert(u->faction == f);
+            maxd = MIN(maxd, sk);
         }
-        else {
-            /* E3A rule: no perception req'd */
-            return maxd;
-        }
+        /* E3A rule: no perception req'd */
+        return maxd;
     }
-    return d;
+    return 0;
 }
 
 bool check_leuchtturm(region * r, faction * f)

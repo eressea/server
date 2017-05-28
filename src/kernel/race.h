@@ -72,8 +72,7 @@ extern "C" {
         RC_BIRTHDAYDRAGON,
         RC_DRACOID,
 
-        RC_SPELL = 22,
-        RC_IRONGOLEM,
+        RC_IRONGOLEM = 23,
         RC_STONEGOLEM,
         RC_SHADOW,
         RC_SHADOWLORD,
