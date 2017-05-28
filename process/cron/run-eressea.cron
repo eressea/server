@@ -1,7 +1,11 @@
 #!/bin/bash
 GAME=$1
-BIN=$HOME/bin
-export ERESSEA=$HOME/eressea
+
+[ "$ENABLED" != "yes" ] && exit
+[ -z ${ERESSEA} ] && ERESSEA=$HOME/eressea
+
+export ERESSEA
+BIN=$ERESSEA/server/bin
 TURN=$(cat $ERESSEA/game-$GAME/turn)
 if [ ! -e $ERESSEA/game-$GAME/data/$TURN.dat ]; then
   echo "data file $TURN is missing, cannot run turn for game $GAME"
@@ -14,6 +18,18 @@ fi
 mkdir $REPORTS
 
 cd $ERESSEA/game-$GAME
+
+# wait for the queue lock to go away
+maxt=5
+to=5
+while [ -e orders.queue.lock ] ; do
+  echo "waiting for orders to finish processing."
+  sleep $to
+  let to=$to+$to
+  let mast=$maxt-1
+  [ $maxt -lt 0 ] && break
+done
+
 if [ -d test ]; then
   touch test/execute.lock
 fi

@@ -1221,7 +1221,7 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = next[d];
             if (rn && rn->seen.mode<seen_neighbour) {
-                add_seen(rn, seen_neighbour);
+                rn->seen.mode = seen_neighbour;
                 if (first->index>rn->index) first = rn;
                 if (last->index<rn->index) last = rn;
             }

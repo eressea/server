@@ -88,7 +88,7 @@
         "rules.economy.herbrot": 0,
         "rules.region_owner_pay_building": "market harbour lighthouse",
         "rules.dwarf_castles": true,
-        "rules.limit.faction": 250,
+        "rules.limit.faction": 500,
         "rules.grow.formula": 1,
         "rules.tactics.formula": 1,
         "rules.help.mask": "fight guard money give",
