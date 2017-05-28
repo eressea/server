@@ -34,15 +34,12 @@ extern "C" {
     typedef void(*fumble_f)(const struct castorder * co);
 
     typedef struct spell {
-        unsigned int id;
         char *sname;
         char *syntax;
         char *parameter;
         int sptyp;
         int rank;                   /* Reihenfolge der Zauber */
         struct spell_component *components;
-        spell_f cast;
-        fumble_f fumble;
     } spell;
 
     typedef struct spellref {
@@ -50,15 +47,20 @@ extern "C" {
         struct spell *sp;
     } spellref;
 
+    void add_fumble(const char *sname, fumble_f fun);
+    fumble_f get_fumble(const char *sname);
+
+    void add_spellcast(const char *sname, spell_f fun);
+    spell_f get_spellcast(const char *sname);
+
     struct spellref *spellref_create(struct spell *sp, const char *name);
     void spellref_free(struct spellref *spref);
     struct spell *spellref_get(struct spellref *spref);
 
     int sp_antimagiczone(struct castorder *co);
 
-    struct spell * create_spell(const char * name, unsigned int id);
+    struct spell * create_spell(const char * name);
     struct spell * find_spell(const char *name);
-    struct spell * find_spellbyid(unsigned int i);
     void add_spell(struct selist **slistp, spell * sp);
     void free_spells(void);
 

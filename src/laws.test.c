@@ -5,6 +5,7 @@
 #include "monsters.h"
 
 #include <kernel/ally.h>
+#include <kernel/alliance.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -427,7 +428,51 @@ static void test_unit_limit(CuTest * tc)
     test_cleanup();
 }
 
-extern int checkunitnumber(const faction * f, int add);
+static void test_limit_new_units(CuTest * tc)
+{
+    faction *f;
+    unit *u;
+    alliance *al;
+
+    test_setup();
+    al = makealliance(1, "Hodor");
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    scale_number(u, 10);
+    CuAssertIntEquals(tc, 10, f->num_people);
+    config_set("rules.limit.faction", "2");
+
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
+    new_units();
+    CuAssertPtrNotNull(tc, u->next);
+    CuAssertIntEquals(tc, 2, f->num_units);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_faction"));
+
+    setalliance(f, al);
+
+    config_set("rules.limit.faction", "3");
+    config_set("rules.limit.alliance", "2");
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
+
+    config_set("rules.limit.alliance", "3");
+    u = test_create_unit(test_create_faction(NULL), u->region);
+    setalliance(u->faction, al);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
+
+    test_cleanup();
+}
+
 static void test_cannot_create_unit_above_limit(CuTest * tc)
 {
     faction *f;
@@ -480,10 +525,6 @@ struct pay_fixture {
     unit *u2;
 };
 
-static double level_taxes(const building * b, int level) {
-    return b->size * level * 2.0;
-}
-
 static void setup_pay_cmd(struct pay_fixture *fix) {
     faction *f;
     region *r;
@@ -495,7 +536,7 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     r = findregion(0, 0);
     assert(r && f);
     btcastle = test_create_buildingtype("castle");
-    btcastle->taxes = level_taxes;
+    btcastle->taxes = 100;
     b = test_create_building(r, btcastle);
     assert(b);
     fix->u1 = test_create_unit(f, r);
@@ -1322,42 +1363,6 @@ static void test_show_without_item(CuTest *tc)
     test_cleanup();
 }
 
-static void test_show_elf(CuTest *tc) {
-    order *ord;
-    race * rc;
-    unit *u;
-    struct locale *loc;
-    message * msg;
-
-    test_setup();
-
-    mt_register(mt_new_va("msg_event", "string:string", 0));
-    rc = test_create_race("elf");
-    test_create_itemtype("elvenhorse");
-
-    loc = test_create_locale();
-    locale_setstring(loc, "elvenhorse", "Elfenpferd");
-    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    init_locale(loc);
-
-    CuAssertPtrNotNull(tc, finditemtype("elf", loc));
-    CuAssertPtrNotNull(tc, findrace("elf", loc));
-
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
-    u->faction->locale = loc;
-    ord = create_order(K_RESHOW, loc, "Elf");
-    reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
-    msg = test_find_messagetype(u->faction->msgs, "msg_event");
-    CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
-    test_clear_messages(u->faction);
-    free_order(ord);
-    test_cleanup();
-}
-
 static void test_show_race(CuTest *tc) {
     order *ord;
     race * rc;
@@ -1399,15 +1404,52 @@ static void test_show_race(CuTest *tc) {
     test_cleanup();
 }
 
-static int low_wage(const region * r, const faction * f, const race * rc, int in_turn) {
-    return 1;
+static void test_show_both(CuTest *tc) {
+    order *ord;
+    race * rc;
+    unit *u;
+    struct locale *loc;
+    message * msg;
+
+    test_cleanup();
+
+    mt_register(mt_new_va("msg_event", "string:string", 0));
+    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", 0));
+    rc = test_create_race("elf");
+    test_create_itemtype("elvenhorse");
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "iteminfo::elvenhorse", "Hiyaa!");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    init_locale(loc);
+
+    CuAssertPtrNotNull(tc, finditemtype("elf", loc));
+    CuAssertPtrNotNull(tc, findrace("elf", loc));
+
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u->faction->locale = loc;
+    i_change(&u->items, finditemtype("elfenpferd", loc), 1);
+    ord = create_order(K_RESHOW, loc, "Elf");
+    reshow_cmd(u, ord);
+    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error36") == NULL);
+    msg = test_find_messagetype(u->faction->msgs, "msg_event");
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
+    msg = test_find_messagetype(u->faction->msgs, "displayitem");
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Hiyaa!", msg->parameters[2].v, 4) == 0);
+    test_clear_messages(u->faction);
+    free_order(ord);
+    test_cleanup();
 }
 
 static void test_immigration(CuTest * tc)
 {
     region *r;
     double inject[] = { 1 };
-    int (*old_wage)(const region*, const faction*, const race*, int) = global.functions.wage;
 
     test_setup();
     r = test_create_region(0, 0, 0);
@@ -1427,10 +1469,9 @@ static void test_immigration(CuTest * tc)
 
     random_source_inject_array(inject, 2);
 
-    global.functions.wage = low_wage;
+    config_set("rules.wage.function", "0");
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
-    global.functions.wage = old_wage;
 
     test_cleanup();
 }
@@ -1535,6 +1576,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_fishing_does_not_give_goblins_money);
     SUITE_ADD_TEST(suite, test_fishing_gets_reset);
     SUITE_ADD_TEST(suite, test_unit_limit);
+    SUITE_ADD_TEST(suite, test_limit_new_units);
     SUITE_ADD_TEST(suite, test_update_guards);
     SUITE_ADD_TEST(suite, test_newbie_cannot_guard);
     SUITE_ADD_TEST(suite, test_unarmed_cannot_guard);
@@ -1571,8 +1613,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
-    SUITE_ADD_TEST(suite, test_show_elf);
     SUITE_ADD_TEST(suite, test_show_race);
+    SUITE_ADD_TEST(suite, test_show_both);
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);

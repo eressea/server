@@ -1,6 +1,7 @@
 {
     "include": [
         "keywords.json",
+        "calendar.json",
         "prefixes.json",
         "e3/terrains.json"
     ],
@@ -51,11 +52,11 @@
         "recruit.allow_merge": true,
         "study.expensivemigrants": true,
         "study.speedup": 2,
-        "world.era": 3,
-        "seed.population.min": 8,
-        "seed.population.max": 8,
+        "game.era": 3,
+        "game.start": 1,
         "rules.reserve.twophase": true,
         "rules.owners.force_leave": false,
+        "rules.wage.function": 2,
         "rules.monsters.attack_chance": 0.1,
         "rules.transfermen": false,
         "stealth.faction.other": false,
@@ -87,7 +88,7 @@
         "rules.economy.herbrot": 0,
         "rules.region_owner_pay_building": "market harbour lighthouse",
         "rules.dwarf_castles": true,
-        "rules.limit.faction": 250,
+        "rules.limit.faction": 500,
         "rules.grow.formula": 1,
         "rules.tactics.formula": 1,
         "rules.help.mask": "fight guard money give",

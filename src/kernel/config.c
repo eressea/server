@@ -93,12 +93,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <errno.h>
 #include <sys/stat.h>
 
-struct settings global = {
-    "Eressea",                    /* gamename */
-};
+struct settings global;
 
 bool lomem = false;
-int turn = -1;
+int turn = 0;
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
@@ -367,13 +365,26 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-void init_locale(struct locale *lang)
+void init_races(struct locale *lang)
 {
-    variant var;
-    int i;
     const struct race *rc;
     void **tokens;
 
+    tokens = get_translations(lang, UT_RACES);
+    for (rc = races; rc; rc = rc->next) {
+        const char *name;
+        variant var;
+        var.v = (void *)rc;
+        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
+        if (name) addtoken((struct tnode **)tokens, name, var);
+        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
+        if (name) addtoken((struct tnode **)tokens, name, var);
+    }
+}
+
+static void init_magic(struct locale *lang)
+{
+    void **tokens;
     tokens = get_translations(lang, UT_MAGIC);
     if (tokens) {
         const char *str = config_get("rules.magic.playerschools");
@@ -385,7 +396,9 @@ void init_locale(struct locale *lang)
         sstr = strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
+            variant var;
             const char *name;
+            int i;
             for (i = 0; i != MAXMAGIETYP; ++i) {
                 if (strcmp(tok, magic_school[i]) == 0) break;
             }
@@ -402,21 +415,14 @@ void init_locale(struct locale *lang)
         }
         free(sstr);
     }
-
+}
+void init_locale(struct locale *lang)
+{
+    init_magic(lang);
     init_directions(lang);
     init_keywords(lang);
     init_skills(lang);
-
-    tokens = get_translations(lang, UT_RACES);
-    for (rc = races; rc; rc = rc->next) {
-        const char *name;
-        var.v = (void *)rc;
-        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-    }
-
+    init_races(lang);
     init_parameters(lang);
 
     init_options_translation(lang);
@@ -733,7 +739,7 @@ bool config_changed(int *cache_key) {
 }
 
 #define MAXKEYS 16
-void config_set_from(const dictionary *d)
+void config_set_from(const dictionary *d, const char *valid_keys[])
 {
     int s, nsec = iniparser_getnsec(d);
     for (s=0;s!=nsec;++s) {
@@ -742,6 +748,7 @@ void config_set_from(const dictionary *d)
         int k, nkeys = iniparser_getsecnkeys(d, sec);
         const char *keys[MAXKEYS];
         size_t slen = strlen(sec);
+
         assert(nkeys <= MAXKEYS);
         assert(slen<sizeof(key));
         memcpy(key, sec, slen);
@@ -756,6 +763,16 @@ void config_set_from(const dictionary *d)
             val = iniparser_getstring(d, keys[k], NULL);
             if (!orig) {
                 if (val) {
+                    if (valid_keys) {
+                        int i;
+                        for (i = 0; valid_keys[i]; ++i) {
+                            size_t vlen = strlen(valid_keys[i]);
+                            if (strncmp(key, valid_keys[i], vlen) == 0) break;
+                        }
+                        if (!valid_keys[i]) {
+                            log_error("unknown key in ini-section %s: %s = %s", sec, key+slen+1, val);
+                        }
+                    }
                     config_set(key, val);
                 }
             } else {
@@ -765,9 +782,16 @@ void config_set_from(const dictionary *d)
     }
 }
 
-void config_set(const char *key, const char *value) {
+void config_set(const char *key, const char *value)
+{
     ++config_cache_key;
     set_param(&configuration, key, value);
+}
+
+void config_set_int(const char *key, int value)
+{
+    ++config_cache_key;
+    set_param(&configuration, key, itoa10(value));
 }
 
 const char *config_get(const char *key) {
@@ -787,7 +811,6 @@ bool config_token(const char *key, const char *tok) {
 }
 
 void free_config(void) {
-    global.functions.wage = NULL;
     free_params(&configuration);
     ++config_cache_key;
 }
@@ -830,7 +853,7 @@ void free_gamedata(void)
 const char * game_name(void)
 {
     const char * param = config_get("game.name");
-    return param ? param : global.gamename;
+    return param ? param : "Eressea";
 }
 
 const char * game_mailcmd(void)

@@ -3,8 +3,4 @@
   <item weight="10" score="100">
     <construction skill="herbalism" minskill="4"/>
   </item>
-  <resourcelimit>
-    <function name="produce" value="lua_produceresource"/>
-    <function name="limit" value="lua_limitresource"/>
-  </resourcelimit>
 </resource>

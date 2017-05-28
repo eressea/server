@@ -35,8 +35,6 @@ extern "C" {
     struct gamedata;
     struct selist;
     
-    extern struct attrib_type at_maxmagicians;
-
     /* faction flags */
 #define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
 #define FFL_ISNEW         (1<<1)
@@ -44,8 +42,8 @@ extern "C" {
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
-#define FFL_SELECT        (1<<18)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
+#define FFL_SELECT        (1<<22)       /* ehemals f->dh, u->dh, r->dh, etc... */
 #define FFL_MARK          (1<<23)       /* f�r markierende algorithmen, die das 
                                              * hinterher auch wieder l�schen m�ssen!
                                              * (FFL_SELECT muss man vorher initialisieren,
@@ -77,13 +75,10 @@ extern "C" {
         magic_t magiegebiet;
         int newbies;
         int num_people;             /* Anzahl Personen ohne Monster */
-        int num_total;              /* Anzahl Personen mit Monstern */
+        int num_units;
         int options;
-        int no_units;
         struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
         struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
-        int nregions;
-        int money;
         score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
@@ -166,14 +161,10 @@ extern "C" {
 #define COUNT_MONSTERS 0x01
 #define COUNT_MIGRANTS 0x02
 #define COUNT_DEFAULT  0x04
-#define COUNT_ALL      0x07
-#define COUNT_UNITS    0x10
 
     int count_faction(const struct faction * f, int flags);
     int count_migrants(const struct faction * f);
     int count_maxmigrants(const struct faction * f);
-    int count_all(const struct faction * f);
-    int count_units(const struct faction * f);
     int max_magicians(const struct faction * f);
 
     struct faction *getfaction(void);

@@ -76,7 +76,6 @@ int update_nmrs(void)
 {
     int i, newplayers = 0;
     faction *f;
-    int turn = global.data_turn;
     int timeout = NMRTimeout();
 
     if (timeout>0) {
@@ -129,15 +128,15 @@ static char *rcomp(int i, int j)
 static void out_faction(FILE * file, const struct faction *f)
 {
     if (alliances != NULL) {
-        fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
+        fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., %d NMR\n",
             f->name, itoa36(f->no), f_get_alliance(f) ? f->alliance->id : 0,
             LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), magic_school[f->magiegebiet],
-            count_units(f), f->num_total, f->money, turn - f->lastorders);
+            f->num_units, f->num_people, turn - f->lastorders);
     }
     else {
-        fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., $%d, %d NMR\n",
+        fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., %d NMR\n",
             factionname(f), LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)),
-            magic_school[f->magiegebiet], count_units(f), f->num_total, f->money,
+            magic_school[f->magiegebiet], f->num_units, f->num_people,
             turn - f->lastorders);
     }
 }
@@ -152,13 +151,12 @@ static char *gamedate2(const struct locale *lang)
     if (weeknames2) {
         week = weeknames2[gd.week];
     }
-    if (monthnames) {
-        month = monthnames[gd.month];
-    }
+    month = calendar_month(gd.month);
     sprintf(buf, "in %s des Monats %s im Jahre %d %s.",
-        LOC(lang, week),
-        LOC(lang, month),
-        gd.year, agename ? LOC(lang, agename) : "");
+        LOC(lang, mkname("calendar", week)),
+        LOC(lang, mkname("calendar", month)),
+        gd.year,
+        LOC(lang, mkname("calendar", calendar_era())));
     return buf;
 }
 
@@ -393,9 +391,6 @@ summary *make_summary(void)
             plang->locale = lang;
         }
         ++plang->number;
-        f->nregions = 0;
-        f->num_total = 0;
-        f->money = 0;
         if (f->units) {
             s->factions++;
             /* Problem mit Monsterpartei ... */
@@ -434,11 +429,6 @@ summary *make_summary(void)
             s->peasants += rpeasants(r);
             s->peasantmoney += rmoney(r);
 
-            /* Einheiten Info. nregions darf nur einmal pro Partei
-             * incrementiert werden. */
-
-            for (u = r->units; u; u = u->next)
-                freset(u->faction, FFL_SELECT);
             for (u = r->units; u; u = u->next) {
                 int orace;
                 f = u->faction;
@@ -471,14 +461,8 @@ summary *make_summary(void)
                         if (aktskill > s->maxskill)
                             s->maxskill = aktskill;
                     }
-                    if (!fval(f, FFL_SELECT)) {
-                        f->nregions++;
-                        fset(f, FFL_SELECT);
-                    }
                 }
 
-                f->num_total += u->number;
-                f->money += get_money(u);
                 orace = (int)old_race(u_race(u));
                 if (orace >= 0) {
                     s->poprace[orace] += u->number;

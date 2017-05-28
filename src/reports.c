@@ -386,7 +386,7 @@ const char **illusion)
     if (illusion) {
         *illusion = NULL;
 
-        if (is_building_type(b->type, "illusioncastle")) {
+        if (b->attribs && is_building_type(b->type, "illusioncastle")) {
             const attrib *a = a_find(b->attribs, &at_icastle);
             if (a != NULL) {
                 *illusion = buildingtype(icastle_type(a), b, b->size);
@@ -1134,7 +1134,48 @@ void reports_done(void) {
     }
 }
 
-static selist *get_regions_distance(region * root, int radius)
+int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
+{
+    int n = 0, i;
+    
+    if (size>n) {
+        result[n++] = rc;
+        fset(rc, RF_MARK);
+    }
+    for (i = 0; i != n; ++i) {
+        region *r;
+        int dist;
+
+        r = result[i];
+        dist = distance(rc, r);
+        if (dist<radius) {
+            region *adj[MAXDIRECTIONS];
+            int d;
+
+            get_neighbours(r, adj);
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                r = adj[d];
+                if (r) {
+                    if (size > n) {
+                        if (!fval(r, RF_MARK) && dist < distance(rc, r)) {
+                            result[n++] = r;
+                            fset(r, RF_MARK);
+                        }
+                    }
+                    else {
+                        return -1;
+                    }
+                }
+            }
+        }
+    }
+    for (i = 0; i != n; ++i) {
+        freset(result[i], RF_MARK);
+    }
+    return n;
+}
+
+selist *get_regions_distance(region * root, int radius)
 {
     selist *ql, *rlist = NULL;
     int qi = 0;
@@ -1180,7 +1221,7 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = next[d];
             if (rn && rn->seen.mode<seen_neighbour) {
-                add_seen(rn, seen_neighbour);
+                rn->seen.mode = seen_neighbour;
                 if (first->index>rn->index) first = rn;
                 if (last->index<rn->index) last = rn;
             }
@@ -1192,9 +1233,8 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
 
 /** mark all regions seen by the lighthouse.
  */
-static void prepare_lighthouse(faction *f, region *r, int range)
-{
-    selist *ql, *rlist = get_regions_distance(r, range);
+static void prepare_lighthouse_ql(faction *f, selist *rlist) {
+    selist *ql;
     int qi;
 
     for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
@@ -1203,7 +1243,28 @@ static void prepare_lighthouse(faction *f, region *r, int range)
             add_seen_nb(f, rl, seen_lighthouse);
         }
     }
-    selist_free(rlist);
+}
+
+static void prepare_lighthouse(faction *f, region *r, int range)
+{
+    if (range > 3) {
+        selist *rlist = get_regions_distance(r, range);
+        prepare_lighthouse_ql(f, rlist);
+        selist_free(rlist);
+    }
+    else {
+        region *result[64];
+        int n, i;
+
+        n = get_regions_distance_arr(r, range, result, 64);
+        assert(n > 0 && n <= 64);
+        for (i = 0; i != n; ++i) {
+            region *rl = result[i];
+            if (!fval(rl->terrain, FORBIDDEN_REGION)) {
+                add_seen_nb(f, rl, seen_lighthouse);
+            }
+        }
+    }
 }
 
 void reorder_units(region * r)

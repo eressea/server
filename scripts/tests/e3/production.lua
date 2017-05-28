@@ -9,171 +9,129 @@ function setup()
 end
 
 local function create_faction(race)
-    return faction.create(race .. '@eressea.de', race, "de")
+    return faction.create(race, race .. '@example.com', "de")
 end
 
-function test_laen_needs_mine()
-    -- some resources require a building
-    -- i.e. you cannot create laen without a mine
-    local r = region.create(0, 0, "mountain")
-    local f = create_faction('human')
-    local u = unit.create(f, r, 1)
-
-    turn_begin()
-    r:set_resource('laen', 100)
-    u:add_order("MACHE Laen")
-    u:set_skill('mining', 7)
-    turn_process()
-    assert_equal(0, u:get_item('laen'))
-    assert_equal(100, r:get_resource('laen'))
-    assert_equal(1, f:count_msg_type("error104")) -- requires building
-
-    u.building = building.create(u.region, "mine")
-    u.building.working = true
-    u.building.size = 10
-    turn_process()
-    assert_equal(1, u:get_item('laen'))
-    assert_equal(99, r:get_resource('laen'))
-
-    turn_end()
-end
-
-function test_mine_laen_bonus()
-    -- some buildings grant a bonus on the production skill
-    -- i.e. a mine adds +1 to mining
+function test_greatbow_needs_elf()
+-- only elves can build a greatbow
     local r = region.create(0, 0, 'mountain')
     local f = create_faction('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
-    r:set_resource('laen', 100)
-    assert_equal(100, r:get_resource('laen'))
-    u:add_order("MACHE Laen")
-    u:set_skill('mining', 6)
-    u.building = building.create(u.region, "mine")
-    u.building.working = true
-    u.building.size = 10
-    u.number = 2
-    turn_process() -- T6 is not enough for laen
-    assert_equal(0, u:get_item('laen'))
-    assert_equal(100, r:get_resource('laen'))
-    assert_equal(1, f:count_msg_type("manufacture_skills"))
+    u:set_skill('weaponsmithing', 5)
+    u:add_item('mallorn', 2)
+    u:add_order("MACHE Elfenbogen")
+    turn_process() -- humans cannot do it
+    assert_equal(1, f:count_msg_type("error117"))
+    assert_equal(0, u:get_item('greatbow'))
+    assert_equal(2, u:get_item('mallorn'))
 
-    u:set_skill('mining', 13)
-    turn_process() -- T13 is enough, the +1 produces one extra Laen
-    assert_equal(4, u:get_item('laen')) -- FAIL (3)
-    assert_equal(96, r:get_resource('laen'))
-
-    turn_end()
+    u.race = 'elf'
+    turn_process() -- but elves can
+    assert_equal(1, u:get_item('greatbow'))
+    assert_equal(0, u:get_item('mallorn'))
 end
 
-function test_mine_iron_bonus()
-    -- some buildings grant a bonus on the production skill
-    -- i.e. a mine adds +1 to mining iron
-    --
+function test_troll_no_quarrying_bonus()
+-- Trolle kriegen keinen Rohstoffbonus wie in E2
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
+    local f = create_faction('troll')
+    local u = unit.create(f, r, 1)
+
+    turn_begin()
+    r:set_resource("stone", 100)
+    u:set_skill('quarrying', 2) -- +2 Rassenbonus
+    u:add_order("MACHE Steine")
+    turn_process()
+    assert_equal(4, u:get_item('stone'))
+    assert_equal(96, r:get_resource('stone'))
+end
+
+function test_dwarf_no_mining_bonus()
+-- E3: Zwerge verlieren den Eisenabbaubonus
+    local r = region.create(0, 0, 'mountain')
+    local f = create_faction('dwarf')
     local u = unit.create(f, r, 1)
 
     turn_begin()
     r:set_resource('iron', 100)
-    assert_equal(100, r:get_resource('iron'))
-    u:add_order("MACHE Eisen")
-    u:set_skill('mining', 1)
-    u.building = building.create(u.region, "mine")
-    u.building.working = false
-    u.building.size = 10
-    u.number = 2
-    turn_process() -- iron can be made without a working mine
+    u:set_skill('mining', 8) -- +2 skill bonus
+    u:add_order('MACHE Eisen')
+    turn_process()
+    assert_equal(10, u:get_item('iron'))
+    assert_equal(90, r:get_resource('iron'))
+end
+
+function test_dwarf_towershield()
+-- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
+-- und Repetierarmbrüste bauen.
+    local r = region.create(0, 0, 'plain')
+    local f = create_faction('human')
+    local u = unit.create(f, r, 1)
+
+    turn_begin()
+    u:set_skill('armorer', 4)
+    u:add_item('iron', 1)
+    u:add_order("MACHE Turmschild")
+    turn_process() -- humans cannot do it
+    assert_equal(1, f:count_msg_type("error117"))
+    assert_equal(0, u:get_item('towershield'))
+    assert_equal(1, u:get_item('iron'))
+
+    u.race = 'dwarf'
+    u:set_skill('armorer', 2) -- dwarf has bonus +2
+    turn_process() -- but dwarves can
+    assert_equal(1, u:get_item('towershield'))
+    assert_equal(0, u:get_item('iron'))
+    
+end
+
+function test_dwarf_scale()
+-- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
+-- und Repetierarmbrüste bauen.
+    local r = region.create(0, 0, 'plain')
+    local f = create_faction('human')
+    local u = unit.create(f, r, 1)
+
+    turn_begin()
+    u:set_skill('armorer', 5)
+    u:add_item('iron', 2)
+    u:add_order("MACHE Schuppenpanzer")
+    turn_process() -- humans cannot do it
+    assert_equal(1, f:count_msg_type("error117"))
+    assert_equal(0, u:get_item('scale'))
     assert_equal(2, u:get_item('iron'))
-    assert_equal(98, r:get_resource('iron'))
 
-    u.building.working = true
-    turn_process()
-    assert_equal(6, u:get_item('iron'))
-    assert_equal(96, r:get_resource('iron'))
-
-    turn_end()
+    u.race = 'dwarf'
+    u:set_skill('armorer', 3) -- dwarf has bonus +2
+    turn_process() -- but dwarves can
+    assert_equal(1, u:get_item('scale'))
+    assert_equal(0, u:get_item('iron'))
 end
 
-function test_quarry_bonus()
-    -- a quarry grants +1 to quarrying, and saves 50% stone
-    --
-    local r = region.create(0, 0, 'mountain')
+function test_dwarf_rep_xbow()
+-- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
+-- und Repetierarmbrüste bauen.
+    local r = region.create(0, 0, 'plain')
     local f = create_faction('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
-    r:set_resource('stone', 100)
-    assert_equal(100, r:get_resource('stone'))
-    u:add_order("MACHE Stein")
-    u:set_skill('quarrying', 1)
-    u.number = 2
-    u.building = building.create(u.region, 'quarry')
-    u.building.working = false
-    u.building.size = 10
-    turn_process()
-    assert_equal(2, u:get_item('stone'))
-    assert_equal(98, r:get_resource('stone'))
+    u:set_skill('weaponsmithing', 5)
+    u:add_item('iron', 1)
+    u:add_item('log', 1)
+    u:add_order("MACHE Repetierarmbrust")
+    turn_process() -- humans cannot do it
+    assert_equal(1, f:count_msg_type("error117"))
+    assert_equal(0, u:get_item('rep_crossbow'))
+    assert_equal(1, u:get_item('iron'))
+    assert_equal(1, u:get_item('log'))
 
-    u.building.working = true
-    turn_process()
-    assert_equal(6, u:get_item('stone'))
-    assert_equal(96, r:get_resource('stone'))
-
-    turn_end()
-end
-
-function test_smithy_bonus_iron()
--- a smithy adds +1 to weaponsmithing, and saves 50% iron
-    local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
-    local u = unit.create(f, r, 1)
-
-    turn_begin()
-    u.building = building.create(u.region, 'smithy')
-    u.building.working = false
-    u.building.size = 10
-    u:set_skill('weaponsmithing', 5) -- needs 3
-    u:add_item('iron', 100)
-    u:add_order("MACHE Schwert")
-    turn_process() -- building disabled
-    assert_equal(1, u:get_item('sword'))
-    assert_equal(99, u:get_item('iron'))
-
-    u.building.working = true
-    turn_process() -- building active
-    assert_equal(3, u:get_item('sword'))
-    assert_equal(98, u:get_item('iron'))
-
-    turn_end()
-end
-
-function test_smithy_bonus_mixed()
--- a smithy adds +1 to weaponsmithing, and saves 50% iron
--- it does not save any other resource, though.
-    local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
-    local u = unit.create(f, r, 1)
-
-    turn_begin()
-    u.building = building.create(u.region, 'smithy')
-    u.building.working = false
-    u.building.size = 10
-    u:set_skill('weaponsmithing', 5) -- needs 3
-    u:add_item('iron', 100)
-    u:add_item('log', 100)
-    u:add_order("MACHE Kriegsaxt")
-    turn_process() -- building disabled
-    assert_equal(1, u:get_item('axe'))
-    assert_equal(99, u:get_item('iron'))
-    assert_equal(99, u:get_item('log'))
-
-    u.building.working = true
-    turn_process() -- building active
-    assert_equal(3, u:get_item('axe'))
-    assert_equal(98, u:get_item('iron'))
-    assert_equal(97, u:get_item('log'))
-
-    turn_end()
+    u.race = 'dwarf'
+    u:set_skill('weaponsmithing', 3) -- dwarf has bonus +2
+    turn_process() -- but dwarves can
+    assert_equal(1, u:get_item('rep_crossbow'))
+    assert_equal(0, u:get_item('iron'))
+    assert_equal(0, u:get_item('log'))
 end

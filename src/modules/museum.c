@@ -497,9 +497,10 @@ void register_museum(void)
     at_register(&at_museumgivebackcookie);
     at_register(&at_museumgiveback);
 
-    register_item_use(use_museumticket, "use_museumticket");
-    register_item_use(use_museumkey, "use_museumkey");
     register_item_use(use_museumexitticket, "use_museumexitticket");
+    register_item_use(use_museumticket, "use_museumticket");
+    register_item_use(use_museumkey, "use_questkey1");
+    register_item_use(use_museumkey, "use_questkey2");
 }
 
 #endif

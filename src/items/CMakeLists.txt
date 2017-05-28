@@ -5,7 +5,6 @@ xerewards.test.c
 )
 
 SET(_FILES
-demonseye.c
 speedsail.c
 weapons.c
 xerewards.c

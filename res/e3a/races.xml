@@ -71,7 +71,11 @@
     <familiar race="ghost"/>
   </race>
 
-  <race name="halfling" defensemodifier="1" magres="5" maxaura="1.0" regaura="1.0" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="halfling" defensemodifier="1" magres="5" maxaura="1.0"
+  regaura="1.0" recruitcost="100" maintenance="10" weight="1000"
+  capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
+  unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
+  giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <param name="other_race" value="dwarf"/>
     <param name="luxury_trade" value="600"/>
@@ -116,7 +120,11 @@
     <familiar race="ghost"/>
   </race>
 
-  <race name="elf" magres="10" maxaura="1.0" regaura="1.1" recruitcost="200" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="elf" magres="10" maxaura="1.0" regaura="1.1"
+  recruitcost="200" maintenance="10" weight="1000" capacity="540"
+  speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
+  unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
+  giveunit="yes" getitem="yes" equipment="yes" >
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="armorer" modifier="-1"/>
     <skill name="bow" modifier="2"/>
@@ -156,7 +164,11 @@
     <familiar race="rat"/>
   </race>
 
-  <race name="dwarf" magres="5" maxaura="1.0" regaura="0.9" recruitcost="240" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="dwarf" magres="5" maxaura="1.0" regaura="0.9"
+  recruitcost="240" maintenance="10" weight="1000" capacity="540"
+  speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
+  unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
+  giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-1"/>

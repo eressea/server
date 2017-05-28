@@ -39,7 +39,7 @@ extern "C" {
     struct storage;
     struct gamedata;
     struct rawmaterial_type;
-    struct resource_limit;
+    struct resource_mod;
 
     typedef struct item {
         struct item *next;
@@ -68,8 +68,6 @@ extern "C" {
 
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
-    typedef int(*rtype_uget) (const struct unit * user,
-        const struct resource_type * rtype);
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
     typedef struct resource_type {
         /* --- constants --- */
@@ -77,12 +75,10 @@ extern "C" {
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
-        rtype_uget uget;
         rtype_name name;
         struct rawmaterial_type *raw;
-        struct resource_limit  *limit;
+        struct resource_mod *modifiers;
         /* --- pointers --- */
-        struct attrib *attribs;
         struct item_type *itype;
         struct potion_type *ptype;
         struct luxury_type *ltype;
@@ -94,11 +90,6 @@ extern "C" {
     const resource_type *findresourcetype(const char *name,
         const struct locale *lang);
 
-    /* resource-limits for regions */
-#define RMF_SKILL         0x01  /* int, bonus on resource production skill */
-#define RMF_SAVEMATERIAL  0x02  /* fraction (sa[0]/sa[1]), multiplier on resource usage */
-#define RMF_REQUIREDBUILDING 0x04       /* building, required to build */
-
     /* bitfield values for item_type::flags */
 #define ITF_NONE             0x0000
 #define ITF_HERB             0x0001     /* this item is a herb */
@@ -107,6 +98,7 @@ extern "C" {
 #define ITF_BIG              0x0008     /* big item, e.g. does not fit in a bag of holding */
 #define ITF_ANIMAL           0x0010     /* an animal */
 #define ITF_VEHICLE          0x0020     /* a vehicle, drawn by two animals */
+#define ITF_CANUSE           0x0040     /* can be used with use_item_fun callout */
 
     /* error codes for item_type::use */
 #define ECUSTOM   -1
@@ -120,17 +112,10 @@ extern "C" {
         unsigned int flags;
         int weight;
         int capacity;
+        int mask_allow;
+        int mask_deny;
         struct construction *construction;
         char *_appearance[2];       /* wie es f�r andere aussieht */
-        /* --- functions --- */
-        bool(*canuse) (const struct unit * user,
-            const struct item_type * itype);
-        int(*use) (struct unit * user, const struct item_type * itype, int amount,
-        struct order * ord);
-        int(*useonother) (struct unit * user, int targetno,
-            const struct item_type * itype, int amount, struct order * ord);
-        int(*give) (struct unit * src, struct unit * dest,
-            const struct item_type * itm, int number, struct order * ord);
         int score;
     } item_type;
 
@@ -320,8 +305,6 @@ extern "C" {
     void register_item_give(int(*foo) (struct unit *, struct unit *,
         const struct item_type *, int, struct order *), const char *name);
     void register_item_use(int(*foo) (struct unit *,
-        const struct item_type *, int, struct order *), const char *name);
-    void register_item_useonother(int(*foo) (struct unit *, int,
         const struct item_type *, int, struct order *), const char *name);
 
     void free_resources(void);

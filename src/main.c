@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2017, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -45,32 +45,52 @@ static const char *inifile = "eressea.ini";
 static int memdebug = 0;
 static int verbosity = 1;
 
-static void load_inifile(dictionary * d)
+static void load_inifile(void)
 {
-    const char *reportdir = reportpath();
-    const char *datadir = datapath();
-    const char *basedir = basepath();
     const char *str;
 
-    assert(d);
-
-    str = iniparser_getstring(d, "game:base", basedir);
-    if (str != basedir) {
+    str = config_get("game.base");
+    if (str) {
         set_basepath(str);
     }
-    str = iniparser_getstring(d, "game:report", reportdir);
-    if (str != reportdir) {
+    str = config_get("game.report");
+    if (str) {
         set_reportpath(str);
     }
-    str = iniparser_getstring(d, "game:data", datadir);
-    if (str != datadir) {
+    str = config_get("game.data");
+    if (str) {
         set_datapath(str);
     }
 
-    lomem = iniparser_getint(d, "game:lomem", lomem) ? 1 : 0;
-
-    verbosity = iniparser_getint(d, "game:verbose", 2);
+    lomem = config_get_int("game.lomem", lomem) ? 1 : 0;
+    verbosity = config_get_int("game.verbose", 2);
+    memdebug = config_get_int("game.memcheck", memdebug);
+#ifdef USE_CURSES
+    /* only one value in the [editor] section */
+    force_color = config_get_int("editor.color", force_color);
+    gm_codepage = config_get_int("editor.codepage", gm_codepage);
+#endif
 }
+
+static const char * valid_keys[] = {
+    "game.id",
+    "game.name",
+    "game.start",
+    "game.locale",
+    "game.verbose",
+    "game.report",
+    "game.lomem",
+    "game.memcheck",
+    "game.email",
+    "game.mailcmd",
+    "game.era",
+    "game.sender",
+    "editor.color",
+    "editor.codepage",
+    "editor.population.",
+    "lua.",
+    NULL
+};
 
 static dictionary *parse_config(const char *filename)
 {
@@ -87,15 +107,8 @@ static dictionary *parse_config(const char *filename)
         d  = iniparser_load(filename);        
     }
     if (d) {
-        load_inifile(d);
-        config_set_from(d);
-
-        memdebug = iniparser_getint(d, "game:memcheck", memdebug);
-#ifdef USE_CURSES
-        /* only one value in the [editor] section */
-        force_color = iniparser_getint(d, "editor:color", force_color);
-        gm_codepage = iniparser_getint(d, "editor:codepage", gm_codepage);
-#endif
+        config_set_from(d, valid_keys);
+        load_inifile();
     }
     str = config_get("game.locales");
     make_locales(str ? str : "de,en");
@@ -152,7 +165,7 @@ static int verbosity_to_flags(int verbosity) {
     return flags;
 }
 
-static int parse_args(int argc, char **argv, int *exitcode)
+static int parse_args(int argc, char **argv)
 {
     int i;
     int log_stderr = LOG_CPERROR;
@@ -165,10 +178,10 @@ static int parse_args(int argc, char **argv, int *exitcode)
         }
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
-                printf("\n%s PBEM host\n"
-                    "Copyright (C) 1996-2005 C. Schlittchen, K. Zedel, E. Rehling, H. Peters.\n\n"
-                    "Compilation: " __DATE__ " at " __TIME__ "\nVersion: %s\n\n",
-                    game_name(), eressea_version());
+                printf("Eressea version %s, "
+	            "Copyright (C) 2017 Enno Rehling et al.\n",
+                    eressea_version());
+	return 1;
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
@@ -216,7 +229,6 @@ static int parse_args(int argc, char **argv, int *exitcode)
                 usage(argv[0], NULL);
                 return 1;
             default:
-                *exitcode = -1;
                 usage(argv[0], argi);
                 return 1;
             }
@@ -287,8 +299,10 @@ int main(int argc, char **argv)
     dictionary *d = 0;
     setup_signal_handler();
     /* parse arguments again, to override ini file */
-    parse_args(argc, argv, &err);
-
+    err = parse_args(argc, argv);
+    if (err!=0) {
+        return (err>0) ? 0 : err;
+    }
     d = parse_config(inifile);
     if (!d) {
         log_error("could not open ini configuration %s\n", inifile);

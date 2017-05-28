@@ -160,7 +160,7 @@ void score(void)
         faction *f;
         fwrite(utf8_bom, 1, 3, scoreFP);
         for (f = factions; f; f = f->next)
-            if (!fval(f, FFL_NPC) && f->num_total != 0) {
+            if (!fval(f, FFL_NPC) && f->num_people != 0) {
                 char score[32];
                 write_score(score, sizeof(score), f->score);
                 fprintf(scoreFP, "%s ", score);
@@ -195,7 +195,7 @@ void score(void)
                     if (f->alliance && f->alliance == a) {
                         alliance_factions++;
                         alliance_score += f->score;
-                        alliance_number += f->num_total;
+                        alliance_number += f->num_people;
                         if (token != NULL) {
                             unit *u = f->units;
                             while (u != NULL) {

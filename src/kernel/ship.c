@@ -37,13 +37,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
+#include <util/log.h>
 #include <util/umlaut.h>
-#include <selist.h>
 #include <util/xml.h>
 
 #include <attributes/movement.h>
 
 #include <storage.h>
+#include <selist.h>
+#include <critbit.h>
 
 /* libc includes */
 #include <assert.h>
@@ -51,7 +53,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-selist *shiptypes = NULL;
+selist *shiptypes = NULL; /* do not use this list for searching*/
+static critbit_tree cb_shiptypes; /* use this trie instead */
 
 static local_names *snames;
 
@@ -60,9 +63,7 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
     local_names *sn = snames;
     variant var;
 
-    while (sn) {
-        if (sn->lang == lang)
-            break;
+    while (sn && sn->lang != lang) {
         sn = sn->next;
     }
     if (!sn) {
@@ -89,29 +90,43 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
 static ship_type *st_find_i(const char *name)
 {
-    selist *ql;
-    int qi;
+    const char *match;
+    ship_type *st = NULL;
 
-    for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
-        ship_type *stype = (ship_type *)selist_get(ql, qi);
-        if (strcmp(stype->_name, name) == 0) {
-            return stype;
-        }
+    match = cb_find_str(&cb_shiptypes, name);
+    if (match) {
+        cb_get_kv(match, &st, sizeof(st));
     }
-    return NULL;
+    return st;
 }
 
 const ship_type *st_find(const char *name) {
-    return st_find_i(name);
+    ship_type *st = st_find_i(name);
+    if (!st) {
+        log_warning("st_find: could not find ship '%s'\n", name);
+    }
+    return st;
+}
+
+static void st_register(ship_type *stype) {
+    size_t len;
+    char data[64];
+
+    selist_push(&shiptypes, (void *)stype);
+
+    len = cb_new_kv(stype->_name, strlen(stype->_name), &stype, sizeof(stype), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_shiptypes, data, len);
 }
 
 ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
+    assert(!snames);
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = strdup(name);
         st->storm = 1.0;
-        selist_push(&shiptypes, (void *)st);
+        st_register(st);
     }
     return st;
 }
@@ -234,8 +249,9 @@ void remove_ship(ship ** slist, ship * sh)
 
 void free_ship(ship * s)
 {
-    while (s->attribs)
+    while (s->attribs) {
         a_remove(&s->attribs, s->attribs);
+    }
     free(s->name);
     free(s->display);
     free(s);
@@ -250,6 +266,7 @@ static void free_shiptype(void *ptr) {
 }
 
 void free_shiptypes(void) {
+    cb_clear(&cb_shiptypes);
     selist_foreach(shiptypes, free_shiptype);
     selist_free(shiptypes);
     shiptypes = 0;

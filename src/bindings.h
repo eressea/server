@@ -18,6 +18,7 @@ extern "C" {
     struct _dictionary_;
     struct selist;
 
+    int tolua_toid(struct lua_State *L, int idx, int def);
     int tolua_sqlite_open(struct lua_State *L);
     int tolua_bindings_open(struct lua_State *L, const struct _dictionary_ *d);
     int tolua_itemlist_next(struct lua_State *L);

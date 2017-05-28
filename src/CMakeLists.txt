@@ -187,43 +187,52 @@ target_link_libraries(eressea
   ${INIPARSER_LIBRARIES}
 )
 
+add_executable(convert convert.c)
+target_link_libraries(convert
+  game
+  ${LUA_MATH_LIBRARY}
+  ${STORAGE_LIBRARIES}
+  ${CLIBS_LIBRARIES}
+  ${INIPARSER_LIBRARIES}
+)
+
 set(TESTS_SRC
-  monsters.test.c
-  names.test.c
-  donations.test.c
-  wormhole.test.c
-  alchemy.test.c
-  guard.test.c
   test_eressea.c
   tests.c
+  alchemy.test.c
   battle.test.c
-  vortex.test.c
-  tests.test.c
-  volcano.test.c
-  reports.test.c
+  calendar.test.c
   creport.test.c
-  report.test.c
-  summary.test.c
-  travelthru.test.c
   direction.test.c
+  donations.test.c
   economy.test.c
+  give.test.c
+  guard.test.c
   json.test.c
   keyword.test.c
-  give.test.c
   laws.test.c
   lighthouse.test.c
   magic.test.c
   market.test.c
   monsters.test.c
   move.test.c
+  names.test.c
   piracy.test.c
   prefix.test.c
   renumber.test.c
+  reports.test.c
+  report.test.c
+  summary.test.c
   skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
+  tests.test.c
+  travelthru.test.c
   upkeep.test.c
+  volcano.test.c
+  vortex.test.c
+  wormhole.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
@@ -268,6 +277,7 @@ endif(CURSES_FOUND)
 if (LIBXML2_FOUND)
 include_directories (${LIBXML2_INCLUDE_DIR})
 target_link_libraries(eressea ${LIBXML2_LIBRARIES})
+target_link_libraries(convert ${LIBXML2_LIBRARIES})
 target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
 add_definitions(-DUSE_LIBXML2)
 endif (LIBXML2_FOUND)

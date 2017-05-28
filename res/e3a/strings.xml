@@ -38,12 +38,6 @@
     <text locale="en">adamantium plates</text>
   </string>
 
-  <!--Fort-Ausbaustufen -->
-  <string name="calendar::thirdage">
-    <text locale="de">des dritten Zeitalters</text>
-    <text locale="en">the third age</text>
-  </string>
-
   <string name="packice">
     <text locale="de">Packeis</text>
     <text locale="en">fast ice</text>
@@ -87,6 +81,7 @@
     <text locale="en">repeating crossbows</text>
   </string>
 
+  <!--Fort-Ausbaustufen -->
   <string name="scaffolding">
     <text locale="de">Gerüst</text>
     <text locale="en">scaffolding</text>
@@ -103,6 +98,7 @@
     <text locale="de">Wache</text>
     <text locale="en">watch</text>
   </string>
+
   <string name="market">
     <text locale="de">Marktplatz</text>
     <text locale="en">marketplace</text>
@@ -210,7 +206,7 @@
     <string name="concealing_aura">
       <text locale="de">Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Zeit vor den Blicken anderer verschleiern. Der Zauber schützt nicht vor Dieben und Spionen.</text>
       <text locale="en">This spell will hide the whole equipment of a target unit from the looks of others. It will not protect against thieves or spies.</text>
-	</string>
+    </string>
     <string name="raindance">
       <text locale="de">Durch dieses uralte Tanzritual ruft der Zauberkundige die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge einiger Bauern der Region bis der Regen wieder nachlässt.</text>
       <text locale="en">This ancient rite calls upon the forces of life and fertility. For the next few weeks, the peasants' harvest will be extraordinary good.</text>

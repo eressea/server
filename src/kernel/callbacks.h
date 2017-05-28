@@ -16,26 +16,31 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-#include "matmod.h"
+#ifndef H_KRNL_CALLBACKS_H
+#define H_KRNL_CALLBACKS_H
 
-#include <util/attrib.h>
-#include <stddef.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-attrib_type at_matmod = {
-    "matmod",
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    ATF_PRESERVE
-};
+    struct castorder;
+    struct order;
+    struct unit;
+    struct region;
+    struct item_type;
+    struct resource_type;
 
-attrib *make_matmod(mm_fun function)
-{
-    attrib *a = a_new(&at_matmod);
-    a->data.f = (void(*)(void))function;
-    return a;
+    struct callback_struct {
+        int (*cast_spell)(struct castorder *co, const char *fname);
+        int (*use_item)(struct unit *u, const struct item_type *itype,
+            int amount, struct order *ord);
+        void(*produce_resource)(struct region *, const struct resource_type *, int);
+        int(*limit_resource)(const struct region *, const struct resource_type *);
+    };
+
+    extern struct callback_struct callbacks;
+#ifdef __cplusplus
 }
+#endif
+#endif /* H_KRNL_CALLBACKS_H */
+

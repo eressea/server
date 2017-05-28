@@ -11,10 +11,11 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "resources.h"
 
 /* kernel includes */
+#include <kernel/config.h>
+#include <kernel/callbacks.h>
 #include "build.h"
 #include "item.h"
 #include "region.h"
@@ -193,16 +194,6 @@ struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
     return rm;
 }
 
-struct rawmaterial_type *rmt_find(const char *str)
-{
-    resource_type *rtype = rt_find(str);
-    if (!rtype && strncmp(str, "rm_", 3) == 0) {
-        rtype = rt_find(str+3);
-    }
-    assert(rtype);
-    return rtype ? rtype->raw : NULL;
-}
-
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 {
     return rtype->raw;
@@ -221,4 +212,21 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype)
     rmtype->use = use_default;
     rmtype->visible = visible_default;
     return rmtype;
+}
+
+int limit_resource(const struct region *r, const resource_type *rtype)
+{
+    assert(!rtype->raw);
+    if (callbacks.limit_resource) {
+        return callbacks.limit_resource(r, rtype);
+    }
+    return -1;
+}
+
+void produce_resource(struct region *r, const struct resource_type *rtype, int amount)
+{
+    assert(!rtype->raw);
+    if (callbacks.produce_resource) {
+        callbacks.produce_resource(r, rtype, amount);
+    }
 }

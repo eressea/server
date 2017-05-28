@@ -33,6 +33,8 @@ without prior permission by the authors of Eressea.
 
 /* game modules */
 #include "prefix.h"
+#include "move.h"
+#include "calendar.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -337,11 +339,6 @@ static void json_building(cJSON *json, building_type *bt) {
             }
             break;
         case cJSON_String:
-            if (strcmp(child->string, "name") == 0) {
-                bt->name = (const char *(*)(const struct building_type *,
-                    const struct building *, int))get_function(child->valuestring);
-                break;
-            }
             log_error("building %s contains unknown attribute %s", json->string, child->string);
             break;
         default:
@@ -588,17 +585,11 @@ static void json_spells(cJSON *json) {
     for (child = json->child; child; child = child->next) {
         if (child->type == cJSON_Object) {
             spell *sp;
-            cJSON * item = cJSON_GetObjectItem(child, "index");
-            sp = create_spell(child->string, item ? item->valueint : 0);
+            cJSON * item;
+            sp = create_spell(child->string);
             for (item = child->child; item; item = item->next) {
                 if (strcmp(item->string, "index") == 0) {
                     continue;
-                }
-                else if (strcmp(item->string, "cast") == 0) {
-                    sp->cast = (spell_f)get_function(item->valuestring);
-                }
-                else if (strcmp(item->string, "fumble") == 0) {
-                    sp->fumble = (fumble_f)get_function(item->valuestring);
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
                     sp->syntax = strdup(item->valuestring);
@@ -685,6 +676,74 @@ static void json_direction(cJSON *json, struct locale *lang) {
             }
             else {
                 log_error("invalid type %d for direction `%s`", child->type, child->string);
+            }
+        }
+    }
+}
+
+static void json_calendar(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error("calendar is not an object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        if (strcmp(child->string, "start") == 0) {
+            config_set_int("game.start", child->valueint);
+        }
+        else if (strcmp(child->string, "weeks") == 0) {
+            cJSON *entry;
+            int i;
+            if (child->type != cJSON_Array) {
+                log_error("calendar.weeks is not an array: %d", json->type);
+                return;
+            }
+            weeks_per_month = cJSON_GetArraySize(child);
+            free(weeknames);
+            weeknames = malloc(sizeof(char *) * weeks_per_month);
+            for (i = 0, entry = child->child; entry; entry = entry->next, ++i) {
+                if (entry->type == cJSON_String) {
+                    weeknames[i] = strdup(entry->valuestring);
+                }
+                else {
+                    log_error("calendar.weeks[%d] is not a string: %d", i, json->type);
+                    free(weeknames);
+                    weeknames = NULL;
+                    return;
+                }
+            }
+            assert(i == weeks_per_month);
+            free(weeknames2);
+            weeknames2 = malloc(sizeof(char *) * weeks_per_month);
+            for (i = 0; i != weeks_per_month; ++i) {
+                weeknames2[i] = malloc(strlen(weeknames[i]) + 3);
+                sprintf(weeknames2[i], "%s_d", weeknames[i]);
+            }
+        }
+        else if (strcmp(child->string, "months") == 0) {
+            cJSON *jmonth;
+            int i;
+            if (child->type != cJSON_Array) {
+                log_error("calendar.seasons is not an array: %d", json->type);
+                return;
+            }
+            free(month_season);
+            month_season = NULL;
+            free(storms);
+            months_per_year = cJSON_GetArraySize(child);
+            storms = malloc(sizeof(int) * months_per_year);
+            month_season = malloc(sizeof(int) * months_per_year);
+            for (i = 0, jmonth = child->child; jmonth; jmonth = jmonth->next, ++i) {
+                if (jmonth->type == cJSON_Object) {
+                    storms[i] = cJSON_GetObjectItem(jmonth, "storm")->valueint;
+                    month_season[i] = cJSON_GetObjectItem(jmonth, "season")->valueint;
+                }
+                else {
+                    log_error("calendar.months[%d] is not an object: %d", i, json->type);
+                    free(storms);
+                    storms = NULL;
+                    return;
+                }
             }
         }
     }
@@ -895,6 +954,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "strings") == 0) {
             json_strings(child);
+        }
+        else if (strcmp(child->string, "calendar") == 0) {
+            json_calendar(child);
         }
         else if (strcmp(child->string, "directions") == 0) {
             json_directions(child);

@@ -37,6 +37,7 @@ extern "C" {
         /* do not access this data: */
         struct order_data *data;
         bool _persistent;
+        bool _noerror;
     } order;
 
     /* constructor */

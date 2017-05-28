@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/timeout.h>
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/bsdstring.h>
@@ -243,7 +244,7 @@ static faction *factionorders(void)
 
          /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
           * incrementiert wird. */
-        f->lastorders = global.data_turn + 1;
+        f->lastorders = turn + 1;
 
     }
     else {
@@ -646,6 +647,7 @@ unit *read_unit(struct gamedata *data)
     }
     else {
         u = calloc(sizeof(unit), 1);
+        assert_alloc(u);
         u->no = n;
         uhash(u);
     }
@@ -655,10 +657,7 @@ unit *read_unit(struct gamedata *data)
     if (f != u->faction) {
         u_setfaction(u, f);
     }
-    if (u->faction) {
-        ++u->faction->no_units;
-    }
-    else {
+    if (!u->faction) {
         log_error("unit %s has faction == NULL", itoa36(u->no));
         return 0;
     }
@@ -1022,7 +1021,9 @@ static region *readregion(struct gamedata *data, int x, int y)
         if (!r->land->demands) {
             fix_demand(r);
         }
-        read_items(data->store, &r->land->items);
+        if (data->version < NOLANDITEM_VERSION) {
+            read_items(data->store, NULL);
+        }
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
             region_set_morale(r, MAX(0, (short)n), -1);
@@ -1096,7 +1097,6 @@ void writeregion(struct gamedata *data, const region * r)
             WRITE_INT(data->store, demand->value);
         }
         WRITE_TOK(data->store, "end");
-        write_items(data->store, r->land->items);
         WRITE_SECTION(data->store);
 #if RELEASE_VERSION>=REGIONOWNER_VERSION
         WRITE_INT(data->store, region_get_morale(r));
@@ -1122,9 +1122,7 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
     ally *sf;
 
     state &= ~HELP_OBSERVE;
-#ifndef REGIONOWNERS
     state &= ~HELP_TRAVEL;
-#endif
     state &= HelpMask();
 
     if (state == 0)
@@ -1637,7 +1635,6 @@ int read_game(gamedata *data) {
     }
     read_attribs(data, &global.attribs, NULL);
     READ_INT(store, &turn);
-    global.data_turn = turn;
     log_debug(" - reading turn %d", turn);
     rng_init(turn);
     READ_INT(store, NULL);          /* max_unique_id = ignore */

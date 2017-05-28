@@ -19,6 +19,7 @@
 
 /* kernel includes */
 #include <kernel/ally.h>
+#include <kernel/build.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -169,17 +170,35 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     return n;
 }
 
+static void
+give_horses(unit * s, const item_type * itype, int n)
+{
+    region *r = s->region;
+    if (r->land) {
+        rsethorses(r, rhorses(r) + n);
+    }
+}
+
+static void
+give_money(unit * s, const item_type * itype, int n)
+{
+    region *r = s->region;
+    if (r->land) {
+        rsetmoney(r, rmoney(r) + n);
+    }
+}
+
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest,
 struct order *ord)
 {
     short error = 0;
-    int n, r;
+    int n, delta;
 
     assert(itype != NULL);
     n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
     n = MIN(want, n);
-    r = n;
+    delta = n;
     if (dest && src->faction != dest->faction
         && src->faction->age < GiveRestriction()) {
         if (ord != NULL) {
@@ -200,18 +219,19 @@ struct order *ord)
     else if (itype->flags & ITF_CURSED) {
         error = 25;
     }
-    else if (itype->give == NULL || itype->give(src, dest, itype, n, ord) != 0) {
+    else {
         int use = use_pooled(src, item2resource(itype), GET_SLACK, n);
+
         if (use < n)
             use +=
             use_pooled(src, item2resource(itype), GET_POOLED_SLACK,
             n - use);
         if (dest) {
-            r = give_quota(src, dest, itype, n);
-            i_change(&dest->items, itype, r);
+            delta = give_quota(src, dest, itype, n);
+            i_change(&dest->items, itype, delta);
 #ifdef RESERVE_GIVE
 #ifdef RESERVE_DONATIONS
-            change_reservation(dest, itype, r);
+            change_reservation(dest, itype, delta);
 #else
             if (src->faction == dest->faction) {
                 change_reservation(dest, item2resource(itype), r);
@@ -221,14 +241,23 @@ struct order *ord)
 #if MUSEUM_MODULE && defined(TODO)
             /* TODO: use a trigger for the museum warden! */
             if (a_find(dest->attribs, &at_warden)) {
-                warden_add_give(src, dest, itype, r);
+                warden_add_give(src, dest, itype, delta);
             }
 #endif
-            handle_event(dest->attribs, "receive", src);
         }
-        handle_event(src->attribs, "give", dest);
+        else {
+            /* return horses to the region */
+            if (itype->construction && itype->flags & ITF_ANIMAL) {
+                if (itype->construction->skill == SK_HORSE_TRAINING) {
+                    give_horses(src, itype, n);
+                }
+            }
+            else if (itype->rtype == get_resourcetype(R_SILVER)) {
+                give_money(src, itype, n);
+            }
+        }
     }
-    add_give(src, dest, n, r, item2resource(itype), ord, error);
+    add_give(src, dest, n, delta, item2resource(itype), ord, error);
     if (error)
         return -1;
     return 0;
@@ -502,6 +531,23 @@ void give_unit(unit * u, unit * u2, order * ord)
             }
         }
         return;
+    } else {
+        int err = checkunitnumber(u2->faction, 1);
+        if (err) {
+            if (err == 1) {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord,
+                        "too_many_units_in_alliance",
+                        "allowed", rule_alliance_limit()));
+            }
+            else {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord,
+                        "too_many_units_in_faction",
+                        "allowed", rule_faction_limit()));
+            }
+            return;
+        }
     }
 
     if (!alliedunit(u2, u->faction, HELP_GIVE) && ucontact(u2, u) == 0) {

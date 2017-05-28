@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include "spellbook.h"
 #include "calendar.h"
 #include "prefix.h"
+#include "move.h"
 
 #include "vortex.h"
 
@@ -120,6 +121,72 @@ static xmlChar *xml_cleanup_string(xmlChar * str)
     return str;
 }
 
+static resource_mod * xml_readmodifiers(xmlXPathObjectPtr result, xmlNodePtr node) {
+    /* reading eressea/resources/resource/modifier */
+    if (result->nodesetval != NULL && result->nodesetval->nodeNr > 0) {
+        int k;
+        resource_mod * modifiers =
+            calloc(result->nodesetval->nodeNr + 1, sizeof(resource_mod));
+        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+            xmlNodePtr node = result->nodesetval->nodeTab[k];
+            xmlChar *propValue;
+            building_type *btype = NULL;
+            const race *rc = NULL;
+
+            propValue = xmlGetProp(node, BAD_CAST "race");
+            if (propValue != NULL) {
+                rc = rc_find((const char *)propValue);
+                if (rc == NULL)
+                    rc = rc_get_or_create((const char *)propValue);
+                xmlFree(propValue);
+            }
+            modifiers[k].race = rc;
+
+            propValue = xmlGetProp(node, BAD_CAST "building");
+            if (propValue != NULL) {
+                btype = bt_get_or_create((const char *)propValue);
+                xmlFree(propValue);
+            }
+            modifiers[k].btype = btype;
+
+            propValue = xmlGetProp(node, BAD_CAST "type");
+            assert(propValue != NULL);
+            if (strcmp((const char *)propValue, "skill") == 0) {
+                xmlChar *propSkill;
+                skill_t sk = NOSKILL;
+
+                modifiers[k].type = RMT_PROD_SKILL;
+                propSkill = xmlGetProp(node, BAD_CAST "skill");
+                if (propSkill) {
+                    sk = findskill((const char *)propSkill);
+                    xmlFree(propSkill);
+                }
+                modifiers[k].value.sa[0] = (short)sk;
+                modifiers[k].value.sa[1] = (short)xml_ivalue(node, "value", 0);
+            }
+            else if (strcmp((const char *)propValue, "material") == 0) {
+                modifiers[k].value = xml_fraction(node, "value");
+                modifiers[k].type = RMT_PROD_SAVE;
+            }
+            else {
+                if (strcmp((const char *)propValue, "require") == 0) {
+                    modifiers[k].type = RMT_PROD_REQUIRE;
+                }
+                else if (strcmp((const char *)propValue, "save") == 0) {
+                    modifiers[k].type = RMT_USE_SAVE;
+                    modifiers[k].value = xml_fraction(node, "value");
+                }
+                else {
+                    log_error("unknown type '%s' for resourcelimit-modifier", (const char *)propValue);
+                }
+            }
+            xmlFree(propValue);
+        }
+        return modifiers;
+    }
+    return NULL;
+}
+
 static void
 xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 {
@@ -148,7 +215,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 
 void
 xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
-construction ** consPtr)
+construction ** consPtr, construct_t type)
 {
     xmlNodePtr pushNode = xpath->node;
     int k;
@@ -157,7 +224,6 @@ construction ** consPtr)
         xmlChar *propValue;
         construction *con;
         xmlXPathObjectPtr req;
-        int m;
         skill_t sk = NOSKILL;
 
         propValue = xmlGetProp(node, BAD_CAST "skill");
@@ -176,15 +242,18 @@ construction ** consPtr)
         *consPtr = con = (construction *)calloc(sizeof(construction), 1);
         consPtr = &con->improvement;
 
+        con->type = type;
         con->skill = sk;
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
 
-        propValue = xmlGetProp(node, BAD_CAST "building");
-        if (propValue != NULL) {
-            con->btype = bt_get_or_create((const char *)propValue);
-            xmlFree(propValue);
+        if (type == CONS_BUILDING) {
+            propValue = xmlGetProp(node, BAD_CAST "name");
+            if (propValue != NULL) {
+                con->name = strdup((const char *)propValue);
+                xmlFree(propValue);
+            }
         }
 
         /* read construction/requirement */
@@ -192,23 +261,6 @@ construction ** consPtr)
         req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
         xml_readrequirements(req->nodesetval->nodeTab,
             req->nodesetval->nodeNr, &con->materials);
-        xmlXPathFreeObject(req);
-
-        /* read construction/modifier */
-        xpath->node = node;
-        req = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
-        for (m = 0; m != req->nodesetval->nodeNr; ++m) {
-            xmlNodePtr node = req->nodesetval->nodeTab[m];
-
-            propValue = xmlGetProp(node, BAD_CAST "function");
-            if (propValue != NULL) {
-                pf_generic foo = get_function((const char *)propValue);
-                a_add(&con->attribs, make_skillmod(NOSKILL, SMF_PRODUCTION,
-                    (skillmod_fun)foo, 1.0, 0));
-                xmlFree(propValue);
-            }
-
-        }
         xmlXPathFreeObject(req);
     }
     xpath->node = pushNode;
@@ -221,11 +273,8 @@ parse_function(xmlNodePtr node, pf_generic * funPtr, xmlChar ** namePtr)
     xmlChar *propValue = xmlGetProp(node, BAD_CAST "value");
     assert(propValue != NULL);
     fun = get_function((const char *)propValue);
-    if (fun != NULL) {
-        xmlFree(propValue);
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-    }
+    xmlFree(propValue);
+    propValue = xmlGetProp(node, BAD_CAST "name");
     *namePtr = propValue;
     *funPtr = fun;
     return 0;
@@ -262,6 +311,7 @@ static int parse_buildings(xmlDocPtr doc)
             btype->magresbonus = xml_ivalue(node, "magresbonus", btype->magresbonus);
             btype->fumblebonus = xml_ivalue(node, "fumblebonus", btype->fumblebonus);
             btype->auraregen = xml_fvalue(node, "auraregen", btype->auraregen);
+            btype->taxes = xml_ivalue(node, "taxes", btype->taxes);
 
             if (xml_bvalue(node, "nodestroy", false))
                 btype->flags |= BTF_INDESTRUCTIBLE;
@@ -280,10 +330,16 @@ static int parse_buildings(xmlDocPtr doc)
             if (xml_bvalue(node, "fort", false))
                 btype->flags |= BTF_FORTIFICATION;
 
+            /* reading eressea/buildings/building/modifier */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+            btype->modifiers = xml_readmodifiers(result, node);
+            xmlXPathFreeObject(result);
+
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &btype->construction);
+            xml_readconstruction(xpath, result->nodesetval, &btype->construction, CONS_BUILDING);
             xmlXPathFreeObject(result);
 
             /* reading eressea/buildings/building/function */
@@ -300,23 +356,7 @@ static int parse_buildings(xmlDocPtr doc)
                     continue;
                 }
                 assert(propValue != NULL);
-                if (strcmp((const char *)propValue, "name") == 0) {
-                    btype->name =
-                        (const char *(*)(const struct building_type *,
-                        const struct building *, int))fun;
-                }
-                else if (strcmp((const char *)propValue, "init") == 0) {
-                    btype->init = (void(*)(struct building_type *))fun;
-                }
-                else if (strcmp((const char *)propValue, "age") == 0) {
-                    btype->age = (void(*)(struct building *))fun;
-                }
-                else if (strcmp((const char *)propValue, "taxes") == 0) {
-                    btype->taxes = (double(*)(const struct building *, int))fun;
-                }
-                else {
-                    log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
-                }
+                log_error("unknown function type '%s' for building %s\n", (const char *)propValue, btype->_name);
                 xmlFree(propValue);
             }
             xmlXPathFreeObject(result);
@@ -344,141 +384,11 @@ static int parse_buildings(xmlDocPtr doc)
                     mt->flags |= MTF_VARIABLE;
             }
             xmlXPathFreeObject(result);
-
-            /* finally, initialize the new building type */
-            if (btype->init)
-                btype->init(btype);
         }
     }
     xmlXPathFreeObject(buildings);
 
     xmlXPathFreeContext(xpath);
-    return 0;
-}
-
-static int parse_calendar(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr xpathCalendars;
-    xmlNodeSetPtr nsetCalendars;
-
-    xpathCalendars = xmlXPathEvalExpression(BAD_CAST "/eressea/calendar", xpath);
-    nsetCalendars = xpathCalendars->nodesetval;
-    if (nsetCalendars != NULL && nsetCalendars->nodeNr != 0) {
-        int c;
-        for (c = 0; c != nsetCalendars->nodeNr; ++c) {
-            xmlNodePtr calendar = nsetCalendars->nodeTab[c];
-            xmlXPathObjectPtr xpathWeeks, xpathMonths, xpathSeasons;
-            xmlNodeSetPtr nsetWeeks, nsetMonths, nsetSeasons;
-            xmlChar *propValue = xmlGetProp(calendar, BAD_CAST "name");
-            xmlChar *newyear = xmlGetProp(calendar, BAD_CAST "newyear");
-            xmlChar *start;
-
-            start = xmlGetProp(calendar, BAD_CAST "start");
-            if (start && config_get("game.start") == NULL) {
-                config_set("game.start", (const char *)start);
-                xmlFree(start);
-            }
-            if (propValue) {
-                free(agename);
-                agename = strdup(mkname("calendar", (const char *)propValue));
-                xmlFree(propValue);
-            }
-
-            xpath->node = calendar;
-            xpathWeeks = xmlXPathEvalExpression(BAD_CAST "week", xpath);
-            nsetWeeks = xpathWeeks->nodesetval;
-            if (nsetWeeks != NULL && nsetWeeks->nodeNr) {
-                int i;
-
-                weeks_per_month = nsetWeeks->nodeNr;
-                free(weeknames);
-                free(weeknames2);
-                weeknames = malloc(sizeof(char *) * weeks_per_month);
-                weeknames2 = malloc(sizeof(char *) * weeks_per_month);
-                for (i = 0; i != nsetWeeks->nodeNr; ++i) {
-                    xmlNodePtr week = nsetWeeks->nodeTab[i];
-                    xmlChar *propValue = xmlGetProp(week, BAD_CAST "name");
-                    if (propValue) {
-                        weeknames[i] = strdup(mkname("calendar", (const char *)propValue));
-                        weeknames2[i] = malloc(strlen(weeknames[i]) + 3);
-                        sprintf(weeknames2[i], "%s_d", weeknames[i]);
-                        xmlFree(propValue);
-                    }
-                }
-            }
-            xmlXPathFreeObject(xpathWeeks);
-
-            xpathSeasons = xmlXPathEvalExpression(BAD_CAST "season", xpath);
-            nsetSeasons = xpathSeasons->nodesetval;
-            if (nsetSeasons != NULL && nsetSeasons->nodeNr) {
-                int i;
-
-                seasons = nsetSeasons->nodeNr;
-                assert(!seasonnames);
-                seasonnames = malloc(sizeof(char *) * seasons);
-
-                for (i = 0; i != nsetSeasons->nodeNr; ++i) {
-                    xmlNodePtr season = nsetSeasons->nodeTab[i];
-                    xmlChar *propValue = xmlGetProp(season, BAD_CAST "name");
-                    if (propValue) {
-                        seasonnames[i] =
-                            strdup(mkname("calendar", (const char *)propValue));
-                        xmlFree(propValue);
-                    }
-                }
-            }
-
-            xpathMonths = xmlXPathEvalExpression(BAD_CAST "season/month", xpath);
-            nsetMonths = xpathMonths->nodesetval;
-            if (nsetMonths != NULL && nsetMonths->nodeNr) {
-                int i;
-
-                months_per_year = nsetMonths->nodeNr;
-                free(monthnames);
-                monthnames = malloc(sizeof(char *) * months_per_year);
-                free(month_season);
-                month_season = malloc(sizeof(int) * months_per_year);
-                free(storms);
-                storms = malloc(sizeof(int) * months_per_year);
-
-                for (i = 0; i != nsetMonths->nodeNr; ++i) {
-                    xmlNodePtr month = nsetMonths->nodeTab[i];
-                    xmlChar *propValue = xmlGetProp(month, BAD_CAST "name");
-
-                    if (propValue) {
-                        if (newyear
-                            && strcmp((const char *)newyear, (const char *)propValue) == 0) {
-                            first_month = i;
-                            xmlFree(newyear);
-                            newyear = NULL;
-                        }
-                        monthnames[i] = strdup(mkname("calendar", (const char *)propValue));
-                        xmlFree(propValue);
-                    }
-                    if (nsetSeasons) {
-                        int j;
-                        for (j = 0; j != seasons; ++j) {
-                            xmlNodePtr season = month->parent;
-                            if (season == nsetSeasons->nodeTab[j]) {
-                                month_season[i] = j;
-                                break;
-                            }
-                        }
-                        assert(j != seasons);
-                    }
-                    storms[i] = xml_ivalue(nsetMonths->nodeTab[i], "storm", 0);
-                }
-            }
-            xmlXPathFreeObject(xpathMonths);
-            xmlXPathFreeObject(xpathSeasons);
-            xmlFree(newyear);
-            newyear = NULL;
-        }
-    }
-    xmlXPathFreeObject(xpathCalendars);
-    xmlXPathFreeContext(xpath);
-
     return 0;
 }
 
@@ -525,7 +435,7 @@ static int parse_ships(xmlDocPtr doc)
             /* reading eressea/ships/ship/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &st->construction);
+            xml_readconstruction(xpath, result->nodesetval, &st->construction, CONS_OTHER);
             xmlXPathFreeObject(result);
 
             for (child = node->children; child; child = child->next) {
@@ -757,6 +667,28 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     return wtype;
 }
 
+static int race_mask = 1;
+
+static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
+    int mask = 0;
+    assert(maskp);
+    if (propValue) {
+        char * tok = strtok((char *)propValue, " ,");
+        while (tok) {
+            race * rc = rc_get_or_create(tok);
+            if (!rc->mask_item) {
+                rc->mask_item = race_mask;
+                race_mask = race_mask << 1;
+            }
+            mask |= rc->mask_item;
+            tok = strtok(NULL, " ,");
+        }
+        xmlFree(propValue);
+    }
+    *maskp = mask;
+}
+
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 {
     xmlNodePtr node = xpath->node;
@@ -767,6 +699,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
     if (xml_bvalue(node, "cursed", false))
         flags |= ITF_CURSED;
+    if (xml_bvalue(node, "use", false))
+        flags |= ITF_CANUSE;
     if (xml_bvalue(node, "notlost", false))
         flags |= ITF_NOTLOST;
     if (xml_bvalue(node, "herb", false))
@@ -780,12 +714,14 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
+    mask_races(node, "allow", &itype->mask_allow);
+    mask_races(node, "deny", &itype->mask_deny);
     itype->flags |= flags;
 
     /* reading item/construction */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval, &itype->construction);
+    xml_readconstruction(xpath, result->nodesetval, &itype->construction, CONS_ITEM);
     xmlXPathFreeObject(result);
 
     /* reading item/weapon */
@@ -803,6 +739,10 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     result = xmlXPathEvalExpression(BAD_CAST "potion", xpath);
     assert(result->nodesetval->nodeNr <= 1);
     if (result->nodesetval->nodeNr != 0) {
+        if ((itype->flags & ITF_CANUSE) == 0) {
+            log_error("potion %s has no use attribute", rtype->_name);
+            itype->flags |= ITF_CANUSE;
+        }
         xpath->node = result->nodesetval->nodeTab[0];
         rtype->ptype = xml_readpotion(xpath, itype);
     }
@@ -843,28 +783,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             continue;
         }
         assert(propValue != NULL);
-        if (strcmp((const char *)propValue, "give") == 0) {
-            itype->give =
-                (int(*)(struct unit *, struct unit *, const struct item_type *, int,
-            struct order *))fun;
-        }
-        else if (strcmp((const char *)propValue, "use") == 0) {
-            itype->use =
-                (int(*)(struct unit *, const struct item_type *, int,
-            struct order *))fun;
-        }
-        else if (strcmp((const char *)propValue, "canuse") == 0) {
-            itype->canuse =
-                (bool(*)(const struct unit *, const struct item_type *))fun;
-        }
-        else if (strcmp((const char *)propValue, "useonother") == 0) {
-            itype->useonother =
-                (int(*)(struct unit *, int, const struct item_type *, int,
-            struct order *))fun;
-        }
-        else {
-            log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
-        }
+        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
         xmlFree(propValue);
     }
     itype->score = xml_ivalue(node, "score", 0);
@@ -872,44 +791,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     xmlXPathFreeObject(result);
 
     return itype;
-}
-
-static int parse_rules(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr functions;
-    xmlNodeSetPtr nodes;
-    int i;
-
-    /* reading eressea/resources/resource */
-    functions = xmlXPathEvalExpression(BAD_CAST "/eressea/rules/function", xpath);
-    nodes = functions->nodesetval;
-    for (i = 0; i != nodes->nodeNr; ++i) {
-        xmlNodePtr node = nodes->nodeTab[i];
-        xmlChar *propValue;
-        pf_generic fun;
-
-        parse_function(node, &fun, &propValue);
-
-        if (fun == NULL) {
-            log_error("unknown function for rule '%s' %s\n", (const char *)propValue);
-            xmlFree(propValue);
-            continue;
-        }
-        assert(propValue != NULL);
-        if (strcmp((const char *)propValue, "wage") == 0) {
-            global.functions.wage =
-                (int(*)(const struct region *, const struct faction *,
-                const struct race *, int))fun;
-        }
-        else {
-            log_error("unknown function for rule '%s'\n", (const char *)propValue);
-        }
-        xmlFree(propValue);
-    }
-    xmlXPathFreeObject(functions);
-    xmlXPathFreeContext(xpath);
-    return 0;
 }
 
 static int parse_resources(xmlDocPtr doc)
@@ -933,8 +814,6 @@ static int parse_resources(xmlDocPtr doc)
 
         if (xml_bvalue(node, "pooled", true))
             flags |= RTF_POOLED;
-        if (xml_bvalue(node, "limited", false))
-            flags |= RTF_LIMITED;
 
         name = xmlGetProp(node, BAD_CAST "name");
         if (!name) {
@@ -965,9 +844,6 @@ static int parse_resources(xmlDocPtr doc)
                 if (strcmp((const char *)propValue, "change") == 0) {
                     rtype->uchange = (rtype_uchange)fun;
                 }
-                else if (strcmp((const char *)propValue, "get") == 0) {
-                    rtype->uget = (rtype_uget)fun;
-                }
                 else if (strcmp((const char *)propValue, "name") == 0) {
                     rtype->name = (rtype_name)fun;
                 }
@@ -982,102 +858,12 @@ static int parse_resources(xmlDocPtr doc)
             rmt_create(rtype);
         }
 
-        /* reading eressea/resources/resource/resourcelimit */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "resourcelimit", xpath);
-        assert(result->nodesetval->nodeNr <= 1);
-        if (result->nodesetval->nodeNr != 0) {
-            resource_limit *rdata = rtype->limit = calloc(1, sizeof(resource_limit));
-            xmlNodePtr limit = result->nodesetval->nodeTab[0];
-
+        if (xml_bvalue(node, "limited", false)) {
             rtype->flags |= RTF_LIMITED;
-            xpath->node = limit;
-            xmlXPathFreeObject(result);
-
-            result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
-            if (result->nodesetval != NULL) {
-                rdata->modifiers =
-                    calloc(result->nodesetval->nodeNr + 1, sizeof(resource_mod));
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    building_type *btype = NULL;
-                    const race *rc = NULL;
-
-                    propValue = xmlGetProp(node, BAD_CAST "race");
-                    if (propValue != NULL) {
-                        rc = rc_find((const char *)propValue);
-                        if (rc == NULL)
-                            rc = rc_get_or_create((const char *)propValue);
-                        xmlFree(propValue);
-                    }
-                    rdata->modifiers[k].race = rc;
-
-                    propValue = xmlGetProp(node, BAD_CAST "building");
-                    if (propValue != NULL) {
-                        btype = bt_get_or_create((const char *)propValue);
-                        xmlFree(propValue);
-                    }
-                    rdata->modifiers[k].btype = btype;
-
-                    propValue = xmlGetProp(node, BAD_CAST "type");
-                    assert(propValue != NULL);
-                    if (strcmp((const char *)propValue, "skill") == 0) {
-                        rdata->modifiers[k].value.i = xml_ivalue(node, "value", 0);
-                        rdata->modifiers[k].flags = RMF_SKILL;
-                    }
-                    else if (strcmp((const char *)propValue, "material") == 0) {
-                        rdata->modifiers[k].value = xml_fraction(node, "value");
-                        rdata->modifiers[k].flags = RMF_SAVEMATERIAL;
-                    }
-                    else if (strcmp((const char *)propValue, "require") == 0) {
-                        xmlChar *propBldg = xmlGetProp(node, BAD_CAST "building");
-                        if (propBldg != NULL) {
-                            btype = bt_get_or_create((const char *)propBldg);
-                            rdata->modifiers[k].btype = btype;
-                            rdata->modifiers[k].flags = RMF_REQUIREDBUILDING;
-                            xmlFree(propBldg);
-                        }
-                    }
-                    else {
-                        log_error("unknown type '%s' for resourcelimit-modifier '%s'\n", (const char *)propValue, rtype->_name);
-                    }
-                    xmlFree(propValue);
-                }
-            }
-            xmlXPathFreeObject(result);
-
-            /* reading eressea/resources/resource/resourcelimit/function */
-            result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-            if (result->nodesetval != NULL) {
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    pf_generic fun;
-
-                    propValue = xmlGetProp(node, BAD_CAST "value");
-                    assert(propValue != NULL);
-                    fun = get_function((const char *)propValue);
-                    if (fun == NULL) {
-                        log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
-                        xmlFree(propValue);
-                        continue;
-                    }
-                    xmlFree(propValue);
-
-                    propValue = xmlGetProp(node, BAD_CAST "name");
-                    assert(propValue != NULL);
-                    if (strcmp((const char *)propValue, "produce") == 0) {
-                        rdata->produce = (rlimit_produce)fun;
-                    }
-                    else if (strcmp((const char *)propValue, "limit") == 0) {
-                        rdata->limit = (rlimit_limit)fun;
-                    }
-                    else {
-                        log_error("unknown limit '%s' for resource %s\n", (const char *)propValue, rtype->_name);
-                    }
-                    xmlFree(propValue);
-                }
-            }
         }
+        xpath->node = node;
+        result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+        rtype->modifiers = xml_readmodifiers(result, node);
         xmlXPathFreeObject(result);
         /* reading eressea/resources/resource/resourcelimit/function */
         xpath->node = node;
@@ -1383,12 +1169,8 @@ static int parse_spellbooks(xmlDocPtr doc)
 
 static int parse_spells(xmlDocPtr doc)
 {
-    pf_generic cast = 0;
-    pf_generic fumble = 0;
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr spells;
-    char zText[32];
-    strcpy(zText, "fumble_");
 
     /* reading eressea/spells/spell */
     spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
@@ -1403,14 +1185,12 @@ static int parse_spells(xmlDocPtr doc)
             int k;
             spell_component *component;
             spell *sp;
-            unsigned int index;
             static int modes[] = { 0, PRECOMBATSPELL, COMBATSPELL, POSTCOMBATSPELL };
 
             /* spellname */
-            index = xml_ivalue(node, "index", 0);
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            sp = create_spell((const char *)propValue, index);
+            sp = create_spell((const char *)propValue);
             xmlFree(propValue);
             if (!sp) {
                 continue;
@@ -1463,50 +1243,9 @@ static int parse_spells(xmlDocPtr doc)
                 sp->sptyp |= REGIONSPELL;
 
             k = xml_ivalue(node, "combat", 0);
-            if (k >= 0 && k <= 3)
+            if (k >= 0 && k <= 3) {
                 sp->sptyp |= modes[k];
-
-            /* reading eressea/spells/spell/function */
-
-            xpath->node = node;
-            result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-
-            if (result->nodesetval->nodeNr == 0) {
-                cast = get_function(sp->sname);
-                if (!cast) {
-                    log_error("no spell cast function registered for '%s'\n", sp->sname);
-                }
-                strlcpy(zText + 7, sp->sname, sizeof(zText) - 7);
-                fumble = get_function(zText);
             }
-            else {
-                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    pf_generic fun;
-
-                    parse_function(node, &fun, &propValue);
-                    assert(propValue != NULL);
-                    if (strcmp((const char *)propValue, "cast") == 0) {
-                        if (fun) {
-                            cast = fun;
-                        }
-                        else {
-                            log_error("unknown function name '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
-                        }
-                    }
-                    else if (fun && strcmp((const char *)propValue, "fumble") == 0) {
-                        fumble = fun;
-                    }
-                    else {
-                        log_error("unknown function type '%s' for spell '%s'\n", (const char *)propValue, sp->sname);
-                    }
-                    xmlFree(propValue);
-                }
-            }
-            sp->cast = (spell_f)cast;
-            sp->fumble = (fumble_f)fumble;
-            xmlXPathFreeObject(result);
-
             /* reading eressea/spells/spell/resource */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "resource", xpath);
@@ -1997,10 +1736,7 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_rules);
-
     xml_register_callback(parse_races);
-    xml_register_callback(parse_calendar);
     xml_register_callback(parse_resources);
 
     xml_register_callback(parse_buildings); /* requires resources */

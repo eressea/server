@@ -576,10 +576,7 @@ static weapon *select_weapon(const troop t, bool attacking,
 
 static bool i_canuse(const unit * u, const item_type * itype)
 {
-    if (itype->canuse) {
-        return itype->canuse(u, itype);
-    }
-    return true;
+    return rc_can_use(u_race(u), itype);
 }
 
 static int
@@ -1208,11 +1205,12 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (rule_damage & DAMAGE_CRITICAL) {
             double kritchance = (sk * 3 - sd) / 200.0;
+            int maxk = 4;
 
             kritchance = MAX(kritchance, 0.005);
             kritchance = MIN(0.9, kritchance);
 
-            while (chance(kritchance)) {
+            while (maxk-- && chance(kritchance)) {
                 da += dice_rand(damage);
             }
         }
@@ -1752,15 +1750,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
             fighter *fig = co->magician.fig;
             const spell *sp = co->sp;
 
-            level = co->level;
-            if (!sp->cast) {
-                log_error("spell '%s' has no function.\n", sp->sname);
-            }
-            else {
-                level = sp->cast(co);
-                if (level > 0) {
-                    pay_spell(fig->unit, sp, level, 1);
-                }
+            level = cast_spell(co);
+            if (level > 0) {
+                pay_spell(fig->unit, sp, level, 1);
             }
         }
     }
@@ -1774,7 +1766,7 @@ static int cast_combatspell(troop at, const spell * sp, int level, double force)
     castorder co;
 
     create_castorder_combat(&co, at.fighter, sp, level, force);
-    level = sp->cast(&co);
+    level = cast_spell(&co);
     free_castorder(&co);
     if (level > 0) {
         pay_spell(at.fighter->unit, sp, level, 1);
@@ -1843,12 +1835,7 @@ static void do_combatspell(troop at)
         return;
     }
 
-    if (!sp->cast) {
-        log_error("spell '%s' has no function.\n", sp->sname);
-    }
-    else {
-        level = cast_combatspell(at, sp, level, power);
-    }
+    level = cast_combatspell(at, sp, level, power);
 }
 
 /* Sonderattacken: Monster patzern nicht und zahlen auch keine
@@ -1862,9 +1849,6 @@ static void do_extra_spell(troop at, const att * a)
 
     if (!sp) {
         log_error("no such spell: '%s'", a->data.sp->name);
-    }
-    else if (sp->cast == NULL) {
-        log_error("spell '%s' has no function.", sp->sname);
     }
     else {
         assert(a->level > 0);

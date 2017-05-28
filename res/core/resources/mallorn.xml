@@ -1,12 +1,8 @@
 <?xml version="1.0"?>
-<resource name="mallorn">
-  <item weight="500" score="30">
-    <construction skill="forestry" minskill="2"/>
-  </item>
-  <resourcelimit>
+<resource name="mallorn" limited="yes">
+    <item weight="500" score="30">
+        <construction skill="forestry" minskill="2"/>
+    </item>
     <modifier building="sawmill" type="skill" value="1"/>
     <modifier building="sawmill" type="material" value="0.5"/>
-    <function name="produce" value="lua_produceresource"/>
-    <function name="limit" value="lua_limitresource"/>
-  </resourcelimit>
 </resource>

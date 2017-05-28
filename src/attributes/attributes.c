@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include "follow.h"
+#include "fleechance.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
@@ -57,6 +58,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 
 #include <storage.h>
+
 
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
@@ -100,7 +102,6 @@ void register_attributes(void)
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
-    at_register(&at_maxmagicians);
     at_register(&at_npcfaction);
 
     /* connection-typen */
@@ -112,6 +113,8 @@ void register_attributes(void)
 
     at_register(&at_germs);
 
+    at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
+    at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */

@@ -4,7 +4,7 @@
 #include "teleport.h"
 #include "give.h"
 
-#include <kernel/config.h>
+#include <kernel/building.h>
 #include <kernel/race.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
@@ -14,13 +14,16 @@
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
-#include <selist.h>
+
+#include <util/attrib.h>
 #include <util/language.h>
 
 #include <CuTest.h>
+#include <selist.h>
 #include <tests.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 void test_updatespells(CuTest * tc)
 {
@@ -32,7 +35,7 @@ void test_updatespells(CuTest * tc)
     test_create_race("human");
 
     f = test_create_faction(0);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     CuAssertPtrNotNull(tc, sp);
 
     book = create_spellbook("spells");
@@ -65,7 +68,7 @@ void test_spellbooks(CuTest * tc)
     CuAssertStrEquals(tc, "herp", herp->name);
     CuAssertStrEquals(tc, "derp", derp->name);
 
-    sp = create_spell(sname, 0);
+    sp = create_spell(sname);
     spellbook_add(herp, sp, 1);
     CuAssertPtrNotNull(tc, sp);
     entry = spellbook_get(herp, sp);
@@ -168,7 +171,7 @@ void test_getspell_unit(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -197,7 +200,7 @@ void test_getspell_faction(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -227,7 +230,7 @@ void test_getspell_school(CuTest * tc)
     set_level(u, SK_MAGIC, 1);
 
     lang = test_create_locale();
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
@@ -254,7 +257,7 @@ void test_set_pre_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= PRECOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -286,7 +289,7 @@ void test_set_main_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= COMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -318,7 +321,7 @@ void test_set_post_combatspell(CuTest * tc)
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     set_level(u, SK_MAGIC, 1);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 1);
@@ -348,7 +351,7 @@ void test_hasspell(CuTest * tc)
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
     unit_add_spell(u, 0, sp, 2);
@@ -377,8 +380,8 @@ void test_multi_cast(CuTest *tc) {
     struct locale * lang;
 
     test_setup();
-    sp = create_spell("fireball", 0);
-    sp->cast = cast_fireball;
+    add_spellcast("fireball", cast_fireball);
+    sp = create_spell("fireball");
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
 
     lang = test_create_locale();
@@ -460,6 +463,27 @@ static void test_familiar_mage(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_illusioncastle(CuTest *tc)
+{
+    building *b;
+    building_type *btype, *bt_icastle;
+    const attrib *a;
+    test_setup();
+    btype = test_create_buildingtype("castle");
+    bt_icastle = test_create_buildingtype("illusioncastle");
+    b = test_create_building(test_create_region(0, 0, NULL), bt_icastle);
+    b->size = 1;
+    make_icastle(b, btype, 10);
+    a = a_find(b->attribs, &at_icastle);
+    CuAssertPtrNotNull(tc, a);
+    CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
+    CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
+    CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
+    btype->construction->name = strdup("site");
+    CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
+    test_cleanup();
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -477,6 +501,7 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_hasspell);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
+    SUITE_ADD_TEST(suite, test_illusioncastle);
     DISABLE_TEST(suite, test_familiar_mage);
     return suite;
 }

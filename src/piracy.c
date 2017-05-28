@@ -66,6 +66,8 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
 }
 
 static bool validate_pirate(unit *u, order *ord) {
+    assert(u);
+    assert(ord);
     if (fval(u_race(u), RCF_SWIM | RCF_FLY))
         return true;
     if (!u->ship) {
@@ -128,6 +130,7 @@ void piracy_cmd(unit * u)
     int saff = 0;
     int *il;
 
+    assert(u->thisorder);
     if (!validate_pirate(u, u->thisorder)) {
         return;
     }

@@ -10,7 +10,7 @@ end
 function disabled_test_dont_move_after_destroy()
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
-    local f = faction.create("test@example.com", "human", "de")
+    local f = faction.create("human", "test@example.com", "de")
     local u = unit.create(f, r1, 1)
     u.building = building.create(u.region, "castle")
     u:clear_orders()
@@ -26,8 +26,8 @@ end
 
 function test_dont_destroy_after_attack()
     local r1 = region.create(0, 0, "plain")
-    local u = unit.create(faction.create("one@example.com", "human", "de"), r1, 10)
-    local u2 = unit.create(faction.create("two@example.com", "human", "de"), r1, 1)
+    local u = unit.create(faction.create("human", "one@example.com", "de"), r1, 10)
+    local u2 = unit.create(faction.create("human", "two@example.com", "de"), r1, 1)
     u.building = building.create(u.region, "castle")
     u:clear_orders()
     u:add_order("ATTACKIERE " .. itoa36(u2.id))
@@ -38,7 +38,7 @@ end
 
 function test_destroy_is_long()
     local r1 = region.create(0, 0, "plain")
-    local u = unit.create(faction.create("one@example.com", "human", "de"), r1, 10)
+    local u = unit.create(faction.create("human", "one@example.com", "de"), r1, 10)
     u.building = building.create(u.region, "castle")
     u:clear_orders()
     u:add_order("LERNE Unterhaltung")

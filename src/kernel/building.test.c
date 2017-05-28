@@ -21,14 +21,13 @@ static void test_register_building(CuTest * tc)
 
     test_cleanup();
 
-    btype = (building_type *)calloc(sizeof(building_type), 1);
-    btype->_name = strdup("herp");
     CuAssertIntEquals(tc, true, bt_changed(&cache));
     CuAssertIntEquals(tc, false, bt_changed(&cache));
-    bt_register(btype);
-    CuAssertIntEquals(tc, true, bt_changed(&cache));
 
-    CuAssertPtrNotNull(tc, bt_find("herp"));
+    btype = bt_get_or_create("herp");
+    CuAssertIntEquals(tc, true, bt_changed(&cache));
+    CuAssertPtrEquals(tc, btype, (void *)bt_find("herp"));
+
     free_buildingtypes();
     CuAssertIntEquals(tc, true, bt_changed(&cache));
     test_cleanup();
@@ -295,11 +294,8 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertStrEquals(tc, "hodor", btype->_name);
     CuAssertPtrEquals(tc, 0, btype->maintenance);
     CuAssertPtrEquals(tc, 0, btype->construction);
-    CuAssertTrue(tc, !btype->name);
-    CuAssertTrue(tc, !btype->init);
-    CuAssertTrue(tc, !btype->age);
-    CuAssertTrue(tc, !btype->taxes);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
+    CuAssertIntEquals(tc, 0, btype->taxes);
     CuAssertIntEquals(tc, -1, btype->maxsize);
     CuAssertIntEquals(tc, 1, btype->capacity);
     CuAssertIntEquals(tc, -1, btype->maxcapacity);
@@ -428,10 +424,87 @@ static void test_cmp_castle_size(CuTest *tc) {
     u_set_building(u2, b2);
     b1->size = 5;
     b2->size = 10;
-    CuAssertTrue(tc, cmp_castle_size(b1, b2)<0);
-    CuAssertTrue(tc, cmp_castle_size(b2, b1)>0);
-    CuAssertTrue(tc, cmp_castle_size(b1, NULL)>0);
-    CuAssertTrue(tc, cmp_castle_size(NULL, b1)<0);
+    CuAssertTrue(tc, cmp_castle_size(b1, b2) < 0);
+    CuAssertTrue(tc, cmp_castle_size(b2, b1) > 0);
+    CuAssertTrue(tc, cmp_castle_size(b1, b1) == 0);
+    test_cleanup();
+}
+
+static void test_cmp_wage(CuTest *tc) {
+    region *r;
+    building *b1, *b2;
+    building_type *btype;
+
+    test_setup();
+    btype = test_create_buildingtype("castle");
+    btype->taxes = 100;
+    r = test_create_region(0, 0, 0);
+    b1 = test_create_building(r, btype);
+    b2 = test_create_building(r, btype);
+    b1->size = 5;
+    b2->size = 10;
+    CuAssertPtrEquals(tc, b2, largestbuilding(r, cmp_wage, false));
+    CuAssertTrue(tc, cmp_wage(b1, b2) < 0);
+    CuAssertTrue(tc, cmp_wage(b2, b1) > 0);
+    CuAssertTrue(tc, cmp_wage(b1, b1) == 0);
+    test_cleanup();
+}
+
+static void test_cmp_taxes(CuTest *tc) {
+    region *r;
+    building *b1, *b2;
+    building_type *btype;
+    unit *u1, *u2;
+
+    test_setup();
+    btype = test_create_buildingtype("castle");
+    btype->taxes = 100;
+    r = test_create_region(0, 0, 0);
+    b1 = test_create_building(r, btype);
+    b2 = test_create_building(r, btype);
+    b1->size = 5;
+    b2->size = 10;
+    u1 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u1, b1);
+    u2 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u2, b2);
+    CuAssertPtrEquals(tc, b2, largestbuilding(r, cmp_taxes, false));
+    CuAssertTrue(tc, cmp_taxes(b1, b2) < 0);
+    CuAssertTrue(tc, cmp_taxes(b2, b1) > 0);
+    CuAssertTrue(tc, cmp_taxes(b1, b1) == 0);
+    test_cleanup();
+}
+
+static void test_cmp_current_owner(CuTest *tc) {
+    region *r;
+    building *b1, *b2;
+    building_type *btype;
+    unit *u1, *u2;
+
+    test_setup();
+    config_set("rules.region_owners", "1");
+    r = test_create_region(0, 0, 0);
+    btype = test_create_buildingtype("watch");
+    btype->construction->maxsize = 1;
+    btype->taxes = 200;
+    b1 = test_create_building(r, btype);
+    btype = test_create_buildingtype("castle");
+    btype->construction->maxsize = 1;
+    btype->taxes = 100;
+    b2 = test_create_building(r, btype);
+    b1->size = 1;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b1, false));
+    b2->size = 1;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b2, false));
+    u1 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u1, b1);
+    u2 = test_create_unit(test_create_faction(0), r);
+    u_set_building(u2, b2);
+    region_set_owner(r, u1->faction, turn);
+    CuAssertPtrEquals(tc, b1, largestbuilding(r, cmp_current_owner, false));
+    CuAssertTrue(tc, cmp_current_owner(b2, b1) < 0);
+    CuAssertTrue(tc, cmp_current_owner(b1, b2) > 0);
+    CuAssertTrue(tc, cmp_current_owner(b1, b1) == 0);
     test_cleanup();
 }
 
@@ -460,10 +533,52 @@ static void test_building_effsize(CuTest *tc) {
     test_cleanup();
 }
 
+static int cmp_size(const building *lhs, const building *rhs) {
+    assert(lhs);
+    return rhs ? lhs->size - rhs->size : 1;
+}
+
+static void test_largestbuilding(CuTest *tc) {
+    region *r;
+    building *b1, *b2;
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    CuAssertPtrEquals(tc, NULL, largestbuilding(r, cmp_size, false));
+    b1 = test_create_building(r, NULL);
+    b2 = test_create_building(r, NULL);
+    b1->size = 1;
+    b2->size = 1;
+    CuAssertPtrEquals(tc, b1, largestbuilding(r, cmp_size, false));
+    b1->size = 2;
+    CuAssertPtrEquals(tc, b1, largestbuilding(r, cmp_size, false));
+    b2->size = 3;
+    CuAssertPtrEquals(tc, b2, largestbuilding(r, cmp_size, false));
+    test_cleanup();
+}
+
+static void test_buildingtype(CuTest *tc) {
+    building_type *btype;
+    test_setup();
+    btype = test_create_buildingtype("hodor");
+    CuAssertPtrNotNull(tc, btype->construction);
+    CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
+    btype->construction->name = strdup("castle");
+    CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
+    btype = bt_get_or_create("portal");
+    CuAssertPtrEquals(tc, NULL, btype->construction);
+    CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_buildingtype);
+    SUITE_ADD_TEST(suite, test_largestbuilding);
     SUITE_ADD_TEST(suite, test_cmp_castle_size);
+    SUITE_ADD_TEST(suite, test_cmp_taxes);
+    SUITE_ADD_TEST(suite, test_cmp_wage);
+    SUITE_ADD_TEST(suite, test_cmp_current_owner);
     SUITE_ADD_TEST(suite, test_register_building);
     SUITE_ADD_TEST(suite, test_btype_defaults);
     SUITE_ADD_TEST(suite, test_building_set_owner);

@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
+#include <util/assert.h>
 #include <util/attrib.h>
 #include <util/bsdstring.h>
 #include <util/gamedata.h>
@@ -697,6 +698,7 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
     d = *dp;
     if (!d) {
         d = *dp = malloc(sizeof(struct demand));
+        assert_alloc(d);
         d->next = NULL;
         d->type = ltype;
     }
@@ -768,6 +770,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
         return r;
     }
     r = calloc(1, sizeof(region));
+    assert_alloc(r);
     r->x = x;
     r->y = y;
     r->uid = uid;
@@ -1077,8 +1080,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (!fval(terrain, LAND_REGION)) {
         region_setinfo(r, NULL);
-        if (r->land != NULL) {
-            i_freeall(&r->land->items);
+        if (r->land) {
             free_land(r->land);
             r->land = NULL;
         }
@@ -1098,7 +1100,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             rsetroad(r, d, 0);
         }
-        i_freeall(&r->land->items);
     }
     else {
         static struct surround {
@@ -1173,11 +1174,6 @@ void terraform_region(region * r, const terrain_type * terrain)
 
     if (fval(terrain, LAND_REGION)) {
         const item_type *itype = NULL;
-        char equip_hash[64];
-
-        /* TODO: put the equipment in struct terrain, faster */
-        sprintf(equip_hash, "terrain_%s", terrain->_name);
-        equip_items(&r->land->items, get_equipment(equip_hash));
 
         if (r->terrain->herbs) {
             int len = 0;
@@ -1227,7 +1223,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 
         if (!fval(r, RF_CHAOTIC)) {
             int peasants;
-            peasants = (region_maxworkers(r) * (20 + dice_rand("6d10"))) / 100;
+            peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
             rsetpeasants(r, MAX(100, peasants));
             rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
                 INT_MAX) + 1) + rng_int() % 5));
@@ -1395,8 +1391,8 @@ faction *update_owners(region * r)
     faction *f = NULL;
     assert(rule_region_owners());
     if (r->land) {
-        building *bowner = largestbuilding(r, &cmp_current_owner, false);
-        building *blargest = largestbuilding(r, &cmp_taxes, false);
+        building *bowner = largestbuilding(r, cmp_current_owner, false);
+        building *blargest = largestbuilding(r, cmp_taxes, false);
         if (blargest) {
             if (!bowner || bowner->size < blargest->size) {
                 /* region owners update? */
@@ -1502,6 +1498,7 @@ int owner_change(const region * r)
 bool is_mourning(const region * r, int in_turn)
 {
     int change = owner_change(r);
-    return (change == in_turn - 1 && r->land->ownership->last_owner && r->land->ownership->owner
-        && r->land->ownership->last_owner != r->land->ownership->owner);
+    return (change == in_turn - 1 && r->land &&
+        r->land->ownership->last_owner && r->land->ownership->owner &&
+        r->land->ownership->last_owner != r->land->ownership->owner);
 }

@@ -8,9 +8,6 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if ARENA_MODULE
-#include <modules/arena.h>
-#endif
 #include <triggers/triggers.h>
 #include <util/language.h>
 #include <util/functions.h>
@@ -73,13 +70,9 @@ void game_init(void)
     register_spells();
     register_names();
     register_resources();
-    register_buildings();
     register_itemfunctions();
 #if MUSEUM_MODULE
     register_museum();
-#endif
-#if ARENA_MODULE
-    register_arena();
 #endif
     wormholes_register();
 

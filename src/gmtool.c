@@ -26,9 +26,6 @@
 #if MUSEUM_MODULE
 #include <modules/museum.h>
 #endif
-#if ARENA_MODULE
-#include <modules/arena.h>
-#endif
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>
@@ -905,8 +902,8 @@ static void handlekey(state * st, int c)
             new_players = read_newfactions(sbuffer);
         }
         cnormalize(&st->cursor, &nx, &ny);
-        minpop = config_get_int("seed.population.min", 8);
-        maxpop = config_get_int("seed.population.max", minpop);
+        minpop = config_get_int("editor.population.min", 8);
+        maxpop = config_get_int("editor.population.max", minpop);
         if (maxpop > minpop) {
             n = rng_int() % (maxpop - minpop) + minpop;
         }

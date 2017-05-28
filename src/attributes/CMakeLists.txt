@@ -12,7 +12,6 @@ follow.c
 hate.c
 iceberg.c
 key.c
-matmod.c
 moved.c
 movement.c
 dict.c

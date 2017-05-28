@@ -14,11 +14,14 @@
 #define NO_STRDUP
 #define NO_MKDIR
 #define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
+#if _MSC_VER >= 1900
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
 #pragma warning(disable: 4456) // declaration hides previous
 #pragma warning(disable: 4457) // declaration hides function parameter
 #pragma warning(disable: 4459) // declaration hides global
+#endif
 #else /* assume gcc */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 # define va_copy(a,b) __va_copy(a,b)
@@ -46,5 +49,11 @@ char * strdup(const char *s);
 #ifdef NO_MKDIR
 int mkdir(const char *pathname, int mode);
 #endif
+
+/* do not use M_PI, use one of these instead: */
+#define PI_F 3.1415926535897932384626433832795F
+#define PI_D 3.1415926535897932384626433832795
+#define PI_L 3.1415926535897932384626433832795L
+
 
 #endif

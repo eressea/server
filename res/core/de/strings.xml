@@ -1458,12 +1458,6 @@
   <string name="aots_p">
     <text locale="de">Amulette des wahren Sehens</text>
   </string>
-  <string name="aoc">
-    <text locale="de">Katzenamulett</text>
-  </string>
-  <string name="aoc_p">
-    <text locale="de">Katzenamulette</text>
-  </string>
   <string name="roi">
     <text locale="de">Ring der Unsichtbarkeit</text>
   </string>
@@ -6529,13 +6523,17 @@
       <text locale="de">Sonnenfeuer</text>
       <text locale="en">sunfire</text>
     </string>
-    <string name="secondage">
+    <string name="age_1">
+      <text locale="de">neuer Zeitrechnung</text>
+      <text locale="en">of the new age</text>
+    </string>
+    <string name="age_2">
       <text locale="de">des zweiten Zeitalters</text>
       <text locale="en">the second age</text>
     </string>
-    <string name="newage">
-      <text locale="de">neuer Zeitrechnung</text>
-      <text locale="en">of the new age</text>
+    <string name="age_3">
+      <text locale="de">des dritten Zeitalters</text>
+      <text locale="en">the third age</text>
     </string>
   </namespace>
 

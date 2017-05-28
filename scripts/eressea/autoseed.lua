@@ -61,7 +61,7 @@ end
 
 local function seed(r, email, race, lang)
     assert(r)
-    local f = faction.create(email, race, lang)
+    local f = faction.create(race, email, lang)
     assert(f)
     local u = unit.create(f, r)
     assert(u)

@@ -116,35 +116,36 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(ally);
     ADD_SUITE(messages);
     /* gamecode */
-    ADD_SUITE(guard);
-    ADD_SUITE(report);
-    ADD_SUITE(creport);
-    ADD_SUITE(summary);
-    ADD_SUITE(names);
     ADD_SUITE(battle);
-    ADD_SUITE(volcano);
+    ADD_SUITE(calendar);
+    ADD_SUITE(creport);
     ADD_SUITE(donations);
-    ADD_SUITE(travelthru);
     ADD_SUITE(economy);
     ADD_SUITE(flyingship);
     ADD_SUITE(give);
+    ADD_SUITE(guard);
+    ADD_SUITE(key);
     ADD_SUITE(laws);
     ADD_SUITE(lighthouse);
     ADD_SUITE(market);
     ADD_SUITE(monsters);
     ADD_SUITE(move);
+    ADD_SUITE(names);
+    ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
     ADD_SUITE(prefix);
     ADD_SUITE(renumber);
-    ADD_SUITE(key);
+    ADD_SUITE(report);
+    ADD_SUITE(shock);
+    ADD_SUITE(spy);
     ADD_SUITE(stealth);
-    ADD_SUITE(otherfaction);
+    ADD_SUITE(study);
+    ADD_SUITE(summary);
+    ADD_SUITE(travelthru);
     ADD_SUITE(upkeep);
+    ADD_SUITE(volcano);
     ADD_SUITE(vortex);
     ADD_SUITE(wormhole);
-    ADD_SUITE(spy);
-    ADD_SUITE(study);
-    ADD_SUITE(shock);
 
     if (suites) {
         CuSuite *summary = CuSuiteNew();

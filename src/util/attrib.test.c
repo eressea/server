@@ -127,6 +127,7 @@ static void test_attrib_rwstring(CuTest *tc) {
     data.strm.api->rewind(data.strm.handle);
     a_readstring(&a, NULL, &data);
     CuAssertStrEquals(tc, "Hello World", (const char *)a.data.v);
+    a_finalizestring(&a);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_cleanup();

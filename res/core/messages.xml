@@ -5536,8 +5536,8 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur Elfen können diese Bögen herstellen."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Only elves can make these bows."</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diesen Gegenstand kann die Einheit nicht herstellen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This unit cannot produce that."</text>
   </message>
   <message name="error117" section="errors">
     <type>
@@ -5545,8 +5545,8 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Nur die EMail-Adresse angeben!"</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - Please provide only an email address!"</text>
+    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann das nicht herstellen."</text>
+    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - This race cannot produce that."</text>
   </message>
   <message name="error116" section="errors">
     <type>
@@ -7676,24 +7676,6 @@
     </type>
     <text locale="de">"$unit($unit) spielt einen Dudelsack. Ausser sich vor Furcht geben die Bauern $int($money) Silber."</text>
     <text locale="en">"$unit($unit) plays the bagpipe. Stricken with fear the peasants give $int($money) silver."</text>
-  </message>
-
-  <message name="artacademy_create" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region) erschafft eine Akademie der Künste."</text>
-    <text locale="en">"$unit($unit) in $region($region) creates an academy of arts."</text>
-  </message>
-
-  <message name="artsculpture_create" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region) erschafft eine Skulptur."</text>
-    <text locale="en">"$unit($unit) in $region($region) creates a sculpture."</text>
   </message>
 
   <message name="spellfail_distance" section="errors">

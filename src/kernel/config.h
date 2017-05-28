@@ -56,6 +56,7 @@ extern "C" {
     /* returns a value between [0..xpct_2], generated with two dice */
 
     void init_locale(struct locale *lang);
+    void init_races(struct locale *lang);
 
     int forbiddenid(int id);
     int newcontainerid(void);
@@ -108,14 +109,8 @@ extern "C" {
 
     /* globale settings des Spieles */
     typedef struct settings {
-        const char *gamename;
         struct attrib *attribs;
-        unsigned int data_turn;
         void *vm_state;
-        struct global_functions {
-            int(*wage) (const struct region * r, const struct faction * f,
-                const struct race * rc, int in_turn);
-        } functions;
     } settings;
 
     void set_param(struct param **p, const char *key, const char *value);
@@ -126,7 +121,8 @@ extern "C" {
     void free_params(struct param **pp);
 
     void config_set(const char *key, const char *value);
-    void config_set_from(const struct _dictionary_ *d);
+    void config_set_int(const char *key, int value);
+    void config_set_from(const struct _dictionary_ *d, const char *keys[]);
     const char *config_get(const char *key);
     int config_get_int(const char *key, int def);
     double config_get_flt(const char *key, double def);

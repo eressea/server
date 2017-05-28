@@ -316,8 +316,12 @@ static void test_recruit(CuTest *tc) {
     f = test_create_faction(0);
     u = test_create_unit(f, test_create_region(0, 0, 0));
     CuAssertIntEquals(tc, 1, u->number);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    CuAssertIntEquals(tc, 1, f->num_units);
     add_recruits(u, 1, 1);
     CuAssertIntEquals(tc, 2, u->number);
+    CuAssertIntEquals(tc, 2, f->num_people);
+    CuAssertIntEquals(tc, 1, f->num_units);
     CuAssertPtrEquals(tc, u, f->units);
     CuAssertPtrEquals(tc, NULL, u->nextF);
     CuAssertPtrEquals(tc, NULL, u->prevF);
@@ -341,12 +345,118 @@ static void test_income(CuTest *tc)
     test_cleanup();
 }
 
-static void test_make_item(CuTest *tc) {
+static void test_modify_material(CuTest *tc) {
+    unit *u;
+    struct item_type *itype;
+    resource_type *rtype;
+    resource_mod *mod;
+
+    test_setup();
+    init_resources();
+
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_WEAPONSMITH, 1);
+
+    /* the unit's race gets 2x savings on iron used to produce goods */
+    itype = test_create_itemtype("iron");
+    rtype = itype->rtype;
+    mod = rtype->modifiers = calloc(2, sizeof(resource_mod));
+    mod[0].type = RMT_USE_SAVE;
+    mod[0].value = frac_make(2, 1);
+    mod[0].race = u_race(u);
+
+    itype = test_create_itemtype("sword");
+    make_item(u, itype, 1);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
+    CuAssertIntEquals(tc, 0, get_item(u, itype));
+    test_clear_messages(u->faction);
+    itype->construction = calloc(1, sizeof(construction));
+    itype->construction->skill = SK_WEAPONSMITH;
+    itype->construction->minskill = 1;
+    itype->construction->maxsize = 1;
+    itype->construction->reqsize = 1;
+    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials[0].rtype = rtype;
+    itype->construction->materials[0].number = 2;
+
+    set_item(u, rtype->itype, 1); /* 1 iron should get us 1 sword */
+    make_item(u, itype, 1);
+    CuAssertIntEquals(tc, 1, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
+
+    u_setrace(u, test_create_race("smurf"));
+    set_item(u, rtype->itype, 2); /* 2 iron should be required now */
+    make_item(u, itype, 1);
+    CuAssertIntEquals(tc, 2, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
+
+    test_cleanup();
+}
+
+static void test_modify_skill(CuTest *tc) {
+    unit *u;
+    struct item_type *itype;
+    /* building_type *btype; */
+    resource_type *rtype;
+    resource_mod *mod;
+
+    test_setup();
+    init_resources();
+
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_WEAPONSMITH, 1);
+
+    itype = test_create_itemtype("iron");
+    rtype = itype->rtype;
+
+    itype = test_create_itemtype("sword");
+    make_item(u, itype, 1);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
+    CuAssertIntEquals(tc, 0, get_item(u, itype));
+    test_clear_messages(u->faction);
+    itype->construction = calloc(1, sizeof(construction));
+    itype->construction->skill = SK_WEAPONSMITH;
+    itype->construction->minskill = 1;
+    itype->construction->maxsize = -1;
+    itype->construction->reqsize = 1;
+    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials[0].rtype = rtype;
+    itype->construction->materials[0].number = 1;
+
+    /* our race gets a +1 bonus to the item's production skill */
+    mod = itype->rtype->modifiers = calloc(2, sizeof(resource_mod));
+    mod[0].type = RMT_PROD_SKILL;
+    mod[0].value.sa[0] = SK_WEAPONSMITH;
+    mod[0].value.sa[1] = 1;
+    mod[0].race = u_race(u);
+
+    set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
+    make_item(u, itype, 2);
+    CuAssertIntEquals(tc, 2, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
+
+    mod[0].value.sa[0] = NOSKILL; /* match any skill */
+    set_item(u, rtype->itype, 2);
+    make_item(u, itype, 2);
+    CuAssertIntEquals(tc, 4, get_item(u, itype));
+    CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
+
+
+    u_setrace(u, test_create_race("smurf"));
+    set_item(u, rtype->itype, 2);
+    make_item(u, itype, 1); /* only enough skill to make 1 now */
+    CuAssertIntEquals(tc, 5, get_item(u, itype));
+    CuAssertIntEquals(tc, 1, get_item(u, rtype->itype));
+
+    test_cleanup();
+}
+
+
+static void test_modify_production(CuTest *tc) {
     unit *u;
     struct item_type *itype;
     const struct resource_type *rt_silver;
     resource_type *rtype;
-    resource_limit *rdata;
     double d = 0.6;
 
     test_setup();
@@ -380,8 +490,7 @@ static void test_make_item(CuTest *tc) {
     itype->construction->materials = 0;
     rtype->flags |= RTF_LIMITED;
     rmt_create(rtype);
-    rdata = rtype->limit = calloc(1, sizeof(resource_limit));
-    add_resource(u->region, 1, 300, 150, rtype);
+    add_resource(u->region, 1, 300, 150, rtype); /* there are 300 stones at level 1 */
     CuAssertIntEquals(tc, 300, region_getresource(u->region, rtype));
     set_level(u, SK_ALCHEMY, 10);
 
@@ -390,11 +499,11 @@ static void test_make_item(CuTest *tc) {
     CuAssertIntEquals(tc, 11, get_item(u, itype));
     CuAssertIntEquals(tc, 290, region_getresource(u->region, rtype)); /* used 10 stones to make 10 stones */
 
-    rdata->modifiers = calloc(2, sizeof(resource_mod));
-    rdata->modifiers[0].flags = RMF_SAVEMATERIAL;
-    rdata->modifiers[0].race = u->_race;
-    rdata->modifiers[0].value.sa[0] = (short)(0.5+100*d);
-    rdata->modifiers[0].value.sa[1] = 100;
+    rtype->modifiers = calloc(2, sizeof(resource_mod));
+    rtype->modifiers[0].type = RMT_PROD_SAVE;
+    rtype->modifiers[0].race = u->_race;
+    rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
+    rtype->modifiers[0].value.sa[1] = 100;
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 21, get_item(u, itype));
@@ -405,17 +514,39 @@ static void test_make_item(CuTest *tc) {
     CuAssertIntEquals(tc, 22, get_item(u, itype));
     CuAssertIntEquals(tc, 283, region_getresource(u->region, rtype)); /* no free lunches */
 
-    rdata->modifiers[0].value = frac_make(1, 2);
+    rtype->modifiers[0].value = frac_make(1, 2);
     make_item(u, itype, 6);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 28, get_item(u, itype));
     CuAssertIntEquals(tc, 280, region_getresource(u->region, rtype)); /* 50% saving = 3 stones make 6 stones */
 
-    rdata->modifiers[0].flags = RMF_REQUIREDBUILDING;
-    rdata->modifiers[0].race = NULL;
-    rdata->modifiers[0].btype = bt_get_or_create("mine");
+    rtype->modifiers[0].type = RMT_PROD_REQUIRE;
+    rtype->modifiers[0].race = NULL;
+    rtype->modifiers[0].btype = bt_get_or_create("mine");
+
+    test_clear_messages(u->faction);
     make_item(u, itype, 10);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error104"));
+    CuAssertIntEquals(tc, 28, get_item(u, itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "building_needed"));
+
+    rtype->modifiers[0].type = RMT_PROD_REQUIRE;
+    rtype->modifiers[0].race = test_create_race("smurf");
+    rtype->modifiers[0].btype = NULL;
+
+    test_clear_messages(u->faction);
+    make_item(u, itype, 10);
+    CuAssertIntEquals(tc, 28, get_item(u, itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error117"));
+
+    rtype->modifiers[1].type = RMT_PROD_REQUIRE;
+    rtype->modifiers[1].race = u_race(u);
+    rtype->modifiers[1].btype = NULL;
+
+    test_clear_messages(u->faction);
+    make_item(u, itype, 10);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    split_allocations(u->region);
+    CuAssertIntEquals(tc, 38, get_item(u, itype));
 
     test_cleanup();
 }
@@ -426,7 +557,9 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
     SUITE_ADD_TEST(suite, test_income);
-    SUITE_ADD_TEST(suite, test_make_item);
+    SUITE_ADD_TEST(suite, test_modify_production);
+    SUITE_ADD_TEST(suite, test_modify_skill);
+    SUITE_ADD_TEST(suite, test_modify_material);
     SUITE_ADD_TEST(suite, test_steal_okay);
     SUITE_ADD_TEST(suite, test_steal_ocean);
     SUITE_ADD_TEST(suite, test_steal_nosteal);

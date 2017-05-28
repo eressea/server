@@ -66,7 +66,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
     struct faction;
     struct gamedata;
 
-#define MORALE_TAX_FACTOR 0.005 /* 0.5% tax per point of morale */
+#define MORALE_TAX_FACTOR 200 /* 0.5% tax per point of morale, 1 silver per 200 */
 #define MORALE_MAX 10           /* Maximum morale allowed */
 #define MORALE_DEFAULT 1        /* Morale of peasants when they are conquered for the first time */
 #define MORALE_TAKEOVER 0       /* Morale of peasants after they lose their lord */
@@ -105,7 +105,6 @@ extern "C" {
         int peasants;
         int newpeasants;
         int money;
-        struct item *items;         /* items that can be claimed */
         struct region_owner *ownership;
     } land_region;
 

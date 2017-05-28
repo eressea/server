@@ -644,7 +644,7 @@ int skill_limit(faction * f, skill_t sk)
         m = max_magicians(f);
     }
     else if (sk == SK_ALCHEMY) {
-        m = config_get_int("rules.maxskills.alchemy", MAXALCHEMISTS);
+        m = config_get_int("rules.maxskills.alchemy", 3);
     }
     return m;
 }
@@ -712,7 +712,7 @@ int count_faction(const faction * f, int flags)
     int n = 0;
     for (u = f->units; u; u = u->nextF) {
         const race *rc = u_race(u);
-        int x = (flags&COUNT_UNITS) ? 1 : u->number;
+        int x = u->number;
         if (f->race != rc) {
             if (!playerrace(rc)) {
                 if (flags&COUNT_MONSTERS) {
@@ -732,16 +732,6 @@ int count_faction(const faction * f, int flags)
     return n;
 }
 
-int count_units(const faction * f)
-{
-    return count_faction(f, COUNT_ALL | COUNT_UNITS);
-}
-
-int count_all(const faction * f)
-{
-    return count_faction(f, COUNT_ALL);
-}
-
 int count_migrants(const faction * f)
 {
     return count_faction(f, COUNT_MIGRANTS);
@@ -752,7 +742,7 @@ int count_maxmigrants(const faction * f)
     int formula = rc_migrants_formula(f->race);
 
     if (formula == MIGRANTS_LOG10) {
-        int nsize = count_all(f);
+        int nsize = f->num_people;
         if (nsize > 0) {
             int x = (int)(log10(nsize / 50.0) * 20);
             if (x < 0) x = 0;
@@ -762,22 +752,6 @@ int count_maxmigrants(const faction * f)
     return 0;
 }
 
-static void init_maxmagicians(struct attrib *a)
-{
-    a->data.i = MAXMAGICIANS;
-}
-
-attrib_type at_maxmagicians = {
-    "maxmagicians",
-    init_maxmagicians,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
-
 int max_magicians(const faction * f)
 {
     static int rule, config, rc_cache;
@@ -785,15 +759,9 @@ int max_magicians(const faction * f)
     int m;
 
     if (config_changed(&config)) {
-        rule = config_get_int("rules.maxskills.magic", MAXMAGICIANS);
+        rule = config_get_int("rules.maxskills.magic", 3);
     }
     m = rule;
-    if (f->attribs) {
-        attrib *a = a_find(f->attribs, &at_maxmagicians);
-        if (a) {
-            m = a->data.i;
-        }
-    }
     if (rc_changed(&rc_cache)) {
         rc_elf = get_race(RC_ELF);
     }

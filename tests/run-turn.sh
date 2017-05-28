@@ -28,12 +28,12 @@ while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
 
-set -e
 cd $ROOT/tests
 setup
 cleanup
 VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
+set -e
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
 SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
@@ -53,6 +53,7 @@ assert_grep_count reports/$CRFILE '^BURG' 1
 assert_grep_count reports/$CRFILE '^EINHEIT' 2
 assert_grep_count reports/$CRFILE '^GEGENSTAENDE' 2
 
+assert_grep_count reports/185-heg.cr '185;Runde' 1
 assert_grep_count reports/185-heg.cr ';Baeume' 4
 assert_grep_count reports/185-heg.cr '"B.ume";type' 4
 assert_grep_count reports/185-heg.cr '"Pferde";type' 6
@@ -62,4 +63,4 @@ assert_grep_count reports/185-heg.cr '"neighbour";visibility' 11
 assert_grep_count reports/185-6rLo.cr '^EINHEIT' 2
 assert_grep_count reports/185-6rLo.cr '^REGION' 13
 echo "integration tests: PASS"
-#cleanup
+cleanup

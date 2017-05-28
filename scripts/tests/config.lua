@@ -11,7 +11,7 @@ function test_read_race()
     eressea.free_game()
     assert_not_nil(eressea.config)
     eressea.config.parse('{ "races": { "orc" : {}}}')
-    f = faction.create("orc@example.com", "orc", "en")
+    f = faction.create("orc", "orc@example.com", "en")
     assert_not_nil(f)
 end
 

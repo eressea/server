@@ -19,6 +19,7 @@ without prior permission by the authors of Eressea.
 #include "chaos.h"
 
 #include <kernel/config.h>
+#include <kernel/curse.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/unit.h>
@@ -29,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include <kernel/ship.h>
 #include <kernel/plane.h>
 #include <kernel/terrain.h>
+#include <kernel/messages.h>
 #include <modules/autoseed.h>
 #include <attributes/key.h>
 #include <attributes/racename.h>
@@ -45,6 +47,23 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+static int tolua_region_count_msg_type(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *str = tolua_tostring(L, 2, 0);
+    int n = 0;
+    if (self->msgs) {
+        mlist * ml = self->msgs->begin;
+        while (ml) {
+            if (strcmp(str, ml->msg->type->name) == 0) {
+                ++n;
+            }
+            ml = ml->next;
+        }
+    }
+    lua_pushinteger(L, n);
+    return 1;
+}
 
 int tolua_regionlist_next(lua_State * L)
 {
@@ -341,20 +360,16 @@ static int tolua_region_get_resourcelevel(lua_State * L)
 
 #define LUA_ASSERT(c, s) if (!(c)) { log_error("%s(%d): %s\n", __FILE__, __LINE__, (s)); return 0; }
 
-static critbit_tree * special_resources(void)
-{
-    static critbit_tree cb = CRITBIT_TREE();
-    if (!cb.root) {
-        const char * special[] = { "seed", "sapling", "tree", "grave", "chaos", 0 };
-        char buffer[32];
-        int i;
-        for (i = 0; special[i]; ++i) {
-            size_t len = strlen(special[i]);
-            len = cb_new_kv(special[i], len, &i, sizeof(int), buffer);
-            cb_insert(&cb, buffer, len);
+static int special_resource(const char *type) {
+    const char * special[] = { "seed", "sapling", "tree", "grave", "chaos", 0 };
+    int i;
+
+    for (i = 0; special[i]; ++i) {
+        if (strcmp(type, special[i]) == 0) {
+            return i;
         }
     }
-    return &cb;
+    return -1;
 }
 
 static int tolua_region_get_resource(lua_State * L)
@@ -362,32 +377,27 @@ static int tolua_region_get_resource(lua_State * L)
     region *r;
     const char *type;
     const resource_type *rtype;
-    int result = 0;
-    void * match;
-    critbit_tree * cb = special_resources();
+    int result;
 
     r = (region *)tolua_tousertype(L, 1, 0);
     LUA_ASSERT(r != NULL, "invalid parameter");
     type = tolua_tostring(L, 2, 0);
     LUA_ASSERT(type != NULL, "invalid parameter");
-
-    if (cb_find_prefix(cb, type, strlen(type) + 1, &match, 1, 0)) {
-        cb_get_kv(match, &result, sizeof(result));
-        switch (result) {
-        case 0:
-        case 1:
-        case 2:
-            result = rtrees(r, result);
-            break;
-        case 3:
-            result = deathcount(r);
-            break;
-        case 4:
-            result = get_chaoscount(r);
-            break;
-        }
-    }
-    else {
+    
+    result = special_resource(type);
+    switch (result) {
+    case 0:
+    case 1:
+    case 2:
+        result = rtrees(r, result);
+        break;
+    case 3:
+        result = deathcount(r);
+        break;
+    case 4:
+        result = get_chaoscount(r);
+        break;
+    default:
         rtype = rt_find(type);
         if (rtype) {
             result = region_getresource(r, rtype);
@@ -406,27 +416,23 @@ static int tolua_region_set_resource(lua_State * L)
     region *r = (region *)tolua_tousertype(L, 1, 0);
     const char *type = tolua_tostring(L, 2, 0);
     int result, value = (int)tolua_tonumber(L, 3, 0);
-    critbit_tree * cb = special_resources();
-    void * match;
+    const resource_type *rtype;
 
-    if (cb_find_prefix(cb, type, strlen(type) + 1, &match, 1, 0)) {
-        cb_get_kv(match, &result, sizeof(result));
-        switch (result) {
-        case 0:
-        case 1:
-        case 2:
-            rsettrees(r, result, value);
-            break;
-        case 3:
-            deathcounts(r, value - deathcount(r));
-            break;
-        case 4:
-            add_chaoscount(r, value - get_chaoscount(r));
-            break;
-        }
-    }
-    else {
-        const resource_type *rtype = rt_find(type);
+    result = special_resource(type);
+    switch (result) {
+    case 0:
+    case 1:
+    case 2:
+        rsettrees(r, result, value);
+        break;
+    case 3:
+        deathcounts(r, value - deathcount(r));
+        break;
+    case 4:
+        add_chaoscount(r, value - get_chaoscount(r));
+        break;
+    default:
+        rtype = rt_find(type);
         if (rtype != NULL) {
             region_setresource(r, rtype, value);
         }
@@ -665,6 +671,27 @@ static int tolua_distance(lua_State * L)
     return 1;
 }
 
+static int tolua_region_get_curse(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    if (self->attribs) {
+        curse * c = get_curse(self->attribs, ct_find(name));
+        if (c) {
+            lua_pushnumber(L, curse_geteffect(c));
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int tolua_region_has_attrib(lua_State *L) {
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+    const char *name = tolua_tostring(L, 2, 0);
+    attrib * a = a_find(self->attribs, at_find(name));
+    lua_pushboolean(L, a != NULL);
+    return 1;
+}
+
 void tolua_region_open(lua_State * L)
 {
     /* register user types */
@@ -684,6 +711,10 @@ void tolua_region_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "destroy", tolua_region_destroy);
             tolua_function(L, TOLUA_CAST "__tostring", tolua_region_tostring);
 
+            tolua_function(L, TOLUA_CAST "count_msg_type", tolua_region_count_msg_type);
+
+            tolua_function(L, TOLUA_CAST "get_curse", &tolua_region_get_curse);
+            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_region_has_attrib);
             /* flags */
             tolua_variable(L, TOLUA_CAST "blocked", tolua_region_get_blocked, tolua_region_set_blocked);
 

@@ -153,54 +153,43 @@ static void test_unit_name(CuTest *tc) {
 
 static void test_unit_name_from_race(CuTest *tc) {
     unit *u;
-    struct locale *lang;
 
-    test_cleanup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    test_setup();
+    u = test_create_unit(test_create_faction(test_create_race("human")), test_create_region(0, 0, NULL));
     renumber_unit(u, 666);
     unit_setname(u, NULL);
-    lang = get_or_create_locale("de");
-    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
-    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
 
-    CuAssertStrEquals(tc, "Mensch (ii)", unitname(u));
-    CuAssertStrEquals(tc, "Mensch", unit_getname(u));
+    CuAssertStrEquals(tc, "human (ii)", unitname(u));
+    CuAssertStrEquals(tc, "human", unit_getname(u));
 
     u->number = 2;
-    CuAssertStrEquals(tc, "Menschen (ii)", unitname(u));
-    CuAssertStrEquals(tc, "Menschen", unit_getname(u));
+    CuAssertStrEquals(tc, "human_p (ii)", unitname(u));
+    CuAssertStrEquals(tc, "human_p", unit_getname(u));
 
     test_cleanup();
 }
 
 static void test_update_monster_name(CuTest *tc) {
     unit *u;
-    struct locale *lang;
+    race *rc;
 
-    test_cleanup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
-    lang = get_or_create_locale("de");
-    locale_setstring(lang, rc_name_s(u->_race, NAME_SINGULAR), "Mensch");
-    locale_setstring(lang, rc_name_s(u->_race, NAME_PLURAL), "Menschen");
+    test_setup();
+    rc = test_create_race("human");
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
     unit_setname(u, "Hodor");
     CuAssertTrue(tc, !unit_name_equals_race(u));
 
-    unit_setname(u, "Menschling");
+    unit_setname(u, "humanitarian");
+    CuAssertTrue(tc, !unit_name_equals_race(u));
+
+    unit_setname(u, "huma");
     CuAssertTrue(tc, !unit_name_equals_race(u));
 
     unit_setname(u, rc_name_s(u->_race, NAME_SINGULAR));
     CuAssertTrue(tc, unit_name_equals_race(u));
 
     unit_setname(u, rc_name_s(u->_race, NAME_PLURAL));
-    CuAssertTrue(tc, unit_name_equals_race(u));
-
-    unit_setname(u, "Mensch");
-    CuAssertTrue(tc, unit_name_equals_race(u));
-
-    unit_setname(u, "Menschen");
     CuAssertTrue(tc, unit_name_equals_race(u));
 
     test_cleanup();
@@ -256,19 +245,19 @@ static void test_skillmod(CuTest *tc) {
     set_level(u, SK_ARMORER, 5);
     CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, 0));
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 2.0, 0));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 2.0, 0));
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(NOSKILL, SMF_ALWAYS, 0, 2.0, 0)); /* NOSKILL means any skill */
+    a_add(&u->attribs, a = make_skillmod(NOSKILL, 0, 2.0, 0)); /* NOSKILL means any skill */
     CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, 0, 0, 2));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 0, 2));
     CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
-    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, SMF_ALWAYS, cb_skillmod, 0, 0));
+    a_add(&u->attribs, a = make_skillmod(SK_ARMORER, cb_skillmod, 0, 0));
     CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, 0));
     a_remove(&u->attribs, a);
 
@@ -519,6 +508,43 @@ static void test_heal_factor(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_unlimited_units(CuTest *tc) {
+    race *rc;
+    faction *f;
+    unit *u;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    rc = test_create_race("spell");
+    rc->flags |= RCF_INVISIBLE;
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    CuAssertTrue(tc, count_unit(u));
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    u_setfaction(u, NULL);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u_setfaction(u, f);
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 1, f->num_people);
+    u_setrace(u, rc);
+    CuAssertTrue(tc, !count_unit(u));
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    scale_number(u, 10);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    u_setrace(u, f->race);
+    CuAssertIntEquals(tc, 1, f->num_units);
+    CuAssertIntEquals(tc, 10, f->num_people);
+    remove_unit(&u->region->units, u);
+    CuAssertIntEquals(tc, 0, f->num_units);
+    CuAssertIntEquals(tc, 0, f->num_people);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -534,6 +560,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_remove_units_with_dead_faction);
     SUITE_ADD_TEST(suite, test_remove_empty_units_in_region);
     SUITE_ADD_TEST(suite, test_names);
+    SUITE_ADD_TEST(suite, test_unlimited_units);
     SUITE_ADD_TEST(suite, test_default_name);
     SUITE_ADD_TEST(suite, test_skillmod);
     SUITE_ADD_TEST(suite, test_skill_hunger);

@@ -21,9 +21,9 @@ function setup()
     set_rule('rules.food.flags', '4')
 
     local r = region.create(0,0, "plain")
-    f = faction.create("stealthy@eressea.de", "human", "de")
+    f = faction.create("human", "stealthy@eressea.de", "de")
     u = unit.create(f, r, 1)
-    f = faction.create("stealth@eressea.de", "human", "de")
+    f = faction.create("human", "stealth@eressea.de", "de")
     unit.create(f, r, 1) -- TARNE PARTEI NUMMER <no> must have a unit in the region
 end
 

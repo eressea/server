@@ -44,13 +44,8 @@ static struct locale_data *locale_array[MAXLOCALES];
 
 typedef struct order_data {
     const char *_str;
-# ifdef LOMEM
-    int _refcount:20;
-    int _lindex:4;
-# else
     int _refcount;
     int _lindex;
-# endif
     keyword_t _keyword;
 } order_data;
 
@@ -99,6 +94,15 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
 
+    if (ord->_noerror) {
+        if (size > 0) {
+            *bufp++ = '!';
+            --size;
+        }
+        else {
+            WARN_STATIC_BUFFER();
+        }
+    }
     if (ord->_persistent) {
         if (size > 0) {
             *bufp++ = '@';
@@ -159,6 +163,7 @@ order *copy_order(const order * src)
         order *ord = (order *)malloc(sizeof(order));
         ord->next = NULL;
         ord->_persistent = src->_persistent;
+        ord->_noerror = src->_noerror;
         ord->data = src->data;
         ++ord->data->_refcount;
         return ord;
@@ -280,7 +285,7 @@ void close_orders(void) {
 }
 
 static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
-    const struct locale *lang)
+    bool noerror, const struct locale *lang)
 {
     order *ord = NULL;
     int lindex;
@@ -313,6 +318,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
 
     ord = (order *)malloc(sizeof(order));
     ord->_persistent = persistent;
+    ord->_noerror = noerror;
     ord->next = NULL;
 
     ord->data = create_data(kwd, sptr, lindex);
@@ -373,7 +379,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     else {
         zBuffer[0] = 0;
     }
-    return create_order_i(kwd, zBuffer, false, lang);
+    return create_order_i(kwd, zBuffer, false, false, lang);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -386,11 +392,12 @@ order *parse_order(const char *s, const struct locale * lang)
     if (*s != 0) {
         keyword_t kwd;
         const char *sptr;
-        bool persistent = false;
+        bool persistent = false, noerror = false;
         const char * p;
 
-        while (*s == '@') {
-            persistent = true;
+        while (*s == '!' || *s=='@') {
+            if (*s=='!') noerror = true;
+            else if (*s == '@') persistent = true;
             ++s;
         }
         sptr = s;
@@ -407,7 +414,7 @@ order *parse_order(const char *s, const struct locale * lang)
         if (kwd != NOKEYWORD) {
             while (isspace(*(unsigned char *)sptr)) ++sptr;
             s = sptr;
-            return create_order_i(kwd, s, persistent, lang);
+            return create_order_i(kwd, s, persistent, noerror, lang);
         }
     }
     return NULL;

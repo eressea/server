@@ -11,7 +11,7 @@ function setup()
 end
 
 local function create_faction(race)
-    return faction.create(race .. '@eressea.de', race, "de")
+    return faction.create(race, race .. '@eressea.de', "de")
 end
 
 local function _test_create_adamantium()

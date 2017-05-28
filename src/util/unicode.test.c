@@ -123,6 +123,17 @@ static void test_unicode_compare(CuTest *tc)
     CuAssertIntEquals(tc, 1, unicode_utf8_strcasecmp("bacdefg123", "ABCDEFG123"));
 }
 
+static void test_unicode_farsi_nzwj(CuTest *tc) {
+    const char str[] = { 0xe2, 0x80, 0x8c, 0xd8, 0xa7, 0xd9, 0x84, 0xd8, 0xaf,
+        0xdb, 0x8c, 0xd9, 0x86, 0x20, 0xd9, 0x85, 0xd8, 0xad, 0xd9, 0x85, 0xd8,
+        0xaf, 0x20, 0xd8, 0xb1, 0xd9, 0x88, 0xd9, 0x85, 0xdb, 0x8c, 0xe2, 0x80,
+        0x8e, 0xe2, 0x80, 0x8e, 0x00 };
+    char name[64];
+    strcpy(name, str);
+    CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, str, name);
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -132,5 +143,6 @@ CuSuite *get_unicode_suite(void)
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
     SUITE_ADD_TEST(suite, test_unicode_compare);
+    SUITE_ADD_TEST(suite, test_unicode_farsi_nzwj);
     return suite;
 }

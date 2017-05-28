@@ -34,23 +34,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
-/* triggers includes */
-#include <triggers/changerace.h>
-#include <triggers/timeout.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <critbit.h>
-#include <util/event.h>
 #include <util/functions.h>
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/language.h>
 #include <util/message.h>
-#include <util/umlaut.h>
 #include <util/rng.h>
+#include <util/umlaut.h>
 
+#include <critbit.h>
 #include <storage.h>
 
 /* libc includes */
@@ -568,48 +563,6 @@ item *i_new(const item_type * itype, int size)
     return i;
 }
 
-#include "region.h"
-
-static int
-give_horses(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsethorses(r, rhorses(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
-static int
-give_money(unit * s, unit * d, const item_type * itype, int n,
-struct order *ord)
-{
-    if (d == NULL) {
-        int use = use_pooled(s, item2resource(itype), GET_SLACK, n);
-        region *r = s->region;
-        if (use < n) {
-            use +=
-            use_pooled(s, item2resource(itype), GET_RESERVE | GET_POOLED_SLACK,
-            n - use);
-        }
-        if (r->land) {
-            rsetmoney(r, rmoney(r) + use);
-        }
-        return 0;
-    }
-    return -1;                    /* use the mechanism */
-}
-
 const potion_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
@@ -668,61 +621,12 @@ int set_item(unit * u, const item_type *itype, int value)
     return value;
 }
 
-static int
-use_birthdayamulet(unit * u, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    direction_t d;
-    message *msg = msg_message("meow", "");
-
-    UNUSED_ARG(ord);
-    UNUSED_ARG(amount);
-    UNUSED_ARG(itype);
-
-    add_message(&u->region->msgs, msg);
-    for (d = 0; d < MAXDIRECTIONS; d++) {
-        region *tr = rconnect(u->region, d);
-        if (tr)
-            add_message(&tr->msgs, msg);
-    }
-    msg_release(msg);
-    return 0;
-}
-
 /* t_item::flags */
 #define FL_ITEM_CURSED  (1<<0)
 #define FL_ITEM_NOTLOST (1<<1)
 #define FL_ITEM_NOTINBAG  (1<<2)        /* nicht im Bag Of Holding */
 #define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
 #define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
-
-/* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
- * Runde um -1 - 4 Punkte. */
-static int
-use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int i;
-    for (i = 0; i != amount; ++i) {
-        int duration = 1;           /* wirkt nur eine Runde */
-        curse *c;
-        float effect;
-        float power = 5;            /* Widerstand gegen Antimagiesprueche, ist in diesem
-                                       Fall egal, da der curse fuer den Kampf gelten soll,
-                                       der vor den Antimagiezaubern passiert */
-
-        effect = (float)(rng_int() % 6 - 1);
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
-            duration, effect, u->number);
-        c->data.i = SK_TACTICS;
-        UNUSED_ARG(ord);
-    }
-    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
-    ADDMSG(&u->faction->msgs, msg_message("use_tacticcrystal",
-        "unit region", u, u->region));
-    return 0;
-}
 
 typedef struct t_item {
     const char *name;
@@ -759,17 +663,6 @@ mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
     return -118;
 }
 
-static int heal(unit * user, int effect)
-{
-    int req = unit_max_hp(user) * user->number - user->hp;
-    if (req > 0) {
-        req = MIN(req, effect);
-        effect -= req;
-        user->hp += req;
-    }
-    return effect;
-}
-
 void
 register_item_give(int(*foo) (struct unit *, struct unit *,
 const struct item_type *, int, struct order *), const char *name)
@@ -782,173 +675,6 @@ register_item_use(int(*foo) (struct unit *, const struct item_type *, int,
 struct order *), const char *name)
 {
     register_function((pf_generic)foo, name);
-}
-
-void
-register_item_useonother(int(*foo) (struct unit *, int,
-const struct item_type *, int, struct order *), const char *name)
-{
-    register_function((pf_generic)foo, name);
-}
-
-static int
-use_healingpotion(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int effect = amount * 400;
-    unit *u = user->region->units;
-    effect = heal(user, effect);
-    while (effect > 0 && u != NULL) {
-        if (u->faction == user->faction) {
-            effect = heal(u, effect);
-        }
-        u = u->next;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(user, itype->rtype->ptype);
-
-    ADDMSG(&user->faction->msgs, msg_message("usepotion",
-        "unit potion", user, itype->rtype));
-    return 0;
-}
-
-static int
-use_warmthpotion(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    if (u->faction->race == get_race(RC_INSECT)) {
-        fset(u, UFL_WARMTH);
-    }
-    else {
-        /* nur fuer insekten: */
-        cmistake(u, ord, 163, MSG_EVENT);
-        return ECUSTOM;
-    }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(u, itype->rtype->ptype);
-
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-    return 0;
-}
-
-static int
-use_foolpotion(struct unit *u, int targetno, const struct item_type *itype,
-int amount, struct order *ord)
-{
-    unit *target = findunit(targetno);
-    if (target == NULL || u->region != target->region) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
-        return ECUSTOM;
-    }
-    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
-        cmistake(u, ord, 64, MSG_EVENT);
-        return ECUSTOM;
-    }
-    ADDMSG(&u->faction->msgs, msg_message("givedumb",
-        "unit recipient amount", u, target, amount));
-
-    change_effect(target, itype->rtype->ptype, amount);
-    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
-    return 0;
-}
-
-static int
-use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
-        change_effect(u, itype->rtype->ptype, 100 * amount);
-    }
-    else {
-        const race *irace = u_irace(u);
-        if (irace == u_race(u)) {
-            const race *rcfailure = rc_find("smurf");
-            if (!rcfailure) {
-                rcfailure = rc_find("toad");
-            }
-            if (rcfailure) {
-                trigger *trestore = trigger_changerace(u, u_race(u), irace);
-                if (trestore) {
-                    int duration = 2 + rng_int() % 8;
-
-                    add_trigger(&u->attribs, "timer", trigger_timeout(duration,
-                        trestore));
-                    u->irace = NULL;
-                    u_setrace(u, rcfailure);
-                }
-            }
-        }
-    }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(u, itype->rtype->ptype);
-
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-    return 0;
-}
-
-#include <attributes/fleechance.h>
-static int
-use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int mtoes =
-        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-
-    if (user->number > mtoes) {
-        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-            "unit item region command", user, itype->rtype, user->region, ord));
-        return -1;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-    a_add(&user->attribs, make_fleechance((float)1.0));
-    ADDMSG(&user->faction->msgs,
-        msg_message("use_item", "unit item", user, itype->rtype));
-
-    return 0;
-}
-
-static int
-use_magicboost(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int mtoes =
-        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-    faction *f = user->faction;
-    if (user->number > mtoes) {
-        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-            "unit item region command", user, itype->rtype, user->region, ord));
-        return -1;
-    }
-    if (!is_mage(user) || key_get(f->attribs, atoi36("mbst"))) {
-        cmistake(user, user->thisorder, 214, MSG_EVENT);
-        return -1;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-
-    key_set(&f->attribs, atoi36("mbst"), turn);
-    set_level(user, SK_MAGIC, 3);
-
-    ADDMSG(&user->faction->msgs, msg_message("use_item",
-        "unit item", user, itype->rtype));
-
-    return 0;
-}
-
-static int
-use_snowball(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    return 0;
 }
 
 static void init_oldpotions(void)
@@ -982,7 +708,6 @@ void init_resources(void)
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->weight = 1;
-    rtype->itype->give = give_money;
 
     rtype = rt_get_or_create(resourcenames[R_HORSE]);
     rtype->flags |= RTF_ITEM | RTF_LIMITED;
@@ -1186,25 +911,27 @@ void read_items(struct storage *store, item ** ilist)
 {
     for (;;) {
         char ibuf[32];
-        const item_type *itype;
         int i;
         READ_STR(store, ibuf, sizeof(ibuf));
         if (!strcmp("end", ibuf)) {
             break;
         }
-        itype = it_find(ibuf);
         READ_INT(store, &i);
-        if (i <= 0) {
-            log_error("data contains an entry with %d %s", i, ibuf);
-        }
-        else {
-            if (itype && itype->rtype) {
-                i_change(ilist, itype, i);
+        if (ilist) {
+            const item_type *itype;
+            itype = it_find(ibuf);
+            if (i <= 0) {
+                log_error("data contains an entry with %d %s", i, ibuf);
             }
             else {
-                log_error("data contains unknown item type %s.", ibuf);
+                if (itype && itype->rtype) {
+                    i_change(ilist, itype, i);
+                }
+                else {
+                    log_error("data contains unknown item type %s.", ibuf);
+                }
+                assert(itype && itype->rtype);
             }
-            assert(itype && itype->rtype);
         }
     }
 }
@@ -1242,15 +969,12 @@ void free_rtype(resource_type *rtype) {
     if (rtype->wtype) {
         free_wtype(rtype->wtype);
     }
-    if (rtype->atype) {
-        free(rtype->atype);
-    }
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
-    if (rtype->raw) {
-        free(rtype->raw);
-    }
+    free(rtype->atype);
+    free(rtype->modifiers);
+    free(rtype->raw);
     free(rtype->_name);
     free(rtype);
 }
@@ -1296,18 +1020,4 @@ void register_resources(void)
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
-
-    register_item_use(use_potion, "usepotion");
-    register_item_use(use_potion_delayed, "usepotion_delayed");
-    register_item_use(use_tacticcrystal, "use_tacticcrystal");
-    register_item_use(use_birthdayamulet, "use_birthdayamulet");
-    register_item_use(use_warmthpotion, "usewarmthpotion");
-    register_item_use(use_bloodpotion, "usebloodpotion");
-    register_item_use(use_healingpotion, "usehealingpotion");
-    register_item_useonother(use_foolpotion, "usefoolpotion");
-    register_item_use(use_mistletoe, "usemistletoe");
-    register_item_use(use_magicboost, "usemagicboost");
-    register_item_use(use_snowball, "usesnowball");
-
-    register_item_give(give_horses, "givehorses");
 }

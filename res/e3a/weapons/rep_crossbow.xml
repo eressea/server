@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <resource name="rep_crossbow">
-  <item weight="100">
-    <function name="canuse" value="lua_canuse_item"/>
+  <modifier type="require" race="dwarf"/>
+  <item weight="100" allow="dwarf halfling">
     <construction skill="weaponsmithing" minskill="5">
-      <modifier function="mod_dwarves_only"/>
       <requirement type="log" quantity="1"/>
       <requirement type="iron" quantity="1"/>
     </construction>

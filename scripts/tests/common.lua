@@ -6,7 +6,7 @@ local function _test_create_ship(r)
 end
 
 local function create_faction(race)
-    return faction.create(race .. '@eressea.de', race, "de")
+    return faction.create(race, race .. '@eressea.de', "de")
 end
 
 local function one_unit(r, f)
@@ -218,6 +218,9 @@ function test_gmtool()
     local r1 = region.create(1, 0, "plain")
     local r2 = region.create(1, 1, "plain")
     local r3 = region.create(1, 2, "plain")
+    if not gmtool then
+        return
+    end
     gmtool.open()
     gmtool.select(r1, true)
     gmtool.select_at(0, 1, true)
@@ -1031,6 +1034,37 @@ function test_recruit()
     for u in f.units do
         assert_equal(6, u.number)
     end
+end
+
+function test_give_horses()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "noreply@eressea.de", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("horse", 0)
+    u:add_item("horse", 21)
+    u:add_item("dolphin", 10)
+    u:add_order("GIB 0 7 PFERD")
+    u:add_order("GIB 0 5 DELPHIN")
+    process_orders()
+    assert_equal(7, r:get_resource("horse"))
+    assert_equal(5, u:get_item("dolphin"))
+    assert_equal(14, u:get_item("horse"))
+end
+
+function test_give_silver()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "noreply@eressea.de", "de")
+    local u = unit.create(f, r, 1)
+
+    r:set_resource("peasant", 0)
+    r:set_resource("money", 11)
+    u:clear_orders()
+    u:add_item("money", 20)
+    u:add_order("GIB 0 10 SILBER")
+    process_orders()
+    assert_equal(21, r:get_resource("money"))
+    assert_equal(10, u:get_item("money"))
 end
 
 function test_give_horses()

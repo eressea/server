@@ -63,33 +63,11 @@ static void test_build_requires_materials(CuTest *tc) {
 
     u = setup_build(&bf);
     set_level(u, SK_ARMORER, 2);
-    CuAssertIntEquals(tc, ENOMATERIALS, build(u, &bf.cons, 0, 1));
+    CuAssertIntEquals(tc, ENOMATERIALS, build(u, &bf.cons, 0, 1, 0));
     itype = bf.cons.materials[0].rtype->itype;
     i_change(&u->items, itype, 2);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
+    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1, 0));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
-    teardown_build(&bf);
-}
-
-static void test_build_requires_building(CuTest *tc) {
-    build_fixture bf = { 0 };
-    unit *u;
-    const struct resource_type *rtype;
-    building_type *btype;
-
-    u = setup_build(&bf);
-    rtype = bf.cons.materials[0].rtype;
-    i_change(&u->items, rtype->itype, 1);
-    set_level(u, SK_ARMORER, 2);
-    bf.cons.btype = btype = bt_get_or_create("hodor");
-    btype->maxcapacity = 1;
-    btype->capacity = 1;
-    CuAssertIntEquals_Msg(tc, "must be inside a production building", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
-    u->building = test_create_building(u->region, btype);
-    fset(u->building, BLD_MAINTAINED);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1));
-    btype->maxcapacity = 0;
-    CuAssertIntEquals_Msg(tc, "cannot build when production building capacity exceeded", EBUILDINGREQ, build(u, &bf.cons, 0, 1));
     teardown_build(&bf);
 }
 
@@ -101,7 +79,7 @@ static void test_build_failure_missing_skill(CuTest *tc) {
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
-    CuAssertIntEquals(tc, ENEEDSKILL, build(u, &bf.cons, 1, 1));
+    CuAssertIntEquals(tc, ENEEDSKILL, build(u, &bf.cons, 1, 1, 0));
     teardown_build(&bf);
 }
 
@@ -114,7 +92,7 @@ static void test_build_failure_low_skill(CuTest *tc) {
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill - 1);
-    CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10));
+    CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10, 0));
     teardown_build(&bf);
 }
 
@@ -128,7 +106,7 @@ static void test_build_failure_completed(CuTest *tc) {
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     bf.cons.maxsize = 1;
-    CuAssertIntEquals(tc, ECOMPLETE, build(u, &bf.cons, bf.cons.maxsize, 10));
+    CuAssertIntEquals(tc, ECOMPLETE, build(u, &bf.cons, bf.cons.maxsize, 10, 0));
     CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -143,19 +121,19 @@ static void test_build_limits(CuTest *tc) {
     assert(rtype);
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10));
+    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
 
     scale_number(u, 2);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     i_change(&u->items, rtype->itype, 2);
-    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 10));
+    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
 
     scale_number(u, 2);
     set_level(u, SK_ARMORER, bf.cons.minskill * 2);
     i_change(&u->items, rtype->itype, 4);
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 10));
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -174,7 +152,7 @@ static void test_build_with_ring(CuTest *tc) {
     set_level(u, SK_ARMORER, bf.cons.minskill);
     i_change(&u->items, rtype->itype, 20);
     i_change(&u->items, ring, 1);
-    CuAssertIntEquals(tc, 10, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 10, build(u, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -193,16 +171,16 @@ static void test_build_with_potion(CuTest *tc) {
     i_change(&u->items, rtype->itype, 20);
     change_effect(u, ptype, 4);
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 18, i_get(u->items, rtype->itype));
     CuAssertIntEquals(tc, 3, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill * 2);
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill);
     scale_number(u, 2); /* OBS: this scales the effects, too: */
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20));
+    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     teardown_build(&bf);
 }
@@ -410,7 +388,6 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_failure_low_skill);
     SUITE_ADD_TEST(suite, test_build_failure_missing_skill);
     SUITE_ADD_TEST(suite, test_build_requires_materials);
-    SUITE_ADD_TEST(suite, test_build_requires_building);
     SUITE_ADD_TEST(suite, test_build_failure_completed);
     SUITE_ADD_TEST(suite, test_build_with_ring);
     SUITE_ADD_TEST(suite, test_build_with_potion);

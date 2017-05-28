@@ -493,18 +493,12 @@ static order *make_movement_order(unit * u, const region * target, int moves,
     if (plan == NULL)
         return NULL;
 
-    bytes =
-        (int)strlcpy(bufp,
-        (const char *)LOC(u->faction->locale, keyword(K_MOVE)), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-
     while (position != moves && plan[position + 1]) {
         region *prev = plan[position];
         region *next = plan[++position];
         direction_t dir = reldirection(prev, next);
         assert(dir != NODIRECTION && dir != D_SPECIAL);
-        if (size > 1) {
+        if (size > 1 && bufp != zOrder) {
             *bufp++ = ' ';
             --size;
         }
@@ -516,7 +510,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
     }
 
     *bufp = 0;
-    return parse_order(zOrder, u->faction->locale);
+    return create_order(K_MOVE, u->faction->locale, zOrder);
 }
 
 void random_growl(const unit *u, region *target, int rand)
@@ -744,7 +738,7 @@ void plan_monsters(faction * f)
             order *long_order = NULL;
 
             /* Ab hier nur noch Befehle für NPC-Einheiten. */
-            if (!is_monsters(u->faction))
+            if (u->faction!=f)
                 continue;
 
             /* Befehle müssen jede Runde neu gegeben werden: */
@@ -754,10 +748,6 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (u->status > ST_BEHIND) {
-                setstatus(u, ST_FIGHT);
-                /* all monsters fight */
-            }
             if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, true, false);
             }
@@ -804,10 +794,6 @@ void plan_monsters(faction * f)
 
             if (long_order == NULL) {
                 /* Ab hier noch nicht generalisierte Spezialbehandlungen. */
-
-                if (!u->orders) {
-                    handle_event(u->attribs, "ai_move", u);
-                }
 
                 if (fval(rc, RCF_DRAGON)) {
                     long_order = plan_dragon(u);

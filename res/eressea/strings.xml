@@ -116,18 +116,6 @@
       <text locale="de">Eine Geburtstagstorte mit 10 Kerzen. Herzlichen Glückwunsch, Eressea!</text>
       <text locale="en">A birthday cake with 10 candles. Happy Birthday, Eressea!</text>
     </string>
-    <string name="griphonwing">
-      <text locale="de">Dieses Fluggerät aus der Schmiede der Zwerge von Celeband galt wie die
-        'Ebene der Herausforderung' seit Urzeiten als verschollen, ja man
-        zweifelte seine Existenz an. Die Sage überliefert, das derjenige, der
-        sie auf der Spitze des Turmes seiner Gesinnung benutzt, als einziger
-        die 'Ebene der Herausforderungen' verlassen kann.</text>
-    </string>
-    <string name="ao_daemon">
-      <text locale="de">Glückwunsch, mein Kind. Du bist im Besitz des mächtigsten
-        Artefaktes Eresseas. Ein Fluch, sagt man, liege auf ihm, denn
-        niemand hat es bisher lange sein Eigen genannt...</text>
-    </string>
     <string name="cookie">
       <text locale="de">Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e</text>
     </string>
@@ -374,29 +362,6 @@
   </string>
   <!-- art rewards end -->
 
-  <!-- igjarjuk queste begin -->
-  <string name="ao_daemon">
-    <text locale="de">Auge des Dämon</text>
-    <text locale="en">eye of the demon</text>
-    <text locale="fr">oeil du démon</text>
-  </string>
-  <string name="ao_daemon_p">
-    <text locale="de">Augen des Dämon</text>
-    <text locale="en">eyes of the demon</text>
-    <text locale="fr">oeil du démon</text>
-  </string>
-  <string name="griphonwing">
-    <text locale="de">Schwinge des Greifen</text>
-    <text locale="en">wing of the gryphon</text>
-    <text locale="fr">aile du griffon</text>
-  </string>
-  <string name="griphonwing_p">
-    <text locale="de">Schwingen des Greifen</text>
-    <text locale="en">wings of the gryphon</text>
-    <text locale="fr">ailes du griffon</text>
-  </string>
-  <!-- igjarjuk queste end -->
-
   <string name="rm_adamantium">
     <text locale="de">Adamantium</text>
     <text locale="en">adamantium</text>
@@ -427,5 +392,14 @@
     <text locale="de">Adamantiumrüstungen</text>
     <text locale="en">adamantium plates</text>
   </string>
-
+    <string name="aoc">
+        <text locale="de">Katzenamulett</text>
+        <text locale="en">amulet of the kitten</text>
+        <text locale="fr">amulette du chaton</text>
+    </string>
+    <string name="aoc_p">
+        <text locale="en">amulets of the kitten</text>
+        <text locale="de">Katzenamulette</text>
+        <text locale="fr">amulettes du chaton</text>
+    </string>
 </strings>

@@ -45,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
+#include <kernel/callbacks.h>
 #include <kernel/connection.h>
 #include <kernel/curse.h>
 #include <kernel/building.h>
@@ -284,31 +285,6 @@ static double peasant_growth_factor(void)
     return config_get_flt("rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
 }
 
-#ifdef SLOWLUCK
-int peasant_luck_effect(int peasants, int luck, int maxp, double variance) {
-    int n, births = 0;
-    double factor = peasant_growth_factor();
-    for (n = peasants; n && luck; --n) {
-        int chances = 0;
-
-        if (luck > 0) {
-            --luck;
-            chances += PEASANTLUCK;
-        }
-
-        while (chances--) {
-            if (rng_double() < factor) {
-                /* Only raise with 75% chance if peasants have
-                * reached 90% of maxpopulation */
-                if (peasants / (float)maxp < 0.9 || chance(PEASANTFORCE)) {
-                    ++births;
-                }
-            }
-        }
-    }
-    return births;
-}
-#else
 static double peasant_luck_factor(void)
 {
     return config_get_flt("rules.peasants.peasantluck.factor", PEASANTLUCK);
@@ -331,9 +307,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
     return births;
 }
 
-#endif
-
-static void peasants(region * r)
+static void peasants(region * r, int rule)
 {
     int peasants = rpeasants(r);
     int money = rmoney(r);
@@ -341,7 +315,7 @@ static void peasants(region * r)
     int n, satiated;
     int dead = 0;
 
-    if (peasants > 0 && config_get_int("rules.peasants.growth", 1)) {
+    if (peasants > 0 && rule > 0) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
         int births = RAND_ROUND(fraction);
@@ -812,6 +786,8 @@ void demographics(void)
     static int last_weeks_season = -1;
     static int current_season = -1;
     int plant_rules = config_get_int("rules.grow.formula", 2);
+    int horse_rules = config_get_int("rules.horses.growth", 1);
+    int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
 
     if (current_season < 0) {
@@ -843,7 +819,8 @@ void demographics(void)
                  * und gewandert sind */
 
                 calculate_emigration(r);
-                peasants(r);
+                peasants(r, peasant_rules);
+
                 if (r->age > 20) {
                     double mwp = MAX(region_maxworkers(r), 1);
                     double prob =
@@ -854,7 +831,9 @@ void demographics(void)
                         plagues(r);
                     }
                 }
-                horses(r);
+                if (horse_rules > 0) {
+                    horses(r);
+                }
                 if (plant_rules == 2) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season);
                     growing_herbs(r, current_season, last_weeks_season);
@@ -1274,8 +1253,8 @@ static void remove_idle_players(void)
             }
             else if (turn != f->lastorders) {
                 char info[256];
-                sprintf(info, "%d Einheiten, %d Personen, %d Silber",
-                    f->no_units, f->num_total, f->money);
+                sprintf(info, "%d Einheiten, %d Personen",
+                    f->num_units, f->num_people);
             }
             fp = &f->next;
         }
@@ -1605,10 +1584,14 @@ int display_cmd(unit * u, struct order *ord)
 
         free(*s);
         if (s2) {
-            *s = strdup(s2);
-            if (strlen(s2) >= DISPLAYSIZE) {
-                (*s)[DISPLAYSIZE] = 0;
+            char * str = strdup(s2);
+            if (unicode_utf8_trim(str) != 0) {
+                log_info("trimming info: %s", s2);
             }
+            if (strlen(str) >= DISPLAYSIZE) {
+                str[DISPLAYSIZE-1] = 0;
+            }
+            *s = str;
         }
         else {
             *s = 0;
@@ -1646,7 +1629,9 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
     strlcpy(name, s2, sizeof(name));
-    unicode_utf8_trim(name);
+    if (unicode_utf8_trim(name) != 0) {
+        log_info("trimming name: %s", s2);
+    }
 
     free(*s);
     *s = strdup(name);
@@ -2405,6 +2390,7 @@ static void display_race(unit * u, const race * rc)
 
 static void reshow_other(unit * u, struct order *ord, const char *s) {
     int err = 21;
+    bool found = false;
 
     if (s) {
         const spell *sp = 0;
@@ -2441,7 +2427,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             else {
                 display_item(u, itype);
             }
-            return;
+            found = true;
         }
 
         if (sp) {
@@ -2452,15 +2438,16 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             if (a != NULL) {
                 a_remove(&u->faction->attribs, a);
             }
-            return;
+            found = true;
         }
 
         if (rc && u_race(u) == rc) {
             display_race(u, rc);
-            return;
+            found = true;
         }
     }
-    cmistake(u, ord, err, MSG_EVENT);
+    if (!found)
+      cmistake(u, ord, err, MSG_EVENT);
 }
 
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)
@@ -2514,7 +2501,7 @@ int promotion_cmd(unit * u, struct order *ord)
             u_race(u)));
         return 0;
     }
-    people = count_all(u->faction) * u->number;
+    people = u->faction->num_people * u->number;
     money = get_pooled(u, rsilver, GET_ALL, people);
 
     if (people > money) {
@@ -2899,10 +2886,6 @@ static building *age_building(building * b)
     a_age(&b->attribs, b);
     handle_event(b->attribs, "timer", b);
 
-    if (b->type->age) {
-        b->type->age(b);
-    }
-
     return b;
 }
 
@@ -3015,8 +2998,7 @@ static int maxunits(const faction * f)
 int checkunitnumber(const faction * f, int add)
 {
     int alimit, flimit;
-    int flags = COUNT_DEFAULT | COUNT_MIGRANTS | COUNT_UNITS;
-    int fno = count_faction(f, flags) + add;
+    int fno = f->num_units + add;
     flimit = rule_faction_limit();
     if (flimit && fno > flimit) {
         return 2;
@@ -3024,21 +3006,9 @@ int checkunitnumber(const faction * f, int add)
 
     alimit = rule_alliance_limit();
     if (alimit) {
-        /* if unitsperalliance is true, maxunits returns the
-         number of units allowed in an alliance */
-        faction *f2;
-        int unitsinalliance = fno;
-        if (unitsinalliance > alimit) {
+        int unitsinalliance = alliance_size(f->alliance);
+        if (unitsinalliance + add > alimit) {
             return 1;
-        }
-
-        for (f2 = factions; f2; f2 = f2->next) {
-            if (f != f2 && f->alliance == f2->alliance) {
-                unitsinalliance += count_faction(f2, flags);
-                if (unitsinalliance > alimit) {
-                    return 1;
-                }
-            }
         }
     }
 
@@ -3240,11 +3210,6 @@ void update_long_order(unit * u)
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
-    int target = -1;
-
-    if (itype->useonother) {
-        target = read_unitid(u->faction, u->region);
-    }
 
     i = get_pooled(u, itype->rtype, GET_DEFAULT, amount);
     if (amount > i) {
@@ -3255,19 +3220,14 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
         return ENOITEM;
     }
 
-    if (target == -1) {
-        if (itype->use) {
-            int result = itype->use(u, itype, amount, ord);
-            if (result > 0) {
-                use_pooled(u, itype->rtype, GET_DEFAULT, result);
-            }
-            return result;
+    if (itype->flags & ITF_CANUSE) {
+        int result = callbacks.use_item(u, itype, amount, ord);
+        if (result > 0) {
+            use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }
-        return EUNUSABLE;
+        return result;
     }
-    else {
-        return itype->useonother(u, target, itype, amount, ord);
-    }
+    return EUNUSABLE;
 }
 
 void monthly_healing(void)
@@ -4226,6 +4186,7 @@ static void reset_game(void)
 
 void turn_begin(void)
 {
+    assert(turn >= 0);
     ++turn;
     reset_game();
 }
@@ -4290,12 +4251,18 @@ void update_subscriptions(void)
     fclose(F);
 }
 
-bool
-cansee(const faction * f, const region * r, const unit * u, int modifier)
-/* r kann != u->region sein, wenn es um Durchreisen geht,
+/** determine if unit can be seen by faction
+ * @param f -- the observiong faction
+ * @param u -- the unit that is observed
+ * @param r -- the region that u is obesrved in (see below)
+ * @param m -- terrain modifier to stealth
+ * 
+ * r kann != u->region sein, wenn es um Durchreisen geht,
  * oder Zauber (sp_generous, sp_fetchastral).
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
+bool
+cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
     unit *u2 = r->units;

@@ -3,6 +3,7 @@
 #include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
+#include "calendar.h"
 
 #include <kernel/config.h>
 #include <kernel/alliance.h>
@@ -96,8 +97,19 @@ struct locale * test_create_locale(void) {
         locale_setstring(loc, "stone_p", "Steine");
         locale_setstring(loc, "plain", "Ebene");
         locale_setstring(loc, "ocean", "Ozean");
-        locale_setstring(loc, "race::human", "Mensch");
-        locale_setstring(loc, "race::human_p", "Menschen");
+        for (i = 0; i < MAXRACES; ++i) {
+            if (racenames[i]) {
+                char name[64];
+                rc_key(racenames[i], NAME_PLURAL, name, sizeof(name));
+                if (!locale_getstring(loc, name)) {
+                    locale_setstring(loc, name, name + 6);
+                }
+                rc_key(racenames[i], NAME_SINGULAR, name, sizeof(name));
+                if (!locale_getstring(loc, name)) {
+                    locale_setstring(loc, name, name + 6);
+                }
+            }
+        }
         for (i = 0; i < MAXSKILLS; ++i) {
             if (!locale_getstring(loc, mkname("skill", skillnames[i])))
                 locale_setstring(loc, mkname("skill", skillnames[i]), skillnames[i]);
@@ -181,7 +193,7 @@ void test_log_stderr(int flags) {
 
 static void test_reset(void) {
     int i;
-    turn = 0;
+    turn = 1;
     default_locale = 0;
 
     if (errno) {
@@ -195,6 +207,7 @@ static void test_reset(void) {
     free_resources();
     free_config();
     default_locale = 0;
+    calendar_cleanup();
     close_orders();
     free_locales();
     free_spells();
@@ -345,7 +358,7 @@ void test_create_castorder(castorder *co, unit *u, int level, float force, int r
 spell * test_create_spell(void)
 {
     spell *sp;
-    sp = create_spell("testspell", 0);
+    sp = create_spell("testspell");
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
     assert_alloc(sp->components);

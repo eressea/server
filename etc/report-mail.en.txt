@@ -1,0 +1,6 @@
+If you feel that getting a report every weekend is worth something to you,
+why not flattr Eressea at https://flattr.com/thing/681354/Eressea ?
+
+This email contains an Attachment with your Eressea report in compressed
+form. To open the attachment, you will need a program that can extract
+ZIP files, e.g. 7-Zip (http://www.7-zip.org/).
