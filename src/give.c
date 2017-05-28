@@ -667,12 +667,7 @@ void give_cmd(unit * u, order * ord)
         return;
     }
 
-    if (u2 && u_race(u2) == get_race(RC_SPELL)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-            "feedback_unit_not_found", ""));
-        return;
-    }
-    else if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
+    if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
         cmistake(u, ord, 40, MSG_COMMERCE);
         return;
     }

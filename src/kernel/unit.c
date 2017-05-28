@@ -1896,8 +1896,7 @@ void remove_empty_units_in_region(region * r)
                 set_number(u, 0);
             }
         }
-        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
-            && u_race(u) == get_race(RC_SPELL))) {
+        if (u->number == 0) {
             remove_unit(up, u);
         }
         if (*up == u)
