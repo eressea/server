@@ -749,6 +749,7 @@ void free_units(void)
     while (deleted_units) {
         unit *u = deleted_units;
         deleted_units = deleted_units->next;
+        u_setfaction(u, NULL);
         free_unit(u);
         free(u);
     }
