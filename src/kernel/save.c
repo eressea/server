@@ -1707,6 +1707,7 @@ int read_game(gamedata *data) {
 
             if (data->version < NORCSPELL_VERSION && u_race(u) == rc_spell) {
                 set_observer(r, u->faction, get_level(u, SK_PERCEPTION), u->age);
+                u_setfaction(u, NULL);
                 free_unit(u);
             }
             else {

@@ -3010,7 +3010,6 @@ int cast_spell(struct castorder *co)
 
     fun = get_spellcast(sp->sname);
     if (!fun) {
-        log_warning("no spell function for %s, try callback", sp->sname);
         return callbacks.cast_spell(co, fname);
     }
     return fun(co);
