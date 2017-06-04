@@ -918,8 +918,6 @@ void free_region(region * r)
         unit *u = r->units;
         r->units = u->next;
         uunhash(u);
-        u->region = NULL;
-        u_setfaction(u, NULL);
         free_unit(u);
         free(u);
     }
