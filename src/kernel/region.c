@@ -917,6 +917,7 @@ void free_region(region * r)
     while (r->units) {
         unit *u = r->units;
         r->units = u->next;
+        u->region = NULL;
         uunhash(u);
         free_unit(u);
         free(u);

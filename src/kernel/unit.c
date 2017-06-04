@@ -1400,12 +1400,11 @@ int invisible(const unit * target, const unit * viewer)
 /** remove the unit from memory.
  * this frees all memory that's only accessible through the unit,
  * and you should already have called uunhash and removed the unit from the
- * region and faction.
+ * region.
  */
 void free_unit(unit * u)
 {
     assert(!u->region);
-    assert(!u->faction);
     free(u->_name);
     free(u->display);
     free_order(u->thisorder);
