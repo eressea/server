@@ -1404,6 +1404,7 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
+    assert(!u->region);
     free(u->_name);
     free(u->display);
     free_order(u->thisorder);
