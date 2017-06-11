@@ -869,6 +869,7 @@ const char * game_mailcmd(void)
         }
         *r = '\0';
         log_warning("game.mailcmd configuration is not set, using %s from game.name", result);
+        config_set("game.mailcmd", result);
         return result;
     }
     return param;
