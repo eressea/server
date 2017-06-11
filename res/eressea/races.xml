@@ -1031,7 +1031,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
+  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
