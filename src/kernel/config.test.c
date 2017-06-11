@@ -278,6 +278,7 @@ static void test_game_mailcmd(CuTest *tc) {
     CuAssertStrEquals(tc, "Eressea", game_name());
     CuAssertStrEquals(tc, "ERESSEA", game_mailcmd());
     config_set("game.name", "Hodor");
+    config_set("game.mailcmd", NULL);
     CuAssertStrEquals(tc, "Hodor", game_name());
     CuAssertStrEquals(tc, "HODOR", game_mailcmd());
     config_set("game.mailcmd", "ERESSEA");

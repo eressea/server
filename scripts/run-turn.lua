@@ -142,8 +142,9 @@ function process(rules, orders)
         return -1
     end
 
-    callbacks(rules, 'init')
+    turn_begin()
     init_summary()
+    callbacks(rules, 'init')
 
     -- run the turn:
     if eressea.read_orders(orders) ~= 0 then
@@ -157,12 +158,13 @@ function process(rules, orders)
         return -1
     end
 
-    process_orders()
     callbacks(rules, 'update')
+    turn_process()
 
     write_files(config.locales)
     dbupdate()
 
+    turn_end()
     file = '' .. get_turn() .. '.dat'
     if eressea.write_game(file)~=0 then
         eressea.log.error("could not write game")
