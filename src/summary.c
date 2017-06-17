@@ -92,7 +92,7 @@ int update_nmrs(void)
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
-            int nmr = turn - f->lastorders + 1;
+            int nmr = turn - f->lastorders;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
                     log_error("faction %s has %d NMR", itoa36(f->no), nmr);

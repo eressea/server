@@ -240,10 +240,7 @@ static faction *factionorders(void)
         }
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
          * nicht als untätig gilt */
-
-         /* TODO: +1 ist ein Workaround, weil cturn erst in process_orders
-          * incrementiert wird. */
-        f->lastorders = turn + 1;
+        f->lastorders = turn;
 
     }
     else {
