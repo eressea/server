@@ -142,7 +142,7 @@ function process(rules, orders)
         return -1
     end
 
-    callbacks(rules, 'init')
+    turn_begin()
     init_summary()
 
     -- run the turn:
@@ -151,14 +151,14 @@ function process(rules, orders)
         return -1
     end
 
-    plan_monsters()
-
     if nmr_check(config.maxnmrs or 80)~=0 then
         return -1
     end
-
-    process_orders()
+    plan_monsters()
+    callbacks(rules, 'init')
+    turn_process()
     callbacks(rules, 'update')
+    turn_end() -- ageing, etc.
 
     write_files(config.locales)
     dbupdate()

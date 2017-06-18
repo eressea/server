@@ -2033,6 +2033,13 @@
     <text locale="de">$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) erschuf einen heiligen Hain von $int($amount) Schößlingen.</text>
     <text locale="en">$if($isnull($mage),"An unknown magician",$unit($mage)) created a holy forest of $int($amount) young trees.</text>
   </message>
+  <message name="raindance_effect" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+    </type>
+    <text locale="de">"$if($isnull($mage),"Ein unentdeckter Magier",$unit($mage)) führt einen sonderbaren Tanz auf. Kurz darauf beginnt es zu regnen."</text>
+    <text locale="en">"$if($isnull($mage),"an unseen magician",$unit($mage)) dances a strange dance. Shortly after, rain begins to fall on the fields."</text>
+  </message>
   <message name="harvest_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
