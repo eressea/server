@@ -759,7 +759,7 @@ unit *read_unit(struct gamedata *data)
 
     assert(u_race(u));
     for (;;) {
-        int n, level, weeks;
+        int n = NOSKILL, level, weeks;
         skill_t sk;
         READ_INT(data->store, &n);
         sk = (skill_t)n;
@@ -1662,7 +1662,7 @@ int read_game(gamedata *data) {
     if (rmax < 0) {
         rmax = nread;
     }
-    log_debug(" - Einzulesende Regionen: %d/%d\r", rmax, nread);
+    log_debug(" - Einzulesende Regionen: %d/%d", rmax, nread);
 
     while (--nread >= 0) {
         unit **up;
@@ -1721,10 +1721,6 @@ int read_game(gamedata *data) {
                 up = &u->next;
                 update_interval(u->faction, r);
             }
-        }
-
-        if ((nread & 0x3FF) == 0) {     /* das spart extrem Zeit */
-            log_debug(" - Einzulesende Regionen: %d/%d * %d,%d    \r", rmax, nread, r->x, r->y);
         }
         --rmax;
     }

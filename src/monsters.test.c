@@ -27,7 +27,7 @@
 #include <string.h>
 
 extern void plan_monsters(struct faction *f);
-extern int monster_attacks(unit * monster, bool respect_buildings, bool rich_only);
+extern int monster_attacks(unit * monster, bool rich_only);
 
 static order *find_order(const char *expected, const unit *unit)
 {
@@ -64,6 +64,7 @@ static void create_monsters(faction **player, faction **monsters, unit **u, unit
     *u = test_create_unit(*player, r);
     unit_setid(*u, 1);
     *m = test_create_unit(*monsters, r);
+    unit_setstatus(*m, ST_FIGHT);
 }
 
 static void test_monsters_attack(CuTest * tc)
@@ -72,7 +73,6 @@ static void test_monsters_attack(CuTest * tc)
     unit *u, *m;
 
     create_monsters(&f, &f2, &u, &m);
-
     setguard(m, true);
 
     config_set("rules.monsters.attack_chance", "1");
@@ -112,7 +112,7 @@ static void test_monsters_waiting(CuTest * tc)
     create_monsters(&f, &f2, &u, &m);
     setguard(m, true);
     fset(m, UFL_ISNEW);
-    monster_attacks(m, false, false);
+    monster_attacks(m, false);
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
     test_cleanup();
 }

@@ -10,23 +10,25 @@ local jokes = {
 }
 
 local function ponnuki_brain(u)
-  local i = math.random(#jokes)
-  u:add_notice("Eine Botschaft von " .. tostring(u) .. ": " ..jokes[i])
-  local d = math.random(6)
-  local r = u.region:next(d-1)
-  if r.terrain == 'glacier' then
     u:clear_orders()
-    u:add_order("NACH " .. directions[d])
-  end
+    local i = math.random(#jokes)
+    u:add_order("BOTSCHAFT REGION \"" .. jokes[i] .. "\"")
+    eressea.log.info("Ponnuki is telling jokes in " .. tostring(u.region))
+    local d = math.random(6)
+    local r = u.region:next(d-1)
+    if r.terrain == 'glacier' then
+        u:add_order("NACH " .. directions[d])
+        eressea.log.info("Ponnuki is walking to " .. tostring(r))
+    end
 end
 
 function ponnuki.init()
     -- initialize other scripts
+    local f = get_faction(666)
     local u = get_unit(atoi36("ponn"))
     if not u then
         eressea.log.error("Ponnuki is missing, will re-create")
         local home = get_region(-67, -5)
-        local f = get_faction(666)
         if home and f then
             if home.terrain~="glacier" then
                 home.terrain="glacier"
@@ -44,10 +46,11 @@ function ponnuki.init()
         else
             eressea.log.error("Ponnuki cannot find Magrathea")
         end
+    elseif u.faction==f then
+        eressea.log.info("Ponnuki is in " .. tostring(u.region))
+        u.status = 5 -- FLIEHE
     end
-    if u then
-        ponnuki_brain(u)
-    end
+    ponnuki_brain(u)
 end
 
 return ponnuki

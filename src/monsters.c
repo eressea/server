@@ -187,25 +187,28 @@ void monsters_desert(struct faction *monsters)
     }
 }
 
-int monster_attacks(unit * monster, bool respect_buildings, bool rich_only)
+int monster_attacks(unit * monster, bool rich_only)
 {
-    region *r = monster->region;
-    unit *u2;
-    int money = 0;
+    if (monster->status < ST_AVOID) {
+        region *r = monster->region;
+        unit *u2;
+        int money = 0;
 
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
-            int m = get_money(u2);
-            if (!rich_only || m > 0) {
-                order *ord = monster_attack(monster, u2);
-                if (ord) {
-                    addlist(&monster->orders, ord);
-                    money += m;
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
+                int m = get_money(u2);
+                if (!rich_only || m > 0) {
+                    order *ord = monster_attack(monster, u2);
+                    if (ord) {
+                        addlist(&monster->orders, ord);
+                        money += m;
+                    }
                 }
             }
         }
+        return money;
     }
-    return money;
+    return 0;
 }
 
 static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
@@ -226,7 +229,7 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
     if (attacks && is_guard(udragon)) {
-        money += monster_attacks(udragon, true, true);
+        money += monster_attacks(udragon, true);
     }
 
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
@@ -749,7 +752,7 @@ void plan_monsters(faction * f)
             }
 
             if (attacking && (!r->land || is_guard(u))) {
-                monster_attacks(u, true, false);
+                monster_attacks(u, false);
             }
 
             /* units with a plan to kill get ATTACK orders: */
@@ -773,7 +776,7 @@ void plan_monsters(faction * f)
             }
 
             /* All monsters guard the region: */
-            if (!monster_is_waiting(u) && r->land) {
+            if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
                 addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
             }
 

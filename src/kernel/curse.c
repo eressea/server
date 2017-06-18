@@ -107,24 +107,21 @@ void curse_init(attrib * a)
 int curse_age(attrib * a, void *owner)
 {
     curse *c = (curse *)a->data.v;
-    int result = 0;
-
+    int result = AT_AGE_KEEP;
     UNUSED_ARG(owner);
     c_clearflag(c, CURSE_ISNEW);
 
-    if (c_flags(c) & CURSE_NOAGE) {
-        c->duration = INT_MAX;
+    if ((c_flags(c) & CURSE_NOAGE) == 0) {
+        if (c->type->age) {
+            if (c->type->age(c) == 0) {
+                result = AT_AGE_REMOVE;
+            }
+        }
+        if (--c->duration <= 0) {
+            result = AT_AGE_REMOVE;
+        }
     }
-    if (c->type->age) {
-        result = c->type->age(c);
-    }
-    if (result != 0) {
-        c->duration = 0;
-    }
-    else if (c->duration != INT_MAX) {
-        c->duration = MAX(0, c->duration - 1);
-    }
-    return (c->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
+    return result;
 }
 
 void destroy_curse(curse * c)
@@ -308,6 +305,7 @@ void ct_register(const curse_type * ct)
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
     selist **ctlp = cursetypes + hash;
 
+    assert(ct->age==NULL || (ct->flags&CURSE_NOAGE) == 0);
     selist_set_insert(ctlp, (void *)ct, NULL);
     ++ct_changes;
 }
