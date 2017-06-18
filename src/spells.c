@@ -2079,7 +2079,6 @@ static int sp_homestone(castorder * co)
         cmistake(mage, co->order, 206, MSG_MAGIC);
         return 0;
     }
-    c_setflag(c, CURSE_NOAGE | CURSE_ONLYONE);
 
     /* Magieresistenz der Burg erhoeht sich um 50% */
     effect = 50.0F;
