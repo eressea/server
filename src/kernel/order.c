@@ -446,7 +446,8 @@ bool is_repeated(keyword_t kwd)
     case K_SABOTAGE:
     case K_STUDY:
     case K_TEACH:
-    case K_BREED:
+    case K_GROW:
+    case K_PLANT:
     case K_PIRACY:
     case K_MAKE:
     case K_LOOT:
@@ -485,7 +486,8 @@ bool is_exclusive(const order * ord)
     case K_SABOTAGE:
     case K_STUDY:
     case K_TEACH:
-    case K_BREED:
+    case K_GROW:
+    case K_PLANT:
     case K_PIRACY:
     case K_MAKE:
     case K_LOOT:
@@ -525,7 +527,8 @@ bool is_long(keyword_t kwd)
     case K_SABOTAGE:
     case K_STUDY:
     case K_TEACH:
-    case K_BREED:
+    case K_GROW:
+    case K_PLANT:
     case K_PIRACY:
     case K_MAKE:
     case K_LOOT:

@@ -134,6 +134,7 @@ const char *keywords[MAXKEYWORDS] = {
     "cast",
     "show",
     "destroy",
+    "plant",
     "grow",
     "default",
     "origin",

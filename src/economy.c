@@ -3098,7 +3098,8 @@ void produce(struct region *r)
             sabotage_cmd(u, u->thisorder);
             break;
 
-        case K_BREED:
+        case K_PLANT:
+        case K_GROW:
             breed_cmd(u, u->thisorder);
             break;
 
