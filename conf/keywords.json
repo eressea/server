@@ -1,7 +1,8 @@
 {
     "keywords": {
         "en" : {
-            "grow": [ "GROW", "BREED", "PLANT" ],
+            "plant": "PLANT",
+	    "grow": [ "GROW", "BREED" ],
             "promote": ["PROMOTE", "PROMOTION" ],
             "combat": [ "COMBAT", "FIGHT" ]
         },
@@ -53,7 +54,8 @@
             "cast": ["ZAUBERE", "ZAUBERN"],
             "show": ["ZEIGE", "ZEIGEN"],
             "destroy": ["ZERSTÖRE", "ZERSTÖREN"],
-            "grow": ["ZÜCHTE", "PFLANZE", "ZÜCHTEN", "PFLANZEN"],
+            "grow": ["ZÜCHTE", "ZÜCHTEN"],
+            "plant": ["PFLANZE", "PFLANZEN"],
             "default": "DEFAULT",
             "origin": "URSPRUNG",
             "email": "EMAIL",
