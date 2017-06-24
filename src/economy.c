@@ -601,40 +601,44 @@ int give_control_cmd(unit * u, order * ord)
 
     s = gettoken(token, sizeof(token));
     if (s && isparam(s, u->faction->locale, P_CONTROL)) {
-        message *msg = 0;
-
+        bool okay = false;
         if (!can_give_to(u, u2)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "feedback_unit_not_found", ""));
-            return 0;
         }
         else if (!u->building && !u->ship) {
-            msg = cmistake(u, ord, 140, MSG_EVENT);
+            cmistake(u, ord, 140, MSG_EVENT);
         }
         else if (u->building) {
             if (u != building_owner(u->building)) {
-                msg = cmistake(u, ord, 49, MSG_EVENT);
+                cmistake(u, ord, 49, MSG_EVENT);
             }
             else if (u2->building != u->building) {
-                msg = cmistake(u, ord, 33, MSG_EVENT);
+                cmistake(u, ord, 33, MSG_EVENT);
+            }
+            else {
+                okay = true;
             }
         }
         else if (u->ship) {
             if (u != ship_owner(u->ship)) {
-                msg = cmistake(u, ord, 49, MSG_EVENT);
+                cmistake(u, ord, 49, MSG_EVENT);
             }
             else if (u2->ship != u->ship) {
-                msg = cmistake(u, ord, 32, MSG_EVENT);
+                cmistake(u, ord, 32, MSG_EVENT);
+            }
+            else {
+                okay = true;
             }
         }
-        if (!msg) {
-            give_control(u, u2);
-            msg = msg_message("givecommand", "unit recipient", u, u2);
+        if (okay) {
+            message *msg = msg_message("givecommand", "unit recipient", u, u2);
             add_message(&u->faction->msgs, msg);
             if (u->faction != u2->faction) {
                 add_message(&u2->faction->msgs, msg);
             }
             msg_release(msg);
+            give_control(u, u2);
         }
     }
     return 0;
