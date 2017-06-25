@@ -267,7 +267,7 @@ extern "C" {
 
     /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
      * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-    int get_cursedmen(struct unit *u, const struct curse *c);
+    int get_cursedmen(const struct unit *u, const struct curse *c);
 
     /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
     void c_setflag(curse * c, unsigned int flag);
@@ -277,7 +277,7 @@ extern "C" {
      * korrekt gehandhabt werden. Je nach internen Flag kann dies
      * unterschiedlich gewünscht sein
      * */
-    void transfer_curse(struct unit *u, struct unit *u2, int n);
+    void transfer_curse(const struct unit *u, struct unit *u2, int n);
 
     /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
      * oder einen NULL-pointer

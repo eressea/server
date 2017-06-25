@@ -493,7 +493,7 @@ const curse_type * ct)
 /* ------------------------------------------------------------- */
 /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
  * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-int get_cursedmen(unit * u, const curse * c)
+int get_cursedmen(const unit * u, const curse * c)
 {
     int cursedmen = u->number;
 
@@ -631,7 +631,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
 /* hier müssen alle c-typen, die auf Einheiten gezaubert werden können,
  * berücksichtigt werden */
 
-static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
+static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
 {
     int cursedmen = 0;
     int men = get_cursedmen(u, c);
@@ -678,7 +678,7 @@ static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
     }
 }
 
-void transfer_curse(unit * u, unit * u2, int n)
+void transfer_curse(const unit * u, unit * u2, int n)
 {
     attrib *a;
 
