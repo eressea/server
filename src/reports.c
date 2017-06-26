@@ -1367,6 +1367,9 @@ void reorder_units(region * r)
 
 static region *lastregion(faction * f)
 {
+    if (!f->units) {
+        return NULL;
+    }
     return f->last ? f->last->next : NULL;
 }
 
@@ -1418,43 +1421,45 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->addresses = NULL;
     ctx->userdata = NULL;
     /* [first,last) interval of regions with a unit in it: */
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
+    if (f->units) {
+        ctx->first = firstregion(f);
+        ctx->last = lastregion(f);
 
-    for (r = ctx->first; r!=ctx->last; r = r->next) {
-        int range = 0;
-        unit *u;
-        if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
-            if (rule_region_owners && f == region_get_owner(r)) {
-                /* region owners get the report from lighthouses */
-                building *b;
+        for (r = ctx->first; r != ctx->last; r = r->next) {
+            int range = 0;
+            unit *u;
+            if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
+                if (rule_region_owners && f == region_get_owner(r)) {
+                    /* region owners get the report from lighthouses */
+                    building *b;
 
-                for (b = r->buildings; b; b = b->next) {
-                    if (b->type == bt_lighthouse) {
-                        int br = lighthouse_range(b, NULL);
-                        if (br > range) range = br;
+                    for (b = r->buildings; b; b = b->next) {
+                        if (b->type == bt_lighthouse) {
+                            int br = lighthouse_range(b, NULL);
+                            if (br > range) range = br;
+                        }
                     }
                 }
             }
-        }
-        for (u = r->units; u; u = u->next) {
-            if (u->faction == f) {
-                add_seen_nb(f, r, seen_unit);
-                if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
-                    if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
-                        int br = lighthouse_range(u->building, f);
-                        if (br > range) range = br;
+            for (u = r->units; u; u = u->next) {
+                if (u->faction == f) {
+                    add_seen_nb(f, r, seen_unit);
+                    if (fval(r, RF_LIGHTHOUSE) && bt_lighthouse) {
+                        if (u->building && u->building->type == bt_lighthouse && inside_building(u)) {
+                            int br = lighthouse_range(u->building, f);
+                            if (br > range) range = br;
+                        }
                     }
                 }
             }
-        }
-        if (range > 0) {
-            /* we are in at least one lighthouse. add the regions we can see from here! */
-            prepare_lighthouse(f, r, range);
-        }
+            if (range > 0) {
+                /* we are in at least one lighthouse. add the regions we can see from here! */
+                prepare_lighthouse(f, r, range);
+            }
 
-        if (fval(r, RF_TRAVELUNIT) && r->seen.mode<seen_travel) {
-            travelthru_map(r, cb_add_seen, f);
+            if (fval(r, RF_TRAVELUNIT) && r->seen.mode < seen_travel) {
+                travelthru_map(r, cb_add_seen, f);
+            }
         }
     }
     /* [fast,last) interval of seen regions (with lighthouses and travel)
