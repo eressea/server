@@ -1370,6 +1370,9 @@ void reorder_units(region * r)
 
 static region *lastregion(faction * f)
 {
+    if (!f->units) {
+        return NULL;
+    }
     return f->last ? f->last->next : NULL;
 }
 
@@ -1421,8 +1424,9 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->addresses = NULL;
     ctx->userdata = NULL;
     /* [first,last) interval of regions with a unit in it: */
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
+    if (f->units) {
+        ctx->first = firstregion(f);
+        ctx->last = lastregion(f);
 
     for (r = ctx->first; r!=ctx->last; r = r->next) {
         unit *u;
@@ -1485,8 +1489,9 @@ void prepare_report(report_context *ctx, faction *f)
             prepare_lighthouse(f, r, range);
         }
 
-        if (fval(r, RF_TRAVELUNIT) && r->seen.mode<seen_travel) {
-            travelthru_map(r, cb_add_seen, f);
+            if (fval(r, RF_TRAVELUNIT) && r->seen.mode < seen_travel) {
+                travelthru_map(r, cb_add_seen, f);
+            }
         }
     }
     /* [fast,last) interval of seen regions (with lighthouses and travel)
