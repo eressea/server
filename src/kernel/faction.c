@@ -497,7 +497,6 @@ void renumber_faction(faction * f, int no)
     funhash(f);
     f->no = no;
     fhash(f);
-    fset(f, FFL_NEWID);
 }
 
 void update_interval(struct faction *f, struct region *r)

@@ -36,21 +36,20 @@ extern "C" {
     struct selist;
     
     /* faction flags */
-#define FFL_NEWID         (1<<0)  /* Die Partei hat bereits einmal ihre no gewechselt */
+#define FFL_NOAID         (1<<0)  /* Hilfsflag Kampf */
 #define FFL_ISNEW         (1<<1)
 #define FFL_PWMSG         (1<<2)  /* received a "new password" message */
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
 #define FFL_DEFENDER      (1<<10)
-#define FFL_NOAID         (1<<21)       /* Hilfsflag Kampf */
-#define FFL_SELECT        (1<<22)       /* ehemals f->dh, u->dh, r->dh, etc... */
-#define FFL_MARK          (1<<23)       /* f�r markierende algorithmen, die das 
-                                             * hinterher auch wieder l�schen m�ssen!
-                                             * (FFL_SELECT muss man vorher initialisieren,
-                                             * FL_MARK hinterher l�schen) */
-#define FFL_NOIDLEOUT     (1<<24)       /* Partei stirbt nicht an NMRs */
-#define FFL_NPC           (1<<25)       /* eine Partei mit Monstern */
-#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NEWID|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
+#define FFL_SELECT        (1<<22) /* ehemals f->dh, u->dh, r->dh, etc... */
+#define FFL_MARK          (1<<23) /* fuer markierende algorithmen, die das 
+                                   * hinterher auch wieder loeschen muessen!
+                                   * (FFL_SELECT muss man vorher initialisieren,
+                                   * FL_MARK hinterher loeschen) */
+#define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
+#define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
+#define FFL_SAVEMASK (FFL_DEFENDER|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
 
     typedef struct faction {
         struct faction *next;
