@@ -191,6 +191,7 @@ void get_food(region * r)
         int need = lifestyle(u);
         faction *f = u->faction;
 
+        assert(u->hp > 0);
         need -= MAX(0, get_money(u));
 
         if (need > 0) {

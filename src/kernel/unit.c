@@ -981,10 +981,9 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void clone_men(unit * u, unit * dst, int n)
+void clone_men(const unit * u, unit * dst, int n)
 {
     const attrib *a;
-    int hp = u->hp;
     region *r = u->region;
 
     if (n == 0)
@@ -1073,11 +1072,9 @@ void clone_men(unit * u, unit * dst, int n)
         if (u->attribs) {
             transfer_curse(u, dst, n);
         }
-    }
-    if (dst) {
         set_number(dst, dst->number + n);
-        hp -= u->hp;
-        dst->hp += hp;
+        dst->hp += u->hp * dst->number / u->number;
+        assert(dst->hp >= dst->number);
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
         a = a_find(dst->attribs, &at_effect);
         while (a && a->type == &at_effect) {
@@ -1530,7 +1527,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
     /* u->race muss bereits gesetzt sein, wird fuer default-hp gebraucht */
     /* u->region auch */
-    u->hp = unit_max_hp(u) * number;
+    if (number > 0) {
+        u->hp = unit_max_hp(u) * number;
+    }
 
     if (dname) {
         u->_name = strdup(dname);

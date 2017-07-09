@@ -166,7 +166,7 @@ extern "C" {
     void set_level(struct unit *u, skill_t id, int level);
     int get_level(const struct unit *u, skill_t id);
     void transfermen(struct unit *src, struct unit *dst, int n);
-    void clone_men(struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
+    void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
 
     int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
     int effskill_study(const struct unit *u, skill_t sk, const struct region *r);

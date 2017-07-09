@@ -161,15 +161,15 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
         const char *lname = locale_name(lang);
         struct locale *wloc = get_locale(lname);
         log_warning("no translation for combat status %s in %s", combatstatus[u->status], lname);
-        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status]+7);
-        len = strlcpy(fsbuf, combatstatus[u->status]+7, buflen);
+        locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status] + 7);
+        len = strlcpy(fsbuf, combatstatus[u->status] + 7, buflen);
     }
     else {
         len = strlcpy(fsbuf, status, buflen);
     }
     if (fval(u, UFL_NOAID)) {
-        len += strlcat(fsbuf+len, ", ", buflen-len);
-        len += strlcat(fsbuf+len, LOC(lang, "status_noaid"), buflen-len);
+        len += strlcat(fsbuf + len, ", ", buflen - len);
+        len += strlcat(fsbuf + len, LOC(lang, "status_noaid"), buflen - len);
     }
 
     return len;
@@ -201,7 +201,7 @@ const char *hp_status(const unit * u)
 
 void
 report_item(const unit * owner, const item * i, const faction * viewer,
-const char **name, const char **basename, int *number, bool singular)
+    const char **name, const char **basename, int *number, bool singular)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
 
@@ -251,7 +251,7 @@ const char **name, const char **basename, int *number, bool singular)
         if (name)
             *name =
             LOC(viewer->locale, resourcename(i->type->rtype,
-            NMF_APPEARANCE | ((i->number != 1 && !singular) ? GR_PLURAL : 0)));
+                NMF_APPEARANCE | ((i->number != 1 && !singular) ? GR_PLURAL : 0)));
         if (basename)
             *basename = resourcename(i->type->rtype, NMF_APPEARANCE);
         if (number) {
@@ -286,7 +286,7 @@ static size_t buforder(char *buffer, size_t size, const order * ord, int mode)
         WARN_STATIC_BUFFER();
     }
 
-    return bufp-buffer;
+    return bufp - buffer;
 }
 
 /** create a report of a list of items to a non-owner.
@@ -349,7 +349,7 @@ report_items(const unit *u, item * result, int size, const unit * owner,
     return n;
 }
 
-static void report_resource(resource_report * result, const resource_type *rtype, 
+static void report_resource(resource_report * result, const resource_type *rtype,
     int number, int level)
 {
     assert(rtype);
@@ -381,7 +381,7 @@ void report_race(const struct unit *u, const char **name, const char **illusion)
 
 void
 report_building(const struct building *b, const char **name,
-const char **illusion)
+    const char **illusion)
 {
     if (name) {
         *name = buildingtype(b->type, b, b->size);
@@ -400,7 +400,7 @@ const char **illusion)
 
 int
 report_resources(const region * r, resource_report * result, int size,
-const faction * viewer, bool see_unit)
+    const faction * viewer, bool see_unit)
 {
     int n = 0;
 
@@ -487,7 +487,7 @@ const faction * viewer, bool see_unit)
 
 int
 bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, char *buf,
-size_t size)
+    size_t size)
 {
     int i, dh;
     int getarnt = fval(u, UFL_ANON_FACTION);
@@ -626,7 +626,7 @@ size_t size)
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             size_t bytes = spskill(bufp, size, f->locale, u, sv, &dh, 1);
-            assert(bytes <=INT_MAX);
+            assert(bytes <= INT_MAX);
             if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
         }
@@ -796,7 +796,7 @@ size_t size)
 
 size_t
 spskill(char *buffer, size_t size, const struct locale * lang,
-const struct unit * u, struct skill * sv, int *dh, int days)
+    const struct unit * u, struct skill * sv, int *dh, int days)
 {
     char *bufp = buffer;
     int i, effsk;
@@ -856,7 +856,7 @@ const struct unit * u, struct skill * sv, int *dh, int days)
                 WARN_STATIC_BUFFER();
         }
     }
-    return bufp-buffer;
+    return bufp - buffer;
 }
 
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
@@ -927,7 +927,7 @@ void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
 
 void
 spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned int indent,
-seen_mode mode)
+    seen_mode mode)
 {
     char buf[DISPLAYSIZE];
     int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
@@ -1013,7 +1013,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
     address_data *data = (address_data *)cbdata;
     faction *f = data->f;
 
-    if (ut->faction==f) {
+    if (ut->faction == f) {
         unit *u;
         for (u = r->units; u; u = u->next) {
             faction *sf = visible_faction(f, u);
@@ -1140,8 +1140,8 @@ void reports_done(void) {
 int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
 {
     int n = 0, i;
-    
-    if (size>n) {
+
+    if (size > n) {
         result[n++] = rc;
         fset(rc, RF_MARK);
     }
@@ -1151,7 +1151,7 @@ int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
 
         r = result[i];
         dist = distance(rc, r);
-        if (dist<radius) {
+        if (dist < radius) {
             region *adj[MAXDIRECTIONS];
             int d;
 
@@ -1223,10 +1223,10 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
         get_neighbours(r, next);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = next[d];
-            if (rn && rn->seen.mode<seen_neighbour) {
+            if (rn && rn->seen.mode < seen_neighbour) {
                 rn->seen.mode = seen_neighbour;
-                if (first->index>rn->index) first = rn;
-                if (last->index<rn->index) last = rn;
+                if (first->index > rn->index) first = rn;
+                if (last->index < rn->index) last = rn;
             }
         }
     }
@@ -1370,6 +1370,9 @@ void reorder_units(region * r)
 
 static region *lastregion(faction * f)
 {
+    if (!f->units) {
+        return NULL;
+    }
     return f->last ? f->last->next : NULL;
 }
 
@@ -1387,14 +1390,14 @@ static region *firstregion(faction * f)
 
 static void cb_add_seen(region *r, unit *u, void *cbdata) {
     faction *f = (faction *)cbdata;
-    if (u->faction==f) {
+    if (u->faction == f) {
         add_seen_nb(f, r, seen_travel);
     }
 }
 
 /** set region.seen based on visibility by one faction.
  *
- * this function may also update ctx->last and ctx->first for potential 
+ * this function may also update ctx->last and ctx->first for potential
  * lighthouses and travelthru reports
  */
 void prepare_report(report_context *ctx, faction *f)
@@ -1408,8 +1411,8 @@ void prepare_report(report_context *ctx, faction *f)
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
     }
 
-    if (f->age<=2) {
-        if ((f->flags&FFL_PWMSG)==0) {
+    if (f->age <= 2) {
+        if ((f->flags&FFL_PWMSG) == 0) {
             /* TODO: this assumes unencrypted passwords */
             f->flags |= FFL_PWMSG;
             ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
@@ -1421,72 +1424,74 @@ void prepare_report(report_context *ctx, faction *f)
     ctx->addresses = NULL;
     ctx->userdata = NULL;
     /* [first,last) interval of regions with a unit in it: */
-    ctx->first = firstregion(f);
-    ctx->last = lastregion(f);
+    if (f->units) {
+        ctx->first = firstregion(f);
+        ctx->last = lastregion(f);
 
-    for (r = ctx->first; r!=ctx->last; r = r->next) {
-        unit *u;
-        building *b;
-        int br = 0, c = 0, range = 0;
-        if (fval(r, RF_OBSERVER)) {
-            int skill = get_observer(r, f);
-            if (skill >= 0) {
-                add_seen_nb(f, r, seen_spell);
+        for (r = ctx->first; r != ctx->last; r = r->next) {
+            unit *u;
+            building *b;
+            int br = 0, c = 0, range = 0;
+            if (fval(r, RF_OBSERVER)) {
+                int skill = get_observer(r, f);
+                if (skill >= 0) {
+                    add_seen_nb(f, r, seen_spell);
+                }
             }
-        }
-        if (fval(r, RF_LIGHTHOUSE)) {
-            /* region owners get the report from lighthouses */
-            if (rule_region_owners && f == region_get_owner(r)) {
-                for (b = rbuildings(r); b; b = b->next) {
-                    if (b && b->type == bt_lighthouse) {
-                        /* region owners get maximm range */
-                        int br = lighthouse_range(b, NULL, NULL);
-                        if (br > range) range = br;
+            if (fval(r, RF_LIGHTHOUSE)) {
+                /* region owners get the report from lighthouses */
+                if (rule_region_owners && f == region_get_owner(r)) {
+                    for (b = rbuildings(r); b; b = b->next) {
+                        if (b && b->type == bt_lighthouse) {
+                            /* region owners get maximm range */
+                            int br = lighthouse_range(b, NULL, NULL);
+                            if (br > range) range = br;
+                        }
                     }
                 }
             }
-        }
 
-        b = NULL;
-        for (u = r->units; u; u = u->next) {
-            /* if we have any unit in this region, then we get seen_unit access */
-            if (u->faction == f) {
-                add_seen_nb(f, r, seen_unit);
-                /* units inside the lighthouse get range based on their perception
-                 * or the size, if perception is not a skill
-                 */
-                if (!fval(r, RF_LIGHTHOUSE)) {
-                    /* it's enough to add the region once, and if there are
-                    * no lighthouses, there is no need to look at more units */
-                    break;
-                }
-            }
-            if (range == 0 && u->building && u->building->type == bt_lighthouse) {
-                if (u->building && b != u->building) {
-                    b = u->building;
-                    c = buildingcapacity(b);
-                    br = 0;
-                }
-                c -= u->number;
-                if (u->faction == f && c >= 0) {
-                    /* unit is one of ours, and inside the current lighthouse */
-                    if (br == 0) {
-                        /* lazy-calculate the range */
-                        br = lighthouse_range(u->building, f, u);
-                    }
-                    if (br > range) {
-                        range = br;
+            b = NULL;
+            for (u = r->units; u; u = u->next) {
+                /* if we have any unit in this region, then we get seen_unit access */
+                if (u->faction == f) {
+                    add_seen_nb(f, r, seen_unit);
+                    /* units inside the lighthouse get range based on their perception
+                     * or the size, if perception is not a skill
+                     */
+                    if (!fval(r, RF_LIGHTHOUSE)) {
+                        /* it's enough to add the region once, and if there are
+                        * no lighthouses, there is no need to look at more units */
+                        break;
                     }
                 }
+                if (range == 0 && u->building && u->building->type == bt_lighthouse) {
+                    if (u->building && b != u->building) {
+                        b = u->building;
+                        c = buildingcapacity(b);
+                        br = 0;
+                    }
+                    c -= u->number;
+                    if (u->faction == f && c >= 0) {
+                        /* unit is one of ours, and inside the current lighthouse */
+                        if (br == 0) {
+                            /* lazy-calculate the range */
+                            br = lighthouse_range(u->building, f, u);
+                        }
+                        if (br > range) {
+                            range = br;
+                        }
+                    }
+                }
             }
-        }
-        if (range > 0) {
-            /* we are in at least one lighthouse. add the regions we can see from here! */
-            prepare_lighthouse(f, r, range);
-        }
+            if (range > 0) {
+                /* we are in at least one lighthouse. add the regions we can see from here! */
+                prepare_lighthouse(f, r, range);
+            }
 
-        if (fval(r, RF_TRAVELUNIT) && r->seen.mode<seen_travel) {
-            travelthru_map(r, cb_add_seen, f);
+            if (fval(r, RF_TRAVELUNIT) && r->seen.mode < seen_travel) {
+                travelthru_map(r, cb_add_seen, f);
+            }
         }
     }
     /* [fast,last) interval of seen regions (with lighthouses and travel)
@@ -1697,7 +1702,7 @@ const char *trailinto(const region * r, const struct locale *lang)
         size_t sz;
 
         sz = strlcpy(ref, tname, sizeof(ref));
-        sz += strlcat(ref+sz, "_trail", sizeof(ref)-sz);
+        sz += strlcat(ref + sz, "_trail", sizeof(ref) - sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
