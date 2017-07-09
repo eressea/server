@@ -54,11 +54,35 @@ function test_give_other_zombie_fail()
 end
 
 function test_give_self_zombie_okay()
-    -- allow giving undead units to own units of same race
+    -- allow giving zombie units to own units of same race
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u1 = unit.create(f, r, 2, "zombie")
     local u2 = unit.create(f, r, 1, "zombie")
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
+
+function test_give_self_skeleton_okay()
+    -- allow giving skeleton units to own units of same race
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 2, "skeleton")
+    local u2 = unit.create(f, r, 1, "skeleton")
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
+
+function test_give_self_ghoul_okay()
+    -- allow giving ghoul units to own units of same race
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 2, "ghoul")
+    local u2 = unit.create(f, r, 1, "ghoul")
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
     process_orders()
     assert_equal(1, u1.number)
