@@ -37,17 +37,28 @@ function test_give_self_undead_fail()
     assert_equal(1, u2.number)
 end
 
-function test_give_other_zombie_fail()
-    -- cannot give undead units to another faction
+local function setup_give_self(race)
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 2, race)
+    local u2 = unit.create(f, r, 1, race)
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    return u1, u2
+end
+
+local function setup_give_other(race)
     local r = region.create(0, 0, "plain")
     local f1 = faction.create("human")
     local f2 = faction.create("human")
-
-    local u1 = unit.create(f1, r, 2, "zombie")
-    local u2 = unit.create(f2, r, 1, "zombie")
+    local u1 = unit.create(f1, r, 2, race)
+    local u2 = unit.create(f2, r, 1, race)
     u2:add_order("KONTAKTIERE " .. itoa36(u1.id))
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
-    -- TODO: Migranten blockieren das derzeit, nicht Untoten-Eigenschaften
+    return u1, u2
+end
+
+function test_give_other_zombie_fail()
+    u1, u2 = setup_give_other("zombie")
     process_orders()
     assert_equal(2, u1.number)
     assert_equal(1, u2.number)
@@ -55,11 +66,7 @@ end
 
 function test_give_self_zombie_okay()
     -- allow giving zombie units to own units of same race
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u1 = unit.create(f, r, 2, "zombie")
-    local u2 = unit.create(f, r, 1, "zombie")
-    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    u1, u2 = setup_give_self("zombie")
     process_orders()
     assert_equal(1, u1.number)
     assert_equal(2, u2.number)
@@ -67,11 +74,7 @@ end
 
 function test_give_self_skeleton_okay()
     -- allow giving skeleton units to own units of same race
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u1 = unit.create(f, r, 2, "skeleton")
-    local u2 = unit.create(f, r, 1, "skeleton")
-    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    u1, u2 = setup_give_self("skeleton")
     process_orders()
     assert_equal(1, u1.number)
     assert_equal(2, u2.number)
@@ -79,11 +82,31 @@ end
 
 function test_give_self_ghoul_okay()
     -- allow giving ghoul units to own units of same race
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u1 = unit.create(f, r, 2, "ghoul")
-    local u2 = unit.create(f, r, 1, "ghoul")
-    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    u1, u2 = setup_give_self("ghoul")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
+
+function test_give_self_ghast_okay()
+    -- allow giving ghast units to own units of same race
+    u1, u2 = setup_give_self("ghast")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
+
+function test_give_self_juju_okay()
+    -- allow giving juju units to own units of same race
+    u1, u2 = setup_give_self("juju")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
+
+function test_give_self_skeletonlord_okay()
+    -- allow giving skeletonlord units to own units of same race
+    u1, u2 = setup_give_self("skeletonlord")
     process_orders()
     assert_equal(1, u1.number)
     assert_equal(2, u2.number)
