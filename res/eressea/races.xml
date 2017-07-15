@@ -983,7 +983,7 @@
     <attack type="2" damage="5d600"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="ghast" magres="60" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
+  <race name="ghast" magres="60" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1000,7 +1000,7 @@
     <attack type="2" damage="1d30"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="ghoul" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes">
+  <race name="ghoul" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1016,7 +1016,7 @@
     <attack type="3" damage="1d2"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="juju" magres="50" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes">
+  <race name="juju" magres="50" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1031,7 +1031,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
+  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1044,7 +1044,7 @@
     <skill name="unarmed" modifier="1"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeletonlord" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
+  <race name="skeletonlord" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" canlearn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1058,7 +1058,7 @@
     <attack type="1" damage="1d7"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeleton" magres="10" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes">
+  <race name="skeleton" magres="10" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>

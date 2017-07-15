@@ -408,3 +408,19 @@ end
 function test_calendar_season_2328()
     assert_equal("fall", get_season(1026))
 end
+
+function test_give_to_other_okay()
+    -- can give a person to another faction
+    eressea.settings.set("GiveRestriction", "0")
+    local r = region.create(0, 0, "plain")
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
+
+    local u1 = unit.create(f1, r, 2, "human")
+    local u2 = unit.create(f2, r, 1, "human")
+    u2:add_order("KONTAKTIERE " .. itoa36(u1.id))
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    process_orders()
+    assert_equal(1, u1.number)
+    assert_equal(2, u2.number)
+end
