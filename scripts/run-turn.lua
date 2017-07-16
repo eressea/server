@@ -1,6 +1,6 @@
 function nmr_check(maxnmrs)
   local nmrs = get_nmrs(1)
-  if nmrs >= maxnmrs then
+  if nmrs > maxnmrs then
     eressea.log.error("Shit. More than " .. maxnmrs .. " factions with 1 NMR (" .. nmrs .. ")")
     write_summary()
     return -1
