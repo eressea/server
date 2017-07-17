@@ -58,10 +58,9 @@ static void test_flags(CuTest *tc) {
     check_flag(tc, "undead", RCF_UNDEAD);
     check_flag(tc, "dragon", RCF_DRAGON);
     check_flag(tc, "fly", RCF_FLY);
-    check_ec_flag(tc, "getitem", GETITEM);
-    check_ec_flag(tc, "keepitem", ECF_KEEP_ITEM);
-    check_ec_flag(tc, "giveperson", GIVEPERSON);
-    check_ec_flag(tc, "giveunit", GIVEUNIT);
+    check_ec_flag(tc, "getitem", ECF_GETITEM);
+    check_ec_flag(tc, "giveperson", ECF_GIVEPERSON);
+    check_ec_flag(tc, "giveunit", ECF_GIVEUNIT);
     test_cleanup();
 }
 

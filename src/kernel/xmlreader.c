@@ -1423,14 +1423,12 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "irongolem", false))
             rc->flags |= RCF_IRONGOLEM;
 
-        if (xml_bvalue(node, "keepitem", false))
-            rc->ec_flags |= ECF_KEEP_ITEM;
         if (xml_bvalue(node, "giveperson", false))
-            rc->ec_flags |= GIVEPERSON;
+            rc->ec_flags |= ECF_GIVEPERSON;
         if (xml_bvalue(node, "giveunit", false))
-            rc->ec_flags |= GIVEUNIT;
+            rc->ec_flags |= ECF_GIVEUNIT;
         if (xml_bvalue(node, "getitem", false))
-            rc->ec_flags |= GETITEM;
+            rc->ec_flags |= ECF_GETITEM;
         if (xml_bvalue(node, "recruitethereal", false))
             rc->ec_flags |= ECF_REC_ETHEREAL;
         if (xml_bvalue(node, "recruitunlimited", false))

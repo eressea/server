@@ -213,7 +213,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
                 buddy *nf, **fr = &friends;
 
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
                     while (*fr && (*fr)->faction->no < u2->faction->no)
                         fr = &(*fr)->next;
                     nf = *fr;
@@ -224,13 +224,6 @@ static buddy *get_friends(const unit * u, int *numfriends)
                         nf->unit = u2;
                         nf->number = 0;
                         *fr = nf;
-                    }
-                    else if (nf->faction == u2->faction
-                        && !(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
-                        /* we don't like to gift it to units that won't give it back */
-                        if ((u_race(nf->unit)->ec_flags & ECF_KEEP_ITEM)) {
-                            nf->unit = u2;
-                        }
                     }
                     nf->number += u2->number;
                     number += u2->number;
@@ -269,8 +262,6 @@ int gift_items(unit * u, int flags)
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
-    if ((u_race(u)->ec_flags & ECF_KEEP_ITEM))
-        return 0;
 
     /* at first, I should try giving my crap to my own units in this region */
     if (u->faction && (u->faction->flags & FFL_QUIT) == 0 && (flags & GIFT_SELF)) {
@@ -278,16 +269,10 @@ int gift_items(unit * u, int flags)
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2 != u && u2->faction == u->faction && u2->number > 0) {
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
-                    /* we don't like to gift it to units that won't give it back */
-                    if (!(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
-                        i_merge(&u2->items, &u->items);
-                        u->items = NULL;
-                        break;
-                    }
-                    else {
-                        u3 = u2;
-                    }
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
+                    i_merge(&u2->items, &u->items);
+                    u->items = NULL;
+                    break;
                 }
             }
         }

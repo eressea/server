@@ -233,10 +233,9 @@ extern "C" {
 #define RCF_FAMILIAR       (1<<31)      /* may be a familiar */
 
     /* Economic flags */
-#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenst�nde weg */
-#define GIVEPERSON     (1<<2)   /* �bergibt Personen */
-#define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei �bergeben */
-#define GETITEM        (1<<4)   /* nimmt Gegenst�nde an */
+#define ECF_GIVEPERSON     (1<<2)   /* �bergibt Personen */
+#define ECF_GIVEUNIT       (1<<3)   /* Einheiten an andere Partei �bergeben */
+#define ECF_GETITEM        (1<<4)   /* nimmt Gegenst�nde an */
 #define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
 

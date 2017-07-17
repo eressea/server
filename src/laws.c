@@ -2823,7 +2823,7 @@ static void age_stonecircle(building *b) {
             if (!mage && is_mage(u)) {
                 mage = u;
             }
-            if (rtype && (u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
+            if (rtype) {
                 int n, unicorns = 0;
                 for (n = 0; n != u->number; ++n) {
                     if (chance(0.02)) {
@@ -3533,7 +3533,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     char token[128];
-    if (u->number > 0 && (u_race(u)->ec_flags & GETITEM)) {
+    if (u->number > 0 && (u_race(u)->ec_flags & ECF_GETITEM)) {
         int use, count, para;
         const item_type *itype;
         const char *s;
