@@ -678,11 +678,6 @@ void give_cmd(unit * u, order * ord)
     } 
     else if (p == P_HERBS) {
         bool given = false;
-        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
-            ADDMSG(&u->faction->msgs,
-                msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
-            return;
-        }
         if (!can_give(u, u2, NULL, GIVE_HERBS)) {
             feedback_give_not_allowed(u, ord);
             return;
@@ -741,11 +736,6 @@ void give_cmd(unit * u, order * ord)
         if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
-            if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
-                return;
-            }
             if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
@@ -784,10 +774,6 @@ void give_cmd(unit * u, order * ord)
                         ADDMSG(&u->faction->msgs, msg);
                     }
                 }
-            }
-            else if ((u_race(u)->ec_flags & ECF_KEEP_ITEM) && u2 != NULL) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
             }
             else if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
                 ADDMSG(&u->faction->msgs,
@@ -844,11 +830,6 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if ((u_race(u)->ec_flags & ECF_KEEP_ITEM)) {
-            ADDMSG(&u->faction->msgs,
-                msg_feedback(u, ord, "race_nogive", "race", u_race(u)));
-            return;
-        }
         if (!(u_race(u2)->ec_flags & GETITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));

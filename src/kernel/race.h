@@ -233,7 +233,6 @@ extern "C" {
 #define RCF_FAMILIAR       (1<<31)      /* may be a familiar */
 
     /* Economic flags */
-#define ECF_KEEP_ITEM       (1<<1)   /* gibt Gegenst�nde weg */
 #define GIVEPERSON     (1<<2)   /* �bergibt Personen */
 #define GIVEUNIT       (1<<3)   /* Einheiten an andere Partei �bergeben */
 #define GETITEM        (1<<4)   /* nimmt Gegenst�nde an */

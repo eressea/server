@@ -179,9 +179,6 @@ int count)
             if (u != v) {
                 int mask;
 
-                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
-
                 if (v->faction == f) {
                     mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
                 }
@@ -232,9 +229,6 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
         for (v = r->units; use > 0 && v != NULL; v = v->next) {
             if (u != v) {
                 int mask;
-                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
-
                 if (v->faction == f) {
                     mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
                 }

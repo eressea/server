@@ -2823,7 +2823,7 @@ static void age_stonecircle(building *b) {
             if (!mage && is_mage(u)) {
                 mage = u;
             }
-            if (rtype && (u_race(u)->ec_flags & ECF_KEEP_ITEM) == 0) {
+            if (rtype) {
                 int n, unicorns = 0;
                 for (n = 0; n != u->number; ++n) {
                     if (chance(0.02)) {
