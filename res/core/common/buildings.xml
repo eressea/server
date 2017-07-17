@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <buildings>
-  <building name="wormhole" maxsize="4" capacity="1" maxcapacity="4" nobuild="yes" nodestroy="yes" unique="yes" />
+  <building name="wormhole" maxsize="4" maxcapacity="4" nobuild="yes" nodestroy="yes" unique="yes" />
   <building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild="yes"/>
   <building name="xmas_exit" maxsize="10" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes"/>
-  <building name="caldera" capacity="1" nodestroy="yes" nobuild="yes"/>
+  <building name="caldera" nodestroy="yes" nobuild="yes"/>
   <building name="building" namechange="no" maxsize="1" nobuild="yes"/>
 
   <building name="blessedstonecircle" maxcapacity="3" maxsize="100" nobuild="yes" magic="yes" magres="60" magresbonus="30" auraregen="1.50">
@@ -20,7 +20,7 @@
     </construction>
   </building>
 
-  <building name="inn" capacity="1">
+  <building name="inn">
     <maintenance type="money" amount="5" variable="yes"/>
     <construction skill="building" minskill="2" reqsize="10">
       <requirement type="iron" quantity="10"/>
@@ -30,7 +30,7 @@
     </construction>
   </building>
 
-  <building name="tunnel" capacity="1" maxsize="100">
+  <building name="tunnel" maxsize="100">
     <maintenance type="stone" amount="2"/>
     <maintenance type="money" amount="100"/>
     <construction skill="building" minskill="6" reqsize="100">
@@ -41,7 +41,7 @@
     </construction>
   </building>
 
-  <building name="caravan" capacity="1" maxsize="10">
+  <building name="caravan" maxsize="10">
     <maintenance type="horse" amount="2"/>
     <maintenance type="money" amount="3000"/>
     <construction skill="building" minskill="2" reqsize="10">
@@ -52,7 +52,7 @@
     </construction>
   </building>
 
-  <building name="dam" capacity="1" maxsize="50">
+  <building name="dam" maxsize="50">
     <maintenance type="log" amount="3"/>
     <maintenance type="money" amount="1000"/>
     <construction skill="building" minskill="4" reqsize="50">
@@ -63,7 +63,7 @@
     </construction>
   </building>
 
-  <building name="monument" namechange="no" capacity="1">
+  <building name="monument" namechange="no">
     <construction skill="building" minskill="4">
       <requirement type="log" quantity="1"/>
       <requirement type="stone" quantity="1"/>
@@ -72,7 +72,7 @@
     </construction>
   </building>
 
-  <building name="stables" capacity="1">
+  <building name="stables">
     <maintenance type="money" amount="150"/>
     <construction skill="building" minskill="2">
       <requirement type="log" quantity="4"/>
@@ -82,7 +82,7 @@
     </construction>
   </building>
 
-  <building name="sawmill" capacity="1">
+  <building name="sawmill">
     <maintenance type="money" amount="250"/>
     <construction skill="building" minskill="3">
       <requirement type="log" quantity="5"/>
@@ -92,7 +92,7 @@
     </construction>
   </building>
 
-  <building name="smithy" capacity="1">
+  <building name="smithy">
     <maintenance type="money" amount="300"/>
     <maintenance type="log" amount="1"/>
     <construction skill="building" minskill="3">
@@ -127,7 +127,7 @@
     </construction>
   </building>
 
-  <building name="harbour" capacity="1" maxcapacity="25" maxsize="25" unique="yes">
+  <building name="harbour" maxcapacity="25" maxsize="25" unique="yes">
     <maintenance type="money" amount="250"/>
     <construction skill="building" minskill="3" reqsize="25">
       <requirement type="log" quantity="125"/>
@@ -136,7 +136,7 @@
     </construction>
   </building>
 
-  <building name="quarry" capacity="1">
+  <building name="quarry">
     <maintenance type="money" amount="250"/>
     <construction skill="building" minskill="2">
       <requirement type="iron" quantity="1"/>
@@ -146,7 +146,7 @@
     </construction>
   </building>
 
-  <building name="mine" capacity="1">
+  <building name="mine">
     <maintenance type="money" amount="500"/>
     <construction skill="building" minskill="4">
       <requirement type="iron" quantity="1"/>
@@ -156,7 +156,7 @@
     </construction>
   </building>
 
-  <building name="lighthouse" capacity="1" maxcapacity="4">
+  <building name="lighthouse" maxcapacity="4">
     <maintenance type="money" amount="100"/>
     <construction skill="building" minskill="3">
       <requirement type="iron" quantity="1"/>
