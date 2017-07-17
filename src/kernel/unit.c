@@ -213,7 +213,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
                 buddy *nf, **fr = &friends;
 
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
                     while (*fr && (*fr)->faction->no < u2->faction->no)
                         fr = &(*fr)->next;
                     nf = *fr;
@@ -269,7 +269,7 @@ int gift_items(unit * u, int flags)
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2 != u && u2->faction == u->faction && u2->number > 0) {
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
                     i_merge(&u2->items, &u->items);
                     u->items = NULL;
                     break;

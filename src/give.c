@@ -682,7 +682,7 @@ void give_cmd(unit * u, order * ord)
             feedback_give_not_allowed(u, ord);
             return;
         }
-        if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
+        if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             return;
@@ -716,7 +716,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     else if (p == P_UNIT) {       /* Einheiten uebergeben */
-        if (!(u_race(u)->ec_flags & GIVEUNIT)) {
+        if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
             cmistake(u, ord, 167, MSG_COMMERCE);
             return;
         }
@@ -736,7 +736,7 @@ void give_cmd(unit * u, order * ord)
         if (!s || *s == 0) {              /* GIVE ALL items that you have */
 
             /* do these checks once, not for each item we have: */
-            if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
+            if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
                 return;
@@ -763,7 +763,7 @@ void give_cmd(unit * u, order * ord)
         }
         else {
             if (isparam(s, u->faction->locale, P_PERSON)) {
-                if (!(u_race(u)->ec_flags & GIVEPERSON)) {
+                if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                     ADDMSG(&u->faction->msgs,
                         msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
                 }
@@ -775,7 +775,7 @@ void give_cmd(unit * u, order * ord)
                     }
                 }
             }
-            else if (u2 && !(u_race(u2)->ec_flags & GETITEM)) {
+            else if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             }
@@ -816,7 +816,7 @@ void give_cmd(unit * u, order * ord)
 
     if (isparam(s, u->faction->locale, P_PERSON)) {
         message * msg;
-        if (!(u_race(u)->ec_flags & GIVEPERSON)) {
+        if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
@@ -830,7 +830,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (u2 != NULL) {
-        if (!(u_race(u2)->ec_flags & GETITEM)) {
+        if (!(u_race(u2)->ec_flags & ECF_GETITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
             return;
