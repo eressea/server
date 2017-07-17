@@ -129,7 +129,7 @@
 
   <building name="harbour" capacity="1" maxcapacity="25" maxsize="25" unique="yes">
     <maintenance type="money" amount="250"/>
-    <construction skill="building" minskill="3" reqsize="25" maxsize="25">
+    <construction skill="building" minskill="3" reqsize="25">
       <requirement type="log" quantity="125"/>
       <requirement type="stone" quantity="125"/>
       <requirement type="money" quantity="6250"/>
