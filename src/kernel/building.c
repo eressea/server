@@ -310,6 +310,7 @@ static const int watch_bonus[3] = { 0, 1, 2 };
 
 int building_protection(const building_type * btype, int stage)
 {
+    assert(btype->flags & BTF_FORTIFICATION);
     if (btype->maxsize < 0) {
         return castle_bonus[MIN(stage, 5)];
     }

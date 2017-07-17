@@ -51,3 +51,23 @@ function test_build_castle_stages()
     process_orders()
     assert_equal(250, b.size)
 end
+
+function test_build_maxsize()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 100)
+    local b = building.create(r, "harbour")
+    
+    b.size = 20
+    u:add_item("stone", 1000)
+    u:add_item("log", 1000)
+    u:add_item("money", 10000)
+
+    u:set_skill("building", 100)
+    u:clear_orders()
+    u:add_order("MACHE BURG " .. itoa36(b.id))
+    process_orders()
+    assert_equal(25, b.size) -- build no more than max
+    process_orders()
+    assert_equal(25, b.size) -- stop at max
+end
