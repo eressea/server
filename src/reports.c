@@ -1405,10 +1405,12 @@ void prepare_report(report_context *ctx, faction *f)
     region *r;
     static int config;
     static bool rule_region_owners;
+    static bool rule_lighthouse_units;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
 
     if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
+        rule_lighthouse_units = config_get_int("rules.lighthouse.unit_capacity", 0) != 0;
     }
 
     if (f->age <= 2) {
@@ -1471,7 +1473,12 @@ void prepare_report(report_context *ctx, faction *f)
                         c = buildingcapacity(b);
                         br = 0;
                     }
-                    c -= u->number;
+                    if (rule_lighthouse_units) {
+                        --c;
+                    }
+                    else {
+                        c -= u->number;
+                    }
                     if (u->faction == f && c >= 0) {
                         /* unit is one of ours, and inside the current lighthouse */
                         if (br == 0) {

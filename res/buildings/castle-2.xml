@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<building name="castle" capacity="1" fort="yes" taxes="100">
+<building name="castle" fort="yes" taxes="100">
   <construction skill="building" minskill="1" maxsize="10" name="site">
     <requirement type="stone" quantity="1"/>
   </construction>
