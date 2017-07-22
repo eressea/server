@@ -570,11 +570,32 @@ static void test_buildingtype(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_buildingcapacity(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    test_setup();
+    btype = test_create_buildingtype("lighthouse");
+    btype->capacity = 1;
+    btype->maxcapacity = 4;
+    b = test_create_building(test_create_region(0, 0, NULL), btype);
+
+    b->size = 1;
+    CuAssertIntEquals(tc, b->size*btype->capacity, buildingcapacity(b));
+    b->size = 5;
+    CuAssertIntEquals(tc, btype->maxcapacity, buildingcapacity(b));
+
+    btype->capacity = -1;
+    CuAssertTrue(tc, building_finished(b));
+    CuAssertIntEquals(tc, btype->maxcapacity, buildingcapacity(b));
+    test_cleanup();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_buildingtype);
     SUITE_ADD_TEST(suite, test_largestbuilding);
+    SUITE_ADD_TEST(suite, test_buildingcapacity);
     SUITE_ADD_TEST(suite, test_cmp_castle_size);
     SUITE_ADD_TEST(suite, test_cmp_taxes);
     SUITE_ADD_TEST(suite, test_cmp_wage);

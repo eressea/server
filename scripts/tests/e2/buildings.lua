@@ -51,3 +51,27 @@ function test_build_castle_stages()
     process_orders()
     assert_equal(250, b.size)
 end
+
+function test_build_harbour()
+-- try to reproduce mantis bug 2221
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "harbour@eressea.de", "de")
+    local u = unit.create(f, r)
+    size = 30
+    u.number = 20
+    u:set_skill("building", 3)
+    u:add_item("money", size*250)
+    u:add_item("stone", size*5)
+    u:add_item("log", size*5)
+    u:clear_orders()
+    u:add_order("MACHE HAFEN")
+    process_orders()
+    assert_not_nil(u.building)
+    assert_equal("harbour", u.building.type)
+    assert_equal(20, u.building.size)
+    process_orders()
+    assert_equal(25, u.building.size)
+    process_orders()
+    assert_equal(25, u.building.size)
+end
+

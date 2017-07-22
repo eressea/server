@@ -496,6 +496,15 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
     finish_reports(&ctx);
 
+    /* lighthouse capacity is # of units, not people: */
+    config_set_int("rules.lighthouse.unit_capacity", 1);
+    prepare_report(&ctx, u2->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    finish_reports(&ctx);
+
     test_cleanup();
 }
 
