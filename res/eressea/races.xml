@@ -732,7 +732,7 @@
     <attack type="4" damage="1d30"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="undead" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
+  <race name="undead" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
