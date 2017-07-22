@@ -700,7 +700,11 @@
     <attack type="4" damage="2d12"/>
   </race>
 
-  <race name="undead" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes" undead="yes" equipment="yes">
+  <race name="undead" maxaura="1.0" regaura="1.0" weight="1000"
+  capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0"
+  unarmeddefense="0" attackmodifier="1" defensemodifier="1"
+  scarepeasants="yes" walk="yes" canlearn="no" teach="no" noheal="yes"
+  undead="yes" equipment="yes" giveperson="yes">
     <ai splitsize="20000" moverandom="yes"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
