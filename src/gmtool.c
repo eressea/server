@@ -912,15 +912,15 @@ static void handlekey(state * st, int c)
         break;
     case 'B':
         cnormalize(&st->cursor, &nx, &ny);
-        minpop = config_get_int("editor.population.min", 8);
-        maxpop = config_get_int("editor.population.max", minpop);
+        minpop = config_get_int("editor.island.min", 8);
+        maxpop = config_get_int("editor.island.max", minpop);
         if (maxpop > minpop) {
             n = rng_int() % (maxpop - minpop) + minpop;
         }
         else {
             n = minpop;
         }
-        build_island_e3(NULL, nx, ny, n, n * 3);
+        build_island_e3(nx, ny, n, NULL, 0);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
