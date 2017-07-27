@@ -920,7 +920,7 @@ static void handlekey(state * st, int c)
         else {
             n = minpop;
         }
-        build_island_e3(&new_players, nx, ny, n, n * 3);
+        build_island_e3(NULL, nx, ny, n, n * 3);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;

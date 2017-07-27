@@ -784,13 +784,15 @@ const terrain_type * (*terraformer) (direction_t))
     direction_t dir;
     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
         region *rn = rconnect(r, dir);
-        if (rn == NULL) {
+        if (rn == NULL || !rn->land) {
             const terrain_type *terrain = terraformer(dir);
-            plane *pl = rplane(r);
-            int x = r->x + delta_x[dir];
-            int y = r->y + delta_y[dir];
-            pnormalize(&x, &y, pl);
-            rn = new_region(x, y, pl, 0);
+            if (!rn) {
+                plane *pl = rplane(r);
+                int x = r->x + delta_x[dir];
+                int y = r->y + delta_y[dir];
+                pnormalize(&x, &y, pl);
+                rn = new_region(x, y, pl, 0);
+            }
             terraform_region(rn, terrain);
             regionqueue_push(rlist, rn);
             if (rn->land) {
@@ -946,7 +948,7 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
 
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY && nfactions < numfactions && *players) {
+                if (q >= MIN_QUALITY && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
                     minq = MIN(minq, q);
                     maxq = MAX(maxq, q);
@@ -961,7 +963,7 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 region *rn[MAXDIRECTIONS];
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && *players) {
+                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
                     minq = MIN(minq, q);
                     maxq = MAX(maxq, q);
