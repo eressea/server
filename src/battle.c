@@ -958,6 +958,7 @@ void drain_exp(struct unit *u, int n)
         skill *sv = unit_skill(u, sk);
         if (sv) {
             while (n > 0) {
+              /* FIXME STUDYDAYS */
                 if (n >= 30 * u->number) {
                     reduce_skill(u, sv, 1);
                     n -= 30;

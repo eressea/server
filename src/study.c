@@ -176,13 +176,13 @@ const attrib_type at_learning = {
 
 static int study_days(unit * student, skill_t sk)
 {
-    int speed = 30;
+    int speed = STUDYDAYS;
     if (u_race(student)->study_speed) {
         speed += u_race(student)->study_speed[sk];
-        if (speed < 30) {
+        if (speed < STUDYDAYS) {
             skill *sv = unit_skill(student, sk);
             if (sv == 0) {
-                speed = 30;
+                speed = STUDYDAYS;
             }
         }
     }
@@ -209,7 +209,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         return 0;
     }
 
-    n = 30 * student->number;
+    n = STUDYDAYS * student->number;
     a = a_find(student->attribs, &at_learning);
     if (a != NULL) {
         teach = (teaching_info *)a->data.v;
@@ -231,7 +231,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
              * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
             if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->value += (n / 30) * 10;  /* learning erhoehen */
+                teach->value += (n / STUDYDAYS) * EXPERIENCEDAYS;  /* learning erhoehen */
                                                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
                 if (academy) {
                     *academy += n;
@@ -268,7 +268,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
          * die Talentaenderung (enno).
          */
 
-        nteaching = MAX(0, nteaching - student->number * 30);
+        nteaching = MAX(0, nteaching - student->number * STUDYDAYS);
 
     }
     return n;
@@ -301,14 +301,14 @@ int teach_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    teaching = u->number * 30 * TEACHNUMBER;
+    teaching = u->number * STUDYDAYS * TEACHNUMBER;
 
     if ((i = get_effect(u, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
         i = MIN(i, u->number * TEACHNUMBER);
         /* Trank wirkt pro Schueler, nicht pro Lehrer */
-        teaching -= i * 30;
+        teaching -= i * STUDYDAYS;
         change_effect(u, oldpotiontype[P_FOOL], -i);
-        j = teaching / 30;
+        j = teaching / STUDYDAYS;
         ADDMSG(&u->faction->msgs, msg_message("teachdumb", "teacher amount", u, j));
     }
     if (teaching == 0)
@@ -747,12 +747,12 @@ int study_cmd(unit * u, order * ord)
 
     if (get_effect(u, oldpotiontype[P_WISE])) {
         l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
-        teach->value += l * 10;
+        teach->value += l * EXPERIENCEDAYS;
         change_effect(u, oldpotiontype[P_WISE], -l);
     }
     if (get_effect(u, oldpotiontype[P_FOOL])) {
         l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
-        teach->value -= l * 30;
+        teach->value -= l * STUDYDAYS;
         change_effect(u, oldpotiontype[P_FOOL], -l);
     }
 
@@ -761,11 +761,11 @@ int study_cmd(unit * u, order * ord)
         /* p ist Kosten ohne Uni, studycost mit; wenn
          * p!=studycost, ist die Einheit zwangsweise
          * in einer Uni */
-        teach->value += u->number * 10;
+        teach->value += u->number * EXPERIENCEDAYS;
     }
 
     if (is_cursed(r->attribs, C_BADLEARN, 0)) {
-        teach->value -= u->number * 10;
+        teach->value -= u->number * EXPERIENCEDAYS;
     }
 
     multi *= study_speedup(u, sk, speed_rule);
@@ -828,7 +828,7 @@ int study_cmd(unit * u, order * ord)
 static int produceexp_days(void) {
     static int config, rule;
     if (config_changed(&config)) {
-        rule = config_get_int("study.produceexp", 10);
+        rule = config_get_int("study.produceexp", EXPERIENCEDAYS);
     }
     return rule;
 }

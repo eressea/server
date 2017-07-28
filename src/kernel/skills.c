@@ -153,6 +153,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 
 int level_days(int level)
 {
+  /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
     return 30 * ((level + 1) * level / 2);
 }
 

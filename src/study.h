@@ -39,6 +39,7 @@ extern "C" {
     typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
 
 #define STUDYDAYS 30
+#define EXPERIENCEDAYS 10
     void learn_skill(struct unit *u, skill_t sk, int days);
 
     void produceexp(struct unit *u, skill_t sk, int n);
