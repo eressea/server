@@ -163,8 +163,8 @@ static void init_learning(struct attrib *a)
 
 static void done_learning(struct attrib *a)
 {
-	teaching_info *teach = (teaching_info *)a->data.v;
-	selist_free(teach->teachers);
+    teaching_info *teach = (teaching_info *)a->data.v;
+    selist_free(teach->teachers);
     free(a->data.v);
 }
 
@@ -173,6 +173,8 @@ const attrib_type at_learning = {
     init_learning, done_learning, NULL, NULL, NULL, NULL,
     ATF_UNIQUE
 };
+
+#define EXPERIENCEDAYS 10
 
 static int study_days(unit * student, skill_t sk)
 {
@@ -260,14 +262,16 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
          *
          * Ist C aber vor B dran, lehrt C 300 tage an A, und 0 tage an D,
          * und B lehrt auch 0 tage an A.
+         * (Na und? -stm)
          *
-         * Deswegen darf C D nie lehren duerfen.
+         * Deswegen darf C D nie lehren duerfen. (Warum? -stm)
          *
          * -> Das ist wirr. wer hat das entworfen?
          * Besser waere, man macht erst vorab alle zuordnungen, und dann
          * die Talentaenderung (enno).
          */
 
+        /* FIXME: this code no effect; check if the refactoring done in 1e51d0e9e238e1e6e073cab2060777038e1acfa1 fucked this up */
         nteaching = MAX(0, nteaching - student->number * STUDYDAYS);
 
     }
@@ -449,7 +453,6 @@ int teach_cmd(unit * u, struct order *ord)
                 continue;
             }
 
-            /* u is teacher, u2 is student */
             if (effskill_study(u2, sk, 0) > effskill_study(u, sk, 0)
                 - TEACHDIFFERENCE) {
                 if (feedback) {
@@ -480,7 +483,8 @@ int teach_cmd(unit * u, struct order *ord)
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
     if (academy && sk_academy!=NOSKILL) {
-        academy_teaching_bonus(u, sk_academy, academy);
+        assert(academy % STUDYDAYS == 0);
+        academy_teaching_bonus(u, sk_academy, academy / STUDYDAYS);
     }
     return 0;
 }
@@ -871,15 +875,24 @@ void learn_skill(unit *u, skill_t sk, int days) {
         ++weeks;
     }
     if (weeks > 0) {
-        skill *sv = unit_skill(u, sk);
-        if (!sv) {
-            sv = add_skill(u, sk);
+        increase_skill(u, sk, weeks);
+    }
+}
+
+void reduce_skill_days(unit *u, skill_t sk, int days) {
+    skill *sv = unit_skill(u, sk);
+    if (sv) {
+        while (days > 0) {
+            if (days >=  STUDYDAYS * u->number) {
+                reduce_skill(u, sv, 1);
+                days -= STUDYDAYS;
+            }
+            else {
+                if (chance (days / ((double) STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
+                    reduce_skill(u, sv, 1);
+                days = 0;
+            }
         }
-        while (sv->weeks <= weeks) {
-            weeks -= sv->weeks;
-            sk_set(sv, sv->level + 1);
-        }
-        sv->weeks -= weeks;
     }
 }
 

@@ -203,6 +203,19 @@ int skill_weeks(int level)
     return level + 1;
 }
 
+void increase_skill(unit * u, skill_t sk, unsigned int weeks)
+{
+    skill *sv = unit_skill(u, sk);
+    if (!sv) {
+        sv = add_skill(u, sk);
+    }
+    while (sv->weeks <= (int) weeks) {
+        weeks -= sv->weeks;
+        sk_set(sv, sv->level + 1);
+    }
+    sv->weeks -= weeks;
+}
+
 void reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
     sv->weeks += weeks;

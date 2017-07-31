@@ -156,7 +156,7 @@ static bool improve_all(faction * f, skill_t sk, int by_weeks)
     bool result = false;
     for (u = f->units; u; u = u->nextF) {
         if (has_skill(u, sk)) {
-            learn_skill(u, sk, by_weeks * STUDYDAYS);
+            increase_skill(u, sk, by_weeks);
             result = true;
         }
     }
@@ -242,7 +242,7 @@ void find_manual(region * r, unit * u)
     }
 
     if (!improve_all(u->faction, skill, 3)) {
-        learn_skill(u, skill, 9 * STUDYDAYS);
+        increase_skill(u, skill, 9);
     }
 }
 

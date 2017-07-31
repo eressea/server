@@ -34,6 +34,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/functions.h>
 
+#include <study.h>
+
 /* libc includes */
 #include <assert.h>
 #include <string.h>
