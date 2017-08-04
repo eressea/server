@@ -25,9 +25,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "academy.h"
 #include "study.h"
 
-void academy_teaching_bonus(struct unit *u, skill_t sk, int academy) {
-    if (academy && sk != NOSKILL) {
-        learn_skill(u, sk, academy);
+void academy_teaching_bonus(struct unit *u, skill_t sk, int student_days) {
+    if (student_days && sk != NOSKILL) {
+        /* actually days / STUDYDAYS * EXPERIENCEDAYS / MAX_STUDENTS */
+        learn_skill(u, sk, student_days / STUDYDAYS); 
     }
 }
 

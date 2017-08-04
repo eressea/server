@@ -484,7 +484,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     }
     if (academy && sk_academy!=NOSKILL) {
         assert(academy % STUDYDAYS == 0);
-        academy_teaching_bonus(teacher, sk_academy, academy / STUDYDAYS);
+        academy_teaching_bonus(teacher, sk_academy, academy);
     }
     return 0;
 }
@@ -842,7 +842,7 @@ void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
     assert(u && n <= u->number);
     if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
         int days = produceexp_days();
-        learn(u, sk, days * n / u->number);
+        learn(u, sk, days * n);
     }
 }
 
@@ -858,6 +858,7 @@ void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
 #endif
+/** days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning */
 void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
@@ -929,7 +930,7 @@ void demon_skillchange(unit *u)
                 }
             }
             else {
-                learn_skill(u, sv->id, STUDYDAYS*weeks);
+                learn_skill(u, sv->id, STUDYDAYS * u->number * weeks);
             }
         }
         ++sv;
