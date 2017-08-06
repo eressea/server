@@ -8,6 +8,7 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/config.h>
+#include <util/goodies.h>
 #include <util/language.h>
 #include <util/password.h>
 
@@ -223,6 +224,21 @@ static void test_valid_race(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_set_email(CuTest *tc) {
+    char * email = NULL;
+    test_setup();
+    CuAssertIntEquals(tc, 0, set_email(&email, "enno@eressea.de"));
+    CuAssertStrEquals(tc, "enno@eressea.de", email);
+    CuAssertIntEquals(tc, 0, set_email(&email, "bugs@eressea.de"));
+    CuAssertStrEquals(tc, "bugs@eressea.de", email);
+    CuAssertIntEquals(tc, -1, set_email(&email, "bad@@eressea.de"));
+    CuAssertStrEquals(tc, "bugs@eressea.de", email);
+    CuAssertIntEquals(tc, -1, set_email(&email, "eressea.de"));
+    CuAssertStrEquals(tc, "bugs@eressea.de", email);
+    free(email);
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -237,5 +253,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_set_origin_bug);
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
+    SUITE_ADD_TEST(suite, test_set_email);
     return suite;
 }
