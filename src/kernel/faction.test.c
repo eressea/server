@@ -232,8 +232,8 @@ static void test_set_email(CuTest *tc) {
     CuAssertIntEquals(tc, 0, set_email(&email, "bugs@eressea.de"));
     CuAssertStrEquals(tc, "bugs@eressea.de", email);
     CuAssertIntEquals(tc, -1, set_email(&email, "bad@@eressea.de"));
-    CuAssertStrEquals(tc, "bugs@eressea.de", email);
     CuAssertIntEquals(tc, -1, set_email(&email, "eressea.de"));
+    CuAssertIntEquals(tc, -1, set_email(&email, "eressea@"));
     CuAssertStrEquals(tc, "bugs@eressea.de", email);
     free(email);
     test_cleanup();
