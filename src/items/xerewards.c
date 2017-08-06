@@ -34,6 +34,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/functions.h>
 
+#include <study.h>
+
 /* libc includes */
 #include <assert.h>
 #include <string.h>
@@ -52,6 +54,7 @@ struct order *ord)
     for (n = 0; n != amount; ++n) {
         skill *sv = u->skills;
         while (sv != u->skills + u->skill_size) {
+            /* only one person learns for 3 weeks */
             learn_skill(u, (skill_t)sv->id, STUDYDAYS * 3);
             ++sv;
         }

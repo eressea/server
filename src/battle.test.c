@@ -12,8 +12,13 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <util/functions.h>
+#include <util/rand.h>
+#include <util/rng.h>
 
 #include <CuTest.h>
+
+#include <stdio.h>
+
 #include "tests.h"
 
 static void test_make_fighter(CuTest * tc)
@@ -494,6 +499,82 @@ static void test_battle_skilldiff_building(CuTest *tc)
     test_cleanup();
 }
 
+static void assert_skill(CuTest *tc, char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
+{
+  skill *sv = unit_skill(u, sk);
+  char buf[256];
+  if (sv) {
+    sprintf(buf, "%s level %d != %d", msg, sv->level, level);
+    CuAssertIntEquals_Msg(tc, (const char *)&buf, level, sv->level);
+    sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);
+    CuAssert(tc, (const char *)&buf, sv->weeks >= week && sv->weeks <=weekmax);
+  } else {
+    CuAssertIntEquals_Msg(tc, msg, level, 0);
+    CuAssertIntEquals_Msg(tc, msg, week, 0);
+  }    
+}
+
+static void test_drain_exp(CuTest *tc) 
+{
+    unit *u;
+    char *msg;
+    int i;
+    double rand;
+    
+    test_setup();
+    config_set("study.random_progress", "0");
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_STAMINA, 3);
+    
+    CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);
+    CuAssertIntEquals(tc, 4, unit_skill(u, SK_STAMINA)->weeks);
+
+    assert_skill(tc, msg = "base", u, SK_STAMINA, 3, 4, 4);
+    assert_skill(tc, msg, u, SK_STAMINA, 3, 4, 4);
+    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+    for (i=0; i<10; ++i) {
+    set_level(u, SK_STAMINA, 3);
+    drain_exp(u, 0);
+    assert_skill(tc, msg = "0 change", u, SK_STAMINA, 3, 4, 4);
+    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+    for (rand = 0.0; rand < 2.0; rand += 1) {
+      random_source_inject_constant(rand);
+
+      set_level(u, SK_STAMINA, 3);
+      drain_exp(u, 29);
+    
+      assert_skill(tc, msg = "no change yet", u, SK_STAMINA, 3, 4, rand == 0.0?4:5);
+      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+      
+      set_level(u, SK_STAMINA, 3);
+      drain_exp(u, 1);
+      
+      assert_skill(tc, msg = "random change", u, SK_STAMINA, 3, 4, rand == 0.0?4:5);
+      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+      set_level(u, SK_STAMINA, 3);
+      drain_exp(u, 30);
+      
+      assert_skill(tc, msg = "plus one", u, SK_STAMINA, 3, 5, 5);
+      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+    }
+    
+    set_level(u, SK_STAMINA, 3);
+    drain_exp(u, 90);
+    
+    assert_skill(tc, msg = "plus three", u, SK_STAMINA, 3, 7, 7);
+    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+    
+    set_level(u, SK_STAMINA, 3);
+    drain_exp(u, 120);
+      
+    assert_skill(tc, msg = "plus four", u, SK_STAMINA, 2, 5, 5);
+    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+    }
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -508,5 +589,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
+    SUITE_ADD_TEST(suite, test_drain_exp);
     return suite;
 }

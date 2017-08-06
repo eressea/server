@@ -1172,7 +1172,7 @@
     <familiar race="wolf"/>
     <familiar race="rat"/>
   </race>
-  <race name="orc" magres="-5" maxaura="1.000000" regaura="1.000000" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
+  <race name="orc" studyspeed="-5" magres="-5" maxaura="1.000000" regaura="1.000000" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1.000000" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <param name="recruit_multi" value="0.5"/>
     <skill name="alchemy" modifier="1"/>
