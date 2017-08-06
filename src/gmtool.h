@@ -22,7 +22,6 @@ extern "C" {
     struct terrain_type;
     struct newfaction;
 
-  int gmmain(int argc, char *argv[]);
   int curses_readline(struct lua_State *L, char *buffer, size_t size,
     const char *prompt);
 
