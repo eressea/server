@@ -24,6 +24,7 @@
 #include <kernel/unit.h>
 
 /* util includes */
+#include <util/log.h>
 #include <util/nrmessage.h>
 #include <util/message.h>
 #include <util/functions.h>
@@ -32,10 +33,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-
-/* --------------------------------------------------------------------- */
-/* CurseInfo mit Spezialabfragen
- */
 
 /*
  * godcursezone
@@ -205,6 +202,22 @@ static struct curse_type ct_blessedharvest = {
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
+
+int harvest_effect(const struct region *r) {
+    if (r->attribs) {
+        curse *c = get_curse(r->attribs, &ct_blessedharvest);
+        if (c) {
+            int happy = curse_geteffect_int(c);
+            if (happy != 1) {
+                /* https://bugs.eressea.de/view.php?id=2353 detect and fix bad harvest */
+                log_error("blessedharvest curse %d has effect=%d, duration=%d", c->no, happy, c->duration);
+                c->effect = 1.0;
+            }
+            return happy;
+        }
+    }
+    return 0;
+}
 
 static struct curse_type ct_drought = {
     "drought",

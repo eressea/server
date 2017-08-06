@@ -596,28 +596,23 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
         if (ct->mergeflags & M_DURATION) {
             c->duration = MAX(c->duration, duration);
         }
-        if (ct->mergeflags & M_SUMDURATION) {
+        else if (ct->mergeflags & M_SUMDURATION) {
             c->duration += duration;
-        }
-        if (ct->mergeflags & M_SUMEFFECT) {
-            c->effect += effect;
         }
         if (ct->mergeflags & M_MAXEFFECT) {
             c->effect = MAX(c->effect, effect);
         }
+        else if (ct->mergeflags & M_SUMEFFECT) {
+            c->effect += effect;
+        }
         if (ct->mergeflags & M_VIGOUR) {
             c->vigour = MAX(vigour, c->vigour);
         }
-        if (ct->mergeflags & M_VIGOUR_ADD) {
+        else if (ct->mergeflags & M_VIGOUR_ADD) {
             c->vigour = vigour + c->vigour;
         }
-        if (ct->mergeflags & M_MEN) {
-            switch (ct->typ) {
-            case CURSETYP_UNIT:
-            {
-                c->data.i += men;
-            }
-            }
+        if (ct->mergeflags & M_MEN && ct->typ == CURSETYP_UNIT) {
+            c->data.i += men;
         }
         set_curseingmagician(magician, *ap, ct);
     }

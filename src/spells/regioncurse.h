@@ -17,10 +17,10 @@
 extern "C" {
 #endif
 
-    struct curse;
-    struct locale;
+    struct region;
 
-    extern void register_regioncurse(void);
+    int harvest_effect(const struct region *r);
+    void register_regioncurse(void);
 
 #ifdef __cplusplus
 }
