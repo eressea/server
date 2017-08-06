@@ -69,6 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
+#include <spells/regioncurse.h>
 
 /* libs includes */
 #include <math.h>
@@ -2653,14 +2654,10 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
         jobs = rpeasants(r);
     }
     earnings = jobs * p_wage;
-    if (r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
+    if (jobs > 0 && r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
         /* E3 rules */
-        const curse_type *blessedharvest_ct = ct_find("blessedharvest");
-        if (blessedharvest_ct) {
-            int happy =
-                (int)(jobs * curse_geteffect(get_curse(r->attribs, blessedharvest_ct)));
-            earnings += happy;
-        }
+        int happy = harvest_effect(r);
+        earnings += happy * jobs;
     }
     rsetmoney(r, money + earnings);
 }

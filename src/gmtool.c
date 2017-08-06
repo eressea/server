@@ -1,4 +1,4 @@
-/* 
+/*
  * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  * |                   |  Enno Rehling <enno@eressea.de>
  * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -81,7 +81,7 @@ int gm_codepage = -1;
 
 static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
-        if (gm_codepage >=0 && *rp & 0x80) {
+        if (gm_codepage >= 0 && *rp & 0x80) {
             size_t sz = 0;
             unsigned char ch;
             switch (gm_codepage) {
@@ -115,7 +115,7 @@ int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
 
     va_start(args, format);
     memset(buffer, 0, sizeof(buffer));
-    vsnprintf(buffer, sizeof(buffer)-1, format, args);
+    vsnprintf(buffer, sizeof(buffer) - 1, format, args);
     va_end(args);
 
     simplify(buffer, buffer);
@@ -344,7 +344,7 @@ map_region *cursor_region(const view * v, const coordinate * c)
 
 static void
 draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
-int show)
+    int show)
 {
     int lines = getmaxy(win) / THEIGHT;
     int xp, yp, nx, ny;
@@ -814,7 +814,7 @@ static void select_regions(state * st, int selectmode)
     st->wnd_map->update |= 3;
 }
 
-void loaddata(state *st)  {
+static void loaddata(state *st) {
     char datafile[MAX_PATH];
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
@@ -824,7 +824,7 @@ void loaddata(state *st)  {
     }
 }
 
-void savedata(state *st)  {
+static void savedata(state *st) {
     char datafile[MAX_PATH];
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
@@ -835,6 +835,20 @@ void savedata(state *st)  {
     }
 }
 
+static void seed_player(state *st, const newfaction *player) {
+    if (player) {
+        region *r;
+        int nx = st->cursor.x;
+        int ny = st->cursor.y;
+
+        pnormalize(&nx, &ny, st->cursor.pl);
+        r = findregion(nx, ny);
+        if (r) {
+            addplayer(r, addfaction(player->email, player->password, player->race,
+                player->lang, player->subscription));
+        }
+    }
+}
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -897,10 +911,6 @@ static void handlekey(state * st, int c)
         loaddata(st);
         break;
     case 'B':
-        if (!new_players) {
-            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
-            new_players = read_newfactions(sbuffer);
-        }
         cnormalize(&st->cursor, &nx, &ny);
         minpop = config_get_int("editor.population.min", 8);
         maxpop = config_get_int("editor.population.max", minpop);
@@ -1111,13 +1121,15 @@ static void handlekey(state * st, int c)
         else
             tag_region(st->selected, nx, ny);
         break;
-    case 'A':
-        if (!new_players) {
-            join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
-            new_players = read_newfactions(sbuffer);
+    case 's': /* seed */
+        if (new_players) {
+            newfaction * next = new_players->next;
+            seed_player(st, new_players);
+            free(new_players->email);
+            free(new_players->password);
+            free(new_players);
+            new_players = next;
         }
-        seed_players(&new_players, false);
-        st->wnd_map->update |= 1;
         break;
     case '/':
         statusline(st->wnd_status->handle, "find-");
@@ -1289,13 +1301,15 @@ void run_mapper(void)
     int split = 20;
     state *st;
     point tl;
-/* FIXME: dsiable logging
-    int old_flags = log_flags;
-    log_flags &= ~(LOG_CPERROR | LOG_CPWARNING);
-*/
+    char sbuffer[512];
+
+    if (!new_players) {
+        join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
+        new_players = read_newfactions(sbuffer);
+    }
+
     init_curses();
     curs_set(1);
-
     set_readline(curses_readline);
     assert(stdscr);
     getbegyx(stdscr, x, y);
@@ -1384,15 +1398,15 @@ void run_mapper(void)
     set_readline(NULL);
     curs_set(1);
     endwin();
-/* FIXME: reset logging
-    log_flags = old_flags;
-*/
+    /* FIXME: reset logging
+        log_flags = old_flags;
+    */
     state_close(st);
 }
 
 int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
-const char *prompt)
+    const char *prompt)
 {
     UNUSED_ARG(L);
     askstring(hstatus, prompt, buffer, size);

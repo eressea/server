@@ -82,12 +82,18 @@ static int spc_email_isvalid(const char *address)
         if (strchr(rfc822_specials, *c))
             return 0;
     }
+    if (*c!='@') {
+        /* no @ symbol */
+        return -1;
+    }
+    domain = ++c;
+    if (!*c) {
+        return -1;
+    }
     if (c == address || *(c - 1) == '.')
         return 0;
 
     /* next we validate the domain portion (name@domain) */
-    if (!*(domain = ++c))
-        return 0;
     do {
         if (*c == '.') {
             if (c == domain || *(c - 1) == '.')

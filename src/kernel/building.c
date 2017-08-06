@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 
 /* attributes includes */
+#include <spells/regioncurse.h>
 #include <attributes/reduceproduction.h>
 
 typedef struct building_typelist {
@@ -710,7 +711,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
         if (r->attribs && rule_blessed_harvest() == HARVEST_WORK) {
             /* E1 rules */
-            wage += curse_geteffect(get_curse(r->attribs, ct_find("blessedharvest")));
+            wage += harvest_effect(r);
         }
     }
 
