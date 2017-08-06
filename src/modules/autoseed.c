@@ -161,6 +161,8 @@ newfaction *read_newfactions(const char *filename)
             break;
         if (email[0] == '\0')
             break;
+        if (email[0] == '#')
+            break;
         if (password[0] == '\0') {
             size_t sz;
             sz = strlcpy(password, itoa36(rng_int()), sizeof(password));

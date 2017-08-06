@@ -483,7 +483,7 @@ int teach_cmd(unit * teacher, struct order *ord)
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
     if (academy && sk_academy!=NOSKILL) {
-        assert(academy % STUDYDAYS == 0);
+        /* assert(academy % STUDYDAYS == 0); bug 2355: why? */
         academy_teaching_bonus(teacher, sk_academy, academy);
     }
     return 0;
