@@ -53,6 +53,19 @@ attrib_type at_chaoscount = {
     ATF_UNIQUE
 };
 
+void set_chaoscount(struct region *r, int deaths)
+{
+    if (deaths==0) {
+        a_removeall(&r->attribs, &at_chaoscount);
+    } else {
+        attrib *a = a_find(r->attribs, &at_chaoscount);
+        if (!a) {
+            a = a_add(&r->attribs, a_new(&at_chaoscount));
+        }
+        a->data.i = deaths;
+    }
+}
+
 int get_chaoscount(const region * r)
 {
     attrib *a = a_find(r->attribs, &at_chaoscount);
