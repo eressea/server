@@ -157,9 +157,13 @@ newfaction *read_newfactions(const char *filename)
         password[0] = '\0';
 
         if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus,
-            &subscription, password, &alliance) < 3)
+            &subscription, password, &alliance) < 3) {
             break;
-        if (email[0] == '\0')
+	}
+	if (email[0] == '#') {
+            continue;
+        }
+	if (email[0] == '\0')
             break;
         if (email[0] == '#')
             break;
@@ -778,25 +782,29 @@ const terrain_type *random_terrain_e3(direction_t dir)
     return random_terrain(terrainarr, distribution, GEOMAX);
 }
 
-int
+static int
 random_neighbours(region * r, region_list ** rlist,
-const terrain_type * (*terraformer) (direction_t))
+const terrain_type * (*terraformer) (direction_t), int n)
 {
     int nsize = 0;
     direction_t dir;
     for (dir = 0; dir != MAXDIRECTIONS; ++dir) {
         region *rn = rconnect(r, dir);
-        if (rn == NULL) {
+        if (rn == NULL || (!rn->units && !rn->land)) {
             const terrain_type *terrain = terraformer(dir);
-            plane *pl = rplane(r);
-            int x = r->x + delta_x[dir];
-            int y = r->y + delta_y[dir];
-            pnormalize(&x, &y, pl);
-            rn = new_region(x, y, pl, 0);
+            if (!rn) {
+                plane *pl = rplane(r);
+                int x = r->x + delta_x[dir];
+                int y = r->y + delta_y[dir];
+                pnormalize(&x, &y, pl);
+                rn = new_region(x, y, pl, 0);
+            }
             terraform_region(rn, terrain);
             regionqueue_push(rlist, rn);
             if (rn->land) {
-                ++nsize;
+                if (++nsize >= n) {
+                    break;
+                }
             }
         }
     }
@@ -906,7 +914,7 @@ static void starting_region(newfaction ** players, region * r, region * rn[])
 }
 
 /* E3A island generation */
-int build_island_e3(newfaction ** players, int x, int y, int numfactions, int minsize)
+int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfactions)
 {
 #define MIN_QUALITY 1000
     int nfactions = 0;
@@ -917,9 +925,10 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
     int nsize = 1;
     int q, maxq = INT_MIN, minq = INT_MAX;
 
-    if (!r)
+    if (r && r->units) return 0;
+    if (!r) {
         r = new_region(x, y, pl, 0);
-    assert(!r->units);
+    }
     do {
         terraform_region(r, random_terrain_e3(NODIRECTION));
     } while (!r->land);
@@ -928,10 +937,10 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, &random_terrain_e3);
+                nsize += random_neighbours(r, &rlist, &random_terrain_e3, minsize-nsize);
             }
             else {
-                nsize += random_neighbours(r, &rlist, &get_ocean);
+                nsize += random_neighbours(r, &rlist, &get_ocean, minsize - nsize);
             }
         }
         regionqueue_push(&island, r);
@@ -948,7 +957,7 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
 
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY && nfactions < numfactions && *players) {
+                if (q >= MIN_QUALITY && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
                     minq = MIN(minq, q);
                     maxq = MAX(maxq, q);
@@ -963,7 +972,7 @@ int build_island_e3(newfaction ** players, int x, int y, int numfactions, int mi
                 region *rn[MAXDIRECTIONS];
                 get_neighbours(r, rn);
                 q = region_quality(r, rn);
-                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && *players) {
+                if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
                     minq = MIN(minq, q);
                     maxq = MAX(maxq, q);
