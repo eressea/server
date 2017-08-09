@@ -499,11 +499,12 @@ static void test_modify_production(CuTest *tc) {
     CuAssertIntEquals(tc, 11, get_item(u, itype));
     CuAssertIntEquals(tc, 290, region_getresource(u->region, rtype)); /* used 10 stones to make 10 stones */
 
-    rtype->modifiers = calloc(2, sizeof(resource_mod));
+    rtype->modifiers = calloc(3, sizeof(resource_mod));
     rtype->modifiers[0].type = RMT_PROD_SAVE;
     rtype->modifiers[0].race = u->_race;
     rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
     rtype->modifiers[0].value.sa[1] = 100;
+    rtype->modifiers[1].type = RMT_END;
     make_item(u, itype, 10);
     split_allocations(u->region);
     CuAssertIntEquals(tc, 21, get_item(u, itype));
@@ -541,6 +542,7 @@ static void test_modify_production(CuTest *tc) {
     rtype->modifiers[1].type = RMT_PROD_REQUIRE;
     rtype->modifiers[1].race = u_race(u);
     rtype->modifiers[1].btype = NULL;
+    rtype->modifiers[2].type = RMT_END;
 
     test_clear_messages(u->faction);
     make_item(u, itype, 10);
