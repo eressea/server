@@ -16,7 +16,7 @@
 
 #include "market.h"
 
-/* kernel includes */
+ /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
@@ -94,7 +94,7 @@ static int count_demand(const region * r)
 
 static int
 recurse_regions(region * r, region_list ** rlist,
-bool(*fun) (const region * r))
+    bool(*fun) (const region * r))
 {
     if (!fun(r))
         return 0;
@@ -159,32 +159,35 @@ newfaction *read_newfactions(const char *filename)
         if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus,
             &subscription, password, &alliance) < 3) {
             break;
-	}
-	if (email[0] == '#') {
+        }
+        if (email[0] == '#') {
             continue;
         }
-	if (email[0] == '\0')
+        if (email[0] == '\0') {
             break;
-        if (email[0] == '#')
-            break;
+        }
         if (password[0] == '\0') {
             size_t sz;
             sz = strlcpy(password, itoa36(rng_int()), sizeof(password));
             sz += strlcat(password, itoa36(rng_int()), sizeof(password));
         }
         for (f = factions; f; f = f->next) {
-            if (strcmp(f->email, email) == 0 && f->subscription
-                && f->age < MINAGE_MULTI)
+            if (strcmp(f->email, email) == 0 && f->age < MINAGE_MULTI) {
+                log_warning("email %s already in use by %s", email, factionname(f));
                 break;
+            }
         }
         if (f && f->units)
             continue;                 /* skip the ones we've already got */
         for (nf = newfactions; nf; nf = nf->next) {
-            if (strcmp(nf->email, email) == 0)
+            if (strcmp(nf->email, email) == 0) {
+                log_warning("duplicate new faction %s", email);
                 break;
+            }
         }
-        if (nf)
+        if (nf) {
             continue;
+        }
         nf = calloc(sizeof(newfaction), 1);
         if (set_email(&nf->email, email) != 0) {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
@@ -784,7 +787,7 @@ const terrain_type *random_terrain_e3(direction_t dir)
 
 static int
 random_neighbours(region * r, region_list ** rlist,
-const terrain_type * (*terraformer) (direction_t), int n)
+    const terrain_type * (*terraformer) (direction_t), int n)
 {
     int nsize = 0;
     direction_t dir;
@@ -937,7 +940,7 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, &random_terrain_e3, minsize-nsize);
+                nsize += random_neighbours(r, &rlist, &random_terrain_e3, minsize - nsize);
             }
             else {
                 nsize += random_neighbours(r, &rlist, &get_ocean, minsize - nsize);
@@ -995,7 +998,7 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
             rsetmoney(r, 50000);   /* 2% = 1000 silver */
         }
         else if (r->land) {
-            rsetmoney(r, rmoney(r) *4);
+            rsetmoney(r, rmoney(r) * 4);
         }
     }
     return nfactions;
