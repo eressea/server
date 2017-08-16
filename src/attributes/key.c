@@ -61,6 +61,9 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
 
 static int a_readkey(attrib *a, void *owner, struct gamedata *data) {
     int res = a_readint(a, owner, data);
+    if (data->version>=KEYVAL_VERSION) {
+        return AT_READ_FAIL;
+    }
     return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
 }
 
