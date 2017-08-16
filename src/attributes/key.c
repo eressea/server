@@ -79,36 +79,12 @@ attrib_type at_keys = {
 };
 
 static void a_upgradekeys(attrib **alist, attrib *abegin) {
-    int n = 0, *keys = 0;
-    int i = 0, val[8];
-    attrib *a, *ak = a_find(*alist, &at_keys);
-    if (ak) {
-        keys = (int *)ak->data.v;
-        if (keys) n = keys[0];
-    }
+    attrib *a, *ak;
+
+    ak = a_find(*alist, &at_keys);
+    if (ak) alist = &ak;
     for (a = abegin; a && a->type == abegin->type; a = a->next) {
-        val[i * 2] = a->data.i;
-        val[i * 2 + 1] = 1;
-        if (++i == 4) {
-            keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
-            memcpy(keys + 2 * n + 1, val, sizeof(val));
-            n += i;
-            i = 0;
-        }
-    }
-    if (i > 0) {
-        keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
-        memcpy(keys + 2 * n + 1, val, sizeof(int)*i*2);
-        if (!ak) {
-            ak = a_add(alist, a_new(&at_keys));
-        }
-    }
-    if (ak) {
-        ak->data.v = keys;
-        if (keys) {
-            keys[0] = i + n;
-            assert(keys[0] < 4096 && keys[0]>=0);
-        }
+        key_set(alist, a->data.i, 1);
     }
 }
 
@@ -117,7 +93,7 @@ attrib_type at_key = {
     NULL,
     NULL,
     NULL,
-    a_writeint,
+    NULL,
     a_readkey,
     a_upgradekeys
 };
@@ -135,8 +111,8 @@ void key_set(attrib ** alist, int key, int val)
     if (keys) {
         n = keys[0];
     }
+    /* TODO: too many allocations, unsorted array */
     keys = realloc(keys, sizeof(int) *(2 * n + 3));
-    /* TODO: does insertion sort pay off here? prob. not. */
     keys[0] = n + 1;
     assert(keys[0] < 4096 && keys[0]>=0);
     keys[2 * n + 1] = key;
@@ -172,6 +148,7 @@ int key_get(attrib *alist, int key) {
     if (a) {
         int i, *keys = (int *)a->data.v;
         if (keys) {
+            /* TODO: binary search this! */
             for (i = 0; i != keys[0]; ++i) {
                 if (keys[i*2+1] == key) {
                     return keys[i * 2 + 2];
