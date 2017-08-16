@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static void a_writekeys(const attrib *a, const void *o, storage *store) {
     int i, *keys = (int *)a->data.v;
+    assert(keys[0] < 4096 && keys[0]>0);
     WRITE_INT(store, keys[0]);
     for (i = 0; i < keys[0]; ++i) {
         WRITE_INT(store, keys[i * 2 + 1]);
@@ -105,7 +106,8 @@ static void a_upgradekeys(attrib **alist, attrib *abegin) {
     if (ak) {
         ak->data.v = keys;
         if (keys) {
-            keys[0] = n + i;
+            keys[0] = i + n;
+            assert(keys[0] < 4096 && keys[0]>=0);
         }
     }
 }
@@ -136,6 +138,7 @@ void key_set(attrib ** alist, int key, int val)
     keys = realloc(keys, sizeof(int) *(2 * n + 3));
     /* TODO: does insertion sort pay off here? prob. not. */
     keys[0] = n + 1;
+    assert(keys[0] < 4096 && keys[0]>=0);
     keys[2 * n + 1] = key;
     keys[2 * n + 2] = val;
     a->data.v = keys;
@@ -150,6 +153,7 @@ void key_unset(attrib ** alist, int key)
         int i, *keys = (int *)a->data.v;
         if (keys) {
             int n = keys[0];
+            assert(keys[0] < 4096 && keys[0]>0);
             for (i = 0; i != n; ++i) {
                 if (keys[2 * i + 1] == key) {
                     memmove(keys + 2 * i + 1, keys + 2 * n - 1, 2 * sizeof(int));
