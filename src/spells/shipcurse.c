@@ -73,14 +73,14 @@ static message *cinfo_shipnodrift(const void *obj, objtype_t typ, const curse * 
 }
 
 static struct curse_type ct_stormwind = { "stormwind",
-CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
+CURSETYP_NORM, CURSE_NOAGE, NO_MERGE, cinfo_ship
 };
 
 static struct curse_type ct_nodrift = { "nodrift",
 CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR), cinfo_shipnodrift
 };
 
-static struct curse_type ct_shipspeedup = { "shipspeedup",
+const struct curse_type ct_shipspeedup = { "shipspeedup",
 CURSETYP_NORM, 0, 0, cinfo_ship
 };
 

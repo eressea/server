@@ -187,7 +187,7 @@ extern "C" {
     /* ------------------------------------------------------------- */
     /* Allgemeine Zauberwirkungen */
 
-#define c_flags(c) ((c)->type->flags ^ (c)->flags)
+#define c_flags(c) ((c)->type->flags ^ (c)->mask)
 
     /* ------------------------------------------------------------- */
 
@@ -215,7 +215,7 @@ extern "C" {
         double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
         double effect;
         int no;                     /* 'Einheitennummer' dieses Curse */
-        int flags;                  /* WARNING: these are XORed with type->flags! */
+        int mask;                   /* This is XORed with type->flags, see c_flags()! */
         int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
     } curse;
 

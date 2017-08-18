@@ -55,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
+#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -1920,9 +1921,7 @@ int skilldiff(troop at, troop dt, int dist)
                 skdiff -= beff;
                 is_protected = 2;
                 if (b->attribs) {
-                    const curse_type *magicwalls_ct = ct_find("magicwalls");
-                    if (magicwalls_ct
-                        && curse_active(get_curse(b->attribs, magicwalls_ct))) {
+                    if (curse_active(get_curse(b->attribs, &ct_magicwalls))) {
                         /* Verdoppelt Burgenbonus */
                         skdiff -= beff;
                     }

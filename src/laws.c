@@ -70,6 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
 #include <attributes/stealth.h>
+#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -3872,7 +3873,6 @@ int siege_cmd(unit * u, order * ord)
     building *b;
     int d, pooled;
     int bewaffnete, katapultiere = 0;
-    const curse_type *magicwalls_ct;
     resource_type *rt_catapultammo = NULL;
     resource_type *rt_catapult = NULL;
 
@@ -3891,7 +3891,6 @@ int siege_cmd(unit * u, order * ord)
     }
     /* schaden durch katapulte */
 
-    magicwalls_ct = ct_find("magicwalls");
     rt_catapultammo = rt_find("catapultammo");
     rt_catapult = rt_find("catapult");
 
@@ -3932,7 +3931,7 @@ int siege_cmd(unit * u, order * ord)
     d = MIN(d, b->size - 1);
 
     /* meldung, schaden anrichten */
-    if (d && !curse_active(get_curse(b->attribs, magicwalls_ct))) {
+    if (d && !curse_active(get_curse(b->attribs, &ct_magicwalls))) {
         b->size -= d;
         use_pooled(u, rt_catapultammo,
             GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
