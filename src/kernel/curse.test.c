@@ -106,7 +106,7 @@ static void test_memstream(CuTest *tc) {
     storage store;
     stream out = { 0 };
     char buf[1024];
-    int val=0;
+    int val = 0;
 
     mstream_init(&out);
     binstore_init(&store, &out);
@@ -137,11 +137,13 @@ static void test_write_flag(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
-    setup_curse(&fix, "gbdream");
+    setup_curse(&fix, "magicwalls");
     c = fix.c;
     r = fix.r;
     uid = r->uid;
-    c->flags = CURSE_ISNEW;
+    c_setflag(c, CURSE_ISNEW);
+    c_setflag(c, CURSE_IMMUNE);
+    CuAssertIntEquals(tc, c->type->flags | CURSE_IMMUNE | CURSE_ISNEW, c_flags(c));
     write_game(&data);
     free_gamedata();
     data.strm.api->rewind(data.strm.handle);
@@ -150,7 +152,7 @@ static void test_write_flag(CuTest *tc) {
     CuAssertPtrNotNull(tc, r);
     CuAssertPtrNotNull(tc, r->attribs);
     c = (curse *)r->attribs->data.v;
-    CuAssertIntEquals(tc, CURSE_ISNEW, c->flags);
+    CuAssertIntEquals(tc, c->type->flags | CURSE_IMMUNE | CURSE_ISNEW, c_flags(c));
 
     mstream_done(&data.strm);
     gamedata_done(&data);
@@ -160,7 +162,7 @@ static void test_write_flag(CuTest *tc) {
 static void test_curse_cache(CuTest *tc)
 {
     int cache = 0;
-    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };    
+    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
     test_setup();
     CuAssertIntEquals(tc, true, ct_changed(&cache));
     CuAssertIntEquals(tc, false, ct_changed(&cache));
