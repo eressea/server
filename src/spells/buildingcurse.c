@@ -75,7 +75,7 @@ CURSETYP_NORM, 0, M_SUMEFFECT, cinfo_magicrunes
 };
 
 /* Heimstein-Zauber */
-static struct curse_type ct_magicwalls = { "magicwalls",
+const struct curse_type ct_magicwalls = { "magicwalls",
 CURSETYP_NORM, CURSE_ONLYONE|CURSE_NOAGE, NO_MERGE, cinfo_building
 };
 

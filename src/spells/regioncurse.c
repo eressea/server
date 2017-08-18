@@ -57,7 +57,7 @@ static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
 
 static struct curse_type ct_godcursezone = {
     "godcursezone",
-    CURSETYP_NORM, CURSE_IMMUNE | CURSE_ISNEW, (NO_MERGE),
+    CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
     cinfo_cursed_by_the_gods,
 };
 
@@ -83,7 +83,7 @@ static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c
 
 static struct curse_type ct_gbdream = {
     "gbdream",
-    CURSETYP_NORM, CURSE_ISNEW, (NO_MERGE), cinfo_dreamcurse
+    CURSETYP_NORM, 0, (NO_MERGE), cinfo_dreamcurse
 };
 
 /* --------------------------------------------------------------------- */
@@ -196,7 +196,7 @@ static struct curse_type ct_fogtrap = {
 
 static struct curse_type ct_maelstrom = {
     "maelstrom",
-    CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
@@ -214,7 +214,7 @@ static struct curse_type ct_drought = {
 
 static struct curse_type ct_badlearn = {
     "badlearn",
-    CURSETYP_NORM, CURSE_ISNEW, (M_DURATION | M_VIGOUR),
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
