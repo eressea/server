@@ -15,6 +15,7 @@
 
 #include "gmtool.h"
 #include "gmtool_structs.h"
+#include "chaos.h"
 #include "console.h"
 #include "listbox.h"
 #include "wormhole.h"
@@ -45,6 +46,7 @@
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
 
+#include <util/attrib.h>
 #include <util/log.h>
 #include <util/unicode.h>
 #include <util/lists.h>
@@ -515,6 +517,46 @@ static void statusline(WINDOW * win, const char *str)
     wnoutrefresh(win);
 }
 
+static void reset_region(region *r) {
+    set_chaoscount(r, 0);
+    r->flags = 0;
+    a_removeall(&r->attribs, NULL);
+    while (r->units) {
+        remove_unit(&r->units, r->units);
+    }
+    while (r->ships) {
+        remove_ship(&r->ships, r->ships);
+    }
+    while (r->buildings) {
+        remove_building(&r->buildings, r->buildings);
+    }
+}
+
+static void reset_cursor(state *st) {
+    int nx = st->cursor.x;
+    int ny = st->cursor.y;
+    region *r;
+    pnormalize(&nx, &ny, st->cursor.pl);
+    if ((r = findregion(nx, ny)) != NULL) {
+        reset_region(r);
+    }
+}
+
+static void reset_rect(state *st) {
+    int x, y, bs = 3;
+    for (x=0;x!=bs;++x) {
+        for (y = 0; y != bs; ++y) {
+            region *r;
+            int nx = st->cursor.x + x;
+            int ny = st->cursor.y + y;
+            pnormalize(&nx, &ny, st->cursor.pl);
+            if ((r = findregion(nx, ny)) != NULL) {
+                reset_region(r);
+            }
+        }
+    }
+}
+
 static void terraform_at(coordinate * c, const terrain_type * terrain)
 {
     if (terrain != NULL) {
@@ -844,8 +886,20 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            addplayer(r, addfaction(player->email, player->password, player->race,
-                player->lang, player->subscription));
+            const char *at = strchr(player->email, '@');
+            faction *f;
+            addplayer(r, f = addfaction(player->email, player->password,
+                                        player->race, player->lang,
+                                        player->subscription));
+            if (at) {
+                char fname[64];
+                size_t len = at - player->email;
+                if (len>4 && len<sizeof(fname)) {
+                    memcpy(fname, player->email, len);
+                    fname[len]=0;
+                    faction_setname(f, fname);
+                }
+            }
         }
     }
 }
@@ -912,15 +966,15 @@ static void handlekey(state * st, int c)
         break;
     case 'B':
         cnormalize(&st->cursor, &nx, &ny);
-        minpop = config_get_int("editor.population.min", 8);
-        maxpop = config_get_int("editor.population.max", minpop);
+        minpop = config_get_int("editor.island.min", 8);
+        maxpop = config_get_int("editor.island.max", minpop);
         if (maxpop > minpop) {
             n = rng_int() % (maxpop - minpop) + minpop;
         }
         else {
             n = minpop;
         }
-        build_island_e3(&new_players, nx, ny, n, n * 3);
+        build_island_e3(nx, ny, n, NULL, 0);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
@@ -933,6 +987,12 @@ static void handlekey(state * st, int c)
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
         st->wnd_map->update |= 1;
+        break;
+    case 'c': /* clear/reset */
+        reset_cursor(st);
+        break;
+    case 'C': /* clear/reset */
+        reset_rect(st);
         break;
     case 0x09:                 /* tab = next selected */
         if (regions != NULL) {

@@ -61,14 +61,14 @@ static curse *cursehash[MAXENTITYHASH];
 void c_setflag(curse * c, unsigned int flags)
 {
     assert(c);
-    c->flags = (c->flags & ~flags) | (flags & (c->type->flags ^ flags));
+    c->mask = (c->mask & ~flags) | (flags & (c->type->flags ^ flags));
 }
 
 /* -------------------------------------------------------------------------- */
 void c_clearflag(curse * c, unsigned int flags)
 {
     assert(c);
-    c->flags = (c->flags & ~flags) | (c->type->flags & flags);
+    c->mask = (c->mask & ~flags) | (c->type->flags & flags);
 }
 
 void chash(curse * c)
@@ -180,14 +180,13 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     int ur;
     char cursename[64];
     int n;
-    int flags;
     float flt;
 
     assert(!c->no);
     READ_INT(store, &c->no);
     chash(c);
     READ_TOK(store, cursename, sizeof(cursename));
-    READ_INT(store, &flags);
+    READ_INT(store, &c->mask);
     READ_INT(store, &c->duration);
     READ_FLT(store, &flt);
     c->vigour = flt;
@@ -214,7 +213,6 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         assert(result == 0);
         return AT_READ_FAIL;
     }
-    c->flags = flags;
     if (data->version < EXPLICIT_CURSE_ISNEW_VERSION) {
         c_clearflag(c, CURSE_ISNEW);
     }
@@ -239,21 +237,13 @@ int curse_read(attrib * a, void *owner, gamedata *data)
 
 void curse_write(const attrib * a, const void *owner, struct storage *store)
 {
-    unsigned int flags;
     curse *c = (curse *)a->data.v;
     const curse_type *ct = c->type;
     unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 
-    /* copied from c_clearflag */
-#if RELEASE_VERSION < EXPLICIT_CURSE_ISNEW_VERSION
-    flags = (c->flags & ~CURSE_ISNEW) | (c->type->flags & CURSE_ISNEW);
-#else
-    flags = c->flags | c->type->flags;
-#endif
-
     WRITE_INT(store, c->no);
     WRITE_TOK(store, ct->cname);
-    WRITE_INT(store, flags);
+    WRITE_INT(store, c->mask);
     WRITE_INT(store, c->duration);
     WRITE_FLT(store, (float)c->vigour);
     write_unit_reference(mage, store);
@@ -306,6 +296,7 @@ void ct_register(const curse_type * ct)
     selist **ctlp = cursetypes + hash;
 
     assert(ct->age==NULL || (ct->flags&CURSE_NOAGE) == 0);
+    assert((ct->flags&CURSE_ISNEW) == 0);
     selist_set_insert(ctlp, (void *)ct, NULL);
     ++ct_changes;
 }
@@ -553,7 +544,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
     c = (curse *)a->data.v;
 
     c->type = ct;
-    c->flags = 0;
+    c->mask = 0;
     c->vigour = vigour;
     c->duration = duration;
     c->effect = effect;
@@ -633,7 +624,7 @@ static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
     bool dogive = false;
     const curse_type *ct = c->type;
 
-    switch ((ct->flags | c->flags) & CURSE_SPREADMASK) {
+    switch (c_flags(c) & CURSE_SPREADMASK) {
     case CURSE_SPREADALWAYS:
         dogive = true;
         men = u2->number + n;
@@ -666,7 +657,7 @@ static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
     if (dogive) {
         curse *cnew = make_curse(c->magician, &u2->attribs, c->type, c->vigour,
             c->duration, c->effect, men);
-        cnew->flags = c->flags;
+        cnew->mask = c->mask;
 
         if (ct->typ == CURSETYP_UNIT)
             set_cursedmen(cnew, men);

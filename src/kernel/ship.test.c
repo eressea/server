@@ -462,7 +462,7 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, ct_find("shipspeedup"), 1, 1, 3, 0);
+    create_curse(0, &sh->attribs, &ct_shipspeedup, 1, 1, 3, 0);
     CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, shipspeed(sh, cap));
     test_cleanup();
 }
