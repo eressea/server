@@ -213,6 +213,12 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         assert(result == 0);
         return AT_READ_FAIL;
     }
+    if (data->version <= NOLANDITEM_VERSION) {
+        if ((c->type->flags & CURSE_NOAGE) && !(c_flags(c) & CURSE_NOAGE)) {
+            /* bugfix bug 2356 */
+            c_setflag(c, CURSE_NOAGE);
+        }
+    }
     if (data->version < EXPLICIT_CURSE_ISNEW_VERSION) {
         c_clearflag(c, CURSE_ISNEW);
     }
