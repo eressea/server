@@ -283,11 +283,19 @@ faction *addfaction(const char *email, const char *password,
     return f;
 }
 
+#define PEASANT_MIN (10 * RECRUITFRACTION)
+#define PEASANT_MAX (20 * RECRUITFRACTION)
+
 unit *addplayer(region * r, faction * f)
 {
     unit *u;
     const char * name;
     const struct equipment* eq;
+
+    assert(r->land);
+    if (rpeasants(r) < PEASANT_MIN) {
+        rsetpeasants(r, PEASANT_MIN + rng_int() % (PEASANT_MAX - PEASANT_MIN));
+    }
 
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
