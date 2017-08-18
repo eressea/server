@@ -22,6 +22,8 @@ extern "C" {
     struct message;
     struct curse;
 
+    extern const struct curse_type ct_shipspeedup;
+
     struct message *cinfo_ship(const void *obj, objtype_t typ,
         const struct curse *c, int self);
     void register_shipcurse(void);

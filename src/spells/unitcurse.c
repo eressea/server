@@ -170,7 +170,7 @@ message *cinfo_unit(const void *obj, objtype_t typ, const curse * c, int self)
 
 static struct curse_type ct_orcish = {
     "orcish",
-    CURSETYP_UNIT, CURSE_SPREADMODULO | CURSE_ISNEW, M_MEN,
+    CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
     cinfo_unit
 };
 

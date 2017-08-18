@@ -21,6 +21,9 @@ extern "C" {
     struct locale;
     struct curse;
     struct message;
+    struct curse_type;
+
+    extern const struct curse_type ct_magicwalls;
 
     extern void register_buildingcurse(void);
     struct message *cinfo_building(const void *obj, objtype_t typ, const struct curse * c, int self);
