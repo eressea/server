@@ -89,7 +89,6 @@ static int
 use_speedsail(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
-    curse *c;
     double effect;
     ship *sh = u->ship;
     if (!sh) {
@@ -98,8 +97,7 @@ struct order *ord)
     }
 
     effect = SPEEDSAIL_EFFECT;
-    c = create_curse(u, &sh->attribs, &ct_shipspeedup, 20, INT_MAX,
-        effect, 0);
+    create_curse(u, &sh->attribs, &ct_shipspeedup, 20, INT_MAX, effect, 0);
 
     ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit speed", u,
         SPEEDSAIL_EFFECT));
