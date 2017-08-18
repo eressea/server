@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/xml.h>
 
 #include <attributes/movement.h>
+#include <spells/shipcurse.h>
 
 #include <storage.h>
 #include <selist.h>
@@ -365,7 +366,7 @@ int shipspeed(const ship * sh, const unit * u)
         a = a->next;
     }
 
-    c = get_curse(sh->attribs, ct_find("shipspeedup"));
+    c = get_curse(sh->attribs, &ct_shipspeedup);
     while (c) {
         k += curse_geteffect_int(c);
         c = c->nexthash;

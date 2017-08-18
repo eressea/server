@@ -2072,7 +2072,7 @@ static int sp_homestone(castorder * co)
         return 0;
     }
 
-    c = create_curse(mage, &mage->building->attribs, ct_find("magicwalls"),
+    c = create_curse(mage, &mage->building->attribs, &ct_magicwalls,
         force * force, 1, zero_effect, 0);
 
     if (c == NULL) {
