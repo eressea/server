@@ -432,8 +432,11 @@ static void test_shipspeed_stormwind(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, ct_find("stormwind"), 1, 1, 1, 0);
+    create_curse(0, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
+    CuAssertPtrNotNull(tc, sh->attribs);
     CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, shipspeed(sh, cap));
+    a_age(&sh->attribs, sh);
+    CuAssertPtrEquals(tc, NULL, sh->attribs);
     test_cleanup();
 }
 

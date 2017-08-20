@@ -332,7 +332,7 @@ int shipspeed(const ship * sh, const unit * u)
         return 0;
 
     if (sh->attribs) {
-        if (curse_active(get_curse(sh->attribs, ct_find("stormwind")))) {
+        if (curse_active(get_curse(sh->attribs, &ct_stormwind))) {
             k *= 2;
         }
         if (curse_active(get_curse(sh->attribs, ct_find("nodrift")))) {

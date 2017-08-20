@@ -2276,7 +2276,7 @@ static int sp_stormwinds(castorder * co)
         }
 
         /* Duration = 1, nur diese Runde */
-        create_curse(mage, &sh->attribs, ct_find("stormwind"), power, 1,
+        create_curse(mage, &sh->attribs, &ct_stormwind, power, 1,
             zero_effect, 0);
         /* Da der Spruch nur diese Runde wirkt wird er nie im Report
          * erscheinen */
