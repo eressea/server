@@ -32,8 +32,8 @@ static void test_upgrade_key(CuTest *tc) {
     attrib *alist = 0;
     key_set_orig(&alist, 40);
     key_set_orig(&alist, 41);
-    key_set_orig(&alist, 42);
     key_set_orig(&alist, 43);
+    key_set_orig(&alist, 42);
     key_set_orig(&alist, 44);
     CuAssertPtrNotNull(tc, alist->type->upgrade);
     alist->type->upgrade(&alist, alist);
