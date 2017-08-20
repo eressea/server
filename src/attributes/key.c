@@ -62,6 +62,16 @@ static int keys_lower_bound(int *base, int k, int l, int r) {
     return l;
 }
 
+static int keys_size(int n) {
+    /* TODO maybe use log2 from https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog */
+    assert(n > 0 && n <= 4096);
+    if (n <= 1) return 1;
+    if (n <= 4) return 4;
+    if (n <= 16) return 16;
+    if (n <= 256) return 256;
+    return 4096;
+}
+
 static int a_readkeys(attrib * a, void *owner, gamedata *data) {
     int i, n, *keys;
 
@@ -70,8 +80,7 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
     if (n == 0) {
         return AT_READ_FAIL;
     }
-
-    keys = malloc(sizeof(int)*(n * 2 + 1));
+    keys = malloc(sizeof(int)*(keys_size(n) * 2 + 1));
     *keys = n;
     for (i = 0; i != n; ++i) {
         READ_INT(data->store, keys + i * 2 + 1);
@@ -108,8 +117,12 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
             ++e;
         }
         if (e != n) {
-            keys = realloc(keys, sizeof(int)*(2 * e + 1));
-            keys[0] = e;
+            int sz = keys_size(n);
+            if (e > sz) {
+                sz = keys_size(e);
+                keys = realloc(keys, sizeof(int)*(2 * sz + 1));
+                keys[0] = e;
+            }
         }
     }
     a->data.v = keys;
@@ -176,9 +189,14 @@ static int *keys_update(int *base, int key, int val)
             kv[1] = val;
         }
         else {
+            int sz = keys_size(n);
             assert(kv[0] > key);
-            base = realloc(base, (n * 2 + 3) * sizeof(int));
-            kv = keys_get(base, l);
+            if (n + 1 > sz) {
+                ptrdiff_t diff = kv - base;
+                sz = keys_size(n + 1);
+                base = realloc(base, (sz * 2 + 1) * sizeof(int));
+                kv = base + diff;
+            }
             base[0] = n + 1;
             memmove(kv + 2, kv, 2 * sizeof(int) * (n - l));
             kv[0] = key;
@@ -186,7 +204,11 @@ static int *keys_update(int *base, int key, int val)
         }
     }
     else {
-        base = realloc(base, (n * 2 + 3) * sizeof(int));
+        int sz = keys_size(n);
+        if (n + 1 > sz) {
+            sz = keys_size(n + 1);
+            base = realloc(base, (sz * 2 + 1) * sizeof(int));
+        }
         base[0] = n + 1;
         kv = keys_get(base, l);
         kv[0] = key;
@@ -206,7 +228,8 @@ void key_set(attrib ** alist, int key, int val)
     }
     keys = (int *)a->data.v;
     if (!keys) {
-        a->data.v = keys = malloc(3 * sizeof(int));
+        int sz = keys_size(1);
+        a->data.v = keys = malloc((2 * sz + 1) * sizeof(int));
         keys[0] = 1;
         keys[1] = key;
         keys[2] = val;
@@ -230,12 +253,9 @@ void key_unset(attrib ** alist, int key)
             if (l < n) {
                 int *kv = keys_get(keys, l);
                 if (kv[0] == key) {
-                    memmove(kv, kv + 2, (n - l - 1) * 2 * sizeof(int));
-                    // TODO: realloc to smaller size?
-                    keys[0]--;
+                    kv[1] = 0; /* do not delete, just set to 0 */
                 }
             }
-            assert(keys[0] < 4096 && keys[0]>0);
         }
     }
 }
