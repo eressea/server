@@ -1785,7 +1785,7 @@ static int sp_treewalkenter(castorder * co)
     }
 
     rt = r_standard_to_astral(r);
-    if (rt == NULL || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)
+    if (rt == NULL || is_cursed(rt->attribs, &ct_astralblock)
         || fval(rt->terrain, FORBIDDEN_REGION)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
@@ -1901,7 +1901,7 @@ static int sp_treewalkexit(castorder * co)
             "spellfail_astralonly", ""));
         return 0;
     }
-    if (is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
+    if (is_cursed(r->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
         return 0;
@@ -2264,12 +2264,12 @@ static int sp_stormwinds(castorder * co)
         sh = pa->param[n]->data.sh;
 
         /* mit C_SHIP_NODRIFT haben wir kein Problem */
-        if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
+        if (is_cursed(sh->attribs, &ct_flyingship)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "error_spell_on_flying_ship", "ship", sh))
                 continue;
         }
-        if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+        if (is_cursed(sh->attribs, &ct_shipspeedup)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "error_spell_on_ship_already", "ship", sh))
                 continue;
@@ -2338,7 +2338,7 @@ static int sp_earthquake(castorder * co)
     while (*blist) {
         building *burg = *blist;
 
-        if (burg->size != 0 && !is_cursed(burg->attribs, C_MAGICWALLS, 0)) {
+        if (burg->size != 0 && !is_cursed(burg->attribs, &ct_magicwalls)) {
             /* Magieresistenz */
             if (!target_resists_magic(mage, burg, TYP_BUILDING, 0)) {
                 kaputt = MIN(10 * cast_level, burg->size / 4);
@@ -2798,7 +2798,7 @@ static int sp_unholypower(castorder * co)
              * korrekt abgefangen wird. Besser (aber nicht gerade einfach)
              * waere es, eine solche Konstruktion irgendwie zu kapseln. */
             if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)
-                || is_cursed(u->attribs, C_SLAVE, 0)) {
+                || is_cursed(u->attribs, &ct_slavery)) {
                 cmistake(mage, co->order, 74, MSG_MAGIC);
                 continue;
             }
@@ -3186,7 +3186,7 @@ static int sp_chaossuction(castorder * co)
         cmistake(mage, co->order, 216, MSG_MAGIC);
         return 0;
     }
-    else if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    else if (is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
         return 0;
@@ -3233,7 +3233,7 @@ static int sp_magicboost(castorder * co)
     trigger *tsummon;
 
     /* fehler, wenn schon ein boost */
-    if (is_cursed(mage->attribs, C_MBOOST, 0)) {
+    if (is_cursed(mage->attribs, &ct_magicboost)) {
         report_failure(mage, co->order);
         return 0;
     }
@@ -3748,7 +3748,7 @@ static int sp_rallypeasantmob(castorder * co)
         }
     }
 
-    c = get_curse(r->attribs, ct_find(oldcursename(C_RIOT)));
+    c = get_curse(r->attribs, &ct_riotzone);
     if (c != NULL) {
         remove_curse(&r->attribs, c);
     }
@@ -3964,7 +3964,7 @@ static int sp_generous(castorder * co)
     double effect;
     message *msg[2] = { NULL, NULL };
 
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    if (is_cursed(r->attribs, &ct_depression)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_generous", ""));
         return 0;
@@ -4662,7 +4662,29 @@ int sp_analysedream(castorder * co)
     return cast_level;
 }
 
-static int sp_gbdreams(castorder * co, const char *curse_name, int effect);
+static int sp_gbdreams(castorder * co, int effect)
+{
+    int duration;
+    unit *mage = co->magician.u;
+    int cast_level = co->level;
+    double power = co->force;
+    region *r = co_get_region(co);
+
+    /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
+    * also duration+2 */
+    duration = (int)MAX(1, power / 2);    /* Stufe 1 macht sonst mist */
+    duration = 2 + rng_int() % duration;
+
+    /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
+    create_curse(mage, &r->attribs, &ct_gbdream, power, duration, effect, 0);
+
+    /* Erfolg melden */
+    ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
+        "unit region command", mage, mage->region, co->order));
+
+    return cast_level;
+}
+
 
 /* ------------------------------------------------------------- */
 /* Name:       Schlechte Traeume
@@ -4679,7 +4701,7 @@ static int sp_gbdreams(castorder * co, const char *curse_name, int effect);
  * */
 int sp_baddreams(castorder * co)
 {
-    return sp_gbdreams(co, "gbdream", -1);
+    return sp_gbdreams(co, -1);
 }
 
 /* ------------------------------------------------------------- */
@@ -4696,30 +4718,7 @@ int sp_baddreams(castorder * co)
  */
 int sp_gooddreams(castorder * co)
 {
-    return sp_gbdreams(co, "gbdream", 1);
-}
-
-static int sp_gbdreams(castorder * co, const char *curse_name, int effect)
-{
-    int duration;
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    double power = co->force;
-    region *r = co_get_region(co);
-
-    /* wirkt erst in der Folgerunde, soll mindestens eine Runde wirken,
-     * also duration+2 */
-    duration = (int)MAX(1, power / 2);    /* Stufe 1 macht sonst mist */
-    duration = 2 + rng_int() % duration;
-
-    /* Nichts machen als ein entsprechendes Attribut in die Region legen. */
-    create_curse(mage, &r->attribs, ct_find(curse_name), power, duration, effect, 0);
-    
-    /* Erfolg melden */
-    ADDMSG(&mage->faction->msgs, msg_message("regionmagic_effect",
-        "unit region command", mage, mage->region, co->order));
-
-    return cast_level;
+    return sp_gbdreams(co, 1);
 }
 
 /* ------------------------------------------------------------- */
@@ -5075,8 +5074,8 @@ int sp_enterastral(castorder * co)
         return 0;
     }
 
-    if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)
-        || is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+    if (is_cursed(rt->attribs, &ct_astralblock)
+        || is_cursed(ro->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
         return 0;
@@ -5202,8 +5201,8 @@ int sp_pullastral(castorder * co)
         return 0;
     }
 
-    if (is_cursed(rt->attribs, C_ASTRALBLOCK, 0)
-        || is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+    if (is_cursed(rt->attribs, &ct_astralblock)
+        || is_cursed(ro->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
         return 0;
@@ -5346,8 +5345,8 @@ int sp_leaveastral(castorder * co)
         return 0;
     }
 
-    if (ro == NULL || is_cursed(ro->attribs, C_ASTRALBLOCK, 0)
-        || is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+    if (ro == NULL || is_cursed(ro->attribs, &ct_astralblock)
+        || is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));
         return 0;
@@ -5486,7 +5485,7 @@ int sp_fetchastral(castorder * co)
             ro = u->region;
         }
 
-        if (is_cursed(ro->attribs, C_ASTRALBLOCK, 0)) {
+        if (is_cursed(ro->attribs, &ct_astralblock)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "spellfail_astralblock", ""));
             continue;
@@ -5599,7 +5598,7 @@ int sp_showastral(castorder * co)
 
     for (rl2 = rl; rl2; rl2 = rl2->next) {
         region *r2 = rl2->data;
-        if (!is_cursed(r2->attribs, C_ASTRALBLOCK, 0)) {
+        if (!is_cursed(r2->attribs, &ct_astralblock)) {
             for (u = r2->units; u; u = u->next) {
                 if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL))
                     n++;
@@ -5619,7 +5618,7 @@ int sp_showastral(castorder * co)
             "Nebel zu erkennen sind ", unitname(mage));
 
         for (rl2 = rl; rl2; rl2 = rl2->next) {
-            if (!is_cursed(rl2->data->attribs, C_ASTRALBLOCK, 0)) {
+            if (!is_cursed(rl2->data->attribs, &ct_astralblock)) {
                 for (u = rl2->data->units; u; u = u->next) {
                     if (u_race(u) != get_race(RC_SPECIAL) && u_race(u) != get_race(RC_SPELL)) {
                         c++;
@@ -5677,7 +5676,7 @@ int sp_viewreality(castorder * co)
     /* Irgendwann mal auf Curses u/o Attribut umstellen. */
     for (rl2 = rl; rl2; rl2 = rl2->next) {
         region *rt = rl2->data;
-        if (!is_cursed(rt->attribs, C_ASTRALBLOCK, 0)) {
+        if (!is_cursed(rt->attribs, &ct_astralblock)) {
             u =
                 create_unit(rt, mage->faction, 1, get_race(RC_SPELL), 0,
                 "spell/viewreality", NULL);
@@ -5735,7 +5734,7 @@ int sp_disruptastral(castorder * co)
         int inhab_regions = 0;
         region_list *trl = NULL;
 
-        if (is_cursed(r2->attribs, C_ASTRALBLOCK, 0))
+        if (is_cursed(r2->attribs, &ct_astralblock))
             continue;
 
         if (r2->units != NULL) {

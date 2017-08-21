@@ -29,6 +29,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "travelthru.h"
 
+#include <spells/regioncurse.h>
+#include <spells/buildingcurse.h>
+
 /* modules includes */
 #include <modules/score.h>
 
@@ -45,8 +48,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "vortex.h"
 #include "calendar.h"
 #include "teleport.h"
-
-#include <spells/buildingcurse.h>
 
 /* kernel includes */
 #include <kernel/ally.h>
@@ -1187,7 +1188,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     paragraph(out, buf, 0, 0, 0);
 
     if (r->seen.mode == seen_unit && is_astral(r) &&
-        !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
+        !is_cursed(r->attribs, &ct_astralblock)) {
         /* Sonderbehandlung Teleport-Ebene */
         region_list *rl = astralregions(r, inhabitable);
         region_list *rl2;

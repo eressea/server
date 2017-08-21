@@ -764,7 +764,7 @@ int study_cmd(unit * u, order * ord)
         teach->value += u->number * 10;
     }
 
-    if (is_cursed(r->attribs, C_BADLEARN, 0)) {
+    if (is_cursed(r->attribs, &ct_badlearn)) {
         teach->value -= u->number * 10;
     }
 

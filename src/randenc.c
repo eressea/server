@@ -27,11 +27,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "study.h"
 
+#include <spells/unitcurse.h>
+#include <spells/regioncurse.h>
+
 /* attributes includes */
 #include <attributes/racename.h>
 #include <attributes/reduceproduction.h>
-
-#include <spells/unitcurse.h>
 
 /* kernel includes */
 #include <kernel/building.h>
@@ -651,7 +652,7 @@ static void godcurse(void)
     region *r;
 
     for (r = regions; r; r = r->next) {
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             unit *u;
             for (u = r->units; u; u = u->next) {
                 skill *sv = u->skills;

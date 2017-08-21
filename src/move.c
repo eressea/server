@@ -34,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/flyingship.h>
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
+#include <spells/shipcurse.h>
 
 /* attributes includes */
 #include <attributes/follow.h>
@@ -673,7 +674,7 @@ static bool is_freezing(const unit * u)
 {
     if (u_race(u) != get_race(RC_INSECT))
         return false;
-    if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+    if (is_cursed(u->attribs, &ct_insectfur))
         return false;
     return true;
 }
@@ -832,7 +833,7 @@ static void drifting_ships(region * r)
             }
 
             /* Schiff schon abgetrieben oder durch Zauber geschützt? */
-            if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+            if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, &ct_nodrift)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1803,7 +1804,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                 }
                 if (rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
-                    if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+                    if (!is_cursed(sh->attribs, &ct_nodrift)) {
                         region *rnext = NULL;
                         bool storm = true;
                         int d_offset = rng_int() % MAXDIRECTIONS;
@@ -1920,9 +1921,10 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         last_point = current_point;
         current_point = next_point;
 
-        if (!fval(current_point->terrain, SEA_REGION)
-            && !is_cursed(sh->attribs, C_SHIP_FLYING, 0))
+        if (!fval(next_point->terrain, SEA_REGION)
+            && !is_cursed(sh->attribs, &ct_flyingship)) {
             break;
+        }
         token = getstrtoken();
         error = movewhere(u, token, current_point, &next_point);
         if (error || next_point == NULL) {
@@ -1958,7 +1960,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
 
-        if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
+        if (is_cursed(sh->attribs, &ct_flyingship)) {
             ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
                 starting_point, current_point));
         }

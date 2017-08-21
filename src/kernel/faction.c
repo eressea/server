@@ -33,6 +33,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
+#include <spells/unitcurse.h>
+#include <attributes/otherfaction.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -48,8 +51,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
-
-#include <attributes/otherfaction.h>
 
 #include <selist.h>
 #include <storage.h>
@@ -730,7 +731,7 @@ int count_faction(const faction * f, int flags)
                 }
             }
             else if (flags&COUNT_MIGRANTS) {
-                if (!is_cursed(u->attribs, C_SLAVE, 0)) {
+                if (!is_cursed(u->attribs, &ct_slavery)) {
                     n += x;
                 }
             }

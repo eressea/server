@@ -141,10 +141,11 @@ static int read_ccompat(const char *cursename, struct storage *store)
     struct compat {
         const char *name;
         const char *tokens;
-    } *seek, old_curses[] = { {
-            "disorientationzone", "" }, {
-                "shipdisorientation", "" }, {
-                    NULL, NULL } };
+    } *seek, old_curses[] = {
+        { "disorientationzone", "" },
+        { "shipdisorientation", "" },
+        { NULL, NULL }
+    };
     for (seek = old_curses; seek->name; ++seek) {
         if (strcmp(seek->tokens, cursename) == 0) {
             const char *p;
@@ -232,7 +233,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     if (c->type->typ == CURSETYP_REGION) {
         int rr =
             read_reference(&c->data.v, data, read_region_reference,
-            RESOLVE_REGION(data->version));
+                RESOLVE_REGION(data->version));
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }
@@ -290,7 +291,7 @@ void ct_register(const curse_type * ct)
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
     selist **ctlp = cursetypes + hash;
 
-    assert(ct->age==NULL || (ct->flags&CURSE_NOAGE) == 0);
+    assert(ct->age == NULL || (ct->flags&CURSE_NOAGE) == 0);
     assert((ct->flags&CURSE_ISNEW) == 0);
     selist_set_insert(ctlp, (void *)ct, NULL);
 }
@@ -466,7 +467,7 @@ int curse_geteffect_int(const curse * c)
 /* ------------------------------------------------------------- */
 static void
 set_curseingmagician(struct unit *magician, struct attrib *ap_target,
-const curse_type * ct)
+    const curse_type * ct)
 {
     curse *c = get_curse(ap_target, ct);
     if (c) {
@@ -721,51 +722,6 @@ bool is_cursed_with(const attrib * ap, const curse * c)
     }
 
     return false;
-}
-
-/* ------------------------------------------------------------- */
-/* cursedata */
-/* ------------------------------------------------------------- */
-
-static const char *oldnames[MAXCURSE] = {
-    /* OBS: when removing curses, remember to update read_ccompat() */
-    "fogtrap",
-    "antimagiczone",
-    "farvision",
-    "gbdream",
-    "auraboost",
-    "maelstrom",
-    "blessedharvest",
-    "drought",
-    "badlearn",
-    "stormwind",
-    "flyingship",
-    "nodrift",
-    "depression",
-    "magicwalls",
-    "strongwall",
-    "astralblock",
-    "generous",
-    "peacezone",
-    "magicstreet",
-    "magicrunes",
-    "badmagicresistancezone",
-    "goodmagicresistancezone",
-    "slavery",
-    "calmmonster",
-    "oldrace",
-    "fumble",
-    "riotzone",
-    "godcursezone",
-    "speed",
-    "orcish",
-    "magicboost",
-    "insectfur"
-};
-
-const char *oldcursename(int id)
-{
-    return oldnames[id];
 }
 
 /* ------------------------------------------------------------- */

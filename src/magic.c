@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/clonedied.h>
 
 #include <spells/regioncurse.h>
+#include <spells/buildingcurse.h>
 #include <spells/unitcurse.h>
 
 #include <kernel/ally.h>
@@ -699,7 +700,7 @@ int max_spellpoints(const region * r, const unit * u)
     if (rtype && i_get(u->items, rtype->itype) > 0) {
         msp += use_item_aura(r, u);
     }
-    n = get_curseeffect(u->attribs, C_AURA, 0);
+    n = get_curseeffect(u->attribs, &ct_auraboost);
     if (n > 0) {
         msp = (msp * n) / 100;
     }
@@ -1251,8 +1252,7 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
     }
 
     if (a) {
-        const struct curse_type *ct_resist = ct_find(oldcursename(C_RESIST_MAGIC));
-        curse * c = get_curse(a, ct_resist);
+        curse * c = get_curse(a, &ct_magicrunes);
         int effect = curse_geteffect_int(c);
         prob = frac_add(prob, frac_make(effect, 100));
     }
@@ -1320,10 +1320,10 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     if (mage->magietyp == M_DRAIG) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
-    if (is_cursed(u->attribs, C_MBOOST, 0)) {
+    if (is_cursed(u->attribs, &ct_magicboost)) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
-    if (is_cursed(u->attribs, C_FUMBLE, 0)) {
+    if (is_cursed(u->attribs, &ct_fumble)) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
 
@@ -1503,7 +1503,7 @@ void regenerate_aura(void)
                         reg_aura *= btype->auraregen;
 
                     /* Bonus/Malus durch Zauber */
-                    mod = get_curseeffect(u->attribs, C_AURA, 0);
+                    mod = get_curseeffect(u->attribs, &ct_auraboost);
                     if (mod > 0) {
                         reg_aura = (reg_aura * mod) / 100.0;
                     }
@@ -2795,7 +2795,7 @@ void magic(void)
                 continue;
 
             if (u_race(u) == rc_insect && r_insectstalled(r) &&
-                !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+                !is_cursed(u->attribs, &ct_insectfur))
                 continue;
 
             if (fval(u, UFL_WERE | UFL_LONGACTION)) {

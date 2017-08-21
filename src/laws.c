@@ -430,7 +430,7 @@ static void horses(region * r)
     maxhorses = MAX(0, maxhorses);
     horses = rhorses(r);
     if (horses > 0) {
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             rsethorses(r, (int)(horses * 0.9));
         }
         else if (maxhorses) {
@@ -583,7 +583,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             a_removeall(&r->attribs, &at_germs);
         }
 
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             rsettrees(r, 1, (int)(rtrees(r, 1) * 0.9));
             rsettrees(r, 2, (int)(rtrees(r, 2) * 0.9));
             return;
@@ -640,7 +640,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
     }
     else if (current_season == SEASON_SPRING) {
 
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0))
+        if (is_cursed(r->attribs, &ct_godcursezone))
             return;
 
         /* in at_germs merken uns die Zahl der Samen und Sprößlinge, die
@@ -2924,11 +2924,13 @@ static void ageing(void)
                 change_effect(u, oldpotiontype[P_BERSERK], -1 * MIN(u->number, i));
             }
 
-            if (is_cursed(u->attribs, C_OLDRACE, 0)) {
-                curse *c = get_curse(u->attribs, &ct_oldrace);
-                if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
-                    u_setrace(u, get_race(curse_geteffect_int(c)));
-                    u->irace = NULL;
+            if (u->attribs) {
+                curse * c = get_curse(u->attribs, &ct_oldrace);
+                if (c && curse_active(c)) {
+                    if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
+                        u_setrace(u, get_race(curse_geteffect_int(c)));
+                        u->irace = NULL;
+                    }
                 }
             }
         }
@@ -3789,7 +3791,7 @@ void process(void)
                                     }
                                     else if (u_race(u) == get_race(RC_INSECT)
                                         && r_insectstalled(r)
-                                        && !is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) {
+                                        && !is_cursed(u->attribs, &ct_insectfur)) {
                                         ord = NULL;
                                     }
                                     else if (LongHunger(u)) {

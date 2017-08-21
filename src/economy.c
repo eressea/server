@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
 
 /* kernel includes */
 #include <kernel/ally.h>
@@ -118,14 +119,14 @@ int entertainmoney(const region * r)
 {
     double n;
 
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    if (is_cursed(r->attribs, &ct_depression)) {
         return 0;
     }
 
     n = rmoney(r) / (double)ENTERTAINFRACTION;
 
-    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
+    if (is_cursed(r->attribs, &ct_generous)) {
+        n *= get_curseeffect(r->attribs, &ct_generous);
     }
 
     return (int)n;
@@ -502,7 +503,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
             return;
         }
     }
-    if (is_cursed(r->attribs, C_RIOT, 0)) {
+    if (is_cursed(r->attribs, &ct_riotzone)) {
         /* Die Region befindet sich in Aufruhr */
         cmistake(u, ord, 237, MSG_EVENT);
         return;
@@ -652,7 +653,7 @@ static int forget_cmd(unit * u, order * ord)
     skill_t sk;
     const char *s;
 
-    if (is_cursed(u->attribs, C_SLAVE, 0)) {
+    if (is_cursed(u->attribs, &ct_slavery)) {
         /* charmed units shouldn't be losing their skills */
         return 0;
     }
@@ -2589,7 +2590,7 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    if (is_cursed(r->attribs, &ct_depression)) {
         cmistake(u, ord, 28, MSG_INCOME);
         return;
     }
@@ -3028,7 +3029,7 @@ void produce(struct region *r)
             continue;
 
         if (u_race(u) == rc_insect && r_insectstalled(r) &&
-            !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+            !is_cursed(u->attribs, &ct_insectfur))
             continue;
 
         if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {

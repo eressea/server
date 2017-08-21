@@ -20,6 +20,8 @@ without prior permission by the authors of Eressea.
 #define BUFFERSIZE 32768
 #define RESOURCECOMPAT
 
+#include <spells/regioncurse.h>
+
 /* modules include */
 #include <modules/score.h>
 
@@ -1361,7 +1363,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 if (skill_enabled(SK_ENTERTAINMENT)) {
                     fprintf(F, "%d;Unterh\n", entertainmoney(r));
                 }
-                if (is_cursed(r->attribs, C_RIOT, 0)) {
+                if (is_cursed(r->attribs, &ct_riotzone)) {
                     fputs("0;Rekruten\n", F);
                 }
                 else {
@@ -1419,7 +1421,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(r, f, r->seen.mode, F);
         if (r->seen.mode == seen_unit && is_astral(r)
-            && !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
+            && !is_cursed(r->attribs, &ct_astralblock)) {
             /* Sonderbehandlung Teleport-Ebene */
             region_list *rl = astralregions(r, inhabitable);
 

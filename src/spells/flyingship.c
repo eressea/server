@@ -66,11 +66,11 @@ int sp_flying_ship(castorder * co)
 
     cno = levitate_ship(sh, mage, power, 1);
     if (cno == 0) {
-        if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
+        if (is_cursed(sh->attribs, &ct_flyingship)) {
             /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
             cmistake(mage, co->order, 211, MSG_MAGIC);
         }
-        else if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+        else if (is_cursed(sh->attribs, &ct_shipspeedup)) {
             /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
             cmistake(mage, co->order, 210, MSG_MAGIC);
         }
@@ -127,7 +127,7 @@ static int flyingship_age(curse * c)
     return 0;
 }
 
-static struct curse_type ct_flyingship = { "flyingship",
+const struct curse_type ct_flyingship = { "flyingship",
 CURSETYP_NORM, 0, NO_MERGE, cinfo_ship, NULL, flyingship_read,
 flyingship_write, NULL, flyingship_age
 };
@@ -153,7 +153,7 @@ static curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int dur
         if (curse_active(get_curse(sh->attribs, &ct_flyingship))) {
             return NULL;
         }
-        if (is_cursed(sh->attribs, C_SHIP_SPEEDUP, 0)) {
+        if (is_cursed(sh->attribs, &ct_shipspeedup)) {
             return NULL;
         }
     }
