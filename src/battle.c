@@ -55,6 +55,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
 #include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -138,15 +140,10 @@ static int rule_nat_armor;
 static int rule_cavalry_mode;
 static int rule_vampire;
 
-static const curse_type *peace_ct, *slave_ct, *calm_ct;
-
 /** initialize rules from configuration.
  */
 static void init_rules(void)
 {
-    peace_ct = ct_find("peacezone");
-    slave_ct = ct_find("slavery");
-    calm_ct = ct_find("calmmonster");
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
@@ -1889,14 +1886,11 @@ int skilldiff(troop at, troop dt, int dist)
     if (df->building) {
         building *b = df->building;
         if (b->attribs) {
-            const curse_type *strongwall_ct = ct_find("strongwall");
-            if (strongwall_ct) {
-                curse *c = get_curse(b->attribs, strongwall_ct);
-                if (curse_active(c)) {
-                    /* wirkt auf alle Geb�ude */
-                    skdiff -= curse_geteffect_int(c);
-                    is_protected = 2;
-                }
+            curse *c = get_curse(b->attribs, &ct_strongwall);
+            if (curse_active(c)) {
+                /* wirkt auf alle Geb�ude */
+                skdiff -= curse_geteffect_int(c);
+                is_protected = 2;
             }
         }
         if (b->type->flags & BTF_FORTIFICATION) {
@@ -3173,14 +3167,10 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* Effekte von Spr�chen */
 
     if (u->attribs) {
-        const curse_type *speed_ct;
-        speed_ct = ct_find("speed");
-        if (speed_ct) {
-            curse *c = get_curse(u->attribs, speed_ct);
-            if (c) {
-                speeded = get_cursedmen(u, c);
-                speed = curse_geteffect_int(c);
-            }
+        curse *c = get_curse(u->attribs, &ct_speed);
+        if (c) {
+            speeded = get_cursedmen(u, c);
+            speed = curse_geteffect_int(c);
         }
     }
 
@@ -3748,6 +3738,21 @@ static void flee(const troop dt)
     kill_troop(dt);
 }
 
+static bool is_calmed(const unit *u, const faction *f) {
+    attrib *a = a_find(u->attribs, &at_curse);
+
+    while (a && a->type == &at_curse) {
+        curse *c = (curse *)a->data.v;
+        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->subscription) {
+            if (curse_active(c)) {
+                return true;
+            }
+        }
+        a = a->next;
+    }
+    return false;
+}
+
 static bool start_battle(region * r, battle ** bp)
 {
     battle *b = NULL;
@@ -3794,12 +3799,12 @@ static bool start_battle(region * r, battle ** bp)
                     if (fval(u, UFL_LONGACTION))
                         continue;
 
-                    if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
+                    if (curse_active(get_curse(r->attribs, &ct_peacezone))) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "peace_active", ""));
                         continue;
                     }
 
-                    if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) {
+                    if (curse_active(get_curse(u->attribs, &ct_slavery))) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "slave_active", ""));
                         continue;
                     }
@@ -3847,26 +3852,11 @@ static bool start_battle(region * r, battle ** bp)
                             NewbieImmunity()));
                         continue;
                     }
-                    /* Fehler: "Die Einheit ist mit uns alliert" */
 
-                    if (calm_ct) {
-                        attrib *a = a_find(u->attribs, &at_curse);
-                        bool calm = false;
-                        while (a && a->type == &at_curse) {
-                            curse *c = (curse *)a->data.v;
-                            if (c->type == calm_ct
-                                && curse_geteffect_int(c) == u2->faction->subscription) {
-                                if (curse_active(c)) {
-                                    calm = true;
-                                    break;
-                                }
-                            }
-                            a = a->next;
-                        }
-                        if (calm) {
-                            cmistake(u, ord, 47, MSG_BATTLE);
-                            continue;
-                        }
+                    /* Fehler: "Die Einheit ist mit uns alliert" */
+                    if (is_calmed(u, u2->faction)) {
+                        cmistake(u, ord, 47, MSG_BATTLE);
+                        continue;
                     }
                     /* Ende Fehlerbehandlung */
                     if (b == NULL) {

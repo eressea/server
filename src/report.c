@@ -72,6 +72,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 #include <kernel/alliance.h>
 
+#include <spells/buildingcurse.h>
+
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -1390,7 +1392,6 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     char buf[8192], *bufp;
     size_t size;
     int bytes;
-    const curse_type *nocost_ct = ct_find("nocostbuilding");
 
     if (F == NULL) {
         perror(filename);
@@ -1459,7 +1460,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     WARN_STATIC_BUFFER();
                 if (u->building && building_owner(u->building) == u) {
                     building *b = u->building;
-                    if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+                    if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
                         int cost = buildingmaintenance(b, rsilver);
                         if (cost > 0) {
                             bytes = (int)strlcpy(bufp, ",U", size);

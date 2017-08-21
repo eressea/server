@@ -92,7 +92,7 @@ static message *cinfo_slave(const void *obj, objtype_t typ, const curse * c,
     return NULL;
 }
 
-static struct curse_type ct_slavery = { "slavery",
+const struct curse_type ct_slavery = { "slavery",
 CURSETYP_NORM, 0, NO_MERGE,
 cinfo_slave
 };
@@ -120,7 +120,7 @@ static message *cinfo_calm(const void *obj, objtype_t typ, const curse * c,
     return NULL;
 }
 
-static struct curse_type ct_calmmonster = {
+const struct curse_type ct_calmmonster = {
     "calmmonster",
     CURSETYP_NORM, CURSE_SPREADNEVER | CURSE_ONLYONE, NO_MERGE,
     cinfo_calm
@@ -144,7 +144,7 @@ static message *cinfo_speed(const void *obj, objtype_t typ, const curse * c,
     return NULL;
 }
 
-static struct curse_type ct_speed = {
+const struct curse_type ct_speed = {
     "speed",
     CURSETYP_UNIT, CURSE_SPREADNEVER, M_MEN,
     cinfo_speed
@@ -275,7 +275,7 @@ CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_simple
 /*
  * C_ALLSKILLS (Alp)
  */
-static struct curse_type ct_worse = {
+const struct curse_type ct_worse = {
     "worse", CURSETYP_UNIT, CURSE_SPREADMODULO | CURSE_NOAGE, M_MEN, cinfo_unit
 };
 
@@ -339,7 +339,7 @@ static message *cinfo_skillmod(const void *obj, objtype_t typ, const curse * c,
     return NULL;
 }
 
-static struct curse_type ct_skillmod = {
+const struct curse_type ct_skillmod = {
     "skillmod", CURSETYP_NORM, CURSE_SPREADMODULO, M_MEN, cinfo_skillmod,
     NULL, read_skill, write_skill
 };

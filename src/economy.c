@@ -69,6 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
+#include <spells/buildingcurse.h>
 
 /* libs includes */
 #include <math.h>
@@ -728,13 +729,12 @@ static int maintain(building * b)
 
 void maintain_buildings(region * r)
 {
-    const curse_type *nocost_ct = ct_find("nocostbuilding");
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
         int flags = BLD_MAINTAINED;
 
-        if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+        if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
             flags = maintain(b);
         }
         fset(b, flags);

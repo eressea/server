@@ -466,11 +466,9 @@ static void test_battle_skilldiff_building(CuTest *tc)
     unit *ua, *ud;
     battle *b = NULL;
     building_type *btype;
-    const curse_type *strongwall_ct;
 
     test_setup();
     btype = setup_castle();
-    strongwall_ct = ct_find("strongwall");
 
     r = test_create_region(0, 0, 0);
     ud = test_create_unit(test_create_faction(0), r);
@@ -489,7 +487,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     create_curse(NULL, &ud->building->attribs, &ct_magicwalls, 1, 1, 1, 1);
     CuAssertIntEquals(tc, -2, skilldiff(ta, td, 0));
 
-    create_curse(NULL, &ud->building->attribs, strongwall_ct, 1, 1, 2, 1);
+    create_curse(NULL, &ud->building->attribs, &ct_strongwall, 1, 1, 2, 1);
     CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
 
     free_battle(b);

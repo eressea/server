@@ -37,6 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"
 #include "unit.h"
 
+#include <spells/regioncurse.h>
+
 /* util includes */
 #include <util/assert.h>
 #include <util/attrib.h>
@@ -1241,8 +1243,9 @@ int production(const region * r)
 {
     /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
-    if (curse_active(get_curse(r->attribs, ct_find("drought"))))
+    if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;
+    }
 
     return p;
 }

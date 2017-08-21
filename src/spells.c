@@ -1659,7 +1659,7 @@ static int sp_great_drought(castorder * co)
 
     /* Arbeitslohn = 1/4 */
     effect = 4.0;                 /* curses: higher is stronger */
-    create_curse(mage, &r->attribs, ct_find("drought"), force, duration, effect,
+    create_curse(mage, &r->attribs, &ct_drought, force, duration, effect,
         0);
 
     /* terraforming */
@@ -2141,7 +2141,7 @@ static int sp_drought(castorder * co)
      * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
      * Auswirkungen.
      */
-    c = get_curse(r->attribs, ct_find("drought"));
+    c = get_curse(r->attribs, &ct_drought);
     if (c) {
         c->vigour = MAX(c->vigour, power);
         c->duration = MAX(c->duration, (int)power);
@@ -2154,7 +2154,7 @@ static int sp_drought(castorder * co)
         rsettrees(r, 0, rtrees(r, 0) / 2);
         rsethorses(r, rhorses(r) / 2);
 
-        create_curse(mage, &r->attribs, ct_find("drought"), power, duration, effect,
+        create_curse(mage, &r->attribs, &ct_drought, power, duration, effect,
             0);
     }
     return cast_level;
@@ -3647,7 +3647,7 @@ static int sp_charmingsong(castorder * co)
         add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
     }
     /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
-    create_curse(mage, &target->attribs, ct_find("slavery"), force, duration, zero_effect, 0);
+    create_curse(mage, &target->attribs, &ct_slavery, force, duration, zero_effect, 0);
 
     /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
     u_setfaction(target, mage->faction);
@@ -3921,7 +3921,7 @@ static int sp_song_of_peace(castorder * co)
     int duration = 2 + lovar(force / 2);
     message *msg[2] = { NULL, NULL };
 
-    create_curse(mage, &r->attribs, ct_find("peacezone"), force, duration,
+    create_curse(mage, &r->attribs, &ct_peacezone, force, duration,
         zero_effect, 0);
 
     for (u = r->units; u; u = u->next)
@@ -4295,7 +4295,7 @@ static int sp_calm_monster(castorder * co)
     }
 
     effect = mage->faction->subscription;
-    c = create_curse(mage, &target->attribs, ct_find("calmmonster"), force,
+    c = create_curse(mage, &target->attribs, &ct_calmmonster, force,
         (int)force, effect, 0);
     if (c == NULL) {
         report_failure(mage, co->order);
@@ -5829,7 +5829,7 @@ static int sp_eternizewall(castorder * co)
         return 0;
 
     b = pa->param[0]->data.b;
-    c = create_curse(mage, &b->attribs, ct_find("nocostbuilding"),
+    c = create_curse(mage, &b->attribs, &ct_nocostbuilding,
         power * power, 1, zero_effect, 0);
 
     if (c == NULL) {              /* ist bereits verzaubert */
@@ -6167,7 +6167,7 @@ static int sp_magicrunes(castorder * co)
         b = pa->param[0]->data.b;
 
         /* Magieresistenz der Burg erhoeht sich um 20% */
-        create_curse(mage, &b->attribs, ct_find("magicrunes"), force,
+        create_curse(mage, &b->attribs, &ct_magicrunes, force,
             duration, effect, 0);
 
         /* Erfolg melden */
@@ -6181,7 +6181,7 @@ static int sp_magicrunes(castorder * co)
         ship *sh;
         sh = pa->param[0]->data.sh;
         /* Magieresistenz des Schiffs erhoeht sich um 20% */
-        create_curse(mage, &sh->attribs, ct_find("magicrunes"), force,
+        create_curse(mage, &sh->attribs, &ct_magicrunes, force,
             duration, effect, 0);
 
         /* Erfolg melden */
@@ -6233,7 +6233,7 @@ int sp_speed2(castorder * co)
 
         men = MIN(maxmen, u->number);
         effect = 2;
-        create_curse(mage, &u->attribs, ct_find("speed"), force, dur, effect, men);
+        create_curse(mage, &u->attribs, &ct_speed, force, dur, effect, men);
         maxmen -= men;
         used += men;
     }

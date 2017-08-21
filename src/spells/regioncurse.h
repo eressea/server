@@ -17,10 +17,16 @@
 extern "C" {
 #endif
 
-    struct curse;
-    struct locale;
+    struct curse_type;
 
-    extern void register_regioncurse(void);
+    extern const struct curse_type ct_peacezone;
+    extern const struct curse_type ct_drought;
+    extern const struct curse_type ct_blessedharvest;
+    extern const struct curse_type ct_godcursezone;
+    extern const struct curse_type ct_gbdream;
+    extern const struct curse_type ct_healing;
+
+    void register_regioncurse(void);
 
 #ifdef __cplusplus
 }

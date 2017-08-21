@@ -55,7 +55,7 @@ static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
     return msg_message("curseinfo::godcurse", "id", c->no);
 }
 
-static struct curse_type ct_godcursezone = {
+const struct curse_type ct_godcursezone = {
     "godcursezone",
     CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
     cinfo_cursed_by_the_gods,
@@ -81,7 +81,7 @@ static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c
     }
 }
 
-static struct curse_type ct_gbdream = {
+const struct curse_type ct_gbdream = {
     "gbdream",
     CURSETYP_NORM, 0, (NO_MERGE), cinfo_dreamcurse
 };
@@ -200,13 +200,13 @@ static struct curse_type ct_maelstrom = {
     cinfo_simple
 };
 
-static struct curse_type ct_blessedharvest = {
+const struct curse_type ct_blessedharvest = {
     "blessedharvest",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
-static struct curse_type ct_drought = {
+const struct curse_type ct_drought = {
     "drought",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
@@ -240,7 +240,7 @@ static struct curse_type ct_generous = {
 };
 
 /* verhindert Attackiere regional */
-static struct curse_type ct_peacezone = {
+const struct curse_type ct_peacezone = {
     "peacezone",
     CURSETYP_NORM, 0, NO_MERGE,
     cinfo_simple
@@ -274,7 +274,7 @@ static struct curse_type ct_holyground = {
     cinfo_simple
 };
 
-static struct curse_type ct_healing = {
+const struct curse_type ct_healing = {
     "healingzone",
     CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
     cinfo_simple

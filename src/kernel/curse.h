@@ -285,7 +285,6 @@ extern "C" {
     struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
     const curse_type *ct_find(const char *c);
-    bool ct_changed(int *cache);
     void ct_register(const curse_type *);
     void ct_remove(const char *c);
     void ct_checknames(void);

@@ -284,17 +284,6 @@ attrib_type at_curse = {
 
 #define MAXCTHASH 128
 static selist *cursetypes[MAXCTHASH];
-static int ct_changes = 1;
-
-bool ct_changed(int *cache)
-{
-    assert(cache);
-    if (*cache != ct_changes) {
-        *cache = ct_changes;
-        return true;
-    }
-    return false;
-}
 
 void ct_register(const curse_type * ct)
 {
@@ -304,7 +293,6 @@ void ct_register(const curse_type * ct)
     assert(ct->age==NULL || (ct->flags&CURSE_NOAGE) == 0);
     assert((ct->flags&CURSE_ISNEW) == 0);
     selist_set_insert(ctlp, (void *)ct, NULL);
-    ++ct_changes;
 }
 
 void ct_remove(const char *c)
@@ -320,7 +308,6 @@ void ct_remove(const char *c)
 
             if (strcmp(c, type->cname) == 0) {
                 selist_delete(&ctl, qi);
-                ++ct_changes;
                 break;
             }
         }
@@ -845,5 +832,4 @@ void curses_done(void) {
         selist_free(cursetypes[i]);
         cursetypes[i] = 0;
     }
-    ++ct_changes;
 }

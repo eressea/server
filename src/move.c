@@ -50,6 +50,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 #include <spells/flyingship.h>
+#include <spells/unitcurse.h>
 
 #include "teleport.h"
 #include "direction.h"
@@ -1415,13 +1416,10 @@ static int movement_speed(unit * u)
     }
 
     if (u->attribs) {
-        const curse_type *speed_ct = ct_find("speed");
-        if (speed_ct) {
-            curse *c = get_curse(u->attribs, speed_ct);
-            if (c != NULL) {
-                int men = get_cursedmen(u, c);
-                dk *= 1.0 + (double)men / (double)u->number;
-            }
+        curse *c = get_curse(u->attribs, &ct_speed);
+        if (c != NULL) {
+            int men = get_cursedmen(u, c);
+            dk *= 1.0 + (double)men / (double)u->number;
         }
     }
 

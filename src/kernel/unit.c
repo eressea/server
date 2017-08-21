@@ -43,6 +43,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include <spells/unitcurse.h>
+#include <spells/regioncurse.h>
+
 #include "guard.h"
 
 /* util includes */
@@ -1268,52 +1271,45 @@ static int att_modification(const unit * u, skill_t sk)
 
     if (u->attribs) {
         curse *c;
-        static int cache;
-        static const curse_type *skillmod_ct, *worse_ct;
-        if (ct_changed(&cache)) {
-            skillmod_ct = ct_find("skillmod");
-            worse_ct = ct_find("worse");
-        }
-        c = get_curse(u->attribs, worse_ct);
-        if (c != NULL)
+        attrib *a;
+
+        c = get_curse(u->attribs, &ct_worse);
+        if (c != NULL) {
             result += curse_geteffect(c);
-        if (skillmod_ct) {
-            attrib *a = a_find(u->attribs, &at_curse);
-            while (a && a->type == &at_curse) {
-                curse *c = (curse *)a->data.v;
-                if (c->type == skillmod_ct && c->data.i == sk) {
-                    result += curse_geteffect(c);
-                    break;
-                }
-                a = a->next;
+        }
+
+        a = a_find(u->attribs, &at_curse);
+        while (a && a->type == &at_curse) {
+            c = (curse *)a->data.v;
+            if (c->type == &ct_skillmod && c->data.i == sk) {
+                result += curse_geteffect(c);
+                break;
             }
+            a = a->next;
         }
     }
     /* TODO hier kann nicht mit get/iscursed gearbeitet werden, da nur der
      * jeweils erste vom Typ C_GBDREAM zurueckgegen wird, wir aber alle
      * durchsuchen und aufaddieren muessen */
     if (u->region && u->region->attribs) {
-        const curse_type *gbdream_ct = ct_find("gbdream");
-        if (gbdream_ct) {
-            int bonus = 0, malus = 0;
-            attrib *a = a_find(u->region->attribs, &at_curse);
-            while (a && a->type == &at_curse) {
-                curse *c = (curse *)a->data.v;
+        int bonus = 0, malus = 0;
+        attrib *a = a_find(u->region->attribs, &at_curse);
+        while (a && a->type == &at_curse) {
+            curse *c = (curse *)a->data.v;
 
-                if (c->magician && curse_active(c) && c->type == gbdream_ct) {
-                    int effect = curse_geteffect_int(c);
-                    bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
-                    if (allied) {
-                        if (effect > bonus) bonus = effect;
-                    }
-                    else {
-                        if (effect < malus) malus = effect;
-                    }
+            if (c->magician && curse_active(c) && c->type == &ct_gbdream) {
+                int effect = curse_geteffect_int(c);
+                bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
+                if (allied) {
+                    if (effect > bonus) bonus = effect;
                 }
-                a = a->next;
+                else {
+                    if (effect < malus) malus = effect;
+                }
             }
-            result = result + bonus + malus;
+            a = a->next;
         }
+        result = result + bonus + malus;
     }
 
     return (int)result;
@@ -1738,16 +1734,9 @@ int unit_max_hp(const unit * u)
 
     /* der healing curse veraendert die maximalen hp */
     if (u->region && u->region->attribs) {
-        static int cache;
-        static const curse_type *heal_ct;
-        if (ct_changed(&cache)) {
-            heal_ct = ct_find("healingzone");
-        }
-        if (heal_ct) {
-            curse *c = get_curse(u->region->attribs, heal_ct);
-            if (c) {
-                h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
-            }
+        curse *c = get_curse(u->region->attribs, &ct_healing);
+        if (c) {
+            h = (int)(h * (1.0 + (curse_geteffect(c) / 100)));
         }
     }
     return h;
