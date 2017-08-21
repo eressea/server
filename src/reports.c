@@ -25,6 +25,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 #include "donations.h"
 
+/* attributes includes */
+#include <attributes/follow.h>
+#include <attributes/otherfaction.h>
+#include <attributes/racename.h>
+#include <attributes/stealth.h>
+
+#include <spells/unitcurse.h>
+
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
@@ -68,11 +76,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <time.h>
 
-/* attributes includes */
-#include <attributes/follow.h>
-#include <attributes/otherfaction.h>
-#include <attributes/racename.h>
-#include <attributes/stealth.h>
 
 #include "move.h"
 
@@ -303,12 +306,9 @@ report_items(const unit *u, item * result, int size, const unit * owner,
     assert(size);
 
     if (u->attribs) {
-        const curse_type *itemcloak_ct = ct_find("itemcloak");
-        if (itemcloak_ct) {
-            curse * cu = get_curse(u->attribs, itemcloak_ct);
-            if (cu && curse_active(cu)) {
-                return 0;
-            }
+        curse * cu = get_curse(u->attribs, &ct_itemcloak);
+        if (cu && curse_active(cu)) {
+            return 0;
         }
     }
     for (itm = items; itm; itm = itm->next) {

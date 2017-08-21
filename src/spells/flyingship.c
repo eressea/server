@@ -1,6 +1,8 @@
 #include <platform.h>
 #include "flyingship.h"
 
+#include <spells/shipcurse.h>
+
 #include <kernel/build.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -12,8 +14,6 @@
 #include <util/gamedata.h>
 
 #include <magic.h>
-
-#include <spells/shipcurse.h>
 
 #include <storage.h>
 

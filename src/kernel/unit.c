@@ -941,8 +941,7 @@ bool can_survive(const unit * u, const region * r)
             return false;
 
         if (r->attribs) {
-            const curse_type *ctype = ct_find("holyground");
-            if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, ctype)))
+            if (fval(u_race(u), RCF_UNDEAD) && curse_active(get_curse(r->attribs, &ct_holyground)))
                 return false;
         }
         return true;

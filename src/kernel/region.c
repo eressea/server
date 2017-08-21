@@ -159,7 +159,7 @@ void deathcounts(region * r, int fallen)
     if (fallen == 0)
         return;
     if (r->attribs) {
-        const curse_type *ctype = ct_find("holyground");
+        const curse_type *ctype = &ct_holyground;
         if (ctype && curse_active(get_curse(r->attribs, ctype)))
             return;
         a = a_find(r->attribs, &at_deathcount);

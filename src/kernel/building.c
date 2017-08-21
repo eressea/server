@@ -21,6 +21,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "building.h"
 
+#include <attributes/reduceproduction.h>
+#include <spells/regioncurse.h>
+
 /* kernel includes */
 #include "curse.h"
 #include "item.h"
@@ -53,10 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-
-/* attributes includes */
-#include <attributes/reduceproduction.h>
-#include <spells/regioncurse.h>
 
 typedef struct building_typelist {
     struct building_typelist *next;

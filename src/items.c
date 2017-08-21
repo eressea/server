@@ -7,6 +7,12 @@
 #include "move.h"
 #include "magic.h"
 
+#include <attributes/fleechance.h>
+
+#include <spells/shipcurse.h>
+#include <spells/unitcurse.h>
+#include <spells/regioncurse.h>
+
 #include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -20,9 +26,6 @@
 #include <kernel/ship.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
-
-#include <attributes/fleechance.h>
-#include <spells/shipcurse.h>
 
 /* triggers includes */
 #include <triggers/changerace.h>
@@ -167,7 +170,7 @@ struct order *ord)
         }
 
         if (force > 0) {
-            create_curse(u, &r->attribs, ct_find("antimagiczone"), force, duration,
+            create_curse(u, &r->attribs, &ct_antimagiczone, force, duration,
                 effect, 0);
         }
     }
@@ -185,7 +188,7 @@ int amount, struct order *ord)
 {
     int money;
 
-    if (get_curse(u->region->attribs, ct_find("depression"))) {
+    if (get_curse(u->region->attribs, &ct_depression)) {
         cmistake(u, ord, 58, MSG_MAGIC);
         return -1;
     }
@@ -194,7 +197,7 @@ int amount, struct order *ord)
     change_money(u, money);
     rsetmoney(u->region, rmoney(u->region) - money);
 
-    create_curse(u, &u->region->attribs, ct_find("depression"),
+    create_curse(u, &u->region->attribs, &ct_depression,
         20, BAGPIPEDURATION, 0.0, 0);
 
     ADDMSG(&u->faction->msgs, msg_message("bagpipeoffear_faction",
@@ -354,7 +357,7 @@ use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
                                     der vor den Antimagiezaubern passiert */
 
         effect = (float)(rng_int() % 6 - 1);
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), power,
+        c = create_curse(u, &u->attribs, &ct_skillmod, power,
             duration, effect, u->number);
         c->data.i = SK_TACTICS;
         UNUSED_ARG(ord);

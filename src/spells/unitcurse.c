@@ -60,14 +60,14 @@ static message *cinfo_auraboost(const void *obj, objtype_t typ, const curse * c,
     return NULL;
 }
 
-static struct curse_type ct_auraboost = {
+const struct curse_type ct_auraboost = {
     "auraboost",
     CURSETYP_NORM, CURSE_SPREADMODULO, (NO_MERGE),
     cinfo_auraboost
 };
 
 /* Magic Boost - Gabe des Chaos */
-static struct curse_type ct_magicboost = {
+const struct curse_type ct_magicboost = {
     "magicboost",
     CURSETYP_UNIT, CURSE_SPREADMODULO | CURSE_IMMUNE, M_MEN, cinfo_simple
 };
@@ -168,7 +168,7 @@ message *cinfo_unit(const void *obj, objtype_t typ, const curse * c, int self)
     return NULL;
 }
 
-static struct curse_type ct_orcish = {
+const struct curse_type ct_orcish = {
     "orcish",
     CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN,
     cinfo_unit
@@ -192,7 +192,7 @@ static message *cinfo_kaelteschutz(const void *obj, objtype_t typ, const curse *
     return NULL;
 }
 
-static struct curse_type ct_insectfur = {
+const struct curse_type ct_insectfur = {
     "insectfur",
     CURSETYP_UNIT, CURSE_SPREADMODULO, (M_MEN | M_DURATION),
     cinfo_kaelteschutz
@@ -259,7 +259,7 @@ static message *cinfo_sparkle(const void *obj, objtype_t typ, const curse * c,
     }
 }
 
-static struct curse_type ct_sparkle = { "sparkle",
+const struct curse_type ct_sparkle = { "sparkle",
 CURSETYP_UNIT, CURSE_SPREADMODULO, (M_MEN | M_DURATION), cinfo_sparkle
 };
 
@@ -284,20 +284,20 @@ const struct curse_type ct_worse = {
 /*
  * C_ITEMCLOAK
  */
-static struct curse_type ct_itemcloak = {
+const struct curse_type ct_itemcloak = {
     "itemcloak", CURSETYP_UNIT, CURSE_SPREADNEVER, M_DURATION, cinfo_unit
 };
 
 /* ------------------------------------------------------------- */
 
-static struct curse_type ct_fumble = {
+const struct curse_type ct_fumble = {
     "fumble", CURSETYP_NORM, CURSE_SPREADNEVER | CURSE_ONLYONE, NO_MERGE,
     cinfo_unit
 };
 
 /* ------------------------------------------------------------- */
 
-static struct curse_type ct_oldrace = {
+const struct curse_type ct_oldrace = {
     "oldrace", CURSETYP_NORM, CURSE_SPREADALWAYS, NO_MERGE, NULL
 };
 

@@ -28,6 +28,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "academy.h"
 
+#include <spells/regioncurse.h>
+
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -52,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+
 #include <selist.h>
 
 /* libc includes */
@@ -282,12 +285,9 @@ int teach_cmd(unit * u, struct order *ord)
     int teaching, i, j, count, academy = 0;
 
     if (u->region->attribs) {
-        const curse_type *gbdream_ct = ct_find("gbdream");
-        if (gbdream_ct) {
-            if (get_curse(u->region->attribs, gbdream_ct)) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
-                return 0;
-            }
+        if (get_curse(u->region->attribs, &ct_gbdream)) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "gbdream_noteach", ""));
+            return 0;
         }
     }
     if ((u_race(u)->flags & RCF_NOTEACH) || fval(u, UFL_WERE)) {

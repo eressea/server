@@ -42,6 +42,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "calendar.h"
 #include "guard.h"
 
+/* attributes includes */
+#include <attributes/racename.h>
+#include <attributes/raceprefix.h>
+#include <attributes/stealth.h>
+
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
+
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
@@ -65,12 +74,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>
-
-/* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/raceprefix.h>
-#include <attributes/stealth.h>
-#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -2859,13 +2862,12 @@ static void age_stonecircle(building *b) {
     if (get_astralplane()) {
         region *rt = r_standard_to_astral(r);
         if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
-            const struct curse_type *ct_astralblock = ct_find("astralblock");
-            curse *c = get_curse(rt->attribs, ct_astralblock);
+            curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
                 int sk = effskill(mage, SK_MAGIC, 0);
                 float effect = 100;
                 /* the mage reactivates the circle */
-                c = create_curse(mage, &rt->attribs, ct_astralblock,
+                c = create_curse(mage, &rt->attribs, &ct_astralblock,
                     (float)MAX(1, sk), MAX(1, sk / 2), effect, 0);
                 ADDMSG(&r->msgs,
                     msg_message("astralshield_activate", "region unit", r, mage));
@@ -2923,7 +2925,7 @@ static void ageing(void)
             }
 
             if (is_cursed(u->attribs, C_OLDRACE, 0)) {
-                curse *c = get_curse(u->attribs, ct_find("oldrace"));
+                curse *c = get_curse(u->attribs, &ct_oldrace);
                 if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
                     u_setrace(u, get_race(curse_geteffect_int(c)));
                     u->irace = NULL;
@@ -3234,15 +3236,14 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 void monthly_healing(void)
 {
     region *r;
-    const curse_type *heal_ct = ct_find("healingzone");
 
     for (r = regions; r; r = r->next) {
         unit *u;
         double healingcurse = 0;
 
-        if (r->attribs && heal_ct) {
+        if (r->attribs) {
             /* bonus zurücksetzen */
-            curse *c = get_curse(r->attribs, heal_ct);
+            curse *c = get_curse(r->attribs, &ct_healing);
             if (c != NULL) {
                 healingcurse = curse_geteffect(c);
             }

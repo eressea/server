@@ -22,7 +22,7 @@ static struct message *cinfo_magicresistance(const void *obj, objtype_t typ, con
     return 0;
 }
 
-static struct curse_type ct_magicresistance = {
+const struct curse_type ct_magicresistance = {
     "magicresistance", CURSETYP_UNIT, CURSE_SPREADMODULO, M_MEN, cinfo_magicresistance
 };
 

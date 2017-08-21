@@ -450,7 +450,7 @@ static void test_shipspeed_nodrift(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, ct_find("nodrift"), 1, 1, 1, 0);
+    create_curse(0, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
     CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
     test_cleanup();
 }

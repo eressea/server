@@ -46,6 +46,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "calendar.h"
 #include "teleport.h"
 
+#include <spells/buildingcurse.h>
+
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/connection.h>
@@ -71,8 +73,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 #include <kernel/alliance.h>
-
-#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/attrib.h>

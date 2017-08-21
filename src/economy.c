@@ -36,6 +36,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "calendar.h"
 
+#include <attributes/reduceproduction.h>
+#include <attributes/racename.h>
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -66,10 +71,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rng.h>
-
-#include <attributes/reduceproduction.h>
-#include <attributes/racename.h>
-#include <spells/buildingcurse.h>
 
 /* libs includes */
 #include <math.h>
@@ -2655,12 +2656,9 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
     earnings = jobs * p_wage;
     if (r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
         /* E3 rules */
-        const curse_type *blessedharvest_ct = ct_find("blessedharvest");
-        if (blessedharvest_ct) {
-            int happy =
-                (int)(jobs * curse_geteffect(get_curse(r->attribs, blessedharvest_ct)));
-            earnings += happy;
-        }
+        int happy =
+            (int)(jobs * curse_geteffect(get_curse(r->attribs, &ct_blessedharvest)));
+        earnings += happy;
     }
     rsetmoney(r, money + earnings);
 }

@@ -27,6 +27,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "skill.h"
 
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
+
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/build.h>
@@ -54,9 +58,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
-#include <spells/buildingcurse.h>
-#include <spells/regioncurse.h>
-#include <spells/unitcurse.h>
 
 /* util includes */
 #include <util/assert.h>

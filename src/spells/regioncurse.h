@@ -25,6 +25,18 @@ extern "C" {
     extern const struct curse_type ct_godcursezone;
     extern const struct curse_type ct_gbdream;
     extern const struct curse_type ct_healing;
+    extern const struct curse_type ct_antimagiczone;
+    extern const struct curse_type ct_depression;
+    extern const struct curse_type ct_astralblock;
+    extern const struct curse_type ct_badmagicresistancezone;
+    extern const struct curse_type ct_goodmagicresistancezone;
+    extern const struct curse_type ct_holyground;
+    extern const struct curse_type ct_fogtrap;
+    extern const struct curse_type ct_magicstreet;
+    extern const struct curse_type ct_maelstrom;
+    extern const struct curse_type ct_riotzone;
+    extern const struct curse_type ct_generous;
+    extern const struct curse_type ct_badlearn;
 
     void register_regioncurse(void);
 

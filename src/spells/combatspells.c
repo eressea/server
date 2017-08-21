@@ -12,7 +12,9 @@
 #include <platform.h>
 #include "combatspells.h"
 
-/* kernel includes */
+#include <spells/buildingcurse.h>
+
+ /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -26,8 +28,6 @@
 #include <kernel/spell.h>
 #include <kernel/race.h>
 #include <kernel/terrain.h>
-
-#include <spells/buildingcurse.h>
 
 #include <guard.h>
 #include <battle.h>

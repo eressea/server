@@ -76,7 +76,7 @@ const struct curse_type ct_stormwind = { "stormwind",
 CURSETYP_NORM, 0, NO_MERGE, cinfo_ship
 };
 
-static struct curse_type ct_nodrift = { "nodrift",
+const struct curse_type ct_nodrift = { "nodrift",
 CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR), cinfo_shipnodrift
 };
 
