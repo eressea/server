@@ -82,7 +82,7 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
     int i, dead = 0, hp_rem = 0, heiltrank;
 
     assert(u->number);
-    if (fval(u_race(u), RCF_ILLUSIONARY) || u_race(u) == get_race(RC_SPELL)) {
+    if (fval(u_race(u), RCF_ILLUSIONARY)) {
         return 0;
     }
 

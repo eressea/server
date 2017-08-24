@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/gamedata.h>
+#include <util/log.h>
 #include <storage.h>
 
 #include <stdlib.h>
@@ -30,38 +31,107 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static void a_writekeys(const attrib *a, const void *o, storage *store) {
     int i, *keys = (int *)a->data.v;
-    assert(keys[0] < 4096 && keys[0]>0);
-    WRITE_INT(store, keys[0]);
-    for (i = 0; i < keys[0]; ++i) {
+    int n = 0;
+    if (keys) {
+        assert(keys[0] < 4096 && keys[0]>0);
+        n = keys[0];
+    }
+    WRITE_INT(store, n);
+    for (i = 0; i < n; ++i) {
         WRITE_INT(store, keys[i * 2 + 1]);
         WRITE_INT(store, keys[i * 2 + 2]);
     }
 }
 
-static int a_readkeys(attrib * a, void *owner, gamedata *data) {
-    int i, *p = 0;
-    READ_INT(data->store, &i);
-    assert(i < 4096 && i>=0);
-    if (i == 0) {
-        return AT_READ_FAIL;
-    }
-    a->data.v = p = malloc(sizeof(int)*(i*2 + 1));
-    *p++ = i;
-    while (i--) {
-        READ_INT(data->store, p++);
-        if (data->version >= KEYVAL_VERSION) {
-            READ_INT(data->store, p++);
+static int keys_lower_bound(int *base, int k, int l, int r) {
+    int km = k;
+    int *p = base + 1;
+
+    while (l != r) {
+        int m = (l + r) / 2;
+        km = p[m * 2];
+        if (km < k) {
+            if (l == m) l = r;
+            else l = m;
         }
         else {
-            *p++ = 1;
+            if (r == m) r = l;
+            else r = m;
         }
     }
+    return l;
+}
+
+static int keys_size(int n) {
+    /* TODO maybe use log2 from https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog */
+    assert(n > 0 && n <= 4096);
+    if (n <= 1) return 1;
+    if (n <= 4) return 4;
+    if (n <= 16) return 16;
+    if (n <= 256) return 256;
+    return 4096;
+}
+
+static int a_readkeys(attrib * a, void *owner, gamedata *data) {
+    int i, n, *keys;
+
+    READ_INT(data->store, &n);
+    assert(n < 4096 && n >= 0);
+    if (n == 0) {
+        return AT_READ_FAIL;
+    }
+    keys = malloc(sizeof(int)*(keys_size(n) * 2 + 1));
+    *keys = n;
+    for (i = 0; i != n; ++i) {
+        READ_INT(data->store, keys + i * 2 + 1);
+        if (data->version >= KEYVAL_VERSION) {
+            READ_INT(data->store, keys + i * 2 + 2);
+        }
+        else {
+            keys[i * 2 + 2] = 1;
+        }
+    }
+    if (data->version < SORTKEYS_VERSION) {
+        int e = 1;
+        for (i = 1; i != n; ++i) {
+            int k = keys[i * 2 + 1];
+            int v = keys[i * 2 + 2];
+            int l = keys_lower_bound(keys, k, 0, e);
+            if (l != e) {
+                int km = keys[l * 2 + 1];
+                if (km == k) {
+                    int vm = keys[l * 2 + 2];
+                    if (v != vm) {
+                        log_error("key %d has values %d and %d", k, v, vm);
+                    }
+                    --e;
+                }
+                else {
+                    if (e > l) {
+                        memmove(keys + 2 * l + 3, keys + 2 * l + 1, (e - l) * 2 * sizeof(int));
+                    }
+                    keys[2 * l + 1] = k;
+                    keys[2 * l + 2] = v;
+                }
+            }
+            ++e;
+        }
+        if (e != n) {
+            int sz = keys_size(n);
+            if (e > sz) {
+                sz = keys_size(e);
+                keys = realloc(keys, sizeof(int)*(2 * sz + 1));
+                keys[0] = e;
+            }
+        }
+    }
+    a->data.v = keys;
     return AT_READ_OK;
 }
 
 static int a_readkey(attrib *a, void *owner, struct gamedata *data) {
     int res = a_readint(a, owner, data);
-    if (data->version>=KEYVAL_VERSION) {
+    if (data->version >= KEYVAL_VERSION) {
         return AT_READ_FAIL;
     }
     return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
@@ -101,9 +171,55 @@ attrib_type at_key = {
     a_upgradekeys
 };
 
+static int* keys_get(int *base, int i)
+{
+    int n = base[0];
+    assert(i >= 0 && i < n);
+    return base + 1 + i * 2;
+}
+
+static int *keys_update(int *base, int key, int val)
+{
+    int *kv;
+    int n = base[0];
+    int l = keys_lower_bound(base, key, 0, n);
+    if (l < n) {
+        kv = keys_get(base, l);
+        if (kv[0] == key) {
+            kv[1] = val;
+        }
+        else {
+            int sz = keys_size(n);
+            assert(kv[0] > key);
+            if (n + 1 > sz) {
+                ptrdiff_t diff = kv - base;
+                sz = keys_size(n + 1);
+                base = realloc(base, (sz * 2 + 1) * sizeof(int));
+                kv = base + diff;
+            }
+            base[0] = n + 1;
+            memmove(kv + 2, kv, 2 * sizeof(int) * (n - l));
+            kv[0] = key;
+            kv[1] = val;
+        }
+    }
+    else {
+        int sz = keys_size(n);
+        if (n + 1 > sz) {
+            sz = keys_size(n + 1);
+            base = realloc(base, (sz * 2 + 1) * sizeof(int));
+        }
+        base[0] = n + 1;
+        kv = keys_get(base, l);
+        kv[0] = key;
+        kv[1] = val;
+    }
+    return base;
+}
+
 void key_set(attrib ** alist, int key, int val)
 {
-    int *keys, n = 0;
+    int *keys;
     attrib *a;
     assert(key != 0);
     a = a_find(*alist, &at_keys);
@@ -111,16 +227,17 @@ void key_set(attrib ** alist, int key, int val)
         a = a_add(alist, a_new(&at_keys));
     }
     keys = (int *)a->data.v;
-    if (keys) {
-        n = keys[0];
+    if (!keys) {
+        int sz = keys_size(1);
+        a->data.v = keys = malloc((2 * sz + 1) * sizeof(int));
+        keys[0] = 1;
+        keys[1] = key;
+        keys[2] = val;
     }
-    /* TODO: too many allocations, unsorted array */
-    keys = realloc(keys, sizeof(int) *(2 * n + 3));
-    keys[0] = n + 1;
-    assert(keys[0] < 4096 && keys[0]>=0);
-    keys[2 * n + 1] = key;
-    keys[2 * n + 2] = val;
-    a->data.v = keys;
+    else {
+        a->data.v = keys = keys_update(keys, key, val);
+        assert(keys[0] < 4096 && keys[0] >= 0);
+    }
 }
 
 void key_unset(attrib ** alist, int key)
@@ -129,15 +246,14 @@ void key_unset(attrib ** alist, int key)
     assert(key != 0);
     a = a_find(*alist, &at_keys);
     if (a) {
-        int i, *keys = (int *)a->data.v;
+        int *keys = (int *)a->data.v;
         if (keys) {
             int n = keys[0];
-            assert(keys[0] < 4096 && keys[0]>0);
-            for (i = 0; i != n; ++i) {
-                if (keys[2 * i + 1] == key) {
-                    memmove(keys + 2 * i + 1, keys + 2 * n - 1, 2 * sizeof(int));
-                    keys[0]--;
-                    break;
+            int l = keys_lower_bound(keys, key, 0, n);
+            if (l < n) {
+                int *kv = keys_get(keys, l);
+                if (kv[0] == key) {
+                    kv[1] = 0; /* do not delete, just set to 0 */
                 }
             }
         }
@@ -149,12 +265,14 @@ int key_get(attrib *alist, int key) {
     assert(key != 0);
     a = a_find(alist, &at_keys);
     if (a) {
-        int i, *keys = (int *)a->data.v;
+        int *keys = (int *)a->data.v;
         if (keys) {
-            /* TODO: binary search this! */
-            for (i = 0; i != keys[0]; ++i) {
-                if (keys[i*2+1] == key) {
-                    return keys[i * 2 + 2];
+            int n = keys[0];
+            int l = keys_lower_bound(keys, key, 0, n);
+            if (l < n) {
+                int * kv = keys_get(keys, l);
+                if (kv[0] == key) {
+                    return kv[1];
                 }
             }
         }

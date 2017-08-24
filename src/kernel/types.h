@@ -71,8 +71,8 @@ typedef enum {
     seen_neighbour,
     seen_lighthouse,
     seen_travel,
-    seen_far,
     seen_unit,
+    seen_spell,
     seen_battle
 } seen_mode;
 

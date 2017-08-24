@@ -2,14 +2,14 @@
 #include "spells/shipcurse.h"
 #include "monsters.h"
 
+#include <spells/flyingship.h>
+
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/ship.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
-
-#include <spells/flyingship.h>
 
 #include <tolua.h>
 #include <stdlib.h>

@@ -12,6 +12,9 @@ extern "C" {
     struct castorder;
     struct ship;
     struct unit;
+    struct curse_type;
+
+    extern const struct curse_type ct_flyingship;
 
     int sp_flying_ship(struct castorder * co);
 

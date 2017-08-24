@@ -25,6 +25,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 #include "helpers.h"
 #include "laws.h"
+#include "spells.h"
+
+#include <triggers/timeout.h>
+#include <triggers/shock.h>
+#include <triggers/killunit.h>
+#include <triggers/giveitem.h>
+#include <triggers/changerace.h>
+#include <triggers/clonedied.h>
+
+#include <spells/regioncurse.h>
+#include <spells/buildingcurse.h>
+#include <spells/unitcurse.h>
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -45,13 +57,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-
-#include <triggers/timeout.h>
-#include <triggers/shock.h>
-#include <triggers/killunit.h>
-#include <triggers/giveitem.h>
-#include <triggers/changerace.h>
-#include <triggers/clonedied.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -695,7 +700,7 @@ int max_spellpoints(const region * r, const unit * u)
     if (rtype && i_get(u->items, rtype->itype) > 0) {
         msp += use_item_aura(r, u);
     }
-    n = get_curseeffect(u->attribs, C_AURA, 0);
+    n = get_curseeffect(u->attribs, &ct_auraboost);
     if (n > 0) {
         msp = (msp * n) / 100;
     }
@@ -1024,7 +1029,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         curse *c;
 
         /* Antimagie in der Zielregion */
-        c = get_curse(r->attribs, ct_find("antimagiczone"));
+        c = get_curse(r->attribs, &ct_antimagiczone);
         if (curse_active(c)) {
             unit *mage = c->magician;
             force -= curse_geteffect(c);
@@ -1043,7 +1048,7 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level, struct order 
         }
 
         /* Patzerfluch-Effekt: */
-        c = get_curse(r->attribs, ct_find("fumble"));
+        c = get_curse(r->attribs, &ct_fumble);
         if (curse_active(c)) {
             unit *mage = c->magician;
             force -= curse_geteffect(c);
@@ -1100,21 +1105,22 @@ variant magic_resistance(unit * target)
 {
     attrib *a;
     curse *c;
-    const curse_type * ct_goodresist = 0, *ct_badresist = 0;
     const resource_type *rtype;
     const race *rc = u_race(target);
     variant v, prob = rc_magres(rc);
     const plane *pl = rplane(target->region);
+    bool good_resist = true;
+    bool bad_resist = true;
 
     if (rc == get_race(RC_HIRNTOETER) && !pl) {
-	prob = frac_mul(prob, frac_make(1, 2));        
+    	prob = frac_mul(prob, frac_make(1, 2));        
     }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
     prob = frac_add(prob, frac_make(effskill(target, SK_MAGIC, 0), 20));
 
     /* Auswirkungen von Zaubern auf der Einheit */
-    c = get_curse(target->attribs, ct_find("magicresistance"));
+    c = get_curse(target->attribs, &ct_magicresistance);
     if (c) {
         /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
         int effect = curse_geteffect_int(c) * get_cursedmen(target, c);
@@ -1132,27 +1138,23 @@ variant magic_resistance(unit * target)
 
     /* Auswirkungen von Zaubern auf der Region */
     a = a_find(target->region->attribs, &at_curse);
-    if (a) {
-        ct_badresist = ct_find("badmagicresistancezone");
-        ct_goodresist = ct_find("goodmagicresistancezone");
-    }
     while (a && a->type == &at_curse) {
         curse *c = (curse *)a->data.v;
         unit *mage = c->magician;
 
         if (mage != NULL) {
-            if (ct_goodresist && c->type == ct_goodresist) {
+            if (good_resist && c->type == &ct_goodmagicresistancezone) {
                 if (alliedunit(mage, target->faction, HELP_GUARD)) {
                     /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
                     prob = frac_add(prob, frac_make(curse_geteffect_int(c), 100));
-                    ct_goodresist = 0; /* only one effect per region */
+                    good_resist = false; /* only one effect per region */
                 }
             }
-            else if (ct_badresist && c->type == ct_badresist) {
+            else if (bad_resist && c->type == &ct_badmagicresistancezone) {
                 if (!alliedunit(mage, target->faction, HELP_GUARD)) {
                     /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
                     prob = frac_sub(prob, frac_make(curse_geteffect_int(c), 100));
-                    ct_badresist = 0; /* only one effect per region */
+                    bad_resist = false; /* only one effect per region */
                 }
             }
         }
@@ -1209,9 +1211,6 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
-        if (u_race(u)==get_race(RC_SPELL)) {
-            return true;
-        }
         at = effskill(magician, SK_MAGIC, 0);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
@@ -1250,8 +1249,7 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
     }
 
     if (a) {
-        const struct curse_type *ct_resist = ct_find(oldcursename(C_RESIST_MAGIC));
-        curse * c = get_curse(a, ct_resist);
+        curse * c = get_curse(a, &ct_magicrunes);
         int effect = curse_geteffect_int(c);
         prob = frac_add(prob, frac_make(effect, 100));
     }
@@ -1319,10 +1317,10 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     if (mage->magietyp == M_DRAIG) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
-    if (is_cursed(u->attribs, C_MBOOST, 0)) {
+    if (is_cursed(u->attribs, &ct_magicboost)) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
-    if (is_cursed(u->attribs, C_FUMBLE, 0)) {
+    if (is_cursed(u->attribs, &ct_fumble)) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
 
@@ -1410,7 +1408,7 @@ static void do_fumble(castorder * co)
         /* temporary skill loss */
         duration = MAX(rng_int() % level / 2, 2);
         effect = level / -2.0;
-        c = create_curse(u, &u->attribs, ct_find("skillmod"), level,
+        c = create_curse(u, &u->attribs, &ct_skillmod, level,
             duration, effect, 1);
         c->data.i = SK_MAGIC;
         ADDMSG(&u->faction->msgs, msg_message("patzer2", "unit region", u, r));
@@ -1502,7 +1500,7 @@ void regenerate_aura(void)
                         reg_aura *= btype->auraregen;
 
                     /* Bonus/Malus durch Zauber */
-                    mod = get_curseeffect(u->attribs, C_AURA, 0);
+                    mod = get_curseeffect(u->attribs, &ct_auraboost);
                     if (mod > 0) {
                         reg_aura = (reg_aura * mod) / 100.0;
                     }
@@ -2780,7 +2778,6 @@ void magic(void)
     int rank;
     castorder *co;
     spellrank spellranks[MAX_SPELLRANK];
-    const race *rc_spell = get_race(RC_SPELL);
     const race *rc_insect = get_race(RC_INSECT);
 
     memset(spellranks, 0, sizeof(spellranks));
@@ -2790,11 +2787,11 @@ void magic(void)
         for (u = r->units; u; u = u->next) {
             order *ord;
 
-            if (u->number <= 0 || u_race(u) == rc_spell)
+            if (u->number <= 0)
                 continue;
 
             if (u_race(u) == rc_insect && r_insectstalled(r) &&
-                !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+                !is_cursed(u->attribs, &ct_insectfur))
                 continue;
 
             if (fval(u, UFL_WERE | UFL_LONGACTION)) {

@@ -92,6 +92,7 @@
         "rules.grow.formula": 1,
         "rules.tactics.formula": 1,
         "rules.help.mask": "fight guard money give",
+        "rules.lighthouse.unit_capacity": true,
         "movement.shipspeed.skillbonus": 6,
         "alliance.auto": "fight",
         "alliance.restricted": "fight"

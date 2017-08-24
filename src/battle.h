@@ -229,15 +229,17 @@ extern "C" {
     fighter * get_fighter(battle * b, const struct unit * u);
     /* END battle interface */
 
-    extern void do_battles(void);
+    void do_battles(void);
 
     /* for combat spells and special attacks */
     enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
     enum { ALLY_SELF, ALLY_ANY };
 
-    extern troop select_enemy(struct fighter *af, int minrow, int maxrow,
+    int get_unitrow(const fighter * af, const side * vs);
+
+    troop select_enemy(struct fighter *af, int minrow, int maxrow,
         int select);
-    extern troop select_ally(struct fighter *af, int minrow, int maxrow,
+    troop select_ally(struct fighter *af, int minrow, int maxrow,
         int allytype);
 
     int count_enemies(struct battle *b, const struct fighter *af,
@@ -246,21 +248,25 @@ extern "C" {
     int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, union variant *magres);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
-    extern void message_all(battle * b, struct message *m);
-    extern int hits(troop at, troop dt, weapon * awp);
-    extern void damage_building(struct battle *b, struct building *bldg,
+    void message_all(battle * b, struct message *m);
+    int hits(troop at, troop dt, weapon * awp);
+    void damage_building(struct battle *b, struct building *bldg,
         int damage_abs);
+
+    typedef bool(*select_fun)(const struct side *vs, const struct fighter *fig, void *cbdata);
+    struct selist *select_fighters(struct battle *b, const struct side *vs, int mask, select_fun cb, void *cbdata);
     struct selist *fighters(struct battle *b, const struct side *vs,
         int minrow, int maxrow, int mask);
+
     int count_allies(const struct side *as, int minrow, int maxrow,
         int select, int allytype);
-    extern bool helping(const struct side *as, const struct side *ds);
-    extern void rmfighter(fighter * df, int i);
-    extern struct fighter *select_corpse(struct battle *b, struct fighter *af);
-    extern int statusrow(int status);
-    extern void drain_exp(struct unit *u, int d);
-    extern void kill_troop(troop dt);
-    extern void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
+    bool helping(const struct side *as, const struct side *ds);
+    void rmfighter(fighter * df, int i);
+    struct fighter *select_corpse(struct battle *b, struct fighter *af);
+    int statusrow(int status);
+    void drain_exp(struct unit *u, int d);
+    void kill_troop(troop dt);
+    void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
     bool is_attacker(const fighter * fig);
     struct battle *make_battle(struct region * r);

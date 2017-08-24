@@ -37,6 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"
 #include "unit.h"
 
+#include <spells/regioncurse.h>
+
 /* util includes */
 #include <util/assert.h>
 #include <util/attrib.h>
@@ -157,7 +159,7 @@ void deathcounts(region * r, int fallen)
     if (fallen == 0)
         return;
     if (r->attribs) {
-        const curse_type *ctype = ct_find("holyground");
+        const curse_type *ctype = &ct_holyground;
         if (ctype && curse_active(get_curse(r->attribs, ctype)))
             return;
         a = a_find(r->attribs, &at_deathcount);
@@ -584,7 +586,7 @@ int rroad(const region * r, direction_t d)
 bool r_isforest(const region * r)
 {
     if (fval(r->terrain, FOREST_REGION)) {
-        /* needs to be covered with at leas 48% trees */
+        /* needs to be covered with at least 48% trees */
         int mincover = (int)(r->terrain->size * 0.48);
         int trees = rtrees(r, 2) + rtrees(r, 1);
         return (trees * TREESIZE >= mincover);
@@ -917,6 +919,7 @@ void free_region(region * r)
     while (r->units) {
         unit *u = r->units;
         r->units = u->next;
+        u->region = NULL;
         uunhash(u);
         free_unit(u);
         free(u);
@@ -1241,8 +1244,9 @@ int production(const region * r)
 {
     /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
-    if (curse_active(get_curse(r->attribs, ct_find("drought"))))
+    if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;
+    }
 
     return p;
 }

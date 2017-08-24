@@ -160,7 +160,7 @@ int count)
     region *r = u->region;
     int have = get_resource(u, rtype);
 
-    if ((u_race(u)->ec_flags & GETITEM) == 0) {
+    if ((u_race(u)->ec_flags & ECF_GETITEM) == 0) {
         mode &= (GET_SLACK | GET_RESERVE);
     }
 
@@ -178,9 +178,6 @@ int count)
         for (v = r->units; v && use < count; v = v->next)
             if (u != v) {
                 int mask;
-
-                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
 
                 if (v->faction == f) {
                     mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
@@ -204,7 +201,7 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     region *r = u->region;
     int n = 0, have = get_resource(u, rtype);
 
-    if ((u_race(u)->ec_flags & GETITEM) == 0) {
+    if ((u_race(u)->ec_flags & ECF_GETITEM) == 0) {
         mode &= (GET_SLACK | GET_RESERVE);
     }
 
@@ -232,9 +229,6 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
         for (v = r->units; use > 0 && v != NULL; v = v->next) {
             if (u != v) {
                 int mask;
-                if ((u_race(v)->ec_flags & ECF_KEEP_ITEM))
-                    continue;
-
                 if (v->faction == f) {
                     mask = (mode >> 3) & (GET_SLACK | GET_RESERVE);
                 }

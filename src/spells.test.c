@@ -1,15 +1,20 @@
 #include <platform.h>
+
+#include "spells.h"
+
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 #include <util/language.h>
 #include <util/attrib.h>
 #include <spells/regioncurse.h>
-#include "spells.h"
+
+#include <attributes/attributes.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -39,7 +44,7 @@ static void test_good_dreams(CuTest *tc) {
 
     level = sp_gooddreams(&co);
     CuAssertIntEquals(tc, 10, level);
-    curse = get_curse(r->attribs, ct_find("gbdream"));
+    curse = get_curse(r->attribs, &ct_gbdream);
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == 1);
 
@@ -96,7 +101,7 @@ static void test_bad_dreams(CuTest *tc) {
 
     level = sp_baddreams(&co);
     CuAssertIntEquals(tc, 10, level);
-    curse = get_curse(r->attribs, ct_find("gbdream"));
+    curse = get_curse(r->attribs, &ct_gbdream);
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == -1);
 
@@ -108,9 +113,26 @@ static void test_bad_dreams(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_watch_region(CuTest *tc) {
+    region *r;
+    faction *f;
+    test_setup();
+    r = test_create_region(0, 0, 0);
+    f = test_create_faction(0);
+    CuAssertIntEquals(tc, -1, get_observer(r, f));
+    set_observer(r, f, 0, 2);
+    CuAssertIntEquals(tc, 0, get_observer(r, f));
+    set_observer(r, f, 10, 2);
+    CuAssertIntEquals(tc, 10, get_observer(r, f));
+    CuAssertIntEquals(tc, RF_OBSERVER, fval(r, RF_OBSERVER));
+    CuAssertPtrNotNull(tc, r->attribs);
+    test_cleanup();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);

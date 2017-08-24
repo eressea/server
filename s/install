@@ -1,18 +1,25 @@
 #!/bin/sh
-ROOT=$(pwd)
-while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
-  if [ "/" = "$ROOT" ]; then
-    echo "could not find root, are you in the git repository?"
-    exit
-  fi
+
+FORCE=0
+while getopts f o; do
+  case "${o}" in
+  f) usage ; FORCE=yes ;;
+  esac
 done
 
+if [ "$FORCE" != "yes" ] ; then
+  BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
+  if [ "$BRANCH" != "master" ] ; then
+    echo "you should only install stable versions from the master branch"
+    exit
+  fi
+fi
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 BIN_DIR="Debug"
 
+ROOT=$(git rev-parse --show-toplevel)
 cd $ROOT/$BIN_DIR
 make install

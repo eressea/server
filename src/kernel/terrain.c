@@ -18,14 +18,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include <kernel/config.h>
-#include <attributes/racename.h>
 #include "terrain.h"
-#include "terrainid.h"
+
+#include <attributes/racename.h>
+#include <spells/regioncurse.h>
 
 /* kernel includes */
 #include "curse.h"
 #include "region.h"
 #include "resources.h"
+#include "terrainid.h"
 
 #include <util/log.h>
 #include <util/attrib.h>
@@ -160,7 +162,7 @@ const char *terrain_name(const struct region *r)
         return r->terrain->name(r);
     }
     else if (fval(r->terrain, SEA_REGION)) {
-        if (curse_active(get_curse(r->attribs, ct_find("maelstrom")))) {
+        if (curse_active(get_curse(r->attribs, &ct_maelstrom))) {
             return "maelstrom";
         }
     }

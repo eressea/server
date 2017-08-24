@@ -717,8 +717,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         b = u->building;
     }
 
-    if (b)
+    if (b) {
         btype = b->type;
+    }
 
     if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
         /* only one of these per region */

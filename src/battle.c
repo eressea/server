@@ -26,6 +26,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "move.h"
 #include "skill.h"
+#include "study.h"
+
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
@@ -54,7 +59,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
-#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -138,15 +142,10 @@ static int rule_nat_armor;
 static int rule_cavalry_mode;
 static int rule_vampire;
 
-static const curse_type *peace_ct, *slave_ct, *calm_ct;
-
 /** initialize rules from configuration.
  */
 static void init_rules(void)
 {
-    peace_ct = ct_find("peacezone");
-    slave_ct = ct_find("slavery");
-    calm_ct = ct_find("calmmonster");
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
@@ -440,7 +439,7 @@ static int get_row(const side * s, int row, const side * vs)
     return result;
 }
 
-static int get_unitrow(const fighter * af, const side * vs)
+int get_unitrow(const fighter * af, const side * vs)
 {
     int row = statusrow(af->status);
     if (vs == NULL) {
@@ -956,20 +955,7 @@ void drain_exp(struct unit *u, int n)
         }
     }
     if (sk != NOSKILL) {
-        skill *sv = unit_skill(u, sk);
-        if (sv) {
-            while (n > 0) {
-                if (n >= 30 * u->number) {
-                    reduce_skill(u, sv, 1);
-                    n -= 30;
-                }
-                else {
-                    if (rng_int() % (30 * u->number) < n)
-                        reduce_skill(u, sv, 1);
-                    n = 0;
-                }
-            }
-        }
+        reduce_skill_days(u, sk, n);
     }
 }
 
@@ -1590,8 +1576,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
     return dt;
 }
 
-selist *fighters(battle * b, const side * vs, int minrow, int maxrow,
-    int mask)
+selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     side *s;
     selist *fightervp = 0;
@@ -1614,14 +1599,33 @@ selist *fighters(battle * b, const side * vs, int minrow, int maxrow,
             assert(mask == (FS_HELP | FS_ENEMY) || !"invalid alliance state");
         }
         for (fig = s->fighters; fig; fig = fig->next) {
-            int row = get_unitrow(fig, vs);
-            if (row >= minrow && row <= maxrow) {
+            if (cb(vs, fig, cbdata)) {
                 selist_push(&fightervp, fig);
             }
         }
     }
 
     return fightervp;
+}
+
+struct selector {
+    int minrow;
+    int maxrow;
+};
+
+static bool select_row(const side *vs, const fighter *fig, void *cbdata)
+{
+    struct selector *sel = (struct selector *)cbdata;
+    int row = get_unitrow(fig, vs);
+    return (row >= sel->minrow && row <= sel->maxrow);
+}
+
+selist *fighters(battle * b, const side * vs, int minrow, int maxrow, int mask)
+{
+    struct selector sel;
+    sel.maxrow = maxrow;
+    sel.minrow = minrow;
+    return select_fighters(b, vs, mask, select_row, &sel);
 }
 
 static void report_failed_spell(struct battle * b, struct unit * mage, const struct spell *sp)
@@ -1637,11 +1641,51 @@ static castorder * create_castorder_combat(castorder *co, fighter *fig, const sp
     return co;
 }
 
+#ifdef FFL_CURSED
+static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
+    side *s;
+    castorder *co;
+
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        fighter *fig = 0;
+        if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
+            spell *sp = find_spell("igjarjuk");
+            if (sp) {
+                int si;
+                for (si = 0; s->enemies[si]; ++si) {
+                    side *se = s->enemies[si];
+                    if (se && !fval(se->faction, FFL_NPC)) {
+                        fighter *fi;
+                        for (fi = se->fighters; fi; fi = fi->next) {
+                            if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                fig = fi;
+                                if (fig->unit->number == 1) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (fig && fig->unit->number == 1) {
+                            break;
+                        }
+                    }
+                }
+                if (fig) {
+                    co = create_castorder_combat(0, fig, sp, 10, 10);
+                    co->magician.fig = fig;
+                    add_castorder(&spellranks[sp->rank], co);
+                    break;
+                }
+            }
+        }
+    }
+}
+#endif
+
 void do_combatmagic(battle * b, combatmagic_t was)
 {
     side *s;
-    region *r = b->region;
     castorder *co;
+    region *r = b->region;
     int level, rank, sl;
     spellrank spellranks[MAX_SPELLRANK];
 
@@ -1649,38 +1693,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
 #ifdef FFL_CURSED
     if (was == DO_PRECOMBATSPELL) {
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
-            fighter *fig = 0;
-            if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
-                spell *sp = find_spell("igjarjuk");
-                if (sp) {
-                    int si;
-                    for (si = 0; s->enemies[si]; ++si) {
-                        side *se = s->enemies[si];
-                        if (se && !fval(se->faction, FFL_NPC)) {
-                            fighter *fi;
-                            for (fi = se->fighters; fi; fi = fi->next) {
-                                if (fi && (!fig || fig->unit->number > fi->unit->number)) {
-                                    fig = fi;
-                                    if (fig->unit->number == 1) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (fig && fig->unit->number == 1) {
-                                break;
-                            }
-                        }
-                    }
-                    if (fig) {
-                        co = create_castorder_combat(0, fig, sp, 10, 10);
-                        co->magician.fig = fig;
-                        add_castorder(&spellranks[sp->rank], co);
-                        break;
-                    }
-                }
-            }
-        }
+        summon_igjarjuk(b, spellranks);
     }
 #endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
@@ -1889,14 +1902,11 @@ int skilldiff(troop at, troop dt, int dist)
     if (df->building) {
         building *b = df->building;
         if (b->attribs) {
-            const curse_type *strongwall_ct = ct_find("strongwall");
-            if (strongwall_ct) {
-                curse *c = get_curse(b->attribs, strongwall_ct);
-                if (curse_active(c)) {
-                    /* wirkt auf alle Geb�ude */
-                    skdiff -= curse_geteffect_int(c);
-                    is_protected = 2;
-                }
+            curse *c = get_curse(b->attribs, &ct_strongwall);
+            if (curse_active(c)) {
+                /* wirkt auf alle Geb�ude */
+                skdiff -= curse_geteffect_int(c);
+                is_protected = 2;
             }
         }
         if (b->type->flags & BTF_FORTIFICATION) {
@@ -3173,14 +3183,10 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* Effekte von Spr�chen */
 
     if (u->attribs) {
-        const curse_type *speed_ct;
-        speed_ct = ct_find("speed");
-        if (speed_ct) {
-            curse *c = get_curse(u->attribs, speed_ct);
-            if (c) {
-                speeded = get_cursedmen(u, c);
-                speed = curse_geteffect_int(c);
-            }
+        curse *c = get_curse(u->attribs, &ct_speed);
+        if (c) {
+            speeded = get_cursedmen(u, c);
+            speed = curse_geteffect_int(c);
         }
     }
 
@@ -3748,6 +3754,21 @@ static void flee(const troop dt)
     kill_troop(dt);
 }
 
+static bool is_calmed(const unit *u, const faction *f) {
+    attrib *a = a_find(u->attribs, &at_curse);
+
+    while (a && a->type == &at_curse) {
+        curse *c = (curse *)a->data.v;
+        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->subscription) {
+            if (curse_active(c)) {
+                return true;
+            }
+        }
+        a = a->next;
+    }
+    return false;
+}
+
 static bool start_battle(region * r, battle ** bp)
 {
     battle *b = NULL;
@@ -3794,12 +3815,12 @@ static bool start_battle(region * r, battle ** bp)
                     if (fval(u, UFL_LONGACTION))
                         continue;
 
-                    if (peace_ct && curse_active(get_curse(r->attribs, peace_ct))) {
+                    if (curse_active(get_curse(r->attribs, &ct_peacezone))) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "peace_active", ""));
                         continue;
                     }
 
-                    if (slave_ct && curse_active(get_curse(u->attribs, slave_ct))) {
+                    if (curse_active(get_curse(u->attribs, &ct_slavery))) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "slave_active", ""));
                         continue;
                     }
@@ -3847,26 +3868,11 @@ static bool start_battle(region * r, battle ** bp)
                             NewbieImmunity()));
                         continue;
                     }
-                    /* Fehler: "Die Einheit ist mit uns alliert" */
 
-                    if (calm_ct) {
-                        attrib *a = a_find(u->attribs, &at_curse);
-                        bool calm = false;
-                        while (a && a->type == &at_curse) {
-                            curse *c = (curse *)a->data.v;
-                            if (c->type == calm_ct
-                                && curse_geteffect_int(c) == u2->faction->subscription) {
-                                if (curse_active(c)) {
-                                    calm = true;
-                                    break;
-                                }
-                            }
-                            a = a->next;
-                        }
-                        if (calm) {
-                            cmistake(u, ord, 47, MSG_BATTLE);
-                            continue;
-                        }
+                    /* Fehler: "Die Einheit ist mit uns alliert" */
+                    if (is_calmed(u, u2->faction)) {
+                        cmistake(u, ord, 47, MSG_BATTLE);
+                        continue;
                     }
                     /* Ende Fehlerbehandlung */
                     if (b == NULL) {

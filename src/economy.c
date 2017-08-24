@@ -36,6 +36,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 #include "calendar.h"
 
+#include <attributes/reduceproduction.h>
+#include <attributes/racename.h>
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
+
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -66,9 +72,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rng.h>
-
-#include <attributes/reduceproduction.h>
-#include <attributes/racename.h>
 
 /* libs includes */
 #include <math.h>
@@ -116,14 +119,14 @@ int entertainmoney(const region * r)
 {
     double n;
 
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    if (is_cursed(r->attribs, &ct_depression)) {
         return 0;
     }
 
     n = rmoney(r) / (double)ENTERTAINFRACTION;
 
-    if (is_cursed(r->attribs, C_GENEROUS, 0)) {
-        n *= get_curseeffect(r->attribs, C_GENEROUS, 0);
+    if (is_cursed(r->attribs, &ct_generous)) {
+        n *= get_curseeffect(r->attribs, &ct_generous);
     }
 
     return (int)n;
@@ -500,7 +503,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
             return;
         }
     }
-    if (is_cursed(r->attribs, C_RIOT, 0)) {
+    if (is_cursed(r->attribs, &ct_riotzone)) {
         /* Die Region befindet sich in Aufruhr */
         cmistake(u, ord, 237, MSG_EVENT);
         return;
@@ -650,7 +653,7 @@ static int forget_cmd(unit * u, order * ord)
     skill_t sk;
     const char *s;
 
-    if (is_cursed(u->attribs, C_SLAVE, 0)) {
+    if (is_cursed(u->attribs, &ct_slavery)) {
         /* charmed units shouldn't be losing their skills */
         return 0;
     }
@@ -728,13 +731,12 @@ static int maintain(building * b)
 
 void maintain_buildings(region * r)
 {
-    const curse_type *nocost_ct = ct_find("nocostbuilding");
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
         int flags = BLD_MAINTAINED;
 
-        if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+        if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
             flags = maintain(b);
         }
         fset(b, flags);
@@ -2588,7 +2590,7 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
-    if (is_cursed(r->attribs, C_DEPRESSION, 0)) {
+    if (is_cursed(r->attribs, &ct_depression)) {
         cmistake(u, ord, 28, MSG_INCOME);
         return;
     }
@@ -2653,14 +2655,10 @@ expandwork(region * r, request * work_begin, request * work_end, int maxwork)
         jobs = rpeasants(r);
     }
     earnings = jobs * p_wage;
-    if (r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
+    if (jobs > 0 && r->attribs && rule_blessed_harvest() == HARVEST_TAXES) {
         /* E3 rules */
-        const curse_type *blessedharvest_ct = ct_find("blessedharvest");
-        if (blessedharvest_ct) {
-            int happy =
-                (int)(jobs * curse_geteffect(get_curse(r->attribs, blessedharvest_ct)));
-            earnings += happy;
-        }
+        int happy = harvest_effect(r);
+        earnings += happy * jobs;
     }
     rsetmoney(r, money + earnings);
 }
@@ -2982,13 +2980,12 @@ void produce(struct region *r)
     static int bt_cache;
     static const struct building_type *caravan_bt;
     static int rc_cache;
-    static const race *rc_spell, *rc_insect, *rc_aquarian;
+    static const race *rc_insect, *rc_aquarian;
     
     if (bt_changed(&bt_cache)) {
         caravan_bt = bt_find("caravan");
     }
     if (rc_changed(&rc_cache)) {
-        rc_spell = get_race(RC_SPELL);
         rc_insect = get_race(RC_INSECT);
         rc_aquarian = get_race(RC_AQUARIAN);
     }
@@ -3026,11 +3023,11 @@ void produce(struct region *r)
         bool trader = false;
         keyword_t todo;
 
-        if (u_race(u) == rc_spell || fval(u, UFL_LONGACTION))
+        if (fval(u, UFL_LONGACTION))
             continue;
 
         if (u_race(u) == rc_insect && r_insectstalled(r) &&
-            !is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+            !is_cursed(u->attribs, &ct_insectfur))
             continue;
 
         if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {
@@ -3103,7 +3100,8 @@ void produce(struct region *r)
             sabotage_cmd(u, u->thisorder);
             break;
 
-        case K_BREED:
+        case K_PLANT:
+        case K_GROW:
             breed_cmd(u, u->thisorder);
             break;
 

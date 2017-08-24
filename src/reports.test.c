@@ -6,6 +6,7 @@
 #include "lighthouse.h"
 #include "travelthru.h"
 #include "keyword.h"
+#include "spells.h"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -26,6 +27,7 @@
 #include <util/lists.h>
 #include <util/message.h>
 
+#include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <attributes/otherfaction.h>
 
@@ -474,12 +476,11 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     u1->number = 4;
     u1->building = b;
     set_level(u1, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction));
+    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction, u1));
     CuAssertPtrEquals(tc, b, inside_building(u1));
     u2 = test_create_unit(f, r1);
     u2->building = b;
     set_level(u2, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, u2->faction));
     CuAssertPtrEquals(tc, NULL, inside_building(u2));
     prepare_report(&ctx, u1->faction);
     CuAssertPtrEquals(tc, r1, ctx.first);
@@ -493,6 +494,15 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
+    finish_reports(&ctx);
+
+    /* lighthouse capacity is # of units, not people: */
+    config_set_int("rules.lighthouse.unit_capacity", 1);
+    prepare_report(&ctx, u2->faction);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     finish_reports(&ctx);
 
     test_cleanup();
@@ -532,7 +542,12 @@ static void test_prepare_lighthouse(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_prepare_lighthouse_owners(CuTest *tc) {
+/**
+ * In E3, region owners get the view range benefit of 
+ * any lighthouse in the region.
+ */
+static void test_prepare_lighthouse_owners(CuTest *tc)
+{
     report_context ctx;
     faction *f;
     region *r1, *r2, *r3;
@@ -542,6 +557,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc) {
     const struct terrain_type *t_ocean, *t_plain;
 
     test_setup();
+    enable_skill(SK_PERCEPTION, false);
     config_set("rules.region_owner_pay_building", "lighthouse");
     config_set("rules.region_owners", "1");
     t_ocean = test_create_terrain("ocean", SEA_REGION);
@@ -550,6 +566,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
+    r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
@@ -558,8 +575,8 @@ static void test_prepare_lighthouse_owners(CuTest *tc) {
     u = test_create_unit(f, r1);
     u = test_create_unit(test_create_faction(0), r1);
     u->building = b;
-    set_level(u, SK_PERCEPTION, 3);
     region_set_owner(b->region, f, 0);
+    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
@@ -707,6 +724,27 @@ static void test_region_distance_ql(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_report_far_vision(CuTest *tc) {
+    faction *f;
+    region *r1, *r2;
+    test_setup();
+    f = test_create_faction(0);
+    r1 = test_create_region(0, 0, 0);
+    test_create_unit(f, r1);
+    r2 = test_create_region(10, 0, 0);
+    set_observer(r2, f, 10, 2);
+    CuAssertPtrEquals(tc, r1, f->first);
+    CuAssertPtrEquals(tc, r2, f->last);
+    report_context ctx;
+    prepare_report(&ctx, f);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_spell, r2->seen.mode);
+    finish_reports(&ctx);
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -724,6 +762,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_get_addresses);
     SUITE_ADD_TEST(suite, test_get_addresses_fstealth);
     SUITE_ADD_TEST(suite, test_get_addresses_travelthru);
+    SUITE_ADD_TEST(suite, test_report_far_vision);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);

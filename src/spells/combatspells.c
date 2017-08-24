@@ -12,7 +12,9 @@
 #include <platform.h>
 #include "combatspells.h"
 
-/* kernel includes */
+#include <spells/buildingcurse.h>
+
+ /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -256,6 +258,17 @@ static void scramble_fighters(selist * ql)
     }
 }
 
+static bool select_armed(const side *vs, const fighter *fig, void *cbdata)
+{
+    int row = get_unitrow(fig, vs);
+
+    UNUSED_ARG(cbdata);
+    if (row >= FIGHT_ROW && row < BEHIND_ROW) {
+        return fig->alive > 0 && fig->weapons;
+    }
+    return false;
+}
+
 /* Rosthauch */
 int sp_combatrosthauch(struct castorder * co)
 {
@@ -275,52 +288,42 @@ int sp_combatrosthauch(struct castorder * co)
         return 0;
     }
 
-    fgs = fighters(b, fi->side, FIGHT_ROW, BEHIND_ROW - 1, FS_ENEMY);
+    fgs = select_fighters(b, fi->side, FS_ENEMY, select_armed, NULL);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = fgs; force>0 && ql; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
+        int w;
 
-        if (df->alive == 0)
-            continue;
-        if (force <= 0)
-            break;
-
-        /* da n MIN(force, x), sollte force maximal auf 0 sinken */
-        assert(force >= 0);
-
-        if (df->weapons) {
-            int w;
-            for (w = 0; df->weapons[w].type != NULL; ++w) {
-                weapon *wp = df->weapons;
-                int n = MIN(force, wp->used);
-                if (n) {
-                    requirement *mat = wp->type->itype->construction->materials;
-                    bool iron = false;
-                    while (mat && mat->number > 0) {
-                        if (mat->rtype == get_resourcetype(R_IRON)) {
-                            iron = true;
-                            break;
-                        }
-                        mat++;
+        for (w = 0; df->weapons[w].type != NULL; ++w) {
+            weapon *wp = df->weapons;
+            int n = MIN(force, wp->used);
+            if (n) {
+                requirement *mat = wp->type->itype->construction->materials;
+                bool iron = false;
+                while (mat && mat->number > 0) {
+                    if (mat->rtype == get_resourcetype(R_IRON)) {
+                        iron = true;
+                        break;
                     }
-                    if (iron) {
-                        int p;
-                        force -= n;
-                        wp->used -= n;
-                        k += n;
-                        i_change(&df->unit->items, wp->type->itype, -n);
-                        for (p = 0; n && p != df->unit->number; ++p) {
-                            if (df->person[p].missile == wp) {
-                                df->person[p].missile = NULL;
-                                --n;
-                            }
+                    mat++;
+                }
+                if (iron) {
+                    int p;
+                    force -= n;
+                    wp->used -= n;
+                    k += n;
+                    i_change(&df->unit->items, wp->type->itype, -n);
+                    for (p = 0; n && p != df->unit->number; ++p) {
+                        if (df->person[p].missile == wp) {
+                            df->person[p].missile = NULL;
+                            --n;
                         }
-                        for (p = 0; n && p != df->unit->number; ++p) {
-                            if (df->person[p].melee == wp) {
-                                df->person[p].melee = NULL;
-                                --n;
-                            }
+                    }
+                    for (p = 0; n && p != df->unit->number; ++p) {
+                        if (df->person[p].melee == wp) {
+                            df->person[p].melee = NULL;
+                            --n;
                         }
                     }
                 }
@@ -879,7 +882,7 @@ int sp_strong_wall(struct castorder * co)
     burg = mage->building;
 
     effect = power / 4;
-    create_curse(mage, &burg->attribs, ct_find("strongwall"), power, 1, effect, 0);
+    create_curse(mage, &burg->attribs, &ct_strongwall, power, 1, effect, 0);
 
     msg =
         msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);
@@ -887,6 +890,13 @@ int sp_strong_wall(struct castorder * co)
     msg_release(msg);
 
     return level;
+}
+
+static bool select_alive(const side *vs, const fighter *fig, void *cbdata)
+{
+    UNUSED_ARG(vs);
+    UNUSED_ARG(cbdata);
+    return fig->alive > 0;
 }
 
 /** Spells: chaosrow / song of confusion.
@@ -915,7 +925,7 @@ int sp_chaosrow(struct castorder * co)
 
     power = chaosrow ? (power * 40) : get_force(power, 5);
 
-    fgs = fighters(b, fi->side, FIGHT_ROW, NUMROWS, FS_ENEMY);
+    fgs = select_fighters(b, fi->side, FS_ENEMY, select_alive, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
@@ -977,9 +987,18 @@ int sp_chaosrow(struct castorder * co)
     return level;
 }
 
+static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
+{
+    int row = get_unitrow(fig, vs);
+    UNUSED_ARG(cbdata);
+    if (row >= FIGHT_ROW && row <= AVOID_ROW) {
+        return fig->alive + fig->run.number < fig->unit->number;
+    }
+    return false;
+}
+
 /* Gesang der Furcht (Kampfzauber) */
 /* Panik (Pr�kampfzauber) */
-
 int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
@@ -994,23 +1013,20 @@ int flee_spell(struct castorder * co, int strength)
     int force;
 
     force = (int)get_force(power, strength);
-    if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
+    if (force<=0 || !count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
         msg = msg_message("sp_flee_effect_0", "mage spell", mage, sp);
         message_all(b, msg);
         msg_release(msg);
         return 0;
     }
 
-    fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
+    fgs = select_fighters(b, fi->side, FS_ENEMY, select_afraid, NULL);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = fgs; force > 0 && ql; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
 
-        for (n = 0; n != df->alive; ++n) {
-            if (force < 0)
-                break;
-
+        for (n = 0; force > 0 && n != df->alive; ++n) {
             if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR m�glich */
                 df->person[n].attack -= 1;
                 --force;
@@ -1556,8 +1572,8 @@ int sp_healing(struct castorder * co)
     message *msg;
     bool use_item = has_ao_healing(mage);
 
-    /* bis zu 11 Personen pro Stufe (einen HP m�ssen sie ja noch
-     * haben, sonst w�ren sie tot) k�nnen geheilt werden */
+    /* bis zu 11 Personen pro Stufe (einen HP muessen sie ja noch
+     * haben, sonst waeren sie tot) koennen geheilt werden */
 
     if (use_item) {
         healhp *= 2;
@@ -1589,6 +1605,19 @@ int sp_healing(struct castorder * co)
     return level;
 }
 
+static bool select_hero(const side *vs, const fighter *fig, void *cbdata)
+{
+    UNUSED_ARG(cbdata);
+
+    if (playerrace(u_race(fig->unit))) {
+        int row = get_unitrow(fig, vs);
+        if (row >= FIGHT_ROW && row <= AVOID_ROW) {
+            return fig->alive + fig->run.number < fig->unit->number;
+        }
+    }
+    return false;
+}
+
 int sp_undeadhero(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
@@ -1603,80 +1632,69 @@ int sp_undeadhero(struct castorder * co)
     int force = (int)get_force(power, 0);
     double c = 0.50 + 0.02 * power;
 
-    /* Liste aus allen K�mpfern */
-    fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY | FS_HELP);
+    /* Liste aus allen Kaempfern */
+    fgs = select_fighters(b, fi->side, FS_ENEMY | FS_HELP, select_hero, NULL);
     scramble_fighters(fgs);
 
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = fgs; ql && force>0; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
         unit *du = df->unit;
+        int j = 0;
 
-        if (force <= 0)
-            break;
+        /* Wieviele Untote koennen wir aus dieser Einheit wecken? */
+        for (n = df->alive + df->run.number; force>0 && n != du->number; n++) {
+            if (chance(c)) {
+                ++j;
+                --force;
+            }
+        }
 
-        /* keine Monster */
-        if (!playerrace(u_race(du)))
-            continue;
+        if (j > 0) {
+            item **ilist;
+            unit *u =
+                create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, unit_getname(du),
+                du);
 
-        if (df->alive + df->run.number < du->number) {
-            int j = 0;
+            /* new units gets some stats from old unit */
 
-            /* Wieviele Untote k�nnen wir aus dieser Einheit wecken? */
-            for (n = df->alive + df->run.number; n != du->number; n++) {
-                if (chance(c)) {
-                    ++j;
-                    if (--force <= 0)
-                        break;
+            if (du->display) {
+                unit_setinfo(u, du->display);
+            }
+            else {
+                unit_setinfo(u, NULL);
+            }
+            setstatus(u, du->status);
+            setguard(u, false);
+            for (ilist = &du->items; *ilist;) {
+                item *itm = *ilist;
+                int loot = itm->number * j / du->number;
+                if (loot != itm->number) {
+                    int split = itm->number * j % du->number;
+                    if (split > 0 && (rng_int() % du->number) < split) {
+                        ++loot;
+                    }
+                }
+                i_change(&u->items, itm->type, loot);
+                i_change(ilist, itm->type, -loot);
+                if (*ilist == itm) {
+                    ilist = &itm->next;
                 }
             }
 
-            if (j > 0) {
-                item **ilist;
-                unit *u =
-                    create_unit(r, mage->faction, 0, get_race(RC_UNDEAD), 0, unit_getname(du),
-                    du);
-
-                /* new units gets some stats from old unit */
-
-                if (du->display) {
-                    unit_setinfo(u, du->display);
-                }
-                else {
-                    unit_setinfo(u, NULL);
-                }
-                setstatus(u, du->status);
-                setguard(u, false);
-                for (ilist = &du->items; *ilist;) {
-                    item *itm = *ilist;
-                    int loot = itm->number * j / du->number;
-                    if (loot != itm->number) {
-                        int split = itm->number * j % du->number;
-                        if (split > 0 && (rng_int() % du->number) < split) {
-                            ++loot;
-                        }
-                    }
-                    i_change(&u->items, itm->type, loot);
-                    i_change(ilist, itm->type, -loot);
-                    if (*ilist == itm) {
-                        ilist = &itm->next;
-                    }
-                }
-
-                /* inherit stealth from magician */
-                if (mage->flags & UFL_ANON_FACTION) {
-                    u->flags |= UFL_ANON_FACTION;
-                }
-
-                /* transfer dead people to new unit, set hitpoints to those of old unit */
-                transfermen(du, u, j);
-                u->hp = u->number * unit_max_hp(du);
-                assert(j <= df->side->casualties);
-                df->side->casualties -= j;
-                df->side->dead -= j;
-
-                /* counting total number of undead */
-                undead += j;
+            /* inherit stealth from magician */
+            if (mage->flags & UFL_ANON_FACTION) {
+                u->flags |= UFL_ANON_FACTION;
             }
+
+            /* transfer dead people to new unit, set hitpoints to those of old unit */
+            transfermen(du, u, j);
+            u->hp = u->number * unit_max_hp(du);
+            assert(j <= df->side->casualties);
+            df->side->casualties -= j;
+            df->side->dead -= j;
+
+            /* counting total number of undead */
+            undead += j;
         }
     }
     selist_free(fgs);

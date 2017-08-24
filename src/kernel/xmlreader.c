@@ -1320,6 +1320,12 @@ static void parse_ai(race * rc, xmlNodePtr node)
         rc->flags |= RCF_ATTACK_MOVED;
 }
 
+static void set_study_speed(race *rc, skill_t sk, int modifier){
+    if (!rc->study_speed)
+        rc->study_speed = calloc(1, MAXSKILLS);
+    rc->study_speed[sk] = (char)modifier;
+}
+
 static int parse_races(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
@@ -1338,6 +1344,7 @@ static int parse_races(xmlDocPtr doc)
         xmlXPathObjectPtr result;
         int k, study_speed_base, attacks;
         struct att *attack;
+        skill_t sk;
 
         propValue = xmlGetProp(node, BAD_CAST "name");
         assert(propValue != NULL);
@@ -1362,6 +1369,11 @@ static int parse_races(xmlDocPtr doc)
         rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
         rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
         study_speed_base = xml_ivalue(node, "studyspeed", 0);
+        if (study_speed_base != 0) {
+          for (sk = 0; sk < MAXSKILLS; ++sk) {
+            set_study_speed(rc, sk, study_speed_base);
+          }
+        }
 
         rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
         rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
@@ -1423,14 +1435,12 @@ static int parse_races(xmlDocPtr doc)
         if (xml_bvalue(node, "irongolem", false))
             rc->flags |= RCF_IRONGOLEM;
 
-        if (xml_bvalue(node, "keepitem", false))
-            rc->ec_flags |= ECF_KEEP_ITEM;
         if (xml_bvalue(node, "giveperson", false))
-            rc->ec_flags |= GIVEPERSON;
+            rc->ec_flags |= ECF_GIVEPERSON;
         if (xml_bvalue(node, "giveunit", false))
-            rc->ec_flags |= GIVEUNIT;
+            rc->ec_flags |= ECF_GIVEUNIT;
         if (xml_bvalue(node, "getitem", false))
-            rc->ec_flags |= GETITEM;
+            rc->ec_flags |= ECF_GETITEM;
         if (xml_bvalue(node, "recruitethereal", false))
             rc->ec_flags |= ECF_REC_ETHEREAL;
         if (xml_bvalue(node, "recruitunlimited", false))
@@ -1473,7 +1483,6 @@ static int parse_races(xmlDocPtr doc)
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             int mod = xml_ivalue(node, "modifier", 0);
             int speed = xml_ivalue(node, "speed", study_speed_base);
-            skill_t sk;
 
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
@@ -1481,9 +1490,7 @@ static int parse_races(xmlDocPtr doc)
             if (sk != NOSKILL) {
                 rc->bonus[sk] = (char)mod;
                 if (speed) {
-                    if (!rc->study_speed)
-                        rc->study_speed = calloc(1, MAXSKILLS);
-                    rc->study_speed[sk] = (char)speed;
+                    set_study_speed(rc, sk, speed);
                 }
             }
             else {

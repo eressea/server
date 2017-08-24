@@ -40,10 +40,6 @@ void renumber_factions(void)
         if (!a)
             continue;
         want = a->data.i;
-        if (fval(f, FFL_NEWID)) {
-            ADDMSG(&f->msgs, msg_message("renumber_twice", "id", want));
-            continue;
-        }
         if (!faction_id_is_unused(want)) {
             a_remove(&f->attribs, a);
             ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));

@@ -29,6 +29,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "travelthru.h"
 
+#include <spells/regioncurse.h>
+#include <spells/buildingcurse.h>
+
 /* modules includes */
 #include <modules/score.h>
 
@@ -997,7 +1000,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     }
 
     /* iron & stone */
-    if (r->seen.mode == seen_unit) {
+    if (r->seen.mode >= seen_unit) {
         resource_report result[MAX_RAWMATERIALS];
         int n, numresults = report_resources(r, result, MAX_RAWMATERIALS, f, true);
 
@@ -1184,8 +1187,8 @@ void report_region(struct stream *out, const region * r, faction * f)
     *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 
-    if (r->seen.mode == seen_unit && is_astral(r) &&
-        !is_cursed(r->attribs, C_ASTRALBLOCK, 0)) {
+    if (r->seen.mode >= seen_unit && is_astral(r) &&
+        !is_cursed(r->attribs, &ct_astralblock)) {
         /* Sonderbehandlung Teleport-Ebene */
         region_list *rl = astralregions(r, inhabitable);
         region_list *rl2;
@@ -1390,7 +1393,6 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     char buf[8192], *bufp;
     size_t size;
     int bytes;
-    const curse_type *nocost_ct = ct_find("nocostbuilding");
 
     if (F == NULL) {
         perror(filename);
@@ -1459,7 +1461,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     WARN_STATIC_BUFFER();
                 if (u->building && building_owner(u->building) == u) {
                     building *b = u->building;
-                    if (!curse_active(get_curse(b->attribs, nocost_ct))) {
+                    if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
                         int cost = buildingmaintenance(b, rsilver);
                         if (cost > 0) {
                             bytes = (int)strlcpy(bufp, ",U", size);
@@ -2272,7 +2274,7 @@ report_plaintext(const char *filename, report_context * ctx,
             continue;
         /* Beschreibung */
 
-        if (r->seen.mode == seen_unit) {
+        if (r->seen.mode >= seen_unit) {
             anyunits = 1;
             newline(out);
             report_region(out, r, f);
@@ -2305,24 +2307,13 @@ report_plaintext(const char *filename, report_context * ctx,
             report_travelthru(out, r, f);
         }
         else {
-            if (r->seen.mode == seen_far) {
-                newline(out);
-                report_region(out, r, f);
-                newline(out);
-                guards(out, r, f);
-                newline(out);
-                report_travelthru(out, r, f);
-            }
-            else {
-                newline(out);
-                report_region(out, r, f);
-                newline(out);
-                report_travelthru(out, r, f);
-            }
+            report_region(out, r, f);
+            newline(out);
+            report_travelthru(out, r, f);
         }
         /* Statistik */
 
-        if (wants_stats && r->seen.mode == seen_unit)
+        if (wants_stats && r->seen.mode >= seen_unit)
             statistics(out, r, f);
 
         /* Nachrichten an REGION in der Region */

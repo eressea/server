@@ -35,6 +35,7 @@
         "rules.guard.guard_number_stop_prob": 0.001,
         "rules.guard.castle_stop_prob": 0.05,
         "rules.guard.region_type_stop_prob": 0.05,
-        "rules.economy.repopulate_maximum": 500
+        "rules.economy.repopulate_maximum": 500,
+        "rules.lighthouse.unit_capacity": true
     }
 }

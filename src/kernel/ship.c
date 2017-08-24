@@ -20,6 +20,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "ship.h"
 
+#include <attributes/movement.h>
+#include <spells/shipcurse.h>
+
 /* kernel includes */
 #include "build.h"
 #include "curse.h"
@@ -40,9 +43,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
-
-#include <attributes/movement.h>
-#include <spells/shipcurse.h>
 
 #include <storage.h>
 #include <selist.h>
@@ -332,10 +332,10 @@ int shipspeed(const ship * sh, const unit * u)
         return 0;
 
     if (sh->attribs) {
-        if (curse_active(get_curse(sh->attribs, ct_find("stormwind")))) {
+        if (curse_active(get_curse(sh->attribs, &ct_stormwind))) {
             k *= 2;
         }
-        if (curse_active(get_curse(sh->attribs, ct_find("nodrift")))) {
+        if (curse_active(get_curse(sh->attribs, &ct_nodrift))) {
             k += 1;
         }
     }

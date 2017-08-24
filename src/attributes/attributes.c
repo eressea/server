@@ -56,9 +56,98 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/gamedata.h>
+#include <util/resolve.h>
 
 #include <storage.h>
+#include <stdlib.h>
 
+typedef struct obs_data {
+    faction *f;
+    int skill;
+    int timer;
+} obs_data;
+
+static void obs_init(struct attrib *a)
+{
+    a->data.v = malloc(sizeof(obs_data));
+}
+
+static void obs_done(struct attrib *a)
+{
+    free(a->data.v);
+}
+
+static int obs_age(struct attrib *a, void *owner)
+{
+    obs_data *od = (obs_data *)a->data.v;
+    update_interval(od->f, (region *)owner);
+    return --od->timer;
+}
+
+static void obs_write(const struct attrib *a, const void *owner, struct storage *store)
+{
+    obs_data *od = (obs_data *)a->data.v;
+    write_faction_reference(od->f, store);
+    WRITE_INT(store, od->skill);
+    WRITE_INT(store, od->timer);
+}
+
+static int obs_read(struct attrib *a, void *owner, struct gamedata *data)
+{
+    obs_data *od = (obs_data *)a->data.v;
+
+    read_reference(&od->f, data, read_faction_reference, resolve_faction);
+    READ_INT(data->store, &od->skill);
+    READ_INT(data->store, &od->timer);
+    return AT_READ_OK;
+}
+
+attrib_type at_observer = { "observer", obs_init, obs_done, obs_age, obs_write, obs_read };
+
+static attrib *make_observer(faction *f, int perception)
+{
+    attrib * a = a_new(&at_observer);
+    obs_data *od = (obs_data *)a->data.v;
+    od->f = f;
+    od->skill = perception;
+    od->timer = 2;
+    return a;
+}
+
+int get_observer(region *r, faction *f) {
+    if (fval(r, RF_OBSERVER)) {
+        attrib *a = a_find(r->attribs, &at_observer);
+        while (a && a->type == &at_observer) {
+            obs_data *od = (obs_data *)a->data.v;
+            if (od->f == f) {
+                return od->skill;
+            }
+            a = a->next;
+        }
+    }
+    return -1;
+}
+
+void set_observer(region *r, faction *f, int skill, int turns)
+{
+    update_interval(f, r);
+    if (fval(r, RF_OBSERVER)) {
+        attrib *a = a_find(r->attribs, &at_observer);
+        while (a && a->type == &at_observer) {
+            obs_data *od = (obs_data *)a->data.v;
+            if (od->f == f && od->skill < skill) {
+                od->skill = skill;
+                od->timer = turns;
+                return;
+            }
+            a = a->nexttype;
+        }
+    }
+    else {
+        fset(r, RF_OBSERVER);
+    }
+    a_add(&r->attribs, make_observer(f, skill));
+}
 
 attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
@@ -123,6 +212,7 @@ void register_attributes(void)
     at_register(&at_stealth);
     at_register(&at_dict);
     at_register(&at_unitdissolve);
+    at_register(&at_observer);
     at_register(&at_overrideroads);
     at_register(&at_raceprefix);
     at_register(&at_iceberg);

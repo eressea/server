@@ -991,3 +991,20 @@ function test_bug2187()
       
   set_rule("rules.food.flags", "4")
 end
+
+
+function test_give_to_other_fails()
+    -- E3: cannot give a person to another faction
+    local r = region.create(0, 0, "plain")
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
+
+    local u1 = unit.create(f1, r, 2, "human")
+    local u2 = unit.create(f2, r, 1, "human")
+    -- u2:add_order("HELFE " .. itoa36(f1.id) .. " GIB")
+    u2:add_order("KONTAKTIERE " .. itoa36(u1.id))
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 PERSON")
+    process_orders()
+    assert_equal(2, u1.number)
+    assert_equal(1, u2.number)
+end

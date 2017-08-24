@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 
 /* attributes includes */
+#include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <triggers/timeout.h>
 
@@ -131,8 +132,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
     i = getid();
     u = findunitg(i, NULL);
 
-    if (u && u_race(u) == get_race(RC_SPELL))
-        return NULL;
     if (u && u->faction == f) {
         order **ordp;
 
@@ -848,7 +847,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
-    if (u->hp == 0 && u_race(u)!= get_race(RC_SPELL)) {
+    if (u->hp == 0 && data->version < NORCSPELL_VERSION) {
         log_error("unit %s has 0 hitpoints, adjusting.", itoa36(u->no));
         ((unit *)u)->hp = u->number;
     }
@@ -1618,6 +1617,7 @@ int read_game(gamedata *data) {
     int rmax = maxregions;
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    const struct race *rc_spell = rc_find("spell");
 
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
@@ -1702,19 +1702,25 @@ int read_game(gamedata *data) {
         while (--p >= 0) {
             unit *u = read_unit(data);
 
-            if (data->version < JSON_REPORT_VERSION) {
-                if (u->_name && fval(u->faction, FFL_NPC)) {
-                    if (!u->_name[0] || unit_name_equals_race(u)) {
-                        unit_setname(u, NULL);
+            if (data->version < NORCSPELL_VERSION && u_race(u) == rc_spell) {
+                set_observer(r, u->faction, get_level(u, SK_PERCEPTION), u->age);
+                u_setfaction(u, NULL);
+                free_unit(u);
+            }
+            else {
+                if (data->version < JSON_REPORT_VERSION) {
+                    if (u->_name && fval(u->faction, FFL_NPC)) {
+                        if (!u->_name[0] || unit_name_equals_race(u)) {
+                            unit_setname(u, NULL);
+                        }
                     }
                 }
+                assert(u->region == NULL);
+                u->region = r;
+                *up = u;
+                up = &u->next;
+                update_interval(u->faction, r);
             }
-            assert(u->region == NULL);
-            u->region = r;
-            *up = u;
-            up = &u->next;
-
-            update_interval(u->faction, r);
         }
         --rmax;
     }

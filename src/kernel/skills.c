@@ -153,6 +153,7 @@ int rc_skillmod(const struct race *rc, const region * r, skill_t sk)
 
 int level_days(int level)
 {
+  /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
     return 30 * ((level + 1) * level / 2);
 }
 
@@ -200,6 +201,19 @@ int skill_weeks(int level)
         return heads;
     }
     return level + 1;
+}
+
+void increase_skill(unit * u, skill_t sk, unsigned int weeks)
+{
+    skill *sv = unit_skill(u, sk);
+    if (!sv) {
+        sv = add_skill(u, sk);
+    }
+    while (sv->weeks <= (int) weeks) {
+        weeks -= sv->weeks;
+        sk_set(sv, sv->level + 1);
+    }
+    sv->weeks -= weeks;
 }
 
 void reduce_skill(unit * u, skill * sv, unsigned int weeks)
