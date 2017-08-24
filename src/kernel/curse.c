@@ -478,7 +478,7 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target,
 /* ------------------------------------------------------------- */
 /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
  * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
-int get_cursedmen(unit * u, const curse * c)
+int get_cursedmen(const unit * u, const curse * c)
 {
     int cursedmen = u->number;
 
@@ -581,28 +581,23 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
         if (ct->mergeflags & M_DURATION) {
             c->duration = MAX(c->duration, duration);
         }
-        if (ct->mergeflags & M_SUMDURATION) {
+        else if (ct->mergeflags & M_SUMDURATION) {
             c->duration += duration;
-        }
-        if (ct->mergeflags & M_SUMEFFECT) {
-            c->effect += effect;
         }
         if (ct->mergeflags & M_MAXEFFECT) {
             c->effect = MAX(c->effect, effect);
         }
+        else if (ct->mergeflags & M_SUMEFFECT) {
+            c->effect += effect;
+        }
         if (ct->mergeflags & M_VIGOUR) {
             c->vigour = MAX(vigour, c->vigour);
         }
-        if (ct->mergeflags & M_VIGOUR_ADD) {
+        else if (ct->mergeflags & M_VIGOUR_ADD) {
             c->vigour = vigour + c->vigour;
         }
-        if (ct->mergeflags & M_MEN) {
-            switch (ct->typ) {
-            case CURSETYP_UNIT:
-            {
-                c->data.i += men;
-            }
-            }
+        if (ct->mergeflags & M_MEN && ct->typ == CURSETYP_UNIT) {
+            c->data.i += men;
         }
         set_curseingmagician(magician, *ap, ct);
     }
@@ -616,7 +611,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
 /* hier müssen alle c-typen, die auf Einheiten gezaubert werden können,
  * berücksichtigt werden */
 
-static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
+static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
 {
     int cursedmen = 0;
     int men = get_cursedmen(u, c);
@@ -663,7 +658,7 @@ static void do_transfer_curse(curse * c, unit * u, unit * u2, int n)
     }
 }
 
-void transfer_curse(unit * u, unit * u2, int n)
+void transfer_curse(const unit * u, unit * u2, int n)
 {
     attrib *a;
 

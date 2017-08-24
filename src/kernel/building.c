@@ -310,6 +310,7 @@ static const int watch_bonus[3] = { 0, 1, 2 };
 
 int building_protection(const building_type * btype, int stage)
 {
+    assert(btype->flags & BTF_FORTIFICATION);
     if (btype->maxsize < 0) {
         return castle_bonus[MIN(stage, 5)];
     }
@@ -704,7 +705,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
         if (r->attribs && rule_blessed_harvest() == HARVEST_WORK) {
             /* E1 rules */
-            wage += curse_geteffect(get_curse(r->attribs, &ct_blessedharvest));
+            wage += harvest_effect(r);
         }
     }
 

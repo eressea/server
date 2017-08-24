@@ -258,15 +258,14 @@ message * msg_error(const unit * u, struct order *ord, int mno) {
     return msg_feedback(u, ord, msgname, "");
 }
 
-message * cmistake(const unit * u, struct order *ord, int mno, int mtype)
+void cmistake(const unit * u, struct order *ord, int mno, int mtype)
 {
-    message * result;
+    message * msg;
     UNUSED_ARG(mtype);
-    result = msg_error(u, ord, mno);
-    if (result) {
-        ADDMSG(&u->faction->msgs, result);
+    msg = msg_error(u, ord, mno);
+    if (msg) {
+        ADDMSG(&u->faction->msgs, msg);
     }
-    return result;
 }
 
 void syntax_error(const struct unit *u, struct order *ord)

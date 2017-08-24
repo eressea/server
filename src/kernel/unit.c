@@ -216,7 +216,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
                 buddy *nf, **fr = &friends;
 
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
                     while (*fr && (*fr)->faction->no < u2->faction->no)
                         fr = &(*fr)->next;
                     nf = *fr;
@@ -227,13 +227,6 @@ static buddy *get_friends(const unit * u, int *numfriends)
                         nf->unit = u2;
                         nf->number = 0;
                         *fr = nf;
-                    }
-                    else if (nf->faction == u2->faction
-                        && !(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
-                        /* we don't like to gift it to units that won't give it back */
-                        if ((u_race(nf->unit)->ec_flags & ECF_KEEP_ITEM)) {
-                            nf->unit = u2;
-                        }
                     }
                     nf->number += u2->number;
                     number += u2->number;
@@ -272,8 +265,6 @@ int gift_items(unit * u, int flags)
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
-    if ((u_race(u)->ec_flags & ECF_KEEP_ITEM))
-        return 0;
 
     /* at first, I should try giving my crap to my own units in this region */
     if (u->faction && (u->faction->flags & FFL_QUIT) == 0 && (flags & GIFT_SELF)) {
@@ -281,16 +272,10 @@ int gift_items(unit * u, int flags)
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2 != u && u2->faction == u->faction && u2->number > 0) {
                 /* some units won't take stuff: */
-                if (u_race(u2)->ec_flags & GETITEM) {
-                    /* we don't like to gift it to units that won't give it back */
-                    if (!(u_race(u2)->ec_flags & ECF_KEEP_ITEM)) {
-                        i_merge(&u2->items, &u->items);
-                        u->items = NULL;
-                        break;
-                    }
-                    else {
-                        u3 = u2;
-                    }
+                if (u_race(u2)->ec_flags & ECF_GETITEM) {
+                    i_merge(&u2->items, &u->items);
+                    u->items = NULL;
+                    break;
                 }
             }
         }
@@ -983,10 +968,9 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void transfermen(unit * u, unit * dst, int n)
+void clone_men(const unit * u, unit * dst, int n)
 {
     const attrib *a;
-    int hp = u->hp;
     region *r = u->region;
 
     if (n == 0)
@@ -1075,12 +1059,9 @@ void transfermen(unit * u, unit * dst, int n)
         if (u->attribs) {
             transfer_curse(u, dst, n);
         }
-    }
-    scale_number(u, u->number - n);
-    if (dst) {
         set_number(dst, dst->number + n);
-        hp -= u->hp;
-        dst->hp += hp;
+        dst->hp += u->hp * dst->number / u->number;
+        assert(dst->hp >= dst->number);
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
         a = a_find(dst->attribs, &at_effect);
         while (a && a->type == &at_effect) {
@@ -1100,6 +1081,12 @@ void transfermen(unit * u, unit * dst, int n)
             rsetpeasants(r, p);
         }
     }
+}
+
+void transfermen(unit * u, unit * dst, int n)
+{
+    clone_men(u, dst, n);
+    scale_number(u, u->number - n);
 }
 
 struct building *inside_building(const struct unit *u)
@@ -1394,6 +1381,7 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
+    assert(!u->region);
     free(u->_name);
     free(u->display);
     free_order(u->thisorder);
@@ -1519,7 +1507,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
     /* u->race muss bereits gesetzt sein, wird fuer default-hp gebraucht */
     /* u->region auch */
-    u->hp = unit_max_hp(u) * number;
+    if (number > 0) {
+        u->hp = unit_max_hp(u) * number;
+    }
 
     if (dname) {
         u->_name = strdup(dname);
@@ -1879,8 +1869,7 @@ void remove_empty_units_in_region(region * r)
                 set_number(u, 0);
             }
         }
-        if ((u->number == 0 && u_race(u) != get_race(RC_SPELL)) || (u->age <= 0
-            && u_race(u) == get_race(RC_SPELL))) {
+        if (u->number == 0) {
             remove_unit(up, u);
         }
         if (*up == u)

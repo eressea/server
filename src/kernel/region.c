@@ -586,7 +586,7 @@ int rroad(const region * r, direction_t d)
 bool r_isforest(const region * r)
 {
     if (fval(r->terrain, FOREST_REGION)) {
-        /* needs to be covered with at leas 48% trees */
+        /* needs to be covered with at least 48% trees */
         int mincover = (int)(r->terrain->size * 0.48);
         int trees = rtrees(r, 2) + rtrees(r, 1);
         return (trees * TREESIZE >= mincover);
@@ -919,6 +919,7 @@ void free_region(region * r)
     while (r->units) {
         unit *u = r->units;
         r->units = u->next;
+        u->region = NULL;
         uunhash(u);
         free_unit(u);
         free(u);

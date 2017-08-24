@@ -25,6 +25,8 @@ extern "C" {
     struct curse_type;
     struct region;
     struct unit;
+    struct faction;
+    struct region;
     struct message;
 
     extern const struct curse_type ct_magicresistance;

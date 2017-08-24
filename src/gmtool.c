@@ -903,6 +903,7 @@ static void seed_player(state *st, const newfaction *player) {
         }
     }
 }
+
 static void handlekey(state * st, int c)
 {
     window *wnd;

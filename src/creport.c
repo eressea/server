@@ -1420,7 +1420,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
         cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(r, f, r->seen.mode, F);
-        if (r->seen.mode == seen_unit && is_astral(r)
+        if (r->seen.mode >= seen_unit && is_astral(r)
             && !is_cursed(r->attribs, &ct_astralblock)) {
             /* Sonderbehandlung Teleport-Ebene */
             region_list *rl = astralregions(r, inhabitable);
@@ -1443,7 +1443,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
 
         cr_output_travelthru(F, r, f);
-        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
+        if (r->seen.mode >= seen_travel) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {

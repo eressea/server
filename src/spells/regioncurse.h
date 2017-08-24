@@ -17,6 +17,7 @@
 extern "C" {
 #endif
 
+    struct region;
     struct curse_type;
 
     extern const struct curse_type ct_peacezone;
@@ -38,6 +39,7 @@ extern "C" {
     extern const struct curse_type ct_generous;
     extern const struct curse_type ct_badlearn;
 
+    int harvest_effect(const struct region *r);
     void register_regioncurse(void);
 
 #ifdef __cplusplus

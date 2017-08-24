@@ -36,7 +36,7 @@ static void setup_give(struct give *env) {
 
     assert(env->f1);
     rc = test_create_race(env->f1->race ? env->f1->race->_name : "humon");
-    rc->ec_flags |= GIVEPERSON;
+    rc->ec_flags |= ECF_GIVEPERSON;
 
     env->r = test_create_region(0, 0, ter);
     env->src = test_create_unit(env->f1, env->r);

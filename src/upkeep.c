@@ -38,11 +38,6 @@ int lifestyle(const unit * u)
     return need;
 }
 
-static bool help_money(const unit * u)
-{
-    return !(u_race(u)->ec_flags & ECF_KEEP_ITEM);
-}
-
 static void help_feed(unit * donor, unit * u, int *need_p)
 {
     int need = *need_p;
@@ -172,7 +167,7 @@ void get_food(region * r)
             unit *v;
 
             for (v = r->units; need && v; v = v->next) {
-                if (v->faction == u->faction && help_money(v)) {
+                if (v->faction == u->faction) {
                     int give = get_money(v) - lifestyle(v);
                     give = MIN(need, give);
                     if (give > 0) {
@@ -191,6 +186,7 @@ void get_food(region * r)
         int need = lifestyle(u);
         faction *f = u->faction;
 
+        assert(u->hp > 0);
         need -= MAX(0, get_money(u));
 
         if (need > 0) {
@@ -201,8 +197,7 @@ void get_food(region * r)
                 faction *owner = region_get_owner(r);
                 if (owner && owner != u->faction) {
                     for (v = r->units; v; v = v->next) {
-                        if (v->faction == owner && alliedunit(v, f, HELP_MONEY)
-                            && help_money(v)) {
+                        if (v->faction == owner && alliedunit(v, f, HELP_MONEY)) {
                             help_feed(v, u, &need);
                             break;
                         }
@@ -210,8 +205,7 @@ void get_food(region * r)
                 }
             }
             for (v = r->units; need && v; v = v->next) {
-                if (v->faction != f && alliedunit(v, f, HELP_MONEY)
-                    && help_money(v)) {
+                if (v->faction != f && alliedunit(v, f, HELP_MONEY)) {
                     help_feed(v, u, &need);
                 }
             }

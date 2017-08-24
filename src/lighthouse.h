@@ -29,14 +29,15 @@ extern "C" {
     struct faction;
     struct region;
     struct building;
+    struct unit;
     struct attrib;
 
     extern struct attrib_type at_lighthouse;
     /* leuchtturm */
     bool check_leuchtturm(struct region *r, struct faction *f);
-    void update_lighthouse(struct building *lh);
-    int lighthouse_range(const struct building *b,
-        const struct faction *f);
+    void update_lighthouse(struct building *b);
+    int lighthouse_range(const struct building *b, const struct faction *f,
+        const struct unit *u);
 
 
 #ifdef __cplusplus
