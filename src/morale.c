@@ -20,6 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "morale.h"
 
+#include <spells/regioncurse.h>
+
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/region.h>
@@ -53,7 +55,7 @@ void morale_update(region *r) {
             if (stability > MORALE_COOLDOWN && r->land->ownership->owner
                 && morale < MORALE_MAX) {
                 double ch = popularity();
-                if (is_cursed(r->attribs, C_GENEROUS, 0)) {
+                if (is_cursed(r->attribs, &ct_generous)) {
                     ch *= 1.2;            /* 20% improvement */
                 }
                 if (stability >= MORALE_AVERAGE * 2 || chance(ch)) {

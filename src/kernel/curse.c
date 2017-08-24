@@ -141,10 +141,11 @@ static int read_ccompat(const char *cursename, struct storage *store)
     struct compat {
         const char *name;
         const char *tokens;
-    } *seek, old_curses[] = { {
-            "disorientationzone", "" }, {
-                "shipdisorientation", "" }, {
-                    NULL, NULL } };
+    } *seek, old_curses[] = {
+        { "disorientationzone", "" },
+        { "shipdisorientation", "" },
+        { NULL, NULL }
+    };
     for (seek = old_curses; seek->name; ++seek) {
         if (strcmp(seek->tokens, cursename) == 0) {
             const char *p;
@@ -213,6 +214,12 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         assert(result == 0);
         return AT_READ_FAIL;
     }
+    if (data->version <= NOLANDITEM_VERSION) {
+        if ((c->type->flags & CURSE_NOAGE) && !(c_flags(c) & CURSE_NOAGE)) {
+            /* bugfix bug 2356 */
+            c_setflag(c, CURSE_NOAGE);
+        }
+    }
     if (data->version < EXPLICIT_CURSE_ISNEW_VERSION) {
         c_clearflag(c, CURSE_ISNEW);
     }
@@ -226,7 +233,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     if (c->type->typ == CURSETYP_REGION) {
         int rr =
             read_reference(&c->data.v, data, read_region_reference,
-            RESOLVE_REGION(data->version));
+                RESOLVE_REGION(data->version));
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }
@@ -278,27 +285,15 @@ attrib_type at_curse = {
 
 #define MAXCTHASH 128
 static selist *cursetypes[MAXCTHASH];
-static int ct_changes = 1;
-
-bool ct_changed(int *cache)
-{
-    assert(cache);
-    if (*cache != ct_changes) {
-        *cache = ct_changes;
-        return true;
-    }
-    return false;
-}
 
 void ct_register(const curse_type * ct)
 {
     unsigned int hash = tolower(ct->cname[0]) & 0xFF;
     selist **ctlp = cursetypes + hash;
 
-    assert(ct->age==NULL || (ct->flags&CURSE_NOAGE) == 0);
+    assert(ct->age == NULL || (ct->flags&CURSE_NOAGE) == 0);
     assert((ct->flags&CURSE_ISNEW) == 0);
     selist_set_insert(ctlp, (void *)ct, NULL);
-    ++ct_changes;
 }
 
 void ct_remove(const char *c)
@@ -314,7 +309,6 @@ void ct_remove(const char *c)
 
             if (strcmp(c, type->cname) == 0) {
                 selist_delete(&ctl, qi);
-                ++ct_changes;
                 break;
             }
         }
@@ -473,7 +467,7 @@ int curse_geteffect_int(const curse * c)
 /* ------------------------------------------------------------- */
 static void
 set_curseingmagician(struct unit *magician, struct attrib *ap_target,
-const curse_type * ct)
+    const curse_type * ct)
 {
     curse *c = get_curse(ap_target, ct);
     if (c) {
@@ -726,51 +720,6 @@ bool is_cursed_with(const attrib * ap, const curse * c)
 }
 
 /* ------------------------------------------------------------- */
-/* cursedata */
-/* ------------------------------------------------------------- */
-
-static const char *oldnames[MAXCURSE] = {
-    /* OBS: when removing curses, remember to update read_ccompat() */
-    "fogtrap",
-    "antimagiczone",
-    "farvision",
-    "gbdream",
-    "auraboost",
-    "maelstrom",
-    "blessedharvest",
-    "drought",
-    "badlearn",
-    "stormwind",
-    "flyingship",
-    "nodrift",
-    "depression",
-    "magicwalls",
-    "strongwall",
-    "astralblock",
-    "generous",
-    "peacezone",
-    "magicstreet",
-    "magicrunes",
-    "badmagicresistancezone",
-    "goodmagicresistancezone",
-    "slavery",
-    "calmmonster",
-    "oldrace",
-    "fumble",
-    "riotzone",
-    "godcursezone",
-    "speed",
-    "orcish",
-    "magicboost",
-    "insectfur"
-};
-
-const char *oldcursename(int id)
-{
-    return oldnames[id];
-}
-
-/* ------------------------------------------------------------- */
 message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
     int self)
 {
@@ -834,5 +783,4 @@ void curses_done(void) {
         selist_free(cursetypes[i]);
         cursetypes[i] = 0;
     }
-    ++ct_changes;
 }

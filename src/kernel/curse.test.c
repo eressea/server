@@ -159,24 +159,6 @@ static void test_write_flag(CuTest *tc) {
     cleanup_curse(&fix);
 }
 
-static void test_curse_cache(CuTest *tc)
-{
-    int cache = 0;
-    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
-    test_setup();
-    CuAssertIntEquals(tc, true, ct_changed(&cache));
-    CuAssertIntEquals(tc, false, ct_changed(&cache));
-    CuAssertPtrEquals(tc, NULL, (void *)ct_find(ct_dummy.cname));
-    ct_register(&ct_dummy);
-    CuAssertIntEquals(tc, true, ct_changed(&cache));
-    CuAssertPtrEquals(tc, (void *)&ct_dummy, (void *)ct_find(ct_dummy.cname));
-    ct_remove(ct_dummy.cname);
-    CuAssertIntEquals(tc, true, ct_changed(&cache));
-    CuAssertIntEquals(tc, false, ct_changed(&cache));
-    CuAssertPtrEquals(tc, NULL, (void *)ct_find(ct_dummy.cname));
-    test_cleanup();
-}
-
 static void test_curse_ids(CuTest *tc) {
     const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
     curse *c1, *c2;
@@ -218,7 +200,6 @@ CuSuite *get_curse_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_curse);
-    SUITE_ADD_TEST(suite, test_curse_cache);
     SUITE_ADD_TEST(suite, test_magicstreet);
     SUITE_ADD_TEST(suite, test_magicstreet_warning);
     SUITE_ADD_TEST(suite, test_good_dreams);

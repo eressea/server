@@ -42,6 +42,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "calendar.h"
 #include "guard.h"
 
+/* attributes includes */
+#include <attributes/racename.h>
+#include <attributes/raceprefix.h>
+#include <attributes/stealth.h>
+
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
+
 /* kernel includes */
 #include <kernel/alliance.h>
 #include <kernel/ally.h>
@@ -65,12 +74,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
 #include <kernel/unit.h>
-
-/* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/raceprefix.h>
-#include <attributes/stealth.h>
-#include <spells/buildingcurse.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -415,7 +418,7 @@ static void horses(region * r)
     maxhorses = MAX(0, maxhorses);
     horses = rhorses(r);
     if (horses > 0) {
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             rsethorses(r, (int)(horses * 0.9));
         }
         else if (maxhorses) {
@@ -568,7 +571,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             a_removeall(&r->attribs, &at_germs);
         }
 
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             rsettrees(r, 1, (int)(rtrees(r, 1) * 0.9));
             rsettrees(r, 2, (int)(rtrees(r, 2) * 0.9));
             return;
@@ -625,7 +628,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
     }
     else if (current_season == SEASON_SPRING) {
 
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0))
+        if (is_cursed(r->attribs, &ct_godcursezone))
             return;
 
         /* in at_germs merken uns die Zahl der Samen und Sprößlinge, die
@@ -2846,13 +2849,12 @@ static void age_stonecircle(building *b) {
     if (get_astralplane()) {
         region *rt = r_standard_to_astral(r);
         if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
-            const struct curse_type *ct_astralblock = ct_find("astralblock");
-            curse *c = get_curse(rt->attribs, ct_astralblock);
+            curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
                 int sk = effskill(mage, SK_MAGIC, 0);
                 float effect = 100;
                 /* the mage reactivates the circle */
-                c = create_curse(mage, &rt->attribs, ct_astralblock,
+                c = create_curse(mage, &rt->attribs, &ct_astralblock,
                     (float)MAX(1, sk), MAX(1, sk / 2), effect, 0);
                 ADDMSG(&r->msgs,
                     msg_message("astralshield_activate", "region unit", r, mage));
@@ -2909,11 +2911,13 @@ static void ageing(void)
                 change_effect(u, oldpotiontype[P_BERSERK], -1 * MIN(u->number, i));
             }
 
-            if (is_cursed(u->attribs, C_OLDRACE, 0)) {
-                curse *c = get_curse(u->attribs, ct_find("oldrace"));
-                if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
-                    u_setrace(u, get_race(curse_geteffect_int(c)));
-                    u->irace = NULL;
+            if (u->attribs) {
+                curse * c = get_curse(u->attribs, &ct_oldrace);
+                if (c && curse_active(c)) {
+                    if (c->duration == 1 && !(c_flags(c) & CURSE_NOAGE)) {
+                        u_setrace(u, get_race(curse_geteffect_int(c)));
+                        u->irace = NULL;
+                    }
                 }
             }
         }
@@ -3221,15 +3225,14 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
 void monthly_healing(void)
 {
     region *r;
-    const curse_type *heal_ct = ct_find("healingzone");
 
     for (r = regions; r; r = r->next) {
         unit *u;
         double healingcurse = 0;
 
-        if (r->attribs && heal_ct) {
+        if (r->attribs) {
             /* bonus zurücksetzen */
-            curse *c = get_curse(r->attribs, heal_ct);
+            curse *c = get_curse(r->attribs, &ct_healing);
             if (c != NULL) {
                 healingcurse = curse_geteffect(c);
             }
@@ -3775,7 +3778,7 @@ void process(void)
                                     }
                                     else if (u_race(u) == get_race(RC_INSECT)
                                         && r_insectstalled(r)
-                                        && !is_cursed(u->attribs, C_KAELTESCHUTZ, 0)) {
+                                        && !is_cursed(u->attribs, &ct_insectfur)) {
                                         ord = NULL;
                                     }
                                     else if (LongHunger(u)) {

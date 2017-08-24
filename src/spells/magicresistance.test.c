@@ -36,7 +36,7 @@ static void test_magicresistance_unit(CuTest *tc) {
     f2 = test_create_faction(NULL);
     u2 = test_create_unit(f2, r);
 
-    c = create_curse(u1, &u2->attribs, ct_find("magicresistance"), 10, 20, 30, u2->number);
+    c = create_curse(u1, &u2->attribs, &ct_magicresistance, 10, 20, 30, u2->number);
     CuAssertPtrNotNull(tc, u2->attribs);
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)u2->attribs->type);
     msg = c->type->curseinfo(u2, TYP_UNIT, c, 1);
@@ -62,7 +62,7 @@ static void test_magicresistance_building(CuTest *tc) {
 
     b1 = test_create_building(r, NULL);
 
-    c = create_curse(u1, &b1->attribs, ct_find("magicresistance"), 10, 20, 30, 0);
+    c = create_curse(u1, &b1->attribs, &ct_magicresistance, 10, 20, 30, 0);
     CuAssertPtrNotNull(tc, b1->attribs);
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)b1->attribs->type);
     msg = c->type->curseinfo(b1, TYP_BUILDING, c, 1);
