@@ -12,7 +12,9 @@
 #include <platform.h>
 #include "combatspells.h"
 
-/* kernel includes */
+#include <spells/buildingcurse.h>
+
+ /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -880,7 +882,7 @@ int sp_strong_wall(struct castorder * co)
     burg = mage->building;
 
     effect = power / 4;
-    create_curse(mage, &burg->attribs, ct_find("strongwall"), power, 1, effect, 0);
+    create_curse(mage, &burg->attribs, &ct_strongwall, power, 1, effect, 0);
 
     msg =
         msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);

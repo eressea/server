@@ -52,7 +52,7 @@ static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
     return msg_message("curseinfo::godcurse", "id", c->no);
 }
 
-static struct curse_type ct_godcursezone = {
+const struct curse_type ct_godcursezone = {
     "godcursezone",
     CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
     cinfo_cursed_by_the_gods,
@@ -78,7 +78,7 @@ static message *cinfo_dreamcurse(const void *obj, objtype_t typ, const curse * c
     }
 }
 
-static struct curse_type ct_gbdream = {
+const struct curse_type ct_gbdream = {
     "gbdream",
     CURSETYP_NORM, 0, (NO_MERGE), cinfo_dreamcurse
 };
@@ -103,7 +103,7 @@ static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * 
     return msg_message("curseinfo::magicstreetwarn", "id", c->no);
 }
 
-static struct curse_type ct_magicstreet = {
+const struct curse_type ct_magicstreet = {
     "magicstreet",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_magicstreet
@@ -154,7 +154,7 @@ const curse * c, int self)
     return self;
 }
 
-static struct curse_type ct_antimagiczone = {
+const struct curse_type ct_antimagiczone = {
     "antimagiczone",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
@@ -185,19 +185,19 @@ static struct curse_type ct_farvision = {
 
 /* --------------------------------------------------------------------- */
 
-static struct curse_type ct_fogtrap = {
+const struct curse_type ct_fogtrap = {
     "fogtrap",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
-static struct curse_type ct_maelstrom = {
+const struct curse_type ct_maelstrom = {
     "maelstrom",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
-static struct curse_type ct_blessedharvest = {
+const struct curse_type ct_blessedharvest = {
     "blessedharvest",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
@@ -219,41 +219,41 @@ int harvest_effect(const struct region *r) {
     return 0;
 }
 
-static struct curse_type ct_drought = {
+const struct curse_type ct_drought = {
     "drought",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
-static struct curse_type ct_badlearn = {
+const struct curse_type ct_badlearn = {
     "badlearn",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
 /*  Trübsal-Zauber */
-static struct curse_type ct_depression = {
+const struct curse_type ct_depression = {
     "depression",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
 
 /* Astralblock, auf Astralregion */
-static struct curse_type ct_astralblock = {
+const struct curse_type ct_astralblock = {
     "astralblock",
     CURSETYP_NORM, 0, NO_MERGE,
     cinfo_simple
 };
 
 /* Unterhaltungsanteil vermehren */
-static struct curse_type ct_generous = {
+const struct curse_type ct_generous = {
     "generous",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | M_MAXEFFECT),
     cinfo_simple
 };
 
 /* verhindert Attackiere regional */
-static struct curse_type ct_peacezone = {
+const struct curse_type ct_peacezone = {
     "peacezone",
     CURSETYP_NORM, 0, NO_MERGE,
     cinfo_simple
@@ -261,7 +261,7 @@ static struct curse_type ct_peacezone = {
 
 /*  erniedigt Magieresistenz von nicht-aliierten Einheiten, wirkt nur 1x
 *  pro Einheit */
-static struct curse_type ct_badmagicresistancezone = {
+const struct curse_type ct_badmagicresistancezone = {
     "badmagicresistancezone",
     CURSETYP_NORM, 0, NO_MERGE,
     cinfo_simple
@@ -269,25 +269,25 @@ static struct curse_type ct_badmagicresistancezone = {
 
 /* erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
 * Einheit */
-static struct curse_type ct_goodmagicresistancezone = {
+const struct curse_type ct_goodmagicresistancezone = {
     "goodmagicresistancezone",
     CURSETYP_NORM, 0, NO_MERGE,
     cinfo_simple
 };
 
-static struct curse_type ct_riotzone = {
+const struct curse_type ct_riotzone = {
     "riotzone",
     CURSETYP_NORM, 0, (M_DURATION),
     cinfo_simple
 };
 
-static struct curse_type ct_holyground = {
+const struct curse_type ct_holyground = {
     "holyground",
     CURSETYP_NORM, CURSE_NOAGE, (M_VIGOUR_ADD),
     cinfo_simple
 };
 
-static struct curse_type ct_healing = {
+const struct curse_type ct_healing = {
     "healingzone",
     CURSETYP_NORM, 0, (M_VIGOUR | M_DURATION),
     cinfo_simple

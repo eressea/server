@@ -34,6 +34,8 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 
+#include <spells/regioncurse.h>
+
 /* kernel includes */
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -904,13 +906,12 @@ void spawn_undead(void)
 {
     region *r;
     faction *monsters = get_monsters();
-    const curse_type *ctype = ct_find("holyground");
 
     for (r = regions; r; r = r->next) {
         int unburied = deathcount(r);
 
-        if (r->attribs && ctype) {
-            if (curse_active(get_curse(r->attribs, ctype))) {
+        if (r->attribs) {
+            if (curse_active(get_curse(r->attribs, &ct_holyground))) {
                 continue;
             }
         }

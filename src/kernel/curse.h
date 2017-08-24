@@ -285,7 +285,6 @@ extern "C" {
     struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
 
     const curse_type *ct_find(const char *c);
-    bool ct_changed(int *cache);
     void ct_register(const curse_type *);
     void ct_remove(const char *c);
     void ct_checknames(void);
@@ -304,14 +303,13 @@ extern "C" {
     bool curse_active(const struct curse *c);
 
     /*** COMPATIBILITY MACROS. DO NOT USE FOR NEW CODE, REPLACE IN OLD CODE: */
-    const char *oldcursename(int id);
     struct message *cinfo_simple(const void *obj, objtype_t typ,
         const struct curse *c, int self);
     int curse_cansee(const struct curse *c, const struct faction *viewer, objtype_t typ, const void *obj, int self);
-#define is_cursed(a, id, id2) \
-  (a && curse_active(get_curse(a, ct_find(oldcursename(id)))))
-#define get_curseeffect(a, id, id2) \
-  curse_geteffect(get_curse(a, ct_find(oldcursename(id))))
+#define is_cursed(a, ctype) \
+  (a && curse_active(get_curse(a, ctype)))
+#define get_curseeffect(a, ctype) \
+  curse_geteffect(get_curse(a, ctype))
 
     /* eressea-defined attribute-type flags */
 #define ATF_CURSE  ATF_USER_DEFINED

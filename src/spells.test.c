@@ -44,7 +44,7 @@ static void test_good_dreams(CuTest *tc) {
 
     level = sp_gooddreams(&co);
     CuAssertIntEquals(tc, 10, level);
-    curse = get_curse(r->attribs, ct_find("gbdream"));
+    curse = get_curse(r->attribs, &ct_gbdream);
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == 1);
 
@@ -101,7 +101,7 @@ static void test_bad_dreams(CuTest *tc) {
 
     level = sp_baddreams(&co);
     CuAssertIntEquals(tc, 10, level);
-    curse = get_curse(r->attribs, ct_find("gbdream"));
+    curse = get_curse(r->attribs, &ct_gbdream);
     CuAssertTrue(tc, curse && curse->duration > 1);
     CuAssertTrue(tc, curse->effect == -1);
 

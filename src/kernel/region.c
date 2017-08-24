@@ -37,6 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"
 #include "unit.h"
 
+#include <spells/regioncurse.h>
+
 /* util includes */
 #include <util/assert.h>
 #include <util/attrib.h>
@@ -157,7 +159,7 @@ void deathcounts(region * r, int fallen)
     if (fallen == 0)
         return;
     if (r->attribs) {
-        const curse_type *ctype = ct_find("holyground");
+        const curse_type *ctype = &ct_holyground;
         if (ctype && curse_active(get_curse(r->attribs, ctype)))
             return;
         a = a_find(r->attribs, &at_deathcount);
@@ -1242,8 +1244,9 @@ int production(const region * r)
 {
     /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
-    if (curse_active(get_curse(r->attribs, ct_find("drought"))))
+    if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;
+    }
 
     return p;
 }

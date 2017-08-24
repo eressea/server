@@ -28,6 +28,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "academy.h"
 
+#include <spells/regioncurse.h>
+
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -52,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+
 #include <selist.h>
 
 /* libc includes */
@@ -285,13 +288,11 @@ int teach_cmd(unit * teacher, struct order *ord)
     skill_t sk_academy = NOSKILL;
     int teaching, i, j, count, academy = 0;
 
-    if (teacher->region->attribs) {
-        const curse_type *gbdream_ct = ct_find("gbdream");
-        if (gbdream_ct) {
-            if (get_curse(teacher->region->attribs, gbdream_ct)) {
-                ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord, "gbdream_noteach", ""));
-                return 0;
-            }
+    if (r->attribs) {
+        if (get_curse(r->attribs, &ct_gbdream)) {
+            ADDMSG(&teacher->faction->msgs,
+                msg_feedback(teacher, ord, "gbdream_noteach", ""));
+            return 0;
         }
     }
     if ((u_race(teacher)->flags & RCF_NOTEACH) || fval(teacher, UFL_WERE)) {
@@ -768,7 +769,7 @@ int study_cmd(unit * u, order * ord)
         teach->value += u->number * EXPERIENCEDAYS;
     }
 
-    if (is_cursed(r->attribs, C_BADLEARN, 0)) {
+    if (is_cursed(r->attribs, &ct_badlearn)) {
         teach->value -= u->number * EXPERIENCEDAYS;
     }
 

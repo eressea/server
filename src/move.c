@@ -31,6 +31,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 #include "piracy.h"
 
+#include <spells/flyingship.h>
+#include <spells/unitcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/shipcurse.h>
+
+/* attributes includes */
+#include <attributes/follow.h>
+#include <attributes/movement.h>
+#include <attributes/stealth.h>
+#include <attributes/targetregion.h>
+
+/* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/build.h>
 #include <kernel/building.h>
@@ -48,8 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
-
-#include <spells/flyingship.h>
 
 #include "teleport.h"
 #include "direction.h"
@@ -70,12 +80,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 #include <storage.h>
-
-/* attributes includes */
-#include <attributes/follow.h>
-#include <attributes/movement.h>
-#include <attributes/stealth.h>
-#include <attributes/targetregion.h>
 
 /* libc includes */
 #include <math.h>
@@ -670,7 +674,7 @@ static bool is_freezing(const unit * u)
 {
     if (u_race(u) != get_race(RC_INSECT))
         return false;
-    if (is_cursed(u->attribs, C_KAELTESCHUTZ, 0))
+    if (is_cursed(u->attribs, &ct_insectfur))
         return false;
     return true;
 }
@@ -829,7 +833,7 @@ static void drifting_ships(region * r)
             }
 
             /* Schiff schon abgetrieben oder durch Zauber geschützt? */
-            if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+            if (!drift || fval(sh, SF_DRIFTED) || is_cursed(sh->attribs, &ct_nodrift)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1001,7 +1005,7 @@ bool move_blocked(const unit * u, const region * r, const region * r2)
     }
 
     if (r->attribs) {
-        const curse_type *fogtrap_ct = ct_find("fogtrap");
+        const curse_type *fogtrap_ct = &ct_fogtrap;
         curse *c = get_curse(r->attribs, fogtrap_ct);
         return curse_active(c);
     }
@@ -1253,7 +1257,7 @@ static bool roadto(const region * r, direction_t dir)
         return false;
     }
     if (r->attribs || r2->attribs) {
-        const curse_type *roads_ct = ct_find("magicstreet");
+        const curse_type *roads_ct = &ct_magicstreet;
         if (roads_ct != NULL) {
             if (get_curse(r->attribs, roads_ct) != NULL)
                 return true;
@@ -1415,13 +1419,10 @@ static int movement_speed(unit * u)
     }
 
     if (u->attribs) {
-        const curse_type *speed_ct = ct_find("speed");
-        if (speed_ct) {
-            curse *c = get_curse(u->attribs, speed_ct);
-            if (c != NULL) {
-                int men = get_cursedmen(u, c);
-                dk *= 1.0 + (double)men / (double)u->number;
-            }
+        curse *c = get_curse(u->attribs, &ct_speed);
+        if (c != NULL) {
+            int men = get_cursedmen(u, c);
+            dk *= 1.0 + (double)men / (double)u->number;
         }
     }
 
@@ -1580,7 +1581,7 @@ static const region_list *travel_route(unit * u,
 
         /* illusionary units disappear in antimagic zones */
         if (fval(u_race(u), RCF_ILLUSIONARY)) {
-            curse *c = get_curse(next->attribs, ct_find("antimagiczone"));
+            curse *c = get_curse(next->attribs, &ct_antimagiczone);
             if (curse_active(c)) {
                 curse_changevigour(&next->attribs, c, (float)-u->number);
                 ADDMSG(&u->faction->msgs, msg_message("illusionantimagic", "unit", u));
@@ -1803,7 +1804,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                 }
                 if (rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
-                    if (!is_cursed(sh->attribs, C_SHIP_NODRIFT, 0)) {
+                    if (!is_cursed(sh->attribs, &ct_nodrift)) {
                         region *rnext = NULL;
                         bool storm = true;
                         int d_offset = rng_int() % MAXDIRECTIONS;
@@ -1894,7 +1895,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                 break;
             }
 
-            if (curse_active(get_curse(next_point->attribs, ct_find("maelstrom")))) {
+            if (curse_active(get_curse(next_point->attribs, &ct_maelstrom))) {
                 if (do_maelstrom(next_point, u) == NULL)
                     break;
             }
@@ -1920,9 +1921,10 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         last_point = current_point;
         current_point = next_point;
 
-        if (!fval(current_point->terrain, SEA_REGION)
-            && !is_cursed(sh->attribs, C_SHIP_FLYING, 0))
+        if (!fval(next_point->terrain, SEA_REGION)
+            && !is_cursed(sh->attribs, &ct_flyingship)) {
             break;
+        }
         token = getstrtoken();
         error = movewhere(u, token, current_point, &next_point);
         if (error || next_point == NULL) {
@@ -1958,7 +1960,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
 
-        if (is_cursed(sh->attribs, C_SHIP_FLYING, 0)) {
+        if (is_cursed(sh->attribs, &ct_flyingship)) {
             ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
                 starting_point, current_point));
         }

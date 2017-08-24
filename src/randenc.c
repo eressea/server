@@ -27,6 +27,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "study.h"
 
+#include <spells/unitcurse.h>
+#include <spells/regioncurse.h>
+
+/* attributes includes */
+#include <attributes/racename.h>
+#include <attributes/reduceproduction.h>
+
 /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -43,10 +50,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
-
-/* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/reduceproduction.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -649,7 +652,7 @@ static void godcurse(void)
     region *r;
 
     for (r = regions; r; r = r->next) {
-        if (is_cursed(r->attribs, C_CURSED_BY_THE_GODS, 0)) {
+        if (is_cursed(r->attribs, &ct_godcursezone)) {
             unit *u;
             for (u = r->units; u; u = u->next) {
                 skill *sv = u->skills;
@@ -692,32 +695,28 @@ static void orc_growth(void)
         for (u = r->units; u; u = u->next) {
             if (u->attribs && !has_skill(u, SK_MAGIC) && !has_skill(u, SK_ALCHEMY)
                 && !fval(u, UFL_HERO)) {
-                const curse_type *ct_orcish = ct_find("orcish");
+                curse *c = get_curse(u->attribs, &ct_orcish);
+                if (c) {
+                    int n;
+                    int increase = 0;
+                    int num = get_cursedmen(u, c);
+                    double prob = curse_geteffect(c);
+                    const item_type * it_chastity = it_find("ao_chastity");
 
-                if (ct_orcish) {
-                    curse *c = get_curse(u->attribs, ct_orcish);
-                    if (c) {
-                        int n;
-                        int increase = 0;
-                        int num = get_cursedmen(u, c);
-                        double prob = curse_geteffect(c);
-                        const item_type * it_chastity = it_find("ao_chastity");
+                    if (it_chastity) {
+                        num -= i_get(u->items, it_chastity);
+                    }
+                    for (n = num; n > 0; n--) {
+                        if (chance(prob)) {
+                            ++increase;
+                        }
+                    }
+                    if (increase) {
+                        unit *u2 = create_unit(r, u->faction, increase, u_race(u), 0, NULL, u);
+                        transfermen(u2, u, u2->number);
 
-                        if (it_chastity) {
-                            num -= i_get(u->items, it_chastity);
-                        }
-                        for (n = num; n > 0; n--) {
-                            if (chance(prob)) {
-                                ++increase;
-                            }
-                        }
-                        if (increase) {
-                            unit *u2 = create_unit(r, u->faction, increase, u_race(u), 0, NULL, u);
-                            transfermen(u2, u, u2->number);
-
-                            ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
-                                "unit amount race", u, increase, u_race(u)));
-                        }
+                        ADDMSG(&u->faction->msgs, msg_message("orcgrowth",
+                            "unit amount race", u, increase, u_race(u)));
                     }
                 }
             }

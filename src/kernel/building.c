@@ -21,6 +21,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "building.h"
 
+#include <attributes/reduceproduction.h>
+#include <spells/regioncurse.h>
+
 /* kernel includes */
 #include "curse.h"
 #include "item.h"
@@ -53,10 +56,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-
-/* attributes includes */
-#include <spells/regioncurse.h>
-#include <attributes/reduceproduction.h>
 
 typedef struct building_typelist {
     struct building_typelist *next;
@@ -681,12 +680,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
     double wage;
-    static int ct_cache;
-    static const struct curse_type *drought_ct;
 
-    if (ct_changed(&ct_cache)) {
-        drought_ct = ct_find("drought");
-    }
     if (b != NULL) {
         /* TODO: this reveals imaginary castles */
         esize = buildingeffsize(b, false);
@@ -717,18 +711,18 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 
     if (r->attribs) {
         attrib *a;
-        const struct curse_type *ctype;
+        curse *c;
+
         /* Godcurse: Income -10 */
-        ctype = ct_find("godcursezone");
-        if (ctype && curse_active(get_curse(r->attribs, ctype))) {
+        c = get_curse(r->attribs, &ct_godcursezone);
+        if (c && curse_active(c)) {
             wage = MAX(0, wage - 10);
         }
 
         /* Bei einer D�rre verdient man nur noch ein Viertel  */
-        if (drought_ct) {
-            curse *c = get_curse(r->attribs, drought_ct);
-            if (curse_active(c))
-                wage /= curse_geteffect(c);
+        c = get_curse(r->attribs, &ct_drought);
+        if (c && curse_active(c)) {
+            wage /= curse_geteffect(c);
         }
 
         a = a_find(r->attribs, &at_reduceproduction);
