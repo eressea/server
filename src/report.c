@@ -568,7 +568,7 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
         char buf[4096];
         message *msg = 0;
 
-        if (fval(a->type, ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
             self = curse_cansee(c, viewer, typ, obj, self);

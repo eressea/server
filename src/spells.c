@@ -144,7 +144,7 @@ static void magicanalyse_region(region * r, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
@@ -184,7 +184,7 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -225,7 +225,7 @@ static void magicanalyse_building(building * b, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -266,7 +266,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -308,7 +308,7 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
     while (*ap && force > 0) {
         curse *c1;
         attrib *a = *ap;
-        if (!fval(a->type, ATF_CURSE)) {
+        if (a->type != &at_curse) {
             do {
                 ap = &(*ap)->next;
             } while (*ap && a->type == (*ap)->type);
@@ -2970,7 +2970,7 @@ static int sp_deathcloud(castorder * co)
     unit *u;
 
     while (a) {
-        if ((a->type->flags & ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = a->data.v;
             if (c->type == &ct_deathcloud) {
                 report_failure(mage, co->order);
