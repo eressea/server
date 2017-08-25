@@ -3116,46 +3116,6 @@ static int sp_summonshadowlords(castorder * co)
     return cast_level;
 }
 
-static bool chaosgate_valid(const connection * b)
-{
-    const attrib *a = a_find(b->from->attribs, &at_direction);
-    if (!a)
-        a = a_find(b->to->attribs, &at_direction);
-    if (!a)
-        return false;
-    return true;
-}
-
-static struct region *chaosgate_move(const connection * b, struct unit *u,
-    struct region *from, struct region *to, bool routing)
-{
-    UNUSED_ARG(from);
-    UNUSED_ARG(b);
-    if (!routing) {
-        int maxhp = u->hp / 4;
-        if (maxhp < u->number)
-            maxhp = u->number;
-        u->hp = maxhp;
-    }
-    return to;
-}
-
-border_type bt_chaosgate = {
-    "chaosgate", VAR_NONE,
-    b_transparent,                /* transparent */
-    NULL,                         /* init */
-    NULL,                         /* destroy */
-    NULL,                         /* read */
-    NULL,                         /* write */
-    b_blocknone,                  /* block */
-    NULL,                         /* name */
-    b_rinvisible,                 /* rvisible */
-    b_finvisible,                 /* fvisible */
-    b_uinvisible,                 /* uvisible */
-    chaosgate_valid,
-    chaosgate_move
-};
-
 /* ------------------------------------------------------------- */
 /* Name:       Chaossog
  * Stufe:      14
