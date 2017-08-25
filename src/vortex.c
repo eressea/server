@@ -26,6 +26,16 @@ typedef struct dir_lookup {
 
 static dir_lookup *dir_name_lookup;
 
+void free_special_directions(void)
+{
+    while (dir_name_lookup) {
+        dir_lookup *dl = dir_name_lookup;
+        dir_name_lookup = dl->next;
+        free(dl->name);
+        free(dl);
+    }
+}
+
 void register_special_direction(struct locale *lang, const char *name)
 {
     const char *token = locale_string(lang, name, false);

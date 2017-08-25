@@ -4,6 +4,7 @@
 #include "prefix.h"
 #include "reports.h"
 #include "calendar.h"
+#include "vortex.h"
 
 #include <kernel/config.h>
 #include <kernel/alliance.h>
@@ -209,6 +210,7 @@ static void test_reset(void) {
     default_locale = 0;
     calendar_cleanup();
     close_orders();
+    free_special_directions();
     free_locales();
     free_spells();
     free_buildingtypes();
