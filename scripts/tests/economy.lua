@@ -11,6 +11,23 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
 end
 
+function test_bug_2361_forget_magic()
+    -- https://bugs.eressea.de/view.php?id=2361
+    -- familiars cannot forget magic
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:clear_orders()
+    u:add_order("VERGESSE Magie")
+    u:set_skill('magic', 5)
+    u.race = 'unicorn'
+    process_orders()
+    assert_equal(5, u:get_skill('magic'))
+    u.race = 'human'
+    process_orders()
+    assert_equal(0, u:get_skill('magic'))
+end
+
 function test_mine_bonus()
     local r = region.create(0, 0, "mountain")
     r:set_resource("iron", 100)
