@@ -745,11 +745,17 @@ int rtrees(const region * r, int ageclass)
 
 int rsettrees(const region * r, int ageclass, int value)
 {
-    if (!r->land)
+    if (!r->land) {
         assert(value == 0);
+    }
     else {
         assert(value >= 0);
-        return r->land->trees[ageclass] = value;
+        if (value <= MAXTREES) {
+            return r->land->trees[ageclass] = value;
+        }
+        else {
+            r->land->trees[ageclass] = MAXTREES;
+        }
     }
     return 0;
 }
