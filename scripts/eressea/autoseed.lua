@@ -1,4 +1,4 @@
-if not config.autoseed then return nil end
+if not config.autoseed or config.autoseed==0 then return nil end
 local autoseed = {}
 
 -- minimum required resources in the 7-hex neighborhood:
