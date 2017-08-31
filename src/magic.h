@@ -38,6 +38,10 @@ extern "C" {
 #define IRONGOLEM_CRUMBLE   15  /* monatlich Chance zu zerfallen */
 #define STONEGOLEM_CRUMBLE  10  /* monatlich Chance zu zerfallen */
 
+    extern const char *magic_school[MAXMAGIETYP];
+    extern struct attrib_type at_familiar;
+    extern struct attrib_type at_familiarmage;
+
     /* ------------------------------------------------------------- */
     /* Spruchparameter
      * Wir suchen beim Parsen des Befehls erstmal nach lokalen Objekten,
@@ -81,11 +85,6 @@ extern "C" {
 
 #define TARGET_RESISTS (1<<0)
 #define TARGET_NOTFOUND (1<<1)
-
-    /* ------------------------------------------------------------- */
-    /* Magierichtungen */
-
-    extern const char *magic_school[MAXMAGIETYP];
 
     /* ------------------------------------------------------------- */
     /* Magier:
@@ -324,16 +323,15 @@ extern "C" {
 
     /* Sprüche in der struct region */
     /* (sind in curse) */
-    extern struct unit *get_familiar(const struct unit *u);
-    extern struct unit *get_familiar_mage(const struct unit *u);
-    extern struct unit *get_clone(const struct unit *u);
-    extern struct unit *get_clone_mage(const struct unit *u);
-    extern struct attrib_type at_familiar;
-    extern struct attrib_type at_familiarmage;
-    extern void remove_familiar(struct unit *mage);
-    extern bool create_newfamiliar(struct unit *mage, struct unit *familiar);
-    extern void create_newclone(struct unit *mage, struct unit *familiar);
-    extern struct unit *has_clone(struct unit *mage);
+    void set_familiar(struct unit * mage, struct unit * familiar);
+    struct unit *get_familiar(const struct unit *u);
+    struct unit *get_familiar_mage(const struct unit *u);
+    struct unit *get_clone(const struct unit *u);
+    struct unit *get_clone_mage(const struct unit *u);
+    void remove_familiar(struct unit *mage);
+    bool create_newfamiliar(struct unit *mage, struct unit *familiar);
+    void create_newclone(struct unit *mage, struct unit *familiar);
+    struct unit *has_clone(struct unit *mage);
 
     const char *spell_info(const struct spell *sp,
         const struct locale *lang);

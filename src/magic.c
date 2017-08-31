@@ -2140,16 +2140,6 @@ void free_castorders(castorder * co)
     return;
 }
 
-/* ------------------------------------------------------------- */
-/***
- ** at_familiarmage
- **/
-
-typedef struct familiar_data {
-    unit *mage;
-    unit *familiar;
-} famililar_data;
-
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
@@ -2182,7 +2172,7 @@ static int sm_familiar(const unit * u, const region * r, skill_t sk, int value)
     }
 }
 
-static void set_familiar(unit * mage, unit * familiar)
+void set_familiar(unit * mage, unit * familiar)
 {
     /* if the skill modifier for the mage does not yet exist, add it */
     attrib *a = a_find(mage->attribs, &at_skillmod);
@@ -2384,7 +2374,6 @@ static int read_clone(attrib * a, void *owner, struct gamedata *data)
 }
 
 /* mages */
-
 static int resolve_mage(variant data, void *addr)
 {
     unit *mage;
