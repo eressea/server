@@ -273,8 +273,7 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
-    NULL,
-    ATF_CURSE
+    NULL
 };
 
 /* ------------------------------------------------------------- */
@@ -363,7 +362,7 @@ void ct_checknames(void) {
 static bool cmp_curse(const attrib * a, const void *data)
 {
     const curse *c = (const curse *)data;
-    if (a->type->flags & ATF_CURSE) {
+    if (a->type == &at_curse) {
         if (!data || c == (curse *)a->data.v)
             return true;
     }
@@ -375,7 +374,7 @@ curse *get_curse(attrib * ap, const curse_type * ctype)
     attrib *a = ap;
     if (!ctype) return NULL;
     while (a) {
-        if (a->type->flags & ATF_CURSE) {
+        if (a->type == &at_curse) {
             const attrib_type *at = a->type;
             while (a && a->type == at) {
                 curse *c = (curse *)a->data.v;
@@ -710,7 +709,7 @@ bool is_cursed_with(const attrib * ap, const curse * c)
     const attrib *a = ap;
 
     while (a) {
-        if ((a->type->flags & ATF_CURSE) && (c == (const curse *)a->data.v)) {
+        if ((a->type == &at_curse) && (c == (const curse *)a->data.v)) {
             return true;
         }
         a = a->next;

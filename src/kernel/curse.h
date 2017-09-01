@@ -311,9 +311,6 @@ extern "C" {
 #define get_curseeffect(a, ctype) \
   curse_geteffect(get_curse(a, ctype))
 
-    /* eressea-defined attribute-type flags */
-#define ATF_CURSE  ATF_USER_DEFINED
-
 #ifdef __cplusplus
 }
 #endif

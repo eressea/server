@@ -329,8 +329,9 @@ sc_mage *get_mage(const unit * u)
 {
     if (has_skill(u, SK_MAGIC)) {
         attrib *a = a_find(u->attribs, &at_mage);
-        if (a)
-            return a->data.v;
+        if (a) {
+            return (sc_mage *)a->data.v;
+        }
     }
     return (sc_mage *)NULL;
 }

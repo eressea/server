@@ -254,7 +254,7 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
     }
 
     while (a) {
-        if (fval(a->type, ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
             message *msg;
 

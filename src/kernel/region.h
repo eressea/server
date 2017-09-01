@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
 #define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
+#define MAXTREES 100 * 1000 * 1000 /* bug 2360: some players are crazy */
 
     /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
        a hash-access each time a neighbour is needed, 6 extra pointers per hex */

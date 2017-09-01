@@ -78,10 +78,29 @@ static void test_region_getset_resource(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_trees(CuTest *tc) {
+    region *r;
+
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    rsettrees(r, 0, 1000);
+    rsettrees(r, 1, 2000);
+    rsettrees(r, 2, 3000);
+    CuAssertIntEquals(tc, 1000, rtrees(r, 0));
+    CuAssertIntEquals(tc, 2000, rtrees(r, 1));
+    CuAssertIntEquals(tc, 3000, rtrees(r, 2));
+    rsettrees(r, 0, MAXTREES);
+    CuAssertIntEquals(tc, MAXTREES, rtrees(r, 0));
+    rsettrees(r, 0, MAXTREES+100);
+    CuAssertIntEquals(tc, MAXTREES, rtrees(r, 0));
+    test_cleanup();
+}
+
 CuSuite *get_region_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_terraform);
+    SUITE_ADD_TEST(suite, test_trees);
     SUITE_ADD_TEST(suite, test_region_getset_resource);
     SUITE_ADD_TEST(suite, test_region_get_owner);
     return suite;

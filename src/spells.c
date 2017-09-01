@@ -144,7 +144,7 @@ static void magicanalyse_region(region * r, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
@@ -184,7 +184,7 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -225,7 +225,7 @@ static void magicanalyse_building(building * b, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -266,7 +266,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -308,7 +308,7 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
     while (*ap && force > 0) {
         curse *c1;
         attrib *a = *ap;
-        if (!fval(a->type, ATF_CURSE)) {
+        if (a->type != &at_curse) {
             do {
                 ap = &(*ap)->next;
             } while (*ap && a->type == (*ap)->type);
@@ -2970,7 +2970,7 @@ static int sp_deathcloud(castorder * co)
     unit *u;
 
     while (a) {
-        if ((a->type->flags & ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = a->data.v;
             if (c->type == &ct_deathcloud) {
                 report_failure(mage, co->order);
@@ -3115,46 +3115,6 @@ static int sp_summonshadowlords(castorder * co)
         mage, amount, u_race(u)));
     return cast_level;
 }
-
-static bool chaosgate_valid(const connection * b)
-{
-    const attrib *a = a_find(b->from->attribs, &at_direction);
-    if (!a)
-        a = a_find(b->to->attribs, &at_direction);
-    if (!a)
-        return false;
-    return true;
-}
-
-static struct region *chaosgate_move(const connection * b, struct unit *u,
-    struct region *from, struct region *to, bool routing)
-{
-    UNUSED_ARG(from);
-    UNUSED_ARG(b);
-    if (!routing) {
-        int maxhp = u->hp / 4;
-        if (maxhp < u->number)
-            maxhp = u->number;
-        u->hp = maxhp;
-    }
-    return to;
-}
-
-border_type bt_chaosgate = {
-    "chaosgate", VAR_NONE,
-    b_transparent,                /* transparent */
-    NULL,                         /* init */
-    NULL,                         /* destroy */
-    NULL,                         /* read */
-    NULL,                         /* write */
-    b_blocknone,                  /* block */
-    NULL,                         /* name */
-    b_rinvisible,                 /* rvisible */
-    b_finvisible,                 /* fvisible */
-    b_uinvisible,                 /* uvisible */
-    chaosgate_valid,
-    chaosgate_move
-};
 
 /* ------------------------------------------------------------- */
 /* Name:       Chaossog

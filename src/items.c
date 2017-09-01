@@ -145,7 +145,7 @@ struct order *ord)
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
-            if (!(a->type->flags & ATF_CURSE)) {
+            if (a->type != &at_curse) {
                 do {
                     ap = &(*ap)->next;
                 } while (*ap && a->type == (*ap)->type);
