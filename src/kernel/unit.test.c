@@ -618,6 +618,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_clone_men);
     SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
+    SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
