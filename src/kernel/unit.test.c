@@ -548,6 +548,27 @@ static void test_clone_men(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_transfermen(CuTest *tc) {
+    unit *u1, *u2;
+    region *r;
+    faction *f;
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 3500);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 3500);
+    CuAssertIntEquals(tc, 70000, u1->hp);
+    CuAssertIntEquals(tc, 70000, u2->hp);
+    transfermen(u1, u2, u1->number);
+    CuAssertIntEquals(tc, 7000, u2->number);
+    CuAssertIntEquals(tc, 140000, u2->hp);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertIntEquals(tc, 0, u1->hp);
+    test_cleanup();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -557,6 +578,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_clone_men);
+    SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
