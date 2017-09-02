@@ -74,9 +74,9 @@ struct order *ord)
             if (amount > MAXGAIN) {
                 amount = MAXGAIN;
             }
-            teach->value += amount * STUDYDAYS;
-            if (teach->value > MAXGAIN * STUDYDAYS) {
-                teach->value = MAXGAIN * STUDYDAYS;
+            teach->days += amount * STUDYDAYS;
+            if (teach->days > MAXGAIN * STUDYDAYS) {
+                teach->days = MAXGAIN * STUDYDAYS;
             }
             i_change(&u->items, itype, -amount);
             return 0;
