@@ -17,15 +17,18 @@ function test_bug_2361_forget_magic()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
+    local uf = unit.create(f, r, 1)
     u:clear_orders()
     u:add_order("VERGESSE Magie")
     u:set_skill('magic', 5)
-    u.race = 'unicorn'
-    process_orders()
-    assert_equal(5, u:get_skill('magic'))
-    u.race = 'human'
+    uf.race = 'unicorn'
+    uf:clear_orders()
+    uf:add_order("VERGESSE Magie")
+    uf:set_skill('magic', 5)
+    u.familiar = uf
     process_orders()
     assert_equal(0, u:get_skill('magic'))
+    assert_equal(5, uf:get_skill('magic'))
 end
 
 function test_mine_bonus()

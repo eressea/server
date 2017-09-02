@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
+#include "magic.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -51,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <triggers/timeout.h>
+#include <triggers/shock.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -1607,7 +1609,59 @@ ship *read_ship(struct gamedata *data)
 }
 
 
-int read_game(gamedata *data) {
+static void fix_familiars(void) {
+    region *r;
+    for (r = regions; r; r = r->next) {
+        unit * u;
+        for (u = r->units; u; u = u->next) {
+            if (u->_race != u->faction->race && (u->_race->flags & RCF_FAMILIAR)) {
+                /* unit is potentially a familiar */
+                attrib * a = a_find(u->attribs, &at_mage);
+                if (a) {
+                    /* unit is magical */
+                    attrib * am = a_find(u->attribs, &at_familiarmage);
+                    if (!am) {
+                        /* but it is not a familiar? */
+                        attrib * ae = a_find(u->attribs, &at_eventhandler);
+                        if (ae) {
+                            trigger **tlist;
+                            tlist = get_triggers(ae, "destroy");
+                            if (tlist) {
+                                trigger *t;
+                                unit *um = NULL;
+                                for (t = *tlist; t; t = t->next) {
+                                    if (t->type == &tt_shock) {
+                                        um = (unit *)t->data.v;
+                                        break;
+                                    }
+                                }
+                                if (um) {
+                                    attrib *af = a_find(um->attribs, &at_familiar);
+                                    log_error("%s seems to be a broken familiar of %s.",
+                                        unitname(u), unitname(um));
+                                    if (af) {
+                                        unit * uf = (unit *)af->data.v;
+                                        log_error("%s already has a familiar: %s.",
+                                            unitname(um), unitname(uf));
+                                    }
+                                    else {
+                                        set_familiar(um, u);
+                                    }
+                                }
+                                else {
+                                    log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+int read_game(gamedata *data)
+{
     int p, nread;
     faction *f, **fp;
     region *r;
@@ -1783,6 +1837,11 @@ int read_game(gamedata *data) {
             }
         }
     }
+
+    if (data->version < FAMILIAR_FIX_VERSION) {
+        fix_familiars();
+    }
+
     if (loadplane || maxregions >= 0) {
         remove_empty_factions();
     }

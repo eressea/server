@@ -663,8 +663,8 @@ static int forget_cmd(unit * u, order * ord)
 
     sk = get_skill(s, u->faction->locale);
     if (sk != NOSKILL) {
-        if (sk == SK_MAGIC && (u_race(u)->flags & RCF_FAMILIAR)) {
-            /* some races cannot forget their innate magical abilities */
+        if (sk == SK_MAGIC && is_familiar(u)) {
+            /* some units cannot forget their innate magical abilities */
             return 0;
         }
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
