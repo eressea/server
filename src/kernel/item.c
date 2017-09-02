@@ -517,6 +517,7 @@ static int icache_size;
 #define ICACHE_MAX 100
 
 void item_done(void) {
+    icache_size = ICACHE_MAX;
     i_freeall(&icache);
     icache_size = 0;
 }
@@ -951,7 +952,7 @@ void write_items(struct storage *store, item * ilist)
 
 static void free_itype(item_type *itype) {
     assert(itype);
-    free(itype->construction);
+    free_construction(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);

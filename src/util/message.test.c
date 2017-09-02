@@ -9,6 +9,7 @@ static void test_mt_new(CuTest *tc)
     message_type *mt;
     test_setup();
     mt = mt_new_va("test", "name:string", "number:int", NULL);
+    mt_register(mt);
     CuAssertPtrNotNull(tc, mt);
     CuAssertStrEquals(tc, "test", mt->name);
     CuAssertIntEquals(tc, 2, mt->nparameters);
