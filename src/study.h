@@ -51,7 +51,7 @@ extern "C" {
     typedef struct teaching_info {
         struct selist *teachers;
         int students;
-        int value;
+        int days;
     } teaching_info;
 
     extern const struct attrib_type at_learning;

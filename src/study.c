@@ -223,7 +223,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             teach = (teaching_info *)a->data.v;
         }
         selist_push(&teach->teachers, teacher);
-        teach->value += students * STUDYDAYS;
+        teach->days += students * STUDYDAYS;
         teach->students += students; 
 
         if (student->building && teacher->building == student->building) {
@@ -232,7 +232,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             /* FIXME comment contradicts implementation */
             if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->value += students * EXPERIENCEDAYS;  /* learning erhoehen */
+                teach->days += students * EXPERIENCEDAYS;  /* learning erhoehen */
                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
                 if (academy_students) {
                     *academy_students += students;
@@ -713,12 +713,12 @@ int study_cmd(unit * u, order * ord)
 
     if (get_effect(u, oldpotiontype[P_WISE])) {
         l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
-        teach->value += l * EXPERIENCEDAYS;
+        teach->days += l * EXPERIENCEDAYS;
         change_effect(u, oldpotiontype[P_WISE], -l);
     }
     if (get_effect(u, oldpotiontype[P_FOOL])) {
         l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
-        teach->value -= l * STUDYDAYS;
+        teach->days -= l * STUDYDAYS;
         change_effect(u, oldpotiontype[P_FOOL], -l);
     }
 
@@ -727,16 +727,16 @@ int study_cmd(unit * u, order * ord)
         /* p ist Kosten ohne Uni, studycost mit; wenn
          * p!=studycost, ist die Einheit zwangsweise
          * in einer Uni */
-        teach->value += u->number * EXPERIENCEDAYS;
+        teach->days += u->number * EXPERIENCEDAYS;
     }
 
     if (is_cursed(r->attribs, &ct_badlearn)) {
-        teach->value -= u->number * EXPERIENCEDAYS;
+        teach->days -= u->number * EXPERIENCEDAYS;
     }
 
     multi *= study_speedup(u, sk, speed_rule);
     days = study_days(u, sk);
-    days = (int)((days + teach->value) * multi);
+    days = (int)((days + teach->days) * multi);
 
     /* the artacademy currently improves the learning of entertainment
        of all units in the region, to be able to make it cumulative with
