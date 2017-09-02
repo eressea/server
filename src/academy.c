@@ -22,13 +22,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
+
 #include "academy.h"
 #include "study.h"
 
-void academy_teaching_bonus(struct unit *u, skill_t sk, int student_days) {
-    if (student_days && sk != NOSKILL) {
-        /* actually days / STUDYDAYS * EXPERIENCEDAYS / MAX_STUDENTS */
-        learn_skill(u, sk, student_days / STUDYDAYS); 
+void academy_teaching_bonus(struct unit *u, skill_t sk, int students) {
+    if (students && sk != NOSKILL) {
+        /* actually students * EXPERIENCEDAYS / MAX_STUDENTS */
+        learn_skill(u, sk, students);
     }
 }
 
