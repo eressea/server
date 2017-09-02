@@ -196,89 +196,51 @@ static int study_days(unit * student, skill_t sk)
 
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
-    bool report, int *academy)
+    bool report, int *academy_students)
 {
     teaching_info *teach = NULL;
     attrib *a;
-    int n;
-
-    /* learning sind die Tage, die sie schon durch andere Lehrer zugute
-     * geschrieben bekommen haben. Total darf dies nicht ueber 30 Tage pro Mann
-     * steigen.
-     *
-     * n ist die Anzahl zusaetzlich gelernter Tage. n darf max. die Differenz
-     * von schon gelernten Tagen zum MAX(30 Tage pro Mann) betragen. */
+    int students;
 
     if (magic_lowskill(student)) {
         cmistake(teacher, teacher->thisorder, 292, MSG_EVENT);
         return 0;
     }
 
-    n = STUDYDAYS * student->number;
+    students = student->number;
+    /* subtract already taught students */
     a = a_find(student->attribs, &at_learning);
     if (a != NULL) {
         teach = (teaching_info *)a->data.v;
-        n -= teach->value;
+        students -= teach->students;
     }
 
-    n = MIN(n, nteaching);
+    students = MIN(students, nteaching);
 
-    if (n != 0) {
+    if (students > 0) {
         if (teach == NULL) {
             a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
         selist_push(&teach->teachers, teacher);
-        teach->value += n;
+        teach->value += students * STUDYDAYS;
+        teach->students += students; 
 
         if (student->building && teacher->building == student->building) {
             /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
              * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
+            /* FIXME comment contradicts implementation */
             if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->value += (n / STUDYDAYS) * EXPERIENCEDAYS;  /* learning erhoehen */
-                                                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
-                if (academy) {
-                    *academy += n;
+                teach->value += students * EXPERIENCEDAYS;  /* learning erhoehen */
+                /* Lehrer zusaetzlich +1 Tag pro Schueler. */
+                if (academy_students) {
+                    *academy_students += students;
                 }
             }
         }
-        /* Teaching ist die Anzahl Leute, denen man noch was beibringen kann. Da
-         * hier nicht n verwendet wird, werden die Leute gezaehlt und nicht die
-         * effektiv gelernten Tage. -> FALSCH ? (ENNO)
-         *
-         * Eine Einheit A von 11 Mann mit Talent 0 profitiert vom ersten Lehrer B
-         * also 10x30=300 tage, und der zweite Lehrer C lehrt fuer nur noch 1x30=30
-         * Tage (damit das Maximum von 11x30=330 nicht ueberschritten wird).
-         *
-         * Damit es aber in der Ausfuehrung nicht auf die Reihenfolge drauf ankommt,
-         * darf der zweite Lehrer C keine weiteren Einheiten D mehr lehren. Also
-         * wird student 30 Tage gutgeschrieben, aber teaching sinkt auf 0 (300-11x30 <=
-         * 0).
-         *
-         * Sonst traete dies auf:
-         *
-         * A: lernt B: lehrt A C: lehrt A D D: lernt
-         *
-         * Wenn B vor C dran ist, lehrt C nur 30 Tage an A (wie oben) und
-         * 270 Tage an D.
-         *
-         * Ist C aber vor B dran, lehrt C 300 tage an A, und 0 tage an D,
-         * und B lehrt auch 0 tage an A.
-         * (Na und? -stm)
-         *
-         * Deswegen darf C D nie lehren duerfen. (Warum? -stm)
-         *
-         * -> Das ist wirr. wer hat das entworfen?
-         * Besser waere, man macht erst vorab alle zuordnungen, und dann
-         * die Talentaenderung (enno).
-         */
-
-        /* FIXME: this code no effect; check if the refactoring done in 1e51d0e9e238e1e6e073cab2060777038e1acfa1 fucked this up */
-        nteaching = MAX(0, nteaching - student->number * STUDYDAYS);
-
     }
-    return n;
+    return students;
 }
 
 int teach_cmd(unit * teacher, struct order *ord)
@@ -286,7 +248,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     plane *pl;
     region *r = teacher->region;
     skill_t sk_academy = NOSKILL;
-    int teaching, i, j, count, academy = 0;
+    int teaching, i, j, count, academy_students = 0;
 
     if (r->attribs) {
         if (get_curse(r->attribs, &ct_gbdream)) {
@@ -306,17 +268,17 @@ int teach_cmd(unit * teacher, struct order *ord)
         return 0;
     }
 
-    teaching = teacher->number * STUDYDAYS * TEACHNUMBER;
+    teaching = teacher->number  * TEACHNUMBER;
 
     if ((i = get_effect(teacher, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
         i = MIN(i, teacher->number * TEACHNUMBER);
         /* Trank wirkt pro Schueler, nicht pro Lehrer */
-        teaching -= i * STUDYDAYS;
+        teaching -= i;
         change_effect(teacher, oldpotiontype[P_FOOL], -i);
-        j = teaching / STUDYDAYS;
+        j = teaching;
         ADDMSG(&teacher->faction->msgs, msg_message("teachdumb", "teacher amount", teacher, j));
     }
-    if (teaching == 0)
+    if (teaching <= 0)
         return 0;
 
     count = 0;
@@ -335,7 +297,7 @@ int teach_cmd(unit * teacher, struct order *ord)
             teachskill[t] = getskill(teacher->faction->locale);
         } while (sk != NOSKILL);
 
-        for (student = r->units; teaching && student; student = student->next) {
+        for (student = r->units; teaching > 0 && student; student = student->next) {
             if (LongHunger(student)) {
                 continue;
             }
@@ -354,7 +316,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     }
                     if (sk != NOSKILL
                         && effskill_study(teacher, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
-                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy);
+                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
             }
@@ -366,7 +328,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
                         && effskill_study(teacher, sk, 0) - TEACHDIFFERENCE >= effskill(student, sk, 0)) {
-                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy);
+                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
             }
@@ -477,15 +439,14 @@ int teach_cmd(unit * teacher, struct order *ord)
                 }
             }
             sk_academy = sk;
-            teaching -= teach_unit(teacher, student, teaching, sk, false, &academy);
+            teaching -= teach_unit(teacher, student, teaching, sk, false, &academy_students);
         }
         new_order = create_order(K_TEACH, teacher->faction->locale, "%s", zOrder);
         replace_order(&teacher->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy && sk_academy!=NOSKILL) {
-        /* assert(academy % STUDYDAYS == 0); bug 2355: why? */
-        academy_teaching_bonus(teacher, sk_academy, academy);
+    if (academy_students > 0 && sk_academy!=NOSKILL) {
+        academy_teaching_bonus(teacher, sk_academy, academy_students);
     }
     return 0;
 }
