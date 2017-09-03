@@ -26,4 +26,4 @@ addr=$1
 subj=$2
 shift 2
 
-cat $ERESSEA/etc/$TEMPLATE | mutt -F $ERESSEA/etc/muttrc -s "$subj" -a $* -- $addr
+cat $ERESSEA/server/etc/$TEMPLATE | mutt -F $ERESSEA/etc/muttrc -s "$subj" -a $* -- $addr
