@@ -2,6 +2,8 @@ Diese Mail enthält ein Attachment mit Deinem Eressea-Report in
 komprimierter Form. Um ihn zu entpacken benötigst Du ein Programm, 
 das ZIP-Archive öffnen kann, wie z.B. 7-Zip (http://www.7-zip.org/)
 
-Eressea ist ein kostenloses Angebot von Freiwilligen, und die Spielleitung bezahlt
-seit Jahren die Entwicklung und den Betrieb aus eigener Tasche. Wenn Dir
-das etwas wert ist, kannst Du das Spiel auf https://www.patreon.com/enno unterstützen.
+Eressea ist ein kostenloses Angebot von Freiwilligen, und die Spielleitung
+bezahlt seit Jahren die Entwicklung und den Betrieb aus eigener Tasche. 
+Wenn Dir das etwas wert ist, kannst Du das Spiel mit einer Spende auf
+https://www.patreon.com/enno unterstützen.
+
