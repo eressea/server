@@ -153,6 +153,23 @@ static void test_sparagraph(CuTest *tc) {
     freestrlist(sp);
 }
 
+static void test_sparagraph_long(CuTest *tc) {
+    strlist *sp = 0;
+
+    split_paragraph(&sp, "HelloWorld HelloWorld", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "HelloWorld", sp->s);
+    CuAssertStrEquals(tc, "HelloWorld", sp->next->s);
+    CuAssertPtrEquals(tc, NULL, sp->next->next);
+    freestrlist(sp);
+
+    split_paragraph(&sp, "HelloWorldHelloWorld", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "HelloWorldHelloWorld", sp->s);
+    CuAssertPtrEquals(tc, NULL, sp->next);
+    freestrlist(sp);
+}
+
 static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
@@ -767,6 +784,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_seen_faction);
     SUITE_ADD_TEST(suite, test_regionid);
     SUITE_ADD_TEST(suite, test_sparagraph);
+    SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_arg_resources);
