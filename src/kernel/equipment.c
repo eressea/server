@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <selist.h>
+#include <critbit.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -37,41 +38,35 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 
-static equipment *equipment_sets;
-
-equipment *get_or_create_equipment(const char *eqname)
-{
-    equipment **eqp = &equipment_sets;
-    for (;;) {
-        struct equipment *eq = *eqp;
-        int i = eq ? strcmp(eq->name, eqname) : 1;
-        if (i > 0) {
-            eq = (equipment *)calloc(1, sizeof(equipment));
-            eq->name = strdup(eqname);
-            eq->next = *eqp;
-            memset(eq->skills, 0, sizeof(eq->skills));
-            *eqp = eq;
-            break;
-        }
-        else if (i == 0) {
-            break;
-        }
-        eqp = &eq->next;
-    }
-    return *eqp;
-}
+static critbit_tree cb_equipments = { 0 };
 
 equipment *get_equipment(const char *eqname)
 {
-    equipment *eq = equipment_sets;
-    for (; eq; eq = eq->next) {
-        int i = strcmp(eq->name, eqname);
-        if (i == 0)
-            return eq;
-        else if (i > 0)
-            break;
+    const char *match;
+    equipment *eq = NULL;
+
+    match = cb_find_str(&cb_equipments, eqname);
+    if (match) {
+        cb_get_kv(match, &eq, sizeof(eq));
     }
-    return NULL;
+    return eq;
+}
+
+equipment *get_or_create_equipment(const char *eqname)
+{
+    equipment *eq = get_equipment(eqname);
+    if (!eq) {
+        size_t len;
+        char data[64];
+
+        eq = (equipment *)calloc(1, sizeof(equipment));
+        eq->name = strdup(eqname);
+
+        len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
+        assert(len <= sizeof(data));
+        cb_insert(&cb_equipments, data, len);
+    }
+    return eq;
 }
 
 void equipment_setskill(equipment * eq, skill_t sk, const char *value)
@@ -236,27 +231,34 @@ void free_ls(void *arg) {
     free(ls);
 }
 
-void equipment_done(void) {
-    equipment **eqp = &equipment_sets;
-    while (*eqp) {
-        int i;
-        equipment *eq = *eqp;
-        *eqp = eq->next;
-        free(eq->name);
-        if (eq->spells) {
-            selist_foreach(eq->spells, free_ls);
-            selist_free(eq->spells);
-        }
-        while (eq->items) {
-            itemdata *next = eq->items->next;
-            free(eq->items->value);
-            free(eq->items);
-            eq->items = next;
-        }
-        /* TODO: subsets, skills */
-        for (i=0;i!=MAXSKILLS;++i) {
-            free(eq->skills[i]);
-        }
-        free(eq);
+static void free_equipment(equipment *eq) {
+    int i;
+    free(eq->name);
+    if (eq->spells) {
+        selist_foreach(eq->spells, free_ls);
+        selist_free(eq->spells);
     }
+    while (eq->items) {
+        itemdata *next = eq->items->next;
+        free(eq->items->value);
+        free(eq->items);
+        eq->items = next;
+    }
+    /* TODO: subsets, skills */
+    for (i = 0; i != MAXSKILLS; ++i) {
+        free(eq->skills[i]);
+    }
+}
+
+static int free_equipment_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    equipment *eq;
+    cb_get_kv(match, &eq, sizeof(eq));
+    free_equipment(eq);
+    free(eq);
+    return 0;
+}
+
+void equipment_done(void) {
+    cb_foreach(&cb_equipments, "", 0, free_equipment_cb, 0);
+    cb_clear(&cb_equipments);
 }

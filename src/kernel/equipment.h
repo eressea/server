@@ -50,7 +50,6 @@ extern "C" {
         char *skills[MAXSKILLS];
         struct selist *spells;
         struct subset *subsets;
-        struct equipment *next;
         void(*callback) (const struct equipment *, struct unit *);
     } equipment;
 
