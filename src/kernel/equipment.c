@@ -38,37 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <stdlib.h>
 
-static critbit_tree cb_equipments = { 0 };
-
-equipment *get_equipment(const char *eqname)
-{
-    const char *match;
-    equipment *eq = NULL;
-
-    match = cb_find_str(&cb_equipments, eqname);
-    if (match) {
-        cb_get_kv(match, &eq, sizeof(eq));
-    }
-    return eq;
-}
-
-equipment *get_or_create_equipment(const char *eqname)
-{
-    equipment *eq = get_equipment(eqname);
-    if (!eq) {
-        size_t len;
-        char data[64];
-
-        eq = (equipment *)calloc(1, sizeof(equipment));
-        eq->name = strdup(eqname);
-
-        len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
-        assert(len <= sizeof(data));
-        cb_insert(&cb_equipments, data, len);
-    }
-    return eq;
-}
-
 void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
     if (eq != NULL) {
@@ -229,6 +198,37 @@ void free_ls(void *arg) {
     lazy_spell *ls = (lazy_spell*)arg;
     spellref_free(ls->spref);
     free(ls);
+}
+
+static critbit_tree cb_equipments = { 0 };
+
+equipment *get_equipment(const char *eqname)
+{
+    const char *match;
+    equipment *eq = NULL;
+
+    match = cb_find_str(&cb_equipments, eqname);
+    if (match) {
+        cb_get_kv(match, &eq, sizeof(eq));
+    }
+    return eq;
+}
+
+equipment *get_or_create_equipment(const char *eqname)
+{
+    equipment *eq = get_equipment(eqname);
+    if (!eq) {
+        size_t len;
+        char data[64];
+
+        eq = (equipment *)calloc(1, sizeof(equipment));
+        eq->name = strdup(eqname);
+
+        len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
+        assert(len <= sizeof(data));
+        cb_insert(&cb_equipments, data, len);
+    }
+    return eq;
 }
 
 static void free_equipment(equipment *eq) {
