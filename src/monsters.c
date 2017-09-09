@@ -49,6 +49,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -191,6 +192,7 @@ void monsters_desert(struct faction *monsters)
 
 int monster_attacks(unit * monster, bool rich_only)
 {
+    const race *rc_serpent = get_race(RC_SEASERPENT);
     if (monster->status < ST_AVOID) {
         region *r = monster->region;
         unit *u2;
@@ -199,6 +201,12 @@ int monster_attacks(unit * monster, bool rich_only)
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
                 int m = get_money(u2);
+                if (u_race(monster) == rc_serpent) {
+                    /* attack bigger ships only */
+                    if (!u2->ship || u2->ship->type->cargo <= 50000) {
+                        continue;
+                    }
+                }
                 if (!rich_only || m > 0) {
                     order *ord = monster_attack(monster, u2);
                     if (ord) {

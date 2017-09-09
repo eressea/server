@@ -7,6 +7,8 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/region.h>
+#include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -41,43 +43,43 @@ static order *find_order(const char *expected, const unit *unit)
     return NULL;
 }
 
-static void create_monsters(faction **player, faction **monsters, unit **u, unit **m) {
+static void create_monsters(unit **up, unit **um) {
     race* rc;
     region *r;
+    faction *fp, *fm;
 
     test_cleanup();
 
     test_create_horse();
     default_locale = test_create_locale();
-    *player = test_create_faction(NULL);
-    *monsters = get_or_create_monsters();
-    assert(rc_find((*monsters)->race->_name));
-    rc = rc_get_or_create((*monsters)->race->_name);
+    fp = test_create_faction(NULL);
+    fm = get_or_create_monsters();
+    assert(rc_find(fm->race->_name));
+    rc = rc_get_or_create(fm->race->_name);
     fset(rc, RCF_UNARMEDGUARD|RCF_NPC|RCF_DRAGON);
-    fset(*monsters, FFL_NOIDLEOUT);
-    assert(fval(*monsters, FFL_NPC) && fval((*monsters)->race, RCF_UNARMEDGUARD) && fval((*monsters)->race, RCF_NPC) && fval(*monsters, FFL_NOIDLEOUT));
+    fset(fm, FFL_NOIDLEOUT);
+    assert(fval(fm, FFL_NPC) && fval(fm->race, RCF_UNARMEDGUARD) && fval(fm->race, RCF_NPC) && fval(fm, FFL_NOIDLEOUT));
 
     test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
 
-    *u = test_create_unit(*player, r);
-    unit_setid(*u, 1);
-    *m = test_create_unit(*monsters, r);
-    unit_setstatus(*m, ST_FIGHT);
+    *up = test_create_unit(fp, r);
+    unit_setid(*up, 1);
+    *um = test_create_unit(fm, r);
+    unit_setstatus(*um, ST_FIGHT);
 }
 
 static void test_monsters_attack(CuTest * tc)
 {
-    faction *f, *f2;
     unit *u, *m;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     setguard(m, true);
 
     config_set("rules.monsters.attack_chance", "1");
 
-    plan_monsters(f2);
+    plan_monsters(m->faction);
 
     CuAssertPtrNotNull(tc, find_order("attack 1", m));
     test_cleanup();
@@ -85,11 +87,10 @@ static void test_monsters_attack(CuTest * tc)
 
 static void test_monsters_attack_ocean(CuTest * tc)
 {
-    faction *f, *f2;
     region *r;
     unit *u, *m;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
     unit_setid(u, 2);
@@ -98,7 +99,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
 
     config_set("rules.monsters.attack_chance", "1");
 
-    plan_monsters(f2);
+    plan_monsters(m->faction);
 
     CuAssertPtrNotNull(tc, find_order("attack 2", m));
     test_cleanup();
@@ -106,10 +107,9 @@ static void test_monsters_attack_ocean(CuTest * tc)
 
 static void test_monsters_waiting(CuTest * tc)
 {
-    faction *f, *f2;
     unit *u, *m;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false);
@@ -119,14 +119,16 @@ static void test_monsters_waiting(CuTest * tc)
 
 static void test_seaserpent_piracy(CuTest * tc)
 {
-    faction *f, *f2;
     region *r;
     unit *u, *m;
     race *rc;
+    ship_type * stype;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
+    stype = test_create_shiptype("yacht");
     r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
+    u->ship = test_create_ship(r, stype);
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
     u_setrace(m, rc = test_create_race("seaserpent"));
@@ -136,25 +138,28 @@ static void test_seaserpent_piracy(CuTest * tc)
 
     config_set("rules.monsters.attack_chance", "1");
 
-    plan_monsters(f2);
+    stype->cargo = 50000;
+    plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("piracy", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+    stype->cargo = 50001;
+    plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("attack 2", m));
     test_cleanup();
 }
 
 static void test_monsters_attack_not(CuTest * tc)
 {
-    faction *f, *f2;
     unit *u, *m;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
 
     setguard(m, true);
     setguard(u, true);
 
     config_set("rules.monsters.attack_chance", "0");
 
-    plan_monsters(f2);
+    plan_monsters(m->faction);
 
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
     test_cleanup();
@@ -162,11 +167,10 @@ static void test_monsters_attack_not(CuTest * tc)
 
 static void test_dragon_attacks_the_rich(CuTest * tc)
 {
-    faction *f, *f2;
     unit *u, *m;
     const item_type *i_silver;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     init_resources();
 
     setguard(m, true);
@@ -180,8 +184,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
 
     config_set("rules.monsters.attack_chance", "0.00001");
 
-    plan_monsters(f2);
-
+    plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("attack 1", m));
     CuAssertPtrNotNull(tc, find_order("loot", m));
     test_cleanup();
@@ -191,12 +194,11 @@ extern void random_growl(const unit *u, region *tr, int rand);
 
 static void test_dragon_moves(CuTest * tc)
 {
-    faction *f, *f2;
     region *r;
     unit *u, *m;
     struct message *msg;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     rsetmoney(findregion(1, 0), 1000);
     r = findregion(0, 0); /* plain */
     rsetpeasants(r, 0);
@@ -204,8 +206,8 @@ static void test_dragon_moves(CuTest * tc)
 
     set_level(m, SK_WEAPONLESS, 10);
     config_set("rules.monsters.attack_chance", ".0");
-    plan_monsters(f2);
 
+    plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("move east", m));
 
     mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
@@ -224,11 +226,10 @@ static void test_dragon_moves(CuTest * tc)
 
 static void test_monsters_learn_exp(CuTest * tc)
 {
-    faction *f, *f2;
     unit *u, *m;
     skill* sk;
 
-    create_monsters(&f, &f2, &u, &m);
+    create_monsters(&u, &m);
     config_set("study.produceexp", "30");
 
     u_setrace(u, u_race(m));

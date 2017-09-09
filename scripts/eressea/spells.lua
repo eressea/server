@@ -19,44 +19,49 @@ local function create_item(mage, level, name, number)
   return level
 end
 
+local function create_potion(mage, level, name, force)
+  count = math.floor(force * 2 + 0.5)
+  return create_item(mage, level, name, count)
+end
+
 -- Wasser des Lebens
 function create_potion_p2(r, mage, level, force)
-  return create_item(mage, level, "p2", level)
+  return create_potion(mage, level, "p2", force)
 end
 
 -- Siebenmeilentee
 function create_potion_p0(r, mage, level, force)
-  return create_item(mage, level, "p0", level)
+  return create_potion(mage, level, "p0", force)
 end
 
 -- Wundsalbe
 function create_potion_ointment(r, mage, level, force)
-  return create_item(mage, level, "ointment", level)
+  return create_potion(mage, level, "ointment", force)
 end
 
 -- Bauernblut
 function create_potion_peasantblood(r, mage, level, force)
-  return create_item(mage, level, "peasantblood", level)
+  return create_potion(mage, level, "peasantblood", force)
 end
 
 -- Pferdeglueck
 function create_potion_p9(r, mage, level, force)
-  return create_item(mage, level, "p9", level)
+  return create_potion(mage, level, "p9", force)
 end
 
 -- Schaffenstrunk
 function create_potion_p3(r, mage, level, force)
-  return create_item(mage, level, "p3", level)
+  return create_potion(mage, level, "p3", force)
 end
 
 -- Heiltrank
 function create_potion_p14(r, mage, level, force)
-  return create_item(mage, level, "p14", level)
+  return create_potion(mage, level, "p14", force)
 end
 
 -- Elixier der Macht
 function create_potion_p13(r, mage, level, force)
-  return create_item(mage, level, "p13", level)
+  return create_potion(mage, level, "p13", force)
 end
 
 -- Erschaffe ein Flammenschwert
