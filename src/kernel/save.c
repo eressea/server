@@ -603,8 +603,7 @@ int current_turn(void)
     return cturn;
 }
 
-static void
-writeorder(struct gamedata *data, const struct order *ord,
+static void writeorder(gamedata *data, const struct order *ord,
     const struct locale *lang)
 {
     char obuf[1024];
@@ -613,7 +612,40 @@ writeorder(struct gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
-unit *read_unit(struct gamedata *data)
+static void read_skills(gamedata *data, unit *u)
+{
+    for (;;) {
+        int n = NOSKILL, level, weeks;
+        skill_t sk;
+        READ_INT(data->store, &n);
+        sk = (skill_t)n;
+        if (sk == NOSKILL) break;
+        READ_INT(data->store, &level);
+        READ_INT(data->store, &weeks);
+        if (level) {
+            skill *sv = add_skill(u, sk);
+            sv->level = sv->old = (unsigned char)level;
+            sv->weeks = (unsigned char)weeks;
+        }
+    }
+}
+
+static void write_skills(gamedata *data, const unit *u) {
+    int i;
+    for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+        assert(sv->weeks <= sv->level * 2 + 1);
+        if (sv->level > 0) {
+            WRITE_INT(data->store, sv->id);
+            WRITE_INT(data->store, sv->level);
+            WRITE_INT(data->store, sv->weeks);
+        }
+    }
+    WRITE_INT(data->store, -1);
+    WRITE_SECTION(data->store);
+}
+
+unit *read_unit(gamedata *data)
 {
     unit *u;
     const race *rc;
@@ -760,20 +792,7 @@ unit *read_unit(struct gamedata *data)
     set_order(&u->thisorder, NULL);
 
     assert(u_race(u));
-    for (;;) {
-        int n = NOSKILL, level, weeks;
-        skill_t sk;
-        READ_INT(data->store, &n);
-        sk = (skill_t)n;
-        if (sk == NOSKILL) break;
-        READ_INT(data->store, &level);
-        READ_INT(data->store, &weeks);
-        if (level) {
-            skill *sv = add_skill(u, sk);
-            sv->level = sv->old = (unsigned char)level;
-            sv->weeks = (unsigned char)weeks;
-        }
-    }
+    read_skills(data, u);
     read_items(data->store, &u->items);
     READ_INT(data->store, &u->hp);
     if (u->hp < u->number) {
@@ -787,7 +806,7 @@ unit *read_unit(struct gamedata *data)
 void write_unit(struct gamedata *data, const unit * u)
 {
     order *ord;
-    int i, p = 0;
+    int p = 0;
     unsigned int flags = u->flags & UFL_SAVEMASK;
     const race *irace = u_irace(u);
 
@@ -835,18 +854,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 
     assert(u_race(u));
-
-    for (i = 0; i != u->skill_size; ++i) {
-        skill *sv = u->skills + i;
-        assert(sv->weeks <= sv->level * 2 + 1);
-        if (sv->level > 0) {
-            WRITE_INT(data->store, sv->id);
-            WRITE_INT(data->store, sv->level);
-            WRITE_INT(data->store, sv->weeks);
-        }
-    }
-    WRITE_INT(data->store, -1);
-    WRITE_SECTION(data->store);
+    write_skills(data, u);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
     if (u->hp == 0 && data->version < NORCSPELL_VERSION) {
