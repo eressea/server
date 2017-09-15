@@ -18,10 +18,11 @@ else
 fi
 ls -1rt orders.dir.$TURN/turn-* | xargs cat > orders.$TURN
 
+lockfile -r3 -l120 orders.queue.lock
 if [ -e orders.queue ] ; then
-  lockfile -r3 -l120 orders.queue.lock
   mv orders.queue orders.dir.$TURN/orders.queue
-  rm -f orders.queue.lock
+fi
+rm -f orders.queue.lock
 fi
 
 
