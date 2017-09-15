@@ -773,7 +773,7 @@ int get_level(const unit * u, skill_t id)
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
         skill *sv = u->skills;
-        while (sv != u->skills + u->skill_size) {
+        while (sv != u->skills + u->skill_size && sv->id <= id) {
             if (sv->id == id) {
                 return sv->level;
             }
@@ -795,7 +795,7 @@ void set_level(unit * u, skill_t sk, int value)
         remove_skill(u, sk);
         return;
     }
-    while (sv != u->skills + u->skill_size) {
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
         if (sv->id == sk) {
             sk_set(sv, value);
             return;
@@ -1186,35 +1186,39 @@ void set_number(unit * u, int count)
 
 void remove_skill(unit * u, skill_t sk)
 {
-    skill *sv = u->skills;
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    int i;
+    skill *sv;
+    for (i = 0; i != u->skill_size; ++i) {
+        sv = u->skills + i;
         if (sv->id == sk) {
-            skill *sl = u->skills + u->skill_size - 1;
-            if (sl != sv) {
-                *sv = *sl;
-            }
+            memmove(sv, sv + 1, (u->skill_size - 1) * sizeof(skill));
             --u->skill_size;
             return;
         }
     }
 }
 
-skill *add_skill(unit * u, skill_t id)
+skill *add_skill(unit * u, skill_t sk)
 {
-    skill *sv = u->skills;
-#ifndef NDEBUG
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        assert(sv->id != id);
+    skill *sv;
+    int i;
+
+    for (i=0; i != u->skill_size; ++i) {
+        sv = u->skills+i;
+        if (sv->id >= sk) break;
     }
-#endif
+    u->skills = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    sv = u->skills + i;
+    if (i < u->skill_size) {
+        assert(sv->id != sk);
+        memmove(sv + 1, sv, sizeof(skill) * (u->skill_size - i));
+    }
     ++u->skill_size;
-    u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
-    sv = (u->skills + u->skill_size - 1);
     sv->level = 0;
     sv->weeks = 1;
     sv->old = 0;
-    sv->id = id;
-    if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
+    sv->id = sk;
+    if (sk == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
         assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
     }
@@ -1224,9 +1228,10 @@ skill *add_skill(unit * u, skill_t id)
 skill *unit_skill(const unit * u, skill_t sk)
 {
     skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size) {
-        if (sv->id == sk)
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
+        if (sv->id == sk) {
             return sv;
+        }
         ++sv;
     }
     return NULL;
@@ -1235,7 +1240,7 @@ skill *unit_skill(const unit * u, skill_t sk)
 bool has_skill(const unit * u, skill_t sk)
 {
     skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size) {
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
         if (sv->id == sk) {
             return (sv->level > 0);
         }
