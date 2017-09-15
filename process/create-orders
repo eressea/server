@@ -1,3 +1,5 @@
+#!/bin/bash
+
 GAME=$1
 TURN=$2
 
@@ -7,6 +9,7 @@ if [ ! -d $ERESSEA/game-$GAME ] ; then
 fi
 
 cd $ERESSEA/game-$GAME
+
 if [ -d orders.dir.$TURN ]; then
   echo "orders.dir.$TURN already exists"
 else
@@ -14,3 +17,11 @@ else
   mkdir -p orders.dir
 fi
 ls -1rt orders.dir.$TURN/turn-* | xargs cat > orders.$TURN
+
+if [ -e orders.queue ] ; then
+  lockfile -r3 -l120 orders.queue.lock
+  mv orders.queue orders.dir.$TURN/orders.queue
+  rm -f orders.queue.lock
+fi
+
+
