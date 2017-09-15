@@ -614,35 +614,48 @@ static void writeorder(gamedata *data, const struct order *ord,
 
 static void read_skills(gamedata *data, unit *u)
 {
-    for (;;) {
-        int n = NOSKILL, level, weeks;
-        skill_t sk;
-        READ_INT(data->store, &n);
-        sk = (skill_t)n;
-        if (sk == NOSKILL) break;
-        READ_INT(data->store, &level);
-        READ_INT(data->store, &weeks);
-        if (level) {
-            skill *sv = add_skill(u, sk);
-            sv->level = sv->old = (unsigned char)level;
-            sv->weeks = (unsigned char)weeks;
+    if (data->version < SKILLSORT_VERSION) {
+        for (;;) {
+            int n = NOSKILL, level, weeks;
+            skill_t sk;
+            READ_INT(data->store, &n);
+            sk = (skill_t)n;
+            if (sk == NOSKILL) break;
+            READ_INT(data->store, &level);
+            READ_INT(data->store, &weeks);
+            if (level) {
+                skill *sv = add_skill(u, sk);
+                sv->level = sv->old = (unsigned char)level;
+                sv->weeks = (unsigned char)weeks;
+            }
+        }
+    }
+    else {
+        int i;
+        READ_INT(data->store, &u->skill_size);
+        u->skills = malloc(sizeof(skill)*u->skill_size);
+        for (i = 0; i != u->skill_size; ++i) {
+            skill *sv = u->skills + i;
+            int val;
+            READ_INT(data->store, &val);
+            sv->id = (skill_t)val;
+            READ_INT(data->store, &sv->level);
+            sv->old = sv->level;
+            READ_INT(data->store, &sv->weeks);
         }
     }
 }
 
 static void write_skills(gamedata *data, const unit *u) {
     int i;
+    WRITE_INT(data->store, u->skill_size);
     for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
         assert(sv->weeks <= sv->level * 2 + 1);
-        if (sv->level > 0) {
-            WRITE_INT(data->store, sv->id);
-            WRITE_INT(data->store, sv->level);
-            WRITE_INT(data->store, sv->weeks);
-        }
+        WRITE_INT(data->store, sv->id);
+        WRITE_INT(data->store, sv->level);
+        WRITE_INT(data->store, sv->weeks);
     }
-    WRITE_INT(data->store, -1);
-    WRITE_SECTION(data->store);
 }
 
 unit *read_unit(gamedata *data)
