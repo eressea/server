@@ -648,10 +648,15 @@ static void read_skills(gamedata *data, unit *u)
 
 static void write_skills(gamedata *data, const unit *u) {
     int i;
+    skill_t sk = NOSKILL;
     WRITE_INT(data->store, u->skill_size);
     for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
+#ifndef NDEBUG
+        assert(sv->id > sk);
+        sk = sv->id;
         assert(sv->weeks <= sv->level * 2 + 1);
+#endif
         WRITE_INT(data->store, sv->id);
         WRITE_INT(data->store, sv->level);
         WRITE_INT(data->store, sv->weeks);

@@ -445,24 +445,6 @@ static void test_max_spellpoints(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_familiar_mage(CuTest *tc) {
-    unit *um, *uf, *ut;
-    test_setup();
-    um = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    uf = test_create_unit(um->faction, um->region);
-    ut = test_create_unit(um->faction, um->region);
-    set_number(ut, 0);
-    CuAssertTrue(tc, create_newfamiliar(um, uf));
-    CuAssertTrue(tc, is_familiar(uf));
-    CuAssertTrue(tc, !is_familiar(um));
-    CuAssertPtrEquals(tc, um, get_familiar_mage(uf));
-    CuAssertPtrEquals(tc, uf, get_familiar(um));
-    
-    CuAssertPtrEquals(tc, NULL, give_men(1, um, ut, NULL));
-    CuAssertPtrEquals(tc, ut, get_familiar_mage(uf));
-    test_cleanup();
-}
-
 static void test_illusioncastle(CuTest *tc)
 {
     building *b;
@@ -502,6 +484,5 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
     SUITE_ADD_TEST(suite, test_illusioncastle);
-    DISABLE_TEST(suite, test_familiar_mage);
     return suite;
 }

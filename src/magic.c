@@ -356,9 +356,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     }
     sp = find_spell(token);
     if (!sp) {
-        log_warning("read_seenspell: could not find spell '%s'\n", token);
-    }
-    if (!sp) {
+        log_info("read_seenspell: could not find spell '%s'\n", token);
         return AT_READ_FAIL;
     }
     a->data.v = sp;
