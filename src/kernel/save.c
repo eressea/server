@@ -885,12 +885,12 @@ void write_unit(gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 }
 
-static void read_regioninfo(gamedata *data, const region *r, char *info) {
+static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
-        READ_STR(data->store, info, sizeof(info));
+        READ_STR(data->store, info, len);
         if (unicode_utf8_trim(info) != 0) {
             log_warning("trim region %d info to '%s'", r->uid, info);
         }
@@ -929,7 +929,7 @@ static region *readregion(gamedata *data, int x, int y)
         r->land = 0;
     }
     if (data->version < LANDDISPLAY_VERSION) {
-        read_regioninfo(data, r, info);
+        read_regioninfo(data, r, info, sizeof(info));
     }
 
     READ_STR(data->store, name, sizeof(name));
@@ -956,7 +956,7 @@ static region *readregion(gamedata *data, int x, int y)
         rawmaterial **pres = &r->resources;
 
         if (data->version >= LANDDISPLAY_VERSION) {
-            read_regioninfo(data, r, info);
+            read_regioninfo(data, r, info, sizeof(info));
         }
         region_setinfo(r, info);
         READ_INT(data->store, &i);

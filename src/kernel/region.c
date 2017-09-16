@@ -1444,7 +1444,7 @@ void region_setinfo(struct region *r, const char *info)
 {
     assert(r->land);
     free(r->land->display);
-    r->land->display = info ? strdup(info) : 0;
+    r->land->display = (info && info[0]) ? strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
