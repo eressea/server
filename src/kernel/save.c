@@ -885,18 +885,14 @@ void write_unit(gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 }
 
-static void read_regioninfo(gamedata *data, region *r) {
+static void read_regioninfo(gamedata *data, const region *r, char *info) {
     if (lomem) {
         READ_STR(data->store, NULL, 0);
     }
     else {
-        char info[DISPLAYSIZE];
         READ_STR(data->store, info, sizeof(info));
         if (unicode_utf8_trim(info) != 0) {
             log_warning("trim region %d info to '%s'", r->uid, info);
-        }
-        if (r->land) {
-            region_setinfo(r, info);
         }
     }
 }
@@ -906,6 +902,7 @@ static region *readregion(gamedata *data, int x, int y)
     region *r = findregion(x, y);
     const terrain_type *terrain;
     char name[NAMESIZE];
+    char info[DISPLAYSIZE];
     int uid = 0;
     int n;
 
@@ -932,7 +929,7 @@ static region *readregion(gamedata *data, int x, int y)
         r->land = 0;
     }
     if (data->version < LANDDISPLAY_VERSION) {
-        read_regioninfo(data, r);
+        read_regioninfo(data, r, info);
     }
 
     READ_STR(data->store, name, sizeof(name));
@@ -959,8 +956,9 @@ static region *readregion(gamedata *data, int x, int y)
         rawmaterial **pres = &r->resources;
 
         if (data->version >= LANDDISPLAY_VERSION) {
-            read_regioninfo(data, r);
+            read_regioninfo(data, r, info);
         }
+        region_setinfo(r, info);
         READ_INT(data->store, &i);
         if (i < 0) {
             log_error("number of trees in %s is %d.", regionname(r, NULL), i);
@@ -1038,7 +1036,11 @@ static region *readregion(gamedata *data, int x, int y)
         READ_INT(data->store, &n);
         rsetmoney(r, n);
     }
-
+    else {
+        if (info[0]) {
+            log_error("%s %d has a description: %s", r->terrain->_name, r->uid, info);
+        }
+    }
     assert(r->terrain != NULL);
 
     if (r->land) {
@@ -1759,6 +1761,9 @@ int read_game(gamedata *data)
 
         /* Burgen */
         READ_INT(store, &p);
+        if (p > 0 && !r->land) {
+            log_error("%s, uid=%d has %d buildings", regionname(r, NULL), r->uid, p);
+        }
         bp = &r->buildings;
 
         while (--p >= 0) {
