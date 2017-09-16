@@ -931,6 +931,9 @@ static region *readregion(gamedata *data, int x, int y)
     if (data->version < LANDDISPLAY_VERSION) {
         read_regioninfo(data, r, info, sizeof(info));
     }
+    else {
+        info[0] = '\0';
+    }
 
     READ_STR(data->store, name, sizeof(name));
     terrain = get_terrain(name);
