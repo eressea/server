@@ -38,6 +38,7 @@
 #define SORTKEYS_VERSION 358 /* at_keys is sorted */
 #define FAMILIAR_FIX_VERSION 359 /* familiar links are fixed */
 #define SKILLSORT_VERSION 360 /* u->skills is sorted */
+#define LANDDISPLAY_VERSION 360 /* r.display is now in r.land.display */
 /* unfinished: */
 #define CRYPT_VERSION 400 /* passwords are encrypted */
 

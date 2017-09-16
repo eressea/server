@@ -377,7 +377,7 @@ race_t typus2race(unsigned char typus)
     return NORACE;
 }
 
-static void read_alliances(struct gamedata *data)
+static void read_alliances(gamedata *data)
 {
     storage *store = data->store;
     char pbuf[8];
@@ -492,7 +492,7 @@ void write_planes(storage *store) {
     }
 }
 
-void write_alliances(struct gamedata *data)
+void write_alliances(gamedata *data)
 {
     alliance *al = alliances;
     while (al) {
@@ -524,7 +524,7 @@ static int resolve_owner(variant id, void *address)
     return result;
 }
 
-static void read_owner(struct gamedata *data, region_owner ** powner)
+static void read_owner(gamedata *data, region_owner ** powner)
 {
     int since_turn;
 
@@ -563,7 +563,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
     }
 }
 
-static void write_owner(struct gamedata *data, region_owner * owner)
+static void write_owner(gamedata *data, region_owner * owner)
 {
     if (owner) {
         faction *f;
@@ -821,7 +821,7 @@ unit *read_unit(gamedata *data)
     return u;
 }
 
-void write_unit(struct gamedata *data, const unit * u)
+void write_unit(gamedata *data, const unit * u)
 {
     order *ord;
     int p = 0;
@@ -885,7 +885,23 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 }
 
-static region *readregion(struct gamedata *data, int x, int y)
+static void read_regioninfo(gamedata *data, region *r) {
+    if (lomem) {
+        READ_STR(data->store, NULL, 0);
+    }
+    else {
+        char info[DISPLAYSIZE];
+        READ_STR(data->store, info, sizeof(info));
+        if (unicode_utf8_trim(info) != 0) {
+            log_warning("trim region %d info to '%s'", r->uid, info);
+        }
+        if (r->land) {
+            region_setinfo(r, info);
+        }
+    }
+}
+
+static region *readregion(gamedata *data, int x, int y)
 {
     region *r = findregion(x, y);
     const terrain_type *terrain;
@@ -915,16 +931,8 @@ static region *readregion(struct gamedata *data, int x, int y)
         }
         r->land = 0;
     }
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
-    }
-    else {
-        char info[DISPLAYSIZE];
-        READ_STR(data->store, info, sizeof(info));
-		if (unicode_utf8_trim(info)!=0) {
-			log_warning("trim region %d info to '%s'", uid, info);
-		};
-        region_setinfo(r, info);
+    if (data->version < LANDDISPLAY_VERSION) {
+        read_regioninfo(data, r);
     }
 
     READ_STR(data->store, name, sizeof(name));
@@ -941,15 +949,18 @@ static region *readregion(struct gamedata *data, int x, int y)
     if (fval(r->terrain, LAND_REGION)) {
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
-		if (unicode_utf8_trim(name)!=0) {
-			log_warning("trim region %d name to '%s'", uid, name);
-		};
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim region %d name to '%s'", uid, name);
+        };
         r->land->name = strdup(name);
     }
     if (r->land) {
         int i;
         rawmaterial **pres = &r->resources;
 
+        if (data->version >= LANDDISPLAY_VERSION) {
+            read_regioninfo(data, r);
+        }
         READ_INT(data->store, &i);
         if (i < 0) {
             log_error("number of trees in %s is %d.", regionname(r, NULL), i);
@@ -1069,24 +1080,23 @@ region *read_region(gamedata *data)
     return r;
 }
 
-void writeregion(struct gamedata *data, const region * r)
+void writeregion(gamedata *data, const region * r)
 {
     assert(r);
     assert(data);
 
     WRITE_INT(data->store, r->uid);
-    WRITE_STR(data->store, region_getinfo(r));
     WRITE_TOK(data->store, r->terrain->_name);
     WRITE_INT(data->store, r->flags & RF_SAVEMASK);
     WRITE_INT(data->store, r->age);
     WRITE_SECTION(data->store);
-    if (fval(r->terrain, LAND_REGION)) {
+    if (r->land) {
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
 
-        assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
+        WRITE_STR(data->store, region_getinfo(r));
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
         assert(rtrees(r, 2) >= 0);
@@ -1122,11 +1132,9 @@ void writeregion(struct gamedata *data, const region * r)
         }
         WRITE_TOK(data->store, "end");
         WRITE_SECTION(data->store);
-#if RELEASE_VERSION>=REGIONOWNER_VERSION
         WRITE_INT(data->store, region_get_morale(r));
         write_owner(data, r->land->ownership);
         WRITE_SECTION(data->store);
-#endif
     }
     write_attribs(data->store, r->attribs, r);
     WRITE_SECTION(data->store);
@@ -1243,7 +1251,7 @@ void _test_write_password(gamedata *data, const faction *f) {
     write_password(data, f);
 }
 
-faction *read_faction(struct gamedata * data)
+faction *read_faction(gamedata * data)
 {
     ally **sfp;
     int planes, n;
@@ -1395,7 +1403,7 @@ faction *read_faction(struct gamedata * data)
     return f;
 }
 
-void write_faction(struct gamedata *data, const faction * f)
+void write_faction(gamedata *data, const faction * f)
 {
     ally *sf;
     ursprung *ur;
@@ -1584,7 +1592,7 @@ void write_ship(gamedata *data, const ship *sh)
     write_attribs(store, sh->attribs, sh);
 }
 
-ship *read_ship(struct gamedata *data)
+ship *read_ship(gamedata *data)
 {
     char name[DISPLAYSIZE];
     ship *sh;

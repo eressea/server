@@ -96,7 +96,7 @@ extern "C" {
 
     typedef struct land_region {
         char *name;
-        /* TODO: demand kann nach Konvertierung entfernt werden. */
+        char *display;
         demand *demands;
         const struct item_type *herbtype;
         short herbs;
@@ -122,7 +122,6 @@ extern "C" {
         int uid;           /* a unique id */
         int x, y;
         struct plane *_plane;       /* to access, use rplane(r) */
-        char *display;
         int flags;
         unsigned short age;
         struct message_list *msgs;

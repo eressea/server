@@ -1365,8 +1365,8 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         unit *u;
         int stealthmod = stealth_modifier(r->seen.mode);
 
-        if (r->display && r->display[0])
-            fprintf(F, "\"%s\";Beschr\n", r->display);
+        if (r->land && r->land->display && r->land->display[0])
+            fprintf(F, "\"%s\";Beschr\n", r->land->display);
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));

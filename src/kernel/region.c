@@ -825,8 +825,8 @@ void free_land(land_region * lr)
         lr->demands = d->next;
         free(d);
     }
-    if (lr->name)
-        free(lr->name);
+    free(lr->name);
+    free(lr->display);
     free(lr);
 }
 
@@ -894,7 +894,6 @@ void free_region(region * r)
 {
     if (last == r)
         last = NULL;
-    free(r->display);
     if (r->land)
         free_land(r->land);
 
@@ -1088,7 +1087,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     terraform_resources(r);
 
     if (!fval(terrain, LAND_REGION)) {
-        region_setinfo(r, NULL);
         if (r->land) {
             free_land(r->land);
             r->land = NULL;
@@ -1444,13 +1442,14 @@ faction *update_owners(region * r)
 
 void region_setinfo(struct region *r, const char *info)
 {
-    free(r->display);
-    r->display = info ? strdup(info) : 0;
+    assert(r->land);
+    free(r->land->display);
+    r->land->display = info ? strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
 {
-    return r->display ? r->display : "";
+    return (r->land && r->land->display) ? r->land->display : "";
 }
 
 void region_setname(struct region *r, const char *name)

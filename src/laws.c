@@ -1559,11 +1559,11 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_REGION:
-        if (u->faction != region_get_owner(r)) {
+        if (!r->land || u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
-        s = &r->display;
+        s = &r->land->display;
         break;
 
     default:

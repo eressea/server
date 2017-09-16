@@ -1069,15 +1069,15 @@ void report_region(struct stream *out, const region * r, faction * f)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    if (r->display && r->display[0]) {
+    if (r->land && r->land->display && r->land->display[0]) {
         bytes = (int)strlcpy(bufp, " ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, r->display, size);
+        bytes = (int)strlcpy(bufp, r->land->display, size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        n = r->display[strlen(r->display) - 1];
+        n = r->land->display[strlen(r->land->display) - 1];
         if (n != '!' && n != '?' && n != '.') {
             bytes = (int)strlcpy(bufp, ".", size);
             if (wrptr(&bufp, &size, bytes) != 0)
