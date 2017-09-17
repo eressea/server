@@ -214,19 +214,26 @@ equipment *get_equipment(const char *eqname)
     return eq;
 }
 
+equipment *create_equipment(const char *eqname)
+{
+    equipment *eq;
+    size_t len;
+    char data[64];
+
+    eq = (equipment *)calloc(1, sizeof(equipment));
+    eq->name = strdup(eqname);
+
+    len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
+    assert(len <= sizeof(data));
+    cb_insert(&cb_equipments, data, len);
+    return eq;
+}
+
 equipment *get_or_create_equipment(const char *eqname)
 {
     equipment *eq = get_equipment(eqname);
     if (!eq) {
-        size_t len;
-        char data[64];
-
-        eq = (equipment *)calloc(1, sizeof(equipment));
-        eq->name = strdup(eqname);
-
-        len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
-        assert(len <= sizeof(data));
-        cb_insert(&cb_equipments, data, len);
+        return create_equipment(eqname);
     }
     return eq;
 }

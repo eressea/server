@@ -1069,8 +1069,12 @@ static int parse_equipment(xmlDocPtr doc)
             xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
 
             if (propName != NULL) {
-                equipment *eq = get_or_create_equipment((const char *)propName);
+                equipment *eq = get_equipment((const char *)propName);
                 xmlXPathObjectPtr xpathResult;
+
+                if (!eq) {
+                    eq = create_equipment((const char *)propName);
+                }
 
                 xpath->node = node;
 
