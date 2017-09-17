@@ -266,7 +266,6 @@ void add_recruits(unit * u, int number, int wanted)
 
         strlcpy(equipment, "new_", sizeof(equipment));
         strlcat(equipment, u_race(u)->_name, sizeof(equipment));
-        strlcat(equipment, "_unit", sizeof(equipment));
         equip_unit(unew, get_equipment(equipment));
 
         if (unew != u) {

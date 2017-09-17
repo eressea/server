@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <selist.h>
 #include <critbit.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -202,31 +203,41 @@ void free_ls(void *arg) {
 
 static critbit_tree cb_equipments = { 0 };
 
+#define EQNAMELEN 16
+typedef struct eq_entry {
+    char key[EQNAMELEN];
+    equipment *value;
+} eq_entry;
+
 equipment *get_equipment(const char *eqname)
 {
     const char *match;
-    equipment *eq = NULL;
+
+    assert(strlen(eqname) <= EQNAMELEN);
 
     match = cb_find_str(&cb_equipments, eqname);
     if (match) {
-        cb_get_kv(match, &eq, sizeof(eq));
+        eq_entry *ent = (eq_entry *)match;
+        return ent->value;
     }
-    return eq;
+    return NULL;
 }
 
 equipment *create_equipment(const char *eqname)
 {
-    equipment *eq;
-    size_t len;
-    char data[64];
+    eq_entry ent;
 
-    eq = (equipment *)calloc(1, sizeof(equipment));
-    eq->name = strdup(eqname);
+    if (strlen(eqname) > EQNAMELEN) {
+        log_error("equipment names should be no longer than %d bytes: %s", EQNAMELEN, eqname);
+    }
+    /* OBS: we require the nul-padding property of strncpy here, so do not use strlcpy: */
+    strncpy(ent.key, eqname, EQNAMELEN);
 
-    len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
-    assert(len <= sizeof(data));
-    cb_insert(&cb_equipments, data, len);
-    return eq;
+    ent.value = (equipment *)calloc(1, sizeof(equipment));
+    ent.value->name = strdup(eqname);
+
+    cb_insert(&cb_equipments, &ent, sizeof(ent));
+    return ent.value;
 }
 
 equipment *get_or_create_equipment(const char *eqname)
@@ -258,10 +269,9 @@ static void free_equipment(equipment *eq) {
 }
 
 static int free_equipment_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    equipment *eq;
-    cb_get_kv(match, &eq, sizeof(eq));
-    free_equipment(eq);
-    free(eq);
+    eq_entry * ent = (eq_entry *)match;
+    free_equipment(ent->value);
+    free(ent->value);
     return 0;
 }
 

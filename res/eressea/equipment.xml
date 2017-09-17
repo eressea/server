@@ -2,18 +2,18 @@
 <equipment>
 
   <!-- one equipment-set per player-race for the first unit in a faction -->
-  <set name="autoseed_dwarf">
+  <set name="seed_dwarf">
     <item name="axe" amount="1"/>
     <item name="chainmail" amount="1"/>
     <skill name="melee" level="1"/>
   </set>
 
-  <set name="autoseed_elf">
+  <set name="seed_elf">
     <item name="fairyboot" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="autoseed_orc">
+  <set name="seed_orc">
     <skill name="polearm" level="4"/>
     <skill name="melee" level="4"/>
     <skill name="crossbow" level="4"/>
@@ -21,30 +21,30 @@
     <skill name="bow" level="4"/>
   </set>
 
-  <set name="autoseed_goblin">
+  <set name="seed_goblin">
     <item name="roi" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="autoseed_human">
+  <set name="seed_human">
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="autoseed_troll">
+  <set name="seed_troll">
     <skill name="building" level="1"/>
     <skill name="perception" level="3"/>
     <item name="stone" amount="50"/>
   </set>
 
-  <set name="autoseed_demon">
+  <set name="seed_demon">
     <skill name="stamina" level="15"/>
   </set>
 
-  <set name="autoseed_insect">
+  <set name="seed_insect">
     <item name="nestwarmth" amount="9"/>
   </set>
 
-  <set name="autoseed_halfling">
+  <set name="seed_halfling">
     <skill name="trade" level="1"/>
     <skill name="riding" level="2"/>
     <item name="horse" amount="2"/>
@@ -58,12 +58,12 @@
     <item name="incense" amount="5"/>
   </set>
 
-  <set name="autoseed_cat">
+  <set name="seed_cat">
     <item name="roi" amount="1"/>
     <callback name="equip_newunits"/>
   </set>
 
-  <set name="autoseed_aquarian">
+  <set name="seed_aquarian">
     <skill name="sailing" level="1"/>
     <callback name="equip_newunits"/>
   </set>
@@ -177,7 +177,7 @@
     <skill name="riding" level="d3"/>
   </set>
 
-  <set name="recruited_dracoid">
+  <set name="new_dracoid">
     <!-- dracoiden, von drachen rekrutiert -->
     <skill name="polearm" level="d4+2"/>
     <skill name="melee" level="d4+2"/>
@@ -229,22 +229,22 @@
     <item name="rustychainmail" amount="1"/>
   </set>
 
-  <set name="dragon_spoils">
+  <set name="spo_dragon">
     <item name="dragonblood" amount="4"/>
     <item name="dragonhead" amount="1"/>
   </set>
 
-  <set name="youngdragon_spoils">
+  <set name="spo_youngdragon">
     <item name="dragonblood" amount="1"/>
   </set>
 
-  <set name="wyrm_spoils">
+  <set name="spo_wyrm">
     <item name="dragonblood" amount="10"/>
     <item name="dragonhead" amount="1"/>
   </set>
 
   <!-- sets that are used by the monster-spawning code -->
-  <set name="monster_dragon">
+  <set name="seed_dragon">
     <skill name="magic" level="4"/>
     <skill name="stealth" level="1"/>
     <skill name="stamina" level="1"/>
@@ -252,24 +252,24 @@
     <item name="money" amount="d500+99"/>
   </set>
 
-  <set name="monster_braineater">
+  <set name="seed_braineater">
     <skill name="stealth" level="1"/>
     <skill name="perception" level="1"/>
   </set>
 
-  <set name="monster_seaserpent">
+  <set name="seed_seaserpent">
     <skill name="magic" level="4"/>
     <skill name="stealth" level="2"/>
     <skill name="stamina" level="1"/>
     <skill name="perception" level="3"/>
   </set>
 
-  <set name="new_orc_unit">
+  <set name="new_orc">
     <skill name="polearm" level="1"/>
     <skill name="melee" level="1"/>
   </set>
 
-  <set name="seaserpent_spoils">
+  <set name="spo_seaserpent">
     <item name="dragonblood" amount="6"/>
     <item name="seaserpenthead" amount="1"/>
   </set>

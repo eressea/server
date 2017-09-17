@@ -519,7 +519,7 @@ static void make_familiar(unit * familiar, unit * mage)
     const struct equipment *eq;
     char eqname[64];
     const race * rc = u_race(familiar);
-    snprintf(eqname, sizeof(eqname), "%s_familiar", rc->_name);
+    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
     eq = get_equipment(eqname);
     if (eq != NULL) {
         equip_items(&familiar->items, eq);
