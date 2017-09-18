@@ -277,6 +277,10 @@ int gift_items(unit * u, int flags)
                     u->items = NULL;
                     break;
                 }
+                else if (!u3) {
+                    /* pick a last-chance recipient: */
+                    u3 = u2;
+                }
             }
         }
         if (u->items && u3) {
