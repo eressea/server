@@ -178,11 +178,11 @@ static void test_get_resource(CuTest *tc) {
 
     test_setup();
 
-    CuAssertPtrEquals(tc, NULL, rt_find("catapultammo"));
-    rtype = rt_get_or_create("catapultammo");
+    CuAssertPtrEquals(tc, NULL, rt_find("catapultammo123"));
+    rtype = rt_get_or_create("catapultammo123");
     CuAssertPtrNotNull(tc, rtype);
-    CuAssertPtrEquals(tc, rtype, rt_find("catapultammo"));
-    CuAssertStrEquals(tc, "catapultammo", rtype->_name);
+    CuAssertPtrEquals(tc, rtype, rt_find("catapultammo123"));
+    CuAssertStrEquals(tc, "catapultammo123", rtype->_name);
 
     CuAssertPtrEquals(tc, NULL, rt_find("catapult"));
     rtype = rt_get_or_create("catapult");

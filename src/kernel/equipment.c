@@ -212,7 +212,7 @@ typedef struct eq_entry {
 
 equipment *get_equipment(const char *eqname)
 {
-    const char *match;
+    char *match;
 
     assert(strlen(eqname) < EQNAMELEN);
 

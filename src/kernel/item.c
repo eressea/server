@@ -60,7 +60,7 @@ static critbit_tree cb_resources;
 luxury_type *luxurytypes;
 potion_type *potiontypes;
 
-#define RTYPENAMELEN 16
+#define RTYPENAMELEN 24
 typedef struct rt_entry {
     char key[RTYPENAMELEN];
     struct resource_type *value;
@@ -176,10 +176,10 @@ static void rt_register(resource_type * rtype)
     size_t len = strlen(name);
     rt_entry ent;
 
-    if (len > RTYPENAMELEN) {
-        log_error("resource names may not be longer than %d bytes: %s",
-                RTYPENAMELEN, name);
-        len = RTYPENAMELEN;
+    if (len >= RTYPENAMELEN) {
+        log_error("resource name is longer than %d bytes: %s",
+                RTYPENAMELEN-1, name);
+        len = RTYPENAMELEN-1;
     }
     ent.value = rtype;
     memset(ent.key, 0, RTYPENAMELEN);
@@ -389,15 +389,16 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-    void * match;
+    char *match;
     size_t len = strlen(name);
 
-    if (len > RTYPENAMELEN) {
-        log_error("resource name is longer than $d bytes: %s",
-                RTYPENAMELEN, name);
-        len = RTYPENAMELEN;
+    if (len >= RTYPENAMELEN) {
+        log_error("resource name is longer than %d bytes: %s",
+                RTYPENAMELEN-1, name);
+        return NULL;
     }
-    if (cb_find_prefix(&cb_resources, name, len, &match, 1, 0)) {
+    match = cb_find_str(&cb_resources, name);
+    if (match) {
         rt_entry *ent = (rt_entry *)match;
         return ent->value;
     }
