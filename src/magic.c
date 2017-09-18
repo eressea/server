@@ -3013,7 +3013,8 @@ spellbook * get_spellbook(const char * name)
     spellbook * result;
     void * match;
 
-    if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
+    match = cb_find_str(&cb_spellbooks, name);
+    if (match) {
         cb_get_kv(match, &result, sizeof(result));
     }
     else {
