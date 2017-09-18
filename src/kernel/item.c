@@ -393,7 +393,7 @@ resource_type *rt_find(const char *name)
     size_t len = strlen(name);
 
     if (len >= RTYPENAMELEN) {
-        log_error("resource name is longer than %d bytes: %s",
+        log_warning("resource name is longer than %d bytes: %s",
                 RTYPENAMELEN-1, name);
         return NULL;
     }

@@ -203,7 +203,7 @@ void free_ls(void *arg) {
 
 static critbit_tree cb_equipments = { 0 };
 
-#define EQNAMELEN 16
+#define EQNAMELEN 24
 
 typedef struct eq_entry {
     char key[EQNAMELEN];
@@ -240,7 +240,10 @@ equipment *get_equipment(const char *eqname)
 {
     const void *match;
 
-    assert(strlen(eqname) < EQNAMELEN);
+    if (strlen(eqname) >= EQNAMELEN) {
+        log_warning("equipment name is longer than %d bytes: %s", EQNAMELEN - 1, eqname);
+        return NULL;
+    }
 
     match = cb_find_str(&cb_equipments, eqname);
     if (match) {
@@ -256,7 +259,7 @@ equipment *create_equipment(const char *eqname)
     eq_entry ent;
 
     if (len >= EQNAMELEN) {
-        log_error("equipment names should be no longer than %d bytes: %s", EQNAMELEN-1, eqname);
+        log_error("equipment name is longer than %d bytes: %s", EQNAMELEN-1, eqname);
         len = EQNAMELEN-1;
     }
     memset(ent.key, 0, EQNAMELEN);
