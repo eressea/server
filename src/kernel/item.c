@@ -192,16 +192,6 @@ resource_type *rt_get_or_create(const char *name) {
     return rtype;
 }
 
-static void it_register(item_type * itype)
-{
-    char buffer[64];
-    const char * name = itype->rtype->_name;
-    size_t len = strlen(name);
-
-    assert(len < sizeof(buffer) - sizeof(itype));
-    len = cb_new_kv(name, len, &itype, sizeof(itype), buffer);
-}
-
 static const char *it_aliases[][2] = {
     { "Runenschwert", "runesword" },
     { "p12", "truthpotion" },
@@ -244,7 +234,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     rtype->uchange = res_changeitem;
     rtype->itype = itype;
     rtype->flags |= RTF_ITEM;
-    it_register(itype);
     return itype;
 }
 
