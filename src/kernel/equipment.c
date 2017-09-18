@@ -225,13 +225,15 @@ equipment *get_equipment(const char *eqname)
 
 equipment *create_equipment(const char *eqname)
 {
+    size_t len = strlen(eqname);
     eq_entry ent;
 
-    if (strlen(eqname) > EQNAMELEN) {
+    if (len > EQNAMELEN) {
         log_error("equipment names should be no longer than %d bytes: %s", EQNAMELEN, eqname);
+        len = EQNAMELEN;
     }
-    /* OBS: we require the nul-padding property of strncpy here, so do not use strlcpy: */
-    strncpy(ent.key, eqname, EQNAMELEN);
+    memset(ent.key, 0, EQNAMELEN);
+    memcpy(ent.key, eqname, len);
 
     ent.value = (equipment *)calloc(1, sizeof(equipment));
     ent.value->name = strdup(eqname);
