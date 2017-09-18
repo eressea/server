@@ -10,7 +10,7 @@
 #include <CuTest.h>
 #include <tests.h>
 
-void test_equipment(CuTest * tc)
+static void test_equipment(CuTest * tc)
 {
     equipment * eq;
     unit * u;
@@ -46,9 +46,33 @@ void test_equipment(CuTest * tc)
     test_cleanup();
 }
 
+static void test_get_equipment(CuTest * tc)
+{
+    equipment * eq;
+
+    test_setup();
+    eq = create_equipment("catapultammo");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo", eq->name);
+    eq = get_equipment("catapultammo");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo", eq->name);
+    eq = get_equipment("catapult");
+    CuAssertPtrEquals(tc, NULL, eq);
+    eq = create_equipment("catapult");
+    eq = get_equipment("catapult");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapult", eq->name);
+    eq = get_equipment("catapultammo");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo", eq->name);
+    test_cleanup();
+}
+
 CuSuite *get_equipment_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_equipment);
+    SUITE_ADD_TEST(suite, test_get_equipment);
     return suite;
 }
