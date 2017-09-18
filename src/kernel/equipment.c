@@ -213,7 +213,7 @@ equipment *get_equipment(const char *eqname)
 {
     const char *match;
 
-    assert(strlen(eqname) <= EQNAMELEN);
+    assert(strlen(eqname) < EQNAMELEN);
 
     match = cb_find_str(&cb_equipments, eqname);
     if (match) {
@@ -228,9 +228,9 @@ equipment *create_equipment(const char *eqname)
     size_t len = strlen(eqname);
     eq_entry ent;
 
-    if (len > EQNAMELEN) {
-        log_error("equipment names should be no longer than %d bytes: %s", EQNAMELEN, eqname);
-        len = EQNAMELEN;
+    if (len >= EQNAMELEN) {
+        log_error("equipment names should be no longer than %d bytes: %s", EQNAMELEN-1, eqname);
+        len = EQNAMELEN-1;
     }
     memset(ent.key, 0, EQNAMELEN);
     memcpy(ent.key, eqname, len);
