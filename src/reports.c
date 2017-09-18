@@ -1616,11 +1616,13 @@ int reports(void)
     }
 
     for (f = factions; f; f = f->next) {
-        int error = write_reports(f, ltime);
-        if (error)
-            retval = error;
-        if (mailit)
-            write_script(mailit, f);
+        if (f->email && !fval(f, FFL_NPC)) {
+            int error = write_reports(f, ltime);
+            if (error)
+                retval = error;
+            if (mailit)
+                write_script(mailit, f);
+        }
     }
     if (mailit)
         fclose(mailit);
