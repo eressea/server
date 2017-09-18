@@ -3007,31 +3007,36 @@ int cast_spell(struct castorder *co)
 
 static critbit_tree cb_spellbooks;
 
+#define SBNAMELEN 16
+
+typedef struct sb_entry {
+    char key[SBNAMELEN];
+    spellbook *value;
+} sb_entry;
+
 spellbook * get_spellbook(const char * name)
 {
-    char buffer[64];
-    spellbook * result;
-    void * match;
+    size_t len = strlen(name);
+    const void * match;
+
+    if (len >= SBNAMELEN) {
+        log_error("spellbook name is longer than %d bytes: %s", SBNAMELEN-1, name);
+        return NULL;
+    }
 
     match = cb_find_str(&cb_spellbooks, name);
-    if (match) {
-        cb_get_kv(match, &result, sizeof(result));
-    }
-    else {
-        size_t len = strlen(name);
-        result = create_spellbook(name);
-        assert(strlen(name) + sizeof(result) < sizeof(buffer));
-        len = cb_new_kv(name, len, &result, sizeof(result), buffer);
-        if (cb_insert(&cb_spellbooks, buffer, len) == CB_EXISTS) {
+    if (!match) {
+        sb_entry ent;
+        memset(ent.key, 0, SBNAMELEN);
+        memcpy(ent.key, name, len);
+        ent.value = create_spellbook(name);
+        if (cb_insert(&cb_spellbooks, &ent, sizeof(ent)) == CB_EXISTS) {
             log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
             assert(!"should not happen");
         }
-        result = 0;
-        if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
-            cb_get_kv(match, &result, sizeof(result));
-        }
+        return ent.value;
     }
-    return result;
+    return ((const sb_entry *)match)->value;
 }
 
 void free_spellbook(spellbook *sb) {
@@ -3040,9 +3045,8 @@ void free_spellbook(spellbook *sb) {
 }
 
 static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
-    spellbook *sb;
-    cb_get_kv(match, &sb, sizeof(sb));
-    free_spellbook(sb);
+    const sb_entry *ent = (const sb_entry *)match;
+    free_spellbook(ent->value);
     return 0;
 }
 

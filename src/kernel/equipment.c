@@ -212,13 +212,13 @@ typedef struct eq_entry {
 
 equipment *get_equipment(const char *eqname)
 {
-    char *match;
+    const void *match;
 
     assert(strlen(eqname) < EQNAMELEN);
 
     match = cb_find_str(&cb_equipments, eqname);
     if (match) {
-        eq_entry *ent = (eq_entry *)match;
+        const eq_entry *ent = (const eq_entry *)match;
         return ent->value;
     }
     return NULL;
@@ -272,7 +272,7 @@ static void free_equipment(equipment *eq) {
 }
 
 static int free_equipment_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    eq_entry * ent = (eq_entry *)match;
+    const eq_entry * ent = (const eq_entry *)match;
     free_equipment(ent->value);
     free(ent->value);
     return 0;

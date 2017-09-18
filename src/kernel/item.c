@@ -389,7 +389,7 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-    char *match;
+    const void *match;
     size_t len = strlen(name);
 
     if (len >= RTYPENAMELEN) {
@@ -399,7 +399,7 @@ resource_type *rt_find(const char *name)
     }
     match = cb_find_str(&cb_resources, name);
     if (match) {
-        rt_entry *ent = (rt_entry *)match;
+        const rt_entry *ent = (const rt_entry *)match;
         return ent->value;
     }
     return NULL;
