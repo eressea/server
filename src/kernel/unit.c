@@ -1191,7 +1191,7 @@ void remove_skill(unit * u, skill_t sk)
     for (i = 0; i != u->skill_size; ++i) {
         sv = u->skills + i;
         if (sv->id == sk) {
-            memmove(sv, sv + 1, (u->skill_size - 1) * sizeof(skill));
+            memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
             --u->skill_size;
             return;
         }
