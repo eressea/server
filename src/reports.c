@@ -1701,7 +1701,7 @@ static void var_free_regions(variant x) /*-V524 */
 
 const char *trailinto(const region * r, const struct locale *lang)
 {
-    char ref[32];
+    static char ref[32];
     const char *s;
     if (r) {
         const char *tname = terrain_name(r);
