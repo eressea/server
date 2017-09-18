@@ -51,12 +51,12 @@ static void test_get_equipment(CuTest * tc)
     equipment * eq;
 
     test_setup();
-    eq = create_equipment("catapultammo");
+    eq = create_equipment("catapultammo1234");
     CuAssertPtrNotNull(tc, eq);
-    CuAssertStrEquals(tc, "catapultammo", eq->name);
-    eq = get_equipment("catapultammo");
+    CuAssertStrEquals(tc, "catapultammo1234", eq->name);
+    eq = get_equipment("catapultammo1234");
     CuAssertPtrNotNull(tc, eq);
-    CuAssertStrEquals(tc, "catapultammo", eq->name);
+    CuAssertStrEquals(tc, "catapultammo1234", eq->name);
     eq = get_equipment("catapult");
     CuAssertPtrEquals(tc, NULL, eq);
     eq = create_equipment("catapult");

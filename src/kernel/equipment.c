@@ -204,6 +204,7 @@ void free_ls(void *arg) {
 static critbit_tree cb_equipments = { 0 };
 
 #define EQNAMELEN 16
+
 typedef struct eq_entry {
     char key[EQNAMELEN];
     equipment *value;
