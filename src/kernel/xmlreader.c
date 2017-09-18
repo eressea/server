@@ -960,7 +960,7 @@ static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
                 equipment_addspell(eq, name, level);
             }
             else {
-                log_error("spell '%s' for equipment-set '%s' has no level\n", name, eq->name);
+                log_error("spell '%s' for equipment-set '%s' has no level\n", name, equipment_name(eq));
             }
             xmlFree(propValue);
         }
@@ -980,7 +980,7 @@ static void add_skills(equipment * eq, xmlNodeSetPtr nsetSkills)
             assert(propValue != NULL);
             sk = findskill((const char *)propValue);
             if (sk == NOSKILL) {
-                log_error("unknown skill '%s' in equipment-set %s\n", (const char *)propValue, eq->name);
+                log_error("unknown skill '%s' in equipment-set %s\n", (const char *)propValue, equipment_name(eq));
                 xmlFree(propValue);
             }
             else {
@@ -1044,7 +1044,7 @@ add_subsets(xmlDocPtr doc, equipment * eq, xmlNodeSetPtr nsetSubsets)
                     }
                 }
                 if (totalChance > 1.0f) {
-                    log_error("total chance exceeds 1.0: %f in equipment set %s.\n", totalChance, eq->name);
+                    log_error("total chance exceeds 1.0: %f in equipment set %s.\n", totalChance, equipment_name(eq));
                 }
             }
             xmlXPathFreeObject(xpathResult);

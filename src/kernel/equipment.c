@@ -210,6 +210,32 @@ typedef struct eq_entry {
     equipment *value;
 } eq_entry;
 
+typedef struct name_cb_data {
+    const equipment *find;
+    const char *result;
+} name_cb_data;
+
+
+static int equipment_name_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    const eq_entry *ent = (const eq_entry *)match;
+    name_cb_data *query = (name_cb_data *)cbdata;
+    if (ent->value == query->find) {
+        query->result = ent->key;
+        return 1;
+    }
+    return 0;
+}
+
+const char *equipment_name(const struct equipment *eq)
+{
+    name_cb_data data;
+
+    data.find = eq;
+    data.result = NULL;
+    cb_foreach(&cb_equipments, "", 0, equipment_name_cb, &data);
+    return data.result;
+}
+
 equipment *get_equipment(const char *eqname)
 {
     const void *match;
@@ -237,7 +263,6 @@ equipment *create_equipment(const char *eqname)
     memcpy(ent.key, eqname, len);
 
     ent.value = (equipment *)calloc(1, sizeof(equipment));
-    ent.value->name = strdup(eqname);
 
     cb_insert(&cb_equipments, &ent, sizeof(ent));
     return ent.value;
@@ -254,7 +279,6 @@ equipment *get_or_create_equipment(const char *eqname)
 
 static void free_equipment(equipment *eq) {
     int i;
-    free(eq->name);
     if (eq->spells) {
         selist_foreach(eq->spells, free_ls);
         selist_free(eq->spells);
