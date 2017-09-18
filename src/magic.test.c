@@ -51,7 +51,18 @@ void test_updatespells(CuTest * tc)
     test_cleanup();
 }
 
-void test_spellbooks(CuTest * tc)
+static void test_get_spellbook(CuTest * tc)
+{
+    spellbook *sb;
+
+    test_setup();
+    CuAssertPtrNotNull(tc, sb = get_spellbook("hodorhodorhodor"));
+    CuAssertPtrEquals(tc, sb, get_spellbook("hodorhodorhodor"));
+    CuAssertTrue(tc, sb != get_spellbook("hodor"));
+    test_cleanup();
+}
+
+static void test_spellbooks(CuTest * tc)
 {
     spell *sp;
     spellbook *herp, *derp;
@@ -472,6 +483,7 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_multi_cast);
     SUITE_ADD_TEST(suite, test_updatespells);
     SUITE_ADD_TEST(suite, test_spellbooks);
+    SUITE_ADD_TEST(suite, test_get_spellbook);
     SUITE_ADD_TEST(suite, test_pay_spell);
     SUITE_ADD_TEST(suite, test_pay_spell_failure);
     SUITE_ADD_TEST(suite, test_getspell_unit);
