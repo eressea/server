@@ -204,6 +204,7 @@ void free_ls(void *arg) {
 static critbit_tree cb_equipments = { 0 };
 
 #define EQNAMELEN 16
+
 typedef struct eq_entry {
     char key[EQNAMELEN];
     equipment *value;
@@ -211,7 +212,7 @@ typedef struct eq_entry {
 
 equipment *get_equipment(const char *eqname)
 {
-    const char *match;
+    char *match;
 
     assert(strlen(eqname) < EQNAMELEN);
 
