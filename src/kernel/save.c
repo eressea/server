@@ -1378,7 +1378,7 @@ void write_faction(gamedata *data, const faction * f)
 
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
-    WRITE_STR(data->store, f->email);
+    WRITE_STR(data->store, f->email?f->email:"");
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);

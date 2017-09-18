@@ -230,7 +230,8 @@ faction *addfaction(const char *email, const char *password,
     char buf[128];
 
     if (set_email(&f->email, email) != 0) {
-        log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email);
+        log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email?email:"");
+        faction_setemail(f, "");
     }
 
     f->alliance_joindate = turn;
@@ -544,6 +545,8 @@ void faction_setemail(faction * self, const char *email)
     free(self->email);
     if (email)
         self->email = strdup(email);
+    else
+        self->email = strdup("");
 }
 
 const char *faction_getbanner(const faction * self)

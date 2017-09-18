@@ -172,7 +172,7 @@ newfaction *read_newfactions(const char *filename)
             sz += strlcat(password, itoa36(rng_int()), sizeof(password));
         }
         for (f = factions; f; f = f->next) {
-            if (strcmp(f->email, email) == 0 && f->age < MINAGE_MULTI) {
+            if (strcmp(faction_getemail(f), email) == 0 && f->age < MINAGE_MULTI) {
                 log_warning("email %s already in use by %s", email, factionname(f));
                 break;
             }

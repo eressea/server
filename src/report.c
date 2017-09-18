@@ -1750,7 +1750,7 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
             char buf[8192];
             char label = '-';
 
-            sprintf(buf, "%s: %s; %s", factionname(f), f->email,
+            sprintf(buf, "%s: %s; %s", factionname(f), faction_getemail(f),
                 f->banner ? f->banner : "");
             if (uf == f)
                 label = '*';
@@ -2075,7 +2075,7 @@ report_plaintext(const char *filename, report_context * ctx,
     newline(out);
     sprintf(buf, "%s, %s/%s (%s)", factionname(f),
         LOC(f->locale, rc_name_s(f->race, NAME_PLURAL)),
-        LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), f->email);
+        LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), faction_getemail(f));
     centre(out, buf, true);
     if (f_get_alliance(f)) {
         centre(out, alliancename(f->alliance), true);
@@ -2085,8 +2085,11 @@ report_plaintext(const char *filename, report_context * ctx,
         const char *email;
         const char *subject;
         email = config_get("game.email");
+        if (!email)
+          log_error("game.email not set");
         subject = get_mailcmd(f->locale);
-        m = msg_message("newbie_info_game", "email subject", email, subject);
+
+        m = msg_message("newbie_info_game", "email subject", email?email:"???", subject);
         if (m) {
             nr_render(m, f->locale, buf, sizeof(buf), f);
             msg_release(m);

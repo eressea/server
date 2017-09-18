@@ -114,6 +114,8 @@ int set_email(char **pemail, const char *newmail)
     if (newmail && *newmail) {
         if (spc_email_isvalid(newmail) <= 0)
             return -1;
+    } else {
+      return -1;
     }
     if (*pemail)
         free(*pemail);

@@ -126,7 +126,7 @@ static void update_faction(sqlite3 *db, const faction *f) {
     sqlite3_bind_int(stmt, 1, f->subscription);
     sqlite3_bind_text(stmt, 2, code, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, f->name, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, f->email, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, faction_getemail(f), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, locale_name(f->locale), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 6, turn);
     sqlite3_step(stmt);
@@ -144,7 +144,7 @@ static bool db_faction_cb(void *el, void *arg) {
     struct cb_data *cb = (struct cb_data *)arg;
     const faction *f = cb->f;
 
-    if (f->no == df->no || strcmp(f->email, df->email) == 0 || strcmp(f->name, df->name) == 0) {
+    if (f->no == df->no || strcmp(faction_getemail(f), df->email) == 0 || strcmp(f->name, df->name) == 0) {
         cb->dbf = df;
     }
     if (f->subscription == df->uid) {
@@ -172,7 +172,7 @@ int db_update_factions(sqlite3 * db, bool force, int game_id) {
                     log_warning("faction %s(%d) not found in database, but matches %d\n", itoa36(f->no), f->subscription, dbf->uid);
                     f->subscription = dbf->uid;
                 }
-                update = (dbf->no != f->no) || (strcmp(f->email, dbf->email) != 0) || (strcmp(f->name, dbf->name) != 0);
+                update = (dbf->no != f->no) || (strcmp(faction_getemail(f), dbf->email) != 0) || (strcmp(f->name, dbf->name) != 0);
             }
             else {
                 f->subscription = insert_faction(db, game_id, f);

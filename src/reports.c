@@ -1559,7 +1559,14 @@ static void write_script(FILE * F, const faction * f)
 {
     report_type *rtype;
     char buf[1024];
-
+    char *testemail = NULL; 
+    
+    if (set_email(&testemail, faction_getemail(f)) != 0) {
+        free(testemail);
+        return;
+    }
+    free(testemail);
+    
     fprintf(F, "faction=%s:email=%s:lang=%s", itoa36(f->no), f->email,
         locale_name(f->locale));
     if (f->options & (1 << O_BZIP2))
