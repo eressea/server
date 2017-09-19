@@ -257,9 +257,9 @@ extern "C" {
     void region_set_morale(region * r, int morale, int turn);
 
     void write_region_reference(const struct region *r, struct storage *store);
-    variant read_region_reference(struct gamedata *data);
-    int resolve_region_coor(variant id, void *address);
-    int resolve_region_id(variant id, void *address);
+    int read_region_reference(struct gamedata *data);
+    int resolve_region_coor(int id, void *address);
+    int resolve_region_id(int id, void *address);
 #define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
 
     const char *regionname(const struct region *r, const struct faction *f);

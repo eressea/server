@@ -97,9 +97,9 @@ static void wormhole_write(const struct attrib *a, const void *owner, struct sto
 }
 
 /** conversion code, turn 573, 2008-05-23 */
-static int resolve_exit(variant id, void *address)
+static int resolve_exit(int id, void *address)
 {
-    building *b = findbuilding(id.i);
+    building *b = findbuilding(id);
     region **rp = address;
     if (b) {
         *rp = b->region;

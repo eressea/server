@@ -2900,7 +2900,7 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
     struct storage *store = data->store;
     region *r = NULL;
     unit *u;
-    variant var;
+    int id;
     int duration;
     float strength;
     int rx, ry;
@@ -2909,8 +2909,8 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
     UNUSED_ARG(target);
     READ_INT(store, &duration);
     READ_FLT(store, &strength);
-    READ_INT(store, &var.i);
-    u = findunit(var.i);
+    READ_INT(store, &id);
+    u = findunit(id);
 
     /* this only affects really old data. no need to change: */
     READ_INT(store, &rx);
@@ -2927,7 +2927,7 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
                 effect, 0);
         c->data.v = r;
         if (u == NULL) {
-            ur_add(var, &c->magician, resolve_unit);
+            ur_add(id, &c->magician, resolve_unit);
         }
     }
     return AT_READ_FAIL;          /* we don't care for the attribute. */

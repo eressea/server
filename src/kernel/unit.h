@@ -185,9 +185,9 @@ extern "C" {
     void make_zombie(unit * u);
 
     /* see resolve.h */
-    int resolve_unit(variant data, void *address);
+    int resolve_unit(int id, void *address);
     void write_unit_reference(const struct unit *u, struct storage *store);
-    variant read_unit_reference(struct gamedata *data);
+    int read_unit_reference(struct gamedata *data);
 
     bool leave(struct unit *u, bool force);
     bool can_leave(struct unit *u);

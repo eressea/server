@@ -1255,9 +1255,11 @@ int production(const region * r)
     return p;
 }
 
-int resolve_region_coor(variant id, void *address)
+int resolve_region_coor(int id, void *address)
 {
-    region *r = findregion(id.sa[0], id.sa[1]);
+    int x = (id >> 16);
+    int y = id & 0xFFFF;
+    region *r = findregion(x, y);
     if (r) {
         *(region **)address = r;
         return 0;
@@ -1266,11 +1268,11 @@ int resolve_region_coor(variant id, void *address)
     return -1;
 }
 
-int resolve_region_id(variant id, void *address)
+int resolve_region_id(int id, void *address)
 {
     region *r = NULL;
-    if (id.i != 0) {
-        r = findregionbyid(id.i);
+    if (id != 0) {
+        r = findregionbyid(id);
         if (r == NULL) {
             *(region **)address = NULL;
             return -1;
@@ -1280,19 +1282,21 @@ int resolve_region_id(variant id, void *address)
     return 0;
 }
 
-variant read_region_reference(gamedata *data)
+int read_region_reference(gamedata *data)
 {
     struct storage * store = data->store;
-    variant result;
+    int result;
     if (data->version < UIDHASH_VERSION) {
         int n;
+        short x, y;
         READ_INT(store, &n);
-        result.sa[0] = (short)n;
+        x = (short)n;
         READ_INT(store, &n);
-        result.sa[1] = (short)n;
+        y = (short)n;
+        result = x << 16 | (y & 0xFFFF);
     }
     else {
-        READ_INT(store, &result.i);
+        READ_INT(store, &result);
     }
     return result;
 }

@@ -420,7 +420,6 @@ void read_planes(gamedata *data) {
     READ_INT(store, &nread);
     while (--nread >= 0) {
         int id;
-        variant fno;
         plane *pl;
 
         READ_INT(store, &id);
@@ -459,8 +458,8 @@ void read_planes(gamedata *data) {
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
             if (data->version < NOWATCH_VERSION) {
-                fno = read_faction_reference(data);
-                while (fno.i) {
+                int fno = read_faction_reference(data);
+                while (fno) {
                     fno = read_faction_reference(data);
                 }
             }
@@ -509,15 +508,15 @@ void write_alliances(gamedata *data)
     WRITE_SECTION(data->store);
 }
 
-static int resolve_owner(variant id, void *address)
+static int resolve_owner(int id, void *address)
 {
     region_owner *owner = (region_owner *)address;
     int result = 0;
     faction *f = NULL;
-    if (id.i != 0) {
-        f = findfaction(id.i);
+    if (id != 0) {
+        f = findfaction(id);
         if (f == NULL) {
-            log_error("region has an invalid owner (%s)", itoa36(id.i));
+            log_error("region has an invalid owner (%s)", itoa36(id));
         }
     }
     owner->owner = f;
@@ -1171,9 +1170,7 @@ static ally **addally(const faction * f, ally ** sfp, int aid, int state)
 
     sf = ally_add(sfp, af);
     if (!sf->faction) {
-        variant id;
-        id.i = aid;
-        ur_add(id, &sf->faction, resolve_faction);
+        ur_add(aid, &sf->faction, resolve_faction);
     }
     sf->status = state & HELP_ALL;
 
@@ -1489,7 +1486,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 
 int readgame(const char *filename)
 {
-    int n;
+    int n, stream_version;
     char path[MAX_PATH];
     gamedata gdata = { 0 };
     storage store;
@@ -1506,11 +1503,8 @@ int readgame(const char *filename)
         return -1;
     }
     sz = fread(&gdata.version, sizeof(int), 1, F);
-    if (sz != sizeof(int) || gdata.version >= INTPAK_VERSION) {
-        int stream_version;
-        size_t sz = fread(&stream_version, sizeof(int), 1, F);
-        assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
-    }
+    sz = fread(&stream_version, sizeof(int), 1, F);
+    assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
 

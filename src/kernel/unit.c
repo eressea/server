@@ -751,11 +751,11 @@ void write_unit_reference(const unit * u, struct storage *store)
     WRITE_INT(store, (u && u->region) ? u->no : 0);
 }
 
-int resolve_unit(variant id, void *address)
+int resolve_unit(int id, void *address)
 {
     unit *u = NULL;
-    if (id.i != 0) {
-        u = findunit(id.i);
+    if (id != 0) {
+        u = findunit(id);
         if (u == NULL) {
             *(unit **)address = NULL;
             return -1;
@@ -765,11 +765,11 @@ int resolve_unit(variant id, void *address)
     return 0;
 }
 
-variant read_unit_reference(gamedata *data)
+int read_unit_reference(gamedata *data)
 {
-    variant var;
-    READ_INT(data->store, &var.i);
-    return var;
+    int id;
+    READ_INT(data->store, &id);
+    return id;
 }
 
 int get_level(const unit * u, skill_t id)

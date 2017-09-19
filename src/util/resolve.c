@@ -37,26 +37,19 @@ static unresolved *ur_list;
 static unresolved *ur_begin;
 static unresolved *ur_current;
 
-variant read_int(struct storage *store)
-{
-    variant var;
-    READ_INT(store, &var.i);
-    return var;
-}
-
 int
 read_reference(void *address, struct gamedata * data, read_fun reader,
     resolve_fun resolver)
 {
-    variant var = reader(data);
-    int result = resolver(var, address);
+    int id = reader(data);
+    int result = resolver(id, address);
     if (result != 0) {
-        ur_add(var, address, resolver);
+        ur_add(id, address, resolver);
     }
     return result;
 }
 
-void ur_add(variant data, void *ptrptr, resolve_fun fun)
+void ur_add(int id, void *ptrptr, resolve_fun fun)
 {
     assert(ptrptr);
     if (ur_list == NULL) {
@@ -68,7 +61,7 @@ void ur_add(variant data, void *ptrptr, resolve_fun fun)
         ur_current->data.v = ur_begin;
         ur_current = ur_begin;
     }
-    ur_current->data = data;
+    ur_current->data.i = id;
     ur_current->resolve = fun;
     ur_current->ptrptr = ptrptr;
 
@@ -88,7 +81,7 @@ void resolve(void)
             continue;
         }
         assert(ur->ptrptr);
-        ur->resolve(ur->data, ur->ptrptr);
+        ur->resolve(ur->data.i, ur->ptrptr);
         ++ur;
     }
     free(ur_list);

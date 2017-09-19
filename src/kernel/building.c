@@ -322,12 +322,12 @@ void write_building_reference(const struct building *b, struct storage *store)
     WRITE_INT(store, (b && b->region) ? b->no : 0);
 }
 
-int resolve_building(variant id, void *address)
+int resolve_building(int id, void *address)
 {
     int result = 0;
     building *b = NULL;
-    if (id.i != 0) {
-        b = findbuilding(id.i);
+    if (id != 0) {
+        b = findbuilding(id);
         if (b == NULL) {
             result = -1;
         }
@@ -336,10 +336,10 @@ int resolve_building(variant id, void *address)
     return result;
 }
 
-variant read_building_reference(gamedata * data)
+int read_building_reference(gamedata * data)
 {
-    variant result;
-    READ_INT(data->store, &result.i);
+    int result;
+    READ_INT(data->store, &result);
     return result;
 }
 

@@ -203,12 +203,12 @@ const char *factionname(const faction * f)
     return ibuf;
 }
 
-int resolve_faction(variant id, void *address)
+int resolve_faction(int id, void *address)
 {
     int result = 0;
     faction *f = NULL;
-    if (id.i != 0) {
-        f = findfaction(id.i);
+    if (id != 0) {
+        f = findfaction(id);
         if (f == NULL) {
             result = -1;
         }
@@ -332,10 +332,10 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-variant read_faction_reference(gamedata * data)
+int read_faction_reference(gamedata * data)
 {
-    variant id;
-    READ_INT(data->store, &id.i);
+    int id;
+    READ_INT(data->store, &id);
     return id;
 }
 

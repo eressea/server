@@ -239,12 +239,12 @@ void read_groups(gamedata *data, faction * f)
         pa = &g->allies;
         for (;;) {
             ally *a;
-            variant fid;
+            int fid;
 
             fid = read_faction_reference(data);
-            if (fid.i <= 0)
+            if (fid <= 0)
                 break;
-            a = ally_add(pa, findfaction(fid.i));
+            a = ally_add(pa, findfaction(fid));
             READ_INT(store, &a->status);
             if (!a->faction)
                 ur_add(fid, &a->faction, resolve_faction);

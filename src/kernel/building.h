@@ -152,10 +152,10 @@ extern "C" {
 #include "build.h"
 #define NOBUILDING NULL
 
-    int resolve_building(variant data, void *address);
+    int resolve_building(int id, void *address);
     void write_building_reference(const struct building *b,
     struct storage *store);
-    variant read_building_reference(struct gamedata *data);
+    int read_building_reference(struct gamedata *data);
 
     struct building *findbuilding(int n);
 

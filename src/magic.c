@@ -2262,10 +2262,10 @@ bool create_newfamiliar(unit * mage, unit * familiar)
     return true;
 }
 
-static int resolve_familiar(variant data, void *addr)
+static int resolve_familiar(int id, void *addr)
 {
     unit *familiar;
-    int result = resolve_unit(data, &familiar);
+    int result = resolve_unit(id, &familiar);
     if (result == 0 && familiar) {
         attrib *a = a_find(familiar->attribs, &at_familiarmage);
         if (a != NULL && a->data.v) {
@@ -2346,10 +2346,10 @@ unit *has_clone(unit * mage)
     return NULL;
 }
 
-static int resolve_clone(variant data, void *addr)
+static int resolve_clone(int id, void *addr)
 {
     unit *clone;
-    int result = resolve_unit(data, &clone);
+    int result = resolve_unit(id, &clone);
     if (result == 0 && clone) {
         attrib *a = a_find(clone->attribs, &at_clonemage);
         if (a != NULL && a->data.v) {
@@ -2372,10 +2372,10 @@ static int read_clone(attrib * a, void *owner, struct gamedata *data)
 }
 
 /* mages */
-static int resolve_mage(variant data, void *addr)
+static int resolve_mage(int id, void *addr)
 {
     unit *mage;
-    int result = resolve_unit(data, &mage);
+    int result = resolve_unit(id, &mage);
     if (result == 0 && mage) {
         attrib *a = a_find(mage->attribs, &at_familiar);
         if (a != NULL && a->data.v) {
