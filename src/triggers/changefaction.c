@@ -83,15 +83,10 @@ static void changefaction_write(const trigger * t, struct storage *store)
 
 static int changefaction_read(trigger * t, gamedata *data)
 {
-    int id;
     changefaction_data *td = (changefaction_data *)t->data.v;
 
-    read_reference(&td->unit, data, read_unit_reference, resolve_unit);
-    id = read_faction_reference(data);
-    if (id == 0) {
-        return AT_READ_FAIL;
-    }
-    ur_add(id, &td->faction, resolve_faction);
+    read_unit_reference(data, &td->unit, NULL);
+    read_faction_reference(data, &td->faction, NULL);
     return AT_READ_OK;
 }
 

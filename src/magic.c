@@ -2262,26 +2262,21 @@ bool create_newfamiliar(unit * mage, unit * familiar)
     return true;
 }
 
-static int resolve_familiar(int id, void *addr)
-{
-    unit *familiar;
-    int result = resolve_unit(id, &familiar);
-    if (result == 0 && familiar) {
+static void * resolve_familiar(int id, void *data) {
+    if (data) {
+        unit *familiar = (unit *)data;
         attrib *a = a_find(familiar->attribs, &at_familiarmage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = familiar;
-    return result;
+    return data;
 }
 
 static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_familiar);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2346,52 +2341,42 @@ unit *has_clone(unit * mage)
     return NULL;
 }
 
-static int resolve_clone(int id, void *addr)
-{
-    unit *clone;
-    int result = resolve_unit(id, &clone);
-    if (result == 0 && clone) {
+static void * resolve_clone(int id, void *data) {
+    if (data) {
+        unit *clone = (unit *)data;
         attrib *a = a_find(clone->attribs, &at_clonemage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_clone(mage, clone);
         }
     }
-    *(unit **)addr = clone;
-    return result;
+    return data;
 }
 
 static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_clone);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
 }
 
 /* mages */
-static int resolve_mage(int id, void *addr)
-{
-    unit *mage;
-    int result = resolve_unit(id, &mage);
-    if (result == 0 && mage) {
+static void * resolve_mage(int id, void *data) {
+    if (data) {
+        unit *mage = (unit *)data;
         attrib *a = a_find(mage->attribs, &at_familiar);
         if (a != NULL && a->data.v) {
             unit *familiar = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = mage;
-    return result;
+    return data;
 }
 
 static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_mage);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

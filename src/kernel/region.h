@@ -19,10 +19,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
 
-#include <stddef.h>
-#include <stdbool.h>
+#include <util/resolve.h>
+
 #include "types.h"
 #include "direction.h"
+
+#include <stddef.h>
+#include <stdbool.h>
 
 #define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
 #define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
@@ -257,10 +260,8 @@ extern "C" {
     void region_set_morale(region * r, int morale, int turn);
 
     void write_region_reference(const struct region *r, struct storage *store);
-    int read_region_reference(struct gamedata *data);
-    int resolve_region_coor(int id, void *address);
-    int resolve_region_id(int id, void *address);
-#define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
+    int read_region_reference(struct gamedata *data, void **rp, resolve_fun fun);
+    void resolve_region(region *r);
 
     const char *regionname(const struct region *r, const struct faction *f);
 

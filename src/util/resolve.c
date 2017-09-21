@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "variant.h"
 
 typedef struct unresolved {
-    void *ptrptr;
+    void **addr;
     /* address to pass to the resolve-function */
     variant data;
     /* information on how to resolve the missing object */
@@ -37,21 +37,10 @@ static unresolved *ur_list;
 static unresolved *ur_begin;
 static unresolved *ur_current;
 
-int
-read_reference(void *address, struct gamedata * data, read_fun reader,
-    resolve_fun resolver)
+void ur_add(int id, void **addr, resolve_fun fun)
 {
-    int id = reader(data);
-    int result = resolver(id, address);
-    if (result != 0) {
-        ur_add(id, address, resolver);
-    }
-    return result;
-}
-
-void ur_add(int id, void *ptrptr, resolve_fun fun)
-{
-    assert(ptrptr);
+    assert(addr);
+    assert(!*addr);
     if (ur_list == NULL) {
         ur_list = malloc(BLOCKSIZE * sizeof(unresolved));
         ur_begin = ur_current = ur_list;
@@ -63,25 +52,32 @@ void ur_add(int id, void *ptrptr, resolve_fun fun)
     }
     ur_current->data.i = id;
     ur_current->resolve = fun;
-    ur_current->ptrptr = ptrptr;
+    ur_current->addr = addr;
 
     ++ur_current;
-    ur_current->resolve = NULL;
+    ur_current->addr = NULL;
     ur_current->data.v = NULL;
 }
 
-void resolve(void)
+void resolve(int id, void *data)
 {
     unresolved *ur = ur_list;
+    /* TODO: hella slow! hashing is better */
     while (ur) {
-        if (ur->resolve == NULL) {
+        if (ur->addr == NULL) {
             ur = ur->data.v;
             free(ur_list);
             ur_list = ur;
             continue;
         }
-        assert(ur->ptrptr);
-        ur->resolve(ur->data.i, ur->ptrptr);
+        if (id == ur->data.i) {
+            if (ur->resolve) {
+                *ur->addr = ur->resolve(id, data);
+            }
+            else {
+                *ur->addr = data;
+            }
+        }
         ++ur;
     }
     free(ur_list);

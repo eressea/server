@@ -86,8 +86,7 @@ static void lc_done(struct attrib *a)
     free(data);
 }
 
-static void
-lc_write(const struct attrib *a, const void *owner, struct storage *store)
+static void lc_write(const struct attrib *a, const void *owner, struct storage *store)
 {
     building_action *data = (building_action *)a->data.v;
     const char *fname = data->fname;

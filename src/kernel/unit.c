@@ -648,9 +648,7 @@ void a_writesiege(const attrib * a, const void *owner, struct storage *store)
 
 int a_readsiege(attrib * a, void *owner, gamedata *data)
 {
-    int result = read_reference(&a->data.v, data, read_building_reference,
-        resolve_building);
-    if (result == 0 && !a->data.v) {
+    if (read_building_reference(data, &a->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -751,24 +749,27 @@ void write_unit_reference(const unit * u, struct storage *store)
     WRITE_INT(store, (u && u->region) ? u->no : 0);
 }
 
-int resolve_unit(int id, void *address)
+#define RESOLVE_UNIT (TYP_UNIT << 24)
+
+void resolve_unit(unit *u)
 {
-    unit *u = NULL;
-    if (id != 0) {
-        u = findunit(id);
-        if (u == NULL) {
-            *(unit **)address = NULL;
-            return -1;
-        }
-    }
-    *(unit **)address = u;
-    return 0;
+    resolve(RESOLVE_UNIT | u->no, u);
 }
 
-int read_unit_reference(gamedata *data)
+int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
 {
     int id;
     READ_INT(data->store, &id);
+    if (id > 0) {
+        *up = findunit(id);
+        if (*up == NULL) {
+            *up = NULL;
+            ur_add(RESOLVE_UNIT | id, up, fun);
+        }
+    }
+    else {
+        *up = NULL;
+    }
     return id;
 }
 

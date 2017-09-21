@@ -322,25 +322,28 @@ void write_building_reference(const struct building *b, struct storage *store)
     WRITE_INT(store, (b && b->region) ? b->no : 0);
 }
 
-int resolve_building(int id, void *address)
+#define RESOLVE_BUILDING (TYP_BUILDING << 24)
+
+void resolve_building(building *b)
 {
-    int result = 0;
-    building *b = NULL;
-    if (id != 0) {
-        b = findbuilding(id);
-        if (b == NULL) {
-            result = -1;
-        }
-    }
-    *(building **)address = b;
-    return result;
+    resolve(RESOLVE_BUILDING | b->no, b);
 }
 
-int read_building_reference(gamedata * data)
+int read_building_reference(gamedata * data, void **bp, resolve_fun fun)
 {
-    int result;
-    READ_INT(data->store, &result);
-    return result;
+    int id;
+    READ_INT(data->store, &id);
+    if (id > 0) {
+        *bp = findbuilding(id);
+        if (*bp == NULL) {
+            *bp = NULL;
+            ur_add(RESOLVE_BUILDING | id, bp, fun);
+        }
+    }
+    else {
+        *bp = NULL;
+    }
+    return id;
 }
 
 building *new_building(const struct building_type * btype, region * r,

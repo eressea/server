@@ -96,7 +96,7 @@ static int obs_read(struct attrib *a, void *owner, struct gamedata *data)
 {
     obs_data *od = (obs_data *)a->data.v;
 
-    read_reference(&od->f, data, read_faction_reference, resolve_faction);
+    read_faction_reference(data, &od->f, NULL);
     READ_INT(data->store, &od->skill);
     READ_INT(data->store, &od->timer);
     return AT_READ_OK;

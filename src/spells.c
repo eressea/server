@@ -2922,12 +2922,11 @@ static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
         curse *c;
 
         effect = strength;
-        c =
-            create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration,
-                effect, 0);
+        c = create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration,
+            effect, 0);
         c->data.v = r;
         if (u == NULL) {
-            ur_add(id, &c->magician, resolve_unit);
+            ur_add(id, &c->magician, NULL);
         }
     }
     return AT_READ_FAIL;          /* we don't care for the attribute. */

@@ -1255,50 +1255,53 @@ int production(const region * r)
     return p;
 }
 
-int resolve_region_coor(int id, void *address)
+void * resolve_region_coor(int id, void **address)
 {
     int x = (id >> 16);
     int y = id & 0xFFFF;
-    region *r = findregion(x, y);
-    if (r) {
-        *(region **)address = r;
-        return 0;
-    }
-    *(region **)address = NULL;
-    return -1;
+    return *(region **)address = findregion(x, y);
 }
 
-int resolve_region_id(int id, void *address)
+#define RESOLVE_REGION_ID (TYP_REGION << 24)
+#define RESOLVE_REGION_XY ((TYP_REGION|0x10) << 24)
+
+void resolve_region(region *r)
 {
-    region *r = NULL;
-    if (id != 0) {
-        r = findregionbyid(id);
-        if (r == NULL) {
-            *(region **)address = NULL;
-            return -1;
-        }
-    }
-    *(region **)address = r;
-    return 0;
+    short x = (short)r->x;
+    short y = (short)r->y;
+    int id = x << 16 | (y & 0xFFFF);
+
+    resolve(RESOLVE_REGION_XY | id, r);
+    resolve(RESOLVE_REGION_ID | r->uid, r);
 }
 
-int read_region_reference(gamedata *data)
+int read_region_reference(gamedata * data, void **rp, resolve_fun fun)
 {
     struct storage * store = data->store;
-    int result;
-    if (data->version < UIDHASH_VERSION) {
+    int id = 0;
+
+    if (data->version >= UIDHASH_VERSION) {
+        READ_INT(store, &id);
+        *rp = findregionbyid(id);
+        if (*rp == NULL) {
+            ur_add(RESOLVE_REGION_ID | id, rp, fun);
+        }
+    }
+    else {
         int n;
         short x, y;
         READ_INT(store, &n);
         x = (short)n;
         READ_INT(store, &n);
         y = (short)n;
-        result = x << 16 | (y & 0xFFFF);
+        *rp = findregion(x, y);
+        if (*rp == NULL) {
+            id = x << 16 | (y & 0xFFFF);
+            ur_add(RESOLVE_REGION_XY | id, rp, resolve_region_coor);
+        }
+
     }
-    else {
-        READ_INT(store, &result);
-    }
-    return result;
+    return id;
 }
 
 void write_region_reference(const region * r, struct storage *store)

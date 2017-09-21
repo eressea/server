@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_BUILDING
 
 #include <kernel/types.h>
-#include <util/variant.h>
+#include <util/resolve.h>
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -152,10 +152,10 @@ extern "C" {
 #include "build.h"
 #define NOBUILDING NULL
 
-    int resolve_building(int id, void *address);
+    void resolve_building(building *b);
     void write_building_reference(const struct building *b,
     struct storage *store);
-    int read_building_reference(struct gamedata *data);
+    int read_building_reference(struct gamedata * data, void **bp, resolve_fun fun);
 
     struct building *findbuilding(int n);
 

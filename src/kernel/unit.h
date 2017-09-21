@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_UNIT_H
 #define H_KRNL_UNIT_H
 
-#include <util/variant.h>
+#include <util/resolve.h>
 #include "types.h"
 #include "skills.h"
 #include <stddef.h>
@@ -182,12 +182,12 @@ extern "C" {
 #define GIFT_FRIENDS  1<<1
 #define GIFT_PEASANTS 1<<2
     int gift_items(struct unit *u, int flags);
-    void make_zombie(unit * u);
+    void make_zombie(struct unit * u);
 
     /* see resolve.h */
-    int resolve_unit(int id, void *address);
+    void resolve_unit(struct unit *u);
     void write_unit_reference(const struct unit *u, struct storage *store);
-    int read_unit_reference(struct gamedata *data);
+    int read_unit_reference(struct gamedata * data, struct unit **up, resolve_fun fun);
 
     bool leave(struct unit *u, bool force);
     bool can_leave(struct unit *u);
