@@ -660,19 +660,6 @@ int read_borders(gamedata *data)
             b->id = bid;
             assert(bid <= nextborder);
             type->read(b, data);
-            if (data->version < NOBORDERATTRIBS_VERSION) {
-                attrib *a = NULL;
-                int result = read_attribs(data, &a, b);
-                if (border_convert_cb) {
-                    border_convert_cb(b, a);
-                }
-                while (a) {
-                    a_remove(&a, a);
-                }
-                if (result < 0) {
-                    return result;
-                }
-            }
             if (!type->write) {
                 log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
             }

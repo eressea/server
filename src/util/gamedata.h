@@ -5,10 +5,7 @@
 
 #include <stream.h>
 
-#define INTPAK_VERSION 329      /* in binary, ints can get packed. starting with E2/572 */
-#define NOZEROIDS_VERSION 330   /* 2008-05-16 zero is not a valid ID for anything (including factions) */
-#define NOBORDERATTRIBS_VERSION 331     /* 2008-05-17 connection::attribs has been moved to userdata */
-#define UIDHASH_VERSION 332     /* 2008-05-22 borders use the region.uid to store */
+#define UIDHASH_VERSION 332     /* 2008-05-22 = 572 borders use the region.uid to store */
 #define REGIONOWNER_VERSION 333 /* 2009-05-14 regions have owners and morale */
 #define ALLIANCELEADER_VERSION 333      /* alliances have a leader */
 #define CURSEFLOAT_VERSION 334  /* all curse-effects are float */
@@ -43,7 +40,7 @@
 #define CRYPT_VERSION 400 /* passwords are encrypted */
 
 #define RELEASE_VERSION SKILLSORT_VERSION /* current datafile */
-#define MIN_VERSION INTPAK_VERSION      /* minimal datafile we support */
+#define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
 #define STREAM_VERSION 2 /* internal encoding of binary files */

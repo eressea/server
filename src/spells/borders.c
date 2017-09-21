@@ -94,9 +94,7 @@ static void wall_read(connection * b, gamedata * data)
 
     read_reference(&fd->mage, data, read_unit_reference, resolve_unit);
     READ_INT(data->store, &fd->force);
-    if (data->version >= NOBORDERATTRIBS_VERSION) {
-        READ_INT(data->store, &fd->countdown);
-    }
+    READ_INT(data->store, &fd->countdown);
     fd->active = true;
 }
 
