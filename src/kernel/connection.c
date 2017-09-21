@@ -606,7 +606,7 @@ int read_borders(gamedata *data)
 {
     struct storage *store = data->store;
     for (;;) {
-        int bid = 0;
+        int fid, tid, bid;
         char zText[32];
         region *from, *to;
         border_type *type;
@@ -621,22 +621,10 @@ int read_borders(gamedata *data)
         }
 
         READ_INT(store, &bid);
-        if (data->version < UIDHASH_VERSION) {
-            int fx, fy, tx, ty;
-            READ_INT(store, &fx);
-            READ_INT(store, &fy);
-            READ_INT(store, &tx);
-            READ_INT(store, &ty);
-            from = findregion(fx, fy);
-            to = findregion(tx, ty);
-        }
-        else {
-            int fid, tid;
-            READ_INT(store, &fid);
-            READ_INT(store, &tid);
-            from = findregionbyid(fid);
-            to = findregionbyid(tid);
-        }
+        READ_INT(store, &fid);
+        READ_INT(store, &tid);
+        from = findregionbyid(fid);
+        to = findregionbyid(tid);
         if (!to || !from) {
             log_error("%s connection %d has missing regions", zText, bid);
             if (type->read) {

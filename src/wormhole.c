@@ -96,16 +96,6 @@ static void wormhole_write(const struct attrib *a, const void *owner, struct sto
     write_region_reference(exit, store);
 }
 
-/** conversion code, turn 573, 2008-05-23 */
-static void * resolve_exit(int id, void *data)
-{
-    building *b = (building *)data;
-    if (b) {
-        return b->region;
-    }
-    return NULL;
-}
-
 static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
 {
     int id;
@@ -113,12 +103,7 @@ static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);
     }
-    if (data->version < UIDHASH_VERSION) {
-        id = read_building_reference(data, &a->data.v, resolve_exit);
-    }
-    else {
-        id = read_region_reference(data, &a->data.v, NULL);
-    }
+    id = read_region_reference(data, &a->data.v, NULL);
     return (id <= 0) ? AT_READ_FAIL : AT_READ_OK;
 }
 

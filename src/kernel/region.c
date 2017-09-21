@@ -1255,24 +1255,11 @@ int production(const region * r)
     return p;
 }
 
-void * resolve_region_coor(int id, void **address)
-{
-    int x = (id >> 16);
-    int y = id & 0xFFFF;
-    return *(region **)address = findregion(x, y);
-}
-
-#define RESOLVE_REGION_ID (TYP_REGION << 24)
-#define RESOLVE_REGION_XY ((TYP_REGION|0x10) << 24)
+#define RESOLVE_REGION (TYP_REGION << 24)
 
 void resolve_region(region *r)
 {
-    short x = (short)r->x;
-    short y = (short)r->y;
-    int id = x << 16 | (y & 0xFFFF);
-
-    resolve(RESOLVE_REGION_XY | id, r);
-    resolve(RESOLVE_REGION_ID | r->uid, r);
+    resolve(RESOLVE_REGION | r->uid, r);
 }
 
 int read_region_reference(gamedata * data, void **rp, resolve_fun fun)
@@ -1280,26 +1267,10 @@ int read_region_reference(gamedata * data, void **rp, resolve_fun fun)
     struct storage * store = data->store;
     int id = 0;
 
-    if (data->version >= UIDHASH_VERSION) {
-        READ_INT(store, &id);
-        *rp = findregionbyid(id);
-        if (*rp == NULL) {
-            ur_add(RESOLVE_REGION_ID | id, rp, fun);
-        }
-    }
-    else {
-        int n;
-        short x, y;
-        READ_INT(store, &n);
-        x = (short)n;
-        READ_INT(store, &n);
-        y = (short)n;
-        *rp = findregion(x, y);
-        if (*rp == NULL) {
-            id = x << 16 | (y & 0xFFFF);
-            ur_add(RESOLVE_REGION_XY | id, rp, resolve_region_coor);
-        }
-
+    READ_INT(store, &id);
+    *rp = findregionbyid(id);
+    if (*rp == NULL) {
+        ur_add(RESOLVE_REGION | id, rp, fun);
     }
     return id;
 }
