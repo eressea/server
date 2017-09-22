@@ -612,15 +612,16 @@ int read_borders(gamedata *data)
         border_type *type;
 
         READ_TOK(store, zText, sizeof(zText));
-        if (!strcmp(zText, "end"))
+        if (!strcmp(zText, "end")) {
             break;
+        }
+        READ_INT(store, &bid);
         type = find_bordertype(zText);
         if (type == NULL) {
             log_error("[read_borders] connection %d type %s is not registered", bid, zText);
             assert(type || !"connection type not registered");
         }
 
-        READ_INT(store, &bid);
         READ_INT(store, &fid);
         READ_INT(store, &tid);
         from = findregionbyid(fid);
