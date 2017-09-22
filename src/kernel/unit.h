@@ -185,6 +185,7 @@ extern "C" {
     void make_zombie(struct unit * u);
 
     /* see resolve.h */
+#define RESOLVE_UNIT (TYP_UNIT << 24)
     void resolve_unit(struct unit *u);
     void write_unit_reference(const struct unit *u, struct storage *store);
     int read_unit_reference(struct gamedata * data, struct unit **up, resolve_fun fun);

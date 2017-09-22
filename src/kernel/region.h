@@ -259,9 +259,10 @@ extern "C" {
     int region_get_morale(const region * r);
     void region_set_morale(region * r, int morale, int turn);
 
+#define RESOLVE_REGION (TYP_REGION << 24)
+    void resolve_region(region *r);
     void write_region_reference(const struct region *r, struct storage *store);
     int read_region_reference(struct gamedata *data, region **rp, resolve_fun fun);
-    void resolve_region(region *r);
 
     const char *regionname(const struct region *r, const struct faction *f);
 

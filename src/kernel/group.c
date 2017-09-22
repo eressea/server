@@ -24,6 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ally.h"
 #include "faction.h"
 #include "unit.h"
+#include "objtypes.h"
 
 /* attrib includes */
 #include <attributes/raceprefix.h>
@@ -239,9 +240,13 @@ void read_groups(gamedata *data, faction * f)
         pa = &g->allies;
         for (;;) {
             ally *al;
+            int id;
+            READ_INT(store, &id);
+            if (id == 0) break;
             al = ally_add(pa, NULL);
-            if (read_faction_reference(data, &al->faction, NULL) <= 0) {
-                break;
+            al->faction = findfaction(id);
+            if (!al->faction) {
+                ur_add(RESOLVE_FACTION | id, (void **)&al->faction, NULL);
             }
             READ_INT(store, &al->status);
         }

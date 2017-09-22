@@ -749,8 +749,6 @@ void write_unit_reference(const unit * u, struct storage *store)
     WRITE_INT(store, (u && u->region) ? u->no : 0);
 }
 
-#define RESOLVE_UNIT (TYP_UNIT << 24)
-
 void resolve_unit(unit *u)
 {
     resolve(RESOLVE_UNIT | u->no, u);

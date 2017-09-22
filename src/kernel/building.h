@@ -152,6 +152,7 @@ extern "C" {
 #include "build.h"
 #define NOBUILDING NULL
 
+#define RESOLVE_BUILDING (TYP_BUILDING << 24)
     void resolve_building(building *b);
     void write_building_reference(const struct building *b,
     struct storage *store);

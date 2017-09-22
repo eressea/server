@@ -317,8 +317,6 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-#define RESOLVE_FACTION (TYP_FACTION << 24)
-
 void resolve_faction(faction *f)
 {
     resolve(RESOLVE_FACTION | f->no, f);

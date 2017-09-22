@@ -322,8 +322,6 @@ void write_building_reference(const struct building *b, struct storage *store)
     WRITE_INT(store, (b && b->region) ? b->no : 0);
 }
 
-#define RESOLVE_BUILDING (TYP_BUILDING << 24)
-
 void resolve_building(building *b)
 {
     resolve(RESOLVE_BUILDING | b->no, b);

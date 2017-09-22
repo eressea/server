@@ -1255,8 +1255,6 @@ int production(const region * r)
     return p;
 }
 
-#define RESOLVE_REGION (TYP_REGION << 24)
-
 void resolve_region(region *r)
 {
     resolve(RESOLVE_REGION | r->uid, r);
