@@ -1152,31 +1152,6 @@ void write_region(gamedata *data, const region *r)
     writeregion(data, r);
 }
 
-static ally **addally(const faction * f, ally ** sfp, int aid, int state)
-{
-    struct faction *af = findfaction(aid);
-    ally *sf;
-
-    state &= ~HELP_OBSERVE;
-    state &= ~HELP_TRAVEL;
-    state &= HelpMask();
-
-    if (state == 0)
-        return sfp;
-
-    while (*sfp) {
-        sfp = &(*sfp)->next;
-    }
-
-    sf = ally_add(sfp, af);
-    if (!sf->faction) {
-        ur_add(aid, &sf->faction, NULL);
-    }
-    sf->status = state & HELP_ALL;
-
-    return &sf->next;
-}
-
 int get_spell_level_faction(const spell * sp, void * cbdata)
 {
     static spellbook * common = 0;
@@ -1385,18 +1360,7 @@ faction *read_faction(gamedata * data)
         f->options &= ~want(O_JSON);
     }
     sfp = &f->allies;
-    for (;;) {
-        int aid = 0;
-        READ_INT(data->store, &aid);
-        if (aid > 0) {
-            int state;
-            READ_INT(data->store, &state);
-            sfp = addally(f, sfp, aid, state);
-        }
-        else {
-            break;
-        }
-    }
+    read_allies(data, f);
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {

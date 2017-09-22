@@ -10,9 +10,32 @@
 #include "plane.h"
 
 #include <util/attrib.h>
+#include <util/gamedata.h>
+
+#include <storage.h>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+void read_allies(gamedata * data, faction *f)
+{
+    ally **sfp = &f->allies;
+    for (;;) {
+        int aid;
+        ally * al = ally_add(sfp, NULL);
+        aid = read_faction_reference(data, &al->faction, NULL);
+        if (aid > 0) {
+            int state;
+            READ_INT(data->store, &state);
+            al->status = state & HELP_ALL;
+            sfp = &al->next;
+        }
+        else {
+            break;
+        }
+    }
+}
 
 ally * ally_find(ally *al, const struct faction *f) {
     for (; al; al = al->next) {
