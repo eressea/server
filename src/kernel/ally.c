@@ -7,6 +7,7 @@
 #include "region.h"
 #include "group.h"
 #include "faction.h"
+#include "objtypes.h"
 #include "plane.h"
 
 #include <util/attrib.h>
@@ -23,10 +24,13 @@ void read_allies(gamedata * data, faction *f)
     ally **sfp = &f->allies;
     for (;;) {
         int aid;
-        ally * al = ally_add(sfp, NULL);
-        aid = read_faction_reference(data, &al->faction, NULL);
+        READ_INT(data->store, &aid);
         if (aid > 0) {
+            ally * al = ally_add(sfp, NULL);
             int state;
+            if ((al->faction = findfaction(aid)) == NULL) {
+                ur_add(RESOLVE_FACTION | aid, &al->faction, NULL);
+            }
             READ_INT(data->store, &state);
             al->status = state & HELP_ALL;
             sfp = &al->next;

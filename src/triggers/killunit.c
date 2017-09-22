@@ -60,7 +60,7 @@ static void killunit_write(const trigger * t, struct storage *store)
 
 static int killunit_read(trigger * t, gamedata *data)
 {
-    if (read_unit_reference(data, (unit **)&t->data.v, NULL)) {
+    if (read_unit_reference(data, (unit **)&t->data.v, NULL) == 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
