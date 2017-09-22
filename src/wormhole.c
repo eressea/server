@@ -103,7 +103,7 @@ static int wormhole_read(struct attrib *a, void *owner, struct gamedata *data)
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);
     }
-    id = read_region_reference(data, &a->data.v, NULL);
+    id = read_region_reference(data, (region **)&a->data.v, NULL);
     return (id <= 0) ? AT_READ_FAIL : AT_READ_OK;
 }
 

@@ -226,7 +226,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         READ_INT(store, &c->data.i);
     }
     if (c->type->typ == CURSETYP_REGION) {
-        int rr = read_region_reference(data, &c->data.v, NULL);
+        int rr = read_region_reference(data, (region **)&c->data.v, NULL);
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }

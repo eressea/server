@@ -36,7 +36,7 @@ write_targetregion(const attrib * a, const void *owner, struct storage *store)
 
 static int read_targetregion(attrib * a, void *owner, gamedata *data)
 {
-    if (read_region_reference(data, &a->data.v, NULL) <= 0) {
+    if (read_region_reference(data, (region **)&a->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

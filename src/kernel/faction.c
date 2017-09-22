@@ -332,7 +332,7 @@ int read_faction_reference(gamedata * data, faction **fp, resolve_fun fun)
         *fp = findfaction(id);
         if (*fp == NULL) {
             *fp = NULL;
-            ur_add(RESOLVE_FACTION | id, fp, fun);
+            ur_add(RESOLVE_FACTION | id, (void **)fp, fun);
         }
     }
     else {

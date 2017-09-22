@@ -1262,7 +1262,7 @@ void resolve_region(region *r)
     resolve(RESOLVE_REGION | r->uid, r);
 }
 
-int read_region_reference(gamedata * data, void **rp, resolve_fun fun)
+int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
 {
     struct storage * store = data->store;
     int id = 0;
@@ -1270,7 +1270,7 @@ int read_region_reference(gamedata * data, void **rp, resolve_fun fun)
     READ_INT(store, &id);
     *rp = findregionbyid(id);
     if (*rp == NULL) {
-        ur_add(RESOLVE_REGION | id, rp, fun);
+        ur_add(RESOLVE_REGION | id, (void **)rp, fun);
     }
     return id;
 }

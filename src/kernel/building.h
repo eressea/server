@@ -155,7 +155,7 @@ extern "C" {
     void resolve_building(building *b);
     void write_building_reference(const struct building *b,
     struct storage *store);
-    int read_building_reference(struct gamedata * data, void **bp, resolve_fun fun);
+    int read_building_reference(struct gamedata * data, struct building **bp, resolve_fun fun);
 
     struct building *findbuilding(int n);
 

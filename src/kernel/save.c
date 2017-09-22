@@ -508,21 +508,6 @@ void write_alliances(gamedata *data)
     WRITE_SECTION(data->store);
 }
 
-static int resolve_owner(int id, void *address)
-{
-    region_owner *owner = (region_owner *)address;
-    int result = 0;
-    faction *f = NULL;
-    if (id != 0) {
-        f = findfaction(id);
-        if (f == NULL) {
-            log_error("region has an invalid owner (%s)", itoa36(id));
-        }
-    }
-    owner->owner = f;
-    return result;
-}
-
 static void read_owner(gamedata *data, region_owner ** powner)
 {
     int since_turn;
@@ -1230,7 +1215,6 @@ void _test_write_password(gamedata *data, const faction *f) {
 
 faction *read_faction(gamedata * data)
 {
-    ally **sfp;
     int planes, n;
     faction *f;
     char name[DISPLAYSIZE];
@@ -1359,7 +1343,6 @@ faction *read_faction(gamedata * data)
         /* mistakes were made in the past*/
         f->options &= ~want(O_JSON);
     }
-    sfp = &f->allies;
     read_allies(data, f);
     read_groups(data, f);
     f->spellbook = 0;

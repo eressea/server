@@ -329,7 +329,7 @@ void resolve_building(building *b)
     resolve(RESOLVE_BUILDING | b->no, b);
 }
 
-int read_building_reference(gamedata * data, void **bp, resolve_fun fun)
+int read_building_reference(gamedata * data, building **bp, resolve_fun fun)
 {
     int id;
     READ_INT(data->store, &id);
@@ -337,7 +337,7 @@ int read_building_reference(gamedata * data, void **bp, resolve_fun fun)
         *bp = findbuilding(id);
         if (*bp == NULL) {
             *bp = NULL;
-            ur_add(RESOLVE_BUILDING | id, bp, fun);
+            ur_add(RESOLVE_BUILDING | id, (void**)bp, fun);
         }
     }
     else {

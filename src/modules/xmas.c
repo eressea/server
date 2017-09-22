@@ -50,7 +50,7 @@ static void xmasgate_write(const trigger * t, struct storage *store)
 
 static int xmasgate_read(trigger * t, struct gamedata *data)
 {
-    if (read_building_reference(data, &t->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&t->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

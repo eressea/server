@@ -260,7 +260,7 @@ extern "C" {
     void region_set_morale(region * r, int morale, int turn);
 
     void write_region_reference(const struct region *r, struct storage *store);
-    int read_region_reference(struct gamedata *data, void **rp, resolve_fun fun);
+    int read_region_reference(struct gamedata *data, region **rp, resolve_fun fun);
     void resolve_region(region *r);
 
     const char *regionname(const struct region *r, const struct faction *f);
