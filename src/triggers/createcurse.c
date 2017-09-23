@@ -98,8 +98,8 @@ static int createcurse_read(trigger * t, gamedata *data)
     char zText[128];
     float flt;
 
-    read_reference(&td->mage, data, read_unit_reference, resolve_unit);
-    read_reference(&td->target, data, read_unit_reference, resolve_unit);
+    read_unit_reference(data, &td->mage, NULL);
+    read_unit_reference(data, &td->target, NULL);
 
     READ_TOK(data->store, zText, sizeof(zText));
     td->type = ct_find(zText);

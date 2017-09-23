@@ -31,7 +31,7 @@ static void test_remove_empty_units(CuTest *tc) {
     unit *u;
     int uid;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
@@ -48,7 +48,7 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     unit *u;
     int uid;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
@@ -69,7 +69,7 @@ static void test_remove_units_without_faction(CuTest *tc) {
     unit *u;
     int uid;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
@@ -85,7 +85,7 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
     unit *u;
     int uid;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
@@ -101,7 +101,7 @@ static void test_scale_number(CuTest *tc) {
     unit *u;
     const struct potion_type *ptype;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     ptype = new_potiontype(it_get_or_create(rt_get_or_create("hodor")), 1);
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
@@ -122,7 +122,7 @@ static void test_scale_number(CuTest *tc) {
 static void test_unit_name(CuTest *tc) {
     unit *u;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     renumber_unit(u, 666);
@@ -334,9 +334,50 @@ static void test_inside_building(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_skills(CuTest *tc) {
+    unit *u;
+    skill *sv;
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    sv = add_skill(u, SK_ALCHEMY);
+    CuAssertPtrNotNull(tc, sv);
+    CuAssertPtrEquals(tc, sv, u->skills);
+    CuAssertIntEquals(tc, 1, u->skill_size);
+    CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
+    CuAssertIntEquals(tc, 0, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 0, sv->old);
+    sv = add_skill(u, SK_BUILDING);
+    CuAssertPtrNotNull(tc, sv);
+    CuAssertIntEquals(tc, 2, u->skill_size);
+    CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
+    CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
+    sv = add_skill(u, SK_LONGBOW);
+    CuAssertPtrNotNull(tc, sv);
+    CuAssertPtrEquals(tc, sv, unit_skill(u, SK_LONGBOW));
+    CuAssertIntEquals(tc, 3, u->skill_size);
+    CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
+    CuAssertIntEquals(tc, SK_LONGBOW, u->skills[1].id);
+    CuAssertIntEquals(tc, SK_BUILDING, u->skills[2].id);
+    CuAssertTrue(tc, !has_skill(u, SK_LONGBOW));
+    set_level(u, SK_LONGBOW, 1);
+    CuAssertTrue(tc, has_skill(u, SK_LONGBOW));
+    remove_skill(u, SK_LONGBOW);
+    CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
+    CuAssertIntEquals(tc, 2, u->skill_size);
+    remove_skill(u, SK_LONGBOW);
+    CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
+    CuAssertIntEquals(tc, 2, u->skill_size);
+    remove_skill(u, SK_BUILDING);
+    CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
+    CuAssertIntEquals(tc, 1, u->skill_size);
+    CuAssertTrue(tc, !has_skill(u, SK_LONGBOW));
+    test_cleanup();
+}
+
 static void test_limited_skills(CuTest *tc) {
     unit *u;
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     CuAssertIntEquals(tc, false, has_limited_skills(u));
     set_level(u, SK_ENTERTAINMENT, 1);
@@ -592,6 +633,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
+    SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_limited_skills);
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);

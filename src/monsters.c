@@ -612,7 +612,7 @@ static void recruit_dracoids(unit * dragon, int size)
 
     name_unit(un);
     change_money(dragon, -un->number * 50);
-    equip_unit(un, get_equipment("recruited_dracoid"));
+    equip_unit(un, get_equipment("new_dracoid"));
 
     setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
@@ -863,7 +863,7 @@ static int nrand(int start, int sub)
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
     fset(u, UFL_ISNEW | UFL_MOVED);
-    equip_unit(u, get_equipment("monster_seaserpent"));
+    equip_unit(u, get_equipment("seed_seaserpent"));
     return u;
 }
 
@@ -894,7 +894,7 @@ void spawn_dragons(void)
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
             fset(u, UFL_ISNEW | UFL_MOVED);
-            equip_unit(u, get_equipment("monster_dragon"));
+            equip_unit(u, get_equipment("seed_dragon"));
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
@@ -1132,7 +1132,7 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
         const char *email = config_get("monster.email");
-        f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
+        f = addfaction(email ? email : NULL, NULL, rc, default_locale, 0);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");
         fset(f, FFL_NPC | FFL_NOIDLEOUT);

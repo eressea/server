@@ -45,7 +45,6 @@ extern "C" {
     } subset;
 
     typedef struct equipment {
-        char *name;
         struct itemdata *items;
         char *skills[MAXSKILLS];
         struct selist *spells;
@@ -55,8 +54,10 @@ extern "C" {
 
     void equipment_done(void);
 
+    const char *equipment_name(const struct equipment *eq);
     struct equipment *get_or_create_equipment(const char *eqname);
     struct equipment *get_equipment(const char *eqname);
+    struct equipment *create_equipment(const char *eqname);
 
     void equipment_setitem(struct equipment *eq,
         const struct item_type *itype, const char *value);

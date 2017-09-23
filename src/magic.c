@@ -356,9 +356,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     }
     sp = find_spell(token);
     if (!sp) {
-        log_warning("read_seenspell: could not find spell '%s'\n", token);
-    }
-    if (!sp) {
+        log_info("read_seenspell: could not find spell '%s'\n", token);
         return AT_READ_FAIL;
     }
     a->data.v = sp;
@@ -2264,26 +2262,21 @@ bool create_newfamiliar(unit * mage, unit * familiar)
     return true;
 }
 
-static int resolve_familiar(variant data, void *addr)
-{
-    unit *familiar;
-    int result = resolve_unit(data, &familiar);
-    if (result == 0 && familiar) {
+static void * resolve_familiar(int id, void *data) {
+    if (data) {
+        unit *familiar = (unit *)data;
         attrib *a = a_find(familiar->attribs, &at_familiarmage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = familiar;
-    return result;
+    return data;
 }
 
 static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_familiar);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2348,52 +2341,42 @@ unit *has_clone(unit * mage)
     return NULL;
 }
 
-static int resolve_clone(variant data, void *addr)
-{
-    unit *clone;
-    int result = resolve_unit(data, &clone);
-    if (result == 0 && clone) {
+static void * resolve_clone(int id, void *data) {
+    if (data) {
+        unit *clone = (unit *)data;
         attrib *a = a_find(clone->attribs, &at_clonemage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_clone(mage, clone);
         }
     }
-    *(unit **)addr = clone;
-    return result;
+    return data;
 }
 
 static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_clone);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
 }
 
 /* mages */
-static int resolve_mage(variant data, void *addr)
-{
-    unit *mage;
-    int result = resolve_unit(data, &mage);
-    if (result == 0 && mage) {
+static void * resolve_mage(int id, void *data) {
+    if (data) {
+        unit *mage = (unit *)data;
         attrib *a = a_find(mage->attribs, &at_familiar);
         if (a != NULL && a->data.v) {
             unit *familiar = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = mage;
-    return result;
+    return data;
 }
 
 static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_mage);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -3009,30 +2992,36 @@ int cast_spell(struct castorder *co)
 
 static critbit_tree cb_spellbooks;
 
+#define SBNAMELEN 16
+
+typedef struct sb_entry {
+    char key[SBNAMELEN];
+    spellbook *value;
+} sb_entry;
+
 spellbook * get_spellbook(const char * name)
 {
-    char buffer[64];
-    spellbook * result;
-    void * match;
+    size_t len = strlen(name);
+    const void * match;
 
-    if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
-        cb_get_kv(match, &result, sizeof(result));
+    if (len >= SBNAMELEN) {
+        log_error("spellbook name is longer than %d bytes: %s", SBNAMELEN-1, name);
+        return NULL;
     }
-    else {
-        size_t len = strlen(name);
-        result = create_spellbook(name);
-        assert(strlen(name) + sizeof(result) < sizeof(buffer));
-        len = cb_new_kv(name, len, &result, sizeof(result), buffer);
-        if (cb_insert(&cb_spellbooks, buffer, len) == CB_EXISTS) {
+
+    match = cb_find_str(&cb_spellbooks, name);
+    if (!match) {
+        sb_entry ent;
+        memset(ent.key, 0, SBNAMELEN);
+        memcpy(ent.key, name, len);
+        ent.value = create_spellbook(name);
+        if (cb_insert(&cb_spellbooks, &ent, sizeof(ent)) == CB_EXISTS) {
             log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
             assert(!"should not happen");
         }
-        result = 0;
-        if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
-            cb_get_kv(match, &result, sizeof(result));
-        }
+        return ent.value;
     }
-    return result;
+    return ((const sb_entry *)match)->value;
 }
 
 void free_spellbook(spellbook *sb) {
@@ -3041,9 +3030,8 @@ void free_spellbook(spellbook *sb) {
 }
 
 static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
-    spellbook *sb;
-    cb_get_kv(match, &sb, sizeof(sb));
-    free_spellbook(sb);
+    const sb_entry *ent = (const sb_entry *)match;
+    free_spellbook(ent->value);
     return 0;
 }
 

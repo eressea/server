@@ -173,12 +173,31 @@ static void test_core_resources(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_get_resource(CuTest *tc) {
+    resource_type *rtype;
+
+    test_setup();
+
+    CuAssertPtrEquals(tc, NULL, rt_find("catapultammo123"));
+    rtype = rt_get_or_create("catapultammo123");
+    CuAssertPtrNotNull(tc, rtype);
+    CuAssertPtrEquals(tc, rtype, rt_find("catapultammo123"));
+    CuAssertStrEquals(tc, "catapultammo123", rtype->_name);
+
+    CuAssertPtrEquals(tc, NULL, rt_find("catapult"));
+    rtype = rt_get_or_create("catapult");
+    CuAssertPtrEquals(tc, rtype, rt_find("catapult"));
+    CuAssertStrEquals(tc, "catapult", rtype->_name);
+    test_cleanup();
+}
+
 CuSuite *get_item_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_resourcename_no_appearance);
     SUITE_ADD_TEST(suite, test_resourcename_with_appearance);
     SUITE_ADD_TEST(suite, test_change_item);
+    SUITE_ADD_TEST(suite, test_get_resource);
     SUITE_ADD_TEST(suite, test_resource_type);
     SUITE_ADD_TEST(suite, test_finditemtype);
     SUITE_ADD_TEST(suite, test_findresourcetype);

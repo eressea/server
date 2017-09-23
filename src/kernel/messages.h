@@ -46,10 +46,10 @@ extern "C" {
         int level;
     } msglevel;
 
-    extern struct message *msg_message(const char *name, const char *sig, ...);
-    extern struct message *msg_feedback(const struct unit *, struct order *cmd,
+    struct message *msg_message(const char *name, const char *sig, ...);
+    struct message *msg_feedback(const struct unit *, struct order *cmd,
         const char *name, const char *sig, ...);
-    extern struct message *add_message(struct message_list **pm,
+    struct message *add_message(struct message_list **pm,
     struct message *m);
     void addmessage(struct region *r, struct faction *f, const char *s,
         msg_t mtype, int level);
