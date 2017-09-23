@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int read_follow(attrib * a, void *owner, gamedata *data)
 {
-    read_unit_reference(data);   /* skip it */
+    READ_INT(data->store, NULL);   /* skip it */
     return AT_READ_FAIL;
 }
 

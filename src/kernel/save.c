@@ -399,8 +399,7 @@ static void read_alliances(gamedata *data)
             READ_INT(store, &al->flags);
         }
         if (data->version >= ALLIANCELEADER_VERSION) {
-            read_reference(&al->_leader, data, read_faction_reference,
-                resolve_faction);
+            read_faction_reference(data, &al->_leader, NULL);
             READ_INT(store, &id);
         }
         else {
@@ -458,9 +457,10 @@ void read_planes(gamedata *data) {
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
             if (data->version < NOWATCH_VERSION) {
-                int fno = read_faction_reference(data);
+                int fno;
+                READ_INT(data->store, &fno);
                 while (fno) {
-                    fno = read_faction_reference(data);
+                    READ_INT(data->store, &fno);
                 }
             }
         }
@@ -508,21 +508,6 @@ void write_alliances(gamedata *data)
     WRITE_SECTION(data->store);
 }
 
-static int resolve_owner(int id, void *address)
-{
-    region_owner *owner = (region_owner *)address;
-    int result = 0;
-    faction *f = NULL;
-    if (id != 0) {
-        f = findfaction(id);
-        if (f == NULL) {
-            log_error("region has an invalid owner (%s)", itoa36(id));
-        }
-    }
-    owner->owner = f;
-    return result;
-}
-
 static void read_owner(gamedata *data, region_owner ** powner)
 {
     int since_turn;
@@ -539,9 +524,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
             owner->flags = 0;
         }
         if (data->version >= OWNER_3_VERSION) {
-            int id;
-            READ_INT(data->store, &id);
-            owner->last_owner = id ? findfaction(id) : NULL;
+            read_faction_reference(data, &owner->last_owner, NULL);
         }
         else if (data->version >= OWNER_2_VERSION) {
             int id;
@@ -554,7 +537,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
         else {
             owner->last_owner = NULL;
         }
-        read_reference(owner, data, &read_faction_reference, &resolve_owner);
+        read_faction_reference(data, &owner->owner, NULL);
         *powner = owner;
     }
     else {
@@ -817,6 +800,7 @@ unit *read_unit(gamedata *data)
         u->hp = u->number;
     }
     read_attribs(data, &u->attribs, u);
+    resolve_unit(u);
     return u;
 }
 
@@ -1081,6 +1065,7 @@ region *read_region(gamedata *data)
     READ_INT(store, &x);
     READ_INT(store, &y);
     r = readregion(data, x, y);
+    resolve_region(r);
     return r;
 }
 
@@ -1150,31 +1135,6 @@ void write_region(gamedata *data, const region *r)
     WRITE_INT(store, r->x);
     WRITE_INT(store, r->y);
     writeregion(data, r);
-}
-
-static ally **addally(const faction * f, ally ** sfp, int aid, int state)
-{
-    struct faction *af = findfaction(aid);
-    ally *sf;
-
-    state &= ~HELP_OBSERVE;
-    state &= ~HELP_TRAVEL;
-    state &= HelpMask();
-
-    if (state == 0)
-        return sfp;
-
-    while (*sfp) {
-        sfp = &(*sfp)->next;
-    }
-
-    sf = ally_add(sfp, af);
-    if (!sf->faction) {
-        ur_add(aid, &sf->faction, resolve_faction);
-    }
-    sf->status = state & HELP_ALL;
-
-    return &sf->next;
 }
 
 int get_spell_level_faction(const spell * sp, void * cbdata)
@@ -1255,7 +1215,6 @@ void _test_write_password(gamedata *data, const faction *f) {
 
 faction *read_faction(gamedata * data)
 {
-    ally **sfp;
     int planes, n;
     faction *f;
     char name[DISPLAYSIZE];
@@ -1384,24 +1343,13 @@ faction *read_faction(gamedata * data)
         /* mistakes were made in the past*/
         f->options &= ~want(O_JSON);
     }
-    sfp = &f->allies;
-    for (;;) {
-        int aid = 0;
-        READ_INT(data->store, &aid);
-        if (aid > 0) {
-            int state;
-            READ_INT(data->store, &state);
-            sfp = addally(f, sfp, aid, state);
-        }
-        else {
-            break;
-        }
-    }
+    read_allies(data, f);
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {
         read_spellbook(FactionSpells() ? &f->spellbook : 0, data, get_spell_level_faction, (void *)f);
     }
+    resolve_faction(f);
     return f;
 }
 
@@ -1573,7 +1521,8 @@ struct building *read_building(gamedata *data) {
         log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
         b->size = b->type->maxsize;
     }
-	return b;
+    resolve_building(b);
+    return b;
 }
 
 void write_ship(gamedata *data, const ship *sh)
@@ -1815,10 +1764,6 @@ int read_game(gamedata *data)
         --rmax;
     }
     read_borders(data);
-
-    /* Unaufgeloeste Zeiger initialisieren */
-    log_debug("fixing unresolved references.");
-    resolve();
 
     log_debug("updating area information for lighthouses.");
     for (r = regions; r; r = r->next) {

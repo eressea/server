@@ -203,21 +203,6 @@ const char *factionname(const faction * f)
     return ibuf;
 }
 
-int resolve_faction(int id, void *address)
-{
-    int result = 0;
-    faction *f = NULL;
-    if (id != 0) {
-        f = findfaction(id);
-        if (f == NULL) {
-            result = -1;
-        }
-    }
-    assert(address);
-    *(faction **)address = f;
-    return result;
-}
-
 bool faction_id_is_unused(int id)
 {
     return findfaction(id) == NULL;
@@ -332,10 +317,25 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-int read_faction_reference(gamedata * data)
+void resolve_faction(faction *f)
+{
+    resolve(RESOLVE_FACTION | f->no, f);
+}
+
+int read_faction_reference(gamedata * data, faction **fp, resolve_fun fun)
 {
     int id;
     READ_INT(data->store, &id);
+    if (id > 0) {
+        *fp = findfaction(id);
+        if (*fp == NULL) {
+            *fp = NULL;
+            ur_add(RESOLVE_FACTION | id, (void **)fp, fun);
+        }
+    }
+    else {
+        *fp = NULL;
+    }
     return id;
 }
 

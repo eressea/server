@@ -17,73 +17,85 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
+
+#include <selist.h>
+
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "resolve.h"
 #include "storage.h"
 #include "variant.h"
 
 typedef struct unresolved {
-    void *ptrptr;
-    /* address to pass to the resolve-function */
-    variant data;
+    int id;
     /* information on how to resolve the missing object */
     resolve_fun resolve;
     /* function to resolve the unknown object */
+    selist *addrs;
+    /* address to pass to the resolve-function */
 } unresolved;
 
-#define BLOCKSIZE 1024
-static unresolved *ur_list;
-static unresolved *ur_begin;
-static unresolved *ur_current;
+#define HASHSIZE 1024 /* must be a power of 2 */
+static unresolved ur_hash[HASHSIZE];
 
-int
-read_reference(void *address, struct gamedata * data, read_fun reader,
-    resolve_fun resolver)
-{
-    int id = reader(data);
-    int result = resolver(id, address);
-    if (result != 0) {
-        ur_add(id, address, resolver);
-    }
-    return result;
+int ur_key(int id) {
+    int h = id ^ (id >> 16);
+    return h & (HASHSIZE - 1);
 }
 
-void ur_add(int id, void *ptrptr, resolve_fun fun)
+void ur_add(int id, void **addr, resolve_fun fun)
 {
-    assert(ptrptr);
-    if (ur_list == NULL) {
-        ur_list = malloc(BLOCKSIZE * sizeof(unresolved));
-        ur_begin = ur_current = ur_list;
-    }
-    else if (ur_current - ur_begin == BLOCKSIZE - 1) {
-        ur_begin = malloc(BLOCKSIZE * sizeof(unresolved));
-        ur_current->data.v = ur_begin;
-        ur_current = ur_begin;
-    }
-    ur_current->data.i = id;
-    ur_current->resolve = fun;
-    ur_current->ptrptr = ptrptr;
+    int h, i;
 
-    ++ur_current;
-    ur_current->resolve = NULL;
-    ur_current->data.v = NULL;
-}
-
-void resolve(void)
-{
-    unresolved *ur = ur_list;
-    while (ur) {
-        if (ur->resolve == NULL) {
-            ur = ur->data.v;
-            free(ur_list);
-            ur_list = ur;
-            continue;
+    assert(id > 0);
+    assert(addr);
+    assert(!*addr);
+    
+    h = ur_key(id);
+    for (i = 0; i != HASHSIZE; ++i) {
+        int k = h + i;
+        if (k >= HASHSIZE) k -= HASHSIZE;
+        if (ur_hash[k].id <= 0) {
+            ur_hash[k].id = id;
+            ur_hash[k].resolve = fun;
+            selist_push(&ur_hash[k].addrs, addr);
+            return;
         }
-        assert(ur->ptrptr);
-        ur->resolve(ur->data.i, ur->ptrptr);
-        ++ur;
+        if (ur_hash[k].id == id && ur_hash[k].resolve == fun) {
+            ur_hash[k].resolve = fun;
+            selist_push(&ur_hash[k].addrs, addr);
+            return;
+        }
     }
-    free(ur_list);
-    ur_list = NULL;
+    assert(!"hash table is full");
+}
+
+static bool addr_cb(void *data, void *more) {
+    void **addr = (void **)data;
+    *addr = more;
+    return true;
+}
+
+void resolve(int id, void *data)
+{
+    int h, i;
+    h = ur_key(id);
+
+    for (i = 0; i != HASHSIZE; ++i) {
+        int k = h + i;
+
+        if (k >= HASHSIZE) k -= HASHSIZE;
+        if (ur_hash[k].id == 0) break;
+        else if (ur_hash[k].id == id) {
+            if (ur_hash[k].resolve) {
+                data = ur_hash[k].resolve(id, data);
+            }
+            selist_foreach_ex(ur_hash[k].addrs, addr_cb, data);
+            selist_free(ur_hash[k].addrs);
+            ur_hash[k].addrs = NULL;
+            ur_hash[k].id = -1;
+        }
+    }
 }

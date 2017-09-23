@@ -26,13 +26,11 @@ struct gamedata;
 extern "C" {
 #endif
 
-    typedef int(*resolve_fun) (int id, void *address);
+    typedef void *(*resolve_fun) (int id, void *data);
     typedef int(*read_fun) (struct gamedata * data);
-    int read_reference(void *address, struct gamedata *data,
-        read_fun reader, resolve_fun resolver);
 
-    void ur_add(int id, void *address, resolve_fun fun);
-    void resolve(void);
+    void ur_add(int id, void **addr, resolve_fun fun);
+    void resolve(int id, void *data);
 
 #ifdef __cplusplus
 }

@@ -258,40 +258,6 @@ unsigned char index)
     return (rel + ursprung_y(f, pl, NULL) + plane_center_y(pl));
 }
 
-static int resolve_plane(int id, void *addr)
-{
-    int result = 0;
-    plane *pl = NULL;
-    if (id != 0) {
-        pl = getplanebyid(id);
-        if (pl == NULL) {
-            result = -1;
-        }
-    }
-    *(plane **)addr = pl;
-    return result;
-}
-
-void write_plane_reference(const plane * u, struct storage *store)
-{
-    WRITE_INT(store, u ? (u->id) : 0);
-}
-
-int read_plane_reference(plane ** pp, struct storage *store)
-{
-    int id;
-    READ_INT(store, &id);
-    if (id == 0) {
-        *pp = NULL;
-        return AT_READ_FAIL;
-    }
-    *pp = getplanebyid(id);
-    if (*pp == NULL) {
-        ur_add(id, pp, resolve_plane);
-    }
-    return AT_READ_OK;
-}
-
 void free_plane(plane *pl) {
     free(pl->name);
     free(pl);

@@ -21,7 +21,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "types.h"
+
+#include <util/resolve.h>
 #include <modules/score.h>
+
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -126,8 +129,10 @@ extern "C" {
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    int read_faction_reference(struct gamedata *data);
-    int resolve_faction(int id, void *addr);
+    int read_faction_reference(struct gamedata *data, struct faction **fp, resolve_fun fun);
+
+#define RESOLVE_FACTION (TYP_FACTION << 24)
+    void resolve_faction(struct faction *f);
 
     void renumber_faction(faction * f, int no);
     void free_factions(void);
