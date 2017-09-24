@@ -133,6 +133,13 @@ function write_reports() {
   [ -e $REPORTS ] && echo "could not delete $REPORTS"
   mkdir $REPORTS
   ./eressea -t$turn reports.lua
+  compress_reports
+}
+
+function compress_reports() {
+  assert_dir $GAMEDIR
+  cd $GAMEDIR/reports
+  $BINDIR/compress.py $turn $gamename
 }
 
 function run_turn() {
@@ -152,6 +159,7 @@ function run_turn() {
   let turn=$turn+1
   [ -e data/$turn.dat ] || abort "no data file created"
 
+  compress_reports
 }
 
 function run_all() {
@@ -226,6 +234,10 @@ while [ ! -z $1 ]; do
     "reports")
       acquire_lock $LOCKFILE
       write_reports
+      ;;
+    "compress")
+      acquire_lock $LOCKFILE
+      compress_reports 
       ;;
     "run")
       acquire_lock $LOCKFILE
