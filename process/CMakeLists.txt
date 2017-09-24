@@ -4,5 +4,7 @@ checkpasswd.py sendreport.sh sendreports.sh orders-accept functions.sh DESTINATI
 
 install(DIRECTORY cron/ DESTINATION bin USE_SOURCE_PERMISSIONS
 FILES_MATCHING PATTERN "*.cron")
+install(DIRECTORY cron/ DESTINATION etc USE_SOURCE_PERMISSIONS
+FILES_MATCHING PATTERN "crontab.template")
 
 install(DIRECTORY procmail DESTINATION share)

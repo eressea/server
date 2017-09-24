@@ -112,3 +112,4 @@ ln -sf $SOURCE/bin/eressea
 ln -sf $SOURCE/scripts/run-turn.lua
 ln -sf $SOURCE/scripts/reports.lua
 ln -sf $SOURCE/scripts/config.lua
+ln -sf $SOURCE/bin/run-turn.sh

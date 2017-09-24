@@ -1,0 +1,22 @@
+# Crontab for Eressea server
+
+# your regular environment variables are not visible by cron; adjust these value according to your system
+# setting variables like this might not work for your crontab implementation; if this is the case, you could start a custom script here and set variables there
+PATH=/home/eressea/bin:/opt/bin:/usr/local/bin:/usr/bin:/bin
+ERESSEA=/home/eressea/eressea
+FETCHMAILRC=/home/eressea/server/etc/fetchmailrc
+
+# enables the game server
+ENABLED=yes
+# enables order confirmation
+CONFIRM=yes
+
+# m h  dom mon dow   command
+# starts the fetchmail daemon; note that only one daemon process is permitted per user
+00 *  * * *         [ -f $FETCHMAILRC ] && fetchmail --quit -d 300 -f $FETCHMAILRC >> $ERESSEA/server/fetchmail.log 2>&1
+
+# run the server for game 1 at 9:15 pm every Saturday
+15 21 * * Sat        [ "$ENABLED" = "yes" ] && $ERESSEA/server/bin/run-turn.sh -g 1 -v 3 all
+# run order confirmation for game 1 every 5 minutes
+*/5 * * * *          [ "$CONFIRM" = "yes" ] && $ERESSEA/server/bin/orders.cron 1
+
