@@ -5,66 +5,18 @@ from email.Utils import parseaddr
 from email.Parser import Parser
 import os
 import os.path
-import ConfigParser
 from re import compile, IGNORECASE
 from stat import ST_MTIME
 from string import upper, split, replace
 import logging
 import sys
 from sys import stdin
-from time import ctime, sleep, time
+from time import ctime, time
 from socket import gethostname
 from rfc822 import parsedate_tz, mktime_tz
 
 from epasswd import EPasswd
-
-def get_eressea_dir():
-    if 'ERESSEA' in os.environ:
-        dir = os.environ['ERESSEA']
-    elif 'HOME' in os.environ:
-        dir = os.path.join(os.environ['HOME'], '/eressea')
-    else: # WTF? No HOME?
-        dir = "/home/eressea/eressea"
-    if not os.path.isdir(dir):
-        print "please set the ERESSEA environment variable to the install path"
-        sys.exit(1)
-    return dir
-
-def pwd_get_email(faction, pwd, pwdfile=None):
-    return None
-
-def split_filename(filename):
-    return os.path.split(filename)
-
-def unlock_file(filename):
-    try:
-        os.unlink(filename+".lock")
-    except:
-        print "could not unlock %s.lock, file not found" % filename
-
-def lock_file(filename):
-    i = 0
-    wait = 1
-    if not os.path.exists(filename):
-        file=open(filename, "w")
-        file.close()
-    while True:
-        try:
-            os.symlink(filename, filename+".lock")
-            return
-        except:
-            i = i+1
-            if i == 5: unlock_file(filename)
-            sleep(wait)
-            wait = wait*2
-
-def get_config(section, key, abort=None, default=None):
-    if config.has_option(section, key):
-        return config.get(section, key)
-    elif abort is not None:
-        print "missing %s.%s" % (section, key)
-        sys.exit(abort)
-    return default
+from eorders import get_eressea_dir, split_filename, lock_file, unlock_file, EConfig
 
 messages = {
         "multipart-en" :
@@ -354,12 +306,11 @@ if not os.path.exists(inifile):
     print "no such file: " . inifile
     sys.exit(1)
 
-config = ConfigParser.ConfigParser()
-config.read(inifile)
+config = EConfig(inifile)
 
-frommail = get_config("game", "email", 1)
-gamename = get_config("game", "name", 1)
-sender = get_config("game", "sender", default='%s Server <%s>' % (gamename, frommail))
+frommail = config.get("game", "email", 1)
+gamename = config.get("game", "name", 1)
+sender = config.get("game", "sender", default='%s Server <%s>' % (gamename, frommail))
 
 
 prefix = 'turn-'

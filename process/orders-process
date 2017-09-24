@@ -5,7 +5,6 @@ from os import unlink, symlink
 import sys
 import os
 import subprocess, shlex
-import ConfigParser
 from re import compile, IGNORECASE
 from string import split, join, strip
 from sys import exit
@@ -13,44 +12,9 @@ from time import sleep, time, ctime
 from syslog import openlog, closelog, syslog
 
 from epasswd import EPasswd
+import eorders
+from eorders import get_eressea_dir, split_filename, lock_file, unlock_file, EConfig
 
-def pwd_get_email(faction, pwd, pwdfile=None):
-    return None
-
-def split_filename(filename):
-    return os.path.split(filename)
-
-def unlock_file(filename):
-    try:
-        unlink(filename+".lock")
-    except:
-        print "could not unlock %s.lock, file not found" % filename
-        raise
-    
-def lock_file(filename):
-    i = 0
-    wait = 1
-    if not os.path.exists(filename):
-        file=open(filename, "w")
-        file.close()
-    while True:
-        try:
-            symlink(filename, filename+".lock")
-            return
-        except:
-            i = i+1
-            if i == 5:
-                raise
-            sleep(wait)
-            wait = wait*2
-
-def get_config(section, key, abort=None, default=None):
-    if config.has_option(section, key):
-        return config.get(section, key)
-    elif abort is not None:
-        print "missing %s.%s" % (section, key)
-        sys.exit(abort)
-    return default
 
 messages = {
 "subject-de": "Befehle angekommen",
@@ -70,24 +34,20 @@ messages = {
 
 "error-de": "Fehler",
 "error-en": "Error",
+
+"nocheck-de": "Kein Syntaxchecker installiert. Der Zug wird akzeptiert, wurde aber nicht überprüft",
+"nocheck-en": "Syntax checker is broken. Your turn was accepted, but could not be verified.",
 }
 
 game = int(sys.argv[1])
 maxlines = 25
 
-# base directory for all your games:
-rootdir = "/home/eressea/eressea"
-if 'ERESSEA' in os.environ:
-    rootdir = os.environ['ERESSEA']
-if not os.path.isdir(rootdir):
-    print "please set the ERESSEA environment variable to the install path"
-    sys.exit(1)
+rootdir=get_eressea_dir()
 
 gamedir = os.path.join(rootdir, "game-%d" % (game, ))
 serverdir = os.path.join(rootdir, "server")
 frommail = None
 gamename = None
-echeck_cmd = None
 checker = None
 muttrc=os.path.join(rootdir, "etc/muttrc")
 
@@ -96,14 +56,12 @@ if not os.path.exists(inifile):
     print "no such file: " . inifile
     sys.exit(1)
 else:
-    config = ConfigParser.ConfigParser()
-    config.read(inifile)
-    frommail = get_config('game', 'email', abort=1)
-    gamename = get_config('game', 'name', abort=1)
-    sender = get_config('game', 'sender', default="%s Server <%s>" % (gamename, frommail))
-    frommail = get_config('lua', 'install', abort=1)
-    echeck_cmd = get_config('game', 'echeck', default=None)
-    checker = get_config('game', 'checker', default=None)
+    config = EConfig(inifile)
+    frommail = config.get('game', 'email', abort=1)
+    gamename = config.get('game', 'name', abort=1)
+    sender = config.get('game', 'sender', default="%s Server <%s>" % (gamename, frommail))
+    frommail = config.get('lua', 'install', abort=1)
+    checker = config.get('game', 'checker', default=None)
 
 queue_file = os.path.join(gamedir, "orders.queue")
 if not os.path.exists(queue_file):
@@ -135,30 +93,8 @@ def check_pwd(filename, email, pw_data):
                 results = results + [ (fact_nr, None, False, fact_pw) ]
     return results
 
-def echeck(filename, locale, rules):
-    dirname, filename = split_filename(filename)
-    echeck_dir, echeck_file = split_filename(echeck_cmd)
-    stream = subprocess.Popen([
-        echeck_cmd,
-        "-P%s" % echeck_dir,
-        "-R%s" % rules,
-        "-w0", "-x",
-        "-L%s" % locale,
-        filename ], stdout=subprocess.PIPE, cwd=dirname, shell=False).stdout
-    
-    lines = stream.readlines()
-    if len(lines)==0:
-        stream.close()
-        return None
-    if len(lines)>maxlines:
-        mail = join(lines[:maxlines-3] + ["...", "\n"] + lines[-3:], '')
-    else:
-        mail = join(lines[:maxlines], '')
-    stream.close()
-    return mail
-
 def check_orders(filename, locale, rules):
-    options = get_config("game", "checker.parameters", default=None)
+    options = config.get("game", "checker.parameters", default=None)
     args = [ checker, filename, locale, str(game), gamedir, serverdir]
     if options is not None:
         args.extend(shlex.split(options))
@@ -234,7 +170,6 @@ for line in lines:
     locale = dict["locale"]
     game = int(dict["game"])
     infile = dict["file"]
-    gamename='[E%d]' % game
     rules='e%d' % game
     warning = ""
     failed = True
@@ -255,15 +190,13 @@ for line in lines:
         syslog("failed - no valid password in " + infile)
     else:
         result = None
-        if os.path.exists(echeck_cmd):
-            result = echeck(infile, locale, rules)
         if os.path.exists(checker):
-            result += check_orders(infile, locale, rules)
+            result = check_orders(infile, locale, rules)
         if result is None:
             # echeck did not finish
-            msg = msg + "Echeck is broken. Your turn was accepted, but could not be verified.\n"
+            msg = msg + messages[ "nocheck-" + locale] + "\n"
             warning = " (" + messages["warning-" + locale] + ")"
-            syslog("process - echeck broken, " + infile)
+            syslog("process - checker broken, " + infile)
         else:
             msg = msg + result
             syslog("process - checked orders in " + infile)
