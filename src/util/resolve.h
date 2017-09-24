@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef RESOLVE_H
 #define RESOLVE_H
 
-#include "variant.h"
 struct storage;
 struct gamedata;
 
@@ -27,15 +26,11 @@ struct gamedata;
 extern "C" {
 #endif
 
-    typedef int(*resolve_fun) (variant data, void *address);
-    typedef variant(*read_fun) (struct gamedata * data);
-    extern int read_reference(void *address, struct gamedata *data,
-        read_fun reader, resolve_fun resolver);
+    typedef void *(*resolve_fun) (int id, void *data);
+    typedef int(*read_fun) (struct gamedata * data);
 
-    extern void ur_add(variant data, void *address, resolve_fun fun);
-    extern void resolve(void);
-
-    extern variant read_int(struct storage *store);
+    void ur_add(int id, void **addr, resolve_fun fun);
+    void resolve(int id, void *data);
 
 #ifdef __cplusplus
 }

@@ -86,8 +86,7 @@ static void lc_done(struct attrib *a)
     free(data);
 }
 
-static void
-lc_write(const struct attrib *a, const void *owner, struct storage *store)
+static void lc_write(const struct attrib *a, const void *owner, struct storage *store)
 {
     building_action *data = (building_action *)a->data.v;
     const char *fname = data->fname;
@@ -106,8 +105,7 @@ static int lc_read(struct attrib *a, void *owner, gamedata *data)
     building *b = (building *)owner;
     int result = 0;
     if (data->version < ATTRIBOWNER_VERSION) {
-        result = read_reference(&b, data, read_building_reference, resolve_building);
-        assert(b == owner);
+        READ_INT(data->store, NULL);
     }
     READ_TOK(store, name, sizeof(name));
     if (strcmp(name, "tunnel_action") == 0) {

@@ -26,7 +26,9 @@ extern "C" {
     struct attrib_type;
     struct plane;
     struct faction;
+    struct gamedata;
     struct unit;
+
     extern struct attrib_type at_npcfaction;
 
     typedef struct ally {
@@ -35,6 +37,7 @@ extern "C" {
         int status;
     } ally;
 
+    void read_allies(struct gamedata * data, struct faction *f);
     ally * ally_find(ally *al, const struct faction *f);
     ally * ally_add(ally **al_p, struct faction *f);
     void ally_remove(ally **al_p, struct faction *f);

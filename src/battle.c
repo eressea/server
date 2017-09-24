@@ -927,7 +927,7 @@ void kill_troop(troop dt)
         if (drops != NULL) {
             i_merge(&du->items, &drops);
         }
-        sprintf(eqname, "%s_spoils", rc->_name);
+        sprintf(eqname, "spo_%s", rc->_name);
         eq = get_equipment(eqname);
         if (eq != NULL) {
             equip_items(&du->items, eq);

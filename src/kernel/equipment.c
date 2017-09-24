@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <selist.h>
 #include <critbit.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -202,38 +203,85 @@ void free_ls(void *arg) {
 
 static critbit_tree cb_equipments = { 0 };
 
+#define EQNAMELEN 24
+
+typedef struct eq_entry {
+    char key[EQNAMELEN];
+    equipment *value;
+} eq_entry;
+
+typedef struct name_cb_data {
+    const equipment *find;
+    const char *result;
+} name_cb_data;
+
+
+static int equipment_name_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    const eq_entry *ent = (const eq_entry *)match;
+    name_cb_data *query = (name_cb_data *)cbdata;
+    if (ent->value == query->find) {
+        query->result = ent->key;
+        return 1;
+    }
+    return 0;
+}
+
+const char *equipment_name(const struct equipment *eq)
+{
+    name_cb_data data;
+
+    data.find = eq;
+    data.result = NULL;
+    cb_foreach(&cb_equipments, "", 0, equipment_name_cb, &data);
+    return data.result;
+}
+
 equipment *get_equipment(const char *eqname)
 {
-    const char *match;
-    equipment *eq = NULL;
+    const void *match;
+
+    if (strlen(eqname) >= EQNAMELEN) {
+        log_warning("equipment name is longer than %d bytes: %s", EQNAMELEN - 1, eqname);
+        return NULL;
+    }
 
     match = cb_find_str(&cb_equipments, eqname);
     if (match) {
-        cb_get_kv(match, &eq, sizeof(eq));
+        const eq_entry *ent = (const eq_entry *)match;
+        return ent->value;
     }
-    return eq;
+    return NULL;
+}
+
+equipment *create_equipment(const char *eqname)
+{
+    size_t len = strlen(eqname);
+    eq_entry ent;
+
+    if (len >= EQNAMELEN) {
+        log_error("equipment name is longer than %d bytes: %s", EQNAMELEN-1, eqname);
+        len = EQNAMELEN-1;
+    }
+    memset(ent.key, 0, EQNAMELEN);
+    memcpy(ent.key, eqname, len);
+
+    ent.value = (equipment *)calloc(1, sizeof(equipment));
+
+    cb_insert(&cb_equipments, &ent, sizeof(ent));
+    return ent.value;
 }
 
 equipment *get_or_create_equipment(const char *eqname)
 {
     equipment *eq = get_equipment(eqname);
     if (!eq) {
-        size_t len;
-        char data[64];
-
-        eq = (equipment *)calloc(1, sizeof(equipment));
-        eq->name = strdup(eqname);
-
-        len = cb_new_kv(eqname, strlen(eqname), &eq, sizeof(eq), data);
-        assert(len <= sizeof(data));
-        cb_insert(&cb_equipments, data, len);
+        return create_equipment(eqname);
     }
     return eq;
 }
 
 static void free_equipment(equipment *eq) {
     int i;
-    free(eq->name);
     if (eq->spells) {
         selist_foreach(eq->spells, free_ls);
         selist_free(eq->spells);
@@ -251,10 +299,9 @@ static void free_equipment(equipment *eq) {
 }
 
 static int free_equipment_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    equipment *eq;
-    cb_get_kv(match, &eq, sizeof(eq));
-    free_equipment(eq);
-    free(eq);
+    const eq_entry * ent = (const eq_entry *)match;
+    free_equipment(ent->value);
+    free(ent->value);
     return 0;
 }
 

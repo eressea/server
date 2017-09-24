@@ -279,13 +279,13 @@ static void test_bufunit(CuTest *tc) {
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv.", buffer);
 
-    set_level(u, SK_SAILING, 1);
-    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1.", buffer);
-
     set_level(u, SK_ALCHEMY, 1);
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1, Alchemie 2.", buffer);
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2.", buffer);
+
+    set_level(u, SK_SAILING, 1);
+    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2, Segeln 1.", buffer);
 
     f = test_create_faction(0);
     f->locale = get_or_create_locale("de");

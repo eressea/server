@@ -519,7 +519,7 @@ static void make_familiar(unit * familiar, unit * mage)
     const struct equipment *eq;
     char eqname[64];
     const race * rc = u_race(familiar);
-    snprintf(eqname, sizeof(eqname), "%s_familiar", rc->_name);
+    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
     eq = get_equipment(eqname);
     if (eq != NULL) {
         equip_items(&familiar->items, eq);
@@ -2892,47 +2892,20 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
     return c;
 }
 
-#define COMPAT_DEATHCLOUD
-#ifdef COMPAT_DEATHCLOUD
 static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
     struct storage *store = data->store;
-    region *r = NULL;
-    unit *u;
-    variant var;
-    int duration;
-    float strength;
-    int rx, ry;
 
     UNUSED_ARG(a);
     UNUSED_ARG(target);
-    READ_INT(store, &duration);
-    READ_FLT(store, &strength);
-    READ_INT(store, &var.i);
-    u = findunit(var.i);
-
-    /* this only affects really old data. no need to change: */
-    READ_INT(store, &rx);
-    READ_INT(store, &ry);
-    r = findregion(rx, ry);
-
-    if (r != NULL) {
-        double effect;
-        curse *c;
-
-        effect = strength;
-        c =
-            create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration,
-                effect, 0);
-        c->data.v = r;
-        if (u == NULL) {
-            ur_add(var, &c->magician, resolve_unit);
-        }
-    }
-    return AT_READ_FAIL;          /* we don't care for the attribute. */
+    READ_INT(store, NULL);
+    READ_FLT(store, NULL);
+    READ_INT(store, NULL);
+    READ_INT(store, NULL);
+    READ_INT(store, NULL);
+    return AT_READ_DEPR;          /* we don't care for the attribute. */
 }
-#endif
 
 /* ------------------------------------------------------------- */
 /* Name:       Todeswolke
@@ -6705,9 +6678,7 @@ void register_spells(void)
 {
     register_borders();
 
-#ifdef COMPAT_DEATHCLOUD
     at_deprecate("zauber_todeswolke", dc_read_compat);
-#endif
     
     /* init_firewall(); */
     ct_register(&ct_firewall);
