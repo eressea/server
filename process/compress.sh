@@ -5,8 +5,10 @@ if [ -z $ERESSEA ]; then
   exit -2
 fi
 
+BINDIR=$ERESSEA/server/bin
+
 GAME=$ERESSEA/game-$1
-GAME_NAME=$(grep -w name $GAME/eressea.ini | sed 's/.*=\s*//')
+GAME_NAME="$($BINDIR/inifile $GAME/eressea.ini get game:name)"
 
 TURN=$2
 if [ -z $TURN ]
@@ -20,5 +22,5 @@ if [ ! -d $GAME/reports ]; then
 fi
 
 cd $GAME/reports
-$ERESSEA/server/bin/compress.py $TURN "$GAME_NAME"
+$BINDIR/compress.py $TURN "$GAME_NAME"
 cd -
