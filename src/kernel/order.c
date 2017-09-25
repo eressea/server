@@ -321,6 +321,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     ord->_noerror = noerror;
     ord->next = NULL;
 
+    while (isspace(*(unsigned char *)sptr)) ++sptr;
     ord->data = create_data(kwd, sptr, lindex);
 
     return ord;
@@ -410,7 +411,6 @@ order *parse_order(const char *s, const struct locale * lang)
             }
         }
         if (kwd != NOKEYWORD) {
-            while (isspace(*(unsigned char *)sptr)) ++sptr;
             return create_order_i(kwd, sptr, persistent, noerror, lang);
         }
     }
