@@ -386,35 +386,32 @@ order *parse_order(const char *s, const struct locale * lang)
 {
     assert(lang);
     assert(s);
-    while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s)) {
-        ++s;
-    }
     if (*s != 0) {
-        keyword_t kwd;
-        const char *sptr;
+        keyword_t kwd = NOKEYWORD;
+        const char *sptr = s;
         bool persistent = false, noerror = false;
         const char * p;
 
-        while (*s == '!' || *s=='@') {
-            if (*s=='!') noerror = true;
-            else if (*s == '@') persistent = true;
-            ++s;
-        }
-        sptr = s;
         p = *sptr ? parse_token_depr(&sptr) : 0;
-        kwd = p ? get_keyword(p, lang) : NOKEYWORD;
+        if (p) {
+            while (*p == '!' || *p == '@') {
+                if (*p == '!') noerror = true;
+                else if (*p == '@') persistent = true;
+                ++p;
+            }
+            kwd = get_keyword(p, lang);
+        }
         if (kwd == K_MAKE) {
-            const char *s, *sp = sptr;
-            s = parse_token_depr(&sp);
-            if (s && isparam(s, lang, P_TEMP)) {
+            const char *sp = sptr;
+            p = parse_token_depr(&sp);
+            if (p && isparam(p, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
             }
         }
         if (kwd != NOKEYWORD) {
             while (isspace(*(unsigned char *)sptr)) ++sptr;
-            s = sptr;
-            return create_order_i(kwd, s, persistent, noerror, lang);
+            return create_order_i(kwd, sptr, persistent, noerror, lang);
         }
     }
     return NULL;
