@@ -41,17 +41,17 @@ extern "C" {
     } order;
 
     /* constructor */
-    extern order *create_order(keyword_t kwd, const struct locale *lang,
+    order *create_order(keyword_t kwd, const struct locale *lang,
         const char *params, ...);
-    extern order *parse_order(const char *s, const struct locale *lang);
-    extern void replace_order(order ** dst, order * orig, const order * src);
+    order *parse_order(const char *s, const struct locale *lang);
+    void replace_order(order ** dst, order * orig, const order * src);
 
     /* reference counted copies of orders: */
-    extern order *copy_order(const order * ord);
-    extern void free_order(order * ord);
-    extern void free_orders(order ** olist);
+    order *copy_order(const order * ord);
+    void free_order(order * ord);
+    void free_orders(order ** olist);
 
-    extern void push_order(struct order **olist, struct order *ord);
+    void push_order(struct order **olist, struct order *ord);
 
     /* access functions for orders */
     keyword_t getkeyword(const order * ord);

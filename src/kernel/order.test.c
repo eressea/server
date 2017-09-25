@@ -49,24 +49,40 @@ static void test_parse_order(CuTest *tc) {
 
     ord = parse_order("!MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertTrue(tc, ord->_noerror);
     CuAssertTrue(tc, !ord->_persistent);
     free_order(ord);
 
     ord = parse_order("@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertTrue(tc, !ord->_noerror);
     CuAssertTrue(tc, ord->_persistent);
     free_order(ord);
 
     ord = parse_order("@!MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertTrue(tc, ord->_noerror);
     CuAssertTrue(tc, ord->_persistent);
     free_order(ord);
 
     ord = parse_order("!@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertTrue(tc, ord->_noerror);
+    CuAssertTrue(tc, ord->_persistent);
+    free_order(ord);
+
+    ord = parse_order("  !@MOVE NORTH", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertTrue(tc, ord->_noerror);
     CuAssertTrue(tc, ord->_persistent);
     free_order(ord);
