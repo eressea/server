@@ -2,7 +2,10 @@
 GAME=$1
 
 [ "$ENABLED" != "yes" ] && exit
-[ -z ${ERESSEA} ] && ERESSEA=$HOME/eressea
+if [ -z $ERESSEA ] ; then
+  ERESSEA=$HOME/eressea
+  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+fi
 
 export ERESSEA
 BIN=$ERESSEA/server/bin

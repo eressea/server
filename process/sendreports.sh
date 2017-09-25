@@ -7,7 +7,7 @@ if [ -z $ERESSEA ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
   exit -2
 fi
-source $HOME/bin/functions.sh
+source $ERESSEA/server/bin/functions.sh
 
 if [ ! -z $1 ]; then
   GAME=$ERESSEA/game-$1

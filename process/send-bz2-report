@@ -7,7 +7,7 @@ if [ ! -f reports.txt ]; then
   echo "need to run $0 from the report direcory"
   exit -2
 fi
-source $HOME/bin/functions.sh
+source $ERESSEA/server/bin/functions.sh
 
 TEMPLATE=report-mail.txt
 if [ "$1" == "-Lde" ]

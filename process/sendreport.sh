@@ -5,7 +5,7 @@ if [ -z $ERESSEA ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
   exit -2
 fi
-source $HOME/bin/functions.sh
+source $ERESSEA/server/bin/functions.sh
 
 GAME=$1
 EMAIL=$2
@@ -21,7 +21,6 @@ function reply() {
 LOCKFILE=$ERESSEA/.report.lock
 [ -e $LOCKFILE ] && reply "lockfile exists. wait for mail delivery to finish."
 
-REPLYTO='accounts@eressea.de'
 
 echo `date`:report:$GAME:$EMAIL:$FACTION:$PASSWD >> $ERESSEA/request.log
 

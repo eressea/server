@@ -4,6 +4,11 @@
 # files are delivered into an incoming queue by procmail, then cron runs
 # this here script to make a non-blocking syntax check and reject or
 # accept the order file.
+if [ -z $ERESSEA ] ; then
+  ERESSEA=$HOME/eressea
+  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+fi
+
 
 if [ "yes" != "$CONFIRM" ] ; then
   exit
@@ -13,8 +18,8 @@ for GAME in $*
 do
   if [ "$GAME" == "eressea" ]; then GAME=2 ; fi
   if [ "$GAME" == "e3a" ]; then GAME=3 ; fi
-  if [ -e $HOME/eressea/game-$GAME/orders.queue ]
+  if [ -e $ERESSEA/game-$GAME/orders.queue ]
   then
-    $HOME/bin/orders-process $GAME
+    $ERESSEA/server/bin/orders-process $GAME
   fi
 done
