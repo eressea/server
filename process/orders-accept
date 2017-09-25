@@ -16,48 +16,25 @@ from time import ctime, sleep, time
 from socket import gethostname
 from rfc822 import parsedate_tz, mktime_tz
 
-if 'ERESSEA' in os.environ:
-    dir = os.environ['ERESSEA']
-elif 'HOME' in os.environ:
-    dir = os.path.join(os.environ['HOME'], '/eressea')
-else: # WTF? No HOME?
-    dir = "/home/eressea/eressea"
-if not os.path.isdir(dir):
-    print "please set the ERESSEA environment variable to the install path"
-    sys.exit(1)
-rootdir = dir
+from epasswd import EPasswd
 
-game = int(sys.argv[1])
-gamedir = os.path.join(rootdir, "game-%d" % (game, ))
-frommail = 'eressea-server@kn-bremen.de'
-gamename = 'Eressea'
-sender = '%s Server <%s>' % (gamename, frommail)
+def get_eressea_dir():
+    if 'ERESSEA' in os.environ:
+        dir = os.environ['ERESSEA']
+    elif 'HOME' in os.environ:
+        dir = os.path.join(os.environ['HOME'], '/eressea')
+    else: # WTF? No HOME?
+        dir = "/home/eressea/eressea"
+    if not os.path.isdir(dir):
+        print "please set the ERESSEA environment variable to the install path"
+        sys.exit(1)
+    return dir
 
-inifile = os.path.join(gamedir, 'eressea.ini')
-if not os.path.exists(inifile):
-    print "no such file: " . inifile
-else:
-    config = ConfigParser.ConfigParser()
-    config.read(inifile)
-    if config.has_option('game', 'email'):
-        frommail = config.get('game', 'email')
-    if config.has_option('game', 'name'):
-        gamename = config.get('game', 'name')
-    if config.has_option('game', 'sender'):
-        sender = config.get('game', 'sender')
-    else:
-        sender = "%s Server <%s>" % (gamename, frommail)
-    config = None
-prefix = 'turn-'
-hostname = gethostname()
-orderbase = "orders.dir"
-sendmail = True
-# maximum number of reports per sender:
-maxfiles = 20
-# write headers to file?
-writeheaders = True
-# reject all html email?
-rejecthtml = True
+def pwd_get_email(faction, pwd, pwdfile=None):
+    return None
+
+def split_filename(filename):
+    return os.path.split(filename)
 
 def unlock_file(filename):
     try:
@@ -80,6 +57,14 @@ def lock_file(filename):
             if i == 5: unlock_file(filename)
             sleep(wait)
             wait = wait*2
+
+def get_config(section, key, abort=None, default=None):
+    if config.has_option(section, key):
+        return config.get(section, key)
+    elif abort is not None:
+        print "missing %s.%s" % (section, key)
+        sys.exit(abort)
+    return default
 
 messages = {
         "multipart-en" :
@@ -247,8 +232,7 @@ def write_part(outfile, part):
 def copy_orders(message, filename, sender):
         # print the header first
     if writeheaders:
-        from os.path import split
-        dirname, basename = split(filename)
+        dirname, basename = split_filename(filename)
         dirname = dirname + '/headers'
         if not os.path.exists(dirname): os.mkdir(dirname)
         outfile = open(dirname + '/' + basename, "w")
@@ -358,6 +342,36 @@ def accept(game, locale, stream, extend=None):
     logger.info("done - accepted orders from " + email)
 
     return 0
+
+rootdir = get_eressea_dir()
+
+game = int(sys.argv[1])
+
+gamedir = os.path.join(rootdir, "game-%d" % (game, ))
+
+inifile = os.path.join(gamedir, 'eressea.ini')
+if not os.path.exists(inifile):
+    print "no such file: " . inifile
+    sys.exit(1)
+
+config = ConfigParser.ConfigParser()
+config.read(inifile)
+
+frommail = get_config("game", "email", 1)
+gamename = get_config("game", "name", 1)
+sender = get_config("game", "sender", default='%s Server <%s>' % (gamename, frommail))
+
+
+prefix = 'turn-'
+hostname = gethostname()
+orderbase = "orders.dir"
+sendmail = True
+# maximum number of reports per sender:
+maxfiles = 20
+# write headers to file?
+writeheaders = True
+# reject all html email?
+rejecthtml = True
 
 # the main body of the script:
 try:

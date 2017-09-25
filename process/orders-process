@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
 
-from os import unlink, symlink, rename, popen, tmpfile
+from os import unlink, symlink
 import sys
 import os
-import os.path
+import subprocess, shlex
 import ConfigParser
 from re import compile, IGNORECASE
-from string import split, join, upper, strip
-from sys import argv, exit
+from string import split, join, strip
+from sys import exit
 from time import sleep, time, ctime
 from syslog import openlog, closelog, syslog
 
@@ -44,6 +44,14 @@ def lock_file(filename):
             sleep(wait)
             wait = wait*2
 
+def get_config(section, key, abort=None, default=None):
+    if config.has_option(section, key):
+        return config.get(section, key)
+    elif abort is not None:
+        print "missing %s.%s" % (section, key)
+        sys.exit(abort)
+    return default
+
 messages = {
 "subject-de": "Befehle angekommen",
 "subject-en": "orders received",
@@ -65,43 +73,41 @@ messages = {
 }
 
 game = int(sys.argv[1])
-echeck_cmd = "/home/eressea/echeck/echeck.sh"
 maxlines = 25
 
 # base directory for all your games:
-install_dir = "/home/eressea/eressea"
+rootdir = "/home/eressea/eressea"
 if 'ERESSEA' in os.environ:
-    install_dir = os.environ['ERESSEA']
-elif 'HOME' in os.environ:
-    install_dir = os.path.join(os.environ['HOME'], '/eressea')
-if not os.path.isdir(install_dir):
+    rootdir = os.environ['ERESSEA']
+if not os.path.isdir(rootdir):
     print "please set the ERESSEA environment variable to the install path"
     sys.exit(1)
 
-game_dir = os.path.join(install_dir, "game-%d" % (game, ))
-frommail = 'eressea-server@kn-bremen.de'
-gamename = 'Eressea'
-sender = '%s Server <%s>' % (gamename, frommail)
+gamedir = os.path.join(rootdir, "game-%d" % (game, ))
+serverdir = os.path.join(rootdir, "server")
+frommail = None
+gamename = None
+echeck_cmd = None
+checker = None
+muttrc=os.path.join(rootdir, "etc/muttrc")
 
-inifile = os.path.join(game_dir, 'eressea.ini')
+inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
     print "no such file: " . inifile
+    sys.exit(1)
 else:
     config = ConfigParser.ConfigParser()
     config.read(inifile)
-    if config.has_option('game', 'email'):
-        frommail = config.get('game', 'email')
-    if config.has_option('game', 'name'):
-        gamename = config.get('game', 'name')
-    if config.has_option('game', 'sender'):
-        sender = config.get('game', 'sender')
-    else:
-        sender = "%s Server <%s>" % (gamename, frommail)
-    config = None
+    frommail = get_config('game', 'email', abort=1)
+    gamename = get_config('game', 'name', abort=1)
+    sender = get_config('game', 'sender', default="%s Server <%s>" % (gamename, frommail))
+    frommail = get_config('lua', 'install', abort=1)
+    echeck_cmd = get_config('game', 'echeck', default=None)
+    checker = get_config('game', 'checker', default=None)
 
-queue_file = os.path.join(game_dir, "orders.queue")
+queue_file = os.path.join(gamedir, "orders.queue")
 if not os.path.exists(queue_file):
-    exit(0)
+    sys.exit(0)
 
 # regular expression that finds the start of a faction
 fact_re = compile("^\s*(eressea|partei|faction)\s+([a-zA-Z0-9]+)\s+\"?([^\"]*)\"?", IGNORECASE)
@@ -131,7 +137,15 @@ def check_pwd(filename, email, pw_data):
 
 def echeck(filename, locale, rules):
     dirname, filename = split_filename(filename)
-    stream = popen("%s %s %s %s %s" % (echeck_cmd, locale, filename, dirname, rules), 'r')
+    echeck_dir, echeck_file = split_filename(echeck_cmd)
+    stream = subprocess.Popen([
+        echeck_cmd,
+        "-P%s" % echeck_dir,
+        "-R%s" % rules,
+        "-w0", "-x",
+        "-L%s" % locale,
+        filename ], stdout=subprocess.PIPE, cwd=dirname, shell=False).stdout
+    
     lines = stream.readlines()
     if len(lines)==0:
         stream.close()
@@ -143,24 +157,47 @@ def echeck(filename, locale, rules):
     stream.close()
     return mail
 
+def check_orders(filename, locale, rules):
+    options = get_config("game", "checker.parameters", default=None)
+    args = [ checker, filename, locale, str(game), gamedir, serverdir]
+    if options is not None:
+        args.extend(shlex.split(options))
+    
+    stream = subprocess.Popen(args, stdout=subprocess.PIPE).stdout
+
+    lines = stream.readlines()
+    if len(lines)==0:
+        stream.close()
+        return None
+    if len(lines)>maxlines:
+        mail = join(lines[:maxlines-3] + ["...", "\n"] + lines[-3:], '')
+    else:
+        mail = join(lines[:maxlines], '')
+    stream.close()
+    return mail
+
+
 # parse the queue file -
 #print "connecting to SMTP..."
-from smtplib import SMTP
-try:
-    server = SMTP("localhost")
-except:
-    print "could not connect to SMTP server"
-    exit(0)
+mailserver = None
+if not os.path.exists(muttrc):
+    from smtplib import SMTP
+    try:
+        mailserver = SMTP("localhost")
+    except:
+        print "could not connect to SMTP server"
+        sys.exit(0)
 
 #print "reading password file..."
-pw_data = EPasswd(os.path.join(game_dir,"passwd"))
+pw_data = EPasswd(os.path.join(gamedir,"passwd"))
 
 #print "reading orders.queue..."
 # move the queue file to a save space while locking it:
 try:
     lock_file(queue_file)
 except:
-    exit(0)
+    print "could not create lock for %s" %queue_file
+    sys.exit(0)
 queuefile = open(queue_file, "r")
 lines = queuefile.readlines()
 queuefile.close()
@@ -171,7 +208,8 @@ tname="/tmp/orders.queue.%s" % str(time())
 try:
     lock_file(tname)
 except:
-    exit(0)
+    print "could not create lock for %s" % tname
+    sys.exit(0)
 tmpfile=open(tname, "w")
 for line in lines:
     tmpfile.write(line)
@@ -201,7 +239,7 @@ for line in lines:
     warning = ""
     failed = True
     results = check_pwd(infile, email, pw_data)
-    logfile = open(os.path.join(game_dir, "zug.log"), "a")
+    logfile = open(os.path.join(gamedir, "zug.log"), "a")
     dirname, filename = split_filename(infile)
     msg = messages["validate-"+locale] + " " + infile + "\n\n"
     for faction, game_email, success, pwd in results:
@@ -219,6 +257,8 @@ for line in lines:
         result = None
         if os.path.exists(echeck_cmd):
             result = echeck(infile, locale, rules)
+        if os.path.exists(checker):
+            result += check_orders(infile, locale, rules)
         if result is None:
             # echeck did not finish
             msg = msg + "Echeck is broken. Your turn was accepted, but could not be verified.\n"
@@ -229,13 +269,19 @@ for line in lines:
             syslog("process - checked orders in " + infile)
 
     subject = gamename + " " + messages["subject-" + locale] + warning
-    msg = "Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\n\n" % (subject, sender, email) + msg
     try:
-        server.sendmail(sender, email, msg)
+        if os.path.exists(muttrc):
+            mutt_cmd = "mutt"
+            p=subprocess.Popen([ mutt_cmd, "-d2", "-F", muttrc, "-s", subject, "--", email],  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            sv = p.communicate(msg)
+        else:
+            msg = "Subject: %s\nFrom: %s\nTo: %s\nContent-Type: text/plain; charset=utf-8\n\n" % (subject, sender, email) + msg
+            mailserver.sendmail(sender, email, msg)
     except:
         syslog("failed - cannot send to " + email)
 
-server.close()
+if mailserver is not None:
+    mailserver.close()
 
 closelog()
 unlink(tname)

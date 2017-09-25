@@ -16,8 +16,6 @@ fi
 
 for GAME in $*
 do
-  if [ "$GAME" == "eressea" ]; then GAME=2 ; fi
-  if [ "$GAME" == "e3a" ]; then GAME=3 ; fi
   if [ -e $ERESSEA/game-$GAME/orders.queue ]
   then
     $ERESSEA/server/bin/orders-process $GAME
