@@ -1,0 +1,5 @@
+# insert your provider's pop3 server, user name and password
+
+poll pop.gmx.net protocol pop3 with :
+     user "myserver@gmx.de" password "mypassphrase":
+          mda "/usr/bin/procmail -m ERESSEA=$ERESSEA $ERESSEA/server/etc/procmailrc " with options sslproto "auto" and keep

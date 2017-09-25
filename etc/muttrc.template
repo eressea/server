@@ -1,0 +1,48 @@
+# your user name for sending mails (may or may not be your email address)
+set my_smtp_user="myserver@gmx.net
+# your passphrase
+set smtp_pass="mypassphrase"
+# your provider's SMTP server
+set my_smtp_server="mail.gmx.net"
+# server's SMTP port, sometimes 587
+set my_smtp_port=465
+
+# your user name for getting mails; change if different from smpt user
+set imap_user=$my_smtp_user
+# your passphrase
+set imap_pass=$smtp_pass
+# your imap server
+set my_imap_server="imap.gmx.net"
+set my_imap_port=993
+# server imap address including port
+set folder="imaps://$my_imap_server:$my_imap_port/"
+set spoolfile=+INBOX
+#set spoolfile="imaps://$my_imap_server@imap.zoho.eu/"
+
+# set to your game server name (optional)
+set from = "My Server <$imap_user>"
+set use_from = yes
+
+set record=+Gesendet
+#unset record
+
+set smtp_url=smtps://$my_smtp_user:$smtp_pass@$my_smtp_server:$smtp_port
+
+set postponed="Drafts"
+# activate TLS if available on the server
+set ssl_starttls=yes
+# always use SSL when connecting to a server
+set ssl_force_tls=yes
+# Don't wait to enter mailbox manually 
+unset imap_passive        
+# Automatically poll subscribed mailboxes for new mail (new in 1.5.11)
+#set imap_check_subscribed
+# Reduce polling frequency to a sane level
+set mail_check=60
+# And poll the current mailbox more often (not needed with IDLE in post 1.5.11)
+set timeout=10
+# keep a cache of headers for faster loading (1.5.9+?)
+#set header_cache=~/.hcache
+# Display download progress every 5K
+#set net_inc=5
+

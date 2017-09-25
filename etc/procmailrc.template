@@ -1,0 +1,21 @@
+# PATH=/usr/local/bin:/usr/bin:/bin
+
+# set to game.mailcmd or game.name from eressea.ini
+GAME_NAME=Eressea
+GAME_ID=1
+
+MAILDIR=$ERESSEA/server/Mail      #you'd better make sure it exists
+DEFAULT=$MAILDIR/mbox/   #completely optional
+LOGFILE=$MAILDIR/from   #recommended
+
+
+# $ERESSEA
+:0
+* $^Subject:.*${GAME_NAME} +${GAME_ID} +BEF.*
+| grep -v '>From' | $ERESSEA/server/bin/orders-accept $GAME_ID de
+
+# $ERESSEA
+:0
+* $^Subject:.*${GAME_NAME} +${GAME_ID} +ORDERS.*
+| grep -v '>From' | $ERESSEA/server/bin/orders-accept $GAME_ID en
+
