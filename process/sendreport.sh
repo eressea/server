@@ -1,7 +1,5 @@
 #!/bin/bash
 
-## this script takes a backup of a turn.
-## usage: backup.sh <turn>
 
 if [ -z $ERESSEA ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
