@@ -5,6 +5,7 @@
 #include <attributes/key.h>
 
 #include "save.h"
+#include "order.h"
 #include "version.h"
 #include "building.h"
 #include "ship.h"
@@ -452,6 +453,25 @@ static void test_version_no(CuTest *tc) {
     CuAssertIntEquals(tc, 0x10203, version_no("1.2.3-what.is.42"));
 }
 
+static void test_read_order(CuTest *tc) {
+    char cmd[32];
+    order *ord;
+    struct locale * lang;
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = read_order("MOVE NORTH", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertTrue(tc, !ord->_noerror);
+    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
+    free_order(ord);
+
+    test_cleanup();
+}
+
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -468,6 +488,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
+    SUITE_ADD_TEST(suite, test_read_order);
     SUITE_ADD_TEST(suite, test_version_no);
 
     return suite;
