@@ -1,5 +1,0 @@
-#!/bin/sh
-git submodule update --init
-ln -sf conf/eressea.ini
-s/cmake-init
-echo "configuration complete. run s/build to build the server"
