@@ -122,10 +122,11 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-struct order *read_order(const char *s, const struct locale *lang) {
-    assert(s);
+struct order *read_order(const char *in, const struct locale *lang) {
+    assert(in);
     assert(lang);
-    if (s[0]) {
+    if (in[0]) {
+        const char *s = in;
         keyword_t kwd;
         char token[64];
         const char *stok;
@@ -152,7 +153,7 @@ struct order *read_order(const char *s, const struct locale *lang) {
         /* Nun wird der Befehl erzeut und eingehängt */
         kwd = get_keyword(stok, lang);
         if (kwd != NOKEYWORD) {
-            return create_order(kwd, lang, s);
+            return parse_order(in, lang);
         }
     }
     return NULL;

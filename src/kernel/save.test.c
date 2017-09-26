@@ -469,6 +469,29 @@ static void test_read_order(CuTest *tc) {
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
     free_order(ord);
 
+    ord = read_order("MAKE TEMP foo", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertTrue(tc, !ord->_noerror);
+    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
+    CuAssertStrEquals(tc, "maketemp foo", get_command(ord, cmd, sizeof(cmd)));
+    free_order(ord);
+
+    ord = read_order("MAKETEMP foo", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertTrue(tc, !ord->_noerror);
+    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
+    CuAssertStrEquals(tc, "maketemp foo", get_command(ord, cmd, sizeof(cmd)));
+    free_order(ord);
+
+    CuAssertPtrEquals(tc, NULL, read_order("HODOR HODOR HODOR", lang));
+    CuAssertPtrEquals(tc, NULL, read_order("FACTION abcd", lang));
+    CuAssertPtrEquals(tc, NULL, read_order("UNIT abcd", lang));
+    CuAssertPtrEquals(tc, NULL, read_order("ERESSEA abcd", lang));
+    CuAssertPtrEquals(tc, NULL, read_order("REGION 2,3", lang));
+    CuAssertPtrEquals(tc, NULL, read_order("NEXT", lang));
+
     test_cleanup();
 }
 
