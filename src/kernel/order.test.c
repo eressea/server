@@ -224,6 +224,29 @@ static void test_get_command(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_is_persistent(CuTest *tc) {
+    order *ord;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = parse_order("@move", lang);
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST, ord->command);
+    CuAssertTrue(tc, !is_persistent(ord));
+    free_order(ord);
+
+    ord = parse_order("@invalid", lang);
+    CuAssertPtrEquals(tc, NULL, ord);
+
+    ord = parse_order("// comment", lang);
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
+    free_order(ord);
+
+    test_cleanup();
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -237,5 +260,6 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_getstrtoken);
     SUITE_ADD_TEST(suite, test_get_command);
+    SUITE_ADD_TEST(suite, test_is_persistent);
     return suite;
 }
