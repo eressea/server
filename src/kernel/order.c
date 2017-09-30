@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-# define ORD_KEYWORD(ord) (ord)->data->_keyword
+# define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
 # define ORD_STRING(ord) (ord)->data->_str
 
@@ -46,7 +46,6 @@ typedef struct order_data {
     const char *_str;
     int _refcount;
     int _lindex;
-    keyword_t _keyword;
 } order_data;
 
 static void release_data(order_data * data)
@@ -188,13 +187,12 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, keyword_t kwd, int lindex, const char *str)
+static char *mkdata(order_data **pdata, size_t len, int lindex, const char *str)
 {
     order_data *data;
     char *result;
     data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
-    data->_keyword = kwd;
     data->_lindex = lindex;
     data->_refcount = 0;
     data->_str = 0;
@@ -228,7 +226,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
                 const char *skname = skillname(sk, lang);
                 const char *spc = strchr(skname, ' ');
                 size_t len = strlen(skname);
-                char *dst = mkdata(&data, len + (spc ? 3 : 0), kwd, lindex, spc ? 0 : skname);
+                char *dst = mkdata(&data, len + (spc ? 3 : 0), lindex, spc ? 0 : skname);
                 locale_array[lindex]->study_orders[sk] = data;
                 if (spc) {
                     dst[0] = '\"';
@@ -247,14 +245,14 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
     else if (kwd != NOKEYWORD && *sptr == 0) {
         data = locale_array[lindex]->short_orders[kwd];
         if (data == NULL) {
-            mkdata(&data, 0, kwd, lindex, 0);
+            mkdata(&data, 0, lindex, 0);
             data->_refcount = 1;
             locale_array[lindex]->short_orders[kwd] = data;
         }
         ++data->_refcount;
         return data;
     }
-    mkdata(&data, s ? strlen(s) : 0, kwd, lindex, s);
+    mkdata(&data, s ? strlen(s) : 0, lindex, s);
     data->_refcount = 1;
     return data;
 }
@@ -599,5 +597,5 @@ keyword_t init_order(const struct order *ord)
 {
     assert(ord && ord->data);
     init_tokens_str(ord->data->_str);
-    return ord->data->_keyword;
+    return ORD_KEYWORD(ord);
 }
