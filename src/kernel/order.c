@@ -94,7 +94,7 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
 
-    if (ord->_noerror) {
+    if (ord->command & CMD_QUIET) {
         if (size > 0) {
             *bufp++ = '!';
             --size;
@@ -103,7 +103,7 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             WARN_STATIC_BUFFER();
         }
     }
-    if (ord->_persistent) {
+    if (ord->command & CMD_PERSIST) {
         if (size > 0) {
             *bufp++ = '@';
             --size;
@@ -162,8 +162,7 @@ order *copy_order(const order * src)
     if (src != NULL) {
         order *ord = (order *)malloc(sizeof(order));
         ord->next = NULL;
-        ord->_persistent = src->_persistent;
-        ord->_noerror = src->_noerror;
+        ord->command = src->command;
         ord->data = src->data;
         ++ord->data->_refcount;
         return ord;
@@ -316,8 +315,9 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
     }
     locale_array[lindex]->lang = lang;
 
-    ord->_persistent = persistent;
-    ord->_noerror = noerror;
+    ord->command = (int)kwd;
+    if (persistent) ord->command |= CMD_PERSIST;
+    if (noerror) ord->command |= CMD_QUIET;
     ord->next = NULL;
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
@@ -560,7 +560,7 @@ bool is_persistent(const order * ord)
     case K_KOMMENTAR:
         return true;
     default:
-        return ord->_persistent || is_repeated(kwd);
+        return (ord->command & CMD_PERSIST) || is_repeated(kwd);
     }
 }
 

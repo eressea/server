@@ -38,8 +38,7 @@ static void test_parse_order(CuTest *tc) {
 
     ord = parse_order("MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, !ord->_noerror);
-    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE, ord->command);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
 
@@ -51,40 +50,35 @@ static void test_parse_order(CuTest *tc) {
     CuAssertPtrNotNull(tc, ord);
     CuAssertPtrNotNull(tc, ord->data);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE | CMD_QUIET, ord->command);
     free_order(ord);
 
     ord = parse_order("@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertPtrNotNull(tc, ord->data);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertTrue(tc, !ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
-    free_order(ord);
-
-    ord = parse_order("@!MOVE NORTH", lang);
-    CuAssertPtrNotNull(tc, ord);
-    CuAssertPtrNotNull(tc, ord->data);
-    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST, ord->command);
     free_order(ord);
 
     ord = parse_order("!@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertPtrNotNull(tc, ord->data);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
+    free_order(ord);
+
+    ord = parse_order("@!MOVE NORTH", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
     free_order(ord);
 
     ord = parse_order("  !@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertPtrNotNull(tc, ord->data);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
     free_order(ord);
 
     test_cleanup();
@@ -220,11 +214,11 @@ static void test_get_command(CuTest *tc) {
     lang = test_create_locale();
     ord = create_order(K_MAKE, lang, "iron");
     CuAssertStrEquals(tc, "make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_noerror = true;
+    ord->command |= CMD_QUIET;
     CuAssertStrEquals(tc, "!make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_persistent = true;
+    ord->command |= CMD_PERSIST;
     CuAssertStrEquals(tc, "!@make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_noerror = false;
+    ord->command = K_MAKE | CMD_PERSIST;
     CuAssertStrEquals(tc, "@make iron", get_command(ord, buf, sizeof(buf)));
     free_order(ord);
     test_cleanup();

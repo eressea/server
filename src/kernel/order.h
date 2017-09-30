@@ -32,12 +32,15 @@ extern "C" {
 
     struct order_data;
 
+#define CMD_QUIET   0x010000
+#define CMD_PERSIST 0x020000
+#define CMD_DEFAULT 0x040000
+
     typedef struct order {
         struct order *next;
         /* do not access this data: */
         struct order_data *data;
-        bool _persistent;
-        bool _noerror;
+        int command;
     } order;
 
     /* constructor */
