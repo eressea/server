@@ -35,7 +35,7 @@
 # define ORD_STRING(ord) (ord)->data->_str
 
 typedef struct locale_data {
-    struct order_data *short_orders[MAXKEYWORDS];
+    struct order_data *short_orders;
     struct order_data *study_orders[MAXSKILLS];
     const struct locale *lang;
 } locale_data;
@@ -243,11 +243,11 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
     /* orders with no parameter, only one order_data per order required */
     else if (kwd != NOKEYWORD && *sptr == 0) {
-        data = locale_array[lindex]->short_orders[kwd];
+        data = locale_array[lindex]->short_orders;
         if (data == NULL) {
             mkdata(&data, 0, lindex, 0);
             data->_refcount = 1;
-            locale_array[lindex]->short_orders[kwd] = data;
+            locale_array[lindex]->short_orders = data;
         }
         ++data->_refcount;
         return data;
@@ -259,10 +259,8 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
 static void clear_localedata(int lindex) {
     int i;
-    for (i = 0; i != MAXKEYWORDS; ++i) {
-        release_data(locale_array[lindex]->short_orders[i]);
-        locale_array[lindex]->short_orders[i] = 0;
-    }
+    release_data(locale_array[lindex]->short_orders);
+    locale_array[lindex]->short_orders = NULL;
     for (i = 0; i != MAXSKILLS; ++i) {
         release_data(locale_array[lindex]->study_orders[i]);
         locale_array[lindex]->study_orders[i] = 0;
