@@ -564,6 +564,11 @@ bool is_persistent(const order * ord)
     }
 }
 
+bool is_silent(const order * ord)
+{
+    return (ord->command & CMD_QUIET) != 0;
+}
+
 char *write_order(const order * ord, char *buffer, size_t size)
 {
     if (ord == 0) {
