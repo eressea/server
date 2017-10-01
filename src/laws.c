@@ -3086,6 +3086,14 @@ void maketemp_cmd(unit *u, order **olist)
         *olist = *ordp;
         makeord->next = NULL;
         free_order(makeord);
+
+        if (!u2->orders) {
+            order *deford = default_order(u2->faction->locale);
+            if (deford) {
+                set_order(&u2->thisorder, NULL);
+                addlist(&u2->orders, deford);
+            }
+        }
     }
 }
 

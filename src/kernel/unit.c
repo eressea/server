@@ -1492,14 +1492,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (f) {
         assert(faction_alive(f));
         u_setfaction(u, f);
-
-        if (f->locale) {
-            order *deford = default_order(f->locale);
-            if (deford) {
-                set_order(&u->thisorder, NULL);
-                addlist(&u->orders, deford);
-            }
-        }
     }
 
     set_number(u, number);
