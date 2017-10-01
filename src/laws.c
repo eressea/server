@@ -3007,10 +3007,92 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
+void maketemp_cmd(unit *u, order **olist) 
+{
+    order *makeord;
+    int err = checkunitnumber(u->faction, 1);
+
+    makeord = *olist;
+    if (err) {
+        if (err == 1) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, makeord,
+                    "too_many_units_in_alliance",
+                    "allowed", maxunits(u->faction)));
+        }
+        else {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, makeord,
+                    "too_many_units_in_faction",
+                    "allowed", maxunits(u->faction)));
+        }
+        *olist = makeord->next;
+        makeord->next = NULL;
+        free_order(makeord);
+        while (*olist) {
+            keyword_t kwd;
+            order * ord = *olist;
+            *olist = ord->next;
+            ord->next = NULL;
+            kwd = getkeyword(ord);
+            free_order(ord);
+            if (kwd == K_END) {
+                break;
+            }
+        }
+    }
+    else {
+        char token[128];
+        const char *s;
+        int alias;
+        ship *sh;
+        unit *u2;
+        order **ordp, **oinsert;
+#ifndef NDEBUG
+        keyword_t kwd = init_order(makeord);
+        assert(kwd == K_MAKETEMP);
+#endif
+        alias = getid();
+        s = gettoken(token, sizeof(token));
+        if (s && s[0] == '\0') {
+            /* empty name? => generate one */
+            s = NULL;
+        }
+        u2 = create_unit(u->region, u->faction, 0, u->faction->race, alias, s, u);
+        fset(u2, UFL_ISNEW);
+        a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
+        sh = leftship(u);
+        if (sh) {
+            set_leftship(u2, sh);
+        }
+        setstatus(u2, u->status);
+
+        /* copy orders until K_END from u to u2 */
+        ordp = &makeord->next;
+        oinsert = &u2->orders;
+
+        while (*ordp) {
+            order *ord = *ordp;
+            *ordp = ord->next;
+            if (getkeyword(ord) == K_END) {
+                ord->next = NULL;
+                free_order(ord);
+                break;
+            }
+            *oinsert = ord;
+            oinsert = &ord->next;
+            *oinsert = NULL;
+        }
+        *olist = *ordp;
+        makeord->next = NULL;
+        free_order(makeord);
+    }
+}
+
 void new_units(void)
 {
     region *r;
-    unit *u, *u2;
+    unit *u;
 
     /* neue einheiten werden gemacht und ihre befehle (bis zum "ende" zu
      * ihnen rueberkopiert, damit diese einheiten genauso wie die alten
@@ -3028,73 +3110,13 @@ void new_units(void)
             }
 
             while (*ordp) {
-                order *makeord = *ordp;
-                if (getkeyword(makeord) == K_MAKETEMP) {
-                    char token[128], *name = NULL;
-                    const char *s;
-                    int alias;
-                    ship *sh;
-                    order **newordersp;
-                    int err = checkunitnumber(u->faction, 1);
-
-                    if (err) {
-                        if (err == 1) {
-                            ADDMSG(&u->faction->msgs,
-                                msg_feedback(u, makeord,
-                                    "too_many_units_in_alliance",
-                                    "allowed", maxunits(u->faction)));
-                        }
-                        else {
-                            ADDMSG(&u->faction->msgs,
-                                msg_feedback(u, makeord,
-                                    "too_many_units_in_faction",
-                                    "allowed", maxunits(u->faction)));
-                        }
-                        ordp = &makeord->next;
-
-                        while (*ordp) {
-                            order *ord = *ordp;
-                            if (getkeyword(ord) == K_END)
-                                break;
-                            *ordp = ord->next;
-                            ord->next = NULL;
-                            free_order(ord);
-                        }
-                        continue;
-                    }
-                    init_order(makeord);
-                    alias = getid();
-
-                    s = gettoken(token, sizeof(token));
-                    if (s && s[0]) {
-                        name = strdup(s);
-                    }
-                    u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
-                    if (name != NULL)
-                        free(name); /* TODO: use a buffer on the stack instead? */
-                    fset(u2, UFL_ISNEW);
-
-                    a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
-                    sh = leftship(u);
-                    if (sh) {
-                        set_leftship(u2, sh);
-                    }
-                    setstatus(u2, u->status);
-
-                    ordp = &makeord->next;
-                    newordersp = &u2->orders;
-                    while (*ordp) {
-                        order *ord = *ordp;
-                        if (getkeyword(ord) == K_END)
-                            break;
-                        *ordp = ord->next;
-                        ord->next = NULL;
-                        *newordersp = ord;
-                        newordersp = &ord->next;
-                    }
+                order *ord = *ordp;
+                if (getkeyword(ord) == K_MAKETEMP) {
+                    maketemp_cmd(u, ordp);
                 }
-                if (*ordp == makeord)
-                    ordp = &makeord->next;
+                else {
+                    ordp = &ord->next;
+                }
             }
         }
     }
