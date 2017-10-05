@@ -477,6 +477,52 @@ static void test_illusioncastle(CuTest *tc)
     test_cleanup();
 }
 
+static void test_familiar_set(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_setup();
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    CuAssertPtrEquals(tc, NULL, get_familiar_mage(fam));
+    CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
+    set_familiar(mag, fam);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    CuAssertPtrNotNull(tc, a_find(mag->attribs, &at_skillmod));
+    test_cleanup();
+}
+
+static void test_familiar_age(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_setup();
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    set_familiar(mag, fam);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    a_age(&fam->attribs, fam);
+    a_age(&mag->attribs, mag);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    set_number(fam, 0);
+    a_age(&mag->attribs, mag);
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    test_cleanup();
+}
+
+
+CuSuite *get_familiar_suite(void)
+{
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_familiar_set);
+    SUITE_ADD_TEST(suite, test_familiar_age);
+    return suite;
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();

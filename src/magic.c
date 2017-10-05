@@ -2192,17 +2192,19 @@ void set_familiar(unit * mage, unit * familiar)
         a = a_add(&mage->attribs, a_new(&at_familiar));
         a->data.v = familiar;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == familiar);
-    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+    }
 
+    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     a = a_find(familiar->attribs, &at_familiarmage);
     if (a == NULL) {
         a = a_add(&familiar->attribs, a_new(&at_familiarmage));
         a->data.v = mage;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == mage);
+    }
 }
 
 void remove_familiar(unit * mage)
