@@ -2181,10 +2181,8 @@ void set_familiar(unit * mage, unit * familiar)
         a = a->next;
     }
     if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
+        a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
+        a_add(&mage->attribs, a);
     }
 
     a = a_find(mage->attribs, &at_familiar);
@@ -2228,19 +2226,7 @@ void remove_familiar(unit * mage)
 
 bool create_newfamiliar(unit * mage, unit * familiar)
 {
-    /* if the skill modifier for the mage does not yet exist, add it */
-    attrib *a;
-    attrib *afam = a_find(mage->attribs, &at_familiar);
-    attrib *amage = a_find(familiar->attribs, &at_familiarmage);
-
-    if (afam == NULL) {
-        afam = a_add(&mage->attribs, a_new(&at_familiar));
-    }
-    afam->data.v = familiar;
-    if (amage == NULL) {
-        amage = a_add(&familiar->attribs, a_new(&at_familiarmage));
-    }
-    amage->data.v = mage;
+    set_familiar(mage, familiar);
 
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     /* Wenn der Magier stirbt, dann auch der Vertraute */
@@ -2248,19 +2234,6 @@ bool create_newfamiliar(unit * mage, unit * familiar)
     /* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
     add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
 
-    a = a_find(mage->attribs, &at_skillmod);
-    while (a && a->type == &at_skillmod) {
-        skillmod_data *smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
-            break;
-        a = a->next;
-    }
-    if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
-    }
     return true;
 }
 
