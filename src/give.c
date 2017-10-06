@@ -591,7 +591,7 @@ void give_unit(unit * u, unit * u2, order * ord)
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
-        mage = get_mage(u);
+        mage = get_mage_depr(u);
         if (!mage || u2->faction->magiegebiet != mage->magietyp) {
             cmistake(u, ord, 157, MSG_COMMERCE);
             return;

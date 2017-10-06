@@ -427,8 +427,8 @@ int teach_cmd(unit * teacher, struct order *ord)
             if (sk == SK_MAGIC) {
                 /* ist der Magier schon spezialisiert, so versteht er nur noch
                  * Lehrer seines Gebietes */
-                sc_mage *mage1 = get_mage(teacher);
-                sc_mage *mage2 = get_mage(student);
+                sc_mage *mage1 = get_mage_depr(teacher);
+                sc_mage *mage2 = get_mage_depr(student);
                 if (mage2 && mage1 && mage2->magietyp != M_GRAY
                     && mage1->magietyp != mage2->magietyp) {
                     if (feedback) {
@@ -782,7 +782,7 @@ int study_cmd(unit * u, order * ord)
         }
     }
     else if (sk == SK_MAGIC) {
-        sc_mage *mage = get_mage(u);
+        sc_mage *mage = get_mage_depr(u);
         if (!mage) {
             mage = create_mage(u, u->faction->magiegebiet);
         }

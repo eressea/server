@@ -1814,7 +1814,7 @@ void u_setrace(struct unit *u, const struct race *rc)
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 {
-    sc_mage *mage = m ? m : get_mage(u);
+    sc_mage *mage = m ? m : get_mage_depr(u);
 
     if (!mage) {
         log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
@@ -1828,7 +1828,7 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 
 struct spellbook * unit_get_spellbook(const struct unit * u)
 {
-    sc_mage * mage = get_mage(u);
+    sc_mage * mage = get_mage_depr(u);
     if (mage) {
         if (mage->spellbook) {
             return mage->spellbook;

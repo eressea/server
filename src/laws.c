@@ -3387,7 +3387,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
 
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
-            sc_mage *mage = get_mage(u);
+            sc_mage *mage = get_mage_depr(u);
             if (mage) {
                 int level = effskill(u, SK_MAGIC, 0);
                 if (level > maxlevel) {
@@ -3446,7 +3446,7 @@ static void update_spells(void)
             show_new_spells(f, maxlevel, faction_get_spellbook(f));
             for (i = 0; i != MAXMAGES && mages[i]; ++i) {
                 unit * u = mages[i];
-                sc_mage *mage = get_mage(u);
+                sc_mage *mage = get_mage_depr(u);
                 if (mage && mage->spellbook) {
                     int level = effskill(u, SK_MAGIC, 0);
                     show_new_spells(f, level, mage->spellbook);

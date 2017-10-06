@@ -39,7 +39,7 @@ static void test_equipment(CuTest * tc)
     CuAssertIntEquals(tc, 1, i_get(u->items, it_horses));
     CuAssertIntEquals(tc, 5, get_level(u, SK_MAGIC));
 
-    mage = get_mage(u);
+    mage = get_mage_depr(u);
     CuAssertPtrNotNull(tc, mage);
     CuAssertPtrNotNull(tc, mage->spellbook);
     CuAssertTrue(tc, u_hasspell(u, sp));

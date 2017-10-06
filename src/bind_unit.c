@@ -273,7 +273,7 @@ static int tolua_unit_set_guard(lua_State * L)
 
 static const char *unit_getmagic(const unit * u)
 {
-    sc_mage *mage = get_mage(u);
+    sc_mage *mage = get_mage_depr(u);
     return mage ? magic_school[mage->magietyp] : NULL;
 }
 
@@ -286,7 +286,7 @@ static int tolua_unit_get_magic(lua_State * L)
 
 static void unit_setmagic(unit * u, const char *type)
 {
-    sc_mage *mage = get_mage(u);
+    sc_mage *mage = get_mage_depr(u);
     int mtype;
     for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
         if (strcmp(magic_school[mtype], type) == 0)
@@ -753,7 +753,7 @@ static int tolua_unit_get_items(lua_State * L)
 static int tolua_unit_get_spells(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    sc_mage *mage = self ? get_mage(self) : 0;
+    sc_mage *mage = self ? get_mage_depr(self) : 0;
     spellbook *sb = mage ? mage->spellbook : 0;
     selist *slist = 0;
     if (sb) {

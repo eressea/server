@@ -549,7 +549,7 @@ static void test_familiar_equip(CuTest *tc) {
     CuAssertPtrNotNull(tc, mage);
     CuAssertPtrNotNull(tc, mage->spellbook);
     set_level(u, SK_MAGIC, 1);
-    CuAssertPtrEquals(tc, mage, get_mage(u));
+    CuAssertPtrEquals(tc, mage, get_mage_depr(u));
     CuAssertTrue(tc, u_hasspell(u, sp));
 
     test_cleanup();

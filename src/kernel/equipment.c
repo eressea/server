@@ -121,7 +121,7 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
             if (eq->spells) {
                 selist * ql = eq->spells;
                 int qi;
-                sc_mage * mage = get_mage(u);
+                sc_mage * mage = get_mage_depr(u);
 
                 for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                     lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);

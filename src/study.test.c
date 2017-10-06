@@ -409,11 +409,11 @@ static void test_study_magic(CuTest *tc) {
     study_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    CuAssertPtrNotNull(tc, get_mage(u));
+    CuAssertPtrNotNull(tc, get_mage_depr(u));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
-    CuAssertIntEquals(tc, M_GWYRRD, get_mage(u)->magietyp);
+    CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
 
-    /* the static cost array in study_cost prevents this test:
+    /* TODO: the static cost array in study_cost prevents this test:
     test_clear_messages(f);
     config_set("skills.cost.magic", "50");
     i_change(&u->items, rtype->itype, 50);

@@ -731,7 +731,7 @@ static int sp_transferaura(castorder * co)
     int cast_level = co->level;
     spellparameter *pa = co->par;
     unit *u;
-    sc_mage *scm_dst, *scm_src = get_mage(mage);
+    sc_mage *scm_dst, *scm_src = get_mage_depr(mage);
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)
@@ -745,7 +745,7 @@ static int sp_transferaura(castorder * co)
     /* Wieviel Transferieren? */
     aura = pa->param[1]->data.i;
     u = pa->param[0]->data.u;
-    scm_dst = get_mage(u);
+    scm_dst = get_mage_depr(u);
 
     if (scm_dst == NULL) {
         /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
@@ -5813,7 +5813,7 @@ int sp_permtransfer(castorder * co)
     change_maxspellpoints(mage, -aura);
     change_spellpoints(mage, -aura);
 
-    if (get_mage(tu)->magietyp == get_mage(mage)->magietyp) {
+    if (get_mage_depr(tu)->magietyp == get_mage_depr(mage)->magietyp) {
         change_maxspellpoints(tu, aura / 2);
     }
     else {
@@ -5936,18 +5936,18 @@ int sp_stealaura(castorder * co)
     /* Zieleinheit */
     u = pa->param[0]->data.u;
 
-    if (!get_mage(u)) {
+    if (!get_mage_depr(u)) {
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_fail", "unit target",
             mage, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
         return 0;
     }
 
-    taura = (get_mage(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
+    taura = (get_mage_depr(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
 
     if (taura > 0) {
-        get_mage(u)->spellpoints -= taura;
-        get_mage(mage)->spellpoints += taura;
+        get_mage_depr(u)->spellpoints -= taura;
+        get_mage_depr(mage)->spellpoints += taura;
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_success",

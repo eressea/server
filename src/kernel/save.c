@@ -1791,7 +1791,7 @@ int read_game(gamedata *data)
         else {
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
-                    sc_mage *mage = get_mage(u);
+                    sc_mage *mage = get_mage_depr(u);
                     if (mage) {
                         faction *f = u->faction;
                         int skl = effskill(u, SK_MAGIC, 0);
