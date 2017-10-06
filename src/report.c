@@ -1090,6 +1090,9 @@ void report_region(struct stream *out, const region * r, faction * f)
         message *msg;
 
         if (owner != NULL) {
+            bytes = (int)strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             msg = msg_message("nr_region_owner", "faction", owner);
             bytes = (int)nr_render(msg, f->locale, bufp, size, f);
             msg_release(msg);
