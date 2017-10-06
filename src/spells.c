@@ -39,7 +39,6 @@
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/connection.h>
-#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -513,27 +512,22 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 /* ------------------------------------------------------------- */
 /* der Vertraue des Magiers */
 
-static void make_familiar(unit * familiar, unit * mage)
+static unit * make_familiar(unit * mage, region *r, const race *rc, const char *name)
 {
-    /* skills and spells: */
-    const struct equipment *eq;
-    char eqname[64];
-    const race * rc = u_race(familiar);
-    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
-    eq = get_equipment(eqname);
-    if (eq != NULL) {
-        equip_items(&familiar->items, eq);
-    }
-    else {
-        log_info("could not perform initialization for familiar %s.\n", rc->_name);
-    }
+    unit *fam;
+
+    fam = create_unit(r, mage->faction, 1, rc, 0, name, mage);
+    setstatus(fam, ST_FLEE);
+    fset(fam, UFL_LOCKED);
 
     /* triggers: */
-    create_newfamiliar(mage, familiar);
+    create_newfamiliar(mage, fam);
 
     /* Hitpoints nach Talenten korrigieren, sonst starten vertraute
      * mit Ausdauerbonus verwundet */
-    familiar->hp = unit_max_hp(familiar);
+    fam->hp = unit_max_hp(fam);
+
+    return fam;
 }
 
 static int sp_summon_familiar(castorder * co)
@@ -586,10 +580,7 @@ static int sp_summon_familiar(castorder * co)
     msg = msg_message("familiar_name", "unit", mage);
     nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
     msg_release(msg);
-    familiar = create_unit(r, mage->faction, 1, rc, 0, zText, mage);
-    setstatus(familiar, ST_FLEE);
-    fset(familiar, UFL_LOCKED);
-    make_familiar(familiar, mage);
+    familiar = make_familiar(mage, r, rc, zText);
 
     dh = 0;
     dh1 = 0;

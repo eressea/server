@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
 #include <kernel/curse.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -2218,23 +2219,35 @@ void remove_familiar(unit * mage)
     while (a && a->type == &at_skillmod) {
         an = a->next;
         smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
+        if (smd->special == sm_familiar) {
             a_remove(&mage->attribs, a);
+        }
         a = an;
     }
 }
 
-bool create_newfamiliar(unit * mage, unit * familiar)
+void create_newfamiliar(unit * mage, unit * fam)
 {
-    set_familiar(mage, familiar);
+    /* skills and spells: */
+    const struct equipment *eq;
+    char eqname[64];
+    const race *rc = u_race(fam);
 
+    set_familiar(mage, fam);
+
+    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
+    eq = get_equipment(eqname);
+    if (eq != NULL) {
+        equip_items(&fam->items, eq);
+    }
+    else {
+        log_info("could not perform initialization for familiar %s.\n", rc->_name);
+    }
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     /* Wenn der Magier stirbt, dann auch der Vertraute */
-    add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
+    add_trigger(&mage->attribs, "destroy", trigger_killunit(fam));
     /* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
-    add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
-
-    return true;
+    add_trigger(&fam->attribs, "destroy", trigger_shock(mage));
 }
 
 static void * resolve_familiar(int id, void *data) {

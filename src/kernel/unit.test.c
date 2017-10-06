@@ -274,7 +274,7 @@ static void test_skill_familiar(CuTest *tc) {
     CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
 
     /* make them mage and familiar to each other */
-    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
+    create_newfamiliar(mag, fam);
 
     /* when they are in the same region, the mage gets half their skill as a bonus */
     CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));

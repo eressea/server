@@ -638,8 +638,14 @@ static int tolua_unit_get_familiar(lua_State * L)
 
 static int tolua_unit_set_familiar(lua_State * L)
 {
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    create_newfamiliar(self, (unit *)tolua_tousertype(L, 2, 0));
+    unit *mag = (unit *)tolua_tousertype(L, 1, NULL);
+    unit *fam = (unit *)tolua_tousertype(L, 2, NULL);
+    if (fam) {
+        set_familiar(mag, fam);
+    }
+    else {
+        remove_familiar(mag);
+    }
     return 0;
 }
 

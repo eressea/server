@@ -6,6 +6,7 @@
 
 #include <kernel/building.h>
 #include <kernel/race.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/item.h>
@@ -491,6 +492,9 @@ static void test_familiar_set(CuTest *tc) {
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
     CuAssertPtrNotNull(tc, a_find(mag->attribs, &at_skillmod));
+    remove_familiar(mag);
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
     test_cleanup();
 }
 
@@ -514,10 +518,47 @@ static void test_familiar_age(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_familiar_equip(CuTest *tc) {
+    unit *mag, *u;
+    equipment *eq;
+    const item_type * itype;
+    spell *sp;
+    sc_mage * mage;
+
+    test_setup();
+
+    itype = test_create_itemtype("horse");
+    CuAssertPtrNotNull(tc, itype);
+    sp = create_spell("testspell");
+    CuAssertPtrNotNull(tc, sp);
+
+    eq = get_or_create_equipment("fam_human");
+    equipment_setitem(eq, itype, "1");
+    equipment_setskill(eq, SK_ENTERTAINMENT, "5");
+    equipment_addspell(eq, sp->sname, 1);
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    set_familiar(mag, u);
+    create_newfamiliar(mag, u);
+    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 5, get_level(u, SK_ENTERTAINMENT));
+    CuAssertIntEquals(tc, 0, get_level(u, SK_MAGIC));
+
+    mage = get_mage(u);
+    CuAssertPtrNotNull(tc, mage);
+    CuAssertPtrNotNull(tc, mage->spellbook);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertPtrEquals(tc, mage, get_mage(u));
+    CuAssertTrue(tc, u_hasspell(u, sp));
+
+    test_cleanup();
+}
 
 CuSuite *get_familiar_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_familiar_equip);
     SUITE_ADD_TEST(suite, test_familiar_set);
     SUITE_ADD_TEST(suite, test_familiar_age);
     return suite;
