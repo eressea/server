@@ -532,7 +532,6 @@ static unit * make_familiar(unit * mage, region *r, const race *rc, const char *
 
 static int sp_summon_familiar(castorder * co)
 {
-    unit *familiar;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -580,7 +579,7 @@ static int sp_summon_familiar(castorder * co)
     msg = msg_message("familiar_name", "unit", mage);
     nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
     msg_release(msg);
-    familiar = make_familiar(mage, r, rc, zText);
+    make_familiar(mage, r, rc, zText);
 
     dh = 0;
     dh1 = 0;
