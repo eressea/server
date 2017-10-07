@@ -18,7 +18,7 @@ assert_grep_count() {
 file=$1
 expr=$2
 expect=$3
-count=`grep -cE $expr $file`
+count=`grep -cE "$expr" $file`
 [ $count -eq $expect ] || quit 1 "expected $expect counts of $expr in $file, got $count"
 echo "PASS: $expr is $expect"
 }
@@ -33,7 +33,7 @@ setup
 cleanup
 VALGRIND=`which valgrind`
 SERVER=../Debug/eressea/eressea
-set -e
+#set -e
 if [ -n "$VALGRIND" ]; then
 SUPP=../share/ubuntu-12_04.supp
 SERVER="$VALGRIND --track-origins=yes --gen-suppressions=all --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
@@ -62,5 +62,6 @@ assert_grep_count reports/185-heg.cr '"lighthouse";visibility' 6
 assert_grep_count reports/185-heg.cr '"neighbour";visibility' 11
 assert_grep_count reports/185-6rLo.cr '^EINHEIT' 2
 assert_grep_count reports/185-6rLo.cr '^REGION' 13
+assert_grep_count reports/185-6rLo.cr "Befehl ist unbekannt" 0
 echo "integration tests: PASS"
 cleanup
