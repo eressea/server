@@ -7,10 +7,7 @@
 extern "C" {
 #endif
 
-    struct stream;
-
-    void read_orderfile(const char *filename);
-    void read_orders(struct stream *strm);
+    int readorders(const char *filename);
 
 #ifdef __cplusplus
 }
