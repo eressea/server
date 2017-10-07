@@ -819,9 +819,8 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     bufp = STRLCPY(bufp, " ", size);
 
     if (sv->id == SK_MAGIC) {
-        sc_mage *mage = get_mage_depr(u);
-        assert(mage);
-        if (mage->magietyp != M_GRAY) {
+        sc_mage *mage = get_mage(u);
+        if (mage && mage->magietyp != M_GRAY) {
             bufp = STRLCPY(bufp, LOC(lang, mkname("school",
                 magic_school[mage->magietyp])), size);
             bufp = STRLCPY(bufp, " ", size);
