@@ -23,16 +23,13 @@ static void test_read_orders(CuTest *tc) {
 }
 
 typedef struct order_list {
-    const char *orders[8];
+    const char **orders;
     int next;
 } order_list;
 
 static const char *getbuf_list(void *data)
 {
     order_list * olist = (order_list *)data;
-    if (olist->next >= 8) {
-        return NULL;
-    }
     return olist->orders[olist->next++];
 }
 
@@ -40,6 +37,7 @@ static void test_faction_password_okay(CuTest *tc) {
     input in;
     faction *f;
     order_list olist;
+    const char *orders[] = { "ERESSEA 1 password", NULL };
 
     test_setup();
     f = test_create_faction(NULL);
@@ -47,8 +45,7 @@ static void test_faction_password_okay(CuTest *tc) {
     CuAssertIntEquals(tc, 1, f->no);
     faction_setpassword(f, "password");
     f->lastorders = turn - 1;
-    olist.orders[0] = "ERESSEA 1 password";
-    olist.orders[1] = NULL;
+    olist.orders = orders;
     olist.next = 0;
     in.getbuf = getbuf_list;
     in.data = &olist;
@@ -62,15 +59,15 @@ static void test_faction_password_bad(CuTest *tc) {
     input in;
     faction *f;
     order_list olist;
+    const char *orders[] = { "ERESSEA 1 password", NULL };
 
     test_setup();
     f = test_create_faction(NULL);
     renumber_faction(f, 1);
     CuAssertIntEquals(tc, 1, f->no);
-    faction_setpassword(f, "password");
+    faction_setpassword(f, "patzword");
     f->lastorders = turn - 1;
-    olist.orders[0] = "ERESSEA 1 patzword";
-    olist.orders[1] = NULL;
+    olist.orders = orders;
     olist.next = 0;
     in.getbuf = getbuf_list;
     in.data = &olist;
