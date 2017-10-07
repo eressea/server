@@ -954,7 +954,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         }
 
         /* spells that this unit can cast */
-        mage = get_mage(u);
+        mage = get_mage_depr(u);
         if (mage) {
             int i, maxlevel = effskill(u, SK_MAGIC, 0);
             cr_output_spells(out, u, maxlevel);

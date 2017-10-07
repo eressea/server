@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
 #include <kernel/curse.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -322,10 +323,19 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return get_mage(u) != NULL;
+    return get_mage_depr(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
+{
+    attrib *a = a_find(u->attribs, &at_mage);
+    if (a) {
+        return (sc_mage *)a->data.v;
+    }
+    return NULL;
+}
+
+sc_mage *get_mage_depr(const unit * u)
 {
     if (has_skill(u, SK_MAGIC)) {
         attrib *a = a_find(u->attribs, &at_mage);
@@ -333,7 +343,7 @@ sc_mage *get_mage(const unit * u)
             return (sc_mage *)a->data.v;
         }
     }
-    return (sc_mage *)NULL;
+    return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -506,7 +516,7 @@ int u_hasspell(const unit *u, const struct spell *sp)
 
 int get_combatspelllevel(const unit * u, int nr)
 {
-    sc_mage *m = get_mage(u);
+    sc_mage *m = get_mage_depr(u);
 
     assert(nr < MAXCOMBATSPELLS);
     if (m) {
@@ -524,7 +534,7 @@ const spell *get_combatspell(const unit * u, int nr)
     sc_mage *m;
 
     assert(nr < MAXCOMBATSPELLS);
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (m) {
         return m->combatspells[nr].sp;
     }
@@ -533,7 +543,7 @@ const spell *get_combatspell(const unit * u, int nr)
 
 void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 {
-    sc_mage *mage = get_mage(u);
+    sc_mage *mage = get_mage_depr(u);
     int i = -1;
 
     assert(mage || !"trying to set a combat spell for non-mage");
@@ -573,7 +583,7 @@ void unset_combatspell(unit * u, spell * sp)
     int nr = 0;
     int i;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return;
 
@@ -609,7 +619,7 @@ int get_spellpoints(const unit * u)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -620,7 +630,7 @@ void set_spellpoints(unit * u, int sp)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return;
 
@@ -637,7 +647,7 @@ int change_spellpoints(unit * u, int mp)
     sc_mage *m;
     int sp;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m) {
         return 0;
     }
@@ -656,7 +666,7 @@ static int get_spchange(const unit * u)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -710,7 +720,7 @@ int change_maxspellpoints(unit * u, int csp)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m) {
         return 0;
     }
@@ -728,7 +738,7 @@ int countspells(unit * u, int step)
     sc_mage *m;
     int count;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -1312,7 +1322,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     }
 
     /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-    mage = get_mage(u);
+    mage = get_mage_depr(u);
     if (mage->magietyp == M_DRAIG) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
@@ -2181,10 +2191,8 @@ void set_familiar(unit * mage, unit * familiar)
         a = a->next;
     }
     if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
+        a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
+        a_add(&mage->attribs, a);
     }
 
     a = a_find(mage->attribs, &at_familiar);
@@ -2192,17 +2200,19 @@ void set_familiar(unit * mage, unit * familiar)
         a = a_add(&mage->attribs, a_new(&at_familiar));
         a->data.v = familiar;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == familiar);
-    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+    }
 
+    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     a = a_find(familiar->attribs, &at_familiarmage);
     if (a == NULL) {
         a = a_add(&familiar->attribs, a_new(&at_familiarmage));
         a->data.v = mage;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == mage);
+    }
 }
 
 void remove_familiar(unit * mage)
@@ -2218,48 +2228,35 @@ void remove_familiar(unit * mage)
     while (a && a->type == &at_skillmod) {
         an = a->next;
         smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
+        if (smd->special == sm_familiar) {
             a_remove(&mage->attribs, a);
+        }
         a = an;
     }
 }
 
-bool create_newfamiliar(unit * mage, unit * familiar)
+void create_newfamiliar(unit * mage, unit * fam)
 {
-    /* if the skill modifier for the mage does not yet exist, add it */
-    attrib *a;
-    attrib *afam = a_find(mage->attribs, &at_familiar);
-    attrib *amage = a_find(familiar->attribs, &at_familiarmage);
+    /* skills and spells: */
+    const struct equipment *eq;
+    char eqname[64];
+    const race *rc = u_race(fam);
 
-    if (afam == NULL) {
-        afam = a_add(&mage->attribs, a_new(&at_familiar));
-    }
-    afam->data.v = familiar;
-    if (amage == NULL) {
-        amage = a_add(&familiar->attribs, a_new(&at_familiarmage));
-    }
-    amage->data.v = mage;
+    set_familiar(mage, fam);
 
+    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
+    eq = get_equipment(eqname);
+    if (eq != NULL) {
+        equip_unit(fam, eq);
+    }
+    else {
+        log_info("could not perform initialization for familiar %s.\n", rc->_name);
+    }
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     /* Wenn der Magier stirbt, dann auch der Vertraute */
-    add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
+    add_trigger(&mage->attribs, "destroy", trigger_killunit(fam));
     /* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
-    add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
-
-    a = a_find(mage->attribs, &at_skillmod);
-    while (a && a->type == &at_skillmod) {
-        skillmod_data *smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
-            break;
-        a = a->next;
-    }
-    if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
-    }
-    return true;
+    add_trigger(&fam->attribs, "destroy", trigger_shock(mage));
 }
 
 static void * resolve_familiar(int id, void *data) {

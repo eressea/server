@@ -39,7 +39,6 @@
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/connection.h>
-#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -513,32 +512,26 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 /* ------------------------------------------------------------- */
 /* der Vertraue des Magiers */
 
-static void make_familiar(unit * familiar, unit * mage)
+static unit * make_familiar(unit * mage, region *r, const race *rc, const char *name)
 {
-    /* skills and spells: */
-    const struct equipment *eq;
-    char eqname[64];
-    const race * rc = u_race(familiar);
-    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
-    eq = get_equipment(eqname);
-    if (eq != NULL) {
-        equip_items(&familiar->items, eq);
-    }
-    else {
-        log_info("could not perform initialization for familiar %s.\n", rc->_name);
-    }
+    unit *fam;
+
+    fam = create_unit(r, mage->faction, 1, rc, 0, name, mage);
+    setstatus(fam, ST_FLEE);
+    fset(fam, UFL_LOCKED);
 
     /* triggers: */
-    create_newfamiliar(mage, familiar);
+    create_newfamiliar(mage, fam);
 
     /* Hitpoints nach Talenten korrigieren, sonst starten vertraute
      * mit Ausdauerbonus verwundet */
-    familiar->hp = unit_max_hp(familiar);
+    fam->hp = unit_max_hp(fam);
+
+    return fam;
 }
 
 static int sp_summon_familiar(castorder * co)
 {
-    unit *familiar;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -586,10 +579,7 @@ static int sp_summon_familiar(castorder * co)
     msg = msg_message("familiar_name", "unit", mage);
     nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
     msg_release(msg);
-    familiar = create_unit(r, mage->faction, 1, rc, 0, zText, mage);
-    setstatus(familiar, ST_FLEE);
-    fset(familiar, UFL_LOCKED);
-    make_familiar(familiar, mage);
+    make_familiar(mage, r, rc, zText);
 
     dh = 0;
     dh1 = 0;
@@ -740,7 +730,7 @@ static int sp_transferaura(castorder * co)
     int cast_level = co->level;
     spellparameter *pa = co->par;
     unit *u;
-    sc_mage *scm_dst, *scm_src = get_mage(mage);
+    sc_mage *scm_dst, *scm_src = get_mage_depr(mage);
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)
@@ -754,7 +744,7 @@ static int sp_transferaura(castorder * co)
     /* Wieviel Transferieren? */
     aura = pa->param[1]->data.i;
     u = pa->param[0]->data.u;
-    scm_dst = get_mage(u);
+    scm_dst = get_mage_depr(u);
 
     if (scm_dst == NULL) {
         /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
@@ -5822,7 +5812,7 @@ int sp_permtransfer(castorder * co)
     change_maxspellpoints(mage, -aura);
     change_spellpoints(mage, -aura);
 
-    if (get_mage(tu)->magietyp == get_mage(mage)->magietyp) {
+    if (get_mage_depr(tu)->magietyp == get_mage_depr(mage)->magietyp) {
         change_maxspellpoints(tu, aura / 2);
     }
     else {
@@ -5945,18 +5935,18 @@ int sp_stealaura(castorder * co)
     /* Zieleinheit */
     u = pa->param[0]->data.u;
 
-    if (!get_mage(u)) {
+    if (!get_mage_depr(u)) {
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_fail", "unit target",
             mage, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
         return 0;
     }
 
-    taura = (get_mage(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
+    taura = (get_mage_depr(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
 
     if (taura > 0) {
-        get_mage(u)->spellpoints -= taura;
-        get_mage(mage)->spellpoints += taura;
+        get_mage_depr(u)->spellpoints -= taura;
+        get_mage_depr(mage)->spellpoints += taura;
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_success",

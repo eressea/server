@@ -221,6 +221,7 @@ extern "C" {
     /*      macht die struct unit zu einem neuen Magier: legt die struct u->mage an
      *      und     initialisiert den Magiertypus mit mtyp.  */
     sc_mage *get_mage(const struct unit *u);
+    sc_mage *get_mage_depr(const struct unit *u);
     /*      gibt u->mage zurück, bei nicht-Magiern *NULL */
     bool is_mage(const struct unit *u);
     /*      gibt true, wenn u->mage gesetzt.  */
@@ -329,7 +330,7 @@ extern "C" {
     struct unit *get_clone(const struct unit *u);
     struct unit *get_clone_mage(const struct unit *u);
     void remove_familiar(struct unit *mage);
-    bool create_newfamiliar(struct unit *mage, struct unit *familiar);
+    void create_newfamiliar(struct unit *mage, struct unit *familiar);
     void create_newclone(struct unit *mage, struct unit *familiar);
     struct unit *has_clone(struct unit *mage);
 

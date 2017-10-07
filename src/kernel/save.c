@@ -24,8 +24,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "alliance.h"
 #include "ally.h"
-#include "connection.h"
 #include "building.h"
+#include "connection.h"
+#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -1599,40 +1600,59 @@ static void fix_familiars(void) {
             if (u->_race != u->faction->race && (u->_race->flags & RCF_FAMILIAR)) {
                 /* unit is potentially a familiar */
                 attrib * a = a_find(u->attribs, &at_mage);
-                if (a) {
-                    /* unit is magical */
-                    attrib * am = a_find(u->attribs, &at_familiarmage);
-                    if (!am) {
-                        /* but it is not a familiar? */
-                        attrib * ae = a_find(u->attribs, &at_eventhandler);
-                        if (ae) {
-                            trigger **tlist;
-                            tlist = get_triggers(ae, "destroy");
-                            if (tlist) {
-                                trigger *t;
-                                unit *um = NULL;
-                                for (t = *tlist; t; t = t->next) {
-                                    if (t->type == &tt_shock) {
-                                        um = (unit *)t->data.v;
-                                        break;
-                                    }
+                attrib * am = a_find(u->attribs, &at_familiarmage);
+                if (am) {
+                    sc_mage *mage = a ? (sc_mage *)a->data.v : NULL;
+                    /* a familiar */
+                    if (!mage) {
+                        log_error("%s seems to be a familiar with no magic.",
+                            unitname(u));
+                        mage = create_mage(u, M_GRAY);
+                    }
+                    if (!mage->spellbook) {
+                        char eqname[32];
+                        equipment *eq;
+                        
+                        snprintf(eqname, sizeof(eqname), "fam_%s", u->_race->_name);
+                        eq = get_equipment(eqname);
+                        if (eq && eq->spells) {
+                            log_error("%s seems to be a familiar with no spells.",
+                                unitname(u));
+                            /* magical familiar, no spells */
+                            equip_unit_mask(u, eq, EQUIP_SPELLS);
+                        }
+                    }
+                }
+                else if (a) {
+                    /* not a familiar, but magical */
+                    attrib * ae = a_find(u->attribs, &at_eventhandler);
+                    if (ae) {
+                        trigger **tlist;
+                        tlist = get_triggers(ae, "destroy");
+                        if (tlist) {
+                            trigger *t;
+                            unit *um = NULL;
+                            for (t = *tlist; t; t = t->next) {
+                                if (t->type == &tt_shock) {
+                                    um = (unit *)t->data.v;
+                                    break;
                                 }
-                                if (um) {
-                                    attrib *af = a_find(um->attribs, &at_familiar);
-                                    log_error("%s seems to be a broken familiar of %s.",
-                                        unitname(u), unitname(um));
-                                    if (af) {
-                                        unit * uf = (unit *)af->data.v;
-                                        log_error("%s already has a familiar: %s.",
-                                            unitname(um), unitname(uf));
-                                    }
-                                    else {
-                                        set_familiar(um, u);
-                                    }
+                            }
+                            if (um) {
+                                attrib *af = a_find(um->attribs, &at_familiar);
+                                log_error("%s seems to be a broken familiar of %s.",
+                                    unitname(u), unitname(um));
+                                if (af) {
+                                    unit * uf = (unit *)af->data.v;
+                                    log_error("%s already has a familiar: %s.",
+                                        unitname(um), unitname(uf));
                                 }
                                 else {
-                                    log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
+                                    set_familiar(um, u);
                                 }
+                            }
+                            else {
+                                log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
                             }
                         }
                     }
@@ -1790,7 +1810,7 @@ int read_game(gamedata *data)
         else {
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
-                    sc_mage *mage = get_mage(u);
+                    sc_mage *mage = get_mage_depr(u);
                     if (mage) {
                         faction *f = u->faction;
                         int skl = effskill(u, SK_MAGIC, 0);

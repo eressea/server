@@ -1492,14 +1492,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (f) {
         assert(faction_alive(f));
         u_setfaction(u, f);
-
-        if (f->locale) {
-            order *deford = default_order(f->locale);
-            if (deford) {
-                set_order(&u->thisorder, NULL);
-                addlist(&u->orders, deford);
-            }
-        }
     }
 
     set_number(u, number);
@@ -1822,7 +1814,7 @@ void u_setrace(struct unit *u, const struct race *rc)
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 {
-    sc_mage *mage = m ? m : get_mage(u);
+    sc_mage *mage = m ? m : get_mage_depr(u);
 
     if (!mage) {
         log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
@@ -1836,7 +1828,7 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 
 struct spellbook * unit_get_spellbook(const struct unit * u)
 {
-    sc_mage * mage = get_mage(u);
+    sc_mage * mage = get_mage_depr(u);
     if (mage) {
         if (mage->spellbook) {
             return mage->spellbook;

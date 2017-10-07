@@ -36,6 +36,14 @@ extern "C" {
     extern struct attrib_type at_shiptrail;
     extern int *storms;
 
+    /* Bewegungsweiten: */
+#define BP_WALKING 4
+#define BP_RIDING  6
+#define BP_UNICORN 9
+#define BP_DRAGON  4
+#define BP_NORMAL 3
+#define BP_ROAD   2
+
     /* die Zahlen sind genau äquivalent zu den race Flags */
 #define MV_CANNOTMOVE     (1<<5)
 #define MV_FLY            (1<<7)        /* kann fliegen */
@@ -70,6 +78,7 @@ extern "C" {
     struct ship *move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
+    int movement_speed(const struct unit * u);
     void follow_unit(struct unit *u);
     struct unit *owner_buildingtyp(const struct region *r,
         const struct building_type *bt);

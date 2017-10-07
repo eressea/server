@@ -32,32 +32,36 @@ extern "C" {
 
     struct order_data;
 
+#define CMD_QUIET   0x010000
+#define CMD_PERSIST 0x020000
+#define CMD_DEFAULT 0x040000
+
     typedef struct order {
         struct order *next;
         /* do not access this data: */
         struct order_data *data;
-        bool _persistent;
-        bool _noerror;
+        int command;
     } order;
 
     /* constructor */
-    extern order *create_order(keyword_t kwd, const struct locale *lang,
+    order *create_order(keyword_t kwd, const struct locale *lang,
         const char *params, ...);
-    extern order *parse_order(const char *s, const struct locale *lang);
-    extern void replace_order(order ** dst, order * orig, const order * src);
+    order *parse_order(const char *s, const struct locale *lang);
+    void replace_order(order ** dst, order * orig, const order * src);
 
     /* reference counted copies of orders: */
-    extern order *copy_order(const order * ord);
-    extern void free_order(order * ord);
-    extern void free_orders(order ** olist);
+    order *copy_order(const order * ord);
+    void free_order(order * ord);
+    void free_orders(order ** olist);
 
-    extern void push_order(struct order **olist, struct order *ord);
+    void push_order(struct order **olist, struct order *ord);
 
     /* access functions for orders */
     keyword_t getkeyword(const order * ord);
     void set_order(order ** destp, order * src);
     char* get_command(const order *ord, char *buffer, size_t size);
     bool is_persistent(const order * ord);
+    bool is_silent(const order * ord);
     bool is_exclusive(const order * ord);
     bool is_repeated(keyword_t kwd);
     bool is_long(keyword_t kwd);

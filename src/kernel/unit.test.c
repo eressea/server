@@ -274,7 +274,7 @@ static void test_skill_familiar(CuTest *tc) {
     CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
 
     /* make them mage and familiar to each other */
-    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
+    create_newfamiliar(mag, fam);
 
     /* when they are in the same region, the mage gets half their skill as a bonus */
     CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
@@ -287,33 +287,11 @@ static void test_skill_familiar(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_age_familiar(CuTest *tc) {
-    unit *mag, *fam;
-
-    test_cleanup();
-
-    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
-    CuAssertPtrEquals(tc, 0, get_familiar(mag));
-    CuAssertPtrEquals(tc, 0, get_familiar_mage(fam));
-    CuAssertIntEquals(tc, true, create_newfamiliar(mag, fam));
-    CuAssertPtrEquals(tc, fam, get_familiar(mag));
-    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
-    a_age(&fam->attribs, fam);
-    a_age(&mag->attribs, mag);
-    CuAssertPtrEquals(tc, fam, get_familiar(mag));
-    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
-    set_number(fam, 0);
-    a_age(&mag->attribs, mag);
-    CuAssertPtrEquals(tc, 0, get_familiar(mag));
-    test_cleanup();
-}
-
 static void test_inside_building(CuTest *tc) {
     unit *u;
     building *b;
 
-    test_cleanup();
+    test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     b = test_create_building(u->region, 0);
 
@@ -631,7 +609,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skillmod);
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
-    SUITE_ADD_TEST(suite, test_age_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_limited_skills);
