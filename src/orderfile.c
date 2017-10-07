@@ -18,8 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
-
-static unit *unitorders(FILE * F, int enc, struct faction *f)
+static unit *unitorders(input *in, faction *f)
 {
     int i;
     unit *u;
@@ -64,7 +63,7 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             * eingegeben wurde, checken wir, ob nun eine neue
             * Einheit oder ein neuer Spieler drankommt */
 
-            s = getbuf(F, enc);
+            s = in->getbuf(in->data);
             if (s == NULL)
                 break;
 
@@ -147,23 +146,14 @@ static faction *factionorders(void)
     return f;
 }
 
-int readorders(const char *filename)
+int read_orders(input *in)
 {
-    FILE *F = NULL;
     const char *b;
     int nfactions = 0;
-    int enc_gamedata = ENCODING_UTF8;
     struct faction *f = NULL;
 
-    F = fopen(filename, "r");
-    if (!F) {
-        perror(filename);
-        return -1;
-    }
-    log_info("reading orders from %s", filename);
-
     /* TODO: recognize UTF8 BOM */
-    b = getbuf(F, enc_gamedata);
+    b = in->getbuf(in->data);
 
     /* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
     * Partei */
@@ -184,7 +174,7 @@ int readorders(const char *filename)
                 ++nfactions;
             }
 
-            b = getbuf(F, enc_gamedata);
+            b = in->getbuf(in->data);
             break;
 
             /* in factionorders wird nur eine zeile gelesen:
@@ -193,9 +183,9 @@ int readorders(const char *filename)
             * vermerkt. */
 
         case P_UNIT:
-            if (!f || !unitorders(F, enc_gamedata, f)) {
+            if (!f || !unitorders(in, f)) {
                 do {
-                    b = getbuf(F, enc_gamedata);
+                    b = in->getbuf(in->data);
                     if (!b) {
                         break;
                     }
@@ -216,16 +206,40 @@ int readorders(const char *filename)
 
         case P_NEXT:
             f = NULL;
-            b = getbuf(F, enc_gamedata);
+            b = in->getbuf(in->data);
             break;
 
         default:
-            b = getbuf(F, enc_gamedata);
+            b = in->getbuf(in->data);
             break;
         }
     }
 
-    fclose(F);
     log_info("done reading orders for %d factions", nfactions);
     return 0;
+}
+
+static const char * file_getbuf(void *data)
+{
+    FILE *F = (FILE *)data;
+    return getbuf(F, ENCODING_UTF8);
+}
+
+int readorders(const char *filename)
+{
+    input in;
+    int result;
+
+    FILE *F = NULL;
+    F = fopen(filename, "r");
+    if (!F) {
+        perror(filename);
+        return -1;
+    }
+    log_info("reading orders from %s", filename);
+    in.getbuf = file_getbuf;
+    in.data = F;
+    result = read_orders(&in);
+    fclose(F);
+    return result;
 }
