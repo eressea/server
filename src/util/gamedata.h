@@ -39,7 +39,7 @@
 /* unfinished: */
 #define CRYPT_VERSION 400 /* passwords are encrypted */
 
-#define RELEASE_VERSION SKILLSORT_VERSION /* current datafile */
+#define RELEASE_VERSION LANDDISPLAY_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
