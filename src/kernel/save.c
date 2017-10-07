@@ -123,42 +123,6 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-struct order *read_order(const char *in, const struct locale *lang) {
-    assert(in);
-    assert(lang);
-    if (in[0]) {
-        const char *s = in;
-        keyword_t kwd;
-        char token[64];
-        const char *stok;
-
-        stok = parse_token(&s, token, sizeof(token));
-        if (stok) {
-            param_t param = findparam(token, lang);
-            switch (param) {
-            case P_UNIT:
-            case P_REGION:
-                return NULL;
-            case P_FACTION:
-            case P_NEXT:
-            case P_GAMENAME:
-                /* these terminate the orders, so we apply extra checking */
-                if (strlen(stok) >= 3) {
-                    return NULL;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        /* Nun wird der Befehl erzeut und eingehängt */
-        kwd = get_keyword(stok, lang);
-        if (kwd != NOKEYWORD) {
-            return parse_order(in, lang);
-        }
-    }
-    return NULL;
-}
 
 static unit *unitorders(FILE * F, int enc, struct faction *f)
 {
@@ -201,7 +165,6 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
 
         for (;;) {
             const char *s;
-            order * ord;
             /* Erst wenn wir sicher sind, dass kein Befehl
              * eingegeben wurde, checken wir, ob nun eine neue
              * Einheit oder ein neuer Spieler drankommt */
@@ -210,13 +173,49 @@ static unit *unitorders(FILE * F, int enc, struct faction *f)
             if (s == NULL)
                 break;
 
-            ord = read_order(s, f->locale);
-            if (!ord) {
-                ADDMSG(&f->msgs, msg_message("parse_error", "unit command", u, s));
-                break;
+            if (s[0]) {
+                if (s[0] != '@') {
+                    char token[64];
+                    const char *stok = s;
+                    stok = parse_token(&stok, token, sizeof(token)); 
+
+                    if (stok) {
+                        bool quit = false;
+                        param_t param = findparam(stok, u->faction->locale);
+                        switch (param) {
+                        case P_UNIT:
+                        case P_REGION:
+                            quit = true;
+                            break;
+                        case P_FACTION:
+                        case P_NEXT:
+                        case P_GAMENAME:
+                            /* these terminate the orders, so we apply extra checking */
+                            if (strlen(stok) >= 3) {
+                                quit = true;
+                                break;
+                            }
+                            else {
+                                quit = false;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                        if (quit) {
+                            break;
+                        }
+                    }
+                }
+                /* Nun wird der Befehl erzeut und eingehängt */
+                *ordp = parse_order(s, u->faction->locale);
+                if (*ordp) {
+                    ordp = &(*ordp)->next;
+                }
+                else {
+                    ADDMSG(&f->msgs, msg_message("parse_error", "unit command", u, s));
+                }
             }
-            *ordp = ord;
-            ordp = &(*ordp)->next;
         }
 
     }
@@ -306,7 +305,7 @@ int readorders(const char *filename)
                     }
                     init_tokens_str(b);
                     s = gettoken(token, sizeof(token));
-                    p = (s && s[0] != '@' && s[0] != '!') ? findparam(s, lang) : NOPARAM;
+                    p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
                 } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
                     && p != P_GAMENAME);
 	        }

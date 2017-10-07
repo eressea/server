@@ -5,7 +5,6 @@
 #include <attributes/key.h>
 
 #include "save.h"
-#include "order.h"
 #include "version.h"
 #include "building.h"
 #include "ship.h"
@@ -453,45 +452,6 @@ static void test_version_no(CuTest *tc) {
     CuAssertIntEquals(tc, 0x10203, version_no("1.2.3-what.is.42"));
 }
 
-static void test_read_order(CuTest *tc) {
-    char cmd[32];
-    order *ord;
-    struct locale * lang;
-
-    test_setup();
-    lang = test_create_locale();
-
-    ord = read_order("MOVE NORTH", lang);
-    CuAssertPtrNotNull(tc, ord);
-    CuAssertIntEquals(tc, K_MOVE, ord->command);
-    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
-    free_order(ord);
-
-    ord = read_order("MAKE TEMP foo", lang);
-    CuAssertPtrNotNull(tc, ord);
-    CuAssertIntEquals(tc, K_MAKETEMP, ord->command);
-    CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
-    CuAssertStrEquals(tc, "maketemp foo", get_command(ord, cmd, sizeof(cmd)));
-    free_order(ord);
-
-    ord = read_order("MAKETEMP foo", lang);
-    CuAssertPtrNotNull(tc, ord);
-    CuAssertIntEquals(tc, K_MAKETEMP, ord->command);
-    CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
-    CuAssertStrEquals(tc, "maketemp foo", get_command(ord, cmd, sizeof(cmd)));
-    free_order(ord);
-
-    CuAssertPtrEquals(tc, NULL, read_order("HODOR HODOR HODOR", lang));
-    CuAssertPtrEquals(tc, NULL, read_order("FACTION abcd", lang));
-    CuAssertPtrEquals(tc, NULL, read_order("UNIT abcd", lang));
-    CuAssertPtrEquals(tc, NULL, read_order("ERESSEA abcd", lang));
-    CuAssertPtrEquals(tc, NULL, read_order("REGION 2,3", lang));
-    CuAssertPtrEquals(tc, NULL, read_order("NEXT", lang));
-
-    test_cleanup();
-}
-
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -508,7 +468,6 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
-    SUITE_ADD_TEST(suite, test_read_order);
     SUITE_ADD_TEST(suite, test_version_no);
 
     return suite;

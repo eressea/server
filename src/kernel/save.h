@@ -31,8 +31,6 @@ extern "C" {
     struct spellbook;
     struct unit;
     struct building;
-    struct order;
-    struct locale;
     struct faction;
     struct region;
     struct ship;
@@ -44,8 +42,6 @@ extern "C" {
 
     /* TODO: is this *really* still in use? */
     extern int enc_gamedata;
-
-    struct order *read_order(const char *s, const struct locale *lang);
 
     int readorders(const char *filename);
     int readgame(const char *filename);
