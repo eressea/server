@@ -613,8 +613,6 @@ int study_cmd(unit * u, order * ord)
             /* Vertraute zaehlen nicht zu den Magiern einer Partei,
              * koennen aber nur Graue Magie lernen */
             mtyp = M_GRAY;
-            if (!is_mage(u))
-                create_mage(u, mtyp);
         }
         else if (!has_skill(u, SK_MAGIC)) {
             int mmax = skill_limit(u->faction, SK_MAGIC);
@@ -654,8 +652,7 @@ int study_cmd(unit * u, order * ord)
                     u->faction->magiegebiet = mtyp;
                 }
             }
-            if (!is_mage(u))
-                create_mage(u, mtyp);
+            create_mage(u, mtyp);
         }
         else {
             /* ist schon ein Magier und kein Vertrauter */

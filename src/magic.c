@@ -488,12 +488,10 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
     attrib *a;
 
     a = a_find(u->attribs, &at_mage);
-    if (a != NULL) {
-        a_remove(&u->attribs, a);
+    if (a == NULL) {
+        a = a_add(&u->attribs, a_new(&at_mage));
     }
-    a = a_add(&u->attribs, a_new(&at_mage));
-    mage = a->data.v;
-
+    mage = (sc_mage *)a->data.v;
     mage->magietyp = mtyp;
     return mage;
 }
