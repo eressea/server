@@ -38,24 +38,39 @@ typedef struct order_data {
     int _refcount;
 } order_data;
 
-#include <selist.h>
+#include <critbit.h>
 
-static selist * orders;
+static critbit_tree cb_orders = { 0 };
+static int auto_id = 0;
+
+struct cb_entry {
+    int id;
+    order_data *data;
+};
 
 order_data *load_data(int id) {
+    void * match;
+
     if (id > 0) {
-        order_data * od = (order_data *)selist_get(orders, id - 1);
-        ++od->_refcount;
-        return od;
+        if (cb_find_prefix(&cb_orders, &id, sizeof(id), &match, 1, 0) > 0) {
+            struct cb_entry *ent = (struct cb_entry *)match;
+            order_data * od = ent->data;
+            ++od->_refcount;
+            return od;
+        }
     }
     return NULL;
 }
 
-int add_data(order_data *od) {
+int save_data(order_data *od) {
     if (od->_str) {
+        struct cb_entry ent;
+
         ++od->_refcount;
-        selist_push(&orders, od);
-        return selist_length(orders);
+        ent.id = ++auto_id;
+        ent.data = od;
+        cb_insert(&cb_orders, &ent, sizeof(ent));
+        return ent.id;
     }
     return 0;
 }
@@ -69,18 +84,19 @@ static void release_data(order_data * data)
     }
 }
 
-void free_data_cb(void *entry) {
-    order_data *od = (order_data *)entry;
+int free_data_cb(const void *match, const void *key, size_t keylen, void *udata) {
+    struct cb_entry * ent = (struct cb_entry *)match;
+    order_data *od = ent->data;
     if (od->_refcount > 1) {
-        log_error("refcount=%d for order %s", od->_refcount, od->_str);
+        log_error("refcount=%d for order %d, %s", od->_refcount, ent->id, od->_str);
     }
     release_data(od);
+    return 0;
 }
 
 void free_data(void) {
-    selist_foreach(orders, free_data_cb);
-    selist_free(orders);
-    orders = NULL;
+    cb_foreach(&cb_orders, NULL, 0, free_data_cb, NULL);
+    cb_clear(&cb_orders);
 }
 
 void replace_order(order ** dlist, order * orig, const order * src)
@@ -276,7 +292,7 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
     while (isspace(*(unsigned char *)sptr)) ++sptr;
 
     od = create_data(kwd, sptr);
-    ord->id = add_data(od);
+    ord->id = save_data(od);
     release_data(od);
 
     return ord;
