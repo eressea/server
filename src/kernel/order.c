@@ -31,8 +31,8 @@
 #include <string.h>
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
-# define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
-# define ORD_STRING(ord) (ord)->data->_str
+# define OD_LOCALE(odata) locale_array[(odata)->_lindex]->lang
+# define OD_STRING(odata) (odata)->_str
 
 typedef struct locale_data {
     struct order_data *short_orders;
@@ -48,6 +48,22 @@ typedef struct order_data {
     int _lindex;
 } order_data;
 
+#include <selist.h>
+
+static selist * orders;
+
+order_data *load_data(int id) {
+    order_data * od = (order_data *)selist_get(orders, id - 1);
+    ++od->_refcount;
+    return od;
+}
+
+int add_data(order_data *od) {
+    ++od->_refcount;
+    selist_push(&orders, od);
+    return selist_length(orders);
+}
+
 static void release_data(order_data * data)
 {
     if (data) {
@@ -57,6 +73,20 @@ static void release_data(order_data * data)
     }
 }
 
+void free_data_cb(void *entry) {
+    order_data *od = (order_data *)entry;
+    if (od->_refcount > 1) {
+        log_error("refcount=%d for order %s", od->_refcount, od->_str);
+    }
+    release_data(od);
+}
+
+void free_data(void) {
+    selist_foreach(orders, free_data_cb);
+    selist_free(orders);
+    orders = NULL;
+}
+
 void replace_order(order ** dlist, order * orig, const order * src)
 {
     assert(src);
@@ -64,7 +94,7 @@ void replace_order(order ** dlist, order * orig, const order * src)
     assert(dlist);
     while (*dlist != NULL) {
         order *dst = *dlist;
-        if (dst->data == orig->data) {
+        if (dst->id == orig->id) {
             order *cpy = copy_order(src);
             *dlist = cpy;
             cpy->next = dst->next;
@@ -89,7 +119,8 @@ keyword_t getkeyword(const order * ord)
  */
 char* get_command(const order *ord, char *sbuffer, size_t size) {
     char *bufp = sbuffer;
-    const char *text = ORD_STRING(ord);
+    order_data *od;
+    const char * text;
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
 
@@ -111,8 +142,11 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             WARN_STATIC_BUFFER();
         }
     }
+
+    od = load_data(ord->id);
+    text = OD_STRING(od);
     if (kwd != NOKEYWORD) {
-        const struct locale *lang = ORD_LOCALE(ord);
+        const struct locale *lang = OD_LOCALE(od);
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
             assert(str);
@@ -142,6 +176,7 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             }
         }
     }
+    release_data(od);
     if (size > 0) *bufp = 0;
     return sbuffer;
 }
@@ -150,8 +185,6 @@ void free_order(order * ord)
 {
     if (ord != NULL) {
         assert(ord->next == 0);
-
-        release_data(ord->data);
         free(ord);
     }
 }
@@ -162,8 +195,7 @@ order *copy_order(const order * src)
         order *ord = (order *)malloc(sizeof(order));
         ord->next = NULL;
         ord->command = src->command;
-        ord->data = src->data;
-        ++ord->data->_refcount;
+        ord->id = src->id;
         return ord;
     }
     return NULL;
@@ -277,12 +309,14 @@ void close_orders(void) {
             locale_array[i] = 0;
         }
     }
+    free_data();
 }
 
 static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
     bool noerror, const struct locale *lang)
 {
     int lindex;
+    order_data *od;
 
     assert(ord);
     if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
@@ -317,7 +351,10 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
     ord->next = NULL;
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
-    ord->data = create_data(kwd, sptr, lindex);
+
+    od = create_data(kwd, sptr, lindex);
+    ord->id = add_data(od);
+    release_data(od);
 
     return ord;
 }
@@ -573,9 +610,11 @@ char *write_order(const order * ord, char *buffer, size_t size)
     else {
         keyword_t kwd = ORD_KEYWORD(ord);
         if (kwd == NOKEYWORD) {
-            const char *text = ORD_STRING(ord);
+            order_data *od = load_data(ord->id);
+            const char *text = OD_STRING(od);
             if (text) strlcpy(buffer, (const char *)text, size);
             else buffer[0] = 0;
+            release_data(od);
         }
         else {
             get_command(ord, buffer, size);
@@ -593,7 +632,19 @@ void push_order(order ** ordp, order * ord)
 
 keyword_t init_order(const struct order *ord)
 {
-    assert(ord && ord->data);
-    init_tokens_str(ord->data->_str);
-    return ORD_KEYWORD(ord);
+    static order_data *od;
+
+    if (!ord) {
+        release_data(od);
+        return NOKEYWORD;
+    }
+    else {
+        if (od) {
+            // TODO: warning
+            release_data(od);
+        }
+        od = load_data(ord->id);
+        init_tokens_str(od->_str);
+        return ORD_KEYWORD(ord);
+    }
 }
