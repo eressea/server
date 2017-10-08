@@ -31,21 +31,13 @@
 #include <string.h>
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
-# define OD_LOCALE(odata) locale_array[(odata)->_lindex]->lang
-# define OD_STRING(odata) (odata)->_str
-
-typedef struct locale_data {
-    struct order_data *short_orders;
-    struct order_data *study_orders[MAXSKILLS];
-    const struct locale *lang;
-} locale_data;
-
-static struct locale_data *locale_array[MAXLOCALES];
+# define OD_LOCALE(odata) ((odata) ? (odata)->lang : NULL)
+# define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
 
 typedef struct order_data {
     const char *_str;
     int _refcount;
-    int _lindex;
+    const struct locale *lang;
 } order_data;
 
 #include <selist.h>
@@ -53,15 +45,21 @@ typedef struct order_data {
 static selist * orders;
 
 order_data *load_data(int id) {
-    order_data * od = (order_data *)selist_get(orders, id - 1);
-    ++od->_refcount;
-    return od;
+    if (id > 0) {
+        order_data * od = (order_data *)selist_get(orders, id - 1);
+        ++od->_refcount;
+        return od;
+    }
+    return NULL;
 }
 
 int add_data(order_data *od) {
-    ++od->_refcount;
-    selist_push(&orders, od);
-    return selist_length(orders);
+    if (od->_str) {
+        ++od->_refcount;
+        selist_push(&orders, od);
+        return selist_length(orders);
+    }
+    return 0;
 }
 
 static void release_data(order_data * data)
@@ -219,103 +217,42 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, int lindex, const char *str)
+static char *mkdata(order_data **pdata, size_t len, const struct locale *lang, const char *str)
 {
     order_data *data;
     char *result;
     data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
-    data->_lindex = lindex;
+    data->lang = lang;
     data->_refcount = 0;
-    data->_str = 0;
-    data->_str = (len > 0) ? result : 0;
+    data->_str = (len > 0) ? result : NULL;
     if (str) strcpy(result, str);
     if (pdata) *pdata = data;
     return result;
 }
 
-static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
+static order_data *create_data(keyword_t kwd, const char *sptr, const struct locale *lang)
 {
     const char *s = sptr;
     order_data *data;
-    const struct locale *lang = locale_array[lindex]->lang;
 
     if (kwd != NOKEYWORD)
         s = (*sptr) ? sptr : NULL;
 
-    /* learning, only one order_data per skill required */
-    if (kwd == K_STUDY) {
-        skill_t sk = get_skill(parse_token_depr(&sptr), lang);
-        switch (sk) {
-        case NOSKILL:              /* fehler */
-            break;
-        case SK_MAGIC:             /* kann parameter haben */
-            if (*sptr != 0)
-                break;
-        default:                   /* nur skill als Parameter, keine extras */
-            data = locale_array[lindex]->study_orders[sk];
-            if (data == NULL) {
-                const char *skname = skillname(sk, lang);
-                const char *spc = strchr(skname, ' ');
-                size_t len = strlen(skname);
-                char *dst = mkdata(&data, len + (spc ? 3 : 0), lindex, spc ? 0 : skname);
-                locale_array[lindex]->study_orders[sk] = data;
-                if (spc) {
-                    dst[0] = '\"';
-                    memcpy(dst + 1, skname, len);
-                    dst[len + 1] = '\"';
-                    dst[len + 2] = '\0';
-                }
-                data->_refcount = 1;
-            }
-            ++data->_refcount;
-            return data;
-        }
-    }
-
     /* orders with no parameter, only one order_data per order required */
-    else if (kwd != NOKEYWORD && *sptr == 0) {
-        data = locale_array[lindex]->short_orders;
-        if (data == NULL) {
-            mkdata(&data, 0, lindex, 0);
-            data->_refcount = 1;
-            locale_array[lindex]->short_orders = data;
-        }
-        ++data->_refcount;
+    if (kwd != NOKEYWORD && *sptr == 0) {
+        mkdata(&data, 0, lang, NULL);
+        data->_refcount = 1;
         return data;
     }
-    mkdata(&data, s ? strlen(s) : 0, lindex, s);
+    mkdata(&data, s ? strlen(s) : 0, lang, s);
     data->_refcount = 1;
     return data;
-}
-
-static void clear_localedata(int lindex) {
-    int i;
-    release_data(locale_array[lindex]->short_orders);
-    locale_array[lindex]->short_orders = NULL;
-    for (i = 0; i != MAXSKILLS; ++i) {
-        release_data(locale_array[lindex]->study_orders[i]);
-        locale_array[lindex]->study_orders[i] = 0;
-    }
-    locale_array[lindex]->lang = 0;
-}
-
-void close_orders(void) {
-    int i;
-    for (i = 0; i != MAXLOCALES; ++i) {
-        if (locale_array[i]){
-            clear_localedata(i);
-            free(locale_array[i]);
-            locale_array[i] = 0;
-        }
-    }
-    free_data();
 }
 
 static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
     bool noerror, const struct locale *lang)
 {
-    int lindex;
     order_data *od;
 
     assert(ord);
@@ -335,16 +272,6 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
         }
     }
 
-    lindex = locale_index(lang);
-    assert(lindex < MAXLOCALES);
-    if (!locale_array[lindex]) {
-        locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
-    }
-    else if (locale_array[lindex]->lang != lang) {
-        clear_localedata(lindex);
-    }
-    locale_array[lindex]->lang = lang;
-
     ord->command = (int)kwd;
     if (persistent) ord->command |= CMD_PERSIST;
     if (noerror) ord->command |= CMD_QUIET;
@@ -352,7 +279,7 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
 
-    od = create_data(kwd, sptr, lindex);
+    od = create_data(kwd, sptr, lang);
     ord->id = add_data(od);
     release_data(od);
 
@@ -630,21 +557,30 @@ void push_order(order ** ordp, order * ord)
     *ordp = ord;
 }
 
+static order_data *parser_od;
+
 keyword_t init_order(const struct order *ord)
 {
-    static order_data *od;
-
     if (!ord) {
-        release_data(od);
+        release_data(parser_od);
+        parser_od = NULL;
         return NOKEYWORD;
     }
     else {
-        if (od) {
+        if (parser_od) {
             // TODO: warning
-            release_data(od);
+            release_data(parser_od);
         }
-        od = load_data(ord->id);
-        init_tokens_str(od->_str);
+        parser_od = load_data(ord->id);
+        init_tokens_str(OD_STRING(parser_od));
         return ORD_KEYWORD(ord);
     }
 }
+
+void close_orders(void) {
+    if (parser_od) {
+        init_order(NULL);
+    }
+    free_data();
+}
+

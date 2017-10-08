@@ -448,6 +448,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     if (academy_students > 0 && sk_academy!=NOSKILL) {
         academy_teaching_bonus(teacher, sk_academy, academy_students);
     }
+    init_order(NULL);
     return 0;
 }
 
@@ -784,7 +785,7 @@ int study_cmd(unit * u, order * ord)
             mage = create_mage(u, u->faction->magiegebiet);
         }
     }
-
+    init_order(NULL);
     return 0;
 }
 
