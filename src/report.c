@@ -1389,7 +1389,8 @@ static int
 report_template(const char *filename, report_context * ctx, const char *bom)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
-    faction *f = ctx->f;
+    const faction *f = ctx->f;
+    const struct locale *lang = f->locale;
     region *r;
     FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
@@ -1408,11 +1409,11 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     }
 
     newline(out);
-    rps_nowrap(out, LOC(f->locale, "nr_template"));
+    rps_nowrap(out, LOC(lang, "nr_template"));
     newline(out);
     newline(out);
 
-    sprintf(buf, "%s %s \"password\"", LOC(f->locale, parameters[P_FACTION]), itoa36(f->no));
+    sprintf(buf, "%s %s \"password\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no));
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -1439,12 +1440,12 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     adjust_coordinates(f, &nx, &ny, pl);
                     newline(out);
                     if (pl && pl->id != 0) {
-                        sprintf(buf, "%s %d,%d,%d ; %s", LOC(f->locale,
-                            parameters[P_REGION]), nx, ny, pl->id, rname(r, f->locale));
+                        sprintf(buf, "%s %d,%d,%d ; %s", LOC(lang,
+                            parameters[P_REGION]), nx, ny, pl->id, rname(r, lang));
                     }
                     else {
-                        sprintf(buf, "%s %d,%d ; %s", LOC(f->locale, parameters[P_REGION]),
-                            nx, ny, rname(r, f->locale));
+                        sprintf(buf, "%s %d,%d ; %s", LOC(lang, parameters[P_REGION]),
+                            nx, ny, rname(r, lang));
                     }
                     rps_nowrap(out, buf);
                     newline(out);
@@ -1505,7 +1506,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                 for (ord = u->old_orders; ord; ord = ord->next) {
                     /* this new order will replace the old defaults */
                     strcpy(buf, "   ");
-                    write_order(ord, buf + 2, sizeof(buf) - 2);
+                    write_order(ord, lang, buf + 2, sizeof(buf) - 2);
                     rps_nowrap(out, buf);
                     newline(out);
                 }
@@ -1515,7 +1516,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                         continue;           /* unit has defaults */
                     if (is_persistent(ord)) {
                         strcpy(buf, "   ");
-                        write_order(ord, buf + 2, sizeof(buf) - 2);
+                        write_order(ord, lang, buf + 2, sizeof(buf) - 2);
                         rps_nowrap(out, buf);
                         newline(out);
                     }
@@ -1527,7 +1528,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
         }
     }
     newline(out);
-    strlcpy(buf, LOC(f->locale, parameters[P_NEXT]), sizeof(buf));
+    strlcpy(buf, LOC(lang, parameters[P_NEXT]), sizeof(buf));
     rps_nowrap(out, buf);
     newline(out);
     fstream_done(&strm);

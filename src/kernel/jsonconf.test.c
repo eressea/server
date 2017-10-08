@@ -637,7 +637,7 @@ static void test_infinitive_from_config(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
 
     ord = create_order(K_STUDY, lang, "");
-    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, lang, buffer, sizeof(buffer)));
     free_order(ord);
     cJSON_Delete(json);
     test_cleanup();

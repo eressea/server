@@ -20,7 +20,7 @@ static void test_create_order(CuTest *tc) {
     ord = create_order(K_MOVE, lang, "NORTH");
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
+    CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
     CuAssertIntEquals(tc, K_MOVE, init_order(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
@@ -40,7 +40,7 @@ static void test_parse_order(CuTest *tc) {
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MOVE, ord->command);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
+    CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
     CuAssertIntEquals(tc, K_MOVE, init_order(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
@@ -98,7 +98,7 @@ static void test_parse_make(CuTest *tc) {
     ord = parse_order("M hurrdurr", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKE, getkeyword(ord));
-    CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, cmd, sizeof(cmd)));
+    CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, lang, cmd, sizeof(cmd)));
 
     CuAssertIntEquals(tc, K_MAKE, init_order(ord));
     CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
@@ -121,7 +121,7 @@ static void test_parse_make_temp(CuTest *tc) {
     ord = parse_order("M T herp", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
-    CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, cmd, sizeof(cmd)));
+    CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
 
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
@@ -144,7 +144,7 @@ static void test_parse_maketemp(CuTest *tc) {
 
     ord = parse_order("MAKET herp", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, cmd, sizeof(cmd)));
+    CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
@@ -213,13 +213,13 @@ static void test_get_command(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     ord = create_order(K_MAKE, lang, "iron");
-    CuAssertStrEquals(tc, "make iron", get_command(ord, buf, sizeof(buf)));
+    CuAssertStrEquals(tc, "make iron", get_command(ord, lang, buf, sizeof(buf)));
     ord->command |= CMD_QUIET;
-    CuAssertStrEquals(tc, "!make iron", get_command(ord, buf, sizeof(buf)));
+    CuAssertStrEquals(tc, "!make iron", get_command(ord, lang, buf, sizeof(buf)));
     ord->command |= CMD_PERSIST;
-    CuAssertStrEquals(tc, "!@make iron", get_command(ord, buf, sizeof(buf)));
+    CuAssertStrEquals(tc, "!@make iron", get_command(ord, lang, buf, sizeof(buf)));
     ord->command = K_MAKE | CMD_PERSIST;
-    CuAssertStrEquals(tc, "@make iron", get_command(ord, buf, sizeof(buf)));
+    CuAssertStrEquals(tc, "@make iron", get_command(ord, lang, buf, sizeof(buf)));
     free_order(ord);
     test_cleanup();
 }
