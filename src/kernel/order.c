@@ -580,7 +580,7 @@ keyword_t init_order(const struct order *ord)
     }
     else {
         if (parser_od) {
-            // TODO: warning
+            /* TODO: warning */
             release_data(parser_od);
         }
         parser_od = load_data(ord->id);
