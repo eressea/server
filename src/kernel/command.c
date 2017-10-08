@@ -14,6 +14,7 @@
 #include <kernel/config.h>
 #include "command.h"
 
+#include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/unit.h>
 
@@ -107,7 +108,7 @@ void do_command(const struct tnode *keys, struct unit *u, struct order *ord)
     init_order(ord);
     if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
         char cmd[ORDERSIZE];
-        get_command(ord, cmd, sizeof(cmd));
+        get_command(ord, u->faction->locale, cmd, sizeof(cmd));
         log_warning("%s failed command '%s'\n", unitname(u), cmd);
     }
 }

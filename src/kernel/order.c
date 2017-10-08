@@ -31,13 +31,11 @@
 #include <string.h>
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
-# define OD_LOCALE(odata) ((odata) ? (odata)->lang : NULL)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
 
 typedef struct order_data {
     const char *_str;
     int _refcount;
-    const struct locale *lang;
 } order_data;
 
 #include <selist.h>
@@ -115,7 +113,7 @@ keyword_t getkeyword(const order * ord)
  * This is the inverse function to the parse_order command. Note that
  * keywords are expanded to their full length.
  */
-char* get_command(const order *ord, char *sbuffer, size_t size) {
+char* get_command(const order *ord, const struct locale *lang, char *sbuffer, size_t size) {
     char *bufp = sbuffer;
     order_data *od;
     const char * text;
@@ -144,7 +142,6 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
     od = load_data(ord->id);
     text = OD_STRING(od);
     if (kwd != NOKEYWORD) {
-        const struct locale *lang = OD_LOCALE(od);
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
             assert(str);
@@ -217,13 +214,12 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, const struct locale *lang, const char *str)
+static char *mkdata(order_data **pdata, size_t len, const char *str)
 {
     order_data *data;
     char *result;
     data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
-    data->lang = lang;
     data->_refcount = 0;
     data->_str = (len > 0) ? result : NULL;
     if (str) strcpy(result, str);
@@ -231,7 +227,7 @@ static char *mkdata(order_data **pdata, size_t len, const struct locale *lang, c
     return result;
 }
 
-static order_data *create_data(keyword_t kwd, const char *sptr, const struct locale *lang)
+static order_data *create_data(keyword_t kwd, const char *sptr)
 {
     const char *s = sptr;
     order_data *data;
@@ -241,17 +237,17 @@ static order_data *create_data(keyword_t kwd, const char *sptr, const struct loc
 
     /* orders with no parameter, only one order_data per order required */
     if (kwd != NOKEYWORD && *sptr == 0) {
-        mkdata(&data, 0, lang, NULL);
+        mkdata(&data, 0, NULL);
         data->_refcount = 1;
         return data;
     }
-    mkdata(&data, s ? strlen(s) : 0, lang, s);
+    mkdata(&data, s ? strlen(s) : 0, s);
     data->_refcount = 1;
     return data;
 }
 
 static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
-    bool noerror, const struct locale *lang)
+    bool noerror)
 {
     order_data *od;
 
@@ -279,7 +275,7 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
 
-    od = create_data(kwd, sptr, lang);
+    od = create_data(kwd, sptr);
     ord->id = add_data(od);
     release_data(od);
 
@@ -341,7 +337,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         zBuffer[0] = 0;
     }
     ord = (order *)malloc(sizeof(order));
-    return create_order_i(ord, kwd, zBuffer, false, false, lang);
+    return create_order_i(ord, kwd, zBuffer, false, false);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -373,7 +369,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
-            return create_order_i(ord, kwd, sptr, persistent, noerror, lang);
+            return create_order_i(ord, kwd, sptr, persistent, noerror);
         }
     }
     return NULL;
@@ -529,7 +525,7 @@ bool is_silent(const order * ord)
     return (ord->command & CMD_QUIET) != 0;
 }
 
-char *write_order(const order * ord, char *buffer, size_t size)
+char *write_order(const order * ord, const struct locale *lang, char *buffer, size_t size)
 {
     if (ord == 0) {
         buffer[0] = 0;
@@ -544,7 +540,7 @@ char *write_order(const order * ord, char *buffer, size_t size)
             release_data(od);
         }
         else {
-            get_command(ord, buffer, size);
+            get_command(ord, lang, buffer, size);
         }
     }
     return buffer;

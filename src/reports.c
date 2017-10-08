@@ -266,14 +266,14 @@ report_item(const unit * owner, const item * i, const faction * viewer,
 }
 
 #define ORDERS_IN_NR 1
-static size_t buforder(char *buffer, size_t size, const order * ord, int mode)
+static size_t buforder(char *buffer, size_t size, const order * ord, const struct locale *lang, int mode)
 {
     char *bufp = buffer;
 
     bufp = STRLCPY(bufp, ", \"", size);
     if (mode < ORDERS_IN_NR) {
         char cmd[ORDERSIZE];
-        get_command(ord, cmd, sizeof(cmd));
+        get_command(ord, lang, cmd, sizeof(cmd));
         bufp = STRLCPY(bufp, cmd, size);
     }
     else {
@@ -498,6 +498,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     char *bufp = buf;
     int result = 0;
     item results[MAX_INVENTORY];
+    const struct locale *lang = f->locale;
 
     assert(f);
     bufp = STRLCPY(bufp, unitname(u), size);
@@ -514,7 +515,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
             }
             if (getarnt) {
                 bufp = STRLCPY(bufp, ", ", size);
-                bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
+                bufp = STRLCPY(bufp, LOC(lang, "anonymous"), size);
             }
             else if (u->attribs) {
                 faction *otherf = get_otherfaction(u);
@@ -527,7 +528,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
         else {
             if (getarnt) {
                 bufp = STRLCPY(bufp, ", ", size);
-                bufp = STRLCPY(bufp, LOC(f->locale, "anonymous"), size);
+                bufp = STRLCPY(bufp, LOC(lang, "anonymous"), size);
             }
             else {
                 if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
@@ -562,7 +563,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
         bufp = STRLCPY(bufp, pzTmp, size);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             bufp = STRLCPY(bufp, " (", size);
-            bufp = STRLCPY(bufp, racename(f->locale, u, u_race(u)), size);
+            bufp = STRLCPY(bufp, racename(lang, u, u_race(u)), size);
             if (size > 1) {
                 strcpy(bufp++, ")");
                 --size;
@@ -571,10 +572,10 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     }
     else {
         const race *irace = u_irace(u);
-        bufp = STRLCPY(bufp, racename(f->locale, u, irace), size);
+        bufp = STRLCPY(bufp, racename(lang, u, irace), size);
         if (u->faction == f && irace != u_race(u)) {
             bufp = STRLCPY(bufp, " (", size);
-            bufp = STRLCPY(bufp, racename(f->locale, u, u_race(u)), size);
+            bufp = STRLCPY(bufp, racename(lang, u, u_race(u)), size);
             if (size > 1) {
                 strcpy(bufp++, ")");
                 --size;
@@ -584,15 +585,15 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
 
     if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
         bufp = STRLCPY(bufp, ", ", size);
-        bufp = STRLCPY(bufp, LOC(f->locale, "hero"), size);
+        bufp = STRLCPY(bufp, LOC(lang, "hero"), size);
     }
     /* status */
 
     if (u->number && (u->faction == f || isbattle)) {
         const char *c = hp_status(u);
-        c = c ? LOC(f->locale, c) : 0;
+        c = c ? LOC(lang, c) : 0;
         bufp = STRLCPY(bufp, ", ", size);
-        bufp += report_status(u, f->locale, bufp, size);
+        bufp += report_status(u, lang, bufp, size);
         if (c || fval(u, UFL_HUNGER)) {
             bufp = STRLCPY(bufp, " (", size);
             if (c) {
@@ -602,7 +603,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 if (c) {
                     bufp = STRLCPY(bufp, ", ", size);
                 }
-                bufp = STRLCPY(bufp, LOC(f->locale, "unit_hungers"), size);
+                bufp = STRLCPY(bufp, LOC(lang, "unit_hungers"), size);
             }
             if (size > 1) {
                 strcpy(bufp++, ")");
@@ -612,7 +613,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     }
     if (is_guard(u)) {
         bufp = STRLCPY(bufp, ", ", size);
-        bufp = STRLCPY(bufp, LOC(f->locale, "unit_guards"), size);
+        bufp = STRLCPY(bufp, LOC(lang, "unit_guards"), size);
     }
 
     if ((b = usiege(u)) != NULL) {
@@ -624,7 +625,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     if (u->faction == f) {
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            size_t bytes = spskill(bufp, size, f->locale, u, sv, &dh, 1);
+            size_t bytes = spskill(bufp, size, lang, u, sv, &dh, 1);
             assert(bytes <= INT_MAX);
             if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -651,7 +652,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
         bufp = STRLCPY(bufp, ", ", size);
 
         if (!dh) {
-            result = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_inventory"));
+            result = snprintf(bufp, size, "%s: ", LOC(lang, "nr_inventory"));
             if (wrptr(&bufp, &size, result) != 0)
                 WARN_STATIC_BUFFER();
             dh = 1;
@@ -681,7 +682,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 if (sbe->level <= maxlevel) {
                     int result = 0;
                     if (!header) {
-                        result = snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_spells"));
+                        result = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
                         header = 1;
                     }
                     else {
@@ -691,7 +692,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                         WARN_STATIC_BUFFER();
                     }
                     /* TODO: no need to deref the spellref here (spref->name is good) */
-                    bufp = STRLCPY(bufp, spell_name(sbe->sp, f->locale), size);
+                    bufp = STRLCPY(bufp, spell_name(sbe->sp, lang), size);
                 }
             }
 
@@ -701,7 +702,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
             }
             if (i != MAXCOMBATSPELLS) {
                 int result =
-                    snprintf(bufp, size, ", %s: ", LOC(f->locale, "nr_combatspells"));
+                    snprintf(bufp, size, ", %s: ", LOC(lang, "nr_combatspells"));
                 if (wrptr(&bufp, &size, result) != 0)
                     WARN_STATIC_BUFFER();
 
@@ -717,7 +718,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     sp = get_combatspell(u, i);
                     if (sp) {
                         int sl = get_combatspelllevel(u, i);
-                        bufp = STRLCPY(bufp, spell_name(sp, u->faction->locale), size);
+                        bufp = STRLCPY(bufp, spell_name(sp, lang), size);
                         if (sl > 0) {
                             result = snprintf(bufp, size, " (%d)", sl);
                             if (wrptr(&bufp, &size, result) != 0)
@@ -725,7 +726,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                         }
                     }
                     else {
-                        bufp = STRLCPY(bufp, LOC(f->locale, "nr_nospells"), size);
+                        bufp = STRLCPY(bufp, LOC(lang, "nr_nospells"), size);
                     }
                 }
             }
@@ -737,7 +738,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 keyword_t kwd = getkeyword(ord);
                 if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
-                        int result = (int)buforder(bufp, size, ord, printed++);
+                        int result = (int)buforder(bufp, size, ord, u->faction->locale, printed++);
                         if (wrptr(&bufp, &size, result) != 0)
                             WARN_STATIC_BUFFER();
                     }
@@ -750,7 +751,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     keyword_t kwd = getkeyword(ord);
                     if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
-                            int result = (int)buforder(bufp, size, ord, printed++);
+                            int result = (int)buforder(bufp, size, ord, lang, printed++);
                             if (wrptr(&bufp, &size, result) != 0)
                                 WARN_STATIC_BUFFER();
                         }
@@ -762,7 +763,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     }
     i = 0;
 
-    str = u_description(u, f->locale);
+    str = u_description(u, lang);
     if (str) {
         bufp = STRLCPY(bufp, "; ", size);
         bufp = STRLCPY(bufp, str, size);
@@ -1980,13 +1981,15 @@ static void eval_race(struct opstack **stack, const void *userdata)
 
 static void eval_order(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
+    const faction *f = (const faction *)userdata;
     const struct order *ord = (const struct order *)opop(stack).v;
     char buf[4096];
     size_t len;
     variant var;
+    const struct locale *lang = f ? f->locale : default_locale;
 
     UNUSED_ARG(userdata);
-    write_order(ord, buf, sizeof(buf));
+    write_order(ord, lang, buf, sizeof(buf));
     len = strlen(buf);
     var.v = strcpy(balloc(len + 1), buf);
     opush(stack, var);
@@ -1994,8 +1997,8 @@ static void eval_order(struct opstack **stack, const void *userdata)
 
 static void eval_resources(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
-    const faction *report = (const faction *)userdata;
-    const struct locale *lang = report ? report->locale : default_locale;
+    const faction *f = (const faction *)userdata;
+    const struct locale *lang = f ? f->locale : default_locale;
     const struct resource *res = (const struct resource *)opop(stack).v;
     char buf[1024];        /* but we only use about half of this */
     size_t size = sizeof(buf) - 1;
