@@ -496,8 +496,8 @@ int sabotage_cmd(unit * u, struct order *ord)
 
     init_order(ord);
     s = getstrtoken();
-
     p = findparam(s, u->faction->locale);
+    init_order(NULL);
 
     switch (p) {
     case P_SHIP:
