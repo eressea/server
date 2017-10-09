@@ -62,10 +62,9 @@ order_data *load_data(int id) {
     return NULL;
 }
 
-int save_data(order_data *od) {
+int save_data(keyword_t kwd, order_data *od) {
     if (od->_str) {
         struct cb_entry ent;
-
         ++od->_refcount;
         ent.id = ++auto_id;
         ent.data = od;
@@ -131,7 +130,7 @@ keyword_t getkeyword(const order * ord)
  */
 char* get_command(const order *ord, const struct locale *lang, char *sbuffer, size_t size) {
     char *bufp = sbuffer;
-    order_data *od;
+    order_data *od = NULL;
     const char * text;
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
@@ -155,8 +154,14 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         }
     }
 
-    od = load_data(ord->id);
-    text = OD_STRING(od);
+    if (ord->id < 0) {
+        skill_t sk = (skill_t)(100-ord->id);
+        assert(kwd == K_STUDY && sk != SK_MAGIC);
+        text = skillname(sk, lang);
+    } else {
+        od = load_data(ord->id);
+        text = OD_STRING(od);
+    }
     if (kwd != NOKEYWORD) {
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
@@ -187,7 +192,9 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
             }
         }
     }
-    release_data(od);
+    if (od) {
+        release_data(od);
+    }
     if (size > 0) *bufp = 0;
     return sbuffer;
 }
@@ -236,52 +243,46 @@ static char *mkdata(order_data **pdata, size_t len, const char *str)
     char *result;
     data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
-    data->_refcount = 0;
+    data->_refcount = 1;
     data->_str = (len > 0) ? result : NULL;
     if (str) strcpy(result, str);
     if (pdata) *pdata = data;
     return result;
 }
 
-static order_data *create_data(keyword_t kwd, const char *sptr)
+static int create_data(keyword_t kwd, const char *s,
+    const struct locale *lang)
 {
-    const char *s = sptr;
     order_data *data;
+    int id;
 
-    if (kwd != NOKEYWORD)
-        s = (*sptr) ? sptr : NULL;
+    assert(kwd!=NOKEYWORD);
 
-    /* orders with no parameter, only one order_data per order required */
-    if (kwd != NOKEYWORD && *sptr == 0) {
-        mkdata(&data, 0, NULL);
-        data->_refcount = 1;
-        return data;
+    if (!s || *s == 0) {
+        return 0;
     }
+    if (kwd==K_STUDY) {
+        const char * sptr = s;
+        skill_t sk = get_skill(parse_token_depr(&sptr), lang);
+        if (sk != SK_MAGIC && sk != NOSKILL) {
+            return ((int)sk)-100;
+        }
+    }
+    /* TODO: between mkdata and release_data, this object is very
+     * short-lived. */
     mkdata(&data, s ? strlen(s) : 0, s);
-    data->_refcount = 1;
-    return data;
+    id = save_data(kwd, data);
+    release_data(data);
+    return id;
 }
 
-static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
-    bool noerror)
+static order *create_order_i(order *ord, const struct locale *lang,
+    keyword_t kwd, const char *sptr, bool persistent, bool noerror)
 {
-    order_data *od;
-
     assert(ord);
     if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
-    }
-
-    /* if this is just nonsense, then we skip it. */
-    if (lomem) {
-        switch (kwd) {
-        case K_KOMMENTAR:
-        case NOKEYWORD:
-            return NULL;
-        default:
-            break;
-        }
     }
 
     ord->command = (int)kwd;
@@ -291,10 +292,7 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
 
-    od = create_data(kwd, sptr);
-    ord->id = save_data(od);
-    release_data(od);
-
+    ord->id = create_data(kwd, sptr, lang);
     return ord;
 }
 
@@ -353,7 +351,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         zBuffer[0] = 0;
     }
     ord = (order *)malloc(sizeof(order));
-    return create_order_i(ord, kwd, zBuffer, false, false);
+    return create_order_i(ord, lang, kwd, zBuffer, false, false);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -385,7 +383,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
-            return create_order_i(ord, kwd, sptr, persistent, noerror);
+            return create_order_i(ord, lang, kwd, sptr, persistent, noerror);
         }
     }
     return NULL;
