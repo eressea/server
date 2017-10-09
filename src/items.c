@@ -47,7 +47,7 @@ static int
 use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
-    if (u->thisorder && init_order(u->thisorder) == K_STUDY) {
+    if (u->thisorder && init_order(u->thisorder, u->faction->locale) == K_STUDY) {
         char token[128];
         skill_t sk = NOSKILL;
         skill *sv = 0;

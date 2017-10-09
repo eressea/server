@@ -462,7 +462,7 @@ static void test_follow_ship_msg(CuTest * tc) {
 
     mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", 0));
 
-    init_order(ord);
+    init_order_depr(ord);
     getstrtoken();
 
     follow_ship(u, ord);

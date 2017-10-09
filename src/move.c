@@ -1067,7 +1067,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
         return;
     tail[0] = '\0';
 
-    init_order(ord);
+    init_order_depr(ord);
 
     neworder[0] = 0;
     for (cm = 0;; ++cm) {
@@ -1144,7 +1144,7 @@ static bool transport(unit * ut, unit * u)
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
             unit *u2;
-            init_order(ord);
+            init_order_depr(ord);
             getunit(ut->region, ut->faction, &u2);
             if (u2 == u) {
                 return true;
@@ -1178,7 +1178,7 @@ static void init_transportation(void)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
                 unit *ut = 0;
 
-                init_order(u->thisorder);
+                init_order_depr(u->thisorder);
                 if (getunit(r, u->faction, &ut) != GET_UNIT) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", ""));
@@ -1207,7 +1207,7 @@ static void init_transportation(void)
 
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_TRANSPORT) {
-                        init_order(ord);
+                        init_order_depr(ord);
                         for (;;) {
                             unit *ut = 0;
 
@@ -1218,7 +1218,7 @@ static void init_transportation(void)
                                 can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
                                 !LongHunger(ut)) {
                                 unit *u2;
-                                init_order(ut->thisorder);
+                                init_order_depr(ut->thisorder);
                                 getunit(r, ut->faction, &u2);
                                 if (u2 == u) {
                                     w += weight(ut);
@@ -2062,7 +2062,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
 
-        init_order(ord);
+        init_order_depr(ord);
         if (getunit(r, u->faction, &ut) == GET_UNIT) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
                 if (ut->building && !can_leave(ut)) {
@@ -2077,7 +2077,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                         unit *u2;
-                        init_order(ut->thisorder);
+                        init_order_depr(ut->thisorder);
                         getunit(u->region, ut->faction, &u2);
                         if (u2 == u) {
                             const region_list *route_to =
@@ -2363,7 +2363,7 @@ static void move_hunters(void)
                     if (getkeyword(ord) == K_FOLLOW) {
                         param_t p;
 
-                        init_order(ord);
+                        init_order_depr(ord);
                         p = getparam(u->faction->locale);
                         if (p != P_SHIP) {
                             if (p != P_UNIT) {
@@ -2485,13 +2485,13 @@ void movement(void)
                     else {
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
-                                init_order(u->thisorder);
+                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
-                                init_order(u->thisorder);
+                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
@@ -2548,7 +2548,7 @@ void follow_unit(unit * u)
         if (getkeyword(ord) == K_FOLLOW) {
             int id;
             param_t p;
-            init_order(ord);
+            init_order_depr(ord);
             p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);
