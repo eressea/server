@@ -2,6 +2,8 @@
 #include <kernel/config.h>
 #include "order.h"
 
+#include <kernel/skills.h>
+
 #include <util/parser.h>
 #include <util/language.h>
 
@@ -22,7 +24,7 @@ static void test_create_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MOVE, init_order(ord));
+    CuAssertIntEquals(tc, K_MOVE, init_order_depr(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
     test_cleanup();
@@ -42,7 +44,7 @@ static void test_parse_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MOVE, init_order(ord));
+    CuAssertIntEquals(tc, K_MOVE, init_order_depr(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
 
@@ -100,7 +102,7 @@ static void test_parse_make(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKE, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MAKE, init_order(ord));
+    CuAssertIntEquals(tc, K_MAKE, init_order_depr(ord));
     CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
     free_order(ord);
     test_cleanup();
@@ -123,7 +125,7 @@ static void test_parse_make_temp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
     test_cleanup();
@@ -146,7 +148,7 @@ static void test_parse_maketemp(CuTest *tc) {
     CuAssertPtrNotNull(tc, ord);
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
     test_cleanup();
@@ -160,7 +162,7 @@ static void test_init_order(CuTest *tc) {
 
     lang = get_or_create_locale("en");
     ord = create_order(K_MAKETEMP, lang, "hurr durr");
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
     free_order(ord);
@@ -292,10 +294,48 @@ static void test_is_silent(CuTest *tc) {
 
     test_cleanup();
 }
+
+static void test_study_orders(CuTest *tc) {
+    order *ord;
+    struct locale *lang;
+    const char *s;
+    char token[16];
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = create_order(K_STUDY, lang, skillname(SK_CROSSBOW, lang));
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertIntEquals(tc, K_STUDY, init_order(ord, lang));
+    s = gettoken(token, sizeof(token));
+    CuAssertStrEquals(tc, skillname(SK_CROSSBOW, lang), s);
+    CuAssertPtrEquals(tc, NULL, (void *)getstrtoken());
+    free_order(ord);
+
+    ord = create_order(K_STUDY, lang, skillname(SK_MAGIC, lang));
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertIntEquals(tc, K_STUDY, init_order(ord, lang));
+    s = gettoken(token, sizeof(token));
+    CuAssertStrEquals(tc, skillname(SK_MAGIC, lang), s);
+    CuAssertPtrEquals(tc, NULL, (void *)getstrtoken());
+    free_order(ord);
+
+    ord = create_order(K_STUDY, lang, "%s 100", skillname(SK_MAGIC, lang));
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertIntEquals(tc, K_STUDY, init_order(ord, lang));
+    s = gettoken(token, sizeof(token));
+    CuAssertStrEquals(tc, skillname(SK_MAGIC, lang), s);
+    CuAssertIntEquals(tc, 100, getint());
+    free_order(ord);
+
+    test_cleanup();
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_create_order);
+    SUITE_ADD_TEST(suite, test_study_orders);
     SUITE_ADD_TEST(suite, test_parse_order);
     SUITE_ADD_TEST(suite, test_parse_make);
     SUITE_ADD_TEST(suite, test_parse_make_temp);

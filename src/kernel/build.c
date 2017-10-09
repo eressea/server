@@ -161,7 +161,7 @@ int destroy_cmd(unit * u, struct order *ord)
         return 52;
     }
 
-    init_order(ord);
+    init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     if (s && *s) {

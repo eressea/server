@@ -3841,7 +3841,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     /* Ende Fehlerbehandlung Angreifer */
 
-                    init_order(ord);
+                    init_order_depr(ord);
                     /* attackierte Einheit ermitteln */
                     getunit(r, u->faction, &u2);
 

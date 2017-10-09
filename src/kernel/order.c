@@ -155,7 +155,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
     }
 
     if (ord->id < 0) {
-        skill_t sk = (skill_t)(100-ord->id);
+        skill_t sk = (skill_t)(100+ord->id);
         assert(kwd == K_STUDY && sk != SK_MAGIC);
         text = skillname(sk, lang);
     } else {
@@ -569,7 +569,7 @@ void push_order(order ** ordp, order * ord)
 
 static order_data *parser_od;
 
-keyword_t init_order(const struct order *ord)
+keyword_t init_order(const struct order *ord, const struct locale *lang)
 {
     if (!ord) {
         release_data(parser_od);
@@ -577,19 +577,38 @@ keyword_t init_order(const struct order *ord)
         return NOKEYWORD;
     }
     else {
+        keyword_t kwd = ORD_KEYWORD(ord);
         if (parser_od) {
             /* TODO: warning */
             release_data(parser_od);
+            parser_od = NULL;
         }
-        parser_od = load_data(ord->id);
-        init_tokens_str(OD_STRING(parser_od));
-        return ORD_KEYWORD(ord);
+        if (ord->id < 0) {
+            skill_t sk = (skill_t)(100 + ord->id);
+            assert(lang);
+            assert(kwd == K_STUDY);
+            init_tokens_str(skillname(sk, lang));
+        }
+        else {
+            parser_od = load_data(ord->id);
+            init_tokens_str(OD_STRING(parser_od));
+        }
+        return kwd;
     }
+}
+
+keyword_t init_order_depr(const struct order *ord)
+{
+    if (ord) {
+        keyword_t kwd = ORD_KEYWORD(ord);
+        assert(kwd != K_STUDY);
+    }
+    return init_order(ord, NULL);
 }
 
 void close_orders(void) {
     if (parser_od) {
-        init_order(NULL);
+        (void)init_order(NULL, NULL);
     }
     free_data();
 }

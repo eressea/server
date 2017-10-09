@@ -441,7 +441,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     const char *str;
     int n;
 
-    init_order(ord);
+    init_order_depr(ord);
     n = getint();
     if (n <= 0) {
         syntax_error(u, ord);
@@ -598,7 +598,7 @@ int give_control_cmd(unit * u, order * ord)
     unit *u2;
     const char *s;
 
-    init_order(ord);
+    init_order_depr(ord);
     getunit(r, u->faction, &u2);
 
     s = gettoken(token, sizeof(token));
@@ -657,7 +657,7 @@ static int forget_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_order(ord);
+    init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     sk = get_skill(s, u->faction->locale);
@@ -1303,7 +1303,7 @@ int make_cmd(unit * u, struct order *ord)
     char ibuf[16];
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_MAKE);
     s = gettoken(token, sizeof(token));
 
@@ -1582,7 +1582,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon daf�r ausger�stet, mehrere Produkte zu kaufen. */
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_BUY);
     n = getint();
     if (n <= 0) {
@@ -1896,7 +1896,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     /* sellorders sind KEIN array, weil f�r alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_SELL);
     s = gettoken(token, sizeof(token));
 
@@ -2287,7 +2287,7 @@ static void breed_cmd(unit * u, struct order *ord)
     }
 
     /* z�chte [<anzahl>] <parameter> */
-    (void)init_order(ord);
+    (void)init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     m = s ? atoip(s) : 0;
@@ -2354,7 +2354,7 @@ static void research_cmd(unit * u, struct order *ord)
     region *r = u->region;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_RESEARCH);
 
     if (effskill(u, SK_HERBALISM, 0) < 7) {
@@ -2430,7 +2430,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     message * msg;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_STEAL);
 
     assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
@@ -2568,7 +2568,7 @@ void entertain_cmd(unit * u, struct order *ord)
     static int entertainperlevel = 0;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
         const char *str = config_get("entertain.base");
@@ -2778,7 +2778,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         taxperlevel = config_get_int("taxing.perlevel", 0);
     }
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_TAX);
 
     if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
@@ -2847,7 +2847,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     request *o;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_LOOT);
 
     if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {

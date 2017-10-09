@@ -105,7 +105,7 @@ static int do_command_i(const struct tnode *keys, struct unit *u, struct order *
 
 void do_command(const struct tnode *keys, struct unit *u, struct order *ord)
 {
-    init_order(ord);
+    init_order_depr(ord);
     if (do_command_i(keys, u, ord) != E_TOK_SUCCESS) {
         char cmd[ORDERSIZE];
         get_command(ord, u->faction->locale, cmd, sizeof(cmd));
