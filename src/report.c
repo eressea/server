@@ -2269,7 +2269,7 @@ report_plaintext(const char *filename, report_context * ctx,
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
-        int stealthmod = stealth_modifier(r->seen.mode);
+        int stealthmod = stealth_modifier(r, f, r->seen.mode);
         building *b = r->buildings;
         ship *sh = r->ships;
 
@@ -2314,14 +2314,12 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
-        /* Statistik */
 
         if (wants_stats && r->seen.mode >= seen_unit)
             statistics(out, r, f);
 
         /* Nachrichten an REGION in der Region */
-
-        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
+        if (r->seen.mode >= seen_travel) {
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
@@ -2350,8 +2348,8 @@ report_plaintext(const char *filename, report_context * ctx,
             }
         }
         while (u && !u->ship) {
-            if (stealthmod > INT_MIN) {
-                if (u->faction == f || cansee(f, r, u, stealthmod)) {
+            if (stealthmod > INT_MIN && r->seen.mode >= seen_unit) {
+                if (u->faction == f || cansee(f, r, u, stealthmod, r->seen.mode)) {
                     nr_unit(out, f, u, 4, r->seen.mode);
                 }
             }

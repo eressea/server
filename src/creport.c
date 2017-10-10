@@ -1363,7 +1363,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         building *b;
         ship *sh;
         unit *u;
-        int stealthmod = stealth_modifier(r->seen.mode);
+        int stealthmod = stealth_modifier(r, f, r->seen.mode);
 
         if (r->land && r->land->display && r->land->display[0])
             fprintf(F, "\"%s\";Beschr\n", r->land->display);
@@ -1497,7 +1497,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         for (u = r->units; u; u = u->next) {
 
             if (u->building || u->ship || (stealthmod > INT_MIN
-                && cansee(f, r, u, stealthmod))) {
+                && cansee(f, r, u, stealthmod, r->seen.mode))) {
                 cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }

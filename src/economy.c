@@ -2454,7 +2454,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     }
 
     for (u2 = r->units; u2; u2 = u2->next) {
-        if (u2->faction == f && cansee(u->faction, r, u2, 0))
+        if (u2->faction == f && cansee_depr(u->faction, r, u2, 0))
             break;
     }
 

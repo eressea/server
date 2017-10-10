@@ -762,6 +762,24 @@ static void test_report_far_vision(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_stealth_modifier(CuTest *tc) {
+    region *r;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
+    CuAssertIntEquals(tc, 0, stealth_modifier(r, f, seen_unit));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_travel));
+    CuAssertIntEquals(tc, -2, stealth_modifier(r, f, seen_lighthouse));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_spell));
+
+    set_observer(r, f, 10, 1);
+    CuAssertIntEquals(tc, 10, stealth_modifier(r, f, seen_spell));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, NULL, seen_spell));
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -782,6 +800,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_report_far_vision);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
+    SUITE_ADD_TEST(suite, test_stealth_modifier);
     SUITE_ADD_TEST(suite, test_regionid);
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_sparagraph_long);

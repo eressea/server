@@ -3847,7 +3847,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     /* Beginn Fehlerbehandlung */
                     /* Fehler: "Die Einheit wurde nicht gefunden" */
-                    if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0)) {
+                    if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0, seen_battle)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                             "feedback_unit_not_found", ""));
                         continue;

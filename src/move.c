@@ -912,7 +912,7 @@ static void caught_target(region * r, unit * u)
                 target, u));
         }
         else if (!alliedunit(target, u->faction, HELP_ALL)
-            && cansee(target->faction, r, u, 0)) {
+            && cansee_depr(target->faction, r, u, 0)) {
             ADDMSG(&target->faction->msgs, msg_message("followdetect",
                 "unit follower", target, u));
         }
@@ -1185,7 +1185,7 @@ static void init_transportation(void)
                     continue;
                 }
                 if (!transport(ut, u)) {
-                    if (cansee(u->faction, r, ut, 0)) {
+                    if (cansee_depr(u->faction, r, ut, 0)) {
                         cmistake(u, u->thisorder, 286, MSG_MOVE);
                     }
                     else {
@@ -2093,7 +2093,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                         }
                     }
                     if (!found) {
-                        if (cansee(u->faction, u->region, ut, 0)) {
+                        if (cansee_depr(u->faction, u->region, ut, 0)) {
                             cmistake(u, ord, 90, MSG_MOVE);
                         }
                         else {
@@ -2604,7 +2604,7 @@ void follow_unit(unit * u)
             u2 = a->data.v;
         }
 
-        if (!u2 || (!followship && (u2->region != r || !cansee(u->faction, r, u2, 0)))) {
+        if (!u2 || (!followship && (u2->region != r || !cansee_depr(u->faction, r, u2, 0)))) {
             return;
         }
 
