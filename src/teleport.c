@@ -39,25 +39,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 
-#define TE_CENTER_X 1000
-#define TE_CENTER_Y 1000
+#define TE_CENTER 1000
 #define TP_RADIUS 2
 #define TP_DISTANCE 4
 
-static int real2tp(int rk)
+int real2tp(int rk)
 {
     /* in C:
      * -4 / 5 = 0;
      * +4 / 5 = 0;
      * !!!!!!!!!!;
      */
-    return (rk + (TP_DISTANCE * 5000)) / TP_DISTANCE - 5000;
+    return TE_CENTER + (rk + (TP_DISTANCE * 5000)) / TP_DISTANCE - 5000;
 }
 
 static region *tpregion(const region * r)
 {
     region *rt =
-        findregion(TE_CENTER_X + real2tp(r->x), TE_CENTER_Y + real2tp(r->y));
+        findregion(real2tp(r->x), real2tp(r->y));
     if (!is_astral(rt))
         return NULL;
     return rt;
@@ -106,8 +105,8 @@ region *r_astral_to_standard(const region * r)
     region *r2;
 
     assert(is_astral(r));
-    x = (r->x - TE_CENTER_X) * TP_DISTANCE;
-    y = (r->y - TE_CENTER_Y) * TP_DISTANCE;
+    x = (r->x - TE_CENTER) * TP_DISTANCE;
+    y = (r->y - TE_CENTER) * TP_DISTANCE;
     pnormalize(&x, &y, NULL);
     r2 = findregion(x, y);
     if (r2 == NULL || rplane(r2))
@@ -188,8 +187,8 @@ plane *get_astralplane(void)
     astralspace = getplanebyname("Astralraum");
     if (!astralspace) {
         astralspace = create_new_plane(1, "Astralraum",
-            TE_CENTER_X - 500, TE_CENTER_X + 500,
-            TE_CENTER_Y - 500, TE_CENTER_Y + 500, 0);
+            TE_CENTER - 500, TE_CENTER + 500,
+            TE_CENTER - 500, TE_CENTER + 500, 0);
     }
     return astralspace;
 }
@@ -208,8 +207,8 @@ void create_teleport_plane(void)
             region *ra = tpregion(r);
 
             if (ra == NULL) {
-                int x = TE_CENTER_X + real2tp(r->x);
-                int y = TE_CENTER_Y + real2tp(r->y);
+                int x = real2tp(r->x);
+                int y = real2tp(r->y);
                 pnormalize(&x, &y, aplane);
 
                 ra = new_region(x, y, aplane, 0);
