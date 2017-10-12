@@ -116,6 +116,7 @@ set (ERESSEA_SRC
   magic.c
   market.c
   morale.c
+  orderdb.c
   orderfile.c
   randenc.c
   renumber.c

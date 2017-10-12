@@ -14,6 +14,7 @@
 #include <kernel/config.h>
 #include "order.h"
 
+#include "orderdb.h"
 #include "skill.h"
 #include "keyword.h"
 
@@ -32,71 +33,6 @@
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
-
-typedef struct order_data {
-    const char *_str;
-    int _refcount;
-} order_data;
-
-#include <critbit.h>
-
-static critbit_tree cb_orders = { 0 };
-static int auto_id = 0;
-
-struct cb_entry {
-    int id;
-    order_data *data;
-};
-
-order_data *load_data(int id) {
-    void * match;
-
-    if (id > 0) {
-        if (cb_find_prefix(&cb_orders, &id, sizeof(id), &match, 1, 0) > 0) {
-            struct cb_entry *ent = (struct cb_entry *)match;
-            order_data * od = ent->data;
-            ++od->_refcount;
-            return od;
-        }
-    }
-    return NULL;
-}
-
-int save_data(keyword_t kwd, order_data *od) {
-    if (od->_str) {
-        struct cb_entry ent;
-        ++od->_refcount;
-        ent.id = ++auto_id;
-        ent.data = od;
-        cb_insert(&cb_orders, &ent, sizeof(ent));
-        return ent.id;
-    }
-    return 0;
-}
-
-static void release_data(order_data * data)
-{
-    if (data) {
-        if (--data->_refcount == 0) {
-            free(data);
-        }
-    }
-}
-
-int free_data_cb(const void *match, const void *key, size_t keylen, void *udata) {
-    struct cb_entry * ent = (struct cb_entry *)match;
-    order_data *od = ent->data;
-    if (od->_refcount > 1) {
-        log_error("refcount=%d for order %d, %s", od->_refcount, ent->id, od->_str);
-    }
-    release_data(od);
-    return 0;
-}
-
-void free_data(void) {
-    cb_foreach(&cb_orders, NULL, 0, free_data_cb, NULL);
-    cb_clear(&cb_orders);
-}
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
@@ -159,7 +95,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         assert(kwd == K_STUDY && sk != SK_MAGIC);
         text = skillname(sk, lang);
     } else {
-        od = load_data(ord->id);
+        od = odata_load(ord->id);
         text = OD_STRING(od);
     }
     if (kwd != NOKEYWORD) {
@@ -193,7 +129,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         }
     }
     if (od) {
-        release_data(od);
+        odata_release(od);
     }
     if (size > 0) *bufp = 0;
     return sbuffer;
@@ -268,11 +204,11 @@ static int create_data(keyword_t kwd, const char *s,
             return ((int)sk)-100;
         }
     }
-    /* TODO: between mkdata and release_data, this object is very
+    /* TODO: between mkdata and odata_release, this object is very
      * short-lived. */
     mkdata(&data, s ? strlen(s) : 0, s);
-    id = save_data(kwd, data);
-    release_data(data);
+    id = odata_save(data);
+    odata_release(data);
     return id;
 }
 
@@ -547,11 +483,11 @@ char *write_order(const order * ord, const struct locale *lang, char *buffer, si
     else {
         keyword_t kwd = ORD_KEYWORD(ord);
         if (kwd == NOKEYWORD) {
-            order_data *od = load_data(ord->id);
+            order_data *od = odata_load(ord->id);
             const char *text = OD_STRING(od);
             if (text) strlcpy(buffer, (const char *)text, size);
             else buffer[0] = 0;
-            release_data(od);
+            odata_release(od);
         }
         else {
             get_command(ord, lang, buffer, size);
@@ -572,7 +508,7 @@ static order_data *parser_od;
 keyword_t init_order(const struct order *ord, const struct locale *lang)
 {
     if (!ord) {
-        release_data(parser_od);
+        odata_release(parser_od);
         parser_od = NULL;
         return NOKEYWORD;
     }
@@ -580,7 +516,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
         keyword_t kwd = ORD_KEYWORD(ord);
         if (parser_od) {
             /* TODO: warning */
-            release_data(parser_od);
+            odata_release(parser_od);
             parser_od = NULL;
         }
         if (ord->id < 0) {
@@ -590,7 +526,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
             init_tokens_str(skillname(sk, lang));
         }
         else {
-            parser_od = load_data(ord->id);
+            parser_od = odata_load(ord->id);
             init_tokens_str(OD_STRING(parser_od));
         }
         return kwd;
@@ -610,6 +546,5 @@ void close_orders(void) {
     if (parser_od) {
         (void)init_order(NULL, NULL);
     }
-    free_data();
 }
 
