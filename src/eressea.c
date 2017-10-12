@@ -8,6 +8,7 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
+#include "orderdb.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"
@@ -57,10 +58,12 @@ void game_done(void)
     free_special_directions();
     free_locales();
     kernel_done();
+    orderdb_close();
 }
 
 void game_init(void)
 {
+    orderdb_open();
     kernel_init();
     register_triggers();
     register_xmas();
