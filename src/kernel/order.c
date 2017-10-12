@@ -92,7 +92,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
 
     if (ord->id < 0) {
         skill_t sk = (skill_t)(100+ord->id);
-        assert(kwd == K_STUDY && sk != SK_MAGIC);
+        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
     } else {
         od = odata_load(ord->id);
@@ -206,7 +206,7 @@ static int create_data(keyword_t kwd, const char *s,
     }
     /* TODO: between mkdata and odata_release, this object is very
      * short-lived. */
-    mkdata(&data, s ? strlen(s) : 0, s);
+    mkdata(&data, strlen(s), s);
     id = odata_save(data);
     odata_release(data);
     return id;
@@ -287,7 +287,11 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         zBuffer[0] = 0;
     }
     ord = (order *)malloc(sizeof(order));
-    return create_order_i(ord, lang, kwd, zBuffer, false, false);
+    if (create_order_i(ord, lang, kwd, zBuffer, false, false) == NULL) {
+        free(ord);
+        return NULL;
+    }
+    return ord;
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -319,7 +323,12 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
-            return create_order_i(ord, lang, kwd, sptr, persistent, noerror);
+            if (create_order_i(ord, lang, kwd, sptr, persistent, noerror)
+                    == NULL) {
+                free(ord);
+                return NULL;
+            }
+            return ord;
         }
     }
     return NULL;
@@ -521,6 +530,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
         }
         if (ord->id < 0) {
             skill_t sk = (skill_t)(100 + ord->id);
+            assert(sk < MAXSKILLS);
             assert(lang);
             assert(kwd == K_STUDY);
             init_tokens_str(skillname(sk, lang));
