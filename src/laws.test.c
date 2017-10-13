@@ -1579,6 +1579,23 @@ static void test_demon_hunger(CuTest * tc)
     test_cleanup();
 }
 
+static void test_cansee(CuTest *tc) {
+    unit *u, *u2;
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
+
+    set_level(u, SK_PERCEPTION, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+
+    test_cleanup();
+}
+
 static void test_armedmen(CuTest *tc) {
     /* TODO: test RCF_NOWEAPONS and SK_WEAPONLESS */
     unit *u;
@@ -1683,6 +1700,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
+    SUITE_ADD_TEST(suite, test_cansee);
 
     return suite;
 }
