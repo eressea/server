@@ -207,8 +207,8 @@ static int create_data(keyword_t kwd, const char *s,
     /* TODO: between mkdata and odata_release, this object is very
      * short-lived. */
     mkdata(&data, strlen(s), s);
-    id = odata_save(kwd, data);
-    release_data(data);
+    id = odata_save(data);
+    odata_release(data);
     return id;
 }
 
