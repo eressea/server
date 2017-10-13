@@ -425,7 +425,7 @@ bool canswim(unit * u)
     return false;
 }
 
-static int canride(const unit * u)
+static int walk_mode(const unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
     int skill = effskill(u, SK_RIDING, 0);
@@ -1407,7 +1407,7 @@ int movement_speed(const unit * u)
         mp = BP_DRAGON;
         break;
     default:
-        mp = canride(u);
+        mp = walk_mode(u);
         if (mp>=BP_RIDING) {
             dk = 1.0;
         }
@@ -1611,7 +1611,7 @@ static const region_list *travel_route(unit * u,
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
         }
-        if (canride(u)) {
+        else if (walk_mode(u) >= BP_RIDING) {
             walkmode = 1;
             produceexp(u, SK_RIDING, u->number);
         }
