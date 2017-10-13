@@ -4311,7 +4311,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier, seen_m
     stealth = eff_stealth(u, r) - modifier;
 
     if (mode > seen_unit) {
-        return (rings <= 0 || stealth <= 0);
+        return (rings <= 0 && stealth <= 0);
     }
     else {
         unit *u2;
