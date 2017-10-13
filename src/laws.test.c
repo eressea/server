@@ -1579,6 +1579,60 @@ static void test_demon_hunger(CuTest * tc)
     test_cleanup();
 }
 
+static void test_cansee(CuTest *tc) {
+    unit *u, *u2;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 1, seen_spell));
+
+    set_level(u, SK_PERCEPTION, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+
+    test_cleanup();
+}
+
+static void test_cansee_items(CuTest *tc) {
+    unit *u, *u2;
+    item_type *itype[3];
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    scale_number(u2, 2);
+
+    itype[0] = test_create_itemtype("roi");
+    itype[1] = test_create_itemtype("sphereofinv");
+    itype[2] = test_create_itemtype("aots");
+    CuAssertPtrNotNull(tc, get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_SPHERE_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+
+    i_change(&u->items, itype[2], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+
+    test_cleanup();
+}
+
 static void test_armedmen(CuTest *tc) {
     /* TODO: test RCF_NOWEAPONS and SK_WEAPONLESS */
     unit *u;
@@ -1683,6 +1737,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
+    SUITE_ADD_TEST(suite, test_cansee);
+    SUITE_ADD_TEST(suite, test_cansee_items);
 
     return suite;
 }

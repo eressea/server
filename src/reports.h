@@ -70,7 +70,7 @@ extern "C" {
     const struct unit *ucansee(const struct faction *f,
         const struct unit *u, const struct unit *x);
 
-    int stealth_modifier(seen_mode seen_mode);
+    int stealth_modifier(const struct region *r, const struct faction *f, seen_mode mode);
 
     typedef struct report_context {
         struct faction *f;

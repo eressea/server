@@ -114,7 +114,7 @@ static attrib *make_observer(faction *f, int perception)
     return a;
 }
 
-int get_observer(region *r, faction *f) {
+int get_observer(const region *r, const faction *f) {
     if (fval(r, RF_OBSERVER)) {
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {

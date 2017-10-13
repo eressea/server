@@ -159,7 +159,7 @@ static order *monster_attack(unit * u, const unit * target)
 {
     assert(u->region == target->region);
     assert(u->faction != target->faction);
-    if (!cansee(u->faction, u->region, target, 0))
+    if (!cansee_depr(u->faction, u->region, target, 0))
         return NULL;
     if (monster_is_waiting(u))
         return NULL;
@@ -199,7 +199,7 @@ int monster_attacks(unit * monster, bool rich_only)
         int money = 0;
 
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
+            if (u2->faction != monster->faction && cansee_depr(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
                 int m = get_money(u2);
                 if (u_race(monster) == rc_serpent) {
                     /* attack bigger ships only */
