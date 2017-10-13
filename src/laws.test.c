@@ -1590,12 +1590,28 @@ static void test_cansee(CuTest *tc) {
 
     set_level(u2, SK_STEALTH, 1);
     CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 1, seen_spell));
 
     set_level(u, SK_PERCEPTION, 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
+
+    test_cleanup();
+}
+
+static void test_cansee_spell(CuTest *tc) {
+    unit *u2;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 0, seen_battle));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 1, seen_spell));
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 1, seen_battle));
 
     test_cleanup();
 }
@@ -1738,6 +1754,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
     SUITE_ADD_TEST(suite, test_cansee);
+    SUITE_ADD_TEST(suite, test_cansee_spell);
     SUITE_ADD_TEST(suite, test_cansee_items);
 
     return suite;
