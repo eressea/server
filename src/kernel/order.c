@@ -173,19 +173,6 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, const char *str)
-{
-    order_data *data;
-    char *result;
-    data = malloc(sizeof(order_data) + len + 1);
-    result = (char *)(data + 1);
-    data->_refcount = 1;
-    data->_str = (len > 0) ? result : NULL;
-    if (str) strcpy(result, str);
-    if (pdata) *pdata = data;
-    return result;
-}
-
 static int create_data(keyword_t kwd, const char *s,
     const struct locale *lang)
 {
@@ -206,7 +193,7 @@ static int create_data(keyword_t kwd, const char *s,
     }
     /* TODO: between mkdata and odata_release, this object is very
      * short-lived. */
-    mkdata(&data, strlen(s), s);
+    odata_create(&data, strlen(s), s);
     id = odata_save(data);
     odata_release(data);
     return id;

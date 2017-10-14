@@ -23,48 +23,6 @@ faction *get_faction_by_id(int uid)
     return NULL;
 }
 
-/*
-typedef struct stmt_cache {
-sqlite3 *db;
-sqlite3_stmt *stmt;
-const char *sql;
-int inuse;
-} stmt_cache;
-
-#define MAX_STMT_CACHE 64
-static stmt_cache cache[MAX_STMT_CACHE];
-static int cache_insert;
-
-static sqlite3_stmt *stmt_cache_get(sqlite3 * db, const char *sql)
-{
-int i;
-sqlite3_stmt *stmt;
-
-for (i = 0; i != MAX_STMT_CACHE && cache[i].db; ++i) {
-if (cache[i].sql == sql && cache[i].db == db) {
-cache[i].inuse = 1;
-stmt = cache[i].stmt;
-sqlite3_reset(stmt);
-sqlite3_clear_bindings(stmt);
-return stmt;
-}
-}
-if (i == MAX_STMT_CACHE) {
-while (cache[cache_insert].inuse) {
-cache[cache_insert].inuse = 0;
-cache_insert = (cache_insert + 1) & (MAX_STMT_CACHE - 1);
-}
-i = cache_insert;
-stmt = cache[i].stmt;
-sqlite3_finalize(stmt);
-}
-cache[i].inuse = 1;
-cache[i].db = db;
-cache[i].sql = sql;
-sqlite3_prepare_v2(db, sql, -1, &cache[i].stmt, NULL);
-return cache[i].stmt;
-}
-*/
 typedef struct db_faction {
     int uid;
     int no;

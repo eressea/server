@@ -1,6 +1,8 @@
 #ifndef H_ORDERDB
 #define H_ORDERDB
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,9 +23,11 @@ extern "C" {
     db_backend orderdb_open(db_backend choices[]);
     void orderdb_close(void);
 
+    void odata_create(order_data **pdata, size_t len, const char *str);
+    void odata_release(order_data * od);
+
     order_data *odata_load(int id);
     int odata_save(order_data *od);
-    void odata_release(order_data * od);
 
 #ifdef __cplusplus
 }

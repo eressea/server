@@ -6,6 +6,7 @@
 #include <critbit.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 static critbit_tree cb_orders = { 0 };
 static int auto_id = 0;
@@ -30,6 +31,19 @@ order_data *odata_load(int id)
         }
     }
     return NULL;
+}
+
+void odata_create(order_data **pdata, size_t len, const char *str)
+{
+    order_data *data;
+    char *result;
+
+    data = malloc(sizeof(order_data) + len + 1);
+    data->_refcount = 1;
+    result = (char *)(data + 1);
+    data->_str = (len > 0) ? result : NULL;
+    if (str) strcpy(result, str);
+    if (pdata) *pdata = data;
 }
 
 int odata_save(order_data *od)
