@@ -37,6 +37,8 @@
 #include <util/message.h>
 #include <races/races.h>
 
+#include <stdlib.h>
+
 void game_done(void)
 {
 #ifdef CLEANUP_CODE
@@ -63,7 +65,10 @@ void game_done(void)
 
 void game_init(void)
 {
-    orderdb_open();
+    db_backend choices[] = { DB_MEMORY, DB_NONE };
+    if (orderdb_open(choices) == DB_NONE) {
+        log_fatal("no orderdb backend available");
+    }
     kernel_init();
     register_triggers();
     register_xmas();

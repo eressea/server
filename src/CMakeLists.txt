@@ -219,6 +219,7 @@ set(TESTS_SRC
   monsters.test.c
   move.test.c
   names.test.c
+  orderdb.test.c
   orderfile.test.c
   piracy.test.c
   prefix.test.c

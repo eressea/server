@@ -15,6 +15,8 @@ struct cb_entry {
     order_data *data;
 };
 
+static db_backend odata_backend = DB_NONE;
+
 order_data *odata_load(int id)
 {
     void * match;
@@ -67,9 +69,17 @@ void free_data(void) {
     cb_clear(&cb_orders);
 }
 
-void orderdb_open(void)
+db_backend orderdb_open(db_backend choices[])
 {
-    auto_id = 0;
+    int i;
+    for (i = 0; choices[i] != DB_NONE; ++i) {
+        db_backend choice = choices[i];
+        if (choice == DB_MEMORY) {
+            auto_id = 0;
+            return odata_backend = choice;
+        }
+    }
+    return DB_NONE;
 }
 
 void orderdb_close(void)

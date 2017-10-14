@@ -132,6 +132,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(names);
+    ADD_SUITE(orderdb);
     ADD_SUITE(orderfile);
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
