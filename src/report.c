@@ -2349,7 +2349,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
         while (u && !u->ship) {
             if (stealthmod > INT_MIN && r->seen.mode >= seen_unit) {
-                if (u->faction == f || cansee(f, r, u, stealthmod, r->seen.mode)) {
+                if (u->faction == f || cansee_ex(f, r, u, stealthmod, r->seen.mode)) {
                     nr_unit(out, f, u, 4, r->seen.mode);
                 }
             }

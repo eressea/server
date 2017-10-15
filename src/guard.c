@@ -93,7 +93,7 @@ static bool is_guardian_u(const unit * guard, unit * u)
         return false;
     if (ucontact(guard, u))
         return false;
-    if (!cansee_depr(guard->faction, u->region, u, 0))
+    if (!cansee(guard->faction, u->region, u, 0))
         return false;
     if (!(u_race(guard)->flags & RCF_FLY) && u_race(u)->flags & RCF_FLY)
         return false;

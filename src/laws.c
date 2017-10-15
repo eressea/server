@@ -1651,7 +1651,7 @@ static bool try_rename(unit *u, building *b, order *ord) {
         }
 
         if (owner) {
-            if (cansee(owner->faction, u->region, u, 0, seen_unit)) {
+            if (cansee(owner->faction, u->region, u, 0)) {
                 ADDMSG(&owner->faction->msgs,
                     msg_message("renamed_building_seen",
                         "building renamer region", b, u, u->region));
@@ -1747,7 +1747,7 @@ int name_cmd(struct unit *u, struct order *ord)
                     break;
                 }
             }
-            if (cansee(f, r, u, 0, seen_unit)) {
+            if (cansee(f, r, u, 0)) {
                 ADDMSG(&f->msgs,
                     msg_message("renamed_faction_seen", "unit region", u, r));
             }
@@ -1794,7 +1794,7 @@ int name_cmd(struct unit *u, struct order *ord)
             }
             uo = ship_owner(sh);
             if (uo) {
-                if (cansee(uo->faction, r, u, 0, seen_unit)) {
+                if (cansee(uo->faction, r, u, 0)) {
                     ADDMSG(&uo->faction->msgs,
                         msg_message("renamed_ship_seen", "ship renamer region", sh, u, r));
                 }
@@ -1823,7 +1823,7 @@ int name_cmd(struct unit *u, struct order *ord)
             unit *u2 = 0;
 
             getunit(r, u->faction, &u2);
-            if (!u2 || !cansee(u->faction, r, u2, 0, seen_unit)) {
+            if (!u2 || !cansee(u->faction, r, u2, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "feedback_unit_not_found", ""));
                 break;
@@ -1836,7 +1836,7 @@ int name_cmd(struct unit *u, struct order *ord)
                     break;
                 }
             }
-            if (cansee(u2->faction, r, u, 0, seen_unit)) {
+            if (cansee(u2->faction, r, u, 0)) {
                 ADDMSG(&u2->faction->msgs, msg_message("renamed_seen",
                     "renamer renamed region", u, u2, r));
             }
@@ -1898,7 +1898,7 @@ int name_cmd(struct unit *u, struct order *ord)
 void
 deliverMail(faction * f, region * r, unit * u, const char *s, unit * receiver)
 {
-    if (!cansee(f, r, u, 0, seen_unit)) {
+    if (!cansee(f, r, u, 0)) {
         u = NULL;
     }
     if (!receiver) {              /* BOTSCHAFT an PARTEI */
@@ -1917,7 +1917,7 @@ mailunit(region * r, unit * u, int n, struct order *ord, const char *s)
 {
     unit *u2 = findunitr(r, n);
 
-    if (u2 && cansee(u->faction, r, u2, 0, seen_unit)) {
+    if (u2 && cansee(u->faction, r, u2, 0)) {
         deliverMail(u2->faction, r, u, s, u2);
         /* now done in prepare_mail_cmd */
     }
@@ -1995,7 +1995,7 @@ int mail_cmd(unit * u, struct order *ord)
             n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
-                if (u2->no == n && cansee(u->faction, r, u2, 0, seen_unit)) {
+                if (u2->no == n && cansee(u->faction, r, u2, 0)) {
                     break;
                 }
             }
@@ -2049,7 +2049,7 @@ int mail_cmd(unit * u, struct order *ord)
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->building == b && !fval(u2->faction, FFL_SELECT)
-                    && cansee(u->faction, r, u2, 0, seen_unit)) {
+                    && cansee(u->faction, r, u2, 0)) {
                     mailunit(r, u, u2->no, ord, s);
                     fset(u2->faction, FFL_SELECT);
                 }
@@ -2078,7 +2078,7 @@ int mail_cmd(unit * u, struct order *ord)
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->ship == sh && !fval(u2->faction, FFL_SELECT)
-                    && cansee(u->faction, r, u2, 0, seen_unit)) {
+                    && cansee(u->faction, r, u2, 0)) {
                     mailunit(r, u, u2->no, ord, s);
                     fset(u2->faction, FFL_SELECT);
                 }
@@ -4281,7 +4281,7 @@ void update_subscriptions(void)
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird */
 bool
-cansee(const faction * f, const region * r, const unit * u, int modifier, seen_mode mode)
+cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
 
@@ -4310,35 +4310,31 @@ cansee(const faction * f, const region * r, const unit * u, int modifier, seen_m
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    if (mode > seen_unit) {
-        return (rings <= 0 && stealth <= 0);
-    }
-    else {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction == f) {
-                if (rings < u->number || invisible(u, u2) < u->number) {
-                    if (skill_enabled(SK_PERCEPTION)) {
-                        int observation = effskill(u2, SK_PERCEPTION, 0);
+    unit *u2;
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction == f) {
+            if (rings < u->number || invisible(u, u2) < u->number) {
+                if (skill_enabled(SK_PERCEPTION)) {
+                    int observation = effskill(u2, SK_PERCEPTION, 0);
 
-                        if (observation >= stealth) {
-                            return true;
-                        }
-                    }
-                    else {
+                    if (observation >= stealth) {
                         return true;
                     }
+                }
+                else {
+                    return true;
                 }
             }
         }
     }
-    return false;
+
+    return (rings <= 0 && stealth <= 0);
 }
 
-bool
-cansee_depr(const faction * f, const region * r, const unit * u, int modifier)
+bool cansee_ex(const faction * f, const region * r, const unit * u, int modifier, seen_mode mode)
 {
-    return cansee(f, r, u, modifier, seen_unit);
+    UNUSED_ARG(mode);
+    return cansee(f, r, u, modifier);
 }
 
 bool cansee_unit(const unit * u, const unit * target, int modifier)
@@ -4427,7 +4423,7 @@ bool
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
     if (((f == u->faction) || !fval(u, UFL_ANON_FACTION))
-        && cansee(f, r, u, modifier, seen_unit))
+        && cansee(f, r, u, modifier))
         return true;
     return false;
 }

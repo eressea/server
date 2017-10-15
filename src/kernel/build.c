@@ -113,7 +113,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2->faction != u->faction && is_guard(u2)
-                && cansee_depr(u2->faction, u->region, u, 0)
+                && cansee(u2->faction, u->region, u, 0)
                 && !alliedunit(u, u2->faction, HELP_GUARD)) {
                 cmistake(u, ord, 70, MSG_EVENT);
                 return;

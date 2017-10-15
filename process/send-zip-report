@@ -27,7 +27,7 @@ fi
 if [ -e $GAME/$TEMPLATE ]; then
 TEMPLATE=$GAME/$TEMPLATE
 else
-TEMPLATE=$ERESSEA/etc/$TEMPLATE
+TEMPLATE=$ERESSEA/server/etc/$TEMPLATE
 fi
 
 if [ ! -e $TEMPLATE ]; then
