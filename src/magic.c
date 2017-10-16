@@ -1621,7 +1621,7 @@ order * ord)
         if (u->region != r)
             u = NULL;
         else if (sp->sptyp & TESTCANSEE) {
-            if (!cansee_depr(mage->faction, r, u, 0) && !ucontact(u, mage)) {
+            if (!cansee(mage->faction, r, u, 0) && !ucontact(u, mage)) {
                 u = NULL;
             }
         }

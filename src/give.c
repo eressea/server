@@ -614,7 +614,7 @@ bool can_give_to(unit *u, unit *u2) {
         return false;
     }
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
-        && !cansee_depr(u->faction, u->region, u2, 0) && !ucontact(u2, u)
+        && !cansee(u->faction, u->region, u2, 0) && !ucontact(u2, u)
         && !fval(u2, UFL_TAKEALL)) {
         return false;
     }

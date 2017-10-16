@@ -1579,60 +1579,6 @@ static void test_demon_hunger(CuTest * tc)
     test_cleanup();
 }
 
-static void test_cansee(CuTest *tc) {
-    unit *u, *u2;
-
-    test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u2 = test_create_unit(test_create_faction(0), u->region);
-
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-
-    set_level(u2, SK_STEALTH, 1);
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 1, seen_spell));
-
-    set_level(u, SK_PERCEPTION, 1);
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-
-    test_cleanup();
-}
-
-static void test_cansee_items(CuTest *tc) {
-    unit *u, *u2;
-    item_type *itype[3];
-
-    test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u2 = test_create_unit(test_create_faction(0), u->region);
-    scale_number(u2, 2);
-
-    itype[0] = test_create_itemtype("roi");
-    itype[1] = test_create_itemtype("sphereofinv");
-    itype[2] = test_create_itemtype("aots");
-    CuAssertPtrNotNull(tc, get_resourcetype(R_RING_OF_INVISIBILITY));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_SPHERE_OF_INVISIBILITY));
-    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
-
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-
-    i_change(&u2->items, itype[0], 1);
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-
-    i_change(&u2->items, itype[0], 1);
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-
-    i_change(&u->items, itype[2], 1);
-    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0, seen_unit));
-    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0, seen_spell));
-
-    test_cleanup();
-}
-
 static void test_armedmen(CuTest *tc) {
     /* TODO: test RCF_NOWEAPONS and SK_WEAPONLESS */
     unit *u;
@@ -1666,6 +1612,109 @@ static void test_armedmen(CuTest *tc) {
     wtype->flags |= WTF_SIEGE;
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     CuAssertIntEquals(tc, 1, armedmen(u, true));
+    test_cleanup();
+}
+
+static void test_cansee(CuTest *tc) {
+    unit *u, *u2;
+    
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    
+    set_level(u, SK_PERCEPTION, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+    
+    test_cleanup();
+}
+
+static void test_cansee_spell(CuTest *tc) {
+    unit *u2;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 0, seen_battle));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee_ex(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 1, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 1, seen_battle));
+
+    test_cleanup();
+}
+
+static void test_cansee_ring(CuTest *tc) {
+    unit *u, *u2;
+    item_type *itype[2];
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    scale_number(u2, 2);
+
+    itype[0] = test_create_itemtype("roi");
+    itype[1] = test_create_itemtype("aots");
+    CuAssertPtrNotNull(tc, get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrEquals(tc, itype[0]->rtype, (void *)get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+    CuAssertPtrEquals(tc, itype[1]->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* a single ring is not enough to hide two people */
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* two rings can hide two people */
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+
+    /* one amulet negates one of the two rings */
+    i_change(&u->items, itype[1], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_cleanup();
+}
+
+static void test_cansee_sphere(CuTest *tc) {
+    unit *u, *u2;
+    item_type *itype[2];
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+
+    itype[0] = test_create_itemtype("sphereofinv");
+    itype[1] = test_create_itemtype("aots");
+    CuAssertPtrNotNull(tc, get_resourcetype(R_SPHERE_OF_INVISIBILITY));
+    CuAssertPtrEquals(tc, itype[0]->rtype, (void *)get_resourcetype(R_SPHERE_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+    CuAssertPtrEquals(tc, itype[1]->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* a single sphere can hide 100 people */
+    scale_number(u2, 100);
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+
+    /* one single amulet negates it? */
+    i_change(&u->items, itype[1], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* number of people inside the sphere does not matter? */
+    scale_number(u2, 99);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
     test_cleanup();
 }
 
@@ -1738,7 +1787,9 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
     SUITE_ADD_TEST(suite, test_cansee);
-    SUITE_ADD_TEST(suite, test_cansee_items);
+    SUITE_ADD_TEST(suite, test_cansee_ring);
+    SUITE_ADD_TEST(suite, test_cansee_sphere);
+    SUITE_ADD_TEST(suite, test_cansee_spell);
 
     return suite;
 }

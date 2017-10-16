@@ -362,11 +362,11 @@ int report_action(region * r, unit * actor, message * msg, int flags)
                 if (view == ACTION_CANSEE) {
                     /* Bei Fernzaubern sieht nur die eigene Partei den Magier */
                     show = show || (r == actor->region
-                        && cansee_depr(u->faction, r, actor, 0));
+                        && cansee(u->faction, r, actor, 0));
                 }
                 else if (view == ACTION_CANNOTSEE) {
                     show = !show && !(r == actor->region
-                        && cansee_depr(u->faction, r, actor, 0));
+                        && cansee(u->faction, r, actor, 0));
                 }
                 else {
                     /* the unliely (or lazy) case */
@@ -1328,7 +1328,7 @@ static int sp_rosthauch(castorder * co)
                 "mage target amount", mage, u, ironweapon));
             ADDMSG(&u->faction->msgs, msg_message("rust_effect",
                 "mage target amount",
-                cansee_depr(u->faction, r, mage, 0) ? mage : NULL, u, ironweapon));
+                cansee(u->faction, r, mage, 0) ? mage : NULL, u, ironweapon));
             success += ironweapon;
         }
         else {
@@ -1405,7 +1405,7 @@ static int sp_kaelteschutz(castorder * co)
             u));
         if (u->faction != mage->faction)
             ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
-                cansee_depr(u->faction, r, mage, 0) ? mage : NULL, u));
+                cansee(u->faction, r, mage, 0) ? mage : NULL, u));
         i = cast_level;
     }
     /* Erstattung? */
@@ -1825,7 +1825,7 @@ static int sp_treewalkenter(castorder * co)
             m = NULL;
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, r, u, 0)) {
+                    if (cansee(u2->faction, r, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_disappear", "unit", u);
@@ -1842,7 +1842,7 @@ static int sp_treewalkenter(castorder * co)
             m = NULL;
             for (u2 = rt->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, rt, u, 0)) {
+                    if (cansee(u2->faction, rt, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_appear", "unit", u);
@@ -1971,7 +1971,7 @@ static int sp_treewalkexit(castorder * co)
                 m = NULL;
                 for (u2 = r->units; u2; u2 = u2->next) {
                     if (!fval(u2->faction, FFL_SELECT)) {
-                        if (cansee_depr(u2->faction, r, u, 0)) {
+                        if (cansee(u2->faction, r, u, 0)) {
                             fset(u2->faction, FFL_SELECT);
                             if (!m)
                                 m = msg_message("astral_disappear", "unit", u);
@@ -1989,7 +1989,7 @@ static int sp_treewalkexit(castorder * co)
                 m = NULL;
                 for (u2 = rt->units; u2; u2 = u2->next) {
                     if (!fval(u2->faction, FFL_SELECT)) {
-                        if (cansee_depr(u2->faction, rt, u, 0)) {
+                        if (cansee(u2->faction, rt, u, 0)) {
                             fset(u2->faction, FFL_SELECT);
                             if (!m)
                                 m = msg_message("astral_appear", "unit", u);
@@ -2954,7 +2954,7 @@ static int sp_deathcloud(castorder * co)
         if (!fval(u->faction, FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
             ADDMSG(&u->faction->msgs, msg_message("deathcloud_effect",
-                "mage region", cansee_depr(u->faction, r, mage, 0) ? mage : NULL, r));
+                "mage region", cansee(u->faction, r, mage, 0) ? mage : NULL, r));
         }
     }
 
@@ -3848,7 +3848,7 @@ static int sp_song_of_peace(castorder * co)
         if (!fval(u->faction, FFL_SELECT)) {
             message *m = NULL;
             fset(u->faction, FFL_SELECT);
-            if (cansee_depr(u->faction, r, mage, 0)) {
+            if (cansee(u->faction, r, mage, 0)) {
                 if (msg[0] == NULL)
                     msg[0] = msg_message("song_of_peace_effect_0", "mage", mage);
                 m = msg[0];
@@ -3905,7 +3905,7 @@ static int sp_generous(castorder * co)
         if (!fval(u->faction, FFL_SELECT)) {
             message *m = NULL;
             fset(u->faction, FFL_SELECT);
-            if (cansee_depr(u->faction, r, mage, 0)) {
+            if (cansee(u->faction, r, mage, 0)) {
                 if (msg[0] == NULL)
                     msg[0] = msg_message("generous_effect_0", "mage", mage);
                 m = msg[0];
@@ -5040,7 +5040,7 @@ int sp_enterastral(castorder * co)
             m = NULL;
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, r, u, 0)) {
+                    if (cansee(u2->faction, r, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_disappear", "unit", u);
@@ -5058,7 +5058,7 @@ int sp_enterastral(castorder * co)
             m = NULL;
             for (u2 = rt->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, rt, u, 0)) {
+                    if (cansee(u2->faction, rt, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_appear", "unit", u);
@@ -5184,7 +5184,7 @@ int sp_pullastral(castorder * co)
             m = NULL;
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, r, u, 0)) {
+                    if (cansee(u2->faction, r, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_disappear", "unit", u);
@@ -5202,7 +5202,7 @@ int sp_pullastral(castorder * co)
             m = NULL;
             for (u2 = rt->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, rt, u, 0)) {
+                    if (cansee(u2->faction, rt, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_appear", "unit", u);
@@ -5315,7 +5315,7 @@ int sp_leaveastral(castorder * co)
             m = NULL;
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, r, u, 0)) {
+                    if (cansee(u2->faction, r, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_disappear", "unit", u);
@@ -5333,7 +5333,7 @@ int sp_leaveastral(castorder * co)
             m = NULL;
             for (u2 = rt->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee_depr(u2->faction, rt, u, 0)) {
+                    if (cansee(u2->faction, rt, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_appear", "unit", u);
@@ -5443,7 +5443,7 @@ int sp_fetchastral(castorder * co)
         m = NULL;
         for (u2 = ro->units; u2; u2 = u2->next) {
             if (!fval(u2->faction, FFL_SELECT)) {
-                if (cansee_depr(u2->faction, ro, u, 0)) {
+                if (cansee(u2->faction, ro, u, 0)) {
                     fset(u2->faction, FFL_SELECT);
                     if (!m)
                         m = msg_message("astral_disappear", "unit", u);
@@ -5460,7 +5460,7 @@ int sp_fetchastral(castorder * co)
         m = NULL;
         for (u2 = rt->units; u2; u2 = u2->next) {
             if (!fval(u2->faction, FFL_SELECT)) {
-                if (cansee_depr(u2->faction, rt, u, 0)) {
+                if (cansee(u2->faction, rt, u, 0)) {
                     fset(u2->faction, FFL_SELECT);
                     if (!m)
                         m = msg_message("astral_appear", "unit", u);

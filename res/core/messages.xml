@@ -7154,7 +7154,7 @@
     <text locale="de">"Das Wurmloch in $region($region) schließt sich."</text>
     <text locale="en">"The wormhole in $region($region) disappears."</text>
   </message>
-  <message name="battle::useflamingsword" section="battle">
+  <message name="useflamingsword" section="battle">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="amount" type="int"/>
@@ -7162,7 +7162,7 @@
     <text locale="de">"$int($amount) Krieger von $unit($unit) benutzen ihre Flammenschwerter."</text>
     <text locale="en">"$int($amount) fighters of $unit($unit) are using their flaming sword."</text>
   </message>
-  <message name="battle::usecatapult" section="battle">
+  <message name="usecatapult" section="battle">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="amount" type="int"/>
@@ -7170,35 +7170,35 @@
     <text locale="de">"$int($amount) Krieger von $unit($unit) feuern ihre Katapulte ab."</text>
     <text locale="en">"$int($amount) fighters of $unit($unit) launch their catapults."</text>
   </message>
-  <message name="battle::starters" section="battle">
+  <message name="start_battle" section="battle">
     <type>
       <arg name="factions" type="string"/>
     </type>
     <text locale="de">"Der Kampf wurde ausgelöst von ${factions}."</text>
     <text locale="en">"The battle was initiated by ${factions}."</text>
   </message>
-  <message name="battle::potionsave" section="battle">
+  <message name="potionsave" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"Eine Person von $unit($unit) konnte durch einen Heiltrank überleben."</text>
     <text locale="en">"A fighter of $unit($unit) was saved by a healing potion."</text>
   </message>
-  <message name="battle::tactics_lost" section="battle">
+  <message name="tactics_lost" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) konnte dem Gegner eine Falle stellen."</text>
     <text locale="en">"$unit($unit) lured the enemy into an ambush."</text>
   </message>
-  <message name="battle::tactics_won" section="battle">
+  <message name="tactics_won" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
     <text locale="de">"$unit($unit) überrascht den Gegner."</text>
     <text locale="en">"$unit($unit) surprises the enemies."</text>
   </message>
-  <message name="battle::spell_failed" section="battle">
+  <message name="spell_failed" section="battle">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="spell" type="spell"/>
@@ -7206,20 +7206,20 @@
     <text locale="de">"$unit($unit) versucht $spell($spell) zu zaubern, doch der Zauber schlägt fehl!"</text>
     <text locale="en">"$unit($unit) tries to cast $spell($spell), but the spell fails!"</text>
   </message>
-  <message name="battle::aborted" section="battle">
+  <message name="aborted_battle" section="battle">
     <type>
     </type>
     <text locale="de">"Der Kampf wurde abgebrochen, da alle Verteidiger flohen."</text>
     <text locale="en">"The battle was aborted because all enemies escaped."</text>
   </message>
-  <message name="battle::row_header" section="battle">
+  <message name="battle_row" section="battle">
     <type>
       <arg name="row" type="int"/>
     </type>
     <text locale="de">"... in der $int($row). Kampflinie:"</text>
     <text locale="en">"... in combat rank $int($row):"</text>
   </message>
-  <message name="battle::out_of_range" section="battle">
+  <message name="spell_out_of_range" section="battle">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
@@ -7228,14 +7228,14 @@
     <text locale="en">"$unit($mage) casts $spell($spell), but nobody was in range."</text>
   </message>
 
-  <message name="battle::after" section="battle">
+  <message name="after_battle" section="battle">
     <type>
     </type>
     <text locale="de">"Einheiten nach dem Kampf:"</text>
     <text locale="en">"Units after the battle:"</text>
   </message>
   
-  <message name="battle::section" section="battle">
+  <message name="section_battle" section="battle">
     <type>
     </type>
     <text locale="de">""</text>
@@ -7301,21 +7301,21 @@
     <text locale="en">"$unit($mage) causes the walls of $building($building) to glow in an eerie magic light."</text>
   </message>
   
-  <message name="battle::lineup" section="battle">
+  <message name="lineup_battle" section="battle">
     <type>
       <arg name="turn" type="int"/>
     </type>
     <text locale="de">"Einheiten vor der $int($turn). Runde:"</text>
     <text locale="en">"Units before turn $int($turn):"</text>
   </message>
-  <message name="battle::header" section="battle">
+  <message name="header_battle" section="battle">
     <type>
       <arg name="region" type="region"/>
     </type>
     <text locale="de">"In $region($region) findet ein Kampf statt."</text>
     <text locale="en">"There is a battle in $region($region)."</text>
   </message>
-  <message name="battle::combatspell" section="battle">
+  <message name="cast_combatspell" section="battle">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
@@ -7516,7 +7516,7 @@
     <text locale="en">"$unit($mage) casts $spell($spell). $int($amount) fighters are temporarily losing some of their memories."</text>
   </message>
 
-  <message name="battle::killed" section="battle">
+  <message name="killed_battle" section="battle">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="dead" type="int"/>
@@ -7524,7 +7524,7 @@
     <text locale="de">"$unit($unit) tötete $int($dead) Krieger."</text>
     <text locale="en">"$unit($unit) killed $int($dead) opponents."</text>
   </message>
-  <message name="battle::army_report" section="battle">
+  <message name="army_report" section="battle">
     <type>
       <arg name="index" type="int"/>
       <arg name="abbrev" type="string"/>
