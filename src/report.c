@@ -768,7 +768,7 @@ static void rp_battles(struct stream *out, faction * f)
 
         while (bm) {
             char buf[256];
-            RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
+            RENDER(f, buf, sizeof(buf), ("header_battle", "region", bm->r));
             newline(out);
             centre(out, buf, true);
             newline(out);
