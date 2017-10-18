@@ -131,7 +131,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (enemies == 0) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -144,7 +144,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
         killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
     }
 
-    m = msg_message("battle::combatspell", "mage spell dead",
+    m = msg_message("cast_combatspell", "mage spell dead",
         fi->unit, sp, killed);
     message_all(b, m);
     msg_release(m);
@@ -171,7 +171,7 @@ int sp_petrify(struct castorder * co)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -218,7 +218,7 @@ int sp_stun(struct castorder * co)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -366,7 +366,7 @@ int sp_sleep(struct castorder * co)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
     if (!enemies) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -485,7 +485,7 @@ int sp_mindblast_temp(struct castorder * co)
     int enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
     if (!enemies) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -551,7 +551,7 @@ int sp_mindblast(struct castorder * co)
     int enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
     if (!enemies) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -634,7 +634,7 @@ int sp_dragonodem(struct castorder * co)
 
     if (!enemies) {
         struct message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -653,7 +653,7 @@ int sp_dragonodem(struct castorder * co)
         }
 
         m =
-            msg_message("battle::combatspell", "mage spell dead", fi->unit, sp,
+            msg_message("cast_combatspell", "mage spell dead", fi->unit, sp,
             killed);
         message_all(b, m);
         msg_release(m);
@@ -682,7 +682,7 @@ int sp_immolation(struct castorder * co)
 
     if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -710,7 +710,7 @@ int sp_immolation(struct castorder * co)
     selist_free(fgs);
 
     m =
-        msg_message("battle::combatspell", "mage spell killed", fi->unit, sp,
+        msg_message("cast_combatspell", "mage spell killed", fi->unit, sp,
         killed);
     message_all(b, m);
     msg_release(m);
@@ -736,7 +736,7 @@ int sp_drainodem(fighter * fi, int level, double power, spell * sp)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
 
     if (!enemies) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -917,7 +917,7 @@ int sp_chaosrow(struct castorder * co)
     bool chaosrow = strcmp(sp->sname, "chaosrow") == 0;
 
     if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -1167,7 +1167,7 @@ int sp_frighten(struct castorder * co)
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (!enemies) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -1217,7 +1217,7 @@ int sp_tiredsoldiers(struct castorder * co)
     if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW,
         SELECT_ADVANCE | SELECT_FIND)) {
         message *m =
-            msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -1263,7 +1263,7 @@ int sp_windshield(struct castorder * co)
 
     enemies = count_enemies(b, fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
-        m = msg_message("battle::out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;

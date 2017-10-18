@@ -193,7 +193,7 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
                 if (ru->number) {
                     faction *fv = visible_faction(f, ru);
                     if (fv == f) {
-                        if (cansee_depr(f, lastr, ru, 0))
+                        if (cansee(f, lastr, ru, 0))
                             return true;
                     }
                 }

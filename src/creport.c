@@ -1498,7 +1498,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         for (u = r->units; u; u = u->next) {
 
             if (u->building || u->ship || (stealthmod > INT_MIN
-                && cansee(f, r, u, stealthmod, r->seen.mode))) {
+                && cansee_ex(f, r, u, stealthmod, r->seen.mode))) {
                 cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }

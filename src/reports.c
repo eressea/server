@@ -961,7 +961,7 @@ struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
 const struct unit *ucansee(const struct faction *f, const struct unit *u,
     const struct unit *x)
 {
-    if (cansee_depr(f, u->region, u, 0))
+    if (cansee(f, u->region, u, 0))
         return u;
     return x;
 }
@@ -1070,7 +1070,7 @@ void get_addresses(report_context * ctx)
                 faction *sf = visible_faction(ctx->f, u);
                 if (lastf != sf) {
                     if (u->building || u->ship || (stealthmod > INT_MIN
-                        && cansee_depr(ctx->f, r, u, stealthmod))) {
+                        && cansee(ctx->f, r, u, stealthmod))) {
                         add_seen_faction_i(&flist, sf);
                         lastf = sf;
                     }
@@ -1088,7 +1088,7 @@ void get_addresses(report_context * ctx)
                 if (u->faction != ctx->f) {
                     faction *sf = visible_faction(ctx->f, u);
                     bool ballied = sf && sf != ctx->f && sf != lastf
-                        && !fval(u, UFL_ANON_FACTION) && cansee_depr(ctx->f, r, u, stealthmod);
+                        && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
                     if (ballied || is_allied(ctx->f, sf)) {
                         add_seen_faction_i(&flist, sf);
                         lastf = sf;

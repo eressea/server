@@ -768,7 +768,7 @@ static void rp_battles(struct stream *out, faction * f)
 
         while (bm) {
             char buf[256];
-            RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
+            RENDER(f, buf, sizeof(buf), ("header_battle", "region", bm->r));
             newline(out);
             centre(out, buf, true);
             newline(out);
@@ -2350,7 +2350,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
         while (u && !u->ship) {
             if (stealthmod > INT_MIN && r->seen.mode >= seen_unit) {
-                if (u->faction == f || cansee(f, r, u, stealthmod, r->seen.mode)) {
+                if (u->faction == f || cansee_ex(f, r, u, stealthmod, r->seen.mode)) {
                     nr_unit(out, f, u, 4, r->seen.mode);
                 }
             }
