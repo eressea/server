@@ -101,10 +101,11 @@ static dictionary *parse_config(const char *filename)
     if (cfgpath) {
         join_path(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
-        d  = iniparser_load(path);
-    } else {
+        d = iniparser_load(path);
+    }
+    else {
         log_debug("reading from configuration file %s\n", filename);
-        d  = iniparser_load(filename);        
+        d = iniparser_load(filename);
     }
     if (d) {
         config_set_from(d, valid_keys);
@@ -168,8 +169,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr = LOG_CPERROR;
-    int log_flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
+    int log_stderr, log_flags = 2;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -179,9 +179,9 @@ static int parse_args(int argc, char **argv)
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
                 printf("Eressea version %s, "
-	            "Copyright (C) 2017 Enno Rehling et al.\n",
+                    "Copyright (C) 2017 Enno Rehling et al.\n",
                     eressea_version());
-	return 1;
+                return 1;
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
@@ -300,8 +300,8 @@ int main(int argc, char **argv)
     setup_signal_handler();
     /* parse arguments again, to override ini file */
     err = parse_args(argc, argv);
-    if (err!=0) {
-        return (err>0) ? 0 : err;
+    if (err != 0) {
+        return (err > 0) ? 0 : err;
     }
     d = parse_config(inifile);
     if (!d) {

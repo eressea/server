@@ -487,9 +487,9 @@ static void test_drifting_ships(CuTest *tc) {
     r2 = test_create_region(1, 0, t_ocean);
     st_boat = test_create_shiptype("boat");
     sh = test_create_ship(r1, st_boat);
-    CuAssertPtrEquals(tc, r2, drift_target(sh));
+    CuAssertIntEquals(tc, D_EAST, drift_target(sh));
     r3 = test_create_region(-1, 0, t_plain);
-    CuAssertPtrEquals(tc, r3, drift_target(sh));
+    CuAssertIntEquals(tc, D_WEST, drift_target(sh));
     test_cleanup();
 }
 
