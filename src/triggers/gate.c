@@ -74,16 +74,11 @@ static void gate_write(const trigger * t, struct storage *store)
 static int gate_read(trigger * t, gamedata *data)
 {
     gate_data *gd = (gate_data *)t->data.v;
+    int bc = read_building_reference(data, &gd->gate, NULL);
+    int rc = read_region_reference(data, &gd->target, NULL);
 
-    int bc =
-        read_reference(&gd->gate, data, read_building_reference, resolve_building);
-    int rc =
-        read_reference(&gd->target, data, read_region_reference,
-            RESOLVE_REGION(data->version));
-
-    if (bc == 0 && rc == 0) {
-        if (!gd->gate || !gd->target)
-            return AT_READ_FAIL;
+    if (bc <= 0 && rc <= 0) {
+        return AT_READ_FAIL;
     }
     return AT_READ_OK;
 }

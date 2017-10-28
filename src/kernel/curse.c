@@ -191,12 +191,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     READ_INT(store, &c->duration);
     READ_FLT(store, &flt);
     c->vigour = flt;
-    if (data->version < INTPAK_VERSION) {
-        ur = resolve_unit(read_int(data->store), &c->magician);
-    }
-    else {
-        ur = read_reference(&c->magician, data, read_unit_reference, resolve_unit);
-    }
+    ur = read_unit_reference(data, &c->magician, NULL);
     if (data->version < CURSEFLOAT_VERSION) {
         READ_INT(store, &n);
         c->effect = (float)n;
@@ -231,9 +226,7 @@ int curse_read(attrib * a, void *owner, gamedata *data)
         READ_INT(store, &c->data.i);
     }
     if (c->type->typ == CURSETYP_REGION) {
-        int rr =
-            read_reference(&c->data.v, data, read_region_reference,
-                RESOLVE_REGION(data->version));
+        int rr = read_region_reference(data, (region **)&c->data.v, NULL);
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }
@@ -273,8 +266,7 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
-    NULL,
-    ATF_CURSE
+    NULL
 };
 
 /* ------------------------------------------------------------- */
@@ -363,7 +355,7 @@ void ct_checknames(void) {
 static bool cmp_curse(const attrib * a, const void *data)
 {
     const curse *c = (const curse *)data;
-    if (a->type->flags & ATF_CURSE) {
+    if (a->type == &at_curse) {
         if (!data || c == (curse *)a->data.v)
             return true;
     }
@@ -375,7 +367,7 @@ curse *get_curse(attrib * ap, const curse_type * ctype)
     attrib *a = ap;
     if (!ctype) return NULL;
     while (a) {
-        if (a->type->flags & ATF_CURSE) {
+        if (a->type == &at_curse) {
             const attrib_type *at = a->type;
             while (a && a->type == at) {
                 curse *c = (curse *)a->data.v;
@@ -710,7 +702,7 @@ bool is_cursed_with(const attrib * ap, const curse * c)
     const attrib *a = ap;
 
     while (a) {
-        if ((a->type->flags & ATF_CURSE) && (c == (const curse *)a->data.v)) {
+        if ((a->type == &at_curse) && (c == (const curse *)a->data.v)) {
             return true;
         }
         a = a->next;

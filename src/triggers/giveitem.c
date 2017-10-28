@@ -86,15 +86,16 @@ static int giveitem_read(trigger * t, gamedata *data)
 {
     giveitem_data *td = (giveitem_data *)t->data.v;
     char zText[128];
+    int result;
 
-    int result = read_reference(&td->u, data, read_unit_reference, resolve_unit);
+    result = read_unit_reference(data, &td->u, NULL);
 
     READ_INT(data->store, &td->number);
     READ_TOK(data->store, zText, sizeof(zText));
     td->itype = it_find(zText);
     assert(td->itype);
 
-    if (result == 0 && td->u == NULL) {
+    if (result == 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

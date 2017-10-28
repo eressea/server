@@ -8,6 +8,7 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
+    eressea.settings.set("study.produceexp", "0")
 end
 
 function test_calendar()
@@ -57,6 +58,7 @@ function test_dwarf_bonus()
     u.building = building.create(r, "mine")
     u.building.size = 10
     u:add_item("money", 500) -- maintenance
+    assert_equal(1, u:get_skill("mining"))
     process_orders()
     assert_equal(70, u:get_item("iron"))
     assert_equal(70, r:get_resource("iron"))

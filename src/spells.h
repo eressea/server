@@ -22,11 +22,10 @@
 extern "C" {
 #endif
 
+    struct castorder;
     struct curse_type;
     struct region;
     struct unit;
-    struct faction;
-    struct region;
     struct message;
 
     extern const struct curse_type ct_magicresistance;
@@ -34,8 +33,9 @@ extern "C" {
     void register_magicresistance(void);
     void register_spells(void);
 
-    int sp_baddreams(castorder * co);
-    int sp_gooddreams(castorder * co);
+    int sp_baddreams(struct castorder * co);
+    int sp_gooddreams(struct castorder * co);
+    int sp_viewreality(struct castorder * co);
 
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */

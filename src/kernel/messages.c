@@ -83,7 +83,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     variant var;
     memset(args, 0, sizeof(args));
 
-    if (ord && ord->_noerror) {
+    if (ord && is_silent(ord)) {
         return NULL;
     }
 

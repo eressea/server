@@ -42,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
 #include <kernel/curse.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -322,17 +323,27 @@ attrib_type at_mage = {
 
 bool is_mage(const unit * u)
 {
-    return get_mage(u) != NULL;
+    return get_mage_depr(u) != NULL;
 }
 
 sc_mage *get_mage(const unit * u)
 {
+    attrib *a = a_find(u->attribs, &at_mage);
+    if (a) {
+        return (sc_mage *)a->data.v;
+    }
+    return NULL;
+}
+
+sc_mage *get_mage_depr(const unit * u)
+{
     if (has_skill(u, SK_MAGIC)) {
         attrib *a = a_find(u->attribs, &at_mage);
-        if (a)
-            return a->data.v;
+        if (a) {
+            return (sc_mage *)a->data.v;
+        }
     }
-    return (sc_mage *)NULL;
+    return NULL;
 }
 
 /* ------------------------------------------------------------- */
@@ -355,9 +366,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     }
     sp = find_spell(token);
     if (!sp) {
-        log_warning("read_seenspell: could not find spell '%s'\n", token);
-    }
-    if (!sp) {
+        log_info("read_seenspell: could not find spell '%s'\n", token);
         return AT_READ_FAIL;
     }
     a->data.v = sp;
@@ -479,12 +488,10 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
     attrib *a;
 
     a = a_find(u->attribs, &at_mage);
-    if (a != NULL) {
-        a_remove(&u->attribs, a);
+    if (a == NULL) {
+        a = a_add(&u->attribs, a_new(&at_mage));
     }
-    a = a_add(&u->attribs, a_new(&at_mage));
-    mage = a->data.v;
-
+    mage = (sc_mage *)a->data.v;
     mage->magietyp = mtyp;
     return mage;
 }
@@ -507,7 +514,7 @@ int u_hasspell(const unit *u, const struct spell *sp)
 
 int get_combatspelllevel(const unit * u, int nr)
 {
-    sc_mage *m = get_mage(u);
+    sc_mage *m = get_mage_depr(u);
 
     assert(nr < MAXCOMBATSPELLS);
     if (m) {
@@ -525,7 +532,7 @@ const spell *get_combatspell(const unit * u, int nr)
     sc_mage *m;
 
     assert(nr < MAXCOMBATSPELLS);
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (m) {
         return m->combatspells[nr].sp;
     }
@@ -534,7 +541,7 @@ const spell *get_combatspell(const unit * u, int nr)
 
 void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 {
-    sc_mage *mage = get_mage(u);
+    sc_mage *mage = get_mage_depr(u);
     int i = -1;
 
     assert(mage || !"trying to set a combat spell for non-mage");
@@ -574,7 +581,7 @@ void unset_combatspell(unit * u, spell * sp)
     int nr = 0;
     int i;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return;
 
@@ -610,7 +617,7 @@ int get_spellpoints(const unit * u)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -621,7 +628,7 @@ void set_spellpoints(unit * u, int sp)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return;
 
@@ -638,7 +645,7 @@ int change_spellpoints(unit * u, int mp)
     sc_mage *m;
     int sp;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m) {
         return 0;
     }
@@ -657,7 +664,7 @@ static int get_spchange(const unit * u)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -711,7 +718,7 @@ int change_maxspellpoints(unit * u, int csp)
 {
     sc_mage *m;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m) {
         return 0;
     }
@@ -729,7 +736,7 @@ int countspells(unit * u, int step)
     sc_mage *m;
     int count;
 
-    m = get_mage(u);
+    m = get_mage_depr(u);
     if (!m)
         return 0;
 
@@ -1313,7 +1320,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     }
 
     /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-    mage = get_mage(u);
+    mage = get_mage_depr(u);
     if (mage->magietyp == M_DRAIG) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
@@ -2139,16 +2146,6 @@ void free_castorders(castorder * co)
     return;
 }
 
-/* ------------------------------------------------------------- */
-/***
- ** at_familiarmage
- **/
-
-typedef struct familiar_data {
-    unit *mage;
-    unit *familiar;
-} famililar_data;
-
 bool is_familiar(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_familiarmage);
@@ -2181,7 +2178,7 @@ static int sm_familiar(const unit * u, const region * r, skill_t sk, int value)
     }
 }
 
-static void set_familiar(unit * mage, unit * familiar)
+void set_familiar(unit * mage, unit * familiar)
 {
     /* if the skill modifier for the mage does not yet exist, add it */
     attrib *a = a_find(mage->attribs, &at_skillmod);
@@ -2192,10 +2189,8 @@ static void set_familiar(unit * mage, unit * familiar)
         a = a->next;
     }
     if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
+        a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
+        a_add(&mage->attribs, a);
     }
 
     a = a_find(mage->attribs, &at_familiar);
@@ -2203,17 +2198,19 @@ static void set_familiar(unit * mage, unit * familiar)
         a = a_add(&mage->attribs, a_new(&at_familiar));
         a->data.v = familiar;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == familiar);
-    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+    }
 
+    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     a = a_find(familiar->attribs, &at_familiarmage);
     if (a == NULL) {
         a = a_add(&familiar->attribs, a_new(&at_familiarmage));
         a->data.v = mage;
     }
-    else
+    else {
         assert(!a->data.v || a->data.v == mage);
+    }
 }
 
 void remove_familiar(unit * mage)
@@ -2229,70 +2226,52 @@ void remove_familiar(unit * mage)
     while (a && a->type == &at_skillmod) {
         an = a->next;
         smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
+        if (smd->special == sm_familiar) {
             a_remove(&mage->attribs, a);
+        }
         a = an;
     }
 }
 
-bool create_newfamiliar(unit * mage, unit * familiar)
+void create_newfamiliar(unit * mage, unit * fam)
 {
-    /* if the skill modifier for the mage does not yet exist, add it */
-    attrib *a;
-    attrib *afam = a_find(mage->attribs, &at_familiar);
-    attrib *amage = a_find(familiar->attribs, &at_familiarmage);
+    /* skills and spells: */
+    const struct equipment *eq;
+    char eqname[64];
+    const race *rc = u_race(fam);
 
-    if (afam == NULL) {
-        afam = a_add(&mage->attribs, a_new(&at_familiar));
-    }
-    afam->data.v = familiar;
-    if (amage == NULL) {
-        amage = a_add(&familiar->attribs, a_new(&at_familiarmage));
-    }
-    amage->data.v = mage;
+    set_familiar(mage, fam);
 
+    snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
+    eq = get_equipment(eqname);
+    if (eq != NULL) {
+        equip_unit(fam, eq);
+    }
+    else {
+        log_info("could not perform initialization for familiar %s.\n", rc->_name);
+    }
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     /* Wenn der Magier stirbt, dann auch der Vertraute */
-    add_trigger(&mage->attribs, "destroy", trigger_killunit(familiar));
+    add_trigger(&mage->attribs, "destroy", trigger_killunit(fam));
     /* Wenn der Vertraute stirbt, dann bekommt der Magier einen Schock */
-    add_trigger(&familiar->attribs, "destroy", trigger_shock(mage));
-
-    a = a_find(mage->attribs, &at_skillmod);
-    while (a && a->type == &at_skillmod) {
-        skillmod_data *smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
-            break;
-        a = a->next;
-    }
-    if (a == NULL) {
-        attrib *an = a_add(&mage->attribs, a_new(&at_skillmod));
-        skillmod_data *smd = (skillmod_data *)an->data.v;
-        smd->special = sm_familiar;
-        smd->skill = NOSKILL;
-    }
-    return true;
+    add_trigger(&fam->attribs, "destroy", trigger_shock(mage));
 }
 
-static int resolve_familiar(variant data, void *addr)
-{
-    unit *familiar;
-    int result = resolve_unit(data, &familiar);
-    if (result == 0 && familiar) {
+static void * resolve_familiar(int id, void *data) {
+    if (data) {
+        unit *familiar = (unit *)data;
         attrib *a = a_find(familiar->attribs, &at_familiarmage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = familiar;
-    return result;
+    return data;
 }
 
 static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_familiar);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2357,53 +2336,42 @@ unit *has_clone(unit * mage)
     return NULL;
 }
 
-static int resolve_clone(variant data, void *addr)
-{
-    unit *clone;
-    int result = resolve_unit(data, &clone);
-    if (result == 0 && clone) {
+static void * resolve_clone(int id, void *data) {
+    if (data) {
+        unit *clone = (unit *)data;
         attrib *a = a_find(clone->attribs, &at_clonemage);
         if (a != NULL && a->data.v) {
             unit *mage = (unit *)a->data.v;
             set_clone(mage, clone);
         }
     }
-    *(unit **)addr = clone;
-    return result;
+    return data;
 }
 
 static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_clone);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
 }
 
 /* mages */
-
-static int resolve_mage(variant data, void *addr)
-{
-    unit *mage;
-    int result = resolve_unit(data, &mage);
-    if (result == 0 && mage) {
+static void * resolve_mage(int id, void *data) {
+    if (data) {
+        unit *mage = (unit *)data;
         attrib *a = a_find(mage->attribs, &at_familiar);
         if (a != NULL && a->data.v) {
             unit *familiar = (unit *)a->data.v;
             set_familiar(mage, familiar);
         }
     }
-    *(unit **)addr = mage;
-    return result;
+    return data;
 }
 
 static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
-    int result =
-        read_reference(&a->data.v, data, read_unit_reference, resolve_mage);
-    if (result == 0 && a->data.v == NULL) {
+    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -3019,30 +2987,36 @@ int cast_spell(struct castorder *co)
 
 static critbit_tree cb_spellbooks;
 
+#define SBNAMELEN 16
+
+typedef struct sb_entry {
+    char key[SBNAMELEN];
+    spellbook *value;
+} sb_entry;
+
 spellbook * get_spellbook(const char * name)
 {
-    char buffer[64];
-    spellbook * result;
-    void * match;
+    size_t len = strlen(name);
+    const void * match;
 
-    if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
-        cb_get_kv(match, &result, sizeof(result));
+    if (len >= SBNAMELEN) {
+        log_error("spellbook name is longer than %d bytes: %s", SBNAMELEN-1, name);
+        return NULL;
     }
-    else {
-        size_t len = strlen(name);
-        result = create_spellbook(name);
-        assert(strlen(name) + sizeof(result) < sizeof(buffer));
-        len = cb_new_kv(name, len, &result, sizeof(result), buffer);
-        if (cb_insert(&cb_spellbooks, buffer, len) == CB_EXISTS) {
+
+    match = cb_find_str(&cb_spellbooks, name);
+    if (!match) {
+        sb_entry ent;
+        memset(ent.key, 0, SBNAMELEN);
+        memcpy(ent.key, name, len);
+        ent.value = create_spellbook(name);
+        if (cb_insert(&cb_spellbooks, &ent, sizeof(ent)) == CB_EXISTS) {
             log_error("cb_insert failed although cb_find returned nothing for spellbook=%s", name);
             assert(!"should not happen");
         }
-        result = 0;
-        if (cb_find_prefix(&cb_spellbooks, name, strlen(name), &match, 1, 0) > 0) {
-            cb_get_kv(match, &result, sizeof(result));
-        }
+        return ent.value;
     }
-    return result;
+    return ((const sb_entry *)match)->value;
 }
 
 void free_spellbook(spellbook *sb) {
@@ -3051,9 +3025,8 @@ void free_spellbook(spellbook *sb) {
 }
 
 static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
-    spellbook *sb;
-    cb_get_kv(match, &sb, sizeof(sb));
-    free_spellbook(sb);
+    const sb_entry *ent = (const sb_entry *)match;
+    free_spellbook(ent->value);
     return 0;
 }
 

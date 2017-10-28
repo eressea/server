@@ -396,7 +396,6 @@ int a_age(attrib ** p, void *owner)
 
 static critbit_tree cb_deprecated = { 0 };
 
-
 typedef struct deprecated_s {
     unsigned int hash;
     int(*reader)(attrib *, void *, struct gamedata *);

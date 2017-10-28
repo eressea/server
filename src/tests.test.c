@@ -27,11 +27,12 @@ static void test_resources(CuTest *tc) {
     rtype = rt_get_or_create("stone");
     CuAssertPtrEquals(tc, (void *)rtype, (void *)rt_find("stone"));
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
-    test_cleanup();
+    free_resources();
     CuAssertPtrEquals(tc, 0, rt_find("stone"));
     CuAssertPtrEquals(tc, 0, rt_find("peasant"));
     rtype = rt_get_or_create("stone");
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
+    test_cleanup();
 }
 
 CuSuite *get_tests_suite(void)

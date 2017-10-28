@@ -3,6 +3,7 @@
 #include <platform.h>
 
 #include "json.h"
+#include "orderfile.h"
 
 #include <kernel/faction.h>
 #include <kernel/item.h>

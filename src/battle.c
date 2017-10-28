@@ -927,7 +927,7 @@ void kill_troop(troop dt)
         if (drops != NULL) {
             i_merge(&du->items, &drops);
         }
-        sprintf(eqname, "%s_spoils", rc->_name);
+        sprintf(eqname, "spo_%s", rc->_name);
         eq = get_equipment(eqname);
         if (eq != NULL) {
             equip_items(&du->items, eq);
@@ -1295,7 +1295,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
         if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
-            message *m = msg_message("battle::potionsave", "unit", du);
+            message *m = msg_message("potionsave", "unit", du);
             message_faction(b, du->faction, m);
             msg_release(m);
             i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
@@ -1630,7 +1630,7 @@ selist *fighters(battle * b, const side * vs, int minrow, int maxrow, int mask)
 
 static void report_failed_spell(struct battle * b, struct unit * mage, const struct spell *sp)
 {
-    message *m = msg_message("battle::spell_failed", "unit spell", mage, sp);
+    message *m = msg_message("spell_failed", "unit spell", mage, sp);
     message_all(b, m);
     msg_release(m);
 }
@@ -2277,7 +2277,7 @@ void do_attack(fighter * af)
      * Ladezeit neu und generiert die Meldung. */
     if (af->catmsg >= 0) {
         struct message *m =
-            msg_message("battle::killed", "unit dead", au, af->catmsg);
+            msg_message("killed_battle", "unit dead", au, af->catmsg);
         message_all(b, m);
         msg_release(m);
         af->catmsg = -1;
@@ -2752,10 +2752,10 @@ static void aftermath(battle * b)
     battle_effects(b, dead_players);
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        message *seen = msg_message("battle::army_report",
+        message *seen = msg_message("army_report",
             "index abbrev dead fled survived",
             army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
-        message *unseen = msg_message("battle::army_report",
+        message *unseen = msg_message("army_report",
             "index abbrev dead fled survived",
             army_index(s), "-?-", s->dead, s->flee, s->alive);
 
@@ -2864,7 +2864,7 @@ static void print_fighters(battle * b, const side * s)
 
             if (row == thisrow) {
                 if (m == NULL) {
-                    m = msg_message("battle::row_header", "row", row);
+                    m = msg_message("battle_row", "row", row);
                     message_all(b, m);
                 }
                 battle_punit(du, b);
@@ -2927,7 +2927,7 @@ static void print_header(battle * b)
             bufp = STRLCPY(bufp, lastf, size);
         }
 
-        m = msg_message("battle::starters", "factions", zText);
+        m = msg_message("start_battle", "factions", zText);
         message_faction(b, f, m);
         msg_release(m);
     }
@@ -3049,10 +3049,10 @@ static void print_stats(battle * b)
                     unit *u = tf->unit;
                     message *m = NULL;
                     if (!is_attacker(tf)) {
-                        m = msg_message("battle::tactics_lost", "unit", u);
+                        m = msg_message("tactics_lost", "unit", u);
                     }
                     else {
-                        m = msg_message("battle::tactics_won", "unit", u);
+                        m = msg_message("tactics_won", "unit", u);
                     }
                     message_all(b, m);
                     msg_release(m);
@@ -3579,9 +3579,9 @@ static int battle_report(battle * b)
         message_faction(b, fac, msg_separator);
 
         if (cont)
-            m = msg_message("battle::lineup", "turn", b->turn);
+            m = msg_message("lineup_battle", "turn", b->turn);
         else
-            m = msg_message("battle::after", "");
+            m = msg_message("after_battle", "");
         message_faction(b, fac, m);
         msg_release(m);
 
@@ -4073,7 +4073,7 @@ void do_battle(region * r)
     bool fighting = false;
     ship *sh;
     if (msg_separator == NULL) {
-        msg_separator = msg_message("battle::section", "");
+        msg_separator = msg_message("section_battle", "");
     }
 
     fighting = start_battle(r, &b);
@@ -4087,7 +4087,7 @@ void do_battle(region * r)
     print_header(b);
     if (!fighting) {
         /* Niemand mehr da, Kampf kann nicht stattfinden. */
-        message *m = msg_message("battle::aborted", "");
+        message *m = msg_message("aborted_battle", "");
         message_all(b, m);
         msg_release(m);
         free_battle(b);

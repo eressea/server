@@ -20,6 +20,7 @@ without prior permission by the authors of Eressea.
 #include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
+#include <util/gamedata.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/resolve.h>
@@ -290,10 +291,10 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
 }
 
 /* compat code for old data files */
-static int caldera_read(trigger *t, struct gamedata *data)
+static int caldera_read(trigger *t, gamedata *data)
 {
     UNUSED_ARG(t);
-    read_building_reference(data);
+    READ_INT(data->store, NULL);
     return AT_READ_FAIL;
 }
 

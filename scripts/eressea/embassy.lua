@@ -1,6 +1,6 @@
 -- Muschelplateau
 
-if not config.embassy then return nil end
+if not config.embassy or config.embassy==0 then return nil end
 
 local embassy = {}
 local home = nil

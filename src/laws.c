@@ -1559,11 +1559,11 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_REGION:
-        if (u->faction != region_get_owner(r)) {
+        if (!r->land || u->faction != region_get_owner(r)) {
             cmistake(u, ord, 147, MSG_EVENT);
             break;
         }
-        s = &r->display;
+        s = &r->land->display;
         break;
 
     default:
@@ -3007,10 +3007,100 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
+void maketemp_cmd(unit *u, order **olist) 
+{
+    order *makeord;
+    int err = checkunitnumber(u->faction, 1);
+
+    makeord = *olist;
+    if (err) {
+        if (err == 1) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, makeord,
+                    "too_many_units_in_alliance",
+                    "allowed", maxunits(u->faction)));
+        }
+        else {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, makeord,
+                    "too_many_units_in_faction",
+                    "allowed", maxunits(u->faction)));
+        }
+        *olist = makeord->next;
+        makeord->next = NULL;
+        free_order(makeord);
+        while (*olist) {
+            keyword_t kwd;
+            order * ord = *olist;
+            *olist = ord->next;
+            ord->next = NULL;
+            kwd = getkeyword(ord);
+            free_order(ord);
+            if (kwd == K_END) {
+                break;
+            }
+        }
+    }
+    else {
+        char token[128];
+        const char *s;
+        int alias;
+        ship *sh;
+        unit *u2;
+        order **ordp, **oinsert;
+#ifndef NDEBUG
+        keyword_t kwd = init_order(makeord);
+        assert(kwd == K_MAKETEMP);
+#endif
+        alias = getid();
+        s = gettoken(token, sizeof(token));
+        if (s && s[0] == '\0') {
+            /* empty name? => generate one */
+            s = NULL;
+        }
+        u2 = create_unit(u->region, u->faction, 0, u->faction->race, alias, s, u);
+        fset(u2, UFL_ISNEW);
+        a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
+        sh = leftship(u);
+        if (sh) {
+            set_leftship(u2, sh);
+        }
+        setstatus(u2, u->status);
+
+        /* copy orders until K_END from u to u2 */
+        ordp = &makeord->next;
+        oinsert = &u2->orders;
+
+        while (*ordp) {
+            order *ord = *ordp;
+            *ordp = ord->next;
+            if (getkeyword(ord) == K_END) {
+                ord->next = NULL;
+                free_order(ord);
+                break;
+            }
+            *oinsert = ord;
+            oinsert = &ord->next;
+            *oinsert = NULL;
+        }
+        *olist = *ordp;
+        makeord->next = NULL;
+        free_order(makeord);
+
+        if (!u2->orders) {
+            order *deford = default_order(u2->faction->locale);
+            if (deford) {
+                set_order(&u2->thisorder, NULL);
+                addlist(&u2->orders, deford);
+            }
+        }
+    }
+}
+
 void new_units(void)
 {
     region *r;
-    unit *u, *u2;
+    unit *u;
 
     /* neue einheiten werden gemacht und ihre befehle (bis zum "ende" zu
      * ihnen rueberkopiert, damit diese einheiten genauso wie die alten
@@ -3028,73 +3118,13 @@ void new_units(void)
             }
 
             while (*ordp) {
-                order *makeord = *ordp;
-                if (getkeyword(makeord) == K_MAKETEMP) {
-                    char token[128], *name = NULL;
-                    const char *s;
-                    int alias;
-                    ship *sh;
-                    order **newordersp;
-                    int err = checkunitnumber(u->faction, 1);
-
-                    if (err) {
-                        if (err == 1) {
-                            ADDMSG(&u->faction->msgs,
-                                msg_feedback(u, makeord,
-                                    "too_many_units_in_alliance",
-                                    "allowed", maxunits(u->faction)));
-                        }
-                        else {
-                            ADDMSG(&u->faction->msgs,
-                                msg_feedback(u, makeord,
-                                    "too_many_units_in_faction",
-                                    "allowed", maxunits(u->faction)));
-                        }
-                        ordp = &makeord->next;
-
-                        while (*ordp) {
-                            order *ord = *ordp;
-                            if (getkeyword(ord) == K_END)
-                                break;
-                            *ordp = ord->next;
-                            ord->next = NULL;
-                            free_order(ord);
-                        }
-                        continue;
-                    }
-                    init_order(makeord);
-                    alias = getid();
-
-                    s = gettoken(token, sizeof(token));
-                    if (s && s[0]) {
-                        name = strdup(s);
-                    }
-                    u2 = create_unit(r, u->faction, 0, u->faction->race, alias, name, u);
-                    if (name != NULL)
-                        free(name); /* TODO: use a buffer on the stack instead? */
-                    fset(u2, UFL_ISNEW);
-
-                    a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
-                    sh = leftship(u);
-                    if (sh) {
-                        set_leftship(u2, sh);
-                    }
-                    setstatus(u2, u->status);
-
-                    ordp = &makeord->next;
-                    newordersp = &u2->orders;
-                    while (*ordp) {
-                        order *ord = *ordp;
-                        if (getkeyword(ord) == K_END)
-                            break;
-                        *ordp = ord->next;
-                        ord->next = NULL;
-                        *newordersp = ord;
-                        newordersp = &ord->next;
-                    }
+                order *ord = *ordp;
+                if (getkeyword(ord) == K_MAKETEMP) {
+                    maketemp_cmd(u, ordp);
                 }
-                if (*ordp == makeord)
-                    ordp = &makeord->next;
+                else {
+                    ordp = &ord->next;
+                }
             }
         }
     }
@@ -3357,7 +3387,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
 
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
-            sc_mage *mage = get_mage(u);
+            sc_mage *mage = get_mage_depr(u);
             if (mage) {
                 int level = effskill(u, SK_MAGIC, 0);
                 if (level > maxlevel) {
@@ -3416,7 +3446,7 @@ static void update_spells(void)
             show_new_spells(f, maxlevel, faction_get_spellbook(f));
             for (i = 0; i != MAXMAGES && mages[i]; ++i) {
                 unit * u = mages[i];
-                sc_mage *mage = get_mage(u);
+                sc_mage *mage = get_mage_depr(u);
                 if (mage && mage->spellbook) {
                     int level = effskill(u, SK_MAGIC, 0);
                     show_new_spells(f, level, mage->spellbook);
@@ -4254,7 +4284,6 @@ bool
 cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
-    unit *u2 = r->units;
 
     if (u->faction == f || omniscient(f)) {
         return true;
@@ -4273,42 +4302,39 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
         }
     }
 
-    if (leftship(u))
-        return true;
-
-    while (u2 && u2->faction != f)
-        u2 = u2->next;
-    if (u2 == NULL)
-        return false;
-
-    /* simple visibility, just gotta have a unit in the region to see 'em */
-    if (is_guard(u) || usiege(u) || u->building || u->ship) {
+    /* simple visibility, just gotta have a viewer in the region to see 'em */
+    if (leftship(u) || is_guard(u) || usiege(u) || u->building || u->ship) {
         return true;
     }
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    while (u2) {
-        if (rings < u->number || invisible(u, u2) < u->number) {
-            if (skill_enabled(SK_PERCEPTION)) {
-                int observation = effskill(u2, SK_PERCEPTION, 0);
+    unit *u2;
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (u2->faction == f) {
+            if (rings < u->number || invisible(u, u2) < u->number) {
+                if (skill_enabled(SK_PERCEPTION)) {
+                    int observation = effskill(u2, SK_PERCEPTION, 0);
 
-                if (observation >= stealth) {
+                    if (observation >= stealth) {
+                        return true;
+                    }
+                }
+                else {
                     return true;
                 }
             }
-            else {
-                return true;
-            }
         }
-
-        /* find next unit in our faction */
-        do {
-            u2 = u2->next;
-        } while (u2 && u2->faction != f);
     }
-    return false;
+
+    return (rings <= 0 && stealth <= 0);
+}
+
+bool cansee_ex(const faction * f, const region * r, const unit * u, int modifier, seen_mode mode)
+{
+    UNUSED_ARG(mode);
+    return cansee(f, r, u, modifier);
 }
 
 bool cansee_unit(const unit * u, const unit * target, int modifier)

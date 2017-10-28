@@ -29,7 +29,7 @@ extern "C" {
     extern void register_attributes(void);
 
     void set_observer(struct region *r, struct faction *f, int perception, int turns);
-    int get_observer(struct region *r, struct faction *f);
+    int get_observer(const struct region *r, const struct faction *f);
 
 #ifdef __cplusplus
 }

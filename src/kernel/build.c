@@ -991,6 +991,7 @@ void free_construction(struct construction *cons)
 {
     while (cons) {
         construction *next = cons->improvement;
+        free(cons->name);
         free(cons->materials);
         free(cons);
         cons = next;

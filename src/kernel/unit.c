@@ -277,6 +277,10 @@ int gift_items(unit * u, int flags)
                     u->items = NULL;
                     break;
                 }
+                else if (!u3) {
+                    /* pick a last-chance recipient: */
+                    u3 = u2;
+                }
             }
         }
         if (u->items && u3) {
@@ -644,9 +648,7 @@ void a_writesiege(const attrib * a, const void *owner, struct storage *store)
 
 int a_readsiege(attrib * a, void *owner, gamedata *data)
 {
-    int result = read_reference(&a->data.v, data, read_building_reference,
-        resolve_building);
-    if (result == 0 && !a->data.v) {
+    if (read_building_reference(data, (building **)&a->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -747,25 +749,26 @@ void write_unit_reference(const unit * u, struct storage *store)
     WRITE_INT(store, (u && u->region) ? u->no : 0);
 }
 
-int resolve_unit(variant id, void *address)
+void resolve_unit(unit *u)
 {
-    unit *u = NULL;
-    if (id.i != 0) {
-        u = findunit(id.i);
-        if (u == NULL) {
-            *(unit **)address = NULL;
-            return -1;
-        }
-    }
-    *(unit **)address = u;
-    return 0;
+    resolve(RESOLVE_UNIT | u->no, u);
 }
 
-variant read_unit_reference(gamedata *data)
+int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
 {
-    variant var;
-    READ_INT(data->store, &var.i);
-    return var;
+    int id;
+    READ_INT(data->store, &id);
+    if (id > 0) {
+        *up = findunit(id);
+        if (*up == NULL) {
+            *up = NULL;
+            ur_add(RESOLVE_UNIT | id, (void **)up, fun);
+        }
+    }
+    else {
+        *up = NULL;
+    }
+    return id;
 }
 
 int get_level(const unit * u, skill_t id)
@@ -773,7 +776,7 @@ int get_level(const unit * u, skill_t id)
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
         skill *sv = u->skills;
-        while (sv != u->skills + u->skill_size) {
+        while (sv != u->skills + u->skill_size && sv->id <= id) {
             if (sv->id == id) {
                 return sv->level;
             }
@@ -795,7 +798,7 @@ void set_level(unit * u, skill_t sk, int value)
         remove_skill(u, sk);
         return;
     }
-    while (sv != u->skills + u->skill_size) {
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
         if (sv->id == sk) {
             sk_set(sv, value);
             return;
@@ -1060,7 +1063,7 @@ void clone_men(const unit * u, unit * dst, int n)
             transfer_curse(u, dst, n);
         }
         set_number(dst, dst->number + n);
-        dst->hp += u->hp * dst->number / u->number;
+        dst->hp += u->hp * n / u->number;
         assert(dst->hp >= dst->number);
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
         a = a_find(dst->attribs, &at_effect);
@@ -1186,35 +1189,39 @@ void set_number(unit * u, int count)
 
 void remove_skill(unit * u, skill_t sk)
 {
-    skill *sv = u->skills;
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    int i;
+    skill *sv;
+    for (i = 0; i != u->skill_size; ++i) {
+        sv = u->skills + i;
         if (sv->id == sk) {
-            skill *sl = u->skills + u->skill_size - 1;
-            if (sl != sv) {
-                *sv = *sl;
-            }
+            memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
             --u->skill_size;
             return;
         }
     }
 }
 
-skill *add_skill(unit * u, skill_t id)
+skill *add_skill(unit * u, skill_t sk)
 {
-    skill *sv = u->skills;
-#ifndef NDEBUG
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        assert(sv->id != id);
+    skill *sv;
+    int i;
+
+    for (i=0; i != u->skill_size; ++i) {
+        sv = u->skills+i;
+        if (sv->id >= sk) break;
     }
-#endif
+    u->skills = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    sv = u->skills + i;
+    if (i < u->skill_size) {
+        assert(sv->id != sk);
+        memmove(sv + 1, sv, sizeof(skill) * (u->skill_size - i));
+    }
     ++u->skill_size;
-    u->skills = realloc(u->skills, u->skill_size * sizeof(skill));
-    sv = (u->skills + u->skill_size - 1);
     sv->level = 0;
     sv->weeks = 1;
     sv->old = 0;
-    sv->id = id;
-    if (id == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
+    sv->id = sk;
+    if (sk == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
         assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
     }
@@ -1224,9 +1231,10 @@ skill *add_skill(unit * u, skill_t id)
 skill *unit_skill(const unit * u, skill_t sk)
 {
     skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size) {
-        if (sv->id == sk)
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
+        if (sv->id == sk) {
             return sv;
+        }
         ++sv;
     }
     return NULL;
@@ -1235,7 +1243,7 @@ skill *unit_skill(const unit * u, skill_t sk)
 bool has_skill(const unit * u, skill_t sk)
 {
     skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size) {
+    while (sv != u->skills + u->skill_size && sv->id <= sk) {
         if (sv->id == sk) {
             return (sv->level > 0);
         }
@@ -1484,14 +1492,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (f) {
         assert(faction_alive(f));
         u_setfaction(u, f);
-
-        if (f->locale) {
-            order *deford = default_order(f->locale);
-            if (deford) {
-                set_order(&u->thisorder, NULL);
-                addlist(&u->orders, deford);
-            }
-        }
     }
 
     set_number(u, number);
@@ -1814,7 +1814,7 @@ void u_setrace(struct unit *u, const struct race *rc)
 
 void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 {
-    sc_mage *mage = m ? m : get_mage(u);
+    sc_mage *mage = m ? m : get_mage_depr(u);
 
     if (!mage) {
         log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
@@ -1828,7 +1828,7 @@ void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
 
 struct spellbook * unit_get_spellbook(const struct unit * u)
 {
-    sc_mage * mage = get_mage(u);
+    sc_mage * mage = get_mage_depr(u);
     if (mage) {
         if (mage->spellbook) {
             return mage->spellbook;
