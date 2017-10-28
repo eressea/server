@@ -1,4 +1,4 @@
-/* 
+/*
  +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
  |                   |  Enno Rehling <enno@eressea.de>
  | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
@@ -14,7 +14,7 @@
 #include <kernel/config.h>
 #include "xmas.h"
 
-/* kernel includes */
+ /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -50,10 +50,7 @@ static void xmasgate_write(const trigger * t, struct storage *store)
 
 static int xmasgate_read(trigger * t, struct gamedata *data)
 {
-    int bc =
-        read_reference(&t->data.v, data, read_building_reference,
-        resolve_building);
-    if (bc == 0 && !t->data.v) {
+    if (read_building_reference(data, (building **)&t->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

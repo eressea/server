@@ -18,8 +18,9 @@ local function file_exists(name)
     if f~=nil then io.close(f) return true else return false end
 end
 
-local function assert_file(filename)
-    assert_equal(true, file_exists(filename))
+local function assert_file(filename, exists)
+    if exists == nil then exists = true end
+    assert_equal(exists, file_exists(filename))
     os.remove(filename)
 end
 
@@ -30,9 +31,9 @@ function test_process_turn()
     assert_equal(0, write_reports())
     assert_equal(0, eressea.write_game("test.dat"))
     assert_file("data/test.dat")
-    assert_file("reports/" .. get_turn() .. "-ii.nr")
-    assert_file("reports/" .. get_turn() .. "-ii.cr")
-    assert_file("reports/" .. get_turn() .. "-ii.txt")
+    assert_file("reports/" .. get_turn() .. "-ii.nr", false)
+    assert_file("reports/" .. get_turn() .. "-ii.cr", false)
+    assert_file("reports/" .. get_turn() .. "-ii.txt", false)
     assert_file("reports/" .. get_turn() .. "-777.nr")
     assert_file("reports/" .. get_turn() .. "-777.cr")
     assert_file("reports/" .. get_turn() .. "-777.txt")

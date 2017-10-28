@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "assert.h"
 #include "log.h"
+#include "bsdstring.h"
 #include "unicode.h"
 
 #include <ctype.h>
@@ -211,7 +212,7 @@ void addtoken(tnode ** root, const char *str, variant id)
             if (lcs == replace[i].ucs) {
                 char zText[1024];
                 memcpy(zText, replace[i].str, 3);
-                strcpy(zText + 2, (const char *)str + len);
+                strlcpy(zText + 2, (const char *)str + len, sizeof(zText)-2);
                 addtoken(root, zText, id);
                 break;
             }

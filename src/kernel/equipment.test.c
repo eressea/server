@@ -10,7 +10,7 @@
 #include <CuTest.h>
 #include <tests.h>
 
-void test_equipment(CuTest * tc)
+static void test_equipment(CuTest * tc)
 {
     equipment * eq;
     unit * u;
@@ -39,10 +39,33 @@ void test_equipment(CuTest * tc)
     CuAssertIntEquals(tc, 1, i_get(u->items, it_horses));
     CuAssertIntEquals(tc, 5, get_level(u, SK_MAGIC));
 
-    mage = get_mage(u);
+    mage = get_mage_depr(u);
     CuAssertPtrNotNull(tc, mage);
     CuAssertPtrNotNull(tc, mage->spellbook);
     CuAssertTrue(tc, u_hasspell(u, sp));
+    test_cleanup();
+}
+
+static void test_get_equipment(CuTest * tc)
+{
+    equipment * eq;
+
+    test_setup();
+    eq = create_equipment("catapultammo123");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo123", equipment_name(eq));
+    eq = get_equipment("catapultammo123");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo123", equipment_name(eq));
+    eq = get_equipment("catapult");
+    CuAssertPtrEquals(tc, NULL, eq);
+    eq = create_equipment("catapult");
+    eq = get_equipment("catapult");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapult", equipment_name(eq));
+    eq = get_equipment("catapultammo123");
+    CuAssertPtrNotNull(tc, eq);
+    CuAssertStrEquals(tc, "catapultammo123", equipment_name(eq));
     test_cleanup();
 }
 
@@ -50,5 +73,6 @@ CuSuite *get_equipment_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_equipment);
+    SUITE_ADD_TEST(suite, test_get_equipment);
     return suite;
 }

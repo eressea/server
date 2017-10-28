@@ -25,7 +25,7 @@
       <item name="log" amount="10"/>
       <item name="stone" amount="4"/>
     </set>
-    <set name="autoseed_unit">
+    <set name="seed_unit">
       <item name="log" amount="50"/>
       <item name="stone" amount="50"/>
       <item name="iron" amount="50"/>
@@ -38,7 +38,7 @@
       <skill name="perception" level="30"/>
       <skill name="melee" level="1"/>
     </set>
-    <set name="autoseed_faction">
+    <set name="seed_faction">
       <item name="adamantium" amount="1"/>
     </set>
   </equipment>

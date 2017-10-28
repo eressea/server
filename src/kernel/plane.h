@@ -69,8 +69,6 @@ extern "C" {
     struct plane *get_homeplane(void);
     int rel_to_abs(const struct plane *pl, const struct faction *f,
         int rel, unsigned char index);
-    void write_plane_reference(const plane * p, struct storage *store);
-    int read_plane_reference(plane ** pp, struct storage *store);
     int plane_width(const plane * pl);
     int plane_height(const plane * pl);
     void adjust_coordinates(const struct faction *f, int *x, int *y, const struct plane *pl);

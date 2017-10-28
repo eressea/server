@@ -45,9 +45,7 @@ write_hate(const attrib * a, const void *owner, struct storage *store)
 
 static int read_hate(attrib * a, void *owner, gamedata *data)
 {
-    int result = read_reference(&a->data.v, data, read_unit_reference,
-        resolve_unit);
-    if (result == 0 && !a->data.v) {
+    if (read_unit_reference(data, (unit **)&a->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

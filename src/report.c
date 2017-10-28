@@ -568,7 +568,7 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
         char buf[4096];
         message *msg = 0;
 
-        if (fval(a->type, ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
 
             self = curse_cansee(c, viewer, typ, obj, self);
@@ -768,7 +768,7 @@ static void rp_battles(struct stream *out, faction * f)
 
         while (bm) {
             char buf[256];
-            RENDER(f, buf, sizeof(buf), ("battle::header", "region", bm->r));
+            RENDER(f, buf, sizeof(buf), ("header_battle", "region", bm->r));
             newline(out);
             centre(out, buf, true);
             newline(out);
@@ -1069,15 +1069,15 @@ void report_region(struct stream *out, const region * r, faction * f)
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    if (r->display && r->display[0]) {
+    if (r->land && r->land->display && r->land->display[0]) {
         bytes = (int)strlcpy(bufp, " ", size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
-        bytes = (int)strlcpy(bufp, r->display, size);
+        bytes = (int)strlcpy(bufp, r->land->display, size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        n = r->display[strlen(r->display) - 1];
+        n = r->land->display[strlen(r->land->display) - 1];
         if (n != '!' && n != '?' && n != '.') {
             bytes = (int)strlcpy(bufp, ".", size);
             if (wrptr(&bufp, &size, bytes) != 0)
@@ -1090,6 +1090,9 @@ void report_region(struct stream *out, const region * r, faction * f)
         message *msg;
 
         if (owner != NULL) {
+            bytes = (int)strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             msg = msg_message("nr_region_owner", "faction", owner);
             bytes = (int)nr_render(msg, f->locale, bufp, size, f);
             msg_release(msg);
@@ -2266,7 +2269,7 @@ report_plaintext(const char *filename, report_context * ctx,
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
-        int stealthmod = stealth_modifier(r->seen.mode);
+        int stealthmod = stealth_modifier(r, f, r->seen.mode);
         building *b = r->buildings;
         ship *sh = r->ships;
 
@@ -2311,14 +2314,12 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
-        /* Statistik */
 
         if (wants_stats && r->seen.mode >= seen_unit)
             statistics(out, r, f);
 
         /* Nachrichten an REGION in der Region */
-
-        if (r->seen.mode == seen_unit || r->seen.mode == seen_travel) {
+        if (r->seen.mode >= seen_travel) {
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
@@ -2347,8 +2348,8 @@ report_plaintext(const char *filename, report_context * ctx,
             }
         }
         while (u && !u->ship) {
-            if (stealthmod > INT_MIN) {
-                if (u->faction == f || cansee(f, r, u, stealthmod)) {
+            if (stealthmod > INT_MIN && r->seen.mode >= seen_unit) {
+                if (u->faction == f || cansee_ex(f, r, u, stealthmod, r->seen.mode)) {
                     nr_unit(out, f, u, 4, r->seen.mode);
                 }
             }

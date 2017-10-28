@@ -522,9 +522,33 @@ static void test_ship_leave_trail(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_movement_speed(CuTest *tc) {
+    unit * u;
+    race * rc;
+    const struct item_type *it_horse;
+
+    test_setup();
+    it_horse = test_create_horse();
+    rc = test_create_race(NULL);
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+
+    rc->speed = 1.0;
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    rc->speed = 2.0;
+    CuAssertIntEquals(tc, 2 * BP_WALKING, movement_speed(u));
+
+    set_level(u, SK_RIDING, 1);
+    i_change(&u->items, it_horse, 1);
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_movement_speed);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);

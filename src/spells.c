@@ -39,7 +39,6 @@
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/connection.h>
-#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -144,7 +143,7 @@ static void magicanalyse_region(region * r, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
@@ -184,7 +183,7 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -225,7 +224,7 @@ static void magicanalyse_building(building * b, unit * mage, double force)
         double probability;
         int mon;
 
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -266,7 +265,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
         curse *c;
         double probability;
         int mon;
-        if (!fval(a->type, ATF_CURSE))
+        if (a->type != &at_curse)
             continue;
 
         c = (curse *)a->data.v;
@@ -308,7 +307,7 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
     while (*ap && force > 0) {
         curse *c1;
         attrib *a = *ap;
-        if (!fval(a->type, ATF_CURSE)) {
+        if (a->type != &at_curse) {
             do {
                 ap = &(*ap)->next;
             } while (*ap && a->type == (*ap)->type);
@@ -513,32 +512,26 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
 /* ------------------------------------------------------------- */
 /* der Vertraue des Magiers */
 
-static void make_familiar(unit * familiar, unit * mage)
+static unit * make_familiar(unit * mage, region *r, const race *rc, const char *name)
 {
-    /* skills and spells: */
-    const struct equipment *eq;
-    char eqname[64];
-    const race * rc = u_race(familiar);
-    snprintf(eqname, sizeof(eqname), "%s_familiar", rc->_name);
-    eq = get_equipment(eqname);
-    if (eq != NULL) {
-        equip_items(&familiar->items, eq);
-    }
-    else {
-        log_info("could not perform initialization for familiar %s.\n", rc->_name);
-    }
+    unit *fam;
+
+    fam = create_unit(r, mage->faction, 1, rc, 0, name, mage);
+    setstatus(fam, ST_FLEE);
+    fset(fam, UFL_LOCKED);
 
     /* triggers: */
-    create_newfamiliar(mage, familiar);
+    create_newfamiliar(mage, fam);
 
     /* Hitpoints nach Talenten korrigieren, sonst starten vertraute
      * mit Ausdauerbonus verwundet */
-    familiar->hp = unit_max_hp(familiar);
+    fam->hp = unit_max_hp(fam);
+
+    return fam;
 }
 
 static int sp_summon_familiar(castorder * co)
 {
-    unit *familiar;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -586,10 +579,7 @@ static int sp_summon_familiar(castorder * co)
     msg = msg_message("familiar_name", "unit", mage);
     nr_render(msg, mage->faction->locale, zText, sizeof(zText), mage->faction);
     msg_release(msg);
-    familiar = create_unit(r, mage->faction, 1, rc, 0, zText, mage);
-    setstatus(familiar, ST_FLEE);
-    fset(familiar, UFL_LOCKED);
-    make_familiar(familiar, mage);
+    make_familiar(mage, r, rc, zText);
 
     dh = 0;
     dh1 = 0;
@@ -740,7 +730,7 @@ static int sp_transferaura(castorder * co)
     int cast_level = co->level;
     spellparameter *pa = co->par;
     unit *u;
-    sc_mage *scm_dst, *scm_src = get_mage(mage);
+    sc_mage *scm_dst, *scm_src = get_mage_depr(mage);
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)
@@ -754,7 +744,7 @@ static int sp_transferaura(castorder * co)
     /* Wieviel Transferieren? */
     aura = pa->param[1]->data.i;
     u = pa->param[0]->data.u;
-    scm_dst = get_mage(u);
+    scm_dst = get_mage_depr(u);
 
     if (scm_dst == NULL) {
         /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
@@ -2892,47 +2882,20 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
     return c;
 }
 
-#define COMPAT_DEATHCLOUD
-#ifdef COMPAT_DEATHCLOUD
 static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
     struct storage *store = data->store;
-    region *r = NULL;
-    unit *u;
-    variant var;
-    int duration;
-    float strength;
-    int rx, ry;
 
     UNUSED_ARG(a);
     UNUSED_ARG(target);
-    READ_INT(store, &duration);
-    READ_FLT(store, &strength);
-    READ_INT(store, &var.i);
-    u = findunit(var.i);
-
-    /* this only affects really old data. no need to change: */
-    READ_INT(store, &rx);
-    READ_INT(store, &ry);
-    r = findregion(rx, ry);
-
-    if (r != NULL) {
-        double effect;
-        curse *c;
-
-        effect = strength;
-        c =
-            create_curse(u, &r->attribs, &ct_deathcloud, strength * 2, duration,
-                effect, 0);
-        c->data.v = r;
-        if (u == NULL) {
-            ur_add(var, &c->magician, resolve_unit);
-        }
-    }
-    return AT_READ_FAIL;          /* we don't care for the attribute. */
+    READ_INT(store, NULL);
+    READ_FLT(store, NULL);
+    READ_INT(store, NULL);
+    READ_INT(store, NULL);
+    READ_INT(store, NULL);
+    return AT_READ_DEPR;          /* we don't care for the attribute. */
 }
-#endif
 
 /* ------------------------------------------------------------- */
 /* Name:       Todeswolke
@@ -2970,7 +2933,7 @@ static int sp_deathcloud(castorder * co)
     unit *u;
 
     while (a) {
-        if ((a->type->flags & ATF_CURSE)) {
+        if (a->type == &at_curse) {
             curse *c = a->data.v;
             if (c->type == &ct_deathcloud) {
                 report_failure(mage, co->order);
@@ -3115,46 +3078,6 @@ static int sp_summonshadowlords(castorder * co)
         mage, amount, u_race(u)));
     return cast_level;
 }
-
-static bool chaosgate_valid(const connection * b)
-{
-    const attrib *a = a_find(b->from->attribs, &at_direction);
-    if (!a)
-        a = a_find(b->to->attribs, &at_direction);
-    if (!a)
-        return false;
-    return true;
-}
-
-static struct region *chaosgate_move(const connection * b, struct unit *u,
-    struct region *from, struct region *to, bool routing)
-{
-    UNUSED_ARG(from);
-    UNUSED_ARG(b);
-    if (!routing) {
-        int maxhp = u->hp / 4;
-        if (maxhp < u->number)
-            maxhp = u->number;
-        u->hp = maxhp;
-    }
-    return to;
-}
-
-border_type bt_chaosgate = {
-    "chaosgate", VAR_NONE,
-    b_transparent,                /* transparent */
-    NULL,                         /* init */
-    NULL,                         /* destroy */
-    NULL,                         /* read */
-    NULL,                         /* write */
-    b_blocknone,                  /* block */
-    NULL,                         /* name */
-    b_rinvisible,                 /* rvisible */
-    b_finvisible,                 /* fvisible */
-    b_uinvisible,                 /* uvisible */
-    chaosgate_valid,
-    chaosgate_move
-};
 
 /* ------------------------------------------------------------- */
 /* Name:       Chaossog
@@ -5889,7 +5812,7 @@ int sp_permtransfer(castorder * co)
     change_maxspellpoints(mage, -aura);
     change_spellpoints(mage, -aura);
 
-    if (get_mage(tu)->magietyp == get_mage(mage)->magietyp) {
+    if (get_mage_depr(tu)->magietyp == get_mage_depr(mage)->magietyp) {
         change_maxspellpoints(tu, aura / 2);
     }
     else {
@@ -6012,18 +5935,18 @@ int sp_stealaura(castorder * co)
     /* Zieleinheit */
     u = pa->param[0]->data.u;
 
-    if (!get_mage(u)) {
+    if (!get_mage_depr(u)) {
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_fail", "unit target",
             mage, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
         return 0;
     }
 
-    taura = (get_mage(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
+    taura = (get_mage_depr(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
 
     if (taura > 0) {
-        get_mage(u)->spellpoints -= taura;
-        get_mage(mage)->spellpoints += taura;
+        get_mage_depr(u)->spellpoints -= taura;
+        get_mage_depr(mage)->spellpoints += taura;
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */
         ADDMSG(&mage->faction->msgs, msg_message("stealaura_success",
@@ -6745,9 +6668,7 @@ void register_spells(void)
 {
     register_borders();
 
-#ifdef COMPAT_DEATHCLOUD
     at_deprecate("zauber_todeswolke", dc_read_compat);
-#endif
     
     /* init_firewall(); */
     ct_register(&ct_firewall);

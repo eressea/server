@@ -2,6 +2,17 @@
 #include "settings.h"
 #include "eressea.h"
 
+#include "calendar.h"
+#include "chaos.h"
+#include "items.h"
+#include "creport.h"
+#include "report.h"
+#include "names.h"
+#include "reports.h"
+#include "spells.h"
+#include "vortex.h"
+#include "wormhole.h"
+
 #include <kernel/config.h>
 #include <util/log.h>
 
@@ -25,16 +36,6 @@
 #include <util/message.h>
 #include <races/races.h>
 
-#include "calendar.h"
-#include "chaos.h"
-#include "items.h"
-#include "creport.h"
-#include "report.h"
-#include "names.h"
-#include "reports.h"
-#include "spells.h"
-#include "wormhole.h"
-
 void game_done(void)
 {
 #ifdef CLEANUP_CODE
@@ -53,6 +54,7 @@ void game_done(void)
     calendar_cleanup();
     free_functions();
     free_config();
+    free_special_directions();
     free_locales();
     kernel_done();
 }

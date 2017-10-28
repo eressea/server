@@ -29,6 +29,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <selist.h>
+#include <critbit.h>
+#include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -36,43 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-
-static equipment *equipment_sets;
-
-equipment *get_or_create_equipment(const char *eqname)
-{
-    equipment **eqp = &equipment_sets;
-    for (;;) {
-        struct equipment *eq = *eqp;
-        int i = eq ? strcmp(eq->name, eqname) : 1;
-        if (i > 0) {
-            eq = (equipment *)calloc(1, sizeof(equipment));
-            eq->name = strdup(eqname);
-            eq->next = *eqp;
-            memset(eq->skills, 0, sizeof(eq->skills));
-            *eqp = eq;
-            break;
-        }
-        else if (i == 0) {
-            break;
-        }
-        eqp = &eq->next;
-    }
-    return *eqp;
-}
-
-equipment *get_equipment(const char *eqname)
-{
-    equipment *eq = equipment_sets;
-    for (; eq; eq = eq->next) {
-        int i = strcmp(eq->name, eqname);
-        if (i == 0)
-            return eq;
-        else if (i > 0)
-            break;
-    }
-    return NULL;
-}
 
 void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
@@ -156,7 +121,7 @@ void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
             if (eq->spells) {
                 selist * ql = eq->spells;
                 int qi;
-                sc_mage * mage = get_mage(u);
+                sc_mage * mage = get_mage_depr(u);
 
                 for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                     lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
@@ -236,27 +201,111 @@ void free_ls(void *arg) {
     free(ls);
 }
 
-void equipment_done(void) {
-    equipment **eqp = &equipment_sets;
-    while (*eqp) {
-        int i;
-        equipment *eq = *eqp;
-        *eqp = eq->next;
-        free(eq->name);
-        if (eq->spells) {
-            selist_foreach(eq->spells, free_ls);
-            selist_free(eq->spells);
-        }
-        while (eq->items) {
-            itemdata *next = eq->items->next;
-            free(eq->items->value);
-            free(eq->items);
-            eq->items = next;
-        }
-        /* TODO: subsets, skills */
-        for (i=0;i!=MAXSKILLS;++i) {
-            free(eq->skills[i]);
-        }
-        free(eq);
+static critbit_tree cb_equipments = { 0 };
+
+#define EQNAMELEN 24
+
+typedef struct eq_entry {
+    char key[EQNAMELEN];
+    equipment *value;
+} eq_entry;
+
+typedef struct name_cb_data {
+    const equipment *find;
+    const char *result;
+} name_cb_data;
+
+
+static int equipment_name_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    const eq_entry *ent = (const eq_entry *)match;
+    name_cb_data *query = (name_cb_data *)cbdata;
+    if (ent->value == query->find) {
+        query->result = ent->key;
+        return 1;
     }
+    return 0;
+}
+
+const char *equipment_name(const struct equipment *eq)
+{
+    name_cb_data data;
+
+    data.find = eq;
+    data.result = NULL;
+    cb_foreach(&cb_equipments, "", 0, equipment_name_cb, &data);
+    return data.result;
+}
+
+equipment *get_equipment(const char *eqname)
+{
+    const void *match;
+
+    if (strlen(eqname) >= EQNAMELEN) {
+        log_warning("equipment name is longer than %d bytes: %s", EQNAMELEN - 1, eqname);
+        return NULL;
+    }
+
+    match = cb_find_str(&cb_equipments, eqname);
+    if (match) {
+        const eq_entry *ent = (const eq_entry *)match;
+        return ent->value;
+    }
+    return NULL;
+}
+
+equipment *create_equipment(const char *eqname)
+{
+    size_t len = strlen(eqname);
+    eq_entry ent;
+
+    if (len >= EQNAMELEN) {
+        log_error("equipment name is longer than %d bytes: %s", EQNAMELEN-1, eqname);
+        len = EQNAMELEN-1;
+    }
+    memset(ent.key, 0, EQNAMELEN);
+    memcpy(ent.key, eqname, len);
+
+    ent.value = (equipment *)calloc(1, sizeof(equipment));
+
+    cb_insert(&cb_equipments, &ent, sizeof(ent));
+    return ent.value;
+}
+
+equipment *get_or_create_equipment(const char *eqname)
+{
+    equipment *eq = get_equipment(eqname);
+    if (!eq) {
+        return create_equipment(eqname);
+    }
+    return eq;
+}
+
+static void free_equipment(equipment *eq) {
+    int i;
+    if (eq->spells) {
+        selist_foreach(eq->spells, free_ls);
+        selist_free(eq->spells);
+    }
+    while (eq->items) {
+        itemdata *next = eq->items->next;
+        free(eq->items->value);
+        free(eq->items);
+        eq->items = next;
+    }
+    /* TODO: subsets, skills */
+    for (i = 0; i != MAXSKILLS; ++i) {
+        free(eq->skills[i]);
+    }
+}
+
+static int free_equipment_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
+    const eq_entry * ent = (const eq_entry *)match;
+    free_equipment(ent->value);
+    free(ent->value);
+    return 0;
+}
+
+void equipment_done(void) {
+    cb_foreach(&cb_equipments, "", 0, free_equipment_cb, 0);
+    cb_clear(&cb_equipments);
 }

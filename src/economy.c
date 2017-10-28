@@ -266,7 +266,6 @@ void add_recruits(unit * u, int number, int wanted)
 
         strlcpy(equipment, "new_", sizeof(equipment));
         strlcat(equipment, u_race(u)->_name, sizeof(equipment));
-        strlcat(equipment, "_unit", sizeof(equipment));
         equip_unit(unew, get_equipment(equipment));
 
         if (unew != u) {
@@ -661,7 +660,12 @@ static int forget_cmd(unit * u, order * ord)
     init_order(ord);
     s = gettoken(token, sizeof(token));
 
-    if ((sk = get_skill(s, u->faction->locale)) != NOSKILL) {
+    sk = get_skill(s, u->faction->locale);
+    if (sk != NOSKILL) {
+        if (sk == SK_MAGIC && is_familiar(u)) {
+            /* some units cannot forget their innate magical abilities */
+            return 0;
+        }
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
         set_level(u, sk, 0);
     }

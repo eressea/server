@@ -43,7 +43,6 @@ extern "C" {
     /* TODO: is this *really* still in use? */
     extern int enc_gamedata;
 
-    int readorders(const char *filename);
     int readgame(const char *filename);
     int writegame(const char *filename);
 

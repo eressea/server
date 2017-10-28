@@ -263,7 +263,7 @@ static void get_villagers(region * r, unit * u)
         u);
     leave(newunit, true);
     fset(newunit, UFL_ISNEW | UFL_MOVED);
-    equip_unit(newunit, get_equipment("random_villagers"));
+    equip_unit(newunit, get_equipment("rand_villagers"));
 }
 
 static void get_allies(region * r, unit * u)
@@ -282,7 +282,7 @@ static void get_allies(region * r, unit * u)
             if (get_money(u) / u->number < 100 + rng_int() % 200)
                 return;
             name = "random_plain_men";
-            equip = "random_plain";
+            equip = "rand_plain";
             number = rng_int() % 8 + 2;
             break;
         }
@@ -293,7 +293,7 @@ static void get_allies(region * r, unit * u)
                 return;
             }
             name = "random_forest_men";
-            equip = "random_forest";
+            equip = "rand_forest";
             number = rng_int() % 6 + 2;
         }
         break;
@@ -303,7 +303,7 @@ static void get_allies(region * r, unit * u)
             return;
         }
         name = "random_swamp_men";
-        equip = "random_swamp";
+        equip = "rand_swamp";
         number = rng_int() % 6 + 2;
         break;
 
@@ -312,7 +312,7 @@ static void get_allies(region * r, unit * u)
             return;
         }
         name = "random_desert_men";
-        equip = "random_desert";
+        equip = "rand_desert";
         number = rng_int() % 12 + 2;
         break;
 
@@ -321,7 +321,7 @@ static void get_allies(region * r, unit * u)
             return;
         }
         name = "random_highland_men";
-        equip = "random_highland";
+        equip = "rand_highland";
         number = rng_int() % 8 + 2;
         break;
 
@@ -330,7 +330,7 @@ static void get_allies(region * r, unit * u)
             return;
         }
         name = "random_mountain_men";
-        equip = "random_mountain";
+        equip = "rand_mountain";
         number = rng_int() % 6 + 2;
         break;
 
@@ -339,7 +339,7 @@ static void get_allies(region * r, unit * u)
             return;
         }
         name = "random_glacier_men";
-        equip = "random_glacier";
+        equip = "rand_glacier";
         number = rng_int() % 4 + 2;
         break;
 

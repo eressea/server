@@ -67,8 +67,12 @@ static int keys_size(int n) {
     assert(n > 0 && n <= 4096);
     if (n <= 1) return 1;
     if (n <= 4) return 4;
+    if (n <= 8) return 8;
     if (n <= 16) return 16;
     if (n <= 256) return 256;
+    if (n <= 512) return 512;
+    if (n <= 1024) return 1024;
+    if (n <= 2048) return 2048;
     return 4096;
 }
 

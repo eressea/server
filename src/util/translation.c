@@ -71,7 +71,7 @@ void opstack_push(opstack ** stackp, variant data)
  ** static buffer malloc
  **/
 
-#define BBUFSIZE 0x20000
+#define BBUFSIZE 0x10000
 static struct {
     char *begin;
     char *end;
@@ -81,16 +81,13 @@ static struct {
 
 char *balloc(size_t size)
 {
-    static int init = 0;          /* STATIC_XCALL: used across calls */
+    static int init = 0;
     if (!init) {
         init = 1;
         buffer.current = buffer.begin = malloc(BBUFSIZE * sizeof(char));
         buffer.end = buffer.begin + BBUFSIZE;
     }
-    if (buffer.current + size > buffer.end) {
-        /* out of memory! */
-        return NULL;
-    }
+    assert(buffer.current + size <= buffer.end || !"balloc is out of memory");
     buffer.last = buffer.current;
     buffer.current += size;
     return buffer.last;
@@ -99,6 +96,7 @@ char *balloc(size_t size)
 void bfree(char *c)
 /* only release this memory if it was part of the last allocation
  * that's a joke, but who cares.
+ * I'm afraid I don't get the joke.
  */
 {
     if (c >= buffer.last && c < buffer.current)

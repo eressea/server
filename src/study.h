@@ -50,7 +50,8 @@ extern "C" {
 #define TEACHNUMBER 10
     typedef struct teaching_info {
         struct selist *teachers;
-        int value;
+        int students;
+        int days;
     } teaching_info;
 
     extern const struct attrib_type at_learning;

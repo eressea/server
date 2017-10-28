@@ -30,12 +30,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-# define ORD_KEYWORD(ord) (ord)->data->_keyword
+# define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
 # define ORD_STRING(ord) (ord)->data->_str
 
 typedef struct locale_data {
-    struct order_data *short_orders[MAXKEYWORDS];
+    struct order_data *short_orders;
     struct order_data *study_orders[MAXSKILLS];
     const struct locale *lang;
 } locale_data;
@@ -46,7 +46,6 @@ typedef struct order_data {
     const char *_str;
     int _refcount;
     int _lindex;
-    keyword_t _keyword;
 } order_data;
 
 static void release_data(order_data * data)
@@ -94,7 +93,7 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
 
-    if (ord->_noerror) {
+    if (ord->command & CMD_QUIET) {
         if (size > 0) {
             *bufp++ = '!';
             --size;
@@ -103,7 +102,7 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             WARN_STATIC_BUFFER();
         }
     }
-    if (ord->_persistent) {
+    if (ord->command & CMD_PERSIST) {
         if (size > 0) {
             *bufp++ = '@';
             --size;
@@ -162,8 +161,7 @@ order *copy_order(const order * src)
     if (src != NULL) {
         order *ord = (order *)malloc(sizeof(order));
         ord->next = NULL;
-        ord->_persistent = src->_persistent;
-        ord->_noerror = src->_noerror;
+        ord->command = src->command;
         ord->data = src->data;
         ++ord->data->_refcount;
         return ord;
@@ -189,13 +187,12 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, keyword_t kwd, int lindex, const char *str)
+static char *mkdata(order_data **pdata, size_t len, int lindex, const char *str)
 {
     order_data *data;
     char *result;
     data = malloc(sizeof(order_data) + len + 1);
     result = (char *)(data + 1);
-    data->_keyword = kwd;
     data->_lindex = lindex;
     data->_refcount = 0;
     data->_str = 0;
@@ -229,7 +226,7 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
                 const char *skname = skillname(sk, lang);
                 const char *spc = strchr(skname, ' ');
                 size_t len = strlen(skname);
-                char *dst = mkdata(&data, len + (spc ? 3 : 0), kwd, lindex, spc ? 0 : skname);
+                char *dst = mkdata(&data, len + (spc ? 3 : 0), lindex, spc ? 0 : skname);
                 locale_array[lindex]->study_orders[sk] = data;
                 if (spc) {
                     dst[0] = '\"';
@@ -246,26 +243,24 @@ static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
 
     /* orders with no parameter, only one order_data per order required */
     else if (kwd != NOKEYWORD && *sptr == 0) {
-        data = locale_array[lindex]->short_orders[kwd];
+        data = locale_array[lindex]->short_orders;
         if (data == NULL) {
-            mkdata(&data, 0, kwd, lindex, 0);
+            mkdata(&data, 0, lindex, 0);
             data->_refcount = 1;
-            locale_array[lindex]->short_orders[kwd] = data;
+            locale_array[lindex]->short_orders = data;
         }
         ++data->_refcount;
         return data;
     }
-    mkdata(&data, s ? strlen(s) : 0, kwd, lindex, s);
+    mkdata(&data, s ? strlen(s) : 0, lindex, s);
     data->_refcount = 1;
     return data;
 }
 
 static void clear_localedata(int lindex) {
     int i;
-    for (i = 0; i != MAXKEYWORDS; ++i) {
-        release_data(locale_array[lindex]->short_orders[i]);
-        locale_array[lindex]->short_orders[i] = 0;
-    }
+    release_data(locale_array[lindex]->short_orders);
+    locale_array[lindex]->short_orders = NULL;
     for (i = 0; i != MAXSKILLS; ++i) {
         release_data(locale_array[lindex]->study_orders[i]);
         locale_array[lindex]->study_orders[i] = 0;
@@ -284,12 +279,12 @@ void close_orders(void) {
     }
 }
 
-static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
+static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
     bool noerror, const struct locale *lang)
 {
-    order *ord = NULL;
     int lindex;
 
+    assert(ord);
     if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
         log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
         return NULL;
@@ -316,11 +311,12 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
     }
     locale_array[lindex]->lang = lang;
 
-    ord = (order *)malloc(sizeof(order));
-    ord->_persistent = persistent;
-    ord->_noerror = noerror;
+    ord->command = (int)kwd;
+    if (persistent) ord->command |= CMD_PERSIST;
+    if (noerror) ord->command |= CMD_QUIET;
     ord->next = NULL;
 
+    while (isspace(*(unsigned char *)sptr)) ++sptr;
     ord->data = create_data(kwd, sptr, lindex);
 
     return ord;
@@ -329,6 +325,7 @@ static order *create_order_i(keyword_t kwd, const char *sptr, bool persistent,
 order *create_order(keyword_t kwd, const struct locale * lang,
     const char *params, ...)
 {
+    order *ord;
     char zBuffer[DISPLAYSIZE];
     if (params) {
         char *bufp = zBuffer;
@@ -379,42 +376,40 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     else {
         zBuffer[0] = 0;
     }
-    return create_order_i(kwd, zBuffer, false, false, lang);
+    ord = (order *)malloc(sizeof(order));
+    return create_order_i(ord, kwd, zBuffer, false, false, lang);
 }
 
 order *parse_order(const char *s, const struct locale * lang)
 {
     assert(lang);
     assert(s);
-    while (*s && !isalnum(*(unsigned char *)s) && !ispunct(*(unsigned char *)s)) {
-        ++s;
-    }
     if (*s != 0) {
-        keyword_t kwd;
-        const char *sptr;
+        keyword_t kwd = NOKEYWORD;
+        const char *sptr = s;
         bool persistent = false, noerror = false;
         const char * p;
 
-        while (*s == '!' || *s=='@') {
-            if (*s=='!') noerror = true;
-            else if (*s == '@') persistent = true;
-            ++s;
-        }
-        sptr = s;
         p = *sptr ? parse_token_depr(&sptr) : 0;
-        kwd = p ? get_keyword(p, lang) : NOKEYWORD;
+        if (p) {
+            while (*p == '!' || *p == '@') {
+                if (*p == '!') noerror = true;
+                else if (*p == '@') persistent = true;
+                ++p;
+            }
+            kwd = get_keyword(p, lang);
+        }
         if (kwd == K_MAKE) {
-            const char *s, *sp = sptr;
-            s = parse_token_depr(&sp);
-            if (s && isparam(s, lang, P_TEMP)) {
+            const char *sp = sptr;
+            p = parse_token_depr(&sp);
+            if (p && isparam(p, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
             }
         }
         if (kwd != NOKEYWORD) {
-            while (isspace(*(unsigned char *)sptr)) ++sptr;
-            s = sptr;
-            return create_order_i(kwd, s, persistent, noerror, lang);
+            order *ord = (order *)malloc(sizeof(order));
+            return create_order_i(ord, kwd, sptr, persistent, noerror, lang);
         }
     }
     return NULL;
@@ -561,8 +556,13 @@ bool is_persistent(const order * ord)
     case K_KOMMENTAR:
         return true;
     default:
-        return ord->_persistent || is_repeated(kwd);
+        return (ord->command & CMD_PERSIST) || is_repeated(kwd);
     }
+}
+
+bool is_silent(const order * ord)
+{
+    return (ord->command & CMD_QUIET) != 0;
 }
 
 char *write_order(const order * ord, char *buffer, size_t size)
@@ -595,5 +595,5 @@ keyword_t init_order(const struct order *ord)
 {
     assert(ord && ord->data);
     init_tokens_str(ord->data->_str);
-    return ord->data->_keyword;
+    return ORD_KEYWORD(ord);
 }

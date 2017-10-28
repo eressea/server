@@ -418,10 +418,12 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             set_racename(&u2->attribs, get_racename(u->attribs));
             u_setrace(u2, u_race(u));
             u2->irace = u->irace;
-            if (fval(u, UFL_HERO))
+            if (fval(u, UFL_HERO)) {
                 fset(u2, UFL_HERO);
-            else
+            }
+            else {
                 freset(u2, UFL_HERO);
+            }
         }
 
         /* Einheiten von Schiffen können nicht NACH in von
@@ -589,7 +591,7 @@ void give_unit(unit * u, unit * u2, order * ord)
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
-        mage = get_mage(u);
+        mage = get_mage_depr(u);
         if (!mage || u2->faction->magiegebiet != mage->magietyp) {
             cmistake(u, ord, 157, MSG_COMMERCE);
             return;

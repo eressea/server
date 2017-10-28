@@ -15,6 +15,7 @@ extern "C" {
      **/
     extern struct border_type bt_chaosgate;
     extern struct border_type bt_firewall;
+    extern const struct curse_type ct_firewall;
 
     typedef struct wall_data {
         struct unit *mage;
@@ -23,7 +24,6 @@ extern "C" {
         int countdown;
     } wall_data;
 
-    extern const struct curse_type ct_firewall;
 
 #ifdef __cplusplus
 }

@@ -125,11 +125,8 @@ static void shock_write(const trigger * t, struct storage *store)
     }
 }
 
-static int shock_read(trigger * t, gamedata *data)
-{
-    int result =
-        read_reference(&t->data.v, data, read_unit_reference, resolve_unit);
-    if (result == 0 && t->data.v == NULL) {
+static int shock_read(trigger * t, gamedata *data) {
+    if (read_unit_reference(data, (unit **)&t->data.v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

@@ -74,9 +74,9 @@ struct order *ord)
             if (amount > MAXGAIN) {
                 amount = MAXGAIN;
             }
-            teach->value += amount * STUDYDAYS;
-            if (teach->value > MAXGAIN * STUDYDAYS) {
-                teach->value = MAXGAIN * STUDYDAYS;
+            teach->days += amount * STUDYDAYS;
+            if (teach->days > MAXGAIN * STUDYDAYS) {
+                teach->days = MAXGAIN * STUDYDAYS;
             }
             i_change(&u->items, itype, -amount);
             return 0;
@@ -145,7 +145,7 @@ struct order *ord)
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
-            if (!(a->type->flags & ATF_CURSE)) {
+            if (a->type != &at_curse) {
                 do {
                     ap = &(*ap)->next;
                 } while (*ap && a->type == (*ap)->type);

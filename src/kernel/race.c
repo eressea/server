@@ -561,21 +561,15 @@ void write_race_reference(const race * rc, struct storage *store)
     WRITE_TOK(store, rc ? rc->_name : "none");
 }
 
-variant read_race_reference(struct storage *store)
+struct race * read_race_reference(struct storage *store)
 {
-    variant result;
     char zName[20];
     READ_TOK(store, zName, sizeof(zName));
 
     if (strcmp(zName, "none") == 0) {
-        result.v = NULL;
-        return result;
+        return NULL;
     }
-    else {
-        result.v = rc_find_i(zName);
-    }
-    assert(result.v != NULL);
-    return result;
+    return rc_find_i(zName);
 }
 
 void register_race_function(race_func func, const char *name) {
