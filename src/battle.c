@@ -1141,7 +1141,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
-    variant res = frac_make(1, 1);
+    variant res = frac_one;
 
     int rda, sk = 0, sd;
     bool magic = false;
@@ -1185,6 +1185,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     if (magic) {
+        res = frac_sub(frac_one, res);
         res = frac_mul(frac_make(da, 1), res);
         da = res.sa[0] / res.sa[1];
     }
