@@ -177,11 +177,15 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
                 ++ctoken;
             }
             else {
-                *cursor++ = *ctoken++;
+                if (cursor - buflen < lbuf - len) {
+                    *cursor++ = *ctoken++;
+                }
             }
         }
         else if (utf8_character == SPACE_REPLACEMENT) {
-            *cursor++ = ' ';
+            if (cursor - buflen < lbuf - len) {
+                *cursor++ = ' ';
+            }
             ++ctoken;
         }
         else if (utf8_character == ESCAPE_CHAR) {
