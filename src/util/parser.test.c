@@ -28,6 +28,15 @@ static void test_parse_token(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)tok);
 }
 
+static void test_parse_token_bug_2381(CuTest *tc) {
+    const char *stok, *s = "Bitte~wechselt~auf~die~trireme~3im9,~sobald~eine~Crew~da~ist,~geht~es~los~:)";
+    char token[64];
+
+    stok = s;
+    stok = parse_token(&stok, token, sizeof(token));
+    CuAssertTrue(tc, strlen(token) < sizeof(token));
+}
+
 static void test_parse_token_limit(CuTest *tc) {
     char lbuf[8];
     const char *tok;
@@ -117,6 +126,7 @@ CuSuite *get_parser_suite(void)
     SUITE_ADD_TEST(suite, test_atoip);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_parse_token);
+    SUITE_ADD_TEST(suite, test_parse_token_bug_2381);
     SUITE_ADD_TEST(suite, test_parse_token_limit);
     SUITE_ADD_TEST(suite, test_parse_token_limit_utf8);
     SUITE_ADD_TEST(suite, test_gettoken);
