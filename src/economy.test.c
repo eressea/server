@@ -170,6 +170,59 @@ static void test_normals_recruit(CuTest * tc) {
     test_cleanup();
 }
 
+static void test_buy_cmd(CuTest *tc) {
+    region * r;
+    unit *u;
+    building *b;
+    const resource_type *rt_silver;
+    const resource_type *rt_luxury;
+    test_setup();
+
+    init_resources();
+    rt_luxury = get_resourcetype(R_HORSE);
+    CuAssertPtrNotNull(tc, rt_luxury);
+    CuAssertPtrNotNull(tc, rt_luxury->itype);
+    new_luxurytype(rt_luxury->itype, 5);
+    CuAssertPtrNotNull(tc, rt_luxury->ltype);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    r = test_create_region(0, 0, NULL);
+    fix_demand(r);
+    CuAssertPtrEquals(tc, rt_luxury->itype, (void *)r_luxury(r));
+    u = test_create_unit(test_create_faction(NULL), r);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(rt_luxury, 0))));
+    set_item(u, rt_silver->itype, 1000);
+
+    produce(r);
+    CuAssertPtrNotNullMsg(tc, "trading requires a castle", test_find_messagetype(u->faction->msgs, "error119"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    produce(r);
+    CuAssertPtrNotNullMsg(tc, "castle must have size >=2", test_find_messagetype(u->faction->msgs, "error119"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    b->size = 2;
+    produce(r);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
+    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "error102"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    /* at last, the happy case: */
+    set_level(u, SK_TRADE, 1);
+    produce(r);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buy"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
+    CuAssertIntEquals(tc, 1, get_item(u, rt_luxury->itype));
+    CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
+    test_cleanup();
+}
+
 typedef struct request {
     struct request *next;
     struct unit *unit;
@@ -568,6 +621,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
+    SUITE_ADD_TEST(suite, test_buy_cmd);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);
     return suite;

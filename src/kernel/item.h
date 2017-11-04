@@ -224,7 +224,7 @@ extern "C" {
 
     /* convenience: */
     item *i_change(item ** items, const item_type * it, int delta);
-    int i_get(const item * i, const item_type * it);
+    int i_get(const item * items, const item_type * it);
 
     /* creation */
     resource_type *rt_get_or_create(const char *name);
@@ -300,7 +300,6 @@ extern "C" {
 
     void register_resources(void);
     void init_resources(void);
-    void init_itemtypes(void);
 
     void register_item_give(int(*foo) (struct unit *, struct unit *,
         const struct item_type *, int, struct order *), const char *name);

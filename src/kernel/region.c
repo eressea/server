@@ -711,7 +711,7 @@ const item_type *r_luxury(const region * r)
 {
     struct demand *dmd;
     if (r->land) {
-        assert(r->land->demands || !"need to call fix_demands on a region");
+        assert(r->land->demands || !"need to call fix_demand on a region");
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value == 0)
                 return dmd->type->itype;
