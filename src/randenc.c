@@ -610,9 +610,14 @@ static void move_icebergs(void)
 void create_icebergs(void)
 {
     region *r;
+    const struct terrain_type *t_iceberg, *t_sleep;
+
+    t_iceberg = get_terrain("iceberg");
+    t_sleep = get_terrain("iceberg_sleep");
+    assert(t_iceberg && t_sleep);
 
     for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_ICEBERG_SLEEP) && chance(0.05)) {
+        if (r->terrain == t_sleep && chance(0.05)) {
             bool has_ocean_neighbour = false;
             direction_t dir;
             region *rc;
@@ -629,7 +634,7 @@ void create_icebergs(void)
             if (!has_ocean_neighbour)
                 continue;
 
-            rsetterrain(r, T_ICEBERG);
+            r->terrain = t_iceberg;
 
             fset(r, RF_SELECT);
             move_iceberg(r);
@@ -801,7 +806,9 @@ void randomevents(void)
     region *r;
     faction *monsters = get_monsters();
 
-    icebergs();
+    if (config_get_int("modules.icebergs", 0)) {
+        icebergs();
+    }
     godcurse();
     orc_growth();
     demon_skillchanges();

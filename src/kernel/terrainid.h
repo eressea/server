@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-  enum {
+  typedef enum {
     T_OCEAN = 0,
     T_PLAIN,
     T_SWAMP,
@@ -29,8 +29,8 @@ extern "C" {
     T_VOLCANO_SMOKING,
     T_ICEBERG_SLEEP,
     T_ICEBERG,
-    NOTERRAIN = (terrain_t) - 1
-  };
+    NOTERRAIN = - 1
+  } terrain_t;
 
   extern const struct terrain_type *newterrain(terrain_t t);
   extern terrain_t oldterrain(const struct terrain_type *terrain);
