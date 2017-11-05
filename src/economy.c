@@ -1446,24 +1446,19 @@ static void expandbuying(region * r, request * buyorders)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     int max_products;
     unit *u;
-    static struct trade {
+    struct trade {
         const luxury_type *type;
         int number;
         int multi;
     } trades[MAXLUXURIES], *trade;
-    static int ntrades = 0;
-    int i;
+    int ntrades = 0;
     const luxury_type *ltype;
 
-    if (ntrades == 0) {
-        for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
-            assert(ntrades < MAXLUXURIES);
-            trades[ntrades++].type = ltype;
-        }
-    }
-    for (i = 0; i != ntrades; ++i) {
-        trades[i].number = 0;
-        trades[i].multi = 1;
+    for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
+        assert(ntrades < MAXLUXURIES);
+        trades[ntrades].number = 0;
+        trades[ntrades].multi = 1;
+        trades[ntrades++].type = ltype;
     }
 
     if (!buyorders)
@@ -1490,7 +1485,7 @@ static void expandbuying(region * r, request * buyorders)
             int price, multi;
             ltype = g_requests[j].type.ltype;
             trade = trades;
-            while (trade->type != ltype)
+            while (trade->type && trade->type != ltype)
                 ++trade;
             multi = trade->multi;
             price = ltype->price * multi;
