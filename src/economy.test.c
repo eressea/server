@@ -206,8 +206,9 @@ static void test_trade_insect(CuTest *tc) {
     test_setup();
     init_resources();
     test_create_locale();
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    init_terrains();
 
-    r = setup_trade_region(tc, get_terrain("swamp"));
     it_luxury = r_luxury(r);
     CuAssertPtrNotNull(tc, it_luxury);
     it_silver = get_resourcetype(R_SILVER)->itype;
@@ -220,6 +221,7 @@ static void test_trade_insect(CuTest *tc) {
     produce(u->region);
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));
+    test_cleanup();
 }
 
 static void test_buy_cmd(CuTest *tc) {
@@ -231,8 +233,9 @@ static void test_buy_cmd(CuTest *tc) {
     test_setup();
     init_resources();
     test_create_locale();
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    init_terrains();
 
-    r = setup_trade_region(tc, get_terrain("swamp"));
     it_luxury = r_luxury(r);
     CuAssertPtrNotNull(tc, it_luxury);
     rt_silver = get_resourcetype(R_SILVER);

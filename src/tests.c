@@ -122,10 +122,10 @@ struct locale * test_create_locale(void) {
         for (i = 0; i != MAXDIRECTIONS; ++i) {
             locale_setstring(loc, directions[i], directions[i]);
             init_direction(loc, i, directions[i]);
-            init_direction(loc, i, coasts[i]+7);
+            init_direction(loc, i, coasts[i] + 7);
         }
         for (i = 0; i <= ST_FLEE; ++i) {
-            locale_setstring(loc, combatstatus[i], combatstatus[i]+7);
+            locale_setstring(loc, combatstatus[i], combatstatus[i] + 7);
         }
         for (i = 0; i != MAXKEYWORDS; ++i) {
             locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
@@ -446,10 +446,10 @@ void test_create_world(void)
     test_create_itemtype("iron");
     test_create_itemtype("stone");
 
-    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION |  FLY_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
     t_plain->size = 1000;
     t_plain->max_road = 100;
-    t_ocean = test_create_terrain("ocean", SEA_REGION |  SWIM_INTO | FLY_INTO);
+    t_ocean = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
     t_ocean->size = 0;
 
     island[0] = test_create_region(0, 0, t_plain);
@@ -545,20 +545,20 @@ void assert_message(CuTest * tc, message *msg, char *name, int numpar) {
 
 void assert_pointer_parameter(CuTest * tc, message *msg, int index, void *arg) {
     const message_type *mtype = (msg)->type;
-    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertPtrEquals((tc), (arg), msg->parameters[(index)].v);
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype); CuAssertPtrEquals((tc), (arg), msg->parameters[(index)].v);
 }
 
 void assert_int_parameter(CuTest * tc, message *msg, int index, int arg) {
     const message_type *mtype = (msg)->type;
-    CuAssertIntEquals((tc), VAR_INT, mtype->types[(index)]->vtype);CuAssertIntEquals((tc), (arg), msg->parameters[(index)].i);
+    CuAssertIntEquals((tc), VAR_INT, mtype->types[(index)]->vtype); CuAssertIntEquals((tc), (arg), msg->parameters[(index)].i);
 }
 
 void assert_string_parameter(CuTest * tc, message *msg, int index, const char *arg) {
     const message_type *mtype = (msg)->type;
-    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype);CuAssertStrEquals((tc), (arg), msg->parameters[(index)].v);
+    CuAssertIntEquals((tc), VAR_VOIDPTR, mtype->types[(index)]->vtype); CuAssertStrEquals((tc), (arg), msg->parameters[(index)].v);
 }
 
-void disabled_test(void *suite, void (*test)(CuTest *), const char *name) {
+void disabled_test(void *suite, void(*test)(CuTest *), const char *name) {
     (void)test;
     fprintf(stderr, "%s: SKIP\n", name);
 }

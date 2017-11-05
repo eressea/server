@@ -132,6 +132,10 @@ const struct terrain_type *newterrain(terrain_t t)
         return NULL;
     assert(t >= 0);
     assert(t < MAXTERRAINS);
+    if (!newterrains[t]) {
+        log_warning("did you call init_terrains?");
+        newterrains[t] = get_terrain(terraindata[t]);
+    }
     return newterrains[t];
 }
 
