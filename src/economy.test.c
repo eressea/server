@@ -14,6 +14,7 @@
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
@@ -170,6 +171,23 @@ static void test_normals_recruit(CuTest * tc) {
     test_cleanup();
 }
 
+/** 
+ * Create any terrain types that are used by the trade rules.
+ * 
+ * This should prevent newterrain from returning NULL.
+ */
+static void setup_terrains(CuTest *tc) {
+    test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
+    test_create_terrain("swamp", LAND_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("desert", LAND_REGION | WALK_INTO | FLY_INTO);
+    init_terrains();
+    CuAssertPtrNotNull(tc, newterrain(T_OCEAN));
+    CuAssertPtrNotNull(tc, newterrain(T_PLAIN));
+    CuAssertPtrNotNull(tc, newterrain(T_SWAMP));
+    CuAssertPtrNotNull(tc, newterrain(T_DESERT));
+}
+
 static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain) {
     region *r;
     item_type *it_luxury;
@@ -206,6 +224,7 @@ static void test_trade_insect(CuTest *tc) {
     test_setup();
     init_resources();
     test_create_locale();
+    setup_terrains(tc);
     r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
     init_terrains();
 
@@ -233,6 +252,7 @@ static void test_buy_cmd(CuTest *tc) {
     test_setup();
     init_resources();
     test_create_locale();
+    setup_terrains(tc);
     r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
     init_terrains();
 

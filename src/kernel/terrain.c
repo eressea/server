@@ -128,15 +128,20 @@ static const terrain_type *newterrains[MAXTERRAINS];
 
 const struct terrain_type *newterrain(terrain_t t)
 {
-    if (t == NOTERRAIN)
+    const struct terrain_type *result;
+    if (t == NOTERRAIN) {
         return NULL;
+    }
     assert(t >= 0);
     assert(t < MAXTERRAINS);
-    if (!newterrains[t]) {
-        log_warning("did you call init_terrains?");
-        newterrains[t] = get_terrain(terraindata[t]);
+    result = newterrains[t];
+    if (!result) {
+        result = newterrains[t] = get_terrain(terraindata[t]);
     }
-    return newterrains[t];
+    if (!result) {
+        log_error("no such terrain: %s.", terraindata[t]);
+    }
+    return result;
 }
 
 terrain_t oldterrain(const struct terrain_type * terrain)
