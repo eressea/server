@@ -181,7 +181,9 @@ static void setup_terrains(CuTest *tc) {
     test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
     test_create_terrain("swamp", LAND_REGION | WALK_INTO | FLY_INTO);
     test_create_terrain("desert", LAND_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("mountain", LAND_REGION | WALK_INTO | FLY_INTO);
     init_terrains();
+    CuAssertPtrNotNull(tc, newterrain(T_MOUNTAIN));
     CuAssertPtrNotNull(tc, newterrain(T_OCEAN));
     CuAssertPtrNotNull(tc, newterrain(T_PLAIN));
     CuAssertPtrNotNull(tc, newterrain(T_SWAMP));
@@ -225,7 +227,7 @@ static void test_trade_insect(CuTest *tc) {
     init_resources();
     test_create_locale();
     setup_terrains(tc);
-    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    r = setup_trade_region(tc, get_terrain("swamp"));
     init_terrains();
 
     it_luxury = r_luxury(r);
@@ -240,6 +242,8 @@ static void test_trade_insect(CuTest *tc) {
     produce(u->region);
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));
+
+    terraform_region(r, get_terrain("swamp"));
     test_cleanup();
 }
 

@@ -1067,7 +1067,7 @@ static int required(int want, variant save)
 {
     int req = (int)(want * save.sa[0] / save.sa[1]);
     int r = want * save.sa[0] % save.sa[1];
-    if (r>0) ++req;
+    if (r > 0) ++req;
     return req;
 }
 
@@ -1173,7 +1173,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             int x = avail * want / nreq;
             int rx = (avail * want) % nreq;
             /* Wenn Rest, dann wuerfeln, ob ich was bekomme: */
-            if (rx>0 && rng_int() % nreq < rx) ++x;
+            if (rx > 0 && rng_int() % nreq < rx) ++x;
             avail -= x;
             nreq -= want;
             al->get = x * al->save.sa[1] / al->save.sa[0];
@@ -1590,17 +1590,10 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
         return;
     }
 
-    if (u_race(u) == get_race(RC_INSECT)) {
-        /* entweder man ist insekt, oder... */
-        if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
-            && !rbuildings(r)) {
-            cmistake(u, ord, 119, MSG_COMMERCE);
-            return;
-        }
-    }
-    else {
-        /* ...oder in der Region mu� es eine Burg geben. */
-        building *b = 0;
+    /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
+     * einen Handelsposten in der Region geben: */
+    if (u_race(u) != get_race(RC_INSECT) || (r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT))) {
+        building *b = NULL;
         if (r->buildings) {
             static int cache;
             static const struct building_type *bt_castle;
@@ -2719,7 +2712,7 @@ static void expandloot(region * r, request * lootorders)
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
     m = region_get_morale(r);
-    if (m && startmoney>0) {
+    if (m && startmoney > 0) {
         if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
             region_set_morale(r, m - 1, -1);
@@ -2980,7 +2973,7 @@ void produce(struct region *r)
     static const struct building_type *caravan_bt;
     static int rc_cache;
     static const race *rc_insect, *rc_aquarian;
-    
+
     if (bt_changed(&bt_cache)) {
         caravan_bt = bt_find("caravan");
     }
