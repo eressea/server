@@ -202,17 +202,15 @@ static void test_trade_insect(CuTest *tc) {
     region *r;
     const item_type *it_luxury;
     const item_type *it_silver;
-    struct locale *lang;
 
     test_setup();
     init_resources();
-
-    lang = test_create_locale();
-    it_silver = get_resourcetype(R_SILVER)->itype;
+    test_create_locale();
 
     r = setup_trade_region(tc, get_terrain("swamp"));
     it_luxury = r_luxury(r);
     CuAssertPtrNotNull(tc, it_luxury);
+    it_silver = get_resourcetype(R_SILVER)->itype;
 
     u = setup_trade_unit(tc, r, test_create_race("insect"));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
@@ -229,24 +227,20 @@ static void test_buy_cmd(CuTest *tc) {
     unit *u;
     building *b;
     const resource_type *rt_silver;
-    const resource_type *rt_luxury;
+    const item_type *it_luxury;
     test_setup();
-
     init_resources();
-    rt_luxury = get_resourcetype(R_HORSE);
-    CuAssertPtrNotNull(tc, rt_luxury);
-    CuAssertPtrNotNull(tc, rt_luxury->itype);
-    new_luxurytype(rt_luxury->itype, 5);
-    CuAssertPtrNotNull(tc, rt_luxury->ltype);
+    test_create_locale();
+
+    r = setup_trade_region(tc, get_terrain("swamp"));
+    it_luxury = r_luxury(r);
+    CuAssertPtrNotNull(tc, it_luxury);
     rt_silver = get_resourcetype(R_SILVER);
     CuAssertPtrNotNull(tc, rt_silver);
     CuAssertPtrNotNull(tc, rt_silver->itype);
 
-    r = test_create_region(0, 0, NULL);
-    fix_demand(r);
-    CuAssertPtrEquals(tc, rt_luxury->itype, (void *)r_luxury(r));
     u = test_create_unit(test_create_faction(NULL), r);
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(rt_luxury, 0))));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
     set_item(u, rt_silver->itype, 1000);
 
     produce(r);
@@ -272,7 +266,7 @@ static void test_buy_cmd(CuTest *tc) {
     produce(r);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buy"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
-    CuAssertIntEquals(tc, 1, get_item(u, rt_luxury->itype));
+    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
     test_cleanup();
 }
