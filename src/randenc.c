@@ -457,10 +457,6 @@ static void melt_iceberg(region * r)
 
     /* in Ozean wandeln */
     terraform_region(r, newterrain(T_OCEAN));
-
-    /* Einheiten, die nicht schwimmen k�nnen oder in Schiffen sind,
-     * ertrinken */
-    drown(r);
 }
 
 static void move_iceberg(region * r)
@@ -755,12 +751,8 @@ static void demon_skillchanges(void)
  */
 static void icebergs(void)
 {
-    region *r;
     create_icebergs();
     move_icebergs();
-    for (r = regions; r; r = r->next) {
-        drown(r);
-    }
 }
 
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
@@ -808,6 +800,9 @@ void randomevents(void)
 
     if (config_get_int("modules.icebergs", 0)) {
         icebergs();
+    }
+    for (r = regions; r; r = r->next) {
+        drown(r);
     }
     godcurse();
     orc_growth();
