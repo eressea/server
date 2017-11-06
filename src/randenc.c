@@ -432,7 +432,7 @@ void drown(region * r)
     }
 }
 
-static void melt_iceberg(region * r)
+static void melt_iceberg(region * r, const terrain_type *t_ocean)
 {
     attrib *a;
     unit *u;
@@ -456,7 +456,7 @@ static void melt_iceberg(region * r)
     }
 
     /* in Ozean wandeln */
-    terraform_region(r, newterrain(T_OCEAN));
+    terraform_region(r, t_ocean);
 }
 
 static void move_iceberg(region * r)
@@ -585,14 +585,20 @@ static void move_iceberg(region * r)
 static void move_icebergs(void)
 {
     region *r;
+    static int terrain_cache;
+    static const terrain_type *t_iceberg, *t_ocean;
 
+    if (terrain_changed(&terrain_cache)) {
+        t_iceberg = newterrain(T_ICEBERG);
+        t_ocean = newterrain(T_OCEAN);
+    }
     for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_ICEBERG) && !fval(r, RF_SELECT)) {
+        if (r->terrain == t_iceberg && !fval(r, RF_SELECT)) {
             int select = rng_int() % 10;
             if (select < 4) {
                 /* 4% chance */
                 fset(r, RF_SELECT);
-                melt_iceberg(r);
+                melt_iceberg(r, t_ocean);
             }
             else if (select < 64) {
                 /* 60% chance */
@@ -798,7 +804,7 @@ void randomevents(void)
     region *r;
     faction *monsters = get_monsters();
 
-    if (config_get_int("modules.icebergs", 0)) {
+    if (config_get_int("modules.iceberg", 0)) {
         icebergs();
     }
     for (r = regions; r; r = r->next) {
@@ -807,7 +813,9 @@ void randomevents(void)
     godcurse();
     orc_growth();
     demon_skillchanges();
-    volcano_update();
+    if (volcano_module) {
+        volcano_update();
+    }
     /* Monumente zerfallen, Schiffe verfaulen */
 
     for (r = regions; r; r = r->next) {

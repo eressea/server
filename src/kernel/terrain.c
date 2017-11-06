@@ -37,9 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXTERRAINS 14
-
-const char *terraindata[MAXTERRAINS] = {
+static const char *terrainnames[MAXTERRAINS] = {
     "ocean",
     "plain",
     "swamp",
@@ -149,10 +147,10 @@ const struct terrain_type *newterrain(terrain_t t)
     assert(t < MAXTERRAINS);
     result = newterrains[t];
     if (!result) {
-        result = newterrains[t] = get_terrain(terraindata[t]);
+        result = newterrains[t] = get_terrain(terrainnames[t]);
     }
     if (!result) {
-        log_error("no such terrain: %s.", terraindata[t]);
+        log_error("no such terrain: %s.", terrainnames[t]);
     }
     return result;
 }
@@ -198,8 +196,8 @@ void init_terrains(void)
         const terrain_type *newterrain = newterrains[t];
         if (newterrain != NULL)
             continue;
-        if (terraindata[t] != NULL) {
-            newterrain = get_terrain(terraindata[t]);
+        if (terrainnames[t] != NULL) {
+            newterrain = get_terrain(terrainnames[t]);
             if (newterrain != NULL) {
                 newterrains[t] = newterrain;
             }

@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 #include "calendar.h"
 #include "guard.h"
+#include "volcano.h"
 
 /* attributes includes */
 #include <attributes/racename.h>
@@ -72,7 +73,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
-#include <kernel/terrainid.h>   /* for volcanoes in emigration (needs a flag) */
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -246,16 +247,20 @@ static void calculate_emigration(region * r)
     int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
-    static int terrain_cache;
-    static const terrain_type *t_volcano;
-    static const terrain_type *t_smoking;
 
-    if (terrain_changed(&terrain_cache)) {
-        t_volcano = get_terrain("volcano");
-        t_smoking = get_terrain("activevolcano");
-    }
-    if (r->terrain == t_volcano || r->terrain == t_smoking) {
-        max_immigrants = max_immigrants / 10;
+
+    if (volcano_module()) {
+        static int terrain_cache;
+        static const terrain_type *t_volcano;
+        static const terrain_type *t_smoking;
+
+        if (terrain_changed(&terrain_cache)) {
+            t_volcano = newterrain(T_VOLCANO);
+            t_smoking = newterrain(T_VOLCANO_SMOKING);
+        }
+        if (r->terrain == t_volcano || r->terrain == t_smoking) {
+            max_immigrants = max_immigrants / 10;
+        }
     }
 
     for (i = 0; max_immigrants > 0 && i != MAXDIRECTIONS; i++) {
@@ -4221,7 +4226,7 @@ void turn_process(void)
     init_processor();
     process();
 
-    if (config_get_int("modules.markets", 0)) {
+    if (markets_module()) {
         do_markets();
     }
 }
@@ -4233,7 +4238,7 @@ void turn_end(void)
     remove_empty_units();
 
     /* must happen AFTER age, because that would destroy them right away */
-    if (config_get_int("modules.wormholes", 0)) {
+    if (config_get_int("modules.wormhole", 0)) {
         wormholes_update();
     }
 

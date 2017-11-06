@@ -29,6 +29,7 @@ extern "C" {
     T_VOLCANO_SMOKING,
     T_ICEBERG_SLEEP,
     T_ICEBERG,
+    MAXTERRAINS,
     NOTERRAIN = - 1
   } terrain_t;
 
