@@ -57,6 +57,17 @@ const char *terraindata[MAXTERRAINS] = {
 };
 
 static terrain_type *registered_terrains;
+static int terrain_changes = 1;
+
+bool terrain_changed(int *cache) {
+    assert(cache);
+    if (*cache != terrain_changes) {
+        *cache = terrain_changes;
+        return true;
+    }
+    return false;
+}
+
 
 void free_terrains(void)
 {
@@ -76,6 +87,7 @@ void free_terrains(void)
         }
         free(t);
     }
+    ++terrain_changes;
 }
 
 const terrain_type *terrains(void)
@@ -110,6 +122,7 @@ const terrain_type *get_terrain(const char *name) {
 terrain_type * get_or_create_terrain(const char *name) {
     terrain_type *terrain = terrain_find_i(name);
     if (!terrain) {
+        ++terrain_changes;
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
         if (terrain) {
             terrain->_name = strdup(name);

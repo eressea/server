@@ -246,9 +246,15 @@ static void calculate_emigration(region * r)
     int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
+    static int terrain_cache;
+    static const terrain_type *t_volcano;
+    static const terrain_type *t_smoking;
 
-    if (r->terrain == newterrain(T_VOLCANO)
-        || r->terrain == newterrain(T_VOLCANO_SMOKING)) {
+    if (terrain_changed(&terrain_cache)) {
+        t_volcano = get_terrain("volcano");
+        t_smoking = get_terrain("activevolcano");
+    }
+    if (r->terrain == t_volcano || r->terrain == t_smoking) {
         max_immigrants = max_immigrants / 10;
     }
 
