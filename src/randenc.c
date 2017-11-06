@@ -813,7 +813,7 @@ void randomevents(void)
     godcurse();
     orc_growth();
     demon_skillchanges();
-    if (volcano_module) {
+    if (volcano_module()) {
         volcano_update();
     }
     /* Monumente zerfallen, Schiffe verfaulen */
