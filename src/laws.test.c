@@ -1164,10 +1164,12 @@ static void test_ally_cmd_errors(CuTest *tc) {
 static void test_name_cmd(CuTest *tc) {
     unit *u;
     faction *f;
+    alliance *al;
     order *ord;
 
     test_setup();
     u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    setalliance(f, al = makealliance(42, ""));
 
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_UNIT]));
     name_cmd(u, ord);
@@ -1194,6 +1196,11 @@ static void test_name_cmd(CuTest *tc) {
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_REGION]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_ALLIANCE]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", al->name);
     free_order(ord);
 
     test_cleanup();
