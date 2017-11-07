@@ -874,19 +874,27 @@ void spawn_dragons(void)
 {
     region *r;
     faction *monsters = get_or_create_monsters();
+    int minage = config_get_int("monsters.spawn.min_age", 100);
+    int spawn_chance = 100 * config_get_int("monsters.spawn.chance", 100);
 
+    if (spawn_chance <= 0) {
+        /* monster spawning disabled */
+        return;
+    }
     for (r = regions; r; r = r->next) {
         unit *u;
-
+        if (r->age < minage) {
+            continue;
+        }
         if (fval(r->terrain, SEA_REGION)) {
-            if (rng_int() % 10000 < 1) {
+            if (rng_int() % spawn_chance < 1) {
                 u = spawn_seaserpent(r, monsters);
             }
         }
         else if ((r->terrain == newterrain(T_GLACIER)
             || r->terrain == newterrain(T_SWAMP)
             || r->terrain == newterrain(T_DESERT))
-            && rng_int() % 10000 < (5 + 100 * chaosfactor(r))) {
+            && rng_int() % spawn_chance < (5 + 100 * chaosfactor(r))) {
             if (chance(0.80)) {
                 u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
             }
