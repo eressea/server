@@ -371,7 +371,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 token = getstrtoken();
 
                 /* Beginne die Fehlermeldung */
-                if (isparam(token, teacher->faction->locale, P_TEMP)) {
+                if (token && isparam(token, teacher->faction->locale, P_TEMP)) {
                     token = getstrtoken();
                     sprintf(tbuf, "%s %s", LOC(teacher->faction->locale,
                         parameters[P_TEMP]), token);
