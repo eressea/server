@@ -8,7 +8,6 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
-#include "orderdb.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"
@@ -25,6 +24,7 @@
 #include <util/functions.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
+#include <kernel/db.h>
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/xmlreader.h>
@@ -60,15 +60,12 @@ void game_done(void)
     free_special_directions();
     free_locales();
     kernel_done();
-    orderdb_close();
+    db_close();
 }
 
 void game_init(void)
 {
-    db_backend choices[] = { DB_MEMORY, DB_NONE };
-    if (orderdb_open(choices) == DB_NONE) {
-        log_fatal("no orderdb backend available");
-    }
+    db_open();
     kernel_init();
     register_triggers();
     register_xmas();

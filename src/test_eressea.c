@@ -93,6 +93,7 @@ int RunAllTests(int argc, char *argv[])
     /* kernel */
     ADD_SUITE(alliance);
     ADD_SUITE(command);
+    ADD_SUITE(db);
     ADD_SUITE(plane);
     ADD_SUITE(unit);
     ADD_SUITE(faction);
