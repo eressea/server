@@ -6,11 +6,12 @@
 
 #include <critbit.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 static critbit_tree cb_orders = { 0 };
-static int auto_id = 0;
+static int auto_id = -1;
 
 struct cb_entry {
     int id;
@@ -50,15 +51,13 @@ static int free_data_cb(const void *match, const void *key, size_t keylen,
 {
     struct cb_entry * ent = (struct cb_entry *)match;
     order_data *od = ent->data;
-    if (od->_refcount > 1) {
-        log_error("refcount=%d for order %d, %s", od->_refcount, ent->id, od->_str);
-    }
     odata_release(od);
     return 0;
 }
 
 void db_open(void)
 {
+    assert(auto_id == -1);
     auto_id = 0;
 }
 
@@ -66,4 +65,5 @@ void db_close(void)
 {
     cb_foreach(&cb_orders, NULL, 0, free_data_cb, NULL);
     cb_clear(&cb_orders);
+    auto_id = -1;
 }

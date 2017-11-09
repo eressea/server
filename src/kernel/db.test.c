@@ -14,7 +14,7 @@ static void test_save_load_order(CuTest *tc) {
     int id;
     const char * s = "GIB enno 1 Hodor";
 
-    db_open();
+    test_setup();
 
     odata_create(&od, strlen(s) + 1, s);
     CuAssertTrue(tc, od->_refcount >= 1);
@@ -28,7 +28,7 @@ static void test_save_load_order(CuTest *tc) {
     CuAssertStrEquals(tc, s, od->_str);
     odata_release(od);
 
-    db_close();
+    test_cleanup();
 }
 
 CuSuite *get_db_suite(void)
