@@ -37,6 +37,9 @@ jsonconf.test.c
 )
 
 SET(_DBFILES dbtrie.c)
+IF(SQLITE3_FOUND)
+SET(_DBFILES dbsqlite.c)
+ENDIF(SQLITE3_FOUND)
 
 SET(_FILES
 ${_DBFILES}

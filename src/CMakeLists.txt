@@ -267,6 +267,7 @@ install(TARGETS eressea DESTINATION "bin")
 
 if (SQLITE3_FOUND)
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
+target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
 add_definitions(-DUSE_SQLITE)
 endif(SQLITE3_FOUND)
 
