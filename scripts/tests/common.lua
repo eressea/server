@@ -807,7 +807,6 @@ end
 function test_swim_and_survive()
     local r = region.create(0, 0, "plain")
     local f = create_faction('human')
-    f.nam = "chaos"
     local u = unit.create(f, r, 1)
     process_orders()
     r.terrain = "ocean"

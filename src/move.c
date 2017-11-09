@@ -787,22 +787,22 @@ static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *
     msg_release(msg);
 }
 
-region * drift_target(ship *sh) {
-    int d, d_offset = rng_int() % MAXDIRECTIONS;
-    region *rnext = NULL;
+direction_t drift_target(ship *sh) {
+    direction_t d, dir = rng_int() % MAXDIRECTIONS;
+    direction_t result = NODIRECTION;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
         region *rn;
-        direction_t dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-        rn = rconnect(sh->region, dir);
+        direction_t dn = (direction_t)((d + dir) % MAXDIRECTIONS);
+        rn = rconnect(sh->region, dn);
         if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
-            rnext = rn;
-            if (!fval(rnext->terrain, SEA_REGION)) {
+            result = dn;
+            if (!fval(rn->terrain, SEA_REGION)) {
                 /* prefer drifting towards non-ocean regions */
                 break;
             }
         }
     }
-    return rnext;
+    return result;
 }
 
 static void drifting_ships(region * r)
@@ -817,7 +817,7 @@ static void drifting_ships(region * r)
             region *rnext = NULL;
             region_list *route = NULL;
             unit *firstu = r->units, *lastu = NULL, *captain;
-            direction_t dir = 0;
+            direction_t dir = NODIRECTION;
             double ovl;
 
             if (sh->type->fishing > 0) {
@@ -846,13 +846,13 @@ static void drifting_ships(region * r)
             }
 
             ovl = overload(r, sh);
-            if (ovl >= overload_start()) {
-                rnext = NULL;
-            }
-            else {
+            if (ovl < overload_start()) {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
                  * zufällig. Falls unmögliches Resultat: vergiß es. */
-                rnext = drift_target(sh);
+                dir = drift_target(sh);
+                if (dir != NODIRECTION) {
+                    rnext = rconnect(sh->region, dir);
+                }
             }
 
             if (rnext != NULL) {

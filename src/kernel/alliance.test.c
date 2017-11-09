@@ -216,7 +216,6 @@ static void test_alliance_cmd_transfer(CuTest *tc) {
     test_cleanup();
 }
 
-
 CuSuite *get_alliance_suite(void)
 {
     CuSuite *suite = CuSuiteNew();

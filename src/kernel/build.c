@@ -405,7 +405,7 @@ static int required(int size, int msize, int maxneed)
 static int matmod(const unit * u, const resource_type * rtype, int value)
 {
     if (rtype->modifiers) {
-        variant save = frac_make(1, 1);
+        variant save = frac_one;
         const struct building_type *btype = NULL;
         const struct race *rc = u_race(u);
         resource_mod *mod;

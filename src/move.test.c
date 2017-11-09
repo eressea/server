@@ -477,19 +477,19 @@ static void test_follow_ship_msg(CuTest * tc) {
 
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
-    region *r1, *r2, *r3;
+    region *r;
     terrain_type *t_ocean, *t_plain;
     ship_type *st_boat;
     test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
-    r1 = test_create_region(0, 0, t_ocean);
-    r2 = test_create_region(1, 0, t_ocean);
+    r = test_create_region(0, 0, t_ocean);
+    test_create_region(1, 0, t_ocean);
     st_boat = test_create_shiptype("boat");
-    sh = test_create_ship(r1, st_boat);
-    CuAssertPtrEquals(tc, r2, drift_target(sh));
-    r3 = test_create_region(-1, 0, t_plain);
-    CuAssertPtrEquals(tc, r3, drift_target(sh));
+    sh = test_create_ship(r, st_boat);
+    CuAssertIntEquals(tc, D_EAST, drift_target(sh));
+    test_create_region(-1, 0, t_plain);
+    CuAssertIntEquals(tc, D_WEST, drift_target(sh));
     test_cleanup();
 }
 

@@ -16,6 +16,7 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
@@ -864,11 +865,25 @@ static void test_peasant_luck_effect(CuTest *tc) {
     test_cleanup();
 }
 
+/**
+* Create any terrain types that are used by demographics.
+*
+* This should prevent newterrain from returning NULL.
+*/
+static void setup_terrains(CuTest *tc) {
+    test_create_terrain("volcano", SEA_REGION | SWIM_INTO | FLY_INTO);
+    test_create_terrain("activevolcano", LAND_REGION | WALK_INTO | FLY_INTO);
+    init_terrains();
+    CuAssertPtrNotNull(tc, newterrain(T_VOLCANO));
+    CuAssertPtrNotNull(tc, newterrain(T_VOLCANO_SMOKING));
+}
+
 static void test_luck_message(CuTest *tc) {
     region* r;
     attrib *a;
 
     test_setup();
+    setup_terrains(tc);
     r = test_create_region(0, 0, NULL);
     rsetpeasants(r, 1);
 
@@ -1149,10 +1164,12 @@ static void test_ally_cmd_errors(CuTest *tc) {
 static void test_name_cmd(CuTest *tc) {
     unit *u;
     faction *f;
+    alliance *al;
     order *ord;
 
     test_setup();
     u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    setalliance(f, al = makealliance(42, ""));
 
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_UNIT]));
     name_cmd(u, ord);
@@ -1179,6 +1196,11 @@ static void test_name_cmd(CuTest *tc) {
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_REGION]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_ALLIANCE]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor", al->name);
     free_order(ord);
 
     test_cleanup();

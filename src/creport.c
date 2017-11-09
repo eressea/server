@@ -855,8 +855,6 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         stream_printf(out, "\"%s\";Typ\n",
             translate(zRace, LOC(lang, zRace)));
         if (u->faction == f && irace != u_race(u)) {
-            assert(skill_enabled(SK_STEALTH)
-                || !"we're resetting this on load, so.. ircase should never be used");
             zRace = rc_name_s(u_race(u), NAME_PLURAL);
             stream_printf(out, "\"%s\";wahrerTyp\n",
                 translate(zRace, LOC(lang, zRace)));
