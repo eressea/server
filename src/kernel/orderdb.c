@@ -31,6 +31,11 @@ void odata_release(order_data * od)
     }
 }
 
+void odata_addref(order_data *od)
+{
+    ++od->_refcount;
+}
+
 order_data *odata_load(int id)
 {
     return db_load_order(id);

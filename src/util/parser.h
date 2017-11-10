@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+    void init_tokens_ex(const char *initstr, void *data, void(*dtor)(void *));
     void init_tokens_str(const char *initstr);  /* initialize token parsing */
     void skip_token(void);
     const char *parse_token_depr(const char **str);

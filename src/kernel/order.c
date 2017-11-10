@@ -523,8 +523,13 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
             init_tokens_str(skillname(sk, lang));
         }
         else {
+            const char *str;
             parser_od = odata_load(ord->id);
-            init_tokens_str(OD_STRING(parser_od));
+            if (parser_od) {
+                odata_addref(parser_od);
+            }
+            str = OD_STRING(parser_od);
+            init_tokens_ex(str, parser_od, odata_release);
         }
         return kwd;
     }
