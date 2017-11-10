@@ -35,7 +35,7 @@ order_data *db_load_order(int id)
                 bytes = sqlite3_column_bytes(g_stmt_select, 0);
                 assert(bytes > 0);
                 text = sqlite3_column_text(g_stmt_select, 0);
-                odata_create(&od, (size_t)bytes, (const char *)text);
+                odata_create(&od, 1+(size_t)bytes, (const char *)text);
                 return od;
             }
         } while (err == SQLITE_ROW);
