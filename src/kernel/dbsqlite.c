@@ -64,8 +64,12 @@ int db_save_order(order_data *od)
 void db_open(void)
 {
     int err;
-    const char *dbname = config_get("config.dbname", "");
+    const char *dbname;
 
+    dbname = config_get("config.dbname");
+    if (!dbname) {
+        dbname = "";
+    }
     err = sqlite3_open(dbname, &g_db);
     assert(err == SQLITE_OK);
     err = sqlite3_exec(g_db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, data TEXT NOT NULL)", NULL, NULL, NULL);
