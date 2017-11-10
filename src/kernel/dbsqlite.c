@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "db.h"
 #include "orderdb.h"
+#include "config.h"
 
 #include <util/log.h>
 
@@ -11,8 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-#define DBNAME ":memory:"
 static sqlite3 *g_db;
 static sqlite3_stmt * g_stmt_insert;
 static sqlite3_stmt * g_stmt_select;
@@ -65,8 +64,9 @@ int db_save_order(order_data *od)
 void db_open(void)
 {
     int err;
+    const char *dbname = config_get("config.dbname", "");
 
-    err = sqlite3_open(DBNAME, &g_db);
+    err = sqlite3_open(dbname, &g_db);
     assert(err == SQLITE_OK);
     err = sqlite3_exec(g_db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, data TEXT NOT NULL)", NULL, NULL, NULL);
     assert(err == SQLITE_OK);
