@@ -529,7 +529,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
                 odata_addref(parser_od);
             }
             str = OD_STRING(parser_od);
-            init_tokens_ex(str, parser_od, odata_release);
+            init_tokens_ex(str, parser_od, (void(*)(void *))odata_release);
         }
         return kwd;
     }
