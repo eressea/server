@@ -16,12 +16,20 @@ static sqlite3 *g_db;
 static sqlite3_stmt * g_stmt_insert;
 static sqlite3_stmt * g_stmt_select;
 
+static int g_order_batchsize;
+static int g_order_tx_size;
+
 order_data *db_load_order(int id)
 {
     if (id > 0) {
         order_data * od = NULL;
         int err;
 
+        if (g_order_tx_size > 0) {
+            g_order_tx_size = 0;
+            err = sqlite3_exec(g_db, "COMMIT", NULL, NULL, NULL);
+            assert(err == SQLITE_OK);
+        }
         err = sqlite3_reset(g_stmt_select);
         assert(err == SQLITE_OK);
         err = sqlite3_bind_int(g_stmt_select, 1, id);
@@ -48,6 +56,14 @@ int db_save_order(order_data *od)
     if (od->_str) {
         int err;
         sqlite3_int64 id;
+
+        if (g_order_batchsize > 0) {
+            if (g_order_tx_size == 0) {
+                err = sqlite3_exec(g_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
+                assert(err == SQLITE_OK);
+            }
+        }
+
         err = sqlite3_reset(g_stmt_insert);
         assert(err == SQLITE_OK);
         err = sqlite3_bind_text(g_stmt_insert, 1, od->_str, -1, SQLITE_STATIC);
@@ -56,6 +72,15 @@ int db_save_order(order_data *od)
         assert(err == SQLITE_DONE);
         id = sqlite3_last_insert_rowid(g_db);
         assert(id <= INT_MAX);
+
+        if (g_order_batchsize > 0) {
+            if (++g_order_tx_size >= g_order_batchsize) {
+                err = sqlite3_exec(g_db, "COMMIT", NULL, NULL, NULL);
+                assert(err == SQLITE_OK);
+                g_order_tx_size = 0;
+            }
+        }
+
         return (int)id;
     }
     return 0;
@@ -66,11 +91,16 @@ void db_open(void)
     int err;
     const char *dbname;
 
-    dbname = config_get("config.dbname");
+    g_order_batchsize = config_get_int("config.db_batch", 100);
+    dbname = config_get("config.db_name");
     if (!dbname) {
         dbname = "";
     }
     err = sqlite3_open(dbname, &g_db);
+    assert(err == SQLITE_OK);
+    err = sqlite3_exec(g_db, "PRAGMA journal_mode=OFF", NULL, NULL, NULL);
+    assert(err == SQLITE_OK);
+    err = sqlite3_exec(g_db, "PRAGMA synchronous=OFF", NULL, NULL, NULL);
     assert(err == SQLITE_OK);
     err = sqlite3_exec(g_db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, data TEXT NOT NULL)", NULL, NULL, NULL);
     assert(err == SQLITE_OK);
