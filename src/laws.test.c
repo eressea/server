@@ -990,15 +990,14 @@ static void test_name_ship(CuTest *tc) {
     unit *uo, *u, *ux;
     faction *f;
 
-    test_setup();
+    u = setup_name_cmd();
+    u->ship = test_create_ship(u->region, 0);
+    f = u->faction;
     uo = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    uo->ship = test_create_ship(uo->region, 0);
-
-    f = test_create_faction(NULL);
+    u_set_ship(uo, u->ship);
     ux = test_create_unit(f, test_create_region(0, 0, NULL));
-    u_set_ship(ux, uo->ship);
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
-    u_set_ship(u, uo->ship);
+    u_set_ship(ux, u->ship);
+
     u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_SHIP]));
 
     ship_set_owner(uo);
@@ -1006,6 +1005,11 @@ static void test_name_ship(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error12"));
     test_clear_messages(f);
 
+    ship_set_owner(u);
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+
+    ship_setname(u->ship, "Titanic");
     ship_set_owner(ux);
     name_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error12"));
