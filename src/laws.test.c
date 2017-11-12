@@ -1009,6 +1009,34 @@ static void test_name_ship(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_name_cmd_2384(CuTest *tc) {
+    unit *uo, *u, *ux;
+    faction *f;
+
+    test_setup();
+    uo = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    uo->ship = test_create_ship(uo->region, 0);
+
+    f = test_create_faction(NULL);
+    ux = test_create_unit(f, test_create_region(0, 0, NULL));
+    u_set_ship(ux, uo->ship);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u_set_ship(u, uo->ship);
+    u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_SHIP]));
+
+    ship_set_owner(uo);
+    name_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error12"));
+    test_clear_messages(f);
+
+    ship_set_owner(ux);
+    name_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error12"));
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+
+    test_cleanup();
+}
+
 static void test_long_order_normal(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
@@ -1748,6 +1776,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_name_cmd_2384);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
