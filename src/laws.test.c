@@ -987,29 +987,6 @@ static void test_name_building(CuTest *tc) {
 }
 
 static void test_name_ship(CuTest *tc) {
-    unit *u;
-    faction *f;
-    order *ord;
-
-    u = setup_name_cmd();
-    f = u->faction;
-    u->ship = test_create_ship(u->region, 0);
-
-    ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_SHIP]));
-    name_cmd(u, ord);
-    CuAssertStrEquals(tc, "Hodor", u->ship->name);
-    free_order(ord);
-
-    ord = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_SHIP]));
-    name_cmd(u, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
-    CuAssertStrEquals(tc, "Hodor", u->ship->name);
-    free_order(ord);
-
-    test_cleanup();
-}
-
-static void test_name_cmd_2384(CuTest *tc) {
     unit *uo, *u, *ux;
     faction *f;
 
@@ -1032,6 +1009,13 @@ static void test_name_cmd_2384(CuTest *tc) {
     ship_set_owner(ux);
     name_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error12"));
+    CuAssertStrEquals(tc, "Hodor", u->ship->name);
+
+    test_clear_messages(f);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_SHIP]));
+    name_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
 
     test_cleanup();
@@ -1776,8 +1760,11 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
-    SUITE_ADD_TEST(suite, test_name_cmd_2384);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
+    SUITE_ADD_TEST(suite, test_name_unit);
+    SUITE_ADD_TEST(suite, test_name_region);
+    SUITE_ADD_TEST(suite, test_name_building);
+    SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
@@ -1827,10 +1814,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
     SUITE_ADD_TEST(suite, test_mail_faction_no_target);
     SUITE_ADD_TEST(suite, test_luck_message);
-    SUITE_ADD_TEST(suite, test_name_unit);
-    SUITE_ADD_TEST(suite, test_name_region);
-    SUITE_ADD_TEST(suite, test_name_building);
-    SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_show_without_item);
     SUITE_ADD_TEST(suite, test_show_race);
     SUITE_ADD_TEST(suite, test_show_both);
