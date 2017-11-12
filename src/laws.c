@@ -1817,11 +1817,13 @@ int name_cmd(struct unit *u, struct order *ord)
             s = &sh->name;
         }
         else {
+            unit *uo;
             if (!u->ship) {
                 cmistake(u, ord, 144, MSG_PRODUCE);
                 break;
             }
-            if (ship_owner(u->ship) != u) {
+            uo = ship_owner(u->ship);
+            if (uo->faction != u->faction) {
                 cmistake(u, ord, 12, MSG_PRODUCE);
                 break;
             }
