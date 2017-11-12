@@ -86,6 +86,8 @@ static const char * valid_keys[] = {
     "game.mailcmd",
     "game.era",
     "game.sender",
+    "game.dbname",
+    "game.dbbatch",
     "editor.color",
     "editor.codepage",
     "editor.population.",

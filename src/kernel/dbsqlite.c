@@ -91,8 +91,8 @@ void db_open(void)
     int err;
     const char *dbname;
 
-    g_order_batchsize = config_get_int("config.db_batch", 100);
-    dbname = config_get("config.db_name");
+    g_order_batchsize = config_get_int("game.dbbatch", 100);
+    dbname = config_get("game.dbname");
     if (!dbname) {
         dbname = "";
     }
