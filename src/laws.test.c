@@ -956,27 +956,40 @@ static void test_name_region(CuTest *tc) {
 }
 
 static void test_name_building(CuTest *tc) {
-    unit *u;
+    unit *uo, *u, *ux;
     faction *f;
-    order *ord;
 
     u = setup_name_cmd();
-    f = u->faction;
-
-    ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
-    name_cmd(u, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error145"));
-
     u->building = test_create_building(u->region, 0);
-    name_cmd(u, ord);
-    CuAssertStrEquals(tc, "Hodor", u->building->name);
-    free_order(ord);
+    f = u->faction;
+    uo = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u_set_building(uo, u->building);
+    ux = test_create_unit(f, test_create_region(0, 0, NULL));
+    u_set_building(ux, u->building);
 
-    ord = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
-    name_cmd(u, ord);
+    u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
+
+    building_set_owner(uo);
+    name_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error148"));
+    test_clear_messages(f);
+
+    building_set_owner(u);
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+
+    building_setname(u->building, "Home");
+    building_set_owner(ux);
+    name_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error148"));
+    CuAssertStrEquals(tc, "Hodor", u->building->name);
+
+    test_clear_messages(f);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
-    free_order(ord);
 
     /* TODO: test BTF_NAMECHANGE:
     btype->flags |= BTF_NAMECHANGE;
