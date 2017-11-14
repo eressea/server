@@ -2126,12 +2126,12 @@ int email_cmd(unit * u, struct order *ord)
     }
     else {
         faction *f = u->faction;
-        if (set_email(&f->email, s) != 0) {
+        if (check_email(s) == 0) {
+          faction_setemail(f, s);
+          ADDMSG(&f->msgs, msg_message("changemail", "value", faction_getemail(f)));
+        } else {
             log_error("Invalid email address for faction %s: %s\n", itoa36(f->no), s);
             ADDMSG(&f->msgs, msg_message("changemail_invalid", "value", s));
-        }
-        else {
-            ADDMSG(&f->msgs, msg_message("changemail", "value", f->email));
         }
     }
     return 0;
