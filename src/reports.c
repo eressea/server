@@ -1561,8 +1561,12 @@ static void write_script(FILE * F, const faction * f)
 {
     report_type *rtype;
     char buf[1024];
-
-    fprintf(F, "faction=%s:email=%s:lang=%s", itoa36(f->no), f->email,
+    
+    if (check_email(faction_getemail(f)) != 0) {
+        return;
+    }
+    
+    fprintf(F, "faction=%s:email=%s:lang=%s", itoa36(f->no), faction_getemail(f),
         locale_name(f->locale));
     if (f->options & (1 << O_BZIP2))
         fputs(":compression=bz2", F);

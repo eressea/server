@@ -1054,8 +1054,8 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
         if (uf != f) {
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
-            if (f->email)
-                fprintf(F, "\"%s\";email\n", f->email);
+            if (strcmp(faction_getemail(f), "") != 0)
+                fprintf(F, "\"%s\";email\n", faction_getemail(f));
             if (f->banner)
                 fprintf(F, "\"%s\";banner\n", f->banner);
             fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
@@ -1603,7 +1603,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     }
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);
-    fprintf(F, "\"%s\";email\n", f->email);
+    fprintf(F, "\"%s\";email\n", faction_getemail(f));
     if (f->banner)
         fprintf(F, "\"%s\";banner\n", f->banner);
     print_items(F, f->items, f->locale);

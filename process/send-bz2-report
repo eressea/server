@@ -16,7 +16,7 @@ then
   shift
 fi
 
-if [ "$1" == "-Lde" ]
+if [ "$1" == "-Len" ]
 then
   TEMPLATE=report-mail.en.txt
   shift

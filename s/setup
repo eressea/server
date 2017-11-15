@@ -11,9 +11,9 @@ done
 ERESSEA=$(dirname $ROOT)
 
 function abort() {
-echo $1
-[ -z $2 ] && exit -1
-exit $2 # otherwise
+  echo $1
+  [ -z $2 ] && exit -1
+  exit $2 # otherwise
 }
 
 function usage() {
@@ -63,34 +63,36 @@ if [ -d $dir ] ; then
   [ $force -eq 1 ] || abort "$dir directory exists. Use -f to force"
 fi
 mkdir -p $dir
-cd $dir || abort "could not chdir to game-$game"
+cd $dir || abort "could not chdir to $dir"
 mkdir -p data reports
 
 function ini_sec() {
-if [ $edit -eq 1 ]; then
-$INIFILE eressea.ini add $1
-else
-echo "[$1]" >> eressea.ini
-fi
+  if [ $edit -eq 1 ]; then
+    $INIFILE eressea.ini add $1
+  else
+    echo "[$1]" >> eressea.ini
+  fi
 }
+
 function ini_add() {
-if [ $edit -eq 1 ]; then
-$INIFILE eressea.ini add $1:$2 $3
-else
-echo "$2 = $3" >> eressea.ini
-fi
+  if [ $edit -eq 1 ]; then
+    $INIFILE eressea.ini add $1:$2 $3
+  else
+    echo "$2 = $3" >> eressea.ini
+  fi
 }
+
 function ini_start() {
-if [ -e eressea.ini ]; then
-if [ ! -e $INIFILE ] && [ $edit -eq 1 ]; then
-abort "missing editor for eressea.ini. use -n to create new file."
-fi
-rm -f eressea.ini
-edit=0
-else
-edit=0
-fi
-touch eressea.ini
+  if [ -e eressea.ini ]; then
+    if [ ! -e $INIFILE ] && [ $edit -eq 1 ]; then
+      abort "missing editor for eressea.ini. use -n to create new file."
+    fi
+    rm -f eressea.ini
+    edit=0
+  else
+    edit=0
+  fi
+  touch eressea.ini
 }
 
 ini_start
