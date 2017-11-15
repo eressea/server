@@ -859,7 +859,7 @@ static void select_regions(state * st, int selectmode)
 static void loaddata(state *st) {
     char datafile[MAX_PATH];
 
-    askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
+    askstring(st->wnd_status->handle, "load from:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
         readgame(datafile);
         st->modified = 0;

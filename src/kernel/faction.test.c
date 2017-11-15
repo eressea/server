@@ -225,17 +225,28 @@ static void test_valid_race(CuTest *tc) {
 }
 
 static void test_set_email(CuTest *tc) {
-    char * email = NULL;
+    faction *f;
+    char email[10];
     test_setup();
-    CuAssertIntEquals(tc, 0, set_email(&email, "enno@eressea.de"));
-    CuAssertStrEquals(tc, "enno@eressea.de", email);
-    CuAssertIntEquals(tc, 0, set_email(&email, "bugs@eressea.de"));
-    CuAssertStrEquals(tc, "bugs@eressea.de", email);
-    CuAssertIntEquals(tc, -1, set_email(&email, "bad@@eressea.de"));
-    CuAssertIntEquals(tc, -1, set_email(&email, "eressea.de"));
-    CuAssertIntEquals(tc, -1, set_email(&email, "eressea@"));
-    CuAssertStrEquals(tc, "bugs@eressea.de", email);
-    free(email);
+    CuAssertIntEquals(tc, 0, check_email("enno@eressea.de"));
+    CuAssertIntEquals(tc, 0, check_email("bugs@eressea.de"));
+    CuAssertIntEquals(tc, -1, check_email("bad@@eressea.de"));
+    CuAssertIntEquals(tc, -1, check_email("eressea.de"));
+    CuAssertIntEquals(tc, -1, check_email("eressea@"));
+    CuAssertIntEquals(tc, -1, check_email(""));
+    CuAssertIntEquals(tc, -1, check_email(NULL));
+    f = test_create_faction(0);
+
+    sprintf(email, "enno");
+    faction_setemail(f, email);
+    email[0] = 0;
+    CuAssertStrEquals(tc, "enno", f->email);
+    CuAssertStrEquals(tc, "enno", faction_getemail(f));
+    faction_setemail(f, "bugs@eressea.de");
+    CuAssertStrEquals(tc, "bugs@eressea.de", f->email);
+    faction_setemail(f, NULL);
+    CuAssertPtrEquals(tc, 0, f->email);
+    CuAssertStrEquals(tc, "", faction_getemail(f));
     test_cleanup();
 }
 
