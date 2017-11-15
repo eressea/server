@@ -102,7 +102,7 @@ int json_export(stream * out, int flags) {
             cJSON *data;
             cJSON_AddItemToObject(json, itoa36(f->no), data = cJSON_CreateObject());
             cJSON_AddStringToObject(data, "name", f->name);
-            cJSON_AddStringToObject(data, "email", f->email);
+            cJSON_AddStringToObject(data, "email", faction_getemail(f));
             cJSON_AddNumberToObject(data, "score", (double)f->score);
         }
     }
