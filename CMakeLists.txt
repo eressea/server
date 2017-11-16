@@ -12,6 +12,7 @@ include(MSVC)
 endif (MSVC)
 
 find_package (SQLite3)
+find_package (BerkeleyDB)
 find_package (Curses)
 find_package (LibXml2)
 find_package (ToLua REQUIRED)
