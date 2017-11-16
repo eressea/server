@@ -265,7 +265,16 @@ add_test(server test_eressea)
 
 install(TARGETS eressea DESTINATION "bin")
 
+if (DB_FOUND)
+include_directories (${DB_INCLUDE_DIR})
+target_link_libraries(convert ${DB_LIBRARIES})
+target_link_libraries(eressea ${DB_LIBRARIES})
+target_link_libraries(test_eressea ${DB_LIBRARIES})
+add_definitions(-DUSE_DB)
+endif(DB_FOUND)
+
 if (SQLITE3_FOUND)
+include_directories (${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
 target_link_libraries(convert ${SQLITE3_LIBRARIES})
 target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
