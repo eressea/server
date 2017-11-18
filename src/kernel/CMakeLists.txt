@@ -11,7 +11,7 @@ command.test.c
 config.test.c
 # connection.test.c
 curse.test.c
-db.test.c
+database.test.c
 equipment.test.c
 faction.test.c
 group.test.c
@@ -36,9 +36,9 @@ jsonconf.test.c
 # xmlreader.test.c
 )
 
-SET(_DBFILES dbtrie.c)
+SET(_DBFILES db/critbit.c)
 IF(SQLITE3_FOUND)
-SET(_DBFILES dbsqlite.c)
+SET(_DBFILES db/sqlite.c)
 ENDIF(SQLITE3_FOUND)
 
 SET(_FILES
@@ -52,6 +52,7 @@ command.c
 config.c
 connection.c
 curse.c
+database.c
 equipment.c
 faction.c
 group.c

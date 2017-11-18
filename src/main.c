@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 
 #include <kernel/config.h>
-#include <kernel/db.h>
+#include <kernel/database.h>
 #include <kernel/version.h>
 #include <kernel/save.h>
 #include <util/filereader.h>

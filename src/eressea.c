@@ -24,10 +24,10 @@
 #include <util/functions.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
-#include <kernel/db.h>
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/xmlreader.h>
+#include <kernel/database.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/xerewards.h>

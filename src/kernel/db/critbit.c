@@ -1,7 +1,7 @@
 #include <platform.h>
-#include "db.h"
-#include "orderdb.h"
+#include "critbit.h"
 
+#include <kernel/orderdb.h>
 #include <util/log.h>
 
 #include <critbit.h>
@@ -18,32 +18,30 @@ struct cb_entry {
     order_data *data;
 };
 
-order_data *db_load_order(int id)
+order_data *db_critbit_order_load(int id)
 {
     void * match;
 
-    if (id > 0) {
-        if (cb_find_prefix(&cb_orders, &id, sizeof(id), &match, 1, 0) > 0) {
-            struct cb_entry *ent = (struct cb_entry *)match;
-            order_data * od = ent->data;
-            ++od->_refcount;
-            return od;
-        }
+    assert(id>0);
+    if (cb_find_prefix(&cb_orders, &id, sizeof(id), &match, 1, 0) > 0) {
+        struct cb_entry *ent = (struct cb_entry *)match;
+        order_data * od = ent->data;
+        ++od->_refcount;
+        return od;
     }
     return NULL;
 }
 
-int db_save_order(order_data *od)
+int db_critbit_order_save(order_data *od)
 {
-    if (od->_str) {
-        struct cb_entry ent;
-        ++od->_refcount;
-        ent.id = ++auto_id;
-        ent.data = od;
-        cb_insert(&cb_orders, &ent, sizeof(ent));
-        return ent.id;
-    }
-    return 0;
+    struct cb_entry ent;
+
+    assert(od && od->_str);
+    ++od->_refcount;
+    ent.id = ++auto_id;
+    ent.data = od;
+    cb_insert(&cb_orders, &ent, sizeof(ent));
+    return ent.id;
 }
 
 static int free_data_cb(const void *match, const void *key, size_t keylen,
@@ -55,13 +53,13 @@ static int free_data_cb(const void *match, const void *key, size_t keylen,
     return 0;
 }
 
-void db_open(void)
+void db_critbit_open(void)
 {
     assert(auto_id == -1);
     auto_id = 0;
 }
 
-void db_close(void)
+void db_critbit_close(void)
 {
     cb_foreach(&cb_orders, NULL, 0, free_data_cb, NULL);
     cb_clear(&cb_orders);

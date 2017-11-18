@@ -134,6 +134,7 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
+  ${DB_SRC}
   ${UTIL_SRC}
 )
 
