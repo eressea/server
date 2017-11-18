@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 
-#include "db.h"
+#include "database.h"
 #include "orderdb.h"
 
 #include <CuTest.h>
