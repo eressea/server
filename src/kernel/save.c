@@ -509,7 +509,7 @@ unit *read_unit(gamedata *data)
     u_setrace(u, rc);
 
     READ_TOK(data->store, rname, sizeof(rname));
-    if (rname[0] && skill_enabled(SK_STEALTH))
+    if (rname[0])
         u->irace = rc_find(rname);
     else
         u->irace = NULL;
