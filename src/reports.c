@@ -965,10 +965,11 @@ const struct unit *ucansee(const struct faction *f, const struct unit *u,
     return x;
 }
 
-int stealth_modifier(seen_mode mode)
+int stealth_modifier(const region *r, const faction *f, seen_mode mode)
 {
     switch (mode) {
     case seen_spell:
+        return get_observer(r, f);
     case seen_unit:
         return 0;
     case seen_lighthouse:
@@ -1061,7 +1062,7 @@ void get_addresses(report_context * ctx)
     }
 
     for (; r != NULL; r = r->next) {
-        int stealthmod = stealth_modifier(r->seen.mode);
+        int stealthmod = stealth_modifier(r, ctx->f, r->seen.mode);
         if (r->seen.mode == seen_lighthouse) {
             unit *u = r->units;
             for (; u; u = u->next) {
@@ -1616,11 +1617,13 @@ int reports(void)
     }
 
     for (f = factions; f; f = f->next) {
-        int error = write_reports(f, ltime);
-        if (error)
-            retval = error;
-        if (mailit)
-            write_script(mailit, f);
+        if (f->email && !fval(f, FFL_NPC)) {
+            int error = write_reports(f, ltime);
+            if (error)
+                retval = error;
+            if (mailit)
+                write_script(mailit, f);
+        }
     }
     if (mailit)
         fclose(mailit);
@@ -1701,7 +1704,7 @@ static void var_free_regions(variant x) /*-V524 */
 
 const char *trailinto(const region * r, const struct locale *lang)
 {
-    char ref[32];
+    static char ref[32];
     const char *s;
     if (r) {
         const char *tname = terrain_name(r);
@@ -2145,23 +2148,6 @@ static void eval_int36(struct opstack **stack, const void *userdata)
 
 /*** END MESSAGE RENDERING ***/
 
-#include <util/nrmessage.h>
-
-static void log_orders(const struct message *msg)
-{
-    char buffer[4096];
-    int i;
-
-    for (i = 0; i != msg->type->nparameters; ++i) {
-        if (msg->type->types[i]->copy == &var_copy_order) {
-            const char *section = nr_section(msg);
-            nr_render(msg, default_locale, buffer, sizeof(buffer), NULL);
-            log_debug("MESSAGE [%s]: %s\n", section, buffer);
-            break;
-        }
-    }
-}
-
 int stream_printf(struct stream * out, const char *format, ...)
 {
     va_list args;
@@ -2223,8 +2209,6 @@ void register_reports(void)
     register_argtype("resources", var_free_resources, var_copy_resources, VAR_VOIDPTR);
     register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
     register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
-
-    msg_log_create = &log_orders;
 
     /* register functions that turn message contents to readable strings */
     add_function("alliance", &eval_alliance);

@@ -19,13 +19,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
 
-#include <stddef.h>
-#include <stdbool.h>
+#include <util/resolve.h>
+
 #include "types.h"
 #include "direction.h"
 
+#include <stddef.h>
+#include <stdbool.h>
+
 #define MAXLUXURIES 16 /* there must be no more than MAXLUXURIES kinds of luxury goods in any game */
 #define MAXREGIONS 524287      /* must be prime for hashing. 262139 was a little small */
+#define MAXTREES 100 * 1000 * 1000 /* bug 2360: some players are crazy */
 
     /* FAST_CONNECT: regions are directly connected to neighbours, saves doing
        a hash-access each time a neighbour is needed, 6 extra pointers per hex */
@@ -95,7 +99,7 @@ extern "C" {
 
     typedef struct land_region {
         char *name;
-        /* TODO: demand kann nach Konvertierung entfernt werden. */
+        char *display;
         demand *demands;
         const struct item_type *herbtype;
         short herbs;
@@ -121,7 +125,6 @@ extern "C" {
         int uid;           /* a unique id */
         int x, y;
         struct plane *_plane;       /* to access, use rplane(r) */
-        char *display;
         int flags;
         unsigned short age;
         struct message_list *msgs;
@@ -256,11 +259,10 @@ extern "C" {
     int region_get_morale(const region * r);
     void region_set_morale(region * r, int morale, int turn);
 
+#define RESOLVE_REGION (TYP_REGION << 24)
+    void resolve_region(region *r);
     void write_region_reference(const struct region *r, struct storage *store);
-    variant read_region_reference(struct gamedata *data);
-    int resolve_region_coor(variant id, void *address);
-    int resolve_region_id(variant id, void *address);
-#define RESOLVE_REGION(version) ((version<UIDHASH_VERSION)?resolve_region_coor:resolve_region_id)
+    int read_region_reference(struct gamedata *data, region **rp, resolve_fun fun);
 
     const char *regionname(const struct region *r, const struct faction *f);
 

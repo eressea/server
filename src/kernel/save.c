@@ -24,11 +24,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "alliance.h"
 #include "ally.h"
-#include "connection.h"
 #include "building.h"
+#include "connection.h"
+#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
+#include "magic.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -51,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <triggers/timeout.h>
+#include <triggers/shock.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -120,217 +123,6 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-
-static unit *unitorders(FILE * F, int enc, struct faction *f)
-{
-    int i;
-    unit *u;
-
-    if (!f)
-        return NULL;
-
-    i = getid();
-    u = findunitg(i, NULL);
-
-    if (u && u->faction == f) {
-        order **ordp;
-
-        if (!fval(u, UFL_ORDERS)) {
-            /* alle wiederholbaren, langen befehle werden gesichert: */
-            fset(u, UFL_ORDERS);
-            u->old_orders = u->orders;
-            ordp = &u->old_orders;
-            while (*ordp) {
-                order *ord = *ordp;
-                keyword_t kwd = getkeyword(ord);
-                if (!is_repeated(kwd)) {
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
-                }
-                else {
-                    ordp = &ord->next;
-                }
-            }
-        }
-        else {
-            free_orders(&u->orders);
-        }
-        u->orders = 0;
-
-        ordp = &u->orders;
-
-        for (;;) {
-            const char *s;
-            /* Erst wenn wir sicher sind, dass kein Befehl
-             * eingegeben wurde, checken wir, ob nun eine neue
-             * Einheit oder ein neuer Spieler drankommt */
-
-            s = getbuf(F, enc);
-            if (s == NULL)
-                break;
-
-            if (s[0]) {
-                if (s[0] != '@') {
-                    char token[64];
-                    const char *stok = s;
-                    stok = parse_token(&stok, token, sizeof(token)); 
-
-                    if (stok) {
-                        bool quit = false;
-                        param_t param = findparam(stok, u->faction->locale);
-                        switch (param) {
-                        case P_UNIT:
-                        case P_REGION:
-                            quit = true;
-                            break;
-                        case P_FACTION:
-                        case P_NEXT:
-                        case P_GAMENAME:
-                            /* these terminate the orders, so we apply extra checking */
-                            if (strlen(stok) >= 3) {
-                                quit = true;
-                                break;
-                            }
-                            else {
-                                quit = false;
-                            }
-                            break;
-                        default:
-                            break;
-                        }
-                        if (quit) {
-                            break;
-                        }
-                    }
-                }
-                /* Nun wird der Befehl erzeut und eingehängt */
-                *ordp = parse_order(s, u->faction->locale);
-                if (*ordp) {
-                    ordp = &(*ordp)->next;
-                }
-                else {
-                    ADDMSG(&f->msgs, msg_message("parse_error", "unit command", u, s));
-                }
-            }
-        }
-
-    }
-    else {
-        return NULL;
-    }
-    return u;
-}
-
-static faction *factionorders(void)
-{
-    faction *f = NULL;
-    int fid = getid();
-
-    f = findfaction(fid);
-
-    if (f != NULL && !fval(f, FFL_NPC)) {
-        char token[128];
-        const char *pass = gettoken(token, sizeof(token));
-
-        if (!checkpasswd(f, (const char *)pass)) {
-            log_debug("Invalid password for faction %s", itoa36(fid));
-            ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", pass));
-            return 0;
-        }
-        /* Die Partei hat sich zumindest gemeldet, so dass sie noch
-         * nicht als untätig gilt */
-        f->lastorders = turn;
-
-    }
-    else {
-        log_debug("orders for invalid faction %s", itoa36(fid));
-    }
-    return f;
-}
-
-int readorders(const char *filename)
-{
-    FILE *F = NULL;
-    const char *b;
-    int nfactions = 0;
-    struct faction *f = NULL;
-
-    F = fopen(filename, "r");
-    if (!F) {
-        perror(filename);
-        return -1;
-    }
-    log_info("reading orders from %s", filename);
-
-    /* TODO: recognize UTF8 BOM */
-    b = getbuf(F, enc_gamedata);
-
-    /* Auffinden der ersten Partei, und danach abarbeiten bis zur letzten
-     * Partei */
-
-    while (b) {
-        char token[128];
-        const struct locale *lang = f ? f->locale : default_locale;
-        param_t p;
-        const char *s;
-        init_tokens_str(b);
-        s = gettoken(token, sizeof(token));
-        p = findparam_block(s, lang, true);
-        switch (p) {
-        case P_GAMENAME:
-        case P_FACTION:
-            f = factionorders();
-            if (f) {
-                ++nfactions;
-            }
-
-            b = getbuf(F, enc_gamedata);
-            break;
-
-            /* in factionorders wird nur eine zeile gelesen:
-             * diejenige mit dem passwort. Die befehle der units
-             * werden geloescht, und die Partei wird als aktiv
-             * vermerkt. */
-
-        case P_UNIT:
-            if (!f || !unitorders(F, enc_gamedata, f)) {
-                do {
-                    b = getbuf(F, enc_gamedata);
-                    if (!b) {
-                        break;
-                    }
-                    init_tokens_str(b);
-                    s = gettoken(token, sizeof(token));
-                    p = (s && s[0] != '@') ? findparam(s, lang) : NOPARAM;
-                } while ((p != P_UNIT || !f) && p != P_FACTION && p != P_NEXT
-                    && p != P_GAMENAME);
-	        }
-            break;
-
-                /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
-                 * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
-                 * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-                 * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-                 * muss buf erneut gefüllt werden, da die betreffende Information in nur
-                 * einer Zeile steht, und nun die nächste gelesen werden muss. */
-
-        case P_NEXT:
-            f = NULL;
-            b = getbuf(F, enc_gamedata);
-            break;
-
-        default:
-            b = getbuf(F, enc_gamedata);
-            break;
-        }
-    }
-
-    fclose(F);
-    log_info("done reading orders for %d factions", nfactions);
-    return 0;
-}
-
 /* ------------------------------------------------------------- */
 
 /* #define INNER_WORLD  */
@@ -375,7 +167,7 @@ race_t typus2race(unsigned char typus)
     return NORACE;
 }
 
-static void read_alliances(struct gamedata *data)
+static void read_alliances(gamedata *data)
 {
     storage *store = data->store;
     char pbuf[8];
@@ -397,8 +189,7 @@ static void read_alliances(struct gamedata *data)
             READ_INT(store, &al->flags);
         }
         if (data->version >= ALLIANCELEADER_VERSION) {
-            read_reference(&al->_leader, data, read_faction_reference,
-                resolve_faction);
+            read_faction_reference(data, &al->_leader, NULL);
             READ_INT(store, &id);
         }
         else {
@@ -418,7 +209,6 @@ void read_planes(gamedata *data) {
     READ_INT(store, &nread);
     while (--nread >= 0) {
         int id;
-        variant fno;
         plane *pl;
 
         READ_INT(store, &id);
@@ -457,9 +247,10 @@ void read_planes(gamedata *data) {
         else {
             /* WATCHERS - eliminated in February 2016, ca. turn 966 */
             if (data->version < NOWATCH_VERSION) {
-                fno = read_faction_reference(data);
-                while (fno.i) {
-                    fno = read_faction_reference(data);
+                int fno;
+                READ_INT(data->store, &fno);
+                while (fno) {
+                    READ_INT(data->store, &fno);
                 }
             }
         }
@@ -490,7 +281,7 @@ void write_planes(storage *store) {
     }
 }
 
-void write_alliances(struct gamedata *data)
+void write_alliances(gamedata *data)
 {
     alliance *al = alliances;
     while (al) {
@@ -507,22 +298,7 @@ void write_alliances(struct gamedata *data)
     WRITE_SECTION(data->store);
 }
 
-static int resolve_owner(variant id, void *address)
-{
-    region_owner *owner = (region_owner *)address;
-    int result = 0;
-    faction *f = NULL;
-    if (id.i != 0) {
-        f = findfaction(id.i);
-        if (f == NULL) {
-            log_error("region has an invalid owner (%s)", itoa36(id.i));
-        }
-    }
-    owner->owner = f;
-    return result;
-}
-
-static void read_owner(struct gamedata *data, region_owner ** powner)
+static void read_owner(gamedata *data, region_owner ** powner)
 {
     int since_turn;
 
@@ -538,9 +314,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
             owner->flags = 0;
         }
         if (data->version >= OWNER_3_VERSION) {
-            int id;
-            READ_INT(data->store, &id);
-            owner->last_owner = id ? findfaction(id) : NULL;
+            read_faction_reference(data, &owner->last_owner, NULL);
         }
         else if (data->version >= OWNER_2_VERSION) {
             int id;
@@ -553,7 +327,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
         else {
             owner->last_owner = NULL;
         }
-        read_reference(owner, data, &read_faction_reference, &resolve_owner);
+        read_faction_reference(data, &owner->owner, NULL);
         *powner = owner;
     }
     else {
@@ -561,7 +335,7 @@ static void read_owner(struct gamedata *data, region_owner ** powner)
     }
 }
 
-static void write_owner(struct gamedata *data, region_owner * owner)
+static void write_owner(gamedata *data, region_owner * owner)
 {
     if (owner) {
         faction *f;
@@ -601,8 +375,7 @@ int current_turn(void)
     return cturn;
 }
 
-static void
-writeorder(struct gamedata *data, const struct order *ord,
+static void writeorder(gamedata *data, const struct order *ord,
     const struct locale *lang)
 {
     char obuf[1024];
@@ -611,7 +384,58 @@ writeorder(struct gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
-unit *read_unit(struct gamedata *data)
+static void read_skills(gamedata *data, unit *u)
+{
+    if (data->version < SKILLSORT_VERSION) {
+        for (;;) {
+            int n = NOSKILL, level, weeks;
+            skill_t sk;
+            READ_INT(data->store, &n);
+            sk = (skill_t)n;
+            if (sk == NOSKILL) break;
+            READ_INT(data->store, &level);
+            READ_INT(data->store, &weeks);
+            if (level) {
+                skill *sv = add_skill(u, sk);
+                sv->level = sv->old = (unsigned char)level;
+                sv->weeks = (unsigned char)weeks;
+            }
+        }
+    }
+    else {
+        int i;
+        READ_INT(data->store, &u->skill_size);
+        u->skills = malloc(sizeof(skill)*u->skill_size);
+        for (i = 0; i != u->skill_size; ++i) {
+            skill *sv = u->skills + i;
+            int val;
+            READ_INT(data->store, &val);
+            sv->id = (skill_t)val;
+            READ_INT(data->store, &sv->level);
+            sv->old = sv->level;
+            READ_INT(data->store, &sv->weeks);
+        }
+    }
+}
+
+static void write_skills(gamedata *data, const unit *u) {
+    int i;
+    skill_t sk = NOSKILL;
+    WRITE_INT(data->store, u->skill_size);
+    for (i = 0; i != u->skill_size; ++i) {
+        skill *sv = u->skills + i;
+#ifndef NDEBUG
+        assert(sv->id > sk);
+        sk = sv->id;
+        assert(sv->weeks <= sv->level * 2 + 1);
+#endif
+        WRITE_INT(data->store, sv->id);
+        WRITE_INT(data->store, sv->level);
+        WRITE_INT(data->store, sv->weeks);
+    }
+}
+
+unit *read_unit(gamedata *data)
 {
     unit *u;
     const race *rc;
@@ -685,7 +509,7 @@ unit *read_unit(struct gamedata *data)
     u_setrace(u, rc);
 
     READ_TOK(data->store, rname, sizeof(rname));
-    if (rname[0] && skill_enabled(SK_STEALTH))
+    if (rname[0])
         u->irace = rc_find(rname);
     else
         u->irace = NULL;
@@ -758,20 +582,7 @@ unit *read_unit(struct gamedata *data)
     set_order(&u->thisorder, NULL);
 
     assert(u_race(u));
-    for (;;) {
-        int n = NOSKILL, level, weeks;
-        skill_t sk;
-        READ_INT(data->store, &n);
-        sk = (skill_t)n;
-        if (sk == NOSKILL) break;
-        READ_INT(data->store, &level);
-        READ_INT(data->store, &weeks);
-        if (level) {
-            skill *sv = add_skill(u, sk);
-            sv->level = sv->old = (unsigned char)level;
-            sv->weeks = (unsigned char)weeks;
-        }
-    }
+    read_skills(data, u);
     read_items(data->store, &u->items);
     READ_INT(data->store, &u->hp);
     if (u->hp < u->number) {
@@ -779,13 +590,14 @@ unit *read_unit(struct gamedata *data)
         u->hp = u->number;
     }
     read_attribs(data, &u->attribs, u);
+    resolve_unit(u);
     return u;
 }
 
-void write_unit(struct gamedata *data, const unit * u)
+void write_unit(gamedata *data, const unit * u)
 {
     order *ord;
-    int i, p = 0;
+    int p = 0;
     unsigned int flags = u->flags & UFL_SAVEMASK;
     const race *irace = u_irace(u);
 
@@ -833,18 +645,7 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 
     assert(u_race(u));
-
-    for (i = 0; i != u->skill_size; ++i) {
-        skill *sv = u->skills + i;
-        assert(sv->weeks <= sv->level * 2 + 1);
-        if (sv->level > 0) {
-            WRITE_INT(data->store, sv->id);
-            WRITE_INT(data->store, sv->level);
-            WRITE_INT(data->store, sv->weeks);
-        }
-    }
-    WRITE_INT(data->store, -1);
-    WRITE_SECTION(data->store);
+    write_skills(data, u);
     write_items(data->store, u->items);
     WRITE_SECTION(data->store);
     if (u->hp == 0 && data->version < NORCSPELL_VERSION) {
@@ -857,11 +658,24 @@ void write_unit(struct gamedata *data, const unit * u)
     WRITE_SECTION(data->store);
 }
 
-static region *readregion(struct gamedata *data, int x, int y)
+static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
+    if (lomem) {
+        READ_STR(data->store, NULL, 0);
+    }
+    else {
+        READ_STR(data->store, info, len);
+        if (unicode_utf8_trim(info) != 0) {
+            log_warning("trim region %d info to '%s'", r->uid, info);
+        }
+    }
+}
+
+static region *readregion(gamedata *data, int x, int y)
 {
     region *r = findregion(x, y);
     const terrain_type *terrain;
     char name[NAMESIZE];
+    char info[DISPLAYSIZE];
     int uid = 0;
     int n;
 
@@ -887,16 +701,11 @@ static region *readregion(struct gamedata *data, int x, int y)
         }
         r->land = 0;
     }
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
+    if (data->version < LANDDISPLAY_VERSION) {
+        read_regioninfo(data, r, info, sizeof(info));
     }
     else {
-        char info[DISPLAYSIZE];
-        READ_STR(data->store, info, sizeof(info));
-		if (unicode_utf8_trim(info)!=0) {
-			log_warning("trim region %d info to '%s'", uid, info);
-		};
-        region_setinfo(r, info);
+        info[0] = '\0';
     }
 
     READ_STR(data->store, name, sizeof(name));
@@ -913,15 +722,19 @@ static region *readregion(struct gamedata *data, int x, int y)
     if (fval(r->terrain, LAND_REGION)) {
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
-		if (unicode_utf8_trim(name)!=0) {
-			log_warning("trim region %d name to '%s'", uid, name);
-		};
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim region %d name to '%s'", uid, name);
+        };
         r->land->name = strdup(name);
     }
     if (r->land) {
         int i;
         rawmaterial **pres = &r->resources;
 
+        if (data->version >= LANDDISPLAY_VERSION) {
+            read_regioninfo(data, r, info, sizeof(info));
+        }
+        region_setinfo(r, info);
         READ_INT(data->store, &i);
         if (i < 0) {
             log_error("number of trees in %s is %d.", regionname(r, NULL), i);
@@ -999,7 +812,11 @@ static region *readregion(struct gamedata *data, int x, int y)
         READ_INT(data->store, &n);
         rsetmoney(r, n);
     }
-
+    else {
+        if (info[0]) {
+            log_error("%s %d has a description: %s", r->terrain->_name, r->uid, info);
+        }
+    }
     assert(r->terrain != NULL);
 
     if (r->land) {
@@ -1038,27 +855,27 @@ region *read_region(gamedata *data)
     READ_INT(store, &x);
     READ_INT(store, &y);
     r = readregion(data, x, y);
+    resolve_region(r);
     return r;
 }
 
-void writeregion(struct gamedata *data, const region * r)
+void writeregion(gamedata *data, const region * r)
 {
     assert(r);
     assert(data);
 
     WRITE_INT(data->store, r->uid);
-    WRITE_STR(data->store, region_getinfo(r));
     WRITE_TOK(data->store, r->terrain->_name);
     WRITE_INT(data->store, r->flags & RF_SAVEMASK);
     WRITE_INT(data->store, r->age);
     WRITE_SECTION(data->store);
-    if (fval(r->terrain, LAND_REGION)) {
+    if (r->land) {
         const item_type *rht;
         struct demand *demand;
         rawmaterial *res = r->resources;
 
-        assert(r->land);
         WRITE_STR(data->store, (const char *)r->land->name);
+        WRITE_STR(data->store, region_getinfo(r));
         assert(rtrees(r, 0) >= 0);
         assert(rtrees(r, 1) >= 0);
         assert(rtrees(r, 2) >= 0);
@@ -1094,11 +911,9 @@ void writeregion(struct gamedata *data, const region * r)
         }
         WRITE_TOK(data->store, "end");
         WRITE_SECTION(data->store);
-#if RELEASE_VERSION>=REGIONOWNER_VERSION
         WRITE_INT(data->store, region_get_morale(r));
         write_owner(data, r->land->ownership);
         WRITE_SECTION(data->store);
-#endif
     }
     write_attribs(data->store, r->attribs, r);
     WRITE_SECTION(data->store);
@@ -1110,33 +925,6 @@ void write_region(gamedata *data, const region *r)
     WRITE_INT(store, r->x);
     WRITE_INT(store, r->y);
     writeregion(data, r);
-}
-
-static ally **addally(const faction * f, ally ** sfp, int aid, int state)
-{
-    struct faction *af = findfaction(aid);
-    ally *sf;
-
-    state &= ~HELP_OBSERVE;
-    state &= ~HELP_TRAVEL;
-    state &= HelpMask();
-
-    if (state == 0)
-        return sfp;
-
-    while (*sfp) {
-        sfp = &(*sfp)->next;
-    }
-
-    sf = ally_add(sfp, af);
-    if (!sf->faction) {
-        variant id;
-        id.i = aid;
-        ur_add(id, &sf->faction, resolve_faction);
-    }
-    sf->status = state & HELP_ALL;
-
-    return &sf->next;
 }
 
 int get_spell_level_faction(const spell * sp, void * cbdata)
@@ -1215,9 +1003,8 @@ void _test_write_password(gamedata *data, const faction *f) {
     write_password(data, f);
 }
 
-faction *read_faction(struct gamedata * data)
+faction *read_faction(gamedata * data)
 {
-    ally **sfp;
     int planes, n;
     faction *f;
     char name[DISPLAYSIZE];
@@ -1346,28 +1133,17 @@ faction *read_faction(struct gamedata * data)
         /* mistakes were made in the past*/
         f->options &= ~want(O_JSON);
     }
-    sfp = &f->allies;
-    for (;;) {
-        int aid = 0;
-        READ_INT(data->store, &aid);
-        if (aid > 0) {
-            int state;
-            READ_INT(data->store, &state);
-            sfp = addally(f, sfp, aid, state);
-        }
-        else {
-            break;
-        }
-    }
+    read_allies(data, f);
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {
         read_spellbook(FactionSpells() ? &f->spellbook : 0, data, get_spell_level_faction, (void *)f);
     }
+    resolve_faction(f);
     return f;
 }
 
-void write_faction(struct gamedata *data, const faction * f)
+void write_faction(gamedata *data, const faction * f)
 {
     ally *sf;
     ursprung *ur;
@@ -1448,7 +1224,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 
 int readgame(const char *filename)
 {
-    int n;
+    int n, stream_version;
     char path[MAX_PATH];
     gamedata gdata = { 0 };
     storage store;
@@ -1465,11 +1241,8 @@ int readgame(const char *filename)
         return -1;
     }
     sz = fread(&gdata.version, sizeof(int), 1, F);
-    if (sz != sizeof(int) || gdata.version >= INTPAK_VERSION) {
-        int stream_version;
-        size_t sz = fread(&stream_version, sizeof(int), 1, F);
-        assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
-    }
+    sz = fread(&stream_version, sizeof(int), 1, F);
+    assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
     assert(gdata.version >= MIN_VERSION || !"unsupported data format");
     assert(gdata.version <= MAX_VERSION || !"unsupported data format");
 
@@ -1538,7 +1311,8 @@ struct building *read_building(gamedata *data) {
         log_error("building too big: %s (%s size %d of %d), fixing.", buildingname(b), b->type->_name, b->size, b->type->maxsize);
         b->size = b->type->maxsize;
     }
-	return b;
+    resolve_building(b);
+    return b;
 }
 
 void write_ship(gamedata *data, const ship *sh)
@@ -1556,7 +1330,7 @@ void write_ship(gamedata *data, const ship *sh)
     write_attribs(store, sh->attribs, sh);
 }
 
-ship *read_ship(struct gamedata *data)
+ship *read_ship(gamedata *data)
 {
     char name[DISPLAYSIZE];
     ship *sh;
@@ -1607,7 +1381,78 @@ ship *read_ship(struct gamedata *data)
 }
 
 
-int read_game(gamedata *data) {
+static void fix_familiars(void) {
+    region *r;
+    for (r = regions; r; r = r->next) {
+        unit * u;
+        for (u = r->units; u; u = u->next) {
+            if (u->_race != u->faction->race && (u->_race->flags & RCF_FAMILIAR)) {
+                /* unit is potentially a familiar */
+                attrib * a = a_find(u->attribs, &at_mage);
+                attrib * am = a_find(u->attribs, &at_familiarmage);
+                if (am) {
+                    sc_mage *mage = a ? (sc_mage *)a->data.v : NULL;
+                    /* a familiar */
+                    if (!mage) {
+                        log_error("%s seems to be a familiar with no magic.",
+                            unitname(u));
+                        mage = create_mage(u, M_GRAY);
+                    }
+                    if (!mage->spellbook) {
+                        char eqname[32];
+                        equipment *eq;
+                        
+                        snprintf(eqname, sizeof(eqname), "fam_%s", u->_race->_name);
+                        eq = get_equipment(eqname);
+                        if (eq && eq->spells) {
+                            log_error("%s seems to be a familiar with no spells.",
+                                unitname(u));
+                            /* magical familiar, no spells */
+                            equip_unit_mask(u, eq, EQUIP_SPELLS);
+                        }
+                    }
+                }
+                else if (a) {
+                    /* not a familiar, but magical */
+                    attrib * ae = a_find(u->attribs, &at_eventhandler);
+                    if (ae) {
+                        trigger **tlist;
+                        tlist = get_triggers(ae, "destroy");
+                        if (tlist) {
+                            trigger *t;
+                            unit *um = NULL;
+                            for (t = *tlist; t; t = t->next) {
+                                if (t->type == &tt_shock) {
+                                    um = (unit *)t->data.v;
+                                    break;
+                                }
+                            }
+                            if (um) {
+                                attrib *af = a_find(um->attribs, &at_familiar);
+                                log_error("%s seems to be a broken familiar of %s.",
+                                    unitname(u), unitname(um));
+                                if (af) {
+                                    unit * uf = (unit *)af->data.v;
+                                    log_error("%s already has a familiar: %s.",
+                                        unitname(um), unitname(uf));
+                                }
+                                else {
+                                    set_familiar(um, u);
+                                }
+                            }
+                            else {
+                                log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+int read_game(gamedata *data)
+{
     int p, nread;
     faction *f, **fp;
     region *r;
@@ -1671,6 +1516,9 @@ int read_game(gamedata *data) {
 
         /* Burgen */
         READ_INT(store, &p);
+        if (p > 0 && !r->land) {
+            log_error("%s, uid=%d has %d buildings", regionname(r, NULL), r->uid, p);
+        }
         bp = &r->buildings;
 
         while (--p >= 0) {
@@ -1726,10 +1574,6 @@ int read_game(gamedata *data) {
     }
     read_borders(data);
 
-    /* Unaufgeloeste Zeiger initialisieren */
-    log_debug("fixing unresolved references.");
-    resolve();
-
     log_debug("updating area information for lighthouses.");
     for (r = regions; r; r = r->next) {
         if (r->flags & RF_LIGHTHOUSE) {
@@ -1755,7 +1599,7 @@ int read_game(gamedata *data) {
         else {
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
-                    sc_mage *mage = get_mage(u);
+                    sc_mage *mage = get_mage_depr(u);
                     if (mage) {
                         faction *f = u->faction;
                         int skl = effskill(u, SK_MAGIC, 0);
@@ -1783,6 +1627,11 @@ int read_game(gamedata *data) {
             }
         }
     }
+
+    if (data->version < FAMILIAR_FIX_VERSION) {
+        fix_familiars();
+    }
+
     if (loadplane || maxregions >= 0) {
         remove_empty_factions();
     }

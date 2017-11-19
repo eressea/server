@@ -1,4 +1,4 @@
-if not config.autoseed then return nil end
+if not config.autoseed or config.autoseed==0 then return nil end
 local autoseed = {}
 
 -- minimum required resources in the 7-hex neighborhood:
@@ -65,9 +65,9 @@ local function seed(r, email, race, lang)
     assert(f)
     local u = unit.create(f, r)
     assert(u)
-    equip_unit(u, "autoseed_faction")
-    equip_unit(u, "autoseed_unit")
-    equip_unit(u, "autoseed_" .. race, 7)
+    equip_unit(u, "seed_faction")
+    equip_unit(u, "seed_unit")
+    equip_unit(u, "seed_" .. race, 7)
     unit.create(f, r, 5):set_skill("mining", 30)
     unit.create(f, r, 5):set_skill("quarrying", 30)
     f:set_origin(r)

@@ -60,6 +60,12 @@ static critbit_tree cb_resources;
 luxury_type *luxurytypes;
 potion_type *potiontypes;
 
+#define RTYPENAMELEN 24
+typedef struct rt_entry {
+    char key[RTYPENAMELEN];
+    struct resource_type *value;
+} rt_entry;
+
 static int res_changeaura(unit * u, const resource_type * rtype, int delta)
 {
     assert(rtype != NULL);
@@ -166,13 +172,19 @@ static int num_resources;
 
 static void rt_register(resource_type * rtype)
 {
-    char buffer[64];
     const char * name = rtype->_name;
     size_t len = strlen(name);
+    rt_entry ent;
 
-    assert(len < sizeof(buffer) - sizeof(rtype));
-    len = cb_new_kv(name, len, &rtype, sizeof(rtype), buffer);
-    cb_insert(&cb_resources, buffer, len);
+    if (len >= RTYPENAMELEN) {
+        log_error("resource name is longer than %d bytes: %s",
+                RTYPENAMELEN-1, name);
+        len = RTYPENAMELEN-1;
+    }
+    ent.value = rtype;
+    memset(ent.key, 0, RTYPENAMELEN);
+    memcpy(ent.key, name, len); 
+    cb_insert(&cb_resources, &ent, sizeof(ent));
     ++num_resources;
 }
 
@@ -186,20 +198,9 @@ resource_type *rt_get_or_create(const char *name) {
         else {
             rtype->_name = strdup(name);
             rt_register(rtype);
-            return rt_find(name);
         }
     }
     return rtype;
-}
-
-static void it_register(item_type * itype)
-{
-    char buffer[64];
-    const char * name = itype->rtype->_name;
-    size_t len = strlen(name);
-
-    assert(len < sizeof(buffer) - sizeof(itype));
-    len = cb_new_kv(name, len, &itype, sizeof(itype), buffer);
 }
 
 static const char *it_aliases[][2] = {
@@ -244,7 +245,6 @@ item_type *it_get_or_create(resource_type *rtype) {
     rtype->uchange = res_changeitem;
     rtype->itype = itype;
     rtype->flags |= RTF_ITEM;
-    it_register(itype);
     return itype;
 }
 
@@ -389,13 +389,20 @@ const potion_type *resource2potion(const resource_type * rtype)
 
 resource_type *rt_find(const char *name)
 {
-    void * match;
-    resource_type *result = 0;
+    const void *match;
+    size_t len = strlen(name);
 
-    if (cb_find_prefix(&cb_resources, name, strlen(name) + 1, &match, 1, 0)) {
-        cb_get_kv(match, &result, sizeof(result));
+    if (len >= RTYPENAMELEN) {
+        log_warning("resource name is longer than %d bytes: %s",
+                RTYPENAMELEN-1, name);
+        return NULL;
     }
-    return result;
+    match = cb_find_str(&cb_resources, name);
+    if (match) {
+        const rt_entry *ent = (const rt_entry *)match;
+        return ent->value;
+    }
+    return NULL;
 }
 
 item **i_find(item ** i, const item_type * it)
@@ -517,6 +524,7 @@ static int icache_size;
 #define ICACHE_MAX 100
 
 void item_done(void) {
+    icache_size = ICACHE_MAX;
     i_freeall(&icache);
     icache_size = 0;
 }
@@ -791,14 +799,14 @@ int change_money(unit * u, int v)
     return 0;
 }
 
-static int add_resourcename_cb(const void * match, const void * key, size_t keylen, void *data)
+static int add_resourcename_cb(const void * match, const void * key,
+    size_t keylen, void *data)
 {
     struct locale * lang = (struct locale *)data;
     int i = locale_index(lang);
     critbit_tree * cb = rnames + i;
-    resource_type *rtype;
+    resource_type *rtype = ((rt_entry *)match)->value;
 
-    cb_get_kv(match, &rtype, sizeof(rtype));
     for (i = 0; i != 2; ++i) {
         char buffer[128];
         const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
@@ -834,20 +842,20 @@ const resource_type *findresourcetype(const char *name, const struct locale *lan
     else {
         log_debug("findresourcetype: transliterate failed for '%s'\n", name);
     }
-    return 0;
+    return NULL;
 }
 
 attrib_type at_showitem = {
     "showitem"
 };
 
-static int add_itemname_cb(const void * match, const void * key, size_t keylen, void *data)
+static int add_itemname_cb(const void * match, const void * key,
+    size_t keylen, void *data)
 {
     struct locale * lang = (struct locale *)data;
     critbit_tree * cb = inames + locale_index(lang);
-    resource_type *rtype;
+    resource_type *rtype = ((rt_entry *)match)->value;
 
-    cb_get_kv(match, &rtype, sizeof(rtype));
     if (rtype->itype) {
         int i;
         for (i = 0; i != 2; ++i) {
@@ -951,7 +959,7 @@ void write_items(struct storage *store, item * ilist)
 
 static void free_itype(item_type *itype) {
     assert(itype);
-    free(itype->construction);
+    free_construction(itype->construction);
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);
@@ -979,9 +987,10 @@ void free_rtype(resource_type *rtype) {
     free(rtype);
 }
 
-int free_rtype_cb(const void * match, const void * key, size_t keylen, void *cbdata) {
-    resource_type *rtype;
-    cb_get_kv(match, &rtype, sizeof(rtype));
+static int free_rtype_cb(const void * match, const void * key,
+    size_t keylen, void *cbdata)
+{
+    resource_type *rtype = ((rt_entry *)match)->value;;
     free_rtype(rtype);
     return 0;
 }

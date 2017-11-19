@@ -251,6 +251,69 @@ static void test_academy_building(CuTest *tc) {
     test_cleanup();
 }
 
+/*
+u0 (1) TEACH u3 (1) u1 (9/10)
+u (2) TEACH u1 (1/10)
+ */
+
+static void test_academy_bonus(CuTest *tc) {
+    unit *u, *u0, *u1, *u3;
+    struct locale * loc;
+    building * b;
+
+    test_setup();
+
+    random_source_inject_constant(0.0);
+    init_resources();
+    loc = test_create_locale();
+    setup_locale(loc);
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u->faction->locale = loc;
+
+    u0 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    set_level(u, SK_CROSSBOW, TEACHDIFFERENCE);
+    set_level(u0, SK_CROSSBOW, TEACHDIFFERENCE);
+    
+    u1 = test_create_unit(u->faction, u->region);
+    u3 = test_create_unit(u->faction, u->region);
+    u0->thisorder = create_order(K_TEACH, loc, "%s %s", itoa36(u3->no), itoa36(u1->no));
+    u->thisorder = create_order(K_TEACH, loc, "%s", itoa36(u1->no));
+    u1->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
+    u3->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
+    
+    b = test_create_building(u->region, test_create_buildingtype("academy"));
+    b->size = 25;
+    u_set_building(u, b);
+    u_set_building(u0, b);
+    u_set_building(u1, b);
+    u_set_building(u3, b);
+
+    scale_number(u, 2);
+    scale_number(u1, 9);
+    scale_number(u3, 2);
+    i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 5000);
+    b->flags = BLD_MAINTAINED;
+
+    learn_inject();
+    teach_cmd(u0, u0->thisorder);
+    teach_cmd(u, u->thisorder);
+    study_cmd(u1, u1->thisorder);
+    study_cmd(u3, u3->thisorder);
+
+    CuAssertIntEquals(tc, 4, log_size);
+    CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
+    CuAssertPtrEquals(tc, u0, log_learners[0].u);
+    CuAssertIntEquals(tc, 10, log_learners[0].days);
+    CuAssertPtrEquals(tc, u, log_learners[1].u);
+    CuAssertIntEquals(tc, 1, log_learners[1].days);
+    CuAssertPtrEquals(tc, u1, log_learners[2].u);
+    CuAssertIntEquals(tc, 720, log_learners[2].days);
+    CuAssertPtrEquals(tc, u3, log_learners[3].u);
+    CuAssertIntEquals(tc, 160, log_learners[3].days);
+    learn_reset();
+    test_cleanup();
+}
+
 void test_learn_skill_single(CuTest *tc) {
     unit *u;
     skill *sv;
@@ -346,11 +409,11 @@ static void test_study_magic(CuTest *tc) {
     study_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    CuAssertPtrNotNull(tc, get_mage(u));
+    CuAssertPtrNotNull(tc, get_mage_depr(u));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
-    CuAssertIntEquals(tc, M_GWYRRD, get_mage(u)->magietyp);
+    CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
 
-    /* the static cost array in study_cost prevents this test:
+    /* TODO: the static cost array in study_cost prevents this test:
     test_clear_messages(f);
     config_set("skills.cost.magic", "50");
     i_change(&u->items, rtype->itype, 50);
@@ -563,7 +626,7 @@ static void test_teach_message(CuTest *tc) {
     CuAssertPtrNotNull(tc, a->data.v);
     teach = (teaching_info *)a->data.v;
     CuAssertPtrNotNull(tc, teach->teachers);
-    CuAssertIntEquals(tc, 600, teach->value);
+    CuAssertIntEquals(tc, 600, teach->days);
     CuAssertIntEquals(tc, 2, selist_length(teach->teachers));
     CuAssertPtrEquals(tc, u1, selist_get(teach->teachers, 0));
     CuAssertPtrEquals(tc, u2, selist_get(teach->teachers, 1));
@@ -635,6 +698,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
+    SUITE_ADD_TEST(suite, test_academy_bonus);
     SUITE_ADD_TEST(suite, test_demon_skillchanges);
     SUITE_ADD_TEST(suite, test_study_bug_2194);
     return suite;

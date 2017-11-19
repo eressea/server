@@ -1,4 +1,4 @@
-if not config.xmas then return nil end
+if not config.xmas or config.xmas==0 then return nil end
 
 local gifts = {
     e2 = {

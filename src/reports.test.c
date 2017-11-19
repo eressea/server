@@ -153,6 +153,23 @@ static void test_sparagraph(CuTest *tc) {
     freestrlist(sp);
 }
 
+static void test_sparagraph_long(CuTest *tc) {
+    strlist *sp = 0;
+
+    split_paragraph(&sp, "HelloWorld HelloWorld", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "HelloWorld", sp->s);
+    CuAssertStrEquals(tc, "HelloWorld", sp->next->s);
+    CuAssertPtrEquals(tc, NULL, sp->next->next);
+    freestrlist(sp);
+
+    split_paragraph(&sp, "HelloWorldHelloWorld", 0, 16, 0);
+    CuAssertPtrNotNull(tc, sp);
+    CuAssertStrEquals(tc, "HelloWorldHelloWorld", sp->s);
+    CuAssertPtrEquals(tc, NULL, sp->next);
+    freestrlist(sp);
+}
+
 static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
@@ -262,13 +279,13 @@ static void test_bufunit(CuTest *tc) {
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv.", buffer);
 
-    set_level(u, SK_SAILING, 1);
-    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1.", buffer);
-
     set_level(u, SK_ALCHEMY, 1);
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
-    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Segeln 1, Alchemie 2.", buffer);
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2.", buffer);
+
+    set_level(u, SK_SAILING, 1);
+    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2, Segeln 1.", buffer);
 
     f = test_create_faction(0);
     f->locale = get_or_create_locale("de");
@@ -745,6 +762,24 @@ static void test_report_far_vision(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_stealth_modifier(CuTest *tc) {
+    region *r;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
+    CuAssertIntEquals(tc, 0, stealth_modifier(r, f, seen_unit));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_travel));
+    CuAssertIntEquals(tc, -2, stealth_modifier(r, f, seen_lighthouse));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_spell));
+
+    set_observer(r, f, 10, 1);
+    CuAssertIntEquals(tc, 10, stealth_modifier(r, f, seen_spell));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, NULL, seen_spell));
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -765,8 +800,10 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_report_far_vision);
     SUITE_ADD_TEST(suite, test_reorder_units);
     SUITE_ADD_TEST(suite, test_seen_faction);
+    SUITE_ADD_TEST(suite, test_stealth_modifier);
     SUITE_ADD_TEST(suite, test_regionid);
     SUITE_ADD_TEST(suite, test_sparagraph);
+    SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_arg_resources);

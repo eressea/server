@@ -147,8 +147,7 @@ newfaction *read_newfactions(const char *filename)
         faction *f;
         char race[20], email[64], lang[8], password[16];
         newfaction *nf, **nfi;
-        int bonus = 0, subscription = 0;
-        int alliance = 0;
+        int alliance = 0, subscription = 0;
 
         if (fgets(buf, sizeof(buf), F) == NULL)
             break;
@@ -156,8 +155,8 @@ newfaction *read_newfactions(const char *filename)
         email[0] = '\0';
         password[0] = '\0';
 
-        if (sscanf(buf, "%54s %20s %8s %d %d %16s %d", email, race, lang, &bonus,
-            &subscription, password, &alliance) < 3) {
+        if (sscanf(buf, "%54s %20s %8s %16s %d %d", email, race, lang, 
+            password, &subscription, &alliance) < 3) {
             break;
         }
         if (email[0] == '#') {
@@ -228,7 +227,6 @@ newfaction *read_newfactions(const char *filename)
             }
         }
         nf->lang = get_locale(lang);
-        nf->bonus = bonus;
         assert(nf->race && nf->email && nf->lang);
         nfi = &newfactions;
         while (*nfi) {

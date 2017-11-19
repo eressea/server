@@ -4,9 +4,11 @@
 #include "prefix.h"
 #include "reports.h"
 #include "calendar.h"
+#include "vortex.h"
 
 #include <kernel/config.h>
 #include <kernel/alliance.h>
+#include <kernel/equipment.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -38,7 +40,7 @@
 
 struct race *test_create_race(const char *name)
 {
-    race *rc = rc_get_or_create(name);
+    race *rc = rc_get_or_create(name ? name : "smurf");
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
@@ -208,7 +210,9 @@ static void test_reset(void) {
     free_config();
     default_locale = 0;
     calendar_cleanup();
+    equipment_done();
     close_orders();
+    free_special_directions();
     free_locales();
     free_spells();
     free_buildingtypes();

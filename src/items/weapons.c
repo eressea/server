@@ -63,7 +63,7 @@ int *casualties)
             if (wp != NULL && wp->type == wtype)
                 ++k;
         }
-        msg = msg_message("battle::useflamingsword", "amount unit", k, fi->unit);
+        msg = msg_message("useflamingsword", "amount unit", k, fi->unit);
         message_all(fi->side->battle, msg);
         msg_release(msg);
         fi->catmsg = 0;
@@ -119,7 +119,7 @@ int *casualties)
             if (af->person[i].reload == 0 && af->person[i].missile == wp)
                 ++k;
         }
-        msg = msg_message("battle::usecatapult", "amount unit", k, au);
+        msg = msg_message("usecatapult", "amount unit", k, au);
         message_all(b, msg);
         msg_release(msg);
         af->catmsg = 0;

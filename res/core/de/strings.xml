@@ -4990,12 +4990,12 @@
     <string name="sacrifice_strength">
       <text locale="de">Mit Hilfe dieses Zaubers kann der Magier einen Teil
       seiner magischen Kraft permanent auf einen anderen Magier übertragen.
-      Auf einen Tybied-Magier kann er die Hälfte der eingesetzten Kraft
-      übertragen, auf einen Magier eines anderen Gebietes ein Drittel.</text>
+      Auf einen Magier des selben Magiegebietes kann er die Hälfte der
+      eingesetzten Kraft übertragen, auf andere Magier ein Drittel.</text>
       <text locale="en">This spell allows the magician to transfer part of
-      his magical powers to another magician. Tybied magicians will receive
-      half the power invested, magicians of another school will receive one
-      third.</text>
+      his magical powers to another magician. Magicians of the seam school
+      will receive half the power invested, magicians of other schoolsreceive
+      receive one third.</text>
     </string>
     <string name="eternal_walls">
       <text locale="de">Mit dieser Formel bindet der Magier auf ewig die

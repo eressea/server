@@ -90,22 +90,16 @@ static void createunit_write(const trigger * t, struct storage *store)
 static int createunit_read(trigger * t, gamedata *data)
 {
     createunit_data *td = (createunit_data *)t->data.v;
-    variant var;
+    int id;
     int result = AT_READ_OK;
-    var = read_faction_reference(data);
-    if (var.i > 0) {
-        td->f = findfaction(var.i);
-        if (!td->f) {
-            ur_add(var, &td->f, resolve_faction);
-        }
-    }
-    else {
+
+    id = read_faction_reference(data, &td->f, NULL);
+    if (id <= 0) {
         result = AT_READ_FAIL;
     }
 
-    read_reference(&td->r, data, read_region_reference,
-        RESOLVE_REGION(data->version));
-    td->race = (const struct race *)read_race_reference(data->store).v;
+    read_region_reference(data, &td->r, NULL);
+    td->race = read_race_reference(data->store);
     if (!td->race) {
         result = AT_READ_FAIL;
     }

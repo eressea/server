@@ -227,7 +227,7 @@ static void test_display_cmd(CuTest *tc) {
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertPtrEquals(tc, NULL, r->display);
+    CuAssertPtrEquals(tc, NULL, r->land->display);
     free_order(ord);
 
     test_cleanup();
@@ -428,6 +428,63 @@ static void test_unit_limit(CuTest * tc)
     test_cleanup();
 }
 
+static void test_maketemp(CuTest * tc)
+{
+    faction *f;
+    unit *u, *u2;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
+    u->orders->next = create_order(K_ENTERTAIN, f->locale, NULL);
+    u->orders->next->next = create_order(K_END, f->locale, NULL);
+    u->orders->next->next->next = create_order(K_TAX, f->locale, NULL);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, u2 = u->next);
+    CuAssertPtrNotNull(tc, u2->orders);
+    CuAssertPtrEquals(tc, NULL, u2->orders->next);
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u2->orders));
+
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->orders->next);
+    CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
+    test_cleanup();
+}
+
+static void test_maketemp_default_order(CuTest * tc)
+{
+    faction *f;
+    unit *u, *u2;
+
+    test_setup();
+    config_set("orders.default", "work");
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+
+    new_units();
+    CuAssertIntEquals(tc, 1, f->num_units);
+
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
+    u->orders->next = create_order(K_END, f->locale, NULL);
+    u->orders->next->next = create_order(K_TAX, f->locale, NULL);
+
+    new_units();
+    CuAssertIntEquals(tc, 2, f->num_units);
+    CuAssertPtrNotNull(tc, u2 = u->next);
+    CuAssertPtrNotNull(tc, u2->orders);
+    CuAssertPtrEquals(tc, NULL, u2->orders->next);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u2->orders));
+
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->orders->next);
+    CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
+    test_cleanup();
+}
+
 static void test_limit_new_units(CuTest * tc)
 {
     faction *f;
@@ -449,6 +506,8 @@ static void test_limit_new_units(CuTest * tc)
     CuAssertPtrNotNull(tc, u->next);
     CuAssertIntEquals(tc, 2, f->num_units);
 
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
     new_units();
     CuAssertIntEquals(tc, 2, f->num_units);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_faction"));
@@ -458,6 +517,8 @@ static void test_limit_new_units(CuTest * tc)
     config_set("rules.limit.faction", "3");
     config_set("rules.limit.alliance", "2");
 
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
     new_units();
     CuAssertIntEquals(tc, 2, f->num_units);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
@@ -466,6 +527,8 @@ static void test_limit_new_units(CuTest * tc)
     u = test_create_unit(test_create_faction(NULL), u->region);
     setalliance(u->faction, al);
 
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    u->orders = create_order(K_MAKETEMP, f->locale, "1");
     new_units();
     CuAssertIntEquals(tc, 2, f->num_units);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
@@ -1552,9 +1615,114 @@ static void test_armedmen(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_cansee(CuTest *tc) {
+    unit *u, *u2;
+    
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    
+    set_level(u, SK_PERCEPTION, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+    
+    test_cleanup();
+}
+
+static void test_cansee_spell(CuTest *tc) {
+    unit *u2;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 0, seen_battle));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee_ex(f, u2->region, u2, 0, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 1, seen_spell));
+    CuAssertTrue(tc, cansee_ex(f, u2->region, u2, 1, seen_battle));
+
+    test_cleanup();
+}
+
+static void test_cansee_ring(CuTest *tc) {
+    unit *u, *u2;
+    item_type *itype[2];
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+    scale_number(u2, 2);
+
+    itype[0] = test_create_itemtype("roi");
+    itype[1] = test_create_itemtype("aots");
+    CuAssertPtrNotNull(tc, get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrEquals(tc, itype[0]->rtype, (void *)get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+    CuAssertPtrEquals(tc, itype[1]->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* a single ring is not enough to hide two people */
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* two rings can hide two people */
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+
+    /* one amulet negates one of the two rings */
+    i_change(&u->items, itype[1], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_cleanup();
+}
+
+static void test_cansee_sphere(CuTest *tc) {
+    unit *u, *u2;
+    item_type *itype[2];
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u2 = test_create_unit(test_create_faction(0), u->region);
+
+    itype[0] = test_create_itemtype("sphereofinv");
+    itype[1] = test_create_itemtype("aots");
+    CuAssertPtrNotNull(tc, get_resourcetype(R_SPHERE_OF_INVISIBILITY));
+    CuAssertPtrEquals(tc, itype[0]->rtype, (void *)get_resourcetype(R_SPHERE_OF_INVISIBILITY));
+    CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+    CuAssertPtrEquals(tc, itype[1]->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* a single sphere can hide 100 people */
+    scale_number(u2, 100);
+    i_change(&u2->items, itype[0], 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+
+    /* one single amulet negates it? */
+    i_change(&u->items, itype[1], 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* number of people inside the sphere does not matter? */
+    scale_number(u2, 99);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_cleanup();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_maketemp_default_order);
+    SUITE_ADD_TEST(suite, test_maketemp);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
@@ -1618,6 +1786,10 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
+    SUITE_ADD_TEST(suite, test_cansee);
+    SUITE_ADD_TEST(suite, test_cansee_ring);
+    SUITE_ADD_TEST(suite, test_cansee_sphere);
+    SUITE_ADD_TEST(suite, test_cansee_spell);
 
     return suite;
 }

@@ -101,6 +101,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(pool);
     ADD_SUITE(curse);
     ADD_SUITE(equipment);
+    ADD_SUITE(familiar);
     ADD_SUITE(item);
     ADD_SUITE(magic);
     ADD_SUITE(alchemy);
@@ -131,6 +132,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(names);
+    ADD_SUITE(orderfile);
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
     ADD_SUITE(prefix);

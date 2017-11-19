@@ -49,6 +49,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/ship.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -191,6 +192,7 @@ void monsters_desert(struct faction *monsters)
 
 int monster_attacks(unit * monster, bool rich_only)
 {
+    const race *rc_serpent = get_race(RC_SEASERPENT);
     if (monster->status < ST_AVOID) {
         region *r = monster->region;
         unit *u2;
@@ -199,6 +201,12 @@ int monster_attacks(unit * monster, bool rich_only)
         for (u2 = r->units; u2; u2 = u2->next) {
             if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
                 int m = get_money(u2);
+                if (u_race(monster) == rc_serpent) {
+                    /* attack bigger ships only */
+                    if (!u2->ship || u2->ship->type->cargo <= 50000) {
+                        continue;
+                    }
+                }
                 if (!rich_only || m > 0) {
                     order *ord = monster_attack(monster, u2);
                     if (ord) {
@@ -604,7 +612,7 @@ static void recruit_dracoids(unit * dragon, int size)
 
     name_unit(un);
     change_money(dragon, -un->number * 50);
-    equip_unit(un, get_equipment("recruited_dracoid"));
+    equip_unit(un, get_equipment("new_dracoid"));
 
     setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
@@ -855,7 +863,7 @@ static int nrand(int start, int sub)
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
     fset(u, UFL_ISNEW | UFL_MOVED);
-    equip_unit(u, get_equipment("monster_seaserpent"));
+    equip_unit(u, get_equipment("seed_seaserpent"));
     return u;
 }
 
@@ -886,7 +894,7 @@ void spawn_dragons(void)
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
             fset(u, UFL_ISNEW | UFL_MOVED);
-            equip_unit(u, get_equipment("monster_dragon"));
+            equip_unit(u, get_equipment("seed_dragon"));
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
@@ -1124,7 +1132,7 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
         const char *email = config_get("monster.email");
-        f = addfaction(email ? email : "noreply@eressea.de", NULL, rc, default_locale, 0);
+        f = addfaction(email ? email : NULL, NULL, rc, default_locale, 0);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");
         fset(f, FFL_NPC | FFL_NOIDLEOUT);

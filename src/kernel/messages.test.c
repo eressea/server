@@ -79,8 +79,8 @@ static void test_noerror(CuTest *tc) {
     lang = test_create_locale();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     u->thisorder = parse_order("!@move", lang);
-    CuAssertTrue(tc, u->thisorder->_persistent);
-    CuAssertTrue(tc, u->thisorder->_noerror);
+    CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
+    CuAssertTrue(tc, !is_persistent(u->thisorder));
     CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
     CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
     test_cleanup();

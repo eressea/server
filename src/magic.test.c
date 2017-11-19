@@ -6,6 +6,7 @@
 
 #include <kernel/building.h>
 #include <kernel/race.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/item.h>
@@ -51,7 +52,18 @@ void test_updatespells(CuTest * tc)
     test_cleanup();
 }
 
-void test_spellbooks(CuTest * tc)
+static void test_get_spellbook(CuTest * tc)
+{
+    spellbook *sb;
+
+    test_setup();
+    CuAssertPtrNotNull(tc, sb = get_spellbook("hodorhodorhodor"));
+    CuAssertPtrEquals(tc, sb, get_spellbook("hodorhodorhodor"));
+    CuAssertTrue(tc, sb != get_spellbook("hodor"));
+    test_cleanup();
+}
+
+static void test_spellbooks(CuTest * tc)
 {
     spell *sp;
     spellbook *herp, *derp;
@@ -445,24 +457,6 @@ static void test_max_spellpoints(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_familiar_mage(CuTest *tc) {
-    unit *um, *uf, *ut;
-    test_setup();
-    um = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    uf = test_create_unit(um->faction, um->region);
-    ut = test_create_unit(um->faction, um->region);
-    set_number(ut, 0);
-    CuAssertTrue(tc, create_newfamiliar(um, uf));
-    CuAssertTrue(tc, is_familiar(uf));
-    CuAssertTrue(tc, !is_familiar(um));
-    CuAssertPtrEquals(tc, um, get_familiar_mage(uf));
-    CuAssertPtrEquals(tc, uf, get_familiar(um));
-    
-    CuAssertPtrEquals(tc, NULL, give_men(1, um, ut, NULL));
-    CuAssertPtrEquals(tc, ut, get_familiar_mage(uf));
-    test_cleanup();
-}
-
 static void test_illusioncastle(CuTest *tc)
 {
     building *b;
@@ -484,12 +478,135 @@ static void test_illusioncastle(CuTest *tc)
     test_cleanup();
 }
 
+static void test_is_mage(CuTest *tc) {
+    unit *u;
+    sc_mage *mage;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, NULL, get_mage(u));
+    CuAssertTrue(tc, !is_mage(u));
+    set_level(u, SK_MAGIC, 1);
+    CuAssertTrue(tc, !is_mage(u));
+    CuAssertPtrEquals(tc, NULL, get_mage(u));
+    CuAssertPtrNotNull(tc, mage = create_mage(u, M_CERDDOR));
+    CuAssertPtrEquals(tc, mage, get_mage(u));
+    CuAssertTrue(tc, is_mage(u));
+    test_cleanup();
+}
+
+static void test_get_mage(CuTest *tc) {
+    unit *u;
+    sc_mage *mage;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, NULL, get_mage(u));
+    CuAssertPtrEquals(tc, NULL, get_mage_depr(u));
+    CuAssertPtrNotNull(tc, mage = create_mage(u, M_CERDDOR));
+    CuAssertPtrEquals(tc, mage, get_mage(u));
+    CuAssertPtrEquals(tc, NULL, get_mage_depr(u));
+    set_level(u, SK_MAGIC, 1);
+    CuAssertPtrEquals(tc, mage, get_mage(u));
+    CuAssertPtrEquals(tc, mage, get_mage_depr(u));
+    test_cleanup();
+}
+
+static void test_familiar_set(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_setup();
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    CuAssertPtrEquals(tc, NULL, get_familiar_mage(fam));
+    CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
+    set_familiar(mag, fam);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    CuAssertPtrNotNull(tc, a_find(mag->attribs, &at_skillmod));
+    remove_familiar(mag);
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
+    test_cleanup();
+}
+
+static void test_familiar_age(CuTest *tc) {
+    unit *mag, *fam;
+
+    test_setup();
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    fam = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    set_familiar(mag, fam);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    a_age(&fam->attribs, fam);
+    a_age(&mag->attribs, mag);
+    CuAssertPtrEquals(tc, fam, get_familiar(mag));
+    CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
+    set_number(fam, 0);
+    a_age(&mag->attribs, mag);
+    CuAssertPtrEquals(tc, NULL, get_familiar(mag));
+    test_cleanup();
+}
+
+static void test_familiar_equip(CuTest *tc) {
+    unit *mag, *u;
+    equipment *eq;
+    const item_type * itype;
+    spell *sp;
+    sc_mage * mage;
+
+    test_setup();
+
+    itype = test_create_itemtype("horse");
+    CuAssertPtrNotNull(tc, itype);
+    sp = create_spell("testspell");
+    CuAssertPtrNotNull(tc, sp);
+
+    eq = get_or_create_equipment("fam_human");
+    equipment_setitem(eq, itype, "1");
+    equipment_setskill(eq, SK_ENTERTAINMENT, "5");
+    equipment_addspell(eq, sp->sname, 1);
+
+    mag = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(mag->faction, test_create_region(0, 0, 0));
+    set_familiar(mag, u);
+    create_newfamiliar(mag, u);
+    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 5, get_level(u, SK_ENTERTAINMENT));
+    CuAssertIntEquals(tc, 0, get_level(u, SK_MAGIC));
+
+    mage = get_mage(u);
+    CuAssertPtrNotNull(tc, mage);
+    CuAssertPtrNotNull(tc, mage->spellbook);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertPtrEquals(tc, mage, get_mage_depr(u));
+    CuAssertTrue(tc, u_hasspell(u, sp));
+
+    test_cleanup();
+}
+
+CuSuite *get_familiar_suite(void)
+{
+    CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_familiar_equip);
+    SUITE_ADD_TEST(suite, test_familiar_set);
+    SUITE_ADD_TEST(suite, test_familiar_age);
+    return suite;
+}
+
 CuSuite *get_magic_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_is_mage);
+    SUITE_ADD_TEST(suite, test_get_mage);
     SUITE_ADD_TEST(suite, test_multi_cast);
     SUITE_ADD_TEST(suite, test_updatespells);
     SUITE_ADD_TEST(suite, test_spellbooks);
+    SUITE_ADD_TEST(suite, test_get_spellbook);
     SUITE_ADD_TEST(suite, test_pay_spell);
     SUITE_ADD_TEST(suite, test_pay_spell_failure);
     SUITE_ADD_TEST(suite, test_getspell_unit);
@@ -502,6 +619,5 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
     SUITE_ADD_TEST(suite, test_illusioncastle);
-    DISABLE_TEST(suite, test_familiar_mage);
     return suite;
 }

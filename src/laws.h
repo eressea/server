@@ -98,7 +98,9 @@ extern "C" {
 
     void nmr_warnings(void);
 
-    bool cansee(const struct faction *f, const struct region *r,
+    bool cansee_ex(const struct faction * f, const struct region * r, 
+        const struct unit * u, int modifier, seen_mode mode);
+    bool cansee(const struct faction * f, const struct region * r,
         const struct unit *u, int modifier);
     bool cansee_durchgezogen(const struct faction *f, const struct region *r,
         const struct unit *u, int modifier);

@@ -89,14 +89,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <float.h>
 
-/* Bewegungsweiten: */
-#define BP_WALKING 4
-#define BP_RIDING  6
-#define BP_UNICORN 9
-#define BP_DRAGON  4
-#define BP_NORMAL 3
-#define BP_ROAD   2
-
 int *storms;
 
 typedef struct traveldir {
@@ -265,7 +257,7 @@ get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
     *p_acap = acap;
 }
 
-static int ridingcapacity(unit * u)
+static int ridingcapacity(const unit * u)
 {
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
@@ -433,7 +425,7 @@ bool canswim(unit * u)
     return false;
 }
 
-static int canride(unit * u)
+static int walk_mode(const unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
     int skill = effskill(u, SK_RIDING, 0);
@@ -460,17 +452,17 @@ static int canride(unit * u)
     if (!(u_race(u)->flags & RCF_HORSE)
         && ((horses == 0 && unicorns == 0)
             || horses > maxhorses || unicorns > maxunicorns)) {
-        return 0;
+        return BP_WALKING;
     }
 
     if (ridingcapacity(u) - eff_weight(u) >= 0) {
         if (horses == 0 && unicorns >= u->number && !(u_race(u)->flags & RCF_HORSE)) {
-            return 2;
+            return BP_UNICORN;
         }
-        return 1;
+        return BP_RIDING;
     }
 
-    return 0;
+    return BP_WALKING;
 }
 
 static bool cansail(const region * r, ship * sh)
@@ -1399,9 +1391,9 @@ static void make_route(unit * u, order * ord, region_list ** routep)
  * Normalerweise verliert man 3 BP pro Region, bei Straßen nur 2 BP.
  * Außerdem: Wenn Einheit transportiert, nur halbe BP
  */
-static int movement_speed(unit * u)
+int movement_speed(const unit * u)
 {
-    int mp = BP_WALKING;
+    int mp = 0;
     const race *rc = u_race(u);
     double dk = rc->speed;
     assert(u->number);
@@ -1415,6 +1407,10 @@ static int movement_speed(unit * u)
         mp = BP_DRAGON;
         break;
     default:
+        mp = walk_mode(u);
+        if (mp>=BP_RIDING) {
+            dk = 1.0;
+        }
         break;
     }
 
@@ -1426,38 +1422,22 @@ static int movement_speed(unit * u)
         }
     }
 
-    switch (canride(u)) {
-    case 1:                      /* Pferd */
-        mp = BP_RIDING;
-        break;
+    /* unicorn in inventory */
+    if (u->number <= i_get(u->items, it_find("fairyboot"))) {
+        mp *= 2;
+    }
 
-    case 2:                      /* Einhorn */
-        mp = BP_UNICORN;
-        break;
-
-    default:
-        /* Siebenmeilentee */
-        if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
-            mp *= 2;
-            change_effect(u, oldpotiontype[P_FAST], -u->number);
-        }
-
-        /* unicorn in inventory */
-        if (u->number <= i_get(u->items, it_find("fairyboot"))) {
-            mp *= 2;
-        }
-
-        /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-         * Nicht kumulativ mit anderen Beschleunigungen! */
-        if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)
-            && is_mage(u)) {
-            sc_mage *mage = get_mage(u);
-            if (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN) {
+    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+        * Nicht kumulativ mit anderen Beschleunigungen! */
+    if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
+        sc_mage *mage = get_mage(u);
+        if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
+            if (has_skill(u, SK_MAGIC)) {
                 mp *= 2;
             }
         }
-        break;
     }
+
     return (int)(dk * mp);
 }
 
@@ -1631,7 +1611,7 @@ static const region_list *travel_route(unit * u,
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
         }
-        if (canride(u)) {
+        else if (walk_mode(u) >= BP_RIDING) {
             walkmode = 1;
             produceexp(u, SK_RIDING, u->number);
         }
@@ -2044,7 +2024,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     const region_list * route_end, order * ord, int mode, follower ** followers)
 {
     region *r = u->region;
-
+    int mp;
     if (u->building && !can_leave(u)) {
         cmistake(u, u->thisorder, 150, MSG_MOVE);
         return route_begin;
@@ -2060,7 +2040,15 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         cmistake(u, ord, 42, MSG_MOVE);
         return route_begin;
     }
-    route_end = cap_route(r, route_begin, route_end, movement_speed(u));
+
+    mp = movement_speed(u);
+    /* Siebenmeilentee */
+    if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
+        mp *= 2;
+        change_effect(u, oldpotiontype[P_FAST], -u->number);
+    }
+
+    route_end = cap_route(r, route_begin, route_end, mp);
 
     route_end = travel_route(u, route_begin, route_end, ord, mode);
     if (u->flags&UFL_FOLLOWED) {

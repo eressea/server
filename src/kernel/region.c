@@ -745,11 +745,17 @@ int rtrees(const region * r, int ageclass)
 
 int rsettrees(const region * r, int ageclass, int value)
 {
-    if (!r->land)
+    if (!r->land) {
         assert(value == 0);
+    }
     else {
         assert(value >= 0);
-        return r->land->trees[ageclass] = value;
+        if (value <= MAXTREES) {
+            return r->land->trees[ageclass] = value;
+        }
+        else {
+            r->land->trees[ageclass] = MAXTREES;
+        }
     }
     return 0;
 }
@@ -819,8 +825,8 @@ void free_land(land_region * lr)
         lr->demands = d->next;
         free(d);
     }
-    if (lr->name)
-        free(lr->name);
+    free(lr->name);
+    free(lr->display);
     free(lr);
 }
 
@@ -888,7 +894,6 @@ void free_region(region * r)
 {
     if (last == r)
         last = NULL;
-    free(r->display);
     if (r->land)
         free_land(r->land);
 
@@ -1082,7 +1087,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     terraform_resources(r);
 
     if (!fval(terrain, LAND_REGION)) {
-        region_setinfo(r, NULL);
         if (r->land) {
             free_land(r->land);
             r->land = NULL;
@@ -1251,46 +1255,22 @@ int production(const region * r)
     return p;
 }
 
-int resolve_region_coor(variant id, void *address)
+void resolve_region(region *r)
 {
-    region *r = findregion(id.sa[0], id.sa[1]);
-    if (r) {
-        *(region **)address = r;
-        return 0;
-    }
-    *(region **)address = NULL;
-    return -1;
+    resolve(RESOLVE_REGION | r->uid, r);
 }
 
-int resolve_region_id(variant id, void *address)
-{
-    region *r = NULL;
-    if (id.i != 0) {
-        r = findregionbyid(id.i);
-        if (r == NULL) {
-            *(region **)address = NULL;
-            return -1;
-        }
-    }
-    *(region **)address = r;
-    return 0;
-}
-
-variant read_region_reference(gamedata *data)
+int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
 {
     struct storage * store = data->store;
-    variant result;
-    if (data->version < UIDHASH_VERSION) {
-        int n;
-        READ_INT(store, &n);
-        result.sa[0] = (short)n;
-        READ_INT(store, &n);
-        result.sa[1] = (short)n;
+    int id = 0;
+
+    READ_INT(store, &id);
+    *rp = findregionbyid(id);
+    if (*rp == NULL) {
+        ur_add(RESOLVE_REGION | id, (void **)rp, fun);
     }
-    else {
-        READ_INT(store, &result.i);
-    }
-    return result;
+    return id;
 }
 
 void write_region_reference(const region * r, struct storage *store)
@@ -1438,13 +1418,14 @@ faction *update_owners(region * r)
 
 void region_setinfo(struct region *r, const char *info)
 {
-    free(r->display);
-    r->display = info ? strdup(info) : 0;
+    assert(r->land);
+    free(r->land->display);
+    r->land->display = (info && info[0]) ? strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
 {
-    return r->display ? r->display : "";
+    return (r->land && r->land->display) ? r->land->display : "";
 }
 
 void region_setname(struct region *r, const char *name)

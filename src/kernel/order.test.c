@@ -38,8 +38,7 @@ static void test_parse_order(CuTest *tc) {
 
     ord = parse_order("MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, !ord->_noerror);
-    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertIntEquals(tc, K_MOVE, ord->command);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, cmd, sizeof(cmd)));
 
@@ -49,26 +48,37 @@ static void test_parse_order(CuTest *tc) {
 
     ord = parse_order("!MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, !ord->_persistent);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_QUIET, ord->command);
     free_order(ord);
 
     ord = parse_order("@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, !ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
-    free_order(ord);
-
-    ord = parse_order("@!MOVE NORTH", lang);
-    CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST, ord->command);
     free_order(ord);
 
     ord = parse_order("!@MOVE NORTH", lang);
     CuAssertPtrNotNull(tc, ord);
-    CuAssertTrue(tc, ord->_noerror);
-    CuAssertTrue(tc, ord->_persistent);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
+    free_order(ord);
+
+    ord = parse_order("@!MOVE NORTH", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
+    free_order(ord);
+
+    ord = parse_order("  !@MOVE NORTH", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertPtrNotNull(tc, ord->data);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
     free_order(ord);
 
     test_cleanup();
@@ -204,16 +214,84 @@ static void test_get_command(CuTest *tc) {
     lang = test_create_locale();
     ord = create_order(K_MAKE, lang, "iron");
     CuAssertStrEquals(tc, "make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_noerror = true;
+    ord->command |= CMD_QUIET;
     CuAssertStrEquals(tc, "!make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_persistent = true;
+    ord->command |= CMD_PERSIST;
     CuAssertStrEquals(tc, "!@make iron", get_command(ord, buf, sizeof(buf)));
-    ord->_noerror = false;
+    ord->command = K_MAKE | CMD_PERSIST;
     CuAssertStrEquals(tc, "@make iron", get_command(ord, buf, sizeof(buf)));
     free_order(ord);
     test_cleanup();
 }
 
+static void test_is_persistent(CuTest *tc) {
+    order *ord;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = parse_order("@invalid", lang);
+    CuAssertPtrEquals(tc, NULL, ord);
+
+    ord = parse_order("give", lang);
+    CuAssertIntEquals(tc, K_GIVE, ord->command);
+    CuAssertTrue(tc, !is_persistent(ord));
+    free_order(ord);
+
+    ord = parse_order("@give", lang);
+    CuAssertTrue(tc, !is_repeated(K_GIVE));
+    CuAssertIntEquals(tc, K_GIVE | CMD_PERSIST, ord->command);
+    CuAssertTrue(tc, is_persistent(ord));
+    free_order(ord);
+
+    ord = parse_order("make", lang);
+    CuAssertTrue(tc, is_repeated(K_MAKE));
+    CuAssertIntEquals(tc, K_MAKE , ord->command);
+    CuAssertTrue(tc, is_persistent(ord));
+    free_order(ord);
+
+    ord = parse_order("@move", lang);
+    CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST, ord->command);
+    CuAssertTrue(tc, !is_persistent(ord));
+    free_order(ord);
+
+    ord = parse_order("// comment", lang);
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
+    free_order(ord);
+
+    test_cleanup();
+}
+
+
+static void test_is_silent(CuTest *tc) {
+    order *ord;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = parse_order("make", lang);
+    CuAssertIntEquals(tc, K_MAKE, ord->command);
+    CuAssertTrue(tc, !is_silent(ord));
+    free_order(ord);
+
+    ord = parse_order("!make", lang);
+    CuAssertIntEquals(tc, K_MAKE | CMD_QUIET, ord->command);
+    CuAssertTrue(tc, is_silent(ord));
+    free_order(ord);
+
+    ord = parse_order("@invalid", lang);
+    CuAssertPtrEquals(tc, NULL, ord);
+
+    ord = parse_order("// comment", lang);
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
+    free_order(ord);
+
+    test_cleanup();
+}
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -227,5 +305,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_getstrtoken);
     SUITE_ADD_TEST(suite, test_get_command);
+    SUITE_ADD_TEST(suite, test_is_persistent);
+    SUITE_ADD_TEST(suite, test_is_silent);
     return suite;
 }

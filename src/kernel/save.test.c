@@ -1,5 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
+#include <kernel/race.h>
 #include <util/attrib.h>
 #include <util/gamedata.h>
 #include <attributes/key.h>
@@ -51,6 +52,7 @@ static void test_readwrite_unit(CuTest * tc)
     struct unit *u;
     struct region *r;
     struct faction *f;
+    struct race *irace;
     int fno;
 
     test_setup();
@@ -60,6 +62,12 @@ static void test_readwrite_unit(CuTest * tc)
     u = test_create_unit(f, r);
     unit_setname(u, "  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", u->_name);
+    enable_skill(SK_STEALTH, false);
+    irace = test_create_race("halfling");
+    CuAssertTrue(tc, playerrace(irace));
+    u->irace = irace;
+    CuAssertTrue(tc, irace == u_irace(u));
+    
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_unit(&data, u);
@@ -74,6 +82,7 @@ static void test_readwrite_unit(CuTest * tc)
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertStrEquals(tc, "Hodor", u->_name);
+    CuAssertTrue(tc, irace == u_irace(u));
     CuAssertPtrEquals(tc, 0, u->region);
 
     mstream_done(&data.strm);
@@ -116,12 +125,15 @@ static void test_readwrite_region(CuTest * tc)
     gamedata data;
     storage store;
     region *r;
+    const char * lipsum = "Lorem ipsum dolor sit amet";
 
     test_setup();
     r = test_create_region(0, 0, 0);
     free(r->land->name);
     r->land->name = strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
+    region_setinfo(r, lipsum);
+    CuAssertStrEquals(tc, lipsum, r->land->display);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_region(&data, r);
@@ -132,6 +144,7 @@ static void test_readwrite_region(CuTest * tc)
     r = read_region(&data);
     CuAssertPtrNotNull(tc, r);
     CuAssertStrEquals(tc, "Hodor", r->land->name);
+    CuAssertStrEquals(tc, lipsum, r->land->display);
     regions = r;
 
     mstream_done(&data.strm);
