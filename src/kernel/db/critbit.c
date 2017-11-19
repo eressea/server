@@ -1,5 +1,5 @@
 #include <platform.h>
-#include "critbit.h"
+#include "driver.h"
 
 #include <kernel/orderdb.h>
 #include <util/log.h>
@@ -18,7 +18,7 @@ struct cb_entry {
     order_data *data;
 };
 
-order_data *db_critbit_order_load(int id)
+order_data *db_driver_order_load(int id)
 {
     void * match;
 
@@ -32,7 +32,7 @@ order_data *db_critbit_order_load(int id)
     return NULL;
 }
 
-int db_critbit_order_save(order_data *od)
+int db_driver_order_save(order_data *od)
 {
     struct cb_entry ent;
 
@@ -53,13 +53,13 @@ static int free_data_cb(const void *match, const void *key, size_t keylen,
     return 0;
 }
 
-void db_critbit_open(void)
+void db_driver_open(void)
 {
     assert(auto_id == -1);
     auto_id = 0;
 }
 
-void db_critbit_close(void)
+void db_driver_close(void)
 {
     cb_foreach(&cb_orders, NULL, 0, free_data_cb, NULL);
     cb_clear(&cb_orders);

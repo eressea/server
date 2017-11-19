@@ -6,6 +6,8 @@
 
 #include <util/log.h>
 
+#include "driver.h"
+
 #include <sqlite3.h>
 
 #include <assert.h>
@@ -20,7 +22,7 @@ static sqlite3_stmt * g_stmt_select;
 static int g_order_batchsize;
 static int g_order_tx_size;
 
-order_data *db_sqlite_order_load(int id)
+order_data *db_driver_order_load(int id)
 {
     order_data * od = NULL;
     int err;
@@ -50,7 +52,7 @@ order_data *db_sqlite_order_load(int id)
     return NULL;
 }
 
-int db_sqlite_order_save(order_data *od)
+int db_driver_order_save(order_data *od)
 {
     int err;
     sqlite3_int64 id;
@@ -84,7 +86,7 @@ int db_sqlite_order_save(order_data *od)
     return (int)id;
 }
 
-void db_sqlite_open(void)
+void db_driver_open(void)
 {
     int err;
     const char *dbname;
@@ -108,7 +110,7 @@ void db_sqlite_open(void)
     assert(err == SQLITE_OK);
 }
 
-void db_sqlite_close(void)
+void db_driver_close(void)
 {
     int err;
 

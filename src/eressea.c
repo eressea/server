@@ -44,8 +44,8 @@ void game_done(void)
 #ifdef CLEANUP_CODE
     /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
      * zum Debugging interessant, wenn man Leak Detection hat, und nach
-     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-     * wird (temporäre Hilsstrukturen) */
+     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benï¿½tigt
+     * wird (temporï¿½re Hilsstrukturen) */
 
     free_game();
 
@@ -60,12 +60,12 @@ void game_done(void)
     free_special_directions();
     free_locales();
     kernel_done();
-    db_close();
+    dblib_close();
 }
 
 void game_init(void)
 {
-    db_open();
+    dblib_open();
     kernel_init();
     register_triggers();
     register_xmas();

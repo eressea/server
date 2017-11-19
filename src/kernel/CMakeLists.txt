@@ -37,9 +37,14 @@ jsonconf.test.c
 )
 
 SET(_DBFILES db/critbit.c)
+
 IF(SQLITE3_FOUND)
 SET(_DBFILES db/sqlite.c)
 ENDIF(SQLITE3_FOUND)
+
+IF(DB_FOUND)
+SET(_DBFILES db/berkeley.c)
+ENDIF(DB_FOUND)
 
 SET(_FILES
 ${_DBFILES}

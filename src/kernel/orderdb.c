@@ -38,10 +38,10 @@ void odata_addref(order_data *od)
 
 order_data *odata_load(int id)
 {
-    return db_load_order(id);
+    return dblib_load_order(id);
 }
 
 int odata_save(order_data *od)
 {
-    return db_save_order(od);
+    return dblib_save_order(od);
 }

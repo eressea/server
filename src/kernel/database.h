@@ -1,5 +1,5 @@
-#ifndef H_DB
-#define H_DB
+#ifndef H_DATABASE
+#define H_DATABASE
 
 #include <stddef.h>
 
@@ -9,11 +9,11 @@ extern "C" {
 
     struct order_data;
 
-    void db_open(void);
-    void db_close(void);
+    void dblib_open(void);
+    void dblib_close(void);
 
-    struct order_data *db_load_order(int id);
-    int db_save_order(struct order_data *od);
+    struct order_data *dblib_load_order(int id);
+    int dblib_save_order(struct order_data *od);
 
 #ifdef __cplusplus
 }
