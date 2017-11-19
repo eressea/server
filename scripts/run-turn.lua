@@ -29,7 +29,7 @@ local function dbupdate()
     update_scores()
     if config.dbname then
         dbname = config.basepath..'/'..config.dbname
-        edb = db.open(dbame)
+        edb = db.open(dbname)
         if edb~=nil then
             edb:update_factions()
             edb:update_scores()

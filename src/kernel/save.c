@@ -1067,9 +1067,11 @@ faction *read_faction(gamedata * data)
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
     READ_STR(data->store, name, sizeof(name));
-    if (set_email(&f->email, name) != 0) {
-        log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
-        set_email(&f->email, "");
+    if (check_email(name) == 0) {
+      faction_setemail(f, name);
+    } else {
+      log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
+      faction_setemail(f, NULL);
     }
 
     read_password(data, f);
@@ -1168,7 +1170,7 @@ void write_faction(gamedata *data, const faction * f)
 
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
-    WRITE_STR(data->store, f->email);
+    WRITE_STR(data->store, f->email?f->email:"");
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);

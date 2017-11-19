@@ -171,7 +171,7 @@ newfaction *read_newfactions(const char *filename)
             sz += strlcat(password, itoa36(rng_int()), sizeof(password));
         }
         for (f = factions; f; f = f->next) {
-            if (strcmp(f->email, email) == 0 && f->age < MINAGE_MULTI) {
+            if (strcmp(faction_getemail(f), email) == 0 && f->age < MINAGE_MULTI) {
                 log_warning("email %s already in use by %s", email, factionname(f));
                 break;
             }
@@ -188,7 +188,9 @@ newfaction *read_newfactions(const char *filename)
             continue;
         }
         nf = calloc(sizeof(newfaction), 1);
-        if (set_email(&nf->email, email) != 0) {
+        if (check_email(email) == 0) {
+          nf->email = strdup(email);
+        } else {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
             free(nf);
             continue;
@@ -619,6 +621,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             while (*nfp) {
                 newfaction *nf = *nfp;
                 if (strcmp(nextf->email, nf->email) == 0) {
+                    log_warning("Duplicate email %s\n", nf->email?nf->email:"");
                     *nfp = nf->next;
                     free_newfaction(nf);
                 }

@@ -23,7 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    int set_email(char **pemail, const char *newmail);
+    int check_email(const char *newmail);
 
     int *intlist_init(void);
     int *intlist_add(int *i_p, int i);
