@@ -340,8 +340,10 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
+        char plural[32];
         itype->_appearance[0] = strdup(appearance);
-        itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
+        snprintf(plural, "%29s_p", appearance);
+        itype->_appearance[1] = strdup(plural);
     } else {
         itype->_appearance[0] = 0;
         itype->_appearance[1] = 0;

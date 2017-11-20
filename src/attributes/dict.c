@@ -135,7 +135,13 @@ static void dict_upgrade(attrib **alist, attrib *abegin) {
             assert(!"invalid input");
         }
         if (i == 4) {
-            keys = realloc(keys, sizeof(int) * (n + i + 1));
+            int *k;
+            k = realloc(keys, sizeof(int) * (n + i + 1));
+            if (!k) {
+                free(keys);
+                abort();
+            }
+            keys = k;
             memcpy(keys + n + 1, val, sizeof(val));
             n += i;
             i = 0;
