@@ -106,17 +106,18 @@ static void rc_setoption(race *rc, int k, const char *value) {
         rc->options->key[1] = RCO_NONE;
         v = rc->options->value;
     } else {
-        for (i=0;!v && i < MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+        for (i=0;!v && i < MAXOPTIONS;++i) {
             if (rc->options->key[i]==key) {
                 v = rc->options->value+i;
+                break;
             }
-        }
-        if (!v) {
-            assert(i<MAXOPTIONS || !"MAXOPTIONS too small for race");
-            v = rc->options->value+i;
-            rc->options->key[i] = key;
-            if (i+1<MAXOPTIONS) {
-                rc->options->key[i+1]=RCO_NONE;
+            if (rc->options->key[i]==RCO_NONE) {
+                v = rc->options->value+i;
+                rc->options->key[i] = key;
+                if (i+1 < MAXOPTIONS) {
+                    rc->options->key[i+1]=RCO_NONE;
+                }
+                break;
             }
         }
     }
