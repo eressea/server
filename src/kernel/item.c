@@ -342,7 +342,7 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     if (appearance) {
         char plural[32];
         itype->_appearance[0] = strdup(appearance);
-        snprintf(plural, "%29s_p", appearance);
+        snprintf(plural, sizeof(plural), "%s_p", appearance);
         itype->_appearance[1] = strdup(plural);
     } else {
         itype->_appearance[0] = 0;
