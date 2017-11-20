@@ -22,6 +22,7 @@ s/cmake-init
 s/build
 cd $ROOT
 inifile
+cppcheck --quiet --error-exitcode=1 src
 s/runtests -V
-
 integration_tests
+
