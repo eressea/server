@@ -30,5 +30,6 @@ extern "C"
     extern const char * directions[];
 
 #ifdef __cplusplus
+}
 #endif
 #endif
