@@ -13,6 +13,7 @@ addons:
       - libsqlite3-dev
       - libxml2-dev
       - valgrind
+      - cppcheck
 os:
   - linux
 notifications:

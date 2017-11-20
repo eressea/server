@@ -88,9 +88,9 @@ int get_reservation(const unit * u, const item_type * itype)
 {
     reservation *res = u->reservations;
 
-    if (itype->rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM))
+    if (itype->rtype == get_resourcetype(R_STONE) && (u_race(u)->ec_flags & ECF_STONEGOLEM))
         return (u->number * GOLEM_STONE);
-    if (itype->rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM))
+    if (itype->rtype == get_resourcetype(R_IRON) && (u_race(u)->ec_flags & ECF_IRONGOLEM))
         return (u->number * GOLEM_IRON);
     while (res && res->type != itype)
         res = res->next;

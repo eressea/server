@@ -199,14 +199,11 @@ static int create_data(keyword_t kwd, const char *s,
     return id;
 }
 
-static order *create_order_i(order *ord, const struct locale *lang,
-    keyword_t kwd, const char *sptr, bool persistent, bool noerror)
+static void create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
+    bool noerror, const struct locale *lang)
 {
     assert(ord);
-    if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
-        log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
-        return NULL;
-    }
+    assert(kwd != NOKEYWORD && !keyword_disabled(kwd));
 
     ord->command = (int)kwd;
     if (persistent) ord->command |= CMD_PERSIST;
@@ -216,7 +213,6 @@ static order *create_order_i(order *ord, const struct locale *lang,
     while (isspace(*(unsigned char *)sptr)) ++sptr;
 
     ord->id = create_data(kwd, sptr, lang);
-    return ord;
 }
 
 order *create_order(keyword_t kwd, const struct locale * lang,
@@ -274,10 +270,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         zBuffer[0] = 0;
     }
     ord = (order *)malloc(sizeof(order));
-    if (create_order_i(ord, lang, kwd, zBuffer, false, false) == NULL) {
-        free(ord);
-        return NULL;
-    }
+    create_order_i(ord, kwd, zBuffer, false, false, lang);
     return ord;
 }
 
@@ -310,11 +303,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
-            if (create_order_i(ord, lang, kwd, sptr, persistent, noerror)
-                    == NULL) {
-                free(ord);
-                return NULL;
-            }
+            create_order_i(ord, kwd, sptr, persistent, noerror, lang);
             return ord;
         }
     }

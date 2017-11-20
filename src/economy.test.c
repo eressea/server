@@ -217,7 +217,7 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
 }
 
 static void test_trade_insect(CuTest *tc) {
-    /* Insekten können in Wüsten und Sümpfen auch ohne Burgen handeln. */
+    /* Insekten kï¿½nnen in Wï¿½sten und Sï¿½mpfen auch ohne Burgen handeln. */
     unit *u;
     region *r;
     const item_type *it_luxury;
@@ -239,6 +239,8 @@ static void test_trade_insect(CuTest *tc) {
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
 
     set_item(u, it_silver, 10);
+    CuAssertPtrEquals(tc, r, u->region);
+    CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
     produce(u->region);
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));

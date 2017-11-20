@@ -89,7 +89,8 @@ alliance *new_alliance(int id, const char *name) {
         al->flags |= ALF_NON_ALLIED;
     }
     al->next = alliances;
-    return alliances = al;
+    alliances = al;
+    return al;
 }
 
 alliance *findalliance(int id)

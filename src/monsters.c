@@ -9,7 +9,7 @@
  *  based on:
  *
  * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schröder
+ * Atlantis v1.7                    Copyright 1996 by Alex Schrï¿½der
  *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
@@ -74,7 +74,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define DRAGON_RANGE       20  /* max. Distanz zum nächsten Drachenziel */
+#define DRAGON_RANGE       20  /* max. Distanz zum nï¿½chsten Drachenziel */
 #define MOVE_PERCENT       25  /* chance fuer bewegung */
 #define MAXILLUSION_TEXTS   3
 
@@ -359,11 +359,11 @@ static direction_t random_neighbour(region * r, unit * u)
         }
     }
 
-    /* Zufällig eine auswählen */
+    /* Zufï¿½llig eine auswï¿½hlen */
 
     rr = rng_int() % c;
 
-    /* Durchzählen */
+    /* Durchzï¿½hlen */
 
     c = 0;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -400,11 +400,11 @@ static direction_t treeman_neighbour(region * r)
     if (c == 0) {
         return NODIRECTION;
     }
-    /* Zufällig eine auswählen */
+    /* Zufï¿½llig eine auswï¿½hlen */
 
     rr = rng_int() % c;
 
-    /* Durchzählen */
+    /* Durchzï¿½hlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -559,7 +559,7 @@ static order *monster_learn(unit * u)
         return NULL;
     }
 
-    /* Monster lernt ein zufälliges Talent aus allen, in denen es schon
+    /* Monster lernt ein zufï¿½lliges Talent aus allen, in denen es schon
      * Lerntage hat. */
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
         if (sv->level > 0)
@@ -605,7 +605,6 @@ static void recruit_dracoids(unit * dragon, int size)
     faction *f = dragon->faction;
     region *r = dragon->region;
     const struct item *weapon = NULL;
-    order *new_order = NULL;
     unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
 
     fset(un, UFL_ISNEW | UFL_MOVED);
@@ -617,15 +616,10 @@ static void recruit_dracoids(unit * dragon, int size)
     setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
         const weapon_type *wtype = weapon->type->rtype->wtype;
-        if (wtype && (wtype->flags & WTF_MISSILE)) {
+        if (wtype && wtype->flags & WTF_MISSILE) {
             setstatus(un, ST_BEHIND);
+            break;
         }
-        new_order = create_order(K_STUDY, f->locale, "'%s'",
-            skillname(weapon->type->rtype->wtype->skill, f->locale));
-    }
-
-    if (new_order != NULL) {
-        addlist(&un->orders, new_order);
     }
 }
 
@@ -653,7 +647,7 @@ static order *plan_dragon(unit * u)
     if (rc == rc_wyrm && !move) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            /* wyrme sind einzelgänger */
+            /* wyrme sind einzelgï¿½nger */
             if (u2 == u) {
                 /* we do not make room for newcomers, so we don't need to look at them */
                 break;
@@ -750,11 +744,11 @@ void plan_monsters(faction * f)
             attrib *ta;
             order *long_order = NULL;
 
-            /* Ab hier nur noch Befehle für NPC-Einheiten. */
+            /* Ab hier nur noch Befehle fï¿½r NPC-Einheiten. */
             if (u->faction!=f)
                 continue;
 
-            /* Befehle müssen jede Runde neu gegeben werden: */
+            /* Befehle mï¿½ssen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
@@ -823,7 +817,7 @@ void plan_monsters(faction * f)
                 }
             }
             if (long_order == NULL && unit_can_study(u)) {
-                /* Einheiten, die Waffenlosen Kampf lernen könnten, lernen es um
+                /* Einheiten, die Waffenlosen Kampf lernen kï¿½nnten, lernen es um
                 * zu bewachen: */
                 if (rc->bonus[SK_WEAPONLESS] != -99) {
                     if (effskill(u, SK_WEAPONLESS, 0) < 1) {
@@ -868,7 +862,7 @@ unit *spawn_seaserpent(region *r, faction *f) {
 }
 
 /** 
- * Drachen und Seeschlangen können entstehen 
+ * Drachen und Seeschlangen kï¿½nnen entstehen 
  */
 void spawn_dragons(void)
 {
@@ -917,7 +911,7 @@ void spawn_dragons(void)
     }
 }
 
-/** Untote können entstehen */
+/** Untote kï¿½nnen entstehen */
 void spawn_undead(void)
 {
     region *r;
@@ -937,7 +931,7 @@ void spawn_undead(void)
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
-             * Lieber sammeln lassen, bis sie mindestens 5% der Bevölkerung sind, und
+             * Lieber sammeln lassen, bis sie mindestens 5% der Bevï¿½lkerung sind, und
              * dann erst auferstehen. */
             int undead = unburied / (rng_int() % 2 + 1);
             const race *rc = NULL;
@@ -995,7 +989,7 @@ void spawn_undead(void)
         else {
             int i = deathcount(r);
             if (i) {
-                /* Gräber verwittern, 3% der Untoten finden die ewige Ruhe */
+                /* Grï¿½ber verwittern, 3% der Untoten finden die ewige Ruhe */
                 deathcounts(r, (int)(-i * 0.03));
             }
         }
