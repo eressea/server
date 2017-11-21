@@ -720,6 +720,22 @@ static void select_regions(state * st, int selectmode)
             }
         }
     }
+    else if (findmode == 'c') {
+        region *r;
+        sprintf(sbuffer, "%schaos", status);
+        statusline(st->wnd_status->handle, sbuffer);
+        for (r = regions; r; r = r->next) {
+            if (fval(r, RF_CHAOTIC)) {
+                if (selectmode & MODE_SELECT) {
+                    select_coordinate(st->selected, r->x, r->y,
+                        selectmode == MODE_SELECT);
+                }
+                else {
+                    highlight_region(r, selectmode == MODE_MARK);
+                }
+            }
+        }
+    }
     else if (findmode == 'm') {
         region *r;
         sprintf(sbuffer, "%smonsters", status);
@@ -991,9 +1007,13 @@ static void handlekey(state * st, int c)
         break;
     case 'c': /* clear/reset */
         reset_cursor(st);
+        st->modified = 1;
+        st->wnd_map->update |= 1;
         break;
     case 'C': /* clear/reset */
         reset_rect(st);
+        st->modified = 1;
+        st->wnd_map->update |= 1;
         break;
     case 0x09:                 /* tab = next selected */
         if (regions != NULL) {
