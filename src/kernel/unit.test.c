@@ -616,6 +616,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_clone_men);
+    SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_transfermen);
