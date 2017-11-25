@@ -62,7 +62,6 @@ static void load_inifile(void)
         set_datapath(str);
     }
 
-    lomem = config_get_int("game.lomem", lomem) ? 1 : 0;
     verbosity = config_get_int("game.verbose", 2);
     memdebug = config_get_int("game.memcheck", memdebug);
 #ifdef USE_CURSES
@@ -79,7 +78,6 @@ static const char * valid_keys[] = {
     "game.locale",
     "game.verbose",
     "game.report",
-    "game.lomem",
     "game.memcheck",
     "game.email",
     "game.mailcmd",

@@ -95,7 +95,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 struct settings global;
 
-bool lomem = false;
 int turn = 0;
 
 const char *parameters[MAXPARAMS] = {
