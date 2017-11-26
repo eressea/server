@@ -379,7 +379,7 @@ static void writeorder(gamedata *data, const struct order *ord,
     const struct locale *lang)
 {
     char obuf[1024];
-    write_order(ord, obuf, sizeof(obuf));
+    write_order(ord, lang, obuf, sizeof(obuf));
     if (obuf[0])
         WRITE_STR(data->store, obuf);
 }

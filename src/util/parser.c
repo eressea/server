@@ -16,6 +16,8 @@
 typedef struct parser_state {
     const char *current_token;
     struct parser_state *next;
+    void *data;
+    void(*dtor)(void *);
 } parser_state;
 
 static parser_state *states;
@@ -50,17 +52,26 @@ static int eatwhitespace_c(const char **str_p)
     return ret;
 }
 
-void init_tokens_str(const char *initstr)
+void init_tokens_ex(const char *initstr, void *data, void (*dtor)(void *))
 {
     if (states == NULL) {
-        states = malloc(sizeof(parser_state));
+        states = calloc(1, sizeof(parser_state));
     }
+    else if (states->dtor) {
+        states->dtor(states->data);
+    }
+    states->dtor = dtor;
+    states->data = data;
     states->current_token = initstr;
+}
+
+void init_tokens_str(const char *initstr) {
+    init_tokens_ex(initstr, NULL, NULL);
 }
 
 void parser_pushstate(void)
 {
-    parser_state *new_state = malloc(sizeof(parser_state));
+    parser_state *new_state = calloc(1, sizeof(parser_state));
     new_state->current_token = NULL;
     new_state->next = states;
     states = new_state;
@@ -69,6 +80,9 @@ void parser_pushstate(void)
 void parser_popstate(void)
 {
     parser_state *new_state = states->next;
+    if (states->dtor) {
+        states->dtor(states->data);
+    }
     free(states);
     states = new_state;
 }
@@ -254,7 +268,7 @@ unsigned int atoip(const char *s)
     int n;
 
     assert(s);
-    n = (s[0] >='0' && s[0]<='9');
+    n = (s[0] >= '0' && s[0] <= '9');
     n = n ? atoi(s) : 0;
 
     if (n < 0)

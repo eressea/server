@@ -31,12 +31,12 @@
 extern void plan_monsters(struct faction *f);
 extern int monster_attacks(unit * monster, bool rich_only);
 
-static order *find_order(const char *expected, const unit *unit)
+static order *find_order(const char *expected, const unit *u)
 {
     char cmd[32];
     order *ord;
-    for (ord = unit->orders; ord; ord = ord->next) {
-        if (strcmp(expected, get_command(ord, cmd, sizeof(cmd))) == 0) {
+    for (ord = u->orders; ord; ord = ord->next) {
+        if (strcmp(expected, get_command(ord, u->faction->locale, cmd, sizeof(cmd))) == 0) {
             return ord;
         }
     }

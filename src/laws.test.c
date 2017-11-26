@@ -1049,7 +1049,7 @@ static void test_long_order_normal(CuTest *tc) {
     fset(u, UFL_LONGACTION);
     unit_addorder(u, ord = create_order(K_MOVE, u->faction->locale, 0));
     update_long_order(u);
-    CuAssertPtrEquals(tc, ord->data, u->thisorder->data);
+    CuAssertIntEquals(tc, ord->id, u->thisorder->id);
     CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
     CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
     CuAssertPtrNotNull(tc, u->orders);

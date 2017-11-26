@@ -27,6 +27,7 @@
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/xmlreader.h>
+#include <kernel/database.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/xerewards.h>
@@ -35,6 +36,8 @@
 #include <attributes/attributes.h>
 #include <util/message.h>
 #include <races/races.h>
+
+#include <stdlib.h>
 
 void game_done(void)
 {
@@ -57,10 +60,12 @@ void game_done(void)
     free_special_directions();
     free_locales();
     kernel_done();
+    dblib_close();
 }
 
 void game_init(void)
 {
+    dblib_open();
     kernel_init();
     register_triggers();
     register_xmas();

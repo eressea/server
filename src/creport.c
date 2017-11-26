@@ -376,13 +376,13 @@ static int cr_alliance(variant var, char *buffer, const void *userdata)
 
 static int cr_skill(variant var, char *buffer, const void *userdata)
 {
-    const faction *report = (const faction *)userdata;
+    const faction *f = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
     UNUSED_ARG(userdata);
     if (sk != NOSKILL)
         sprintf(buffer, "\"%s\"",
             translate(mkname("skill", skillnames[sk]), skillname(sk,
-                report->locale)));
+                f->locale)));
     else
         strcpy(buffer, "\"\"");
     return 0;
@@ -391,13 +391,14 @@ static int cr_skill(variant var, char *buffer, const void *userdata)
 static int cr_order(variant var, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
-    UNUSED_ARG(userdata);
+    const faction *f = (const faction *)userdata;
+
     if (ord != NULL) {
         char cmd[ORDERSIZE];
         char *wp = buffer;
         const char *rp;
 
-        get_command(ord, cmd, sizeof(cmd));
+        get_command(ord, f->locale, cmd, sizeof(cmd));
 
         *wp++ = '\"';
         for (rp = cmd; *rp;) {
@@ -722,11 +723,11 @@ static void cr_output_ship_compat(FILE *F, const ship *sh, const unit *u,
     cr_output_ship(&strm, sh, u, fcaptain, f, r);
 }
 
-static int stream_order(stream *out, const struct order *ord) {
+static int stream_order(stream *out, const struct order *ord, const struct locale *lang) {
     const char *str;
     char ebuf[1025];
     char obuf[1024];
-    write_order(ord, obuf, sizeof(obuf));
+    write_order(ord, lang, obuf, sizeof(obuf));
     str = escape_string(obuf, ebuf, sizeof(ebuf));
     if (str == ebuf) {
         ebuf[1024] = 0;
@@ -779,6 +780,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const faction *fother;
     const char *prefix;
     bool allied;
+    const struct locale *lang = f->locale;
 
     assert(u && u->number);
     assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
@@ -787,7 +789,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
 
     stream_printf(out, "EINHEIT %d\n", u->no);
     stream_printf(out, "\"%s\";Name\n", unit_getname(u));
-    str = u_description(u, f->locale);
+    str = u_description(u, lang);
     if (str) {
         stream_printf(out, "\"%s\";Beschr\n", str);
     }
@@ -833,7 +835,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     prefix = raceprefix(u);
     if (prefix) {
         prefix = mkname("prefix", prefix);
-        stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(f->locale,
+        stream_printf(out, "\"%s\";typprefix\n", translate(prefix, LOC(lang,
             prefix)));
     }
     stream_printf(out, "%d;Anzahl\n", u->number);
@@ -844,18 +846,18 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
             stream_printf(out, "\"%s\";wahrerTyp\n",
-                translate(zRace, LOC(f->locale, zRace)));
+                translate(zRace, LOC(lang, zRace)));
         }
     }
     else {
         const race *irace = u_irace(u);
         const char *zRace = rc_name_s(irace, NAME_PLURAL);
         stream_printf(out, "\"%s\";Typ\n",
-            translate(zRace, LOC(f->locale, zRace)));
+            translate(zRace, LOC(lang, zRace)));
         if (u->faction == f && irace != u_race(u)) {
             zRace = rc_name_s(u_race(u), NAME_PLURAL);
             stream_printf(out, "\"%s\";wahrerTyp\n",
-                translate(zRace, LOC(f->locale, zRace)));
+                translate(zRace, LOC(lang, zRace)));
         }
     }
 
@@ -923,7 +925,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         for (ord = u->old_orders; ord; ord = ord->next) {
             /* this new order will replace the old defaults */
             if (is_persistent(ord)) {
-                stream_order(out, ord);
+                stream_order(out, ord, lang);
             }
         }
         for (ord = u->orders; ord; ord = ord->next) {
@@ -931,7 +933,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             if (u->old_orders && is_repeated(kwd))
                 continue;               /* unit has defaults */
             if (is_persistent(ord)) {
-                stream_order(out, ord);
+                stream_order(out, ord, lang);
             }
         }
 
@@ -947,7 +949,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
                 }
                 stream_printf(out, "%d %d;%s\n", u->number * level_days(sv->level), esk,
                     translate(mkname("skill", skillnames[sk]), skillname(sk,
-                        f->locale)));
+                        lang)));
             }
         }
 
@@ -961,8 +963,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
                 const spell *sp = mage->combatspells[i].sp;
                 if (sp) {
                     const char *name =
-                        translate(mkname("spell", sp->sname), spell_name(sp,
-                            f->locale));
+                        translate(mkname("spell", sp->sname), spell_name(sp, lang));
                     stream_printf(out, "KAMPFZAUBER %d\n", i);
                     stream_printf(out, "\"%s\";name\n", name);
                     stream_printf(out, "%d;level\n", mage->combatspells[i].level);
@@ -997,7 +998,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             pr = 1;
             stream_printf(out, "GEGENSTAENDE\n");
         }
-        stream_printf(out, "%d;%s\n", in, translate(ic, LOC(f->locale, ic)));
+        stream_printf(out, "%d;%s\n", in, translate(ic, LOC(lang, ic)));
     }
 
     cr_output_curses(out, f, u, TYP_UNIT);

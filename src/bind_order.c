@@ -13,7 +13,7 @@ static int tolua_order_get_token(lua_State *L) {
     order *ord = (order *)tolua_tousertype(L, 1, 0);
     int n = (int)tolua_tonumber(L, 2, 0);
     const char * str = 0;
-    init_order(ord);
+    init_order_depr(ord);
     while (n-->0) {
         str = getstrtoken();
         if (!str) {

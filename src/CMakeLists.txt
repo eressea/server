@@ -26,7 +26,7 @@ ENDIF()
 IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
+#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
@@ -134,6 +134,7 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
+  ${DB_SRC}
   ${UTIL_SRC}
 )
 
@@ -265,8 +266,19 @@ add_test(server test_eressea)
 
 install(TARGETS eressea DESTINATION "bin")
 
+if (DB_FOUND)
+include_directories (${DB_INCLUDE_DIR})
+target_link_libraries(convert ${DB_LIBRARIES})
+target_link_libraries(eressea ${DB_LIBRARIES})
+target_link_libraries(test_eressea ${DB_LIBRARIES})
+add_definitions(-DUSE_DB)
+endif(DB_FOUND)
+
 if (SQLITE3_FOUND)
+include_directories (${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
+target_link_libraries(convert ${SQLITE3_LIBRARIES})
+target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
 add_definitions(-DUSE_SQLITE)
 endif(SQLITE3_FOUND)
 

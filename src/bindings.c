@@ -114,20 +114,6 @@ int log_lua_error(lua_State * L)
     return 1;
 }
 
-int tolua_orderlist_next(lua_State * L)
-{
-    order **order_ptr = (order **)lua_touserdata(L, lua_upvalueindex(1));
-    order *ord = *order_ptr;
-    if (ord != NULL) {
-        char cmd[8192];
-        write_order(ord, cmd, sizeof(cmd));
-        tolua_pushstring(L, cmd);
-        *order_ptr = ord->next;
-        return 1;
-    }
-    return 0;
-}
-
 static int tolua_selist_iter(lua_State * L)
 {
     selist **qlp = (selist **)lua_touserdata(L, lua_upvalueindex(1));

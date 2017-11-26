@@ -218,6 +218,7 @@ void log_fatal(const char *format, ...)
     va_start(args, format);
     log_write(LOG_CPERROR, NULL, format, args);
     va_end(args);
+    abort();
 }
 
 void log_error(const char *format, ...) /*-V524 */

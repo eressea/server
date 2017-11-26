@@ -283,7 +283,7 @@ int teach_cmd(unit * teacher, struct order *ord)
 
     count = 0;
 
-    init_order(ord);
+    init_order_depr(ord);
 
 #if TEACH_ALL
     if (getparam(teacher->faction->locale) == P_ANY) {
@@ -304,7 +304,7 @@ int teach_cmd(unit * teacher, struct order *ord)
             else if (student->faction == teacher->faction) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_order(student->thisorder);
+                    init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
                         for (t = 0; teachskill[t] != NOSKILL; ++t) {
@@ -324,7 +324,7 @@ int teach_cmd(unit * teacher, struct order *ord)
             else if (alliedunit(teacher, student->faction, HELP_GUARD)) {
                 if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_order(student->thisorder);
+                    init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
                         && effskill_study(teacher, sk, 0) - TEACHDIFFERENCE >= effskill(student, sk, 0)) {
@@ -343,7 +343,7 @@ int teach_cmd(unit * teacher, struct order *ord)
         order *new_order;
 
         zOrder[0] = '\0';
-        init_order(ord);
+        init_order_depr(ord);
 
         while (!parser_end()) {
             skill_t sk;
@@ -361,7 +361,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 const char *token;
                 /* Finde den string, der den Fehler verursacht hat */
                 parser_pushstate();
-                init_order(ord);
+                init_order_depr(ord);
 
                 for (j = 0; j != count - 1; ++j) {
                     /* skip over the first 'count' units */
@@ -406,7 +406,7 @@ int teach_cmd(unit * teacher, struct order *ord)
 
             /* Input ist nun von student->thisorder !! */
             parser_pushstate();
-            init_order(student->thisorder);
+            init_order(student->thisorder, student->faction->locale);
             sk = getskill(student->faction->locale);
             parser_popstate();
 
@@ -448,6 +448,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     if (academy_students > 0 && sk_academy!=NOSKILL) {
         academy_teaching_bonus(teacher, sk_academy, academy_students);
     }
+    init_order_depr(NULL);
     return 0;
 }
 
@@ -556,7 +557,7 @@ int study_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_order(ord);
+    (void)init_order(ord, u->faction->locale);
     sk = getskill(u->faction->locale);
 
     if (sk < 0) {
@@ -784,7 +785,7 @@ int study_cmd(unit * u, order * ord)
             mage = create_mage(u, u->faction->magiegebiet);
         }
     }
-
+    init_order_depr(NULL);
     return 0;
 }
 

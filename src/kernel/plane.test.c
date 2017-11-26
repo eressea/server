@@ -9,7 +9,7 @@ static void test_plane(CuTest *tc) {
     struct region *r;
     plane *pl;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     CuAssertPtrEquals(tc, 0, findplane(0, 0));
     CuAssertPtrEquals(tc, 0, getplane(r));
@@ -38,13 +38,14 @@ static void test_plane(CuTest *tc) {
     CuAssertIntEquals(tc, 60, plane_center_y(pl));
     CuAssertIntEquals(tc, 5, plane_width(pl));
     CuAssertIntEquals(tc, 41, plane_height(pl));
+    test_cleanup();
 }
 
 static void test_origin(CuTest *tc) {
     struct faction *f;
     int x, y;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     x = 0;
     y = 0;
