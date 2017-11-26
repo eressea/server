@@ -1063,7 +1063,7 @@ void clone_men(const unit * u, unit * dst, int n)
             transfer_curse(u, dst, n);
         }
         set_number(dst, dst->number + n);
-        dst->hp += u->hp * n / u->number;
+        dst->hp += (long long)u->hp * n / u->number;
         assert(dst->hp >= dst->number);
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
         a = a_find(dst->attribs, &at_effect);

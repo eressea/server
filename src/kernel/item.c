@@ -105,10 +105,10 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {
-    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM)) {
+    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->ec_flags & ECF_STONEGOLEM)) {
         return GOLEM_STONE;
     }
-    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM)) {
+    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
         return GOLEM_IRON;
     }
     return 0;
@@ -340,8 +340,10 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
+        char plural[32];
         itype->_appearance[0] = strdup(appearance);
-        itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
+        snprintf(plural, sizeof(plural), "%s_p", appearance);
+        itype->_appearance[1] = strdup(plural);
     } else {
         itype->_appearance[0] = 0;
         itype->_appearance[1] = 0;
@@ -665,7 +667,7 @@ static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
     UNUSED_ARG(r);
-    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->flags & RCF_IRONGOLEM)) {
+    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
         return value;
     }
     return -118;

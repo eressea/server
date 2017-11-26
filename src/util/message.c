@@ -61,7 +61,7 @@ arg_type *find_argtype(const char *name)
 message_type *mt_new(const char *name, const char *args[])
 {
     int i, nparameters = 0;
-    message_type *mtype = (message_type *)malloc(sizeof(message_type));
+    message_type *mtype;
 
     assert(name != NULL);
     if (name == NULL) {
@@ -72,6 +72,7 @@ message_type *mt_new(const char *name, const char *args[])
         /* count the number of parameters */
         while (args[nparameters]) ++nparameters;
     }
+    mtype = (message_type *)malloc(sizeof(message_type));
     mtype->key = 0;
     mtype->name = strdup(name);
     mtype->nparameters = nparameters;
@@ -143,13 +144,14 @@ static void free_arg(const arg_type * atype, variant data)
 message *msg_create(const struct message_type *mtype, variant args[])
 {
     int i;
-    message *msg = (message *)malloc(sizeof(message));
+    message *msg;
 
     assert(mtype != NULL);
     if (mtype == NULL) {
         log_error("Trying to create message with type=0x0\n");
         return NULL;
     }
+    msg = (message *)malloc(sizeof(message));
     msg->type = mtype;
     msg->parameters = (variant *)(mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL);
     msg->refcount = 1;

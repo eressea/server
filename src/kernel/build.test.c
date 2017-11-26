@@ -207,7 +207,7 @@ static void test_build_building_with_golem(CuTest *tc) {
     const building_type *btype;
 
     u = setup_build(&bf);
-    bf.rc->flags |= RCF_STONEGOLEM;
+    bf.rc->ec_flags |= ECF_STONEGOLEM;
     btype = bt_find("castle");
     assert(btype);
     assert(btype->construction);

@@ -123,8 +123,14 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
         if (e != n) {
             int sz = keys_size(n);
             if (e > sz) {
+                int *k;
                 sz = keys_size(e);
-                keys = realloc(keys, sizeof(int)*(2 * sz + 1));
+                k = realloc(keys, sizeof(int)*(2 * sz + 1));
+                if (!k) {
+                    free(keys);
+                    abort();
+                }
+                keys = k;
                 keys[0] = e;
             }
         }
