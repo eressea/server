@@ -248,6 +248,8 @@ static void dragon_name(unit * u)
     case T_GLACIER:
         ter = 5;
         break;
+    default:
+        ter = 0;
     }
 
     if (num_postfix <=0) {

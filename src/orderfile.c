@@ -101,7 +101,7 @@ static unit *unitorders(input *in, faction *f)
                         }
                     }
                 }
-                /* Nun wird der Befehl erzeut und eingehängt */
+                /* Nun wird der Befehl erzeut und eingehï¿½ngt */
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -136,7 +136,7 @@ static faction *factionorders(void)
             return 0;
         }
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
-        * nicht als untätig gilt */
+        * nicht als untï¿½tig gilt */
         f->lastorders = turn;
 
     }
@@ -151,6 +151,7 @@ int read_orders(input *in)
     const char *b;
     int nfactions = 0;
     struct faction *f = NULL;
+    const struct locale *lang = default_locale;
 
     /* TODO: recognize UTF8 BOM */
     b = in->getbuf(in->data);
@@ -160,7 +161,6 @@ int read_orders(input *in)
 
     while (b) {
         char token[128];
-        const struct locale *lang = f ? f->locale : default_locale;
         param_t p;
         const char *s;
         init_tokens_str(b);
@@ -171,6 +171,7 @@ int read_orders(input *in)
         case P_FACTION:
             f = factionorders();
             if (f) {
+                lang = f->locale;
                 ++nfactions;
             }
 
@@ -200,12 +201,13 @@ int read_orders(input *in)
             /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
             * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
             * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-            * auf alle Fälle nicht überschreiben! Bei allen anderen Einträgen hier
-            * muss buf erneut gefüllt werden, da die betreffende Information in nur
-            * einer Zeile steht, und nun die nächste gelesen werden muss. */
+            * auf alle Fï¿½lle nicht ï¿½berschreiben! Bei allen anderen Eintrï¿½gen hier
+            * muss buf erneut gefï¿½llt werden, da die betreffende Information in nur
+            * einer Zeile steht, und nun die nï¿½chste gelesen werden muss. */
 
         case P_NEXT:
             f = NULL;
+            lang = default_locale;
             b = in->getbuf(in->data);
             break;
 

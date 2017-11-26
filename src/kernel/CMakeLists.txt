@@ -11,12 +11,14 @@ command.test.c
 config.test.c
 # connection.test.c
 curse.test.c
+database.test.c
 equipment.test.c
 faction.test.c
 group.test.c
 item.test.c
 messages.test.c
 order.test.c
+orderdb.test.c
 # pathfinder.test.c
 plane.test.c
 pool.test.c
@@ -34,7 +36,18 @@ jsonconf.test.c
 # xmlreader.test.c
 )
 
+SET(_DBFILES db/critbit.c)
+
+IF(SQLITE3_FOUND)
+SET(_DBFILES db/sqlite.c)
+ENDIF(SQLITE3_FOUND)
+
+IF(DB_FOUND)
+SET(_DBFILES db/berkeley.c)
+ENDIF(DB_FOUND)
+
 SET(_FILES
+${_DBFILES}
 alliance.c
 ally.c
 build.c
@@ -44,12 +57,14 @@ command.c
 config.c
 connection.c
 curse.c
+database.c
 equipment.c
 faction.c
 group.c
 item.c
 messages.c
 order.c
+orderdb.c
 pathfinder.c
 plane.c
 pool.c

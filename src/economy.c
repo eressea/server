@@ -441,7 +441,7 @@ static void recruit(unit * u, struct order *ord, request ** recruitorders)
     const char *str;
     int n;
 
-    init_order(ord);
+    init_order_depr(ord);
     n = getint();
     if (n <= 0) {
         syntax_error(u, ord);
@@ -598,7 +598,7 @@ int give_control_cmd(unit * u, order * ord)
     unit *u2;
     const char *s;
 
-    init_order(ord);
+    init_order_depr(ord);
     getunit(r, u->faction, &u2);
 
     s = gettoken(token, sizeof(token));
@@ -657,7 +657,7 @@ static int forget_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_order(ord);
+    init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     sk = get_skill(s, u->faction->locale);
@@ -1067,7 +1067,7 @@ static int required(int want, variant save)
 {
     int req = (int)(want * save.sa[0] / save.sa[1]);
     int r = want * save.sa[0] % save.sa[1];
-    if (r>0) ++req;
+    if (r > 0) ++req;
     return req;
 }
 
@@ -1173,7 +1173,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             int x = avail * want / nreq;
             int rx = (avail * want) % nreq;
             /* Wenn Rest, dann wuerfeln, ob ich was bekomme: */
-            if (rx>0 && rng_int() % nreq < rx) ++x;
+            if (rx > 0 && rng_int() % nreq < rx) ++x;
             avail -= x;
             nreq -= want;
             al->get = x * al->save.sa[1] / al->save.sa[0];
@@ -1303,7 +1303,7 @@ int make_cmd(unit * u, struct order *ord)
     char ibuf[16];
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_MAKE);
     s = gettoken(token, sizeof(token));
 
@@ -1446,24 +1446,19 @@ static void expandbuying(region * r, request * buyorders)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     int max_products;
     unit *u;
-    static struct trade {
+    struct trade {
         const luxury_type *type;
         int number;
         int multi;
     } trades[MAXLUXURIES], *trade;
-    static int ntrades = 0;
-    int i;
+    int ntrades = 0;
     const luxury_type *ltype;
 
-    if (ntrades == 0) {
-        for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
-            assert(ntrades < MAXLUXURIES);
-            trades[ntrades++].type = ltype;
-        }
-    }
-    for (i = 0; i != ntrades; ++i) {
-        trades[i].number = 0;
-        trades[i].multi = 1;
+    for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
+        assert(ntrades < MAXLUXURIES);
+        trades[ntrades].number = 0;
+        trades[ntrades].multi = 1;
+        trades[ntrades++].type = ltype;
     }
 
     if (!buyorders)
@@ -1490,7 +1485,7 @@ static void expandbuying(region * r, request * buyorders)
             int price, multi;
             ltype = g_requests[j].type.ltype;
             trade = trades;
-            while (trade->type != ltype)
+            while (trade->type && trade->type != ltype)
                 ++trade;
             multi = trade->multi;
             price = ltype->price * multi;
@@ -1582,7 +1577,7 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon daf�r ausger�stet, mehrere Produkte zu kaufen. */
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_BUY);
     n = getint();
     if (n <= 0) {
@@ -1595,17 +1590,10 @@ static void buy(unit * u, request ** buyorders, struct order *ord)
         return;
     }
 
-    if (u_race(u) == get_race(RC_INSECT)) {
-        /* entweder man ist insekt, oder... */
-        if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
-            && !rbuildings(r)) {
-            cmistake(u, ord, 119, MSG_COMMERCE);
-            return;
-        }
-    }
-    else {
-        /* ...oder in der Region mu� es eine Burg geben. */
-        building *b = 0;
+    /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
+     * einen Handelsposten in der Region geben: */
+    if (u_race(u) != get_race(RC_INSECT) || (r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT))) {
+        building *b = NULL;
         if (r->buildings) {
             static int cache;
             static const struct building_type *bt_castle;
@@ -1896,7 +1884,7 @@ static bool sell(unit * u, request ** sellorders, struct order *ord)
     /* sellorders sind KEIN array, weil f�r alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_SELL);
     s = gettoken(token, sizeof(token));
 
@@ -2287,7 +2275,7 @@ static void breed_cmd(unit * u, struct order *ord)
     }
 
     /* z�chte [<anzahl>] <parameter> */
-    (void)init_order(ord);
+    (void)init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     m = s ? atoip(s) : 0;
@@ -2354,7 +2342,7 @@ static void research_cmd(unit * u, struct order *ord)
     region *r = u->region;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_RESEARCH);
 
     if (effskill(u, SK_HERBALISM, 0) < 7) {
@@ -2430,7 +2418,7 @@ static void steal_cmd(unit * u, struct order *ord, request ** stealorders)
     message * msg;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_STEAL);
 
     assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
@@ -2568,7 +2556,7 @@ void entertain_cmd(unit * u, struct order *ord)
     static int entertainperlevel = 0;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
         const char *str = config_get("entertain.base");
@@ -2724,7 +2712,7 @@ static void expandloot(region * r, request * lootorders)
 
     /* Lowering morale by 1 depending on the looted money (+20%) */
     m = region_get_morale(r);
-    if (m && startmoney>0) {
+    if (m && startmoney > 0) {
         if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
             /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
             region_set_morale(r, m - 1, -1);
@@ -2778,7 +2766,7 @@ void tax_cmd(unit * u, struct order *ord, request ** taxorders)
         taxperlevel = config_get_int("taxing.perlevel", 0);
     }
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_TAX);
 
     if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
@@ -2847,7 +2835,7 @@ void loot_cmd(unit * u, struct order *ord, request ** lootorders)
     request *o;
     keyword_t kwd;
 
-    kwd = init_order(ord);
+    kwd = init_order_depr(ord);
     assert(kwd == K_LOOT);
 
     if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
@@ -2985,7 +2973,7 @@ void produce(struct region *r)
     static const struct building_type *caravan_bt;
     static int rc_cache;
     static const race *rc_insect, *rc_aquarian;
-    
+
     if (bt_changed(&bt_cache)) {
         caravan_bt = bt_find("caravan");
     }

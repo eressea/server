@@ -112,7 +112,7 @@ extern "C" {
         int flags;
         struct attrib *attribs;
         status_t status;
-        int n;                      /* helper temporariy variable, used in econmy, enno: attribut? */
+        int n;                      /* helper temporary variable, used in economy, enno: attribut? */
         int wants;                  /* enno: attribut? */
     } unit;
 

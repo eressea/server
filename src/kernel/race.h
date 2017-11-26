@@ -226,11 +226,9 @@ extern "C" {
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
 #define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
-#define RCF_STONEGOLEM     (1<<27)      /* race gets stonegolem properties */
-#define RCF_IRONGOLEM      (1<<28)      /* race gets irongolem properties */
+#define RCF_MIGRANTS       (1<<27)      /* may have migrant units (human bonus) */
+#define RCF_FAMILIAR       (1<<28)      /* may be a familiar */
 #define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
-#define RCF_MIGRANTS       (1<<30)      /* may have migrant units (human bonus) */
-#define RCF_FAMILIAR       (1<<31)      /* may be a familiar */
 
     /* Economic flags */
 #define ECF_GIVEPERSON     (1<<2)   /* �bergibt Personen */
@@ -238,6 +236,8 @@ extern "C" {
 #define ECF_GETITEM        (1<<4)   /* nimmt Gegenst�nde an */
 #define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
+#define ECF_STONEGOLEM     (1<<9)      /* race gets stonegolem properties */
+#define ECF_IRONGOLEM      (1<<10)      /* race gets irongolem properties */
 
     /* Battle-Flags */
 #define BF_EQUIPMENT    (1<<0)  /* Kann Ausr�stung benutzen */

@@ -14,6 +14,7 @@
 #include <kernel/resources.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
 #include <util/attrib.h>
@@ -167,6 +168,135 @@ static void test_normals_recruit(CuTest * tc) {
 
     CuAssertIntEquals(tc, 2, u->number);
 
+    test_cleanup();
+}
+
+/** 
+ * Create any terrain types that are used by the trade rules.
+ * 
+ * This should prevent newterrain from returning NULL.
+ */
+static void setup_terrains(CuTest *tc) {
+    test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
+    test_create_terrain("swamp", LAND_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("desert", LAND_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("mountain", LAND_REGION | WALK_INTO | FLY_INTO);
+    init_terrains();
+    CuAssertPtrNotNull(tc, newterrain(T_MOUNTAIN));
+    CuAssertPtrNotNull(tc, newterrain(T_OCEAN));
+    CuAssertPtrNotNull(tc, newterrain(T_PLAIN));
+    CuAssertPtrNotNull(tc, newterrain(T_SWAMP));
+    CuAssertPtrNotNull(tc, newterrain(T_DESERT));
+}
+
+static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain) {
+    region *r;
+    item_type *it_luxury;
+    struct locale * lang = default_locale;
+
+    new_luxurytype(it_luxury = test_create_itemtype("jewel"), 5);
+    locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
+    CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
+
+    new_luxurytype(it_luxury = test_create_itemtype("balm"), 5);
+    locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
+    CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
+
+    r = test_create_region(0, 0, terrain);
+    return r;
+}
+
+static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
+    unit *u;
+
+    UNUSED_ARG(tc);
+    u = test_create_unit(test_create_faction(rc), r);
+    set_level(u, SK_TRADE, 2);
+    return u;
+}
+
+static void test_trade_insect(CuTest *tc) {
+    /* Insekten k�nnen in W�sten und S�mpfen auch ohne Burgen handeln. */
+    unit *u;
+    region *r;
+    const item_type *it_luxury;
+    const item_type *it_silver;
+
+    test_setup();
+    init_resources();
+    test_create_locale();
+    setup_terrains(tc);
+    r = setup_trade_region(tc, get_terrain("swamp"));
+    init_terrains();
+
+    it_luxury = r_luxury(r);
+    CuAssertPtrNotNull(tc, it_luxury);
+    it_silver = get_resourcetype(R_SILVER)->itype;
+
+    u = setup_trade_unit(tc, r, test_create_race("insect"));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+
+    set_item(u, it_silver, 10);
+    CuAssertPtrEquals(tc, r, u->region);
+    CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
+    produce(u->region);
+    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, 5, get_item(u, it_silver));
+
+    terraform_region(r, get_terrain("swamp"));
+    test_cleanup();
+}
+
+static void test_buy_cmd(CuTest *tc) {
+    region * r;
+    unit *u;
+    building *b;
+    const resource_type *rt_silver;
+    const item_type *it_luxury;
+    test_setup();
+    init_resources();
+    test_create_locale();
+    setup_terrains(tc);
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    init_terrains();
+
+    it_luxury = r_luxury(r);
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    u = test_create_unit(test_create_faction(NULL), r);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    set_item(u, rt_silver->itype, 1000);
+
+    produce(r);
+    CuAssertPtrNotNullMsg(tc, "trading requires a castle", test_find_messagetype(u->faction->msgs, "error119"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    produce(r);
+    CuAssertPtrNotNullMsg(tc, "castle must have size >=2", test_find_messagetype(u->faction->msgs, "error119"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    b->size = 2;
+    produce(r);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
+    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "error102"));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+
+    /* at last, the happy case: */
+    set_level(u, SK_TRADE, 1);
+    produce(r);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buy"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
+    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
     test_cleanup();
 }
 
@@ -568,6 +698,8 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
+    SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);
     return suite;

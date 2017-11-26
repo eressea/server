@@ -379,7 +379,7 @@ static void writeorder(gamedata *data, const struct order *ord,
     const struct locale *lang)
 {
     char obuf[1024];
-    write_order(ord, obuf, sizeof(obuf));
+    write_order(ord, lang, obuf, sizeof(obuf));
     if (obuf[0])
         WRITE_STR(data->store, obuf);
 }
@@ -487,16 +487,11 @@ unit *read_unit(gamedata *data)
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
     u->_name = obuf[0] ? strdup(obuf) : 0;
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
+    READ_STR(data->store, obuf, sizeof(obuf));
+    if (unicode_utf8_trim(obuf)!=0) {
+        log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
     }
-    else {
-        READ_STR(data->store, obuf, sizeof(obuf));
-		if (unicode_utf8_trim(obuf)!=0) {
-			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
-		}
-        u->display = obuf[0] ? strdup(obuf) : 0;
-    }
+    u->display = obuf[0] ? strdup(obuf) : 0;
     READ_INT(data->store, &number);
     set_number(u, number);
 
@@ -557,24 +552,23 @@ unit *read_unit(gamedata *data)
     p = n = 0;
     orderp = &u->orders;
     while (obuf[0]) {
-        if (!lomem) {
-            order *ord = parse_order(obuf, u->faction->locale);
+        order *ord = parse_order(obuf, u->faction->locale);
+        if (ord != NULL) {
+            if (++n < MAXORDERS) {
+                if (!is_persistent(ord) || ++p < MAXPERSISTENT) {
+                    *orderp = ord;
+                    orderp = &ord->next;
+                    ord = NULL;
+                }
+                else if (p == MAXPERSISTENT) {
+                    log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
+                }
+            }
+            else if (n == MAXORDERS) {
+                log_info("%s had %d or more orders", unitname(u), MAXORDERS);
+            }
             if (ord != NULL) {
-                if (++n < MAXORDERS) {
-                    if (!is_persistent(ord) || ++p < MAXPERSISTENT) {
-                        *orderp = ord;
-                        orderp = &ord->next;
-                        ord = NULL;
-                    }
-                    else if (p == MAXPERSISTENT) {
-                        log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
-                    }
-                }
-                else if (n == MAXORDERS) {
-                    log_info("%s had %d or more orders", unitname(u), MAXORDERS);
-                }
-                if (ord != NULL)
-                    free_order(ord);
+                free_order(ord);
             }
         }
         READ_STR(data->store, obuf, sizeof(obuf));
@@ -659,14 +653,9 @@ void write_unit(gamedata *data, const unit * u)
 }
 
 static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
-    }
-    else {
-        READ_STR(data->store, info, len);
-        if (unicode_utf8_trim(info) != 0) {
-            log_warning("trim region %d info to '%s'", r->uid, info);
-        }
+    READ_STR(data->store, info, len);
+    if (unicode_utf8_trim(info) != 0) {
+        log_warning("trim region %d info to '%s'", r->uid, info);
     }
 }
 
@@ -1288,16 +1277,11 @@ struct building *read_building(gamedata *data) {
 		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
 	}
     b->name = strdup(name);
-    if (lomem) {
-        READ_STR(store, NULL, 0);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+        log_warning("trim building %s info to '%s'", itoa36(b->no), name);
     }
-    else {
-        READ_STR(store, name, sizeof(name));
-        if (unicode_utf8_trim(name)!=0) {
-            log_warning("trim building %s info to '%s'", itoa36(b->no), name);
-        }
-        b->display = strdup(name);
-    }
+    b->display = strdup(name);
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
@@ -1347,16 +1331,11 @@ ship *read_ship(gamedata *data)
 		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
 	}
     sh->name = strdup(name);
-    if (lomem) {
-        READ_STR(store, NULL, 0);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+        log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
     }
-    else {
-        READ_STR(store, name, sizeof(name));
-        if (unicode_utf8_trim(name)!=0) {
-            log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
-        }
-        sh->display = strdup(name);
-    }
+    sh->display = strdup(name);
     READ_STR(store, name, sizeof(name));
     sh->type = st_find(name);
     if (sh->type == NULL) {

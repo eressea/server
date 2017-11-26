@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <eressea.h>
 #include <kernel/config.h>
+#include <kernel/database.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>
@@ -93,6 +94,7 @@ int RunAllTests(int argc, char *argv[])
     /* kernel */
     ADD_SUITE(alliance);
     ADD_SUITE(command);
+    ADD_SUITE(db);
     ADD_SUITE(plane);
     ADD_SUITE(unit);
     ADD_SUITE(faction);
@@ -132,6 +134,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(names);
+    ADD_SUITE(orderdb);
     ADD_SUITE(orderfile);
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);

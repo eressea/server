@@ -291,7 +291,7 @@ void free_messagelist(mlist *msgs)
 message *add_message(message_list ** pm, message * m)
 {
     assert(m && m->type);
-    if (!lomem && m != NULL) {
+    if (m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (*pm == NULL) {
             *pm = malloc(sizeof(message_list));

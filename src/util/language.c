@@ -45,9 +45,6 @@ typedef struct locale {
     struct locale_str *strings[SMAXHASH];
 } locale;
 
-extern locale *default_locale;
-extern locale *locales;
-
 locale *default_locale;
 locale *locales;
 

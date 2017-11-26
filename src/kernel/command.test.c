@@ -32,7 +32,7 @@ static void test_command(CuTest * tc) {
     struct locale * loc;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     loc = test_create_locale();
     st = stree_create();
     CuAssertPtrNotNull(tc, st);

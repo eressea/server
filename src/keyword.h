@@ -87,5 +87,6 @@ extern "C"
     const char *keyword(keyword_t kwd);
 
 #ifdef __cplusplus
+}
 #endif
 #endif

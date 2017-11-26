@@ -141,7 +141,6 @@ extern "C" {
     extern const char *parameters[];
     extern settings global;
 
-    extern bool lomem;         /* save memory */
     extern int turn;
 
 #ifdef __cplusplus

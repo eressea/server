@@ -86,7 +86,7 @@ int *parse_ids(const order *ord) {
     const char *s;
     int *il = NULL;
 
-    init_order(ord);
+    init_order_depr(ord);
     s = getstrtoken();
     if (s != NULL && *s) {
         il = intlist_init();
@@ -211,7 +211,7 @@ void piracy_cmd(unit * u)
     ord = create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[target_dir]));
 
     /* Bewegung ausführen */
-    init_order(ord);
+    init_order_depr(ord);
     move_cmd(u, ord);
     free_order(ord);
 }

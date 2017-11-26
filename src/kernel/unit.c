@@ -1063,7 +1063,7 @@ void clone_men(const unit * u, unit * dst, int n)
             transfer_curse(u, dst, n);
         }
         set_number(dst, dst->number + n);
-        dst->hp += (long)u->hp * n / u->number;
+        dst->hp += (long long)u->hp * n / u->number;
         assert(dst->hp >= dst->number);
         /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
         a = a_find(dst->attribs, &at_effect);
@@ -1733,38 +1733,22 @@ int unit_max_hp(const unit * u)
 
 void scale_number(unit * u, int n)
 {
-    const attrib *a;
-    int remain;
-
-    if (n == u->number)
+    if (n == u->number) {
         return;
-    if (n && u->number > 0) {
-        int full;
-        remain = ((u->hp % u->number) * (n % u->number)) % u->number;
-
-        full = u->hp / u->number;   /* wieviel kriegt jede person mindestens */
-        u->hp = full * n + (u->hp - full * u->number) * n / u->number;
-        assert(u->hp >= 0);
-        if ((rng_int() % u->number) < remain)
-            ++u->hp;                  /* Nachkommastellen */
-    }
-    else {
-        remain = 0;
-        u->hp = 0;
     }
     if (u->number > 0) {
-        for (a = a_find(u->attribs, &at_effect); a && a->type == &at_effect;
-        a = a->next) {
-            effect_data *data = (effect_data *)a->data.v;
-            int snew = data->value / u->number * n;
-            if (n) {
-                remain = data->value - snew / n * u->number;
-                snew += remain * n / u->number;
-                remain = (remain * n) % u->number;
-                if ((rng_int() % u->number) < remain)
-                    ++snew;               /* Nachkommastellen */
+        if (n>0) {
+            const attrib *a = a_find(u->attribs, &at_effect);
+
+            u->hp = (long long)u->hp * n / u->number;
+
+            for (; a && a->type == &at_effect; a = a->next) {
+                effect_data *data = (effect_data *)a->data.v;
+                data->value = (long long)data->value * n / u->number;
             }
-            data->value = snew;
+        }
+        else {
+            u->hp = 0;
         }
     }
     if (u->number == 0 || n == 0) {

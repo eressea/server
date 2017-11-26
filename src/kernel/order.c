@@ -14,6 +14,7 @@
 #include <kernel/config.h>
 #include "order.h"
 
+#include "orderdb.h"
 #include "skill.h"
 #include "keyword.h"
 
@@ -31,31 +32,7 @@
 #include <string.h>
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
-# define ORD_LOCALE(ord) locale_array[(ord)->data->_lindex]->lang
-# define ORD_STRING(ord) (ord)->data->_str
-
-typedef struct locale_data {
-    struct order_data *short_orders;
-    struct order_data *study_orders[MAXSKILLS];
-    const struct locale *lang;
-} locale_data;
-
-static struct locale_data *locale_array[MAXLOCALES];
-
-typedef struct order_data {
-    const char *_str;
-    int _refcount;
-    int _lindex;
-} order_data;
-
-static void release_data(order_data * data)
-{
-    if (data) {
-        if (--data->_refcount == 0) {
-            free(data);
-        }
-    }
-}
+# define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
@@ -64,7 +41,7 @@ void replace_order(order ** dlist, order * orig, const order * src)
     assert(dlist);
     while (*dlist != NULL) {
         order *dst = *dlist;
-        if (dst->data == orig->data) {
+        if (dst->id == orig->id) {
             order *cpy = copy_order(src);
             *dlist = cpy;
             cpy->next = dst->next;
@@ -87,9 +64,10 @@ keyword_t getkeyword(const order * ord)
  * This is the inverse function to the parse_order command. Note that
  * keywords are expanded to their full length.
  */
-char* get_command(const order *ord, char *sbuffer, size_t size) {
+char* get_command(const order *ord, const struct locale *lang, char *sbuffer, size_t size) {
     char *bufp = sbuffer;
-    const char *text = ORD_STRING(ord);
+    order_data *od = NULL;
+    const char * text;
     keyword_t kwd = ORD_KEYWORD(ord);
     int bytes;
 
@@ -111,8 +89,16 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             WARN_STATIC_BUFFER();
         }
     }
+
+    if (ord->id < 0) {
+        skill_t sk = (skill_t)(100+ord->id);
+        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+        text = skillname(sk, lang);
+    } else {
+        od = odata_load(ord->id);
+        text = OD_STRING(od);
+    }
     if (kwd != NOKEYWORD) {
-        const struct locale *lang = ORD_LOCALE(ord);
         if (size > 0) {
             const char *str = (const char *)LOC(lang, keyword(kwd));
             assert(str);
@@ -142,6 +128,9 @@ char* get_command(const order *ord, char *sbuffer, size_t size) {
             }
         }
     }
+    if (od) {
+        odata_release(od);
+    }
     if (size > 0) *bufp = 0;
     return sbuffer;
 }
@@ -150,8 +139,6 @@ void free_order(order * ord)
 {
     if (ord != NULL) {
         assert(ord->next == 0);
-
-        release_data(ord->data);
         free(ord);
     }
 }
@@ -162,8 +149,7 @@ order *copy_order(const order * src)
         order *ord = (order *)malloc(sizeof(order));
         ord->next = NULL;
         ord->command = src->command;
-        ord->data = src->data;
-        ++ord->data->_refcount;
+        ord->id = src->id;
         return ord;
     }
     return NULL;
@@ -187,129 +173,37 @@ void free_orders(order ** olist)
     }
 }
 
-static char *mkdata(order_data **pdata, size_t len, int lindex, const char *str)
+static int create_data(keyword_t kwd, const char *s,
+    const struct locale *lang)
 {
     order_data *data;
-    char *result;
-    data = malloc(sizeof(order_data) + len + 1);
-    result = (char *)(data + 1);
-    data->_lindex = lindex;
-    data->_refcount = 0;
-    data->_str = 0;
-    data->_str = (len > 0) ? result : 0;
-    if (str) strcpy(result, str);
-    if (pdata) *pdata = data;
-    return result;
-}
+    int id;
 
-static order_data *create_data(keyword_t kwd, const char *sptr, int lindex)
-{
-    const char *s = sptr;
-    order_data *data;
-    const struct locale *lang = locale_array[lindex]->lang;
+    assert(kwd!=NOKEYWORD);
 
-    if (kwd != NOKEYWORD)
-        s = (*sptr) ? sptr : NULL;
-
-    /* learning, only one order_data per skill required */
-    if (kwd == K_STUDY) {
+    if (!s || *s == 0) {
+        return 0;
+    }
+    if (kwd==K_STUDY) {
+        const char * sptr = s;
         skill_t sk = get_skill(parse_token_depr(&sptr), lang);
-        switch (sk) {
-        case NOSKILL:              /* fehler */
-            break;
-        case SK_MAGIC:             /* kann parameter haben */
-            if (*sptr != 0)
-                break;
-        default:                   /* nur skill als Parameter, keine extras */
-            data = locale_array[lindex]->study_orders[sk];
-            if (data == NULL) {
-                const char *skname = skillname(sk, lang);
-                const char *spc = strchr(skname, ' ');
-                size_t len = strlen(skname);
-                char *dst = mkdata(&data, len + (spc ? 3 : 0), lindex, spc ? 0 : skname);
-                locale_array[lindex]->study_orders[sk] = data;
-                if (spc) {
-                    dst[0] = '\"';
-                    memcpy(dst + 1, skname, len);
-                    dst[len + 1] = '\"';
-                    dst[len + 2] = '\0';
-                }
-                data->_refcount = 1;
-            }
-            ++data->_refcount;
-            return data;
+        if (sk != SK_MAGIC && sk != NOSKILL) {
+            return ((int)sk)-100;
         }
     }
-
-    /* orders with no parameter, only one order_data per order required */
-    else if (kwd != NOKEYWORD && *sptr == 0) {
-        data = locale_array[lindex]->short_orders;
-        if (data == NULL) {
-            mkdata(&data, 0, lindex, 0);
-            data->_refcount = 1;
-            locale_array[lindex]->short_orders = data;
-        }
-        ++data->_refcount;
-        return data;
-    }
-    mkdata(&data, s ? strlen(s) : 0, lindex, s);
-    data->_refcount = 1;
-    return data;
+    /* TODO: between mkdata and odata_release, this object is very
+     * short-lived. */
+    odata_create(&data, strlen(s), s);
+    id = odata_save(data);
+    odata_release(data);
+    return id;
 }
 
-static void clear_localedata(int lindex) {
-    int i;
-    release_data(locale_array[lindex]->short_orders);
-    locale_array[lindex]->short_orders = NULL;
-    for (i = 0; i != MAXSKILLS; ++i) {
-        release_data(locale_array[lindex]->study_orders[i]);
-        locale_array[lindex]->study_orders[i] = 0;
-    }
-    locale_array[lindex]->lang = 0;
-}
-
-void close_orders(void) {
-    int i;
-    for (i = 0; i != MAXLOCALES; ++i) {
-        if (locale_array[i]){
-            clear_localedata(i);
-            free(locale_array[i]);
-            locale_array[i] = 0;
-        }
-    }
-}
-
-static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
+static void create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
     bool noerror, const struct locale *lang)
 {
-    int lindex;
-
     assert(ord);
-    if (kwd == NOKEYWORD || keyword_disabled(kwd)) {
-        log_error("trying to create an order for disabled keyword %s.", keyword(kwd));
-        return NULL;
-    }
-
-    /* if this is just nonsense, then we skip it. */
-    if (lomem) {
-        switch (kwd) {
-        case K_KOMMENTAR:
-        case NOKEYWORD:
-            return NULL;
-        default:
-            break;
-        }
-    }
-
-    lindex = locale_index(lang);
-    assert(lindex < MAXLOCALES);
-    if (!locale_array[lindex]) {
-        locale_array[lindex] = (locale_data *)calloc(1, sizeof(locale_data));
-    }
-    else if (locale_array[lindex]->lang != lang) {
-        clear_localedata(lindex);
-    }
-    locale_array[lindex]->lang = lang;
+    assert(kwd != NOKEYWORD && !keyword_disabled(kwd));
 
     ord->command = (int)kwd;
     if (persistent) ord->command |= CMD_PERSIST;
@@ -317,9 +211,8 @@ static order *create_order_i(order *ord, keyword_t kwd, const char *sptr, bool p
     ord->next = NULL;
 
     while (isspace(*(unsigned char *)sptr)) ++sptr;
-    ord->data = create_data(kwd, sptr, lindex);
 
-    return ord;
+    ord->id = create_data(kwd, sptr, lang);
 }
 
 order *create_order(keyword_t kwd, const struct locale * lang,
@@ -377,7 +270,8 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         zBuffer[0] = 0;
     }
     ord = (order *)malloc(sizeof(order));
-    return create_order_i(ord, kwd, zBuffer, false, false, lang);
+    create_order_i(ord, kwd, zBuffer, false, false, lang);
+    return ord;
 }
 
 order *parse_order(const char *s, const struct locale * lang)
@@ -409,7 +303,8 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
-            return create_order_i(ord, kwd, sptr, persistent, noerror, lang);
+            create_order_i(ord, kwd, sptr, persistent, noerror, lang);
+            return ord;
         }
     }
     return NULL;
@@ -565,7 +460,7 @@ bool is_silent(const order * ord)
     return (ord->command & CMD_QUIET) != 0;
 }
 
-char *write_order(const order * ord, char *buffer, size_t size)
+char *write_order(const order * ord, const struct locale *lang, char *buffer, size_t size)
 {
     if (ord == 0) {
         buffer[0] = 0;
@@ -573,12 +468,14 @@ char *write_order(const order * ord, char *buffer, size_t size)
     else {
         keyword_t kwd = ORD_KEYWORD(ord);
         if (kwd == NOKEYWORD) {
-            const char *text = ORD_STRING(ord);
+            order_data *od = odata_load(ord->id);
+            const char *text = OD_STRING(od);
             if (text) strlcpy(buffer, (const char *)text, size);
             else buffer[0] = 0;
+            odata_release(od);
         }
         else {
-            get_command(ord, buffer, size);
+            get_command(ord, lang, buffer, size);
         }
     }
     return buffer;
@@ -591,9 +488,54 @@ void push_order(order ** ordp, order * ord)
     *ordp = ord;
 }
 
-keyword_t init_order(const struct order *ord)
+static order_data *parser_od;
+
+keyword_t init_order(const struct order *ord, const struct locale *lang)
 {
-    assert(ord && ord->data);
-    init_tokens_str(ord->data->_str);
-    return ORD_KEYWORD(ord);
+    if (!ord) {
+        odata_release(parser_od);
+        parser_od = NULL;
+        return NOKEYWORD;
+    }
+    else {
+        keyword_t kwd = ORD_KEYWORD(ord);
+        if (parser_od) {
+            /* TODO: warning */
+            odata_release(parser_od);
+            parser_od = NULL;
+        }
+        if (ord->id < 0) {
+            skill_t sk = (skill_t)(100 + ord->id);
+            assert(sk < MAXSKILLS);
+            assert(lang);
+            assert(kwd == K_STUDY);
+            init_tokens_str(skillname(sk, lang));
+        }
+        else {
+            const char *str;
+            parser_od = odata_load(ord->id);
+            if (parser_od) {
+                odata_addref(parser_od);
+            }
+            str = OD_STRING(parser_od);
+            init_tokens_ex(str, parser_od, (void(*)(void *))odata_release);
+        }
+        return kwd;
+    }
 }
+
+keyword_t init_order_depr(const struct order *ord)
+{
+    if (ord) {
+        keyword_t kwd = ORD_KEYWORD(ord);
+        assert(kwd != K_STUDY);
+    }
+    return init_order(ord, NULL);
+}
+
+void close_orders(void) {
+    if (parser_od) {
+        (void)init_order(NULL, NULL);
+    }
+}
+

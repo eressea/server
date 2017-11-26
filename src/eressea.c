@@ -27,6 +27,7 @@
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/xmlreader.h>
+#include <kernel/database.h>
 #include <modules/gmcmd.h>
 #include <modules/xmas.h>
 #include <items/xerewards.h>
@@ -36,13 +37,15 @@
 #include <util/message.h>
 #include <races/races.h>
 
+#include <stdlib.h>
+
 void game_done(void)
 {
 #ifdef CLEANUP_CODE
     /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
      * zum Debugging interessant, wenn man Leak Detection hat, und nach
-     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benötigt
-     * wird (temporäre Hilsstrukturen) */
+     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benoetigt
+     * wird (temporaere Hilsstrukturen) */
 
     free_game();
 
@@ -57,10 +60,12 @@ void game_done(void)
     free_special_directions();
     free_locales();
     kernel_done();
+    dblib_close();
 }
 
 void game_init(void)
 {
+    dblib_open();
     kernel_init();
     register_triggers();
     register_xmas();

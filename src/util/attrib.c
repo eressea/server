@@ -119,7 +119,12 @@ int a_readstring(attrib * a, void *owner, struct gamedata *data)
     do {
         e = READ_STR(data->store, buf, sizeof(buf));
         if (result) {
-            result = realloc(result, len + DISPLAYSIZE - 1);
+            char *tmp = realloc(result, len + DISPLAYSIZE - 1);
+            if (!tmp) {
+                free(result);
+                abort();
+            }
+            result = tmp;
             strcpy(result + len, buf);
             len += DISPLAYSIZE - 1;
         }

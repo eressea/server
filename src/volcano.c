@@ -106,8 +106,8 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
         int damage = dice_rand(dam);
         if (magic) {
             variant magres = magic_resistance(u);
-            magres = frac_sub(frac_make(1, 1), magres);
-            damage = damage * magres.sa[0] / magres.sa[1];
+            int save = magres.sa[0] / magres.sa[1];
+            damage -= damage * save;
         }
         if (physical) {
             damage -= nb_armor(u, i);
@@ -313,4 +313,14 @@ void volcano_update(void)
             }
         }
     }
+}
+
+bool volcano_module(void)
+{
+    static int cache;
+    static bool active;
+    if (config_changed(&cache)) {
+        active = config_get_int("modules.volcano", 0) != 0;
+    }
+    return active;
 }

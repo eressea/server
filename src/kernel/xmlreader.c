@@ -1434,10 +1434,6 @@ static int parse_races(xmlDocPtr doc)
             rc->flags |= RCF_DRAGON;
         if (xml_bvalue(node, "shipspeed", false))
             rc->flags |= RCF_SHIPSPEED;
-        if (xml_bvalue(node, "stonegolem", false))
-            rc->flags |= RCF_STONEGOLEM;
-        if (xml_bvalue(node, "irongolem", false))
-            rc->flags |= RCF_IRONGOLEM;
 
         if (xml_bvalue(node, "giveperson", false))
             rc->ec_flags |= ECF_GIVEPERSON;
@@ -1449,6 +1445,10 @@ static int parse_races(xmlDocPtr doc)
             rc->ec_flags |= ECF_REC_ETHEREAL;
         if (xml_bvalue(node, "recruitunlimited", false))
             rc->ec_flags |= ECF_REC_UNLIMITED;
+        if (xml_bvalue(node, "stonegolem", false))
+            rc->ec_flags |= ECF_STONEGOLEM;
+        if (xml_bvalue(node, "irongolem", false))
+            rc->ec_flags |= ECF_IRONGOLEM;
 
         if (xml_bvalue(node, "equipment", false))
             rc->battle_flags |= BF_EQUIPMENT; /* TODO: invert this flag, so rc_get_or_create gets simpler */

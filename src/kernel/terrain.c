@@ -37,9 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-#define MAXTERRAINS 14
-
-const char *terraindata[MAXTERRAINS] = {
+static const char *terrainnames[MAXTERRAINS] = {
     "ocean",
     "plain",
     "swamp",
@@ -57,6 +55,17 @@ const char *terraindata[MAXTERRAINS] = {
 };
 
 static terrain_type *registered_terrains;
+static int terrain_changes = 1;
+
+bool terrain_changed(int *cache) {
+    assert(cache);
+    if (*cache != terrain_changes) {
+        *cache = terrain_changes;
+        return true;
+    }
+    return false;
+}
+
 
 void free_terrains(void)
 {
@@ -76,6 +85,7 @@ void free_terrains(void)
         }
         free(t);
     }
+    ++terrain_changes;
 }
 
 const terrain_type *terrains(void)
@@ -110,6 +120,7 @@ const terrain_type *get_terrain(const char *name) {
 terrain_type * get_or_create_terrain(const char *name) {
     terrain_type *terrain = terrain_find_i(name);
     if (!terrain) {
+        ++terrain_changes;
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
         if (terrain) {
             terrain->_name = strdup(name);
@@ -128,11 +139,20 @@ static const terrain_type *newterrains[MAXTERRAINS];
 
 const struct terrain_type *newterrain(terrain_t t)
 {
-    if (t == NOTERRAIN)
+    const struct terrain_type *result;
+    if (t == NOTERRAIN) {
         return NULL;
+    }
     assert(t >= 0);
     assert(t < MAXTERRAINS);
-    return newterrains[t];
+    result = newterrains[t];
+    if (!result) {
+        result = newterrains[t] = get_terrain(terrainnames[t]);
+    }
+    if (!result) {
+        log_error("no such terrain: %s.", terrainnames[t]);
+    }
+    return result;
 }
 
 terrain_t oldterrain(const struct terrain_type * terrain)
@@ -176,8 +196,8 @@ void init_terrains(void)
         const terrain_type *newterrain = newterrains[t];
         if (newterrain != NULL)
             continue;
-        if (terraindata[t] != NULL) {
-            newterrain = get_terrain(terraindata[t]);
+        if (terrainnames[t] != NULL) {
+            newterrain = get_terrain(terrainnames[t]);
             if (newterrain != NULL) {
                 newterrains[t] = newterrain;
             }
