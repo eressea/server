@@ -23,6 +23,5 @@ if [ -e orders.queue ] ; then
   mv orders.queue orders.dir.$TURN/orders.queue
 fi
 rm -f orders.queue.lock
-fi
 
 
