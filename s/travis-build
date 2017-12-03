@@ -26,4 +26,6 @@ cppcheck --version
 cppcheck --quiet --error-exitcode=1 src
 s/runtests -V
 integration_tests
+cd process
+make
 
