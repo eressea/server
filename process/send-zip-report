@@ -43,8 +43,7 @@ done
 addr=$1
 subject=$2
 shift 2
-mutt -F "$ERESSEA/etc/muttrc" -s "$subject" -a "$@" -- "$addr" < "$TEMPLATE"
 
-if [ $? -ne 0 ] ; then
-  echo "Sending failed for email/report: $2/$3"
-fi
+mutt -F "$ERESSEA/etc/muttrc" -s "$subject" -a "$@" -- "$addr" \
+	< "$TEMPLATE" || echo "Sending failed for email/report: $2/$3"
+
