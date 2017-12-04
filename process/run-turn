@@ -1,17 +1,17 @@
 #!/bin/sh
 
-GAME=$1
-TURN=$2
+GAME="$1"
+TURN="$2"
 
-if [ ! -d $ERESSEA/game-$GAME ] ; then
+if [ ! -d "$ERESSEA/game-$GAME" ] ; then
   echo "No such game: $GAME"
   exit 1
 fi
 
-cd $ERESSEA/game-$GAME
+cd "$ERESSEA/game-$GAME" || exit
 
 echo "running turn $TURN, game $GAME"
-$ERESSEA/server/bin/eressea -v3 -t $TURN run-turn.lua
+"$ERESSEA/server/bin/eressea" -v3 -t "$TURN" run-turn.lua
 mkdir -p log
-ln -f eressea.log log/eressea.log.$TURN
+ln -f eressea.log "log/eressea.log.$TURN"
 
