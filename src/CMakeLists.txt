@@ -109,6 +109,7 @@ set (ERESSEA_SRC
   json.c
   creport.c
   report.c
+  steal.c
   economy.c
   give.c
   items.c
