@@ -300,26 +300,13 @@ static void test_buy_cmd(CuTest *tc) {
     test_cleanup();
 }
 
-typedef struct request {
-    struct request *next;
-    struct unit *unit;
-    struct order *ord;
-    int qty;
-    int no;
-    union {
-        bool goblin;             /* stealing */
-        const struct luxury_type *ltype;    /* trading */
-    } type;
-} request;
-
 static void test_tax_cmd(CuTest *tc) {
     order *ord;
     faction *f;
     region *r;
     unit *u;
     item_type *sword, *silver;
-    request *taxorders = 0;
-
+    production *taxorders = 0;
 
     test_setup();
     init_resources();

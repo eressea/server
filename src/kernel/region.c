@@ -139,7 +139,7 @@ const char *regionname(const region * r, const faction * f)
 
 int region_maxworkers(const region *r)
 {
-    int size = production(r);
+    int size = max_production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
     return MAX(size - treespace, MIN(size / 10, 200));
 }
@@ -1244,7 +1244,7 @@ void terraform_region(region * r, const terrain_type * terrain)
  * egal ob durch den spell oder anderes angelegt.
  **/
 #include "curse.h"
-int production(const region * r)
+int max_production(const region * r)
 {
     /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;

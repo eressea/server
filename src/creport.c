@@ -1388,7 +1388,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 else {
                     fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
                 }
-                if (production(r)) {
+                if (max_production(r)) {
                     int p_wage = wage(r, NULL, NULL, turn + 1);
                     fprintf(F, "%d;Lohn\n", p_wage);
                     if (is_mourning(r, turn + 1)) {

@@ -45,7 +45,18 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
-    struct request;
+    
+    typedef struct production {
+        struct production *next;
+        struct unit *unit;
+        struct order *ord;
+        int qty;
+        int no;
+        union {
+            bool goblin;             /* stealing */
+            const struct luxury_type *ltype;    /* trading */
+        } type;
+    } production;
 
     int income(const struct unit *u);
     int entertainmoney(const struct region *r);
@@ -61,8 +72,8 @@ extern "C" {
     void split_allocations(struct region *r);
     int give_control_cmd(struct unit *u, struct order *ord);
     void give_control(struct unit * u, struct unit * u2);
-    void tax_cmd(struct unit * u, struct order *ord, struct request ** taxorders);
-    void expandtax(struct region * r, struct request * taxorders);
+    void tax_cmd(struct unit * u, struct order *ord, struct production ** taxorders);
+    void expandtax(struct region * r, struct production * taxorders);
     void add_recruits(struct unit * u, int number, int wanted);
     struct message * check_steal(const struct unit * u, struct order *ord);
 

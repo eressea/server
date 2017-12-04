@@ -314,7 +314,7 @@ static void peasants(region * r, int rule)
 {
     int peasants = rpeasants(r);
     int money = rmoney(r);
-    int maxp = production(r);
+    int maxp = max_production(r);
     int n, satiated;
     int dead = 0;
 
@@ -588,12 +588,12 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             return;
         }
 
-        if (production(r) <= 0)
+        if (max_production(r) <= 0)
             return;
 
         /* Grundchance 1.0% */
         /* Jeder Elf in der Region erhöht die Chance marginal */
-        elves = MIN(elves, production(r) / 8);
+        elves = MIN(elves, max_production(r) / 8);
         if (elves) {
             seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
         }
