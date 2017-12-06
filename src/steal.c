@@ -57,14 +57,21 @@ void expandstealing(region * r, econ_request * stealorders)
     if (!norders) return;
 
     /* F�r jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
-     * Beklauen-Orders ist. Jedes Opfer mu� einzeln behandelt werden.
+     * Beklauen-Orders ist. Jedes Opfer muss einzeln behandelt werden.
      *
      * u ist die beklaute unit. oa.unit ist die klauende unit.
      */
 
-    for (j = 0; j != norders && requests[j].unit->n <= requests[j].unit->wants; j++) {
-        unit *u = findunitg(requests[j].no, r);
+    for (j = 0; j != norders; j++) {
+        unit *u;
         int n = 0;
+
+        if (requests[j].unit->n > requests[j].unit->wants) {
+            break;
+        }
+
+        u = findunitg(requests[j].no, r);
+
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
         }
