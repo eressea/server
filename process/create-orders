@@ -16,6 +16,7 @@ else
   mv orders.dir "orders.dir.$TURN"
   mkdir -p orders.dir
 fi
+#shellcheck disable=2011
 ls -1rt "orders.dir.$TURN/turn-*" | xargs cat > "orders.$TURN"
 
 lockfile -r3 -l120 orders.queue.lock
