@@ -11,7 +11,7 @@ fi
 cd "$ERESSEA/game-$GAME" || exit
 
 echo "running turn $TURN, game $GAME"
-"$ERESSEA/server/bin/eressea" -v3 -t "$TURN" run-turn.lua
+"$ERESSEA/server/bin/eressea" -t "$TURN" run-turn.lua
 mkdir -p log
 ln -f eressea.log "log/eressea.log.$TURN"
 

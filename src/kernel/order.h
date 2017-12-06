@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
     struct locale;
+    struct stream;
 
     /* Encapsulation of an order
      *
@@ -69,6 +70,7 @@ extern "C" {
 
     char *write_order(const order * ord, const struct locale *lang,
         char *buffer, size_t size);
+    int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape);
     keyword_t init_order_depr(const struct order *ord);
     keyword_t init_order(const struct order *ord, const struct locale *lang);
 
