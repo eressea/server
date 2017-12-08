@@ -301,7 +301,7 @@ int current_turn(void)
         perror(zText);
     }
     else {
-        int c = fscanf(F, "%d\n", &cturn);
+        int c = fscanf(F, "%4d\n", &cturn);
         fclose(F);
         if (c != 1) {
             return -1;

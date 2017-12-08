@@ -433,14 +433,15 @@ static void horses(region * r)
             rsethorses(r, (int)(horses * 0.9));
         }
         else if (maxhorses) {
-            int i;
             double growth =
                 (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses -
                     horses)) / maxhorses;
 
             if (growth > 0) {
-                if (a_find(r->attribs, &at_horseluck))
+                int i;
+                if (a_find(r->attribs, &at_horseluck)) {
                     growth *= 2;
+                }
                 /* printf("Horses: <%d> %d -> ", growth, horses); */
                 i = (int)(0.5 + (horses * 0.0001) * growth);
                 /* printf("%d\n", horses); */
@@ -562,13 +563,13 @@ growing_trees_e3(region * r, const int current_season,
 static void
 growing_trees(region * r, const int current_season, const int last_weeks_season)
 {
-    int growth, grownup_trees, i, seeds, sprout;
-    direction_t d;
+    int grownup_trees, i, seeds, sprout;
     attrib *a;
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
         double seedchance = 0.01F * RESOURCE_QUANTITY;
         int elves = count_race(r, get_race(RC_ELF));
+        direction_t d;
 
         a = a_find(r->attribs, &at_germs);
         if (a && last_weeks_season == SEASON_SPRING) {
@@ -638,6 +639,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
     }
     else if (current_season == SEASON_SPRING) {
+        int growth;
 
         if (is_cursed(r->attribs, &ct_godcursezone))
             return;
@@ -2153,7 +2155,6 @@ int email_cmd(unit * u, struct order *ord)
 int password_cmd(unit * u, struct order *ord)
 {
     char pwbuf[32];
-    int i;
     const char *s;
     bool pwok = true;
 
@@ -2161,6 +2162,7 @@ int password_cmd(unit * u, struct order *ord)
     s = gettoken(pwbuf, sizeof(pwbuf));
 
     if (!s || !*s) {
+        int i;
         for (i = 0; i < 6; i++)
             pwbuf[i] = (char)(97 + rng_int() % 26);
         pwbuf[6] = 0;
@@ -4272,7 +4274,7 @@ void update_subscriptions(void)
         int subscription, fno;
         faction *f;
 
-        if (fscanf(F, "%d %4s", &subscription, zFaction) <= 0)
+        if (fscanf(F, "%4d %4s", &subscription, zFaction) <= 0)
             break;
         fno = atoi36(zFaction);
         f = findfaction(fno);
@@ -4358,7 +4360,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
     else if (target->faction == u->faction)
         return true;
     else {
-        int n, rings, o;
+        int n, rings;
 
         if (is_guard(target) || usiege(target) || target->building
             || target->ship) {
@@ -4375,7 +4377,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
             return false;
         }
         if (skill_enabled(SK_PERCEPTION)) {
-            o = effskill(u, SK_PERCEPTION, target->region);
+            int o = effskill(u, SK_PERCEPTION, target->region);
             if (o >= n) {
                 return true;
             }
@@ -4394,7 +4396,6 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
     /* und es muss niemand aus f in der region sein, wenn sie vom Turm
     * erblickt wird */
 {
-    int n;
     unit *u2;
 
     if (fval(u_race(u), RCF_INVISIBLE) || u->number == 0)
@@ -4402,7 +4403,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
     else if (u->faction == f)
         return true;
     else {
-        int rings;
+        int rings, n;
 
         if (is_guard(u) || usiege(u) || u->building || u->ship) {
             return true;

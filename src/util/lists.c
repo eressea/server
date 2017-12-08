@@ -76,16 +76,6 @@ void translist(void *l1, void *l2, void *p)
     addlist(l2, p);
 }
 
-void insertlist(void_list ** l, void_list * p)
-{
-
-    /* insert entry p at the beginning of list l */
-
-    p->next = *l;
-    *l = p;
-
-}
-
 void removelist(void *l, void *p)
 {
 

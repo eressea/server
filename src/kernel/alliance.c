@@ -422,7 +422,7 @@ const char *alliancename(const alliance * al)
     char *ibuf = idbuf[(++nextbuf) % 8];
 
     if (al && al->name) {
-        slprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
+        slprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", al->name, itoa36(al->id));
     }
     else {
         return NULL;

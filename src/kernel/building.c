@@ -499,7 +499,7 @@ const char *buildingname(const building * b)
     static name idbuf[8];
     static int nextbuf = 0;
     char *ibuf = idbuf[(++nextbuf) % 8];
-    return write_buildingname(b, ibuf, sizeof(name));
+    return write_buildingname(b, ibuf, sizeof(idbuf[0]));
 }
 
 void building_set_owner(struct unit * owner)

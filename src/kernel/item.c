@@ -596,7 +596,7 @@ const resource_type *get_resourcetype(resource_t type) {
     static struct resource_type * rtypes[MAX_RESOURCES];
     const resource_type *rtype = NULL;
     if (update != num_resources) {
-        memset(rtypes, 0, sizeof(rtypes));
+        memset(rtypes, 0, sizeof(resource_type *) * MAX_RESOURCES);
         update = num_resources;
     }
     else {

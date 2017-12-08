@@ -1763,8 +1763,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
         price = ltype->price * multi;
 
         if (money >= price) {
-            int abgezogenhafen = 0;
-            int abgezogensteuer = 0;
             unit *u = g_requests[j].unit;
             item *itm;
             attrib *a = a_find(u->attribs, &at_luxuries);
@@ -1779,7 +1777,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 
             if (hafenowner != NULL) {
                 if (hafenowner->faction != u->faction) {
-                    abgezogenhafen = price / 10;
+                    int abgezogenhafen = price / 10;
                     hafencollected += abgezogenhafen;
                     price -= abgezogenhafen;
                     money -= abgezogenhafen;
@@ -1787,7 +1785,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             }
             if (maxb != NULL) {
                 if (maxowner->faction != u->faction) {
-                    abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
+                    int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
                     taxcollected += abgezogensteuer;
                     price -= abgezogensteuer;
                     money -= abgezogensteuer;

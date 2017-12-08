@@ -1711,7 +1711,6 @@ void unit_addorder(unit * u, order * ord)
 int unit_max_hp(const unit * u)
 {
     int h;
-    double p;
     static int config;
     static bool rule_stamina;
     h = u_race(u)->hitpoints;
@@ -1720,7 +1719,7 @@ int unit_max_hp(const unit * u)
         rule_stamina = config_get_int("rules.stamina", 1)!=0;
     }
     if (rule_stamina) {
-        p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
+        double p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
 
@@ -1890,7 +1889,7 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 const char *unitname(const unit * u)
 {
     char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
+    return write_unitname(u, ubuf, sizeof(idbuf[0]));
 }
 
 bool unit_name_equals_race(const unit *u) {

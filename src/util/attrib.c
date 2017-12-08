@@ -537,5 +537,5 @@ void a_write_orig(struct storage *store, const attrib * attribs, const void *own
 
 void attrib_done(void) {
     cb_clear(&cb_deprecated);
-    memset(at_hash, 0, sizeof at_hash);
+    memset(at_hash, 0, sizeof(at_hash[0]) * MAXATHASH);
 }

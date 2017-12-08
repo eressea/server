@@ -284,13 +284,13 @@ static int parse_buildings(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr buildings;
-    int i;
 
     /* reading eressea/buildings/building */
     buildings =
         xmlXPathEvalExpression(BAD_CAST "/eressea/buildings/building", xpath);
     if (buildings->nodesetval != NULL) {
         xmlNodeSetPtr nodes = buildings->nodesetval;
+        int i;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlNodePtr node = nodes->nodeTab[i];
             xmlChar *propValue;
@@ -396,12 +396,12 @@ static int parse_ships(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr ships;
-    int i;
 
     /* reading eressea/ships/ship */
     ships = xmlXPathEvalExpression(BAD_CAST "/eressea/ships/ship", xpath);
     if (ships->nodesetval != NULL) {
         xmlNodeSetPtr nodes = ships->nodesetval;
+        int i;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlNodePtr child, node = nodes->nodeTab[i];
             xmlChar *propValue;
@@ -810,7 +810,6 @@ static int parse_resources(xmlDocPtr doc)
         resource_type *rtype;
         unsigned int flags = RTF_NONE;
         xmlXPathObjectPtr result;
-        int k;
 
         if (xml_bvalue(node, "pooled", true))
             flags |= RTF_POOLED;
@@ -828,7 +827,8 @@ static int parse_resources(xmlDocPtr doc)
         /* reading eressea/resources/resource/function */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-        if (result->nodesetval != NULL)
+        if (result->nodesetval != NULL) {
+            int k;
             for (k = 0; k != result->nodesetval->nodeNr; ++k) {
                 xmlNodePtr node = result->nodesetval->nodeTab[k];
                 pf_generic fun;
@@ -852,6 +852,7 @@ static int parse_resources(xmlDocPtr doc)
                 }
                 xmlFree(propValue);
             }
+        }
         xmlXPathFreeObject(result);
 
         if (xml_bvalue(node, "material", false)) {
