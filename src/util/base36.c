@@ -57,13 +57,14 @@ const char *itoab(int i, int base)
     static char sstr[80];
     char *s, *dst;
     static int index = 0;         /* STATIC_XCALL: used across calls */
-    int neg = 0;
 
     s = sstr + (index * 20);
     index = (index + 1) & 3;      /* quick for % 4 */
     dst = s + 19;
     (*dst--) = 0;
     if (i != 0) {
+        int neg = 0;
+
         if (i < 0) {
             i = -i;
             neg = 1;

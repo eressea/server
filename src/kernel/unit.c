@@ -1929,10 +1929,6 @@ int read_unitid(const faction * f, const region * r)
     char token[16];
     const char *s = gettoken(token, sizeof(token));
 
-    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
-    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
-    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
-
     if (!s || *s == 0 || !isalnum(*s)) {
         return -1;
     }

@@ -631,27 +631,6 @@ int set_item(unit * u, const item_type *itype, int value)
     return value;
 }
 
-/* t_item::flags */
-#define FL_ITEM_CURSED  (1<<0)
-#define FL_ITEM_NOTLOST (1<<1)
-#define FL_ITEM_NOTINBAG  (1<<2)        /* nicht im Bag Of Holding */
-#define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
-#define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
-
-typedef struct t_item {
-    const char *name;
-    /* [0]: Einzahl fuer eigene; [1]: Mehrzahl fuer eigene;
-     * [2]: Einzahl fuer Fremde; [3]: Mehrzahl fuer Fremde */
-    bool is_resource;
-    skill_t skill;
-    int minskill;
-    int gewicht;
-    int preis;
-    unsigned int flags;
-    void(*benutze_funktion) (struct region *, struct unit *, int amount,
-    struct order *);
-} t_item;
-
 #include "move.h"
 
 static int

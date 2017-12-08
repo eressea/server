@@ -123,49 +123,8 @@ char *rns(FILE * f, char *c, size_t size)
     return c;
 }
 
-/* ------------------------------------------------------------- */
-
-/* #define INNER_WORLD  */
-/* fürs debuggen nur den inneren Teil der Welt laden */
-/* -9;-27;-1;-19;Sumpfloch */
-int inner_world(region * r)
-{
-    static int xy[2] = { 18, -45 };
-    static int size[2] = { 27, 27 };
-
-    if (r->x >= xy[0] && r->x < xy[0] + size[0] && r->y >= xy[1]
-        && r->y < xy[1] + size[1])
-        return 2;
-    if (r->x >= xy[0] - 9 && r->x < xy[0] + size[0] + 9 && r->y >= xy[1] - 9
-        && r->y < xy[1] + size[1] + 9)
-        return 1;
-    return 0;
-}
-
 int maxregions = -1;
 int loadplane = 0;
-
-enum {
-    U_MAN,
-    U_UNDEAD,
-    U_ILLUSION,
-    U_FIREDRAGON,
-    U_DRAGON,
-    U_WYRM,
-    U_SPELL,
-    U_TAVERNE,
-    U_MONSTER,
-    U_BIRTHDAYDRAGON,
-    U_TREEMAN,
-    MAXTYPES
-};
-
-race_t typus2race(unsigned char typus)
-{
-    if (typus > 0 && typus <= 11)
-        return (race_t)(typus - 1);
-    return NORACE;
-}
 
 static void read_alliances(gamedata *data)
 {

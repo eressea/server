@@ -260,15 +260,6 @@ param_t getparam(const struct locale * lang)
     return s ? findparam(s, lang) : NOPARAM;
 }
 
-unit *getnewunit(const region * r, const faction * f)
-{
-    int n;
-    n = getid();
-
-    return findnewunit(r, f, n);
-}
-
-
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };

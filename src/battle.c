@@ -2285,21 +2285,6 @@ void do_attack(fighter * af)
     }
 }
 
-void do_regenerate(fighter * af)
-{
-    troop ta;
-    unit *au = af->unit;
-
-    ta.fighter = af;
-    ta.index = af->fighting;
-
-    while (ta.index--) {
-        struct person *p = af->person + ta.index;
-        p->hp += effskill(au, SK_STAMINA, 0);
-        p->hp = MIN(unit_max_hp(au), p->hp);
-    }
-}
-
 static void add_tactics(tactics * ta, fighter * fig, int value)
 {
     if (value == 0 || value < ta->value)

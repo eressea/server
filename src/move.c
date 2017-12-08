@@ -2323,22 +2323,6 @@ int follow_ship(unit * u, order * ord)
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
-void destroy_damaged_ships(void)
-{
-    region *r;
-    ship *sh, *shn;
-
-    for (r = regions; r; r = r->next) {
-        for (sh = r->ships; sh;) {
-            shn = sh->next;
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                remove_ship(&sh->region->ships, sh);
-            }
-            sh = shn;
-        }
-    }
-}
-
 /* Bewegung, Verfolgung, Piraterie */
 
 /** ships that folow other ships
