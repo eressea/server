@@ -4,7 +4,6 @@ autoseed.c
 gmcmd.c
 museum.c
 score.c
-weather.c
 xmas.c
 )
 FOREACH(_FILE ${_FILES})

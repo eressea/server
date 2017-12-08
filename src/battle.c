@@ -1009,7 +1009,7 @@ int natural_armor(unit * du)
 static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
 {
     const race *ar = u_race(au);
-    int m, modifier = 0;
+    int modifier = 0;
     if (wtype != NULL) {
         if (fval(u_race(du), RCF_DRAGON)) {
             static int cache;
@@ -1022,6 +1022,7 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
             }
         }
         if (wtype->modifiers != NULL) {
+            int m;
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 /* weapon damage for this weapon, possibly by race */
                 if (wtype->modifiers[m].flags & WMF_DAMAGE) {

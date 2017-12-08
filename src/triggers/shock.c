@@ -19,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "shock.h"
 
-#include "magic.h"
+#include <magic.h>
 
 /* kernel includes */
 #include <kernel/curse.h>
