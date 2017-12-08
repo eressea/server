@@ -394,11 +394,14 @@ faction *dfindhash(int no)
 }
 #else
 struct faction *dfindhash(int no) {
-    unit *u = deleted_units;
-    while (u && u->no != no) {
-        u = u->next;
+    unit *u;
+
+    for (u = deleted_units; u; u = u->next) {
+        if (u->no == no) {
+            return u->faction;
+        }
     }
-    return u ? u->faction : NULL;
+    return NULL;
 }
 #endif
 

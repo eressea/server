@@ -746,11 +746,13 @@ void init_resources(void)
 int get_money(const unit * u)
 {
     const struct resource_type *rtype = get_resourcetype(R_SILVER);
-    const item *i = u->items;
-    while (i && i->type->rtype != rtype) {
-        i = i->next;
+    const item *i;
+    for (i = u->items; i; i = i->next) {
+        if (i->type->rtype == rtype) {
+            return i->number;
+        }
     }
-    return i ? i->number : 0;
+    return 0;
 }
 
 int set_money(unit * u, int v)

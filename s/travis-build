@@ -19,13 +19,12 @@ cd tests
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 s/cmake-init
-s/build
-cd $ROOT
-inifile
 cppcheck --version
 cppcheck --quiet --error-exitcode=1 src
+s/build
+cd process
+make
+cd $ROOT
+inifile
 s/runtests -V
 integration_tests
-cd ../process
-make
-

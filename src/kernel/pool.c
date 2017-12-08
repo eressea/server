@@ -114,7 +114,7 @@ int change_reservation(unit * u, const item_type * itype, int value)
         res->type = itype;
         res->value = value;
     }
-    else if (res && res->value + value <= 0) {
+    else if (res->value + value <= 0) {
         *rp = res->next;
         free(res);
         return 0;
@@ -139,7 +139,7 @@ int set_resvalue(unit * u, const item_type * itype, int value)
         res->type = itype;
         res->value = value;
     }
-    else if (res && value <= 0) {
+    else if (value <= 0) {
         *rp = res->next;
         free(res);
         return 0;
