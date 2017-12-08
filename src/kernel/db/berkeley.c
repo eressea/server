@@ -41,10 +41,10 @@ int db_driver_order_save(struct order_data *od)
 
     assert(od && od->_str);
     key.data = &recno;
-    key.size = sizeof(recno);
+    key.size = key.ulen = sizeof(recno);
     key.flags = DB_DBT_USERMEM;
     data.data = (void *)od->_str;
-    data.size = strlen(od->_str) + 1;
+    data.size = data.ulen = strlen(od->_str) + 1;
     data.flags = DB_DBT_USERMEM;
     ret = g_dbp->put(g_dbp, NULL, &key, &data, DB_APPEND);
     assert(ret == 0);
@@ -63,7 +63,7 @@ struct order_data *db_driver_order_load(int id)
     memset(&data, 0, sizeof(DBT));
     recno = (db_recno_t)id;
     key.data = &recno;
-    key.size = sizeof(recno);
+    key.size = key.ulen = sizeof(recno);
     key.flags = DB_DBT_USERMEM;
     ret = g_dbp->get(g_dbp, NULL, &key, &data, 0);
     if (ret == 0) {
