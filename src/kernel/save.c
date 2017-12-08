@@ -102,30 +102,6 @@ int firstx = 0, firsty = 0;
 /* TODO: is this still important? */
 int enc_gamedata = ENCODING_UTF8;
 
-/* local symbols */
-static region *current_region;
-
-char *rns(FILE * f, char *c, size_t size)
-{
-    char *s = c;
-    do {
-        *s = (char)getc(f);
-    } while (*s != '"');
-
-    for (;;) {
-        *s = (char)getc(f);
-        if (*s == '"')
-            break;
-        if (s < c + size)
-            ++s;
-    }
-    *s = 0;
-    return c;
-}
-
-int maxregions = -1;
-int loadplane = 0;
-
 static void read_alliances(gamedata *data)
 {
     storage *store = data->store;
@@ -635,7 +611,6 @@ static region *readregion(gamedata *data, int x, int y)
     }
     else {
         assert(uid == 0 || r->uid == uid);
-        current_region = r;
         while (r->attribs)
             a_remove(&r->attribs, r->attribs);
         if (r->land) {
@@ -1399,7 +1374,6 @@ int read_game(gamedata *data)
     building **bp;
     ship **shp;
     unit *u;
-    int rmax = maxregions;
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
     const struct race *rc_spell = rc_find("spell");
@@ -1443,11 +1417,9 @@ int read_game(gamedata *data)
     /* Regionen */
 
     READ_INT(store, &nread);
-    assert(nread < MAXREGIONS && nread>=0);
-    if (rmax < 0) {
-        rmax = nread;
-    }
-    log_debug(" - Einzulesende Regionen: %d/%d", rmax, nread);
+    assert(nread < MAXREGIONS && nread >=0);
+
+    log_debug(" - Einzulesende Regionen: %d", nread);
 
     while (--nread >= 0) {
         unit **up;
@@ -1510,7 +1482,6 @@ int read_game(gamedata *data)
                 update_interval(u->faction, r);
             }
         }
-        --rmax;
     }
     read_borders(data);
 
@@ -1572,9 +1543,6 @@ int read_game(gamedata *data)
         fix_familiars();
     }
 
-    if (loadplane || maxregions >= 0) {
-        remove_empty_factions();
-    }
     log_debug("Done loading turn %d.", turn);
 
     return 0;

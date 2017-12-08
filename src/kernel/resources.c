@@ -124,30 +124,6 @@ static void terraform_default(struct rawmaterial *res, const region * r)
     UNUSED_ARG(r);
 }
 
-#ifdef RANDOM_CHANGE
-static void resource_random_change(int *pvalue, bool used)
-{
-    int split = 5;
-    int rnd = rng_int() % 100;
-
-    if (pvalue == 0 || rnd % 10 >= 10)
-        return;
-    if (used)
-        split = 4;
-    /* if a resource was mined this round, there is a 6% probability
-     * of a decline and a 4% probability of a raise. */
-    /* if it wasn't mined this round, there is an equal probability
-     * of 5% for a decline or a raise. */
-    if (rnd < split) {
-        (*pvalue)++;
-    } else {
-        (*pvalue)--;
-    }
-    if ((*pvalue) < 0)
-        (*pvalue) = 0;
-}
-#endif
-
 static int visible_default(const rawmaterial * res, int skilllevel)
 /* resources are visible, if skill equals minimum skill to mine them
  * plus current level of difficulty */

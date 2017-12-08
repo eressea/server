@@ -4528,28 +4528,6 @@ int sp_illusionary_shapeshift(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Regionstraum analysieren
- * Stufe:   9
- * Aura:     18
- * Kosten:   SPC_FIX
- * Wirkung:
- *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
- *  ergibt sich die Chance den Spruch zu identifizieren ((force -
- *  c->vigour)*10 + 100 %).
- */
-int sp_analyseregionsdream(castorder * co)
-{
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-
-    magicanalyse_region(r, mage, cast_level);
-
-    return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:     Traumbilder erkennen
  * Stufe:   5
  * Aura:     12

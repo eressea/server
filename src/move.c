@@ -1764,10 +1764,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         }
 
         if (!flying_ship(sh)) {
-            int stormchance = 0;
-            int reason;
             if (storms_enabled) {
-                int stormyness;
+                int stormchance = 0;
+                int stormyness, reason;
                 gamedate date;
                 get_gamedate(turn, &date);
                 stormyness = storms ? storms[date.month] * 5 : 0;
