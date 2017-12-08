@@ -20,7 +20,7 @@ set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 s/cmake-init
 cppcheck --version
-cppcheck --quiet --error-exitcode=1 src
+cppcheck --quiet -Isrc -Iclibs -Istorage -IcJSON --error-exitcode=1 src
 s/build
 cd process
 make
