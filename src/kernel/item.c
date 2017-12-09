@@ -596,7 +596,7 @@ const resource_type *get_resourcetype(resource_t type) {
     static struct resource_type * rtypes[MAX_RESOURCES];
     const resource_type *rtype = NULL;
     if (update != num_resources) {
-        memset(rtypes, 0, sizeof(rtypes));
+        memset(rtypes, 0, sizeof(resource_type *) * MAX_RESOURCES);
         update = num_resources;
     }
     else {
@@ -630,27 +630,6 @@ int set_item(unit * u, const item_type *itype, int value)
     }
     return value;
 }
-
-/* t_item::flags */
-#define FL_ITEM_CURSED  (1<<0)
-#define FL_ITEM_NOTLOST (1<<1)
-#define FL_ITEM_NOTINBAG  (1<<2)        /* nicht im Bag Of Holding */
-#define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
-#define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
-
-typedef struct t_item {
-    const char *name;
-    /* [0]: Einzahl fuer eigene; [1]: Mehrzahl fuer eigene;
-     * [2]: Einzahl fuer Fremde; [3]: Mehrzahl fuer Fremde */
-    bool is_resource;
-    skill_t skill;
-    int minskill;
-    int gewicht;
-    int preis;
-    unsigned int flags;
-    void(*benutze_funktion) (struct region *, struct unit *, int amount,
-    struct order *);
-} t_item;
 
 #include "move.h"
 
@@ -746,11 +725,13 @@ void init_resources(void)
 int get_money(const unit * u)
 {
     const struct resource_type *rtype = get_resourcetype(R_SILVER);
-    const item *i = u->items;
-    while (i && i->type->rtype != rtype) {
-        i = i->next;
+    const item *i;
+    for (i = u->items; i; i = i->next) {
+        if (i->type->rtype == rtype) {
+            return i->number;
+        }
     }
-    return i ? i->number : 0;
+    return 0;
 }
 
 int set_money(unit * u, int v)

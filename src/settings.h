@@ -24,12 +24,6 @@
 
 #define ROW_FACTOR 3            /* factor for combat row advancement rule */
 
-/* optional game components. TODO: These should either be 
- * configuration variables (XML), script extensions (lua),
- * or both. We don't want separate binaries for different games
- */
-#define MUSEUM_MODULE 1
-
  /* TODO: move these settings to settings.h or into configuration files */
 #define TREESIZE (8)            /* space used by trees (in #peasants) */
 #define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */

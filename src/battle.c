@@ -1009,7 +1009,7 @@ int natural_armor(unit * du)
 static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_type *wtype)
 {
     const race *ar = u_race(au);
-    int m, modifier = 0;
+    int modifier = 0;
     if (wtype != NULL) {
         if (fval(u_race(du), RCF_DRAGON)) {
             static int cache;
@@ -1022,6 +1022,7 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
             }
         }
         if (wtype->modifiers != NULL) {
+            int m;
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 /* weapon damage for this weapon, possibly by race */
                 if (wtype->modifiers[m].flags & WMF_DAMAGE) {
@@ -2009,11 +2010,6 @@ void dazzle(battle * b, troop * td)
 {
     UNUSED_ARG(b);
     /* Nicht kumulativ ! */
-#ifdef TODO_RUNESWORD
-    if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
-        return;
-    }
-#endif
     if (td->fighter->person[td->index].flags & (FL_COURAGE|FL_DAZZLED)) {
         return;
     }
@@ -2282,21 +2278,6 @@ void do_attack(fighter * af)
         message_all(b, m);
         msg_release(m);
         af->catmsg = -1;
-    }
-}
-
-void do_regenerate(fighter * af)
-{
-    troop ta;
-    unit *au = af->unit;
-
-    ta.fighter = af;
-    ta.index = af->fighting;
-
-    while (ta.index--) {
-        struct person *p = af->person + ta.index;
-        p->hp += effskill(au, SK_STAMINA, 0);
-        p->hp = MIN(unit_max_hp(au), p->hp);
     }
 }
 
@@ -2655,14 +2636,14 @@ static void aftermath(battle * b)
                 }
             }
             snumber += du->number;
-            if (relevant) {
-                flags = UFL_LONGACTION | UFL_NOTMOVING;
-                if (du->status == ST_FLEE) {
-                    flags -= UFL_NOTMOVING;
-                }
-            }
             if (df->alive == 0) {
-                flags |= UFL_DEAD;
+                flags = UFL_DEAD;
+            }
+            else if (relevant) {
+                flags = UFL_LONGACTION;
+                if ((du->status != ST_FLEE) && (df->run.hp <= 0)) {
+                    flags |= UFL_NOTMOVING;
+                }
             }
             if (flags) {
                 fset(du, flags);

@@ -18,6 +18,6 @@ const char *eressea_version(void) {
 
 int version_no(const char *str) {
     int maj = 0, min = 0, pat = 0;
-    sscanf(str, "%d.%d.%d", &maj, &min, &pat);
+    sscanf(str, "%4d.%4d.%4d", &maj, &min, &pat);
     return (maj << 16) | (min << 8) | pat;
 }

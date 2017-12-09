@@ -60,7 +60,7 @@ arg_type *find_argtype(const char *name)
 
 message_type *mt_new(const char *name, const char *args[])
 {
-    int i, nparameters = 0;
+    int nparameters = 0;
     message_type *mtype;
 
     assert(name != NULL);
@@ -85,6 +85,8 @@ message_type *mt_new(const char *name, const char *args[])
         mtype->types = NULL;
     }
     if (args != NULL) {
+        int i;
+
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');

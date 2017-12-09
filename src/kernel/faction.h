@@ -84,9 +84,6 @@ extern "C" {
         score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
-#ifdef VICTORY_DELAY
-        unsigned char victory_delay;
-#endif
         struct unit *units;
         struct attrib *attribs;
         struct message_list *msgs;

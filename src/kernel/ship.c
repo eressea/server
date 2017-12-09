@@ -386,7 +386,7 @@ const char *shipname(const ship * sh)
     static name idbuf[8];
     static int nextbuf = 0;
     char *ibuf = idbuf[(++nextbuf) % 8];
-    return write_shipname(sh, ibuf, sizeof(name));
+    return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
 int shipcapacity(const ship * sh)

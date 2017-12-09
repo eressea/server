@@ -109,6 +109,7 @@ set (ERESSEA_SRC
   json.c
   creport.c
   report.c
+  steal.c
   economy.c
   give.c
   items.c
@@ -140,7 +141,6 @@ set (ERESSEA_SRC
 
 set(SERVER_SRC
   main.c
-  building_action.c
   console.c
   helpers.c
   bind_tolua.c
@@ -293,5 +293,4 @@ include_directories (${LIBXML2_INCLUDE_DIR})
 target_link_libraries(eressea ${LIBXML2_LIBRARIES})
 target_link_libraries(convert ${LIBXML2_LIBRARIES})
 target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
-add_definitions(-DUSE_LIBXML2)
 endif (LIBXML2_FOUND)

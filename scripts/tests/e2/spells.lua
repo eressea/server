@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("magic.fumble.enable", "0")
 end
 
 function test_shapeshift()

@@ -12,17 +12,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-faction *get_faction_by_id(int uid)
-{
-    faction *f;
-    for (f = factions; f; f = f->next) {
-        if (f->subscription == uid) {
-            return f;
-        }
-    }
-    return NULL;
-}
-
 typedef struct db_faction {
     int uid;
     int no;

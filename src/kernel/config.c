@@ -73,11 +73,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "guard.h"
 #include "prefix.h"
 
-#ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-#endif
 
 /* external libraries */
 #include <iniparser.h>
@@ -259,15 +257,6 @@ param_t getparam(const struct locale * lang)
     const char *s = gettoken(token, sizeof(token));
     return s ? findparam(s, lang) : NOPARAM;
 }
-
-unit *getnewunit(const region * r, const faction * f)
-{
-    int n;
-    n = getid();
-
-    return findnewunit(r, f, n);
-}
-
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
@@ -611,9 +600,7 @@ void kernel_done(void)
     /* calling this function releases memory assigned to static variables, etc.
      * calling it is optional, e.g. a release server will most likely not do it.
      */
-#ifdef USE_LIBXML2
     xml_done();
-#endif
     attrib_done();
     item_done();
     message_done();

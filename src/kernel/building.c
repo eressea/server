@@ -499,7 +499,7 @@ const char *buildingname(const building * b)
     static name idbuf[8];
     static int nextbuf = 0;
     char *ibuf = idbuf[(++nextbuf) % 8];
-    return write_buildingname(b, ibuf, sizeof(name));
+    return write_buildingname(b, ibuf, sizeof(idbuf[0]));
 }
 
 void building_set_owner(struct unit * owner)
@@ -774,21 +774,10 @@ int cmp_wage(const struct building *b, const building * a)
     return -1;
 }
 
-bool is_owner_building(const struct building * b)
-{
-    region *r = b->region;
-    if (b->type->taxes && r->land && r->land->ownership) {
-        unit *u = building_owner(b);
-        return u && u->faction == r->land->ownership->owner;
-    }
-    return false;
-}
-
 int building_taxes(const building *b) {
     assert(b);
     return b->type->taxes;
 }
-
 
 int cmp_taxes(const building * b, const building * a)
 {

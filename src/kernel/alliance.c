@@ -422,52 +422,12 @@ const char *alliancename(const alliance * al)
     char *ibuf = idbuf[(++nextbuf) % 8];
 
     if (al && al->name) {
-        slprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
+        slprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", al->name, itoa36(al->id));
     }
     else {
         return NULL;
     }
     return ibuf;
-}
-
-void alliancevictory(void)
-{
-    const struct building_type *btype = bt_find("stronghold");
-    region *r = regions;
-    alliance *al = alliances;
-    if (btype == NULL)
-        return;
-    while (r != NULL) {
-        building *b = r->buildings;
-        while (b != NULL) {
-            if (b->type == btype) {
-                unit *u = building_owner(b);
-                if (u) {
-                    fset(u->faction->alliance, FFL_MARK);
-                }
-            }
-            b = b->next;
-        }
-        r = r->next;
-    }
-    while (al != NULL) {
-        if (!fval(al, FFL_MARK)) {
-            faction **fp;
-            for (fp = &factions; *fp; ) {
-                faction *f = *fp;
-                if (f->alliance == al) {
-                    ADDMSG(&f->msgs, msg_message("alliance::lost", "alliance", al));
-                    destroyfaction(fp);
-                } else {
-                    fp = &f->next;
-                }
-            }
-        }
-        else {
-            freset(al, FFL_MARK);
-        }
-        al = al->next;
-    }
 }
 
 void alliance_setname(alliance * self, const char *name)

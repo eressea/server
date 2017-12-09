@@ -78,8 +78,6 @@ char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const
     return buf;
 }
 
-
-
 #ifndef HAVE_STRLCAT
 #define HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz)

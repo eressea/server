@@ -974,7 +974,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     /* Trees */
     trees = rtrees(r, 2);
     saplings = rtrees(r, 1);
-    if (production(r)) {
+    if (max_production(r)) {
         if (trees > 0 || saplings > 0) {
             bytes = snprintf(bufp, size, ", %d/%d ", trees, saplings);
             if (wrptr(&bufp, &size, bytes) != 0)
@@ -1311,7 +1311,7 @@ static void statistics(struct stream *out, const region * r, const faction * f)
         paragraph(out, buf, 2, 2, 0);
         msg_release(m);
     }
-    if (production(r) && (!fval(r->terrain, SEA_REGION)
+    if (max_production(r) && (!fval(r->terrain, SEA_REGION)
         || f->race == get_race(RC_AQUARIAN))) {
         if (markets_module()) {     /* hack */
             m =

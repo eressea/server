@@ -45,28 +45,35 @@ int tolua_shiplist_next(lua_State * L)
 
 static int tolua_ship_get_id(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     lua_pushinteger(L, self->no);
     return 1;
 }
 
 static int tolua_ship_get_name(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     tolua_pushstring(L, ship_getname(self));
+    return 1;
+}
+
+static int tolua_ship_get_size(lua_State * L)
+{
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, self->size);
     return 1;
 }
 
 static int tolua_ship_get_display(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     tolua_pushstring(L, self->display);
     return 1;
 }
 
 static int tolua_ship_get_region(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     if (self) {
         tolua_pushusertype(L, self->region, TOLUA_CAST "region");
         return 1;
@@ -76,8 +83,8 @@ static int tolua_ship_get_region(lua_State * L)
 
 static int tolua_ship_set_region(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    region *r = (region *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    region *r = (region *)tolua_tousertype(L, 2, NULL);
     if (self) {
         move_ship(self, self->region, r, NULL);
     }
@@ -86,22 +93,29 @@ static int tolua_ship_set_region(lua_State * L)
 
 static int tolua_ship_set_name(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    ship_setname(self, tolua_tostring(L, 2, 0));
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    ship_setname(self, tolua_tostring(L, 2, NULL));
+    return 0;
+}
+
+static int tolua_ship_set_size(lua_State * L)
+{
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    self->size = lua_tointeger(L, 2);
     return 0;
 }
 
 static int tolua_ship_set_display(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     free(self->display);
-    self->display = strdup(tolua_tostring(L, 2, 0));
+    self->display = strdup(tolua_tostring(L, 2, NULL));
     return 0;
 }
 
 static int tolua_ship_get_units(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     unit **unit_ptr = (unit **)lua_newuserdata(L, sizeof(unit *));
     unit *u = self->region->units;
 
@@ -118,8 +132,8 @@ static int tolua_ship_get_units(lua_State * L)
 
 static int tolua_ship_create(lua_State * L)
 {
-    region *r = (region *)tolua_tousertype(L, 1, 0);
-    const char *sname = tolua_tostring(L, 2, 0);
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    const char *sname = tolua_tostring(L, 2, NULL);
     if (sname) {
         const ship_type *stype = st_find(sname);
         if (stype) {
@@ -138,40 +152,40 @@ static int tolua_ship_create(lua_State * L)
 static int
 tolua_ship_tostring(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     lua_pushstring(L, shipname(self));
     return 1;
 }
 
 static int tolua_ship_get_flags(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     lua_pushinteger(L, self->flags);
     return 1;
 }
 
 static int tolua_ship_set_flags(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    self->flags = (int)tolua_tonumber(L, 2, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    self->flags = (int)lua_tointeger(L, 2);
     return 0;
 }
 
 static int tolua_ship_set_coast(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     if (lua_isnil(L, 2)) {
         self->coast = NODIRECTION;
     }
     else if (lua_isnumber(L, 2)) {
-        self->coast = (direction_t)tolua_tonumber(L, 2, 0);
+        self->coast = (direction_t)lua_tointeger(L, 2);
     }
     return 0;
 }
 
 static int tolua_ship_get_coast(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     if (self->coast) {
         lua_pushinteger(L, self->coast);
         return 1;
@@ -181,28 +195,28 @@ static int tolua_ship_get_coast(lua_State * L)
 
 static int tolua_ship_get_type(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     tolua_pushstring(L, self->type->_name);
     return 1;
 }
 
 static int tolua_ship_get_damage(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     lua_pushinteger(L, self->damage);
     return 1;
 }
 
 static int tolua_ship_set_damage(lua_State * L)
 {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    self->damage = (int)tolua_tonumber(L, 2, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    self->damage = (int)lua_tointeger(L, 2);
     return 0;
 }
 
 static int tolua_ship_get_curse(lua_State *L) {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
     if (self->attribs) {
         curse * c = get_curse(self->attribs, ct_find(name));
         if (c) {
@@ -214,8 +228,8 @@ static int tolua_ship_get_curse(lua_State *L) {
 }
 
 static int tolua_ship_has_attrib(lua_State *L) {
-    ship *self = (ship *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
+    ship *self = (ship *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
     attrib * a = a_find(self->attribs, at_find(name));
     lua_pushboolean(L, a != NULL);
     return 1;
@@ -236,6 +250,8 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "id", tolua_ship_get_id, NULL);
             tolua_variable(L, TOLUA_CAST "name", tolua_ship_get_name,
                 tolua_ship_set_name);
+            tolua_variable(L, TOLUA_CAST "size", tolua_ship_get_size,
+                tolua_ship_set_size);
             tolua_variable(L, TOLUA_CAST "info", tolua_ship_get_display,
                 tolua_ship_set_display);
             tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);

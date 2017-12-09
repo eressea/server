@@ -23,6 +23,9 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/strings.h>
+
+#include <stream.h>
 
 /* libc includes */
 #include <assert.h>
@@ -133,6 +136,49 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
     }
     if (size > 0) *bufp = 0;
     return sbuffer;
+}
+
+int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape)
+{
+    const char *str, *text;
+    order_data *od = NULL;
+    keyword_t kwd = ORD_KEYWORD(ord);
+
+    if (ord->command & CMD_QUIET) {
+        swrite("!", 1, 1, out);
+    }
+    if (ord->command & CMD_PERSIST) {
+        swrite("@", 1, 1, out);
+    }
+
+    if (ord->id < 0) {
+        skill_t sk = (skill_t)(100 + ord->id);
+        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+        text = skillname(sk, lang);
+    }
+    else {
+        od = odata_load(ord->id);
+        text = OD_STRING(od);
+    }
+    if (kwd != NOKEYWORD) {
+        str = (const char *)LOC(lang, keyword(kwd));
+        assert(str);
+        swrite(str, 1, strlen(str), out);
+    }
+
+    if (text) {
+        char obuf[1024];
+        swrite(" ", 1, 1, out);
+        if (escape) {
+            text = escape_string(text, obuf, sizeof(obuf));
+        }
+        swrite(text, 1, strlen(text), out);
+    }
+    if (od) {
+        odata_release(od);
+    }
+
+    return 0;
 }
 
 void free_order(order * ord)

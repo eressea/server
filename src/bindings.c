@@ -710,7 +710,6 @@ static int config_get_resource(lua_State * L)
                 lua_settable(L, -3);
             }
             if (itype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, itype->construction->minskill);
                 lua_settable(L, -3);
@@ -718,6 +717,7 @@ static int config_get_resource(lua_State * L)
                 lua_pushstring(L, skillnames[itype->construction->skill]);
                 lua_settable(L, -3);
                 if (itype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; itype->construction->materials[i].number; ++i) {
@@ -774,7 +774,6 @@ static int config_get_btype(lua_State * L)
                 lua_settable(L, -3);
             }
             if (btype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, btype->construction->minskill);
                 lua_settable(L, -3);
@@ -782,6 +781,7 @@ static int config_get_btype(lua_State * L)
                 lua_pushstring(L, skillnames[btype->construction->skill]);
                 lua_settable(L, -3);
                 if (btype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; btype->construction->materials[i].number; ++i) {
@@ -840,7 +840,6 @@ static int config_get_stype(lua_State * L)
                 }
             }
             if (stype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, stype->construction->minskill);
                 lua_settable(L, -3);
@@ -848,6 +847,7 @@ static int config_get_stype(lua_State * L)
                 lua_pushstring(L, skillnames[stype->construction->skill]);
                 lua_settable(L, -3);
                 if (stype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; stype->construction->materials[i].number; ++i) {
@@ -921,12 +921,6 @@ int tolua_read_xml(lua_State * L)
     lua_pushinteger(L, init_data(filename, catalog));
     return 1;
 }
-
-typedef struct event_args {
-    int hfunction;
-    int hargs;
-    const char *sendertype;
-} event_args;
 
 static int tolua_report_unit(lua_State * L)
 {

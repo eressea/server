@@ -1764,9 +1764,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         }
 
         if (!flying_ship(sh)) {
-            int stormchance = 0;
             int reason;
             if (storms_enabled) {
+                int stormchance = 0;
                 int stormyness;
                 gamedate date;
                 get_gamedate(turn, &date);
@@ -2321,22 +2321,6 @@ int follow_ship(unit * u, order * ord)
     /* NACH ausführen */
     move_cmd(u, ord);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
-}
-
-void destroy_damaged_ships(void)
-{
-    region *r;
-    ship *sh, *shn;
-
-    for (r = regions; r; r = r->next) {
-        for (sh = r->ships; sh;) {
-            shn = sh->next;
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                remove_ship(&sh->region->ships, sh);
-            }
-            sh = shn;
-        }
-    }
 }
 
 /* Bewegung, Verfolgung, Piraterie */

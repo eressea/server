@@ -1,18 +1,21 @@
 #include <platform.h>
-#include <CuTest.h>
-#include <stream.h>
-#include <memstream.h>
-
-#include <kernel/region.h>
-#include <kernel/terrain.h>
 
 #include "json.h"
 #include "tests.h"
 
+#include <kernel/region.h>
+#include <kernel/terrain.h>
+
+#include <stream.h>
+#include <memstream.h>
+
 #include <cJSON.h>
+#include <CuTest.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 
 static char *strip(char *str) {
     char *s = str, *b = str, *e = str;

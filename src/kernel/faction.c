@@ -195,7 +195,7 @@ const char *factionname(const faction * f)
     char *ibuf = idbuf[(++nextbuf) % 8];
 
     if (f && f->name) {
-        slprintf(ibuf, sizeof(name), "%s (%s)", f->name, itoa36(f->no));
+        slprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", f->name, itoa36(f->no));
     }
     else {
         strcpy(ibuf, "Unbekannte Partei (?)");

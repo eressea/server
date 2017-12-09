@@ -88,7 +88,7 @@ static void test_steal_okay(CuTest * tc) {
     rc = test_create_race("human");
     rc->flags = 0;
     setup_steal(&env, ter, rc);
-    CuAssertPtrEquals(tc, 0, check_steal(env.u, 0));
+    CuAssertPtrEquals(tc, 0, steal_message(env.u, 0));
     test_cleanup();
 }
 
@@ -103,7 +103,7 @@ static void test_steal_nosteal(CuTest * tc) {
     rc = test_create_race("human");
     rc->flags = RCF_NOSTEAL;
     setup_steal(&env, ter, rc);
-    CuAssertPtrNotNull(tc, msg = check_steal(env.u, 0));
+    CuAssertPtrNotNull(tc, msg = steal_message(env.u, 0));
     msg_release(msg);
     test_cleanup();
 }
@@ -118,7 +118,7 @@ static void test_steal_ocean(CuTest * tc) {
     ter = test_create_terrain("ocean", SEA_REGION);
     rc = test_create_race("human");
     setup_steal(&env, ter, rc);
-    CuAssertPtrNotNull(tc, msg = check_steal(env.u, 0));
+    CuAssertPtrNotNull(tc, msg = steal_message(env.u, 0));
     msg_release(msg);
     test_cleanup();
 }
@@ -300,26 +300,13 @@ static void test_buy_cmd(CuTest *tc) {
     test_cleanup();
 }
 
-typedef struct request {
-    struct request *next;
-    struct unit *unit;
-    struct order *ord;
-    int qty;
-    int no;
-    union {
-        bool goblin;             /* stealing */
-        const struct luxury_type *ltype;    /* trading */
-    } type;
-} request;
-
 static void test_tax_cmd(CuTest *tc) {
     order *ord;
     faction *f;
     region *r;
     unit *u;
     item_type *sword, *silver;
-    request *taxorders = 0;
-
+    econ_request *taxorders = 0;
 
     test_setup();
     init_resources();

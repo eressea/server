@@ -19,7 +19,6 @@
 extern "C" {
 #endif
 
-#ifdef USE_LIBXML2
   /* new xml functions: */
 #include <libxml/tree.h>
 
@@ -30,7 +29,6 @@ extern "C" {
     double xml_fvalue(xmlNodePtr node, const char *name, double dflt);
     int xml_ivalue(xmlNodePtr node, const char *name, int dflt);
     bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt);
-#endif
 
     void xml_done(void);
     int read_xml(const char *filename, const char *catalog);

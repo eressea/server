@@ -723,18 +723,6 @@ static void cr_output_ship_compat(FILE *F, const ship *sh, const unit *u,
     cr_output_ship(&strm, sh, u, fcaptain, f, r);
 }
 
-static int stream_order(stream *out, const struct order *ord, const struct locale *lang) {
-    const char *str;
-    char ebuf[1025];
-    char obuf[1024];
-    write_order(ord, lang, obuf, sizeof(obuf));
-    str = escape_string(obuf, ebuf, sizeof(ebuf));
-    if (str == ebuf) {
-        ebuf[1024] = 0;
-    }
-    return stream_printf(out, "\"%s\"\n", str);
-}
-
 static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 {
     spellbook * book = unit_get_spellbook(u);
@@ -925,7 +913,9 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         for (ord = u->old_orders; ord; ord = ord->next) {
             /* this new order will replace the old defaults */
             if (is_persistent(ord)) {
-                stream_order(out, ord, lang);
+                swrite("\"", 1, 1, out);
+                stream_order(out, ord, lang, true);
+                swrite("\"\n", 1, 2, out);
             }
         }
         for (ord = u->orders; ord; ord = ord->next) {
@@ -933,7 +923,9 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
             if (u->old_orders && is_repeated(kwd))
                 continue;               /* unit has defaults */
             if (is_persistent(ord)) {
-                stream_order(out, ord, lang);
+                swrite("\"", 1, 1, out);
+                stream_order(out, ord, lang, true);
+                swrite("\"\n", 1, 2, out);
             }
         }
 
@@ -1388,7 +1380,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 else {
                     fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
                 }
-                if (production(r)) {
+                if (max_production(r)) {
                     int p_wage = wage(r, NULL, NULL, turn + 1);
                     fprintf(F, "%d;Lohn\n", p_wage);
                     if (is_mourning(r, turn + 1)) {

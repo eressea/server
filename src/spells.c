@@ -1280,10 +1280,8 @@ static int sp_rosthauch(castorder * co)
         add_ironweapon(it_find("axe"), it_find("rustyaxe"), 1.0);
         add_ironweapon(it_find("greatsword"), it_find("rustygreatsword"), 1.0);
         add_ironweapon(it_find("halberd"), it_find("rustyhalberd"), 0.5f);
-#ifndef NO_RUSTY_ARMOR
         add_ironweapon(it_find("shield"), it_find("rustyshield"), 0.5f);
         add_ironweapon(it_find("chainmail"), it_find("rustychainmail"), 0.2f);
-#endif
     }
 
     if (force > 0) {
@@ -2358,7 +2356,6 @@ static int sp_earthquake(castorder * co)
 /* ------------------------------------------------------------- */
 void patzer_peasantmob(const castorder * co)
 {
-    int anteil = 6, n;
     unit *u;
     attrib *a;
     region *r;
@@ -2370,8 +2367,9 @@ void patzer_peasantmob(const castorder * co)
         faction *f = get_monsters();
         const struct locale *lang = f->locale;
         message *msg;
+        int anteil, n;
 
-        anteil += rng_int() % 4;
+        anteil = 6 + rng_int() % 4;
         n = rpeasants(r) * anteil / 10;
         rsetpeasants(r, rpeasants(r) - n);
         assert(rpeasants(r) >= 0);
@@ -2966,12 +2964,12 @@ static int sp_deathcloud(castorder * co)
     return co->level;
 }
 
-void patzer_deathcloud(castorder * co)
+static void patzer_deathcloud(const castorder * co)
 {
     unit *mage = co->magician.u;
     int hp = (mage->hp - 2);
 
-    change_hitpoints(mage, -rng_int() % hp);
+    change_hitpoints(mage, -(rng_int() % hp));
 
     ADDMSG(&mage->faction->msgs, msg_message("magic_fumble",
         "unit region command", mage, mage->region, co->order));
@@ -4528,28 +4526,6 @@ int sp_illusionary_shapeshift(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Regionstraum analysieren
- * Stufe:   9
- * Aura:     18
- * Kosten:   SPC_FIX
- * Wirkung:
- *  Zeigt die Verzauberungen eines Objekts an (curse->name,
- *  curse::info). Aus der Differenz Spruchstaerke und Curse->vigour
- *  ergibt sich die Chance den Spruch zu identifizieren ((force -
- *  c->vigour)*10 + 100 %).
- */
-int sp_analyseregionsdream(castorder * co)
-{
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-
-    magicanalyse_region(r, mage, cast_level);
-
-    return cast_level;
-}
-
-/* ------------------------------------------------------------- */
 /* Name:     Traumbilder erkennen
  * Stufe:   5
  * Aura:     12
@@ -5476,7 +5452,8 @@ int sp_fetchastral(castorder * co)
     return cast_level;
 }
 
-#ifdef SHOWASTRAL_NOT_BORKED
+#define SHOWASTRAL_IS_BORKED
+#ifndef SHOWASTRAL_IS_BORKED
 int sp_showastral(castorder * co)
 {
     unit *u;
@@ -5563,8 +5540,6 @@ int sp_showastral(castorder * co)
 
     free_regionlist(rl);
     return cast_level;
-    UNUSED_ARG(co);
-    return 0;
 }
 #endif
 
@@ -6145,89 +6120,6 @@ int sp_speed2(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:     Magiefresser
- * Stufe:   7
- * Kosten:   SPC_LEVEL
- *
- * Wirkung:
- *   Kann eine bestimmte Verzauberung angreifen und aufloesen. Die Staerke
- *   des Zaubers muss staerker sein als die der Verzauberung.
- * Syntax:
- *  ZAUBERE \"Magiefresser\" REGION
- *  ZAUBERE \"Magiefresser\" EINHEIT <Einheit-Nr>
- *  ZAUBERE \"Magiefresser\" GEBAEUDE <Gebaeude-Nr>
- *  ZAUBERE \"Magiefresser\" SCHIFF <Schiff-Nr>
- *
- *  "kc?c"
- * Flags:
- *   (FARCASTING | SPELLLEVEL | ONSHIPCAST | TESTCANSEE)
- */
- /* Jeder gebrochene Zauber verbraucht c->vigour an Zauberkraft
-  * (force) */
-int sp_q_antimagie(castorder * co)
-{
-    attrib **ap;
-    int obj;
-    curse *c = NULL;
-    int succ;
-    region *r = co_get_region(co);
-    unit *mage = co->magician.u;
-    int cast_level = co->level;
-    double force = co->force;
-    spellparameter *pa = co->par;
-    const char *ts = NULL;
-
-    obj = pa->param[0]->typ;
-
-    switch (obj) {
-    case SPP_REGION:
-        ap = &r->attribs;
-        ts = regionname(r, mage->faction);
-        break;
-
-    case SPP_TEMP:
-    case SPP_UNIT:
-    {
-        unit *u = pa->param[0]->data.u;
-        ap = &u->attribs;
-        ts = itoa36(u->no);
-        break;
-    }
-    case SPP_BUILDING:
-    {
-        building *b = pa->param[0]->data.b;
-        ap = &b->attribs;
-        ts = itoa36(b->no);
-        break;
-    }
-    case SPP_SHIP:
-    {
-        ship *sh = pa->param[0]->data.sh;
-        ap = &sh->attribs;
-        ts = itoa36(sh->no);
-        break;
-    }
-    default:
-        /* Das Zielobjekt wurde vergessen */
-        cmistake(mage, co->order, 203, MSG_MAGIC);
-        return 0;
-    }
-
-    succ = break_curse(ap, cast_level, force, c);
-
-    if (succ) {
-        ADDMSG(&mage->faction->msgs, msg_message("destroy_magic_effect",
-            "unit region command succ target", mage, mage->region, co->order, succ,
-            ts));
-    }
-    else {
-        ADDMSG(&mage->faction->msgs, msg_message("destroy_magic_noeffect",
-            "unit region command", mage, mage->region, co->order));
-    }
-    return MAX(succ, 1);
-}
-
-/* ------------------------------------------------------------- */
 /* Name:     Fluch brechen
  * Stufe:   7
  * Kosten:   SPC_LEVEL
@@ -6541,7 +6433,7 @@ static spelldata spell_functions[] = {
     { "forestfire", sp_forest_fire, patzer_peasantmob },
     { "draigdestroymagic", sp_destroy_magic, 0 },
     { "unholypower", sp_unholypower, 0 },
-    { "deathcloud", sp_deathcloud, patzer_peasantmob },
+    { "deathcloud", sp_deathcloud, patzer_deathcloud },
     { "summondragon", sp_summondragon, patzer_peasantmob },
     { "summonshadowlords", sp_summonshadowlords, patzer_peasantmob },
     { "chaossuction", sp_chaossuction, patzer_peasantmob },
@@ -6567,7 +6459,7 @@ static spelldata spell_functions[] = {
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
     /* M_CERDDOR */
-    { "appeasement", sp_denyattack, 0 },
+    { "appeasement", sp_appeasement, 0 },
     { "song_of_healing", sp_healing, 0 },
     { "generous", sp_generous, 0 },
     { "song_of_fear", sp_song_of_fear, 0 },
@@ -6600,7 +6492,7 @@ static spelldata spell_functions[] = {
     { "analyze_magic", sp_analysemagic, 0 },
     { "concealing_aura", sp_itemcloak, 0 },
     { "tybiedfumbleshield", sp_fumbleshield, 0 },
-#ifdef SHOWASTRAL_NOT_BORKED
+#ifndef SHOWASTRAL_IS_BORKED
     { "show_astral", sp_showastral, 0 },
 #endif
     { "resist_magic", sp_resist_magic_bonus, 0 },

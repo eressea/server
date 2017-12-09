@@ -121,9 +121,11 @@ function test_fleeing_units_can_be_transported()
   u1.number = 100
   u1:add_order("ATTACKIEREN " .. itoa36(u2.id))
   u2.number = 100
+  u2.name = 'Passagier'
   u2:add_order("FAHREN " .. itoa36(u3.id))
   u2:add_order("KAEMPFE FLIEHE")
   u3.number = 100
+  u3.name = 'Transporter'
   u3:add_order("KAEMPFE FLIEHE")
   u3:add_order("TRANSPORT " .. itoa36(u2.id))
   u3:add_order("NACH O ")
@@ -131,8 +133,8 @@ function test_fleeing_units_can_be_transported()
   u3:add_item("horse", u2.number)
   u3:add_order("KAEMPFE FLIEHE")
   process_orders()
-  assert_equal(u3.region.id, r1.id, "transporter did not move")
-  assert_equal(u2.region.id, r1.id, "transported unit did not move")
+  assert_equal(u3.region, r1, "transporter did not move")
+  assert_equal(u2.region, r1, "transported unit did not move")
 end
 
 function test_plane()

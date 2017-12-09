@@ -16,9 +16,7 @@
 #include <kernel/config.h>
 #include <util/log.h>
 
-#if MUSEUM_MODULE
 #include <modules/museum.h>
-#endif
 #include <triggers/triggers.h>
 #include <util/language.h>
 #include <util/functions.h>
@@ -41,6 +39,7 @@
 
 void game_done(void)
 {
+#undef CLEANUP_CODE
 #ifdef CLEANUP_CODE
     /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
      * zum Debugging interessant, wenn man Leak Detection hat, und nach
@@ -78,16 +77,12 @@ void game_init(void)
     register_names();
     register_resources();
     register_itemfunctions();
-#if MUSEUM_MODULE
     register_museum();
-#endif
     wormholes_register();
 
     register_weapons();
     register_xerewards();
-#ifdef USE_LIBXML2
     register_xmlreader();
-#endif
     register_attributes();
     register_gmcmd();
 

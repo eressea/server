@@ -394,11 +394,14 @@ faction *dfindhash(int no)
 }
 #else
 struct faction *dfindhash(int no) {
-    unit *u = deleted_units;
-    while (u && u->no != no) {
-        u = u->next;
+    unit *u;
+
+    for (u = deleted_units; u; u = u->next) {
+        if (u->no == no) {
+            return u->faction;
+        }
     }
-    return u ? u->faction : NULL;
+    return NULL;
 }
 #endif
 
@@ -1597,12 +1600,6 @@ int countheroes(const struct faction *f)
             n += u->number;
         u = u->nextF;
     }
-#ifdef DEBUG_MAXHEROES
-    int m = maxheroes(f);
-    if (n > m) {
-        log_warning("%s has %d of %d heroes\n", factionname(f), n, m);
-    }
-#endif
     return n;
 }
 
@@ -1708,7 +1705,6 @@ void unit_addorder(unit * u, order * ord)
 int unit_max_hp(const unit * u)
 {
     int h;
-    double p;
     static int config;
     static bool rule_stamina;
     h = u_race(u)->hitpoints;
@@ -1717,7 +1713,7 @@ int unit_max_hp(const unit * u)
         rule_stamina = config_get_int("rules.stamina", 1)!=0;
     }
     if (rule_stamina) {
-        p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
+        double p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
 
@@ -1887,7 +1883,7 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 const char *unitname(const unit * u)
 {
     char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
+    return write_unitname(u, ubuf, sizeof(idbuf[0]));
 }
 
 bool unit_name_equals_race(const unit *u) {
@@ -1928,10 +1924,6 @@ int read_unitid(const faction * f, const region * r)
 {
     char token[16];
     const char *s = gettoken(token, sizeof(token));
-
-    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
-    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
-    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
     if (!s || *s == 0 || !isalnum(*s)) {
         return -1;

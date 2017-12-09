@@ -240,12 +240,6 @@ struct order *ord)
             }
 #endif
 #endif
-#if MUSEUM_MODULE && defined(TODO)
-            /* TODO: use a trigger for the museum warden! */
-            if (a_find(dest->attribs, &at_warden)) {
-                warden_add_give(src, dest, itype, delta);
-            }
-#endif
         }
         else {
             /* return horses to the region */

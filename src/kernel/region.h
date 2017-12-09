@@ -240,7 +240,7 @@ extern "C" {
     extern const int delta_x[MAXDIRECTIONS];
     extern const int delta_y[MAXDIRECTIONS];
     direction_t dir_invert(direction_t dir);
-    int production(const struct region *r);
+    int max_production(const struct region *r);
 
     void region_set_owner(struct region *r, struct faction *owner, int turn);
     struct faction *region_get_owner(const struct region *r);
