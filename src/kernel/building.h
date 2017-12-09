@@ -71,7 +71,6 @@ extern "C" {
     } building_type;
 
     extern struct selist *buildingtypes;
-    extern struct attrib_type at_building_action;
     extern struct attrib_type at_building_generic_type;
 
     int cmp_castle_size(const struct building *b, const struct building *a);

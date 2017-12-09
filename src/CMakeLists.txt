@@ -141,7 +141,6 @@ set (ERESSEA_SRC
 
 set(SERVER_SRC
   main.c
-  building_action.c
   console.c
   helpers.c
   bind_tolua.c

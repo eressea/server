@@ -304,11 +304,24 @@ struct trigger_type tt_caldera = {
     caldera_read
 };
 
+
+static int building_action_read(struct attrib *a, void *owner, gamedata *data)
+{
+    struct storage *store = data->store;
+
+    if (data->version < ATTRIBOWNER_VERSION) {
+        READ_INT(data->store, NULL);
+    }
+    READ_TOK(store, NULL, 0);
+    READ_TOK(store, NULL, 0);
+    return AT_READ_DEPR;
+}
+
 void register_tolua_helpers(void)
 {
     tt_register(&tt_caldera);
     at_register(&at_direction);
-    at_register(&at_building_action);
+    at_deprecate("lcbuilding", building_action_read);
 
     callbacks.cast_spell = lua_callspell;
     callbacks.use_item = use_item_lua;
