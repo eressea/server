@@ -56,9 +56,7 @@ extern "C" {
 
     extern const struct attrib_type at_learning;
 
-#ifndef NO_TESTS
     void inject_learn(learn_fun fun);
-#endif
 
 #ifdef __cplusplus
 }
