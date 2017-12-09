@@ -2641,14 +2641,14 @@ static void aftermath(battle * b)
                 }
             }
             snumber += du->number;
-            if (relevant) {
-                flags = UFL_LONGACTION | UFL_NOTMOVING;
-                if (du->status == ST_FLEE) {
-                    flags -= UFL_NOTMOVING;
-                }
-            }
             if (df->alive == 0) {
-                flags |= UFL_DEAD;
+                flags = UFL_DEAD;
+            }
+            else if (relevant) {
+                flags = UFL_LONGACTION;
+                if ((du->status != ST_FLEE) && (df->run.hp <= 0)) {
+                    flags |= UFL_NOTMOVING;
+                }
             }
             if (flags) {
                 fset(du, flags);

@@ -1262,7 +1262,7 @@ int sp_reeling_arrows(struct castorder * co)
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
  * eine Nachbarregion, wobei ein NACH ber�cksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
-int sp_denyattack(struct castorder * co)
+int sp_appeasement(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;

@@ -6460,7 +6460,7 @@ static spelldata spell_functions[] = {
     { "mindblast", sp_mindblast_temp, 0 },
     { "orkdream", sp_sweetdreams, 0 },
     /* M_CERDDOR */
-    { "appeasement", sp_denyattack, 0 },
+    { "appeasement", sp_appeasement, 0 },
     { "song_of_healing", sp_healing, 0 },
     { "generous", sp_generous, 0 },
     { "song_of_fear", sp_song_of_fear, 0 },

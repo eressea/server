@@ -81,3 +81,25 @@ function test_create_dreameye()
     assert_equal(amax - 5, u.aura_max)
 end
 
+function test_appeasement()
+    local u1, u2, r1, r2, uno
+    r1 = region.create(0, 0, 'plain')
+    r2 = region.create(1, 0, 'plain')
+    u2 = unit.create(faction.create('human'), r1, 1)
+    u2.race = 'elf'
+    u2.name = 'Angsthase'
+    u2.magic = 'gwyrrd'
+    u2:set_skill('magic', 5)
+    u2.aura = 10
+    u2:add_spell('appeasement')
+    u2:add_order('NACH O')
+    u2:add_order('KAMPFZAUBER STUFE 1 Friedenslied')
+    uno = u2.id
+    u1 = unit.create(faction.create('human'), r1, 1)
+    u1:set_skill('polearm', 5)
+    u1:add_order('ATTACKIERE ' .. itoa36(uno))
+    process_orders()
+    u2 = get_unit(uno)
+    assert_not_nil(u2)
+    assert_equal(r2, u2.region)
+end
