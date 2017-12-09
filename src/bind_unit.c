@@ -286,7 +286,7 @@ static int tolua_unit_get_magic(lua_State * L)
 
 static void unit_setmagic(unit * u, const char *type)
 {
-    sc_mage *mage = get_mage_depr(u);
+    sc_mage *mage = get_mage(u);
     int mtype;
     for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
         if (strcmp(magic_school[mtype], type) == 0)

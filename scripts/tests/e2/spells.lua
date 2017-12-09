@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("magic.fumble.enable", "0")
 end
 
 function test_shapeshift()
@@ -101,4 +102,26 @@ function test_earn_silver()
     process_orders() -- not enough
     assert_equal(350, u:get_item("money"))
     assert_equal(0, r:get_resource("money"))
+end
+
+function test_appeasement()
+    local u1, u2, r1, r2, uno
+    r1 = region.create(0, 0, 'plain')
+    r2 = region.create(1, 0, 'plain')
+    u2 = unit.create(faction.create('human'), r1, 1)
+    u2.name = 'Angsthase'
+    u2.magic = 'gwyrrd'
+    u2:add_spell('appeasement')
+    u2:set_skill('magic', 5)
+    u2:add_order('NACH O')
+    u2:add_order('KAMPFZAUBER STUFE 1 Friedenslied')
+    u2.aura = 10
+    uno = u2.id
+    u1 = unit.create(faction.create('human'), r1, 1)
+    u1:set_skill('polearm', 5)
+    u1:add_order('ATTACKIERE ' .. itoa36(uno))
+    process_orders()
+    u2 = get_unit(uno)
+    assert_not_nil(u2)
+    assert_equal(r2, u2.region)
 end
