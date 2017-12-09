@@ -2010,11 +2010,6 @@ void dazzle(battle * b, troop * td)
 {
     UNUSED_ARG(b);
     /* Nicht kumulativ ! */
-#ifdef TODO_RUNESWORD
-    if (td->fighter->weapon[WP_RUNESWORD].count > td->index) {
-        return;
-    }
-#endif
     if (td->fighter->person[td->index].flags & (FL_COURAGE|FL_DAZZLED)) {
         return;
     }
