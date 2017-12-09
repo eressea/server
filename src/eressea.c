@@ -85,9 +85,7 @@ void game_init(void)
 
     register_weapons();
     register_xerewards();
-#ifdef USE_LIBXML2
     register_xmlreader();
-#endif
     register_attributes();
     register_gmcmd();
 
