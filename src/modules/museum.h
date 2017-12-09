@@ -22,10 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#if MUSEUM_MODULE == 0
-#error "must define MUSEUM_MODULE to use this module"
-#endif
-
     extern struct attrib_type at_warden;
     extern struct attrib_type at_museumexit;
     extern struct attrib_type at_museumgivebackcookie;

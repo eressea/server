@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/config.h>
 
-#if MUSEUM_MODULE
 #include "museum.h"
 
 /* kernel includes */
@@ -502,5 +501,3 @@ void register_museum(void)
     register_item_use(use_museumkey, "use_questkey1");
     register_item_use(use_museumkey, "use_questkey2");
 }
-
-#endif

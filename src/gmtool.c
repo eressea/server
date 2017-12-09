@@ -24,9 +24,7 @@
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
-#if MUSEUM_MODULE
 #include <modules/museum.h>
-#endif
 #include <modules/autoseed.h>
 
 #include <kernel/building.h>
