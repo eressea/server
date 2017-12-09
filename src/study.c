@@ -811,23 +811,21 @@ void produceexp(struct unit *u, skill_t sk, int n)
     produceexp_ex(u, sk, n, learn_skill);
 }
 
-#ifndef NO_TESTS
 static learn_fun inject_learn_fun = 0;
 
 void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
-#endif
+
 /** days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning */
 void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
-#ifndef NO_TESTS
+
     if (inject_learn_fun) {
         inject_learn_fun(u, sk, days);
         return;
     }
-#endif
     while (days >= leveldays) {
         ++weeks;
         days -= leveldays;

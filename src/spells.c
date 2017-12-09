@@ -1280,10 +1280,8 @@ static int sp_rosthauch(castorder * co)
         add_ironweapon(it_find("axe"), it_find("rustyaxe"), 1.0);
         add_ironweapon(it_find("greatsword"), it_find("rustygreatsword"), 1.0);
         add_ironweapon(it_find("halberd"), it_find("rustyhalberd"), 0.5f);
-#ifndef NO_RUSTY_ARMOR
         add_ironweapon(it_find("shield"), it_find("rustyshield"), 0.5f);
         add_ironweapon(it_find("chainmail"), it_find("rustychainmail"), 0.2f);
-#endif
     }
 
     if (force > 0) {
@@ -5454,7 +5452,8 @@ int sp_fetchastral(castorder * co)
     return cast_level;
 }
 
-#ifdef SHOWASTRAL_NOT_BORKED
+#define SHOWASTRAL_IS_BORKED
+#ifndef SHOWASTRAL_IS_BORKED
 int sp_showastral(castorder * co)
 {
     unit *u;
@@ -6493,7 +6492,7 @@ static spelldata spell_functions[] = {
     { "analyze_magic", sp_analysemagic, 0 },
     { "concealing_aura", sp_itemcloak, 0 },
     { "tybiedfumbleshield", sp_fumbleshield, 0 },
-#ifdef SHOWASTRAL_NOT_BORKED
+#ifndef SHOWASTRAL_IS_BORKED
     { "show_astral", sp_showastral, 0 },
 #endif
     { "resist_magic", sp_resist_magic_bonus, 0 },

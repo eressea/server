@@ -41,11 +41,7 @@ extern "C" {
         /* Stufe 3 */
         P_WISE,                     /* 6 */
         P_FOOL,
-#ifdef INSECT_POTION
-        P_WARMTH,
-#else
         P_STEEL,
-#endif
         P_HORSE,
         P_BERSERK,                  /* 10 */
         /* Stufe 4 */
