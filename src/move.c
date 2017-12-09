@@ -1751,7 +1751,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
      * befahrene Region. */
 
     while (next_point && current_point != next_point && step < k) {
-        int reason;
         const terrain_type *tthis = current_point->terrain;
         /* these values need to be updated if next_point changes (due to storms): */
         const terrain_type *tnext = next_point->terrain;
