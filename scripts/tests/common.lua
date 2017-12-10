@@ -1112,3 +1112,25 @@ function test_build_castle()
     assert_equal(1, u.building.size)
     assert_equal(u.building.name, "Burg")
 end
+
+function test_route()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE O W P")
+    process_orders()
+    assert_equal("ROUTE West PAUSE Ost", u:get_order(0))
+    assert_equal(r2, u.region)
+end
+
+function test_route_pause()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE P O W")
+    process_orders()
+    assert_equal("ROUTE P O W", u:get_order(0))
+    assert_equal(r1, u.region)
+end

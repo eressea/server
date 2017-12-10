@@ -64,7 +64,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -248,6 +247,7 @@ void add_recruits(unit * u, int number, int wanted)
     if (number > 0) {
         unit *unew;
         char equipment[64];
+        int len;
 
         if (u->number == 0) {
             set_number(u, number);
@@ -258,10 +258,10 @@ void add_recruits(unit * u, int number, int wanted)
             unew = create_unit(r, u->faction, number, u_race(u), 0, NULL, u);
         }
 
-        strlcpy(equipment, "new_", sizeof(equipment));
-        strlcat(equipment, u_race(u)->_name, sizeof(equipment));
-        equip_unit(unew, get_equipment(equipment));
-
+        len = snprintf(equipment, sizeof(equipment), "new_%s", u_race(u)->_name);
+        if (len > 0 && (size_t)len < sizeof(equipment)) {
+            equip_unit(unew, get_equipment(equipment));
+        }
         if (unew != u) {
             transfermen(unew, u, unew->number);
             remove_unit(&r->units, unew);

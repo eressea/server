@@ -33,7 +33,6 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -166,9 +165,7 @@ newfaction *read_newfactions(const char *filename)
             break;
         }
         if (password[0] == '\0') {
-            size_t sz;
-            sz = strlcpy(password, itoa36(rng_int()), sizeof(password));
-            sz += strlcat(password, itoa36(rng_int()), sizeof(password));
+            snprintf(password, sizeof(password), "%s%s", itoa36(rng_int()), itoa36(rng_int()));
         }
         for (f = factions; f; f = f->next) {
             if (strcmp(faction_getemail(f), email) == 0 && f->age < MINAGE_MULTI) {
