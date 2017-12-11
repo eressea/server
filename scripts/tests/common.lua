@@ -1124,6 +1124,19 @@ function test_route()
     assert_equal(r2, u.region)
 end
 
+function test_route_horse()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE O P W P")
+    u:add_item('horse', 1)
+    u:set_skill('riding', 1)
+    process_orders()
+    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(0))
+    assert_equal(r2, u.region)
+end
+
 function test_route_pause()
     local r1 = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")

@@ -8,6 +8,15 @@
 
 #include <string.h>
 
+const char *shortdirections[MAXDIRECTIONS] = {
+    "dir_nw",
+    "dir_ne",
+    "dir_east",
+    "dir_se",
+    "dir_sw",
+    "dir_west"
+};
+
 void init_direction(const struct locale *lang, direction_t dir, const char *str) {
     void **tokens = get_translations(lang, UT_DIRECTIONS);
     variant token;
