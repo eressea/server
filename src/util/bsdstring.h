@@ -4,6 +4,17 @@
 #include <stddef.h>
 int wrptr(char **ptr, size_t * size, int bytes);
 
+#undef HAVE_STRLCAT
+#undef HAVE_STRLCPY
+#undef HAVE_SLPRINTF
+#ifdef HAVE_BSDSTRING
+#define HAVE_STRLCAT
+#define HAVE_SLPRINT
+#define HAVE_STRLCPY
+#else
+#include <string.h>
+#endif
+
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz);
 #endif

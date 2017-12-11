@@ -29,8 +29,8 @@
 
 #endif
 
-#define _POSIX_C_SOURCE 200809L
-
+/* #define _POSIX_C_SOURCE 200809L
+*/
 #ifndef MAX_PATH
 # define MAX_PATH 4096
 #endif

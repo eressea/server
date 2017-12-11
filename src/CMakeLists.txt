@@ -266,6 +266,10 @@ add_test(server test_eressea)
 
 install(TARGETS eressea DESTINATION "bin")
 
+if (HAVE_STRLCAT)
+	add_definitions(-DHAVE_BSDSTRING)
+endif(HAVE_STRLCAT)
+
 if (DB_FOUND)
 include_directories (${DB_INCLUDE_DIR})
 target_link_libraries(convert ${DB_LIBRARIES})

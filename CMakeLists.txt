@@ -11,6 +11,9 @@ if (MSVC)
 include(MSVC)
 endif (MSVC)
 
+INCLUDE (CheckSymbolExists)
+CHECK_SYMBOL_EXISTS(strlcat string.h HAVE_STRLCAT)
+
 find_package (SQLite3)
 find_package (BerkeleyDB)
 find_package (Curses)
