@@ -9,7 +9,6 @@ int wrptr(char **ptr, size_t * size, int bytes);
 #undef HAVE_SLPRINTF
 #ifdef HAVE_BSDSTRING
 #define HAVE_STRLCAT
-#define HAVE_SLPRINTF
 #define HAVE_STRLCPY
 #else
 #include <string.h>
@@ -22,10 +21,6 @@ char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const
 
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz);
-#endif
-
-#ifndef HAVE_SLPRINTF
-size_t slprintf(char * dst, size_t size, const char * format, ...);
 #endif
 
 #define WARN_STATIC_BUFFER_EX(foo) log_warning("%s: static buffer too small in %s:%d\n", (foo), __FILE__, __LINE__)

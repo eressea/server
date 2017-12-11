@@ -22,9 +22,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "assert.h"
 
 /* libc includes */
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+
+size_t str_slprintf(char * dst, size_t size, const char * format, ...)
+{
+    va_list args;
+    int result;
+
+    va_start(args, format);
+    result = vsnprintf(dst, size, format, args);
+    va_end(args);
+    if (result < 0 || result >= (int)size) {
+        dst[size - 1] = '\0';
+        return size;
+    }
+
+    return (size_t)result;
+}
 
 char *set_string(char **s, const char *neu)
 {

@@ -1,9 +1,7 @@
 #include <platform.h>
-#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <stdarg.h>
 #include <limits.h>
 
 #include "bsdstring.h"
@@ -100,20 +98,4 @@ size_t strlcat(char *dst, const char *src, size_t siz)
     *d = '\0';
 
     return (dlen + (s - src));    /* count does not include NUL */
-}
-
-size_t slprintf(char * dst, size_t size, const char * format, ...)
-{
-    va_list args;
-    int result;
-
-    va_start(args, format);
-    result = vsnprintf(dst, size, format, args);
-    va_end(args);
-    if (result < 0 || result >= (int)size) {
-        dst[size - 1] = '\0';
-        return size;
-    }
-
-    return (size_t)result;
 }

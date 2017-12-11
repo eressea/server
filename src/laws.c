@@ -90,6 +90,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/password.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 

@@ -29,11 +29,30 @@ static void test_str_hash(CuTest * tc)
     CuAssertIntEquals(tc, 140703196, str_hash("Hodor"));
 }
 
+static void test_str_slprintf(CuTest * tc)
+{
+    char buffer[32];
+
+    memset(buffer, 0x7f, sizeof(buffer));
+
+    CuAssertTrue(tc, slprintf(buffer, 4, "%s", "herpderp") > 3);
+    CuAssertStrEquals(tc, "her", buffer);
+
+    CuAssertIntEquals(tc, 4, (int)str_slprintf(buffer, 8, "%s", "herp"));
+    CuAssertStrEquals(tc, "herp", buffer);
+    CuAssertIntEquals(tc, 0x7f, buffer[5]);
+
+    CuAssertIntEquals(tc, 8, (int)str_slprintf(buffer, 8, "%s", "herpderp"));
+    CuAssertStrEquals(tc, "herpder", buffer);
+    CuAssertIntEquals(tc, 0x7f, buffer[8]);
+}
+
 CuSuite *get_strings_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_str_hash);
     SUITE_ADD_TEST(suite, test_str_escape);
     SUITE_ADD_TEST(suite, test_str_replace);
+    SUITE_ADD_TEST(suite, test_str_slprintf);
     return suite;
 }
