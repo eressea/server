@@ -189,7 +189,7 @@ static char *sidename(side * s)
     static char sidename_buf[4][SIDENAMEBUFLEN];  /* STATIC_RESULT: used for return, not across calls */
 
     bufno = bufno % 4;
-    strlcpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
+    strncpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
     return sidename_buf[bufno++];
 }
 
@@ -2886,10 +2886,10 @@ static void print_header(battle * b)
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bufp = STRLCPY(bufp, ", ", size);
+                        strlcpy(bufp, ", ", size);
                     }
                     if (lastf) {
-                        bufp = STRLCPY(bufp, lastf, size);
+                        strlcpy(bufp, lastf, size);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -3579,7 +3579,7 @@ static int battle_report(battle * b)
                 if (komma) {
                     bufp = STRLCPY(bufp, ", ", size);
                 }
-                slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
+                snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
                 
                 bufp = STRLCPY(bufp, buffer, size);

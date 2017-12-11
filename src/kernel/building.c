@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/gamedata.h>
@@ -54,6 +53,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <limits.h>
 
@@ -372,7 +372,7 @@ building *new_building(const struct building_type * btype, region * r,
         bname = parameters[P_GEBAEUDE];
     }
     assert(bname);
-    slprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
+    snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
     b->name = strdup(bname);
     return b;
 }
@@ -489,7 +489,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)
 {
-    slprintf(ibuf, size, "%s (%s)", b->name, itoa36(b->no));
+    snprintf(ibuf, size, "%s (%s)", b->name, itoa36(b->no));
     return ibuf;
 }
 

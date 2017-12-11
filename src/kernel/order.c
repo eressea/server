@@ -170,7 +170,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         char obuf[1024];
         swrite(" ", 1, 1, out);
         if (escape) {
-            text = escape_string(text, obuf, sizeof(obuf));
+            text = str_escape(text, obuf, sizeof(obuf));
         }
         swrite(text, 1, strlen(text), out);
     }

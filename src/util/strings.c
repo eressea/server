@@ -45,7 +45,40 @@ char *set_string(char **s, const char *neu)
     return *s;
 }
 
-unsigned int hashstring(const char *s)
+void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value)
+{
+    size_t val_len = strlen(value);
+    size_t var_len = strlen(var);
+    char *s = buffer;
+    while (buffer + size > s) {
+        char *p = strstr(tmpl, var);
+        size_t len;
+        if (p) {
+            len = p - tmpl;
+        }
+        else {
+            len = strlen(tmpl);
+        }
+        if (len < size) {
+            memmove(s, tmpl, len);
+            tmpl += len;
+            s += len;
+            size -= len;
+            if (p && val_len < size) {
+                tmpl += var_len;
+                memmove(s, value, val_len);
+                s += val_len;
+                size -= val_len;
+            }
+        }
+        if (!p) {
+            break;
+        }
+    }
+    *s = 0;
+}
+
+unsigned int str_hash(const char *s)
 {
     unsigned int key = 0;
     assert(s);
@@ -55,7 +88,7 @@ unsigned int hashstring(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *escape_string(const char *str, char *buffer,
+const char *str_escape(const char *str, char *buffer,
     size_t len)
 {
     const char *start = strchr(str, '\"');

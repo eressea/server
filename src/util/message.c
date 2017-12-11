@@ -192,7 +192,7 @@ void mt_clear(void) {
 
 const message_type *mt_find(const char *name)
 {
-    unsigned int hash = hashstring(name) % MT_MAXHASH;
+    unsigned int hash = str_hash(name) % MT_MAXHASH;
     selist *ql = messagetypes[hash];
     int qi;
 
@@ -218,7 +218,7 @@ static unsigned int mt_id(const message_type * mtype)
 
 const message_type *mt_register(message_type * type)
 {
-    unsigned int hash = hashstring(type->name) % MT_MAXHASH;
+    unsigned int hash = str_hash(type->name) % MT_MAXHASH;
     selist **qlp = messagetypes + hash;
 
     if (selist_set_insert(qlp, type, NULL)) {

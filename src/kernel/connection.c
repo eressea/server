@@ -25,19 +25,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 #include <util/attrib.h>
-#include <util/bsdstring.h>
+#include <util/base36.h>
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <selist.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
+#include <selist.h>
 #include <storage.h>
 
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 int nextborder = 0;
@@ -514,8 +516,8 @@ static const char *b_nameroad(const connection * b, const region * r,
         else {
             int percent = MAX(1, 100 * local / r->terrain->max_road);
             if (local) {
-                slprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
-                    "a_road_percent")), percent);
+                const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
+                str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
             }
             else {
                 return LOC(f->locale, mkname("border", "a_road_connection"));
