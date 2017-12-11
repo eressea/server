@@ -3,6 +3,7 @@ project(util C)
 SET(_TEST_FILES
 attrib.test.c
 base36.test.c
+bsdstring.test.c
 # crmessage.test.c
 # dice.test.c
 # event.test.c
@@ -21,7 +22,6 @@ password.test.c
 # resolve.test.c
 rng.test.c
 strings.test.c
-bsdstring.test.c
 functions.test.c
 log.test.c
 # translation.test.c
@@ -59,11 +59,6 @@ unicode.c
 variant.c
 xml.c
 )
-
-IF(HAVE_BSDSTRING)
-	SET (_TEST_FILES ${_TEST_FILES} bsdstring.test.c)
-	SET (_FILES ${_FILES} bsdstring.c)
-ENDIF(HAVE_BSDSTRING)
 
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
