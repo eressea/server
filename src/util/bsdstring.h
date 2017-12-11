@@ -9,7 +9,7 @@ int wrptr(char **ptr, size_t * size, int bytes);
 #undef HAVE_SLPRINTF
 #ifdef HAVE_BSDSTRING
 #define HAVE_STRLCAT
-#define HAVE_SLPRINT
+#define HAVE_SLPRINTF
 #define HAVE_STRLCPY
 #else
 #include <string.h>

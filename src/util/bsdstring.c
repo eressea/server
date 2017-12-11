@@ -35,8 +35,6 @@ int wrptr(char **ptr, size_t * size, int result)
     return ERANGE;
 }
 
-#ifndef HAVE_STRLCPY
-#define HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz)
 {                               /* copied from OpenBSD source code */
     register char *d = dst;
@@ -61,7 +59,6 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 
     return (s - src - 1);         /* count does not include NUL */
 }
-#endif
 
 char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const char *file, int line)
 {
@@ -78,8 +75,6 @@ char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const
     return buf;
 }
 
-#ifndef HAVE_STRLCAT
-#define HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz)
 {
     register char *d = dst;
@@ -106,10 +101,7 @@ size_t strlcat(char *dst, const char *src, size_t siz)
 
     return (dlen + (s - src));    /* count does not include NUL */
 }
-#endif
 
-#ifndef HAVE_SLPRINTF
-#define HAVE_SLPRINTF
 size_t slprintf(char * dst, size_t size, const char * format, ...)
 {
     va_list args;
@@ -125,4 +117,3 @@ size_t slprintf(char * dst, size_t size, const char * format, ...)
 
     return (size_t)result;
 }
-#endif

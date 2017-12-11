@@ -55,7 +55,6 @@ int atoi36(const char *str)
 const char *itoab_r(int i, int base, char *s, size_t len)
 {
     char *dst;
-    static int index = 0;         /* STATIC_XCALL: used across calls */
 
     assert(len > 2);
     dst = s + len - 2;
