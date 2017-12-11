@@ -61,7 +61,6 @@
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/language.h>
@@ -4643,7 +4642,7 @@ int sp_clonecopy(castorder * co)
         return 0;
     }
 
-    slprintf(name, sizeof(name), (const char *)LOC(mage->faction->locale,
+    snprintf(name, sizeof(name), (const char *)LOC(mage->faction->locale,
         "clone_of"), unitname(mage));
     clone =
         create_unit(target_region, mage->faction, 1, get_race(RC_CLONE), 0, name,

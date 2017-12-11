@@ -82,7 +82,7 @@ static double attack_chance; /* rules.monsters.attack_chance, or default 0.4 */
 
 static void give_peasants(unit *u, const item_type *itype, int reduce) {
     char buf[64];
-    slprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
+    snprintf(buf, sizeof(buf), "%s 0 %d %s", LOC(u->faction->locale, keyword(K_GIVE)), reduce, LOC(u->faction->locale, itype->rtype->_name));
     unit_addorder(u, parse_order(buf, u->faction->locale));
 }
 

@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -217,7 +216,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
         sname = parameters[P_SHIP];
     }
     assert(sname);
-    slprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
+    snprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
     sh->name = strdup(buffer);
     shash(sh);
     if (r) {
@@ -283,7 +282,7 @@ void free_ships(void)
 
 const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 {
-    slprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
+    snprintf(ibuf, size, "%s (%s)", sh->name, itoa36(sh->no));
     return ibuf;
 }
 
