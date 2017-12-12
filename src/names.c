@@ -277,7 +277,7 @@ static void dragon_name(unit * u)
     else {
         char n[32];
 
-        snprintf(n, sizeof(n), "%s%s%s", silbe1[rng_int() % SIL1], silbe2[rng_int() % SIL1], silbe3[rng_int() % SIL1]);
+        snprintf(n, sizeof(n), "%s%s%s", silbe1[rng_int() % SIL1], silbe2[rng_int() % SIL2], silbe3[rng_int() % SIL3]);
         if (rng_int() % 5 > 2) {
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }

@@ -13,6 +13,7 @@ endif (MSVC)
 
 INCLUDE (CheckSymbolExists)
 CHECK_SYMBOL_EXISTS(strlcat string.h HAVE_STRLCAT)
+CHECK_SYMBOL_EXISTS(strdup string.h HAVE_STRDUP)
 
 find_package (SQLite3)
 find_package (BerkeleyDB)
