@@ -1644,7 +1644,6 @@ static castorder * create_castorder_combat(castorder *co, fighter *fig, const sp
     return co;
 }
 
-#ifdef FFL_CURSED
 static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
     side *s;
     castorder *co;
@@ -1682,7 +1681,6 @@ static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
         }
     }
 }
-#endif
 
 void do_combatmagic(battle * b, combatmagic_t was)
 {
@@ -1694,11 +1692,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
     memset(spellranks, 0, sizeof(spellranks));
 
-#ifdef FFL_CURSED
     if (was == DO_PRECOMBATSPELL) {
         summon_igjarjuk(b, spellranks);
     }
-#endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
