@@ -111,3 +111,85 @@ function test_follow_ship()
     assert_equal(2, u1.region.x)
     assert_equal(2, u2.region.x)
 end
+
+function assert_nomove(text, u)
+    if text == nil then text = "" else text = text .. "; " end
+    local r = u.region
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(r, u.region, text .. "unit should never move")
+end
+
+function assert_capacity(text, u, silver, r1, r2, rx)
+    if text == nil then text = "" else text = text .. "; " end
+    if rx == nil then rx = r1 end
+    u.region = r1
+    u:add_item("money", silver-u:get_item("money"))
+    u:add_order("NACH O O")
+    process_orders()
+    assert_equal(r2, u.region, text .. "unit should move")
+
+    u.region = r1
+    u:add_item("money", 1)
+    process_orders()
+    assert_equal(rx, u.region, text .. "unit should not move")
+end
+
+function test_dwarf_example()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    local f = faction.create("dwarf", "dwarf@example.com", "de")
+    local u = unit.create(f, r1, 5)
+    u:add_item("horse", 5)
+    u:add_item("cart", 2)
+
+    -- 5 dwarves + 5 horse - 2 carts = 27 + 100 - 80 = 47.00
+    assert_capacity("dwarves", u, 4700, r1, r2)
+
+    u:set_skill("riding", 3)
+    assert_equal(1, u:eff_skill("riding"))
+    -- 5 dwarves + 5 horses + 2 carts = 327.00
+    assert_capacity("riding", u, 32700, r1, r2)
+
+end
+
+function test_troll_example()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local r3 = region.create(2, 0, "plain")
+    local f = faction.create("troll", "troll@example.com", "de")
+    local u1 = unit.create(f, r1, 3)
+
+    u1:add_item("cart", 1)
+    u1:clear_orders()
+
+    -- 3 trolls - 1 cart = 320, but not allowed?
+    assert_nomove("3 trolls", u1)
+
+    u1.number = 4
+
+    -- 4 trolls + 1 cart = 14320
+    assert_capacity("1 cart", u1, 14320, r1, r2)
+
+    
+    u1:add_item("horse", 4)
+    -- 4 horses, 4 trolls, 1 cart
+    assert_capacity("4 horses", u1, 22320, r1, r2)
+
+    
+    u1:add_item("cart", 1)
+
+    -- 4 horses + 4 trolls + 1 cart - 1 cart
+    assert_capacity("2 carts", u1, 18320, r1, r2)
+
+    u1:set_skill("riding", 3)
+    assert_equal(1, u1:eff_skill("riding"))
+
+    -- 4 horses + 4 trolls + 2 carts = 323.20
+    assert_capacity("walking", u1, 32320, r1, r2)
+
+    -- 4 horses + 2 carts - 4 trolls = 200.00
+    assert_capacity("riding", u1, 20000, r1, r3, r2)
+
+end
