@@ -56,7 +56,7 @@ unsigned int locale_index(const locale * lang)
 
 locale *get_locale(const char *name)
 {
-    unsigned int hkey = hashstring(name);
+    unsigned int hkey = str_hash(name);
     locale *l = locales;
     while (l && l->hashkey != hkey)
         l = l->next;
@@ -68,7 +68,7 @@ static unsigned int nextlocaleindex = 0;
 locale *get_or_create_locale(const char *name)
 {
     locale *l;
-    unsigned int hkey = hashstring(name);
+    unsigned int hkey = str_hash(name);
     locale **lp = &locales;
 
     if (!locales) {
@@ -120,7 +120,7 @@ void make_locales(const char *str)
 
 const char *locale_getstring(const locale * lang, const char *key)
 {
-    unsigned int hkey = hashstring(key);
+    unsigned int hkey = str_hash(key);
     unsigned int id = hkey & (SMAXHASH - 1);
     const struct locale_str *find;
 
@@ -150,7 +150,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
     assert(key);
 
     if (key != NULL) {
-        unsigned int hkey = hashstring(key);
+        unsigned int hkey = str_hash(key);
         unsigned int id = hkey & (SMAXHASH - 1);
         struct locale_str *find;
 
@@ -188,7 +188,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
 
 void locale_setstring(locale * lang, const char *key, const char *value)
 {
-    unsigned int hkey = hashstring(key);
+    unsigned int hkey = str_hash(key);
     unsigned int id = hkey & (SMAXHASH - 1);
     struct locale_str *find;
     if (!lang) {

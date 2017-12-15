@@ -516,7 +516,7 @@ static void report_crtypes(FILE * F, const struct locale *lang)
                 assert(hash > 0);
                 fprintf(F, "MESSAGETYPE %u\n", hash);
                 fputc('\"', F);
-                fputs(escape_string(nrt_string(nrt), buffer, sizeof(buffer)), F);
+                fputs(str_escape(nrt_string(nrt), buffer, sizeof(buffer)), F);
                 fputs("\";text\n", F);
                 fprintf(F, "\"%s\";section\n", nrt_section(nrt));
             }
@@ -1067,7 +1067,7 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
     const char *name =
         translate(mkname("spell", sp->sname), spell_name(sp, lang));
 
-    fprintf(F, "ZAUBER %d\n", hashstring(sp->sname));
+    fprintf(F, "ZAUBER %d\n", str_hash(sp->sname));
     fprintf(F, "\"%s\";name\n", name);
     fprintf(F, "%d;level\n", level);
     fprintf(F, "%d;rank\n", sp->rank);
@@ -1115,7 +1115,7 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
     assert(rtype);
     name = resourcename(rtype, NMF_PLURAL);
     assert(name);
-    buf += sprintf(buf, "RESOURCE %u\n", hashstring(rtype->_name));
+    buf += sprintf(buf, "RESOURCE %u\n", str_hash(rtype->_name));
     tname = LOC(loc, name);
     assert(tname);
     tname = translate(name, tname);
@@ -1663,7 +1663,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
         if (ptype == NULL)
             continue;
         ch = resourcename(ptype->itype->rtype, 0);
-        fprintf(F, "TRANK %d\n", hashstring(ch));
+        fprintf(F, "TRANK %d\n", str_hash(ch));
         fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
         fprintf(F, "%d;Stufe\n", ptype->level);
 

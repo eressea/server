@@ -1279,7 +1279,7 @@ int sp_appeasement(struct castorder * co)
     }
     /* und bewachen nicht */
     setguard(mage, false);
-    /* irgendwie den langen befehl sperren */
+    setstatus(mage, ST_FLEE);
 
     /* wir tun so, als w�re die Person geflohen */
     fi->flags |= FIG_NOLOOT;

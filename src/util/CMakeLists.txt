@@ -22,7 +22,6 @@ password.test.c
 # resolve.test.c
 rng.test.c
 strings.test.c
-bsdstring.test.c
 functions.test.c
 log.test.c
 # translation.test.c
@@ -60,6 +59,7 @@ unicode.c
 variant.c
 xml.c
 )
+
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
 ENDFOREACH(_FILE)

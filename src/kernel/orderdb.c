@@ -6,6 +6,7 @@
 
 #include <critbit.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,12 +15,15 @@ void odata_create(order_data **pdata, size_t len, const char *str)
     order_data *data;
     char *result;
 
+    assert(pdata);
     data = malloc(sizeof(order_data) + len + 1);
     data->_refcount = 1;
     result = (char *)(data + 1);
     data->_str = (len > 0) ? result : NULL;
-    if (str) strcpy(result, str);
-    if (pdata) *pdata = data;
+    if (str) {
+        strcpy(result, str);
+    }
+    *pdata = data;
 }
 
 void odata_release(order_data * od)

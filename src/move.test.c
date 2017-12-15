@@ -545,6 +545,52 @@ static void test_movement_speed(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_route_cycle(CuTest *tc) {
+    unit *u;
+    region *r;
+    struct locale *lang;
+    char buffer[32];
+
+    test_setup();
+    test_create_region(1, 0, NULL);
+    r = test_create_region(2, 0, NULL);
+    lang = test_create_locale();
+    CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
+    u = test_create_unit(test_create_faction(NULL), r);
+    u->faction->locale = lang;
+    CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
+    u->orders = create_order(K_ROUTE, u->faction->locale, "WEST EAST NW");
+    CuAssertStrEquals(tc, "route WEST EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
+    init_order(u->orders, u->faction->locale);
+    move_cmd(u, u->orders);
+    CuAssertIntEquals(tc, 1, u->region->x);
+    CuAssertStrEquals(tc, "route east nw west", get_command(u->orders, lang, buffer, sizeof(buffer)));
+    test_cleanup();
+}
+
+static void test_route_pause(CuTest *tc) {
+    unit *u;
+    region *r;
+    struct locale *lang;
+    char buffer[32];
+
+    test_setup();
+    test_create_region(1, 0, NULL);
+    r = test_create_region(2, 0, NULL);
+    lang = test_create_locale();
+    CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
+    u = test_create_unit(test_create_faction(NULL), r);
+    u->faction->locale = lang;
+    CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
+    u->orders = create_order(K_ROUTE, u->faction->locale, "PAUSE EAST NW");
+    CuAssertStrEquals(tc, "route PAUSE EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
+    init_order(u->orders, u->faction->locale);
+    move_cmd(u, u->orders);
+    CuAssertIntEquals(tc, 2, u->region->x);
+    CuAssertStrEquals(tc, "route PAUSE EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -570,5 +616,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
+    SUITE_ADD_TEST(suite, test_route_cycle);
+    SUITE_ADD_TEST(suite, test_route_pause);
     return suite;
 }

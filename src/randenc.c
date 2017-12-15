@@ -53,7 +53,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -62,10 +61,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 /* libc includes */
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <attributes/iceberg.h>
@@ -234,9 +233,9 @@ void find_manual(region * r, unit * u)
         break;
     }
 
-    slprintf(zLocation, sizeof(zLocation), "manual_location_%d",
+    snprintf(zLocation, sizeof(zLocation), "manual_location_%d",
         (int)(rng_int() % 4));
-    slprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
+    snprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
 
     msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
     if (msg) {

@@ -1,3 +1,4 @@
+require 'tests.e2.insects'
 require 'tests.e2.spells'
 require 'tests.e2.buildings'
 require 'tests.e2.production'

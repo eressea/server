@@ -34,7 +34,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 
 /* libc includes */
@@ -237,5 +236,5 @@ int default_score(const item_type *itype) {
 }
 
 void write_score(char *buffer, size_t size, score_t score) {
-    slprintf(buffer, size, "%lld", score);
+    snprintf(buffer, size, "%lld", score);
 }

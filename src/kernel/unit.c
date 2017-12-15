@@ -51,7 +51,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/strings.h>
@@ -1458,9 +1457,7 @@ void default_name(const unit *u, char name[], int len) {
     else {
         result = parameters[P_UNIT];
     }
-    strlcpy(name, result, len);
-    strlcat(name, " ", len);
-    strlcat(name, itoa36(u->no), len);
+    snprintf(name, len, "%s %s", result, itoa36(u->no));
 }
 
 void name_unit(unit * u)
@@ -1874,7 +1871,7 @@ static int nextbuf = 0;
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
     const char * name = unit_getname(u);
-    slprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
+    snprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
     buffer[size - 1] = 0;
     return buffer;
 }

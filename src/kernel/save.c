@@ -1429,7 +1429,7 @@ int read_game(gamedata *data)
         /* Burgen */
         READ_INT(store, &p);
         if (p > 0 && !r->land) {
-            log_error("%s, uid=%d has %d buildings", regionname(r, NULL), r->uid, p);
+            log_error("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p==1) ? "building" : "buildings");
         }
         bp = &r->buildings;
 
@@ -1569,14 +1569,12 @@ int writegame(const char *filename)
 
     create_directories();
     join_path(datapath(), filename, path, sizeof(path));
-#ifdef HAVE_UNISTD_H
     /* make sure we don't overwrite an existing file (hard links) */
-    if (remove(path)!=0) {
-        if (errno==ENOENT) {
+    if (remove(path) != 0) {
+        if (errno == ENOENT) {
             errno = 0;
         }
     }
-#endif
     F = fopen(path, "wb");
     if (!F) {
         perror(path);

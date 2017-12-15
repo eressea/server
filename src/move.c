@@ -78,6 +78,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -1042,15 +1043,6 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
 }
 
-static const char *shortdirections[MAXDIRECTIONS] = {
-    "dir_nw",
-    "dir_ne",
-    "dir_east",
-    "dir_se",
-    "dir_sw",
-    "dir_west"
-};
-
 static void cycle_route(order * ord, unit * u, int gereist)
 {
     int cm = 0;
@@ -1063,13 +1055,11 @@ static void cycle_route(order * ord, unit * u, int gereist)
     order *norder;
     size_t size = sizeof(tail) - 1;
 
-    if (getkeyword(ord) != K_ROUTE)
-        return;
+    assert(getkeyword(ord) == K_ROUTE);
     tail[0] = '\0';
+    neworder[0] = '\0';
+    init_order(ord, u->faction->locale);
 
-    init_order_depr(ord);
-
-    neworder[0] = 0;
     for (cm = 0;; ++cm) {
         const char *s;
         const struct locale *lang = u->faction->locale;
@@ -1092,6 +1082,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
             assert(!pause);
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
+                assert(loc);
                 if (bufp != tail) {
                     bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
                 }
@@ -1371,7 +1362,7 @@ static void make_route(unit * u, order * ord, region_list ** routep)
         current = next;
         s = gettoken(token, sizeof(token));
         error = movewhere(u, s, current, &next);
-        if (error) {
+        if (error != E_MOVE_OK) {
             message *msg = movement_error(u, s, ord, error);
             if (msg != NULL) {
                 add_message(&u->faction->msgs, msg);
@@ -1606,7 +1597,9 @@ static const region_list *travel_route(unit * u,
         int walkmode;
 
         setguard(u, false);
-        cycle_route(ord, u, steps);
+        if (getkeyword(ord) == K_ROUTE) {
+            cycle_route(ord, u, steps);
+        }
 
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
@@ -1936,7 +1929,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         unit *harbourmaster;
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
-        cycle_route(ord, u, step);
+        if (getkeyword(ord) == K_ROUTE) {
+            cycle_route(ord, u, step);
+        }
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
 
@@ -2026,7 +2021,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     region *r = u->region;
     int mp;
     if (u->building && !can_leave(u)) {
-        cmistake(u, u->thisorder, 150, MSG_MOVE);
+        cmistake(u, ord, 150, MSG_MOVE);
         return route_begin;
     }
     switch (canwalk(u)) {
@@ -2115,7 +2110,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 /** traveling without ships
  * walking, flying or riding units use this function
  */
-static void travel(unit * u, region_list ** routep)
+static void travel(unit * u, order *ord, region_list ** routep)
 {
     region *r = u->region;
     region_list *route_begin;
@@ -2129,7 +2124,7 @@ static void travel(unit * u, region_list ** routep)
         ship *sh = u->ship;
 
         if (!can_leave(u)) {
-            cmistake(u, u->thisorder, 150, MSG_MOVE);
+            cmistake(u, ord, 150, MSG_MOVE);
             return;
         }
 
@@ -2142,28 +2137,28 @@ static void travel(unit * u, region_list ** routep)
         if (sh) {
             unit *guard = is_guarded(r, u);
             if (guard) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "region_guarded", "guard", guard));
                 return;
             }
         }
         if (u->ship && u_race(u)->flags & RCF_SWIM) {
-            cmistake(u, u->thisorder, 143, MSG_MOVE);
+            cmistake(u, ord, 143, MSG_MOVE);
             return;
         }
     }
     else if (u->ship && fval(u->ship, SF_MOVED)) {
         /* die Einheit ist auf einem Schiff, das sich bereits bewegt hat */
-        cmistake(u, u->thisorder, 13, MSG_MOVE);
+        cmistake(u, ord, 13, MSG_MOVE);
         return;
     }
 
-    make_route(u, u->thisorder, routep);
+    make_route(u, ord, routep);
     route_begin = *routep;
 
     if (route_begin) {
         /* und ab die post: */
-        travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
+        travel_i(u, route_begin, NULL, ord, TRAVEL_NORMAL, &followers);
 
         /* followers */
         while (followers != NULL) {
@@ -2204,7 +2199,7 @@ void move_cmd(unit * u, order * ord)
         sail(u, ord, &route, drifting);
     }
     else {
-        travel(u, &route);
+        travel(u, ord, &route);
     }
 
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);

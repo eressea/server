@@ -50,7 +50,6 @@
 #include <util/lists.h>
 #include <util/rng.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 
 #include <storage.h>
 #include <lua.h>
@@ -58,6 +57,7 @@
 #include <assert.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 static int g_quit;
@@ -1228,7 +1228,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                strlcpy(locate, itoa36(f->no), sizeof(locate));
+                itoab_r(f->no, 36, locate, sizeof(locate));
                 findmode = 'f';
             }
             else {
@@ -1254,7 +1254,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                slprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
+                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(locate));
                 if (f == NULL) {

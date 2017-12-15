@@ -44,6 +44,7 @@ struct race *test_create_race(const char *name)
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
+    rc->flags |= RCF_WALK;
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
@@ -120,6 +121,7 @@ struct locale * test_create_locale(void) {
             locale_setstring(loc, alliance_kwd[i], alliance_kwd[i]);
         }
         for (i = 0; i != MAXDIRECTIONS; ++i) {
+            locale_setstring(loc, shortdirections[i], shortdirections[i] + 4);
             locale_setstring(loc, directions[i], directions[i]);
             init_direction(loc, i, directions[i]);
             init_direction(loc, i, coasts[i] + 7);

@@ -28,7 +28,6 @@ without prior permission by the authors of Eressea.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>
@@ -40,6 +39,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 alliance *alliances = NULL;
 
@@ -422,7 +422,7 @@ const char *alliancename(const alliance * al)
     char *ibuf = idbuf[(++nextbuf) % 8];
 
     if (al && al->name) {
-        slprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", al->name, itoa36(al->id));
+        snprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", al->name, itoa36(al->id));
     }
     else {
         return NULL;

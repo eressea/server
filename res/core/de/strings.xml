@@ -7337,8 +7337,8 @@
     </string>
 
     <string name="a_road_percent">
-      <text locale="de">eine zu %d%% vollendete Straße</text>
-      <text locale="en">a road that is %d%% complete</text>
+      <text locale="de">eine zu $percent%% vollendete Straße</text>
+      <text locale="en">a road that is $percent% complete</text>
     </string>
 
     <string name="a_road_connection">

@@ -718,6 +718,30 @@ static int tolua_unit_set_region(lua_State * L)
     return 0;
 }
 
+static int tolua_unit_get_order(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    int index = (int)tolua_tonumber(L, 2, -1);
+    order *ord = NULL;
+    if (index < 0) {
+        ord = self->thisorder;
+    }
+    else {
+        int i;
+        ord = self->orders;
+        for (i = 0; ord && i != index; ++i) {
+            ord = ord->next;
+        }
+    }
+    if (ord) {
+        char buffer[1024];
+        get_command(ord, self->faction->locale, buffer, sizeof(buffer));
+        lua_pushstring(L, buffer);
+        return 1;
+    }
+    return 0;
+}
+
 static int tolua_unit_add_order(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -972,6 +996,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "weight", tolua_unit_get_weight, 0);
             tolua_variable(L, TOLUA_CAST "capacity", tolua_unit_get_capacity, 0);
 
+            tolua_function(L, TOLUA_CAST "get_order", tolua_unit_get_order);
             tolua_function(L, TOLUA_CAST "add_order", tolua_unit_add_order);
             tolua_function(L, TOLUA_CAST "clear_orders", tolua_unit_clear_orders);
             tolua_function(L, TOLUA_CAST "get_curse", tolua_unit_get_curse);

@@ -25,9 +25,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value);
+    const char *str_escape(const char *str, char *buffer, size_t len);
     char *set_string(char **s, const char *neu);
-    unsigned int hashstring(const char *s);
-    const char *escape_string(const char *str, char *buffer, size_t len);
+    unsigned int str_hash(const char *s);
+    size_t str_slprintf(char * dst, size_t size, const char * format, ...);
+
     unsigned int jenkins_hash(unsigned int a);
     unsigned int wang_hash(unsigned int a);
 
@@ -48,6 +51,7 @@ extern "C" {
 
 #define HASH1 JENKINS_HASH1
 #define HASH2 JENKINS_HASH2
+#define slprintf str_slprintf
 
 #ifdef __cplusplus
 }

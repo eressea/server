@@ -69,6 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/parser.h>
+#include <util/strings.h>
 #include <selist.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -1643,7 +1644,6 @@ static castorder * create_castorder_combat(castorder *co, fighter *fig, const sp
     return co;
 }
 
-#ifdef FFL_CURSED
 static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
     side *s;
     castorder *co;
@@ -1681,7 +1681,6 @@ static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
         }
     }
 }
-#endif
 
 void do_combatmagic(battle * b, combatmagic_t was)
 {
@@ -1693,11 +1692,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
 
     memset(spellranks, 0, sizeof(spellranks));
 
-#ifdef FFL_CURSED
     if (was == DO_PRECOMBATSPELL) {
         summon_igjarjuk(b, spellranks);
     }
-#endif
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
@@ -2886,10 +2883,10 @@ static void print_header(battle * b)
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bufp = STRLCPY(bufp, ", ", size);
+                        strlcpy(bufp, ", ", size);
                     }
                     if (lastf) {
-                        bufp = STRLCPY(bufp, lastf, size);
+                        strlcpy(bufp, lastf, size);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -3579,7 +3576,7 @@ static int battle_report(battle * b)
                 if (komma) {
                     bufp = STRLCPY(bufp, ", ", size);
                 }
-                slprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
+                snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
                 
                 bufp = STRLCPY(bufp, buffer, size);

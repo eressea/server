@@ -262,7 +262,7 @@ static void dragon_name(unit * u)
         rnd = num_postfix / 6;
         rnd = (rng_int() % rnd) + ter * rnd;
     }
-    sprintf(zText, "dragon_postfix_%d", rnd);
+    snprintf(zText, sizeof(zText), "dragon_postfix_%d", rnd);
 
     str = locale_getstring(default_locale, zText);
     assert(str != NULL);
@@ -271,28 +271,25 @@ static void dragon_name(unit * u)
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
         /* TODO: localization */
-        sprintf(name, "Die %sn von %s", no_article + 1, rname(u->region,
+        snprintf(name, sizeof(name), "Die %sn von %s", no_article + 1, rname(u->region,
             default_locale));
     }
     else {
         char n[32];
-        size_t sz;
 
-        sz = strlcpy(n, silbe1[rng_int() % SIL1], sizeof(n));
-        sz += strlcat(n, silbe2[rng_int() % SIL2], sizeof(n));
-        sz += strlcat(n, silbe3[rng_int() % SIL3], sizeof(n));
+        snprintf(n, sizeof(n), "%s%s%s", silbe1[rng_int() % SIL1], silbe2[rng_int() % SIL2], silbe3[rng_int() % SIL3]);
         if (rng_int() % 5 > 2) {
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }
         else {
-            sz = strlcpy(name, (const char *)str, sizeof(name));  /* "Der Titel Name" */
+            if (rng_int() % 3 == 0) {
+                /* TODO: localization */
+                snprintf(name, sizeof(name), "%s %s von %s", n, str, rname(u->region, default_locale));
+            }
+            else {
+                snprintf(name, sizeof(name), "%s %s", n, str);
+            }
             name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
-            sz += strlcat(name, " ", sizeof(name));
-            sz += strlcat(name, n, sizeof(name));
-        }
-        if (rng_int() % 3 == 0) {
-            sz += strlcat(name, " von ", sizeof(name));
-            sz += strlcat(name, (const char *)rname(u->region, default_locale), sizeof(name));
         }
     }
 

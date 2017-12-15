@@ -33,4 +33,5 @@
     <entry spell="big_recruit" level="14" />
     <entry spell="calm_riot" level="14" />
     <entry spell="incite_riot" level="15" />
+  <entry spell="summon_familiar" level="9" />
 </spellbook>
