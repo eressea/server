@@ -1008,3 +1008,16 @@ function test_give_to_other_fails()
     assert_equal(2, u1.number)
     assert_equal(1, u2.number)
 end
+
+function test_demons_using_mallornlance()
+    -- bug 2392
+    local r = region.create(0, 0, "plain")
+    local f = faction.create('goblin')
+    local u = unit.create(f, r, 1, 'demon')
+    u:set_skill('taxation', 1)
+    u:set_skill('polearm', 4) -- demon has +1
+    u:add_item('mallornlance', 1)
+    u:add_order('BEWACHE')
+    process_orders()
+    assert_true(u.guard)
+end
