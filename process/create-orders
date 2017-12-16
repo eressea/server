@@ -16,13 +16,15 @@ else
   mv orders.dir orders.dir.$TURN
   mkdir -p orders.dir
 fi
-ls -1rt orders.dir.$TURN/turn-* | xargs cat > orders.$TURN
+find "orders.dir.$TURN" -maxdepth 1 -type f -printf "%T+\t%p\n" | sort | cut -f2 | while read
+do
+  cat "$REPLY" >> "orders.$TURN"
+done
 
 lockfile -r3 -l120 orders.queue.lock
 if [ -e orders.queue ] ; then
-  mv orders.queue orders.dir.$TURN/orders.queue
+  mv orders.queue "orders.dir.$TURN/orders.queue"
 fi
 rm -f orders.queue.lock
-fi
 
 
