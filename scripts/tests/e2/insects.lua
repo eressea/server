@@ -71,13 +71,3 @@ function test_recruit_in_desert()
     assert_equal('winter', get_season(get_turn()))
     assert_equal(2, u.number)
 end 
-
-function bug_1841_test_hunger_in_glacier()
-    local r = region.create(0, 0, "glacier")
-    local f = faction.create("insect", "insect@eressea.de", "de")
-    local u = unit.create(f, r, 1)
-
-    local flags = u.flags
-    process_orders()
-    assert_equal(flags+2048, u.flags)
-end 

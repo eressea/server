@@ -1607,7 +1607,7 @@ static void test_demon_hunger(CuTest * tc)
     u = test_create_unit(f, r);
     u->hp = 999;
 
-    config_set("hunger.demons.peasant_tolerance", "1");
+    config_set("hunger.demon.peasant_tolerance", "1");
 
     rtype = get_resourcetype(R_SILVER);
     i_change(&u->items, rtype->itype, 30);
@@ -1619,7 +1619,7 @@ static void test_demon_hunger(CuTest * tc)
     CuAssertIntEquals(tc, 20, i_get(u->items, rtype->itype));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "malnourish"));
 
-    config_set("hunger.demons.peasant_tolerance", "0");
+    config_set("hunger.demon.peasant_tolerance", "0");
 
     get_food(r);
 
