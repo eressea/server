@@ -1837,10 +1837,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there.. */
-                if (reason == SA_NO_INSECT) {
-                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
-                }
-                else if (check_leuchtturm(current_point, NULL)) {
+                if (check_leuchtturm(current_point, NULL)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {

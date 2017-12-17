@@ -90,8 +90,7 @@ extern "C" {
 
 #define SA_HARBOUR 1
 #define SA_COAST 0
-#define SA_NO_INSECT -1
-#define SA_NO_COAST -2
+#define SA_NO_COAST -1
 
     int check_ship_allowed(struct ship *sh, const struct region * r);
     direction_t drift_target(struct ship *sh);
