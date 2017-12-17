@@ -1429,7 +1429,7 @@ int read_game(gamedata *data)
         /* Burgen */
         READ_INT(store, &p);
         if (p > 0 && !r->land) {
-            log_error("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p==1) ? "building" : "buildings");
+            log_debug("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p==1) ? "building" : "buildings");
         }
         bp = &r->buildings;
 

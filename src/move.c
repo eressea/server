@@ -677,21 +677,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
     int c = 0;
     const building_type *bt_harbour = bt_find("harbour");
 
-    if (sh->region && r_insectstalled(r)) {
-        /* insekten dürfen nicht hier rein. haben wir welche? */
-        unit *u;
-
-        for (u = sh->region->units; u != NULL; u = u->next) {
-            if (u->ship != sh) {
-                continue;
-            }
-
-            if (is_freezing(u)) {
-                return SA_NO_INSECT;
-            }
-        }
-    }
-
     if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
         unit* harbourmaster = NULL;
         harbourmaster = owner_buildingtyp(r, bt_harbour);
@@ -1852,10 +1837,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there.. */
-                if (reason == SA_NO_INSECT) {
-                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
-                }
-                else if (check_leuchtturm(current_point, NULL)) {
+                if (check_leuchtturm(current_point, NULL)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {

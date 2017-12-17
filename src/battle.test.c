@@ -268,7 +268,7 @@ static void test_calculate_armor(CuTest * tc)
     ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
     achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE);
     rc = test_create_race("human");
     du = test_create_unit(test_create_faction(rc), r);
     dt.index = 0;
@@ -409,7 +409,7 @@ static void test_projectile_armor(CuTest * tc)
     ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
     achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
-    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE, 1);
+    wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE);
     rc = test_create_race("human");
     rc->battle_flags |= BF_EQUIPMENT;
     du = test_create_unit(test_create_faction(rc), r);

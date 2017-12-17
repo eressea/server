@@ -64,7 +64,7 @@ static void test_all_spy_message(CuTest *tc) {
     set_factionstealth(fix.victim, fix.spy->faction);
 
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&fix.victim->items, itype, 1);
 
     spy_message(99, fix.spy, fix.victim);

@@ -640,8 +640,6 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         if (!i_canuse(u, wtype->itype))
             return -1;
         skill = effskill(u, wtype->skill, 0);
-        if (skill < wtype->minskill)
-            skill = 0;
         if (skill > 0) {
             if (attacking) {
                 skill += u_race(u)->at_bonus;

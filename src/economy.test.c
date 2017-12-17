@@ -326,7 +326,7 @@ static void test_tax_cmd(CuTest *tc) {
     silver = get_resourcetype(R_SILVER)->itype;
 
     sword = test_create_itemtype("sword");
-    new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 1);
+    new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&u->items, sword, 1);
     set_level(u, SK_MELEE, 1);
 

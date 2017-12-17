@@ -536,6 +536,27 @@ static int tolua_region_get_age(lua_State * L)
     return 0;
 }
 
+static int tolua_region_get_peasants(lua_State * L)
+{
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+
+    if (self) {
+        lua_pushinteger(L, self->land ? self->land->peasants : 0);
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_region_set_peasants(lua_State * L)
+{
+    region *self = (region *)tolua_tousertype(L, 1, 0);
+
+    if (self && self->land) {
+        self->land->peasants = lua_tointeger(L, 2);
+    }
+    return 0;
+}
+
 static int tolua_region_getkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
@@ -734,6 +755,8 @@ void tolua_region_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "age", tolua_region_get_age, NULL);
             tolua_variable(L, TOLUA_CAST "buildings", tolua_region_get_buildings,
                 NULL);
+            tolua_variable(L, TOLUA_CAST "peasants", tolua_region_get_peasants,
+                tolua_region_set_peasants);
             tolua_variable(L, TOLUA_CAST "terrain", tolua_region_get_terrain,
                 tolua_region_set_terrain);
             tolua_function(L, TOLUA_CAST "get_resourcelevel",

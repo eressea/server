@@ -109,16 +109,27 @@ void get_food(region * r)
     plane *pl = rplane(r);
     unit *u;
     int peasantfood = rpeasants(r) * 10;
-    int food_rules = config_get_int("rules.food.flags", 0);
-    static const race *rc_demon;
-    static int rc_cache;
-    
+    static const race *rc_demon, *rc_insect;
+    static int rc_cache, config_cache;
+    static int food_rules;
+    static bool insect_hunger;
+    static bool demon_hunger;
+    bool is_cold;
+
     if (rc_changed(&rc_cache)) {
         rc_demon = get_race(RC_DAEMON);
+        rc_insect = get_race(RC_INSECT);
+    }
+    if (config_changed(&config_cache)) {
+        food_rules = config_get_int("rules.food.flags", 0);
+        insect_hunger = config_get_int("hunger.insect.cold", 1) != 0;
+        demon_hunger = config_get_int("hunger.demon.peasant_tolerance", 0) == 0;
     }
     if (food_rules & FOOD_IS_FREE) {
         return;
     }
+    is_cold = insect_hunger && r_insectstalled(r);
+
     /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
     * wird zun�chst so auf die Einheiten aufgeteilt, dass idealerweise
     * jede Einheit genug Silber f�r ihren Unterhalt hat. */
@@ -227,7 +238,8 @@ void get_food(region * r)
     * bei fehlenden Bauern den D�mon hungern lassen
     */
     for (u = r->units; u; u = u->next) {
-        if (u_race(u) == rc_demon) {
+        const race * rc = u_race(u);
+        if (rc == rc_demon) {
             int hungry = u->number;
 
             /* use peasantblood before eating the peasants themselves */
@@ -271,7 +283,6 @@ void get_food(region * r)
                     peasantfood = 0;
                 }
                 if (hungry > 0) {
-                    bool demon_hunger = config_get_int("hunger.demons.peasant_tolerance", 0) == 0;
                     if (demon_hunger) {
                         /* demons who don't feed are hungry */
                         if (hunger(hungry, u))
@@ -282,6 +293,12 @@ void get_food(region * r)
                         fset(u, UFL_HUNGER);
                     }
                 }
+            }
+        }
+        else if (is_cold && rc == rc_insect) {
+            /* insects in glaciers get hunger damage */
+            if (hunger(u->number, u)) {
+                fset(u, UFL_HUNGER);
             }
         }
     }

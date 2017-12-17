@@ -720,9 +720,9 @@ void setup_guard(guard_fixture *fix, bool armed) {
     if (armed) {
         item_type *itype;
         itype = it_get_or_create(rt_get_or_create("sword"));
-        new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
+        new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
         i_change(&u->items, itype, 1);
-        set_level(u, SK_MELEE, 2);
+        set_level(u, SK_MELEE, 1);
     }
     fix->u = u;
 }
@@ -786,11 +786,11 @@ static void test_monsters_can_guard(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_low_skill_cannot_guard(CuTest *tc) {
+static void test_unskilled_cannot_guard(CuTest *tc) {
     guard_fixture fix;
 
     setup_guard(&fix, true);
-    set_level(fix.u, SK_MELEE, 1);
+    set_level(fix.u, SK_MELEE, 0);
     CuAssertIntEquals(tc, E_GUARD_UNARMED, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
@@ -1607,7 +1607,7 @@ static void test_demon_hunger(CuTest * tc)
     u = test_create_unit(f, r);
     u->hp = 999;
 
-    config_set("hunger.demons.peasant_tolerance", "1");
+    config_set("hunger.demon.peasant_tolerance", "1");
 
     rtype = get_resourcetype(R_SILVER);
     i_change(&u->items, rtype->itype, 30);
@@ -1619,7 +1619,7 @@ static void test_demon_hunger(CuTest * tc)
     CuAssertIntEquals(tc, 20, i_get(u->items, rtype->itype));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "malnourish"));
 
-    config_set("hunger.demons.peasant_tolerance", "0");
+    config_set("hunger.demon.peasant_tolerance", "0");
 
     get_food(r);
 
@@ -1638,7 +1638,7 @@ static void test_armedmen(CuTest *tc) {
     test_setup();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     it_sword = test_create_itemtype("sword");
-    wtype = new_weapontype(it_sword, 0, frac_make(1, 2), 0, 0, 0, 0, SK_MELEE, 1);
+    wtype = new_weapontype(it_sword, 0, frac_make(1, 2), 0, 0, 0, 0, SK_MELEE);
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     CuAssertIntEquals(tc, 0, armedmen(u, true));
     set_level(u, SK_MELEE, 1);
@@ -1655,11 +1655,6 @@ static void test_armedmen(CuTest *tc) {
     set_level(u, SK_MELEE, 1);
     i_change(&u->items, it_sword, -1);
     CuAssertIntEquals(tc, 1, armedmen(u, false));
-    wtype->minskill = 2;
-    CuAssertIntEquals(tc, 0, armedmen(u, false));
-    set_level(u, SK_MELEE, 2);
-    CuAssertIntEquals(tc, 1, armedmen(u, false));
-    CuAssertIntEquals(tc, 1, armedmen(u, true));
     wtype->flags |= WTF_SIEGE;
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     CuAssertIntEquals(tc, 1, armedmen(u, true));
@@ -1806,7 +1801,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_unarmed_races_can_guard);
     SUITE_ADD_TEST(suite, test_monsters_can_guard);
     SUITE_ADD_TEST(suite, test_fleeing_cannot_guard);
-    SUITE_ADD_TEST(suite, test_low_skill_cannot_guard);
+    SUITE_ADD_TEST(suite, test_unskilled_cannot_guard);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd);
