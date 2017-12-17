@@ -187,7 +187,6 @@ extern "C" {
         char *damage[2];
         unsigned int flags;
         skill_t skill;
-        int minskill;
         int offmod;
         int defmod;
         variant magres;
@@ -232,7 +231,7 @@ extern "C" {
     luxury_type *new_luxurytype(item_type * itype, int price);
     weapon_type *new_weapontype(item_type * itype, int wflags,
         variant magres, const char *damage[], int offmod, int defmod, int reload,
-        skill_t sk, int minskill);
+        skill_t sk);
     armor_type *new_armortype(item_type * itype, double penalty,
         variant magres, int prot, unsigned int flags);
     potion_type *new_potiontype(item_type * itype, int level);

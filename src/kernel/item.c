@@ -271,11 +271,10 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 
 weapon_type *new_weapontype(item_type * itype,
     int wflags, variant magres, const char *damage[], int offmod, int defmod,
-    int reload, skill_t sk, int minskill)
+    int reload, skill_t sk)
 {
     weapon_type *wtype;
 
-    assert(minskill > 0);
     assert(itype && (!itype->rtype || !resource2weapon(itype->rtype)));
 
     wtype = calloc(sizeof(weapon_type), 1);
@@ -287,7 +286,6 @@ weapon_type *new_weapontype(item_type * itype,
     wtype->flags |= wflags;
     wtype->itype = itype;
     wtype->magres = magres;
-    wtype->minskill = minskill;
     wtype->offmod = offmod;
     wtype->reload = reload;
     wtype->skill = sk;
