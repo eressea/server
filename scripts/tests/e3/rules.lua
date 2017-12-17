@@ -1015,7 +1015,7 @@ function test_demons_using_mallornlance()
     local f = faction.create('goblin')
     local u = unit.create(f, r, 1, 'demon')
     u:set_skill('taxation', 1)
-    u:set_skill('polearm', 4) -- demon has +1
+    u:set_skill('polearm', 1)
     u:add_item('mallornlance', 1)
     u:add_order('BEWACHE')
     process_orders()

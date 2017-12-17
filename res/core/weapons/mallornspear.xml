@@ -4,7 +4,7 @@
     <construction skill="weaponsmithing" minskill="5">
       <requirement type="mallorn" quantity="1"/>
     </construction>
-    <weapon pierce="true" skill="polearm" minskill="5" offmod="0" defmod="0" magres="0.15">
+    <weapon pierce="true" skill="polearm" offmod="0" defmod="0" magres="0.15">
       <damage type="footman" value="1d10+1"/>
       <damage type="rider" value="1d12+3"/>
       <modifier type="skill" value="1" riding="true" against_riding="true" against_walking="true" offensive="true"/>
