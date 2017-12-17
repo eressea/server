@@ -34,7 +34,7 @@ function test_sail_into_glacier()
     u1:add_order("NACH OST")
     u2.ship = u1.ship
     process_orders()
-    assert_equal(r, u2.region)
+    assert_equal(r2, u2.region)
 end 
 
 function test_recruit_in_winter()
