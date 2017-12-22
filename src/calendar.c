@@ -44,9 +44,10 @@ const gamedate *get_gamedate(int turn, gamedate * gd)
     assert(gd);
     assert(t>=0);
 
+    gd->turn = turn;
     gd->week = t % weeks_per_month;       /* 0 - weeks_per_month-1 */
     gd->month = (t / weeks_per_month + first_month) % months_per_year;    /* 0 - months_per_year-1 */
-    gd->year = t / (weeks_per_year)+1;
+    gd->year = 1 + t / weeks_per_year;
     gd->season = month_season ? month_season[gd->month] : 0;
     return gd;
 }

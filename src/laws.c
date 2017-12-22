@@ -1297,10 +1297,6 @@ void quit(void)
         }
         else {
             ++f->age;
-            if (f->age + 1 < NewbieImmunity()) {
-                ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
-                    NewbieImmunity() - f->age - 1));
-            }
             fptr = &f->next;
         }
     }

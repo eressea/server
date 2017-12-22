@@ -267,7 +267,7 @@ static void dragon_name(unit * u)
     str = locale_getstring(default_locale, zText);
     assert(str != NULL);
 
-    if (u->number > 1) {
+    if (u->region->land && (u->number > 1)) {
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
         /* TODO: localization */
@@ -282,7 +282,7 @@ static void dragon_name(unit * u)
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }
         else {
-            if (rng_int() % 3 == 0) {
+            if (u->region->land && (rng_int() % 3 == 0)) {
                 /* TODO: localization */
                 snprintf(name, sizeof(name), "%s %s von %s", n, str, rname(u->region, default_locale));
             }

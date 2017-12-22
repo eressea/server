@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="nr_insectwinter" section="nr">
+    <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
+    <text locale="en">It is winter, and insects can only recruit in deserts or with the aid of nestwarmth potions.</text>
+  </message>
+  <message name="nr_insectfall" section="nr">
+    <text locale="de">Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können.</text>
+    <text locale="en">It is the last week before winter in which insects can still recruit.</text>
+  </message>
   <message name="newbie_info_game" section="events">
     <type>
       <arg name="subject" type="string"/>
@@ -7049,7 +7057,7 @@
     <text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
   </message>
 
-  <message name="newbieimmunity" section="events">
+  <message name="newbieimmunity" section="nr">
     <type>
       <arg name="turns" type="int"/>
     </type>

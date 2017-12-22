@@ -42,11 +42,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* gamecode includes */
 #include "alchemy.h"
+#include "calendar.h"
 #include "economy.h"
 #include "move.h"
 #include "upkeep.h"
 #include "vortex.h"
-#include "calendar.h"
 #include "teleport.h"
 
 /* kernel includes */
@@ -744,8 +744,13 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
                     newline(out);
                     sprintf(cat_identifier, "section_%s", section->name);
                     section_title = LOC(viewer->locale, cat_identifier);
-                    centre(out, section_title, true);
-                    newline(out);
+                    if (section_title) {
+                        centre(out, section_title, true);
+                        newline(out);
+                    }
+                    else {
+                        log_error("no title defined for section %s in locale %s", section->name, locale_name(viewer->locale));
+                    }
                     k = 1;
                 }
                 nr_render(m->msg, viewer->locale, lbuf, sizeof(lbuf), viewer);
@@ -2050,14 +2055,6 @@ report_plaintext(const char *filename, report_context * ctx,
     char buf[8192];
     char *bufp;
     size_t size;
-    int thisseason;
-    int nextseason;
-    gamedate date;
-
-    get_gamedate(turn + 1, &date);
-    thisseason = date.season;
-    get_gamedate(turn + 2, &date);
-    nextseason = date.season;
 
     if (F == NULL) {
         perror(filename);
@@ -2159,20 +2156,6 @@ report_plaintext(const char *filename, report_context * ctx,
         msg_release(msg);
         newline(out);
         centre(out, buf, true);
-    }
-
-    /* Insekten-Winter-Warnung */
-    if (f->race == get_race(RC_INSECT)) {
-        if (thisseason == 0) {
-            centre(out, LOC(f->locale, "nr_insectwinter"), true);
-            newline(out);
-        }
-        else {
-            if (nextseason == 0) {
-                centre(out, LOC(f->locale, "nr_insectfall"), true);
-                newline(out);
-            }
-        }
     }
 
     bufp = buf;
