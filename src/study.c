@@ -860,19 +860,28 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
 void demon_skillchange(unit *u)
 {
     skill *sv = u->skills;
-    int upchance = 15;
-    int downchance = 10;
+    int upchance = 15, downchance = 10;
+    static int config;
+    static bool rule_hunger;
+    static int cfgup, cfgdown;
+
+    if (config_changed(&config)) {
+        rule_hunger = config_get_int("hunger.demon.skills", 0) != 0;
+        cfgup = config_get_int("skillchange.demon.up", 15);
+        cfgdown = config_get_int("skillchange.demon.down", 10);
+    }
+    if (cfgup == 0) {
+        /* feature is disabled */
+        return;
+    }
+    upchance = cfgup;
+    downchance = cfgdown;
 
     if (fval(u, UFL_HUNGER)) {
         /* hungry demons only go down, never up in skill */
-        static int config;
-        static bool rule_hunger;
-        if (config_changed(&config)) {
-            rule_hunger = config_get_int("hunger.demon.skill", 0) != 0;
-        }
         if (rule_hunger) {
+            downchance = upchance;
             upchance = 0;
-            downchance = 15;
         }
     }
 
