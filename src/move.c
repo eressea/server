@@ -681,7 +681,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         /* insekten dürfen nicht hier rein. haben wir welche? */
         unit *u = ship_owner(sh);
 
-        if (is_freezing(u)) {
+        if (u && is_freezing(u)) {
             return SA_NO_INSECT;
         }
     }

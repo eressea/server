@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "reports.h"
+
+#include "calendar.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
@@ -1396,6 +1398,29 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     }
 }
 
+void report_warnings(faction *f, const gamedate *date)
+{
+    if (f->age < NewbieImmunity()) {
+        ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
+            NewbieImmunity() - f->age));
+    }
+
+    if (date) {
+        if (f->race == get_race(RC_INSECT)) {
+            if (date->season == 0) {
+                ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
+            }
+            else {
+                gamedate next;
+                get_gamedate(date->turn + 1, &next);
+                if (next.season == 0) {
+                    ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
+                }
+            }
+        }
+    }
+}
+
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential
@@ -1408,6 +1433,11 @@ void prepare_report(report_context *ctx, faction *f)
     static bool rule_region_owners;
     static bool rule_lighthouse_units;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
+    gamedate now;
+
+    /* Insekten-Winter-Warnung */
+    get_gamedate(turn, &now);
+    report_warnings(f, &now);
 
     if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
@@ -2193,6 +2223,19 @@ int count_travelthru(struct region *r, const struct faction *f) {
     data.f = f;
     travelthru_map(r, count_cb, &data);
     return data.n;
+}
+
+bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mode)
+{
+    if (u->faction == f) {
+        return true;
+    }
+    else {
+        if (stealthmod > INT_MIN && mode >= seen_unit) {
+            return cansee(f, u->region, u, stealthmod);
+        }
+    }
+    return false;
 }
 
 void register_reports(void)

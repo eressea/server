@@ -31,10 +31,9 @@ function setup()
 end
 
 function teardown()
-    set_rule("rules.move.owner_leave")
-    set_rule("rules.food.flags")
-    set_rule("rules.ship.drifting")
-    set_rule("rules.ship.storms")
+    for k,_ in pairs(settings) do
+        set_rule(k)
+    end
 end
 
 function test_calendar()
@@ -1011,6 +1010,8 @@ end
 
 function test_demons_using_mallornlance()
     -- bug 2392
+    set_rule("skillchange.demon.up", "0")
+    set_rule("NewbieImmunity", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create('goblin')
     local u = unit.create(f, r, 1, 'demon')
@@ -1019,5 +1020,9 @@ function test_demons_using_mallornlance()
     u:add_item('mallornlance', 1)
     u:add_order('BEWACHE')
     process_orders()
+    if not u.guard then
+        init_reports()
+        write_report(f)
+    end
     assert_true(u.guard)
 end

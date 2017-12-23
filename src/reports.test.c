@@ -1,12 +1,14 @@
 #include <platform.h>
 #include "reports.h"
 
-#include "move.h"
-#include "spy.h"
-#include "lighthouse.h"
-#include "travelthru.h"
+#include "calendar.h"
 #include "keyword.h"
+#include "lighthouse.h"
+#include "laws.h"
+#include "move.h"
 #include "spells.h"
+#include "spy.h"
+#include "travelthru.h"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -780,6 +782,66 @@ static void test_stealth_modifier(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_insect_warnings(CuTest *tc) {
+    faction *f;
+    gamedate gd;
+
+    /* OBS: in unit tests, get_gamedate always returns season = 0 */
+    test_setup();
+    f = test_create_faction(test_create_race("insect"));
+
+    gd.turn = 0;
+    gd.season = 3;
+    report_warnings(f, &gd);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
+
+    gd.season = 0;
+    report_warnings(f, &gd);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_cleanup();
+}
+
+static void test_newbie_warning(CuTest *tc) {
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(test_create_race("insect"));
+    config_set_int("NewbieImmunity", 3);
+
+    f->age = 2;
+    report_warnings(f, NULL);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunity"));
+    test_clear_messages(f);
+
+    f->age = 3;
+    report_warnings(f, NULL);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunity"));
+    test_clear_messages(f);
+
+    test_cleanup();
+}
+
+static void test_cansee_spell(CuTest *tc) {
+    unit *u2;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 0));
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_spell));
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_battle));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u2->region, u2, 0));
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 1));
+    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_spell));
+    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_battle));
+
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -807,5 +869,8 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_bufunit);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_arg_resources);
+    SUITE_ADD_TEST(suite, test_insect_warnings);
+    SUITE_ADD_TEST(suite, test_newbie_warning);
+    SUITE_ADD_TEST(suite, test_cansee_spell);
     return suite;
 }

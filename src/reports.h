@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct gamedate;
     struct selist;
     struct stream;
     struct seen_region;
@@ -116,6 +117,7 @@ extern "C" {
         int size, const struct faction *viewer, bool see_unit);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
+    void report_warnings(struct faction *f, const struct gamedate *date);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);
@@ -134,6 +136,8 @@ extern "C" {
 
     int count_travelthru(struct region *r, const struct faction *f);
     const char *get_mailcmd(const struct locale *loc);
+
+    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
