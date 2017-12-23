@@ -35,6 +35,7 @@
 #include <util/message.h>
 #include <races/races.h>
 
+#include <errno.h>
 #include <stdlib.h>
 
 void game_done(void)
@@ -65,6 +66,7 @@ void game_done(void)
 void game_init(void)
 {
     dblib_open();
+    errno = 0;
     kernel_init();
     register_triggers();
     register_xmas();
