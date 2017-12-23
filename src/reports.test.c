@@ -4,6 +4,7 @@
 #include "calendar.h"
 #include "keyword.h"
 #include "lighthouse.h"
+#include "laws.h"
 #include "move.h"
 #include "spells.h"
 #include "spy.h"
@@ -820,6 +821,27 @@ static void test_newbie_warning(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_cansee_spell(CuTest *tc) {
+    unit *u2;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(0);
+    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 0));
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_spell));
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_battle));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u2->region, u2, 0));
+    CuAssertTrue(tc, cansee(f, u2->region, u2, 1));
+    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_spell));
+    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_battle));
+
+    test_cleanup();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -849,5 +871,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_arg_resources);
     SUITE_ADD_TEST(suite, test_insect_warnings);
     SUITE_ADD_TEST(suite, test_newbie_warning);
+    SUITE_ADD_TEST(suite, test_cansee_spell);
     return suite;
 }

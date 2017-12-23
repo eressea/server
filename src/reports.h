@@ -137,7 +137,7 @@ extern "C" {
     int count_travelthru(struct region *r, const struct faction *f);
     const char *get_mailcmd(const struct locale *loc);
 
-    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod);
+    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

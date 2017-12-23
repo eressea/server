@@ -2225,16 +2225,14 @@ int count_travelthru(struct region *r, const struct faction *f) {
     return data.n;
 }
 
-bool visible_unit(const unit *u, const faction *f, int stealthmod)
+bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mode)
 {
     if (u->faction == f) {
         return true;
     }
     else {
-        const region *r = u->region;
-        seen_mode mode = r->seen.mode;
         if (stealthmod > INT_MIN && mode >= seen_unit) {
-            return cansee_ex(f, r, u, stealthmod, mode);
+            return cansee(f, u->region, u, stealthmod);
         }
     }
     return false;

@@ -1481,7 +1481,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         /* visible units */
         for (u = r->units; u; u = u->next) {
 
-            if (visible_unit(u, f, stealthmod)) {
+            if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                 cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }

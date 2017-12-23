@@ -2337,7 +2337,7 @@ report_plaintext(const char *filename, report_context * ctx,
             }
         }
         while (u && !u->ship) {
-            if (visible_unit(u, f, stealthmod)) {
+            if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                 nr_unit(out, f, u, 4, r->seen.mode);
             }
             assert(!u->building);
