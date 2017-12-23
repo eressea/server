@@ -1295,12 +1295,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
     int oc[4][2], o = 0;
     int uid = r->uid;
 
-#ifdef OCEAN_NEIGHBORS_GET_NO_ID
-    if (r->seen.mode <= seen_neighbour && !r->land) {
-        uid = 0;
-    }
-#endif
-
     if (opt_cr_absolute_coords) {
         nx = r->x;
         ny = r->y;
@@ -1487,8 +1481,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         /* visible units */
         for (u = r->units; u; u = u->next) {
 
-            if (u->building || u->ship || (stealthmod > INT_MIN
-                && cansee_ex(f, r, u, stealthmod, r->seen.mode))) {
+            if (visible_unit(u, f, stealthmod)) {
                 cr_output_unit_compat(F, r, f, u, r->seen.mode);
             }
         }
