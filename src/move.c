@@ -802,9 +802,14 @@ direction_t drift_target(ship *sh) {
 
 static void drifting_ships(region * r)
 {
-    bool drift = config_get_int("rules.ship.drifting", 1) != 0;
-    double damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    static int config;
+    static bool drift;
+    static double damage_drift;
 
+    if (config_changed(&config)) {
+        drift = config_get_int("rules.ship.drifting", 1) != 0;
+        damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    }
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
         while (*shp) {
@@ -872,8 +877,9 @@ static void drifting_ships(region * r)
                     damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 }
-                else
+                else {
                     damage_ship(sh, damage_drift);
+                }
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);

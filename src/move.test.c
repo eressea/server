@@ -281,8 +281,6 @@ void setup_drift (struct drift_fixture *fix) {
 static void test_ship_no_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
     setup_drift(&fix);
 
     fix.u->number = 2;
@@ -296,8 +294,6 @@ static void test_ship_no_overload(CuTest *tc) {
 static void test_ship_empty(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
     setup_drift(&fix);
     fix.u->ship = NULL;
     ship_update_owner(fix.sh);
@@ -310,10 +306,24 @@ static void test_ship_empty(CuTest *tc) {
     test_cleanup();
 }
 
-static void test_ship_normal_overload(CuTest *tc) {
+static void test_no_drift_damage(CuTest *tc) {
     struct drift_fixture fix;
 
+    setup_drift(&fix);
+    fix.u->ship = NULL;
+    ship_update_owner(fix.sh);
+
+    config_set("rules.ship.damage_drift", "0.0");
+    movement();
+    CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
+    CuAssertIntEquals(tc, 0, ship_damage_percent(fix.sh));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "ship_drift"));
+
     test_cleanup();
+}
+
+static void test_ship_normal_overload(CuTest *tc) {
+    struct drift_fixture fix;
 
     setup_drift(&fix);
 
@@ -329,8 +339,6 @@ static void test_ship_normal_overload(CuTest *tc) {
 static void test_ship_big_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
     setup_drift(&fix);
 
     fix.u->number = 22;
@@ -344,8 +352,6 @@ static void test_ship_big_overload(CuTest *tc) {
 
 static void test_ship_no_real_overload(CuTest *tc) {
     struct drift_fixture fix;
-
-    test_cleanup();
 
     setup_drift(&fix);
 
@@ -362,8 +368,6 @@ static void test_ship_no_real_overload(CuTest *tc) {
 static void test_ship_ridiculous_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
     setup_drift(&fix);
 
     fix.u->number = 500;
@@ -376,8 +380,6 @@ static void test_ship_ridiculous_overload(CuTest *tc) {
 
 static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     struct drift_fixture fix;
-
-    test_cleanup();
 
     setup_drift(&fix);
     set_level(fix.u, SK_SAILING, 0);
@@ -393,7 +395,6 @@ static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
 static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
     setup_drift(&fix);
 
     fix.u->number = 500;
@@ -607,6 +608,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);
     SUITE_ADD_TEST(suite, test_ship_empty);
+    SUITE_ADD_TEST(suite, test_no_drift_damage);
     SUITE_ADD_TEST(suite, test_ship_normal_overload);
     SUITE_ADD_TEST(suite, test_ship_no_real_overload);
     SUITE_ADD_TEST(suite, test_ship_big_overload);
