@@ -390,6 +390,12 @@ void test_translate_param(const struct locale *lang, param_t param, const char *
     add_translation(cb, text, param);
 }
 
+item_type *test_create_silver(void) {
+    item_type * itype;
+    itype = test_create_itemtype("money");
+    itype->weight = 1;
+    return itype;
+}
 
 item_type *test_create_horse(void) {
     item_type * itype;

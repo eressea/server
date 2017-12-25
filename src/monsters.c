@@ -1128,24 +1128,6 @@ void monster_kills_peasants(unit * u)
     }
 }
 
-faction *get_or_create_monsters(void)
-{
-    faction *f = findfaction(MONSTER_ID);
-    if (!f) {
-        const race *rc = rc_get_or_create("dragon");
-        const char *email = config_get("monster.email");
-        f = addfaction(email, NULL, rc, default_locale, 0);
-        renumber_faction(f, MONSTER_ID);
-        faction_setname(f, "Monster");
-        fset(f, FFL_NPC | FFL_NOIDLEOUT);
-    }
-    return f;
-}
-
-faction *get_monsters(void) {
-    return get_or_create_monsters();
-}
-
 void make_zombie(unit * u)
 {
     u_setfaction(u, get_monsters());

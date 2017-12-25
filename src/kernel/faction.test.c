@@ -3,6 +3,7 @@
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -11,6 +12,8 @@
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/password.h>
+
+#include <attributes/racename.h>
 
 #include "monsters.h"
 #include <CuTest.h>
@@ -250,6 +253,44 @@ static void test_set_email(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_items_notlost(CuTest *tc) {
+    unit *u, *ug;
+    race * rc;
+    struct item_type *itype, *it_silver, *it_horse;
+
+    test_setup();
+    it_horse = test_create_horse();
+    it_silver = test_create_silver();
+    itype = test_create_itemtype("banana");
+    itype->flags |= ITF_NOTLOST;
+    rc = test_create_race("template");
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    i_change(&u->items, itype, 1);
+    save_special_items(u);
+    CuAssertPtrNotNull(tc, u->next);
+    ug = u->next;
+    CuAssertPtrEquals(tc, NULL, ug->next);
+    CuAssertPtrEquals(tc, rc, (void *)ug->_race);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 1, i_get(ug->items, itype));
+    CuAssertStrEquals(tc, "ghost", get_racename(ug->attribs));
+
+    i_change(&u->items, itype, 1);
+    save_special_items(u);
+    CuAssertPtrEquals(tc, NULL, ug->next);
+    CuAssertIntEquals(tc, 2, i_get(ug->items, itype));
+    CuAssertPtrEquals(tc, NULL, u->items);
+
+    i_change(&u->items, itype, 1);
+    i_change(&u->items, it_horse, 5);
+    i_change(&u->items, it_silver, 10);
+    save_special_items(u);
+    CuAssertIntEquals(tc, 3, i_get(ug->items, itype));
+    CuAssertIntEquals(tc, 5, i_get(u->items, it_horse));
+    CuAssertIntEquals(tc, 10, i_get(u->items, it_silver));
+    test_cleanup();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -265,5 +306,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
+    SUITE_ADD_TEST(suite, test_items_notlost);
     return suite;
 }

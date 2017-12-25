@@ -50,6 +50,7 @@ extern "C" {
     struct unit *test_create_unit(struct faction *f, struct region *r);
     void test_create_world(void);
     struct item_type * test_create_horse(void);
+    struct item_type * test_create_silver(void);
     struct building * test_create_building(struct region * r, const struct building_type * btype);
     struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
     struct item_type * test_create_itemtype(const char * name);
