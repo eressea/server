@@ -225,7 +225,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
             if (!fval(u->faction, FFL_SELECT)) {
                 fset(u->faction, FFL_SELECT);
                 ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn",
-                    "region", r));
+                    "region", volcano));
             }
         }
         if (u == *up) {
