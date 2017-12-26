@@ -8,6 +8,22 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
+function test_water_of_life()
+    local r = region.create(0, 0, "plain")
+    r.name = "Fountain of Life"
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local trees = r:get_resource('tree')
+    u:add_item('p2', 1)
+    u:add_item('log', 10)
+    u:add_order("BENUTZE 1 'Wasser des Lebens'")
+    process_orders()
+    assert_equal(0, u:get_item('p2'))
+    assert_equal(5, u:get_item('log'))
+    process_orders()
+    assert_equal(trees+5, r:get_resource('tree'))
+end
+
 function test_give_horses()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")

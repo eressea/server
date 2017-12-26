@@ -11,6 +11,22 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
+function test_water_of_life()
+    local r = region.create(0, 0, "plain")
+    r.name = "Fountain of Life"
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local trees = r:get_resource('sapling')
+    u:add_item('p2', 1)
+    u:add_item('log', 10)
+    u:add_order("BENUTZE 1 'Wasser des Lebens'")
+    process_orders()
+    assert_equal(0, u:get_item('p2'))
+    assert_equal(0, u:get_item('log'))
+    process_orders()
+    assert_equal(trees+10, r:get_resource('sapling'))
+end
+
 function test_nestwarmth_insect()
     local r = region.create(0, 0, "plain")
     local f = faction.create("insect", "noreply@eressea.de", "de")
