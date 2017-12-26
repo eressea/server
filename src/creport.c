@@ -735,7 +735,6 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                /* TODO: no need to deref spref here, spref->name == sp->sname */
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
@@ -752,7 +751,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 * @param f observers faction
 * @param u unit to report
 */
-void cr_output_unit(stream *out, const region * r, const faction * f,
+void cr_output_unit(stream *out, const faction * f,
     const unit * u, seen_mode mode)
 {
     /* Race attributes are always plural and item attributes always
@@ -771,7 +770,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const struct locale *lang = f->locale;
 
     assert(u && u->number);
-    assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
+
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
@@ -996,13 +995,13 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     cr_output_curses(out, f, u, TYP_UNIT);
 }
 
-static void cr_output_unit_compat(FILE * F, const region * r, const faction * f,
+static void cr_output_unit_compat(FILE * F, const faction * f,
     const unit * u, int mode)
 {
     /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
-    cr_output_unit(&strm, r, f, u, mode);
+    cr_output_unit(&strm, f, u, mode);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1482,7 +1481,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         for (u = r->units; u; u = u->next) {
 
             if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                cr_output_unit_compat(F, r, f, u, r->seen.mode);
+                cr_output_unit_compat(F, f, u, r->seen.mode);
             }
         }
     }

@@ -385,14 +385,16 @@ static building *deleted_buildings;
 void remove_building(building ** blist, building * b)
 {
     unit *u;
-    const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
+    static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
+    static int btypes;
 
     assert(bfindhash(b->no));
 
-    bt_caravan = bt_find("caravan");
-    bt_dam = bt_find("dam");
-    bt_tunnel = bt_find("tunnel");
-
+    if (bt_changed(&btypes)) {
+        bt_caravan = bt_find("caravan");
+        bt_dam = bt_find("dam");
+        bt_tunnel = bt_find("tunnel");
+    }
     handle_event(b->attribs, "destroy", b);
     for (u = b->region->units; u; u = u->next) {
         if (u->building == b) leave(u, true);
@@ -404,7 +406,6 @@ void remove_building(building ** blist, building * b)
 
     /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
      * gebaute Strasse zur Haelfte vernichtet */
-    /* TODO: caravan, tunnel, dam modularization ? is_building_type ? */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;
