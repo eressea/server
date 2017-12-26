@@ -10,16 +10,16 @@ end
 
 function test_water_of_life()
     local r = region.create(0, 0, "plain")
-    r.name = "Fountain of Life"
     r:set_flag(1, false) -- no mallorn
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     local trees = r:get_resource('tree')
-    u:add_item('p2', 1)
+    u:add_item('p2', 2)
     u:add_item('log', 10)
     u:add_order("BENUTZE 1 'Wasser des Lebens'")
+    u:add_order("ZEIGE 'Wasser des Lebens'")
     process_orders()
-    assert_equal(0, u:get_item('p2'))
+    assert_equal(1, u:get_item('p2'))
     assert_equal(5, u:get_item('log'))
     process_orders()
     assert_equal(trees+5, r:get_resource('tree'))
