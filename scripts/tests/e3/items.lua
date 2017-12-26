@@ -11,6 +11,7 @@ end
 function test_water_of_life()
     local r = region.create(0, 0, "plain")
     r.name = "Fountain of Life"
+    r:set_flag(1, false) -- no mallorn
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     local trees = r:get_resource('tree')
