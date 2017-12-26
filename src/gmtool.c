@@ -565,7 +565,9 @@ static void terraform_at(coordinate * c, const terrain_type * terrain)
         if (r == NULL) {
             r = new_region(nx, ny, c->pl, 0);
         }
-        terraform_region(r, terrain);
+        if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
+            terraform_region(r, terrain);
+        }
     }
 }
 
@@ -589,7 +591,9 @@ terraform_selection(selection * selected, const terrain_type * terrain)
             if (r == NULL) {
                 r = new_region(nx, ny, pl, 0);
             }
-            terraform_region(r, terrain);
+            if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
+                terraform_region(r, terrain);
+            }
             tp = &t->nexthash;
         }
     }
