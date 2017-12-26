@@ -292,7 +292,12 @@ static void free_equipment(equipment *eq) {
         free(eq->items);
         eq->items = next;
     }
-    /* TODO: subsets, skills */
+    if (eq->subsets) {
+        for (i = 0; eq->subsets[i].sets; ++i) {
+            free(eq->subsets[i].sets);
+        }
+        free(eq->subsets);
+    }
     for (i = 0; i != MAXSKILLS; ++i) {
         free(eq->skills[i]);
     }
