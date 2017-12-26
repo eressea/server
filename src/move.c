@@ -1388,47 +1388,45 @@ int movement_speed(const unit * u)
     const race *rc = u_race(u);
     double dk = rc->speed;
     assert(u->number);
+
     /* dragons have a fixed speed, and no other effects work on them: */
-    if (fval(rc, RCF_DRAGON)) {
-        return BP_DRAGON;
-    }
-    switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON: /* FIXME: catdragon has RCF_DRAGON, so this cannot happen */
-    case RC_SONGDRAGON:
+    if (u_race(u) == get_race(RC_SONGDRAGON)) {
         mp = BP_DRAGON;
-        break;
-    default:
-        mp = walk_mode(u);
-        if (mp>=BP_RIDING) {
-            dk = 1.0;
+    }
+    else {
+        if (fval(rc, RCF_DRAGON)) {
+            mp = BP_DRAGON;
         }
-        break;
-    }
+        else {
+            mp = walk_mode(u);
+            if (mp >= BP_RIDING) {
+                dk = 1.0;
+            }
+            if (u->attribs) {
+                curse *c = get_curse(u->attribs, &ct_speed);
+                if (c != NULL) {
+                    int men = get_cursedmen(u, c);
+                    dk *= 1.0 + (double)men / (double)u->number;
+                }
+            }
 
-    if (u->attribs) {
-        curse *c = get_curse(u->attribs, &ct_speed);
-        if (c != NULL) {
-            int men = get_cursedmen(u, c);
-            dk *= 1.0 + (double)men / (double)u->number;
-        }
-    }
-
-    /* unicorn in inventory */
-    if (u->number <= i_get(u->items, it_find("fairyboot"))) {
-        mp *= 2;
-    }
-
-    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-        * Nicht kumulativ mit anderen Beschleunigungen! */
-    if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
-        sc_mage *mage = get_mage(u);
-        if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
-            if (has_skill(u, SK_MAGIC)) {
+            /* unicorn in inventory */
+            if (u->number <= i_get(u->items, it_find("fairyboot"))) {
                 mp *= 2;
+            }
+
+            /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+                * Nicht kumulativ mit anderen Beschleunigungen! */
+            if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
+                sc_mage *mage = get_mage(u);
+                if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
+                    if (has_skill(u, SK_MAGIC)) {
+                        mp *= 2;
+                    }
+                }
             }
         }
     }
-
     return (int)(dk * mp);
 }
 

@@ -592,10 +592,24 @@ static void test_route_pause(CuTest *tc) {
     test_cleanup();
 }
 
+static void test_movement_speed_dragon(CuTest *tc) {
+    unit *u;
+    race *rc;
+    test_setup();
+
+    rc = test_create_race("dragon");
+    rc->flags |= RCF_DRAGON;
+    rc->speed = 1.5;
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    CuAssertIntEquals(tc, 6, movement_speed(u));
+    test_cleanup();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_movement_speed);
+    SUITE_ADD_TEST(suite, test_movement_speed_dragon);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
