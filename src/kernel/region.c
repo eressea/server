@@ -1060,7 +1060,10 @@ void terraform_region(region * r, const terrain_type * terrain)
     rawmaterial **lrm = &r->resources;
 
     assert(terrain);
-
+    if (r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION)) {
+        log_error("region %s contains units, not terraforming it to %s.", regionname(r, NULL), terrain->_name);
+        return;
+    }
     while (*lrm) {
         rawmaterial *rm = *lrm;
         const resource_type *rtype = NULL;

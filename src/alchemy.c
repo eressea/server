@@ -170,12 +170,6 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     return amount;
 }
 
-static int potion_truth(unit *u) {
-    UNUSED_ARG(u);
-    /* TODO: this potion does nothing! */
-    return 1;
-}
-
 static int potion_power(unit *u, int amount) {
     int use = u->number / 10;
     if (use < amount) {
@@ -200,9 +194,6 @@ static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
     }
     else if (ptype == oldpotiontype[P_HORSE]) {
         return potion_luck(u, r, &at_horseluck, amount);
-    }
-    else if (ptype == oldpotiontype[P_WAHRHEIT]) {
-        return potion_truth(u);
     }
     else if (ptype == oldpotiontype[P_MACHT]) {
         return potion_power(u, amount);
