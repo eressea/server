@@ -88,7 +88,7 @@ int update_nmrs(void)
     }
     
     for (f = factions; f; f = f->next) {
-        if (fval(f, FFL_ISNEW)) {
+        if (f->age<=1) {
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
