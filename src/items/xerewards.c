@@ -67,15 +67,16 @@ int
 use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
     struct order *ord)
 {
-    int i, sp = 0;
+    int i, sp = 0, msp;
 
     if (!is_mage(u)) {
         cmistake(u, u->thisorder, 295, MSG_EVENT);
         return -1;
     }
 
+    msp = max_spellpoints(u->region, u) / 2;
     for (i = 0; i != amount; ++i) {
-        sp += MAX(25, max_spellpoints(u->region, u) / 2);
+        sp += MAX(25, msp);
         change_spellpoints(u, sp);
     }
 

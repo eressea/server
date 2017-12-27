@@ -2,17 +2,39 @@
 
 #include "xerewards.h"
 #include "study.h"
+#include "magic.h"
 
-#include <kernel/unit.h>
+#include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
 #include <kernel/region.h>
+#include <kernel/unit.h>
 
 #include <tests.h>
 #include <CuTest.h>
 
 static void test_manacrystal(CuTest *tc) {
+    struct item_type *itype;
+    unit *u;
     test_setup();
+
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    itype = test_create_itemtype("manacrystal");
+    change_resource(u, itype->rtype, 1);
+    CuAssertIntEquals(tc, -1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error295"));
+    test_clear_messages(u->faction);
+    create_mage(u, M_GRAY);
+    set_level(u, SK_MAGIC, 5);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    CuAssertIntEquals(tc, 1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertIntEquals(tc, 25, get_spellpoints(u));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "manacrystal_use"));
+    test_clear_messages(u->faction);
+    set_level(u, SK_MAGIC, 8);
+    CuAssertIntEquals(tc, 1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "manacrystal_use"));
+    CuAssertIntEquals(tc, 25 + 33, get_spellpoints(u));
     test_teardown();
 }
 
