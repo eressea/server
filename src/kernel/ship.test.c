@@ -438,7 +438,7 @@ static void test_shipspeed_speedy(CuTest *tc) {
     unit *cap, *crw;
     test_setup();
     stype = test_create_shiptype("dragonship");
-    stype->range = 2;
+    stype->range = 5;
     stype->range_max = -1;
     stype->flags |= SFL_SPEEDY;
     cap = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
@@ -449,7 +449,18 @@ static void test_shipspeed_speedy(CuTest *tc) {
     set_level(cap, SK_SAILING, stype->cptskill);
     set_level(crw, SK_SAILING, stype->sumskill - stype->cptskill);
     CuAssertPtrEquals(tc, cap, ship_owner(sh));
-    CuAssertIntEquals(tc, 2, shipspeed(sh, cap));
+    CuAssertIntEquals(tc, 5, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill * 3 - 1);
+    CuAssertIntEquals(tc, 5, shipspeed(sh, cap));
+    set_level(cap, SK_SAILING, stype->cptskill * 3);
+    CuAssertIntEquals(tc, 6, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill * 3 * 3 - 1);
+    CuAssertIntEquals(tc, 6, shipspeed(sh, cap));
+    set_level(cap, SK_SAILING, stype->cptskill * 3 * 3);
+    CuAssertIntEquals(tc, 7, shipspeed(sh, cap));
+
     test_teardown();
 }
 

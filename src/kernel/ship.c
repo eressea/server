@@ -288,12 +288,28 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    int level = config_get_int("movement.shipspeed.skillbonus", 0);
-    if (level > 0) {
-        ship *sh = u->ship;
+    const ship * sh = u->ship;
+    static int config;
+    static int bonus;
+
+    if (config_changed(&config)) {
+        bonus = config_get_int("movement.shipspeed.skillbonus", 0);
+    }
+    if (bonus > 0) {
         int skl = effskill(u, SK_SAILING, 0);
         int minsk = (sh->type->cptskill + 1) / 2;
-        return (skl - minsk) / level;
+        return (skl - minsk) / bonus;
+    }
+    else if (sh->type->flags & SFL_SPEEDY) {
+        int base = 3;
+        int speed = 0;
+        int minsk = sh->type->cptskill * base;
+        int skl = effskill(u, SK_SAILING, 0);
+        while (skl >= minsk) {
+            ++speed;
+            minsk *= base;
+        }
+        return speed;
     }
     return 0;
 }

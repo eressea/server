@@ -58,25 +58,20 @@ function test_speedy_ship_slow()
     u2:set_skill("sailing", 24) -- sumskill = 50
     u1.name = "XXX"
     u1:add_order("NACH O O O O O O O O O O")
-    print(u1.region)
     process_orders()
-    print(u1.region)
     assert_equal(5, u1.region.x)
 end
 
 function test_speedy_ship_fast()
     local r1 = region.create(0, 0, 'ocean')
     local f = faction.create("human")
-    f.name="Vikings"
     local u1 = unit.create(f, r1, 1)
-    u1.name = "Hagar"
     for x = 1, 10 do
         region.create(x, 0, 'ocean')
     end
     u1.ship = ship.create(r1, "dragonship")
-    u1:set_skill("sailing", 64) -- cptskill = 2^6
+    u1:set_skill("sailing", 54) -- cptskill = 2*3^3
     u1:add_order("NACH O O O O O O O O O O")
     process_orders()
-    print(f, get_turn())
-    assert_equal(10, u1.region.x)
+    assert_equal(8, u1.region.x)
 end
