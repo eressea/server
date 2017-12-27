@@ -63,6 +63,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     else {
         terraform_region(r, terrain);
     }
+    r->flags &= ~RF_MALLORN;
     rsettrees(r, 0, 0);
     rsettrees(r, 1, 0);
     rsettrees(r, 2, 0);
