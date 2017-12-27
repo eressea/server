@@ -3,6 +3,8 @@ require "lunit"
 module("tests.e2.ships", package.seeall, lunit.testcase)
 
 function setup()
+    eressea.game.reset()
+    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.damage.nocrewocean", "0")
     eressea.settings.set("rules.ship.damage.nocrew", "0")
     eressea.settings.set("rules.ship.drifting", "0")
@@ -27,7 +29,7 @@ end
 function test_ship_happy_case()
     local r1 = region.create(0, 0, "ocean")
     local r2 = region.create(1, 0, "ocean")
-    local f = faction.create("human", "hodor@eressea.de", "de")
+    local f = faction.create("human")
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f, r1, 1)
     u1.ship = ship.create(r1, "longboat")
@@ -42,9 +44,9 @@ function test_ship_happy_case()
     assert_equal(r2, u2.region)
 end
 
-function test_speedy_ship()
+function test_speedy_ship_slow()
     local r1 = region.create(0, 0, 'ocean')
-    local f = faction.create("human", "hodor@eressea.de", "de")
+    local f = faction.create("human")
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f, r1, 2)
     for x = 1, 10 do
@@ -52,9 +54,29 @@ function test_speedy_ship()
     end
     u1.ship = ship.create(r1, "dragonship")
     u2.ship = u1.ship
-    u1:set_skill("sailing", 2) -- cptskill = 2
+    u1:set_skill("sailing", 2) -- cptskill = 2^1
     u2:set_skill("sailing", 24) -- sumskill = 50
+    u1.name = "XXX"
+    u1:add_order("NACH O O O O O O O O O O")
+    print(u1.region)
+    process_orders()
+    print(u1.region)
+    assert_equal(5, u1.region.x)
+end
+
+function test_speedy_ship_fast()
+    local r1 = region.create(0, 0, 'ocean')
+    local f = faction.create("human")
+    f.name="Vikings"
+    local u1 = unit.create(f, r1, 1)
+    u1.name = "Hagar"
+    for x = 1, 10 do
+        region.create(x, 0, 'ocean')
+    end
+    u1.ship = ship.create(r1, "dragonship")
+    u1:set_skill("sailing", 64) -- cptskill = 2^6
     u1:add_order("NACH O O O O O O O O O O")
     process_orders()
-    assert_equal(5, u1.region.x)
+    print(f, get_turn())
+    assert_equal(10, u1.region.x)
 end
