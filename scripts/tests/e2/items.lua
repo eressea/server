@@ -23,7 +23,6 @@ function test_water_of_life()
     process_orders()
     assert_equal(0, u:get_item('p2'))
     assert_equal(0, u:get_item('log'))
-    process_orders()
     assert_equal(trees+10, r:get_resource('sapling'))
 end
 
