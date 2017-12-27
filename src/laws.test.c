@@ -309,7 +309,7 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
     ship *sh;
 
     test_setup();
-    r = test_create_region(0, 0, test_create_terrain("ocean", SEA_REGION));
+    r = test_create_ocean(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
     sh = test_create_ship(r, NULL);
@@ -323,94 +323,89 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
 
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    rtype = get_resourcetype(R_SILVER);
-    i_change(&u->items, rtype->itype, 42);
+    itype = test_create_silver();
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 1);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 2);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 3);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 32, i_get(u->items, itype));
     test_teardown();
 }
 
 static void test_fishing_does_not_give_goblins_money(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    rtype = get_resourcetype(R_SILVER);
+    itype = test_create_silver();
 
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    i_change(&u->items, rtype->itype, 42);
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 2);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
     test_teardown();
 }
 
 static void test_fishing_gets_reset(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    rtype = get_resourcetype(R_SILVER);
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    itype = test_create_silver();
+
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    i_change(&u->items, rtype->itype, 42);
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 1);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 1);
     get_food(r);
-    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 32, i_get(u->items, itype));
     test_teardown();
 }
 
