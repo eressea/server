@@ -40,7 +40,8 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
     register const char *s = src;
     register size_t n = siz;
 
-    assert(src && dst);
+    assert(src);
+    assert(dst);
     /* Copy as many bytes as will fit */
     if (n != 0 && --n != 0) {
         do {
