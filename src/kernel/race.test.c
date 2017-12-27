@@ -18,7 +18,7 @@ static void test_rc_name(CuTest *tc) {
     CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
     CuAssertStrEquals(tc, "race::human_d", rc_name_s(rc, NAME_DEFINITIVE));
     CuAssertStrEquals(tc, "race::human_x", rc_name_s(rc, NAME_CATEGORY));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_defaults(CuTest *tc) {
@@ -44,7 +44,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, rc->df_bonus);
     CuAssertIntEquals(tc, 0, rc->battle_flags);
     CuAssertIntEquals(tc, PERSON_WEIGHT, rc->weight);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_find(CuTest *tc) {
@@ -52,7 +52,7 @@ static void test_rc_find(CuTest *tc) {
     test_setup();
     rc = test_create_race("hungryhippos");
     CuAssertPtrEquals(tc, rc, (void *)rc_find("hungryhippos"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_race_get(CuTest *tc) {
@@ -68,7 +68,7 @@ static void test_race_get(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)rc, (void *)rc_find("elf"));
     free_races();
     CuAssertTrue(tc, rc_changed(&cache));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_old_race(CuTest *tc)
@@ -83,7 +83,7 @@ static void test_old_race(CuTest *tc)
     rc2 = test_create_race("human");
     CuAssertIntEquals(tc, RC_ELF, old_race(rc1));
     CuAssertIntEquals(tc, RC_HUMAN, old_race(rc2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_set_param(CuTest *tc) {
@@ -100,7 +100,7 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertIntEquals(tc, 400, rc_scare(rc));
     rc_set_param(rc, "hunger.damage", "1d10+12");
     CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_can_use(CuTest *tc) {
@@ -148,7 +148,7 @@ static void test_rc_can_use(CuTest *tc) {
     rc->mask_item = 0;
     CuAssertTrue(tc, ! rc_can_use(rc, itype));
     
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_race_suite(void)

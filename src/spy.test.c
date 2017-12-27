@@ -48,7 +48,7 @@ static void test_simple_spy_message(CuTest *tc) {
 
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_all_spy_message(CuTest *tc) {
@@ -75,7 +75,7 @@ static void test_all_spy_message(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_faction"));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyreport_items"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_sabotage_self(CuTest *tc) {
@@ -95,7 +95,7 @@ static void test_sabotage_self(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 
@@ -125,7 +125,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     CuAssertStrEquals(tc, "destroy_ship_3", test_get_messagetype(msg));
     CuAssertPtrNotNull(tc, r->ships);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_setstealth_cmd(CuTest *tc) {
@@ -146,7 +146,7 @@ static void test_setstealth_cmd(CuTest *tc) {
         LOC(lang, parameters[P_FACTION]));
     setstealth_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, UFL_SIEGE | UFL_ANON_FACTION, u->flags);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_setstealth_demon(CuTest *tc) {
@@ -163,7 +163,7 @@ static void test_setstealth_demon(CuTest *tc) {
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
     setstealth_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, (void *)rc, (void *)u->irace);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_setstealth_demon_bad(CuTest *tc) {
@@ -180,7 +180,7 @@ static void test_setstealth_demon_bad(CuTest *tc) {
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
     setstealth_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, (void *)u->irace);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_sabotage_other_success(CuTest *tc) {
@@ -205,7 +205,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_spy_suite(void)

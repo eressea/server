@@ -54,7 +54,7 @@ static void test_good_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "good dreams give +1 to allies", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "good dreams have no effect on non-allies", 0, get_modifier(u2, SK_MELEE, 11, r, false));
     free_castorder(&co);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_dreams(CuTest *tc) {
@@ -63,9 +63,8 @@ static void test_dreams(CuTest *tc) {
     unit *u1, *u2;
     castorder co;
 
-    test_cleanup();
-    test_create_world();
-    r = findregion(0, 0);
+    test_setup();
+    r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
     u1 = test_create_unit(f1, r);
@@ -80,7 +79,7 @@ static void test_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "bad dreams in same region as good dreams", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
     free_castorder(&co);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_bad_dreams(CuTest *tc) {
@@ -112,7 +111,7 @@ static void test_bad_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "bad dreams give -1 to non-allies", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
     free_castorder(&co);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_view_reality(CuTest *tc) {
@@ -146,7 +145,7 @@ static void test_view_reality(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(ra->individual_messages->msgs, "viewreality_effect"));
     free_castorder(&co);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_watch_region(CuTest *tc) {
@@ -162,7 +161,7 @@ static void test_watch_region(CuTest *tc) {
     CuAssertIntEquals(tc, 10, get_observer(r, f));
     CuAssertIntEquals(tc, RF_OBSERVER, fval(r, RF_OBSERVER));
     CuAssertPtrNotNull(tc, r->attribs);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_spells_suite(void)

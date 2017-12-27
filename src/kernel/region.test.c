@@ -31,7 +31,7 @@ void test_terraform(CuTest *tc) {
     CuAssertIntEquals(tc, 0, r->land->demands->type->price);
     terraform_region(r, t_ocean);
     CuAssertPtrEquals(tc, 0, r->land);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_region_get_owner(CuTest *tc) {
@@ -50,7 +50,7 @@ static void test_region_get_owner(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(0), r);
     u_set_building(u2, b2);
     CuAssertPtrEquals(tc, u2->faction, region_get_owner(r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_region_getset_resource(CuTest *tc) {
@@ -75,7 +75,7 @@ static void test_region_getset_resource(CuTest *tc) {
     CuAssertIntEquals(tc, 10, region_getresource(r, get_resourcetype(R_PEASANT)));
     CuAssertIntEquals(tc, 10, rpeasants(r));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_trees(CuTest *tc) {
@@ -93,7 +93,7 @@ static void test_trees(CuTest *tc) {
     CuAssertIntEquals(tc, MAXTREES, rtrees(r, 0));
     rsettrees(r, 0, MAXTREES+100);
     CuAssertIntEquals(tc, MAXTREES, rtrees(r, 0));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_region_suite(void)

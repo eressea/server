@@ -42,7 +42,7 @@ static void test_readwrite_data(CuTest * tc)
     CuAssertIntEquals(tc, 0, readgame(filename));
     join_path(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_unit(CuTest * tc)
@@ -88,7 +88,7 @@ static void test_readwrite_unit(CuTest * tc)
     mstream_done(&data.strm);
     gamedata_done(&data);
     move_unit(u, r, NULL); /* this makes sure that u doesn't leak */
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_faction(CuTest * tc)
@@ -117,7 +117,7 @@ static void test_readwrite_faction(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_region(CuTest * tc)
@@ -149,7 +149,7 @@ static void test_readwrite_region(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_building(CuTest * tc)
@@ -182,7 +182,7 @@ static void test_readwrite_building(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_ship(CuTest * tc)
@@ -215,7 +215,7 @@ static void test_readwrite_ship(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_attrib(CuTest *tc) {
@@ -240,7 +240,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     CuAssertIntEquals(tc, 43, key_get(a, 42));
     a_removeall(&a, NULL);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_group(CuTest *tc) {
@@ -255,7 +255,7 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
@@ -288,7 +288,7 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, g->allies);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
@@ -320,7 +320,7 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     r = regions;
     CuAssertPtrNotNull(tc, r);
     CuAssertPtrEquals(tc, 0, region_get_owner(r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
@@ -331,7 +331,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     trigger *tr;
     unit * u;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     f2 = test_create_faction(0);
     u = test_create_unit(f2, r = test_create_region(0, 0, 0));
@@ -357,7 +357,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     u = r->units;
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_createunit(CuTest *tc) {
@@ -368,7 +368,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     trigger *tr;
     unit * u;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     f2 = test_create_faction(0);
     u = test_create_unit(f2, r = test_create_region(0, 0, 0));
@@ -394,7 +394,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     u = r->units;
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_read_password(CuTest *tc) {
@@ -413,7 +413,7 @@ static void test_read_password(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_read_password_external(CuTest *tc) {
@@ -452,7 +452,7 @@ static void test_read_password_external(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertIntEquals(tc, 0, remove(pwfile));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_version_no(CuTest *tc) {

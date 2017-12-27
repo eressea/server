@@ -102,7 +102,7 @@ static void test_study_no_teacher(CuTest *tc) {
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
     CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_with_teacher(CuTest *tc) {
@@ -117,7 +117,7 @@ static void test_study_with_teacher(CuTest *tc) {
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 1, sv->weeks);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_with_bad_teacher(CuTest *tc) {
@@ -131,7 +131,7 @@ static void test_study_with_bad_teacher(CuTest *tc) {
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_bug_2194(CuTest *tc) {
@@ -177,7 +177,7 @@ static void test_study_bug_2194(CuTest *tc) {
     teach_cmd(u, u->thisorder);
     learn_reset();
     CuAssertIntEquals(tc, 0, log_size);
-    test_cleanup();
+    test_teardown();
 }
 
 static CuTest *g_tc;
@@ -202,7 +202,7 @@ static void test_produceexp(CuTest *tc) {
     config_set("study.produceexp", "20");
     produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
     produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_academy_building(CuTest *tc) {
@@ -248,7 +248,7 @@ static void test_academy_building(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, u1->number, log_learners[0].days);
-    test_cleanup();
+    test_teardown();
 }
 
 /*
@@ -311,7 +311,7 @@ static void test_academy_bonus(CuTest *tc) {
     CuAssertPtrEquals(tc, u3, log_learners[3].u);
     CuAssertIntEquals(tc, 160, log_learners[3].days);
     learn_reset();
-    test_cleanup();
+    test_teardown();
 }
 
 void test_learn_skill_single(CuTest *tc) {
@@ -330,7 +330,7 @@ void test_learn_skill_single(CuTest *tc) {
     learn_skill(u, SK_ALCHEMY, STUDYDAYS * 2);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    test_cleanup();
+    test_teardown();
 }
 
 void test_learn_skill_multi(CuTest *tc) {
@@ -350,7 +350,7 @@ void test_learn_skill_multi(CuTest *tc) {
     learn_skill(u, SK_ALCHEMY, STUDYDAYS  * u->number * 2);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_demon_skillchanges(CuTest *tc) {
@@ -364,7 +364,7 @@ static void test_demon_skillchanges(CuTest *tc) {
     set_level(u, SK_CROSSBOW, 1);
     demon_skillchange(u);
     /* TODO: sensing here */
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_cmd(CuTest *tc) {
@@ -379,7 +379,7 @@ static void test_study_cmd(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS, log_learners[0].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_magic(CuTest *tc) {
@@ -421,7 +421,7 @@ static void test_study_magic(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
     */
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_cost(CuTest *tc) {
@@ -442,7 +442,7 @@ static void test_study_cost(CuTest *tc) {
     CuAssertIntEquals(tc, SK_ALCHEMY, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS * u->number, log_learners[0].days);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_magic(CuTest *tc) {
@@ -470,7 +470,7 @@ static void test_teach_magic(CuTest *tc) {
     CuAssertIntEquals(tc, SK_MAGIC, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS * 2, log_learners[0].days);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_cmd(CuTest *tc) {
@@ -490,7 +490,7 @@ static void test_teach_cmd(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS * 2 * u->number, log_learners[0].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_two(CuTest *tc) {
@@ -517,7 +517,7 @@ static void test_teach_two(CuTest *tc) {
     CuAssertPtrEquals(tc, u2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[1].sk);
     CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_two_skills(CuTest *tc) {
@@ -550,7 +550,7 @@ static void test_teach_two_skills(CuTest *tc) {
     CuAssertPtrEquals(tc, u2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_ENTERTAINMENT, log_learners[1].sk);
     CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_one_to_many(CuTest *tc) {
@@ -570,7 +570,7 @@ static void test_teach_one_to_many(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS * 10 + STUDYDAYS * u->number, log_learners[0].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_many_to_one(CuTest *tc) {
@@ -595,7 +595,7 @@ static void test_teach_many_to_one(CuTest *tc) {
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, 2 * STUDYDAYS * u->number, log_learners[0].days);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_message(CuTest *tc) {
@@ -636,7 +636,7 @@ static void test_teach_message(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "teach_student"));
     a = a_find(u->attribs, &at_learning);
     CuAssertPtrEquals(tc, NULL, a);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_teach_many_to_many(CuTest *tc) {
@@ -674,7 +674,7 @@ static void test_teach_many_to_many(CuTest *tc) {
     CuAssertPtrEquals(tc, s2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[1].sk);
     CuAssertIntEquals(tc, 2 * STUDYDAYS * s2->number, log_learners[1].days);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_study_suite(void)

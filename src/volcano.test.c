@@ -31,7 +31,7 @@ static void test_volcano_update(CuTest *tc) {
     CuAssertPtrEquals(tc, r, m->parameters[0].v);
     CuAssertPtrEquals(tc, (void *)t_volcano, (void *)r->terrain);
     
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_volcano_outbreak(CuTest *tc) {
@@ -78,7 +78,7 @@ static void test_volcano_outbreak(CuTest *tc) {
     CuAssertPtrEquals(tc, u2, m->parameters[0].v);
     CuAssertPtrEquals(tc, r, m->parameters[1].v);
     CuAssertIntEquals(tc, 1, m->parameters[2].i);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_volcano_suite(void)

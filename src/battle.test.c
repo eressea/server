@@ -65,7 +65,7 @@ static void test_make_fighter(CuTest * tc)
     CuAssertIntEquals(tc, 1, af->horses);
     CuAssertIntEquals(tc, 0, af->elvenhorses);
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static building_type * setup_castle(void) {
@@ -124,7 +124,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_attackers_get_no_building_bonus(CuTest * tc)
@@ -153,7 +153,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
 
     CuAssertPtrEquals(tc, 0, af->building);
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_building_bonus_respects_size(CuTest * tc)
@@ -190,7 +190,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     CuAssertPtrEquals(tc, bld, af->building);
     CuAssertPtrEquals(tc, 0, df->building);
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_building_defence_bonus(CuTest * tc)
@@ -214,7 +214,7 @@ static void test_building_defence_bonus(CuTest * tc)
     CuAssertIntEquals(tc, 1, building_protection(btype, 1));
     CuAssertIntEquals(tc, 2, building_protection(btype, 2));
     CuAssertIntEquals(tc, 2, building_protection(btype, 3));
-    test_cleanup();
+    test_teardown();
 }
 
 static fighter *setup_fighter(battle **bp, unit *u) {
@@ -245,7 +245,7 @@ static void test_natural_armor(CuTest * tc)
     rc_set_param(rc, "armor.stamina", "2");
     CuAssertIntEquals(tc, 2, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 1, natural_armor(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_calculate_armor(CuTest * tc)
@@ -316,7 +316,7 @@ static void test_calculate_armor(CuTest * tc)
     CuAssertIntEquals_Msg(tc, "laen armor", 3, calculate_armor(dt, 0, 0, &magres));
     CuAssertIntEquals_Msg(tc, "laen magres bonus", 4, magres.sa[1]);
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_magic_resistance(CuTest *tc)
@@ -388,7 +388,7 @@ static void test_magic_resistance(CuTest *tc)
     CuAssert(tc, "damage reduction is never < 0.1", frac_equal(magres, frac_make(1, 10)));
 
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_projectile_armor(CuTest * tc)
@@ -427,7 +427,7 @@ static void test_projectile_armor(CuTest * tc)
     wtype->flags = WTF_NONE;
     CuAssertIntEquals_Msg(tc, "no projectiles", 4, calculate_armor(dt, 0, wtype, 0));
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_battle_skilldiff(CuTest *tc)
@@ -461,7 +461,7 @@ static void test_battle_skilldiff(CuTest *tc)
     /* TODO: weapon modifiers, missiles, skill_formula */
 
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_battle_skilldiff_building(CuTest *tc)
@@ -496,36 +496,37 @@ static void test_battle_skilldiff_building(CuTest *tc)
     CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
 
     free_battle(b);
-    test_cleanup();
+    test_teardown();
 }
 
 static void assert_skill(CuTest *tc, char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
 {
-  skill *sv = unit_skill(u, sk);
-  char buf[256];
-  if (sv) {
-    sprintf(buf, "%s level %d != %d", msg, sv->level, level);
-    CuAssertIntEquals_Msg(tc, (const char *)&buf, level, sv->level);
-    sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);
-    CuAssert(tc, (const char *)&buf, sv->weeks >= week && sv->weeks <=weekmax);
-  } else {
-    CuAssertIntEquals_Msg(tc, msg, level, 0);
-    CuAssertIntEquals_Msg(tc, msg, week, 0);
-  }    
+    skill *sv = unit_skill(u, sk);
+    char buf[256];
+    if (sv) {
+        sprintf(buf, "%s level %d != %d", msg, sv->level, level);
+        CuAssertIntEquals_Msg(tc, (const char *)&buf, level, sv->level);
+        sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);
+        CuAssert(tc, (const char *)&buf, sv->weeks >= week && sv->weeks <= weekmax);
+    }
+    else {
+        CuAssertIntEquals_Msg(tc, msg, level, 0);
+        CuAssertIntEquals_Msg(tc, msg, week, 0);
+    }
 }
 
-static void test_drain_exp(CuTest *tc) 
+static void test_drain_exp(CuTest *tc)
 {
     unit *u;
     char *msg;
     int i;
     double rand;
-    
+
     test_setup();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     set_level(u, SK_STAMINA, 3);
-    
+
     CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);
     CuAssertIntEquals(tc, 4, unit_skill(u, SK_STAMINA)->weeks);
 
@@ -533,46 +534,47 @@ static void test_drain_exp(CuTest *tc)
     assert_skill(tc, msg, u, SK_STAMINA, 3, 4, 4);
     assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
-    for (i=0; i<10; ++i) {
-    set_level(u, SK_STAMINA, 3);
-    drain_exp(u, 0);
-    assert_skill(tc, msg = "0 change", u, SK_STAMINA, 3, 4, 4);
-    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+    for (i = 0; i < 10; ++i) {
+        set_level(u, SK_STAMINA, 3);
+        drain_exp(u, 0);
+        assert_skill(tc, msg = "0 change", u, SK_STAMINA, 3, 4, 4);
+        assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
-    for (rand = 0.0; rand < 2.0; rand += 1) {
-      random_source_inject_constant(rand);
+        for (rand = 0.0; rand < 2.0; rand += 1) {
+            random_source_inject_constant(rand);
 
-      set_level(u, SK_STAMINA, 3);
-      drain_exp(u, 29);
-    
-      assert_skill(tc, msg = "no change yet", u, SK_STAMINA, 3, 4, rand == 0.0?4:5);
-      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
-      
-      set_level(u, SK_STAMINA, 3);
-      drain_exp(u, 1);
-      
-      assert_skill(tc, msg = "random change", u, SK_STAMINA, 3, 4, rand == 0.0?4:5);
-      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+            set_level(u, SK_STAMINA, 3);
+            drain_exp(u, 29);
 
-      set_level(u, SK_STAMINA, 3);
-      drain_exp(u, 30);
-      
-      assert_skill(tc, msg = "plus one", u, SK_STAMINA, 3, 5, 5);
-      assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+            assert_skill(tc, msg = "no change yet", u, SK_STAMINA, 3, 4, rand == 0.0 ? 4 : 5);
+            assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+            set_level(u, SK_STAMINA, 3);
+            drain_exp(u, 1);
+
+            assert_skill(tc, msg = "random change", u, SK_STAMINA, 3, 4, rand == 0.0 ? 4 : 5);
+            assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+            set_level(u, SK_STAMINA, 3);
+            drain_exp(u, 30);
+
+            assert_skill(tc, msg = "plus one", u, SK_STAMINA, 3, 5, 5);
+            assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+        }
+
+        set_level(u, SK_STAMINA, 3);
+        drain_exp(u, 90);
+
+        assert_skill(tc, msg = "plus three", u, SK_STAMINA, 3, 7, 7);
+        assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
+
+        set_level(u, SK_STAMINA, 3);
+        drain_exp(u, 120);
+
+        assert_skill(tc, msg = "plus four", u, SK_STAMINA, 2, 5, 5);
+        assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
     }
-    
-    set_level(u, SK_STAMINA, 3);
-    drain_exp(u, 90);
-    
-    assert_skill(tc, msg = "plus three", u, SK_STAMINA, 3, 7, 7);
-    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
-    
-    set_level(u, SK_STAMINA, 3);
-    drain_exp(u, 120);
-      
-    assert_skill(tc, msg = "plus four", u, SK_STAMINA, 2, 5, 5);
-    assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
-    }
+    test_teardown();
 }
 
 CuSuite *get_battle_suite(void)

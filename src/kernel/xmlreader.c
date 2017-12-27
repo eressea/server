@@ -421,6 +421,8 @@ static int parse_ships(xmlDocPtr doc)
                 st->flags |= SFL_FLY;
             if (xml_bvalue(node, "opensea", false))
                 st->flags |= SFL_OPENSEA;
+            if (xml_bvalue(node, "speedy", false))
+                st->flags |= SFL_SPEEDY;
             st->fishing = xml_ivalue(node, "fishing", st->fishing);
             st->cptskill = xml_ivalue(node, "cptskill", st->cptskill);
             st->minskill = xml_ivalue(node, "minskill", st->minskill);

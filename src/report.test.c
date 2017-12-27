@@ -138,7 +138,7 @@ static void test_report_region(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
 
     mstream_done(&out);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_report_travelthru(CuTest *tc) {
@@ -185,7 +185,7 @@ static void test_report_travelthru(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
 
     mstream_done(&out);
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct {
@@ -219,7 +219,6 @@ static void setup_spell_fixture(spell_fixture * spf) {
 static void cleanup_spell_fixture(spell_fixture *spf) {
     spellbook_clear(spf->spb);
     free(spf->spb);
-    test_cleanup();
 }
 
 static void set_parameter(spell_fixture spell, char *value) {
@@ -259,7 +258,7 @@ static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char
 static void test_write_spell_syntax(CuTest *tc) {
     spell_fixture spell;
 
-    test_cleanup();
+    test_setup();
     setup_spell_fixture(&spell);
 
     check_spell_syntax(tc, "vanilla", &spell, "  ZAUBERE \"Testzauber\"");
@@ -312,6 +311,7 @@ static void test_write_spell_syntax(CuTest *tc) {
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
 
     cleanup_spell_fixture(&spell);
+    test_teardown();
 }
 
 CuSuite *get_report_suite(void)

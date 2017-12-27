@@ -23,7 +23,7 @@ static void test_is_guarded(CuTest *tc) {
     region *r;
     race *rc;
 
-    test_cleanup();
+    test_setup();
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
     r = test_create_region(0, 0, 0);
@@ -32,7 +32,7 @@ static void test_is_guarded(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, is_guarded(r, u1));
     setguard(u2, true);
     CuAssertPtrEquals(tc, u2, is_guarded(r, u1));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_unskilled(CuTest * tc)
@@ -57,7 +57,7 @@ static void test_guard_unskilled(CuTest * tc)
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_armed(CuTest * tc)
@@ -76,7 +76,7 @@ static void test_guard_armed(CuTest * tc)
     set_level(ug, SK_MELEE, 2);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_is_guard(CuTest * tc)
@@ -97,7 +97,7 @@ static void test_is_guard(CuTest * tc)
     set_level(ug, SK_MELEE, 1);
     CuAssertIntEquals(tc, 1, armedmen(ug, false));
     CuAssertTrue(tc, is_guard(ug));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_unarmed(CuTest * tc)
@@ -114,7 +114,7 @@ static void test_guard_unarmed(CuTest * tc)
     ug = test_create_unit(test_create_faction(rc), r);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_monsters(CuTest * tc)
@@ -128,7 +128,7 @@ static void test_guard_monsters(CuTest * tc)
     ug = test_create_unit(get_monsters(), r);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_update_guard(CuTest * tc)
@@ -156,7 +156,7 @@ static void test_update_guard(CuTest * tc)
     update_guards();
     CuAssertTrue(tc, ! is_guard(ug));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_on(CuTest * tc)
@@ -229,7 +229,7 @@ static void test_guard_on(CuTest * tc)
     config_set("NewbieImmunity", NULL);
 
     test_clear_messages(ug->faction);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_guard_suite(void)

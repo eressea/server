@@ -19,7 +19,7 @@ static void test_register_building(CuTest * tc)
     building_type *btype;
     int cache = 0;
 
-    test_cleanup();
+    test_setup();
 
     CuAssertIntEquals(tc, true, bt_changed(&cache));
     CuAssertIntEquals(tc, false, bt_changed(&cache));
@@ -30,7 +30,7 @@ static void test_register_building(CuTest * tc)
 
     free_buildingtypes();
     CuAssertIntEquals(tc, true, bt_changed(&cache));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_building_set_owner(CuTest * tc)
@@ -55,7 +55,7 @@ static void test_building_set_owner(CuTest * tc)
     CuAssertPtrEquals(tc, u1, building_owner(bld));
     building_set_owner(u2);
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_next_when_empty(CuTest * tc)
@@ -81,7 +81,7 @@ static void test_buildingowner_goes_to_next_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u, building_owner(bld));
     u->number = 0;
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_other_when_empty(CuTest * tc)
@@ -108,7 +108,7 @@ static void test_buildingowner_goes_to_other_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u, building_owner(bld));
     u->number = 0;
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
@@ -139,7 +139,7 @@ static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u3, building_owner(bld));
     u3->number = 0;
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_next_after_leave(CuTest * tc)
@@ -164,7 +164,7 @@ static void test_buildingowner_goes_to_next_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u, building_owner(bld));
     leave_building(u);
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_other_after_leave(CuTest * tc)
@@ -190,7 +190,7 @@ static void test_buildingowner_goes_to_other_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u, building_owner(bld));
     leave_building(u);
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
@@ -223,7 +223,7 @@ static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u2, building_owner(bld));
     leave_building(u2);
     CuAssertPtrEquals(tc, 0, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingowner_resets_when_empty(CuTest * tc)
@@ -249,7 +249,7 @@ static void test_buildingowner_resets_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, 0, building_owner(bld));
     u->number = 1;
     CuAssertPtrEquals(tc, u, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
@@ -282,12 +282,13 @@ void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, 0, building_owner(bld));
     u2->number = 1;
     CuAssertPtrEquals(tc, u2, building_owner(bld));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_btype_defaults(CuTest *tc) {
     building_type * btype;
-    test_cleanup();
+
+    test_setup();
 
     btype = bt_get_or_create("hodor");
     CuAssertPtrNotNull(tc, btype);
@@ -303,7 +304,7 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
     CuAssertIntEquals(tc, 0, btype->flags);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingtype_exists(CuTest * tc)
@@ -341,6 +342,7 @@ static void test_buildingtype_exists(CuTest * tc)
     CuAssertTrue(tc, buildingtype_exists(r, btype, true));
     freset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, !buildingtype_exists(r, btype, true));
+    test_teardown();
 }
 
 static void test_active_building(CuTest *tc) {
@@ -349,7 +351,7 @@ static void test_active_building(CuTest *tc) {
     unit *u;
     building_type *btype;
 
-    test_cleanup();
+    test_setup();
 
     btype = test_create_buildingtype("castle");
     assert(btype && btype->maxsize == -1);
@@ -375,14 +377,14 @@ static void test_active_building(CuTest *tc) {
     b->flags &= ~BLD_MAINTAINED;
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_safe_building(CuTest *tc) {
     building_type *btype;
     unit *u1, *u2;
 
-    test_cleanup();
+    test_setup();
     btype = test_create_buildingtype("castle");
     u1 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -397,7 +399,7 @@ static void test_safe_building(CuTest *tc) {
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
     u1->building->size = 3;
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_building_type(CuTest *tc) {
@@ -406,7 +408,7 @@ static void test_building_type(CuTest *tc) {
     btype = test_create_buildingtype("house");
     CuAssertIntEquals(tc, true, is_building_type(btype, "house"));
     CuAssertIntEquals(tc, false, is_building_type(btype, "castle"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cmp_castle_size(CuTest *tc) {
@@ -427,7 +429,7 @@ static void test_cmp_castle_size(CuTest *tc) {
     CuAssertTrue(tc, cmp_castle_size(b1, b2) < 0);
     CuAssertTrue(tc, cmp_castle_size(b2, b1) > 0);
     CuAssertTrue(tc, cmp_castle_size(b1, b1) == 0);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cmp_wage(CuTest *tc) {
@@ -447,7 +449,7 @@ static void test_cmp_wage(CuTest *tc) {
     CuAssertTrue(tc, cmp_wage(b1, b2) < 0);
     CuAssertTrue(tc, cmp_wage(b2, b1) > 0);
     CuAssertTrue(tc, cmp_wage(b1, b1) == 0);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cmp_taxes(CuTest *tc) {
@@ -472,7 +474,7 @@ static void test_cmp_taxes(CuTest *tc) {
     CuAssertTrue(tc, cmp_taxes(b1, b2) < 0);
     CuAssertTrue(tc, cmp_taxes(b2, b1) > 0);
     CuAssertTrue(tc, cmp_taxes(b1, b1) == 0);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cmp_current_owner(CuTest *tc) {
@@ -505,7 +507,7 @@ static void test_cmp_current_owner(CuTest *tc) {
     CuAssertTrue(tc, cmp_current_owner(b2, b1) < 0);
     CuAssertTrue(tc, cmp_current_owner(b1, b2) > 0);
     CuAssertTrue(tc, cmp_current_owner(b1, b1) == 0);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_building_effsize(CuTest *tc) {
@@ -530,7 +532,7 @@ static void test_building_effsize(CuTest *tc) {
     CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
     b->size = 20;
     CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
-    test_cleanup();
+    test_teardown();
 }
 
 static int cmp_size(const building *lhs, const building *rhs) {
@@ -553,7 +555,7 @@ static void test_largestbuilding(CuTest *tc) {
     CuAssertPtrEquals(tc, b1, largestbuilding(r, cmp_size, false));
     b2->size = 3;
     CuAssertPtrEquals(tc, b2, largestbuilding(r, cmp_size, false));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingtype(CuTest *tc) {
@@ -567,7 +569,7 @@ static void test_buildingtype(CuTest *tc) {
     btype = bt_get_or_create("portal");
     CuAssertPtrEquals(tc, NULL, btype->construction);
     CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buildingcapacity(CuTest *tc) {
@@ -587,7 +589,7 @@ static void test_buildingcapacity(CuTest *tc) {
     btype->capacity = -1;
     CuAssertTrue(tc, building_finished(b));
     CuAssertIntEquals(tc, btype->maxcapacity, buildingcapacity(b));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_building_suite(void)

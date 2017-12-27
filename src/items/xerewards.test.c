@@ -12,9 +12,8 @@
 #include <CuTest.h>
 
 static void test_manacrystal(CuTest *tc) {
-    test_cleanup();
-    test_create_world();
-    test_cleanup();
+    test_setup();
+    test_teardown();
 }
 
 static void test_skillpotion(CuTest *tc) {
@@ -25,7 +24,7 @@ static void test_skillpotion(CuTest *tc) {
     int initialWeeks_Stamina = 0;
     int initialWeeks_Magic = 0;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     u = test_create_unit(test_create_faction(NULL), findregion(0, 0));
     itype = test_create_itemtype("skillpotion");
@@ -57,7 +56,7 @@ static void test_skillpotion(CuTest *tc) {
     pSkill = unit_skill(u, SK_MAGIC);
     CuAssertIntEquals(tc, initialWeeks_Magic - 3, pSkill->weeks);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_xerewards_suite(void)

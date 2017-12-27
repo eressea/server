@@ -48,8 +48,6 @@ static void create_monsters(unit **up, unit **um) {
     region *r;
     faction *fp, *fm;
 
-    test_cleanup();
-
     test_create_horse();
     default_locale = test_create_locale();
     fp = test_create_faction(NULL);
@@ -74,6 +72,7 @@ static void test_monsters_attack(CuTest * tc)
 {
     unit *u, *m;
 
+    test_setup();
     create_monsters(&u, &m);
     setguard(m, true);
 
@@ -82,7 +81,7 @@ static void test_monsters_attack(CuTest * tc)
     plan_monsters(m->faction);
 
     CuAssertPtrNotNull(tc, find_order("attack 1", m));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monsters_attack_ocean(CuTest * tc)
@@ -90,6 +89,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
     region *r;
     unit *u, *m;
 
+    test_setup();
     create_monsters(&u, &m);
     r = findregion(-1, 0); /* ocean */
     u = test_create_unit(u->faction, r);
@@ -102,19 +102,20 @@ static void test_monsters_attack_ocean(CuTest * tc)
     plan_monsters(m->faction);
 
     CuAssertPtrNotNull(tc, find_order("attack 2", m));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monsters_waiting(CuTest * tc)
 {
     unit *u, *m;
 
+    test_setup();
     create_monsters(&u, &m);
     setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false);
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_seaserpent_piracy(CuTest * tc)
@@ -124,6 +125,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     race *rc;
     ship_type * stype;
 
+    test_setup();
     create_monsters(&u, &m);
     stype = test_create_shiptype("yacht");
     r = findregion(-1, 0); /* ocean */
@@ -145,13 +147,14 @@ static void test_seaserpent_piracy(CuTest * tc)
     stype->cargo = 50001;
     plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("attack 2", m));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monsters_attack_not(CuTest * tc)
 {
     unit *u, *m;
 
+    test_setup();
     create_monsters(&u, &m);
 
     setguard(m, true);
@@ -162,7 +165,7 @@ static void test_monsters_attack_not(CuTest * tc)
     plan_monsters(m->faction);
 
     CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_dragon_attacks_the_rich(CuTest * tc)
@@ -170,6 +173,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     unit *u, *m;
     const item_type *i_silver;
 
+    test_setup();
     create_monsters(&u, &m);
     init_resources();
 
@@ -187,7 +191,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("attack 1", m));
     CuAssertPtrNotNull(tc, find_order("loot", m));
-    test_cleanup();
+    test_teardown();
 }
 
 extern void random_growl(const unit *u, region *tr, int rand);
@@ -198,6 +202,7 @@ static void test_dragon_moves(CuTest * tc)
     unit *u, *m;
     struct message *msg;
 
+    test_setup();
     create_monsters(&u, &m);
     rsetmoney(findregion(1, 0), 1000);
     r = findregion(0, 0); /* plain */
@@ -221,7 +226,7 @@ static void test_dragon_moves(CuTest * tc)
     assert_pointer_parameter(tc, msg, 2, findregion(1,0));
     assert_string_parameter(tc, msg, 3, "growl3");
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monsters_learn_exp(CuTest * tc)
@@ -229,6 +234,7 @@ static void test_monsters_learn_exp(CuTest * tc)
     unit *u, *m;
     skill* sk;
 
+    test_setup();
     create_monsters(&u, &m);
     config_set("study.produceexp", "30");
 
@@ -241,7 +247,7 @@ static void test_monsters_learn_exp(CuTest * tc)
     sk = unit_skill(m, SK_MELEE);
     CuAssertTrue(tc, sk && (sk->level > 0 || (sk->level == 0 && sk->weeks > 0)));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_spawn_seaserpent(CuTest *tc) {
@@ -249,7 +255,7 @@ static void test_spawn_seaserpent(CuTest *tc) {
     unit *u;
     faction *f;
     race *rc;
-    test_cleanup();
+    test_setup();
     rc = test_create_race("seaserpent");
     rc->flags |= RCF_NPC;
     r = test_create_region(0, 0, 0);
@@ -257,7 +263,7 @@ static void test_spawn_seaserpent(CuTest *tc) {
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, u->_name);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_monsters_suite(void)

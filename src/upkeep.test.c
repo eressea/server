@@ -39,7 +39,7 @@ void test_upkeep_default(CuTest * tc)
     CuAssertIntEquals(tc, 0, fval(u1, UFL_HUNGER));
     CuAssertIntEquals(tc, UFL_HUNGER, fval(u2, UFL_HUNGER));
 
-    test_cleanup();
+    test_teardown();
 }
 
 void test_upkeep_hunger_damage(CuTest * tc)
@@ -65,7 +65,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     /* since u1 and u2 are not allied, u1 should not help u2 with upkeep */
     CuAssertTrue(tc, u1->hp < 100);
 
-    test_cleanup();
+    test_teardown();
 }
 
 void test_upkeep_from_pool(CuTest * tc)
@@ -97,7 +97,7 @@ void test_upkeep_from_pool(CuTest * tc)
     CuAssertIntEquals(tc, 0, fval(u1, UFL_HUNGER));
     CuAssertIntEquals(tc, UFL_HUNGER, fval(u2, UFL_HUNGER));
 
-    test_cleanup();
+    test_teardown();
 }
 
 
@@ -133,7 +133,7 @@ void test_upkeep_from_friend(CuTest * tc)
     CuAssertIntEquals(tc, 0, fval(u1, UFL_HUNGER));
     CuAssertIntEquals(tc, UFL_HUNGER, fval(u2, UFL_HUNGER));
 
-    test_cleanup();
+    test_teardown();
 }
 
 void test_upkeep_free(CuTest * tc)
@@ -156,7 +156,7 @@ void test_upkeep_free(CuTest * tc)
     CuAssertIntEquals(tc, 0, i_get(u->items, i_silver));
     CuAssertIntEquals(tc, 0, fval(u, UFL_HUNGER));
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_upkeep_suite(void)

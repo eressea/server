@@ -178,7 +178,7 @@ void test_log_stderr(int flags) {
     static struct log_t *stderrlog;
     if (flags) {
         if (stderrlog) {
-            log_error("stderr logging is still active. did you call test_cleanup?");
+            log_error("stderr logging is still active. did you call test_teardown?");
             log_destroy(stderrlog);
         }
         stderrlog = log_to_file(flags, stderr);
@@ -188,7 +188,7 @@ void test_log_stderr(int flags) {
             log_destroy(stderrlog);
         }
         else {
-            log_warning("stderr logging is inactive. did you call test_cleanup twice?");
+            log_warning("stderr logging is inactive. did you call test_teardown twice?");
         }
         stderrlog = 0;
     }
@@ -249,7 +249,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
     }
 }
 
-void test_cleanup(void)
+void test_teardown(void)
 {
     test_reset();
     test_log_stderr(0);

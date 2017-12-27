@@ -36,7 +36,7 @@ static void test_cr_unit(CuTest *tc) {
     region *r;
     unit *u;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     u = test_create_unit(f, r);
@@ -48,7 +48,7 @@ static void test_cr_unit(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, line, "EINHEIT 1234");
     mstream_done(&strm);
-    test_cleanup();
+    test_teardown();
 }
 
 static void setup_resources(void) {
@@ -158,7 +158,7 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertStrEquals(tc, "1;number", line);
 
     mstream_done(&strm);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cr_mallorn(CuTest *tc) {
@@ -204,7 +204,7 @@ static void test_cr_mallorn(CuTest *tc) {
     CuAssertStrEquals(tc, "3;number", line);
 
     mstream_done(&strm);
-    test_cleanup();
+    test_teardown();
 }
 
 static int cr_get_int(stream *strm, const char *match, int def)
@@ -319,7 +319,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     u->flags &= ~UFL_ANON_FACTION;
     mstream_done(&strm);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_creport_suite(void)

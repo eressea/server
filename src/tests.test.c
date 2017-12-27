@@ -32,7 +32,7 @@ static void test_resources(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, rt_find("peasant"));
     rtype = rt_get_or_create("stone");
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_tests_suite(void)

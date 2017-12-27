@@ -78,7 +78,7 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_alchemy_suite(void)

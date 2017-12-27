@@ -65,7 +65,7 @@ struct order *ord)
 
 int
 use_manacrystal(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
+    struct order *ord)
 {
     int i, sp = 0;
 

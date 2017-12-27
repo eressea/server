@@ -27,7 +27,7 @@ static void test_create_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, init_order_depr(ord));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_parse_order(CuTest *tc) {
@@ -83,7 +83,7 @@ static void test_parse_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE | CMD_PERSIST | CMD_QUIET, ord->command);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_parse_make(CuTest *tc) {
@@ -91,7 +91,7 @@ static void test_parse_make(CuTest *tc) {
     order *ord;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("en");
 
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
@@ -105,7 +105,7 @@ static void test_parse_make(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKE, init_order_depr(ord));
     CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_parse_make_temp(CuTest *tc) {
@@ -113,7 +113,7 @@ static void test_parse_make_temp(CuTest *tc) {
     order *ord;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("en");
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
@@ -128,7 +128,7 @@ static void test_parse_make_temp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_parse_maketemp(CuTest *tc) {
@@ -136,7 +136,7 @@ static void test_parse_maketemp(CuTest *tc) {
     order *ord;
     struct locale * lang;
     
-    test_cleanup();
+    test_setup();
 
     lang = get_or_create_locale("en");
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
@@ -151,14 +151,14 @@ static void test_parse_maketemp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_init_order(CuTest *tc) {
     order *ord;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
 
     lang = get_or_create_locale("en");
     ord = create_order(K_MAKETEMP, lang, "hurr durr");
@@ -166,7 +166,7 @@ static void test_init_order(CuTest *tc) {
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_getstrtoken(CuTest *tc) {
@@ -191,7 +191,7 @@ static void test_replace_order(CuTest *tc) {
     order *orders = 0, *orig, *repl;
     struct locale * lang;
 
-    test_cleanup();
+    test_setup();
     lang = test_create_locale();
     orig = create_order(K_MAKE, lang, NULL);
     repl = create_order(K_ALLY, lang, NULL);
@@ -204,7 +204,7 @@ static void test_replace_order(CuTest *tc) {
     CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
     free_order(orders);
     free_order(repl);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_command(CuTest *tc) {
@@ -223,7 +223,7 @@ static void test_get_command(CuTest *tc) {
     ord->command = K_MAKE | CMD_PERSIST;
     CuAssertStrEquals(tc, "@make iron", get_command(ord, lang, buf, sizeof(buf)));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_is_persistent(CuTest *tc) {
@@ -263,7 +263,7 @@ static void test_is_persistent(CuTest *tc) {
     CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 
@@ -292,7 +292,7 @@ static void test_is_silent(CuTest *tc) {
     CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_study_orders(CuTest *tc) {
@@ -328,7 +328,7 @@ static void test_study_orders(CuTest *tc) {
     CuAssertIntEquals(tc, 100, getint());
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_order_suite(void)

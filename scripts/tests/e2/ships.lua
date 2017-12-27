@@ -41,3 +41,20 @@ function test_ship_happy_case()
     assert_equal(r2, u1.region)
     assert_equal(r2, u2.region)
 end
+
+function test_speedy_ship()
+    local r1 = region.create(0, 0, 'ocean')
+    local f = faction.create("human", "hodor@eressea.de", "de")
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f, r1, 2)
+    for x = 1, 10 do
+        region.create(x, 0, 'ocean')
+    end
+    u1.ship = ship.create(r1, "dragonship")
+    u2.ship = u1.ship
+    u1:set_skill("sailing", 2) -- cptskill = 2
+    u2:set_skill("sailing", 24) -- sumskill = 50
+    u1:add_order("NACH O O O O O O O O O O")
+    process_orders()
+    assert_equal(5, u1.region.x)
+end

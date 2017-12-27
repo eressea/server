@@ -27,7 +27,7 @@ static void test_renumber_faction(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     renumber_factions();
     CuAssertIntEquals(tc, uno, u->faction->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_faction_duplicate(CuTest *tc) {
@@ -46,7 +46,7 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     renumber_factions();
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "renumber_inuse"));
     CuAssertIntEquals(tc, no, u->faction->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_building(CuTest *tc) {
@@ -63,7 +63,7 @@ static void test_renumber_building(CuTest *tc) {
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->building->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_building_duplicate(CuTest *tc) {
@@ -83,7 +83,7 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->building->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship(CuTest *tc) {
@@ -100,7 +100,7 @@ static void test_renumber_ship(CuTest *tc) {
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship_twice(CuTest *tc) {
@@ -121,7 +121,7 @@ static void test_renumber_ship_twice(CuTest *tc) {
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(no));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship_duplicate(CuTest *tc) {
@@ -141,7 +141,7 @@ static void test_renumber_ship_duplicate(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit(CuTest *tc) {
@@ -158,7 +158,7 @@ static void test_renumber_unit(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->no);
     CuAssertIntEquals(tc, -no, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_duplicate(CuTest *tc) {
@@ -177,7 +177,7 @@ static void test_renumber_unit_duplicate(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_limit(CuTest *tc) {
@@ -195,7 +195,7 @@ static void test_renumber_unit_limit(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_invalid(CuTest *tc) {
@@ -213,7 +213,7 @@ static void test_renumber_unit_invalid(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error116"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_renumber_suite(void)

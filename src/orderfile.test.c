@@ -19,7 +19,7 @@ static void test_read_orders(CuTest *tc) {
     in.getbuf = getbuf_null;
     in.data = NULL;
     CuAssertIntEquals(tc, 0, read_orders(&in));
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct order_list {
@@ -52,7 +52,7 @@ static void test_faction_password_okay(CuTest *tc) {
     CuAssertIntEquals(tc, 0, read_orders(&in));
     CuAssertIntEquals(tc, 2, olist.next);
     CuAssertIntEquals(tc, turn, f->lastorders);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_faction_password_bad(CuTest *tc) {
@@ -74,7 +74,7 @@ static void test_faction_password_bad(CuTest *tc) {
     CuAssertIntEquals(tc, 0, read_orders(&in));
     CuAssertIntEquals(tc, 2, olist.next);
     CuAssertIntEquals(tc, turn - 1, f->lastorders);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_orderfile_suite(void)

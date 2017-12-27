@@ -29,7 +29,7 @@ typedef struct build_fixture {
 } build_fixture;
 
 static unit * setup_build(build_fixture *bf) {
-    test_cleanup();
+    test_setup();
     init_resources();
 
     test_create_itemtype("stone");
@@ -53,7 +53,7 @@ static unit * setup_build(build_fixture *bf) {
 
 static void teardown_build(build_fixture *bf) {
     free(bf->cons.materials);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_build_requires_materials(CuTest *tc) {
@@ -254,7 +254,7 @@ static void test_build_destroy_road(CuTest *tc)
     order *ord;
     message *m;
 
-    test_cleanup();
+    test_setup();
     mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", 0));
     r2 = test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
@@ -282,7 +282,7 @@ static void test_build_destroy_road(CuTest *tc)
     set_level(u, SK_ROAD_BUILDING, 2);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 87, rroad(r, D_EAST));
-    test_cleanup();
+    test_teardown();
 }
 
 unit *test_create_guard(region *r, faction *f, race *rc) {
@@ -308,7 +308,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     unit *u, *ug;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
     rsetroad(r, D_EAST, 100);
@@ -330,7 +330,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error70"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_build_destroy_road_limit(CuTest *tc)
@@ -340,7 +340,7 @@ static void test_build_destroy_road_limit(CuTest *tc)
     unit *u;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, 0);
     rsetroad(r, D_EAST, 100);
@@ -357,7 +357,7 @@ static void test_build_destroy_road_limit(CuTest *tc)
     CuAssertIntEquals(tc, 98, rroad(r, D_EAST));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "destroy_road"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_build_destroy_cmd(CuTest *tc) {
@@ -369,7 +369,7 @@ static void test_build_destroy_cmd(CuTest *tc) {
     u->thisorder = create_order(K_DESTROY, f->locale, NULL);
     CuAssertIntEquals(tc, 138, destroy_cmd(u, u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error138"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_build_roqf_factor(CuTest *tc) {
@@ -377,7 +377,7 @@ static void test_build_roqf_factor(CuTest *tc) {
     CuAssertIntEquals(tc, 10, roqf_factor());
     config_set("rules.economy.roqf", "50");
     CuAssertIntEquals(tc, 50, roqf_factor());
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_build_suite(void)

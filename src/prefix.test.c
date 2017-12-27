@@ -18,7 +18,7 @@ static void test_add_prefix(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, race_prefixes[2]);
     free_prefixes();
     CuAssertPtrEquals(tc, 0, race_prefixes);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_prefix_suite(void)

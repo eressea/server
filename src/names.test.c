@@ -15,7 +15,7 @@ static void test_names(CuTest * tc)
 {
     unit *u;
     race *rc;
-    test_cleanup();
+    test_setup();
     register_names();
     CuAssertPtrNotNull(tc, get_function("name_undead"));
     CuAssertPtrNotNull(tc, get_function("name_skeleton"));
@@ -34,7 +34,7 @@ static void test_names(CuTest * tc)
     CuAssertTrue(tc, rc->name_unit == (race_func)get_function("name_undead"));
     name_unit(u);
     CuAssertStrEquals(tc, "Graue Kobolde", u->_name);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monster_names(CuTest *tc) {
@@ -58,7 +58,7 @@ static void test_monster_names(CuTest *tc) {
     CuAssertStrEquals(tc, "Eisengolem", unit_getname(u));
     u->number = 2;
     CuAssertStrEquals(tc, "Eisengolems", unit_getname(u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_names_suite(void)

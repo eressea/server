@@ -34,6 +34,7 @@ extern "C" {
 #define SFL_OPENSEA 0x01
 #define SFL_FLY     0x02
 #define SFL_NOCOAST 0x04
+#define SFL_SPEEDY  0x08
 
     typedef struct ship_type {
         char *_name;

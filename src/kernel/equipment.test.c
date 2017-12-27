@@ -43,7 +43,7 @@ static void test_equipment(CuTest * tc)
     CuAssertPtrNotNull(tc, mage);
     CuAssertPtrNotNull(tc, mage->spellbook);
     CuAssertTrue(tc, u_hasspell(u, sp));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_equipment(CuTest * tc)
@@ -66,7 +66,7 @@ static void test_get_equipment(CuTest * tc)
     eq = get_equipment("catapultammo123");
     CuAssertPtrNotNull(tc, eq);
     CuAssertStrEquals(tc, "catapultammo123", equipment_name(eq));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_equipment_suite(void)

@@ -16,7 +16,7 @@ static void test_init_directions(CuTest *tc) {
     locale_setstring(lang, "dir_nw", "NW");
     init_directions(lang);
     CuAssertIntEquals(tc, D_NORTHWEST, get_direction("nw", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_init_direction(CuTest *tc) {
@@ -33,7 +33,7 @@ static void test_init_direction(CuTest *tc) {
     CuAssertIntEquals(tc, D_EAST, get_direction("ost", lang));
     CuAssertIntEquals(tc, D_EAST, get_direction("O", lang));
     CuAssertIntEquals(tc, NODIRECTION, get_direction("east", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_finddirection(CuTest *tc) {
@@ -47,7 +47,7 @@ static void test_finddirection(CuTest *tc) {
     CuAssertIntEquals(tc, D_PAUSE, finddirection("pause"));
     CuAssertIntEquals(tc, NODIRECTION, finddirection(""));
     CuAssertIntEquals(tc, NODIRECTION, finddirection("potato"));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_direction_suite(void)
