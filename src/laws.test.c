@@ -169,12 +169,11 @@ static void test_enter_ship(CuTest * tc)
     race * rc;
 
     test_setup();
-    test_create_world();
 
-    r = findregion(0, 0);
-    rc = rc_get_or_create("human");
+    r = test_create_region(0, 0, NULL);
+    rc = test_create_race("smurf");
     u = test_create_unit(test_create_faction(rc), r);
-    sh = test_create_ship(r, st_get_or_create("boat"));
+    sh = test_create_ship(r, NULL);
 
     rc->flags = RCF_WALK;
     u->ship = 0;
