@@ -66,6 +66,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/resolve.h>
@@ -142,7 +143,7 @@ static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
     icastle_data *idata = (icastle_data *)a->data.v;
     char token[32];
 
-    (void)owner;
+    UNUSED_ARG(owner);
     READ_TOK(store, token, sizeof(token));
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(store, NULL);
@@ -156,7 +157,7 @@ static void
 a_writeicastle(const attrib * a, const void *owner, struct storage *store)
 {
     icastle_data *data = (icastle_data *)a->data.v;
-    (void)owner;
+    UNUSED_ARG(owner);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->time);
 }
@@ -256,7 +257,7 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
     sc_mage *mage = (sc_mage *)a->data.v;
     char spname[64];
 
-    (void)owner;
+    UNUSED_ARG(owner);
     READ_INT(store, &mtype);
     mage->magietyp = (magic_t)mtype;
     READ_INT(store, &mage->spellpoints);
@@ -302,7 +303,7 @@ write_mage(const attrib * a, const void *owner, struct storage *store)
     int i;
     sc_mage *mage = (sc_mage *)a->data.v;
 
-    (void)owner;
+    UNUSED_ARG(owner);
     WRITE_INT(store, mage->magietyp);
     WRITE_INT(store, mage->spellpoints);
     WRITE_INT(store, mage->spchange);
@@ -364,7 +365,7 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
     spell *sp = 0;
     char token[32];
 
-    (void)owner;
+    UNUSED_ARG(owner);
     READ_TOK(store, token, sizeof(token));
     if (data->version < UNIQUE_SPELLS_VERSION) {
         READ_INT(store, 0); /* ignore mtype */
@@ -382,7 +383,7 @@ static void
 write_seenspell(const attrib * a, const void *owner, struct storage *store)
 {
     const spell *sp = (const spell *)a->data.v;
-    (void)owner;
+    UNUSED_ARG(owner);
     WRITE_TOK(store, sp->sname);
 }
 
@@ -919,7 +920,7 @@ void pay_spell(unit * u, const spell * sp, int cast_level, int range)
  */
 bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
-    (void)r;
+    UNUSED_ARG(r);
     assert(sp);
     /* steht der Spruch in der Spruchliste? */
     return u_hasspell(u, sp) != 0;
@@ -1328,7 +1329,7 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     int fumble_enabled = config_get_int("magic.fumble.enable", 1);
     sc_mage * mage;
 
-    (void)sp;
+    UNUSED_ARG(sp);
     if (effsk <= 0 || !fumble_enabled) {
         return false;
     }
@@ -2177,7 +2178,7 @@ static void
 a_write_unit(const attrib * a, const void *owner, struct storage *store)
 {
     unit *u = (unit *)a->data.v;
-    (void)owner;
+    UNUSED_ARG(owner);
     write_unit_reference(u, store);
 }
 
@@ -2280,7 +2281,7 @@ void create_newfamiliar(unit * mage, unit * fam)
 }
 
 static void * resolve_familiar(int id, void *data) {
-    (void)id;
+    UNUSED_ARG(id);
     if (data) {
         unit *familiar = (unit *)data;
         attrib *a = a_find(familiar->attribs, &at_familiarmage);
@@ -2294,7 +2295,7 @@ static void * resolve_familiar(int id, void *data) {
 
 static int read_familiar(attrib * a, void *owner, struct gamedata *data)
 {
-    (void)owner;
+    UNUSED_ARG(owner);
     if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
@@ -2361,7 +2362,7 @@ unit *has_clone(unit * mage)
 }
 
 static void * resolve_clone(int id, void *data) {
-    (void)id;
+    UNUSED_ARG(id);
     if (data) {
         unit *clone = (unit *)data;
         attrib *a = a_find(clone->attribs, &at_clonemage);
@@ -2375,7 +2376,7 @@ static void * resolve_clone(int id, void *data) {
 
 static int read_clone(attrib * a, void *owner, struct gamedata *data)
 {
-    (void)owner;
+    UNUSED_ARG(owner);
     if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
@@ -2384,7 +2385,7 @@ static int read_clone(attrib * a, void *owner, struct gamedata *data)
 
 /* mages */
 static void * resolve_mage(int id, void *data) {
-    (void)id;
+    UNUSED_ARG(id);
     if (data) {
         unit *mage = (unit *)data;
         attrib *a = a_find(mage->attribs, &at_familiar);
@@ -2398,7 +2399,7 @@ static void * resolve_mage(int id, void *data) {
 
 static int read_magician(attrib * a, void *owner, struct gamedata *data)
 {
-    (void)owner;
+    UNUSED_ARG(owner);
     if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
@@ -2409,7 +2410,7 @@ static int age_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
-    (void)owner;
+    UNUSED_ARG(owner);
     return (u != NULL && u->number > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
@@ -3057,9 +3058,9 @@ void free_spellbook(spellbook *sb) {
 
 static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
     const sb_entry *ent = (const sb_entry *)match;
-    (void)data;
-    (void)keylen;
-    (void)key;
+    UNUSED_ARG(data);
+    UNUSED_ARG(keylen);
+    UNUSED_ARG(key);
     free_spellbook(ent->value);
     return 0;
 }

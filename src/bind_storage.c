@@ -10,13 +10,13 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
 #include "bind_storage.h"
 
 #include <kernel/save.h>
 
 #include <util/gamedata.h>
 #include <util/log.h>
+#include <util/macros.h>
 
 #include <storage.h>
 #include <stream.h>

@@ -10,14 +10,15 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
-
 #include "bind_unit.h"
 #include "bindings.h"
 
-#include <kernel/config.h>
+#include <kernel/config.h> /* for game_id */
+#include <util/macros.h>
+
 #include <sqlite3.h>
 #include <tolua.h>
+#include <stdbool.h>
 
 #define LTYPE_DB TOLUA_CAST "db"
 

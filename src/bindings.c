@@ -10,7 +10,6 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_storage.h"
@@ -65,11 +64,12 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <selist.h>
+#include <util/macros.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/xml.h>
 
+#include <selist.h>
 #include <storage.h>
 
 #include <iniparser.h>
@@ -273,6 +273,7 @@ static int tolua_message_region(lua_State * L)
 
 static int tolua_update_guards(lua_State * L)
 {
+    UNUSED_ARG(L);
     update_guards();
     return 0;
 }
@@ -377,6 +378,7 @@ static int tolua_learn_skill(lua_State * L)
 
 static int tolua_update_scores(lua_State * L)
 {
+    UNUSED_ARG(L);
     score();
     return 0;
 }
@@ -384,6 +386,7 @@ static int tolua_update_scores(lua_State * L)
 static int tolua_update_owners(lua_State * L)
 {
     region *r;
+    UNUSED_ARG(L);
     for (r = regions; r; r = r->next) {
         update_owners(r);
     }
@@ -392,12 +395,14 @@ static int tolua_update_owners(lua_State * L)
 
 static int tolua_update_subscriptions(lua_State * L)
 {
+    UNUSED_ARG(L);
     update_subscriptions();
     return 0;
 }
 
 static int tolua_remove_empty_units(lua_State * L)
 {
+    UNUSED_ARG(L);
     remove_empty_units();
     return 0;
 }
@@ -482,24 +487,28 @@ static int tolua_write_reports(lua_State * L)
 
 static int tolua_process_orders(lua_State * L)
 {
+    UNUSED_ARG(L);
     processorders();
     return 0;
 }
 
 static int tolua_turn_begin(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_begin();
     return 0;
 }
 
 static int tolua_turn_process(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_process();
     return 0;
 }
 
 static int tolua_turn_end(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_end();
     return 0;
 }
@@ -514,12 +523,14 @@ static int tolua_write_passwords(lua_State * L)
 static struct summary *sum_begin = 0;
 static int tolua_init_summary(lua_State * L)
 {
+    UNUSED_ARG(L);
     sum_begin = make_summary();
     return 0;
 }
 
 static int tolua_write_summary(lua_State * L)
 {
+    UNUSED_ARG(L);
     if (sum_begin) {
         struct summary *sum_end = make_summary();
         report_summary(sum_end, sum_begin, false);

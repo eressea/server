@@ -78,7 +78,8 @@ void herbsearch(unit * u, int max)
         max = rherbs(r);
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
-    herbsfound = MIN(herbsfound, max);
+
+    if (herbsfound > max) herbsfound = max;
     rsetherbs(r, (short) (rherbs(r) - herbsfound));
 
     if (herbsfound) {
@@ -156,7 +157,9 @@ static int potion_water_of_life(unit * u, region *r, int amount) {
 }
 
 static int potion_healing(unit * u, int amount) {
-    u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+    int maxhp = unit_max_hp(u) * u->number;
+    u->hp = u->hp + 400 * amount;
+    if (u->hp > maxhp) u->hp = maxhp;
     return amount;
 }
 

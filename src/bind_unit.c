@@ -10,8 +10,6 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
-
 #include "bind_unit.h"
 #include "alchemy.h"
 #include "bindings.h"
@@ -46,6 +44,8 @@ without prior permission by the authors of Eressea.
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
+
 #include <selist.h>
 
 #include <tolua.h>

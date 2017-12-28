@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "spells.h"
 
 /* kernel includes */
@@ -10,6 +9,7 @@
 
 /* util includes */
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 

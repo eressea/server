@@ -10,7 +10,6 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
 #include "bind_building.h"
 #include "bind_unit.h"
 
@@ -21,6 +20,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/log.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/strings.h>
 
 #include <tolua.h>

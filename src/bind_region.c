@@ -10,7 +10,6 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
 #include "bind_region.h"
 #include "bind_unit.h"
 #include "bind_ship.h"
@@ -39,6 +38,7 @@ without prior permission by the authors of Eressea.
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/strings.h>
 
 #include <critbit.h>
