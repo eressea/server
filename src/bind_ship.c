@@ -10,10 +10,10 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
-#include <platform.h>
 #include "bind_ship.h"
 #include "bind_unit.h"
 
+#include "direction.h"
 #include "move.h"
 
 #include <kernel/curse.h>
@@ -25,10 +25,12 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/strings.h>
 
 #include <tolua.h>
-#include <string.h>
+#include <lauxlib.h>
+#include <lua.h>
 #include <stdlib.h>
 
 int tolua_shiplist_next(lua_State * L)
