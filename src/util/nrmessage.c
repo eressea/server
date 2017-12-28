@@ -91,7 +91,7 @@ const nrsection *section_add(const char *name)
     }
     if (!*mcp) {
         nrsection *mc = calloc(sizeof(nrsection), 1);
-        mc->name = strdup(name);
+        mc->name = str_strdup(name);
         *mcp = mc;
     }
     return *mcp;
@@ -130,14 +130,14 @@ const char *string, int level, const char *section)
             nrt->section = NULL;
         nrtypes[hash] = nrt;
         assert(string && *string);
-        nrt->string = strdup(string);
+        nrt->string = str_strdup(string);
         *c = '\0';
         for (i = 0; i != mtype->nparameters; ++i) {
             if (i != 0)
                 *c++ = ' ';
             c += strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
         }
-        nrt->vars = strdup(zNames);
+        nrt->vars = str_strdup(zNames);
     }
 }
 

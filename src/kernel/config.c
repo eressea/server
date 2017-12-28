@@ -65,6 +65,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
@@ -381,7 +382,7 @@ static void init_magic(struct locale *lang)
             str = "gwyrrd illaun draig cerddor tybied";
         }
 
-        sstr = strdup(str);
+        sstr = str_strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
             variant var;
@@ -488,7 +489,7 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
     if (!value) {
         return 0;
     }
-    p_value = strdup(value);
+    p_value = str_strdup(value);
     v = strtok(p_value, " ,;");
 
     while (v != NULL) {

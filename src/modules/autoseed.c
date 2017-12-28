@@ -39,6 +39,7 @@
 #include <util/log.h>
 #include <selist.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -186,13 +187,13 @@ newfaction *read_newfactions(const char *filename)
         }
         nf = calloc(sizeof(newfaction), 1);
         if (check_email(email) == 0) {
-          nf->email = strdup(email);
+          nf->email = str_strdup(email);
         } else {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
             free(nf);
             continue;
         }
-        nf->password = strdup(password);
+        nf->password = str_strdup(password);
         nf->race = rc_find(race);
         nf->subscription = subscription;
         if (alliances != NULL) {

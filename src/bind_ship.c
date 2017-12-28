@@ -25,6 +25,7 @@ without prior permission by the authors of Eressea.
 #include <util/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/strings.h>
 
 #include <tolua.h>
 #include <string.h>
@@ -109,7 +110,7 @@ static int tolua_ship_set_display(lua_State * L)
 {
     ship *self = (ship *)tolua_tousertype(L, 1, NULL);
     free(self->display);
-    self->display = strdup(tolua_tostring(L, 2, NULL));
+    self->display = str_strdup(tolua_tostring(L, 2, NULL));
     return 0;
 }
 

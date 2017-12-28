@@ -52,6 +52,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -1419,7 +1420,7 @@ void region_setinfo(struct region *r, const char *info)
 {
     assert(r->land);
     free(r->land->display);
-    r->land->display = (info && info[0]) ? strdup(info) : 0;
+    r->land->display = (info && info[0]) ? str_strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1431,7 +1432,7 @@ void region_setname(struct region *r, const char *name)
 {
     if (r->land) {
         free(r->land->name);
-        r->land->name = name ? strdup(name) : 0;
+        r->land->name = name ? str_strdup(name) : 0;
     }
 }
 

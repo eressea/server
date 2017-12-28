@@ -16,8 +16,6 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-
 #include "strings.h"
 #include "assert.h"
 
@@ -167,4 +165,12 @@ unsigned int wang_hash(unsigned int a)
     a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
     a = a ^ (a >> 16);
     return a;
+}
+
+char *str_strdup(const char *s) {
+#ifdef _MSC_VER
+    return _strdup(s);
+#else
+    return strdup(s);
+#endif
 }

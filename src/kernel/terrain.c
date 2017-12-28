@@ -31,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/log.h>
 #include <util/attrib.h>
+#include <util/strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -123,7 +124,7 @@ terrain_type * get_or_create_terrain(const char *name) {
         ++terrain_changes;
         terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
         if (terrain) {
-            terrain->_name = strdup(name);
+            terrain->_name = str_strdup(name);
             terrain->next = registered_terrains;
             registered_terrains = terrain;
             if (strcmp("plain", name) == 0) {

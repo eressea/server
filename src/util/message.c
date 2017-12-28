@@ -74,7 +74,7 @@ message_type *mt_new(const char *name, const char *args[])
     }
     mtype = (message_type *)malloc(sizeof(message_type));
     mtype->key = 0;
-    mtype->name = strdup(name);
+    mtype->name = str_strdup(name);
     mtype->nparameters = nparameters;
     if (nparameters > 0) {
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);

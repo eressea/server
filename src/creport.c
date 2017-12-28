@@ -131,7 +131,7 @@ static const char *translate(const char *key, const char *value)
         }
         else
             t = malloc(sizeof(translation));
-        t->key = strdup(key);
+        t->key = str_strdup(key);
         t->value = value;
         t->next = translation_table[kk];
         translation_table[kk] = t;

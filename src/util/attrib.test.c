@@ -2,6 +2,7 @@
 #include "attrib.h"
 
 #include <util/gamedata.h>
+#include <util/strings.h>
 
 #include <storage.h>
 #include <memstream.h>
@@ -119,7 +120,7 @@ static void test_attrib_rwstring(CuTest *tc) {
     attrib a = { 0 };
 
     test_setup();
-    a.data.v = strdup("Hello World");
+    a.data.v = str_strdup("Hello World");
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     a_writestring(&a, NULL, &store);

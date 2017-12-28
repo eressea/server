@@ -13,6 +13,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <spells/regioncurse.h>
 #include <alchemy.h>
 #include <laws.h>
@@ -397,7 +398,7 @@ static void test_unit_description(CuTest *tc) {
 
     CuAssertPtrEquals(tc, 0, u->display);
     CuAssertStrEquals(tc, 0, u_description(u, lang));
-    u->display = strdup("Hodor");
+    u->display = str_strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
     CuAssertStrEquals(tc, "Hodor", u_description(u, lang));
 

@@ -60,14 +60,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
-#include <util/translation.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/strings.h>
+#include <util/translation.h>
 #include <stream.h>
 #include <selist.h>
 
@@ -1667,7 +1668,7 @@ int reports(void)
 
 static variant var_copy_string(variant x)
 {
-    x.v = x.v ? strdup((const char *)x.v) : 0;
+    x.v = x.v ? str_strdup((const char *)x.v) : 0;
     return x;
 }
 

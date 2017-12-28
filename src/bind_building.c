@@ -21,6 +21,7 @@ without prior permission by the authors of Eressea.
 
 #include <util/log.h>
 #include <util/language.h>
+#include <util/strings.h>
 
 #include <tolua.h>
 #include <stdlib.h>
@@ -84,7 +85,7 @@ static int tolua_building_set_info(lua_State * L)
     const char *info = tolua_tostring(L, 2, 0);
     free(self->display);
     if (info)
-        self->display = strdup(info);
+        self->display = str_strdup(info);
     else
         self->display = NULL;
     return 0;

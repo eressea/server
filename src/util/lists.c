@@ -16,8 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
 #include "lists.h"
+
+#include "strings.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -117,7 +118,7 @@ void addstrlist(strlist ** SP, const char *s)
 {
     strlist *slist = malloc(sizeof(strlist));
     slist->next = NULL;
-    slist->s = strdup(s);
+    slist->s = str_strdup(s);
     addlist(SP, slist);
 }
 

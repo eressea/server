@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #pragma warning(disable: 4210)
@@ -35,7 +36,7 @@ static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char
     }
     if (s) {
         s->next = suites;
-        s->name = strdup(name);
+        s->name = str_strdup(name);
         s->csuite = csuite();
         suites = s;
     }

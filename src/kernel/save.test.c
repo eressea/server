@@ -1,8 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/race.h>
-#include <util/attrib.h>
-#include <util/gamedata.h>
 #include <attributes/key.h>
 
 #include "save.h"
@@ -20,9 +18,11 @@
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
 #include <util/attrib.h>
-#include <util/event.h>
 #include <util/base36.h>
+#include <util/event.h>
+#include <util/gamedata.h>
 #include <util/password.h>
+#include <util/strings.h>
 
 #include <storage.h>
 #include <memstream.h>
@@ -100,7 +100,7 @@ static void test_readwrite_faction(CuTest * tc)
     test_setup();
     f = test_create_faction(0);
     free(f->name);
-    f->name = strdup("  Hodor  ");
+    f->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", f->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -130,7 +130,7 @@ static void test_readwrite_region(CuTest * tc)
     test_setup();
     r = test_create_region(0, 0, 0);
     free(r->land->name);
-    r->land->name = strdup("  Hodor  ");
+    r->land->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
     region_setinfo(r, lipsum);
     CuAssertStrEquals(tc, lipsum, r->land->display);
@@ -163,7 +163,7 @@ static void test_readwrite_building(CuTest * tc)
     r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
     free(b->name);
-    b->name = strdup("  Hodor  ");
+    b->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", b->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -196,7 +196,7 @@ static void test_readwrite_ship(CuTest * tc)
     r = test_create_region(0, 0, 0);
     sh = test_create_ship(r, 0);
     free(sh->name);
-    sh->name = strdup("  Hodor  ");
+    sh->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", sh->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);

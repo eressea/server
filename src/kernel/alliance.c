@@ -31,6 +31,7 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <selist.h>
@@ -83,7 +84,7 @@ alliance *new_alliance(int id, const char *name) {
     al = calloc(1, sizeof(alliance));
     al->id = id;
     if (name) {
-        al->name = strdup(name);
+        al->name = str_strdup(name);
     }
     else {
         al->flags |= ALF_NON_ALLIED;
@@ -434,7 +435,7 @@ void alliance_setname(alliance * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = strdup(name);
+        self->name = str_strdup(name);
     else
         self->name = NULL;
 }

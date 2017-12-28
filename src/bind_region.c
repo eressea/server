@@ -39,6 +39,7 @@ without prior permission by the authors of Eressea.
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/strings.h>
 
 #include <critbit.h>
 
@@ -635,7 +636,7 @@ static int tolua_plane_set_name(lua_State * L)
     const char *str = tolua_tostring(L, 2, 0);
     free(self->name);
     if (str)
-        self->name = strdup(str);
+        self->name = str_strdup(str);
     else
         self->name = 0;
     return 0;

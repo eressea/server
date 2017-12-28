@@ -44,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
@@ -132,7 +133,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
         v->v = rc_get_or_create(value);
     }
     else if (key == RCO_HUNGER) {
-        v->v = strdup(value);
+        v->v = str_strdup(value);
     }
     else if (key == RCO_TRADEHERB) {
         v->i = atoi(value);
@@ -359,7 +360,7 @@ race *rc_create(const char *zName)
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
     }
-    rc->_name = strdup(zName);
+    rc->_name = str_strdup(zName);
 
     rc->attack[0].type = AT_COMBATSPELL;
     for (i = 1; i < RACE_ATTACKS; ++i)

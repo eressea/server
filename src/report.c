@@ -85,8 +85,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
-#include <selist.h>
 #include <util/rng.h>
+#include <util/strings.h>
+
+#include <selist.h>
 #include <filestream.h>
 #include <stream.h>
 
@@ -936,7 +938,7 @@ void report_region(struct stream *out, const region * r, faction * f)
             }
             if (!e) {
                 e = calloc(sizeof(struct edge), 1);
-                e->name = strdup(name);
+                e->name = str_strdup(name);
                 e->transparent = transparent;
                 e->next = edges;
                 edges = e;

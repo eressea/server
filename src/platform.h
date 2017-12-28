@@ -4,17 +4,11 @@
 #define _LP64 0 /* fix a warning in pdcurses 3.4 */
 #endif
 
-#ifndef UNILIB_H
-#define UNILIB_H
-
 #ifdef _MSC_VER
 #ifndef __STDC__
 #define __STDC__ 1 // equivalent to /Za
 #endif
-#define NO_STRDUP
 #define NO_MKDIR
-#define _CRT_SECURE_NO_WARNINGS
-#define _USE_MATH_DEFINES
 #if _MSC_VER >= 1900
 #pragma warning(disable: 4710 4820)
 #pragma warning(disable: 4100) // unreferenced formal parameter
@@ -42,10 +36,6 @@
 
 #define TOLUA_CAST (char*)
 
-#ifdef NO_STRDUP
-char * strdup(const char *s);
-#endif
-
 #ifdef NO_MKDIR
 int mkdir(const char *pathname, int mode);
 #endif
@@ -54,6 +44,3 @@ int mkdir(const char *pathname, int mode);
 #define PI_F 3.1415926535897932384626433832795F
 #define PI_D 3.1415926535897932384626433832795
 #define PI_L 3.1415926535897932384626433832795L
-
-
-#endif

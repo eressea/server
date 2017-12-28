@@ -44,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <storage.h>
@@ -134,7 +135,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
-            btype->_name = strdup(name);
+            btype->_name = str_strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;
@@ -373,7 +374,7 @@ building *new_building(const struct building_type * btype, region * r,
     }
     assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = strdup(bname);
+    b->name = str_strdup(bname);
     return b;
 }
 
@@ -569,7 +570,7 @@ void building_setname(building * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = strdup(name);
+        self->name = str_strdup(name);
     else
         self->name = NULL;
 }

@@ -19,10 +19,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "attrib.h"
 
+#include "gamedata.h"
 #include "log.h"
 #include "storage.h"
+#include "strings.h"
 
-#include <util/gamedata.h>
 #include <critbit.h>
 
 #include <assert.h>
@@ -129,7 +130,7 @@ int a_readstring(attrib * a, void *owner, struct gamedata *data)
             len += DISPLAYSIZE - 1;
         }
         else {
-            result = strdup(buf);
+            result = str_strdup(buf);
         }
     } while (e == ENOMEM);
     a->data.v = result;

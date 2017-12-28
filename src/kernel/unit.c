@@ -61,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
@@ -509,7 +510,7 @@ int a_readprivate(attrib * a, void *owner, gamedata *data)
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = strdup(lbuf);
+    a->data.v = str_strdup(lbuf);
     return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
@@ -567,7 +568,7 @@ void usetprivate(unit * u, const char *str)
     if (a->data.v) {
         free(a->data.v);
     }
-    a->data.v = strdup(str);
+    a->data.v = str_strdup(str);
 }
 
 /*********************/
@@ -1512,7 +1513,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
 
     if (dname) {
-        u->_name = strdup(dname);
+        u->_name = str_strdup(dname);
     }
     else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
@@ -1615,7 +1616,7 @@ void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
     if (name && name[0])
-        u->_name = strdup(name);
+        u->_name = str_strdup(name);
     else
         u->_name = NULL;
 }
@@ -1629,7 +1630,7 @@ void unit_setinfo(unit * u, const char *info)
 {
     free(u->display);
     if (info)
-        u->display = strdup(info);
+        u->display = str_strdup(info);
     else
         u->display = NULL;
 }

@@ -18,6 +18,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
+#include <util/strings.h>
 
 #include <stream.h>
 #include <memstream.h>
@@ -223,7 +224,7 @@ static void cleanup_spell_fixture(spell_fixture *spf) {
 
 static void set_parameter(spell_fixture spell, char *value) {
     free(spell.sp->parameter);
-    spell.sp->parameter = strdup(value);
+    spell.sp->parameter = str_strdup(value);
 }
 
 static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
@@ -294,14 +295,14 @@ static void test_write_spell_syntax(CuTest *tc) {
 
     set_parameter(spell, "bc");
     free(spell.sp->syntax);
-    spell.sp->syntax = strdup("hodor");
+    spell.sp->syntax = str_strdup("hodor");
     check_spell_syntax(tc, "bc hodor", &spell, "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
     set_parameter(spell, "c?");
     free(spell.sp->syntax);
-    spell.sp->syntax = strdup("hodor");
+    spell.sp->syntax = str_strdup("hodor");
     check_spell_syntax(tc, "c?", &spell, "  ZAUBERE \"Testzauber\" [<Hodor>]");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;

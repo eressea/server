@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 
@@ -124,7 +125,7 @@ ship_type *st_get_or_create(const char * name) {
     assert(!snames);
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
-        st->_name = strdup(name);
+        st->_name = str_strdup(name);
         st->storm = 1.0;
         st_register(st);
     }
@@ -217,7 +218,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     }
     assert(sname);
     snprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
-    sh->name = strdup(buffer);
+    sh->name = str_strdup(buffer);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);
@@ -491,7 +492,7 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
 void ship_setname(ship * self, const char *name)
 {
     free(self->name);
-    self->name = name ? strdup(name) : 0;
+    self->name = name ? str_strdup(name) : 0;
 }
 
 const char *ship_getname(const ship * self)

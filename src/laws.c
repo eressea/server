@@ -1586,7 +1586,7 @@ int display_cmd(unit * u, struct order *ord)
 
         free(*s);
         if (s2) {
-            char * str = strdup(s2);
+            char * str = str_strdup(s2);
             if (unicode_utf8_trim(str) != 0) {
                 log_info("trimming info: %s", s2);
             }
@@ -1636,7 +1636,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     }
 
     free(*s);
-    *s = strdup(name);
+    *s = str_strdup(name);
     return 0;
 }
 
@@ -2119,7 +2119,7 @@ int banner_cmd(unit * u, struct order *ord)
     free(u->faction->banner);
     init_order_depr(ord);
     s = getstrtoken();
-    u->faction->banner = s ? strdup(s) : 0;
+    u->faction->banner = s ? str_strdup(s) : 0;
     add_message(&u->faction->msgs, msg_message("changebanner", "value",
         u->faction->banner));
 

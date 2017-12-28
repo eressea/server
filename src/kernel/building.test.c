@@ -7,6 +7,7 @@
 #include <kernel/unit.h>
 
 #include <util/language.h>
+#include <util/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -564,7 +565,7 @@ static void test_buildingtype(CuTest *tc) {
     btype = test_create_buildingtype("hodor");
     CuAssertPtrNotNull(tc, btype->construction);
     CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
-    btype->construction->name = strdup("castle");
+    btype->construction->name = str_strdup("castle");
     CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
     btype = bt_get_or_create("portal");
     CuAssertPtrEquals(tc, NULL, btype->construction);

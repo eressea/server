@@ -18,6 +18,7 @@
 
 #include <util/attrib.h>
 #include <util/language.h>
+#include <util/strings.h>
 
 #include <CuTest.h>
 #include <selist.h>
@@ -476,7 +477,7 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
     CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->construction->name = strdup("site");
+    btype->construction->name = str_strdup("site");
     CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
     test_teardown();
 }
