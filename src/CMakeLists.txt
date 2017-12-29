@@ -201,6 +201,7 @@ target_link_libraries(convert
 set(TESTS_SRC
   test_eressea.c
   tests.c
+  academy.test.c
   alchemy.test.c
   battle.test.c
   calendar.test.c

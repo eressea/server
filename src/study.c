@@ -130,8 +130,13 @@ bool magic_lowskill(unit * u)
 
 int study_cost(unit * u, skill_t sk)
 {
+    static int config;
     static int cost[MAXSKILLS];
     int stufe, k = 50;
+
+    if (config_changed(&config)) {
+        memset(cost, 0, sizeof(cost));
+    }
 
     if (cost[sk] == 0) {
         char buffer[256];
