@@ -16,9 +16,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifdef _MSC_VER
 #include <platform.h>
-#endif
 #include <kernel/config.h>
 #include "study.h"
 #include "laws.h"
@@ -228,7 +226,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         students -= teach->students;
     }
 
-    students = MIN(students, nteaching);
+    if (students > nteaching) students = nteaching;
 
     if (students > 0) {
         if (teach == NULL) {
@@ -284,7 +282,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     teaching = teacher->number  * TEACHNUMBER;
 
     if ((i = get_effect(teacher, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
-        i = MIN(i, teacher->number * TEACHNUMBER);
+        if (i > teaching) i = teaching;
         /* Trank wirkt pro Schueler, nicht pro Lehrer */
         teaching -= i;
         change_effect(teacher, oldpotiontype[P_FOOL], -i);
@@ -699,11 +697,11 @@ int study_cmd(unit * u, order * ord)
     if (studycost) {
         int cost = studycost * u->number;
         money = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, cost);
-        money = MIN(money, cost);
+        if (money > cost) money = cost;
     }
     if (money < studycost * u->number) {
         studycost = p;              /* Ohne Univertreurung */
-        money = MIN(money, studycost);
+        if (money > studycost) money = studycost;
         if (p > 0 && money < studycost * u->number) {
             cmistake(u, ord, 65, MSG_EVENT);
             multi = money / (double)(studycost * u->number);
