@@ -680,7 +680,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_SKILL) {
-                int dmg = MIN(skl, 8);
+                int dmg = (skl < 8) ? skl : 8;
                 if (u_race(enemy.fighter->unit) == get_race(RC_TROLL)) {
                     dmg = dmg / 4;
                 }
@@ -691,7 +691,8 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
             }
             else {
                 skl = skl / 2;
-                return MIN(skl, 4);
+                if (skl > 4) skl = 4;
+                return skl;
             }
         }
     }
@@ -985,8 +986,10 @@ static void vampirism(troop at, int damage)
             ++gain;
         if (gain > 0) {
             int maxhp = unit_max_hp(at.fighter->unit);
-            at.fighter->person[at.index].hp =
-                MIN(gain + at.fighter->person[at.index].hp, maxhp);
+
+            gain += at.fighter->person[at.index].hp;
+            if (maxhp > gain) maxhp = gain;
+            at.fighter->person[at.index].hp = maxhp;
         }
     }
 }
@@ -1197,8 +1200,8 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             double kritchance = (sk * 3 - sd) / 200.0;
             int maxk = 4;
 
-            kritchance = MAX(kritchance, 0.005);
-            kritchance = MIN(0.9, kritchance);
+            kritchance = fmax(kritchance, 0.005);
+            kritchance = fmin(0.9, kritchance);
 
             while (maxk-- && chance(kritchance)) {
                 da += dice_rand(damage);
@@ -1733,8 +1736,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
                 }
 
                 level = eff_spelllevel(mage, sp, level, 1);
-                if (sl > 0)
-                    level = MIN(sl, level);
+                if (sl > 0 && sl < level) {
+                    level = sl;
+                }
                 if (level < 0) {
                     report_failed_spell(b, mage, sp);
                     free_order(ord);
@@ -1814,8 +1818,10 @@ static void do_combatspell(troop at)
     }
 
     level = eff_spelllevel(caster, sp, fi->magic, 1);
-    if ((sl = get_combatspelllevel(caster, 1)) > 0)
-        level = MIN(level, sl);
+    sl = get_combatspelllevel(caster, 1);
+    if (sl > 0 && sl < level) {
+        level = sl;
+    }
 
     if (fumble(r, caster, sp, level)) {
         report_failed_spell(b, caster, sp);
@@ -2333,14 +2339,15 @@ double fleechance(unit * u)
 
     if (u_race(u) == get_race(RC_HALFLING)) {
         c += 0.20;
-        c = MIN(c, 0.90);
+        c = fmin(c, 0.90);
     }
     else {
-        c = MIN(c, 0.75);
+        c = fmin(c, 0.75);
     }
 
-    if (a != NULL)
+    if (a) {
         c += a->data.flt;
+    }
 
     return c;
 }
@@ -2461,7 +2468,7 @@ static void loot_items(fighter * corpse)
         float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
         int maxloot = (int)((float)itm->number * lootfactor);
         if (maxloot > 0) {
-            int i = MIN(10, maxloot);
+            int i = (maxloot > 10) ? 10 : maxloot;
             for (; i != 0; --i) {
                 int loot = maxloot / i;
 
@@ -2541,12 +2548,18 @@ static double PopulationDamage(void)
 static void battle_effects(battle * b, int dead_players)
 {
     region *r = b->region;
-    int dead_peasants =
-        MIN(rpeasants(r), (int)(dead_players * PopulationDamage()));
-    if (dead_peasants) {
-        deathcounts(r, dead_peasants + dead_players);
-        add_chaoscount(r, dead_peasants / 2);
-        rsetpeasants(r, rpeasants(r) - dead_peasants);
+    int rp = rpeasants(r);
+
+    if (rp > 0) {
+        int dead_peasants = (int)(dead_players * PopulationDamage());
+        if (dead_peasants > rp) {
+            dead_peasants = rp;
+        }
+        if (dead_peasants) {
+            deathcounts(r, dead_peasants + dead_players);
+            add_chaoscount(r, dead_peasants / 2);
+            rsetpeasants(r, rp - dead_peasants);
+        }
     }
 }
 
@@ -3174,7 +3187,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* change_effect wird in ageing gemacht */
 
     /* Effekte von Artefakten */
-    strongmen = MIN(fig->unit->number, trollbelts(u));
+    strongmen = trollbelts(u);
+    if (strongmen > fig->unit->number) strongmen = fig->unit->number;
 
     /* Hitpoints, Attack- und Defence-Boni f�r alle Personen */
     for (i = 0; i < fig->alive; i++) {
@@ -3946,7 +3960,8 @@ static void battle_flee(battle * b)
                 troop dt;
                 int runners = 0;
                 /* Flucht nicht bei mehr als 600 HP. Damit Wyrme t�tbar bleiben. */
-                int runhp = MIN(600, (int)(0.9 + unit_max_hp(u) * hpflee(u->status)));
+                int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
+                if (runhp > 600) runhp = 600;
 
                 if (u->ship && fval(u->region->terrain, SEA_REGION)) {
                     /* keine Flucht von Schiffen auf hoher See */
@@ -3989,7 +4004,7 @@ static void battle_flee(battle * b)
                     if (fig->person[dt.index].flags & FL_PANICED) {
                         ispaniced = EFFECT_PANIC_SPELL;
                     }
-                    if (chance(MIN(fleechance(u) + ispaniced, 0.90))) {
+                    if (chance(fmin(fleechance(u) + ispaniced, 0.90))) {
                         ++runners;
                         flee(dt);
                     }

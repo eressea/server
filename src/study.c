@@ -16,10 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#define TEACH_ALL 1
-#define TEACH_FRIENDS
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "study.h"
 #include "laws.h"
@@ -64,6 +63,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#define TEACH_ALL 1
+#define TEACH_FRIENDS
 
 static skill_t getskill(const struct locale *lang)
 {

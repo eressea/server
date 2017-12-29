@@ -19,11 +19,6 @@
 /* @see https://insanecoding.blogspot.no/2007/11/pathmax-simply-isnt.html */
 #define PATH_MAX 260
 
-#else /* assume gcc */
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-# define va_copy(a,b) __va_copy(a,b)
-#endif
-
 #endif
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))

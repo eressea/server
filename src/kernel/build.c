@@ -16,8 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 #include "build.h"
 
 #include "alchemy.h"
@@ -34,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/alliance.h>
 #include <kernel/connection.h>
 #include <kernel/building.h>
+#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
@@ -121,11 +123,12 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
         }
 
         road = rroad(r, d);
-        n = MIN(n, road);
+        if (n > road) n = road;
+
         if (n != 0) {
             region *r2 = rconnect(r, d);
             int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
-            willdo = MIN(willdo, n);
+            if (willdo > n) willdo = n;
             if (willdo == 0) {
                 /* TODO: error message */
             }
@@ -324,8 +327,9 @@ void build_road(unit * u, int size, direction_t d)
         return;
     }
 
-    if (size > 0)
-        left = MIN(size, left);
+    if (size > 0 && left > size) {
+        left = size;
+    }
     /* baumaximum anhand der rohstoffe */
     if (u_race(u) == get_race(RC_STONEGOLEM)) {
         n = u->number * GOLEM_STONE;
@@ -337,7 +341,7 @@ void build_road(unit * u, int size, direction_t d)
             return;
         }
     }
-    left = MIN(n, left);
+    if (n < left) left = n;
 
     /* n = maximum by skill. try to maximize it */
     n = u->number * effsk;
@@ -345,7 +349,7 @@ void build_road(unit * u, int size, direction_t d)
         const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
         item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
         if (itm != NULL && itm->number > 0) {
-            int rings = MIN(u->number, itm->number);
+            int rings = (u->number < itm->number) ? u->number : itm->number;
             n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
         }
     }
@@ -353,15 +357,15 @@ void build_road(unit * u, int size, direction_t d)
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
         if (dm != 0) {
             int todo = (left - n + effsk - 1) / effsk;
-            todo = MIN(todo, u->number);
-            dm = MIN(dm, todo);
+            if (todo > u->number) todo = u->number;
+            if (dm > todo) dm = todo;
             change_effect(u, oldpotiontype[P_DOMORE], -dm);
             n += dm * effsk;
         }                           /* Auswirkung Schaffenstrunk */
     }
 
     /* make minimum of possible and available: */
-    n = MIN(left, n);
+    if (n > left) n = left;
 
     /* n is now modified by several special effects, so we have to
      * minimize it again to make sure the road will not grow beyond
@@ -378,7 +382,7 @@ void build_road(unit * u, int size, direction_t d)
     else {
         use_pooled(u, get_resourcetype(R_STONE), GET_DEFAULT, n);
         /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-        produceexp(u, SK_ROAD_BUILDING, MIN(n, u->number));
+        produceexp(u, SK_ROAD_BUILDING, (n < u->number) ? n : u->number);
     }
     ADDMSG(&u->faction->msgs, msg_message("buildroad",
         "region unit size", r, u, n));
@@ -533,7 +537,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
 
         if (dm != 0) {
             /* Auswirkung Schaffenstrunk */
-            dm = MIN(dm, u->number);
+            if (dm > u->number) dm = u->number;
             change_effect(u, oldpotiontype[P_DOMORE], -dm);
             skills += dm * effsk;
         }
@@ -592,7 +596,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
             item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
             int i = itm ? itm->number : 0;
             if (i > 0) {
-                int rings = MIN(u->number, i);
+                int rings = (u->number < i) ? u->number : i;
                 n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
             }
         }
@@ -600,7 +604,8 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         if (want < n) n = want;
 
         if (con->maxsize > 0) {
-            n = MIN(con->maxsize - completed, n);
+            int req = con->maxsize - completed;
+            if (req < n) n = req;
             if (con->improvement == NULL) {
                 want = n;
             }
@@ -623,7 +628,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         completed = completed + n;
     }
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, ctype->skill, MIN(made, u->number));
+    produceexp(u, ctype->skill, (made < u->number) ? made : u->number);
 
     return made;
 }
@@ -667,8 +672,10 @@ int maxbuild(const unit * u, const construction * cons)
         if (have < need) {
             return 0;
         }
-        else
-            maximum = MIN(maximum, have / need);
+        else {
+            int b = have / need;
+            if (maximum > b) maximum = b;
+        }
     }
     return maximum;
 }
@@ -877,7 +884,8 @@ static void build_ship(unit * u, ship * sh, int want)
     }
 
     if (sh->damage && can) {
-        int repair = MIN(sh->damage, can * DAMAGE_SCALE);
+        int repair = can * DAMAGE_SCALE;
+        if (repair > sh->damage) repair = sh->damage;
         n += repair / DAMAGE_SCALE;
         if (repair % DAMAGE_SCALE)
             ++n;
@@ -920,10 +928,9 @@ order * ord)
         cmistake(u, ord, 88, MSG_PRODUCE);
         return;
     }
-    if (want > 0)
-        want = MIN(want, msize);
-    else
+    if (want <= 0 || want > msize) {
         want = msize;
+    }
 
     sh = new_ship(newtype, r, u->faction->locale);
 
@@ -979,10 +986,9 @@ void continue_ship(unit * u, int want)
         cmistake(u, u->thisorder, 88, MSG_PRODUCE);
         return;
     }
-    if (want > 0)
-        want = MIN(want, msize);
-    else
+    if (want <= 0 || want > msize) {
         want = msize;
+    }
 
     build_ship(u, sh, want);
 }

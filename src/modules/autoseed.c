@@ -961,8 +961,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }
@@ -976,8 +976,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }
