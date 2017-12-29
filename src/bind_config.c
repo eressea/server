@@ -7,9 +7,11 @@
 #include <kernel/config.h>
 #include <kernel/jsonconf.h>
 #include <util/bsdstring.h>
-#include <util/nrmessage.h>
 #include <util/log.h>
 #include <util/language.h>
+#include <util/nrmessage.h>
+#include <util/path.h>
+
 #include <cJSON.h>
 #include <string.h>
 #include <stdio.h>
@@ -58,12 +60,12 @@ int config_parse(const char *json)
 
 int config_read(const char *filename, const char * relpath)
 {
-    char name[MAX_PATH];
+    char name[PATH_MAX];
     FILE *F;
 
     json_relpath = relpath;
     if (relpath) {
-        join_path(relpath, filename, name, sizeof(name));
+        path_join(relpath, filename, name, sizeof(name));
         F = fopen(name, "r");
     }
     else {

@@ -68,6 +68,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/path.h>
 #include <util/strings.h>
 #include <util/translation.h>
 #include <stream.h>
@@ -1567,7 +1568,7 @@ int write_reports(faction * f, time_t ltime)
                 char path[4096];
                 sprintf(filename, "%d-%s.%s", turn, itoa36(f->no),
                     rtype->extension);
-                join_path(reportpath(), filename, path, sizeof(path));
+                path_join(reportpath(), filename, path, sizeof(path));
                 errno = 0;
                 if (rtype->write(path, &ctx, (const char *)utf8_bom) == 0) {
                     gotit = true;
@@ -1645,7 +1646,7 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    join_path(rpath, "reports.txt", path, sizeof(path));
+    path_join(rpath, "reports.txt", path, sizeof(path));
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);

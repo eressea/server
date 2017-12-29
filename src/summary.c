@@ -30,6 +30,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/path.h>
 
 #include <assert.h>
 #include <string.h>
@@ -165,7 +166,7 @@ static void writeturn(void)
     char zText[4096];
     FILE *f;
 
-    join_path(basepath(), "datum", zText, sizeof(zText));
+    path_join(basepath(), "datum", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -173,7 +174,7 @@ static void writeturn(void)
     }
     fputs(gamedate2(default_locale), f);
     fclose(f);
-    join_path(basepath(), "turn", zText, sizeof(zText));
+    path_join(basepath(), "turn", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -192,10 +193,10 @@ void report_summary(summary * s, summary * o, bool full)
     int timeout = NMRTimeout();
 
     if (full) {
-        join_path(basepath(), "parteien.full", zText, sizeof(zText));
+        path_join(basepath(), "parteien.full", zText, sizeof(zText));
     }
     else {
-        join_path(basepath(), "parteien", zText, sizeof(zText));
+        path_join(basepath(), "parteien", zText, sizeof(zText));
     }
     F = fopen(zText, "w");
     if (!F) {

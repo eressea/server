@@ -70,6 +70,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
@@ -292,11 +293,11 @@ static void write_owner(gamedata *data, region_owner * owner)
 
 int current_turn(void)
 {
-    char zText[MAX_PATH];
+    char zText[PATH_MAX];
     int cturn = 0;
     FILE *F;
 
-    join_path(basepath(), "turn", zText, sizeof(zText));
+    path_join(basepath(), "turn", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (!F) {
         perror(zText);
@@ -1151,7 +1152,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 int readgame(const char *filename)
 {
     int n, stream_version;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata = { 0 };
     storage store;
     stream strm;
@@ -1159,7 +1160,7 @@ int readgame(const char *filename)
     size_t sz;
 
     log_debug("- reading game data from %s", filename);
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
 
     F = fopen(path, "rb");
     if (!F) {
@@ -1562,14 +1563,14 @@ static void clear_npc_orders(faction *f)
 int writegame(const char *filename)
 {
     int n;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata;
     storage store;
     stream strm;
     FILE *F;
 
     create_directories();
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
     /* make sure we don't overwrite an existing file (hard links) */
     if (remove(path) != 0) {
         if (errno == ENOENT) {

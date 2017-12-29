@@ -63,6 +63,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/lists.h>
 #include <util/macros.h>
 #include <util/parser.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -520,31 +521,13 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
-#ifdef WIN32
-#define PATH_DELIM '\\'
-#else
-#define PATH_DELIM '/'
-#endif
-
 char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
-    size_t sz;
-    assert(p1 && p2);
-    assert(p2 != dst);
-    if (dst == p1) {
-        sz = strlen(p1);
-    }
-    else {
-        sz = strlcpy(dst, p1, len);
-    }
-    assert(sz < len);
-    dst[sz++] = PATH_DELIM;
-    strlcpy(dst + sz, p2, len - sz);
-    return dst;
+    return path_join(p1, p2, dst, len);
 }
 
 static const char * relpath(char *buf, size_t sz, const char *path) {
     if (g_basedir) {
-        join_path(g_basedir, path, buf, sz);
+        path_join(g_basedir, path, buf, sz);
     }
     else {
         strlcpy(buf, path, sz);

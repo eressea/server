@@ -52,6 +52,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/path.h>
 #include <util/rng.h>
 #include <util/unicode.h>
 
@@ -879,7 +880,7 @@ static void select_regions(state * st, int selectmode)
 }
 
 static void loaddata(state *st) {
-    char datafile[MAX_PATH];
+    char datafile[PATH_MAX];
 
     askstring(st->wnd_status->handle, "load from:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
@@ -889,7 +890,7 @@ static void loaddata(state *st) {
 }
 
 static void savedata(state *st) {
-    char datafile[MAX_PATH];
+    char datafile[PATH_MAX];
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
@@ -1391,7 +1392,7 @@ void run_mapper(void)
     char sbuffer[512];
 
     if (!new_players) {
-        join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
+        path_join(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
         new_players = read_newfactions(sbuffer);
     }
 

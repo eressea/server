@@ -89,6 +89,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -4260,7 +4261,7 @@ void update_subscriptions(void)
     FILE *F;
     char zText[4096];
 
-    join_path(basepath(), "subscriptions", zText, sizeof(zText));
+    path_join(basepath(), "subscriptions", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (F == NULL) {
         log_warning(0, "could not open %s.\n", zText);

@@ -22,6 +22,7 @@
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/strings.h>
 
 #include <storage.h>
@@ -36,11 +37,11 @@
 static void test_readwrite_data(CuTest * tc)
 {
     const char *filename = "test.dat";
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     test_setup();
     CuAssertIntEquals(tc, 0, writegame(filename));
     CuAssertIntEquals(tc, 0, readgame(filename));
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
     test_teardown();
 }

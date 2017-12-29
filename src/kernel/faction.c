@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -854,7 +855,7 @@ int writepasswd(void)
     FILE *F;
     char zText[128];
 
-    join_path(basepath(), "passwd", zText, sizeof(zText));
+    path_join(basepath(), "passwd", zText, sizeof(zText));
     F = fopen(zText, "w");
     if (!F) {
         perror(zText);

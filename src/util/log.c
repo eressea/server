@@ -10,8 +10,10 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 #include <platform.h>
-#include "log.h"
+
 #include "bsdstring.h"
+#include "log.h"
+#include "path.h"
 #include "unicode.h"
 
 #include <assert.h>
@@ -92,7 +94,7 @@ cp_convert(const char *format, unsigned char *buffer, size_t length, int codepag
 
 void log_rotate(const char *filename, int maxindex)
 {
-    char buffer[2][MAX_PATH];
+    char buffer[2][PATH_MAX];
     int dst = 1;
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 

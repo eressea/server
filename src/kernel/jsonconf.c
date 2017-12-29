@@ -45,6 +45,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/path.h>
 #include <util/strings.h>
 #include <util/xml.h>
 
@@ -897,8 +898,8 @@ static void json_include(cJSON *json) {
     for (child = json->child; child; child = child->next) {
         FILE *F;
         if (json_relpath) {
-            char name[MAX_PATH];
-            join_path(json_relpath, child->valuestring, name, sizeof(name));
+            char name[PATH_MAX];
+            path_join(json_relpath, child->valuestring, name, sizeof(name));
             F = fopen(name, "r");
         }
         else {

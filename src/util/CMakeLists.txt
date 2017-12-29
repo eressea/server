@@ -50,6 +50,7 @@ mt19937ar.c
 nrmessage.c
 parser.c
 password.c
+path.c
 rand.c
 resolve.c
 strings.c
