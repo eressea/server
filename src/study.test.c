@@ -386,41 +386,43 @@ static void test_study_magic(CuTest *tc) {
     unit *u;
     faction *f;
     const struct locale *lang;
-    const struct resource_type *rtype;
+    const struct item_type *itype;
 
     test_setup();
     init_resources();
     f = test_create_faction(0);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
     lang = f->locale;
-    CuAssertPtrNotNull(tc, rtype = get_resourcetype(R_SILVER));
+    u = test_create_unit(f, test_create_region(0, 0, 0));
     u->thisorder = create_order(K_STUDY, lang, "%s", skillnames[SK_MAGIC]);
-    study_cmd(u, u->thisorder);
+    itype = test_create_silver();
+
+    CuAssertIntEquals(tc, -1, study_cmd(u, u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error178"));
     free_order(u->thisorder);
 
     test_clear_messages(f);
     u->thisorder = create_order(K_STUDY, lang, "%s %s", skillnames[SK_MAGIC], magic_school[M_GWYRRD]);
-    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 0, study_cmd(u, u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error65"));
 
     test_clear_messages(f);
-    i_change(&u->items, rtype->itype, 100);
-    study_cmd(u, u->thisorder);
+    i_change(&u->items, itype, 100);
+    CuAssertIntEquals(tc, 0, study_cmd(u, u->thisorder));
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
-    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertPtrNotNull(tc, get_mage_depr(u));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
     CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
 
-    /* TODO: the static cost array in study_cost prevents this test:
-    test_clear_messages(f);
-    config_set("skills.cost.magic", "50");
-    i_change(&u->items, rtype->itype, 50);
-    study_cmd(u, u->thisorder);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
-    */
+    test_teardown();
+}
 
+static void test_study_cost_magic(CuTest *tc) {
+    test_setup();
+    config_set("skills.cost.magic", "50");
+    CuAssertIntEquals(tc, 50, study_cost(NULL, SK_MAGIC));
+    config_set("skills.cost.magic", "100");
+    CuAssertIntEquals(tc, 100, study_cost(NULL, SK_MAGIC));
     test_teardown();
 }
 
@@ -429,11 +431,16 @@ static void test_study_cost(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
-    init_resources();
-    itype = get_resourcetype(R_SILVER)->itype;
+
+    itype = test_create_silver();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 2);
     u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_ALCHEMY]);
+
+    CuAssertIntEquals(tc, 200, study_cost(u, SK_ALCHEMY));
+    config_set("skills.cost.alchemy", "50");
+    CuAssertIntEquals(tc, 50, study_cost(u, SK_ALCHEMY));
+
     i_change(&u->items, itype, u->number * study_cost(u, SK_ALCHEMY));
     learn_inject();
     study_cmd(u, u->thisorder);
@@ -682,6 +689,7 @@ CuSuite *get_study_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_study_cmd);
     SUITE_ADD_TEST(suite, test_study_cost);
+    SUITE_ADD_TEST(suite, test_study_cost_magic);
     SUITE_ADD_TEST(suite, test_study_magic);
     SUITE_ADD_TEST(suite, test_teach_cmd);
     SUITE_ADD_TEST(suite, test_teach_magic);
