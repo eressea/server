@@ -1,4 +1,6 @@
+#ifdef WIN32
 #include <platform.h>
+#endif
 #include "upkeep.h"
 
 #include <kernel/ally.h>
@@ -42,7 +44,7 @@ static void help_feed(unit * donor, unit * u, int *need_p)
 {
     int need = *need_p;
     int give = get_money(donor) - lifestyle(donor);
-    give = MIN(need, give);
+    if (give > need) give = need;
 
     if (give > 0) {
         change_money(donor, -give);
@@ -167,7 +169,7 @@ void get_food(region * r)
             * food from the peasants - should not be used with WORK */
             if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
                 int rm = rmoney(r);
-                int use = MIN(rm, need);
+                int use = (rm < need) ? rm : need;
                 rsetmoney(r, rm - use);
                 need -= use;
             }
@@ -180,7 +182,7 @@ void get_food(region * r)
             for (v = r->units; need && v; v = v->next) {
                 if (v->faction == u->faction) {
                     int give = get_money(v) - lifestyle(v);
-                    give = MIN(need, give);
+                    if (give > need) give = need;
                     if (give > 0) {
                         change_money(v, -give);
                         change_money(u, give);
@@ -194,11 +196,11 @@ void get_food(region * r)
     /* 2. Versorgung durch Fremde. Das Silber alliierter Einheiten wird
     * entsprechend verteilt. */
     for (u = r->units; u; u = u->next) {
-        int need = lifestyle(u);
+        int need;
         faction *f = u->faction;
 
         assert(u->hp > 0);
-        need -= MAX(0, get_money(u));
+        need = lifestyle(u) - get_money(u);
 
         if (need > 0) {
             unit *v;
@@ -253,8 +255,8 @@ void get_food(region * r)
                 unit *donor = u;
                 while (donor != NULL && hungry > 0) {
                     int blut = get_effect(donor, pt_blood);
-                    blut = MIN(blut, hungry);
-                    if (blut) {
+                    if (hungry < blut) blut = hungry;
+                    if (blut > 0) {
                         change_effect(donor, pt_blood, -blut);
                         hungry -= blut;
                     }
@@ -306,7 +308,9 @@ void get_food(region * r)
 
     /* 3. Von den �berlebenden das Geld abziehen: */
     for (u = r->units; u; u = u->next) {
-        int need = MIN(get_money(u), lifestyle(u));
+        int m = get_money(u);
+        int need = lifestyle(u);
+        if (need > m) need = m;
         change_money(u, -need);
     }
 }
