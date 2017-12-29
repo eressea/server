@@ -68,11 +68,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/strings.h>
-#include <selist.h>
 #include <util/rand.h>
 #include <util/rng.h>
+
+#include <selist.h>
 
 /* libc includes */
 #include <ctype.h>

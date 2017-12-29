@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/rand.h>
 
 #include <storage.h>

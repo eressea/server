@@ -10,6 +10,10 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include "helpers.h"
 #include "vortex.h"
 #include "alchemy.h"

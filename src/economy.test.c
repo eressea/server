@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "economy.h"
 
@@ -19,6 +21,7 @@
 
 #include <util/attrib.h>
 #include <util/language.h>
+#include <util/macros.h>
 
 #include <CuTest.h>
 #include <tests.h>

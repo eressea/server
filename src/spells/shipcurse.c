@@ -26,6 +26,7 @@
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 
 #include <storage.h>
 

@@ -14,6 +14,7 @@
 #include <platform.h>
 #include "crmessage.h"
 
+#include "macros.h"
 #include "message.h"
 #include "strings.h"
 #include "log.h"

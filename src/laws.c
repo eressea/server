@@ -85,6 +85,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
@@ -1586,17 +1587,17 @@ int display_cmd(unit * u, struct order *ord)
 
         free(*s);
         if (s2) {
-            char * str = str_strdup(s2);
-            if (unicode_utf8_trim(str) != 0) {
+            char * sdup = str_strdup(s2);
+            if (unicode_utf8_trim(sdup) != 0) {
                 log_info("trimming info: %s", s2);
             }
-            if (strlen(str) >= DISPLAYSIZE) {
-                str[DISPLAYSIZE-1] = 0;
+            if (strlen(sdup) >= DISPLAYSIZE) {
+                sdup[DISPLAYSIZE-1] = 0;
             }
-            *s = str;
+            *s = sdup;
         }
         else {
-            *s = 0;
+            *s = NULL;
         }
     }
 

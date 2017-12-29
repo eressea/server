@@ -16,8 +16,11 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
+
+#include "config.h"
 
 /* kernel includes */
 #include "alliance.h"
@@ -48,10 +51,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "types.h"
 #include "unit.h"
 
-
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
@@ -62,6 +61,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -90,8 +90,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
-#include <sys/stat.h>
 
+#ifdef WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
 struct settings global;
 
 int turn = 0;
@@ -576,14 +580,23 @@ void set_reportpath(const char *path)
     g_reportdir = path;
 }
 
+static int sys_mkdir(const char *path, int mode) {
+#ifdef WIN32
+    UNUSED_ARG(mode);
+    return _mkdir(path);
+#else
+    return mkdir(path, mode);
+#endif
+}
+
 int create_directories(void) {
     int err;
-    err = mkdir(datapath(), 0777);
+    err = sys_mkdir(datapath(), 0777);
     if (err) {
         if (errno == EEXIST) errno = 0;
         else return err;
     }
-    err = mkdir(reportpath(), 0777);
+    err = sys_mkdir(reportpath(), 0777);
     if (err && errno == EEXIST) {
         errno = 0;
     }

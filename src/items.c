@@ -34,6 +34,7 @@
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>

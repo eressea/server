@@ -8,7 +8,10 @@
  *
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <curses.h>
 
 #include <kernel/config.h>
@@ -45,11 +48,12 @@
 #include <triggers/triggers.h>
 
 #include <util/attrib.h>
-#include <util/log.h>
-#include <util/unicode.h>
-#include <util/lists.h>
-#include <util/rng.h>
 #include <util/base36.h>
+#include <util/lists.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include <util/rng.h>
+#include <util/unicode.h>
 
 #include <storage.h>
 #include <lua.h>

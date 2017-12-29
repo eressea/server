@@ -32,8 +32,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/base36.h>
 #include <util/bsdstring.h>
-#include <util/language.h>
 #include <util/functions.h>
+#include <util/language.h>
+#include <util/macros.h>
 #include <util/rng.h>
 #include <util/unicode.h>
 

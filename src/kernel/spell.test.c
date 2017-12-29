@@ -5,6 +5,7 @@
 
 #include <util/log.h>
 #include <util/lists.h>
+#include <util/macros.h>
 
 #include <CuTest.h>
 #include <tests.h>

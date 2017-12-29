@@ -67,6 +67,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/strings.h>
 #include <util/translation.h>
 #include <stream.h>
@@ -537,10 +538,9 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
                     faction *otherf = get_otherfaction(u);
                     if (otherf) {
-                        int result =
-                            snprintf(bufp, size, ", %s (%s)", factionname(otherf),
-                                factionname(u->faction));
-                        if (wrptr(&bufp, &size, result) != 0)
+                        int n = snprintf(bufp, size, ", %s (%s)",
+                            factionname(otherf), factionname(u->faction));
+                        if (wrptr(&bufp, &size, n) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     else {
@@ -675,23 +675,22 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
         if (book) {
             selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
-            int result = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
-            if (wrptr(&bufp, &size, result) != 0) {
+            int n = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+            if (wrptr(&bufp, &size, n) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 if (sbe->level <= maxlevel) {
-                    int result = 0;
                     if (!header) {
-                        result = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
+                        n = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
                         header = 1;
                     }
                     else {
-                        result = (int)strlcpy(bufp, ", ", size);
+                        n = (int)strlcpy(bufp, ", ", size);
                     }
-                    if (wrptr(&bufp, &size, result) != 0) {
+                    if (wrptr(&bufp, &size, n) != 0) {
                         WARN_STATIC_BUFFER();
                     }
                     /* TODO: no need to deref the spellref here (spref->name is good) */
@@ -704,9 +703,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                int result =
-                    snprintf(bufp, size, ", %s: ", LOC(lang, "nr_combatspells"));
-                if (wrptr(&bufp, &size, result) != 0)
+                n = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_combatspells"));
+                if (wrptr(&bufp, &size, n) != 0)
                     WARN_STATIC_BUFFER();
 
                 dh = 0;
@@ -723,8 +721,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                         int sl = get_combatspelllevel(u, i);
                         bufp = STRLCPY(bufp, spell_name(sp, lang), size);
                         if (sl > 0) {
-                            result = snprintf(bufp, size, " (%d)", sl);
-                            if (wrptr(&bufp, &size, result) != 0)
+                            n = snprintf(bufp, size, " (%d)", sl);
+                            if (wrptr(&bufp, &size, n) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                     }
@@ -741,8 +739,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 keyword_t kwd = getkeyword(ord);
                 if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
-                        int result = (int)buforder(bufp, size, ord, u->faction->locale, printed++);
-                        if (wrptr(&bufp, &size, result) != 0)
+                        int n = (int)buforder(bufp, size, ord, u->faction->locale, printed++);
+                        if (wrptr(&bufp, &size, n) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     else
@@ -754,12 +752,13 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     keyword_t kwd = getkeyword(ord);
                     if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
-                            int result = (int)buforder(bufp, size, ord, lang, printed++);
-                            if (wrptr(&bufp, &size, result) != 0)
+                            int n = (int)buforder(bufp, size, ord, lang, printed++);
+                            if (wrptr(&bufp, &size, n) != 0)
                                 WARN_STATIC_BUFFER();
                         }
-                        else
+                        else {
                             break;
+                        }
                     }
                 }
         }
@@ -1339,8 +1338,8 @@ void reorder_units(region * r)
 
         while (*unext && sh) {
             unit **ufirst = unext;    /* where the first unit in the building should go */
-            unit **umove = unext;     /* a unit we consider moving */
             unit *owner = ship_owner(sh);
+            umove = unext;
             while (owner && *umove) {
                 unit *u = *umove;
                 if (u->number && u->ship == sh) {
@@ -1478,8 +1477,8 @@ void prepare_report(report_context *ctx, faction *f)
                     for (b = rbuildings(r); b; b = b->next) {
                         if (b && b->type == bt_lighthouse) {
                             /* region owners get maximm range */
-                            int br = lighthouse_range(b, NULL, NULL);
-                            if (br > range) range = br;
+                            int lhr = lighthouse_range(b, NULL, NULL);
+                            if (lhr > range) range = lhr;
                         }
                     }
                 }

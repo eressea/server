@@ -768,7 +768,7 @@ int study_cmd(unit * u, order * ord)
         if (skill > maxalchemy) {
             for (ptype = potiontypes; ptype; ptype = ptype->next) {
                 if (skill == ptype->level * 2) {
-                    attrib *a = a_find(f->attribs, &at_showitem);
+                    a = a_find(f->attribs, &at_showitem);
                     while (a && a->type == &at_showitem && a->data.v != ptype)
                         a = a->next;
                     if (a == NULL || a->type != &at_showitem) {

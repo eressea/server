@@ -8,8 +8,10 @@
 *
 */
 
-/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <curses.h>
 #include <kernel/config.h>
 

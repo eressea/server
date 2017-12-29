@@ -1,6 +1,9 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include "bind_config.h"
 
-#include <platform.h>
 #include <kernel/config.h>
 #include <kernel/jsonconf.h>
 #include <util/bsdstring.h>

@@ -32,6 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/crmessage.h>

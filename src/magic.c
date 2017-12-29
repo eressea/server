@@ -17,7 +17,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <kernel/config.h>
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
 #include "magic.h"
 
 #include "skill.h"
@@ -40,6 +42,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
+#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>

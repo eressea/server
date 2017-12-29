@@ -1,4 +1,6 @@
-#include <kernel/config.h>
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
 #include <kernel/spell.h>
 
 #include <util/log.h>

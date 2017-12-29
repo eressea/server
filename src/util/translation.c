@@ -9,13 +9,16 @@
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
  */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 #include "translation.h"
 
 #include "bsdstring.h"
 #include "critbit.h"
 #include "log.h"
+#include "macros.h"
 #include "assert.h"
 
  /* libc includes */
@@ -161,12 +164,12 @@ static void free_functions(void)
 
 void add_function(const char *symbol, evalfun parse)
 {
-    char buffer[64];
+    char token[64];
     size_t len = strlen(symbol);
 
-    assert(len + 1 + sizeof(parse) <= sizeof(buffer));
-    len = cb_new_kv(symbol, len, &parse, sizeof(parse), buffer);
-    cb_insert(&functions, buffer, len);
+    assert(len + 1 + sizeof(parse) <= sizeof(token));
+    len = cb_new_kv(symbol, len, &parse, sizeof(parse), token);
+    cb_insert(&functions, token, len);
 }
 
 static evalfun find_function(const char *symbol)

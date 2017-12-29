@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include <CuTest.h>
 #include "base36.h"
 #include <stdlib.h>

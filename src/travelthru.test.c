@@ -4,6 +4,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <util/attrib.h>
+#include <util/macros.h>
 
 #include "travelthru.h"
 #include "reports.h"

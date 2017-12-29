@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/log.h>
+#include <util/macros.h>
 
 /* libc includes */
 #include <assert.h>

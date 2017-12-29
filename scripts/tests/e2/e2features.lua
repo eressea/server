@@ -214,8 +214,8 @@ end
 
 function test_can_give_person()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("human", "noreply@eressea.de", "de")
-  local f2 = faction.create("human", "noreply@eressea.de", "de")
+  local f1 = faction.create("human")
+  local f2 = faction.create("human")
   local u1 = unit.create(f1, r, 10)
   local u2 = unit.create(f2, r, 10)
   u1.faction.age = 10

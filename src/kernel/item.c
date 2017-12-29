@@ -41,6 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/rng.h>
 #include <util/strings.h>

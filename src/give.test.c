@@ -210,6 +210,21 @@ static void test_give_men_too_many(CuTest * tc) {
     test_teardown();
 }
 
+static void test_give_cmd_limit(CuTest * tc) {
+    struct give env = { 0 };
+    unit *u;
+    test_setup_ex(tc);
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    u = env.src;
+    scale_number(u, 2);
+    u->thisorder = create_order(K_GIVE, u->faction->locale, "%s 1 PERSON", itoa36(env.dst->no));
+    give_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 1, env.src->number);
+    test_teardown();
+}
+
 static void test_give_men_none(CuTest * tc) {
     struct give env = { 0 };
     message * msg;
@@ -436,6 +451,7 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_cmd);
+    SUITE_ADD_TEST(suite, test_give_cmd_limit);
     SUITE_ADD_TEST(suite, test_give_men);
     SUITE_ADD_TEST(suite, test_give_men_magicians);
     SUITE_ADD_TEST(suite, test_give_men_limit);

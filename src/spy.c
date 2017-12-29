@@ -425,9 +425,8 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         }
     }
     for (ui = &r->units; *ui;) {
-        unit *u = *ui;
-
         /* inform this faction about the sinking ship: */
+        u = *ui;
         if (!(u->faction->flags & FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
             if (sink_msg == NULL) {

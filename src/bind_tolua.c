@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #pragma warning(push)
 #pragma warning(disable: 4100)
 #include "config.pkg.c"

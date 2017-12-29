@@ -786,7 +786,7 @@ void plan_monsters(faction * f)
 
             /* Einheiten mit Bewegungsplan kriegen ein NACH: */
             if (long_order == NULL) {
-                attrib *ta = a_find(u->attribs, &at_targetregion);
+                ta = a_find(u->attribs, &at_targetregion);
                 if (ta) {
                     if (u->region == (region *)ta->data.v) {
                         a_remove(&u->attribs, ta);

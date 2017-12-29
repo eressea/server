@@ -56,7 +56,6 @@ function test_speedy_ship_slow()
     u2.ship = u1.ship
     u1:set_skill("sailing", 2) -- cptskill = 2^1
     u2:set_skill("sailing", 24) -- sumskill = 50
-    u1.name = "XXX"
     u1:add_order("NACH O O O O O O O O O O")
     process_orders()
     assert_equal(5, u1.region.x)

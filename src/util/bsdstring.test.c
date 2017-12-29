@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
 #include <CuTest.h>
 #include "bsdstring.h"
 #include <errno.h>

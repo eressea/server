@@ -11,7 +11,6 @@
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
  */
-
 #include <platform.h>
 #include <kernel/config.h>
 
@@ -64,6 +63,7 @@
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/parser.h>
 #include <util/umlaut.h>

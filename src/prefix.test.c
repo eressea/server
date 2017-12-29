@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include "prefix.h"
 
 #include <tests.h>

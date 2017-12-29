@@ -12,8 +12,9 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include <util/rng.h>
+#include <util/macros.h>
 #include <util/strings.h>
+#include <util/rng.h>
 #include <spells/regioncurse.h>
 #include <alchemy.h>
 #include <laws.h>

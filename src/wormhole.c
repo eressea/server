@@ -28,10 +28,11 @@
 #include <util/attrib.h>
 #include <util/gamedata.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <selist.h>
 
+#include <selist.h>
 #include <storage.h>
 
 /* libc includes */

@@ -16,9 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#define ECHECK_VERSION "4.01"
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 
 #include "report.h"
@@ -104,9 +104,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
-# pragma warning(disable: 4774) /* TODO: remove this */
-#endif
+#define ECHECK_VERSION "4.01"
 
 extern int *storms;
 extern int weeks_per_month;
@@ -922,7 +920,7 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (!r2)
             continue;
         for (b = get_borders(r, r2); b;) {
-            struct edge *e = edges;
+            struct edge *edg = edges;
             bool transparent = b->type->transparent(b, f);
             const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
@@ -933,18 +931,18 @@ void report_region(struct stream *out, const region * r, faction * f)
                 b = b->next;
                 continue;
             }
-            while (e && (e->transparent != transparent || strcmp(name, e->name)!=0)) {
-                e = e->next;
+            while (edg && (edg->transparent != transparent || strcmp(name, edg->name)!=0)) {
+                edg = edg->next;
             }
-            if (!e) {
-                e = calloc(sizeof(struct edge), 1);
-                e->name = str_strdup(name);
-                e->transparent = transparent;
-                e->next = edges;
-                edges = e;
+            if (!edg) {
+                edg = calloc(sizeof(struct edge), 1);
+                edg->name = str_strdup(name);
+                edg->transparent = transparent;
+                edg->next = edges;
+                edges = edg;
             }
-            e->lastd = d;
-            e->exist[d] = true;
+            edg->lastd = d;
+            edg->exist[d] = true;
             b = b->next;
         }
     }
@@ -1009,7 +1007,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     /* iron & stone */
     if (r->seen.mode >= seen_unit) {
         resource_report result[MAX_RAWMATERIALS];
-        int n, numresults = report_resources(r, result, MAX_RAWMATERIALS, f, true);
+        int numresults = report_resources(r, result, MAX_RAWMATERIALS, f, true);
 
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
@@ -1024,8 +1022,8 @@ void report_region(struct stream *out, const region * r, faction * f)
 
     /* peasants & silver */
     if (rpeasants(r)) {
-        int n = rpeasants(r);
-        bytes = snprintf(bufp, size, ", %d", n);
+        int p = rpeasants(r);
+        bytes = snprintf(bufp, size, ", %d", p);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
@@ -1040,7 +1038,7 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         bytes =
-            (int)strlcpy(bufp, LOC(f->locale, n == 1 ? "peasant" : "peasant_p"),
+            (int)strlcpy(bufp, LOC(f->locale, p == 1 ? "peasant" : "peasant_p"),
                 size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -1172,17 +1170,17 @@ void report_region(struct stream *out, const region * r, faction * f)
         /* Spezielle Richtungen */
         for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
             a = a->next) {
-            spec_direction *d = (spec_direction *)(a->data.v);
+            spec_direction *spd = (spec_direction *)(a->data.v);
             bytes = (int)strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, LOC(f->locale, d->desc), size);
+            bytes = (int)strlcpy(bufp, LOC(f->locale, spd->desc), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             bytes = (int)strlcpy(bufp, " (\"", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
-            bytes = (int)strlcpy(bufp, LOC(f->locale, d->keyword), size);
+            bytes = (int)strlcpy(bufp, LOC(f->locale, spd->keyword), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
             bytes = (int)strlcpy(bufp, "\")", size);
@@ -2226,14 +2224,14 @@ report_plaintext(const char *filename, report_context * ctx,
                 WARN_STATIC_BUFFER();
 
             if (ptype->itype->construction) {
-                requirement *m = ptype->itype->construction->materials;
-                while (m->number) {
+                requirement *rm = ptype->itype->construction->materials;
+                while (rm->number) {
                     bytes =
-                        (int)strlcpy(bufp, LOC(f->locale, resourcename(m->rtype, 0)), size);
+                        (int)strlcpy(bufp, LOC(f->locale, resourcename(rm->rtype, 0)), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     ++m;
-                    if (m->number)
+                    if (rm->number)
                         bytes = (int)strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
@@ -2275,7 +2273,8 @@ report_plaintext(const char *filename, report_context * ctx,
             if (markets_module() && r->land) {
                 const item_type *lux = r_luxury(r);
                 const item_type *herb = r->land->herbtype;
-                message *m = 0;
+
+                m = NULL;
                 if (herb && lux) {
                     m = msg_message("nr_market_info_p", "p1 p2",
                         lux->rtype, herb->rtype);
@@ -2288,7 +2287,6 @@ report_plaintext(const char *filename, report_context * ctx,
                     newline(out);
                     nr_paragraph(out, m, f);
                 }
-                /*  */
             }
             else {
                 if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {

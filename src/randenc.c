@@ -675,10 +675,11 @@ static void godcurse(void)
                     double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
                     damage_ship(sh, dmg);
                     if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                        unit *u = ship_owner(sh);
-                        if (u)
-                            ADDMSG(&u->faction->msgs,
-                            msg_message("godcurse_destroy_ship", "ship", sh));
+                        unit *uo = ship_owner(sh);
+                        if (uo) {
+                            ADDMSG(&uo->faction->msgs,
+                                msg_message("godcurse_destroy_ship", "ship", sh));
+                        }
                         remove_ship(&sh->region->ships, sh);
                     }
                     sh = shn;
