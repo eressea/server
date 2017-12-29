@@ -81,6 +81,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <selist.h>
 #include <stream.h>
 #include <filestream.h>
+#include <limits.h>
 #include <storage.h>
 #include <binarystore.h>
 

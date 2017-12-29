@@ -26,6 +26,8 @@
 #include <util/strings.h>
 
 #include <storage.h>
+
+#include <limits.h>
 #include <memstream.h>
 #include <CuTest.h>
 #include <tests.h>

@@ -13,6 +13,8 @@
 #include <util/path.h>
 
 #include <cJSON.h>
+
+#include <limits.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
