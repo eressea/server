@@ -1307,7 +1307,7 @@ static int sp_rosthauch(castorder * co)
         for (; iweapon != NULL; iweapon = iweapon->next) {
             item **ip = i_find(&u->items, iweapon->type);
             if (*ip) {
-                float chance = (*ip)->number;
+                double chance = (*ip)->number;
                 if (chance > force) chance = force;
                 if (iweapon->chance < 1.0) {
                     chance *= iweapon->chance;
@@ -4158,7 +4158,8 @@ static int sp_seduce(castorder * co)
                 loot += rng_int() % 2;
             }
             if (loot > 0) {
-                if (loot > 5 * force) loot = 5 * force;
+                int floot = (int)(5 * force);
+                if (loot > floot) loot = floot;
             }
         }
         if (loot > 0) {
