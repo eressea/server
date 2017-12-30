@@ -106,7 +106,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
             const char *str = (const char *)LOC(lang, keyword(kwd));
             assert(str);
             if (text) --size;
-            bytes = (int)strlcpy(bufp, str, size);
+            bytes = (int)str_strlcpy(bufp, str, size);
             if (wrptr(&bufp, &size, bytes) != 0) {
                 WARN_STATIC_BUFFER();
             }
@@ -117,7 +117,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         }
     }
     if (text) {
-        bytes = (int)strlcpy(bufp, (const char *)text, size);
+        bytes = (int)str_strlcpy(bufp, (const char *)text, size);
         if (wrptr(&bufp, &size, bytes) != 0) {
             WARN_STATIC_BUFFER();
             if (bufp - sbuffer >= 6) {
@@ -283,19 +283,19 @@ order *create_order(keyword_t kwd, const struct locale * lang,
                 case 's':
                     s = va_arg(marker, const char *);
                     assert(s);
-                    bytes = (int)strlcpy(bufp, s, size);
+                    bytes = (int)str_strlcpy(bufp, s, size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     break;
                 case 'd':
                     i = va_arg(marker, int);
-                    bytes = (int)strlcpy(bufp, itoa10(i), size);
+                    bytes = (int)str_strlcpy(bufp, itoa10(i), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     break;
                 case 'i':
                     i = va_arg(marker, int);
-                    bytes = (int)strlcpy(bufp, itoa36(i), size);
+                    bytes = (int)str_strlcpy(bufp, itoa36(i), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                     break;
@@ -516,7 +516,7 @@ char *write_order(const order * ord, const struct locale *lang, char *buffer, si
         if (kwd == NOKEYWORD) {
             order_data *od = odata_load(ord->id);
             const char *text = OD_STRING(od);
-            if (text) strlcpy(buffer, (const char *)text, size);
+            if (text) str_strlcpy(buffer, (const char *)text, size);
             else buffer[0] = 0;
             odata_release(od);
         }

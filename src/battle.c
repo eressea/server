@@ -192,7 +192,7 @@ static char *sidename(side * s)
     static char sidename_buf[4][SIDENAMEBUFLEN];  /* STATIC_RESULT: used for return, not across calls */
 
     bufno = bufno % 4;
-    strlcpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
+    str_strlcpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
     return sidename_buf[bufno++];
 }
 
@@ -202,7 +202,7 @@ static const char *sideabkz(side * s, bool truename)
     const faction *f = (s->stealthfaction
         && !truename) ? s->stealthfaction : s->faction;
 
-    strlcpy(sideabkz_buf, itoa36(f->no), sizeof(sideabkz_buf));
+    str_strlcpy(sideabkz_buf, itoa36(f->no), sizeof(sideabkz_buf));
     return sideabkz_buf;
 }
 
@@ -2896,10 +2896,10 @@ static void print_header(battle * b)
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        strlcpy(bufp, ", ", size);
+                        str_strlcpy(bufp, ", ", size);
                     }
                     if (lastf) {
-                        strlcpy(bufp, lastf, size);
+                        str_strlcpy(bufp, lastf, size);
                         first = true;
                     }
                     if (seematrix(f, s))

@@ -1115,15 +1115,15 @@ static void cycle_route(order * ord, unit * u, int gereist)
              * hier keine normale direction), muss jede PAUSE einzeln
              * herausgefiltert und explizit gesetzt werden */
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
         }
         else {
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
         }
     }
 

@@ -135,7 +135,7 @@ const char *string, int level, const char *section)
         for (i = 0; i != mtype->nparameters; ++i) {
             if (i != 0)
                 *c++ = ' ';
-            c += strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
+            c += str_strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
         }
         nrt->vars = str_strdup(zNames);
     }
@@ -151,7 +151,7 @@ size_t size, const void *userdata)
         const char *m =
             translate(nrt->string, userdata, nrt->vars, msg->parameters);
         if (m) {
-            return strlcpy((char *)buffer, m, size);
+            return str_strlcpy((char *)buffer, m, size);
         }
         else {
             log_error("Couldn't render message %s\n", nrt->mtype->name);

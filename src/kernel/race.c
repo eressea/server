@@ -540,11 +540,11 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
         size_t size = sizeof(lbuf) - 1;
         int ch, bytes;
 
-        bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
+        bytes = (int)str_strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
 
-        bytes = (int)strlcpy(bufp, LOC(loc, rc_name_s(rc, u->number != 1)), size);
+        bytes = (int)str_strlcpy(bufp, LOC(loc, rc_name_s(rc, u->number != 1)), size);
         assert(~bufp[0] & 0x80 || !"unicode/not implemented");
         ch = tolower(*(unsigned char *)bufp);
         bufp[0] = (char)ch;

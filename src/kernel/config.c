@@ -530,7 +530,7 @@ static const char * relpath(char *buf, size_t sz, const char *path) {
         path_join(g_basedir, path, buf, sz);
     }
     else {
-        strlcpy(buf, path, sz);
+        str_strlcpy(buf, path, sz);
     }
     return buf;
 }

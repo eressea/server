@@ -66,6 +66,7 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <selist.h>
 
@@ -517,7 +518,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
             --size;
         }
         bytes =
-            (int)strlcpy(bufp,
+            (int)str_strlcpy(bufp,
             (const char *)LOC(u->faction->locale, directions[dir]), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();

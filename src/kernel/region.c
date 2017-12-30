@@ -118,7 +118,7 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
     char *buf = (char *)buffer;
     const struct locale *lang = f ? f->locale : 0;
     if (r == NULL) {
-        strlcpy(buf, "(null)", size);
+        str_strlcpy(buf, "(null)", size);
     }
     else {
         plane *pl = rplane(r);

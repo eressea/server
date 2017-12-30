@@ -62,6 +62,7 @@
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/language.h>
@@ -74,7 +75,7 @@
 #include <util/rand.h>
 #include <util/log.h>
 #include <util/nrmessage.h>
-#include <util/bsdstring.h>
+#include <util/strings.h>
 #include <util/variant.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
@@ -539,7 +540,7 @@ static int sp_summon_familiar(castorder * co)
     const race *rc;
     int sk;
     int dh, dh1;
-    size_t bytes;
+    int bytes;
     message *msg;
     char zText[2048], *bufp = zText;
     size_t size = sizeof(zText) - 1;
@@ -597,23 +598,20 @@ static int sp_summon_familiar(castorder * co)
             }
             else {
                 if (dh == 0) {
-                    bytes =
-                        strlcpy(bufp, (const char *)LOC(mage->faction->locale,
+                    bytes = (int) str_strlcpy(bufp, (const char *)LOC(mage->faction->locale,
                             "list_and"), size);
                 }
                 else {
-                    bytes = strlcpy(bufp, (const char *)", ", size);
+                    bytes = (int)str_strlcpy(bufp, (const char *)", ", size);
                 }
-                assert(bytes <= INT_MAX);
-                if (wrptr(&bufp, &size, (int)bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                assert(bytes >= 0);
+                BUFFER_STRCAT(bufp, size, bytes);
             }
             bytes =
-                strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
+                str_strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
                     size);
             assert(bytes <= INT_MAX);
-            if (wrptr(&bufp, &size, (int)bytes) != 0)
-                WARN_STATIC_BUFFER();
+            BUFFER_STRCAT(bufp, size, (int)bytes);
         }
     }
     ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",

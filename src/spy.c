@@ -46,10 +46,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -101,12 +101,12 @@ void spy_message(int spy, const unit * u, const unit * target)
                     first = 0;
                 }
                 else {
-                    strlcat(buf, ", ", sizeof(buf));
+                    str_strlcat(buf, ", ", sizeof(buf));
                 }
-                strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
+                str_strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
                     sizeof(buf));
-                strlcat(buf, " ", sizeof(buf));
-                strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
+                str_strlcat(buf, " ", sizeof(buf));
+                str_strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
                     sizeof(buf));
             }
         }

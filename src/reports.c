@@ -169,14 +169,14 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
         struct locale *wloc = get_locale(lname);
         log_warning("no translation for combat status %s in %s", combatstatus[u->status], lname);
         locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status] + 7);
-        len = strlcpy(fsbuf, combatstatus[u->status] + 7, buflen);
+        len = str_strlcpy(fsbuf, combatstatus[u->status] + 7, buflen);
     }
     else {
-        len = strlcpy(fsbuf, status, buflen);
+        len = str_strlcpy(fsbuf, status, buflen);
     }
     if (fval(u, UFL_NOAID)) {
-        len += strlcat(fsbuf + len, ", ", buflen - len);
-        len += strlcat(fsbuf + len, LOC(lang, "status_noaid"), buflen - len);
+        len += str_strlcat(fsbuf + len, ", ", buflen - len);
+        len += str_strlcat(fsbuf + len, LOC(lang, "status_noaid"), buflen - len);
     }
 
     return len;
@@ -689,7 +689,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                         header = 1;
                     }
                     else {
-                        n = (int)strlcpy(bufp, ", ", size);
+                        n = (int)str_strlcpy(bufp, ", ", size);
                     }
                     if (wrptr(&bufp, &size, n) != 0) {
                         WARN_STATIC_BUFFER();
@@ -1609,9 +1609,9 @@ static void write_script(FILE * F, const faction * f)
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
             if (buf[0]) {
-                strlcat(buf, ",", sizeof(buf));
+                str_strlcat(buf, ",", sizeof(buf));
             }
-            strlcat(buf, rtype->extension, sizeof(buf));
+            str_strlcat(buf, rtype->extension, sizeof(buf));
         }
     }
     fputs(buf, F);
@@ -1746,8 +1746,8 @@ const char *trailinto(const region * r, const struct locale *lang)
         const char *tname = terrain_name(r);
         size_t sz;
 
-        sz = strlcpy(ref, tname, sizeof(ref));
-        sz += strlcat(ref + sz, "_trail", sizeof(ref) - sz);
+        sz = str_strlcpy(ref, tname, sizeof(ref));
+        sz += str_strlcat(ref + sz, "_trail", sizeof(ref) - sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
@@ -1762,7 +1762,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 {
     size_t len;
     if (!r) {
-        len = strlcpy(buffer, "(Chaos)", size);
+        len = str_strlcpy(buffer, "(Chaos)", size);
     }
     else {
         plane *pl = rplane(r);
@@ -1771,7 +1771,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         int named = (name && name[0]);
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(f, &nx, &ny, pl);
-        len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
+        len = str_strlcpy(buffer, rname(r, f ? f->locale : 0), size);
         snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;
         len = strlen(buffer);

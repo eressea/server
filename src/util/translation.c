@@ -15,7 +15,7 @@
 
 #include "translation.h"
 
-#include "bsdstring.h"
+#include "strings.h"
 #include "critbit.h"
 #include "log.h"
 #include "macros.h"
@@ -291,7 +291,7 @@ static const char *parse_string(opstack ** stack, const char *in,
                 if (ic == NULL)
                     return NULL;
                 c = (char *)opop_v(stack);
-                bytes = (c ? strlcpy(oc, c, size) : 0);
+                bytes = (c ? str_strlcpy(oc, c, size) : 0);
                 if (bytes < size)
                     oc += bytes;
                 else

@@ -1632,7 +1632,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
-    strlcpy(name, s2, sizeof(name));
+    str_strlcpy(name, s2, sizeof(name));
     if (unicode_utf8_trim(name) != 0) {
         log_info("trimming name: %s", s2);
     }
@@ -2176,7 +2176,7 @@ int password_cmd(unit * u, struct order *ord)
     }
     if (!pwok) {
         cmistake(u, ord, 283, MSG_EVENT);
-        strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
+        str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
     faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",

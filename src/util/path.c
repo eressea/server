@@ -3,7 +3,7 @@
 #endif
 
 #include "path.h"
-#include "bsdstring.h"
+#include "strings.h"
 
 #include <assert.h>
 #include <string.h>
@@ -16,11 +16,11 @@ char * path_join(const char *p1, const char *p2, char *dst, size_t len) {
         sz = strlen(p1);
     }
     else {
-        sz = strlcpy(dst, p1, len);
+        sz = str_strlcpy(dst, p1, len);
     }
     assert(sz < len);
     dst[sz++] = PATH_DELIM;
-    strlcpy(dst + sz, p2, len - sz);
+    str_strlcpy(dst + sz, p2, len - sz);
     return dst;
 }
 

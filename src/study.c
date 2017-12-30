@@ -46,12 +46,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <selist.h>
@@ -409,7 +409,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= strlcpy(zOrder + 4096 - sz, itoa36(student->no), sz);
+            sz -= str_strlcpy(zOrder + 4096 - sz, itoa36(student->no), sz);
 
             if (getkeyword(student->thisorder) != K_STUDY) {
                 ADDMSG(&teacher->faction->msgs,
