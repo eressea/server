@@ -3,13 +3,6 @@
 
 #include <stddef.h>
 
-#ifndef HAVE_BSDSTRING
-size_t strlcpy(char *dst, const char *src, size_t siz);
-size_t strlcat(char *dst, const char *src, size_t siz);
-#else
-#include <string.h>
-#endif
-
 int wrptr(char **ptr, size_t * size, int bytes);
 char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const char *file, int line);
 
