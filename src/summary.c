@@ -8,8 +8,9 @@
  *
  */
 
-/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 
 #include "summary.h"
@@ -97,8 +98,8 @@ int update_nmrs(void)
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
                     log_error("faction %s has %d NMR", itoa36(f->no), nmr);
-                    nmr = MAX(0, nmr);
-                    nmr = MIN(nmr, timeout);
+                    if (nmr < 0) nmr = 0;
+                    if (nmr > timeout) nmr = timeout;
                 }
                 if (nmr > 0) {
                     log_debug("faction %s has %d NMR", itoa36(f->no), nmr);

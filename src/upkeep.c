@@ -1,4 +1,4 @@
-#ifdef WIN32
+#ifdef _MSC_VER
 #include <platform.h>
 #endif
 #include "upkeep.h"

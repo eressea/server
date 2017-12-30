@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "spy.h"
 #include "guard.h"
 #include "laws.h"
@@ -52,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -146,7 +149,7 @@ int spy_cmd(unit * u, struct order *ord)
      * Fuer jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
      * des Opfers uebersteigt, erhoeht sich dieses um 5%*/
     spy = effskill(u, SK_SPY, 0) - effskill(target, SK_STEALTH, r);
-    spychance = 0.1 + MAX(spy * 0.05, 0.0);
+    spychance = 0.1 + fmax(spy * 0.05, 0.0);
 
     if (chance(spychance)) {
         produceexp(u, SK_SPY, u->number);
@@ -162,7 +165,7 @@ int spy_cmd(unit * u, struct order *ord)
         - (effskill(u, SK_STEALTH, 0) + effskill(u, SK_SPY, 0) / 2);
 
     if (invisible(u, target) >= u->number) {
-        observe = MIN(observe, 0);
+        if (observe > 0) observe = 0;
     }
 
     /* Anschliessend wird - unabhaengig vom Erfolg - gewuerfelt, ob der
@@ -344,7 +347,7 @@ static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
     for (u = r->units; u; u = u->next) {
         if (u->ship == sh && u->faction == f) {
             int s = effskill(u, sk, 0);
-            value = MAX(s, value);
+            if (value < s) value = s;
         }
     }
     return value;
