@@ -28,7 +28,7 @@ static void test_save_load_order(CuTest *tc) {
     CuAssertStrEquals(tc, s, od->_str);
     odata_release(od);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_db_suite(void)

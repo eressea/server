@@ -1,6 +1,9 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include "bind_process.h"
 
-#include <platform.h>
 #include <kernel/alliance.h>
 #include <kernel/config.h>
 #include <kernel/order.h>

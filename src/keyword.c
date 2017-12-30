@@ -2,10 +2,10 @@
 #include <kernel/config.h>
 #include "keyword.h"
 
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/umlaut.h>
 #include <util/log.h>
+#include <util/strings.h>
 
 #include <critbit.h>
 
@@ -21,7 +21,7 @@ const char * keyword(keyword_t kwd)
     if (!result[0]) {
         strcpy(result, "keyword::");
     }
-    strlcpy(result + 9, keywords[kwd], sizeof(result) - 9);
+    str_strlcpy(result + 9, keywords[kwd], sizeof(result) - 9);
     return result;
 }
 

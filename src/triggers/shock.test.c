@@ -26,7 +26,7 @@ static void test_shock(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "shock"));
     t_free(tt);
     free(tt);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shock_low(CuTest *tc) {
@@ -45,7 +45,7 @@ static void test_shock_low(CuTest *tc) {
     CuAssertIntEquals(tc, 1, get_spellpoints(u));
     t_free(tt);
     free(tt);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_shock_suite(void)

@@ -4,6 +4,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <util/attrib.h>
+#include <util/macros.h>
 
 #include "travelthru.h"
 #include "reports.h"
@@ -28,7 +29,6 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     region *r;
     faction *f;
 
-    test_cleanup();
     r = test_create_region(0, 0, 0);
     while (r->attribs) {
         a_remove(&r->attribs, r->attribs);
@@ -44,6 +44,8 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
 
 static void test_travelthru_count(CuTest *tc) {
     travel_fixture fix;
+
+    test_setup();
     setup_travelthru(&fix, 0);
     CuAssertIntEquals(tc, 0, count_travelthru(fix.r, fix.f));
 
@@ -53,13 +55,14 @@ static void test_travelthru_count(CuTest *tc) {
     setup_travelthru(&fix, 2);
     CuAssertIntEquals(tc, 2, count_travelthru(fix.r, fix.f));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_travelthru_map(CuTest *tc) {
     int n = 0;
     travel_fixture fix;
 
+    test_setup();
     setup_travelthru(&fix, 0);
     travelthru_map(fix.r, count_travelers, &n);
     CuAssertIntEquals(tc, 0, n);
@@ -68,7 +71,7 @@ static void test_travelthru_map(CuTest *tc) {
     travelthru_map(fix.r, count_travelers, &n);
     CuAssertIntEquals(tc, 1, n);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_travelthru_suite(void)

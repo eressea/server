@@ -1,23 +1,16 @@
-/* 
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 #include "bind_unit.h"
 #include "bindings.h"
 
-#include <kernel/config.h>
+#include <kernel/config.h> /* for game_id */
+#include <util/macros.h>
+
 #include <sqlite3.h>
 #include <tolua.h>
+#include <stdbool.h>
 
 #define LTYPE_DB TOLUA_CAST "db"
 

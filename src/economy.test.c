@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "economy.h"
 
@@ -19,6 +21,7 @@
 
 #include <util/attrib.h>
 #include <util/language.h>
+#include <util/macros.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -31,7 +34,7 @@ static void test_give_control_building(CuTest * tc)
     struct faction *f;
     region *r;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     b = test_create_building(r, 0);
@@ -42,7 +45,7 @@ static void test_give_control_building(CuTest * tc)
     CuAssertPtrEquals(tc, u1, building_owner(b));
     give_control(u1, u2);
     CuAssertPtrEquals(tc, u2, building_owner(b));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_control_ship(CuTest * tc)
@@ -52,7 +55,7 @@ static void test_give_control_ship(CuTest * tc)
     struct faction *f;
     region *r;
 
-    test_cleanup();
+    test_setup();
     f = test_create_faction(0);
     r = test_create_region(0, 0, 0);
     sh = test_create_ship(r, 0);
@@ -63,7 +66,7 @@ static void test_give_control_ship(CuTest * tc)
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
     give_control(u1, u2);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
-    test_cleanup();
+    test_teardown();
 }
 
 struct steal {
@@ -83,13 +86,13 @@ static void test_steal_okay(CuTest * tc) {
     race *rc;
     struct terrain_type *ter;
 
-    test_cleanup();
+    test_setup();
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = 0;
     setup_steal(&env, ter, rc);
     CuAssertPtrEquals(tc, 0, steal_message(env.u, 0));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_steal_nosteal(CuTest * tc) {
@@ -98,14 +101,14 @@ static void test_steal_nosteal(CuTest * tc) {
     terrain_type *ter;
     message *msg;
 
-    test_cleanup();
+    test_setup();
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = RCF_NOSTEAL;
     setup_steal(&env, ter, rc);
     CuAssertPtrNotNull(tc, msg = steal_message(env.u, 0));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_steal_ocean(CuTest * tc) {
@@ -114,13 +117,13 @@ static void test_steal_ocean(CuTest * tc) {
     terrain_type *ter;
     message *msg;
 
-    test_cleanup();
+    test_setup();
     ter = test_create_terrain("ocean", SEA_REGION);
     rc = test_create_race("human");
     setup_steal(&env, ter, rc);
     CuAssertPtrNotNull(tc, msg = steal_message(env.u, 0));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static struct unit *create_recruiter(void) {
@@ -153,7 +156,7 @@ static void test_heroes_dont_recruit(CuTest * tc) {
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_herorecruit"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_normals_recruit(CuTest * tc) {
@@ -168,7 +171,7 @@ static void test_normals_recruit(CuTest * tc) {
 
     CuAssertIntEquals(tc, 2, u->number);
 
-    test_cleanup();
+    test_teardown();
 }
 
 /** 
@@ -246,7 +249,7 @@ static void test_trade_insect(CuTest *tc) {
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));
 
     terraform_region(r, get_terrain("swamp"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_buy_cmd(CuTest *tc) {
@@ -297,7 +300,7 @@ static void test_buy_cmd(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_tax_cmd(CuTest *tc) {
@@ -355,7 +358,7 @@ static void test_tax_cmd(CuTest *tc) {
     test_clear_messages(u->faction);
 
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 /** 
@@ -370,7 +373,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintenance *req;
     item_type *itype;
 
-    test_cleanup();
+    test_setup();
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, 0);
@@ -422,7 +425,7 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
     test_clear_messagelist(&r->msgs);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_recruit(CuTest *tc) {
@@ -446,7 +449,7 @@ static void test_recruit(CuTest *tc) {
     add_recruits(u, 1, 2);
     CuAssertIntEquals(tc, 3, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_income(CuTest *tc)
@@ -459,7 +462,7 @@ static void test_income(CuTest *tc)
     CuAssertIntEquals(tc, 20, income(u));
     u->number = 5;
     CuAssertIntEquals(tc, 100, income(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_modify_material(CuTest *tc) {
@@ -507,7 +510,7 @@ static void test_modify_material(CuTest *tc) {
     CuAssertIntEquals(tc, 2, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_modify_skill(CuTest *tc) {
@@ -565,7 +568,7 @@ static void test_modify_skill(CuTest *tc) {
     CuAssertIntEquals(tc, 5, get_item(u, itype));
     CuAssertIntEquals(tc, 1, get_item(u, rtype->itype));
 
-    test_cleanup();
+    test_teardown();
 }
 
 
@@ -667,7 +670,7 @@ static void test_modify_production(CuTest *tc) {
     split_allocations(u->region);
     CuAssertIntEquals(tc, 38, get_item(u, itype));
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_economy_suite(void)

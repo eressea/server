@@ -13,7 +13,7 @@ static void test_language(CuTest *tc)
     default_locale = test_create_locale();
     str = directions[1];
     CuAssertStrEquals(tc, str, locale_getstring(default_locale, str));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_make_locales(CuTest *tc)
@@ -23,7 +23,7 @@ static void test_make_locales(CuTest *tc)
     CuAssertPtrNotNull(tc, get_locale("aa"));
     CuAssertPtrNotNull(tc, get_locale("bb"));
     CuAssertPtrNotNull(tc, get_locale("cc"));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_language_suite(void)

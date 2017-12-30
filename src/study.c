@@ -16,10 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#define TEACH_ALL 1
-#define TEACH_FRIENDS
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "study.h"
 #include "laws.h"
@@ -47,12 +46,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <selist.h>
@@ -64,6 +63,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#define TEACH_ALL 1
+#define TEACH_FRIENDS
 
 static skill_t getskill(const struct locale *lang)
 {
@@ -128,33 +130,44 @@ bool magic_lowskill(unit * u)
 
 /* ------------------------------------------------------------- */
 
-int study_cost(unit * u, skill_t sk)
+int study_cost(struct unit *u, skill_t sk)
 {
-    static int cost[MAXSKILLS];
-    int stufe, k = 50;
+    static int config;
+    static int costs[MAXSKILLS];
+    int cost = -1;
 
-    if (cost[sk] == 0) {
-        char buffer[256];
-        sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        cost[sk] = config_get_int(buffer, -1);
+    if (sk == SK_MAGIC) {
+        int next_level = 1 + (u ? get_level(u, sk) : 0);
+        /* Die Magiekosten betragen 50+Summe(50*Stufe) */
+        /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
+        cost = 50 * (1 + ((next_level + 1) * next_level / 2));
     }
-    if (cost[sk] >= 0) {
-        return cost[sk];
-    }
-    switch (sk) {
+    else switch (sk) {
     case SK_SPY:
-        return 100;
+        cost = 100;
+        break;
     case SK_TACTICS:
     case SK_HERBALISM:
     case SK_ALCHEMY:
-        return 200;
-    case SK_MAGIC:               /* Die Magiekosten betragen 50+Summe(50*Stufe) */
-        /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
-        stufe = 1 + get_level(u, SK_MAGIC);
-        return k * (1 + ((stufe + 1) * stufe / 2));
+        cost = 200;
+        break;
     default:
-        return 0;
+        cost = -1;
     }
+
+    if (config_changed(&config)) {
+        memset(costs, 0, sizeof(costs));
+    }
+
+    if (costs[sk] == 0) {
+        char buffer[256];
+        sprintf(buffer, "skills.cost.%s", skillnames[sk]);
+        costs[sk] = config_get_int(buffer, cost);
+    }
+    if (costs[sk] >= 0) {
+        return costs[sk];
+    }
+    return (cost > 0) ? cost : 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -215,7 +228,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         students -= teach->students;
     }
 
-    students = MIN(students, nteaching);
+    if (students > nteaching) students = nteaching;
 
     if (students > 0) {
         if (teach == NULL) {
@@ -271,7 +284,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     teaching = teacher->number  * TEACHNUMBER;
 
     if ((i = get_effect(teacher, oldpotiontype[P_FOOL])) > 0) { /* Trank "Dumpfbackenbrot" */
-        i = MIN(i, teacher->number * TEACHNUMBER);
+        if (i > teaching) i = teaching;
         /* Trank wirkt pro Schueler, nicht pro Lehrer */
         teaching -= i;
         change_effect(teacher, oldpotiontype[P_FOOL], -i);
@@ -396,7 +409,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= strlcpy(zOrder + 4096 - sz, itoa36(student->no), sz);
+            sz -= str_strlcpy(zOrder + 4096 - sz, itoa36(student->no), sz);
 
             if (getkeyword(student->thisorder) != K_STUDY) {
                 ADDMSG(&teacher->faction->msgs,
@@ -554,7 +567,7 @@ int study_cmd(unit * u, order * ord)
     if (!unit_can_study(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
             u_race(u)));
-        return 0;
+        return -1;
     }
 
     (void)init_order(ord, u->faction->locale);
@@ -562,19 +575,19 @@ int study_cmd(unit * u, order * ord)
 
     if (sk < 0) {
         cmistake(u, ord, 77, MSG_EVENT);
-        return 0;
+        return -1;
     }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
     if (u_race(u)->bonus[sk] == -99) {
         cmistake(u, ord, 771, MSG_EVENT);
-        return 0;
+        return -1;
     }
     if (!learn_newskills) {
         skill *sv = unit_skill(u, sk);
         if (sv == NULL) {
             /* we can only learn skills we already have */
             cmistake(u, ord, 771, MSG_EVENT);
-            return 0;
+            return -1;
         }
     }
 
@@ -582,7 +595,7 @@ int study_cmd(unit * u, order * ord)
     if (u_race(u) == rc_snotling) {
         if (get_level(u, sk) >= 8) {
             cmistake(u, ord, 308, MSG_EVENT);
-            return 0;
+            return -1;
         }
     }
 
@@ -598,17 +611,18 @@ int study_cmd(unit * u, order * ord)
     if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn",
             ""));
-        return 0;
+        return -1;
     }
     /* Akademie: */
     if (active_building(u, bt_find("academy"))) {
-        studycost = MAX(50, studycost * 2);
+        studycost = studycost * 2;
+        if (studycost < 50) studycost = 50;
     }
 
     if (sk == SK_MAGIC) {
         if (u->number > 1) {
             cmistake(u, ord, 106, MSG_MAGIC);
-            return 0;
+            return -1;
         }
         if (is_familiar(u)) {
             /* Vertraute zaehlen nicht zu den Magiern einer Partei,
@@ -621,7 +635,7 @@ int study_cmd(unit * u, order * ord)
             if (count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians",
                     "amount", mmax));
-                return 0;
+                return -1;
             }
             mtyp = getmagicskill(u->faction->locale);
             if (mtyp == M_NONE || mtyp == M_GRAY) {
@@ -636,7 +650,7 @@ int study_cmd(unit * u, order * ord)
                     mtyp = getmagicskill(u->faction->locale);
                     if (mtyp == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
-                        return 0;
+                        return -1;
                     }
                 }
             }
@@ -645,7 +659,7 @@ int study_cmd(unit * u, order * ord)
                  * als das der Partei */
                 if (u->faction->magiegebiet != 0) {
                     cmistake(u, ord, 179, MSG_MAGIC);
-                    return 0;
+                    return -1;
                 }
                 else {
                     /* Lernt zum ersten mal Magie und legt damit das
@@ -664,7 +678,7 @@ int study_cmd(unit * u, order * ord)
                     mtyp = getmagicskill(u->faction->locale);
                     if (mtyp == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
-                        return 0;
+                        return -1;
                     }
                 }
                 /* Legt damit das Magiegebiet der Partei fest */
@@ -679,18 +693,18 @@ int study_cmd(unit * u, order * ord)
             if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists",
                     "amount", amax));
-                return 0;
+                return -1;
             }
         }
     }
     if (studycost) {
         int cost = studycost * u->number;
         money = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, cost);
-        money = MIN(money, cost);
+        if (money > cost) money = cost;
     }
     if (money < studycost * u->number) {
         studycost = p;              /* Ohne Univertreurung */
-        money = MIN(money, studycost);
+        if (money > studycost) money = studycost;
         if (p > 0 && money < studycost * u->number) {
             cmistake(u, ord, 65, MSG_EVENT);
             multi = money / (double)(studycost * u->number);
@@ -710,12 +724,14 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (get_effect(u, oldpotiontype[P_WISE])) {
-        l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
+        l = get_effect(u, oldpotiontype[P_WISE]);
+        if (l > u->number) l = u->number;
         teach->days += l * EXPERIENCEDAYS;
         change_effect(u, oldpotiontype[P_WISE], -l);
     }
     if (get_effect(u, oldpotiontype[P_FOOL])) {
-        l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+        l = get_effect(u, oldpotiontype[P_FOOL]);
+        if (l > u->number) l = u->number;
         teach->days -= l * STUDYDAYS;
         change_effect(u, oldpotiontype[P_FOOL], -l);
     }
@@ -768,7 +784,7 @@ int study_cmd(unit * u, order * ord)
         if (skill > maxalchemy) {
             for (ptype = potiontypes; ptype; ptype = ptype->next) {
                 if (skill == ptype->level * 2) {
-                    attrib *a = a_find(f->attribs, &at_showitem);
+                    a = a_find(f->attribs, &at_showitem);
                     while (a && a->type == &at_showitem && a->data.v != ptype)
                         a = a->next;
                     if (a == NULL || a->type != &at_showitem) {

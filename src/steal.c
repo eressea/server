@@ -17,7 +17,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "economy.h"
 
@@ -80,7 +82,8 @@ void expandstealing(region * r, econ_request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            n = MIN(n, requests[j].unit->wants);
+            int w = requests[j].unit->wants;
+            if (n > w) n = w;
             use_pooled(u, rsilver, GET_ALL, n);
             requests[j].unit->n = n;
             change_money(requests[j].unit, n);
@@ -217,7 +220,8 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
         }
     }
 
-    i = MIN(u->number, i_get(u->items, rring->itype));
+    i = i_get(u->items, rring->itype);
+    if (i > u->number) i = u->number;
     if (i > 0) {
         n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
     }
@@ -239,6 +243,6 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     *stealorders = o;
 
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-
-    produceexp(u, SK_STEALTH, MIN(n, u->number));
+    if (n > u->number) n = u->number;
+    produceexp(u, SK_STEALTH, n);
 }

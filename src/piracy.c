@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include "piracy.h"
 
 #include "direction.h"
@@ -68,8 +67,9 @@ static attrib *mk_piracy(const faction * pirate, const faction * target,
 static bool validate_pirate(unit *u, order *ord) {
     assert(u);
     assert(ord);
-    if (fval(u_race(u), RCF_SWIM | RCF_FLY))
+    if (u_race(u)->flags & (RCF_SWIM | RCF_FLY)) {
         return true;
+    }
     if (!u->ship) {
         cmistake(u, ord, 144, MSG_MOVE);
         return false;
@@ -155,8 +155,8 @@ void piracy_cmd(unit * u)
             /* TODO this could still result in an illegal movement order (through a wall or whatever)
              * which will be prevented by move_cmd below */
             if (rc &&
-                ((sh && !fval(rc->terrain, FORBIDDEN_REGION) && can_takeoff(sh, r, rc))
-                    || (canswim(u) && fval(rc->terrain, SWIM_INTO) && fval(rc->terrain, SEA_REGION)))) {
+                ((sh && !(rc->terrain->flags & FORBIDDEN_REGION) && can_takeoff(sh, r, rc))
+                    || (canswim(u) && ((rc->terrain->flags & (SWIM_INTO|SEA_REGION)) == (SWIM_INTO | SEA_REGION))))) {
 
                 for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
                     unit *cap = ship_owner(sh2);

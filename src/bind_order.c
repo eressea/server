@@ -1,8 +1,11 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 /* kernel includes */
 #include <kernel/order.h>
 #include <util/parser.h>
+#include <util/macros.h>
 
 /* lua includes */
 #include <tolua.h>

@@ -14,7 +14,7 @@
     </construction>
   </ship>
 
-  <ship name="dragonship" range="5" storm="1.00" damage="1.00" cargo="100000" cptskill="2" minskill="1" sumskill="50" opensea="yes">
+  <ship name="dragonship" range="5" storm="1.00" damage="1.00" cargo="100000" cptskill="2" minskill="1" sumskill="50" opensea="yes" speedy="yes">
     <coast terrain="plain"/>
     <construction skill="shipcraft" minskill="2" maxsize="100">
       <requirement type="log" quantity="1"/>

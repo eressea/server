@@ -11,7 +11,7 @@ static void test_add_donation(CuTest *tc) {
     faction *f1, *f2;
     region *r;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, 0);
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
@@ -19,7 +19,7 @@ static void test_add_donation(CuTest *tc) {
     report_donations();
     CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "donation"));
     free_donations();
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_donations_suite(void)

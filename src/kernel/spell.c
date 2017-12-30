@@ -16,8 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 #include "spell.h"
 
 /* util includes */
@@ -25,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <selist.h>
 
@@ -124,7 +126,7 @@ spell * create_spell(const char * name)
     sp = (spell *)calloc(1, sizeof(spell));
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
     if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
-        sp->sname = strdup(name);
+        sp->sname = str_strdup(name);
         add_spell(&spells, sp);
         return sp;
     }
@@ -173,10 +175,10 @@ struct spellref *spellref_create(spell *sp, const char *name)
 
     if (sp) {
         spref->sp = sp;
-        spref->name = strdup(sp->sname);
+        spref->name = str_strdup(sp->sname);
     }
     else if (name) {
-        spref->name = strdup(name);
+        spref->name = str_strdup(name);
         spref->sp = NULL;
     }
     return spref;

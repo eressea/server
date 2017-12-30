@@ -18,6 +18,7 @@
 
 #include <util/attrib.h>
 #include <util/language.h>
+#include <util/strings.h>
 
 #include <CuTest.h>
 #include <selist.h>
@@ -49,7 +50,7 @@ void test_updatespells(CuTest * tc)
     CuAssertIntEquals(tc, 1, selist_length(f->spellbook->spells));
     CuAssertPtrNotNull(tc, spellbook_get(f->spellbook, sp));
     free_spellbook(book);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_spellbook(CuTest * tc)
@@ -60,7 +61,7 @@ static void test_get_spellbook(CuTest * tc)
     CuAssertPtrNotNull(tc, sb = get_spellbook("hodorhodorhodor"));
     CuAssertPtrEquals(tc, sb, get_spellbook("hodorhodorhodor"));
     CuAssertTrue(tc, sb != get_spellbook("hodor"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_spellbooks(CuTest * tc)
@@ -87,10 +88,13 @@ static void test_spellbooks(CuTest * tc)
     CuAssertPtrNotNull(tc, entry);
     CuAssertPtrEquals(tc, sp, entry->sp);
 
-    test_cleanup();
+    test_teardown();
+    test_setup();
+
     herp = get_spellbook("herp");
     CuAssertPtrNotNull(tc, herp);
-    test_cleanup();
+
+    test_teardown();
 }
 
 void test_pay_spell(CuTest * tc)
@@ -124,7 +128,7 @@ void test_pay_spell(CuTest * tc)
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_pay_spell_failure(CuTest * tc)
@@ -162,7 +166,7 @@ void test_pay_spell_failure(CuTest * tc)
     CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
     CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
     CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_getspell_unit(CuTest * tc)
@@ -190,7 +194,7 @@ void test_getspell_unit(CuTest * tc)
 
     unit_add_spell(u, 0, sp, 1);
     CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_getspell_faction(CuTest * tc)
@@ -220,7 +224,7 @@ void test_getspell_faction(CuTest * tc)
     f->spellbook = create_spellbook(0);
     spellbook_add(f->spellbook, sp, 1);
     CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_getspell_school(CuTest * tc)
@@ -251,7 +255,7 @@ void test_getspell_school(CuTest * tc)
     CuAssertPtrNotNull(tc, book);
     spellbook_add(book, sp, 1);
     CuAssertPtrEquals(tc, sp, unit_getspell(u, "Herp-a-derp", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_set_pre_combatspell(CuTest * tc)
@@ -283,7 +287,7 @@ void test_set_pre_combatspell(CuTest * tc)
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
     CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_set_main_combatspell(CuTest * tc)
@@ -315,7 +319,7 @@ void test_set_main_combatspell(CuTest * tc)
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
     CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_set_post_combatspell(CuTest * tc)
@@ -347,7 +351,7 @@ void test_set_post_combatspell(CuTest * tc)
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
     CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_hasspell(CuTest * tc)
@@ -376,7 +380,7 @@ void test_hasspell(CuTest * tc)
 
     set_level(u, SK_MAGIC, 1);
     CuAssertTrue(tc, !u_hasspell(u, sp));
-    test_cleanup();
+    test_teardown();
 }
 
 static selist * casts;
@@ -412,7 +416,7 @@ void test_multi_cast(CuTest *tc) {
     CuAssertPtrNotNull(tc, casts);
     CuAssertIntEquals(tc, 2, selist_length(casts));
     selist_free(casts);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_magic_resistance(CuTest *tc) {
@@ -431,7 +435,7 @@ static void test_magic_resistance(CuTest *tc) {
     CuAssert(tc, "brain eaters outside astral space have 50% magres", frac_equal(magic_resistance(u), frac_make(1, 2)));
     u->region->_plane = get_astralplane();
     CuAssert(tc, "brain eaters in astral space have full magres", frac_equal(magic_resistance(u), frac_make(9, 10)));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_max_spellpoints(CuTest *tc) {
@@ -454,7 +458,7 @@ static void test_max_spellpoints(CuTest *tc) {
     /* permanent aura loss: */
     CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
     CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_illusioncastle(CuTest *tc)
@@ -473,9 +477,9 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
     CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->construction->name = strdup("site");
+    btype->construction->name = str_strdup("site");
     CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_is_mage(CuTest *tc) {
@@ -492,7 +496,7 @@ static void test_is_mage(CuTest *tc) {
     CuAssertPtrNotNull(tc, mage = create_mage(u, M_CERDDOR));
     CuAssertPtrEquals(tc, mage, get_mage(u));
     CuAssertTrue(tc, is_mage(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_mage(CuTest *tc) {
@@ -509,7 +513,7 @@ static void test_get_mage(CuTest *tc) {
     set_level(u, SK_MAGIC, 1);
     CuAssertPtrEquals(tc, mage, get_mage(u));
     CuAssertPtrEquals(tc, mage, get_mage_depr(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_familiar_set(CuTest *tc) {
@@ -529,7 +533,7 @@ static void test_familiar_set(CuTest *tc) {
     remove_familiar(mag);
     CuAssertPtrEquals(tc, NULL, get_familiar(mag));
     CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_familiar_age(CuTest *tc) {
@@ -549,7 +553,7 @@ static void test_familiar_age(CuTest *tc) {
     set_number(fam, 0);
     a_age(&mag->attribs, mag);
     CuAssertPtrEquals(tc, NULL, get_familiar(mag));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_familiar_equip(CuTest *tc) {
@@ -586,7 +590,7 @@ static void test_familiar_equip(CuTest *tc) {
     CuAssertPtrEquals(tc, mage, get_mage_depr(u));
     CuAssertTrue(tc, u_hasspell(u, sp));
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_familiar_suite(void)

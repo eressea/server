@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <spells/unitcurse.h>
 #include <attributes/otherfaction.h>
+#include <attributes/racename.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -47,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -263,7 +265,7 @@ faction *addfaction(const char *email, const char *password,
     fhash(f);
 
     slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
-    f->name = strdup(buf);
+    f->name = str_strdup(buf);
 
     if (!f->race) {
         log_warning("creating a faction that has no race", itoa36(f->no));
@@ -361,6 +363,71 @@ void free_flist(faction **fp) {
 
 static faction *dead_factions;
 
+static void give_special_items(unit *u, item **items) {
+    item **iter = items;
+    while (*iter) {
+        item *itm = *iter;
+        if (itm->number > 0 && itm->type->flags & ITF_NOTLOST) {
+            i_change(&u->items, itm->type, itm->number);
+            *iter = itm->next;
+            if (iter == items) {
+                *items = *iter;
+            }
+            i_free(itm);
+        }
+        else {
+            iter = &itm->next;
+        }
+    }
+}
+
+faction *get_or_create_monsters(void)
+{
+    faction *f = findfaction(MONSTER_ID);
+    if (!f) {
+        const race *rc = rc_get_or_create("dragon");
+        const char *email = config_get("monster.email");
+        f = addfaction(email, NULL, rc, default_locale, 0);
+        renumber_faction(f, MONSTER_ID);
+        faction_setname(f, "Monster");
+        fset(f, FFL_NPC | FFL_NOIDLEOUT);
+    }
+    return f;
+}
+
+faction *get_monsters(void) {
+    return get_or_create_monsters();
+}
+
+void save_special_items(unit *usrc)
+{
+    unit *u;
+    region *r = usrc->region;
+    faction *fm = get_monsters();
+    static const race *rc_ghost;
+    static int cache;
+    static const char *name = NULL;
+    if (rc_changed(&cache)) {
+        rc_ghost = rc_find("ghost");
+        if (!rc_ghost) {
+            rc_ghost = get_race(RC_TEMPLATE);
+            name = "ghost";
+        }
+        assert(rc_ghost);
+    }
+    for (u = r->units; u; u = u->next) {
+        if (u->faction == fm) {
+            give_special_items(u, &usrc->items);
+            return;
+        }
+    }
+    u = create_unit(r, fm, 1, rc_ghost, 0, NULL, NULL);
+    if (name) {
+        set_racename(&u->attribs, name);
+    }
+    give_special_items(u, &usrc->items);
+}
+
 void destroyfaction(faction ** fp)
 {
     faction * f = *fp;
@@ -385,22 +452,19 @@ void destroyfaction(faction ** fp)
     }
 
     while (u) {
-        /* give away your stuff, make zombies if you cannot (quest items) */
-        int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);
-        if (result != 0) {
-            unit *zombie = u;
-            u = u->nextF;
-            make_zombie(zombie);
-        }
-        else {
+        /* give away your stuff, to ghosts if you cannot (quest items) */
+        if (u->items) {
             region *r = u->region;
-
+            int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);
+            if (result != 0) {
+                save_special_items(u);
+            }
             if (r->land && !!playerrace(u_race(u))) {
                 const race *rc = u_race(u);
                 int m = rmoney(r);
 
                 /* Personen gehen nur an die Bauern, wenn sie auch von dort
-                 * stammen */
+                    * stammen */
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     int p = rpeasants(u->region);
                     int h = rhorses(u->region);
@@ -418,9 +482,9 @@ void destroyfaction(faction ** fp)
                 m += get_money(u);
                 rsetmoney(r, m);
             }
-            set_number(u, 0);
-            u = u->nextF;
         }
+        set_number(u, 0);
+        u = u->nextF;
     }
 
     handle_event(f->attribs, "destroy", f);
@@ -534,7 +598,7 @@ void faction_setname(faction * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = strdup(name);
+        self->name = str_strdup(name);
 }
 
 const char *faction_getemail(const faction * self)
@@ -546,7 +610,7 @@ void faction_setemail(faction * self, const char *email)
 {
     free(self->email);
     if (email)
-        self->email = strdup(email);
+        self->email = str_strdup(email);
     else
         self->email = NULL;
 }
@@ -560,14 +624,14 @@ void faction_setbanner(faction * self, const char *banner)
 {
     free(self->banner);
     if (banner)
-        self->banner = strdup(banner);
+        self->banner = str_strdup(banner);
 }
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
     assert(pwhash);
     free(f->_password);
-    f->_password = strdup(pwhash);
+    f->_password = str_strdup(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -791,7 +855,7 @@ int writepasswd(void)
     FILE *F;
     char zText[128];
 
-    join_path(basepath(), "passwd", zText, sizeof(zText));
+    path_join(basepath(), "passwd", zText, sizeof(zText));
     F = fopen(zText, "w");
     if (!F) {
         perror(zText);

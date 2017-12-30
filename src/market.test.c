@@ -74,7 +74,7 @@ static void test_market_curse(CuTest * tc)
 
     CuAssertIntEquals(tc, 70, i_get(u->items, htype));
     CuAssertIntEquals(tc, 35, i_get(u->items, ltype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_trade(CuTest *tc) {
@@ -87,7 +87,7 @@ static void test_rc_trade(CuTest *tc) {
     rc_set_param(rc, "herb_trade", "50");
     CuAssertIntEquals(tc, 100, rc_luxury_trade(rc));
     CuAssertIntEquals(tc, 50, rc_herb_trade(rc));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_market_suite(void)

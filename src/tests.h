@@ -35,7 +35,7 @@ extern "C" {
 #define test_setup() test_setup_test(NULL, __FILE__, __LINE__)
 #define test_setup_ex(tc) test_setup_test(tc, __FILE__, __LINE__)
 
-    void test_cleanup(void);
+    void test_teardown(void);
     void test_log_stderr(int on);
     struct log_t * test_log_start(int flags, struct strlist **slist);
     void test_log_stop(struct log_t *log, struct strlist *slist);
@@ -50,6 +50,7 @@ extern "C" {
     struct unit *test_create_unit(struct faction *f, struct region *r);
     void test_create_world(void);
     struct item_type * test_create_horse(void);
+    struct item_type * test_create_silver(void);
     struct building * test_create_building(struct region * r, const struct building_type * btype);
     struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
     struct item_type * test_create_itemtype(const char * name);

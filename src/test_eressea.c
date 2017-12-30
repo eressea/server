@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #pragma warning(disable: 4210)
@@ -35,7 +36,7 @@ static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char
     }
     if (s) {
         s->next = suites;
-        s->name = strdup(name);
+        s->name = str_strdup(name);
         s->csuite = csuite();
         suites = s;
     }
@@ -77,7 +78,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(config);
     ADD_SUITE(attrib);
     ADD_SUITE(base36);
-    ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);
@@ -106,6 +106,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(familiar);
     ADD_SUITE(item);
     ADD_SUITE(magic);
+    ADD_SUITE(academy);
     ADD_SUITE(alchemy);
     ADD_SUITE(reports);
     ADD_SUITE(region);

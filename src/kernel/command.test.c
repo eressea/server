@@ -48,7 +48,7 @@ static void test_command(CuTest * tc) {
     do_command(st->root, u, u->thisorder);
     CuAssertIntEquals(tc, u->number, 2);
     stree_free(st);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_command_suite(void)

@@ -34,6 +34,7 @@ extern "C" {
 #define SFL_OPENSEA 0x01
 #define SFL_FLY     0x02
 #define SFL_NOCOAST 0x04
+#define SFL_SPEEDY  0x08
 
     typedef struct ship_type {
         char *_name;
@@ -125,12 +126,12 @@ extern "C" {
     extern void free_ship(struct ship *s);
     extern void free_ships(void);
 
-    const char *ship_getname(const struct ship *self);
+    const char *ship_getname(const struct ship *sh);
     void ship_setname(struct ship *self, const char *name);
     int shipspeed(const struct ship *sh, const struct unit *u);
     int crew_skill(const struct ship *sh);
 
-    int ship_damage_percent(const struct ship *ship);
+    int ship_damage_percent(const struct ship *sh);
 #ifdef __cplusplus
 }
 #endif

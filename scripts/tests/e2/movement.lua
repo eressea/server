@@ -165,6 +165,7 @@ function test_troll_example()
     u1:clear_orders()
 
     -- 3 trolls - 1 cart = 320, but not allowed?
+    u1.name='XXX'
     assert_nomove("3 trolls", u1)
 
     u1.number = 4

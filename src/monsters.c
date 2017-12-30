@@ -66,6 +66,7 @@
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <selist.h>
 
@@ -495,7 +496,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
 {
     region *r = u->region;
     region **plan;
-    int bytes, position = 0;
+    int position = 0;
     char zOrder[128], *bufp = zOrder;
     size_t size = sizeof(zOrder) - 1;
 
@@ -507,6 +508,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
         return NULL;
 
     while (position != moves && plan[position + 1]) {
+        int bytes;
         region *prev = plan[position];
         region *next = plan[++position];
         direction_t dir = reldirection(prev, next);
@@ -516,7 +518,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
             --size;
         }
         bytes =
-            (int)strlcpy(bufp,
+            (int)str_strlcpy(bufp,
             (const char *)LOC(u->faction->locale, directions[dir]), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -786,7 +788,7 @@ void plan_monsters(faction * f)
 
             /* Einheiten mit Bewegungsplan kriegen ein NACH: */
             if (long_order == NULL) {
-                attrib *ta = a_find(u->attribs, &at_targetregion);
+                ta = a_find(u->attribs, &at_targetregion);
                 if (ta) {
                     if (u->region == (region *)ta->data.v) {
                         a_remove(&u->attribs, ta);
@@ -1126,24 +1128,6 @@ void monster_kills_peasants(unit * u)
             absorbed_by_monster(u);
         }
     }
-}
-
-faction *get_or_create_monsters(void)
-{
-    faction *f = findfaction(MONSTER_ID);
-    if (!f) {
-        const race *rc = rc_get_or_create("dragon");
-        const char *email = config_get("monster.email");
-        f = addfaction(email, NULL, rc, default_locale, 0);
-        renumber_faction(f, MONSTER_ID);
-        faction_setname(f, "Monster");
-        fset(f, FFL_NPC | FFL_NOIDLEOUT);
-    }
-    return f;
-}
-
-faction *get_monsters(void) {
-    return get_or_create_monsters();
 }
 
 void make_zombie(unit * u)

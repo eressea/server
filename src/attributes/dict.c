@@ -34,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/gamedata.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -69,7 +70,7 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     int n;
 
     READ_STR(store, name, sizeof(name));
-    dd->name = strdup(name);
+    dd->name = str_strdup(name);
     READ_INT(store, &n);
     dd->type = (dict_type)n;
     if (dd->type == TINTEGER) {
@@ -170,7 +171,7 @@ attrib_type at_dict = {
 void dict_set(attrib * a, const char * name, int value)
 {
     dict_data *dd = (dict_data *)a->data.v;
-    dd->name = strdup(name);
+    dd->name = str_strdup(name);
     dd->type = TINTEGER;
     dd->data.i = value;
 }

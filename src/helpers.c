@@ -10,7 +10,10 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "helpers.h"
 #include "vortex.h"
 #include "alchemy.h"
@@ -21,6 +24,7 @@ without prior permission by the authors of Eressea.
 #include <util/functions.h>
 #include <util/gamedata.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 
@@ -54,6 +58,7 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
     int result = -1, len;
     const char *iname = itype->rtype->_name;
 
+    UNUSED_ARG(ord);
     assert(s != NULL);
     len = snprintf(fname, sizeof(fname), "%s_give", iname);
     if (len > 0 && (size_t)len < sizeof(fname)) {
@@ -304,6 +309,9 @@ struct trigger_type tt_caldera = {
 static int building_action_read(struct attrib *a, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
+
+    UNUSED_ARG(owner);
+    UNUSED_ARG(a);
 
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);

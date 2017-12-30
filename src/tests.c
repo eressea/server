@@ -23,7 +23,6 @@
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
-#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -63,6 +62,7 @@ struct region *test_create_region(int x, int y, const terrain_type *terrain)
     else {
         terraform_region(r, terrain);
     }
+    r->flags &= ~RF_MALLORN;
     rsettrees(r, 0, 0);
     rsettrees(r, 1, 0);
     rsettrees(r, 2, 0);
@@ -178,7 +178,7 @@ void test_log_stderr(int flags) {
     static struct log_t *stderrlog;
     if (flags) {
         if (stderrlog) {
-            log_error("stderr logging is still active. did you call test_cleanup?");
+            log_error("stderr logging is still active. did you call test_teardown?");
             log_destroy(stderrlog);
         }
         stderrlog = log_to_file(flags, stderr);
@@ -188,7 +188,7 @@ void test_log_stderr(int flags) {
             log_destroy(stderrlog);
         }
         else {
-            log_warning("stderr logging is inactive. did you call test_cleanup twice?");
+            log_warning("stderr logging is inactive. did you call test_teardown twice?");
         }
         stderrlog = 0;
     }
@@ -249,7 +249,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
     }
 }
 
-void test_cleanup(void)
+void test_teardown(void)
 {
     test_reset();
     test_log_stderr(0);
@@ -390,6 +390,12 @@ void test_translate_param(const struct locale *lang, param_t param, const char *
     add_translation(cb, text, param);
 }
 
+item_type *test_create_silver(void) {
+    item_type * itype;
+    itype = test_create_itemtype("money");
+    itype->weight = 1;
+    return itype;
+}
 
 item_type *test_create_horse(void) {
     item_type * itype;

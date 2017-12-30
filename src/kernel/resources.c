@@ -21,6 +21,7 @@
 #include "region.h"
 #include "terrain.h"
 
+#include <util/macros.h>
 #include <util/rand.h>
 #include <util/rng.h>
 

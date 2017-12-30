@@ -168,7 +168,13 @@ extern "C" {
     int count_maxmigrants(const struct faction * f);
     int max_magicians(const struct faction * f);
 
+#define MONSTER_ID 666
     struct faction *getfaction(void);
+    struct faction *get_monsters(void);
+    struct faction *get_or_create_monsters(void);
+    void save_special_items(struct unit *u);
+
+#define is_monsters(f) (f->no==MONSTER_ID)
 
 #ifdef __cplusplus
 }

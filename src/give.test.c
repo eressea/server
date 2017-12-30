@@ -71,7 +71,7 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrEquals(tc, 0, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_unit_limits(CuTest * tc) {
@@ -89,7 +89,7 @@ static void test_give_unit_limits(CuTest * tc) {
     CuAssertIntEquals(tc, 1, env.f1->num_units);
     CuAssertIntEquals(tc, 1, env.f2->num_units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "too_many_units_in_faction"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_unit_to_peasants(CuTest * tc) {
@@ -102,7 +102,7 @@ static void test_give_unit_to_peasants(CuTest * tc) {
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, rpeasants(env.r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_unit_to_ocean(CuTest * tc) {
@@ -114,7 +114,7 @@ static void test_give_unit_to_ocean(CuTest * tc) {
     env.r->terrain = test_create_terrain("ocean", SEA_REGION);
     give_unit(env.src, NULL, NULL);
     CuAssertIntEquals(tc, 0, env.src->number);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men(CuTest * tc) {
@@ -125,7 +125,7 @@ static void test_give_men(CuTest * tc) {
     CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_magicians(CuTest * tc) {
@@ -150,7 +150,7 @@ static void test_give_men_magicians(CuTest * tc) {
     CuAssertIntEquals(tc, p+1, rpeasants(env.r));
     msg_release(msg);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_limit(CuTest * tc) {
@@ -180,7 +180,7 @@ static void test_give_men_limit(CuTest * tc) {
     CuAssertIntEquals(tc, 0, env.f1->newbies);
     msg_release(msg);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_in_ocean(CuTest * tc) {
@@ -196,7 +196,7 @@ static void test_give_men_in_ocean(CuTest * tc) {
     CuAssertStrEquals(tc, "give_person_ocean", (const char *)msg->parameters[0].v);
     CuAssertIntEquals(tc, 0, env.src->number);
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_too_many(CuTest * tc) {
@@ -207,7 +207,22 @@ static void test_give_men_too_many(CuTest * tc) {
     CuAssertPtrEquals(tc, 0, give_men(2, env.src, env.dst, NULL));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
-    test_cleanup();
+    test_teardown();
+}
+
+static void test_give_cmd_limit(CuTest * tc) {
+    struct give env = { 0 };
+    unit *u;
+    test_setup_ex(tc);
+    env.f2 = env.f1 = test_create_faction(0);
+    setup_give(&env);
+    u = env.src;
+    scale_number(u, 2);
+    u->thisorder = create_order(K_GIVE, u->faction->locale, "%s 1 PERSON", itoa36(env.dst->no));
+    give_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 1, env.src->number);
+    test_teardown();
 }
 
 static void test_give_men_none(CuTest * tc) {
@@ -222,7 +237,7 @@ static void test_give_men_none(CuTest * tc) {
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_other_faction(CuTest * tc) {
@@ -239,7 +254,7 @@ static void test_give_men_other_faction(CuTest * tc) {
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_requires_contact(CuTest * tc) {
@@ -264,7 +279,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
 
     msg_release(msg);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_men_not_to_self(CuTest * tc) {
@@ -277,7 +292,7 @@ static void test_give_men_not_to_self(CuTest * tc) {
     CuAssertStrEquals(tc, "error10", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.src->number);
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_peasants(CuTest * tc) {
@@ -294,7 +309,7 @@ static void test_give_peasants(CuTest * tc) {
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, rpeasants(env.r));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give(CuTest * tc) {
@@ -312,7 +327,7 @@ static void test_give(CuTest * tc) {
     CuAssertIntEquals(tc, -1, give_item(10, env.itype, env.src, env.dst, 0));
     CuAssertIntEquals(tc, 0, i_get(env.src->items, env.itype));
     CuAssertIntEquals(tc, 10, i_get(env.dst->items, env.itype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_cmd(CuTest * tc) {
@@ -333,7 +348,7 @@ static void test_give_cmd(CuTest * tc) {
     CuAssertIntEquals(tc, 5, i_get(env.dst->items, env.itype));
 
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_herbs(CuTest * tc) {
@@ -352,7 +367,7 @@ static void test_give_herbs(CuTest * tc) {
     CuAssertIntEquals(tc, 0, i_get(env.src->items, env.itype));
     CuAssertIntEquals(tc, 10, i_get(env.dst->items, env.itype));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_okay(CuTest * tc) {
@@ -364,7 +379,7 @@ static void test_give_okay(CuTest * tc) {
 
     config_set("rules.give.flags", "0");
     CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_denied_by_rules(CuTest * tc) {
@@ -379,7 +394,7 @@ static void test_give_denied_by_rules(CuTest * tc) {
     config_set("rules.give.flags", "0");
     CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, 0));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_dead_unit(CuTest * tc) {
@@ -394,7 +409,7 @@ static void test_give_dead_unit(CuTest * tc) {
     freset(env.dst, UFL_ISNEW);
     CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, 0));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_new_unit(CuTest * tc) {
@@ -407,7 +422,7 @@ static void test_give_new_unit(CuTest * tc) {
     env.dst->number = 0;
     fset(env.dst, UFL_ISNEW);
     CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, 0));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_give_invalid_target(CuTest *tc) {
@@ -428,7 +443,7 @@ static void test_give_invalid_target(CuTest *tc) {
     CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_give_suite(void)
@@ -436,6 +451,7 @@ CuSuite *get_give_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_cmd);
+    SUITE_ADD_TEST(suite, test_give_cmd_limit);
     SUITE_ADD_TEST(suite, test_give_men);
     SUITE_ADD_TEST(suite, test_give_men_magicians);
     SUITE_ADD_TEST(suite, test_give_men_limit);

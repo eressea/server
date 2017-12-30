@@ -11,11 +11,13 @@ without prior permission by the authors of Eressea.
 */
 #include <platform.h>
 #include "log.h"
-#include "bsdstring.h"
+
 #include "unicode.h"
+#include "strings.h"
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -92,7 +94,7 @@ cp_convert(const char *format, unsigned char *buffer, size_t length, int codepag
 
 void log_rotate(const char *filename, int maxindex)
 {
-    char buffer[2][MAX_PATH];
+    char buffer[2][PATH_MAX];
     int dst = 1;
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
@@ -148,7 +150,7 @@ static int check_dupe(const char *format, int level)
         }
         dupes = 0;
     }
-    strlcpy(last_message, format, sizeof(last_message));
+    str_strlcpy(last_message, format, sizeof(last_message));
     last_type = level;
     return 0;
 }
@@ -191,6 +193,16 @@ log_t *log_to_file(int flags, FILE *out) {
     return log_create(flags, out, log_stdio);
 }
 
+#ifdef _MSC_VER
+/* https://social.msdn.microsoft.com/Forums/vstudio/en-US/53a4fd75-9f97-48b2-aa63-2e2e5a15efa3/stdcversion-problem?forum=vclanguage */
+#define VA_COPY(c, a) va_copy(c, a)
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+/* GNU only: https://www.gnu.org/software/libc/manual/html_node/Argument-Macros.html */
+#define VA_COPY(c, a) __va_copy(c, a)
+#else
+#define VA_COPY(c, a) va_copy(c, a)
+#endif
+
 static void log_write(int flags, const char *module, const char *format, va_list args) {
     log_t *lg;
     for (lg = loggers; lg; lg = lg->next) {
@@ -202,8 +214,7 @@ static void log_write(int flags, const char *module, const char *format, va_list
             }
             if (dupe == 0) {
                 va_list copy;
-
-                va_copy(copy, args);
+                VA_COPY(copy, args);
                 lg->log(lg->data, level, NULL, format, copy);
                 va_end(copy);
             }

@@ -39,6 +39,7 @@
 #include <util/log.h>
 #include <selist.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -186,13 +187,13 @@ newfaction *read_newfactions(const char *filename)
         }
         nf = calloc(sizeof(newfaction), 1);
         if (check_email(email) == 0) {
-          nf->email = strdup(email);
+          nf->email = str_strdup(email);
         } else {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
             free(nf);
             continue;
         }
-        nf->password = strdup(password);
+        nf->password = str_strdup(password);
         nf->race = rc_find(race);
         nf->subscription = subscription;
         if (alliances != NULL) {
@@ -960,8 +961,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }
@@ -975,8 +976,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }

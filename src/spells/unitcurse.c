@@ -26,6 +26,7 @@
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/nrmessage.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/base36.h>
 #include <util/functions.h>

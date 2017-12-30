@@ -38,7 +38,7 @@ static void test_plane(CuTest *tc) {
     CuAssertIntEquals(tc, 60, plane_center_y(pl));
     CuAssertIntEquals(tc, 5, plane_width(pl));
     CuAssertIntEquals(tc, 41, plane_height(pl));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_origin(CuTest *tc) {
@@ -56,7 +56,7 @@ static void test_origin(CuTest *tc) {
     adjust_coordinates(f, &x, &y, 0);
     CuAssertIntEquals(tc, -10, x);
     CuAssertIntEquals(tc, -20, y);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_plane_suite(void)

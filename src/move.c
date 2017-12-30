@@ -17,7 +17,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "move.h"
 #include "guard.h"
@@ -75,6 +77,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -262,6 +265,7 @@ static int ridingcapacity(const unit * u)
 {
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
+    int horses;
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
@@ -269,19 +273,22 @@ static int ridingcapacity(const unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
+    horses = effskill(u, SK_RIDING, 0) * u->number * 2;
+    if (animals > horses) animals = horses;
+
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    vehicles = MIN(animals / HORSESNEEDED, vehicles);
+    horses = animals / HORSES_PER_CART;
+    if (horses < vehicles) vehicles = horses;
 
     return vehicles * vcap + animals * acap;
 }
 
 int walkingcapacity(const struct unit *u)
 {
-    int n, people, pferde_fuer_wagen;
+    int n, people, pferde_fuer_wagen, horses;
     int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
@@ -293,7 +300,8 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
+    horses = effskill(u, SK_RIDING, 0) * u->number * 4;
+    pferde_fuer_wagen = (animals < horses) ? animals : horses;
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -303,7 +311,8 @@ int walkingcapacity(const struct unit *u)
     }
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+    horses = pferde_fuer_wagen / HORSES_PER_CART;
+    wagen_mit_pferden = (vehicles < horses) ? vehicles : horses;
 
     n = wagen_mit_pferden * vcap;
 
@@ -313,7 +322,8 @@ int walkingcapacity(const struct unit *u)
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
-        wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
+        wagen_mit_trollen = u->number / 4;
+        if (wagen_mit_trollen > wagen_ohne_pferde) wagen_mit_trollen = wagen_ohne_pferde;
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
@@ -337,7 +347,8 @@ int walkingcapacity(const struct unit *u)
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
             int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
-            n += MIN(people, belts) * (multi - 1) * u_race(u)->capacity;
+            if (belts > people) belts = people;
+            n += belts * (multi - 1) * u_race(u)->capacity;
         }
     }
 
@@ -368,7 +379,8 @@ static int canwalk(unit * u)
     effsk = effskill(u, SK_RIDING, 0);
     maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
-        maxwagen = MAX(maxwagen, u->number / 4);
+        int trolls = u->number / 4;
+        if (maxwagen > trolls) maxwagen = trolls;
     }
     maxpferde = effsk * u->number * 4 + u->number;
 
@@ -510,8 +522,9 @@ static double overload(const region * r, ship * sh)
 
         getshipweight(sh, &n, &p);
         ovl = n / (double)sh->type->cargo;
-        if (mcabins)
-            ovl = MAX(ovl, p / (double)mcabins);
+        if (mcabins) {
+            ovl = fmax(ovl, p / (double)mcabins);
+        }
         return ovl;
     }
 }
@@ -752,7 +765,7 @@ double damage_overload(double overload)
     badness = overload - overload_worse();
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
-        damage += MIN(badness, overload_worst() - overload_worse()) *
+        damage += fmin(badness, overload_worst() - overload_worse()) *
             (overload_max_damage() - damage) /
             (overload_worst() - overload_worse());
     }
@@ -802,9 +815,14 @@ direction_t drift_target(ship *sh) {
 
 static void drifting_ships(region * r)
 {
-    bool drift = config_get_int("rules.ship.drifting", 1) != 0;
-    double damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    static int config;
+    static bool drift;
+    static double damage_drift;
 
+    if (config_changed(&config)) {
+        drift = config_get_int("rules.ship.drifting", 1) != 0;
+        damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    }
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
         while (*shp) {
@@ -872,8 +890,9 @@ static void drifting_ships(region * r)
                     damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 }
-                else
+                else {
                     damage_ship(sh, damage_drift);
+                }
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);
@@ -946,7 +965,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 double prob_u = (sk - stealth) * skill_prob;
                 guard_count += u->number;
                 /* amulet counts at most once */
-                prob_u += MIN(1, MIN(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += fmin(1, fmin(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -1096,15 +1115,15 @@ static void cycle_route(order * ord, unit * u, int gereist)
              * hier keine normale direction), muss jede PAUSE einzeln
              * herausgefiltert und explizit gesetzt werden */
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
         }
         else {
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
         }
     }
 
@@ -1382,47 +1401,45 @@ int movement_speed(const unit * u)
     const race *rc = u_race(u);
     double dk = rc->speed;
     assert(u->number);
+
     /* dragons have a fixed speed, and no other effects work on them: */
-    if (fval(rc, RCF_DRAGON)) {
-        return BP_DRAGON;
-    }
-    switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON: /* FIXME: catdragon has RCF_DRAGON, so this cannot happen */
-    case RC_SONGDRAGON:
+    if (u_race(u) == get_race(RC_SONGDRAGON)) {
         mp = BP_DRAGON;
-        break;
-    default:
-        mp = walk_mode(u);
-        if (mp>=BP_RIDING) {
-            dk = 1.0;
+    }
+    else {
+        if (fval(rc, RCF_DRAGON)) {
+            mp = BP_DRAGON;
         }
-        break;
-    }
+        else {
+            mp = walk_mode(u);
+            if (mp >= BP_RIDING) {
+                dk = 1.0;
+            }
+            if (u->attribs) {
+                curse *c = get_curse(u->attribs, &ct_speed);
+                if (c != NULL) {
+                    int men = get_cursedmen(u, c);
+                    dk *= 1.0 + (double)men / (double)u->number;
+                }
+            }
 
-    if (u->attribs) {
-        curse *c = get_curse(u->attribs, &ct_speed);
-        if (c != NULL) {
-            int men = get_cursedmen(u, c);
-            dk *= 1.0 + (double)men / (double)u->number;
-        }
-    }
-
-    /* unicorn in inventory */
-    if (u->number <= i_get(u->items, it_find("fairyboot"))) {
-        mp *= 2;
-    }
-
-    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-        * Nicht kumulativ mit anderen Beschleunigungen! */
-    if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
-        sc_mage *mage = get_mage(u);
-        if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
-            if (has_skill(u, SK_MAGIC)) {
+            /* unicorn in inventory */
+            if (u->number <= i_get(u->items, it_find("fairyboot"))) {
                 mp *= 2;
+            }
+
+            /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+                * Nicht kumulativ mit anderen Beschleunigungen! */
+            if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
+                sc_mage *mage = get_mage(u);
+                if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
+                    if (has_skill(u, SK_MAGIC)) {
+                        mp *= 2;
+                    }
+                }
             }
         }
     }
-
     return (int)(dk * mp);
 }
 
@@ -1963,8 +1980,8 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
                                 int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
-                                st = MIN(itm->number, st);
 
+                                if (st > itm->number) st = itm->number;
                                 if (st > 0) {
                                     i_change(&u2->items, itm->type, -st);
                                     i_change(&harbourmaster->items, itm->type, st);

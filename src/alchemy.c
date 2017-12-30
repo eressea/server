@@ -37,6 +37,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/rand.h>
 
 #include <storage.h>
@@ -49,12 +50,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* ------------------------------------------------------------- */
 
-void herbsearch(unit * u, int max)
+void herbsearch(unit * u, int max_take)
 {
     region * r = u->region;
     int herbsfound;
     const item_type *whichherb;
     int effsk = effskill(u, SK_HERBALISM, 0);
+    int herbs = rherbs(r);
 
     if (effsk == 0) {
         cmistake(u, u->thisorder, 59, MSG_PRODUCE);
@@ -72,13 +74,13 @@ void herbsearch(unit * u, int max)
         return;
     }
 
-    if (max)
-        max = MIN(max, rherbs(r));
-    else
-        max = rherbs(r);
+    if (max_take < herbs) {
+        herbs = max_take;
+    }
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
-    herbsfound = MIN(herbsfound, max);
+
+    if (herbsfound > herbs) herbsfound = herbs;
     rsetherbs(r, (short) (rherbs(r) - herbsfound));
 
     if (herbsfound) {
@@ -156,7 +158,9 @@ static int potion_water_of_life(unit * u, region *r, int amount) {
 }
 
 static int potion_healing(unit * u, int amount) {
-    u->hp = MIN(unit_max_hp(u) * u->number, u->hp + 400 * amount);
+    int maxhp = unit_max_hp(u) * u->number;
+    u->hp = u->hp + 400 * amount;
+    if (u->hp > maxhp) u->hp = maxhp;
     return amount;
 }
 
@@ -170,20 +174,14 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     return amount;
 }
 
-static int potion_truth(unit *u) {
-    UNUSED_ARG(u);
-    /* TODO: this potion does nothing! */
-    return 1;
-}
-
 static int potion_power(unit *u, int amount) {
-    int use = u->number / 10;
-    if (use < amount) {
-        if (u->number % 10 > 0) ++use;
-        amount = use;
+    int hp = 10 * amount;
+
+    if (hp > u->number) {
+        hp = u->number;
+        amount = (hp + 9) % 10;
     }
-    /* Verf�nffacht die HP von max. 10 Personen in der Einheit */
-    u->hp += MIN(u->number, 10 * amount) * unit_max_hp(u) * 4;
+    u->hp += hp * unit_max_hp(u) * 4;
     return amount;
 }
 
@@ -200,9 +198,6 @@ static int do_potion(unit * u, region *r, const potion_type * ptype, int amount)
     }
     else if (ptype == oldpotiontype[P_HORSE]) {
         return potion_luck(u, r, &at_horseluck, amount);
-    }
-    else if (ptype == oldpotiontype[P_WAHRHEIT]) {
-        return potion_truth(u);
     }
     else if (ptype == oldpotiontype[P_MACHT]) {
         return potion_power(u, amount);

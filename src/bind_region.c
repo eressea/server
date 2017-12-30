@@ -1,16 +1,7 @@
-/* 
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "bind_region.h"
 #include "bind_unit.h"
 #include "bind_ship.h"
@@ -39,6 +30,8 @@ without prior permission by the authors of Eressea.
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
+#include <util/strings.h>
 
 #include <critbit.h>
 
@@ -635,7 +628,7 @@ static int tolua_plane_set_name(lua_State * L)
     const char *str = tolua_tostring(L, 2, 0);
     free(self->name);
     if (str)
-        self->name = strdup(str);
+        self->name = str_strdup(str);
     else
         self->name = 0;
     return 0;

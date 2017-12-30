@@ -5,6 +5,7 @@
 
 #include <util/log.h>
 #include <util/lists.h>
+#include <util/macros.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -22,7 +23,7 @@ static void test_create_a_spell(CuTest * tc)
     sp = create_spell("testspell");
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
     CuAssertPtrNotNull(tc, spells);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_create_duplicate_spell(CuTest * tc)
@@ -32,7 +33,7 @@ static void test_create_duplicate_spell(CuTest * tc)
     strlist *sl = 0;
 
     test_setup();
-    test_log_stderr(0);
+    test_log_stderr(0); /* suppress the "duplicate spell" error message */
     log = test_log_start(LOG_CPERROR, &sl);
 
     CuAssertPtrEquals(tc, 0, find_spell("testspell"));
@@ -44,7 +45,8 @@ static void test_create_duplicate_spell(CuTest * tc)
     CuAssertPtrEquals(tc, 0, sl->next);
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
     test_log_stop(log, sl);
-    test_cleanup();
+    test_log_stderr(1); /* or teardown complains that stderr logging is off */
+    test_teardown();
 }
 
 static void test_spellref(CuTest *tc)
@@ -61,7 +63,7 @@ static void test_spellref(CuTest *tc)
     CuAssertPtrNotNull(tc, sp);
     CuAssertPtrEquals(tc, sp, spellref_get(ref));
     spellref_free(ref);
-    test_cleanup();
+    test_teardown();
 }
 
 void fumble_foo(const struct castorder *co) {
@@ -81,7 +83,7 @@ static void test_fumbles(CuTest *tc)
     CuAssertTrue(tc, fumble_foo==get_fumble("foone"));
     CuAssertTrue(tc, fumble_bar==get_fumble("foozle"));
     CuAssertTrue(tc, NULL==get_fumble("foo"));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_spell_suite(void)

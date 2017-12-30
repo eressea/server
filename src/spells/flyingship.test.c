@@ -26,7 +26,7 @@ static void test_flyingship(CuTest * tc)
     ship_type *shipType1, *shipType2;
     ship *sh1, *sh2;
 
-    test_cleanup();
+    test_setup();
 
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
@@ -61,7 +61,7 @@ static void test_flyingship(CuTest * tc)
     CuAssertTrue(tc, !flying_ship(sh2));
     co.par = 0;
     free_castorder(&co);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_flyingship_suite(void)

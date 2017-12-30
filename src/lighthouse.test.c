@@ -49,7 +49,7 @@ static void test_lighthouse_range(CuTest * tc)
     set_level(u1, SK_PERCEPTION, 9);
     CuAssertIntEquals(tc, 3, lighthouse_range(b, u1->faction, u1));
     CuAssertIntEquals(tc, 1, lighthouse_range(b, u2->faction, u2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_lighthouse_update(CuTest * tc)
@@ -88,7 +88,7 @@ static void test_lighthouse_update(CuTest * tc)
     CuAssertPtrEquals(tc, (void *)&at_lighthouse, (void *)r2->attribs->type);
     CuAssertPtrNotNull(tc, r3->attribs);
     CuAssertPtrEquals(tc, (void *)&at_lighthouse, (void *)r3->attribs->type);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_lighthouse_suite(void)

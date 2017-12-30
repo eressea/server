@@ -8,7 +8,10 @@
  *
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <curses.h>
 
 #include <kernel/config.h>
@@ -45,11 +48,13 @@
 #include <triggers/triggers.h>
 
 #include <util/attrib.h>
-#include <util/log.h>
-#include <util/unicode.h>
-#include <util/lists.h>
-#include <util/rng.h>
 #include <util/base36.h>
+#include <util/lists.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include <util/path.h>
+#include <util/rng.h>
+#include <util/unicode.h>
 
 #include <storage.h>
 #include <lua.h>
@@ -565,7 +570,9 @@ static void terraform_at(coordinate * c, const terrain_type * terrain)
         if (r == NULL) {
             r = new_region(nx, ny, c->pl, 0);
         }
-        terraform_region(r, terrain);
+        if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
+            terraform_region(r, terrain);
+        }
     }
 }
 
@@ -589,7 +596,9 @@ terraform_selection(selection * selected, const terrain_type * terrain)
             if (r == NULL) {
                 r = new_region(nx, ny, pl, 0);
             }
-            terraform_region(r, terrain);
+            if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
+                terraform_region(r, terrain);
+            }
             tp = &t->nexthash;
         }
     }
@@ -871,7 +880,7 @@ static void select_regions(state * st, int selectmode)
 }
 
 static void loaddata(state *st) {
-    char datafile[MAX_PATH];
+    char datafile[PATH_MAX];
 
     askstring(st->wnd_status->handle, "load from:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
@@ -881,7 +890,7 @@ static void loaddata(state *st) {
 }
 
 static void savedata(state *st) {
-    char datafile[MAX_PATH];
+    char datafile[PATH_MAX];
 
     askstring(st->wnd_status->handle, "save as:", datafile, sizeof(datafile));
     if (strlen(datafile) > 0) {
@@ -1383,7 +1392,7 @@ void run_mapper(void)
     char sbuffer[512];
 
     if (!new_players) {
-        join_path(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
+        path_join(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
         new_players = read_newfactions(sbuffer);
     }
 

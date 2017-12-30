@@ -2,9 +2,11 @@
 #include "items.h"
 
 #include "alchemy.h"
+#include "skill.h"
+#include "keyword.h"
+#include "direction.h"
 #include "study.h"
 #include "economy.h"
-#include "move.h"
 #include "magic.h"
 
 #include <attributes/fleechance.h>
@@ -14,17 +16,16 @@
 #include <spells/regioncurse.h>
 
 #include <kernel/curse.h>
-#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
-#include <kernel/plane.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 
 /* triggers includes */
@@ -33,12 +34,13 @@
 
 #include <util/attrib.h>
 #include <util/event.h>
-#include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <limits.h>
 
 /* BEGIN studypotion */

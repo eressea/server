@@ -68,6 +68,7 @@ without prior permission by the authors of Eressea.
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <selist.h>
@@ -131,7 +132,7 @@ static const char *translate(const char *key, const char *value)
         }
         else
             t = malloc(sizeof(translation));
-        t->key = strdup(key);
+        t->key = str_strdup(key);
         t->value = value;
         t->next = translation_table[kk];
         translation_table[kk] = t;
@@ -620,6 +621,26 @@ static void cr_output_messages(FILE * F, message_list * msgs, faction * f)
         render_messages(F, f, msgs);
 }
 
+static void cr_output_battles(FILE * F, faction * f)
+{
+    struct bmsg *bm;
+    for (bm = f->battles; bm; bm = bm->next) {
+        region *rb = bm->r;
+        plane *pl = rplane(rb);
+        int plid = plane_id(pl);
+        int nx = rb->x, ny = rb->y;
+
+        pnormalize(&nx, &ny, pl);
+        adjust_coordinates(f, &nx, &ny, pl);
+        if (!plid)
+            fprintf(F, "BATTLE %d %d\n", nx, ny);
+        else {
+            fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
+        }
+        cr_output_messages(F, bm->msgs, f);
+    }
+}
+
 /* prints a building */
 static void cr_output_building(struct stream *out, building *b, 
     const unit *owner, int fno, faction *f)
@@ -735,7 +756,6 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                /* TODO: no need to deref spref here, spref->name == sp->sname */
                 spell * sp = sbe->sp;
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
@@ -752,7 +772,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 * @param f observers faction
 * @param u unit to report
 */
-void cr_output_unit(stream *out, const region * r, const faction * f,
+void cr_output_unit(stream *out, const faction * f,
     const unit * u, seen_mode mode)
 {
     /* Race attributes are always plural and item attributes always
@@ -771,7 +791,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     const struct locale *lang = f->locale;
 
     assert(u && u->number);
-    assert(u->region == r); /* TODO: if this holds true, then why did we pass in r? */
+
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
@@ -948,7 +968,7 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
         /* spells that this unit can cast */
         mage = get_mage_depr(u);
         if (mage) {
-            int i, maxlevel = effskill(u, SK_MAGIC, 0);
+            int maxlevel = effskill(u, SK_MAGIC, 0);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {
@@ -996,13 +1016,13 @@ void cr_output_unit(stream *out, const region * r, const faction * f,
     cr_output_curses(out, f, u, TYP_UNIT);
 }
 
-static void cr_output_unit_compat(FILE * F, const region * r, const faction * f,
+static void cr_output_unit_compat(FILE * F, const faction * f,
     const unit * u, int mode)
 {
     /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
-    cr_output_unit(&strm, r, f, u, mode);
+    cr_output_unit(&strm, f, u, mode);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -1101,7 +1121,7 @@ static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale 
         int itemanz = sp->components[k].amount;
         int costtyp = sp->components[k].cost;
         if (itemanz > 0) {
-            const char *name = resourcename(rtype, 0);
+            name = resourcename(rtype, 0);
             fprintf(F, "%d %d;%s\n", itemanz, costtyp == SPC_LEVEL
                 || costtyp == SPC_LINEAR, translate(name, LOC(lang, name)));
         }
@@ -1433,14 +1453,15 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
             if (rl) {
                 region_list *rl2 = rl;
                 while (rl2) {
-                    region *r = rl2->data;
-                    int nx = r->x, ny = r->y;
-                    plane *plx = rplane(r);
+                    region *r2 = rl2->data;
+                    plane *plx = rplane(r2);
 
+                    nx = r2->x;
+                    ny = r2->y;
                     pnormalize(&nx, &ny, plx);
                     adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
-                    fprintf(F, "\"%s\";Name\n", rname(r, f->locale));
+                    fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
                     rl2 = rl2->next;
                 }
                 free_regionlist(rl);
@@ -1482,7 +1503,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         for (u = r->units; u; u = u->next) {
 
             if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                cr_output_unit_compat(F, r, f, u, r->seen.mode);
+                cr_output_unit_compat(F, f, u, r->seen.mode);
             }
         }
     }
@@ -1620,24 +1641,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     }
 
     cr_output_messages(F, f->msgs, f);
-    {
-        struct bmsg *bm;
-        for (bm = f->battles; bm; bm = bm->next) {
-            plane *pl = rplane(bm->r);
-            int plid = plane_id(pl);
-            region *r = bm->r;
-            int nx = r->x, ny = r->y;
-
-            pnormalize(&nx, &ny, pl);
-            adjust_coordinates(f, &nx, &ny, pl);
-            if (!plid)
-                fprintf(F, "BATTLE %d %d\n", nx, ny);
-            else {
-                fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
-            }
-            cr_output_messages(F, bm->msgs, f);
-        }
-    }
+    cr_output_battles(F, f);
 
     cr_find_address(F, f, ctx->addresses);
     a = a_find(f->attribs, &at_reportspell);

@@ -19,7 +19,7 @@ void test_reservation(CuTest *tc) {
     faction *f;
     region *r;
     struct resource_type *rtype;
-    test_cleanup();
+    test_setup();
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
@@ -39,7 +39,7 @@ void test_reservation(CuTest *tc) {
     CuAssertIntEquals(tc, 200, get_resource(u, rtype));
     CuAssertIntEquals(tc, 200, i_get(u->items, rtype->itype));
 
-    test_cleanup();
+    test_teardown();
 }
 
 void test_pool(CuTest *tc) {
@@ -49,7 +49,7 @@ void test_pool(CuTest *tc) {
     struct resource_type *rtype;
     ally *al;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
@@ -85,6 +85,8 @@ void test_pool(CuTest *tc) {
     CuAssertIntEquals(tc, 100, get_pooled(u1, rtype, GET_ALL, 50));
     CuAssertIntEquals(tc, 300, get_pooled(u1, rtype, GET_ALL, 150));
     CuAssertIntEquals(tc, 300, get_pooled(u1, rtype, GET_ALL, INT_MAX));
+
+    test_teardown();
 }
 
 void test_pool_bug_2042(CuTest *tc) {
@@ -93,7 +95,7 @@ void test_pool_bug_2042(CuTest *tc) {
     region *r;
     struct resource_type *rtype;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
@@ -106,6 +108,8 @@ void test_pool_bug_2042(CuTest *tc) {
     i_change(&u2->items, rtype->itype, 100);
 
     CuAssertIntEquals(tc, 100, get_pooled(u1, rtype, GET_SLACK | GET_POOLED_SLACK, 100));
+
+    test_teardown();
 }
 
 void test_pool_use(CuTest *tc) {
@@ -115,7 +119,7 @@ void test_pool_use(CuTest *tc) {
     struct item_type *itype;
     ally *al;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     itype = it_get_or_create(rt_get_or_create("money"));
     f = test_create_faction(0);
@@ -151,6 +155,8 @@ void test_pool_use(CuTest *tc) {
     CuAssertIntEquals(tc, 90, get_reservation(u2, itype));
     CuAssertIntEquals(tc, 90, use_pooled(u1, itype->rtype, GET_POOLED_RESERVE, 100));
     CuAssertIntEquals(tc, 0, i_get(u2->items, itype));
+
+    test_teardown();
 }
 
 void test_change_resource(CuTest * tc)
@@ -161,7 +167,7 @@ void test_change_resource(CuTest * tc)
     const char * names[] = { "money", "aura", "permaura", "horse", "hp", 0 };
     int i;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
     enable_skill(SK_MAGIC, true);
 
@@ -178,7 +184,7 @@ void test_change_resource(CuTest * tc)
         CuAssertIntEquals(tc, have + 1, change_resource(u, rtype, 1));
         CuAssertIntEquals(tc, have + 1, get_resource(u, rtype));
     }
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_pool_suite(void)

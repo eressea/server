@@ -20,7 +20,7 @@ static void test_summary(CuTest * tc)
     CuAssertIntEquals(tc, 0, remove("datum"));
     CuAssertIntEquals(tc, 0, remove("turn"));
     free_summary(sum);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_summary_suite(void)

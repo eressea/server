@@ -40,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
 
@@ -124,7 +125,7 @@ ship_type *st_get_or_create(const char * name) {
     assert(!snames);
     if (!st) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
-        st->_name = strdup(name);
+        st->_name = str_strdup(name);
         st->storm = 1.0;
         st_register(st);
     }
@@ -217,7 +218,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     }
     assert(sname);
     snprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
-    sh->name = strdup(buffer);
+    sh->name = str_strdup(buffer);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);
@@ -288,12 +289,28 @@ const char *write_shipname(const ship * sh, char *ibuf, size_t size)
 
 static int ShipSpeedBonus(const unit * u)
 {
-    int level = config_get_int("movement.shipspeed.skillbonus", 0);
-    if (level > 0) {
-        ship *sh = u->ship;
+    const ship * sh = u->ship;
+    static int config;
+    static int bonus;
+
+    if (config_changed(&config)) {
+        bonus = config_get_int("movement.shipspeed.skillbonus", 0);
+    }
+    if (bonus > 0) {
         int skl = effskill(u, SK_SAILING, 0);
         int minsk = (sh->type->cptskill + 1) / 2;
-        return (skl - minsk) / level;
+        return (skl - minsk) / bonus;
+    }
+    else if (sh->type->flags & SFL_SPEEDY) {
+        int base = 3;
+        int speed = 0;
+        int minsk = sh->type->cptskill * base;
+        int skl = effskill(u, SK_SAILING, 0);
+        while (skl >= minsk) {
+            ++speed;
+            minsk *= base;
+        }
+        return speed;
     }
     return 0;
 }
@@ -475,7 +492,7 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
 void ship_setname(ship * self, const char *name)
 {
     free(self->name);
-    self->name = name ? strdup(name) : 0;
+    self->name = name ? str_strdup(name) : 0;
 }
 
 const char *ship_getname(const ship * self)

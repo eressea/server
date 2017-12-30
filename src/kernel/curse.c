@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/resolve.h>

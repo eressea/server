@@ -44,7 +44,7 @@ static void test_magicresistance_unit(CuTest *tc) {
     CuAssertStrEquals(tc, "curseinfo::magicresistance_unit", test_get_messagetype(msg));
     msg_release(msg);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_magicresistance_building(CuTest *tc) {
@@ -69,7 +69,7 @@ static void test_magicresistance_building(CuTest *tc) {
     CuAssertPtrNotNull(tc, msg);
     CuAssertStrEquals(tc, "curseinfo::magicresistance_building", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_magicresistance_suite(void)

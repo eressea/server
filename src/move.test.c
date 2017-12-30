@@ -34,7 +34,7 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     terrain_type *ttype, *otype;
     ship_type *stype;
 
-    test_cleanup();
+    test_setup();
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     otype = test_create_terrain("ocean", SEA_REGION);
     stype = test_create_shiptype("derp");
@@ -49,7 +49,7 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     CuAssertIntEquals(tc, SA_NO_COAST, check_ship_allowed(sh, r1));
     stype->coasts[0] = ttype;
     CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r1));
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct move_fixture {
@@ -66,8 +66,6 @@ static void setup_harbor(move_fixture *mf) {
     building_type * btype;
     building * b;
     unit *u;
-
-    test_cleanup();
 
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     btype = test_create_buildingtype("harbour");
@@ -92,15 +90,18 @@ static void test_ship_allowed_without_harbormaster(CuTest * tc)
 {
     move_fixture mf;
 
+    test_setup();
     setup_harbor(&mf);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
+    test_teardown();
 }
 
 static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     unit *u;
     move_fixture mf;
 
+    test_setup();
     setup_harbor(&mf);
 
     u = test_create_unit(test_create_faction(0), mf.r);
@@ -108,13 +109,14 @@ static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     building_set_owner(u);
 
     CuAssertIntEquals_Msg(tc, "harbor master must contact ship", SA_NO_COAST, check_ship_allowed(mf.sh, mf.r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_has_harbormaster_contact(CuTest * tc) {
     unit *u;
     move_fixture mf;
 
+    test_setup();
     setup_harbor(&mf);
 
     u = test_create_unit(test_create_faction(0), mf.r);
@@ -123,13 +125,14 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     usetcontact(mf.b->_owner, mf.sh->_owner);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_has_harbormaster_same_faction(CuTest * tc) {
     unit *u;
     move_fixture mf;
 
+    test_setup();
     setup_harbor(&mf);
 
     u = test_create_unit(mf.u->faction, mf.r);
@@ -137,7 +140,7 @@ static void test_ship_has_harbormaster_same_faction(CuTest * tc) {
     building_set_owner(u);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_has_harbormaster_ally(CuTest * tc) {
@@ -145,6 +148,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     move_fixture mf;
     ally *al;
 
+    test_setup();
     setup_harbor(&mf);
 
     u = test_create_unit(test_create_faction(0), mf.r);
@@ -154,7 +158,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     al->status = HELP_GUARD;
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_walkingcapacity(CuTest *tc) {
@@ -196,7 +200,7 @@ static void test_walkingcapacity(CuTest *tc) {
     config_set("rules.trollbelt.multiplier", "5");
     CuAssertIntEquals(tc, cap + 4 * u->_race->capacity, walkingcapacity(u));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_trails(CuTest *tc) {
@@ -205,7 +209,7 @@ static void test_ship_trails(CuTest *tc) {
     terrain_type *otype;
     region_list *route = 0;
 
-    test_cleanup();
+    test_setup();
     otype = test_create_terrain("ocean", SEA_REGION);
     r1 = test_create_region(0, 0, otype);
     r2 = test_create_region(1, 0, otype);
@@ -227,7 +231,7 @@ static void test_ship_trails(CuTest *tc) {
     CuAssertPtrNotNull(tc, a_find(r2->attribs, &at_shiptrail));
     CuAssertPtrNotNull(tc, a_find(r3->attribs, &at_shiptrail));
     free_regionlist(route);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_age_trails(CuTest *tc) {
@@ -235,7 +239,7 @@ static void test_age_trails(CuTest *tc) {
     region *r1, *r2;
     ship *sh;
 
-    test_cleanup();
+    test_setup();
     r1 = test_create_region(0, 0, 0);
     r2 = test_create_region(1, 0, 0);
     sh = test_create_ship(r1, 0);
@@ -249,7 +253,7 @@ static void test_age_trails(CuTest *tc) {
     a_age(&r1->attribs, r1);
     CuAssertPtrEquals(tc, 0, r1->attribs);
     free_regionlist(route);
-    test_cleanup();
+    test_teardown();
 }
 
 struct drift_fixture {
@@ -263,7 +267,6 @@ struct drift_fixture {
 };
 
 void setup_drift (struct drift_fixture *fix) {
-    test_setup();
     test_create_locale();
     config_set("rules.ship.storms", "0");
 
@@ -281,8 +284,7 @@ void setup_drift (struct drift_fixture *fix) {
 static void test_ship_no_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 2;
@@ -290,14 +292,13 @@ static void test_ship_no_overload(CuTest *tc) {
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1,0));
     CuAssertIntEquals(tc, 0, fix.sh->damage);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_empty(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
     fix.u->ship = NULL;
     ship_update_owner(fix.sh);
@@ -307,14 +308,30 @@ static void test_ship_empty(CuTest *tc) {
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "ship_drift"));
 
-    test_cleanup();
+    test_teardown();
+}
+
+static void test_no_drift_damage(CuTest *tc) {
+    struct drift_fixture fix;
+
+    test_setup();
+    setup_drift(&fix);
+    fix.u->ship = NULL;
+    ship_update_owner(fix.sh);
+
+    config_set("rules.ship.damage_drift", "0.0");
+    movement();
+    CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
+    CuAssertIntEquals(tc, 0, ship_damage_percent(fix.sh));
+    CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "ship_drift"));
+
+    test_teardown();
 }
 
 static void test_ship_normal_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 21;
@@ -323,14 +340,13 @@ static void test_ship_normal_overload(CuTest *tc) {
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_big_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 22;
@@ -339,14 +355,13 @@ static void test_ship_big_overload(CuTest *tc) {
     CuAssertIntEquals(tc, 5, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_no_real_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 21;
@@ -356,14 +371,13 @@ static void test_ship_no_real_overload(CuTest *tc) {
     CuAssertIntEquals(tc, 82, ship_damage_percent(fix.sh));
     CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_ridiculous_overload(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 500;
@@ -371,14 +385,13 @@ static void test_ship_ridiculous_overload(CuTest *tc) {
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
-
+    test_setup();
     setup_drift(&fix);
     set_level(fix.u, SK_SAILING, 0);
 
@@ -387,13 +400,13 @@ static void test_ship_ridiculous_overload_no_captain(CuTest *tc) {
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     struct drift_fixture fix;
 
-    test_cleanup();
+    test_setup();
     setup_drift(&fix);
 
     fix.u->number = 500;
@@ -403,7 +416,7 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
     CuAssertPtrEquals(tc, 0, fix.sh->region);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "shipsink"));
-    test_cleanup();
+    test_teardown();
 }
 
 extern double damage_overload(double overload);
@@ -472,7 +485,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     CuAssertPtrNotNull(tc, p);
     CuAssertIntEquals(tc, K_FOLLOW, getkeyword((order *)p));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_drifting_ships(CuTest *tc) {
@@ -480,6 +493,7 @@ static void test_drifting_ships(CuTest *tc) {
     region *r;
     terrain_type *t_ocean, *t_plain;
     ship_type *st_boat;
+
     test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
@@ -490,7 +504,7 @@ static void test_drifting_ships(CuTest *tc) {
     CuAssertIntEquals(tc, D_EAST, drift_target(sh));
     test_create_region(-1, 0, t_plain);
     CuAssertIntEquals(tc, D_WEST, drift_target(sh));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ship_leave_trail(CuTest *tc) {
@@ -519,7 +533,7 @@ static void test_ship_leave_trail(CuTest *tc) {
     CuAssertPtrEquals(tc, &at_shiptrail, (void *)r2->attribs->next->type);
     CuAssertPtrEquals(tc, &at_lighthouse, (void *)r2->attribs->next->next->type);
     free_regionlist(route);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_movement_speed(CuTest *tc) {
@@ -542,7 +556,7 @@ static void test_movement_speed(CuTest *tc) {
     i_change(&u->items, it_horse, 1);
     CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_route_cycle(CuTest *tc) {
@@ -565,7 +579,7 @@ static void test_route_cycle(CuTest *tc) {
     move_cmd(u, u->orders);
     CuAssertIntEquals(tc, 1, u->region->x);
     CuAssertStrEquals(tc, "route east nw west", get_command(u->orders, lang, buffer, sizeof(buffer)));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_route_pause(CuTest *tc) {
@@ -588,13 +602,27 @@ static void test_route_pause(CuTest *tc) {
     move_cmd(u, u->orders);
     CuAssertIntEquals(tc, 2, u->region->x);
     CuAssertStrEquals(tc, "route PAUSE EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
-    test_cleanup();
+    test_teardown();
+}
+
+static void test_movement_speed_dragon(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("dragon");
+    rc->flags |= RCF_DRAGON;
+    rc->speed = 1.5;
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    CuAssertIntEquals(tc, 6, movement_speed(u));
+    test_teardown();
 }
 
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_movement_speed);
+    SUITE_ADD_TEST(suite, test_movement_speed_dragon);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
@@ -607,6 +635,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);
     SUITE_ADD_TEST(suite, test_ship_empty);
+    SUITE_ADD_TEST(suite, test_no_drift_damage);
     SUITE_ADD_TEST(suite, test_ship_normal_overload);
     SUITE_ADD_TEST(suite, test_ship_no_real_overload);
     SUITE_ADD_TEST(suite, test_ship_big_overload);

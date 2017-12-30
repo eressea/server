@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "language.h"
 
 #include "log.h"
@@ -83,7 +86,7 @@ locale *get_or_create_locale(const char *name)
     *lp = l = (locale *)calloc(sizeof(locale), 1);
     assert_alloc(l);
     l->hashkey = hkey;
-    l->name = strdup(name);
+    l->name = str_strdup(name);
     l->index = nextlocaleindex++;
     assert(nextlocaleindex <= MAXLOCALES);
     if (default_locale == NULL) default_locale = l;
@@ -206,15 +209,15 @@ void locale_setstring(locale * lang, const char *key, const char *value)
         find->nexthash = lang->strings[id];
         lang->strings[id] = find;
         find->hashkey = hkey;
-        find->key = strdup(key);
-        find->str = strdup(value);
+        find->key = str_strdup(key);
+        find->str = str_strdup(value);
     }
     else {
         if (strcmp(find->str, value) != 0) {
             log_warning("multiple translations for key %s\n", key);
         }
         free(find->str);
-        find->str = strdup(value);
+        find->str = str_strdup(value);
     }
 }
 

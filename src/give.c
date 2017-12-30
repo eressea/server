@@ -10,7 +10,9 @@
  without prior permission by the authors of Eressea.
 
  */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "give.h"
 
@@ -43,6 +45,7 @@
 #include <util/base36.h>
 #include <util/event.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 
 /* libc includes */
@@ -176,6 +179,7 @@ static void
 give_horses(unit * s, const item_type * itype, int n)
 {
     region *r = s->region;
+    UNUSED_ARG(itype);
     if (r->land) {
         rsethorses(r, rhorses(r) + n);
     }
@@ -185,6 +189,7 @@ static void
 give_money(unit * s, const item_type * itype, int n)
 {
     region *r = s->region;
+    UNUSED_ARG(itype);
     if (r->land) {
         rsetmoney(r, rmoney(r) + n);
     }
@@ -192,14 +197,14 @@ give_money(unit * s, const item_type * itype, int n)
 
 int
 give_item(int want, const item_type * itype, unit * src, unit * dest,
-struct order *ord)
+    struct order *ord)
 {
     short error = 0;
     int n, delta;
 
     assert(itype != NULL);
     n = get_pooled(src, item2resource(itype), GET_SLACK | GET_POOLED_SLACK, want);
-    n = MIN(want, n);
+    if (n > want) n = want;
     delta = n;
     if (dest && src->faction != dest->faction
         && src->faction->age < GiveRestriction()) {
@@ -271,6 +276,7 @@ static bool unit_has_cursed_item(const unit * u)
 }
 
 static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+    UNUSED_ARG(dst);
     if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
     }
@@ -435,9 +441,8 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         return msg_error(u, ord, error);
     }
     else if (u2->faction != u->faction) {
-        message *msg = msg_message("give_person", "unit target amount", u, u2, n);
-        add_message(&u2->faction->msgs, msg);
-        return msg;
+        return add_message(&u2->faction->msgs,
+            msg_message("give_person", "unit target amount", u, u2, n));
     }
     return NULL;
 }
@@ -615,6 +620,79 @@ bool can_give_to(unit *u, unit *u2) {
     return true;
 }
 
+static void give_all_items(unit *u, unit *u2, order *ord) { 
+    char token[128];
+    const char *s;
+
+    if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
+        feedback_give_not_allowed(u, ord);
+        return;
+    }
+    s = gettoken(token, sizeof(token));
+    if (!s || *s == 0) {              /* GIVE ALL items that you have */
+
+                                      /* do these checks once, not for each item we have: */
+        if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
+            return;
+        }
+
+        /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
+        * reserviert ist besitzen und diesen Teil dann übergeben */
+        if (u->items) {
+            item **itmp = &u->items;
+            while (*itmp) {
+                item *itm = *itmp;
+                const item_type *itype = itm->type;
+                if (itm->number > 0
+                    && itm->number - get_reservation(u, itype) > 0) {
+                    int n = itm->number - get_reservation(u, itype);
+                    if (give_item(n, itype, u, u2, ord) == 0) {
+                        if (*itmp != itm)
+                            continue;
+                    }
+                }
+                itmp = &itm->next;
+            }
+        }
+    }
+    else {
+        if (isparam(s, u->faction->locale, P_PERSON)) {
+            if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
+            }
+            else {
+                message * msg;
+                msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
+                if (msg) {
+                    ADDMSG(&u->faction->msgs, msg);
+                }
+            }
+        }
+        else if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
+        }
+        else {
+            const item_type *itype = finditemtype(s, u->faction->locale);
+            if (itype != NULL) {
+                item *i = *i_find(&u->items, itype);
+                if (i != NULL) {
+                    if (can_give(u, u2, itype, 0)) {
+                        int n = i->number - get_reservation(u, itype);
+                        give_item(n, itype, u, u2, ord);
+                    }
+                    else {
+                        feedback_give_not_allowed(u, ord);
+                    }
+                }
+            }
+        }
+    }
+}
+
 void give_cmd(unit * u, order * ord)
 {
     char token[128];
@@ -689,8 +767,7 @@ void give_cmd(unit * u, order * ord)
             item **itmp = &u->items;
             while (*itmp) {
                 item *itm = *itmp;
-                const item_type *itype = itm->type;
-                if (fval(itype, ITF_HERB) && itm->number > 0) {
+                if (fval(itm->type, ITF_HERB) && itm->number > 0) {
                     /* give_item ändert im fall,das man alles übergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
@@ -724,75 +801,7 @@ void give_cmd(unit * u, order * ord)
     }
 
     else if (p == P_ANY) {
-        const char *s;
-
-        if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
-            feedback_give_not_allowed(u, ord);
-            return;
-        }
-        s = gettoken(token, sizeof(token));
-        if (!s || *s == 0) {              /* GIVE ALL items that you have */
-
-            /* do these checks once, not for each item we have: */
-            if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
-                return;
-            }
-
-            /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-            * reserviert ist besitzen und diesen Teil dann übergeben */
-            if (u->items) {
-                item **itmp = &u->items;
-                while (*itmp) {
-                    item *itm = *itmp;
-                    const item_type *itype = itm->type;
-                    if (itm->number > 0
-                        && itm->number - get_reservation(u, itype) > 0) {
-                        n = itm->number - get_reservation(u, itype);
-                        if (give_item(n, itype, u, u2, ord) == 0) {
-                            if (*itmp != itm)
-                                continue;
-                        }
-                    }
-                    itmp = &itm->next;
-                }
-            }
-        }
-        else {
-            if (isparam(s, u->faction->locale, P_PERSON)) {
-                if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
-                    ADDMSG(&u->faction->msgs,
-                        msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
-                }
-                else {
-                    message * msg;
-                    msg = u2 ? give_men(u->number, u, u2, ord) : disband_men(u->number, u, ord);
-                    if (msg) {
-                        ADDMSG(&u->faction->msgs, msg);
-                    }
-                }
-            }
-            else if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
-            }
-            else {
-                itype = finditemtype(s, u->faction->locale);
-                if (itype != NULL) {
-                    item *i = *i_find(&u->items, itype);
-                    if (i != NULL) {
-                        if (can_give(u, u2, itype, 0)) {
-                            n = i->number - get_reservation(u, itype);
-                            give_item(n, itype, u, u2, ord);
-                        }
-                        else {
-                            feedback_give_not_allowed(u, ord);
-                        }
-                    }
-                }
-            }
-        }
+        give_all_items(u, u2, ord);
         return;
     }
     else if (p == P_EACH) {
@@ -813,13 +822,12 @@ void give_cmd(unit * u, order * ord)
     }
 
     if (isparam(s, u->faction->locale, P_PERSON)) {
-        message * msg;
         if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
             return;
         }
-        n = MIN(u->number, n);
+        if (n > u->number) n = u->number;
         msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
         if (msg) {
             ADDMSG(&u->faction->msgs, msg);

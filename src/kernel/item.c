@@ -41,8 +41,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <critbit.h>
@@ -196,7 +198,7 @@ resource_type *rt_get_or_create(const char *name) {
             perror("resource_type allocation failed");
         }
         else {
-            rtype->_name = strdup(name);
+            rtype->_name = str_strdup(name);
             rt_register(rtype);
         }
     }
@@ -279,8 +281,8 @@ weapon_type *new_weapontype(item_type * itype,
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {
-        wtype->damage[0] = strdup(damage[0]);
-        wtype->damage[1] = strdup(damage[1]);
+        wtype->damage[0] = str_strdup(damage[0]);
+        wtype->damage[1] = str_strdup(damage[1]);
     }
     wtype->defmod = defmod;
     wtype->flags |= wflags;
@@ -339,9 +341,9 @@ void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype->rtype);
     if (appearance) {
         char plural[32];
-        itype->_appearance[0] = strdup(appearance);
+        itype->_appearance[0] = str_strdup(appearance);
         snprintf(plural, sizeof(plural), "%s_p", appearance);
-        itype->_appearance[1] = strdup(plural);
+        itype->_appearance[1] = str_strdup(plural);
     } else {
         itype->_appearance[0] = 0;
         itype->_appearance[1] = 0;

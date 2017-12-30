@@ -28,7 +28,7 @@ IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /Za /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
@@ -201,6 +201,7 @@ target_link_libraries(convert
 set(TESTS_SRC
   test_eressea.c
   tests.c
+  academy.test.c
   alchemy.test.c
   battle.test.c
   calendar.test.c

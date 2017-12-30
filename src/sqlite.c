@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/race.h>
@@ -6,6 +8,7 @@
 #include <util/log.h>
 #include <util/base36.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <selist.h>
 #include <sqlite3.h>
 #include <assert.h>
@@ -41,9 +44,9 @@ read_factions(sqlite3 * db, int game_id) {
         text = (const char *)sqlite3_column_text(stmt, 1);
         if (text) dbf->no = atoi36(text);
         text = (const char *)sqlite3_column_text(stmt, 2);
-        if (text) dbf->name = strdup(text);
+        if (text) dbf->name = str_strdup(text);
         text = (const char *)sqlite3_column_text(stmt, 3);
-        if (text) dbf->email = strdup(text);
+        if (text) dbf->email = str_strdup(text);
         selist_push(&result, dbf);
         res = sqlite3_step(stmt);
     }

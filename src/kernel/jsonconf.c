@@ -38,13 +38,14 @@ without prior permission by the authors of Eressea.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/path.h>
+#include <util/strings.h>
 #include <util/xml.h>
 
 /* external libraries */
@@ -228,7 +229,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
         if (dst) {
             free(*dst);
             assert(child->type == cJSON_String);
-            *dst = strdup(child->valuestring);
+            *dst = str_strdup(child->valuestring);
         }
     }
 }
@@ -452,7 +453,7 @@ static void json_race(cJSON *json, race *rc) {
         switch (child->type) {
         case cJSON_String:
             if (strcmp(child->string, "damage") == 0) {
-                rc->def_damage = strdup(child->valuestring);
+                rc->def_damage = str_strdup(child->valuestring);
             }
             break;
         case cJSON_Number:
@@ -592,7 +593,7 @@ static void json_spells(cJSON *json) {
                     continue;
                 }
                 else if (strcmp(item->string, "syntax") == 0) {
-                    sp->syntax = strdup(item->valuestring);
+                    sp->syntax = str_strdup(item->valuestring);
                 }
             }
         }
@@ -703,7 +704,7 @@ static void json_calendar(cJSON *json) {
             weeknames = malloc(sizeof(char *) * weeks_per_month);
             for (i = 0, entry = child->child; entry; entry = entry->next, ++i) {
                 if (entry->type == cJSON_String) {
-                    weeknames[i] = strdup(entry->valuestring);
+                    weeknames[i] = str_strdup(entry->valuestring);
                 }
                 else {
                     log_error("calendar.weeks[%d] is not a string: %d", i, json->type);
@@ -896,8 +897,8 @@ static void json_include(cJSON *json) {
     for (child = json->child; child; child = child->next) {
         FILE *F;
         if (json_relpath) {
-            char name[MAX_PATH];
-            join_path(json_relpath, child->valuestring, name, sizeof(name));
+            char name[PATH_MAX];
+            path_join(json_relpath, child->valuestring, name, sizeof(name));
             F = fopen(name, "r");
         }
         else {

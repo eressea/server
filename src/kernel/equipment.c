@@ -33,6 +33,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -43,7 +44,7 @@ void equipment_setskill(equipment * eq, skill_t sk, const char *value)
 {
     if (eq != NULL) {
         if (value != NULL) {
-            eq->skills[sk] = strdup(value);
+            eq->skills[sk] = str_strdup(value);
         }
         else if (eq->skills[sk]) {
             free(eq->skills[sk]);
@@ -78,7 +79,7 @@ equipment_setitem(equipment * eq, const item_type * itype, const char *value)
             if (idata == NULL) {
                 idata = (itemdata *)malloc(sizeof(itemdata));
                 idata->itype = itype;
-                idata->value = strdup(value);
+                idata->value = str_strdup(value);
                 idata->next = eq->items;
                 eq->items = idata;
             }
@@ -292,7 +293,12 @@ static void free_equipment(equipment *eq) {
         free(eq->items);
         eq->items = next;
     }
-    /* TODO: subsets, skills */
+    if (eq->subsets) {
+        for (i = 0; eq->subsets[i].sets; ++i) {
+            free(eq->subsets[i].sets);
+        }
+        free(eq->subsets);
+    }
     for (i = 0; i != MAXSKILLS; ++i) {
         free(eq->skills[i]);
     }

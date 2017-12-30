@@ -36,7 +36,7 @@ static void test_make_wormholes(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)r2->buildings->type, (void *)btype);
     CuAssertPtrEquals(tc, (void *)r1->buildings->attribs->type, (void *)r2->buildings->attribs->type);
     CuAssertStrEquals(tc, r1->buildings->attribs->type->name, "wormhole");
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_sort_wormhole_regions(CuTest *tc) {
@@ -56,7 +56,7 @@ static void test_sort_wormhole_regions(CuTest *tc) {
     CuAssertPtrEquals(tc, r2, match[0]);
     CuAssertPtrEquals(tc, r1, match[1]);
     selist_free(rlist);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_wormhole_suite(void)

@@ -43,7 +43,7 @@ static void test_new_building_can_be_renamed(CuTest * tc)
 
     b = test_create_building(r, NULL);
     CuAssertTrue(tc, !renamed_building(b));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rename_building(CuTest * tc)
@@ -66,7 +66,7 @@ static void test_rename_building(CuTest * tc)
     rename_building(u, NULL, b, "Villa Nagel");
     CuAssertStrEquals(tc, "Villa Nagel", b->name);
     CuAssertTrue(tc, renamed_building(b));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rename_building_twice(CuTest * tc)
@@ -91,7 +91,7 @@ static void test_rename_building_twice(CuTest * tc)
 
     rename_building(u, NULL, b, "Villa Kunterbunt");
     CuAssertStrEquals(tc, "Villa Kunterbunt", b->name);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_contact(CuTest * tc)
@@ -122,7 +122,7 @@ static void test_contact(CuTest * tc)
     CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
     u_set_building(u2, b);
     CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_enter_building(CuTest * tc)
@@ -158,7 +158,7 @@ static void test_enter_building(CuTest * tc)
     CuAssertIntEquals(tc, 0, enter_building(u, NULL, b->no, true));
     CuAssertPtrNotNull(tc, u->faction->msgs);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_enter_ship(CuTest * tc)
@@ -168,13 +168,12 @@ static void test_enter_ship(CuTest * tc)
     ship *sh;
     race * rc;
 
-    test_cleanup();
-    test_create_world();
+    test_setup();
 
-    r = findregion(0, 0);
-    rc = rc_get_or_create("human");
+    r = test_create_region(0, 0, NULL);
+    rc = test_create_race("smurf");
     u = test_create_unit(test_create_faction(rc), r);
-    sh = test_create_ship(r, st_get_or_create("boat"));
+    sh = test_create_ship(r, NULL);
 
     rc->flags = RCF_WALK;
     u->ship = 0;
@@ -200,7 +199,7 @@ static void test_enter_ship(CuTest * tc)
     CuAssertIntEquals(tc, 0, enter_ship(u, NULL, sh->no, true));
     CuAssertPtrNotNull(tc, u->faction->msgs);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_display_cmd(CuTest *tc) {
@@ -209,7 +208,7 @@ static void test_display_cmd(CuTest *tc) {
     region *r;
     order *ord;
 
-    test_cleanup();
+    test_setup();
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     f = test_create_faction(0);
     assert(r && f);
@@ -231,7 +230,7 @@ static void test_display_cmd(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, r->land->display);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rule_force_leave(CuTest *tc) {
@@ -248,7 +247,7 @@ static void test_rule_force_leave(CuTest *tc) {
     config_set("rules.owners.force_leave", "3");
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_ALL));
     CuAssertIntEquals(tc, true, rule_force_leave(FORCE_LEAVE_POSTCOMBAT));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_force_leave_buildings(CuTest *tc) {
@@ -280,7 +279,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     al->status = HELP_GUARD;
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_force_leave_ships(CuTest *tc) {
@@ -301,7 +300,7 @@ static void test_force_leave_ships(CuTest *tc) {
     CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u2->ship);
     msg = test_get_last_message(u2->faction->msgs);
     CuAssertStrEquals(tc, "force_leave_ship", test_get_messagetype(msg));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_force_leave_ships_on_ocean(CuTest *tc) {
@@ -310,7 +309,7 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
     ship *sh;
 
     test_setup();
-    r = test_create_region(0, 0, test_create_terrain("ocean", SEA_REGION));
+    r = test_create_ocean(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
     sh = test_create_ship(r, NULL);
@@ -319,100 +318,95 @@ static void test_force_leave_ships_on_ocean(CuTest *tc) {
     ship_set_owner(u1);
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "no forcing out of ships on oceans", sh, u2->ship);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_fishing_feeds_2_people(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    rtype = get_resourcetype(R_SILVER);
-    i_change(&u->items, rtype->itype, 42);
+    itype = test_create_silver();
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 1);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 2);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 3);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
-    test_cleanup();
+    CuAssertIntEquals(tc, 32, i_get(u->items, itype));
+    test_teardown();
 }
 
 static void test_fishing_does_not_give_goblins_money(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    rtype = get_resourcetype(R_SILVER);
+    itype = test_create_silver();
 
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    i_change(&u->items, rtype->itype, 42);
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 2);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
-    test_cleanup();
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
+    test_teardown();
 }
 
 static void test_fishing_gets_reset(CuTest * tc)
 {
-    const resource_type *rtype;
+    const item_type *itype;
     region *r;
     faction *f;
     unit *u;
     ship *sh;
 
     test_setup();
-    test_create_world();
-    rtype = get_resourcetype(R_SILVER);
-    r = findregion(-1, 0);
-    CuAssertStrEquals(tc, "ocean", r->terrain->_name);    /* test_create_world needs coverage */
+    itype = test_create_silver();
+
+    r = test_create_ocean(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    sh = new_ship(st_find("boat"), r, 0);
+    sh = test_create_ship(r, NULL);
     u_set_ship(u, sh);
-    i_change(&u->items, rtype->itype, 42);
+    i_change(&u->items, itype, 42);
 
     scale_number(u, 1);
     sh->flags |= SF_FISHING;
     get_food(r);
-    CuAssertIntEquals(tc, 42, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 42, i_get(u->items, itype));
 
     scale_number(u, 1);
     get_food(r);
-    CuAssertIntEquals(tc, 32, i_get(u->items, rtype->itype));
-    test_cleanup();
+    CuAssertIntEquals(tc, 32, i_get(u->items, itype));
+    test_teardown();
 }
 
 static void test_unit_limit(CuTest * tc)
@@ -426,7 +420,7 @@ static void test_unit_limit(CuTest * tc)
 
     config_set("rules.limit.alliance", "250");
     CuAssertIntEquals(tc, 250, rule_alliance_limit());
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_maketemp(CuTest * tc)
@@ -453,7 +447,7 @@ static void test_maketemp(CuTest * tc)
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->orders->next);
     CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_maketemp_default_order(CuTest * tc)
@@ -483,7 +477,7 @@ static void test_maketemp_default_order(CuTest * tc)
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->orders->next);
     CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_limit_new_units(CuTest * tc)
@@ -534,7 +528,7 @@ static void test_limit_new_units(CuTest * tc)
     CuAssertIntEquals(tc, 2, f->num_units);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "too_many_units_in_alliance"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cannot_create_unit_above_limit(CuTest * tc)
@@ -552,7 +546,7 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
     config_set("rules.limit.alliance", "3");
     CuAssertIntEquals(tc, 0, checkunitnumber(f, 3));
     CuAssertIntEquals(tc, 1, checkunitnumber(f, 4));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_reserve_cmd(CuTest *tc) {
@@ -581,7 +575,7 @@ static void test_reserve_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 struct pay_fixture {
@@ -628,7 +622,7 @@ static void test_pay_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
     CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_pay_cmd_other_building(CuTest *tc) {
@@ -652,7 +646,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u1, ord));
     CuAssertIntEquals(tc, BLD_DONTPAY, b->flags&BLD_DONTPAY);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_pay_cmd_must_be_owner(CuTest *tc) {
@@ -671,7 +665,7 @@ static void test_pay_cmd_must_be_owner(CuTest *tc) {
     CuAssertIntEquals(tc, 0, pay_cmd(fix.u2, ord));
     CuAssertIntEquals(tc, 0, b->flags&BLD_DONTPAY);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_new_units(CuTest *tc) {
@@ -696,7 +690,7 @@ static void test_new_units(CuTest *tc) {
     CuAssertIntEquals(tc, 0, u->age);
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertStrEquals(tc, "EINHEIT hurr", u->_name);
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct guard_fixture {
@@ -737,7 +731,7 @@ static void test_update_guards(CuTest *tc) {
     freset(fix.u, UFL_GUARD);
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_newbie_cannot_guard(CuTest *tc) {
@@ -749,7 +743,7 @@ static void test_newbie_cannot_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_NEWBIE, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_unarmed_cannot_guard(CuTest *tc) {
@@ -759,7 +753,7 @@ static void test_unarmed_cannot_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_UNARMED, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_unarmed_races_can_guard(CuTest *tc) {
@@ -772,7 +766,7 @@ static void test_unarmed_races_can_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monsters_can_guard(CuTest *tc) {
@@ -783,7 +777,7 @@ static void test_monsters_can_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_unskilled_cannot_guard(CuTest *tc) {
@@ -794,7 +788,7 @@ static void test_unskilled_cannot_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_UNARMED, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_fleeing_cannot_guard(CuTest *tc) {
@@ -805,7 +799,7 @@ static void test_fleeing_cannot_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_reserve_self(CuTest *tc) {
@@ -837,7 +831,7 @@ static void test_reserve_self(CuTest *tc) {
     CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void statistic_test(CuTest *tc, int peasants, int luck, int maxp,
@@ -862,7 +856,7 @@ static void test_peasant_luck_effect(CuTest *tc) {
 
     config_set("rules.peasants.growth.factor", "1");
     statistic_test(tc, 1000, 1000, 1000, 0, 501, 501);
-    test_cleanup();
+    test_teardown();
 }
 
 /**
@@ -900,7 +894,7 @@ static void test_luck_message(CuTest *tc) {
 
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "peasantluck_success"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static unit * setup_name_cmd(void) {
@@ -929,7 +923,7 @@ static void test_name_unit(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", u->_name);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_name_region(CuTest *tc) {
@@ -952,7 +946,7 @@ static void test_name_region(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_name_building(CuTest *tc) {
@@ -996,7 +990,7 @@ static void test_name_building(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error278"));
     test_clear_messages(u->faction);
     name_cmd(u, ord); */
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_name_ship(CuTest *tc) {
@@ -1035,7 +1029,7 @@ static void test_name_ship(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_normal(CuTest *tc) {
@@ -1055,7 +1049,7 @@ static void test_long_order_normal(CuTest *tc) {
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
     CuAssertPtrEquals(tc, 0, u->old_orders);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_none(CuTest *tc) {
@@ -1067,7 +1061,7 @@ static void test_long_order_none(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrEquals(tc, 0, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_cast(CuTest *tc) {
@@ -1081,7 +1075,7 @@ static void test_long_order_cast(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_buy_sell(CuTest *tc) {
@@ -1096,7 +1090,7 @@ static void test_long_order_buy_sell(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_multi_long(CuTest *tc) {
@@ -1110,7 +1104,7 @@ static void test_long_order_multi_long(CuTest *tc) {
     CuAssertPtrNotNull(tc, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_multi_buy(CuTest *tc) {
@@ -1124,7 +1118,7 @@ static void test_long_order_multi_buy(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_multi_sell(CuTest *tc) {
@@ -1139,7 +1133,7 @@ static void test_long_order_multi_sell(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_buy_cast(CuTest *tc) {
@@ -1153,7 +1147,7 @@ static void test_long_order_buy_cast(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_long_order_hungry(CuTest *tc) {
@@ -1169,7 +1163,7 @@ static void test_long_order_hungry(CuTest *tc) {
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ally_cmd_errors(CuTest *tc) {
@@ -1187,7 +1181,7 @@ static void test_ally_cmd_errors(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_name_cmd(CuTest *tc) {
@@ -1232,7 +1226,7 @@ static void test_name_cmd(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", al->name);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_name_cmd_2274(CuTest *tc) {
@@ -1263,7 +1257,7 @@ static void test_name_cmd_2274(CuTest *tc) {
     name_cmd(u1, u1->thisorder);
     CuAssertStrEquals(tc, "Hodor", r->land->name);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ally_cmd(CuTest *tc) {
@@ -1299,7 +1293,7 @@ static void test_ally_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_nmr_warnings(CuTest *tc) {
@@ -1319,7 +1313,7 @@ static void test_nmr_warnings(CuTest *tc) {
     CuAssertPtrNotNull(tc, f2->msgs->begin);
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning_final"));
-    test_cleanup();
+    test_teardown();
 }
 
 static unit * setup_mail_cmd(void) {
@@ -1341,7 +1335,7 @@ static void test_mail_unit(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unitmessage"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_faction(CuTest *tc) {
@@ -1355,7 +1349,7 @@ static void test_mail_faction(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "regionmessage"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_region(CuTest *tc) {
@@ -1369,7 +1363,7 @@ static void test_mail_region(CuTest *tc) {
     mail_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->region->msgs, "mail_result"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_unit_no_msg(CuTest *tc) {
@@ -1384,7 +1378,7 @@ static void test_mail_unit_no_msg(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "unitmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_faction_no_msg(CuTest *tc) {
@@ -1399,7 +1393,7 @@ static void test_mail_faction_no_msg(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_faction_no_target(CuTest *tc) {
@@ -1414,7 +1408,7 @@ static void test_mail_faction_no_target(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error66"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_mail_region_no_msg(CuTest *tc) {
@@ -1429,7 +1423,7 @@ static void test_mail_region_no_msg(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, test_find_messagetype(u->region->msgs, "mail_result"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_show_without_item(CuTest *tc)
@@ -1474,7 +1468,7 @@ static void test_show_without_item(CuTest *tc)
     test_clear_messages(f);
 
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_show_race(CuTest *tc) {
@@ -1515,7 +1509,7 @@ static void test_show_race(CuTest *tc) {
     test_clear_messages(u->faction);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_show_both(CuTest *tc) {
@@ -1525,8 +1519,7 @@ static void test_show_both(CuTest *tc) {
     struct locale *loc;
     message * msg;
 
-    test_cleanup();
-
+    test_setup();
     mt_register(mt_new_va("msg_event", "string:string", 0));
     mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", 0));
     rc = test_create_race("elf");
@@ -1557,7 +1550,7 @@ static void test_show_both(CuTest *tc) {
     CuAssertTrue(tc, memcmp("Hiyaa!", msg->parameters[2].v, 4) == 0);
     test_clear_messages(u->faction);
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_immigration(CuTest * tc)
@@ -1587,7 +1580,7 @@ static void test_immigration(CuTest * tc)
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_demon_hunger(CuTest * tc)
@@ -1627,7 +1620,7 @@ static void test_demon_hunger(CuTest * tc)
     msg = test_get_last_message(u->faction->msgs);
     CuAssertStrEquals(tc, "malnourish", test_get_messagetype(msg));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_armedmen(CuTest *tc) {
@@ -1658,7 +1651,7 @@ static void test_armedmen(CuTest *tc) {
     wtype->flags |= WTF_SIEGE;
     CuAssertIntEquals(tc, 0, armedmen(u, false));
     CuAssertIntEquals(tc, 1, armedmen(u, true));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cansee(CuTest *tc) {
@@ -1676,7 +1669,7 @@ static void test_cansee(CuTest *tc) {
     set_level(u, SK_PERCEPTION, 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
     
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cansee_ring(CuTest *tc) {
@@ -1709,7 +1702,7 @@ static void test_cansee_ring(CuTest *tc) {
     i_change(&u->items, itype[1], 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_cansee_sphere(CuTest *tc) {
@@ -1742,7 +1735,7 @@ static void test_cansee_sphere(CuTest *tc) {
     scale_number(u2, 99);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_laws_suite(void)

@@ -39,13 +39,13 @@ without prior permission by the authors of Eressea.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/strings.h>
 #include <util/xml.h>
 
 /* libxml includes */
@@ -248,7 +248,7 @@ construction ** consPtr, construct_t type)
         if (type == CONS_BUILDING) {
             propValue = xmlGetProp(node, BAD_CAST "name");
             if (propValue != NULL) {
-                con->name = strdup((const char *)propValue);
+                con->name = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
         }
@@ -421,6 +421,8 @@ static int parse_ships(xmlDocPtr doc)
                 st->flags |= SFL_FLY;
             if (xml_bvalue(node, "opensea", false))
                 st->flags |= SFL_OPENSEA;
+            if (xml_bvalue(node, "speedy", false))
+                st->flags |= SFL_SPEEDY;
             st->fishing = xml_ivalue(node, "fishing", st->fishing);
             st->cptskill = xml_ivalue(node, "cptskill", st->cptskill);
             st->minskill = xml_ivalue(node, "minskill", st->minskill);
@@ -571,7 +573,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         xmlFree(propValue);
 
         propValue = xmlGetProp(node, BAD_CAST "value");
-        wtype->damage[pos] = strdup((const char *)propValue); /* TODO: this is a memory leak */
+        wtype->damage[pos] = str_strdup((const char *)propValue); /* TODO: this is a memory leak */
         if (k == 0)
             wtype->damage[1 - pos] = wtype->damage[pos];
         xmlFree(propValue);
@@ -1198,13 +1200,13 @@ static int parse_spells(xmlDocPtr doc)
 
             propValue = xmlGetProp(node, BAD_CAST "parameters");
             if (propValue) {
-                sp->parameter = strdup((const char *)propValue);
+                sp->parameter = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
 
             propValue = xmlGetProp(node, BAD_CAST "syntax");
             if (propValue) {
-                sp->syntax = strdup((const char *)propValue);
+                sp->syntax = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
 #ifdef TODO /* no longer need it, spellbooks! */
@@ -1353,7 +1355,7 @@ static int parse_races(xmlDocPtr doc)
 
         propValue = xmlGetProp(node, BAD_CAST "damage");
         assert(propValue != NULL);
-        rc->def_damage = strdup((const char *)propValue);
+        rc->def_damage = str_strdup((const char *)propValue);
         xmlFree(propValue);
 
         rc->magres = frac_make(xml_ivalue(node, "magres", 100), 100);
@@ -1548,7 +1550,7 @@ static int parse_races(xmlDocPtr doc)
 
             propValue = xmlGetProp(node, BAD_CAST "damage");
             if (propValue != NULL) {
-                attack->data.dice = strdup((const char *)propValue);
+                attack->data.dice = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
             else {
@@ -1611,7 +1613,7 @@ static int parse_messages(xmlDocPtr doc)
                     (const char *)propType);
                 xmlFree(propName);
                 xmlFree(propType);
-                argv[k] = strdup(zBuffer);
+                argv[k] = str_strdup(zBuffer);
             }
             argv[result->nodesetval->nodeNr] = NULL;
         }

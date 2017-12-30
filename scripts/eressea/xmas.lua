@@ -2,6 +2,7 @@ if not config.xmas or config.xmas==0 then return nil end
 
 local gifts = {
     e2 = {
+        { year = 2017, turn = 1057, item = 'snowglobe', msg='santa_f' },
         { year = 2015, turn = 959, item = 'snowglobe', msg='santa_f' },
         { year = 2009, turn = 624, item = 'xmastree' },
         { year = 2006, turn = 468, key = 'xm06', item = 'snowman' },

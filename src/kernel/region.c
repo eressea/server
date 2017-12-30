@@ -42,7 +42,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/assert.h>
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
@@ -52,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -117,7 +117,7 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
     char *buf = (char *)buffer;
     const struct locale *lang = f ? f->locale : 0;
     if (r == NULL) {
-        strlcpy(buf, "(null)", size);
+        str_strlcpy(buf, "(null)", size);
     }
     else {
         plane *pl = rplane(r);
@@ -1060,7 +1060,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     rawmaterial **lrm = &r->resources;
 
     assert(terrain);
-
     while (*lrm) {
         rawmaterial *rm = *lrm;
         const resource_type *rtype = NULL;
@@ -1420,7 +1419,7 @@ void region_setinfo(struct region *r, const char *info)
 {
     assert(r->land);
     free(r->land->display);
-    r->land->display = (info && info[0]) ? strdup(info) : 0;
+    r->land->display = (info && info[0]) ? str_strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1432,7 +1431,7 @@ void region_setname(struct region *r, const char *name)
 {
     if (r->land) {
         free(r->land->name);
-        r->land->name = name ? strdup(name) : 0;
+        r->land->name = name ? str_strdup(name) : 0;
     }
 }
 

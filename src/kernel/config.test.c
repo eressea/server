@@ -57,7 +57,7 @@ static void test_read_unitid(CuTest *tc) {
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_getunit(CuTest *tc) {
@@ -118,7 +118,7 @@ static void test_getunit(CuTest *tc) {
     CuAssertPtrEquals(tc, u, u2);
     free_order(ord);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_set_param(CuTest * tc)
@@ -135,7 +135,7 @@ static void test_get_set_param(CuTest * tc)
     set_param(&par, "bar", NULL);
     CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
     free_params(&par);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_param_int(CuTest * tc)
@@ -148,7 +148,7 @@ static void test_param_int(CuTest * tc)
     CuAssertIntEquals(tc, 23, get_param_int(par, "foo", 0));
     CuAssertIntEquals(tc, 42, get_param_int(par, "bar", 0));
     free_params(&par);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_param_flt(CuTest * tc)
@@ -161,7 +161,7 @@ static void test_param_flt(CuTest * tc)
     CuAssertDblEquals(tc, 23.0, get_param_flt(par, "foo", 0.0), 0.01);
     CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
     free_params(&par);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_forbiddenid(CuTest *tc) {
@@ -189,7 +189,7 @@ static void test_default_order(CuTest *tc) {
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_config_cache(CuTest *tc) {
@@ -202,7 +202,7 @@ static void test_config_cache(CuTest *tc) {
     CuAssertTrue(tc, !config_changed(&key));
     free_config();
     CuAssertTrue(tc, config_changed(&key));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rules(CuTest *tc) {
@@ -247,7 +247,7 @@ static void test_config_inifile(CuTest *tc) {
     CuAssertStrEquals(tc, "Eressea", game_name());
     CuAssertIntEquals(tc, 42, game_id());
     iniparser_freedict(ini);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_findparam(CuTest *tc) {
@@ -270,7 +270,7 @@ static void test_findparam(CuTest *tc) {
     CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", de, true));
     CuAssertIntEquals(tc, NOPARAM, findparam_block("PARTEI", en, false));
     CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", en, true));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_game_mailcmd(CuTest *tc) {
@@ -283,7 +283,7 @@ static void test_game_mailcmd(CuTest *tc) {
     CuAssertStrEquals(tc, "HODOR", game_mailcmd());
     config_set("game.mailcmd", "ERESSEA");
     CuAssertStrEquals(tc, "ERESSEA", game_mailcmd());
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_config_suite(void)

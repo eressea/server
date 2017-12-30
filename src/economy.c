@@ -17,7 +17,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "economy.h"
 
@@ -86,7 +88,6 @@ static econ_request entertainers[1024];
 static econ_request *nextentertainer;
 static int entertaining;
 
-static unsigned int norders;
 static econ_request *g_requests;
 
 #define RECRUIT_MERGE 1
@@ -179,16 +180,16 @@ unsigned int expand_production(region * r, econ_request * requests, econ_request
         *results = NULL;
     }
     while (requests) {
-        econ_request *o = requests->next;
+        econ_request *req = requests->next;
         free_order(requests->ord);
         free(requests);
-        requests = o;
+        requests = req;
     }
     return norders;
 }
 
-static void expandorders(region * r, econ_request * requests) {
-    norders = expand_production(r, requests, &g_requests);
+static unsigned int expandorders(region * r, econ_request * requests) {
+    return expand_production(r, requests, &g_requests);
 }
 
 /* ------------------------------------------------------------- */
@@ -333,11 +334,12 @@ static int do_recruiting(recruitment * recruits, int available)
             int number, dec;
             double multi = 2.0 * rc->recruit_multi;
 
-            number = MIN(req->qty, (int)(get / multi));
+            number = (int)(get / multi);
+            if (number > req->qty) number = req->qty;
             if (rc->recruitcost) {
                 int afford = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
                     number * rc->recruitcost) / rc->recruitcost;
-                number = MIN(number, afford);
+                if (number > afford) number = afford;
             }
             if (u->number + number > UNIT_MAXSIZE) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
@@ -539,7 +541,8 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     if (recruitcost > 0) {
         int pooled =
             get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
-        n = MIN(n, pooled / recruitcost);
+        int pr = pooled / recruitcost;
+        if (n > pr) n = pr;
     }
 
     u->wants = n;
@@ -802,12 +805,12 @@ void economics(region * r)
 
 }
 
-static void mod_skill(const resource_mod *mod, skill_t sk, int *skill) {
+static void mod_skill(const resource_mod *mod, skill_t sk, int *value) {
     skill_t msk;
     assert(mod->type == RMT_PROD_SKILL);
     msk = (skill_t)mod->value.sa[0];
     if (msk == NOSKILL || msk == sk) {
-        *skill += mod->value.sa[1];
+        *value += mod->value.sa[1];
     }
 }
 
@@ -1023,13 +1026,14 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     /* mit Flinkfingerring verzehnfacht sich die Produktion */
     rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
     if (rring) {
-        int dm = i_get(u->items, rring->itype);
-        amount += skill * MIN(u->number, dm) * (roqf_factor() - 1);
+        int more = i_get(u->items, rring->itype);
+        if (more > u->number) more = u->number;
+        amount += skill * more * (roqf_factor() - 1);
     }
 
     /* Schaffenstrunk: */
     if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-        dm = MIN(dm, u->number);
+        if (dm > u->number) dm = u->number;
         change_effect(u, oldpotiontype[P_DOMORE], -dm);
         amount += dm * skill;       /* dm Personen produzieren doppelt */
     }
@@ -1109,7 +1113,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 }
             need = nreq;
 
-            avail = MIN(avail, nreq);
+            if (avail > nreq) avail = nreq;
             if (need > 0) {
                 int use = 0;
                 for (al = alist; al; al = al->next) {
@@ -1117,14 +1121,15 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                         if (avail > 0) {
                             int want = required(al->want - al->get, al->save);
                             int x = avail * want / nreq;
-                            int r = (avail * want) % nreq;
+                            int req = (avail * want) % nreq;
                             /* Wenn Rest, dann wuerfeln, ob ich etwas bekomme: */
-                            if (r > 0 && rng_int() % nreq < r) ++x;
+                            if (req > 0 && rng_int() % nreq < req) ++x;
                             avail -= x;
                             use += x;
                             nreq -= want;
                             need -= x;
-                            al->get = MIN(al->want, al->get + x * al->save.sa[1] / al->save.sa[0]);
+                            al->get = al->get + x * al->save.sa[1] / al->save.sa[0];
+                            if (al->get > al->want) al->get = al->want;
                         }
                     }
                 }
@@ -1160,7 +1165,8 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
         }
     }
 
-    avail = MIN(avail, nreq);
+    if (avail > nreq) avail = nreq;
+
     for (al = alist; al; al = al->next) {
         if (avail > 0) {
             int want = required(al->want, al->save);
@@ -1171,7 +1177,7 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
             avail -= x;
             nreq -= want;
             al->get = x * al->save.sa[1] / al->save.sa[0];
-            al->get = MIN(al->want, al->get);
+            if (al->want < al->get) al->get = al->want;
             if (!rtype->raw) {
                 int use = required(al->get, al->save);
                 if (use) {
@@ -1285,7 +1291,7 @@ void make_item(unit * u, const item_type * itype, int want)
 
 int make_cmd(unit * u, struct order *ord)
 {
-    char token[128];
+    char token[32];
     region *r = u->region;
     const building_type *btype = 0;
     const ship_type *stype = 0;
@@ -1322,7 +1328,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
         else {
-            const char * s = gettoken(token, sizeof(token));
+            s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
                 build_road(u, m, d);
@@ -1471,7 +1477,7 @@ static void expandbuying(region * r, econ_request * buyorders)
      * gehandelten Produktes. */
     if (max_products > 0) {
         unsigned int j;
-        expandorders(r, buyorders);
+        unsigned int norders = expandorders(r, buyorders);
         if (!norders)
             return;
 
@@ -1486,18 +1492,20 @@ static void expandbuying(region * r, econ_request * buyorders)
 
             if (get_pooled(g_requests[j].unit, rsilver, GET_DEFAULT,
                 price) >= price) {
-                unit *u = g_requests[j].unit;
                 item *items;
-
                 /* litems z�hlt die G�ter, die verkauft wurden, u->n das Geld, das
                  * verdient wurde. Dies mu� gemacht werden, weil der Preis st�ndig sinkt,
                  * man sich also das verdiente Geld und die verkauften Produkte separat
                  * merken mu�. */
-                attrib *a = a_find(u->attribs, &at_luxuries);
-                if (a == NULL)
-                    a = a_add(&u->attribs, a_new(&at_luxuries));
+                attrib *a;
 
+                u = g_requests[j].unit;
+                a = a_find(u->attribs, &at_luxuries);
+                if (a == NULL) {
+                    a = a_add(&u->attribs, a_new(&at_luxuries));
+                }
                 items = a->data.v;
+
                 i_change(&items, ltype->itype, 1);
                 a->data.v = items;
                 i_change(&g_requests[j].unit->items, ltype->itype, 1);
@@ -1620,7 +1628,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         k -= a->data.i;
     }
 
-    n = MIN(n, k);
+    if (n > k) n = k;
 
     if (!n) {
         cmistake(u, ord, 102, MSG_COMMERCE);
@@ -1667,7 +1675,7 @@ static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 static void expandselling(region * r, econ_request * sellorders, int limit)
 {
     int money, price, max_products;
-    unsigned int j;
+    unsigned int j, norders;
     /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
@@ -1742,9 +1750,10 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
      * Runde erweitert werden kann. */
 
-    expandorders(r, sellorders);
-    if (!norders)
+    norders = expandorders(r, sellorders);
+    if (norders == 0) {
         return;
+    }
 
     for (j = 0; j != norders; j++) {
         const luxury_type *search = NULL;
@@ -1763,19 +1772,22 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
         price = ltype->price * multi;
 
         if (money >= price) {
-            unit *u = g_requests[j].unit;
             item *itm;
-            attrib *a = a_find(u->attribs, &at_luxuries);
-            if (a == NULL)
+            attrib *a;
+            u = g_requests[j].unit;
+            a = a_find(u->attribs, &at_luxuries);
+            if (!a) {
                 a = a_add(&u->attribs, a_new(&at_luxuries));
+            }
             itm = (item *)a->data.v;
             i_change(&itm, ltype->itype, 1);
             a->data.v = itm;
             ++use;
-            if (u->n < 0)
+            if (u->n < 0) {
                 u->n = 0;
+            }
 
-            if (hafenowner != NULL) {
+            if (hafenowner) {
                 if (hafenowner->faction != u->faction) {
                     int abgezogenhafen = price / 10;
                     hafencollected += abgezogenhafen;
@@ -1783,7 +1795,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                     money -= abgezogenhafen;
                 }
             }
-            if (maxb != NULL) {
+            if (maxb) {
                 if (maxowner->faction != u->faction) {
                     int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
                     taxcollected += abgezogensteuer;
@@ -1857,7 +1869,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     bool unlimited = true;
     const item_type *itype;
     const luxury_type *ltype;
-    int n;
+    int n, i;
     region *r = u->region;
     const char *s;
     keyword_t kwd;
@@ -1929,7 +1941,8 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
 
     /* Ein H�ndler kann nur 10 G�ter pro Talentpunkt verkaufen. */
 
-    n = MIN(n, u->number * 10 * effskill(u, SK_TRADE, 0));
+    i = u->number * 10 * effskill(u, SK_TRADE, 0);
+    if (n > i) n = i;
 
     if (!n) {
         cmistake(u, ord, 54, MSG_COMMERCE);
@@ -1959,11 +1972,12 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             if (o->type.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
-                available -= MAX(0, fpool);
+                if (fpool < 0) fpool = 0;
+                available -= fpool;
             }
         }
 
-        n = MIN(n, available);
+        if (n > available) n = available;
 
         if (n <= 0) {
             cmistake(u, ord, 264, MSG_COMMERCE);
@@ -1988,7 +2002,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             k -= a->data.i;
         }
 
-        n = MIN(n, k);
+        if (n > k) n = k;
         assert(n >= 0);
         /* die Menge der verkauften G�ter merken */
         a->data.i += n;
@@ -2043,8 +2057,9 @@ static void plant(unit * u, int raw)
         return;
     }
 
-    n = MIN(skill * u->number, n);
-    n = MIN(raw, n);
+    i = skill * u->number;
+    if (i > raw) i = raw;
+    if (n > i) n = i;
     /* F�r jedes Kraut Talent*10% Erfolgschance. */
     for (i = n; i > 0; i--) {
         if (rng_int() % 10 < skill)
@@ -2089,14 +2104,14 @@ static void planttrees(unit * u, int raw)
     }
 
     /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-    raw = MIN(raw, skill * u->number);
+    if (raw > skill * u->number) raw = skill * u->number;
     n = get_pooled(u, rtype, GET_DEFAULT, raw);
     if (n == 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
         return;
     }
-    n = MIN(raw, n);
+    if (n > raw) n = raw;
 
     /* F�r jeden Samen Talent*10% Erfolgschance. */
     for (i = n; i > 0; i--) {
@@ -2146,7 +2161,8 @@ static void breedtrees(unit * u, int raw)
     }
 
     /* wenn eine Anzahl angegeben wurde, nur soviel verbrauchen */
-    raw = MIN(skill * u->number, raw);
+    i = skill * u->number;
+    if (raw > i) raw = i;
     n = get_pooled(u, rtype, GET_DEFAULT, raw);
     /* Samen pr�fen */
     if (n == 0) {
@@ -2154,7 +2170,7 @@ static void breedtrees(unit * u, int raw)
             msg_feedback(u, u->thisorder, "resource_missing", "missing", rtype));
         return;
     }
-    n = MIN(raw, n);
+    if (n > raw) n = raw;
 
     /* F�r jeden Samen Talent*5% Erfolgschance. */
     for (i = n; i > 0; i--) {
@@ -2196,7 +2212,7 @@ static void breedhorses(unit * u)
     }
     effsk = effskill(u, SK_HORSE_TRAINING, 0);
     n = u->number * effsk;
-    n = MIN(n, horses);
+    if (n > horses) n = horses;
 
     for (c = 0; c < n; c++) {
         if (rng_int() % 100 < effsk) {
@@ -2340,7 +2356,7 @@ static void expandentertainment(region * r)
         entertaining -= o->qty;
 
         /* Nur soviel PRODUCEEXP wie auch tats�chlich gemacht wurde */
-        produceexp(u, SK_ENTERTAINMENT, MIN(u->n, u->number));
+        produceexp(u, SK_ENTERTAINMENT, (u->n < u->number) ? u->n : u->number);
         add_income(u, IC_ENTERTAIN, o->qty, u->n);
         fset(u, UFL_LONGACTION | UFL_NOTMOVING);
     }
@@ -2391,7 +2407,7 @@ void entertain_cmd(unit * u, struct order *ord)
 
     max_e = getuint();
     if (max_e != 0) {
-        u->wants = MIN(u->wants, max_e);
+        if (u->wants > max_e) u->wants = max_e;
     }
     o = nextentertainer++;
     o->unit = u;
@@ -2423,9 +2439,9 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
         if (jobs >= working)
             workers = u->number;
         else {
-            int r = (u->number * jobs) % working;
+            int req = (u->number * jobs) % working;
             workers = u->number * jobs / working;
-            if (r > 0 && rng_int() % working < r)
+            if (req > 0 && rng_int() % working < req)
                 workers++;
         }
 
@@ -2491,37 +2507,38 @@ static int do_work(unit * u, order * ord, econ_request * o)
 
 static void expandloot(region * r, econ_request * lootorders)
 {
-    unit *u;
-    unsigned int i;
-    int m, looted = 0;
-    int startmoney = rmoney(r);
+    unsigned int norders;
 
-    expandorders(r, lootorders);
-    if (!norders)
-        return;
+    norders = expandorders(r, lootorders);
+    if (norders > 0) {
+        unit *u;
+        unsigned int i;
+        int m, looted = 0;
+        int startmoney = rmoney(r);
 
-    for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
-        change_money(g_requests[i].unit, TAXFRACTION);
-        g_requests[i].unit->n += TAXFRACTION;
-        /*Looting destroys double the money*/
-        looted += TAXFRACTION * 2;
-    }
-    rsetmoney(r, startmoney - looted);
-    free(g_requests);
-
-    /* Lowering morale by 1 depending on the looted money (+20%) */
-    m = region_get_morale(r);
-    if (m && startmoney > 0) {
-        if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
-            /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
-            region_set_morale(r, m - 1, -1);
+        for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
+            change_money(g_requests[i].unit, TAXFRACTION);
+            g_requests[i].unit->n += TAXFRACTION;
+            /*Looting destroys double the money*/
+            looted += TAXFRACTION * 2;
         }
-    }
+        rsetmoney(r, startmoney - looted);
+        free(g_requests);
 
-    for (u = r->units; u; u = u->next) {
-        if (u->n >= 0) {
-            add_income(u, IC_LOOT, u->wants, u->n);
-            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        /* Lowering morale by 1 depending on the looted money (+20%) */
+        m = region_get_morale(r);
+        if (m && startmoney > 0) {
+            if (rng_int() % 100 < 20 + (looted * 80) / startmoney) {
+                /*Nur Moral -1, turns is not changed, so the first time nothing happens if the morale is good*/
+                region_set_morale(r, m - 1, -1);
+            }
+        }
+
+        for (u = r->units; u; u = u->next) {
+            if (u->n >= 0) {
+                add_income(u, IC_LOOT, u->wants, u->n);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            }
         }
     }
 }
@@ -2529,23 +2546,23 @@ static void expandloot(region * r, econ_request * lootorders)
 void expandtax(region * r, econ_request * taxorders)
 {
     unit *u;
-    unsigned int i;
+    unsigned int norders;
 
-    expandorders(r, taxorders);
-    if (!norders)
-        return;
+    norders = expandorders(r, taxorders);
+    if (norders > 0) {
+        unsigned int i;
+        for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
+            change_money(g_requests[i].unit, TAXFRACTION);
+            g_requests[i].unit->n += TAXFRACTION;
+            rsetmoney(r, rmoney(r) - TAXFRACTION);
+        }
+        free(g_requests);
 
-    for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-        change_money(g_requests[i].unit, TAXFRACTION);
-        g_requests[i].unit->n += TAXFRACTION;
-        rsetmoney(r, rmoney(r) - TAXFRACTION);
-    }
-    free(g_requests);
-
-    for (u = r->units; u; u = u->next) {
-        if (u->n >= 0) {
-            add_income(u, IC_TAX, u->wants, u->n);
-            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        for (u = r->units; u; u = u->next) {
+            if (u->n >= 0) {
+                add_income(u, IC_TAX, u->wants, u->n);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            }
         }
     }
 }
@@ -2601,11 +2618,12 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
         max = INT_MAX;
     }
     if (!playerrace(u_race(u))) {
-        u->wants = MIN(income(u), max);
+        u->wants = income(u);
     }
     else {
-        u->wants = MIN(n * effskill(u, SK_TAXING, 0) * taxperlevel, max);
+        u->wants = n * effskill(u, SK_TAXING, 0) * taxperlevel;
     }
+    if (u->wants > max) u->wants = max;
 
     u2 = is_guarded(r, u);
     if (u2) {
@@ -2675,12 +2693,16 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
         max = INT_MAX;
     }
     if (!playerrace(u_race(u))) {
-        u->wants = MIN(income(u), max);
+        u->wants = income(u);
+        if (u->wants > max) u->wants = max;
     }
     else {
         /* For player start with 20 Silver +10 every 5 level of close combat skill*/
-        int skbonus = (MAX(effskill(u, SK_MELEE, 0), effskill(u, SK_SPEAR, 0)) * 2 / 10) + 2;
-        u->wants = MIN(n * skbonus * 10, max);
+        int skm = effskill(u, SK_MELEE, 0);
+        int sks = effskill(u, SK_SPEAR, 0);
+        int skbonus = ((skm > sks ? skm : sks) * 2 / 10) + 2;
+        u->wants = n * skbonus * 10;
+        if (u->wants > max) u->wants = max;
     }
 
     o = (econ_request *)calloc(1, sizeof(econ_request));

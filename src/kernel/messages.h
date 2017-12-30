@@ -54,8 +54,8 @@ extern "C" {
     void addmessage(struct region *r, struct faction *f, const char *s,
         msg_t mtype, int level);
 
-    struct mlist ** merge_messages(message_list *mlist, message_list *append);
-    void split_messages(message_list *mlist, struct mlist **split);
+    struct mlist ** merge_messages(message_list *ml, message_list *append);
+    void split_messages(message_list *ml, struct mlist **split);
 
 #define ADDMSG(msgs, mcreate) { message * mx = mcreate; if (mx) { assert(mx->refcount>=1); add_message(msgs, mx); msg_release(mx); } }
 

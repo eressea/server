@@ -60,14 +60,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/base36.h>
+#include <util/bsdstring.h>
 #include <util/functions.h>
-#include <util/translation.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
+#include <util/path.h>
+#include <util/strings.h>
+#include <util/translation.h>
 #include <stream.h>
 #include <selist.h>
 
@@ -166,14 +169,14 @@ size_t report_status(const unit * u, const struct locale *lang, char *fsbuf, siz
         struct locale *wloc = get_locale(lname);
         log_warning("no translation for combat status %s in %s", combatstatus[u->status], lname);
         locale_setstring(wloc, combatstatus[u->status], combatstatus[u->status] + 7);
-        len = strlcpy(fsbuf, combatstatus[u->status] + 7, buflen);
+        len = str_strlcpy(fsbuf, combatstatus[u->status] + 7, buflen);
     }
     else {
-        len = strlcpy(fsbuf, status, buflen);
+        len = str_strlcpy(fsbuf, status, buflen);
     }
     if (fval(u, UFL_NOAID)) {
-        len += strlcat(fsbuf + len, ", ", buflen - len);
-        len += strlcat(fsbuf + len, LOC(lang, "status_noaid"), buflen - len);
+        len += str_strlcat(fsbuf + len, ", ", buflen - len);
+        len += str_strlcat(fsbuf + len, LOC(lang, "status_noaid"), buflen - len);
     }
 
     return len;
@@ -536,10 +539,9 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
                     faction *otherf = get_otherfaction(u);
                     if (otherf) {
-                        int result =
-                            snprintf(bufp, size, ", %s (%s)", factionname(otherf),
-                                factionname(u->faction));
-                        if (wrptr(&bufp, &size, result) != 0)
+                        int n = snprintf(bufp, size, ", %s (%s)",
+                            factionname(otherf), factionname(u->faction));
+                        if (wrptr(&bufp, &size, n) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     else {
@@ -674,23 +676,22 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
         if (book) {
             selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
-            int result = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
-            if (wrptr(&bufp, &size, result) != 0) {
+            int n = snprintf(bufp, size, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u->region, u));
+            if (wrptr(&bufp, &size, n) != 0) {
                 WARN_STATIC_BUFFER();
             }
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 if (sbe->level <= maxlevel) {
-                    int result = 0;
                     if (!header) {
-                        result = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
+                        n = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
                         header = 1;
                     }
                     else {
-                        result = (int)strlcpy(bufp, ", ", size);
+                        n = (int)str_strlcpy(bufp, ", ", size);
                     }
-                    if (wrptr(&bufp, &size, result) != 0) {
+                    if (wrptr(&bufp, &size, n) != 0) {
                         WARN_STATIC_BUFFER();
                     }
                     /* TODO: no need to deref the spellref here (spref->name is good) */
@@ -703,9 +704,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                int result =
-                    snprintf(bufp, size, ", %s: ", LOC(lang, "nr_combatspells"));
-                if (wrptr(&bufp, &size, result) != 0)
+                n = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_combatspells"));
+                if (wrptr(&bufp, &size, n) != 0)
                     WARN_STATIC_BUFFER();
 
                 dh = 0;
@@ -722,8 +722,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                         int sl = get_combatspelllevel(u, i);
                         bufp = STRLCPY(bufp, spell_name(sp, lang), size);
                         if (sl > 0) {
-                            result = snprintf(bufp, size, " (%d)", sl);
-                            if (wrptr(&bufp, &size, result) != 0)
+                            n = snprintf(bufp, size, " (%d)", sl);
+                            if (wrptr(&bufp, &size, n) != 0)
                                 WARN_STATIC_BUFFER();
                         }
                     }
@@ -740,8 +740,8 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                 keyword_t kwd = getkeyword(ord);
                 if (is_repeated(kwd)) {
                     if (printed < ORDERS_IN_NR) {
-                        int result = (int)buforder(bufp, size, ord, u->faction->locale, printed++);
-                        if (wrptr(&bufp, &size, result) != 0)
+                        int n = (int)buforder(bufp, size, ord, u->faction->locale, printed++);
+                        if (wrptr(&bufp, &size, n) != 0)
                             WARN_STATIC_BUFFER();
                     }
                     else
@@ -753,12 +753,13 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
                     keyword_t kwd = getkeyword(ord);
                     if (is_repeated(kwd)) {
                         if (printed < ORDERS_IN_NR) {
-                            int result = (int)buforder(bufp, size, ord, lang, printed++);
-                            if (wrptr(&bufp, &size, result) != 0)
+                            int n = (int)buforder(bufp, size, ord, lang, printed++);
+                            if (wrptr(&bufp, &size, n) != 0)
                                 WARN_STATIC_BUFFER();
                         }
-                        else
+                        else {
                             break;
+                        }
                     }
                 }
         }
@@ -1338,8 +1339,8 @@ void reorder_units(region * r)
 
         while (*unext && sh) {
             unit **ufirst = unext;    /* where the first unit in the building should go */
-            unit **umove = unext;     /* a unit we consider moving */
             unit *owner = ship_owner(sh);
+            umove = unext;
             while (owner && *umove) {
                 unit *u = *umove;
                 if (u->number && u->ship == sh) {
@@ -1477,8 +1478,8 @@ void prepare_report(report_context *ctx, faction *f)
                     for (b = rbuildings(r); b; b = b->next) {
                         if (b && b->type == bt_lighthouse) {
                             /* region owners get maximm range */
-                            int br = lighthouse_range(b, NULL, NULL);
-                            if (br > range) range = br;
+                            int lhr = lighthouse_range(b, NULL, NULL);
+                            if (lhr > range) range = lhr;
                         }
                     }
                 }
@@ -1567,7 +1568,7 @@ int write_reports(faction * f, time_t ltime)
                 char path[4096];
                 sprintf(filename, "%d-%s.%s", turn, itoa36(f->no),
                     rtype->extension);
-                join_path(reportpath(), filename, path, sizeof(path));
+                path_join(reportpath(), filename, path, sizeof(path));
                 errno = 0;
                 if (rtype->write(path, &ctx, (const char *)utf8_bom) == 0) {
                     gotit = true;
@@ -1608,9 +1609,9 @@ static void write_script(FILE * F, const faction * f)
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
         if (f->options & rtype->flag) {
             if (buf[0]) {
-                strlcat(buf, ",", sizeof(buf));
+                str_strlcat(buf, ",", sizeof(buf));
             }
-            strlcat(buf, rtype->extension, sizeof(buf));
+            str_strlcat(buf, rtype->extension, sizeof(buf));
         }
     }
     fputs(buf, F);
@@ -1645,7 +1646,7 @@ int reports(void)
     report_donations();
     remove_empty_units();
 
-    join_path(rpath, "reports.txt", path, sizeof(path));
+    path_join(rpath, "reports.txt", path, sizeof(path));
     mailit = fopen(path, "w");
     if (mailit == NULL) {
         log_error("%s could not be opened!\n", path);
@@ -1667,7 +1668,7 @@ int reports(void)
 
 static variant var_copy_string(variant x)
 {
-    x.v = x.v ? strdup((const char *)x.v) : 0;
+    x.v = x.v ? str_strdup((const char *)x.v) : 0;
     return x;
 }
 
@@ -1745,8 +1746,8 @@ const char *trailinto(const region * r, const struct locale *lang)
         const char *tname = terrain_name(r);
         size_t sz;
 
-        sz = strlcpy(ref, tname, sizeof(ref));
-        sz += strlcat(ref + sz, "_trail", sizeof(ref) - sz);
+        sz = str_strlcpy(ref, tname, sizeof(ref));
+        sz += str_strlcat(ref + sz, "_trail", sizeof(ref) - sz);
         s = LOC(lang, ref);
         if (s && *s) {
             if (strstr(s, "%s"))
@@ -1761,7 +1762,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
 {
     size_t len;
     if (!r) {
-        len = strlcpy(buffer, "(Chaos)", size);
+        len = str_strlcpy(buffer, "(Chaos)", size);
     }
     else {
         plane *pl = rplane(r);
@@ -1770,7 +1771,7 @@ f_regionid(const region * r, const faction * f, char *buffer, size_t size)
         int named = (name && name[0]);
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(f, &nx, &ny, pl);
-        len = strlcpy(buffer, rname(r, f ? f->locale : 0), size);
+        len = str_strlcpy(buffer, rname(r, f ? f->locale : 0), size);
         snprintf(buffer + len, size - len, " (%d,%d%s%s)", nx, ny, named ? "," : "", (named) ? name : "");
         buffer[size - 1] = 0;
         len = strlen(buffer);

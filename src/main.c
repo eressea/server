@@ -16,15 +16,21 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <util/log.h>
+#endif
 
 #include <kernel/config.h>
 #include <kernel/database.h>
 #include <kernel/version.h>
 #include <kernel/save.h>
+
 #include <util/filereader.h>
 #include <util/language.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include <util/path.h>
+
 #include "eressea.h"
 #ifdef USE_CURSES
 #include "gmtool.h"
@@ -95,12 +101,12 @@ static const char * valid_keys[] = {
 
 static dictionary *parse_config(const char *filename)
 {
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     dictionary *d;
     const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
-        join_path(cfgpath, filename, path, sizeof(path));
+        path_join(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
         d = iniparser_load(path);
     }

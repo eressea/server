@@ -85,9 +85,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -1586,17 +1588,17 @@ int display_cmd(unit * u, struct order *ord)
 
         free(*s);
         if (s2) {
-            char * str = strdup(s2);
-            if (unicode_utf8_trim(str) != 0) {
+            char * sdup = str_strdup(s2);
+            if (unicode_utf8_trim(sdup) != 0) {
                 log_info("trimming info: %s", s2);
             }
-            if (strlen(str) >= DISPLAYSIZE) {
-                str[DISPLAYSIZE-1] = 0;
+            if (strlen(sdup) >= DISPLAYSIZE) {
+                sdup[DISPLAYSIZE-1] = 0;
             }
-            *s = str;
+            *s = sdup;
         }
         else {
-            *s = 0;
+            *s = NULL;
         }
     }
 
@@ -1630,13 +1632,13 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
-    strlcpy(name, s2, sizeof(name));
+    str_strlcpy(name, s2, sizeof(name));
     if (unicode_utf8_trim(name) != 0) {
         log_info("trimming name: %s", s2);
     }
 
     free(*s);
-    *s = strdup(name);
+    *s = str_strdup(name);
     return 0;
 }
 
@@ -2119,7 +2121,7 @@ int banner_cmd(unit * u, struct order *ord)
     free(u->faction->banner);
     init_order_depr(ord);
     s = getstrtoken();
-    u->faction->banner = s ? strdup(s) : 0;
+    u->faction->banner = s ? str_strdup(s) : 0;
     add_message(&u->faction->msgs, msg_message("changebanner", "value",
         u->faction->banner));
 
@@ -2174,7 +2176,7 @@ int password_cmd(unit * u, struct order *ord)
     }
     if (!pwok) {
         cmistake(u, ord, 283, MSG_EVENT);
-        strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
+        str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
     faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
@@ -4259,7 +4261,7 @@ void update_subscriptions(void)
     FILE *F;
     char zText[4096];
 
-    join_path(basepath(), "subscriptions", zText, sizeof(zText));
+    path_join(basepath(), "subscriptions", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (F == NULL) {
         log_warning(0, "could not open %s.\n", zText);

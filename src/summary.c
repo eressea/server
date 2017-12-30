@@ -8,8 +8,9 @@
  *
  */
 
-/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 
 #include "summary.h"
@@ -30,6 +31,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/path.h>
 
 #include <assert.h>
 #include <string.h>
@@ -88,7 +90,7 @@ int update_nmrs(void)
     }
     
     for (f = factions; f; f = f->next) {
-        if (fval(f, FFL_ISNEW)) {
+        if (f->age<=1) {
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
@@ -96,8 +98,8 @@ int update_nmrs(void)
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
                     log_error("faction %s has %d NMR", itoa36(f->no), nmr);
-                    nmr = MAX(0, nmr);
-                    nmr = MIN(nmr, timeout);
+                    if (nmr < 0) nmr = 0;
+                    if (nmr > timeout) nmr = timeout;
                 }
                 if (nmr > 0) {
                     log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
@@ -165,7 +167,7 @@ static void writeturn(void)
     char zText[4096];
     FILE *f;
 
-    join_path(basepath(), "datum", zText, sizeof(zText));
+    path_join(basepath(), "datum", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -173,7 +175,7 @@ static void writeturn(void)
     }
     fputs(gamedate2(default_locale), f);
     fclose(f);
-    join_path(basepath(), "turn", zText, sizeof(zText));
+    path_join(basepath(), "turn", zText, sizeof(zText));
     f = fopen(zText, "w");
     if (!f) {
         perror(zText);
@@ -192,10 +194,10 @@ void report_summary(summary * s, summary * o, bool full)
     int timeout = NMRTimeout();
 
     if (full) {
-        join_path(basepath(), "parteien.full", zText, sizeof(zText));
+        path_join(basepath(), "parteien.full", zText, sizeof(zText));
     }
     else {
-        join_path(basepath(), "parteien", zText, sizeof(zText));
+        path_join(basepath(), "parteien", zText, sizeof(zText));
     }
     F = fopen(zText, "w");
     if (!F) {

@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/path.h>
 
 /* libc includes */
 #include <assert.h>
@@ -152,7 +153,7 @@ void score(void)
         allscores = 1;
     }
 
-    join_path(basepath(), "score", path, sizeof(path));
+    path_join(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
     if (scoreFP) {
         const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
@@ -177,7 +178,7 @@ void score(void)
         alliance *a;
         const item_type *token = it_find("conquesttoken");
 
-        join_path(basepath(), "score.alliances", path, sizeof(path));
+        path_join(basepath(), "score.alliances", path, sizeof(path));
         scoreFP = fopen(path, "w");
         if (scoreFP) {
             const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };

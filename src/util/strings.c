@@ -16,8 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-
+#endif
 #include "strings.h"
 #include "assert.h"
 
@@ -27,6 +28,67 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+
+size_t str_strlcpy(char *dst, const char *src, size_t len)
+{
+#ifdef HAVE_BSDSTRING
+    return strlcpy(dst, src, len);
+#else
+    register char *d = dst;
+    register const char *s = src;
+    register size_t n = len;
+
+    assert(src);
+    assert(dst);
+    /* Copy as many bytes as will fit */
+    if (n != 0 && --n != 0) {
+        do {
+            if ((*d++ = *s++) == 0)
+                break;
+        } while (--n != 0);
+    }
+
+    /* Not enough room in dst, add NUL and traverse rest of src */
+    if (n == 0) {
+        if (len != 0)
+            *d = '\0';                /* NUL-terminate dst */
+        while (*s++);
+    }
+
+    return (s - src - 1);         /* count does not include NUL */
+#endif
+}
+
+size_t str_strlcat(char *dst, const char *src, size_t len)
+{
+#ifdef HAVE_BSDSTRING
+    return strlcat(dst, src, len);
+#else
+    register char *d = dst;
+    register const char *s = src;
+    register size_t n = len;
+    size_t dlen;
+
+    /* Find the end of dst and adjust bytes left but don't go past end */
+    while (*d != '\0' && n-- != 0)
+        d++;
+    dlen = d - dst;
+    n = len - dlen;
+
+    if (n == 0)
+        return (dlen + strlen(s));
+    while (*s != '\0') {
+        if (n != 1) {
+            *d++ = *s;
+            n--;
+        }
+        s++;
+    }
+    *d = '\0';
+
+    return (dlen + (s - src));    /* count does not include NUL */
+#endif
+}
 
 size_t str_slprintf(char * dst, size_t size, const char * format, ...)
 {
@@ -167,4 +229,12 @@ unsigned int wang_hash(unsigned int a)
     a = a * 2057;                 /*  a = (a + (a << 3)) + (a << 11); */
     a = a ^ (a >> 16);
     return a;
+}
+
+char *str_strdup(const char *s) {
+#ifdef _MSC_VER
+    return _strdup(s);
+#else
+    return strdup(s);
+#endif
 }

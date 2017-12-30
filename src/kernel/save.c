@@ -59,7 +59,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/filereader.h>
 #include <util/gamedata.h>
@@ -70,15 +69,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
 #include <selist.h>
 #include <stream.h>
 #include <filestream.h>
+#include <limits.h>
 #include <storage.h>
 #include <binarystore.h>
 
@@ -157,7 +159,7 @@ void read_planes(gamedata *data) {
         }
         pl->id = id;
         READ_STR(store, name, sizeof(name));
-        pl->name = strdup(name);
+        pl->name = str_strdup(name);
         READ_INT(store, &pl->minx);
         READ_INT(store, &pl->maxx);
         READ_INT(store, &pl->miny);
@@ -291,11 +293,11 @@ static void write_owner(gamedata *data, region_owner * owner)
 
 int current_turn(void)
 {
-    char zText[MAX_PATH];
+    char zText[PATH_MAX];
     int cturn = 0;
     FILE *F;
 
-    join_path(basepath(), "turn", zText, sizeof(zText));
+    path_join(basepath(), "turn", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (!F) {
         perror(zText);
@@ -421,12 +423,12 @@ unit *read_unit(gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? strdup(obuf) : 0;
+    u->_name = obuf[0] ? str_strdup(obuf) : 0;
     READ_STR(data->store, obuf, sizeof(obuf));
     if (unicode_utf8_trim(obuf)!=0) {
         log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
     }
-    u->display = obuf[0] ? strdup(obuf) : 0;
+    u->display = obuf[0] ? str_strdup(obuf) : 0;
     READ_INT(data->store, &number);
     set_number(u, number);
 
@@ -648,7 +650,7 @@ static region *readregion(gamedata *data, int x, int y)
         if (unicode_utf8_trim(name) != 0) {
             log_warning("trim region %d name to '%s'", uid, name);
         };
-        r->land->name = strdup(name);
+        r->land->name = str_strdup(name);
     }
     if (r->land) {
         int i;
@@ -888,7 +890,7 @@ static char * getpasswd(int fno) {
                 assert(line[slen] == '\n');
                 line[slen] = 0;
                 fclose(F);
-                return strdup(line + len + 1);
+                return str_strdup(line + len + 1);
             }
         }
         fclose(F);
@@ -980,12 +982,12 @@ faction *read_faction(gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
 	};
-    f->name = strdup(name);
+    f->name = str_strdup(name);
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = strdup(name);
+    f->banner = str_strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
@@ -1150,7 +1152,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 int readgame(const char *filename)
 {
     int n, stream_version;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata = { 0 };
     storage store;
     stream strm;
@@ -1158,7 +1160,7 @@ int readgame(const char *filename)
     size_t sz;
 
     log_debug("- reading game data from %s", filename);
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
 
     F = fopen(path, "rb");
     if (!F) {
@@ -1210,12 +1212,12 @@ struct building *read_building(gamedata *data) {
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
 	}
-    b->name = strdup(name);
+    b->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     if (unicode_utf8_trim(name)!=0) {
         log_warning("trim building %s info to '%s'", itoa36(b->no), name);
     }
-    b->display = strdup(name);
+    b->display = str_strdup(name);
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
@@ -1264,12 +1266,12 @@ ship *read_ship(gamedata *data)
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
 	}
-    sh->name = strdup(name);
+    sh->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     if (unicode_utf8_trim(name)!=0) {
         log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
     }
-    sh->display = strdup(name);
+    sh->display = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     sh->type = st_find(name);
     if (sh->type == NULL) {
@@ -1561,14 +1563,14 @@ static void clear_npc_orders(faction *f)
 int writegame(const char *filename)
 {
     int n;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata;
     storage store;
     stream strm;
     FILE *F;
 
     create_directories();
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
     /* make sure we don't overwrite an existing file (hard links) */
     if (remove(path) != 0) {
         if (errno == ENOENT) {

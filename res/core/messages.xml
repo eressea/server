@@ -153,8 +153,8 @@
   </message>
   <message name="curseinfo::maelstrom">
     <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber verursacht einen gigantischen magischen Strudel. Der Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))</text>
-    <text locale="en">This spell causes a gargantuan vortex. The maelstrom will heavily damage all ships coming into its wake. ($int36($id))</text>
+    <text locale="de">Der Mahlstrom in dieser Region wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))</text>
+    <text locale="en">The maelstrom in this area will heavily damage all ships coming into its wake. ($int36($id))</text>
   </message>
   <message name="curseinfo::healingzone">
     <type><arg name="id" type="int"/></type>

@@ -3,17 +3,11 @@
 
 #include <stddef.h>
 
-#ifndef HAVE_BSDSTRING
-size_t strlcpy(char *dst, const char *src, size_t siz);
-size_t strlcat(char *dst, const char *src, size_t siz);
-#else
-#include <string.h>
-#endif
-
 int wrptr(char **ptr, size_t * size, int bytes);
 char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const char *file, int line);
 
-#define WARN_STATIC_BUFFER_EX(foo) log_warning("%s: static buffer too small in %s:%d\n", (foo), __FILE__, __LINE__)
+#define BUFFER_STRCAT(bufp, size, bytes) if (wrptr(&bufp, &size, bytes) != 0) log_warning("static buffer too small in %s:%d\n", __FILE__, __LINE__);
+
 #define WARN_STATIC_BUFFER() log_warning("static buffer too small in %s:%d\n", __FILE__, __LINE__)
 #define INFO_STATIC_BUFFER() log_info("static buffer too small in %s:%d\n", __FILE__, __LINE__)
 #define STRLCPY(dst, src, siz) strlcpy_w((dst), (src), &(siz), 0, __FILE__, __LINE__)
