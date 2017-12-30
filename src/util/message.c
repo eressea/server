@@ -11,7 +11,6 @@
 
  */
 
-#include <platform.h>
 #include "message.h"
 
 #include "strings.h"

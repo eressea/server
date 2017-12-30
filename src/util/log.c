@@ -10,10 +10,9 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 #include <platform.h>
+#include "log.h"
 
 #include "bsdstring.h"
-#include "log.h"
-#include "path.h"
 #include "unicode.h"
 
 #include <assert.h>

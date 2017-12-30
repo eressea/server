@@ -495,7 +495,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
 {
     region *r = u->region;
     region **plan;
-    int bytes, position = 0;
+    int position = 0;
     char zOrder[128], *bufp = zOrder;
     size_t size = sizeof(zOrder) - 1;
 
@@ -507,6 +507,7 @@ static order *make_movement_order(unit * u, const region * target, int moves,
         return NULL;
 
     while (position != moves && plan[position + 1]) {
+        int bytes;
         region *prev = plan[position];
         region *next = plan[++position];
         direction_t dir = reldirection(prev, next);

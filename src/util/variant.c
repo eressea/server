@@ -1,7 +1,5 @@
-#include <platform.h>
 #include "variant.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <limits.h>
 

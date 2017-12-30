@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "study.h"
 #include "laws.h"
@@ -613,7 +615,8 @@ int study_cmd(unit * u, order * ord)
     }
     /* Akademie: */
     if (active_building(u, bt_find("academy"))) {
-        studycost = MAX(50, studycost * 2);
+        studycost = studycost * 2;
+        if (studycost < 50) studycost = 50;
     }
 
     if (sk == SK_MAGIC) {
@@ -721,12 +724,14 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (get_effect(u, oldpotiontype[P_WISE])) {
-        l = MIN(u->number, get_effect(u, oldpotiontype[P_WISE]));
+        l = get_effect(u, oldpotiontype[P_WISE]);
+        if (l > u->number) l = u->number;
         teach->days += l * EXPERIENCEDAYS;
         change_effect(u, oldpotiontype[P_WISE], -l);
     }
     if (get_effect(u, oldpotiontype[P_FOOL])) {
-        l = MIN(u->number, get_effect(u, oldpotiontype[P_FOOL]));
+        l = get_effect(u, oldpotiontype[P_FOOL]);
+        if (l > u->number) l = u->number;
         teach->days -= l * STUDYDAYS;
         change_effect(u, oldpotiontype[P_FOOL], -l);
     }

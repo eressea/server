@@ -22,8 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#include <stddef.h>
-
     typedef struct strlist {
         struct strlist *next;
         char *s;
