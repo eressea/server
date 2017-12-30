@@ -2,7 +2,9 @@
 #include <platform.h>
 #endif
 #include <CuTest.h>
+
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include "strings.h"
