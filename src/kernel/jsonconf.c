@@ -38,7 +38,6 @@ without prior permission by the authors of Eressea.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/functions.h>
 #include <util/language.h>

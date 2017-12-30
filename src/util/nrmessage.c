@@ -16,7 +16,6 @@
 #include "nrmessage_struct.h"
 
 /* util includes */
-#include "bsdstring.h"
 #include "log.h"
 #include "message.h"
 #include "language.h"

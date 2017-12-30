@@ -23,7 +23,6 @@
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
-#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/lists.h>

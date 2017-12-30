@@ -78,7 +78,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(config);
     ADD_SUITE(attrib);
     ADD_SUITE(base36);
-    ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);

@@ -3,7 +3,7 @@ project(util C)
 SET(_TEST_FILES
 attrib.test.c
 base36.test.c
-bsdstring.test.c
+# bsdstring.test.c
 # crmessage.test.c
 # dice.test.c
 # event.test.c
