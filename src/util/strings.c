@@ -238,3 +238,28 @@ char *str_strdup(const char *s) {
     return strdup(s);
 #endif
 }
+
+void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
+{
+    assert(sbs);
+    assert(size>0);
+    sbs->begin = buffer;
+    sbs->size = size;
+    sbs->end = buffer;
+    buffer[0] = '\0';
+}
+
+void sbs_strcat(struct sbstring *sbs, const char *str)
+{
+    size_t len;
+    assert(sbs);
+    len = sbs->size - (sbs->end - sbs->begin);
+    len = str_strlcpy(sbs->end, str, len);
+    sbs->end += len;
+}
+
+void sbs_strcpy(struct sbstring *sbs, const char *str)
+{
+    size_t len = str_strlcpy(sbs->begin, str, sbs->size);
+    sbs->end += len;
+}

@@ -37,6 +37,17 @@ extern "C" {
     unsigned int jenkins_hash(unsigned int a);
     unsigned int wang_hash(unsigned int a);
 
+    /* static buffered string */
+    typedef struct sbstring {
+        size_t size;
+        char *begin;
+        char *end;
+    } sbstring;
+
+    void sbs_init(struct sbstring *sbs, char *buffer, size_t size);
+    void sbs_strcat(struct sbstring *sbs, const char *str);
+    void sbs_strcpy(struct sbstring *sbs, const char *str);
+
     /* benchmark for units:
      * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)
      * WANG_HASH:    5.33 misses/hit (with good cache behavior)

@@ -91,6 +91,25 @@ static void test_str_strlcpy(CuTest * tc)
     errno = 0;
 }
 
+static void test_sbstring(CuTest * tc)
+{
+    char buffer[16];
+    sbstring sbs;
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "", sbs.begin);
+    sbs_strcpy(&sbs, "Hodor");
+    CuAssertStrEquals(tc, "Hodor", sbs.begin);
+    sbs_strcat(&sbs, "Hodor");
+    CuAssertStrEquals(tc, "HodorHodor", sbs.begin);
+    sbs_strcpy(&sbs, "Hodor");
+    CuAssertStrEquals(tc, "Hodor", sbs.begin);
+    sbs_strcpy(&sbs, "12345678901234567890");
+    CuAssertStrEquals(tc, "123456789012345", sbs.begin);
+    sbs_strcat(&sbs, "12345678901234567890");
+    CuAssertStrEquals(tc, "123456789012345", sbs.begin);
+    CuAssertStrEquals(tc, buffer, sbs.begin);
+}
+
 CuSuite *get_strings_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -100,5 +119,6 @@ CuSuite *get_strings_suite(void)
     SUITE_ADD_TEST(suite, test_str_slprintf);
     SUITE_ADD_TEST(suite, test_str_strlcat);
     SUITE_ADD_TEST(suite, test_str_strlcpy);
+    SUITE_ADD_TEST(suite, test_sbstring);
     return suite;
 }

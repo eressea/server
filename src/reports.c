@@ -2035,6 +2035,7 @@ void report_battle_start(battle * b)
 {
     bfaction *bf;
     char zText[32 * MAXSIDES];
+    sbstring sbs;
 
     for (bf = b->factions; bf; bf = bf->next) {
         message *m;
@@ -2042,18 +2043,17 @@ void report_battle_start(battle * b)
         const char *lastf = NULL;
         bool first = false;
         side *s;
-        char *bufp = zText;
-        size_t size = sizeof(zText) - 1;
 
+        sbs_init(&sbs, zText, sizeof(zText));
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        bufp += str_strlcpy(bufp, ", ", size);
+                        sbs_strcpy(&sbs, ", ");
                     }
                     if (lastf) {
-                        bufp += str_strlcpy(bufp, lastf, size);
+                        sbs_strcpy(&sbs, lastf);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2065,12 +2065,12 @@ void report_battle_start(battle * b)
             }
         }
         if (first) {
-            bufp = STRLCPY(bufp, " ", size);
-            bufp = STRLCPY(bufp, LOC(f->locale, "and"), size);
-            bufp = STRLCPY(bufp, " ", size);
+            sbs_strcpy(&sbs, " ");
+            sbs_strcpy(&sbs, LOC(f->locale, "and"));
+            sbs_strcpy(&sbs, " ");
         }
         if (lastf) {
-            bufp = STRLCPY(bufp, lastf, size);
+            sbs_strcpy(&sbs, lastf);
         }
 
         m = msg_message("start_battle", "factions", zText);
