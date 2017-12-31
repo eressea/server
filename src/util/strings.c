@@ -25,9 +25,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+
+#ifdef HAVE_LIBBSD
+#include <bsd/string.h>
+#else
+#include <string.h>
+#endif
 
 size_t str_strlcpy(char *dst, const char *src, size_t len)
 {
@@ -232,10 +237,15 @@ unsigned int wang_hash(unsigned int a)
 }
 
 char *str_strdup(const char *s) {
-#ifdef _MSC_VER
+#ifdef HAVE_STRDUP
+    return strdup(s);
+#elif defined(_MSC_VER)
     return _strdup(s);
 #else
-    return strdup(s);
+    size_t len = strlen(s);
+    char *dup = malloc(len+1);
+    memcpy(dup, s, len+1);
+    return dup;
 #endif
 }
 
