@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct battle;
     struct gamedate;
     struct selist;
     struct stream;
@@ -97,6 +98,7 @@ extern "C" {
         const struct locale *lang);
     size_t report_status(const struct unit *u,
         const struct locale *lang, char *buf, size_t siz);
+    void report_battle_start(struct battle * b);
 
     void register_reports(void);
 

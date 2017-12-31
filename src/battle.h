@@ -47,7 +47,6 @@ extern "C" {
 #define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
-
     typedef struct bfaction {
         struct bfaction *next;
         struct side *sides;
@@ -266,6 +265,9 @@ extern "C" {
         const struct faction * stealthfaction);
     int skilldiff(troop at, troop dt, int dist);
     void force_leave(struct region *r, struct battle *b);
+    bool seematrix(const struct faction * f, const struct side * s);
+    const char *sidename(const struct side * s);
+    void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
 
 #ifdef __cplusplus
 }
