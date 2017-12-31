@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "reports.h"
 
+#include "battle.h"
 #include "calendar.h"
 #include "guard.h"
 #include "laws.h"
@@ -2028,6 +2029,54 @@ static void eval_order(struct opstack **stack, const void *userdata)
     len = strlen(buf);
     var.v = strcpy(balloc(len + 1), buf);
     opush(stack, var);
+}
+
+void report_battle_start(battle * b)
+{
+    bfaction *bf;
+    char zText[32 * MAXSIDES];
+    sbstring sbs;
+
+    for (bf = b->factions; bf; bf = bf->next) {
+        message *m;
+        faction *f = bf->faction;
+        const char *lastf = NULL;
+        bool first = false;
+        side *s;
+
+        sbs_init(&sbs, zText, sizeof(zText));
+        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+            fighter *df;
+            for (df = s->fighters; df; df = df->next) {
+                if (is_attacker(df)) {
+                    if (first) {
+                        sbs_strcpy(&sbs, ", ");
+                    }
+                    if (lastf) {
+                        sbs_strcpy(&sbs, lastf);
+                        first = true;
+                    }
+                    if (seematrix(f, s))
+                        lastf = sidename(s);
+                    else
+                        lastf = LOC(f->locale, "unknown_faction_dative");
+                    break;
+                }
+            }
+        }
+        if (first) {
+            sbs_strcpy(&sbs, " ");
+            sbs_strcpy(&sbs, LOC(f->locale, "and"));
+            sbs_strcpy(&sbs, " ");
+        }
+        if (lastf) {
+            sbs_strcpy(&sbs, lastf);
+        }
+
+        m = msg_message("start_battle", "factions", zText);
+        battle_message_faction(b, f, m);
+        msg_release(m);
+    }
 }
 
 static void eval_resources(struct opstack **stack, const void *userdata)

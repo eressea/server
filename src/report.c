@@ -2230,7 +2230,7 @@ report_plaintext(const char *filename, report_context * ctx,
                         (int)str_strlcpy(bufp, LOC(f->locale, resourcename(rm->rtype, 0)), size);
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
-                    ++m;
+                    ++rm;
                     if (rm->number)
                         bytes = (int)str_strlcpy(bufp, ", ", size);
                     if (wrptr(&bufp, &size, bytes) != 0)

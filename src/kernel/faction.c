@@ -316,7 +316,7 @@ bool checkpasswd(const faction * f, const char *passwd)
     if (!passwd) return false;
 
     if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
-        log_warning("password check failed: %s", factionname(f));
+        log_info("password check failed: %s", factionname(f));
         return false;
     }
     return true;
@@ -408,12 +408,8 @@ void save_special_items(unit *usrc)
     static int cache;
     static const char *name = NULL;
     if (rc_changed(&cache)) {
-        rc_ghost = rc_find("ghost");
-        if (!rc_ghost) {
-            rc_ghost = get_race(RC_TEMPLATE);
-            name = "ghost";
-        }
-        assert(rc_ghost);
+        rc_ghost = get_race(RC_TEMPLATE);
+        name = "ghost";
     }
     for (u = r->units; u; u = u->next) {
         if (u->faction == fm) {

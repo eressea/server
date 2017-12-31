@@ -185,7 +185,7 @@ static int army_index(side * s)
     return s->index;
 }
 
-static char *sidename(side * s)
+const char *sidename(const side * s)
 {
 #define SIDENAMEBUFLEN 256
     static int bufno;             /* STATIC_XCALL: used across calls */
@@ -206,7 +206,7 @@ static const char *sideabkz(side * s, bool truename)
     return sideabkz_buf;
 }
 
-static void message_faction(battle * b, faction * f, struct message *m)
+void battle_message_faction(battle * b, faction * f, struct message *m)
 {
     region *r = b->region;
 
@@ -227,14 +227,14 @@ void message_all(battle * b, message * m)
 
     for (bf = b->factions; bf; bf = bf->next) {
         assert(bf->faction);
-        message_faction(b, bf->faction, m);
+        battle_message_faction(b, bf->faction, m);
     }
 }
 
 static void fbattlerecord(battle * b, faction * f, const char *s)
 {
     message *m = msg_message("battle_msg", "string", s);
-    message_faction(b, f, m);
+    battle_message_faction(b, f, m);
     msg_release(m);
 }
 
@@ -1302,7 +1302,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
         if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
             message *m = msg_message("potionsave", "unit", du);
-            message_faction(b, du->faction, m);
+            battle_message_faction(b, du->faction, m);
             msg_release(m);
             i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
             fset(&df->person[dt.index], FL_HEALING_USED);
@@ -2531,7 +2531,7 @@ static void loot_items(fighter * corpse)
     }
 }
 
-static bool seematrix(const faction * f, const side * s)
+bool seematrix(const faction * f, const side * s)
 {
     if (f == s->faction)
         return true;
@@ -2615,7 +2615,7 @@ static void aftermath(battle * b)
                 struct message *m =
                     msg_message("killsandhits", "unit hits kills", du, df->hits,
                     df->kills);
-                message_faction(b, du->faction, m);
+                battle_message_faction(b, du->faction, m);
                 msg_release(m);
             }
         }
@@ -2755,7 +2755,7 @@ static void aftermath(battle * b)
             faction *f = bf->faction;
             message *m = seematrix(f, s) ? seen : unseen;
 
-            message_faction(b, f, m);
+            battle_message_faction(b, f, m);
         }
 
         msg_release(seen);
@@ -2779,7 +2779,7 @@ static void aftermath(battle * b)
                 message *m =
                     msg_message("battle_loot", "unit amount item", du, l->number,
                     itype->rtype);
-                message_faction(b, du->faction, m);
+                battle_message_faction(b, du->faction, m);
                 msg_release(m);
                 i_change(&du->items, itype, l->number);
             }
@@ -2877,54 +2877,6 @@ static void set_attacker(fighter * fig)
     fset(fig, FIG_ATTACKER);
 }
 
-static void print_header(battle * b)
-{
-    bfaction *bf;
-    char zText[32 * MAXSIDES];
-
-    for (bf = b->factions; bf; bf = bf->next) {
-        message *m;
-        faction *f = bf->faction;
-        const char *lastf = NULL;
-        bool first = false;
-        side *s;
-        char *bufp = zText;
-        size_t size = sizeof(zText) - 1;
-
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
-            fighter *df;
-            for (df = s->fighters; df; df = df->next) {
-                if (is_attacker(df)) {
-                    if (first) {
-                        str_strlcpy(bufp, ", ", size);
-                    }
-                    if (lastf) {
-                        str_strlcpy(bufp, lastf, size);
-                        first = true;
-                    }
-                    if (seematrix(f, s))
-                        lastf = sidename(s);
-                    else
-                        lastf = LOC(f->locale, "unknown_faction_dative");
-                    break;
-                }
-            }
-        }
-        if (first) {
-            bufp = STRLCPY(bufp, " ", size);
-            bufp = STRLCPY(bufp, LOC(f->locale, "and"), size);
-            bufp = STRLCPY(bufp, " ", size);
-        }
-        if (lastf) {
-            bufp = STRLCPY(bufp, lastf, size);
-        }
-
-        m = msg_message("start_battle", "factions", zText);
-        message_faction(b, f, m);
-        msg_release(m);
-    }
-}
-
 static void print_stats(battle * b)
 {
     side *s2;
@@ -2947,10 +2899,10 @@ static void print_stats(battle * b)
             message *msg;
             char buf[1024];
 
-            message_faction(b, f, msg_separator);
+            battle_message_faction(b, f, msg_separator);
 
             msg = msg_message("battle_army", "index name", army_index(s), sname);
-            message_faction(b, f, msg);
+            battle_message_faction(b, f, msg);
             msg_release(msg);
 
             bufp = buf;
@@ -3569,13 +3521,13 @@ static int battle_report(battle * b)
         size_t size = sizeof(buf) - 1;
         message *m;
 
-        message_faction(b, fac, msg_separator);
+        battle_message_faction(b, fac, msg_separator);
 
         if (cont)
             m = msg_message("lineup_battle", "turn", b->turn);
         else
             m = msg_message("after_battle", "");
-        message_faction(b, fac, m);
+        battle_message_faction(b, fac, m);
         msg_release(m);
 
         komma = false;
@@ -4078,7 +4030,7 @@ void do_battle(region * r)
     /* Bevor wir die alliierten hineinziehen, sollten wir schauen, *
      * Ob jemand fliehen kann. Dann er�brigt sich das ganze ja
      * vielleicht schon. */
-    print_header(b);
+    report_battle_start(b);
     if (!fighting) {
         /* Niemand mehr da, Kampf kann nicht stattfinden. */
         message *m = msg_message("aborted_battle", "");
