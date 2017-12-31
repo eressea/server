@@ -32,7 +32,7 @@ cppcheck_tests() {
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 s/cmake-init
-cppcheck_tests
+# cppcheck_tests
 s/build
 cd process
 make
