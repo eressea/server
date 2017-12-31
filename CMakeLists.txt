@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
-project (eressea-server C)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 
 if (WIN32)
 FILE(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 FILE(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
 endif(WIN32)
 
+project (eressea-server C)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
+
 if (MSVC)
 include(MSVC)
-endif (MSVC)
+set (HAVE_STRDUP 0)
+set (HAVE_STRLCAT 0)
+set (HAVE_LIBBSD 0)
+else (MSVC)
 
 INCLUDE (CheckIncludeFile)
 CHECK_INCLUDE_FILE(bsd/string.h HAVE_LIBBSD)
@@ -22,6 +26,8 @@ CHECK_LIBRARY_EXISTS(bsd strlcat "bsd/string.h" HAVE_STRLCAT)
 ELSE (HAVE_LIBBSD)
 CHECK_FUNCTION_EXISTS(strlcat HAVE_STRLCAT)
 ENDIF(HAVE_LIBBSD)
+
+endif (MSVC)
 
 find_package (SQLite3)
 find_package (BerkeleyDB)
