@@ -261,5 +261,8 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
 void sbs_strcpy(struct sbstring *sbs, const char *str)
 {
     size_t len = str_strlcpy(sbs->begin, str, sbs->size);
-    sbs->end += len;
+    if (len >= sbs->size) {
+        len = sbs->size - 1;
+    }
+    sbs->end = sbs->begin + len;
 }

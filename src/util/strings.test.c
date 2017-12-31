@@ -105,9 +105,10 @@ static void test_sbstring(CuTest * tc)
     CuAssertStrEquals(tc, "Hodor", sbs.begin);
     sbs_strcpy(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
+    CuAssertPtrEquals(tc, sbs.begin + sbs.size - 1, sbs.end);
     sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
-    CuAssertStrEquals(tc, buffer, sbs.begin);
+    CuAssertPtrEquals(tc, buffer, sbs.begin);
 }
 
 CuSuite *get_strings_suite(void)
