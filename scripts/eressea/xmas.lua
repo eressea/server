@@ -2,15 +2,15 @@ if not config.xmas or config.xmas==0 then return nil end
 
 local gifts = {
     e2 = {
-        { year = 2015, turn = 959, item = 'snowglobe', msg='santa_f' },
-        { year = 2009, turn = 624, item = 'xmastree' },
-        { year = 2006, turn = 468, key = 'xm06', item = 'snowman' },
-        { year = 2005, turn = 416, key = 'xm05', item = 'stardust' },
-        { year = 2004, turn = 364, key = 'xm04', item = 'speedsail' }
+        [1057] = { year = 2017, item = 'snowglobe', msg='santa_f' },
+        [959] = { year = 2015, item = 'snowglobe', msg='santa_f' },
+        [624] = { year = 2009, item = 'xmastree', msg='santa_m' },
+        [468] = { year = 2006, item = 'snowman', msg='santa_m'  },
+        [416] = { year = 2005, item = 'stardust' },
+        [364] = { year = 2004, item = 'speedsail' }
     },
     e3 = {
-        -- { year = 2015, turn = 338, item = 'snowglobe' },
-        { year = 2009, turn = 26, key = 'xm09', item = 'xmastree' }
+        [26] = { year = 2009, item = 'xmastree' }
     }
 }
 
@@ -37,13 +37,9 @@ function self.init()
     local turn = get_turn()
     local tbl = gifts[config.rules]
     if tbl then
-        for _, gift in ipairs(tbl) do
-            if turn == gift.turn then
-                give_gifts(gift)
-            elseif gift.key and not get_key(gift.key) then
-                give_gifts(gift)
-                set_key(gift.key)
-            end
+        gift = tbl[turn]
+        if gift then 
+            give_gifts(gift)
         end
     end
 end
