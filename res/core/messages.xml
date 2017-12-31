@@ -42,6 +42,18 @@
     pulled by 8 young dragons flies through the stary night and presents
     your faction with a $resource($item,1).</text>
   </message>
+  <message name="santa_m" section="events">
+    <type>
+      <arg name="item" type="resource"/>
+    </type>
+    <text locale="de">'Ho ho ho!' Ein dicker Gnom fliegt auf einem von
+    8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner
+    Partei einen $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib
+    ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)').</text>
+    <text locale="en">'Ho ho ho!' A fat little gnome Gnom on a sled
+    pulled by 8 young dragons flies through the stary night and presents
+    your faction with a $resource($item,1).</text>
+  </message>
 
   <message name="target_region_invalid">
     <type>
