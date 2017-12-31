@@ -19,7 +19,6 @@
 #include "keyword.h"
 
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>
@@ -235,50 +234,46 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     order *ord;
     char zBuffer[DISPLAYSIZE];
     if (params) {
-        char *bufp = zBuffer;
-        int bytes;
-        size_t size = sizeof(zBuffer) - 1;
+        sbstring sbs;
         va_list marker;
+        char *tok;
 
         assert(lang);
         va_start(marker, params);
+        sbs_init(&sbs, zBuffer, sizeof(zBuffer));
         while (*params) {
-            if (*params == '%') {
-                int i;
-                const char *s;
-                ++params;
-                switch (*params) {
+            int i;
+            const char *s;
+            tok = strchr(params, '%');
+            if (tok) {
+                if (tok != params) {
+                    sbs_strncat(&sbs, params, tok - params);
+                }
+                switch (tok[1]) {
                 case 's':
                     s = va_arg(marker, const char *);
                     assert(s);
-                    bytes = (int)str_strlcpy(bufp, s, size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, s);
                     break;
                 case 'd':
                     i = va_arg(marker, int);
-                    bytes = (int)str_strlcpy(bufp, itoa10(i), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, itoa10(i));
                     break;
                 case 'i':
                     i = va_arg(marker, int);
-                    bytes = (int)str_strlcpy(bufp, itoa36(i), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, itoa36(i));
                     break;
                 default:
                     assert(!"unknown format-character in create_order");
                 }
+                params = tok + 2;
             }
-            else if (size > 0) {
-                *bufp++ = *params;
-                --size;
+            else {
+                sbs_strcat(&sbs, params);
+                break;
             }
-            ++params;
         }
         va_end(marker);
-        *bufp = 0;
     }
     else {
         zBuffer[0] = 0;

@@ -249,6 +249,19 @@ void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
     buffer[0] = '\0';
 }
 
+void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
+{
+    size_t len;
+    assert(sbs);
+    len = sbs->size - (sbs->end - sbs->begin) - 1;
+    if (len < size) {
+        size = len;
+    }
+    memcpy(sbs->end, str, size);
+    sbs->end[size] = '\0';
+    sbs->end += size;
+}
+
 void sbs_strcat(struct sbstring *sbs, const char *str)
 {
     size_t len;

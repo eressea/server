@@ -109,6 +109,12 @@ static void test_sbstring(CuTest * tc)
     sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
     CuAssertPtrEquals(tc, buffer, sbs.begin);
+    sbs_strcpy(&sbs, "1234567890");
+    CuAssertStrEquals(tc, "1234567890", sbs.begin);
+    sbs_strncat(&sbs, "1234567890", 4);
+    CuAssertStrEquals(tc, "12345678901234", sbs.begin);
+    sbs_strncat(&sbs, "567890", 6);
+    CuAssertStrEquals(tc, "123456789012345", sbs.begin);
 }
 
 CuSuite *get_strings_suite(void)
