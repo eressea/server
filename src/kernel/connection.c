@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "connection.h"
 
@@ -134,7 +136,8 @@ static connection **get_borders_i(const region * r1, const region * r2)
     int key = reg_hashkey(r1);
     int k2 = reg_hashkey(r2);
 
-    key = MIN(k2, key) % BORDER_MAXHASH;
+    if (key > k2) key = k2;
+    key = key % BORDER_MAXHASH;
     bp = &borders[key];
     while (*bp) {
         connection *b = *bp;
@@ -515,9 +518,10 @@ static const char *b_nameroad(const connection * b, const region * r,
             }
         }
         else {
-            int percent = MAX(1, 100 * local / r->terrain->max_road);
             if (local) {
                 const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
+                int percent = 100 * local / r->terrain->max_road;
+                if (percent < 1) percent = 1;
                 str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
             }
             else {

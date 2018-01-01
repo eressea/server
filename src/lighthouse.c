@@ -72,7 +72,7 @@ int lighthouse_range(const building * b, const faction * f, const unit *u)
             int sk = effskill(u, SK_PERCEPTION, 0) / 3;
             assert(u->building == b);
             assert(u->faction == f);
-            maxd = MIN(maxd, sk);
+            if (maxd > sk) maxd = sk;
         }
         /* E3A rule: no perception req'd */
         return maxd;
