@@ -58,6 +58,11 @@ function test_speedy_ship_slow()
     u2:set_skill("sailing", 24) -- sumskill = 50
     u1:add_order("NACH O O O O O O O O O O")
     process_orders()
+    if 5 ~= u1.region.x then
+        for _, msg in ipairs(f.messages) do
+            print(msg)
+        end
+    end
     assert_equal(5, u1.region.x)
 end
 
