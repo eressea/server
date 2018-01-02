@@ -406,10 +406,9 @@ void save_special_items(unit *usrc)
     faction *fm = get_monsters();
     static const race *rc_ghost;
     static int cache;
-    static const char *name = NULL;
+
     if (rc_changed(&cache)) {
         rc_ghost = get_race(RC_TEMPLATE);
-        name = "ghost";
     }
     for (u = r->units; u; u = u->next) {
         if (u->faction == fm) {
@@ -418,9 +417,12 @@ void save_special_items(unit *usrc)
         }
     }
     u = create_unit(r, fm, 1, rc_ghost, 0, NULL, NULL);
-    if (name) {
-        set_racename(&u->attribs, name);
+    unit_setname(u, unit_getname(usrc));
+    if (usrc->number > 1) {
+        /* some units have plural names, it would be neat if they aren't single: */
+        scale_number(u, 2);
     }
+    set_racename(&u->attribs, "ghost");
     give_special_items(u, &usrc->items);
 }
 
