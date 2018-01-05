@@ -246,7 +246,7 @@ int getint(void)
     return s ? atoi(s) : 0;
 }
 
-unsigned int getuint(void)
+int getuint(void)
 {
     int n = getint();
     return (n < 0) ? 0 : n;

@@ -28,7 +28,7 @@ extern "C" {
     bool parser_end(void);
     const char *getstrtoken(void);
     const char *gettoken(char *lbuf, size_t bufsize);
-    unsigned int getuint(void);
+    int getuint(void);
     int getint(void);
     int getid(void);
     unsigned int atoip(const char *s);

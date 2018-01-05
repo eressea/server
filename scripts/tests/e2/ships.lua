@@ -8,6 +8,7 @@ function setup()
     eressea.settings.set("rules.ship.damage.nocrewocean", "0")
     eressea.settings.set("rules.ship.damage.nocrew", "0")
     eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
 end
 
 function test_ship_requires_skill()

@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "items.h"
 
 #include "alchemy.h"
@@ -313,7 +315,7 @@ static int heal(unit * user, int effect)
 {
     int req = unit_max_hp(user) * user->number - user->hp;
     if (req > 0) {
-        req = MIN(req, effect);
+        if (req > effect) req = effect;
         effect -= req;
         user->hp += req;
     }

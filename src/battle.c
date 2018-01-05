@@ -64,7 +64,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -3517,10 +3516,10 @@ static int battle_report(battle * b)
     for (bf = b->factions; bf; bf = bf->next) {
         faction *fac = bf->faction;
         char buf[32 * MAXSIDES];
-        char *bufp = buf;
-        size_t size = sizeof(buf) - 1;
         message *m;
+        sbstring sbs;
 
+        sbs_init(&sbs, buf, sizeof(buf));
         battle_message_faction(b, fac, msg_separator);
 
         if (cont)
@@ -3540,24 +3539,22 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    bufp = STRLCPY(bufp, ", ", size);
+                    sbs_strcat(&sbs, ", ");
                 }
                 snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
-                
-                bufp = STRLCPY(bufp, buffer, size);
+                sbs_strcat(&sbs, buffer);
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            bufp = STRLCPY(bufp, "+", size);
+                            sbs_strcat(&sbs, "+");
                         }
                         while (k--) {
-                            bufp = STRLCPY(bufp, "0+", size);
+                            sbs_strcat(&sbs, "0+");
                         }
                         sprintf(buffer, "%d", alive[r]);
-                        
-                        bufp = STRLCPY(bufp, buffer, size);
+                        sbs_strcat(&sbs, buffer);
 
                         k = 0;
                         l = r + 1;
@@ -3569,7 +3566,6 @@ static int battle_report(battle * b)
                 komma = true;
             }
         }
-        *bufp = 0;
         fbattlerecord(b, fac, buf);
     }
     return cont;

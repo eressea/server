@@ -103,7 +103,7 @@ static void reduce_weight(unit * u)
     int horses = get_resource(u, get_resourcetype(R_HORSE));
 
     if (horses > 0) {
-        horses = MIN(horses, (u->number * 2));
+        if (horses > u->number * 2) horses = u->number * 2;
         change_resource(u, get_resourcetype(R_HORSE), -horses);
     }
 

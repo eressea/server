@@ -2301,7 +2301,7 @@ int follow_ship(unit * u, order * ord)
 
     moves = 1;
 
-    speed = (int)getuint();
+    speed = getuint();
     if (speed == 0) {
         speed = shipspeed(u->ship, u);
     }
