@@ -418,11 +418,26 @@ static void test_study_magic(CuTest *tc) {
 }
 
 static void test_study_cost_magic(CuTest *tc) {
+    unit * u;
+    const struct item_type *itype;
+
     test_setup();
-    config_set("skills.cost.magic", "50");
-    CuAssertIntEquals(tc, 50, study_cost(NULL, SK_MAGIC));
+    itype = test_create_silver();
+    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+
+    CuAssertIntEquals(tc, 100, study_cost(u, SK_MAGIC));
+    set_level(u, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, 200, study_cost(u, SK_MAGIC));
+    set_level(u, SK_MAGIC, 2);
+    CuAssertIntEquals(tc, 350, study_cost(u, SK_MAGIC));
+    set_level(u, SK_MAGIC, 29);
+    CuAssertIntEquals(tc, 23300, study_cost(u, SK_MAGIC));
+    set_level(u, SK_MAGIC, 27);
+    CuAssertIntEquals(tc, 20350, study_cost(u, SK_MAGIC));
+
     config_set("skills.cost.magic", "100");
-    CuAssertIntEquals(tc, 100, study_cost(NULL, SK_MAGIC));
+    CuAssertIntEquals(tc, 2*20350, study_cost(u, SK_MAGIC));
+
     test_teardown();
 }
 
