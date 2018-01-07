@@ -419,10 +419,8 @@ static void test_study_magic(CuTest *tc) {
 
 static void test_study_cost_magic(CuTest *tc) {
     unit * u;
-    const struct item_type *itype;
 
     test_setup();
-    itype = test_create_silver();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
 
     CuAssertIntEquals(tc, 100, study_cost(u, SK_MAGIC));

@@ -2065,12 +2065,12 @@ void report_battle_start(battle * b)
             }
         }
         if (first) {
-            sbs_strcpy(&sbs, " ");
-            sbs_strcpy(&sbs, LOC(f->locale, "and"));
-            sbs_strcpy(&sbs, " ");
+            sbs_strcat(&sbs, " ");
+            sbs_strcat(&sbs, LOC(f->locale, "and"));
+            sbs_strcat(&sbs, " ");
         }
         if (lastf) {
-            sbs_strcpy(&sbs, lastf);
+            sbs_strcat(&sbs, lastf);
         }
 
         m = msg_message("start_battle", "factions", zText);
