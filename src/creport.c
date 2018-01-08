@@ -513,9 +513,9 @@ static void report_crtypes(FILE * F, const struct locale *lang)
             const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
             if (nrt) {
                 char buffer[DISPLAYSIZE];
-                unsigned int hash = kmt->mtype->key;
+                int hash = (int)kmt->mtype->key;
                 assert(hash > 0);
-                fprintf(F, "MESSAGETYPE %u\n", hash);
+                fprintf(F, "MESSAGETYPE %d\n", hash);
                 fputc('\"', F);
                 fputs(str_escape(nrt_string(nrt), buffer, sizeof(buffer)), F);
                 fputs("\";text\n", F);
@@ -530,11 +530,11 @@ static void report_crtypes(FILE * F, const struct locale *lang)
     }
 }
 
-static unsigned int messagehash(const struct message *msg)
+static int message_id(const struct message *msg)
 {
     variant var;
     var.v = (void *)msg;
-    return (unsigned int)var.i;
+    return var.i & 0x7FFFFFFF;
 }
 
 /** writes a quoted string to the file
@@ -580,7 +580,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
         char nrbuffer[1024 * 32];
         nrbuffer[0] = '\0';
         if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f) > 0) {
-            fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
+            fprintf(F, "MESSAGE %d\n", message_id(m->msg));
             fprintf(F, "%u;type\n", hash);
             fwritestr(F, nrbuffer);
             fputs(";rendered\n", F);
@@ -591,7 +591,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
         if (cr_render(m->msg, crbuffer, (const void *)f) == 0) {
             if (crbuffer[0]) {
                 if (!printed) {
-                    fprintf(F, "MESSAGE %u\n", messagehash(m->msg));
+                    fprintf(F, "MESSAGE %d\n", message_id(m->msg));
                 }
                 fputs(crbuffer, F);
             }
@@ -814,7 +814,7 @@ void cr_output_unit(stream *out, const faction * f,
         }
         mage = get_familiar_mage(u);
         if (mage) {
-            stream_printf(out, "%u;familiarmage\n", mage->no);
+            stream_printf(out, "%d;familiarmage\n", mage->no);
         }
     }
 
