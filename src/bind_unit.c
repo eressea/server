@@ -49,14 +49,18 @@
 #include <limits.h>
 
 static int tolua_bufunit(lua_State * L) {
-    char buf[8192];
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int mode = (int)tolua_tonumber(L, 2, (int)seen_unit);
-    if (!self)  return 0;
-
-    bufunit(self->faction, self, 0, mode, buf, sizeof(buf));
-    tolua_pushstring(L, buf);
-    return 1;
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    if (u) {
+        faction *f = (faction *)tolua_tousertype(L, 2, u->faction);
+        if (f) {
+            char buf[8192];
+            int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
+            bufunit(f, u, 0, mode, buf, sizeof(buf));
+            tolua_pushstring(L, buf);
+            return 1;
+        }
+    }
+    return 0;
 
 }
 
