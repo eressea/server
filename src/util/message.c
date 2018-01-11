@@ -213,6 +213,7 @@ static unsigned int mt_id(const message_type * mtype)
     size_t i = strlen(mtype->name);
 
     while (i > 0) {
+        /* TODO: why not use str_hash? */
         key = (mtype->name[--i] + key * 37);
     }
     return key % 0x7FFFFFFF;

@@ -55,7 +55,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include <attributes/key.h>
-#include <attributes/fleechance.h>
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
 #include <attributes/moved.h>
@@ -2330,7 +2329,6 @@ static double horse_fleeing_bonus(const unit * u)
 double fleechance(unit * u)
 {
     double c = 0.20;              /* Fluchtwahrscheinlichkeit in % */
-    attrib *a = a_find(u->attribs, &at_fleechance);
     /* Einheit u versucht, dem Get�mmel zu entkommen */
 
     c += (effskill(u, SK_STEALTH, 0) * 0.05);
@@ -2343,11 +2341,12 @@ double fleechance(unit * u)
     else {
         c = fmin(c, 0.75);
     }
-
+#if 0
+    /* TODO: mistletoe */
     if (a) {
         c += a->data.flt;
     }
-
+#endif
     return c;
 }
 
@@ -3362,6 +3361,8 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     fighter *c = NULL;
 
     if (!attack) {
+#if 0
+        /* TODO: mistletoe */
         attrib *a = a_find(u->attribs, &at_fleechance);
         if (a != NULL) {
             if (rng_double() <= a->data.flt) {
@@ -3369,6 +3370,7 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
                 return false;
             }
         }
+#endif
     }
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {

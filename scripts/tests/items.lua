@@ -11,7 +11,7 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
-function test_mistletoe_okay()
+function disable_test_mistletoe_okay()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
@@ -27,7 +27,7 @@ function test_mistletoe_okay()
     turn_end()
 end
 
-function test_mistletoe_fail()
+function disable_test_mistletoe_fail()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)

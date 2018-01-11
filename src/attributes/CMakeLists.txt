@@ -7,7 +7,6 @@ otherfaction.test.c
 
 SET(_FILES
 attributes.c
-fleechance.c
 follow.c
 hate.c
 iceberg.c

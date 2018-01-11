@@ -140,7 +140,8 @@ int study_cost(struct unit *u, skill_t sk)
         int next_level = 1 + (u ? get_level(u, sk) : 0);
         /* Die Magiekosten betragen 50+Summe(50*Stufe) */
         /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
-        cost = 50 * (1 + ((next_level + 1) * next_level / 2));
+        cost = config_get_int("skills.cost.magic", 50);
+        return cost * (1 + ((next_level + next_level * next_level) / 2));
     }
     else switch (sk) {
     case SK_SPY:

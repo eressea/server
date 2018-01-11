@@ -11,8 +11,6 @@
 #include "economy.h"
 #include "magic.h"
 
-#include <attributes/fleechance.h>
-
 #include <spells/shipcurse.h>
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
@@ -387,7 +385,10 @@ use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         user->number);
+#if 0
+    /* TODO: mistletoe */
     a_add(&user->attribs, make_fleechance((float)1.0));
+#endif
     ADDMSG(&user->faction->msgs,
         msg_message("use_item", "unit item", user, itype->rtype));
 

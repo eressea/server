@@ -253,7 +253,7 @@ static void test_set_email(CuTest *tc) {
     test_teardown();
 }
 
-static void test_items_notlost(CuTest *tc) {
+static void test_save_special_items(CuTest *tc) {
     unit *u, *ug;
     race * rc;
     struct item_type *itype, *it_silver, *it_horse;
@@ -266,16 +266,21 @@ static void test_items_notlost(CuTest *tc) {
     rc = test_create_race("template");
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     i_change(&u->items, itype, 1);
+
+    /* when there is no monster in the region, a ghost of the dead unit is created: */
     save_special_items(u);
     CuAssertPtrNotNull(tc, u->next);
     ug = u->next;
     CuAssertPtrEquals(tc, NULL, ug->next);
     CuAssertPtrEquals(tc, rc, (void *)ug->_race);
+    CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertIntEquals(tc, 1, i_get(ug->items, itype));
     CuAssertStrEquals(tc, "ghost", get_racename(ug->attribs));
+    CuAssertStrEquals(tc, u->_name, ug->_name);
 
     i_change(&u->items, itype, 1);
+    /* when there is a monster, it takes all special items: */
     save_special_items(u);
     CuAssertPtrEquals(tc, NULL, ug->next);
     CuAssertIntEquals(tc, 2, i_get(ug->items, itype));
@@ -284,6 +289,7 @@ static void test_items_notlost(CuTest *tc) {
     i_change(&u->items, itype, 1);
     i_change(&u->items, it_horse, 5);
     i_change(&u->items, it_silver, 10);
+    /* horses and money need to go to the region and are not taken: */
     save_special_items(u);
     CuAssertIntEquals(tc, 3, i_get(ug->items, itype));
     CuAssertIntEquals(tc, 5, i_get(u->items, it_horse));
@@ -306,6 +312,6 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
-    SUITE_ADD_TEST(suite, test_items_notlost);
+    SUITE_ADD_TEST(suite, test_save_special_items);
     return suite;
 }

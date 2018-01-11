@@ -1,7 +1,11 @@
 #include <platform.h>
-#include <kernel/config.h>
+#include "faction.h"
+#include "unit.h"
 #include "race.h"
 #include "item.h"
+
+#include <util/language.h>
+#include <attributes/raceprefix.h>
 
 #include <tests.h>
 #include <CuTest.h>
@@ -151,6 +155,23 @@ static void test_rc_can_use(CuTest *tc) {
     test_teardown();
 }
 
+static void test_racename(CuTest *tc) {
+    unit *u;
+    struct locale * lang;
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->faction->locale = lang = test_create_locale();
+    locale_setstring(lang, "race::human_p", "Menschen");
+    locale_setstring(lang, "race::human", "Mensch");
+    locale_setstring(lang, "prefix::dark", "Dunkel");
+    CuAssertStrEquals(tc, "Mensch", racename(lang, u, u->_race));
+    u->number = 2;
+    CuAssertStrEquals(tc, "Menschen", racename(lang, u, u->_race));
+    set_prefix(&u->faction->attribs, "dark");
+    CuAssertStrEquals(tc, "Dunkelmenschen", racename(lang, u, u->_race));
+    test_teardown();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -161,6 +182,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_rc_find);
     SUITE_ADD_TEST(suite, test_rc_set_param);
     SUITE_ADD_TEST(suite, test_rc_can_use);
+    SUITE_ADD_TEST(suite, test_racename);
     return suite;
 }
 
