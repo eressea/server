@@ -2328,29 +2328,29 @@ static double horse_fleeing_bonus(const unit * u)
 
 double fleechance(unit * u)
 {
-    double c = 0.20;              /* Fluchtwahrscheinlichkeit in % */
+    double p = 0.20;              /* Fluchtwahrscheinlichkeit in % */
     /* Einheit u versucht, dem Get�mmel zu entkommen */
 
-    c += (effskill(u, SK_STEALTH, 0) * 0.05);
-    c += horse_fleeing_bonus(u);
+    p += (effskill(u, SK_STEALTH, 0) * 0.05);
+    p += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
-        c += 0.20;
-        c = fmin(c, 0.90);
-    }
-    else {
-        c = fmin(c, 0.75);
+        p += 0.20;
+        if (p > 0.9) {
+            p = 0.9;
+        }
     }
 #if 0
     /* TODO: mistletoe */
-    if (a) {
-        c += a->data.flt;
+    c = get_curse(u->attribs, &ct_fleechance);
+    if (c) {
+        p += c->effect;
     }
 #endif
-    return c;
+    return p;
 }
 
-/** add a new army to the conflict
+/** add a new army to the conflict.
  * beware: armies need to be added _at the beginning_ of the list because
  * otherwise join_allies() will get into trouble */
 side *make_side(battle * b, const faction * f, const group * g,
@@ -3358,7 +3358,7 @@ fighter * get_fighter(battle * b, const struct unit * u)
 static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     side *s;
-    fighter *c = NULL;
+    fighter *fc = NULL;
 
     if (!attack) {
 #if 0
@@ -3378,7 +3378,7 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
         if (s->faction == u->faction) {
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->unit == u) {
-                    c = fig;
+                    fc = fig;
                     if (attack) {
                         set_attacker(fig);
                     }
@@ -3387,11 +3387,11 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
             }
         }
     }
-    if (!c) {
+    if (!fc) {
         *cp = make_fighter(b, u, NULL, attack);
         return *cp != NULL;
     }
-    *cp = c;
+    *cp = fc;
     return false;
 }
 
