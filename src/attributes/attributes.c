@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include "follow.h"
-#include "fleechance.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
