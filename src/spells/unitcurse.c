@@ -345,9 +345,16 @@ const struct curse_type ct_skillmod = {
     NULL, read_skill, write_skill
 };
 
+const struct curse_type ct_fleechance = {
+    "fleechance",
+    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    NULL, NULL, NULL, NULL, NULL
+};
+
 /* ------------------------------------------------------------- */
 void register_unitcurse(void)
 {
+    ct_register(&ct_fleechance);
     ct_register(&ct_auraboost);
     ct_register(&ct_magicboost);
     ct_register(&ct_slavery);

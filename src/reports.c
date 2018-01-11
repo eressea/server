@@ -953,10 +953,10 @@ struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
             { "unit_unknown", "region_unknown", "building_unknown",
             "ship_unknown" };
             msg = msg_message(mkname("curseinfo", unknown[typ]), "id", c->no);
-            log_error("no curseinfo function for %s and no fallback either.\n", c->type->cname);
+            log_warning("no curseinfo function for %s and no fallback either.\n", c->type->cname);
         }
         else {
-            log_error("no curseinfo function for %s, using cinfo_simple fallback.\n", c->type->cname);
+            log_debug("no curseinfo function for %s, using cinfo_simple fallback.\n", c->type->cname);
         }
         return msg;
     }
