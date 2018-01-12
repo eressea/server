@@ -2252,17 +2252,17 @@ static void display_item(unit * u, const item_type * itype)
         itype->weight, itype->rtype, info));
 }
 
-static void display_potion(unit * u, const potion_type * ptype)
+static void display_potion(unit * u, const item_type * itype)
 {
     faction * f = u->faction;
     attrib *a;
 
     a = a_find(f->attribs, &at_showitem);
-    while (a && a->data.v != ptype)
+    while (a && a->data.v != itype)
         a = a->next;
     if (!a) {
         a = a_add(&f->attribs, a_new(&at_showitem));
-        a->data.v = (void *)ptype->itype;
+        a->data.v = (void *)itype;
     }
 }
 
@@ -2429,21 +2429,16 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             err = 36; /* we do not have this item? */
             if (i <= 0) {
                 /* we don't have the item, but it may be a potion that we know */
-                const potion_type *ptype = resource2potion(item2resource(itype));
-                if (ptype) {
-                    if (2 * ptype->level > effskill(u, SK_ALCHEMY, 0)) {
-                        itype = NULL;
-                    }
-                } else {
+                int level = potion_level(itype);
+                if (2 * level > effskill(u, SK_ALCHEMY, 0)) {
                     itype = NULL;
                 }
             }
         }
 
         if (itype) {
-            const potion_type *ptype = itype->rtype->ptype;
-            if (ptype) {
-                display_potion(u, ptype);
+            if (itype->flags & ITF_POTION) {
+                display_potion(u, itype);
             }
             else {
                 display_item(u, itype);
@@ -2471,26 +2466,30 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
       cmistake(u, ord, err, MSG_EVENT);
 }
 
+bool display_potions(unit *u)
+{
+    int skill = effskill(u, SK_ALCHEMY, 0);
+    int c = 0;
+    const potion_type *ptype;
+    for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
+        if (ptype->level * 2 <= skill) {
+            display_potion(u, ptype);
+            ++c;
+        }
+    }
+    return (c > 0);
+}
+
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)
 {
-    int skill, c;
-    const potion_type *ptype;
-
     switch (p) {
     case P_ZAUBER:
         a_removeall(&u->faction->attribs, &at_seenspell);
         break;
     case P_POTIONS:
-        skill = effskill(u, SK_ALCHEMY, 0);
-        c = 0;
-        for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
-            if (ptype->level * 2 <= skill) {
-                display_potion(u, ptype);
-                ++c;
-            }
-        }
-        if (c == 0)
+        if (!display_potions(u)) {
             cmistake(u, ord, 285, MSG_EVENT);
+        }
         break;
     case NOPARAM:
         reshow_other(u, ord, s);

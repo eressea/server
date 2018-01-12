@@ -101,11 +101,11 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
 
 static void test_scale_number(CuTest *tc) {
     unit *u;
-    const struct potion_type *ptype;
+    const struct item_type *ptype;
 
     test_setup();
     test_create_world();
-    ptype = new_potiontype(it_get_or_create(rt_get_or_create("hodor")), 1);
+    ptype = it_get_or_create(rt_get_or_create("hodor"));
     u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
     change_effect(u, ptype, 1);
     u->hp = 35;

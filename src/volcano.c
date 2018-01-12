@@ -133,8 +133,8 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
                     change_effect(u, oldpotiontype[P_HEAL], -1);
                     heiltrank = 1;
                 }
-                else if (i_get(u->items, oldpotiontype[P_HEAL]->itype) > 0) {
-                    i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
+                else if (i_get(u->items, oldpotiontype[P_HEAL]) > 0) {
+                    i_change(&u->items, oldpotiontype[P_HEAL], -1);
                     change_effect(u, oldpotiontype[P_HEAL], 3);
                     heiltrank = 1;
                 }
