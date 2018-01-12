@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_ALCHEMY_H
 #define H_KRNL_ALCHEMY_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,8 +70,9 @@ extern "C" {
     int get_effect(const struct unit *u, const struct item_type *effect);
     int change_effect(struct unit *u, const struct item_type *effect,
         int value);
+    bool display_potions(struct unit *u);
 
-    /* rausnehmen, sobald man attribute splitten kann: */
+    /* TODO: rausnehmen, sobald man attribute splitten kann: */
     typedef struct effect_data {
         const struct item_type *type;
         int value;

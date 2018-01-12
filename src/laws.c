@@ -2234,6 +2234,10 @@ int send_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+static void display_potion(unit * u, const item_type * itype) {
+    show_item(u, itype);
+}
+
 static void display_item(unit * u, const item_type * itype)
 {
     faction * f = u->faction;
@@ -2250,20 +2254,6 @@ static void display_item(unit * u, const item_type * itype)
     }
     ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
         itype->weight, itype->rtype, info));
-}
-
-static void display_potion(unit * u, const item_type * itype)
-{
-    faction * f = u->faction;
-    attrib *a;
-
-    a = a_find(f->attribs, &at_showitem);
-    while (a && a->data.v != itype)
-        a = a->next;
-    if (!a) {
-        a = a_add(&f->attribs, a_new(&at_showitem));
-        a->data.v = (void *)itype;
-    }
 }
 
 static void display_race(unit * u, const race * rc)
@@ -2464,20 +2454,6 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
     }
     if (!found)
       cmistake(u, ord, err, MSG_EVENT);
-}
-
-bool display_potions(unit *u)
-{
-    int skill = effskill(u, SK_ALCHEMY, 0);
-    int c = 0;
-    const potion_type *ptype;
-    for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
-        if (ptype->level * 2 <= skill) {
-            display_potion(u, ptype);
-            ++c;
-        }
-    }
-    return (c > 0);
 }
 
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)

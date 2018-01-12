@@ -980,3 +980,18 @@ void register_resources(void)
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
 }
+
+void show_item(unit * u, const item_type * itype)
+{
+    faction * f = u->faction;
+    attrib *a;
+
+    a = a_find(f->attribs, &at_showitem);
+    while (a && a->data.v != itype)
+        a = a->next;
+    if (!a) {
+        a = a_add(&f->attribs, a_new(&at_showitem));
+        a->data.v = (void *)itype;
+    }
+}
+
