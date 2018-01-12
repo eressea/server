@@ -2414,26 +2414,22 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
 
         if (itype) {
             /* if this is a potion, we need the right alchemy skill */
-            int i = i_get(u->items, itype);
-            
             err = 36; /* we do not have this item? */
-            if (i <= 0 && (itype->flags & ITF_POTION)) {
+            if (itype->flags & ITF_POTION) {
                 /* we don't have the item, but it is a potion. do we know it? */
                 int level = potion_level(itype);
-                if (level > 0 && 2 * level > effskill(u, SK_ALCHEMY, 0)) {
-                    itype = NULL;
+                if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, 0)) {
+                    display_potion(u, itype);
+                    found = true;
                 }
             }
-        }
-
-        if (itype) {
-            if (itype->flags & ITF_POTION) {
-                display_potion(u, itype);
-            }
             else {
-                display_item(u, itype);
+                int i = i_get(u->items, itype);
+                if (i > 0) {
+                    found = true;
+                    display_item(u, itype);
+                }
             }
-            found = true;
         }
 
         if (sp) {
