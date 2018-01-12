@@ -281,7 +281,7 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
         return result;
     }
     lua_pop(L, 1);
-    if (itype->rtype->ptype) {
+    if (itype->flags & ITF_POTION) {
         return use_potion(u, itype, amount, ord);
     } else {
         log_error("no such callout: %s", fname);

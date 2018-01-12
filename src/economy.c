@@ -1233,14 +1233,14 @@ void split_allocations(region * r)
     allocations = NULL;
 }
 
-static void create_potion(unit * u, const potion_type * ptype, int want)
+static void create_potion(unit * u, const item_type * itype, int want)
 {
     int built;
 
     if (want == 0) {
-        want = maxbuild(u, ptype->itype->construction);
+        want = maxbuild(u, itype->construction);
     }
-    built = build(u, ptype->itype->construction, 0, want, 0);
+    built = build(u, itype->construction, 0, want, 0);
     switch (built) {
     case ELOWSKILL:
     case ENEEDSKILL:
@@ -1253,16 +1253,16 @@ static void create_potion(unit * u, const potion_type * ptype, int want)
     case ENOMATERIALS:
         /* something missing from the list of materials */
         ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
-            ptype->itype->construction, want));
+            itype->construction, want));
         return;
         break;
     default:
-        i_change(&u->items, ptype->itype, built);
+        i_change(&u->items, itype, built);
         if (want == INT_MAX)
             want = built;
         ADDMSG(&u->faction->msgs, msg_message("produce",
             "unit region amount wanted resource", u, u->region, built, want,
-            ptype->itype->rtype));
+            itype->rtype));
         break;
     }
 }
@@ -1277,11 +1277,12 @@ void make_item(unit * u, const item_type * itype, int want)
         allocate_resource(u, itype->rtype, want);
     }
     else {
-        const potion_type *ptype = resource2potion(itype->rtype);
-        if (ptype != NULL)
-            create_potion(u, ptype, want);
-        else if (itype->construction && itype->construction->materials)
+        if (itype->flags & ITF_POTION) {
+            create_potion(u, itype, want);
+        }
+        else if (itype->construction && itype->construction->materials) {
             manufacture(u, itype, want);
+        }
         else {
             ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                 "error_cannotmake", ""));

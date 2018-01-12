@@ -1298,11 +1298,11 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
-        if (i_get(du->items, oldpotiontype[P_HEAL]->itype) > 0) {
+        if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
             message *m = msg_message("potionsave", "unit", du);
             battle_message_faction(b, du->faction, m);
             msg_release(m);
-            i_change(&du->items, oldpotiontype[P_HEAL]->itype, -1);
+            i_change(&du->items, oldpotiontype[P_HEAL], -1);
             fset(&df->person[dt.index], FL_HEALING_USED);
             df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
             return false;

@@ -60,7 +60,6 @@ static critbit_tree inames[MAXLOCALES];
 static critbit_tree rnames[MAXLOCALES];
 static critbit_tree cb_resources;
 luxury_type *luxurytypes;
-potion_type *potiontypes;
 
 #define RTYPENAMELEN 24
 typedef struct rt_entry {
@@ -315,28 +314,8 @@ armor_type *new_armortype(item_type * itype, double penalty, variant magres,
     return atype;
 }
 
-static void pt_register(potion_type * ptype)
+void it_set_appearance(item_type *itype, const char *appearance)
 {
-    ptype->itype->rtype->ptype = ptype;
-    ptype->next = potiontypes;
-    potiontypes = ptype;
-}
-
-potion_type *new_potiontype(item_type * itype, int level)
-{
-    potion_type *ptype;
-
-    assert(resource2potion(itype->rtype) == NULL);
-
-    ptype = (potion_type *)calloc(sizeof(potion_type), 1);
-    ptype->itype = itype;
-    ptype->level = level;
-    pt_register(ptype);
-
-    return ptype;
-}
-
-void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
@@ -374,18 +353,6 @@ const luxury_type *resource2luxury(const resource_type * rtype)
     return NULL;
 #else
     return rtype->ltype;
-#endif
-}
-
-const potion_type *resource2potion(const resource_type * rtype)
-{
-#ifdef AT_PTYPE
-    attrib *a = a_find(rtype->attribs, &at_ptype);
-    if (a)
-        return (const potion_type *)a->data.v;
-    return NULL;
-#else
-    return rtype->ptype;
 #endif
 }
 
@@ -573,7 +540,7 @@ item *i_new(const item_type * itype, int size)
     return i;
 }
 
-const potion_type *oldpotiontype[MAX_POTIONS + 1];
+const item_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
 
@@ -677,7 +644,7 @@ static void init_oldpotions(void)
     for (p = 0; p != MAX_POTIONS; ++p) {
         item_type *itype = it_find(potionnames[p]);
         if (itype != NULL) {
-            oldpotiontype[p] = itype->rtype->ptype;
+            oldpotiontype[p] = itype;
         }
     }
 }

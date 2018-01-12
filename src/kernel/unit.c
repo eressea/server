@@ -585,7 +585,7 @@ attrib_type at_potionuser = {
     NO_READ
 };
 
-void usetpotionuse(unit * u, const potion_type * ptype)
+void usetpotionuse(unit * u, const item_type * ptype)
 {
     attrib *a = a_find(u->attribs, &at_potionuser);
     if (!a)
@@ -593,12 +593,12 @@ void usetpotionuse(unit * u, const potion_type * ptype)
     a->data.v = (void *)ptype;
 }
 
-const potion_type *ugetpotionuse(const unit * u)
+const item_type *ugetpotionuse(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_potionuser);
     if (!a)
         return NULL;
-    return (const potion_type *)a->data.v;
+    return (const item_type *)a->data.v;
 }
 
 /*********************/

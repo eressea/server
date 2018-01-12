@@ -268,7 +268,7 @@ static int use_foolpotion(unit *u, const item_type *itype, int amount,
     ADDMSG(&u->faction->msgs, msg_message("givedumb",
         "unit recipient amount", u, target, amount));
 
-    change_effect(target, itype->rtype->ptype, amount);
+    change_effect(target, itype, amount);
     use_pooled(u, itype->rtype, GET_DEFAULT, amount);
     return 0;
 }
@@ -278,7 +278,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
-        change_effect(u, itype->rtype->ptype, 100 * amount);
+        change_effect(u, itype, 100 * amount);
     }
     else {
         const race *irace = u_irace(u);
@@ -302,7 +302,7 @@ struct order *ord)
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(u, itype->rtype->ptype);
+    usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
         "unit potion", u, itype->rtype));
@@ -335,7 +335,7 @@ struct order *ord)
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(user, itype->rtype->ptype);
+    usetpotionuse(user, itype);
 
     ADDMSG(&user->faction->msgs, msg_message("usepotion",
         "unit potion", user, itype->rtype));
@@ -408,7 +408,7 @@ static int use_warmthpotion(unit *u, const item_type *itype,
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(u, itype->rtype->ptype);
+    usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
         "unit potion", u, itype->rtype));

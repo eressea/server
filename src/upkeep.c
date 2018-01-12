@@ -245,26 +245,22 @@ void get_food(region * r)
             int hungry = u->number;
 
             /* use peasantblood before eating the peasants themselves */
-            const struct potion_type *pt_blood = 0;
-            const resource_type *rt_blood = rt_find("peasantblood");
-            if (rt_blood) {
-                pt_blood = rt_blood->ptype;
-            }
-            if (pt_blood) {
+            const struct item_type *it_blood = it_find("peasantblood");
+            if (it_blood) {
                 /* always start with the unit itself, then the first known unit that may have some blood */
                 unit *donor = u;
                 while (donor != NULL && hungry > 0) {
-                    int blut = get_effect(donor, pt_blood);
+                    int blut = get_effect(donor, it_blood);
                     if (hungry < blut) blut = hungry;
                     if (blut > 0) {
-                        change_effect(donor, pt_blood, -blut);
+                        change_effect(donor, it_blood, -blut);
                         hungry -= blut;
                     }
                     if (donor == u)
                         donor = r->units;
                     while (donor != NULL) {
                         if (u_race(donor) == rc_demon && donor != u) {
-                            if (get_effect(donor, pt_blood)) {
+                            if (get_effect(donor, it_blood)) {
                                 /* if he's in our faction, drain him: */
                                 if (donor->faction == u->faction)
                                     break;
