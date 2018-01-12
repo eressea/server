@@ -276,6 +276,10 @@ extern "C" {
     } resource_t;
 
     extern const struct item_type *oldpotiontype[];
+    extern struct attrib_type at_showitem;        /* show this potion's description */
+
+    void show_item(struct unit * u, const struct item_type * itype);
+
     const struct resource_type *get_resourcetype(resource_t rt);
     struct item *item_spoil(const struct race *rc, int size);
 
@@ -284,8 +288,6 @@ extern "C" {
     int get_money(const struct unit *);
     int set_money(struct unit *, int);
     int change_money(struct unit *, int);
-
-    extern struct attrib_type at_showitem;        /* show this potion's description */
 
     void register_resources(void);
     void init_resources(void);

@@ -32,6 +32,8 @@ without prior permission by the authors of Eressea.
 #include "prefix.h"
 #include "move.h"
 
+/* TODO: core code should not include these files: */
+#include "alchemy.h"
 #include "vortex.h"
 
 #include <modules/score.h>
@@ -483,12 +485,11 @@ static int parse_ships(xmlDocPtr doc)
     return 0;
 }
 
-static potion_type *xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
+static void xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
 {
     int level = xml_ivalue(xpath->node, "level", 0);
 
-    assert(level > 0);
-    return new_potiontype(itype, level);
+    new_potiontype(itype, level);
 }
 
 static luxury_type *xml_readluxury(xmlXPathContextPtr xpath, item_type * itype)
@@ -741,7 +742,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             itype->flags |= ITF_CANUSE;
         }
         xpath->node = result->nodesetval->nodeTab[0];
-        rtype->ptype = xml_readpotion(xpath, itype);
+        xml_readpotion(xpath, itype);
     }
     xmlXPathFreeObject(result);
 

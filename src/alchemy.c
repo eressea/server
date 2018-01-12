@@ -434,3 +434,17 @@ int change_effect(unit * u, const item_type * effect, int delta)
     log_error("change effect with delta==0 for unit %s\n", itoa36(u->no));
     return 0;
 }
+
+bool display_potions(struct unit *u)
+{
+    int skill = effskill(u, SK_ALCHEMY, 0);
+    int c = 0;
+    const potion_type *ptype;
+    for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
+        if (ptype->level * 2 <= skill) {
+            show_item(u, ptype->itype);
+            ++c;
+        }
+    }
+    return (c > 0);
+}
