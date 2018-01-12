@@ -2417,10 +2417,10 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             int i = i_get(u->items, itype);
             
             err = 36; /* we do not have this item? */
-            if (i <= 0) {
-                /* we don't have the item, but it may be a potion that we know */
+            if (i <= 0 && (itype->flags & ITF_POTION)) {
+                /* we don't have the item, but it is a potion. do we know it? */
                 int level = potion_level(itype);
-                if (2 * level > effskill(u, SK_ALCHEMY, 0)) {
+                if (level > 0 && 2 * level > effskill(u, SK_ALCHEMY, 0)) {
                     itype = NULL;
                 }
             }
@@ -2452,8 +2452,9 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             found = true;
         }
     }
-    if (!found)
-      cmistake(u, ord, err, MSG_EVENT);
+    if (!found) {
+        cmistake(u, ord, err, MSG_EVENT);
+    }
 }
 
 static void reshow(unit * u, struct order *ord, const char *s, param_t p)
