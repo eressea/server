@@ -84,6 +84,9 @@ static void test_sabotage_self(CuTest *tc) {
     order *ord;
 
     test_setup();
+    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", 0));
+    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", 0));
+    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", 0));
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -94,6 +97,7 @@ static void test_sabotage_self(CuTest *tc) {
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "sink_msg"));
     free_order(ord);
     test_teardown();
 }
@@ -106,6 +110,11 @@ static void test_sabotage_other_fail(CuTest *tc) {
     message *msg;
 
     test_setup();
+    mt_register(mt_new_va("destroy_ship_0", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_1", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_2", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_3", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_4", "ship:ship", 0));
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -189,6 +198,9 @@ static void test_sabotage_other_success(CuTest *tc) {
     order *ord;
 
     test_setup();
+    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", 0));
+    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", 0));
+    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", 0));
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);

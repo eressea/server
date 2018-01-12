@@ -726,6 +726,7 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
     UNUSED_ARG(obj);
 
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
+    /* TODO: this is never NULL, because of the missing_message logic (used in many tests) */
     if (msg == NULL) {
         log_error("There is no curseinfo for %s.\n", c->type->cname);
     }

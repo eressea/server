@@ -161,12 +161,14 @@ message *msg_message(const char *name, const char *sig, ...)
 
     if (!mtype) {
         log_warning("trying to create message of unknown type \"%s\"\n", name);
+#if 0
         if (strcmp(name, "missing_message") != 0) {
             if (!mt_find("missing_message")) {
                 mt_register(mt_new_va("missing_message", "name:string", 0));
             }
             return msg_message("missing_message", "name", name);
         }
+#endif
         return NULL;
     }
 

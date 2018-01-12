@@ -279,6 +279,10 @@ void setup_drift (struct drift_fixture *fix) {
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->sh);
+
+    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", 0));
+    mt_register(mt_new_va("shipsink", "ship:ship", 0));
+    mt_register(mt_new_va("massive_overload", "ship:ship", 0));
 }
 
 static void test_ship_no_overload(CuTest *tc) {

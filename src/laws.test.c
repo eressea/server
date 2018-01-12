@@ -255,9 +255,9 @@ static void test_force_leave_buildings(CuTest *tc) {
     region *r;
     unit *u1, *u2, *u3;
     building * b;
-    message *msg;
 
     test_setup();
+    mt_register(mt_new_va("force_leave_building", "unit:unit", "owner:unit", "building:building", NULL));
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(u1->faction, r);
@@ -271,8 +271,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     CuAssertPtrEquals_Msg(tc, "owner should not be forced to leave", b, u1->building);
     CuAssertPtrEquals_Msg(tc, "same faction should not be forced to leave", b, u2->building);
     CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u3->building);
-    msg = test_get_last_message(u3->faction->msgs);
-    CuAssertStrEquals(tc, "force_leave_building", test_get_messagetype(msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u3->faction->msgs, "force_leave_building"));
 
     u_set_building(u3, b);
     al = ally_add(&u1->faction->allies, u3->faction);
@@ -286,9 +285,9 @@ static void test_force_leave_ships(CuTest *tc) {
     region *r;
     unit *u1, *u2;
     ship *sh;
-    message *msg;
 
     test_setup();
+    mt_register(mt_new_va("force_leave_ship", "unit:unit", "owner:unit", "ship:ship", NULL));
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -298,8 +297,7 @@ static void test_force_leave_ships(CuTest *tc) {
     ship_set_owner(u1);
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "non-allies should be forced to leave", NULL, u2->ship);
-    msg = test_get_last_message(u2->faction->msgs);
-    CuAssertStrEquals(tc, "force_leave_ship", test_get_messagetype(msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_ship"));
     test_teardown();
 }
 
@@ -1590,9 +1588,9 @@ static void test_demon_hunger(CuTest * tc)
     race *rc;
     faction *f;
     unit *u;
-    message* msg;
 
     test_setup();
+    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", NULL));
     init_resources();
     r = test_create_region(0, 0, 0);
     rc = test_create_race("demon");
@@ -1617,8 +1615,7 @@ static void test_demon_hunger(CuTest * tc)
     get_food(r);
 
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
-    msg = test_get_last_message(u->faction->msgs);
-    CuAssertStrEquals(tc, "malnourish", test_get_messagetype(msg));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "malnourish"));
 
     test_teardown();
 }

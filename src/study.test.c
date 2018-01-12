@@ -625,6 +625,8 @@ static void test_teach_message(CuTest *tc) {
     teaching_info *teach;
 
     test_setup();
+    mt_register(mt_new_va("teach_teacher", "teacher:unit", "student:unit", "skill:int", "level:int", 0));
+    mt_register(mt_new_va("teach_student", "teacher:unit", "student:unit", "skill:int", 0));
     init_resources();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
     scale_number(u, 20);
