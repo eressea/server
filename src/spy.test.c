@@ -33,15 +33,31 @@ typedef struct {
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
-    test_setup();
-    fix->r = test_create_region(0, 0, NULL);
-    fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
-    fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
+    mt_register(mt_new_va("spyreport", "spy:unit", "target:unit", "status:int", 0));
+    mt_register(mt_new_va("spyreport_mage", "spy:unit", "target:unit", "type:int", 0));
+    mt_register(mt_new_va("spyreport_faction", "spy:unit", "target:unit", "faction:faction", 0));
+    mt_register(mt_new_va("spyreport_skills", "spy:unit", "target:unit", "skills:string", 0));
+    mt_register(mt_new_va("spyreport_items", "spy:unit", "target:unit", "items:items", 0));
+    mt_register(mt_new_va("destroy_ship_0", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_1", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_2", "unit:unit", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_3", "ship:ship", 0));
+    mt_register(mt_new_va("destroy_ship_4", "ship:ship", 0));
+    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", 0));
+    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", 0));
+    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", 0));
+
+    if (fix) {
+        fix->r = test_create_region(0, 0, NULL);
+        fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
+        fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
+    }
 }
 
 static void test_simple_spy_message(CuTest *tc) {
     spy_fixture fix;
 
+    test_setup();
     setup_spy(&fix);
 
     spy_message(0, fix.spy, fix.victim);
@@ -55,6 +71,7 @@ static void test_all_spy_message(CuTest *tc) {
     spy_fixture fix;
     item_type *itype;
 
+    test_setup();
     setup_spy(&fix);
 
     enable_skill(SK_MAGIC, true);
@@ -84,9 +101,7 @@ static void test_sabotage_self(CuTest *tc) {
     order *ord;
 
     test_setup();
-    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", 0));
-    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", 0));
-    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", 0));
+    setup_spy(NULL);
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -110,11 +125,8 @@ static void test_sabotage_other_fail(CuTest *tc) {
     message *msg;
 
     test_setup();
-    mt_register(mt_new_va("destroy_ship_0", "unit:unit", "ship:ship", 0));
-    mt_register(mt_new_va("destroy_ship_1", "unit:unit", "ship:ship", 0));
-    mt_register(mt_new_va("destroy_ship_2", "unit:unit", "ship:ship", 0));
-    mt_register(mt_new_va("destroy_ship_3", "ship:ship", 0));
-    mt_register(mt_new_va("destroy_ship_4", "ship:ship", 0));
+    setup_spy(NULL);
+
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
@@ -198,9 +210,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     order *ord;
 
     test_setup();
-    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", 0));
-    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", 0));
-    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", 0));
+    setup_spy(NULL);
     r = test_create_region(0, 0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);

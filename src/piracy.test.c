@@ -12,6 +12,7 @@
 
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -28,6 +29,13 @@ static void setup_piracy(void) {
     test_create_terrain("ocean", SEA_REGION);
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
+
+    mt_register(mt_new_va("piratenovictim", "ship:ship", "unit:unit", "region:region", 0));
+    mt_register(mt_new_va("piratesawvictim", "ship:ship", "unit:unit", "region:region", "dir:int", 0));
+    mt_register(mt_new_va("shipsail", "ship:ship", "from:region", "to:region", 0));
+    mt_register(mt_new_va("shipfly", "ship:ship", "from:region", "to:region", 0));
+    mt_register(mt_new_va("shipnoshore", "ship:ship", "region:region", 0));
+    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", 0));
 }
 
 static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const char *p_shiptype,

@@ -48,6 +48,7 @@ static void create_monsters(unit **up, unit **um) {
     region *r;
     faction *fp, *fm;
 
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
     test_create_horse();
     default_locale = test_create_locale();
     fp = test_create_faction(NULL);

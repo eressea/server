@@ -7,6 +7,8 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
+#include <util/message.h>
+
 #include <magic.h>
 
 #include <CuTest.h>
@@ -27,6 +29,7 @@ static void test_flyingship(CuTest * tc)
     ship *sh1, *sh2;
 
     test_setup();
+    mt_register(mt_new_va("flying_ship_result", "mage:unit", "ship:ship", 0));
 
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;

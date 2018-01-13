@@ -231,6 +231,10 @@ static void test_reset(void) {
     }
     random_source_reset();
 
+    mt_register(mt_new_va("changepasswd", "value:string", 0));
+    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", 0));
+    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", 0));
+
     if (errno) {
         int error = errno;
         errno = 0;

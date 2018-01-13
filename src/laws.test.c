@@ -1297,6 +1297,9 @@ static void test_ally_cmd(CuTest *tc) {
 static void test_nmr_warnings(CuTest *tc) {
     faction *f1, *f2;
     test_setup();
+    mt_register(mt_new_va("nmr_warning", 0));
+    mt_register(mt_new_va("nmr_warning_final", 0));
+    mt_register(mt_new_va("warn_dropout", "faction:faction", "turn:int", 0));
     config_set("nmr.timeout", "3");
     f1 = test_create_faction(0);
     f2 = test_create_faction(0);
@@ -1318,6 +1321,9 @@ static unit * setup_mail_cmd(void) {
     faction *f;
     
     test_setup();
+    mt_register(mt_new_va("regionmessage", "region:region", "sender:unit", "string:string", 0));
+    mt_register(mt_new_va("unitmessage", "region:region", "sender:unit", "string:string", "unit:unit", 0));
+    mt_register(mt_new_va("mail_result", "message:string", "unit:unit", 0));
     f = test_create_faction(0);
     return test_create_unit(f, test_create_region(0, 0, 0));
 }
@@ -1590,7 +1596,6 @@ static void test_demon_hunger(CuTest * tc)
     unit *u;
 
     test_setup();
-    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", NULL));
     init_resources();
     r = test_create_region(0, 0, 0);
     rc = test_create_race("demon");

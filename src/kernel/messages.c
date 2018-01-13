@@ -160,7 +160,7 @@ message *msg_message(const char *name, const char *sig, ...)
     memset(args, 0, sizeof(args));
 
     if (!mtype) {
-        log_warning("trying to create message of unknown type \"%s\"\n", name);
+        log_error("trying to create undefined message of type \"%s\"\n", name);
 #if 0
         if (strcmp(name, "missing_message") != 0) {
             if (!mt_find("missing_message")) {

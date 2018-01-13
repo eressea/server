@@ -57,6 +57,12 @@ typedef struct {
     unit *teachers[2];
 } study_fixture;
 
+static void setup_study(void) {
+    mt_register(mt_new_va("studycost", "unit:unit", "region:region", "cost:int", "skill:int", 0));
+    mt_register(mt_new_va("teach_teacher", "teacher:unit", "student:unit", "skill:int", "level:int", 0));
+    mt_register(mt_new_va("teach_student", "teacher:unit", "student:unit", "skill:int", 0));
+}
+
 static void setup_locale(struct locale *lang) {
     int i;
     for (i = 0; i < MAXSKILLS; ++i) {
@@ -66,7 +72,7 @@ static void setup_locale(struct locale *lang) {
     init_skills(lang);
 }
 
-static void setup_study(study_fixture *fix, skill_t sk) {
+static void setup_teacher(study_fixture *fix, skill_t sk) {
     struct region * r;
     struct faction *f;
     struct locale *lang;
@@ -96,7 +102,7 @@ static void test_study_no_teacher(CuTest *tc) {
     study_fixture fix;
     skill *sv;
 
-    setup_study(&fix, SK_CROSSBOW);
+    setup_teacher(&fix, SK_CROSSBOW);
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
@@ -109,7 +115,7 @@ static void test_study_with_teacher(CuTest *tc) {
     study_fixture fix;
     skill *sv;
 
-    setup_study(&fix, SK_CROSSBOW);
+    setup_teacher(&fix, SK_CROSSBOW);
     set_level(fix.teachers[0], SK_CROSSBOW, TEACHDIFFERENCE);
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
     CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
@@ -124,7 +130,7 @@ static void test_study_with_bad_teacher(CuTest *tc) {
     study_fixture fix;
     skill *sv;
 
-    setup_study(&fix, SK_CROSSBOW);
+    setup_teacher(&fix, SK_CROSSBOW);
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.u->faction->msgs, "teach_asgood"));
     study_cmd(fix.u, fix.u->thisorder);
@@ -262,6 +268,7 @@ static void test_academy_bonus(CuTest *tc) {
     building * b;
 
     test_setup();
+    setup_study();
 
     random_source_inject_constant(0.0);
     init_resources();
@@ -389,6 +396,7 @@ static void test_study_magic(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
+    setup_study();
     init_resources();
     f = test_create_faction(0);
     lang = f->locale;
@@ -421,6 +429,7 @@ static void test_study_cost_magic(CuTest *tc) {
     unit * u;
 
     test_setup();
+    setup_study();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
 
     CuAssertIntEquals(tc, 100, study_cost(u, SK_MAGIC));
@@ -444,6 +453,7 @@ static void test_study_cost(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
+    setup_study();
 
     itype = test_create_silver();
     u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
@@ -471,6 +481,7 @@ static void test_teach_magic(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
+    setup_study();
     init_resources();
     itype = get_resourcetype(R_SILVER)->itype;
     f = test_create_faction(0);

@@ -9,6 +9,7 @@
 #include <kernel/order.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
 
 #include <stddef.h>
 #include <CuTest.h>
@@ -37,6 +38,7 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
+    mt_register(mt_new_va("renumber_inuse", "id:int", 0));
     f2 = test_create_faction(0);
     u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
     no = f->no;

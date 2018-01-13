@@ -12,6 +12,7 @@
 #include <kernel/unit.h>
 
 #include <util/language.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -32,6 +33,7 @@ static void test_market_curse(CuTest * tc)
     building_type *btype;
 
     test_setup();
+    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", 0));
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;

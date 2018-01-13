@@ -52,6 +52,26 @@ static void setup_give(struct give *env) {
         init_locale(env->lang);
         env->f1->locale = env->lang;
     }
+
+    /* success messages: */
+    mt_register(mt_new_va("receive_person", "unit:unit", "target:unit", "amount:int", 0));
+    mt_register(mt_new_va("give_person", "unit:unit", "target:unit", "amount:int", 0));
+    mt_register(mt_new_va("give_person_peasants", "unit:unit", "amount:int", 0));
+    mt_register(mt_new_va("give_person_ocean", "unit:unit", "amount:int", 0));
+    mt_register(mt_new_va("receive", "unit:unit", "target:unit", "resource:resource", "amount:int", 0));
+    mt_register(mt_new_va("give", "unit:unit", "target:unit", "resource:resource", "amount:int", 0));
+    mt_register(mt_new_va("give_peasants", "unit:unit", "resource:resource", "amount:int", 0));
+    /* error messages: */
+    mt_register(mt_new_va("too_many_units_in_faction", "unit:unit", "region:region", "command:order", "allowed:int", 0));
+    mt_register(mt_new_va("too_many_units_in_alliance", "unit:unit", "region:region", "command:order", "allowed:int", 0));
+    mt_register(mt_new_va("feedback_no_contact", "unit:unit", "region:region", "command:order", "target:unit", 0));
+    mt_register(mt_new_va("feedback_give_forbidden", "unit:unit", "region:region", "command:order", 0));
+    mt_register(mt_new_va("peasants_give_invalid", "unit:unit", "region:region", "command:order", 0));
+    mt_register(mt_new_va("giverestriction", "unit:unit", "region:region", "command:order", "turns:int", 0));
+    mt_register(mt_new_va("error_unit_size", "unit:unit", "region:region", "command:order", "maxsize:int", 0));
+    mt_register(mt_new_va("nogive_reserved", "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", 0));
+    mt_register(mt_new_va("race_notake", "unit:unit", "region:region", "command:order", "race:race", 0));
+    mt_register(mt_new_va("race_noregroup", "unit:unit", "region:region", "command:order", "race:race", 0));
 }
 
 static void test_give_unit(CuTest * tc) {

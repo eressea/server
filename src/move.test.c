@@ -27,6 +27,11 @@
 #include <tests.h>
 #include <assert.h>
 
+static void setup_move(void) {
+    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", 0));
+    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", 0));
+}
+
 static void test_ship_not_allowed_in_coast(CuTest * tc)
 {
     region *r1, *r2;
@@ -570,6 +575,7 @@ static void test_route_cycle(CuTest *tc) {
     char buffer[32];
 
     test_setup();
+    setup_move();
     test_create_region(1, 0, NULL);
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
@@ -581,6 +587,7 @@ static void test_route_cycle(CuTest *tc) {
     CuAssertStrEquals(tc, "route WEST EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
     init_order(u->orders, u->faction->locale);
     move_cmd(u, u->orders);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "moveblocked"));
     CuAssertIntEquals(tc, 1, u->region->x);
     CuAssertStrEquals(tc, "route east nw west", get_command(u->orders, lang, buffer, sizeof(buffer)));
     test_teardown();
@@ -593,6 +600,7 @@ static void test_route_pause(CuTest *tc) {
     char buffer[32];
 
     test_setup();
+    setup_move();
     test_create_region(1, 0, NULL);
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
