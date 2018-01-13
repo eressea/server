@@ -165,7 +165,7 @@ static void test_give_men_magicians(CuTest * tc) {
 
     p = rpeasants(env.r);
     CuAssertPtrNotNull(tc, msg = disband_men(1, env.dst, NULL));
-    CuAssertStrEquals(tc, "give_person_peasants", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "give_person_peasants", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 0, env.dst->number);
     CuAssertIntEquals(tc, p+1, rpeasants(env.r));
     msg_release(msg);
@@ -176,6 +176,7 @@ static void test_give_men_magicians(CuTest * tc) {
 static void test_give_men_limit(CuTest * tc) {
     struct give env = { 0 };
     message *msg;
+
     test_setup_ex(tc);
     env.f2 = test_create_faction(0);
     env.f1 = test_create_faction(0);
@@ -185,7 +186,7 @@ static void test_give_men_limit(CuTest * tc) {
     /* below the limit, give men, increase newbies counter */
     usetcontact(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
-    CuAssertStrEquals(tc, "give_person", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
@@ -194,7 +195,7 @@ static void test_give_men_limit(CuTest * tc) {
     /* beyond the limit, do nothing */
     usetcontact(env.src, env.dst);
     msg = give_men(2, env.dst, env.src, NULL);
-    CuAssertStrEquals(tc, "error129", (const char *)msg->parameters[3].v);
+    CuAssertStrEquals(tc, "error129", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 0, env.f1->newbies);
@@ -213,7 +214,7 @@ static void test_give_men_in_ocean(CuTest * tc) {
     setup_give(&env);
     env.r->terrain = test_create_terrain("ocean", SEA_REGION);
     msg = disband_men(1, env.src, NULL);
-    CuAssertStrEquals(tc, "give_person_ocean", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "give_person_ocean", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 0, env.src->number);
     msg_release(msg);
     test_teardown();
@@ -270,7 +271,7 @@ static void test_give_men_other_faction(CuTest * tc) {
     setup_give(&env);
     usetcontact(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
-    CuAssertStrEquals(tc, "give_person", (const char *)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     msg_release(msg);
@@ -325,7 +326,7 @@ static void test_give_peasants(CuTest * tc) {
     setup_give(&env);
     rsetpeasants(env.r, 0);
     msg = disband_men(1, env.src, NULL);
-    CuAssertStrEquals(tc, "give_person_peasants", (const char*)msg->parameters[0].v);
+    CuAssertStrEquals(tc, "give_person_peasants", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 0, env.src->number);
     CuAssertIntEquals(tc, 1, rpeasants(env.r));
     msg_release(msg);

@@ -875,6 +875,7 @@ static void test_luck_message(CuTest *tc) {
     attrib *a;
 
     test_setup();
+    mt_register(mt_new_va("peasantluck_success", "births:int", 0));
     setup_terrains(tc);
     r = test_create_region(0, 0, NULL);
     rsetpeasants(r, 1);
@@ -899,6 +900,8 @@ static unit * setup_name_cmd(void) {
     faction *f;
 
     test_setup();
+    mt_register(mt_new_va("renamed_building_seen", "renamer:unit", "region:region", "building:building", 0));
+    mt_register(mt_new_va("renamed_building_notseen", "region:region", "building:building", 0));
     f = test_create_faction(0);
     return test_create_unit(f, test_create_region(0, 0, 0));
 }
@@ -1440,6 +1443,7 @@ static void test_show_without_item(CuTest *tc)
     struct locale *loc;
 
     test_setup();
+    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", 0));
 
     loc = get_or_create_locale("de");
     locale_setstring(loc, parameters[P_ANY], "ALLE");
