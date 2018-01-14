@@ -46,6 +46,12 @@ extern "C" {
         int level;
     } msglevel;
 
+#define MESSAGE_MISSING_IGNORE  0
+#define MESSAGE_MISSING_ERROR   1
+#define MESSAGE_MISSING_REPLACE 2
+
+    void message_handle_missing(int mode);
+
     struct message *msg_message(const char *name, const char *sig, ...);
     struct message *msg_feedback(const struct unit *, struct order *cmd,
         const char *name, const char *sig, ...);

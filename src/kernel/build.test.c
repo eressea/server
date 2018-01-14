@@ -30,12 +30,13 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_setup();
+    test_inject_messagetypes();
     init_resources();
 
     test_create_itemtype("stone");
     test_create_buildingtype("castle");
     bf->rc = test_create_race("human");
-    bf->r = test_create_region(0, 0, 0);
+    bf->r = test_create_region(0, 0, NULL);
     bf->f = test_create_faction(bf->rc);
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);
@@ -255,11 +256,11 @@ static void test_build_destroy_road(CuTest *tc)
     message *m;
 
     test_setup();
-    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", 0));
+    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", NULL));
     r2 = test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
-    u = test_create_unit(f = test_create_faction(0), r);
+    u = test_create_unit(f = test_create_faction(NULL), r);
     u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
@@ -309,11 +310,12 @@ static void test_build_destroy_road_guard(CuTest *tc)
     order *ord;
 
     test_setup();
+    test_inject_messagetypes();
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
     ug = test_create_guard(r, 0, 0);
-    u = test_create_unit(f = test_create_faction(0), r);
+    u = test_create_unit(f = test_create_faction(NULL), r);
     u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
@@ -341,10 +343,11 @@ static void test_build_destroy_road_limit(CuTest *tc)
     order *ord;
 
     test_setup();
+    test_inject_messagetypes();
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
-    u = test_create_unit(f = test_create_faction(0), r);
+    u = test_create_unit(f = test_create_faction(NULL), r);
     u->orders = ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
@@ -365,7 +368,7 @@ static void test_build_destroy_cmd(CuTest *tc) {
     faction *f;
 
     test_setup();
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_DESTROY, f->locale, NULL);
     CuAssertIntEquals(tc, 138, destroy_cmd(u, u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error138"));

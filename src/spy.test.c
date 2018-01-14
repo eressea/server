@@ -33,15 +33,31 @@ typedef struct {
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
-    test_setup();
-    fix->r = test_create_region(0, 0, NULL);
-    fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
-    fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
+    mt_register(mt_new_va("spyreport", "spy:unit", "target:unit", "status:int", NULL));
+    mt_register(mt_new_va("spyreport_mage", "spy:unit", "target:unit", "type:int", NULL));
+    mt_register(mt_new_va("spyreport_faction", "spy:unit", "target:unit", "faction:faction", NULL));
+    mt_register(mt_new_va("spyreport_skills", "spy:unit", "target:unit", "skills:string", NULL));
+    mt_register(mt_new_va("spyreport_items", "spy:unit", "target:unit", "items:items", NULL));
+    mt_register(mt_new_va("destroy_ship_0", "unit:unit", "ship:ship", NULL));
+    mt_register(mt_new_va("destroy_ship_1", "unit:unit", "ship:ship", NULL));
+    mt_register(mt_new_va("destroy_ship_2", "unit:unit", "ship:ship", NULL));
+    mt_register(mt_new_va("destroy_ship_3", "ship:ship", NULL));
+    mt_register(mt_new_va("destroy_ship_4", "ship:ship", NULL));
+    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", NULL));
+    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", NULL));
+    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", NULL));
+
+    if (fix) {
+        fix->r = test_create_region(0, 0, NULL);
+        fix->spy = test_create_unit(test_create_faction(NULL), fix->r);
+        fix->victim = test_create_unit(test_create_faction(NULL), fix->r);
+    }
 }
 
 static void test_simple_spy_message(CuTest *tc) {
     spy_fixture fix;
 
+    test_setup();
     setup_spy(&fix);
 
     spy_message(0, fix.spy, fix.victim);
@@ -55,6 +71,7 @@ static void test_all_spy_message(CuTest *tc) {
     spy_fixture fix;
     item_type *itype;
 
+    test_setup();
     setup_spy(&fix);
 
     enable_skill(SK_MAGIC, true);
@@ -84,7 +101,8 @@ static void test_sabotage_self(CuTest *tc) {
     order *ord;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    setup_spy(NULL);
+    r = test_create_region(0, 0, NULL);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     assert(u && u->faction && u->region == r);
@@ -94,6 +112,7 @@ static void test_sabotage_self(CuTest *tc) {
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
     CuAssertPtrEquals(tc, 0, r->ships);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "sink_msg"));
     free_order(ord);
     test_teardown();
 }
@@ -106,7 +125,9 @@ static void test_sabotage_other_fail(CuTest *tc) {
     message *msg;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    setup_spy(NULL);
+
+    r = test_create_region(0, 0, NULL);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -133,7 +154,7 @@ static void test_setstealth_cmd(CuTest *tc) {
     const struct locale *lang;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     lang = u->faction->locale;
     u->flags = UFL_ANON_FACTION | UFL_SIEGE;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
@@ -157,7 +178,7 @@ static void test_setstealth_demon(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("demon");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     rc = test_create_race("dwarf");
     init_races(lang);
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
@@ -174,7 +195,7 @@ static void test_setstealth_demon_bad(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("demon");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     rc = test_create_race("smurf");
     init_races(lang);
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
@@ -189,7 +210,8 @@ static void test_sabotage_other_success(CuTest *tc) {
     order *ord;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    setup_spy(NULL);
+    r = test_create_region(0, 0, NULL);
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);

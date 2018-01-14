@@ -22,8 +22,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/config.h>
 #include <kernel/database.h>
-#include <kernel/version.h>
+#include <kernel/messages.h>
 #include <kernel/save.h>
+#include <kernel/version.h>
 
 #include <util/filereader.h>
 #include <util/language.h>
@@ -305,6 +306,7 @@ int main(int argc, char **argv)
     lua_State *L;
     dictionary *d = 0;
     setup_signal_handler();
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     /* parse arguments again, to override ini file */
     err = parse_args(argc, argv);
     if (err != 0) {

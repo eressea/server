@@ -27,7 +27,7 @@ static void test_names(CuTest * tc)
     CuAssertPtrNotNull(tc, get_function("name_dracoid"));
     default_locale = test_create_locale();
     rc = test_create_race("undead");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     locale_setstring(default_locale, "undead_name_0", "Graue");
     locale_setstring(default_locale, "undead_postfix_0", "Kobolde");
     CuAssertPtrNotNull(tc, rc->name_unit);
@@ -50,7 +50,7 @@ static void test_monster_names(CuTest *tc) {
     rc = test_create_race("irongolem");
     f = test_create_faction(rc);
     f->flags |= FFL_NPC;
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
     unit_setname(u, "Hodor");
     CuAssertPtrNotNull(tc, u->_name);
     name_unit(u);

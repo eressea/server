@@ -54,7 +54,7 @@ static void test_reorder_units(CuTest * tc)
     r = test_create_region(0, 0, NULL);
     b = test_create_building(r, NULL);
     s = test_create_ship(r, NULL);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
 
     u0 = test_create_unit(f, r);
     u_set_ship(u0, s);
@@ -184,11 +184,11 @@ static void test_bufunit_fstealth(CuTest *tc) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, "status_aggressive", "aggressive");
     locale_setstring(lang, "anonymous", "anonymous");
-    f1 = test_create_faction(0);
+    f1 = test_create_faction(NULL);
     f1->locale = lang;
-    f2 = test_create_faction(0);
+    f2 = test_create_faction(NULL);
     f2->locale = lang;
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     u = test_create_unit(f1, r);
     faction_setname(f1, "UFO");
     renumber_faction(f1, 1);
@@ -271,7 +271,7 @@ static void test_bufunit(CuTest *tc) {
     locale_setstring(lang, "skill::alchemy", "Alchemie");
     locale_setstring(lang, "status_aggressive", "aggressiv");
     init_skills(lang);
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     u->faction->locale = lang;
     faction_setname(u->faction, "UFO");
     renumber_faction(u->faction, 1);
@@ -289,7 +289,7 @@ static void test_bufunit(CuTest *tc) {
     bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2, Segeln 1.", buffer);
 
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->locale = get_or_create_locale("de");
     bufunit(f, u, 0, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buffer);
@@ -334,7 +334,7 @@ static void test_newbie_password_message(CuTest *tc) {
     report_context ctx;
     faction *f;
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->age = 5;
     f->flags = 0;
     prepare_report(&ctx, f);
@@ -355,9 +355,9 @@ static void test_prepare_travelthru(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(0);
-    f2 = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(3, 0, 0);
     test_create_unit(f2, r1);
@@ -391,10 +391,10 @@ static void test_get_addresses(CuTest *tc) {
     region *r;
 
     test_setup();
-    f = test_create_faction(0);
-    f1 = test_create_faction(0);
-    f2 = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     test_create_unit(f, r);
     test_create_unit(f1, r);
     test_create_unit(f2, r);
@@ -418,10 +418,10 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(0);
-    f1 = test_create_faction(0);
-    f2 = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     test_create_unit(f, r);
     u = test_create_unit(f1, r);
     set_factionstealth(u, f2);
@@ -446,10 +446,10 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(0);
-    f1 = test_create_faction(0);
-    f2 = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     u = test_create_unit(f, r2);
     travelthru_add(r1, u);
@@ -480,7 +480,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     report_context ctx;
 
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
     btype = test_create_buildingtype("lighthouse");
@@ -491,7 +491,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
-    u1 = test_create_unit(test_create_faction(0), r1);
+    u1 = test_create_unit(test_create_faction(NULL), r1);
     u1->number = 4;
     u1->building = b;
     set_level(u1, SK_PERCEPTION, 3);
@@ -539,7 +539,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     test_setup();
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
@@ -581,7 +581,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     config_set("rules.region_owners", "1");
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
@@ -592,7 +592,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     b->size = 10;
     update_lighthouse(b);
     u = test_create_unit(f, r1);
-    u = test_create_unit(test_create_faction(0), r1);
+    u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
     CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
@@ -612,8 +612,8 @@ static void test_prepare_report(CuTest *tc) {
     region *r;
 
     test_setup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
 
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, 0, ctx.first);
@@ -645,8 +645,8 @@ static void test_seen_neighbours(CuTest *tc) {
     region *r1, *r2;
 
     test_setup();
-    f = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
 
     test_create_unit(f, r1);
@@ -666,8 +666,8 @@ static void test_seen_travelthru(CuTest *tc) {
     region *r1, *r2, *r3;
 
     test_setup();
-    f = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(2, 0, 0);
 
@@ -692,7 +692,7 @@ static void test_region_distance_max(CuTest *tc) {
     region *result[64];
     int x, y;
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     for (x=-3;x<=3;++x) {
         for (y = -3; y <= 3; ++y) {
             if (x != 0 || y != 0) {
@@ -711,7 +711,7 @@ static void test_region_distance(CuTest *tc) {
     region *r;
     region *result[8];
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
     CuAssertPtrEquals(tc, r, result[0]);
     CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 1, result, 8));
@@ -727,7 +727,7 @@ static void test_region_distance_ql(CuTest *tc) {
     region *r;
     selist *ql;
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     ql = get_regions_distance(r, 0);
     CuAssertIntEquals(tc, 1, selist_length(ql));
     CuAssertPtrEquals(tc, r, selist_get(ql, 0));
@@ -747,8 +747,8 @@ static void test_report_far_vision(CuTest *tc) {
     faction *f;
     region *r1, *r2;
     test_setup();
-    f = test_create_faction(0);
-    r1 = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r1 = test_create_region(0, 0, NULL);
     test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
     set_observer(r2, f, 10, 2);
@@ -788,6 +788,7 @@ static void test_insect_warnings(CuTest *tc) {
 
     /* OBS: in unit tests, get_gamedate always returns season = 0 */
     test_setup();
+    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
     gd.turn = 0;
@@ -805,6 +806,7 @@ static void test_newbie_warning(CuTest *tc) {
     faction *f;
 
     test_setup();
+    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
     config_set_int("NewbieImmunity", 3);
 
@@ -826,8 +828,8 @@ static void test_cansee_spell(CuTest *tc) {
     faction *f;
 
     test_setup();
-    f = test_create_faction(0);
-    u2 = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    f = test_create_faction(NULL);
+    u2 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
 
     CuAssertTrue(tc, cansee(f, u2->region, u2, 0));
     CuAssertTrue(tc, visible_unit(u2, f, 0, seen_spell));

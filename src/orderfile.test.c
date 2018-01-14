@@ -4,6 +4,7 @@
 #include "orderfile.h"
 
 #include <kernel/faction.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -62,6 +63,8 @@ static void test_faction_password_bad(CuTest *tc) {
     const char *orders[] = { "ERESSEA 1 password", NULL };
 
     test_setup();
+    mt_register(mt_new_va("wrongpasswd", "password:string", NULL));
+
     f = test_create_faction(NULL);
     renumber_faction(f, 1);
     CuAssertIntEquals(tc, 1, f->no);

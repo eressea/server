@@ -127,6 +127,7 @@ message_type *mt_new_va(const char *name, ...)
             break;
     }
     va_end(marker);
+    args[i] = 0;
     return mt_new(name, args);
 }
 
@@ -243,7 +244,7 @@ void msg_free(message * msg)
 
 void msg_release(struct message *msg)
 {
-    assert(msg->refcount > 0);
+    assert(msg && msg->refcount > 0);
     if (--msg->refcount > 0)
         return;
     msg_free(msg);
@@ -251,7 +252,7 @@ void msg_release(struct message *msg)
 
 struct message *msg_addref(struct message *msg)
 {
-    assert(msg->refcount > 0);
+    assert(msg && msg->refcount > 0);
     ++msg->refcount;
     return msg;
 }

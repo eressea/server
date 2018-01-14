@@ -9,6 +9,7 @@
 #include <kernel/terrain.h>
 
 #include <util/attrib.h>
+#include <util/message.h>
 
 #include <selist.h>
 
@@ -17,12 +18,20 @@
 void sort_wormhole_regions(selist *rlist, region **match, int count);
 void make_wormholes(region **match, int count, const building_type *bt_wormhole);
 
+static void setup_wormholes(void) {
+    mt_register(mt_new_va("wormhole_appear", "region:region", NULL));
+    mt_register(mt_new_va("wormhole_dissolve", "region:region", NULL));
+    mt_register(mt_new_va("wormhole_exit", "unit:unit", "region:region", NULL));
+    mt_register(mt_new_va("wormhole_requirements", "unit:unit", "region:region", NULL));
+}
+
 static void test_make_wormholes(CuTest *tc) {
     region *r1, *r2, *match[2];
     terrain_type *t_plain;
     building_type *btype;
 
     test_setup();
+    setup_wormholes();
     t_plain = test_create_terrain("plain", LAND_REGION);
     btype = test_create_buildingtype("wormhole");
     match[0] = r1 = test_create_region(0, 0, t_plain);
@@ -45,6 +54,7 @@ static void test_sort_wormhole_regions(CuTest *tc) {
     selist *rlist = 0;
 
     test_setup();
+    setup_wormholes();
     t_plain = test_create_terrain("plain", LAND_REGION);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_plain);

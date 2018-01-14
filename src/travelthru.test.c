@@ -29,13 +29,13 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     region *r;
     faction *f;
 
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     while (r->attribs) {
         a_remove(&r->attribs, r->attribs);
     }
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     while (nunits--) {
-        unit *u = test_create_unit(f, test_create_region(1, 0, 0));
+        unit *u = test_create_unit(f, test_create_region(1, 0, NULL));
         travelthru_add(r, u);
     }
     fix->r = r;
