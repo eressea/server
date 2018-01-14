@@ -8,7 +8,7 @@
 static void test_ally(CuTest * tc)
 {
     ally * al = 0;
-    struct faction * f1 = test_create_faction(0);
+    struct faction * f1 = test_create_faction(NULL);
 
     ally_add(&al, f1);
     CuAssertPtrNotNull(tc, al);

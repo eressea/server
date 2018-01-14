@@ -29,13 +29,13 @@ static void test_flyingship(CuTest * tc)
     ship *sh1, *sh2;
 
     test_setup();
-    mt_register(mt_new_va("flying_ship_result", "mage:unit", "ship:ship", 0));
+    mt_register(mt_new_va("flying_ship_result", "mage:unit", "ship:ship", NULL));
 
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
     par_data.flag = 0;
 
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(test_create_race("human"));
     u = test_create_unit(f, r);
 

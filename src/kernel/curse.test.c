@@ -183,7 +183,7 @@ static void test_curse_flags(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     c1 = create_curse(u, &u->attribs, &ct_dummy, 1, 1, 1, 0);
     CuAssertPtrEquals(tc, u, c1->magician);
     CuAssertIntEquals(tc, 1, (int)c1->effect);

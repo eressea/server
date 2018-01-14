@@ -12,9 +12,9 @@ static void test_add_donation(CuTest *tc) {
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    f1 = test_create_faction(0);
-    f2 = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
     add_donation(f1, f2, 100, r);
     report_donations();
     CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "donation"));

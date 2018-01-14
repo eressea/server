@@ -35,8 +35,8 @@ static void test_give_control_building(CuTest * tc)
     region *r;
 
     test_setup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     b = test_create_building(r, 0);
     u1 = test_create_unit(f, r);
     u_set_building(u1, b);
@@ -56,8 +56,8 @@ static void test_give_control_ship(CuTest * tc)
     region *r;
 
     test_setup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     sh = test_create_ship(r, 0);
     u1 = test_create_unit(f, r);
     u_set_ship(u1, sh);
@@ -376,8 +376,8 @@ static void test_maintain_buildings(CuTest *tc) {
     test_setup();
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
-    r = test_create_region(0, 0, 0);
-    f = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     b = test_create_building(r, btype);
     itype = test_create_itemtype("money");
@@ -433,8 +433,8 @@ static void test_recruit(CuTest *tc) {
     faction *f;
 
     test_setup();
-    f = test_create_faction(0);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 1, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
@@ -458,7 +458,7 @@ static void test_income(CuTest *tc)
     unit *u;
     test_setup();
     rc = test_create_race("nerd");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, 20, income(u));
     u->number = 5;
     CuAssertIntEquals(tc, 100, income(u));
@@ -474,7 +474,7 @@ static void test_modify_material(CuTest *tc) {
     test_setup();
     init_resources();
 
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_WEAPONSMITH, 1);
 
     /* the unit's race gets 2x savings on iron used to produce goods */
@@ -523,7 +523,7 @@ static void test_modify_skill(CuTest *tc) {
     test_setup();
     init_resources();
 
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_WEAPONSMITH, 1);
 
     itype = test_create_itemtype("iron");
@@ -586,7 +586,7 @@ static void test_modify_production(CuTest *tc) {
     rt_silver = get_resourcetype(R_SILVER);
     itype = test_create_itemtype("stone");
     rtype = itype->rtype;
-    u = test_create_unit(test_create_faction(0), test_create_region(0,0,0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0,0,0));
     make_item(u, itype, 1);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
     CuAssertIntEquals(tc, 0, get_item(u, itype));

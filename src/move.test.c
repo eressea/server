@@ -28,8 +28,8 @@
 #include <assert.h>
 
 static void setup_move(void) {
-    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", 0));
-    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", 0));
+    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", NULL));
+    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", NULL));
 }
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
@@ -81,7 +81,7 @@ static void setup_harbor(move_fixture *mf) {
     b = test_create_building(r, btype);
     b->flags |= BLD_MAINTAINED;
 
-    u = test_create_unit(test_create_faction(0), r);
+    u = test_create_unit(test_create_faction(NULL), r);
     u->ship = sh;
     ship_set_owner(u);
 
@@ -109,7 +109,7 @@ static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(0), mf.r);
+    u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
 
@@ -124,7 +124,7 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(0), mf.r);
+    u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
     usetcontact(mf.b->_owner, mf.sh->_owner);
@@ -156,7 +156,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(0), mf.r);
+    u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
     al = ally_add(&u->faction->allies, mf.u->faction);
@@ -245,7 +245,7 @@ static void test_age_trails(CuTest *tc) {
     ship *sh;
 
     test_setup();
-    r1 = test_create_region(0, 0, 0);
+    r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     sh = test_create_ship(r1, 0);
     add_regionlist(&route, r1);
@@ -279,15 +279,15 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     test_create_ocean(0, 0);
-    fix->u = test_create_unit(fix->f = test_create_faction(0), fix->r = test_create_ocean(-1, 0));
+    fix->u = test_create_unit(fix->f = test_create_faction(NULL), fix->r = test_create_ocean(-1, 0));
     assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->sh);
 
-    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", 0));
-    mt_register(mt_new_va("shipsink", "ship:ship", 0));
-    mt_register(mt_new_va("massive_overload", "ship:ship", 0));
+    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", NULL));
+    mt_register(mt_new_va("shipsink", "ship:ship", NULL));
+    mt_register(mt_new_va("massive_overload", "ship:ship", NULL));
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -459,7 +459,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     test_setup();
     init_resources();
 
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r = test_create_plain(0, 0);
     test_create_ocean(-1, 1); /* D_NORTHWEST */
 
@@ -482,7 +482,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     td->dir = D_NORTHWEST;
     td->age = 2;
 
-    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", 0));
+    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", NULL));
 
     init_order_depr(ord);
     getstrtoken();

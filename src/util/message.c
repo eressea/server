@@ -127,6 +127,7 @@ message_type *mt_new_va(const char *name, ...)
             break;
     }
     va_end(marker);
+    args[i] = 0;
     return mt_new(name, args);
 }
 

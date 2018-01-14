@@ -48,7 +48,7 @@ static void create_monsters(unit **up, unit **um) {
     region *r;
     faction *fp, *fm;
 
-    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", NULL));
     test_create_horse();
     default_locale = test_create_locale();
     fp = test_create_faction(NULL);
@@ -61,7 +61,7 @@ static void create_monsters(unit **up, unit **um) {
 
     test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
 
     *up = test_create_unit(fp, r);
     unit_setid(*up, 1);
@@ -216,7 +216,7 @@ static void test_dragon_moves(CuTest * tc)
     plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("move east", m));
 
-    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", 0));
+    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", NULL));
 
     random_growl(m, findregion(1, 0), 3);
 
@@ -259,8 +259,8 @@ static void test_spawn_seaserpent(CuTest *tc) {
     test_setup();
     rc = test_create_race("seaserpent");
     rc->flags |= RCF_NPC;
-    r = test_create_region(0, 0, 0);
-    f = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, u->_name);

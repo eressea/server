@@ -95,7 +95,7 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "see_travel", "durchgereist");
 
     mstream_init(&out);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
     r->land->peasants = 5;
@@ -105,7 +105,7 @@ static void test_report_region(CuTest *tc) {
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
     region_setname(r, "Hodor");
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->locale = lang;
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
@@ -155,9 +155,9 @@ static void test_report_travelthru(CuTest *tc) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
     mstream_init(&out);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     r->flags |= RF_TRAVELUNIT;
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->locale = lang;
     u = test_create_unit(f, test_create_region(0, 1, 0));
     unit_setname(u, "Hodor");
