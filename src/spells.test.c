@@ -12,8 +12,9 @@
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
-#include <util/language.h>
 #include <util/attrib.h>
+#include <util/language.h>
+#include <util/message.h>
 #include <spells/regioncurse.h>
 
 #include <attributes/attributes.h>
@@ -121,6 +122,8 @@ static void test_view_reality(CuTest *tc) {
     castorder co;
 
     test_setup();
+    mt_register(mt_new_va("spell_astral_only", "unit:unit", "region:region", "command:order", NULL));
+    mt_register(mt_new_va("viewreality_effect", "unit:unit", NULL));
     r = test_create_region(0, 0, NULL);
     ra = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
     ra->_plane = get_astralplane();

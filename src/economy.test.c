@@ -369,7 +369,8 @@ static void test_tax_cmd(CuTest *tc) {
     test_teardown();
 }
 
-static void setup_maintenance(void) {
+static void setup_economy(void) {
+    mt_register(mt_new_va("recruit", "unit:unit", "region:region", "amount:int", "want:int", NULL));
     mt_register(mt_new_va("maintenance", "unit:unit", "building:building", NULL));
     mt_register(mt_new_va("maintenancefail", "unit:unit", "building:building", NULL));
     mt_register(mt_new_va("maintenance_nowork", "building:building", NULL));
@@ -389,7 +390,7 @@ static void test_maintain_buildings(CuTest *tc) {
     item_type *itype;
 
     test_setup();
-    setup_maintenance();
+    setup_economy();
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, NULL);
@@ -449,6 +450,7 @@ static void test_recruit(CuTest *tc) {
     faction *f;
 
     test_setup();
+    setup_economy();
     f = test_create_faction(NULL);
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, 1, u->number);

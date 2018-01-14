@@ -3,6 +3,7 @@
 
 #include <kernel/faction.h>
 #include <kernel/region.h>
+#include <util/message.h>
 #include <tests.h>
 
 #include <CuTest.h>
@@ -12,6 +13,7 @@ static void test_add_donation(CuTest *tc) {
     region *r;
 
     test_setup();
+    mt_register(mt_new_va("donation", "from:faction", "to:faction", "amount:int", NULL));
     r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(NULL);
     f2 = test_create_faction(NULL);

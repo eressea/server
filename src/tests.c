@@ -9,6 +9,7 @@
 #include <kernel/config.h>
 #include <kernel/alliance.h>
 #include <kernel/equipment.h>
+#include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -22,7 +23,6 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
-#include <kernel/messages.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -245,6 +245,7 @@ static void test_reset(void) {
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
+    message_handle_missing(MESSAGE_MISSING_ERROR);
     if (tc) {
         log_debug("start test: %s", tc->name);
     }

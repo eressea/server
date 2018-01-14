@@ -2,7 +2,6 @@
 #include <eressea.h>
 #include <kernel/config.h>
 #include <kernel/database.h>
-#include <kernel/messages.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>
@@ -185,6 +184,5 @@ int main(int argc, char ** argv) {
         ++argv;
         --argc;
     }
-    message_handle_missing(MESSAGE_MISSING_REPLACE);
     return RunAllTests(argc, argv);
 }

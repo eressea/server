@@ -468,7 +468,7 @@
     <text locale="de">"Die Ausrüstung von $unit($unit) scheint unsichtbar. ($int36($id))"</text>
     <text locale="en">"$unit($unit)'s equipment is invisible. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::magicresistance_unit" section="events">
+  <message name="magicresistance_unit" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="id" type="int"/>
@@ -476,7 +476,7 @@
     <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
     <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::magicresistance_building" section="events">
+  <message name="magicresistance_building" section="events">
     <type>
       <arg name="building" type="building"/>
       <arg name="id" type="int"/>
