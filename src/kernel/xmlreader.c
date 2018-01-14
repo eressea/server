@@ -34,7 +34,6 @@ without prior permission by the authors of Eressea.
 
 /* TODO: core code should not include these files: */
 #include "alchemy.h"
-#include "vortex.h"
 
 #include <modules/score.h>
 #include <attributes/attributes.h>

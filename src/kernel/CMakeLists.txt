@@ -32,7 +32,6 @@ spellbook.test.c
 spell.test.c
 # terrain.test.c
 unit.test.c
-jsonconf.test.c
 # xmlreader.test.c
 )
 
@@ -80,7 +79,6 @@ spell.c
 terrain.c
 unit.c
 xmlreader.c
-jsonconf.c
 )
 
 SET(VERSION_SRC ${PROJECT_NAME}/version.c PARENT_SCOPE)

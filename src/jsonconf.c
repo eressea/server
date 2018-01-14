@@ -15,26 +15,17 @@ without prior permission by the authors of Eressea.
 #include "jsonconf.h"
 
 /* kernel includes */
-#include "building.h"
-#include "direction.h"
-#include "keyword.h"
-#include "equipment.h"
-#include "item.h"
-#include "messages.h"
-#include "race.h"
-#include "region.h"
-#include "resources.h"
-#include "ship.h"
-#include "terrain.h"
-#include "skill.h"
-#include "spell.h"
-#include "spellbook.h"
-#include "calendar.h"
-
-/* game modules */
-#include "prefix.h"
-#include "move.h"
-#include "calendar.h"
+#include <kernel/building.h>
+#include <kernel/equipment.h>
+#include <kernel/item.h>
+#include <kernel/messages.h>
+#include <kernel/race.h>
+#include <kernel/region.h>
+#include <kernel/resources.h>
+#include <kernel/ship.h>
+#include <kernel/terrain.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
 
 /* util includes */
 #include <util/attrib.h>
@@ -47,6 +38,14 @@ without prior permission by the authors of Eressea.
 #include <util/path.h>
 #include <util/strings.h>
 #include <util/xml.h>
+
+/* game modules */
+#include "calendar.h"
+#include "direction.h"
+#include "keyword.h"
+#include "move.h"
+#include "prefix.h"
+#include "skill.h"
 
 /* external libraries */
 #include <cJSON.h>
