@@ -148,12 +148,24 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     return msg_create(mtype, args);
 }
 
+static int missing_message_mode;
+
+void message_handle_missing(int mode) {
+    missing_message_mode = mode;
+}
+
 static message *missing_message(const char *name) {
-    if (strcmp(name, "missing_message") != 0) {
-        if (!mt_find("missing_message")) {
-            mt_register(mt_new_va("missing_message", "name:string", NULL));
+    if (missing_message_mode == MESSAGE_MISSING_ERROR) {
+        log_error("trying to create undefined message of type \"%s\"\n", name);
+    }
+    else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
+        log_warning("trying to create undefined message of type \"%s\"\n", name);
+        if (strcmp(name, "missing_message") != 0) {
+            if (!mt_find("missing_message")) {
+                mt_register(mt_new_va("missing_message", "name:string", NULL));
+            }
+            return msg_message("missing_message", "name", name);
         }
-        return msg_message("missing_message", "name", name);
     }
     return NULL;
 }
@@ -170,7 +182,6 @@ message *msg_message(const char *name, const char *sig, ...)
     memset(args, 0, sizeof(args));
 
     if (!mtype) {
-        log_warning("trying to create undefined message of type \"%s\"\n", name);
         return missing_message(name);
     }
 

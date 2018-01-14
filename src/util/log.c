@@ -222,7 +222,6 @@ static void log_write(int flags, const char *module, const char *format, va_list
     }
 }
 
-
 void log_fatal(const char *format, ...)
 {
     va_list args;

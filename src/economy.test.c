@@ -141,11 +141,19 @@ static struct unit *create_recruiter(void) {
     return u;
 }
 
+static void setup_production(void) {
+    init_resources();
+    mt_register(mt_new_va("produce", "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", NULL));
+    mt_register(mt_new_va("income", "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", NULL));
+    mt_register(mt_new_va("buy", "unit:unit", "money:int", NULL));
+    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", NULL));
+}
+
 static void test_heroes_dont_recruit(CuTest * tc) {
     unit *u;
 
     test_setup();
-    init_resources();
+    setup_production();
     u = create_recruiter();
 
     fset(u, UFL_HERO);
@@ -163,7 +171,7 @@ static void test_normals_recruit(CuTest * tc) {
     unit *u;
 
     test_setup();
-    init_resources();
+    setup_production();
     u = create_recruiter();
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
@@ -227,7 +235,7 @@ static void test_trade_insect(CuTest *tc) {
     const item_type *it_silver;
 
     test_setup();
-    init_resources();
+    setup_production();
     test_create_locale();
     setup_terrains(tc);
     r = setup_trade_region(tc, get_terrain("swamp"));
@@ -259,7 +267,7 @@ static void test_buy_cmd(CuTest *tc) {
     const resource_type *rt_silver;
     const item_type *it_luxury;
     test_setup();
-    init_resources();
+    setup_production();
     test_create_locale();
     setup_terrains(tc);
     r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
@@ -312,7 +320,7 @@ static void test_tax_cmd(CuTest *tc) {
     econ_request *taxorders = 0;
 
     test_setup();
-    init_resources();
+    setup_production();
     config_set("taxing.perlevel", "20");
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);
@@ -361,6 +369,13 @@ static void test_tax_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void setup_maintenance(void) {
+    mt_register(mt_new_va("maintenance", "unit:unit", "building:building", NULL));
+    mt_register(mt_new_va("maintenancefail", "unit:unit", "building:building", NULL));
+    mt_register(mt_new_va("maintenance_nowork", "building:building", NULL));
+    mt_register(mt_new_va("maintenance_noowner", "building:building", NULL));
+}
+
 /** 
  * see https://bugs.eressea.de/view.php?id=2234
  */
@@ -374,6 +389,7 @@ static void test_maintain_buildings(CuTest *tc) {
     item_type *itype;
 
     test_setup();
+    setup_maintenance();
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
     r = test_create_region(0, 0, NULL);
@@ -472,7 +488,7 @@ static void test_modify_material(CuTest *tc) {
     resource_mod *mod;
 
     test_setup();
-    init_resources();
+    setup_production();
 
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_WEAPONSMITH, 1);
@@ -521,7 +537,7 @@ static void test_modify_skill(CuTest *tc) {
     resource_mod *mod;
 
     test_setup();
-    init_resources();
+    setup_production();
 
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_WEAPONSMITH, 1);
@@ -580,7 +596,7 @@ static void test_modify_production(CuTest *tc) {
     double d = 0.6;
 
     test_setup();
-    init_resources();
+    setup_production();
 
     /* make items from other items (turn silver to stone) */
     rt_silver = get_resourcetype(R_SILVER);
