@@ -9,6 +9,7 @@
 #include <kernel/config.h>
 #include <kernel/alliance.h>
 #include <kernel/equipment.h>
+#include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -22,7 +23,6 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
-#include <kernel/messages.h>
 #include <util/functions.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -231,6 +231,10 @@ static void test_reset(void) {
     }
     random_source_reset();
 
+    mt_register(mt_new_va("changepasswd", "value:string", NULL));
+    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", NULL));
+    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", NULL));
+
     if (errno) {
         int error = errno;
         errno = 0;
@@ -238,9 +242,15 @@ static void test_reset(void) {
     }
 }
 
+void test_inject_messagetypes(void)
+{
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
+}
+
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
+    message_handle_missing(MESSAGE_MISSING_ERROR);
     if (tc) {
         log_debug("start test: %s", tc->name);
     }

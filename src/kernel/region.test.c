@@ -40,14 +40,14 @@ static void test_region_get_owner(CuTest *tc) {
     unit *u1, *u2;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     b1 = test_create_building(r, NULL);
     b2 = test_create_building(r, NULL);
     b1->size = 5;
     b2->size = 10;
-    u1 = test_create_unit(test_create_faction(0), r);
+    u1 = test_create_unit(test_create_faction(NULL), r);
     u_set_building(u1, b1);
-    u2 = test_create_unit(test_create_faction(0), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
     u_set_building(u2, b2);
     CuAssertPtrEquals(tc, u2->faction, region_get_owner(r));
     test_teardown();

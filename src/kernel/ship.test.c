@@ -393,7 +393,7 @@ static void test_crew_skill(CuTest *tc) {
     test_setup();
     test_create_world();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     assert(r && f);
     sh = test_create_ship(r, st_find("boat"));
     for (i = 0; i != 4; ++i) {
@@ -410,7 +410,7 @@ static ship *setup_ship(void) {
     ship_type *stype;
 
     config_set("movement.shipspeed.skillbonus", "0");
-    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    r = test_create_ocean(0, 0);
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
     stype->sumskill = 10;
@@ -421,7 +421,7 @@ static ship *setup_ship(void) {
 }
 
 static void setup_crew(ship *sh, struct faction *f, unit **cap, unit **crew) {
-    if (!f) f = test_create_faction(0);
+    if (!f) f = test_create_faction(NULL);
     assert(cap);
     assert(crew);
     *cap = test_create_unit(f, sh->region);
@@ -606,7 +606,7 @@ static void test_shipspeed_max_range(CuTest *tc) {
     setup_crew(sh, 0, &cap, &crew);
     config_set("movement.shipspeed.skillbonus", "5");
     r = sh->region;
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     assert(r && f);
     stype = st_get_or_create(sh->type->_name);
 

@@ -37,8 +37,8 @@ static void test_cr_unit(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     u = test_create_unit(f, r);
     renumber_unit(u, 1234);
 
@@ -91,8 +91,8 @@ static void test_cr_resources(CuTest *tc) {
 
     setup_resources();
 
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
     r->land->horses = 1;
@@ -169,8 +169,8 @@ static void test_cr_mallorn(CuTest *tc) {
     
     setup_resources();
 
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     r->land->horses = 1;
     r->land->peasants = 200;
     r->land->money = 300;
@@ -230,9 +230,9 @@ static void test_cr_factionstealth(CuTest *tc) {
     ally *al;
 
     test_setup();
-    f1 = test_create_faction(0);
-    f2 = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     u = test_create_unit(f1, r);
 
     /* report to ourselves */

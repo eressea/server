@@ -10,7 +10,7 @@ static void test_plane(CuTest *tc) {
     plane *pl;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     CuAssertPtrEquals(tc, 0, findplane(0, 0));
     CuAssertPtrEquals(tc, 0, getplane(r));
     CuAssertIntEquals(tc, 0, getplaneid(r));
@@ -46,7 +46,7 @@ static void test_origin(CuTest *tc) {
     int x, y;
 
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     x = 0;
     y = 0;
     adjust_coordinates(f, &x, &y, 0);

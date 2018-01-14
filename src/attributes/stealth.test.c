@@ -15,7 +15,7 @@ static void test_stealth(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(test_create_race("human")), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(test_create_race("human")), test_create_region(0, 0, NULL));
     set_level(u, SK_STEALTH, 2);
     CuAssertIntEquals(tc, -1, u_geteffstealth(u));
     CuAssertIntEquals(tc, 2, eff_stealth(u, u->region));

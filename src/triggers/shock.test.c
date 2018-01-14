@@ -4,17 +4,24 @@
 #include <magic.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
+
 #include <util/event.h>
+#include <util/message.h>
 
 #include <tests.h>
 #include <CuTest.h>
+
+static void shock_setup(void) {
+    mt_register(mt_new_va("shock", "mage:unit", "reason:string", NULL));
+}
 
 static void test_shock(CuTest *tc) {
     unit *u;
     trigger *tt;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    shock_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     create_mage(u, M_GRAY);
     set_level(u, SK_MAGIC, 5);
     set_spellpoints(u, 10);
@@ -34,7 +41,8 @@ static void test_shock_low(CuTest *tc) {
     trigger *tt;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    shock_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     create_mage(u, M_GRAY);
     set_level(u, SK_MAGIC, 5);
     set_spellpoints(u, 1);

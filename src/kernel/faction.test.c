@@ -29,10 +29,10 @@ static void test_destroyfaction_allies(CuTest *tc) {
     ally *al;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    f1 = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f1 = test_create_faction(NULL);
     test_create_unit(f1, r);
-    f2 = test_create_faction(0);
+    f2 = test_create_faction(NULL);
     al = ally_add(&f1->allies, f2);
     al->status = HELP_FIGHT;
     CuAssertIntEquals(tc, HELP_FIGHT, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
@@ -48,7 +48,7 @@ static void test_remove_empty_factions_alliance(CuTest *tc) {
     struct alliance *al;
 
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     al = makealliance(0, "Hodor");
     setalliance(f, al);
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
@@ -66,7 +66,7 @@ static void test_remove_empty_factions(CuTest *tc) {
     test_setup();
     fm = get_or_create_monsters();
     assert(fm);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     fno = f->no;
     remove_empty_factions();
     CuAssertIntEquals(tc, false, f->_alive);
@@ -83,9 +83,9 @@ static void test_remove_dead_factions(CuTest *tc) {
     int fno;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     fm = get_or_create_monsters();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     assert(fm && r && f);
     test_create_unit(f, r);
     test_create_unit(fm, r);
@@ -134,7 +134,7 @@ static void test_addfaction(CuTest *tc) {
 static void test_check_passwd(CuTest *tc) {
     faction *f;
     
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     faction_setpassword(f, password_encode("password", PASSWORD_DEFAULT));
     CuAssertTrue(tc, checkpasswd(f, "password"));
     CuAssertTrue(tc, !checkpasswd(f, "assword"));
@@ -159,7 +159,7 @@ static void test_set_origin(CuTest *tc) {
 
     test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     CuAssertPtrEquals(tc, 0, f->ursprung);
     faction_setorigin(f, 0, 1, 1);
     CuAssertIntEquals(tc, 0, f->ursprung->id);
@@ -184,7 +184,7 @@ static void test_set_origin_bug(CuTest *tc) {
 
     test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     faction_setorigin(f, 0, -10, 3);
     faction_setorigin(f, 0, -13, -4);
     adjust_coordinates(f, &x, &y, pl);
@@ -202,7 +202,7 @@ static void test_max_migrants(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     f = test_create_faction(rc);
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
     rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
@@ -238,7 +238,7 @@ static void test_set_email(CuTest *tc) {
     CuAssertIntEquals(tc, -1, check_email("eressea@"));
     CuAssertIntEquals(tc, -1, check_email(""));
     CuAssertIntEquals(tc, -1, check_email(NULL));
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
 
     sprintf(email, "enno");
     faction_setemail(f, email);

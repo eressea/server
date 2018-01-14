@@ -38,8 +38,8 @@ static void test_otherfaction(CuTest *tc) {
     faction *f;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    f = test_create_faction(0);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    f = test_create_faction(NULL);
     config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());
     CuAssertPtrEquals(tc, u->faction, visible_faction(f, u));

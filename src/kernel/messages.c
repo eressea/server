@@ -92,7 +92,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         log_warning("trying to create message of unknown type \"%s\"\n", name);
         if (!mt_find("missing_feedback")) {
             mt_register(mt_new_va("missing_feedback", "unit:unit", 
-                "region:region", "command:order", "name:string", 0));
+                "region:region", "command:order", "name:string", NULL));
         }
         return msg_message("missing_feedback", "name unit region command",
             name, u, u->region, ord);
@@ -148,6 +148,28 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     return msg_create(mtype, args);
 }
 
+static int missing_message_mode;
+
+void message_handle_missing(int mode) {
+    missing_message_mode = mode;
+}
+
+static message *missing_message(const char *name) {
+    if (missing_message_mode == MESSAGE_MISSING_ERROR) {
+        log_error("trying to create undefined message of type \"%s\"\n", name);
+    }
+    else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
+        log_warning("trying to create undefined message of type \"%s\"\n", name);
+        if (strcmp(name, "missing_message") != 0) {
+            if (!mt_find("missing_message")) {
+                mt_register(mt_new_va("missing_message", "name:string", NULL));
+            }
+            return msg_message("missing_message", "name", name);
+        }
+    }
+    return NULL;
+}
+
 message *msg_message(const char *name, const char *sig, ...)
 /* msg_message("oops_error", "unit region command", u, r, cmd) */
 {
@@ -160,14 +182,7 @@ message *msg_message(const char *name, const char *sig, ...)
     memset(args, 0, sizeof(args));
 
     if (!mtype) {
-        log_warning("trying to create message of unknown type \"%s\"\n", name);
-        if (strcmp(name, "missing_message") != 0) {
-            if (!mt_find("missing_message")) {
-                mt_register(mt_new_va("missing_message", "name:string", 0));
-            }
-            return msg_message("missing_message", "name", name);
-        }
-        return NULL;
+        return missing_message(name);
     }
 
     va_start(vargs, sig);

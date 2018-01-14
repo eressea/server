@@ -23,7 +23,7 @@ void test_reservation(CuTest *tc) {
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f && rtype && rtype->itype);
     u = test_create_unit(f, r);
@@ -53,12 +53,12 @@ void test_pool(CuTest *tc) {
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f && rtype && rtype->itype);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
-    u3 = test_create_unit(test_create_faction(0), r);
+    u3 = test_create_unit(test_create_faction(NULL), r);
     assert(u1 && u2);
     i_change(&u1->items, rtype->itype, 100);
     set_resvalue(u1, rtype->itype, 50);
@@ -99,7 +99,7 @@ void test_pool_bug_2042(CuTest *tc) {
     test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f && rtype && rtype->itype);
     u1 = test_create_unit(f, r);
@@ -122,12 +122,12 @@ void test_pool_use(CuTest *tc) {
     test_setup();
     test_create_world();
     itype = it_get_or_create(rt_get_or_create("money"));
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     r = findregion(0, 0);
     assert(r && f && itype);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
-    u3 = test_create_unit(test_create_faction(0), r);
+    u3 = test_create_unit(test_create_faction(NULL), r);
     assert(u1 && u2);
     i_change(&u1->items, itype, 100);
     set_resvalue(u1, itype, 50);
@@ -172,7 +172,7 @@ void test_change_resource(CuTest * tc)
     enable_skill(SK_MAGIC, true);
 
     r = findregion(0, 0);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
     set_level(u, SK_MAGIC, 5);
