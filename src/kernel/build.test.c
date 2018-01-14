@@ -30,6 +30,7 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_setup();
+    test_inject_messagetypes();
     init_resources();
 
     test_create_itemtype("stone");
@@ -309,6 +310,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     order *ord;
 
     test_setup();
+    test_inject_messagetypes();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
@@ -341,6 +343,7 @@ static void test_build_destroy_road_limit(CuTest *tc)
     order *ord;
 
     test_setup();
+    test_inject_messagetypes();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);

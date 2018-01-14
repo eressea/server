@@ -788,6 +788,7 @@ static void test_insect_warnings(CuTest *tc) {
 
     /* OBS: in unit tests, get_gamedate always returns season = 0 */
     test_setup();
+    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
     gd.turn = 0;
@@ -805,6 +806,7 @@ static void test_newbie_warning(CuTest *tc) {
     faction *f;
 
     test_setup();
+    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
     config_set_int("NewbieImmunity", 3);
 

@@ -59,7 +59,6 @@ extern "C" {
     void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
     struct spell * test_create_spell(void);
 
-    int RunAllTests(void);
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
     struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
@@ -74,6 +73,7 @@ extern "C" {
     void assert_string_parameter(struct CuTest * tc, struct message *msg, int index, const char *arg);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
+    void test_inject_messagetypes(void);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
 

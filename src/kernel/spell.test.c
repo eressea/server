@@ -33,6 +33,7 @@ static void test_create_duplicate_spell(CuTest * tc)
     strlist *sl = 0;
 
     test_setup();
+    test_inject_messagetypes();
     test_log_stderr(0); /* suppress the "duplicate spell" error message */
     log = test_log_start(LOG_CPERROR, &sl);
 

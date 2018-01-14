@@ -242,6 +242,11 @@ static void test_reset(void) {
     }
 }
 
+void test_inject_messagetypes(void)
+{
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
+}
+
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
