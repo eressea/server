@@ -58,7 +58,7 @@ static void test_renumber_building(CuTest *tc) {
 
     test_setup_ex(tc);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->building = test_create_building(u->region, 0);
+    u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -76,9 +76,9 @@ static void test_renumber_building_duplicate(CuTest *tc) {
 
     test_setup_ex(tc);
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->building = test_create_building(u->region, 0);
+    u->building = test_create_building(u->region, NULL);
     uno = u->building->no;
-    u->building = test_create_building(u->region, 0);
+    u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
@@ -95,7 +95,7 @@ static void test_renumber_ship(CuTest *tc) {
 
     test_setup_ex(tc);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -112,7 +112,7 @@ static void test_renumber_ship_twice(CuTest *tc) {
 
     test_setup_ex(tc);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -134,9 +134,9 @@ static void test_renumber_ship_duplicate(CuTest *tc) {
 
     test_setup_ex(tc);
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     uno = u->ship->no;
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));

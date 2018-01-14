@@ -955,7 +955,7 @@ static void test_name_building(CuTest *tc) {
     faction *f;
 
     u = setup_name_cmd();
-    u->building = test_create_building(u->region, 0);
+    u->building = test_create_building(u->region, NULL);
     f = u->faction;
     uo = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     u_set_building(uo, u->building);
@@ -999,7 +999,7 @@ static void test_name_ship(CuTest *tc) {
     faction *f;
 
     u = setup_name_cmd();
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     f = u->faction;
     uo = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     u_set_ship(uo, u->ship);
@@ -1206,13 +1206,13 @@ static void test_name_cmd(CuTest *tc) {
     free_order(ord);
 
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_SHIP]));
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
     free_order(ord);
     
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_BUILDING]));
-    u_set_building(u, test_create_building(u->region, 0));
+    u_set_building(u, test_create_building(u->region, NULL));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
     free_order(ord);

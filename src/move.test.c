@@ -75,7 +75,7 @@ static void setup_harbor(move_fixture *mf) {
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     btype = test_create_buildingtype("harbour");
 
-    sh = test_create_ship(0, 0);
+    sh = test_create_ship(0, NULL);
     r = test_create_region(0, 0, ttype);
 
     b = test_create_building(r, btype);
@@ -219,8 +219,8 @@ static void test_ship_trails(CuTest *tc) {
     r1 = test_create_region(0, 0, otype);
     r2 = test_create_region(1, 0, otype);
     r3 = test_create_region(2, 0, otype);
-    sh = test_create_ship(r1, 0);
-    move_ship(sh, r1, r3, 0);
+    sh = test_create_ship(r1, NULL);
+    move_ship(sh, r1, r3, NULL);
     CuAssertPtrEquals(tc, r3, sh->region);
     CuAssertPtrEquals(tc, sh, r3->ships);
     CuAssertPtrEquals(tc, 0, r1->ships);
@@ -246,8 +246,8 @@ static void test_age_trails(CuTest *tc) {
 
     test_setup();
     r1 = test_create_region(0, 0, NULL);
-    r2 = test_create_region(1, 0, 0);
-    sh = test_create_ship(r1, 0);
+    r2 = test_create_region(1, 0, NULL);
+    sh = test_create_ship(r1, NULL);
     add_regionlist(&route, r1);
     add_regionlist(&route, r2);
     move_ship(sh, r1, r2, route);

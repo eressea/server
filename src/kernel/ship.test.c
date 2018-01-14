@@ -410,7 +410,7 @@ static ship *setup_ship(void) {
     ship_type *stype;
 
     config_set("movement.shipspeed.skillbonus", "0");
-    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    r = test_create_ocean(0, 0);
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
     stype->sumskill = 10;

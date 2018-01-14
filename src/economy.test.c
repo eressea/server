@@ -37,7 +37,7 @@ static void test_give_control_building(CuTest * tc)
     test_setup();
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);
-    b = test_create_building(r, 0);
+    b = test_create_building(r, NULL);
     u1 = test_create_unit(f, r);
     u_set_building(u1, b);
     u2 = test_create_unit(f, r);
@@ -58,7 +58,7 @@ static void test_give_control_ship(CuTest * tc)
     test_setup();
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);
-    sh = test_create_ship(r, 0);
+    sh = test_create_ship(r, NULL);
     u1 = test_create_unit(f, r);
     u_set_ship(u1, sh);
     u2 = test_create_unit(f, r);
@@ -586,7 +586,7 @@ static void test_modify_production(CuTest *tc) {
     rt_silver = get_resourcetype(R_SILVER);
     itype = test_create_itemtype("stone");
     rtype = itype->rtype;
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0,0,0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     make_item(u, itype, 1);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
     CuAssertIntEquals(tc, 0, get_item(u, itype));

@@ -35,7 +35,7 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     }
     f = test_create_faction(NULL);
     while (nunits--) {
-        unit *u = test_create_unit(f, test_create_region(1, 0, 0));
+        unit *u = test_create_unit(f, test_create_region(1, 0, NULL));
         travelthru_add(r, u);
     }
     fix->r = r;

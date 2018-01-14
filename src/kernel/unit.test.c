@@ -304,7 +304,7 @@ static void test_inside_building(CuTest *tc) {
 
     test_setup();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    b = test_create_building(u->region, 0);
+    b = test_create_building(u->region, NULL);
 
     b->size = 1;
     scale_number(u, 1);
@@ -395,7 +395,7 @@ static void test_unit_description(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("hodor");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0,0,0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
     CuAssertPtrEquals(tc, 0, u->display);
     CuAssertStrEquals(tc, 0, u_description(u, lang));

@@ -164,7 +164,7 @@ static void test_readwrite_building(CuTest * tc)
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    b = test_create_building(r, 0);
+    b = test_create_building(r, NULL);
     free(b->name);
     b->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", b->name);
@@ -197,7 +197,7 @@ static void test_readwrite_ship(CuTest * tc)
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    sh = test_create_ship(r, 0);
+    sh = test_create_ship(r, NULL);
     free(sh->name);
     sh->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", sh->name);
