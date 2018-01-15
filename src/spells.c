@@ -14,20 +14,32 @@
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
+
+#include "spells.h"
 
 #include "guard.h"
 #include "spy.h"
 #include "vortex.h"
 #include "laws.h"
-#include "spells.h"
 #include "direction.h"
 #include "randenc.h"
 #include "monsters.h"
 #include "teleport.h"
+#include "xmlreader.h"
 
+ /* triggers includes */
+#include <triggers/changefaction.h>
+#include <triggers/changerace.h>
+#include <triggers/createcurse.h>
+#include <triggers/createunit.h>
+#include <triggers/killunit.h>
+#include <triggers/timeout.h>
+
+ /* attributes includes */
+#include <attributes/targetregion.h>
+#include <attributes/hate.h>
 #include <attributes/attributes.h>
-
+#include <races/races.h>
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
@@ -38,6 +50,7 @@
 
 /* kernel includes */
 #include <kernel/building.h>
+#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/connection.h>
 #include <kernel/faction.h>
@@ -54,9 +67,6 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
-#include <kernel/xmlreader.h>
-
-#include <races/races.h>
 
 /* util includes */
 #include <util/assert.h>
@@ -91,17 +101,6 @@
 #include <string.h>
 #include <limits.h>
 
-/* triggers includes */
-#include <triggers/changefaction.h>
-#include <triggers/changerace.h>
-#include <triggers/createcurse.h>
-#include <triggers/createunit.h>
-#include <triggers/killunit.h>
-#include <triggers/timeout.h>
-
-/* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/hate.h>
 /* ----------------------------------------------------------------------- */
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900

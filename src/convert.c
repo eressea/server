@@ -1,7 +1,7 @@
 #include <platform.h>
 
 
-#include <kernel/xmlreader.h>
+#include "xmlreader.h"
 #include <util/xml.h>
 #include <kernel/race.h>
 #include <kernel/rules.h>
