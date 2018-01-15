@@ -129,6 +129,7 @@ set (ERESSEA_SRC
   travelthru.c
   monsters.c
   wormhole.c
+  xmlreader.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -239,6 +240,7 @@ set(TESTS_SRC
   volcano.test.c
   vortex.test.c
   wormhole.test.c
+# xmlreader.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
