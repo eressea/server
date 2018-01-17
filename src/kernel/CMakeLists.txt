@@ -27,7 +27,7 @@ region.test.c
 # resources.test.c
 save.test.c
 ship.test.c
-# skills.test.c
+skills.test.c
 spellbook.test.c
 spell.test.c
 # terrain.test.c
