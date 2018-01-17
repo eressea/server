@@ -505,6 +505,19 @@ static int tolua_unit_addnotice(lua_State * L)
     return 0;
 }
 
+static int bind_unit_effect(lua_State * L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, NULL);
+    const char *str = tolua_tostring(L, 2, NULL);
+    const item_type *itype = it_find(str);
+    if (itype) {
+        int effect = get_effect(u, itype);
+        lua_pushinteger(L, effect);
+        return 1;
+    }
+    return 0;
+}
+
 static void unit_castspell(unit * u, const char *name, int level)
 {
     spell *sp = find_spell(name);
@@ -1030,6 +1043,7 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "add_spell", tolua_unit_addspell);
             tolua_variable(L, TOLUA_CAST "spells", tolua_unit_get_spells, 0);
             tolua_function(L, TOLUA_CAST "cast_spell", tolua_unit_castspell);
+            tolua_function(L, TOLUA_CAST "effect", bind_unit_effect);
 
             tolua_variable(L, TOLUA_CAST "magic", tolua_unit_get_magic,
                 tolua_unit_set_magic);
