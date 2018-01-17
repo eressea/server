@@ -203,29 +203,36 @@ int skill_weeks(int level)
     return level + 1;
 }
 
-void increase_skill(unit * u, skill_t sk, unsigned int weeks)
+void increase_skill(unit * u, skill_t sk, int weeks)
 {
     skill *sv = unit_skill(u, sk);
+    assert(weeks >= 0);
     if (!sv) {
         sv = add_skill(u, sk);
     }
-    while (sv->weeks <= (int) weeks) {
+    while (sv->weeks <= weeks) {
         weeks -= sv->weeks;
         sk_set(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
 }
 
-void reduce_skill(unit * u, skill * sv, unsigned int weeks)
+void reduce_skill(unit * u, skill * sv, int weeks)
 {
+    int max_weeks = sv->level + 1;
+
+    assert(weeks >= 0);
+    if (rule_random_progress()) {
+        max_weeks += sv->level;
+    }
     sv->weeks += weeks;
-    while (sv->level > 0 && sv->level * 2 + 1 < sv->weeks) {
+    while (sv->level > 0 && sv->weeks > max_weeks) {
         sv->weeks -= sv->level;
         --sv->level;
     }
     if (sv->level == 0) {
         /* reroll */
-        sv->weeks = (unsigned char)skill_weeks(sv->level);
+        sv->weeks = skill_weeks(sv->level);
     }
 }
 

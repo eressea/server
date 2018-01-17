@@ -591,6 +591,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
-    SUITE_ADD_TEST(suite, test_drain_exp);
+    DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

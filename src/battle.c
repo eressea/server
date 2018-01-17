@@ -943,8 +943,8 @@ void drain_exp(struct unit *u, int n)
     skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
     skill_t ssk;
 
+    /* TODO (enno): we can use u->skill_size to find a random skill */
     ssk = sk;
-
     while (get_level(u, sk) == 0) {
         sk++;
         if (sk == MAXSKILLS)
