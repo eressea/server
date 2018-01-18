@@ -183,30 +183,36 @@ static void dumbeffect(unit *u) {
     }
 }
 
+static void astral_crumble(unit *u) {
+    item **itemp = &u->items;
+    while (*itemp) {
+        item *itm = *itemp;
+        if ((itm->type->flags & ITF_NOTLOST) == 0) {
+            if (itm->type->flags & (ITF_BIG | ITF_ANIMAL | ITF_CURSED)) {
+                ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
+                    "unit region item amount",
+                    u, u->region, itm->type->rtype, itm->number));
+                i_free(i_remove(itemp, itm));
+                continue;
+            }
+        }
+        itemp = &itm->next;
+    }
+}
+
 static void age_unit(region * r, unit * u)
 {
     const race *rc = u_race(u);
 
-    dumbeffect(u);
     ++u->age;
     if (u->number > 0 && rc->age_unit) {
         rc->age_unit(u);
     }
-    if (u->region && is_astral(u->region)) {
-        item **itemp = &u->items;
-        while (*itemp) {
-            item *itm = *itemp;
-            if ((itm->type->flags & ITF_NOTLOST) == 0) {
-                if (itm->type->flags & (ITF_BIG | ITF_ANIMAL | ITF_CURSED)) {
-                    ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
-                        "unit region item amount",
-                        u, u->region, itm->type->rtype, itm->number));
-                    i_free(i_remove(itemp, itm));
-                    continue;
-                }
-            }
-            itemp = &itm->next;
-        }
+    if (u->attribs) {
+        dumbeffect(u);
+    }
+    if (u->items && u->region && is_astral(u->region)) {
+        astral_crumble(u);
     }
 }
 
