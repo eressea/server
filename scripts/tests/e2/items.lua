@@ -128,7 +128,7 @@ function test_speedsail()
     assert_equal(1, u.ship:get_curse('shipspeed')) -- effect stays forever
 end
 
-function test_foolpotion()
+function disable_test_foolpotion()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
