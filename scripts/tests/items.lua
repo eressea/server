@@ -13,7 +13,7 @@ end
 
 function disable_test_mistletoe_okay()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item('mistletoe', 2)
@@ -32,7 +32,7 @@ end
 
 function disable_test_mistletoe_fail()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item('mistletoe', 1)
@@ -49,7 +49,7 @@ end
 
 function test_dreameye()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:add_item("dreameye", 2)
     u:clear_orders()
@@ -66,7 +66,7 @@ end
 
 function test_manacrystal()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:add_item("manacrystal", 2)
     u:clear_orders()
@@ -84,7 +84,7 @@ end
 
 function test_skillpotion()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:add_item("skillpotion", 2)
     u:clear_orders()
@@ -96,7 +96,7 @@ end
 
 function test_studypotion()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     turn_begin()
     u:add_item("studypotion", 2)
@@ -112,7 +112,7 @@ end
 
 function test_antimagic()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -132,7 +132,7 @@ end
 
 function test_ointment()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     local hp = u.hp
     u.hp = 1
@@ -145,14 +145,35 @@ function test_ointment()
     assert_equal(hp, u.hp)
 end
 
+function test_use_domore()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_item("p3", 1)
+    u:add_order("BENUTZEN 1 Schaffenstrunk")
+    process_orders()
+    assert_equal(10, u:effect("p3"))
+    assert_equal(0, u:get_item("p3"))
+    assert_equal(1, f:count_msg_type('usepotion'))
+    u:clear_orders()
+    u:set_skill('weaponsmithing', 3)
+    u:add_item("iron", 2)
+    u:add_order("MACHEN Schwert")
+    process_orders()
+    assert_equal(9, u:effect("p3"))
+    assert_equal(0, u:get_item("iron"))
+    assert_equal(2, u:get_item("sword"))
+end
+
 function test_bloodpotion_demon()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("demon", "noreply@eressea.de", "de")
+    local f = faction.create("demon")
     local u = unit.create(f, r, 1)
     u:add_item("peasantblood", 1)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Bauernblut")
     process_orders()
+    assert_equal(100, u:effect('peasantblood'))
     assert_equal(0, u:get_item("peasantblood"))
     assert_equal(1, f:count_msg_type('usepotion'))
     assert_equal("demon", u.race)
@@ -160,12 +181,13 @@ end
 
 function test_bloodpotion_other()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "noreply@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:add_item("peasantblood", 1)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Bauernblut")
     process_orders()
+    assert_equal(0, u:effect('peasantblood'))
     assert_equal(0, u:get_item("peasantblood"))
     assert_equal(1, f:count_msg_type('usepotion'))
     assert_equal("smurf", u.race)
