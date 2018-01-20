@@ -366,13 +366,10 @@ static int tolua_unit_get_effect(lua_State * L)
     const unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *potion_name = tolua_tostring(L, 2, 0);
     int result = -1;
-    const potion_type *pt_potion;
     const item_type *it_potion = it_find(potion_name);
 
     if (it_potion != NULL) {
-        pt_potion = it_potion->rtype->ptype;
-        if (pt_potion != NULL)
-            result = get_effect(self, pt_potion);
+        result = get_effect(self, it_potion);
     }
 
     lua_pushinteger(L, result);

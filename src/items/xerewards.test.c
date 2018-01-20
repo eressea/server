@@ -20,7 +20,7 @@ static void test_manacrystal(CuTest *tc) {
     test_setup();
     test_inject_messagetypes();
 
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("manacrystal");
     change_resource(u, itype->rtype, 1);
     CuAssertIntEquals(tc, -1, use_manacrystal(u, itype, 1, NULL));
@@ -50,8 +50,7 @@ static void test_skillpotion(CuTest *tc) {
 
     test_setup();
     test_inject_messagetypes();
-    test_create_world();
-    u = test_create_unit(test_create_faction(NULL), findregion(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);
 

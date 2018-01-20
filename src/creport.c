@@ -276,7 +276,7 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
         else if (a->type == &at_effect && self) {
             effect_data *data = (effect_data *)a->data.v;
             if (data->value > 0) {
-                const char *key = resourcename(data->type->itype->rtype, 0);
+                const char *key = resourcename(data->type->rtype, 0);
                 if (!header) {
                     header = 1;
                     stream_printf(out, "EFFECTS\n");
@@ -1652,27 +1652,26 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     }
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
-        const potion_type *ptype =
-            resource2potion(((const item_type *)a->data.v)->rtype);
+        const item_type *itype = (const item_type *)a->data.v;
         const char *ch;
         const char *description = NULL;
 
-        if (ptype == NULL)
+        if (itype == NULL)
             continue;
-        ch = resourcename(ptype->itype->rtype, 0);
+        ch = resourcename(itype->rtype, 0);
         fprintf(F, "TRANK %d\n", str_hash(ch));
         fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
-        fprintf(F, "%d;Stufe\n", ptype->level);
+        fprintf(F, "%d;Stufe\n", potion_level(itype));
 
         if (description == NULL) {
-            const char *pname = resourcename(ptype->itype->rtype, 0);
+            const char *pname = resourcename(itype->rtype, 0);
             const char *potiontext = mkname("potion", pname);
             description = LOC(f->locale, potiontext);
         }
 
         fprintf(F, "\"%s\";Beschr\n", description);
-        if (ptype->itype->construction) {
-            requirement *m = ptype->itype->construction->materials;
+        if (itype->construction) {
+            requirement *m = itype->construction->materials;
 
             fprintf(F, "ZUTATEN\n");
 

@@ -779,21 +779,10 @@ int study_cmd(unit * u, order * ord)
     /* Spruchlistenaktualiesierung ist in Regeneration */
 
     if (sk == SK_ALCHEMY) {
-        const potion_type *ptype;
         faction *f = u->faction;
         int skill = effskill(u, SK_ALCHEMY, 0);
         if (skill > maxalchemy) {
-            for (ptype = potiontypes; ptype; ptype = ptype->next) {
-                if (skill == ptype->level * 2) {
-                    a = a_find(f->attribs, &at_showitem);
-                    while (a && a->type == &at_showitem && a->data.v != ptype)
-                        a = a->next;
-                    if (a == NULL || a->type != &at_showitem) {
-                        a = a_add(&f->attribs, a_new(&at_showitem));
-                        a->data.v = (void *)ptype->itype;
-                    }
-                }
-            }
+            show_potions(f, skill);
         }
     }
     else if (sk == SK_MAGIC) {

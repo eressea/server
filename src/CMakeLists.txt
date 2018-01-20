@@ -100,6 +100,7 @@ set (ERESSEA_SRC
   reports.c
   teleport.c
   guard.c
+  jsonconf.c
   prefix.c
   donations.c
   eressea.c
@@ -212,6 +213,7 @@ set(TESTS_SRC
   give.test.c
   guard.test.c
   json.test.c
+  jsonconf.test.c
   keyword.test.c
   laws.test.c
   lighthouse.test.c

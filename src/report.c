@@ -578,7 +578,7 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
             effect_data *data = (effect_data *)a->data.v;
             if (data->value > 0) {
                 msg = msg_message("nr_potion_effect", "potion left",
-                    data->type->itype->rtype, data->value);
+                    data->type->rtype, data->value);
             }
         }
         if (msg) {
@@ -2198,11 +2198,10 @@ report_plaintext(const char *filename, report_context * ctx,
     CHECK_ERRNO();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
-        const potion_type *ptype =
-            resource2potion(((const item_type *)a->data.v)->rtype);
+        const item_type *itype = (const item_type *)a->data.v;
         const char *description = NULL;
-        if (ptype != NULL) {
-            const char *pname = resourcename(ptype->itype->rtype, 0);
+        if (itype) {
+            const char *pname = resourcename(itype->rtype, 0);
 
             if (ch == 0) {
                 newline(out);
@@ -2213,7 +2212,7 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             centre(out, LOC(f->locale, pname), true);
             snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
-                ptype->level);
+                potion_level(itype));
             centre(out, buf, true);
             newline(out);
 
@@ -2223,8 +2222,8 @@ report_plaintext(const char *filename, report_context * ctx,
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
 
-            if (ptype->itype->construction) {
-                requirement *rm = ptype->itype->construction->materials;
+            if (itype->construction) {
+                requirement *rm = itype->construction->materials;
                 while (rm->number) {
                     bytes =
                         (int)str_strlcpy(bufp, LOC(f->locale, resourcename(rm->rtype, 0)), size);
