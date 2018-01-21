@@ -142,11 +142,14 @@ static int rule_tactics_formula;
 static int rule_nat_armor;
 static int rule_cavalry_mode;
 static int rule_vampire;
+static const item_type *it_mistletoe;
 
 /** initialize rules from configuration.
  */
 static void init_rules(void)
 {
+    it_mistletoe = it_find("mistletoe");
+
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
@@ -3354,11 +3357,10 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     fighter *fc = NULL;
 
     if (!attack && u->attribs) {
-        const item_type *itype = it_find("mistletoe");
-        if (itype) {
-            int effect = get_effect(u, itype);
+        if (it_mistletoe) {
+            int effect = get_effect(u, it_mistletoe);
             if (effect >= u->number) {
-                change_effect(u, itype, -u->number);
+                change_effect(u, it_mistletoe, -u->number);
                 *cp = NULL;
                 return false;
             }
