@@ -2530,12 +2530,12 @@ int group_cmd(unit * u, struct order *ord)
 
 int origin_cmd(unit * u, struct order *ord)
 {
-    short px, py;
+    int px, py;
 
     init_order_depr(ord);
 
-    px = (short)getint();
-    py = (short)getint();
+    px = getint();
+    py = getint();
 
     faction_setorigin(u->faction, getplaneid(u->region), px, py);
     return 0;

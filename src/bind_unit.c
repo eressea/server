@@ -327,7 +327,7 @@ static int tolua_unit_get_age(lua_State * L)
 static int tolua_unit_set_age(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    self->age = (short)tolua_tonumber(L, 2, 0);
+    self->age = (int)tolua_tonumber(L, 2, 0);
     return 0;
 }
 

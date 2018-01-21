@@ -115,7 +115,7 @@ void herbsearch(unit * u, int max_take)
         (double)rherbs(r) / 100.0F, -0.01F);
 
     if (herbsfound > herbs) herbsfound = herbs;
-    rsetherbs(r, (short) (rherbs(r) - herbsfound));
+    rsetherbs(r, rherbs(r) - herbsfound);
 
     if (herbsfound) {
         produceexp(u, SK_HERBALISM, u->number);

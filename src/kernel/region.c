@@ -664,7 +664,7 @@ void rsetherbs(region *r, int value)
     assert(r->land || value==0);
     assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = (short)value;
+        r->land->herbs = value;
     }
 }
 
@@ -1190,7 +1190,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         }
         if (itype != NULL) {
             rsetherbtype(r, itype);
-            rsetherbs(r, (short)(50 + rng_int() % 31));
+            rsetherbs(r, 50 + rng_int() % 31);
         }
         else {
             rsetherbtype(r, NULL);
@@ -1455,7 +1455,7 @@ int region_get_morale(const region * r)
 void region_set_morale(region * r, int morale, int turn)
 {
     if (r->land) {
-        r->land->morale = (short)morale;
+        r->land->morale = morale;
         if (turn >= 0 && r->land->ownership) {
             r->land->ownership->morale_turn = turn;
         }
