@@ -206,15 +206,16 @@ static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain
     item_type *it_luxury;
     struct locale * lang = default_locale;
 
-    new_luxurytype(it_luxury = test_create_itemtype("jewel"), 5);
-    locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
-    CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
-
     new_luxurytype(it_luxury = test_create_itemtype("balm"), 5);
     locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
     CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
 
+    new_luxurytype(it_luxury = test_create_itemtype("jewel"), 5);
+    locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
+    CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
+
     r = test_create_region(0, 0, terrain);
+    setluxuries(r, it_luxury->rtype->ltype);
     return r;
 }
 

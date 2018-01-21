@@ -1,23 +1,27 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include "types.h"
+#endif
+
+#include "kernel/types.h"
+
 #include "jsonconf.h"
 
-#include "config.h"
-#include "building.h"
-#include "direction.h"
-#include "item.h"
-#include "keyword.h"
-#include "race.h"
-#include "ship.h"
-#include "spell.h"
-#include "order.h"
-#include "terrain.h"
-
-#include "move.h"
-#include "calendar.h"
-#include "prefix.h"
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/item.h"
+#include "kernel/race.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/order.h"
+#include "kernel/terrain.h"
 
 #include "util/language.h"
+
+#include "calendar.h"
+#include "direction.h"
+#include "keyword.h"
+#include "move.h"
+#include "prefix.h"
 
 #include <CuTest.h>
 #include <cJSON.h>

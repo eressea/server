@@ -161,12 +161,12 @@ static void test_build_with_ring(CuTest *tc) {
 static void test_build_with_potion(CuTest *tc) {
     build_fixture bf = { 0 };
     unit *u;
-    const potion_type *ptype;
+    const item_type *ptype;
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
-    oldpotiontype[P_DOMORE] = ptype = new_potiontype(it_get_or_create(rt_get_or_create("hodor")), 1);
+    oldpotiontype[P_DOMORE] = ptype = it_get_or_create(rt_get_or_create("hodor"));
     assert(rtype && ptype);
 
     i_change(&u->items, rtype->itype, 20);

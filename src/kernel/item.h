@@ -80,7 +80,6 @@ extern "C" {
         struct resource_mod *modifiers;
         /* --- pointers --- */
         struct item_type *itype;
-        struct potion_type *ptype;
         struct luxury_type *ltype;
         struct weapon_type *wtype;
         struct armor_type *atype;
@@ -99,6 +98,7 @@ extern "C" {
 #define ITF_ANIMAL           0x0010     /* an animal */
 #define ITF_VEHICLE          0x0020     /* a vehicle, drawn by two animals */
 #define ITF_CANUSE           0x0040     /* can be used with use_item_fun callout */
+#define ITF_POTION           0x0080     /* is a potion (for use_potion) */
 
     /* error codes for item_type::use */
 #define ECUSTOM   -1
@@ -127,13 +127,6 @@ extern "C" {
         int price;
     } luxury_type;
     extern luxury_type *luxurytypes;
-
-    typedef struct potion_type {
-        struct potion_type *next;
-        const item_type *itype;
-        int level;
-    } potion_type;
-    extern potion_type *potiontypes;
 
 #define WMF_WALKING         0x0001
 #define WMF_RIDING          0x0002
@@ -206,7 +199,6 @@ extern "C" {
     const resource_type *item2resource(const item_type * i);
 
     const weapon_type *resource2weapon(const resource_type * i);
-    const potion_type *resource2potion(const resource_type * i);
     const luxury_type *resource2luxury(const resource_type * i);
 
     item **i_find(item ** pi, const item_type * it);
@@ -234,8 +226,6 @@ extern "C" {
         skill_t sk);
     armor_type *new_armortype(item_type * itype, double penalty,
         variant magres, int prot, unsigned int flags);
-    potion_type *new_potiontype(item_type * itype, int level);
-
 
     /* these constants are used with get_resourcetype.
      * The order of the enum is not important for stored data.
@@ -285,7 +275,11 @@ extern "C" {
         NORESOURCE = -1
     } resource_t;
 
-    extern const struct potion_type *oldpotiontype[];
+    extern const struct item_type *oldpotiontype[];
+    extern struct attrib_type at_showitem;        /* show this potion's description */
+
+    void show_item(struct unit * u, const struct item_type * itype);
+
     const struct resource_type *get_resourcetype(resource_t rt);
     struct item *item_spoil(const struct race *rc, int size);
 
@@ -294,8 +288,6 @@ extern "C" {
     int get_money(const struct unit *);
     int set_money(struct unit *, int);
     int change_money(struct unit *, int);
-
-    extern struct attrib_type at_showitem;        /* show this potion's description */
 
     void register_resources(void);
     void init_resources(void);
