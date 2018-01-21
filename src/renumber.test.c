@@ -79,7 +79,7 @@ static void test_renumber_faction_invalid(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_building(CuTest *tc) {
