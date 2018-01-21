@@ -460,7 +460,7 @@ static void use_key1(connection *b, void *data) {
     if (b->type == &bt_questportal) {
         const struct item_type *itype = it_find("questkey1");
         ADDMSG(&u->faction->msgs,
-            msg_message("use_item", "unit item", u, itype->rtype));
+            msg_message("use_item", "unit amount item", u, 1, itype->rtype));
         b->data.i &= 0xFE;
     }
 }
@@ -470,7 +470,7 @@ static void use_key2(connection *b, void *data) {
     if (b->type == &bt_questportal) {
         const struct item_type *itype = it_find("questkey2");
         ADDMSG(&u->faction->msgs,
-            msg_message("use_item", "unit item", u, itype->rtype));
+            msg_message("use_item", "unit amount item", u, 1, itype->rtype));
         b->data.i &= 0xFD;
     }
 }

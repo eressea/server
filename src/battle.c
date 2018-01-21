@@ -2340,13 +2340,6 @@ double fleechance(unit * u)
             p = 0.9;
         }
     }
-#if 0
-    /* TODO: mistletoe */
-    c = get_curse(u->attribs, &ct_fleechance);
-    if (c) {
-        p += c->effect;
-    }
-#endif
     return p;
 }
 
@@ -3360,17 +3353,16 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     side *s;
     fighter *fc = NULL;
 
-    if (!attack) {
-#if 0
-        /* TODO: mistletoe */
-        attrib *a = a_find(u->attribs, &at_fleechance);
-        if (a != NULL) {
-            if (rng_double() <= a->data.flt) {
+    if (!attack && u->attribs) {
+        const item_type *itype = it_find("mistletoe");
+        if (itype) {
+            int effect = get_effect(u, itype);
+            if (effect >= u->number) {
+                change_effect(u, itype, -u->number);
                 *cp = NULL;
                 return false;
             }
         }
-#endif
     }
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {

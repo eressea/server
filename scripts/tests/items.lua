@@ -11,15 +11,15 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
-function disable_test_use_mistletoe()
+function test_use_mistletoe()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u.name = 'Miraculix'
-    u:add_item('mistletoe', 2)
-    u:add_order("BENUTZEN 1 Mistelzweig")
+    u:add_item('mistletoe', 3)
+    u:add_order("BENUTZEN 2 Mistelzweig")
     process_orders()
-    assert_equal(1, u:effect('mistletoe'))
+    assert_equal(2, u:effect('mistletoe'))
     assert_equal(1, u:get_item('mistletoe'))
     assert_equal(1, f:count_msg_type('use_item'))
 end
