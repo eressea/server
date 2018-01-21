@@ -51,6 +51,37 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     test_teardown();
 }
 
+static void test_renumber_faction_invalid(CuTest *tc) {
+    unit *u;
+    faction *f;
+    int no;
+    const struct locale *lang;
+
+    test_setup_ex(tc);
+    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    no = f->no;
+    lang = f->locale;
+    u->thisorder = create_order(K_NUMBER, lang, "%s [halima]", LOC(lang, parameters[P_FACTION]));
+    renumber_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
+    renumber_factions();
+    CuAssertIntEquals(tc, no, f->no);
+
+    test_clear_messages(f);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_NUMBER, lang, "%s 10000", LOC(lang, parameters[P_FACTION]));
+    renumber_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
+
+    test_clear_messages(f);
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_NUMBER, lang, "%s 0", LOC(lang, parameters[P_FACTION]));
+    renumber_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
+
+    test_cleanup();
+}
+
 static void test_renumber_building(CuTest *tc) {
     unit *u;
     int uno, no;
@@ -232,5 +263,6 @@ CuSuite *get_renumber_suite(void)
     SUITE_ADD_TEST(suite, test_renumber_ship_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_faction);
     SUITE_ADD_TEST(suite, test_renumber_faction_duplicate);
+    SUITE_ADD_TEST(suite, test_renumber_faction_invalid);
     return suite;
 }

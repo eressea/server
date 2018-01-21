@@ -1076,7 +1076,8 @@ void write_faction(gamedata *data, const faction * f)
     ursprung *ur;
 
     assert(f->_alive);
-    write_faction_reference(f, data->store);
+    assert(f->no > 0 && f->no <= MAX_UNIT_NR);
+    WRITE_INT(data->store, f->no);
     WRITE_INT(data->store, f->subscription);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
     WRITE_INT(data->store, f->max_spelllevel);

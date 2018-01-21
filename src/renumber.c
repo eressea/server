@@ -88,11 +88,15 @@ int renumber_cmd(unit * u, order * ord)
         s = gettoken(token, sizeof(token));
         if (s && *s) {
             int id = atoi36((const char *)s);
-            attrib *a = a_find(f->attribs, &at_number);
-            if (!a)
-                a = a_add(&f->attribs, a_new(&at_number));
-            a->data.i = id;
+            if (id > 0 && id <= MAX_UNIT_NR) {
+                attrib *a = a_find(f->attribs, &at_number);
+                if (!a)
+                    a = a_add(&f->attribs, a_new(&at_number));
+                a->data.i = id;
+                break;
+            }
         }
+        cmistake(u, ord, 114, MSG_EVENT);
         break;
 
     case P_UNIT:
