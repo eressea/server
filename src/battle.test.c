@@ -499,15 +499,15 @@ static void test_battle_skilldiff_building(CuTest *tc)
     test_teardown();
 }
 
-static void assert_skill(CuTest *tc, char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
+static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
 {
     skill *sv = unit_skill(u, sk);
     char buf[256];
     if (sv) {
         sprintf(buf, "%s level %d != %d", msg, sv->level, level);
-        CuAssertIntEquals_Msg(tc, (const char *)&buf, level, sv->level);
+        CuAssertIntEquals_Msg(tc, buf, level, sv->level);
         sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);
-        CuAssert(tc, (const char *)&buf, sv->weeks >= week && sv->weeks <= weekmax);
+        CuAssert(tc, buf, sv->weeks >= week && sv->weeks <= weekmax);
     }
     else {
         CuAssertIntEquals_Msg(tc, msg, level, 0);
@@ -518,7 +518,7 @@ static void assert_skill(CuTest *tc, char *msg, unit *u, skill_t sk, int level, 
 static void test_drain_exp(CuTest *tc)
 {
     unit *u;
-    char *msg;
+    const char *msg;
     int i;
     double rand;
 
@@ -591,6 +591,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
-    SUITE_ADD_TEST(suite, test_drain_exp);
+    DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

@@ -6815,19 +6815,10 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="item" type="resource"/>
+      <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) benutzt ein $resource($item,1)."</text>
-    <text locale="en">"$unit($unit) uses a $resource($item,1)."</text>
-  </message>
-  <message name="use_singleperson" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="item" type="resource"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $resource($item,0) können nur von Ein-Personen Einheiten benutzt werden."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $resource($item,0) can only be used by single-person units."</text>
+    <text locale="de">"$unit($unit) benutzt $amount $resource($item,$amount)."</text>
+    <text locale="en">"$unit($unit) uses $amount $resource($item,$amount)."</text>
   </message>
   <message name="no_attack_after_advance" section="errors">
     <type>

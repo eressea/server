@@ -92,33 +92,34 @@ int RunAllTests(int argc, char *argv[])
     /* items */
     ADD_SUITE(xerewards);
     /* kernel */
+    ADD_SUITE(academy);
+    ADD_SUITE(alchemy);
     ADD_SUITE(alliance);
+    ADD_SUITE(ally);
+    ADD_SUITE(building);
     ADD_SUITE(command);
     ADD_SUITE(db);
-    ADD_SUITE(plane);
-    ADD_SUITE(unit);
     ADD_SUITE(faction);
     ADD_SUITE(group);
     ADD_SUITE(build);
-    ADD_SUITE(pool);
     ADD_SUITE(curse);
     ADD_SUITE(equipment);
     ADD_SUITE(familiar);
     ADD_SUITE(item);
     ADD_SUITE(magic);
-    ADD_SUITE(academy);
-    ADD_SUITE(alchemy);
+    ADD_SUITE(magicresistance);
+    ADD_SUITE(messages);
+    ADD_SUITE(plane);
+    ADD_SUITE(pool);
     ADD_SUITE(reports);
     ADD_SUITE(region);
     ADD_SUITE(save);
     ADD_SUITE(ship);
+    ADD_SUITE(skills);
     ADD_SUITE(spellbook);
-    ADD_SUITE(building);
     ADD_SUITE(spell);
     ADD_SUITE(spells);
-    ADD_SUITE(magicresistance);
-    ADD_SUITE(ally);
-    ADD_SUITE(messages);
+    ADD_SUITE(unit);
     /* gamecode */
     ADD_SUITE(battle);
     ADD_SUITE(calendar);

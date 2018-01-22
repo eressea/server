@@ -17,13 +17,6 @@
 #include <kernel/config.h>
 
 #include "gmtool.h"
-#include "gmtool_structs.h"
-#include "chaos.h"
-#include "console.h"
-#include "listbox.h"
-#include "wormhole.h"
-#include "calendar.h"
-#include "teleport.h"
 
 #include <modules/xmas.h>
 #include <modules/gmcmd.h>
@@ -42,7 +35,6 @@
 #include <kernel/save.h>
 #include <kernel/ship.h>
 #include <kernel/terrain.h>
-#include <kernel/xmlreader.h>
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
@@ -55,6 +47,15 @@
 #include <util/path.h>
 #include <util/rng.h>
 #include <util/unicode.h>
+
+#include "gmtool_structs.h"
+#include "chaos.h"
+#include "console.h"
+#include "listbox.h"
+#include "wormhole.h"
+#include "calendar.h"
+#include "teleport.h"
+#include "xmlreader.h"
 
 #include <storage.h>
 #include <lua.h>

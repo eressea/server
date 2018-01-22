@@ -161,6 +161,45 @@ static bool RemoveNMRNewbie(void)
     return value != 0;
 }
 
+static void dumbeffect(unit *u) {
+    int effect = get_effect(u, oldpotiontype[P_FOOL]);
+    if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
+        skill *sv = u->skills, *sb = NULL;
+        while (sv != u->skills + u->skill_size) {
+            if (sb == NULL || skill_compare(sv, sb) > 0) {
+                sb = sv;
+            }
+            ++sv;
+        }
+        /* bestes Talent raussuchen */
+        if (sb != NULL) {
+            int weeks = u->number;
+            if (weeks > effect) weeks = effect;
+            reduce_skill(u, sb, weeks);
+            ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+                "unit weeks skill", u, weeks, (skill_t)sb->id));
+        }                         /* sonst Glück gehabt: wer nix weiss, kann nix vergessen... */
+        change_effect(u, oldpotiontype[P_FOOL], -effect);
+    }
+}
+
+static void astral_crumble(unit *u) {
+    item **itemp = &u->items;
+    while (*itemp) {
+        item *itm = *itemp;
+        if ((itm->type->flags & ITF_NOTLOST) == 0) {
+            if (itm->type->flags & (ITF_BIG | ITF_ANIMAL | ITF_CURSED)) {
+                ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
+                    "unit region item amount",
+                    u, u->region, itm->type->rtype, itm->number));
+                i_free(i_remove(itemp, itm));
+                continue;
+            }
+        }
+        itemp = &itm->next;
+    }
+}
+
 static void age_unit(region * r, unit * u)
 {
     const race *rc = u_race(u);
@@ -169,21 +208,11 @@ static void age_unit(region * r, unit * u)
     if (u->number > 0 && rc->age_unit) {
         rc->age_unit(u);
     }
-    if (u->region && is_astral(u->region)) {
-        item **itemp = &u->items;
-        while (*itemp) {
-            item *itm = *itemp;
-            if ((itm->type->flags & ITF_NOTLOST) == 0) {
-                if (itm->type->flags & (ITF_BIG | ITF_ANIMAL | ITF_CURSED)) {
-                    ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
-                        "unit region item amount",
-                        u, u->region, itm->type->rtype, itm->number));
-                    i_free(i_remove(itemp, itm));
-                    continue;
-                }
-            }
-            itemp = &itm->next;
-        }
+    if (u->attribs) {
+        dumbeffect(u);
+    }
+    if (u->items && u->region && is_astral(u->region)) {
+        astral_crumble(u);
     }
 }
 
@@ -198,26 +227,6 @@ static void live(region * r)
         /* IUW: age_unit() kann u loeschen, u->next ist dann
          * undefiniert, also muessen wir hier schon das nächste
          * Element bestimmen */
-
-        int effect = get_effect(u, oldpotiontype[P_FOOL]);
-        if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
-            skill *sv = u->skills, *sb = NULL;
-            while (sv != u->skills + u->skill_size) {
-                if (sb == NULL || skill_compare(sv, sb) > 0) {
-                    sb = sv;
-                }
-                ++sv;
-            }
-            /* bestes Talent raussuchen */
-            if (sb != NULL) {
-                int weeks = u->number;
-                if (weeks > effect) weeks = effect;
-                reduce_skill(u, sb, weeks);
-                ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
-                    "unit weeks skill", u, weeks, (skill_t)sb->id));
-            }                         /* sonst Glück gehabt: wer nix weiss, kann nix vergessen... */
-            change_effect(u, oldpotiontype[P_FOOL], -effect);
-        }
         age_unit(r, u);
         if (*up == u)
             up = &u->next;
@@ -2521,12 +2530,12 @@ int group_cmd(unit * u, struct order *ord)
 
 int origin_cmd(unit * u, struct order *ord)
 {
-    short px, py;
+    int px, py;
 
     init_order_depr(ord);
 
-    px = (short)getint();
-    py = (short)getint();
+    px = getint();
+    py = getint();
 
     faction_setorigin(u->faction, getplaneid(u->region), px, py);
     return 0;

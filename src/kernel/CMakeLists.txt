@@ -27,12 +27,11 @@ region.test.c
 # resources.test.c
 save.test.c
 ship.test.c
-# skills.test.c
+skills.test.c
 spellbook.test.c
 spell.test.c
 # terrain.test.c
 unit.test.c
-# xmlreader.test.c
 )
 
 SET(_DBFILES db/critbit.c)
@@ -78,7 +77,6 @@ spellbook.c
 spell.c
 terrain.c
 unit.c
-xmlreader.c
 )
 
 SET(VERSION_SRC ${PROJECT_NAME}/version.c PARENT_SCOPE)
