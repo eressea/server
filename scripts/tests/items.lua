@@ -35,16 +35,6 @@ function test_mistletoe_survive()
     process_orders()
     u = get_unit(uno)
     assert_not_nil(u)
-    if u:effect('mistletoe') ~= 1 then
-        print(u2.faction)
-        for _, m in ipairs(u2.faction.messages) do
-            print(m)
-        end
-        print(u.faction)
-        for _, m in ipairs(u.faction.messages) do
-            print(m)
-        end
-    end
     assert_equal(1, u:effect('mistletoe'))
 end
 
