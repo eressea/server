@@ -2071,7 +2071,7 @@ static void plant(unit * u, int raw)
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
     use_pooled(u, itype->rtype, GET_DEFAULT, n);
-    rsetherbs(r, (short)(rherbs(r) + planted));
+    rsetherbs(r, rherbs(r) + planted);
     ADDMSG(&u->faction->msgs, msg_message("plant", "unit region amount herb",
         u, r, planted, itype->rtype));
 }

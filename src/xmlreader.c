@@ -12,28 +12,28 @@ without prior permission by the authors of Eressea.
 
 #include <platform.h>
 #include <kernel/config.h>
+
 #include "xmlreader.h"
 
-#include "building.h"
-#include "guard.h"
-#include "equipment.h"
-#include "item.h"
-#include "keyword.h"
-#include "messages.h"
-#include "race.h"
-#include "region.h"
-#include "resources.h"
-#include "ship.h"
-#include "terrain.h"
-#include "skills.h"
-#include "spell.h"
-#include "spellbook.h"
-#include "calendar.h"
-#include "prefix.h"
-#include "move.h"
+#include "kernel/building.h"
+#include "kernel/equipment.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/skills.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
 
-/* TODO: core code should not include these files: */
 #include "alchemy.h"
+#include "calendar.h"
+#include "guard.h"
+#include "keyword.h"
+#include "move.h"
+#include "prefix.h"
 
 #include <modules/score.h>
 #include <attributes/attributes.h>

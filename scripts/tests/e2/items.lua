@@ -128,28 +128,31 @@ function test_speedsail()
     assert_equal(1, u.ship:get_curse('shipspeed')) -- effect stays forever
 end
 
-function test_foolpotion()
+function disable_test_foolpotion()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     turn_begin()
-    u:add_item("p7", 1)
+    u:add_item('p7', 2)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Dumpfbackenbrot 4242")
     turn_process()
-    assert_equal(1, u:get_item("p7"))
+    assert_equal(2, u:get_item('p7'))
     assert_equal(1, f:count_msg_type('feedback_unit_not_found'))
     local u2 = unit.create(f, r, 1)
     
     u:clear_orders()
-    u:add_order("BENUTZEN 1 Dumpfbackenbrot " .. itoa36(u2.id))
+    u:add_order("BENUTZEN 2 Dumpfbackenbrot " .. itoa36(u2.id))
     turn_process()
-    assert_equal(1, u:get_item("p7"))
+    assert_equal(2, u:get_item('p7'))
     assert_equal(1, f:count_msg_type('error64'))
 
-    u:set_skill("stealth", 1);
+    u:set_skill("stealth", 1)
+    u2:set_skill('crossbow', 1)
     turn_process()
-    assert_equal(0, u:get_item("p7"))
+    assert_equal(0, u:get_item('p7'))
+    assert_equal(0, u2:effect('p7'))
+    assert_equal(0, u2:get_skill('crossbow'))
     assert_equal(1, f:count_msg_type('givedumb'))
     turn_end()
 end

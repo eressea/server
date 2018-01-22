@@ -142,11 +142,14 @@ static int rule_tactics_formula;
 static int rule_nat_armor;
 static int rule_cavalry_mode;
 static int rule_vampire;
+static const item_type *it_mistletoe;
 
 /** initialize rules from configuration.
  */
 static void init_rules(void)
 {
+    it_mistletoe = it_find("mistletoe");
+
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
@@ -887,7 +890,7 @@ static void rmtroop(troop dt)
 {
     fighter *df = dt.fighter;
 
-    /* troop ist immer eine einzele Person */
+    /* troop ist immer eine einzelne Person */
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
@@ -943,8 +946,8 @@ void drain_exp(struct unit *u, int n)
     skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
     skill_t ssk;
 
+    /* TODO (enno): we can use u->skill_size to find a random skill */
     ssk = sk;
-
     while (get_level(u, sk) == 0) {
         sk++;
         if (sk == MAXSKILLS)
@@ -2328,29 +2331,22 @@ static double horse_fleeing_bonus(const unit * u)
 
 double fleechance(unit * u)
 {
-    double c = 0.20;              /* Fluchtwahrscheinlichkeit in % */
+    double p = 0.20;              /* Fluchtwahrscheinlichkeit in % */
     /* Einheit u versucht, dem Get�mmel zu entkommen */
 
-    c += (effskill(u, SK_STEALTH, 0) * 0.05);
-    c += horse_fleeing_bonus(u);
+    p += (effskill(u, SK_STEALTH, 0) * 0.05);
+    p += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
-        c += 0.20;
-        c = fmin(c, 0.90);
+        p += 0.20;
+        if (p > 0.9) {
+            p = 0.9;
+        }
     }
-    else {
-        c = fmin(c, 0.75);
-    }
-#if 0
-    /* TODO: mistletoe */
-    if (a) {
-        c += a->data.flt;
-    }
-#endif
-    return c;
+    return p;
 }
 
-/** add a new army to the conflict
+/** add a new army to the conflict.
  * beware: armies need to be added _at the beginning_ of the list because
  * otherwise join_allies() will get into trouble */
 side *make_side(battle * b, const faction * f, const group * g,
@@ -3358,27 +3354,14 @@ fighter * get_fighter(battle * b, const struct unit * u)
 static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     side *s;
-    fighter *c = NULL;
-
-    if (!attack) {
-#if 0
-        /* TODO: mistletoe */
-        attrib *a = a_find(u->attribs, &at_fleechance);
-        if (a != NULL) {
-            if (rng_double() <= a->data.flt) {
-                *cp = NULL;
-                return false;
-            }
-        }
-#endif
-    }
+    fighter *fc = NULL;
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         if (s->faction == u->faction) {
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->unit == u) {
-                    c = fig;
+                    fc = fig;
                     if (attack) {
                         set_attacker(fig);
                     }
@@ -3387,11 +3370,11 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
             }
         }
     }
-    if (!c) {
+    if (!fc) {
         *cp = make_fighter(b, u, NULL, attack);
         return *cp != NULL;
     }
-    *cp = c;
+    *cp = fc;
     return false;
 }
 
@@ -3828,13 +3811,27 @@ static bool start_battle(region * r, battle ** bp)
                     join_battle(b, u, true, &c1);
                     join_battle(b, u2, false, &c2);
 
+                    if (u2->attribs) {
+                        if (it_mistletoe) {
+                            int effect = get_effect(u2, it_mistletoe);
+                            if (effect >= u->number) {
+                                change_effect(u2, it_mistletoe, -u2->number);
+                                c2->run.hp = u2->hp;
+                                c2->run.number = u2->number;
+                                c2->side->flee += u2->number;
+                                setguard(u2, false);
+                                rmfighter(c2, u2->number);
+                            }
+                        }
+                    }
+
                     /* Hat die attackierte Einheit keinen Noaid-Status,
                      * wird das Flag von der Faction genommen, andere
                      * Einheiten greifen ein. */
                     if (!fval(u2, UFL_NOAID))
                         freset(u2->faction, FFL_NOAID);
 
-                    if (c1 != NULL && c2 != NULL) {
+                    if (c1 && c2 && c2->run.number < c2->unit->number) {
                         /* Merken, wer Angreifer ist, f�r die R�ckzahlung der
                          * Pr�combataura bei kurzem Kampf. */
                         c1->side->bf->attacker = true;
