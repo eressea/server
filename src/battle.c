@@ -890,7 +890,7 @@ static void rmtroop(troop dt)
 {
     fighter *df = dt.fighter;
 
-    /* troop ist immer eine einzele Person */
+    /* troop ist immer eine einzelne Person */
     rmfighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
@@ -3356,17 +3356,6 @@ static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     side *s;
     fighter *fc = NULL;
 
-    if (!attack && u->attribs) {
-        if (it_mistletoe) {
-            int effect = get_effect(u, it_mistletoe);
-            if (effect >= u->number) {
-                change_effect(u, it_mistletoe, -u->number);
-                *cp = NULL;
-                return false;
-            }
-        }
-    }
-
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         if (s->faction == u->faction) {
@@ -3822,13 +3811,27 @@ static bool start_battle(region * r, battle ** bp)
                     join_battle(b, u, true, &c1);
                     join_battle(b, u2, false, &c2);
 
+                    if (u2->attribs) {
+                        if (it_mistletoe) {
+                            int effect = get_effect(u2, it_mistletoe);
+                            if (effect >= u->number) {
+                                change_effect(u2, it_mistletoe, -u2->number);
+                                c2->run.hp = u2->hp;
+                                c2->run.number = u2->number;
+                                c2->side->flee += u2->number;
+                                setguard(u2, false);
+                                rmfighter(c2, u2->number);
+                            }
+                        }
+                    }
+
                     /* Hat die attackierte Einheit keinen Noaid-Status,
                      * wird das Flag von der Faction genommen, andere
                      * Einheiten greifen ein. */
                     if (!fval(u2, UFL_NOAID))
                         freset(u2->faction, FFL_NOAID);
 
-                    if (c1 != NULL && c2 != NULL) {
+                    if (c1 && c2 && c2->run.number < c2->unit->number) {
                         /* Merken, wer Angreifer ist, f�r die R�ckzahlung der
                          * Pr�combataura bei kurzem Kampf. */
                         c1->side->bf->attacker = true;
