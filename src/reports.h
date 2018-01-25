@@ -120,6 +120,7 @@ extern "C" {
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, const struct gamedate *date);
+    void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);

@@ -2195,6 +2195,42 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 #endif
 }
 
+void report_race_skills(const race *rc, char *zText, size_t length, const struct locale *lang)
+{
+    size_t size = length - 1;
+    int dh = 0, dh1 = 0, sk;
+    char *bufp = zText;
+
+    for (sk = 0; sk < MAXSKILLS; ++sk) {
+        if (skill_enabled(sk) && rc->bonus[sk] > -5)
+            dh++;
+    }
+
+    for (sk = 0; sk < MAXSKILLS; sk++) {
+        if (skill_enabled(sk) && rc->bonus[sk] > -5) {
+            size_t bytes;
+            dh--;
+            if (dh1 == 0) {
+                dh1 = 1;
+            }
+            else {
+                if (dh == 0) {
+                    bytes = str_strlcpy(bufp, LOC(lang, "list_and"), size);
+                }
+                else {
+                    bytes = str_strlcpy(bufp, ", ", size);
+                }
+                assert(bytes <= INT_MAX);
+                BUFFER_STRCAT(bufp, size, bytes);
+            }
+            bytes = str_strlcpy(bufp, skillname((skill_t)sk, lang),
+                size);
+            assert(bytes <= INT_MAX);
+            BUFFER_STRCAT(bufp, size, (int)bytes);
+        }
+    }
+}
+
 static void eval_direction(struct opstack **stack, const void *userdata)
 {
     const faction *report = (const faction *)userdata;

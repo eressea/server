@@ -18,6 +18,7 @@
 #include "spells.h"
 
 #include "guard.h"
+#include "reports.h"
 #include "spy.h"
 #include "vortex.h"
 #include "laws.h"
@@ -72,7 +73,6 @@
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/language.h>
@@ -537,11 +537,9 @@ static int sp_summon_familiar(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     const race *rc;
-    int sk;
-    int dh, dh1;
+    int dh;
     message *msg;
-    char zText[2048], *bufp = zText;
-    size_t size = sizeof(zText) - 1;
+    char zText[2048];
 
     if (get_familiar(mage) != NULL) {
         cmistake(mage, co->order, 199, MSG_MAGIC);
@@ -581,37 +579,7 @@ static int sp_summon_familiar(castorder * co)
     msg_release(msg);
     make_familiar(mage, r, rc, zText);
 
-    dh = 0;
-    dh1 = 0;
-    for (sk = 0; sk < MAXSKILLS; ++sk) {
-        if (skill_enabled(sk) && rc->bonus[sk] > -5)
-            dh++;
-    }
-
-    for (sk = 0; sk < MAXSKILLS; sk++) {
-        if (skill_enabled(sk) && rc->bonus[sk] > -5) {
-            size_t bytes;
-            dh--;
-            if (dh1 == 0) {
-                dh1 = 1;
-            }
-            else {
-                if (dh == 0) {
-                    bytes = str_strlcpy(bufp, LOC(mage->faction->locale,
-                            "list_and"), size);
-                }
-                else {
-                    bytes = str_strlcpy(bufp, ", ", size);
-                }
-                assert(bytes <= INT_MAX);
-                BUFFER_STRCAT(bufp, size, bytes);
-            }
-            bytes = str_strlcpy(bufp, skillname((skill_t)sk, mage->faction->locale),
-                    size);
-            assert(bytes <= INT_MAX);
-            BUFFER_STRCAT(bufp, size, (int)bytes);
-        }
-    }
+    report_race_skills(rc, zText, sizeof(zText), mage->faction->locale);
     ADDMSG(&mage->faction->msgs, msg_message("familiar_describe",
         "mage race skills", mage, rc, zText));
     return cast_level;
