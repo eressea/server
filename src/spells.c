@@ -539,7 +539,6 @@ static int sp_summon_familiar(castorder * co)
     const race *rc;
     int sk;
     int dh, dh1;
-    int bytes;
     message *msg;
     char zText[2048], *bufp = zText;
     size_t size = sizeof(zText) - 1;
@@ -591,25 +590,25 @@ static int sp_summon_familiar(castorder * co)
 
     for (sk = 0; sk < MAXSKILLS; sk++) {
         if (skill_enabled(sk) && rc->bonus[sk] > -5) {
+            size_t bytes;
             dh--;
             if (dh1 == 0) {
                 dh1 = 1;
             }
             else {
                 if (dh == 0) {
-                    bytes = (int) str_strlcpy(bufp, (const char *)LOC(mage->faction->locale,
+                    bytes = str_strlcpy(bufp, (const char *)LOC(mage->faction->locale,
                             "list_and"), size);
                 }
                 else {
-                    bytes = (int)str_strlcpy(bufp, (const char *)", ", size);
+                    bytes = str_strlcpy(bufp, (const char *)", ", size);
                 }
-                assert(bytes >= 0);
+                assert(bytes >= 0 && bytes <= INT_MAX);
                 BUFFER_STRCAT(bufp, size, bytes);
             }
-            bytes =
-                str_strlcpy(bufp, (const char *)skillname((skill_t)sk, mage->faction->locale),
+            bytes = str_strlcpy(bufp, skillname((skill_t)sk, mage->faction->locale),
                     size);
-            assert(bytes <= INT_MAX);
+            assert(bytes >= 0 && bytes <= INT_MAX);
             BUFFER_STRCAT(bufp, size, (int)bytes);
         }
     }
