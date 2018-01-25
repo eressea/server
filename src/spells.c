@@ -597,18 +597,18 @@ static int sp_summon_familiar(castorder * co)
             }
             else {
                 if (dh == 0) {
-                    bytes = str_strlcpy(bufp, (const char *)LOC(mage->faction->locale,
+                    bytes = str_strlcpy(bufp, LOC(mage->faction->locale,
                             "list_and"), size);
                 }
                 else {
-                    bytes = str_strlcpy(bufp, (const char *)", ", size);
+                    bytes = str_strlcpy(bufp, ", ", size);
                 }
-                assert(bytes >= 0 && bytes <= INT_MAX);
+                assert(bytes <= INT_MAX);
                 BUFFER_STRCAT(bufp, size, bytes);
             }
             bytes = str_strlcpy(bufp, skillname((skill_t)sk, mage->faction->locale),
                     size);
-            assert(bytes >= 0 && bytes <= INT_MAX);
+            assert(bytes <= INT_MAX);
             BUFFER_STRCAT(bufp, size, (int)bytes);
         }
     }
