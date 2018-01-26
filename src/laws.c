@@ -81,7 +81,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -2265,146 +2264,11 @@ static void display_item(unit * u, const item_type * itype)
         itype->weight, itype->rtype, info));
 }
 
-static void display_race(unit * u, const race * rc)
+static void display_race(faction * f, const race * rc)
 {
-    faction * f = u->faction;
-    const char *name, *key;
-    const char *info;
-    int a, at_count;
-    char buf[2048], *bufp = buf;
-    size_t size = sizeof(buf) - 1;
-    size_t bytes;
+    char buf[2048];
 
-    name = rc_name_s(rc, NAME_SINGULAR);
-
-    bytes = slprintf(bufp, size, "%s: ", LOC(f->locale, name));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    key = mkname("raceinfo", rc->_name);
-    info = locale_getstring(f->locale, key);
-    if (info == NULL) {
-        info = LOC(f->locale, mkname("raceinfo", "no_info"));
-    }
-
-    if (info) bufp = STRLCPY(bufp, info, size);
-
-    /* hp_p : Trefferpunkte */
-    bytes =
-        slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(f->locale,
-            "stat_hitpoints"));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    /* b_attacke : Angriff */
-    bytes =
-        slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_attack"),
-            (rc->at_default + rc->at_bonus));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    /* b_defense : Verteidigung */
-    bytes =
-        slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_defense"),
-            (rc->df_default + rc->df_bonus));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
-
-    /* b_armor : Rüstung */
-    if (rc->armor > 0) {
-        bytes =
-            slprintf(bufp, size, ", %s: %d", LOC(f->locale, "stat_armor"), rc->armor);
-        assert(bytes <= INT_MAX);
-        if (wrptr(&bufp, &size, (int)bytes) != 0)
-            WARN_STATIC_BUFFER();
-    }
-
-    if (size > 1) {
-        *bufp++ = '.';
-        --size;
-    }
-    else
-        WARN_STATIC_BUFFER();
-
-    /* b_damage : Schaden */
-    at_count = 0;
-    for (a = 0; a < RACE_ATTACKS; a++) {
-        if (rc->attack[a].type != AT_NONE) {
-            at_count++;
-        }
-    }
-    if (rc->battle_flags & BF_EQUIPMENT) {
-        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(f->locale, "stat_equipment"))) != 0)
-            WARN_STATIC_BUFFER();
-    }
-    if (rc->battle_flags & BF_RES_PIERCE) {
-        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(f->locale, "stat_pierce"))) != 0)
-            WARN_STATIC_BUFFER();
-    }
-    if (rc->battle_flags & BF_RES_CUT) {
-        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(f->locale, "stat_cut"))) != 0)
-            WARN_STATIC_BUFFER();
-    }
-    if (rc->battle_flags & BF_RES_BASH) {
-        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(f->locale, "stat_bash"))) != 0)
-            WARN_STATIC_BUFFER();
-    }
-
-    if (wrptr(&bufp, &size, snprintf(bufp, size, " %d %s", at_count, LOC(f->locale, (at_count == 1) ? "stat_attack" : "stat_attacks"))) != 0)
-        WARN_STATIC_BUFFER();
-
-    for (a = 0; a < RACE_ATTACKS; a++) {
-        if (rc->attack[a].type != AT_NONE) {
-            if (a != 0)
-                bufp = STRLCPY(bufp, ", ", size);
-            else
-                bufp = STRLCPY(bufp, ": ", size);
-
-            switch (rc->attack[a].type) {
-            case AT_STANDARD:
-                bytes =
-                    (size_t)snprintf(bufp, size, "%s (%s)",
-                        LOC(f->locale, "attack_standard"), rc->def_damage);
-                break;
-            case AT_NATURAL:
-                bytes =
-                    (size_t)snprintf(bufp, size, "%s (%s)",
-                        LOC(f->locale, "attack_natural"), rc->attack[a].data.dice);
-                break;
-            case AT_SPELL:
-            case AT_COMBATSPELL:
-            case AT_DRAIN_ST:
-            case AT_DRAIN_EXP:
-            case AT_DAZZLE:
-                bytes = (size_t)snprintf(bufp, size, "%s", LOC(f->locale, "attack_magical"));
-                break;
-            case AT_STRUCTURAL:
-                bytes =
-                    (size_t)snprintf(bufp, size, "%s (%s)",
-                        LOC(f->locale, "attack_structural"), rc->attack[a].data.dice);
-                break;
-            default:
-                bytes = 0;
-            }
-
-            assert(bytes <= INT_MAX);
-            if (bytes && wrptr(&bufp, &size, (int)bytes) != 0)
-                WARN_STATIC_BUFFER();
-        }
-    }
-
-    if (size > 1) {
-        *bufp++ = '.';
-        --size;
-    }
-    else
-        WARN_STATIC_BUFFER();
-
-    *bufp = 0;
+    report_raceinfo(rc, f->locale, buf, sizeof(buf));
     addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
 }
 
@@ -2453,7 +2317,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
         }
 
         if (rc && u_race(u) == rc) {
-            display_race(u, rc);
+            display_race(u->faction, rc);
             found = true;
         }
     }
