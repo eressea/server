@@ -178,6 +178,7 @@ void sk_set(skill * sv, int level)
     assert(sv && level != 0);
     sv->weeks = skill_weeks(level);
     sv->level = level;
+    assert(sv->weeks <= sv->level * 2 + 1);
 }
 
 static bool rule_random_progress(void)
@@ -215,6 +216,7 @@ void increase_skill(unit * u, skill_t sk, int weeks)
         sk_set(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
+    assert(sv->weeks <= sv->level * 2 + 1);
 }
 
 void reduce_skill(unit * u, skill * sv, int weeks)
@@ -229,11 +231,13 @@ void reduce_skill(unit * u, skill * sv, int weeks)
     while (sv->level > 0 && sv->weeks > max_weeks) {
         sv->weeks -= sv->level;
         --sv->level;
+        max_weeks -= 2;
     }
     if (sv->level == 0) {
         /* reroll */
         sv->weeks = skill_weeks(sv->level);
     }
+    assert(sv->weeks <= sv->level * 2 + 1);
 }
 
 int skill_compare(const skill * sk, const skill * sc)
