@@ -162,13 +162,6 @@ set(SERVER_SRC
   bind_unit.c
 )
 
-if (SQLITE3_FOUND)
-set (SERVER_SRC ${SERVER_SRC}
-  sqlite.c
-  bind_sqlite.c
-)
-endif (SQLITE3_FOUND)
-
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
   gmtool.c
@@ -295,15 +288,13 @@ target_link_libraries(convert ${DB_LIBRARIES})
 target_link_libraries(eressea ${DB_LIBRARIES})
 target_link_libraries(test_eressea ${DB_LIBRARIES})
 add_definitions(-DUSE_DB)
-endif(DB_FOUND)
-
-if (SQLITE3_FOUND)
+elseif (SQLITE3_FOUND)
 include_directories (${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
 target_link_libraries(convert ${SQLITE3_LIBRARIES})
 target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
 add_definitions(-DUSE_SQLITE)
-endif(SQLITE3_FOUND)
+endif(DB_FOUND)
 
 if (CURSES_FOUND)
 include_directories (${CURSES_INCLUDE_DIR})
