@@ -363,25 +363,145 @@ static void report_resource(resource_report * result, const resource_type *rtype
     result->level = level;
 }
 
-void report_race(const struct unit *u, const char **name, const char **illusion)
+void report_raceinfo(const struct race *rc, const struct locale *lang, char *buf, size_t length)
 {
-    if (illusion) {
-        const race *irace = u_irace(u);
-        if (irace && irace != u_race(u)) {
-            *illusion = irace->_name;
-        }
-        else {
-            *illusion = NULL;
+    const char *info;
+    int a, at_count;
+    const char *name, *key;
+    char *bufp = buf;
+    size_t size = length - 1;
+    size_t bytes;
+
+    name = rc_name_s(rc, NAME_SINGULAR);
+
+    bytes = slprintf(bufp, size, "%s: ", LOC(lang, name));
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    key = mkname("raceinfo", rc->_name);
+    info = locale_getstring(lang, key);
+    if (info == NULL) {
+        info = LOC(lang, mkname("raceinfo", "no_info"));
+    }
+
+    if (info) bufp = STRLCPY(bufp, info, size);
+
+    /* hp_p : Trefferpunkte */
+    bytes =
+        slprintf(bufp, size, " %d %s", rc->hitpoints, LOC(lang,
+            "stat_hitpoints"));
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    /* b_attacke : Angriff */
+    bytes =
+        slprintf(bufp, size, ", %s: %d", LOC(lang, "stat_attack"),
+        (rc->at_default + rc->at_bonus));
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    /* b_defense : Verteidigung */
+    bytes =
+        slprintf(bufp, size, ", %s: %d", LOC(lang, "stat_defense"),
+        (rc->df_default + rc->df_bonus));
+    assert(bytes <= INT_MAX);
+    if (wrptr(&bufp, &size, (int)bytes) != 0)
+        WARN_STATIC_BUFFER();
+
+    /* b_armor : Rüstung */
+    if (rc->armor > 0) {
+        bytes =
+            slprintf(bufp, size, ", %s: %d", LOC(lang, "stat_armor"), rc->armor);
+        assert(bytes <= INT_MAX);
+        if (wrptr(&bufp, &size, (int)bytes) != 0)
+            WARN_STATIC_BUFFER();
+    }
+
+    if (size > 1) {
+        *bufp++ = '.';
+        --size;
+    }
+    else
+        WARN_STATIC_BUFFER();
+
+    /* b_damage : Schaden */
+    at_count = 0;
+    for (a = 0; a < RACE_ATTACKS; a++) {
+        if (rc->attack[a].type != AT_NONE) {
+            at_count++;
         }
     }
-    if (name) {
-        *name = u_race(u)->_name;
-        if (fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            const char *str = get_racename(u->attribs);
-            if (str)
-                *name = str;
+    if (rc->battle_flags & BF_EQUIPMENT) {
+        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(lang, "stat_equipment"))) != 0)
+            WARN_STATIC_BUFFER();
+    }
+    if (rc->battle_flags & BF_RES_PIERCE) {
+        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(lang, "stat_pierce"))) != 0)
+            WARN_STATIC_BUFFER();
+    }
+    if (rc->battle_flags & BF_RES_CUT) {
+        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(lang, "stat_cut"))) != 0)
+            WARN_STATIC_BUFFER();
+    }
+    if (rc->battle_flags & BF_RES_BASH) {
+        if (wrptr(&bufp, &size, snprintf(bufp, size, " %s", LOC(lang, "stat_bash"))) != 0)
+            WARN_STATIC_BUFFER();
+    }
+
+    if (wrptr(&bufp, &size, snprintf(bufp, size, " %d %s", at_count, LOC(lang, (at_count == 1) ? "stat_attack" : "stat_attacks"))) != 0)
+        WARN_STATIC_BUFFER();
+
+    for (a = 0; a < RACE_ATTACKS; a++) {
+        if (rc->attack[a].type != AT_NONE) {
+            if (a != 0)
+                bufp = STRLCPY(bufp, ", ", size);
+            else
+                bufp = STRLCPY(bufp, ": ", size);
+
+            switch (rc->attack[a].type) {
+            case AT_STANDARD:
+                bytes =
+                    (size_t)snprintf(bufp, size, "%s (%s)",
+                        LOC(lang, "attack_standard"), rc->def_damage);
+                break;
+            case AT_NATURAL:
+                bytes =
+                    (size_t)snprintf(bufp, size, "%s (%s)",
+                        LOC(lang, "attack_natural"), rc->attack[a].data.dice);
+                break;
+            case AT_SPELL:
+            case AT_COMBATSPELL:
+            case AT_DRAIN_ST:
+            case AT_DRAIN_EXP:
+            case AT_DAZZLE:
+                bytes = (size_t)snprintf(bufp, size, "%s", LOC(lang, "attack_magical"));
+                break;
+            case AT_STRUCTURAL:
+                bytes =
+                    (size_t)snprintf(bufp, size, "%s (%s)",
+                        LOC(lang, "attack_structural"), rc->attack[a].data.dice);
+                break;
+            default:
+                bytes = 0;
+            }
+
+            assert(bytes <= INT_MAX);
+            if (bytes && wrptr(&bufp, &size, (int)bytes) != 0)
+                WARN_STATIC_BUFFER();
         }
     }
+
+    if (size > 1) {
+        *bufp++ = '.';
+        --size;
+    }
+    else
+        WARN_STATIC_BUFFER();
+
+    *bufp = 0;
 }
 
 void
@@ -2193,6 +2313,42 @@ static void eval_trail(struct opstack **stack, const void *userdata)
         errno = eold;
     }
 #endif
+}
+
+void report_race_skills(const race *rc, char *zText, size_t length, const struct locale *lang)
+{
+    size_t size = length - 1;
+    int dh = 0, dh1 = 0, sk;
+    char *bufp = zText;
+
+    for (sk = 0; sk < MAXSKILLS; ++sk) {
+        if (skill_enabled(sk) && rc->bonus[sk] > -5)
+            dh++;
+    }
+
+    for (sk = 0; sk < MAXSKILLS; sk++) {
+        if (skill_enabled(sk) && rc->bonus[sk] > -5) {
+            size_t bytes;
+            dh--;
+            if (dh1 == 0) {
+                dh1 = 1;
+            }
+            else {
+                if (dh == 0) {
+                    bytes = str_strlcpy(bufp, LOC(lang, "list_and"), size);
+                }
+                else {
+                    bytes = str_strlcpy(bufp, ", ", size);
+                }
+                assert(bytes <= INT_MAX);
+                BUFFER_STRCAT(bufp, size, bytes);
+            }
+            bytes = str_strlcpy(bufp, skillname((skill_t)sk, lang),
+                size);
+            assert(bytes <= INT_MAX);
+            BUFFER_STRCAT(bufp, size, (int)bytes);
+        }
+    }
 }
 
 static void eval_direction(struct opstack **stack, const void *userdata)

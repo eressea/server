@@ -38,7 +38,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/umlaut.h>
 #include <util/language.h>
@@ -536,21 +535,18 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
 
     if (prefix != NULL) {
         static char lbuf[80]; /* FIXME: static return value */
-        char *bufp = lbuf;
-        size_t size = sizeof(lbuf) - 1;
-        int ch, bytes;
+        sbstring sbs;
+        char ch[2];
 
-        bytes = (int)str_strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_init(&sbs, lbuf, sizeof(lbuf));
+        sbs_strcpy(&sbs, LOC(loc, mkname("prefix", prefix)));
 
-        bytes = (int)str_strlcpy(bufp, LOC(loc, rc_name_s(rc, u->number != 1)), size);
-        assert(~bufp[0] & 0x80 || !"unicode/not implemented");
-        ch = tolower(*(unsigned char *)bufp);
-        bufp[0] = (char)ch;
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        *bufp = 0;
+        str = LOC(loc, rc_name_s(rc, u->number != 1));
+        assert(~str[0] & 0x80 || !"unicode/not implemented");
+        ch[0] = (char)tolower(*(unsigned char *)str);
+        ch[1] = 0;
+        sbs_strcat(&sbs, ch);
+        sbs_strcat(&sbs, str + 1);
 
         return lbuf;
     }

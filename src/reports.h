@@ -120,14 +120,13 @@ extern "C" {
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, const struct gamedate *date);
+    void report_raceinfo(const struct race *rc, const struct locale *lang, char *buf, size_t length);
+    void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);
     void report_building(const struct building *b, const char **btype,
         const char **billusion);
-    void report_race(const struct unit *u, const char **rcname,
-        const char **rcillusion);
-
     void add_seen_faction(struct faction *self, struct faction *seen);
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
