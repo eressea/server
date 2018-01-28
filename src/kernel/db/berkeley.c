@@ -40,6 +40,8 @@ int db_driver_order_save(struct order_data *od)
     db_recno_t recno;
 
     assert(od && od->_str);
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
     key.data = &recno;
     key.size = key.ulen = sizeof(recno);
     key.flags = DB_DBT_USERMEM;
