@@ -480,6 +480,12 @@ static int tolua_write_reports(lua_State * L)
 static int tolua_process_orders(lua_State * L)
 {
     UNUSED_ARG(L);
+#if 0
+    order * ord = parse_order("@GIB xmis ALLES Gurgelkraut", default_locale);
+    assert(ord);
+    free_order(ord);
+    return 0;
+#endif
     processorders();
     return 0;
 }
@@ -1166,7 +1172,6 @@ int eressea_run(lua_State *L, const char *luafile)
 {
     int err;
     global.vm_state = L;
-
     /* push an error handling function on the stack: */
     lua_getglobal(L, "debug");
     lua_getfield(L, -1, "traceback");
