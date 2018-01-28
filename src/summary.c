@@ -32,6 +32,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/path.h>
+#include <util/unicode.h>
 
 #include <assert.h>
 #include <string.h>
@@ -174,11 +175,41 @@ static int count_umlaut(const char *s)
     int result = 0;
     const char *cp;
     for (cp = s; *cp; ++cp) {
-        if (*cp & 0x80) {
+        ucs4_t ucs = *cp;
+        if (ucs & 0x80) {
+            size_t size;
             ++result;
+            unicode_utf8_to_ucs4(&ucs, cp, &size);
+            cp += size;
         }
     }
     return result;
+}
+
+static void summarize_races(const summary *s, FILE *F, bool full) {
+    int i;
+    for (i = 0; i < MAXRACES; i++) {
+        if (s->poprace[i] > 0) {
+            const char *pad = "      ";
+            int lpad = (int)strlen(pad);
+            const race *rc = get_race(i);
+            const char *rcname = LOC(default_locale, rc_name_s(rc, NAME_PLURAL));
+            lpad -= count_umlaut(rcname);
+            assert(lpad >= 0);
+            if (full) {
+                fputs(pad + lpad, F);
+                fprintf(F, "%20s: ", rcname);
+                fprintf(F, "%8d\n", s->poprace[i]);
+            }
+            else if (i != RC_TEMPLATE && i != RC_CLONE) {
+                if (playerrace(rc)) {
+                    fputs(pad + lpad, F);
+                    fprintf(F, "%16s: ", rcname);
+                    fprintf(F, "%8d\n", s->poprace[i]);
+                }
+            }
+        }
+    }
 }
 
 static void summarize_players(const summary *s, FILE *F) {
@@ -189,13 +220,13 @@ static void summarize_players(const summary *s, FILE *F) {
         if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
             const race *rc = get_race(i);
             if (rc && playerrace(rc)) {
-                int lpad = 6;
                 const char * pad = "      ";
+                int lpad = (int)strlen(pad);
                 const char *rccat = LOC(default_locale, rc_name_s(rc, NAME_CATEGORY));
-                fprintf(F, "%16s%s:", rccat, suffix);
                 lpad -= count_umlaut(rccat);
                 assert(lpad >= 0);
                 fputs(pad + lpad, F);
+                fprintf(F, "%16s%s:", rccat, suffix);
                 fprintf(F, "%8d\n", s->factionrace[i]);
             }
         }
@@ -261,28 +292,7 @@ void report_summary(const summary * s, bool full)
     }
 
     fprintf(F, "\n");
-    if (full) {
-        int i;
-        for (i = 0; i < MAXRACES; i++) {
-            if (s->poprace[i]) {
-                const race *rc = get_race(i);
-                fprintf(F, "%20s: %8d\n", LOC(default_locale, rc_name_s(rc, NAME_PLURAL)),
-                    s->poprace[i]);
-            }
-        }
-    }
-    else {
-        int i;
-        for (i = 0; i < MAXRACES; i++) {
-            if (i != RC_TEMPLATE && i != RC_CLONE && s->poprace[i]) {
-                const race *rc = get_race(i);
-                if (playerrace(rc)) {
-                    fprintf(F, "%20s: %8d\n", LOC(default_locale, rc_name_s(rc, NAME_PLURAL)),
-                        s->poprace[i]);
-                }
-            }
-        }
-    }
+    summarize_races(s, F, full);
 
     if (full) {
         fprintf(F, "\nWaffen:               %8d\n", s->waffen);
@@ -302,7 +312,7 @@ void report_summary(const summary * s, bool full)
             s->playermoney + s->peasantmoney);
     }
 
-    fprintf(F, "\n\n");
+    fprintf(F, "\n");
 
     newplayers = update_nmrs();
 
@@ -310,22 +320,22 @@ void report_summary(const summary * s, bool full)
         int i;
         for (i = 0; i <= timeout; ++i) {
             if (i == timeout) {
-                fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
+                fprintf(F, "+ NMR: %3d\n", nmrs[i]);
             }
             else {
-                fprintf(F, "%d NMR:\t\t %d\n", i, nmrs[i]);
+                fprintf(F, "%d NMR: %3d\n", i, nmrs[i]);
             }
         }
     }
     if (age) {
         if (age[2] != 0) {
-            fprintf(F, "Erstabgaben:\t %d%%\n", 100 - (dropouts[0] * 100 / age[2]));
+            fprintf(F, "Erstabgaben:  %3d%%\n", 100 - (dropouts[0] * 100 / age[2]));
         }
         if (age[3] != 0) {
-            fprintf(F, "Zweitabgaben:\t %d%%\n", 100 - (dropouts[1] * 100 / age[3]));
+            fprintf(F, "Zweitabgaben: %3d%%\n", 100 - (dropouts[1] * 100 / age[3]));
         }
     }
-    fprintf(F, "Neue Spieler:\t %d\n", newplayers);
+    fprintf(F, "Neue Spieler: %d\n", newplayers);
 
     if (full) {
         if (factions) {
