@@ -169,10 +169,43 @@ static void writeturn(void)
     fclose(f);
 }
 
-void report_summary(summary * s, bool full)
+static int count_umlaut(const char *s)
+{
+    int result = 0;
+    const char *cp;
+    for (cp = s; *cp; ++cp) {
+        if (*cp & 0x80) {
+            ++result;
+        }
+    }
+    return result;
+}
+
+static void summarize_players(const summary *s, FILE *F) {
+    int i;
+    const char * suffix = LOC(default_locale, "stat_tribe_p");
+
+    for (i = 0; i < MAXRACES; i++) {
+        if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
+            const race *rc = get_race(i);
+            if (rc && playerrace(rc)) {
+                int lpad = 6;
+                const char * pad = "      ";
+                const char *rccat = LOC(default_locale, rc_name_s(rc, NAME_CATEGORY));
+                fprintf(F, "%16s%s:", rccat, suffix);
+                lpad -= count_umlaut(rccat);
+                assert(lpad >= 0);
+                fputs(pad + lpad, F);
+                fprintf(F, "%8d\n", s->factionrace[i]);
+            }
+        }
+    }
+}
+
+void report_summary(const summary * s, bool full)
 {
     FILE *F = NULL;
-    int i, newplayers = 0;
+    int newplayers = 0;
     faction *f;
     char zText[4096];
     int timeout = NMRTimeout();
@@ -213,15 +246,7 @@ void report_summary(summary * s, bool full)
         fprintf(F, "Aktive Vulkane:        %8d\n\n", s->active_volcanos);
     }
 
-    for (i = 0; i < MAXRACES; i++) {
-        if (i != RC_TEMPLATE && i != RC_CLONE && s->factionrace[i]) {
-            const race *rc = get_race(i);
-            if (rc && playerrace(rc)) {
-                fprintf(F, "%13s%s:   %8d\n", LOC(default_locale, rc_name_s(rc, NAME_CATEGORY)),
-                    LOC(default_locale, "stat_tribe_p"), s->factionrace[i]);
-            }
-        }
-    }
+    summarize_players(s, F);
 
     if (full) {
         fprintf(F, "\n");
@@ -237,6 +262,7 @@ void report_summary(summary * s, bool full)
 
     fprintf(F, "\n");
     if (full) {
+        int i;
         for (i = 0; i < MAXRACES; i++) {
             if (s->poprace[i]) {
                 const race *rc = get_race(i);
@@ -246,6 +272,7 @@ void report_summary(summary * s, bool full)
         }
     }
     else {
+        int i;
         for (i = 0; i < MAXRACES; i++) {
             if (i != RC_TEMPLATE && i != RC_CLONE && s->poprace[i]) {
                 const race *rc = get_race(i);
@@ -280,6 +307,7 @@ void report_summary(summary * s, bool full)
     newplayers = update_nmrs();
 
     if (nmrs) {
+        int i;
         for (i = 0; i <= timeout; ++i) {
             if (i == timeout) {
                 fprintf(F, "+ NMR:\t\t %d\n", nmrs[i]);
@@ -308,6 +336,7 @@ void report_summary(summary * s, bool full)
         }
 
         if (timeout>0 && full) {
+            int i;
             fprintf(F, "\n\nFactions with NMRs:\n");
             for (i = timeout; i > 0; --i) {
                 for (f = factions; f; f = f->next) {

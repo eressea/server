@@ -19,7 +19,7 @@ extern "C" {
 
     struct summary;
 
-    void report_summary(struct summary *sum, bool full);
+    void report_summary(const struct summary *sum, bool full);
     struct summary *make_summary(void);
     void free_summary(struct summary *sum);
     int update_nmrs(void);
