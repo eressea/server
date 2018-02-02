@@ -3703,7 +3703,7 @@
     </string>
     <string name="sound_out">
       <text locale="de">Aushorchen</text>
-      <text locale="en">sound_out</text>
+      <text locale="en">Sound out</text>
     </string>
     <string name="bloodthirst">
       <text locale="de">Kriegsgesang</text>

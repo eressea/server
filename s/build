@@ -31,15 +31,18 @@ if [ ! -d $ROOT/$BUILD ]; then
 fi
 
 echo "build eressea"
+CMAKE_ARGS=".."
 cd $ROOT/$BUILD
 BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
 if [ "$BRANCH" = "master" ] ; then
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 echo "$BRANCH $VERSION"
-cmake -DERESSEA_VERSION="$VERSION" ..
+CMAKE_ARGS="-DERESSEA_VERSION=$VERSION ${CMAKE_ARGS}"
 else
 REV=$(git rev-parse --short HEAD)
-cmake -DERESSEA_BUILDNO="$REV" ..
+CMAKE_ARGS="-DERESSEA_BUILDNO=$REV $CMAKE_ARGS"
 fi
+
+cmake ${CMAKE_ARGS}
 make $MAKEOPTS && make test
 cd $OLDPWD
