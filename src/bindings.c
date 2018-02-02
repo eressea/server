@@ -518,26 +518,15 @@ static int tolua_write_passwords(lua_State * L)
     return 0;
 }
 
-static struct summary *sum_begin = 0;
-static int tolua_init_summary(lua_State * L)
-{
-    UNUSED_ARG(L);
-    sum_begin = make_summary();
-    return 0;
-}
-
 static int tolua_write_summary(lua_State * L)
 {
+    struct summary *sum;
     UNUSED_ARG(L);
-    if (sum_begin) {
-        struct summary *sum_end = make_summary();
-        report_summary(sum_end, sum_begin, false);
-        report_summary(sum_end, sum_begin, true);
-        free_summary(sum_end);
-        free_summary(sum_begin);
-        sum_begin = 0;
-        return 0;
-    }
+    
+    sum = make_summary();
+    report_summary(sum, false);
+    report_summary(sum, true);
+    free_summary(sum);
     return 0;
 }
 /*
@@ -1073,7 +1062,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
         tolua_function(L, TOLUA_CAST "write_reports", tolua_write_reports);
         tolua_function(L, TOLUA_CAST "write_report", tolua_write_report);
-        tolua_function(L, TOLUA_CAST "init_summary", tolua_init_summary);
         tolua_function(L, TOLUA_CAST "write_summary", tolua_write_summary);
         tolua_function(L, TOLUA_CAST "write_passwords", tolua_write_passwords);
         tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);

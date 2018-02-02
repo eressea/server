@@ -129,7 +129,6 @@ function process(rules, orders)
     end
 
     turn_begin()
-    init_summary()
 
     -- run the turn:
     if eressea.read_orders(orders) ~= 0 then
