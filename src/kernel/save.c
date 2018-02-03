@@ -321,23 +321,35 @@ static void writeorder(gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
+static void read_skill(gamedata *data, skill *sv) {
+    int val;
+    READ_INT(data->store, &val);
+    sv->id = (skill_t)val;
+    if (sv->id != NOSKILL) {
+        READ_INT(data->store, &val);
+        sv->old = sv->level = val;
+        READ_INT(data->store, &val);
+        sv->weeks = val;
+    }
+}
+
 static void read_skills(gamedata *data, unit *u)
 {
     if (data->version < SKILLSORT_VERSION) {
+        skill skills[MAXSKILLS], *sv = skills;
+        size_t sz;
+        u->skill_size = 0;
         for (;;) {
-            int n = NOSKILL, level, weeks;
-            skill_t sk;
-            READ_INT(data->store, &n);
-            sk = (skill_t)n;
-            if (sk == NOSKILL) break;
-            READ_INT(data->store, &level);
-            READ_INT(data->store, &weeks);
-            if (level) {
-                skill *sv = add_skill(u, sk);
-                sv->level = sv->old = (unsigned char)level;
-                sv->weeks = (unsigned char)weeks;
+            read_skill(data, sv);
+            if (sv->id == NOSKILL) break;
+            if (sv->level > 0) {
+                ++sv;
+                ++u->skill_size;
             }
         }
+        sz = u->skill_size * sizeof(skill);
+        u->skills = malloc(sz);
+        memcpy(u->skills, skills, sz);
     }
     else {
         int i;
@@ -345,12 +357,7 @@ static void read_skills(gamedata *data, unit *u)
         u->skills = malloc(sizeof(skill)*u->skill_size);
         for (i = 0; i != u->skill_size; ++i) {
             skill *sv = u->skills + i;
-            int val;
-            READ_INT(data->store, &val);
-            sv->id = (skill_t)val;
-            READ_INT(data->store, &sv->level);
-            sv->old = sv->level;
-            READ_INT(data->store, &sv->weeks);
+            read_skill(data, sv);
         }
     }
 }
