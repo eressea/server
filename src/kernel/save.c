@@ -1071,14 +1071,14 @@ faction *read_faction(gamedata * data)
     READ_INT(data->store, &n);
     f->options = n;
 
-    n = want(O_REPORT) | want(O_COMPUTER);
+    n = WANT_OPTION(O_REPORT) | WANT_OPTION(O_COMPUTER);
     if ((f->options & n) == 0) {
         /* Kein Report eingestellt, Fehler */
         f->options |= n;
     }
     if (data->version < JSON_REPORT_VERSION) {
         /* mistakes were made in the past*/
-        f->options &= ~want(O_JSON);
+        f->options &= ~WANT_OPTION(O_JSON);
     }
     read_allies(data, f);
     read_groups(data, f);
@@ -1139,7 +1139,7 @@ void write_faction(gamedata *data, const faction * f)
         WRITE_INT(data->store, ur->y);
     }
     WRITE_SECTION(data->store);
-    WRITE_INT(data->store, f->options & ~want(O_DEBUG));
+    WRITE_INT(data->store, f->options & ~WANT_OPTION(O_DEBUG));
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {

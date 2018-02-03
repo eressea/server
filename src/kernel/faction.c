@@ -253,8 +253,9 @@ faction *addfaction(const char *email, const char *password,
     ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
 
     f->options =
-        want(O_REPORT) | want(O_ZUGVORLAGE) | want(O_COMPUTER) | want(O_COMPRESS) |
-        want(O_ADRESSEN) | want(O_STATISTICS);
+        WANT_OPTION(O_REPORT) | WANT_OPTION(O_ZUGVORLAGE) |
+        WANT_OPTION(O_COMPUTER) | WANT_OPTION(O_COMPRESS) |
+        WANT_OPTION(O_ADRESSEN) | WANT_OPTION(O_STATISTICS);
 
     f->no = unused_faction_id();
     if (rule_region_owners()) {

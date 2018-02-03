@@ -928,7 +928,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     if (!u->number)
         return 0;
     if (sv->level <= 0) {
-        if (sv->old <= 0 || (u->faction->options & want(O_SHOWSKCHANGE)) == 0) {
+        if (sv->old <= 0 || (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) == 0) {
             return 0;
         }
     }
@@ -964,7 +964,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     if (wrptr(&bufp, &size, snprintf(bufp, size, "%d", effsk)) != 0)
         WARN_STATIC_BUFFER();
 
-    if (u->faction->options & want(O_SHOWSKCHANGE)) {
+    if (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) {
         int oldeff = 0;
         int diff;
 
