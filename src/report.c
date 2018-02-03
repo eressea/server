@@ -2048,7 +2048,7 @@ report_plaintext(const char *filename, report_context * ctx,
     attrib *a;
     message *m;
     unsigned char op;
-    int maxh, bytes, ix = want(O_STATISTICS);
+    int maxh, bytes, ix = WANT_OPTION(O_STATISTICS);
     int wants_stats = (f->options & ix);
     FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
@@ -2098,18 +2098,18 @@ report_plaintext(const char *filename, report_context * ctx,
                 centre(out, buf, true);
             }
         }
-        if ((f->options & want(O_COMPUTER)) == 0) {
+        if ((f->options & WANT_OPTION(O_COMPUTER)) == 0) {
             const char *s;
             s = locale_getstring(f->locale, "newbie_info_cr");
             if (s) {
                 newline(out);
                 centre(out, s, true);
             }
-            f->options |= want(O_COMPUTER);
+            f->options |= WANT_OPTION(O_COMPUTER);
         }
     }
     newline(out);
-    if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
+    if (f->options & WANT_OPTION(O_SCORE) && f->age > DISPLAYSCORE) {
         char score[32], avg[32];
         write_score(score, sizeof(score), f->score);
         write_score(avg, sizeof(avg), average_score_of_age(f->age, f->age / 24 + 1));
@@ -2164,7 +2164,7 @@ report_plaintext(const char *filename, report_context * ctx,
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
     for (op = 0; op != MAXOPTIONS; op++) {
-        if (f->options & want(op) && options[op]) {
+        if (f->options & WANT_OPTION(op) && options[op]) {
             bytes = (int)str_strlcpy(bufp, " ", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();

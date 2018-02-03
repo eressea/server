@@ -1568,7 +1568,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     }
     fprintf(F, "%d;age\n", f->age);
     fprintf(F, "%d;Optionen\n", f->options);
-    if (f->options & want(O_SCORE) && f->age > DISPLAYSCORE) {
+    if (f->options & WANT_OPTION(O_SCORE) && f->age > DISPLAYSCORE) {
         char score[32];
         write_score(score, sizeof(score), f->score);
         fprintf(F, "%s;Punkte\n", score);
@@ -1615,7 +1615,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     print_items(F, f->items, f->locale);
     fputs("OPTIONEN\n", F);
     for (i = 0; i != MAXOPTIONS; ++i) {
-        int flag = want(i);
+        int flag = WANT_OPTION(i);
         if (options[i]) {
             fprintf(F, "%d;%s\n", (f->options & flag) ? 1 : 0, options[i]);
         }

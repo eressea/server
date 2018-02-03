@@ -26,10 +26,10 @@ extern "C" {
 #endif
 
     typedef struct skill {
-        skill_t id;
-        int level;
-        int weeks;
-        int old;
+        skill_t id : 8;
+        int level : 8;
+        int weeks : 8;
+        int old : 8;
     } skill;
 
     typedef int(*skillmod_fun) (const struct unit *, const struct region *,

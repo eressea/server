@@ -795,6 +795,7 @@ void set_level(unit * u, skill_t sk, int value)
     skill *sv = u->skills;
 
     assert(sk != SK_MAGIC || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
+    assert(value <= CHAR_MAX && value >= CHAR_MIN);
     if (!skill_enabled(sk))
         return;
 

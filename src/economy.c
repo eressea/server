@@ -88,7 +88,7 @@ static econ_request entertainers[1024];
 static econ_request *nextentertainer;
 static int entertaining;
 
-static econ_request *g_requests;
+static econ_request **g_requests; /* TODO: no need for this to be module-global */
 
 #define RECRUIT_MERGE 1
 static int rules_recruit = -1;
@@ -141,7 +141,7 @@ static void scramble(void *data, unsigned int n, size_t width)
     }
 }
 
-unsigned int expand_production(region * r, econ_request * requests, econ_request **results)
+unsigned int expand_production(region * r, econ_request * requests, econ_request ***results)
 {
     unit *u;
     econ_request *o;
@@ -161,31 +161,33 @@ unsigned int expand_production(region * r, econ_request * requests, econ_request
 
     if (norders > 0) {
         int i = 0;
-        econ_request *split;
-        split = (econ_request *)calloc(norders, sizeof(econ_request));
+        econ_request **split;
+        split = calloc(norders, sizeof(econ_request *));
         for (o = requests; o; o = o->next) {
             if (o->qty > 0) {
                 unsigned int j;
                 for (j = o->qty; j; j--) {
-                    split[i] = *o;
-                    split[i].unit->n = 0;
+                    split[i] = o;
+                    o->unit->n = 0;
                     i++;
                 }
             }
         }
-        scramble(split, norders, sizeof(econ_request));
+        scramble(split, norders, sizeof(econ_request *));
         *results = split;
     }
     else {
         *results = NULL;
     }
+    return norders;
+}
+
+static void free_requests(econ_request *requests) {
     while (requests) {
         econ_request *req = requests->next;
-        free_order(requests->ord);
         free(requests);
         requests = req;
     }
-    return norders;
 }
 
 static unsigned int expandorders(region * r, econ_request * requests) {
@@ -342,7 +344,7 @@ static int do_recruiting(recruitment * recruits, int available)
                 if (number > afford) number = afford;
             }
             if (u->number + number > UNIT_MAXSIZE) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
+                ADDMSG(&u->faction->msgs, msg_feedback(u, req->type.recruit.ord, "error_unit_size",
                     "maxsize", UNIT_MAXSIZE));
                 number = UNIT_MAXSIZE - u->number;
                 assert(number >= 0);
@@ -377,7 +379,6 @@ void free_recruitments(recruitment * recruits)
         while (rec->requests) {
             econ_request *req = rec->requests;
             rec->requests = req->next;
-            free_order(req->ord);
             free(req);
         }
         free(rec);
@@ -555,7 +556,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     o = (econ_request *)calloc(1, sizeof(econ_request));
     o->qty = n;
     o->unit = u;
-    o->ord = copy_order(ord);
+    o->type.recruit.ord = ord;
     addlist(recruitorders, o);
 }
 
@@ -1477,54 +1478,54 @@ static void expandbuying(region * r, econ_request * buyorders)
      * G�ter pro Monat ist. j sind die Befehle, i der Index des
      * gehandelten Produktes. */
     if (max_products > 0) {
-        unsigned int j;
         unsigned int norders = expandorders(r, buyorders);
-        if (!norders)
-            return;
 
-        for (j = 0; j != norders; j++) {
-            int price, multi;
-            ltype = g_requests[j].type.ltype;
-            trade = trades;
-            while (trade->type && trade->type != ltype)
-                ++trade;
-            multi = trade->multi;
-            price = ltype->price * multi;
+        if (norders) {
+            unsigned int j;
+            for (j = 0; j != norders; j++) {
+                int price, multi;
+                ltype = g_requests[j]->type.trade.ltype;
+                trade = trades;
+                while (trade->type && trade->type != ltype)
+                    ++trade;
+                multi = trade->multi;
+                price = ltype->price * multi;
 
-            if (get_pooled(g_requests[j].unit, rsilver, GET_DEFAULT,
-                price) >= price) {
-                item *items;
-                /* litems z�hlt die G�ter, die verkauft wurden, u->n das Geld, das
-                 * verdient wurde. Dies mu� gemacht werden, weil der Preis st�ndig sinkt,
-                 * man sich also das verdiente Geld und die verkauften Produkte separat
-                 * merken mu�. */
-                attrib *a;
+                if (get_pooled(g_requests[j]->unit, rsilver, GET_DEFAULT,
+                    price) >= price) {
+                    item *items;
+                    /* litems z�hlt die G�ter, die verkauft wurden, u->n das Geld, das
+                     * verdient wurde. Dies mu� gemacht werden, weil der Preis st�ndig sinkt,
+                     * man sich also das verdiente Geld und die verkauften Produkte separat
+                     * merken mu�. */
+                    attrib *a;
 
-                u = g_requests[j].unit;
-                a = a_find(u->attribs, &at_luxuries);
-                if (a == NULL) {
-                    a = a_add(&u->attribs, a_new(&at_luxuries));
+                    u = g_requests[j]->unit;
+                    a = a_find(u->attribs, &at_luxuries);
+                    if (a == NULL) {
+                        a = a_add(&u->attribs, a_new(&at_luxuries));
+                    }
+                    items = a->data.v;
+
+                    i_change(&items, ltype->itype, 1);
+                    a->data.v = items;
+                    i_change(&g_requests[j]->unit->items, ltype->itype, 1);
+                    use_pooled(u, rsilver, GET_DEFAULT, price);
+                    if (u->n < 0)
+                        u->n = 0;
+                    u->n += price;
+
+                    rsetmoney(r, rmoney(r) + price);
+
+                    /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
+                     * der Preis Multiplikator f�r das Produkt um den Faktor 1. Der Z�hler
+                     * wird wieder auf 0 gesetzt. */
+                    if (++trade->number == max_products) {
+                        trade->number = 0;
+                        ++trade->multi;
+                    }
+                    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
                 }
-                items = a->data.v;
-
-                i_change(&items, ltype->itype, 1);
-                a->data.v = items;
-                i_change(&g_requests[j].unit->items, ltype->itype, 1);
-                use_pooled(u, rsilver, GET_DEFAULT, price);
-                if (u->n < 0)
-                    u->n = 0;
-                u->n += price;
-
-                rsetmoney(r, rmoney(r) + price);
-
-                /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
-                 * der Preis Multiplikator f�r das Produkt um den Faktor 1. Der Z�hler
-                 * wird wieder auf 0 gesetzt. */
-                if (++trade->number == max_products) {
-                    trade->number = 0;
-                    ++trade->multi;
-                }
-                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
         free(g_requests);
@@ -1654,7 +1655,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         return;
     }
     o = (econ_request *)calloc(1, sizeof(econ_request));
-    o->type.ltype = ltype;        /* sollte immer gleich sein */
+    o->type.trade.ltype = ltype;        /* sollte immer gleich sein */
 
     o->unit = u;
     o->qty = n;
@@ -1752,79 +1753,77 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
      * Runde erweitert werden kann. */
 
     norders = expandorders(r, sellorders);
-    if (norders == 0) {
-        return;
-    }
-
-    for (j = 0; j != norders; j++) {
-        const luxury_type *search = NULL;
-        const luxury_type *ltype = g_requests[j].type.ltype;
-        int multi = r_demand(r, ltype);
-        int i;
-        int use = 0;
-        for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
-            /* TODO: this is slow and lame! */
-            ++i;
-        }
-        if (counter[i] >= limit)
-            continue;
-        if (counter[i] + 1 > max_products && multi > 1)
-            --multi;
-        price = ltype->price * multi;
-
-        if (money >= price) {
-            item *itm;
-            attrib *a;
-            u = g_requests[j].unit;
-            a = a_find(u->attribs, &at_luxuries);
-            if (!a) {
-                a = a_add(&u->attribs, a_new(&at_luxuries));
+    if (norders > 0) {
+        for (j = 0; j != norders; j++) {
+            const luxury_type *search = NULL;
+            const luxury_type *ltype = g_requests[j]->type.trade.ltype;
+            int multi = r_demand(r, ltype);
+            int i;
+            int use = 0;
+            for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
+                /* TODO: this is slow and lame! */
+                ++i;
             }
-            itm = (item *)a->data.v;
-            i_change(&itm, ltype->itype, 1);
-            a->data.v = itm;
-            ++use;
-            if (u->n < 0) {
-                u->n = 0;
-            }
+            if (counter[i] >= limit)
+                continue;
+            if (counter[i] + 1 > max_products && multi > 1)
+                --multi;
+            price = ltype->price * multi;
 
-            if (hafenowner) {
-                if (hafenowner->faction != u->faction) {
-                    int abgezogenhafen = price / 10;
-                    hafencollected += abgezogenhafen;
-                    price -= abgezogenhafen;
-                    money -= abgezogenhafen;
+            if (money >= price) {
+                item *itm;
+                attrib *a;
+                u = g_requests[j]->unit;
+                a = a_find(u->attribs, &at_luxuries);
+                if (!a) {
+                    a = a_add(&u->attribs, a_new(&at_luxuries));
+                }
+                itm = (item *)a->data.v;
+                i_change(&itm, ltype->itype, 1);
+                a->data.v = itm;
+                ++use;
+                if (u->n < 0) {
+                    u->n = 0;
+                }
+
+                if (hafenowner) {
+                    if (hafenowner->faction != u->faction) {
+                        int abgezogenhafen = price / 10;
+                        hafencollected += abgezogenhafen;
+                        price -= abgezogenhafen;
+                        money -= abgezogenhafen;
+                    }
+                }
+                if (maxb) {
+                    if (maxowner->faction != u->faction) {
+                        int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
+                        taxcollected += abgezogensteuer;
+                        price -= abgezogensteuer;
+                        money -= abgezogensteuer;
+                    }
+                }
+                u->n += price;
+                change_money(u, price);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+
+                /* r->money -= price; --- dies wird eben nicht ausgef�hrt, denn die
+                 * Produkte k�nnen auch als Steuern eingetrieben werden. In der Region
+                 * wurden Silberst�cke gegen Luxusg�ter des selben Wertes eingetauscht!
+                 * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
+                 * die Nachfrage f�r das Produkt um 1. Der Z�hler wird wieder auf 0
+                 * gesetzt. */
+
+                if (++counter[i] > max_products) {
+                    int d = r_demand(r, ltype);
+                    if (d > 1) {
+                        r_setdemand(r, ltype, d - 1);
+                    }
+                    counter[i] = 0;
                 }
             }
-            if (maxb) {
-                if (maxowner->faction != u->faction) {
-                    int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
-                    taxcollected += abgezogensteuer;
-                    price -= abgezogensteuer;
-                    money -= abgezogensteuer;
-                }
+            if (use > 0) {
+                use_pooled(g_requests[j]->unit, ltype->itype->rtype, GET_DEFAULT, use);
             }
-            u->n += price;
-            change_money(u, price);
-            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-
-            /* r->money -= price; --- dies wird eben nicht ausgef�hrt, denn die
-             * Produkte k�nnen auch als Steuern eingetrieben werden. In der Region
-             * wurden Silberst�cke gegen Luxusg�ter des selben Wertes eingetauscht!
-             * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
-             * die Nachfrage f�r das Produkt um 1. Der Z�hler wird wieder auf 0
-             * gesetzt. */
-
-            if (++counter[i] > max_products) {
-                int d = r_demand(r, ltype);
-                if (d > 1) {
-                    r_setdemand(r, ltype, d - 1);
-                }
-                counter[i] = 0;
-            }
-        }
-        if (use > 0) {
-            use_pooled(g_requests[j].unit, ltype->itype->rtype, GET_DEFAULT, use);
         }
     }
     free(g_requests);
@@ -1970,7 +1969,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         /* Wenn andere Einheiten das selbe verkaufen, mu� ihr Zeug abgezogen
          * werden damit es nicht zweimal verkauft wird: */
         for (o = *sellorders; o; o = o->next) {
-            if (o->type.ltype == ltype && o->unit->faction == u->faction) {
+            if (o->type.trade.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
                 if (fpool < 0) fpool = 0;
@@ -2010,7 +2009,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         o = (econ_request *)calloc(1, sizeof(econ_request));
         o->unit = u;
         o->qty = n;
-        o->type.ltype = ltype;
+        o->type.trade.ltype = ltype;
         addlist(sellorders, o);
 
         return unlimited;
@@ -2518,8 +2517,8 @@ static void expandloot(region * r, econ_request * lootorders)
         int startmoney = rmoney(r);
 
         for (i = 0; i != norders && startmoney > looted + TAXFRACTION * 2; i++) {
-            change_money(g_requests[i].unit, TAXFRACTION);
-            g_requests[i].unit->n += TAXFRACTION;
+            change_money(g_requests[i]->unit, TAXFRACTION);
+            g_requests[i]->unit->n += TAXFRACTION;
             /*Looting destroys double the money*/
             looted += TAXFRACTION * 2;
         }
@@ -2534,7 +2533,6 @@ static void expandloot(region * r, econ_request * lootorders)
                 region_set_morale(r, m - 1, -1);
             }
         }
-
         for (u = r->units; u; u = u->next) {
             if (u->n >= 0) {
                 add_income(u, IC_LOOT, u->wants, u->n);
@@ -2553,8 +2551,8 @@ void expandtax(region * r, econ_request * taxorders)
     if (norders > 0) {
         unsigned int i;
         for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-            change_money(g_requests[i].unit, TAXFRACTION);
-            g_requests[i].unit->n += TAXFRACTION;
+            change_money(g_requests[i]->unit, TAXFRACTION);
+            g_requests[i]->unit->n += TAXFRACTION;
             rsetmoney(r, rmoney(r) - TAXFRACTION);
         }
         free(g_requests);
@@ -2937,18 +2935,23 @@ void produce(struct region *r)
     if (!rule_autowork()) {
         expandwork(r, workers, nextworker, region_maxworkers(r));
     }
-    if (taxorders)
+    if (taxorders) {
         expandtax(r, taxorders);
+        free_requests(taxorders);
+    }
 
-    if (lootorders)
+    if (lootorders) {
         expandloot(r, lootorders);
-
+        free_requests(lootorders);
+    }
     /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
      * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
      * k�nnen. */
 
-    if (buyorders)
+    if (buyorders) {
         expandbuying(r, buyorders);
+        free_requests(buyorders);
+    }
 
     if (sellorders) {
         int limit = rpeasants(r) / TRADE_FRACTION;
@@ -2956,13 +2959,16 @@ void produce(struct region *r)
             && buildingtype_exists(r, caravan_bt, true))
             limit *= 2;
         expandselling(r, sellorders, limited ? limit : INT_MAX);
+        free_requests(sellorders);
     }
 
     /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
      * (expandstealing). */
 
-    if (stealorders)
+    if (stealorders) {
         expandstealing(r, stealorders);
+        free_requests(stealorders);
+    }
 
     assert(rmoney(r) >= 0);
     assert(rpeasants(r) >= 0);

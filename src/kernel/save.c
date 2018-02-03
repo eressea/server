@@ -321,22 +321,47 @@ static void writeorder(gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
+static void read_skill(gamedata *data, skill *sv) {
+    int val;
+    READ_INT(data->store, &val);
+    assert(val < MAXSKILLS);
+    sv->id = (skill_t)val;
+    if (sv->id != NOSKILL) {
+        READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
+        sv->old = sv->level = val;
+        READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
+        sv->weeks = val;
+    }
+}
+
+static int skill_cmp(const void *a, const void *b) {
+    const skill * sa = (const skill *)a;
+    const skill * sb = (const skill *)b;
+    return sa->id - sb->id;
+}
+
 static void read_skills(gamedata *data, unit *u)
 {
     if (data->version < SKILLSORT_VERSION) {
+        skill skills[MAXSKILLS], *sv = skills;
+
+        u->skill_size = 0;
         for (;;) {
-            int n = NOSKILL, level, weeks;
-            skill_t sk;
-            READ_INT(data->store, &n);
-            sk = (skill_t)n;
-            if (sk == NOSKILL) break;
-            READ_INT(data->store, &level);
-            READ_INT(data->store, &weeks);
-            if (level) {
-                skill *sv = add_skill(u, sk);
-                sv->level = sv->old = (unsigned char)level;
-                sv->weeks = (unsigned char)weeks;
+            read_skill(data, sv);
+            if (sv->id == NOSKILL) break;
+            if (sv->level > 0) {
+                ++sv;
+                ++u->skill_size;
             }
+        }
+        if (u->skill_size > 0) {
+            size_t sz = u->skill_size * sizeof(skill);
+
+            qsort(skills, u->skill_size, sizeof(skill), skill_cmp);
+            u->skills = malloc(sz);
+            memcpy(u->skills, skills, sz);
         }
     }
     else {
@@ -345,12 +370,7 @@ static void read_skills(gamedata *data, unit *u)
         u->skills = malloc(sizeof(skill)*u->skill_size);
         for (i = 0; i != u->skill_size; ++i) {
             skill *sv = u->skills + i;
-            int val;
-            READ_INT(data->store, &val);
-            sv->id = (skill_t)val;
-            READ_INT(data->store, &sv->level);
-            sv->old = sv->level;
-            READ_INT(data->store, &sv->weeks);
+            read_skill(data, sv);
         }
     }
 }
@@ -1051,14 +1071,14 @@ faction *read_faction(gamedata * data)
     READ_INT(data->store, &n);
     f->options = n;
 
-    n = want(O_REPORT) | want(O_COMPUTER);
+    n = WANT_OPTION(O_REPORT) | WANT_OPTION(O_COMPUTER);
     if ((f->options & n) == 0) {
         /* Kein Report eingestellt, Fehler */
         f->options |= n;
     }
     if (data->version < JSON_REPORT_VERSION) {
         /* mistakes were made in the past*/
-        f->options &= ~want(O_JSON);
+        f->options &= ~WANT_OPTION(O_JSON);
     }
     read_allies(data, f);
     read_groups(data, f);
@@ -1119,7 +1139,7 @@ void write_faction(gamedata *data, const faction * f)
         WRITE_INT(data->store, ur->y);
     }
     WRITE_SECTION(data->store);
-    WRITE_INT(data->store, f->options & ~want(O_DEBUG));
+    WRITE_INT(data->store, f->options & ~WANT_OPTION(O_DEBUG));
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {

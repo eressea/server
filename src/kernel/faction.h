@@ -99,7 +99,7 @@ extern "C" {
 
     extern struct faction *factions;
 
-#define want(option) (1<<option)
+#define WANT_OPTION(option) (1<<option)
 
     void fhash(struct faction *f);
     void funhash(struct faction *f);

@@ -312,12 +312,21 @@ static void test_buy_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void arm_unit(unit *u) {
+    item_type *it_sword;
+
+    it_sword = test_create_itemtype("sword");
+    new_weapontype(it_sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    i_change(&u->items, it_sword, u->number);
+    set_level(u, SK_MELEE, 1);
+}
+
 static void test_tax_cmd(CuTest *tc) {
     order *ord;
     faction *f;
     region *r;
     unit *u;
-    item_type *sword, *silver;
+    item_type *silver;
     econ_request *taxorders = 0;
 
     test_setup();
@@ -337,10 +346,7 @@ static void test_tax_cmd(CuTest *tc) {
 
     silver = get_resourcetype(R_SILVER)->itype;
 
-    sword = test_create_itemtype("sword");
-    new_weapontype(sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
-    i_change(&u->items, sword, 1);
-    set_level(u, SK_MELEE, 1);
+    arm_unit(u);
 
     tax_cmd(u, ord, &taxorders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
@@ -692,6 +698,49 @@ static void test_modify_production(CuTest *tc) {
     test_teardown();
 }
 
+static void test_loot(CuTest *tc) {
+    unit *u;
+    faction *f;
+    item_type *it_silver;
+
+    test_setup();
+    setup_production();
+    it_silver = test_create_silver();
+    config_set("rules.enable_loot", "1");
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->thisorder = create_order(K_LOOT, f->locale, NULL);
+    produce(u->region);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error48")); /* unit is unarmed */
+    test_clear_messages(f);
+    arm_unit(u);
+    produce(u->region);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "income")); /* unit is unarmed */
+    CuAssertIntEquals(tc, 2 * TAXFRACTION, i_get(u->items, it_silver));
+    CuAssertIntEquals(tc, UFL_LONGACTION | UFL_NOTMOVING, fval(u, UFL_LONGACTION | UFL_NOTMOVING));
+    test_teardown();
+}
+
+static void test_expand_production(CuTest *tc) {
+    econ_request *orders;
+    econ_request **results = NULL;
+    region *r;
+    unit *u;
+
+    test_setup();
+    orders = calloc(1, sizeof(econ_request));
+    orders->qty = 2;
+    orders->unit = u = test_create_unit(test_create_faction(NULL), r = test_create_region(0, 0, NULL));
+    orders->next = NULL;
+
+    u->n = 1; /* will be overwritten */
+    CuAssertIntEquals(tc, 2, expand_production(r, orders, &results));
+    CuAssertPtrNotNull(tc, results);
+    CuAssertPtrEquals(tc, u, results[0]->unit);
+    CuAssertPtrEquals(tc, u, results[1]->unit);
+    CuAssertIntEquals(tc, 0, u->n);
+    test_teardown();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -711,5 +760,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);
+    SUITE_ADD_TEST(suite, test_loot);
+    SUITE_ADD_TEST(suite, test_expand_production);
     return suite;
 }
