@@ -2534,7 +2534,6 @@ static void expandloot(region * r, econ_request * lootorders)
                 region_set_morale(r, m - 1, -1);
             }
         }
-
         for (u = r->units; u; u = u->next) {
             if (u->n >= 0) {
                 add_income(u, IC_LOOT, u->wants, u->n);
