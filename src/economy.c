@@ -88,7 +88,7 @@ static econ_request entertainers[1024];
 static econ_request *nextentertainer;
 static int entertaining;
 
-static econ_request *g_requests;
+static econ_request *g_requests; /* TODO: no need for this to be module-global */
 
 #define RECRUIT_MERGE 1
 static int rules_recruit = -1;
@@ -181,7 +181,9 @@ unsigned int expand_production(region * r, econ_request * requests, econ_request
     }
     while (requests) {
         econ_request *req = requests->next;
-        free_order(requests->ord);
+        if (requests->ord) {
+            free_order(requests->ord);
+        }
         free(requests);
         requests = req;
     }
@@ -1484,7 +1486,7 @@ static void expandbuying(region * r, econ_request * buyorders)
 
         for (j = 0; j != norders; j++) {
             int price, multi;
-            ltype = g_requests[j].type.ltype;
+            ltype = g_requests[j].type.trade.ltype;
             trade = trades;
             while (trade->type && trade->type != ltype)
                 ++trade;
@@ -1654,7 +1656,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         return;
     }
     o = (econ_request *)calloc(1, sizeof(econ_request));
-    o->type.ltype = ltype;        /* sollte immer gleich sein */
+    o->type.trade.ltype = ltype;        /* sollte immer gleich sein */
 
     o->unit = u;
     o->qty = n;
@@ -1758,7 +1760,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 
     for (j = 0; j != norders; j++) {
         const luxury_type *search = NULL;
-        const luxury_type *ltype = g_requests[j].type.ltype;
+        const luxury_type *ltype = g_requests[j].type.trade.ltype;
         int multi = r_demand(r, ltype);
         int i;
         int use = 0;
@@ -1970,7 +1972,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         /* Wenn andere Einheiten das selbe verkaufen, mu� ihr Zeug abgezogen
          * werden damit es nicht zweimal verkauft wird: */
         for (o = *sellorders; o; o = o->next) {
-            if (o->type.ltype == ltype && o->unit->faction == u->faction) {
+            if (o->type.trade.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
                 if (fpool < 0) fpool = 0;
@@ -2010,7 +2012,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         o = (econ_request *)calloc(1, sizeof(econ_request));
         o->unit = u;
         o->qty = n;
-        o->type.ltype = ltype;
+        o->type.trade.ltype = ltype;
         addlist(sellorders, o);
 
         return unlimited;

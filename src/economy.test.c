@@ -720,6 +720,27 @@ static void test_loot(CuTest *tc) {
     test_teardown();
 }
 
+static void test_expand_production(CuTest *tc) {
+    econ_request *orders;
+    econ_request *results = NULL;
+    region *r;
+    unit *u;
+
+    test_setup();
+    orders = calloc(1, sizeof(econ_request));
+    orders->qty = 2;
+    orders->unit = u = test_create_unit(test_create_faction(NULL), r = test_create_region(0, 0, NULL));
+    orders->next = NULL;
+
+    u->n = 1; /* will be overwritten */
+    CuAssertIntEquals(tc, 2, expand_production(r, orders, &results));
+    CuAssertPtrNotNull(tc, results);
+    CuAssertPtrEquals(tc, u, results[0].unit);
+    CuAssertPtrEquals(tc, u, results[1].unit);
+    CuAssertIntEquals(tc, 0, u->n);
+    test_teardown();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -740,5 +761,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_loot);
+    SUITE_ADD_TEST(suite, test_expand_production);
     return suite;
 }

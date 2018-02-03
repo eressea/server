@@ -51,10 +51,14 @@ extern "C" {
         struct unit *unit;
         struct order *ord;
         int qty;
-        int no;
         union {
-            bool goblin;             /* stealing */
-            const struct luxury_type *ltype;    /* trading */
+            struct {
+                int no;
+                bool goblin;             /* stealing */
+            } steal;
+            struct {
+                const struct luxury_type *ltype;    /* trading */
+            } trade;
         } type;
     } econ_request;
 
