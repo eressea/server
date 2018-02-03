@@ -185,9 +185,6 @@ unsigned int expand_production(region * r, econ_request * requests, econ_request
 static void free_requests(econ_request *requests) {
     while (requests) {
         econ_request *req = requests->next;
-        if (requests->ord) {
-            free_order(requests->ord);
-        }
         free(requests);
         requests = req;
     }
@@ -347,7 +344,7 @@ static int do_recruiting(recruitment * recruits, int available)
                 if (number > afford) number = afford;
             }
             if (u->number + number > UNIT_MAXSIZE) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, req->ord, "error_unit_size",
+                ADDMSG(&u->faction->msgs, msg_feedback(u, req->type.recruit.ord, "error_unit_size",
                     "maxsize", UNIT_MAXSIZE));
                 number = UNIT_MAXSIZE - u->number;
                 assert(number >= 0);
@@ -382,7 +379,6 @@ void free_recruitments(recruitment * recruits)
         while (rec->requests) {
             econ_request *req = rec->requests;
             rec->requests = req->next;
-            free_order(req->ord);
             free(req);
         }
         free(rec);
@@ -560,7 +556,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     o = (econ_request *)calloc(1, sizeof(econ_request));
     o->qty = n;
     o->unit = u;
-    o->ord = copy_order(ord);
+    o->type.recruit.ord = ord;
     addlist(recruitorders, o);
 }
 

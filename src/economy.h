@@ -49,9 +49,11 @@ extern "C" {
     typedef struct econ_request {
         struct econ_request *next;
         struct unit *unit;
-        struct order *ord;
         int qty;
         union {
+            struct {
+                struct order *ord;
+            } recruit;
             struct {
                 int no;
                 bool goblin;             /* stealing */
