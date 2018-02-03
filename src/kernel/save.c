@@ -324,20 +324,29 @@ static void writeorder(gamedata *data, const struct order *ord,
 static void read_skill(gamedata *data, skill *sv) {
     int val;
     READ_INT(data->store, &val);
+    assert(val < MAXSKILLS);
     sv->id = (skill_t)val;
     if (sv->id != NOSKILL) {
         READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
         sv->old = sv->level = val;
         READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
         sv->weeks = val;
     }
+}
+
+static int skill_cmp(const void *a, const void *b) {
+    const skill * sa = (const skill *)a;
+    const skill * sb = (const skill *)b;
+    return sa->id - sb->id;
 }
 
 static void read_skills(gamedata *data, unit *u)
 {
     if (data->version < SKILLSORT_VERSION) {
         skill skills[MAXSKILLS], *sv = skills;
-        size_t sz;
+
         u->skill_size = 0;
         for (;;) {
             read_skill(data, sv);
@@ -347,9 +356,13 @@ static void read_skills(gamedata *data, unit *u)
                 ++u->skill_size;
             }
         }
-        sz = u->skill_size * sizeof(skill);
-        u->skills = malloc(sz);
-        memcpy(u->skills, skills, sz);
+        if (u->skill_size > 0) {
+            size_t sz = u->skill_size * sizeof(skill);
+
+            qsort(skills, u->skill_size, sizeof(skill), skill_cmp);
+            u->skills = malloc(sz);
+            memcpy(u->skills, skills, sz);
+        }
     }
     else {
         int i;

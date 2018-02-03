@@ -828,6 +828,7 @@ void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
 
+    assert(sk >= 0 && sk < MAXSKILLS);
     if (inject_learn_fun) {
         inject_learn_fun(u, sk, days);
         return;

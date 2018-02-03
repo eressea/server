@@ -619,7 +619,8 @@ static void test_shipspeed_max_range(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "skill bonus from movement.shipspeed.skillbonus", 3, shipspeed(sh, cap));
 
     set_level(cap, SK_SAILING, stype->cptskill + 15);
-    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 15);
+    scale_number(crew, 15);
+    set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
     CuAssertIntEquals_Msg(tc, "skill-bonus cannot exceed max_range", 4, shipspeed(sh, cap));
     test_teardown();
 }
