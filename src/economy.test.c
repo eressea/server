@@ -722,7 +722,7 @@ static void test_loot(CuTest *tc) {
 
 static void test_expand_production(CuTest *tc) {
     econ_request *orders;
-    econ_request *results = NULL;
+    econ_request **results = NULL;
     region *r;
     unit *u;
 
@@ -735,8 +735,8 @@ static void test_expand_production(CuTest *tc) {
     u->n = 1; /* will be overwritten */
     CuAssertIntEquals(tc, 2, expand_production(r, orders, &results));
     CuAssertPtrNotNull(tc, results);
-    CuAssertPtrEquals(tc, u, results[0].unit);
-    CuAssertPtrEquals(tc, u, results[1].unit);
+    CuAssertPtrEquals(tc, u, results[0]->unit);
+    CuAssertPtrEquals(tc, u, results[1]->unit);
     CuAssertIntEquals(tc, 0, u->n);
     test_teardown();
 }

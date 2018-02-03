@@ -51,7 +51,7 @@ void expandstealing(region * r, econ_request * stealorders)
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     unsigned int j;
     unsigned int norders;
-    econ_request *requests;
+    econ_request **requests;
 
     assert(rsilver);
 
@@ -68,11 +68,11 @@ void expandstealing(region * r, econ_request * stealorders)
         unit *u;
         int n = 0;
 
-        if (requests[j].unit->n > requests[j].unit->wants) {
+        if (requests[j]->unit->n > requests[j]->unit->wants) {
             break;
         }
 
-        u = findunitg(requests[j].type.steal.no, r);
+        u = findunitg(requests[j]->type.steal.no, r);
 
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -82,16 +82,16 @@ void expandstealing(region * r, econ_request * stealorders)
             n = 10;
         }
         if (n > 0) {
-            int w = requests[j].unit->wants;
+            int w = requests[j]->unit->wants;
             if (n > w) n = w;
             use_pooled(u, rsilver, GET_ALL, n);
-            requests[j].unit->n = n;
-            change_money(requests[j].unit, n);
+            requests[j]->unit->n = n;
+            change_money(requests[j]->unit, n);
             ADDMSG(&u->faction->msgs, msg_message("stealeffect", "unit region amount",
                 u, u->region, n));
         }
-        add_income(requests[j].unit, IC_STEAL, requests[j].unit->wants, requests[j].unit->n);
-        fset(requests[j].unit, UFL_LONGACTION | UFL_NOTMOVING);
+        add_income(requests[j]->unit, IC_STEAL, requests[j]->unit->wants, requests[j]->unit->n);
+        fset(requests[j]->unit, UFL_LONGACTION | UFL_NOTMOVING);
     }
     free(requests);
 }
