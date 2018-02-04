@@ -3,7 +3,9 @@
         "keywords.json",
         "calendar.json",
         "prefixes.json",
-        "e2/terrains.json"
+        "e2/terrains.json",
+        "e2/rules.xml",
+        "e2/locales.xml"
     ],
     "disabled": [
         "jsreport"

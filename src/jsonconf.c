@@ -887,6 +887,53 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
+static void include_json(const char *filename) {
+    FILE *F;
+    if (json_relpath) {
+        char name[PATH_MAX];
+        path_join(json_relpath, filename, name, sizeof(name));
+        F = fopen(name, "r");
+    }
+    else {
+        F = fopen(filename, "r");
+    }
+    if (F) {
+        long pos;
+        fseek(F, 0, SEEK_END);
+        pos = ftell(F);
+        rewind(F);
+        if (pos > 0) {
+            cJSON *config;
+            char *data;
+            size_t sz;
+
+            data = malloc(pos + 1);
+            sz = fread(data, 1, (size_t)pos, F);
+            data[sz] = 0;
+            config = cJSON_Parse(data);
+            free(data);
+            if (config) {
+                json_config(config);
+                cJSON_Delete(config);
+            }
+            else {
+                log_error("invalid JSON, could not parse %s", filename);
+            }
+        }
+        fclose(F);
+    }
+}
+
+static void include_xml(const char *filename) {
+    char name[PATH_MAX];
+
+    if (json_relpath) {
+        path_join(json_relpath, filename, name, sizeof(name));
+        filename = name;
+    }
+    read_xml(filename, NULL);
+}
+
 static void json_include(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
@@ -894,39 +941,12 @@ static void json_include(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        FILE *F;
-        if (json_relpath) {
-            char name[PATH_MAX];
-            path_join(json_relpath, child->valuestring, name, sizeof(name));
-            F = fopen(name, "r");
+        const char * filename = child->valuestring;
+        if (strstr(filename, ".xml") != NULL) {
+            include_xml(filename);
         }
         else {
-            F = fopen(child->valuestring, "r");
-        }
-        if (F) {
-            long pos;
-            fseek(F, 0, SEEK_END);
-            pos = ftell(F);
-            rewind(F);
-            if (pos > 0) {
-                cJSON *config;
-                char *data;
-                size_t sz;
-
-                data = malloc(pos + 1);
-                sz = fread(data, 1, (size_t)pos, F);
-                data[sz] = 0;
-                config = cJSON_Parse(data);
-                free(data);
-                if (config) {
-                    json_config(config);
-                    cJSON_Delete(config);
-                }
-                else {
-                    log_error("invalid JSON, could not parse %s", child->valuestring);
-                }
-            }
-            fclose(F);
+            include_json(filename);
         }
     }
 }
