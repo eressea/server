@@ -112,7 +112,7 @@ int read_xml(const char *filename, const char *catalog)
 {
     xml_reader *reader = xmlReaders;
     xmlDocPtr doc;
-    int result;
+    int result = 0;
 
     if (catalog) {
         xmlLoadCatalog(catalog);
@@ -122,8 +122,9 @@ int read_xml(const char *filename, const char *catalog)
         log_error("could not open '%s'\n", filename);
         return -1;
     }
-
-    result = xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_PEDANTIC | XML_PARSE_COMPACT);
+    if (catalog) {
+        result = xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_PEDANTIC | XML_PARSE_COMPACT);
+    }
     if (result >= 0) {
         while (reader != NULL) {
             int i = reader->callback(doc);
