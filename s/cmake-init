@@ -51,7 +51,7 @@ LUA_DIR=/usr
 if [ -d /usr/include/lua5.1 ]; then
    LUA_VERSION="5.1"
 elif [ -d /usr/local/include/lua5.1 ]; then
-   LUA_DIR=/usr/local
+   export LUA_DIR=/usr/local
    LUA_VERSION="5.1"
 fi
 
@@ -64,8 +64,6 @@ SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
 HEREDOC
 
-#echo 'SET (LUA_DIR "$LUA_DIR" PATH)' >> $BUILD/config.cmake
-
 path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "tolua is not installed, building from source"
@@ -77,7 +75,11 @@ if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "building tolua..."
  cd tolua
  make
- echo 'SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")' >> $BUILD/config.cmake
+ cd -
+cat >> $BUILD/config.cmake <<TOLUA
+SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")
+TOLUA
+
 else
  echo "tolua is $path"
 fi
