@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="greatbow">
   <modifier type="require" race="elf"/>
   <item weight="100">
@@ -15,3 +17,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

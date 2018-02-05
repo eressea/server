@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <races xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <race name="snowman" magres="80" maxaura="0.000000"
@@ -1214,3 +1215,4 @@
     <attack type="6" spell="aura_of_fear" level="12"/>
   </race>
 </races>
+</eressea>

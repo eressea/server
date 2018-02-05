@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <building name="castle" fort="yes" taxes="100">
   <construction skill="building" minskill="1" maxsize="10" name="site">
     <requirement type="stone" quantity="1"/>
@@ -19,3 +20,4 @@
     <requirement type="stone" quantity="1"/>
   </construction>
 </building>
+</eressea>

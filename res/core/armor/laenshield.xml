@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea><resources>
 <resource name="laenshield">
   <item weight="0" score="1000">
     <construction skill="armorer" minskill="7">
@@ -7,3 +8,4 @@
     <armor ac="2" penalty="-0.25" magres="0.3" laen="yes" shield="yes" />
   </item>
 </resource>
+</resources></eressea>

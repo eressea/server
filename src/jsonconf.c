@@ -887,24 +887,45 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
-static const char * uri_to_file(const char * uri, char *name, size_t size) {
-    const char *pos, *path = json_relpath;
+/* TODO: much more configurable authority-to-file lookup */
+static const char * authority_to_path(const char *authority, char *name, size_t size) {
+    /* source and destination cannot share the same buffer */
+    assert(authority < name || authority > name + size);
 
-    pos = strstr(uri, "://");
+    return join_path(json_relpath, authority, name, size);
+}
+
+static const char * uri_to_file(const char * uri, char *name, size_t size) {
+    const char *pos, *scheme, *path = uri;
+
+    /* source and destination cannot share the same buffer */
+    assert(uri < name || uri > name + size);
+
+    /* identify scheme */
+    scheme = uri;
+    pos = strstr(scheme, "://");
     if (pos) {
-        size_t slen = pos - uri;
-        /* identify scheme */
-        if (strncmp(uri, "config", slen) == 0) {
-            path = path_join(path, "conf", name, size);
+        size_t slen = pos - scheme;
+        if (strncmp(scheme, "config", slen) == 0) {
+            const char *authority = pos + 3;
+            /* authority */
+            pos = strstr(authority, "/");
+            if (pos) {
+                char buffer[16];
+                size_t alen = pos - authority;
+                assert(alen < sizeof(buffer));
+                memcpy(buffer, authority, alen);
+                buffer[alen] = 0;
+
+                path = authority_to_path(buffer, name, size);
+                path = path_join(path, pos + 1, name, size);
+            }
         }
-        else if (strncmp(uri, "rules", slen) == 0) {
-            path = path_join(path, "res", name, size);
-        }
-        if (path) {
-            return path_join(path, pos + 3, name, size);
+        else {
+            log_fatal("unknown URI scheme: %s", uri);
         }
     }
-    return uri;
+    return path;
 }
 
 static void include_json(const char *uri) {
