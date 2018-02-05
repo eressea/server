@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <resources>
 
   <resource name="money">
@@ -133,3 +134,4 @@
   </resource>
 
 </resources>
+</eressea>
