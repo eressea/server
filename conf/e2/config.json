@@ -1,11 +1,30 @@
 {
     "include": [
-        "keywords.json",
-        "calendar.json",
-        "prefixes.json",
-        "e2/terrains.json",
-        "e2/rules.xml",
-        "e2/locales.xml"
+        "config://keywords.json",
+        "config://calendar.json",
+        "config://prefixes.json",
+        "config://e2/terrains.json",
+        "config://e2/locales.xml",
+        "config://e2/rules.xml",
+        "rules://core/ships.xml",
+        "rules://core/spoils.xml",
+        "rules://core/common/buildings.xml",
+        "rules://core/common/items.xml",
+        "rules://core/common/resources.xml",
+        "rules://core/common/luxuries.xml",
+        "rules://core/common/herbs.xml",
+        "rules://core/common/potions.xml",
+        "rules://core/common/armor.xml",
+        "rules://core/common/weapons.xml",
+        "rules://eressea/races.xml",
+        "rules://eressea/artrewards.xml",
+        "rules://eressea/buildings.xml",
+        "rules://eressea/familiars.xml",
+        "rules://eressea/buildings.xml",
+        "rules://eressea/equipment.xml",
+        "rules://eressea/items.xml",
+        "rules://eressea/spells.xml",
+        "rules://adamantium.xml"
     ],
     "disabled": [
         "jsreport"

@@ -887,16 +887,32 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
-static void include_json(const char *filename) {
+static const char * uri_to_file(const char * uri, char *name, size_t size) {
+    const char *pos, *path = json_relpath;
+
+    pos = strstr(uri, "://");
+    if (pos) {
+        size_t slen = pos - uri;
+        /* identify scheme */
+        if (strncmp(uri, "config", slen) == 0) {
+            path = path_join(path, "conf", name, size);
+        }
+        else if (strncmp(uri, "rules", slen) == 0) {
+            path = path_join(path, "res", name, size);
+        }
+        if (path) {
+            return path_join(path, pos + 3, name, size);
+        }
+    }
+    return uri;
+}
+
+static void include_json(const char *uri) {
     FILE *F;
-    if (json_relpath) {
-        char name[PATH_MAX];
-        path_join(json_relpath, filename, name, sizeof(name));
-        F = fopen(name, "r");
-    }
-    else {
-        F = fopen(filename, "r");
-    }
+    char name[PATH_MAX];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+
+    F = fopen(filename, "r");
     if (F) {
         long pos;
         fseek(F, 0, SEEK_END);
@@ -917,21 +933,20 @@ static void include_json(const char *filename) {
                 cJSON_Delete(config);
             }
             else {
-                log_error("invalid JSON, could not parse %s", filename);
+                log_error("could not parse JSON from %s", uri);
             }
         }
         fclose(F);
     }
 }
 
-static void include_xml(const char *filename) {
+static void include_xml(const char *uri) {
     char name[PATH_MAX];
-
-    if (json_relpath) {
-        path_join(json_relpath, filename, name, sizeof(name));
-        filename = name;
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    int err = read_xml(filename, NULL);
+    if (err != 0) {
+        log_error("could not parse XML from %s", uri);
     }
-    read_xml(filename, NULL);
 }
 
 static void json_include(cJSON *json) {
@@ -941,12 +956,13 @@ static void json_include(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        const char * filename = child->valuestring;
-        if (strstr(filename, ".xml") != NULL) {
-            include_xml(filename);
+        const char *uri = child->valuestring;
+
+        if (strstr(uri, ".xml") != NULL) {
+            include_xml(uri);
         }
         else {
-            include_json(filename);
+            include_json(uri);
         }
     }
 }
