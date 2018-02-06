@@ -31,7 +31,7 @@ extern "C" {
     bool xml_bvalue(xmlNodePtr node, const char *name, bool dflt);
 
     void xml_done(void);
-    int read_xml(const char *filename, const char *catalog);
+    int read_xml(const char *filename);
 
 #ifdef __cplusplus
 }

@@ -928,7 +928,7 @@ static const char * uri_to_file(const char * uri, char *name, size_t size) {
     return path;
 }
 
-static void include_json(const char *uri) {
+static int include_json(const char *uri) {
     FILE *F;
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
@@ -955,19 +955,22 @@ static void include_json(const char *uri) {
             }
             else {
                 log_error("could not parse JSON from %s", uri);
+                return -1;
             }
         }
         fclose(F);
     }
+    return 0;
 }
 
-static void include_xml(const char *uri) {
+static int include_xml(const char *uri) {
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
-    int err = read_xml(filename, NULL);
-    if (err != 0) {
+    int err = read_xml(filename);
+    if (err < 0) {
         log_error("could not parse XML from %s", uri);
     }
+    return err;
 }
 
 static void json_include(cJSON *json) {
@@ -978,12 +981,16 @@ static void json_include(cJSON *json) {
     }
     for (child = json->child; child; child = child->next) {
         const char *uri = child->valuestring;
+        int err;
 
         if (strstr(uri, ".xml") != NULL) {
-            include_xml(uri);
+            err = include_xml(uri);
         }
         else {
-            include_json(uri);
+            err = include_json(uri);
+        }
+        if (err != 0) {
+            log_error("no data found in %s", uri);
         }
     }
 }

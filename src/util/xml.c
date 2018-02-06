@@ -77,7 +77,6 @@ double xml_fvalue(xmlNodePtr node, const char *name, double dflt)
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/parser.h>
-#include <libxml/xinclude.h>
 
 typedef struct xml_reader {
     struct xml_reader *next;
@@ -108,33 +107,25 @@ void xml_register_callback(xml_callback callback)
     *insert = reader;
 }
 
-int read_xml(const char *filename, const char *catalog)
+int read_xml(const char *filename)
 {
     xml_reader *reader = xmlReaders;
     xmlDocPtr doc;
-    int result = 0;
+    int results = 0;
 
-    if (catalog) {
-        xmlLoadCatalog(catalog);
-    }
-    doc = xmlReadFile(filename, NULL, XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_PEDANTIC | XML_PARSE_COMPACT);
+    doc = xmlReadFile(filename, NULL, XML_PARSE_NONET | XML_PARSE_PEDANTIC | XML_PARSE_COMPACT);
     if (doc == NULL) {
         log_error("could not open '%s'\n", filename);
         return -1;
     }
-    if (catalog) {
-        result = xmlXIncludeProcessFlags(doc, XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_PEDANTIC | XML_PARSE_COMPACT);
-    }
-    if (result >= 0) {
-        while (reader != NULL) {
-            int i = reader->callback(doc);
-            if (i != 0) {
-                return i;
-            }
-            reader = reader->next;
+    while (reader != NULL) {
+        int i = reader->callback(doc);
+        if (i < 0) {
+            return i;
         }
-        result = 0;
+        results += i;
+        reader = reader->next;
     }
     xmlFreeDoc(doc);
-    return result;
+    return (results > 0) ? 0 : -1;
 }

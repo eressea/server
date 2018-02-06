@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<eressea>
 <strings>
   <!--
     Due to extreme lazyness on Enno's part, this file doesn't contain everything.
@@ -1661,3 +1662,4 @@
     <text locale="en">mistletoes</text>
   </string>
 </strings>
+</eressea>

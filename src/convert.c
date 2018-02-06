@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
         if (argc < 4) return usage();
         xmlfile = argv[2];
         catalog = argv[3];
-        read_xml(xmlfile, catalog);
+        read_xml(xmlfile);
         write_rules("rules.dat");
         return 0;
     }
