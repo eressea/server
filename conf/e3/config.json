@@ -1,9 +1,25 @@
 {
     "include": [
-        "keywords.json",
-        "calendar.json",
-        "prefixes.json",
-        "e3/terrains.json"
+        "config://conf/keywords.json",
+        "config://conf/calendar.json",
+        "config://conf/prefixes.json",
+        "config://conf/e3/locales.json",
+        "config://conf/e3/terrains.json",
+        "config://conf/e3/items.json",
+        "config://conf/e3/races.json",
+        "config://res/e3a/familiars.xml",
+        "config://res/e3a/equipment.xml",
+        "config://res/e3a/ships.xml",
+        "config://res/e3a/buildings.xml",
+        "config://res/e3a/spells.xml",
+        "config://res/e3a/spellbooks/gray.xml",
+        "config://res/e3a/spellbooks/gwyrrd.xml",
+        "config://res/e3a/spellbooks/draig.xml",
+        "config://res/e3a/spellbooks/illaun.xml",
+        "config://res/e3a/spellbooks/cerddor.xml",
+        "config://res/e3a/spellbooks/common.xml",
+        "config://res/core/common/buildings.xml",
+        "config://res/buildings/castle-2.xml"
     ],
     "disabled": [
         "herbalism",

@@ -1,6 +1,10 @@
 {
     "include": [
+        "config://res/core/spoils.xml",
+        "config://res/core/common/herbs.xml",
         "config://res/core/common/items.xml",
+        "config://res/core/common/luxuries.xml",
+        "config://res/core/common/potions.xml",
         "config://res/core/armor/chainmail.xml",
         "config://res/core/armor/laenmail.xml",
         "config://res/core/armor/laenshield.xml",
@@ -19,9 +23,6 @@
         "config://res/core/resources/seed.xml",
         "config://res/core/resources/peasant.xml",
         "config://res/core/resources/stone.xml",
-        "config://res/core/common/luxuries.xml",
-        "config://res/core/common/herbs.xml",
-        "config://res/core/common/potions.xml",
         "config://res/core/weapons/axe.xml",
         "config://res/core/weapons/bow.xml",
         "config://res/core/weapons/catapult.xml",

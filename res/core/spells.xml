@@ -1,12 +1,5 @@
 <?xml version="1.0"?>
-<spells xmlns:xi="http://www.w3.org/2001/XInclude">
-
-  <xi:include href="spellbooks/gray.xml"/>
-  <xi:include href="spellbooks/gwyrrd.xml"/>
-  <xi:include href="spellbooks/draig.xml"/>
-  <xi:include href="spellbooks/illaun.xml"/>
-  <xi:include href="spellbooks/cerddor.xml"/>
-  <xi:include href="spellbooks/tybied.xml"/>
+<spells>
 
   <!-- shared spells -->
   <spell name="create_roi" ship="true" rank="5" index="130">

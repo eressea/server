@@ -1,3 +1,5 @@
+<eressea>
+<races>
 <race name="youngdragon" magres="50" maxaura="1.0" regaura="1.0"
 weight="8000" capacity="10000" speed="1.0" hp="300" ac="4"
 damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4"
@@ -12,4 +14,5 @@ teach="no" getitem="yes" resistbash="yes" dragon="yes" income="150">
   <attack type="4" damage="1d30"/>
   <attack type="6" spell="fiery_dragonbreath" level="3" />
 </race>
-
+</races>
+</eressea>

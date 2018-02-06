@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <eressea>
-<races xmlns:xi="http://www.w3.org/2001/XInclude">
+<races>
 
   <race name="snowman" magres="80" maxaura="0.000000"
         regaura="0.000000" weight="500" capacity="200" equipment="no"

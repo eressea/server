@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<eressea>
 <strings>
   <!--
     _d: dativ (wir erklären allen /Trollen/ den Krieg)
@@ -290,3 +291,4 @@
   </namespace>
 
 </strings>
+</eressea>

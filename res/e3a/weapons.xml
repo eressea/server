@@ -1,25 +1,170 @@
 <?xml version="1.0"?>
-<resources xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="config://core/weapons/bow.xml"/>
-  <xi:include href="config://core/weapons/catapult.xml"/>
-  <xi:include href="config://core/weapons/mallornbow.xml"/>
-  <xi:include href="config://core/weapons/mallornspear.xml"/>
-  <xi:include href="config://core/weapons/runesword.xml"/>
-  <xi:include href="config://core/weapons/rustyaxe.xml"/>
-  <xi:include href="config://core/weapons/rustysword.xml"/>
-  <xi:include href="config://core/weapons/spear.xml"/>
-  <xi:include href="config://core/weapons/sword.xml"/>
-  <xi:include href="config://core/weapons/firesword.xml"/>
-  <xi:include href="config://game/weapons/rep_crossbow.xml"/>
-  <xi:include href="config://game/weapons/lance.xml"/>
-  <xi:include href="config://game/weapons/axe.xml"/>
-  <xi:include href="config://game/weapons/crossbow.xml"/>
-  <xi:include href="config://game/weapons/greatbow.xml"/>
-  <xi:include href="config://game/weapons/greatsword.xml"/>
-  <xi:include href="config://game/weapons/halberd.xml"/>
-  <xi:include href="config://game/weapons/laensword.xml"/>
-  <xi:include href="config://game/weapons/mallorncrossbow.xml"/>
-  <xi:include href="config://game/weapons/mallornlance.xml"/>
-  <xi:include href="config://game/weapons/rustygreatsword.xml"/>
-  <xi:include href="config://game/weapons/rustyhalberd.xml"/>
+<eressea>
+<resources>
+<resource name="rustygreatsword">
+<!-- changes to the regular weapon:
+  1. you cannt use this with cavalry
+-->
+  <item weight="200" score="20">
+    <construction skill="weaponsmithing" minskill="4">
+      <requirement type="iron" quantity="2"/>
+    </construction>
+    <weapon useshield="false" cut="true" skill="melee" offmod="-2" defmod="-3" horse="false">
+      <damage type="rider" value="2d8"/>
+      <damage type="footman" value="2d8"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="rustyhalberd">
+<!-- changes to the regular weapon:
+  1. you cannot use this with cavalry
+-->
+  <item weight="200" score="20" deny="goblin">
+    <construction skill="weaponsmithing" minskill="3">
+      <requirement type="iron" quantity="1"/>
+      <requirement type="log" quantity="1"/>
+    </construction>
+    <weapon useshield="false" cut="true" skill="polearm" offmod="-2" defmod="-1" horse="false">
+      <damage type="rider" value="2d6"/>
+      <damage type="footman" value="2d6"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="rep_crossbow">
+  <modifier type="require" race="dwarf"/>
+  <item weight="100" allow="dwarf halfling">
+    <construction skill="weaponsmithing" minskill="5">
+      <requirement type="log" quantity="1"/>
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <weapon armorpiercing="true" pierce="true" missile="true" skill="crossbow" offmod="0" defmod="0" reload="1">
+      <damage type="rider" value="3d4+5"/>
+      <damage type="footman" value="3d4+5"/>
+      <modifier type="missile_target" value="0"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="mallornlance">
+  <item weight="100" deny="goblin">
+    <construction skill="weaponsmithing" minskill="5">
+      <requirement type="mallorn" quantity="2"/>
+    </construction>
+    <weapon pierce="true" skill="polearm" offmod="0" defmod="0" magres="0.15">
+      <damage type="footman" value="1d5+2"/>
+      <damage type="rider" value="2d6+7"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="lance">
+  <item weight="200" deny="goblin">
+    <construction skill="weaponsmithing" minskill="2">
+      <requirement type="log" quantity="2"/>
+    </construction>
+    <weapon pierce="true" skill="polearm" offmod="0" defmod="-2">
+      <damage type="footman" value="1d5"/>
+      <damage type="rider" value="2d6+5"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="mallorncrossbow">
+  <item weight="100">
+    <construction skill="weaponsmithing" minskill="5">
+      <requirement type="mallorn" quantity="1"/>
+    </construction>
+    <weapon armorpiercing="true" pierce="true" missile="true" skill="crossbow" offmod="0" defmod="0" reload="2" magres="0.15">
+      <damage type="rider" value="3d4+6"/>
+      <damage type="footman" value="3d4+6"/>
+      <modifier type="missile_target" value="0"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="laensword">
+<!-- changes:
+     * has lower damage
+-->
+  <item weight="100" score="400">
+    <construction skill="weaponsmithing" minskill="8">
+      <requirement type="laen" quantity="1"/>
+    </construction>
+    <weapon cut="true" skill="melee" offmod="1" defmod="1" magres="0.30">
+      <damage type="rider" value="2d9+4"/>
+      <damage type="footman" value="2d9+4"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="halberd">
+<!-- changes to the regular weapon:
+  1. you cannt use this with cavalry
+-->
+  <item weight="200" deny="goblin">
+    <construction skill="weaponsmithing" minskill="3">
+      <requirement type="log" quantity="2"/>
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <weapon useshield="false" cut="true" skill="polearm" offmod="-1" defmod="2" magres="0.0" horse="false">
+      <damage type="rider" value="2d6+3"/>
+      <damage type="footman" value="2d6+3"/>
+      <modifier type="skill" value="1" walking="true" against_riding="true" defensive="true"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="greatsword">
+<!-- changes to the regular weapon:
+  1. you cannt use this with cavalry
+-->
+  <item weight="200" score="30">
+    <construction skill="weaponsmithing" minskill="4">
+      <requirement type="iron" quantity="2"/>
+    </construction>
+    <weapon useshield="false" cut="true" skill="melee" offmod="-1" defmod="-2" horse="false">
+      <damage type="rider" value="2d8+3"/>
+      <damage type="footman" value="2d8+3"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="greatbow">
+<!-- changes:
+     * has a lua canuse function
+     * has lower damage
+-->
+  <modifier type="require" race="elf"/>
+  <item weight="100" allow="elf">
+    <construction skill="weaponsmithing" minskill="5">
+      <requirement type="mallorn" quantity="2"/>
+    </construction>
+    <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.0">
+      <damage type="rider" value="2d4+5"/>
+      <damage type="footman" value="2d4+5"/>
+      <modifier type="missile_target" value="2"/>
+      <modifier type="damage" value="1">
+        <race name="elf"/>
+      </modifier>
+    </weapon>
+  </item>
+</resource>
+<resource name="crossbow">
+  <item weight="100">
+    <construction skill="weaponsmithing" minskill="3">
+      <requirement type="log" quantity="1"/>
+    </construction>
+    <weapon armorpiercing="true" pierce="true" missile="true" skill="crossbow" offmod="0" defmod="0" reload="2">
+      <damage type="rider" value="3d4+5"/>
+      <damage type="footman" value="3d4+5"/>
+      <modifier type="missile_target" value="0"/>
+    </weapon>
+  </item>
+</resource>
+<resource name="axe">
+  <item weight="200" deny="goblin">
+    <construction skill="weaponsmithing" minskill="3">
+      <requirement type="log" quantity="1"/>
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <weapon cut="true" skill="melee" offmod="1" defmod="-2">
+      <damage type="rider" value="2d6+4"/>
+      <damage type="footman" value="2d6+4"/>
+    </weapon>
+  </item>
+</resource>
 </resources>
+</eressea>
