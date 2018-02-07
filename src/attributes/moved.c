@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/attrib.h>
 #include <util/gamedata.h>
+#include <util/macros.h>
 
 #include <storage.h>
 

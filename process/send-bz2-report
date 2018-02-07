@@ -1,13 +1,12 @@
 #!/bin/bash
-if [ -z $ERESSEA ]; then
-  ERESSEA=`echo $PWD |sed -e 's/\/game.*//'`
+if [ -z "$ERESSEA" ]; then
+  ERESSEA=$(echo "$PWD" |sed -e 's/\/game.*//')
   echo "Assuming that ERESSEA=$ERESSEA"
 fi
 if [ ! -f reports.txt ]; then
   echo "need to run $0 from the report direcory"
   exit -2
 fi
-source $HOME/bin/functions.sh
 
 TEMPLATE=report-mail.txt
 if [ "$1" == "-Lde" ]
@@ -16,7 +15,7 @@ then
   shift
 fi
 
-if [ "$1" == "-Lde" ]
+if [ "$1" == "-Len" ]
 then
   TEMPLATE=report-mail.en.txt
   shift
@@ -26,4 +25,6 @@ addr=$1
 subj=$2
 shift 2
 
-cat $ERESSEA/server/etc/$TEMPLATE | mutt -F $ERESSEA/etc/muttrc -s "$subj" -a $* -- $addr
+mutt -F "$ERESSEA/etc/muttrc" -s "$subj" -a "$@" -- "$addr" \
+	< "$ERESSEA/server/etc/$TEMPLATE"
+

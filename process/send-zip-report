@@ -1,6 +1,7 @@
 #!/bin/bash
-if [ -z $ERESSEA ]; then
-  ERESSEA=`echo $PWD |sed -e 's/\/game.*//'`
+
+if [ -z "$ERESSEA" ]; then
+  ERESSEA=$(echo "$PWD" |sed -e 's/\/game.*//')
   echo "Assuming that ERESSEA=$ERESSEA"
 fi
 if [ ! -f reports.txt ]; then
@@ -9,7 +10,7 @@ if [ ! -f reports.txt ]; then
 fi
 
 PWD=$(pwd)
-GAME=$(dirname $PWD)
+GAME=$(dirname "$PWD")
 
 TEMPLATE=report-mail.txt
 if [ "$1" == "-Lde" ]
@@ -24,13 +25,13 @@ then
   shift
 fi
 
-if [ -e $GAME/$TEMPLATE ]; then
-TEMPLATE=$GAME/$TEMPLATE
+if [ -e "$GAME/$TEMPLATE" ]; then
+TEMPLATE="$GAME/$TEMPLATE"
 else
-TEMPLATE=$ERESSEA/server/etc/$TEMPLATE
+TEMPLATE="$ERESSEA/server/etc/$TEMPLATE"
 fi
 
-if [ ! -e $TEMPLATE ]; then
+if [ ! -e "$TEMPLATE" ]; then
   echo "no such email template: $TEMPLATE"
   exit -3
 fi
@@ -42,8 +43,7 @@ done
 addr=$1
 subject=$2
 shift 2
-mutt -F $ERESSEA/etc/muttrc -s "$subject" -a $* -- $addr < $TEMPLATE
 
-if [ $? -ne 0 ] ; then
-  echo "Sending failed for email/report: $2/$3"
-fi
+mutt -F "$ERESSEA/etc/muttrc" -s "$subject" -a "$@" -- "$addr" \
+	< "$TEMPLATE" || echo "Sending failed for email/report: $2/$3"
+

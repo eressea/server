@@ -1,8 +1,6 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/race.h>
-#include <util/attrib.h>
-#include <util/gamedata.h>
 #include <attributes/key.h>
 
 #include "save.h"
@@ -20,11 +18,16 @@
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
 #include <util/attrib.h>
-#include <util/event.h>
 #include <util/base36.h>
+#include <util/event.h>
+#include <util/gamedata.h>
 #include <util/password.h>
+#include <util/path.h>
+#include <util/strings.h>
 
 #include <storage.h>
+
+#include <limits.h>
 #include <memstream.h>
 #include <CuTest.h>
 #include <tests.h>
@@ -36,13 +39,13 @@
 static void test_readwrite_data(CuTest * tc)
 {
     const char *filename = "test.dat";
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     test_setup();
     CuAssertIntEquals(tc, 0, writegame(filename));
     CuAssertIntEquals(tc, 0, readgame(filename));
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
     CuAssertIntEquals(tc, 0, remove(path));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_unit(CuTest * tc)
@@ -56,8 +59,8 @@ static void test_readwrite_unit(CuTest * tc)
     int fno;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    f = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
     fno = f->no;
     u = test_create_unit(f, r);
     unit_setname(u, "  Hodor  ");
@@ -74,8 +77,8 @@ static void test_readwrite_unit(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
-    f = test_create_faction(0);
-    r = test_create_region(0, 0, 0);
+    f = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
@@ -88,7 +91,7 @@ static void test_readwrite_unit(CuTest * tc)
     mstream_done(&data.strm);
     gamedata_done(&data);
     move_unit(u, r, NULL); /* this makes sure that u doesn't leak */
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_faction(CuTest * tc)
@@ -98,9 +101,9 @@ static void test_readwrite_faction(CuTest * tc)
     faction *f;
 
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     free(f->name);
-    f->name = strdup("  Hodor  ");
+    f->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", f->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -117,7 +120,7 @@ static void test_readwrite_faction(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_region(CuTest * tc)
@@ -128,9 +131,9 @@ static void test_readwrite_region(CuTest * tc)
     const char * lipsum = "Lorem ipsum dolor sit amet";
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     free(r->land->name);
-    r->land->name = strdup("  Hodor  ");
+    r->land->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
     region_setinfo(r, lipsum);
     CuAssertStrEquals(tc, lipsum, r->land->display);
@@ -149,7 +152,7 @@ static void test_readwrite_region(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_building(CuTest * tc)
@@ -160,10 +163,10 @@ static void test_readwrite_building(CuTest * tc)
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    b = test_create_building(r, 0);
+    r = test_create_region(0, 0, NULL);
+    b = test_create_building(r, NULL);
     free(b->name);
-    b->name = strdup("  Hodor  ");
+    b->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", b->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -171,7 +174,7 @@ static void test_readwrite_building(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     gamedata_init(&data, &store, RELEASE_VERSION);
     b = read_building(&data);
     CuAssertPtrNotNull(tc, b);
@@ -182,7 +185,7 @@ static void test_readwrite_building(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_ship(CuTest * tc)
@@ -193,10 +196,10 @@ static void test_readwrite_ship(CuTest * tc)
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    sh = test_create_ship(r, 0);
+    r = test_create_region(0, 0, NULL);
+    sh = test_create_ship(r, NULL);
     free(sh->name);
-    sh->name = strdup("  Hodor  ");
+    sh->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", sh->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -204,7 +207,7 @@ static void test_readwrite_ship(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     gamedata_init(&data, &store, RELEASE_VERSION);
     sh = read_ship(&data);
     CuAssertPtrNotNull(tc, sh);
@@ -215,7 +218,7 @@ static void test_readwrite_ship(CuTest * tc)
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_attrib(CuTest *tc) {
@@ -240,7 +243,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     CuAssertIntEquals(tc, 43, key_get(a, 42));
     a_removeall(&a, NULL);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_group(CuTest *tc) {
@@ -255,14 +258,14 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
 
-    test_cleanup();
-    f = test_create_faction(0);
+    test_setup();
+    f = test_create_faction(NULL);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
     CuAssertPtrEquals(tc, 0, f->next);
-    f2 = test_create_faction(0);
+    f2 = test_create_faction(NULL);
     CuAssertPtrEquals(tc, f2, factions->next);
-    u = test_create_unit(f2, test_create_region(0, 0, 0));
+    u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
@@ -288,7 +291,7 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, g->allies);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
@@ -302,8 +305,8 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     gamedata_init(&data, &store, RELEASE_VERSION);
 
     config_set("rules.region_owners", "1");
-    f = test_create_faction(0);
-    test_create_unit(f, r = test_create_region(0, 0, 0));
+    f = test_create_faction(NULL);
+    test_create_unit(f, r = test_create_region(0, 0, NULL));
     region_set_owner(r, f, 0);
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
@@ -320,7 +323,7 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     r = regions;
     CuAssertPtrNotNull(tc, r);
     CuAssertPtrEquals(tc, 0, region_get_owner(r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
@@ -331,10 +334,10 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     trigger *tr;
     unit * u;
 
-    test_cleanup();
-    f = test_create_faction(0);
-    f2 = test_create_faction(0);
-    u = test_create_unit(f2, r = test_create_region(0, 0, 0));
+    test_setup();
+    f = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
     tr = trigger_changefaction(u, f);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_eventhandler));
@@ -357,7 +360,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     u = r->units;
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_readwrite_dead_faction_createunit(CuTest *tc) {
@@ -368,10 +371,10 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     trigger *tr;
     unit * u;
 
-    test_cleanup();
-    f = test_create_faction(0);
-    f2 = test_create_faction(0);
-    u = test_create_unit(f2, r = test_create_region(0, 0, 0));
+    test_setup();
+    f = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
     tr = trigger_createunit(r, f, f->race, 1);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_eventhandler));
@@ -394,7 +397,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     u = r->units;
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_read_password(CuTest *tc) {
@@ -403,7 +406,7 @@ static void test_read_password(CuTest *tc) {
     faction *f;
 
     test_setup();
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -413,7 +416,7 @@ static void test_read_password(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_read_password_external(CuTest *tc) {
@@ -427,7 +430,7 @@ static void test_read_password_external(CuTest *tc) {
     if (remove(pwfile) != 0) {
         errno = 0;
     }
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
     mstream_init(&data.strm);
@@ -452,7 +455,7 @@ static void test_read_password_external(CuTest *tc) {
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertIntEquals(tc, 0, remove(pwfile));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_version_no(CuTest *tc) {

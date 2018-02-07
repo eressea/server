@@ -23,7 +23,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "attrib.h"
 #include "gamedata.h"
 #include "log.h"
-#include "storage.h"
+#include "strings.h"
+
+#include <storage.h>
 
 /* libc includes */
 #include <assert.h>
@@ -153,7 +155,7 @@ static int read_handler(attrib * a, void *owner, gamedata *data)
     handler_info *hi = (handler_info *)a->data.v;
 
     READ_TOK(store, zText, sizeof(zText));
-    hi->event = strdup(zText);
+    hi->event = str_strdup(zText);
     read_triggers(data, &hi->triggers);
     if (hi->triggers != NULL) {
         return AT_READ_OK;
@@ -200,7 +202,7 @@ void add_trigger(struct attrib **ap, const char *eventname, struct trigger *t)
     if (a == NULL || a->type != &at_eventhandler) {
         a = a_add(ap, a_new(&at_eventhandler));
         td = (handler_info *)a->data.v;
-        td->event = strdup(eventname);
+        td->event = str_strdup(eventname);
     }
     tp = &td->triggers;
     while (*tp)

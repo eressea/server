@@ -1,12 +1,15 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 #include <kernel/spell.h>
-#include <selist.h>
+
 #include <util/log.h>
 #include <util/gamedata.h>
+#include <util/strings.h>
 
 #include "spellbook.h"
 
+#include <selist.h>
 #include <storage.h>
 
 #include <assert.h>
@@ -16,7 +19,7 @@
 spellbook * create_spellbook(const char * name)
 {
     spellbook *result = (spellbook *)malloc(sizeof(spellbook));
-    result->name = name ? strdup(name) : 0;
+    result->name = name ? str_strdup(name) : 0;
     result->spells = 0;
     return result;
 }

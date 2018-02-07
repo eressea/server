@@ -25,7 +25,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* attributes includes */
 #include "follow.h"
-#include "fleechance.h"
 #include "hate.h"
 #include "iceberg.h"
 #include "key.h"
@@ -56,6 +55,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/attrib.h>
 #include <util/event.h>
 #include <util/gamedata.h>
+#include <util/macros.h>
 #include <util/resolve.h>
 
 #include <storage.h>

@@ -28,6 +28,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <float.h>
 #include <ctype.h>
 
+/* do not use M_PI, use one of these instead: */
+#define PI_F 3.1415926535897932384626433832795F
+#define PI_D 3.1415926535897932384626433832795
+#define PI_L 3.1415926535897932384626433832795L
+
 int lovar(double xpct_x2)
 {
     int n = (int)(xpct_x2 * 500) + 1;

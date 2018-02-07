@@ -42,7 +42,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/assert.h>
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
@@ -52,6 +51,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -117,14 +117,14 @@ const char *write_regionname(const region * r, const faction * f, char *buffer,
     char *buf = (char *)buffer;
     const struct locale *lang = f ? f->locale : 0;
     if (r == NULL) {
-        strlcpy(buf, "(null)", size);
+        str_strlcpy(buf, "(null)", size);
     }
     else {
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(f, &nx, &ny, pl);
-        slprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
+        snprintf(buf, size, "%s (%d,%d)", rname(r, lang), nx, ny);
     }
     return buffer;
 }
@@ -139,7 +139,7 @@ const char *regionname(const region * r, const faction * f)
 
 int region_maxworkers(const region *r)
 {
-    int size = production(r);
+    int size = max_production(r);
     int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
     return MAX(size - treespace, MIN(size / 10, 200));
 }
@@ -664,7 +664,7 @@ void rsetherbs(region *r, int value)
     assert(r->land || value==0);
     assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = (short)value;
+        r->land->herbs = value;
     }
 }
 
@@ -711,7 +711,7 @@ const item_type *r_luxury(const region * r)
 {
     struct demand *dmd;
     if (r->land) {
-        assert(r->land->demands || !"need to call fix_demands on a region");
+        assert(r->land->demands || !"need to call fix_demand on a region");
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value == 0)
                 return dmd->type->itype;
@@ -1060,7 +1060,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     rawmaterial **lrm = &r->resources;
 
     assert(terrain);
-
     while (*lrm) {
         rawmaterial *rm = *lrm;
         const resource_type *rtype = NULL;
@@ -1191,7 +1190,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         }
         if (itype != NULL) {
             rsetherbtype(r, itype);
-            rsetherbs(r, (short)(50 + rng_int() % 31));
+            rsetherbs(r, 50 + rng_int() % 31);
         }
         else {
             rsetherbtype(r, NULL);
@@ -1244,7 +1243,7 @@ void terraform_region(region * r, const terrain_type * terrain)
  * egal ob durch den spell oder anderes angelegt.
  **/
 #include "curse.h"
-int production(const region * r)
+int max_production(const region * r)
 {
     /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
@@ -1420,7 +1419,7 @@ void region_setinfo(struct region *r, const char *info)
 {
     assert(r->land);
     free(r->land->display);
-    r->land->display = (info && info[0]) ? strdup(info) : 0;
+    r->land->display = (info && info[0]) ? str_strdup(info) : 0;
 }
 
 const char *region_getinfo(const region * r)
@@ -1432,7 +1431,7 @@ void region_setname(struct region *r, const char *name)
 {
     if (r->land) {
         free(r->land->name);
-        r->land->name = name ? strdup(name) : 0;
+        r->land->name = name ? str_strdup(name) : 0;
     }
 }
 
@@ -1456,7 +1455,7 @@ int region_get_morale(const region * r)
 void region_set_morale(region * r, int morale, int turn)
 {
     if (r->land) {
-        r->land->morale = (short)morale;
+        r->land->morale = morale;
         if (turn >= 0 && r->land->ownership) {
             r->land->ownership->morale_turn = turn;
         }

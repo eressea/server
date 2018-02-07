@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "calendar.h"
 #include "move.h" /* storms */
 
@@ -36,17 +38,18 @@ int first_turn(void)
     return config_get_int("game.start", 0);
 }
 
-const gamedate *get_gamedate(int turn, gamedate * gd)
+const gamedate *get_gamedate(int turn_now, gamedate * gd)
 {
     int weeks_per_year = months_per_year * weeks_per_month;
-    int t = turn - first_turn();
+    int t = turn_now - first_turn();
 
     assert(gd);
     assert(t>=0);
 
+    gd->turn = turn_now;
     gd->week = t % weeks_per_month;       /* 0 - weeks_per_month-1 */
     gd->month = (t / weeks_per_month + first_month) % months_per_year;    /* 0 - months_per_year-1 */
-    gd->year = t / (weeks_per_year)+1;
+    gd->year = 1 + t / weeks_per_year;
     gd->season = month_season ? month_season[gd->month] : 0;
     return gd;
 }

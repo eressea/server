@@ -25,11 +25,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
+#include <util/base36.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/resolve.h>
-#include <util/base36.h>
 
 #include <storage.h>
 

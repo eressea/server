@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "language.h"
 
 #include "log.h"
@@ -45,9 +48,6 @@ typedef struct locale {
     struct locale_str *strings[SMAXHASH];
 } locale;
 
-extern locale *default_locale;
-extern locale *locales;
-
 locale *default_locale;
 locale *locales;
 
@@ -59,7 +59,7 @@ unsigned int locale_index(const locale * lang)
 
 locale *get_locale(const char *name)
 {
-    unsigned int hkey = hashstring(name);
+    unsigned int hkey = str_hash(name);
     locale *l = locales;
     while (l && l->hashkey != hkey)
         l = l->next;
@@ -71,7 +71,7 @@ static unsigned int nextlocaleindex = 0;
 locale *get_or_create_locale(const char *name)
 {
     locale *l;
-    unsigned int hkey = hashstring(name);
+    unsigned int hkey = str_hash(name);
     locale **lp = &locales;
 
     if (!locales) {
@@ -86,7 +86,7 @@ locale *get_or_create_locale(const char *name)
     *lp = l = (locale *)calloc(sizeof(locale), 1);
     assert_alloc(l);
     l->hashkey = hkey;
-    l->name = strdup(name);
+    l->name = str_strdup(name);
     l->index = nextlocaleindex++;
     assert(nextlocaleindex <= MAXLOCALES);
     if (default_locale == NULL) default_locale = l;
@@ -123,7 +123,7 @@ void make_locales(const char *str)
 
 const char *locale_getstring(const locale * lang, const char *key)
 {
-    unsigned int hkey = hashstring(key);
+    unsigned int hkey = str_hash(key);
     unsigned int id = hkey & (SMAXHASH - 1);
     const struct locale_str *find;
 
@@ -153,7 +153,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
     assert(key);
 
     if (key != NULL) {
-        unsigned int hkey = hashstring(key);
+        unsigned int hkey = str_hash(key);
         unsigned int id = hkey & (SMAXHASH - 1);
         struct locale_str *find;
 
@@ -191,7 +191,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
 
 void locale_setstring(locale * lang, const char *key, const char *value)
 {
-    unsigned int hkey = hashstring(key);
+    unsigned int hkey = str_hash(key);
     unsigned int id = hkey & (SMAXHASH - 1);
     struct locale_str *find;
     if (!lang) {
@@ -209,15 +209,15 @@ void locale_setstring(locale * lang, const char *key, const char *value)
         find->nexthash = lang->strings[id];
         lang->strings[id] = find;
         find->hashkey = hkey;
-        find->key = strdup(key);
-        find->str = strdup(value);
+        find->key = str_strdup(key);
+        find->str = str_strdup(value);
     }
     else {
         if (strcmp(find->str, value) != 0) {
             log_warning("multiple translations for key %s\n", key);
         }
         free(find->str);
-        find->str = strdup(value);
+        find->str = str_strdup(value);
     }
 }
 

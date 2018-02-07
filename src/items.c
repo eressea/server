@@ -1,30 +1,31 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "items.h"
 
 #include "alchemy.h"
+#include "skill.h"
+#include "keyword.h"
+#include "direction.h"
 #include "study.h"
 #include "economy.h"
-#include "move.h"
 #include "magic.h"
-
-#include <attributes/fleechance.h>
 
 #include <spells/shipcurse.h>
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
 #include <kernel/curse.h>
-#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
-#include <kernel/plane.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 
 /* triggers includes */
@@ -33,12 +34,13 @@
 
 #include <util/attrib.h>
 #include <util/event.h>
-#include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <limits.h>
 
 /* BEGIN studypotion */
@@ -47,7 +49,7 @@ static int
 use_studypotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
-    if (u->thisorder && init_order(u->thisorder) == K_STUDY) {
+    if (u->thisorder && init_order(u->thisorder, u->faction->locale) == K_STUDY) {
         char token[128];
         skill_t sk = NOSKILL;
         skill *sv = 0;
@@ -266,7 +268,7 @@ static int use_foolpotion(unit *u, const item_type *itype, int amount,
     ADDMSG(&u->faction->msgs, msg_message("givedumb",
         "unit recipient amount", u, target, amount));
 
-    change_effect(target, itype->rtype->ptype, amount);
+    change_effect(target, itype, amount);
     use_pooled(u, itype->rtype, GET_DEFAULT, amount);
     return 0;
 }
@@ -276,7 +278,7 @@ use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
-        change_effect(u, itype->rtype->ptype, 100 * amount);
+        change_effect(u, itype, 100 * amount);
     }
     else {
         const race *irace = u_irace(u);
@@ -300,7 +302,7 @@ struct order *ord)
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(u, itype->rtype->ptype);
+    usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
         "unit potion", u, itype->rtype));
@@ -311,7 +313,7 @@ static int heal(unit * user, int effect)
 {
     int req = unit_max_hp(user) * user->number - user->hp;
     if (req > 0) {
-        req = MIN(req, effect);
+        if (req > effect) req = effect;
         effect -= req;
         user->hp += req;
     }
@@ -333,7 +335,7 @@ struct order *ord)
     }
     use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(user, itype->rtype->ptype);
+    usetpotionuse(user, itype);
 
     ADDMSG(&user->faction->msgs, msg_message("usepotion",
         "unit potion", user, itype->rtype));
@@ -372,21 +374,18 @@ static int
 use_mistletoe(struct unit *user, const struct item_type *itype, int amount,
     struct order *ord)
 {
-    int mtoes =
-        get_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-            user->number);
-
-    if (user->number > mtoes) {
-        ADDMSG(&user->faction->msgs, msg_message("use_singleperson",
-            "unit item region command", user, itype->rtype, user->region, ord));
-        return -1;
+    int mtoes = get_pooled(user, itype->rtype,
+        GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, amount);
+    if (mtoes < amount) {
+        amount = mtoes;
     }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        user->number);
-    a_add(&user->attribs, make_fleechance((float)1.0));
-    ADDMSG(&user->faction->msgs,
-        msg_message("use_item", "unit item", user, itype->rtype));
-
+    if (amount > 0) {
+        use_pooled(user, itype->rtype,
+            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, amount);
+        change_effect(user, itype, amount);
+        ADDMSG(&user->faction->msgs,
+            msg_message("use_item", "unit amount item", user, amount, itype->rtype));
+    }
     return 0;
 }
 
@@ -403,7 +402,7 @@ static int use_warmthpotion(unit *u, const item_type *itype,
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(u, itype->rtype->ptype);
+    usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
         "unit potion", u, itype->rtype));

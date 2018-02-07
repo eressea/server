@@ -10,14 +10,14 @@ static struct message *cinfo_magicresistance(const void *obj, objtype_t typ, con
     if (typ == TYP_UNIT) {
         if (self != 0) {
             const struct unit *u = (const struct unit *)obj;
-            return msg_message(mkname("curseinfo", "magicresistance_unit"), "unit id", u,
+            return msg_message("magicresistance_unit", "unit id", u,
                 c->no);
         }
         return NULL;
     }
     if (typ == TYP_BUILDING) {
         const struct building *b = (const struct building *)obj;
-        return msg_message(mkname("curseinfo", "magicresistance_building"), "id building", c->no, b);
+        return msg_message("magicresistance_building", "id building", c->no, b);
     }
     return 0;
 }

@@ -35,12 +35,7 @@ extern "C" {
     
     void monster_kills_peasants(struct unit *u);
     bool monster_is_waiting(const struct unit *u);
-    struct faction *get_monsters(void);
-    struct faction *get_or_create_monsters(void);
     void make_zombie(struct unit * u);
-
-#define MONSTER_ID 666
-#define is_monsters(f) ((f->flags & FFL_NPC) && f==get_monsters())
 
 #ifdef __cplusplus
 }

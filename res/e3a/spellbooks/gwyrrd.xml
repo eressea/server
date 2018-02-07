@@ -30,4 +30,5 @@
   <entry spell="summonfireelemental" level="13" />
   <entry spell="maelstrom" level="15" />
   <entry spell="rustweapon" level="3" />
+  <entry spell="summon_familiar" level="9" />
 </spellbook>

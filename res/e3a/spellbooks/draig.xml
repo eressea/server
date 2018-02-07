@@ -29,4 +29,5 @@
     <entry spell="summondragon" level="11" />
     <entry spell="summonshadowlords" level="12" />
     <entry spell="unholypower" level="14" />
+  <entry spell="summon_familiar" level="9" />
 </spellbook>

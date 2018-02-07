@@ -16,14 +16,22 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <util/log.h>
+#endif
 
 #include <kernel/config.h>
-#include <kernel/version.h>
+#include <kernel/database.h>
+#include <kernel/messages.h>
 #include <kernel/save.h>
+#include <kernel/version.h>
+
 #include <util/filereader.h>
 #include <util/language.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include <util/path.h>
+
 #include "eressea.h"
 #ifdef USE_CURSES
 #include "gmtool.h"
@@ -62,7 +70,6 @@ static void load_inifile(void)
         set_datapath(str);
     }
 
-    lomem = config_get_int("game.lomem", lomem) ? 1 : 0;
     verbosity = config_get_int("game.verbose", 2);
     memdebug = config_get_int("game.memcheck", memdebug);
 #ifdef USE_CURSES
@@ -79,12 +86,13 @@ static const char * valid_keys[] = {
     "game.locale",
     "game.verbose",
     "game.report",
-    "game.lomem",
     "game.memcheck",
     "game.email",
     "game.mailcmd",
     "game.era",
     "game.sender",
+    "game.dbname",
+    "game.dbbatch",
     "editor.color",
     "editor.codepage",
     "editor.population.",
@@ -94,17 +102,18 @@ static const char * valid_keys[] = {
 
 static dictionary *parse_config(const char *filename)
 {
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     dictionary *d;
     const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
-        join_path(cfgpath, filename, path, sizeof(path));
+        path_join(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
-        d  = iniparser_load(path);
-    } else {
+        d = iniparser_load(path);
+    }
+    else {
         log_debug("reading from configuration file %s\n", filename);
-        d  = iniparser_load(filename);        
+        d = iniparser_load(filename);
     }
     if (d) {
         config_set_from(d, valid_keys);
@@ -168,8 +177,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr = LOG_CPERROR;
-    int log_flags = LOG_CPERROR | LOG_CPWARNING | LOG_CPINFO;
+    int log_stderr, log_flags = 2;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -179,9 +187,9 @@ static int parse_args(int argc, char **argv)
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
                 printf("Eressea version %s, "
-	            "Copyright (C) 2017 Enno Rehling et al.\n",
+                    "Copyright (C) 2017 Enno Rehling et al.\n",
                     eressea_version());
-	return 1;
+                return 1;
 #ifdef USE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
@@ -298,10 +306,11 @@ int main(int argc, char **argv)
     lua_State *L;
     dictionary *d = 0;
     setup_signal_handler();
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     /* parse arguments again, to override ini file */
     err = parse_args(argc, argv);
-    if (err!=0) {
-        return (err>0) ? 0 : err;
+    if (err != 0) {
+        return (err > 0) ? 0 : err;
     }
     d = parse_config(inifile);
     if (!d) {

@@ -25,6 +25,7 @@
 
 /* util includes */
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/nrmessage.h>
 #include <util/message.h>
 #include <util/functions.h>

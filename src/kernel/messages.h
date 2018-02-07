@@ -46,6 +46,12 @@ extern "C" {
         int level;
     } msglevel;
 
+#define MESSAGE_MISSING_IGNORE  0
+#define MESSAGE_MISSING_ERROR   1
+#define MESSAGE_MISSING_REPLACE 2
+
+    void message_handle_missing(int mode);
+
     struct message *msg_message(const char *name, const char *sig, ...);
     struct message *msg_feedback(const struct unit *, struct order *cmd,
         const char *name, const char *sig, ...);
@@ -54,8 +60,8 @@ extern "C" {
     void addmessage(struct region *r, struct faction *f, const char *s,
         msg_t mtype, int level);
 
-    struct mlist ** merge_messages(message_list *mlist, message_list *append);
-    void split_messages(message_list *mlist, struct mlist **split);
+    struct mlist ** merge_messages(message_list *ml, message_list *append);
+    void split_messages(message_list *ml, struct mlist **split);
 
 #define ADDMSG(msgs, mcreate) { message * mx = mcreate; if (mx) { assert(mx->refcount>=1); add_message(msgs, mx); msg_release(mx); } }
 

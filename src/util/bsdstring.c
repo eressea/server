@@ -1,13 +1,14 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <stdio.h>
+#endif
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <stdarg.h>
 #include <limits.h>
 
 #include "bsdstring.h"
 #include "log.h"
+#include "strings.h"
 
 int wrptr(char **ptr, size_t * size, int result)
 {
@@ -35,37 +36,9 @@ int wrptr(char **ptr, size_t * size, int result)
     return ERANGE;
 }
 
-#ifndef HAVE_STRLCPY
-#define HAVE_STRLCPY
-size_t strlcpy(char *dst, const char *src, size_t siz)
-{                               /* copied from OpenBSD source code */
-    register char *d = dst;
-    register const char *s = src;
-    register size_t n = siz;
-
-    assert(src && dst);
-    /* Copy as many bytes as will fit */
-    if (n != 0 && --n != 0) {
-        do {
-            if ((*d++ = *s++) == 0)
-                break;
-        } while (--n != 0);
-    }
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0) {
-        if (siz != 0)
-            *d = '\0';                /* NUL-terminate dst */
-        while (*s++);
-    }
-
-    return (s - src - 1);         /* count does not include NUL */
-}
-#endif
-
 char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const char *file, int line)
 {
-    size_t bytes = strlcpy(dst, src, *siz);
+    size_t bytes = str_strlcpy(dst, src, *siz);
     char * buf = dst;
     assert(bytes <= INT_MAX);
     if (wrptr(&buf, siz, (int)bytes) != 0) {
@@ -77,54 +50,3 @@ char * strlcpy_w(char *dst, const char *src, size_t *siz, const char *err, const
     }
     return buf;
 }
-
-
-
-#ifndef HAVE_STRLCAT
-#define HAVE_STRLCAT
-size_t strlcat(char *dst, const char *src, size_t siz)
-{
-    register char *d = dst;
-    register const char *s = src;
-    register size_t n = siz;
-    size_t dlen;
-
-    /* Find the end of dst and adjust bytes left but don't go past end */
-    while (*d != '\0' && n-- != 0)
-        d++;
-    dlen = d - dst;
-    n = siz - dlen;
-
-    if (n == 0)
-        return (dlen + strlen(s));
-    while (*s != '\0') {
-        if (n != 1) {
-            *d++ = *s;
-            n--;
-        }
-        s++;
-    }
-    *d = '\0';
-
-    return (dlen + (s - src));    /* count does not include NUL */
-}
-#endif
-
-#ifndef HAVE_SLPRINTF
-#define HAVE_SLPRINTF
-size_t slprintf(char * dst, size_t size, const char * format, ...)
-{
-    va_list args;
-    int result;
-
-    va_start(args, format);
-    result = vsnprintf(dst, size, format, args);
-    va_end(args);
-    if (result < 0 || result >= (int)size) {
-        dst[size - 1] = '\0';
-        return size;
-    }
-
-    return (size_t)result;
-}
-#endif

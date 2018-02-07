@@ -21,10 +21,10 @@ static void test_lighthouse_range(CuTest * tc)
     building *b;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     test_create_region(1, 0, 0);
-    u1 = test_create_unit(test_create_faction(0), r);
-    u2 = test_create_unit(test_create_faction(0), r);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
     b = test_create_building(r, test_create_buildingtype("lighthouse"));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL, NULL));
     CuAssertIntEquals(tc, 0, lighthouse_range(b, u1->faction, NULL));
@@ -49,7 +49,7 @@ static void test_lighthouse_range(CuTest * tc)
     set_level(u1, SK_PERCEPTION, 9);
     CuAssertIntEquals(tc, 3, lighthouse_range(b, u1->faction, u1));
     CuAssertIntEquals(tc, 1, lighthouse_range(b, u2->faction, u2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_lighthouse_update(CuTest * tc)
@@ -88,7 +88,7 @@ static void test_lighthouse_update(CuTest * tc)
     CuAssertPtrEquals(tc, (void *)&at_lighthouse, (void *)r2->attribs->type);
     CuAssertPtrNotNull(tc, r3->attribs);
     CuAssertPtrEquals(tc, (void *)&at_lighthouse, (void *)r3->attribs->type);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_lighthouse_suite(void)

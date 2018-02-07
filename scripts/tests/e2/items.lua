@@ -11,6 +11,21 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
+function test_water_of_life()
+    local r = region.create(0, 0, "plain")
+    r:set_flag(1, false) -- no mallorn
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local trees = r:get_resource('sapling')
+    u:add_item('p2', 1)
+    u:add_item('log', 10)
+    u:add_order("BENUTZE 1 'Wasser des Lebens'")
+    process_orders()
+    assert_equal(0, u:get_item('p2'))
+    assert_equal(0, u:get_item('log'))
+    assert_equal(trees+10, r:get_resource('sapling'))
+end
+
 function test_nestwarmth_insect()
     local r = region.create(0, 0, "plain")
     local f = faction.create("insect", "noreply@eressea.de", "de")
@@ -113,28 +128,31 @@ function test_speedsail()
     assert_equal(1, u.ship:get_curse('shipspeed')) -- effect stays forever
 end
 
-function test_foolpotion()
+function disable_test_foolpotion()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human", "noreply@eressea.de", "de")
     local u = unit.create(f, r, 1)
     turn_begin()
-    u:add_item("p7", 1)
+    u:add_item('p7', 2)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Dumpfbackenbrot 4242")
     turn_process()
-    assert_equal(1, u:get_item("p7"))
+    assert_equal(2, u:get_item('p7'))
     assert_equal(1, f:count_msg_type('feedback_unit_not_found'))
     local u2 = unit.create(f, r, 1)
     
     u:clear_orders()
-    u:add_order("BENUTZEN 1 Dumpfbackenbrot " .. itoa36(u2.id))
+    u:add_order("BENUTZEN 2 Dumpfbackenbrot " .. itoa36(u2.id))
     turn_process()
-    assert_equal(1, u:get_item("p7"))
+    assert_equal(2, u:get_item('p7'))
     assert_equal(1, f:count_msg_type('error64'))
 
-    u:set_skill("stealth", 1);
+    u:set_skill("stealth", 1)
+    u2:set_skill('crossbow', 1)
     turn_process()
-    assert_equal(0, u:get_item("p7"))
+    assert_equal(0, u:get_item('p7'))
+    assert_equal(0, u2:effect('p7'))
+    assert_equal(0, u2:get_skill('crossbow'))
     assert_equal(1, f:count_msg_type('givedumb'))
     turn_end()
 end

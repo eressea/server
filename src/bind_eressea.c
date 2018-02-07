@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
 #include "bind_eressea.h"
 
 #include <platform.h>

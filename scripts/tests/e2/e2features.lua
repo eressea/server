@@ -214,8 +214,8 @@ end
 
 function test_can_give_person()
   local r = region.create(0, 0, "plain")
-  local f1 = faction.create("human", "noreply@eressea.de", "de")
-  local f2 = faction.create("human", "noreply@eressea.de", "de")
+  local f1 = faction.create("human")
+  local f2 = faction.create("human")
   local u1 = unit.create(f1, r, 10)
   local u2 = unit.create(f2, r, 10)
   u1.faction.age = 10
@@ -402,4 +402,46 @@ function test_give_to_other_okay()
     process_orders()
     assert_equal(1, u1.number)
     assert_equal(2, u2.number)
+end
+
+local function get_name(x)
+    return x.name .. " (" .. itoa36(x.id) .. ")"
+end
+
+function test_faction_stealth()
+    local f = faction.create('human')
+    local f2 = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    local u2 = unit.create(f2, r)
+    assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
+    u:add_order("TARNE PARTEI NUMMER " .. itoa36(f2.id))
+    process_orders()
+    assert_equal(get_name(u) .. ", " .. get_name(f2) .. ", 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", " .. get_name(f2) .. ", 1 Mensch.", u:show(f2))
+    u:clear_orders()
+    u:add_order("TARNE PARTEI NUMMER")
+    process_orders()
+    assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
+end
+
+function test_faction_anonymous()
+    local f = faction.create('human')
+    local f2 = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    local u2 = unit.create(f2, r)
+    assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
+    u:add_order("TARNE PARTEI")
+    process_orders()
+    assert_equal(get_name(u) .. ", anonym, 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", anonym, 1 Mensch.", u:show(f2))
+    u:clear_orders()
+    u:add_order("TARNE PARTEI NICHT")
+    process_orders()
+    assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
+    assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
 end

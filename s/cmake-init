@@ -1,5 +1,20 @@
 #!/bin/sh
 
+ERESSEA_DB=sqlite
+if [ -e /usr/include/db.h ] ; then
+ERESSEA_DB=db
+fi
+
+# Parse command line arguments
+while [ ! -z "$1" ] ; do
+if [ "$1" = "--with-db" ] ; then
+ERESSEA_DB=db
+elif [ "$1" = "--with-sqlite" ] ; then
+ERESSEA_DB=sqlite
+fi
+shift 1
+done
+
 ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
@@ -15,8 +30,6 @@ mkdir -p $BIN_DIR
 rm -f $BUILD
 ln -sf $BIN_DIR $BUILD
 
-rm -f CMakeCache.txt
-
 # use anything installed in /opt or /usr
 LIBRARY_PATH=/opt/lib:/opt/lib/$MACHINE:/usr/lib/$MACHINE
 INCLUDE_PATH=/opt/include:/usr/include
@@ -30,30 +43,43 @@ if [ -d $HOME/usr ]; then
 fi
 
 DEST=$(dirname $ROOT)/server
-ARGS=" -DCMAKE_BUILD_TYPE=$BUILD \
- -DCMAKE_LIBRARY_PATH=$LIBRARY_PATH \
- -DCMAKE_PREFIX_PATH=$PREFIX_PATH \
- -DCMAKE_INSTALL_PREFIX=$DEST"
-# -DCMAKE_INCLUDE_PATH=$INCLUDE_PATH
 
 git submodule update --init
+
+LUA_VERSION="5.2"
+LUA_DIR=/usr
+if [ -d /usr/include/lua5.1 ]; then
+   LUA_VERSION="5.1"
+elif [ -d /usr/local/include/lua5.1 ]; then
+   export LUA_DIR=/usr/local
+   LUA_VERSION="5.1"
+fi
+
+cat >| $BUILD/config.cmake <<HEREDOC
+SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
+SET (LUA_DIR "$LUA_DIR" CACHE PATH "Lua root path")
+SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")
+SET (CMAKE_INSTALL_PREFIX "$DEST" CACHE PATH "")
+SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
+SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
+HEREDOC
 
 path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "tolua is not installed, building from source"
  cd $ROOT
  if [ ! -d tolua ]; then
-  LUA_VERSION="5.2"
-  if [ -d /usr/include/lua5.1 ] || [ -d /usr/local/include/lua5.1 ]; then
-   LUA_VERSION="5.1"
-  fi
   echo "fetching tolua ${LUA_VERSION} from github..."
   git clone https://github.com/ennorehling/tolua-${LUA_VERSION}.git tolua
  fi
  echo "building tolua..."
  cd tolua
  make
- ARGS="$ARGS -DPC_TOLUA_DIR=$ROOT/tolua"
+ cd -
+cat >> $BUILD/config.cmake <<TOLUA
+SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")
+TOLUA
+
 else
  echo "tolua is $path"
 fi
@@ -62,6 +88,6 @@ unset path
 set -e
 
 cd $BIN_DIR
-cmake .. $ARGS $*
+cmake -C config.cmake .. $*
 cd $OLDPWD
 

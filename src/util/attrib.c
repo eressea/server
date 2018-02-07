@@ -19,10 +19,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "attrib.h"
 
+#include "gamedata.h"
 #include "log.h"
 #include "storage.h"
+#include "strings.h"
 
-#include <util/gamedata.h>
 #include <critbit.h>
 
 #include <assert.h>
@@ -119,12 +120,17 @@ int a_readstring(attrib * a, void *owner, struct gamedata *data)
     do {
         e = READ_STR(data->store, buf, sizeof(buf));
         if (result) {
-            result = realloc(result, len + DISPLAYSIZE - 1);
+            char *tmp = realloc(result, len + DISPLAYSIZE - 1);
+            if (!tmp) {
+                free(result);
+                abort();
+            }
+            result = tmp;
             strcpy(result + len, buf);
             len += DISPLAYSIZE - 1;
         }
         else {
-            result = strdup(buf);
+            result = str_strdup(buf);
         }
     } while (e == ENOMEM);
     a->data.v = result;
@@ -532,5 +538,5 @@ void a_write_orig(struct storage *store, const attrib * attribs, const void *own
 
 void attrib_done(void) {
     cb_clear(&cb_deprecated);
-    memset(at_hash, 0, sizeof at_hash);
+    memset(at_hash, 0, sizeof(at_hash[0]) * MAXATHASH);
 }

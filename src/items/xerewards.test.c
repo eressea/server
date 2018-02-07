@@ -2,19 +2,42 @@
 
 #include "xerewards.h"
 #include "study.h"
+#include "magic.h"
 
-#include <kernel/unit.h>
+#include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
 #include <kernel/region.h>
+#include <kernel/unit.h>
 
 #include <tests.h>
 #include <CuTest.h>
 
 static void test_manacrystal(CuTest *tc) {
-    test_cleanup();
-    test_create_world();
-    test_cleanup();
+    struct item_type *itype;
+    unit *u;
+
+    test_setup();
+    test_inject_messagetypes();
+
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    itype = test_create_itemtype("manacrystal");
+    change_resource(u, itype->rtype, 1);
+    CuAssertIntEquals(tc, -1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error295"));
+    test_clear_messages(u->faction);
+    create_mage(u, M_GRAY);
+    set_level(u, SK_MAGIC, 5);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    CuAssertIntEquals(tc, 1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertIntEquals(tc, 25, get_spellpoints(u));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "manacrystal_use"));
+    test_clear_messages(u->faction);
+    set_level(u, SK_MAGIC, 8);
+    CuAssertIntEquals(tc, 1, use_manacrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "manacrystal_use"));
+    CuAssertIntEquals(tc, 25 + 33, get_spellpoints(u));
+    test_teardown();
 }
 
 static void test_skillpotion(CuTest *tc) {
@@ -25,9 +48,9 @@ static void test_skillpotion(CuTest *tc) {
     int initialWeeks_Stamina = 0;
     int initialWeeks_Magic = 0;
 
-    test_cleanup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(NULL), findregion(0, 0));
+    test_setup();
+    test_inject_messagetypes();
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);
 
@@ -57,7 +80,7 @@ static void test_skillpotion(CuTest *tc) {
     pSkill = unit_skill(u, SK_MAGIC);
     CuAssertIntEquals(tc, initialWeeks_Magic - 3, pSkill->weeks);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_xerewards_suite(void)

@@ -26,13 +26,14 @@ static void test_herbsearch(CuTest * tc)
     const item_type *itype;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
+    test_inject_messagetypes();
+    r = test_create_region(0, 0, NULL);
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
     u2 = test_create_unit(test_create_faction(rc), r);
     setguard(u2, true);
 
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     itype = test_create_itemtype("rosemary");
 
@@ -78,7 +79,7 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_alchemy_suite(void)

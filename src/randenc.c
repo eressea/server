@@ -53,7 +53,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -62,10 +61,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 
 /* libc includes */
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <attributes/iceberg.h>
@@ -234,9 +233,9 @@ void find_manual(region * r, unit * u)
         break;
     }
 
-    slprintf(zLocation, sizeof(zLocation), "manual_location_%d",
+    snprintf(zLocation, sizeof(zLocation), "manual_location_%d",
         (int)(rng_int() % 4));
-    slprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
+    snprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
 
     msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
     if (msg) {
@@ -432,7 +431,7 @@ void drown(region * r)
     }
 }
 
-static void melt_iceberg(region * r)
+static void melt_iceberg(region * r, const terrain_type *t_ocean)
 {
     attrib *a;
     unit *u;
@@ -456,11 +455,7 @@ static void melt_iceberg(region * r)
     }
 
     /* in Ozean wandeln */
-    terraform_region(r, newterrain(T_OCEAN));
-
-    /* Einheiten, die nicht schwimmen k�nnen oder in Schiffen sind,
-     * ertrinken */
-    drown(r);
+    terraform_region(r, t_ocean);
 }
 
 static void move_iceberg(region * r)
@@ -589,14 +584,20 @@ static void move_iceberg(region * r)
 static void move_icebergs(void)
 {
     region *r;
+    static int terrain_cache;
+    static const terrain_type *t_iceberg, *t_ocean;
 
+    if (terrain_changed(&terrain_cache)) {
+        t_iceberg = newterrain(T_ICEBERG);
+        t_ocean = newterrain(T_OCEAN);
+    }
     for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_ICEBERG) && !fval(r, RF_SELECT)) {
+        if (r->terrain == t_iceberg && !fval(r, RF_SELECT)) {
             int select = rng_int() % 10;
             if (select < 4) {
                 /* 4% chance */
                 fset(r, RF_SELECT);
-                melt_iceberg(r);
+                melt_iceberg(r, t_ocean);
             }
             else if (select < 64) {
                 /* 60% chance */
@@ -610,9 +611,14 @@ static void move_icebergs(void)
 void create_icebergs(void)
 {
     region *r;
+    const struct terrain_type *t_iceberg, *t_sleep;
+
+    t_iceberg = get_terrain("iceberg");
+    t_sleep = get_terrain("iceberg_sleep");
+    assert(t_iceberg && t_sleep);
 
     for (r = regions; r; r = r->next) {
-        if (r->terrain == newterrain(T_ICEBERG_SLEEP) && chance(0.05)) {
+        if (r->terrain == t_sleep && chance(0.05)) {
             bool has_ocean_neighbour = false;
             direction_t dir;
             region *rc;
@@ -629,7 +635,7 @@ void create_icebergs(void)
             if (!has_ocean_neighbour)
                 continue;
 
-            rsetterrain(r, T_ICEBERG);
+            r->terrain = t_iceberg;
 
             fset(r, RF_SELECT);
             move_iceberg(r);
@@ -669,10 +675,11 @@ static void godcurse(void)
                     double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
                     damage_ship(sh, dmg);
                     if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                        unit *u = ship_owner(sh);
-                        if (u)
-                            ADDMSG(&u->faction->msgs,
-                            msg_message("godcurse_destroy_ship", "ship", sh));
+                        unit *uo = ship_owner(sh);
+                        if (uo) {
+                            ADDMSG(&uo->faction->msgs,
+                                msg_message("godcurse_destroy_ship", "ship", sh));
+                        }
                         remove_ship(&sh->region->ships, sh);
                     }
                     sh = shn;
@@ -750,12 +757,8 @@ static void demon_skillchanges(void)
  */
 static void icebergs(void)
 {
-    region *r;
     create_icebergs();
     move_icebergs();
-    for (r = regions; r; r = r->next) {
-        drown(r);
-    }
 }
 
 #define HERBS_ROT               /* herbs owned by units have a chance to rot. */
@@ -801,11 +804,18 @@ void randomevents(void)
     region *r;
     faction *monsters = get_monsters();
 
-    icebergs();
+    if (config_get_int("modules.iceberg", 0)) {
+        icebergs();
+    }
+    for (r = regions; r; r = r->next) {
+        drown(r);
+    }
     godcurse();
     orc_growth();
     demon_skillchanges();
-    volcano_update();
+    if (volcano_module()) {
+        volcano_update();
+    }
     /* Monumente zerfallen, Schiffe verfaulen */
 
     for (r = regions; r; r = r->next) {

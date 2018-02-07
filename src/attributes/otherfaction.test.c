@@ -30,7 +30,7 @@ static void test_rules(CuTest *tc) {
     CuAssertIntEquals(tc, false, rule_stealth_anon());
     config_set("stealth.faction.anon", "1");
     CuAssertIntEquals(tc, true, rule_stealth_anon());
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_otherfaction(CuTest *tc) {
@@ -38,14 +38,14 @@ static void test_otherfaction(CuTest *tc) {
     faction *f;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    f = test_create_faction(0);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    f = test_create_faction(NULL);
     config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());
     CuAssertPtrEquals(tc, u->faction, visible_faction(f, u));
     a_add(&u->attribs, make_otherfaction(f));
     CuAssertPtrEquals(tc, f, visible_faction(f, u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_otherfaction_suite(void)

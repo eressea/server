@@ -11,6 +11,9 @@
 #ifndef H_GMTOOL
 #define H_GMTOOL
 
+#include <stddef.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

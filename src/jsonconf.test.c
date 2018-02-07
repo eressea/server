@@ -1,23 +1,27 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include "types.h"
+#endif
+
+#include "kernel/types.h"
+
 #include "jsonconf.h"
 
-#include "config.h"
-#include "building.h"
-#include "direction.h"
-#include "item.h"
-#include "keyword.h"
-#include "race.h"
-#include "ship.h"
-#include "spell.h"
-#include "order.h"
-#include "terrain.h"
-
-#include "move.h"
-#include "calendar.h"
-#include "prefix.h"
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/item.h"
+#include "kernel/race.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/order.h"
+#include "kernel/terrain.h"
 
 #include "util/language.h"
+
+#include "calendar.h"
+#include "direction.h"
+#include "keyword.h"
+#include "move.h"
+#include "prefix.h"
 
 #include <CuTest.h>
 #include <cJSON.h>
@@ -51,6 +55,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
 }
 
 static void test_flags(CuTest *tc) {
+    test_setup();
     check_flag(tc, "npc", RCF_NPC);
     check_flag(tc, "scarepeasants", RCF_SCAREPEASANTS);
     check_flag(tc, "nosteal", RCF_NOSTEAL);
@@ -61,7 +66,7 @@ static void test_flags(CuTest *tc) {
     check_ec_flag(tc, "getitem", ECF_GETITEM);
     check_ec_flag(tc, "giveperson", ECF_GIVEPERSON);
     check_ec_flag(tc, "giveunit", ECF_GIVEUNIT);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_settings(CuTest * tc)
@@ -88,7 +93,7 @@ static void test_settings(CuTest * tc)
     CuAssertIntEquals(tc, 14, config_get_int("integer", 0));
     CuAssertDblEquals(tc, 1.5f, config_get_flt("float", 0), 0.01);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_prefixes(CuTest * tc)
@@ -107,7 +112,7 @@ static void test_prefixes(CuTest * tc)
     CuAssertStrEquals(tc, "dark", race_prefixes[2]);
     CuAssertPtrEquals(tc, 0, race_prefixes[3]);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_disable(CuTest * tc)
@@ -133,7 +138,7 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
     CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_calendar(CuTest * tc)
@@ -158,7 +163,7 @@ static void test_calendar(CuTest * tc)
     CuAssertIntEquals(tc, 1, month_season[0]);
     CuAssertIntEquals(tc, 2, month_season[1]);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_races(CuTest * tc)
@@ -205,7 +210,7 @@ static void test_races(CuTest * tc)
     CuAssertIntEquals(tc, 5, rc->hitpoints);
     CuAssertIntEquals(tc, 6, rc->armor);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_findrace(CuTest *tc) {
@@ -225,7 +230,7 @@ static void test_findrace(CuTest *tc) {
     CuAssertPtrNotNull(tc, rc);
     CuAssertStrEquals(tc, "dwarf", rc->_name);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_items(CuTest * tc)
@@ -259,7 +264,7 @@ static void test_items(CuTest * tc)
     CuAssertPtrNotNull(tc, rt_find("axe"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_ships(CuTest * tc)
@@ -299,7 +304,7 @@ static void test_ships(CuTest * tc)
     CuAssertPtrEquals(tc, 0, (void *)st->coasts[1]);
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_castles(CuTest *tc) {
@@ -327,7 +332,7 @@ static void test_castles(CuTest *tc) {
     CuAssertIntEquals(tc, 6, bt->construction->improvement->maxsize);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement->improvement);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_spells(CuTest * tc)
@@ -347,7 +352,7 @@ static void test_spells(CuTest * tc)
     CuAssertStrEquals(tc, "u+", sp->syntax);
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
     CuAssertPtrEquals(tc, 0, find_spell("fireball"));
 }
 
@@ -413,7 +418,7 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 1, bt->construction->minskill);
     CuAssertPtrEquals(tc, 0, bt->construction->improvement);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static const char * building_defaults_data = "{\"buildings\": { "
@@ -438,7 +443,7 @@ static void test_buildings_default(CuTest * tc)
     CuAssertPtrEquals(tc, (void *)bt, (void *)bt_find("house"));
     CuAssertIntEquals(tc, 0, memcmp(bt, &clone, sizeof(building_type)));
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static const char * ship_defaults_data = "{\"ships\": { "
@@ -463,7 +468,7 @@ static void test_ships_default(CuTest * tc)
     CuAssertPtrEquals(tc, (void *)st, (void *)st_find("hodor"));
     CuAssertIntEquals(tc, 0, memcmp(st, &clone, sizeof(ship_type)));
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_configs(CuTest * tc)
@@ -485,7 +490,7 @@ static void test_configs(CuTest * tc)
         errno = 0;
     }
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_terrains(CuTest * tc)
@@ -527,7 +532,7 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_directions(CuTest * tc)
@@ -549,7 +554,7 @@ static void test_directions(CuTest * tc)
     CuAssertIntEquals(tc, D_PAUSE, get_direction("pause", lang));
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_skills(CuTest * tc)
@@ -574,7 +579,7 @@ static void test_skills(CuTest * tc)
     CuAssertStrEquals(tc, "ARMBRUST", LOC(lang, "skill::crossbow"));
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_keywords(CuTest * tc)
@@ -598,7 +603,7 @@ static void test_keywords(CuTest * tc)
     CuAssertStrEquals(tc, "NACH", LOC(lang, "keyword::move"));
 
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_strings(CuTest * tc)
@@ -617,7 +622,7 @@ static void test_strings(CuTest * tc)
     CuAssertStrEquals(tc, "NACH", LOC(lang, "move"));
     CuAssertStrEquals(tc, "LERNEN", LOC(lang, "study"));
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_infinitive_from_config(CuTest *tc) {
@@ -637,10 +642,10 @@ static void test_infinitive_from_config(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
 
     ord = create_order(K_STUDY, lang, "");
-    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, lang, buffer, sizeof(buffer)));
     free_order(ord);
     cJSON_Delete(json);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_jsonconf_suite(void)

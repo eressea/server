@@ -28,10 +28,10 @@ without prior permission by the authors of Eressea.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <selist.h>
@@ -40,6 +40,7 @@ without prior permission by the authors of Eressea.
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 alliance *alliances = NULL;
 
@@ -83,13 +84,14 @@ alliance *new_alliance(int id, const char *name) {
     al = calloc(1, sizeof(alliance));
     al->id = id;
     if (name) {
-        al->name = strdup(name);
+        al->name = str_strdup(name);
     }
     else {
         al->flags |= ALF_NON_ALLIED;
     }
     al->next = alliances;
-    return alliances = al;
+    alliances = al;
+    return al;
 }
 
 alliance *findalliance(int id)
@@ -171,7 +173,7 @@ static void perform_kick(void)
 
         if (al && alliance_get_leader(al) == ta->u->faction) {
             faction *f;
-            init_order(ta->ord);
+            init_order_depr(ta->ord);
             skip_token();
             f = getfaction();
             if (f && f_get_alliance(f) == al) {
@@ -192,7 +194,7 @@ static void perform_new(void)
         int id;
         faction *f = ta->u->faction;
 
-        init_order(ta->ord);
+        init_order_depr(ta->ord);
         skip_token();
         id = getid();
 
@@ -227,7 +229,7 @@ static void perform_transfer(void)
 
         if (al && alliance_get_leader(al) == ta->u->faction) {
             faction *f;
-            init_order(ta->ord);
+            init_order_depr(ta->ord);
             skip_token();
             f = getfaction();
             if (f && f_get_alliance(f) == al) {
@@ -264,7 +266,7 @@ static void perform_join(void)
         faction *fj = ta->u->faction;
         int aid;
 
-        init_order(ta->ord);
+        init_order_depr(ta->ord);
         skip_token();
         aid = getid();
         if (aid) {
@@ -276,7 +278,7 @@ static void perform_join(void)
                     faction *fi = ti->u->faction;
                     if (fi && f_get_alliance(fi) == al) {
                         int fid;
-                        init_order(ti->ord);
+                        init_order_depr(ti->ord);
                         skip_token();
                         fid = getid();
                         if (fid == fj->no) {
@@ -421,7 +423,7 @@ const char *alliancename(const alliance * al)
     char *ibuf = idbuf[(++nextbuf) % 8];
 
     if (al && al->name) {
-        slprintf(ibuf, sizeof(name), "%s (%s)", al->name, itoa36(al->id));
+        snprintf(ibuf, sizeof(idbuf[0]), "%s (%s)", al->name, itoa36(al->id));
     }
     else {
         return NULL;
@@ -429,51 +431,11 @@ const char *alliancename(const alliance * al)
     return ibuf;
 }
 
-void alliancevictory(void)
-{
-    const struct building_type *btype = bt_find("stronghold");
-    region *r = regions;
-    alliance *al = alliances;
-    if (btype == NULL)
-        return;
-    while (r != NULL) {
-        building *b = r->buildings;
-        while (b != NULL) {
-            if (b->type == btype) {
-                unit *u = building_owner(b);
-                if (u) {
-                    fset(u->faction->alliance, FFL_MARK);
-                }
-            }
-            b = b->next;
-        }
-        r = r->next;
-    }
-    while (al != NULL) {
-        if (!fval(al, FFL_MARK)) {
-            faction **fp;
-            for (fp = &factions; *fp; ) {
-                faction *f = *fp;
-                if (f->alliance == al) {
-                    ADDMSG(&f->msgs, msg_message("alliance::lost", "alliance", al));
-                    destroyfaction(fp);
-                } else {
-                    fp = &f->next;
-                }
-            }
-        }
-        else {
-            freset(al, FFL_MARK);
-        }
-        al = al->next;
-    }
-}
-
 void alliance_setname(alliance * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = strdup(name);
+        self->name = str_strdup(name);
     else
         self->name = NULL;
 }

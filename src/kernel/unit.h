@@ -28,11 +28,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#define MAXUNITS 1048573       /* must be prime for hashing. 524287 was >90% full */
     struct skill;
     struct item;
     struct sc_mage;
     struct gamedata;
+    struct item_type;
+
+#define MAXUNITS 1048573       /* should be prime for hashing. 524287 was >90% full */
+
 #define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
 #define UFL_LONGACTION    (1<<2)        /* 4 */
@@ -112,7 +115,7 @@ extern "C" {
         int flags;
         struct attrib *attribs;
         status_t status;
-        int n;                      /* helper temporariy variable, used in econmy, enno: attribut? */
+        int n;                      /* helper temporary variable, used in economy, enno: attribut? */
         int wants;                  /* enno: attribut? */
     } unit;
 
@@ -147,8 +150,8 @@ extern "C" {
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
 
-    const struct potion_type *ugetpotionuse(const struct unit *u);        /* benutzt u einein trank? */
-    void usetpotionuse(struct unit *u, const struct potion_type *p);      /* u benutzt trank p (es darf halt nur einer pro runde) */
+    const struct item_type *ugetpotionuse(const struct unit *u);        /* benutzt u einein trank? */
+    void usetpotionuse(struct unit *u, const struct item_type *p);      /* u benutzt trank p (es darf halt nur einer pro runde) */
 
     bool ucontact(const struct unit *u, const struct unit *u2);
     void usetcontact(struct unit *u, const struct unit *c);

@@ -1,16 +1,6 @@
-/* 
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 #include "bind_unit.h"
 #include "alchemy.h"
@@ -46,6 +36,8 @@ without prior permission by the authors of Eressea.
 #include <util/event.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
+
 #include <selist.h>
 
 #include <tolua.h>
@@ -57,14 +49,18 @@ without prior permission by the authors of Eressea.
 #include <limits.h>
 
 static int tolua_bufunit(lua_State * L) {
-    char buf[8192];
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    int mode = (int)tolua_tonumber(L, 2, (int)seen_unit);
-    if (!self)  return 0;
-
-    bufunit(self->faction, self, 0, mode, buf, sizeof(buf));
-    tolua_pushstring(L, buf);
-    return 1;
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    if (u) {
+        faction *f = (faction *)tolua_tousertype(L, 2, u->faction);
+        if (f) {
+            char buf[8192];
+            int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
+            bufunit(f, u, 0, mode, buf, sizeof(buf));
+            tolua_pushstring(L, buf);
+            return 1;
+        }
+    }
+    return 0;
 
 }
 
@@ -286,7 +282,7 @@ static int tolua_unit_get_magic(lua_State * L)
 
 static void unit_setmagic(unit * u, const char *type)
 {
-    sc_mage *mage = get_mage_depr(u);
+    sc_mage *mage = get_mage(u);
     int mtype;
     for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
         if (strcmp(magic_school[mtype], type) == 0)
@@ -331,7 +327,7 @@ static int tolua_unit_get_age(lua_State * L)
 static int tolua_unit_set_age(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    self->age = (short)tolua_tonumber(L, 2, 0);
+    self->age = (int)tolua_tonumber(L, 2, 0);
     return 0;
 }
 
@@ -370,13 +366,10 @@ static int tolua_unit_get_effect(lua_State * L)
     const unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *potion_name = tolua_tostring(L, 2, 0);
     int result = -1;
-    const potion_type *pt_potion;
     const item_type *it_potion = it_find(potion_name);
 
     if (it_potion != NULL) {
-        pt_potion = it_potion->rtype->ptype;
-        if (pt_potion != NULL)
-            result = get_effect(self, pt_potion);
+        result = get_effect(self, it_potion);
     }
 
     lua_pushinteger(L, result);
@@ -509,6 +502,19 @@ static int tolua_unit_addnotice(lua_State * L)
     const char *str = tolua_tostring(L, 2, 0);
 
     addmessage(self->region, self->faction, str, MSG_MESSAGE, ML_IMPORTANT);
+    return 0;
+}
+
+static int bind_unit_effect(lua_State * L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, NULL);
+    const char *str = tolua_tostring(L, 2, NULL);
+    const item_type *itype = it_find(str);
+    if (itype) {
+        int effect = get_effect(u, itype);
+        lua_pushinteger(L, effect);
+        return 1;
+    }
     return 0;
 }
 
@@ -718,6 +724,30 @@ static int tolua_unit_set_region(lua_State * L)
     return 0;
 }
 
+static int tolua_unit_get_order(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, 0);
+    int index = (int)tolua_tonumber(L, 2, -1);
+    order *ord = NULL;
+    if (index < 0) {
+        ord = self->thisorder;
+    }
+    else {
+        int i;
+        ord = self->orders;
+        for (i = 0; ord && i != index; ++i) {
+            ord = ord->next;
+        }
+    }
+    if (ord) {
+        char buffer[1024];
+        get_command(ord, self->faction->locale, buffer, sizeof(buffer));
+        lua_pushstring(L, buffer);
+        return 1;
+    }
+    return 0;
+}
+
 static int tolua_unit_add_order(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -761,22 +791,6 @@ static int tolua_unit_get_spells(lua_State * L)
         slist = *slist_ptr;
     }
     return tolua_selist_push(L, "spellbook", "spell_entry", slist);
-}
-
-static int tolua_unit_get_orders(lua_State * L)
-{
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-
-    order **order_ptr = (order **)lua_newuserdata(L, sizeof(order *));
-
-    luaL_getmetatable(L, TOLUA_CAST "order");
-    lua_setmetatable(L, -2);
-
-    *order_ptr = self->orders;
-
-    lua_pushcclosure(L, tolua_orderlist_next, 1);
-
-    return 1;
 }
 
 static int tolua_unit_get_curse(lua_State *L) {
@@ -960,95 +974,95 @@ void tolua_unit_open(lua_State * L)
             NULL);
         tolua_beginmodule(L, TOLUA_CAST "event");
         {
-            tolua_function(L, TOLUA_CAST "get_type", &tolua_event_gettype);
-            tolua_function(L, TOLUA_CAST "get", &tolua_event_get);
+            tolua_function(L, TOLUA_CAST "get_type", tolua_event_gettype);
+            tolua_function(L, TOLUA_CAST "get", tolua_event_get);
         }
         tolua_endmodule(L);
 
         tolua_cclass(L, TOLUA_CAST "unit", TOLUA_CAST "unit", TOLUA_CAST "", NULL);
         tolua_beginmodule(L, TOLUA_CAST "unit");
         {
-            tolua_function(L, TOLUA_CAST "__tostring", &tolua_unit_tostring);
-            tolua_function(L, TOLUA_CAST "create", &tolua_unit_create);
-            tolua_function(L, TOLUA_CAST "destroy", &tolua_unit_destroy);
+            tolua_function(L, TOLUA_CAST "__tostring", tolua_unit_tostring);
+            tolua_function(L, TOLUA_CAST "create", tolua_unit_create);
+            tolua_function(L, TOLUA_CAST "destroy", tolua_unit_destroy);
 
-            tolua_variable(L, TOLUA_CAST "name", &tolua_unit_get_name,
+            tolua_variable(L, TOLUA_CAST "name", tolua_unit_get_name,
                 tolua_unit_set_name);
-            tolua_variable(L, TOLUA_CAST "faction", &tolua_unit_get_faction,
+            tolua_variable(L, TOLUA_CAST "faction", tolua_unit_get_faction,
                 tolua_unit_set_faction);
             tolua_variable(L, TOLUA_CAST "id", tolua_unit_get_id, tolua_unit_set_id);
             tolua_variable(L, TOLUA_CAST "group", tolua_unit_get_group, tolua_unit_set_group);
             tolua_variable(L, TOLUA_CAST "info", tolua_unit_get_info, tolua_unit_set_info);
-            tolua_variable(L, TOLUA_CAST "hp", &tolua_unit_get_hp, tolua_unit_set_hp);
-            tolua_variable(L, TOLUA_CAST "status", &tolua_unit_get_status,
+            tolua_variable(L, TOLUA_CAST "hp", tolua_unit_get_hp, tolua_unit_set_hp);
+            tolua_variable(L, TOLUA_CAST "status", tolua_unit_get_status,
                 tolua_unit_set_status);
-            tolua_variable(L, TOLUA_CAST "familiar", &tolua_unit_get_familiar,
+            tolua_variable(L, TOLUA_CAST "familiar", tolua_unit_get_familiar,
                 tolua_unit_set_familiar);
 
-            tolua_variable(L, TOLUA_CAST "weight", &tolua_unit_get_weight, 0);
-            tolua_variable(L, TOLUA_CAST "capacity", &tolua_unit_get_capacity, 0);
+            tolua_variable(L, TOLUA_CAST "weight", tolua_unit_get_weight, 0);
+            tolua_variable(L, TOLUA_CAST "capacity", tolua_unit_get_capacity, 0);
 
-            tolua_function(L, TOLUA_CAST "add_order", &tolua_unit_add_order);
-            tolua_function(L, TOLUA_CAST "clear_orders", &tolua_unit_clear_orders);
-            tolua_variable(L, TOLUA_CAST "orders", &tolua_unit_get_orders, 0);
-
-            tolua_function(L, TOLUA_CAST "get_curse", &tolua_unit_get_curse);
-            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_unit_has_attrib);
+            tolua_function(L, TOLUA_CAST "get_order", tolua_unit_get_order);
+            tolua_function(L, TOLUA_CAST "add_order", tolua_unit_add_order);
+            tolua_function(L, TOLUA_CAST "clear_orders", tolua_unit_clear_orders);
+            tolua_function(L, TOLUA_CAST "get_curse", tolua_unit_get_curse);
+            tolua_function(L, TOLUA_CAST "has_attrib", tolua_unit_has_attrib);
 
             /*  key-attributes for named flags: */
-            tolua_function(L, TOLUA_CAST "set_flag", &tolua_unit_set_flag);
-            tolua_function(L, TOLUA_CAST "get_flag", &tolua_unit_get_flag);
-            tolua_variable(L, TOLUA_CAST "guard", &tolua_unit_get_guard,
-                &tolua_unit_set_guard);
-            tolua_variable(L, TOLUA_CAST "flags", &tolua_unit_get_flags,
-                &tolua_unit_set_flags);
-            tolua_variable(L, TOLUA_CAST "age", &tolua_unit_get_age,
+            tolua_function(L, TOLUA_CAST "set_flag", tolua_unit_set_flag);
+            tolua_function(L, TOLUA_CAST "get_flag", tolua_unit_get_flag);
+            tolua_variable(L, TOLUA_CAST "guard", tolua_unit_get_guard,
+                tolua_unit_set_guard);
+            tolua_variable(L, TOLUA_CAST "flags", tolua_unit_get_flags,
+                tolua_unit_set_flags);
+            tolua_variable(L, TOLUA_CAST "age", tolua_unit_get_age,
                 tolua_unit_set_age);
 
             /*  items: */
-            tolua_function(L, TOLUA_CAST "get_item", &tolua_unit_get_item);
-            tolua_function(L, TOLUA_CAST "add_item", &tolua_unit_add_item);
-            tolua_variable(L, TOLUA_CAST "items", &tolua_unit_get_items, 0);
-            tolua_function(L, TOLUA_CAST "get_pooled", &tolua_unit_get_pooled);
-            tolua_function(L, TOLUA_CAST "use_pooled", &tolua_unit_use_pooled);
+            tolua_function(L, TOLUA_CAST "get_item", tolua_unit_get_item);
+            tolua_function(L, TOLUA_CAST "add_item", tolua_unit_add_item);
+            tolua_variable(L, TOLUA_CAST "items", tolua_unit_get_items, 0);
+            tolua_function(L, TOLUA_CAST "get_pooled", tolua_unit_get_pooled);
+            tolua_function(L, TOLUA_CAST "use_pooled", tolua_unit_use_pooled);
 
             /* effects */
-            tolua_function(L, TOLUA_CAST "get_potion", &tolua_unit_get_effect);
+            tolua_function(L, TOLUA_CAST "get_potion", tolua_unit_get_effect);
 
             /*  skills: */
-            tolua_function(L, TOLUA_CAST "get_skill", &tolua_unit_getskill);
-            tolua_function(L, TOLUA_CAST "eff_skill", &tolua_unit_effskill);
-            tolua_function(L, TOLUA_CAST "set_skill", &tolua_unit_setskill);
+            tolua_function(L, TOLUA_CAST "get_skill", tolua_unit_getskill);
+            tolua_function(L, TOLUA_CAST "eff_skill", tolua_unit_effskill);
+            tolua_function(L, TOLUA_CAST "set_skill", tolua_unit_setskill);
 
-            tolua_function(L, TOLUA_CAST "add_notice", &tolua_unit_addnotice);
+            tolua_function(L, TOLUA_CAST "add_notice", tolua_unit_addnotice);
 
             /*  npc logic: */
-            tolua_function(L, TOLUA_CAST "add_handler", &tolua_unit_addhandler);
+            tolua_function(L, TOLUA_CAST "add_handler", tolua_unit_addhandler);
 
-            tolua_variable(L, TOLUA_CAST "race_name", &tolua_unit_get_racename,
-                &tolua_unit_set_racename);
-            tolua_function(L, TOLUA_CAST "add_spell", &tolua_unit_addspell);
-            tolua_variable(L, TOLUA_CAST "spells", &tolua_unit_get_spells, 0);
-            tolua_function(L, TOLUA_CAST "cast_spell", &tolua_unit_castspell);
+            tolua_variable(L, TOLUA_CAST "race_name", tolua_unit_get_racename,
+                tolua_unit_set_racename);
+            tolua_function(L, TOLUA_CAST "add_spell", tolua_unit_addspell);
+            tolua_variable(L, TOLUA_CAST "spells", tolua_unit_get_spells, 0);
+            tolua_function(L, TOLUA_CAST "cast_spell", tolua_unit_castspell);
+            tolua_function(L, TOLUA_CAST "effect", bind_unit_effect);
 
-            tolua_variable(L, TOLUA_CAST "magic", &tolua_unit_get_magic,
+            tolua_variable(L, TOLUA_CAST "magic", tolua_unit_get_magic,
                 tolua_unit_set_magic);
-            tolua_variable(L, TOLUA_CAST "aura", &tolua_unit_get_aura,
+            tolua_variable(L, TOLUA_CAST "aura", tolua_unit_get_aura,
                 tolua_unit_set_aura);
-            tolua_variable(L, TOLUA_CAST "building", &tolua_unit_get_building,
+            tolua_variable(L, TOLUA_CAST "building", tolua_unit_get_building,
                 tolua_unit_set_building);
-            tolua_variable(L, TOLUA_CAST "ship", &tolua_unit_get_ship,
+            tolua_variable(L, TOLUA_CAST "ship", tolua_unit_get_ship,
                 tolua_unit_set_ship);
-            tolua_variable(L, TOLUA_CAST "region", &tolua_unit_get_region,
+            tolua_variable(L, TOLUA_CAST "region", tolua_unit_get_region,
                 tolua_unit_set_region);
-            tolua_variable(L, TOLUA_CAST "number", &tolua_unit_get_number,
+            tolua_variable(L, TOLUA_CAST "number", tolua_unit_get_number,
                 tolua_unit_set_number);
-            tolua_variable(L, TOLUA_CAST "race", &tolua_unit_get_race,
+            tolua_variable(L, TOLUA_CAST "race", tolua_unit_get_race,
                 tolua_unit_set_race);
-            tolua_variable(L, TOLUA_CAST "hp_max", &tolua_unit_get_hpmax, 0);
-            tolua_variable(L, TOLUA_CAST "aura_max", &tolua_unit_get_auramax, 0);
+            tolua_variable(L, TOLUA_CAST "hp_max", tolua_unit_get_hpmax, 0);
+            tolua_variable(L, TOLUA_CAST "aura_max", tolua_unit_get_auramax, 0);
 
-            tolua_function(L, TOLUA_CAST "show", &tolua_bufunit);
+            tolua_function(L, TOLUA_CAST "show", tolua_bufunit);
         }
         tolua_endmodule(L);
     }

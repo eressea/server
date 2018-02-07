@@ -18,7 +18,7 @@
 static void test_resourcename_no_appearance(CuTest *tc) {
     const resource_type *rtype;
 
-    test_cleanup();
+    test_setup();
     init_resources(); /* creates R_SILVER */
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
@@ -28,13 +28,13 @@ static void test_resourcename_no_appearance(CuTest *tc) {
     CuAssertStrEquals(tc, "money_p", resourcename(rtype, NMF_PLURAL));
     CuAssertStrEquals(tc, "money", resourcename(rtype, NMF_APPEARANCE));
     CuAssertStrEquals(tc, "money_p", resourcename(rtype, NMF_APPEARANCE | NMF_PLURAL));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_resourcename_with_appearance(CuTest *tc) {
     item_type *itype;
 
-    test_cleanup();
+    test_setup();
     itype = it_get_or_create(rt_get_or_create("foo"));
     assert(itype && itype->rtype);
     it_set_appearance(itype, "bar");
@@ -42,7 +42,7 @@ static void test_resourcename_with_appearance(CuTest *tc) {
     CuAssertStrEquals(tc, "foo_p", resourcename(itype->rtype, NMF_PLURAL));
     CuAssertStrEquals(tc, "bar", resourcename(itype->rtype, NMF_APPEARANCE));
     CuAssertStrEquals(tc, "bar_p", resourcename(itype->rtype, NMF_APPEARANCE | NMF_PLURAL));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
@@ -74,9 +74,10 @@ void test_change_item(CuTest * tc)
     test_create_itemtype("iron");
     init_resources();
 
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     test_uchange(tc, u, get_resourcetype(R_IRON));
-    test_cleanup();
+    test_log_stderr(1);
+    test_teardown();
 }
 
 void test_resource_type(CuTest * tc)
@@ -92,7 +93,7 @@ void test_resource_type(CuTest * tc)
     itype = test_create_itemtype("herp");
 
     CuAssertPtrEquals(tc, itype->rtype, rt_find("herp"));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_finditemtype(CuTest * tc)
@@ -106,7 +107,7 @@ void test_finditemtype(CuTest * tc)
     locale_setstring(lang, "horse", "Pferd");
     itype = test_create_itemtype("horse");
     CuAssertPtrEquals(tc, (void *)itype, (void *)finditemtype("Pferd", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 void test_findresourcetype(CuTest * tc)
@@ -126,7 +127,7 @@ void test_findresourcetype(CuTest * tc)
 
     CuAssertPtrEquals(tc, (void*)itype->rtype, (void*)findresourcetype("Holz", lang));
     CuAssertPtrEquals(tc, (void *)rt_find("peasant"), (void *)findresourcetype("Bauer", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 #include <modules/autoseed.h>
@@ -151,7 +152,7 @@ static void test_fix_demand(CuTest *tc) {
     CuAssertPtrNotNull(tc, r->land->demands);
     CuAssertPtrNotNull(tc, r->land->demands->next);
     CuAssertPtrNotNull(tc, r_luxury(r));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_core_resources(CuTest *tc) {
@@ -170,7 +171,7 @@ static void test_core_resources(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("aura"));
     CuAssertPtrEquals(tc, 0, rtype->itype);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_resource(CuTest *tc) {
@@ -188,7 +189,7 @@ static void test_get_resource(CuTest *tc) {
     rtype = rt_get_or_create("catapult");
     CuAssertPtrEquals(tc, rtype, rt_find("catapult"));
     CuAssertStrEquals(tc, "catapult", rtype->_name);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_item_suite(void)

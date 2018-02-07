@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <resource name="runesword">
   <item weight="100" score="2000">
-    <weapon minskill="7" cut="true" magical="yes" skill="melee" offmod="2" defmod="2">
+    <weapon cut="true" magical="yes" skill="melee" offmod="2" defmod="2">
       <function name="attack" value="attack_firesword"/>
       <damage type="rider" value="3d10+10"/>
       <damage type="footman" value="3d10+10"/>

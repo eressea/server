@@ -23,6 +23,7 @@ extern "C" {
     extern int weeks_per_month;
 
     typedef struct gamedate {
+        int turn;
         int year;
         int season;
         int month;
