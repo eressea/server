@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 #include <kernel/config.h>
 #include "building.h"
@@ -150,10 +152,11 @@ building_type *bt_get_or_create(const char *name)
 int buildingcapacity(const building * b)
 {
     if (b->type->capacity >= 0) {
-        if (b->type->maxcapacity >= 0) {
-            return MIN(b->type->maxcapacity, b->size * b->type->capacity);
+        int cap = b->size * b->type->capacity;
+        if (b->type->maxcapacity > 0 && b->type->maxcapacity < cap) {
+            cap = b->type->maxcapacity;
         }
-        return b->size * b->type->capacity;
+        return cap;
     }
     if (building_finished(b)) {
         if (b->type->maxcapacity >= 0) {
@@ -313,9 +316,15 @@ int building_protection(const building_type * btype, int stage)
 {
     assert(btype->flags & BTF_FORTIFICATION);
     if (btype->maxsize < 0) {
-        return castle_bonus[MIN(stage, 5)];
+        if (stage > 5) {
+            stage = 5;
+        }
+        return castle_bonus[stage];
     }
-    return watch_bonus[MIN(stage, 2)];
+    if (stage > 2) {
+        stage = 2;
+    }
+    return watch_bonus[stage];
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -682,7 +691,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
     building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
-    double wage;
+    int wage;
 
     if (b != NULL) {
         /* TODO: this reveals imaginary castles */
@@ -715,25 +724,27 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     if (r->attribs) {
         attrib *a;
         curse *c;
+        variant vm = frac_make(wage, 1);
 
         /* Godcurse: Income -10 */
         c = get_curse(r->attribs, &ct_godcursezone);
         if (c && curse_active(c)) {
-            wage = MAX(0, wage - 10);
+            wage = (wage < 10) ? 0 : (wage - 10);
         }
 
         /* Bei einer D�rre verdient man nur noch ein Viertel  */
         c = get_curse(r->attribs, &ct_drought);
         if (c && curse_active(c)) {
-            wage /= curse_geteffect(c);
+            vm = frac_mul(vm, frac_make(1, curse_geteffect_int(c)));
         }
 
         a = a_find(r->attribs, &at_reduceproduction);
         if (a) {
-            wage = (wage * a->data.sa[0]) / 100;
+            vm = frac_mul(vm, frac_make(a->data.sa[0], 100));
         }
+        wage = vm.sa[0] / vm.sa[1];
     }
-    return (int)wage;
+    return wage;
 }
 
 static int
