@@ -4085,7 +4085,12 @@ static void reset_game(void)
 
 void turn_begin(void)
 {
+    int start = first_turn();
     assert(turn >= 0);
+    if (turn < start) {
+        /* this should only happen during tests */
+        turn = start;
+    }
     ++turn;
     reset_game();
 }

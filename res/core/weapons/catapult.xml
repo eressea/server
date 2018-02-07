@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="catapult">
   <item weight="10000" big="yes">
     <construction skill="cartmaking" minskill="5">
@@ -12,3 +14,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

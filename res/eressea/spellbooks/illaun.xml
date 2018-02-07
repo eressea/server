@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="illaun">
   <entry spell="bad_dreams" level="10" />
   <entry spell="gooddreams" level="8" />
@@ -27,4 +28,4 @@
   <entry spell="create_invisibility_sphere" level="13" />
   <entry spell="readmind" level="7" />
 </spellbook>
-
+</eressea>

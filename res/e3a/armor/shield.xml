@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<resource name="shield">
-  <item weight="100" score="30">
-    <construction skill="armorer" minskill="2">
-      <requirement type="iron" quantity="1"/>
-    </construction>
-    <armor ac="0" penalty="-0.10" magres="0.0" shield="yes"/>
-  </item>
-</resource>

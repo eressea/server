@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <ships>
   <ship name="canoe" nocoast="true" range="3" fishing="20" storm="1.00" damage="1.00" cabins="2" cargo="2000" cptskill="1" minskill="1" sumskill="2" opensea="no">
     <coast terrain="plain"/>
@@ -143,4 +144,4 @@
   </ship>
 
 </ships>
-
+</eressea>

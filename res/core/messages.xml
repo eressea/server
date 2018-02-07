@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <messages>
   <message name="nr_insectwinter" section="nr">
     <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
@@ -1653,35 +1654,6 @@
     </type>
     <text locale="de">"Der Eisberg $region($region) treibt nach $direction($dir)."</text>
     <text locale="en">"The iceberg $region($region) drifts $direction($dir)."</text>
-  </message>
-  <message name="setjihad" section="events">
-    <type>
-      <arg name="race" type="race"/>
-    </type>
-    <text locale="de">"Wir erklären allen $race($race,2) den heiligen Krieg."</text>
-    <text locale="en">"We declare jihad on all $race($race,2)."</text>
-  </message>
-  <message name="pray_success" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"Die Götter erhören $unit($unit)."</text>
-    <text locale="en">"The Gods have listened to $unit($unit)."</text>
-  </message>
-  <message name="new_fspecial_level" section="events">
-    <type>
-      <arg name="special" type="string"/>
-      <arg name="level" type="int"/>
-    </type>
-    <text locale="de">"Die Götter gewähren uns die Kraft eines $special($int($level))."</text>
-    <text locale="en">"The Gods grant us the powers of $special ($int($level))."</text>
-  </message>
-  <message name="new_fspecial" section="events">
-    <type>
-      <arg name="special" type="string"/>
-    </type>
-    <text locale="de">"Die Götter gewähren uns die Kraft eines ${special}."</text>
-    <text locale="en">"The Gods grant us the powers of ${special}."</text>
   </message>
   <message name="casualties" section="battle">
     <type>
@@ -8295,3 +8267,4 @@
   </message>
 
 </messages>
+</eressea>

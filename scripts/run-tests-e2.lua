@@ -18,6 +18,13 @@ require 'tests.e2'
 require 'lunit'
 
 rng.inject(0)
+eressea.settings.set("rules.food.flags", "4")
+eressea.settings.set("rules.ship.damage.nocrew", "0")
+eressea.settings.set("rules.ship.drifting", "0")
+eressea.settings.set("rules.ship.storms", "0")
+eressea.settings.set("rules.encounters", "0")
+eressea.settings.set("nmr.timeout", "0")
+eressea.settings.set("NewbieImmunity", "0")
 rules = require('eressea.' .. config.rules)
 result = lunit.main()
 return result.errors + result.failed

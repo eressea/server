@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="draig">
   <entry spell="create_potion_p2" level="2" />
   <entry spell="create_potion_p0" level="3" />
@@ -31,3 +32,4 @@
     <entry spell="unholypower" level="14" />
   <entry spell="summon_familiar" level="9" />
 </spellbook>
+</eressea>

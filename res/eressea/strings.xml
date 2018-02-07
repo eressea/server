@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <strings>
   <namespace name="spellinfo">
   <string name="headache">
@@ -403,3 +404,4 @@
         <text locale="fr">amulettes du chaton</text>
     </string>
 </strings>
+</eressea>

@@ -282,6 +282,7 @@ static int parse_buildings(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr buildings;
+    int result = 0;
 
     /* reading eressea/buildings/building */
     buildings =
@@ -289,6 +290,7 @@ static int parse_buildings(xmlDocPtr doc)
     if (buildings->nodesetval != NULL) {
         xmlNodeSetPtr nodes = buildings->nodesetval;
         int i;
+        result += nodes->nodeNr;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlNodePtr node = nodes->nodeTab[i];
             xmlChar *propValue;
@@ -387,19 +389,21 @@ static int parse_buildings(xmlDocPtr doc)
     xmlXPathFreeObject(buildings);
 
     xmlXPathFreeContext(xpath);
-    return 0;
+    return result;
 }
 
 static int parse_ships(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr ships;
+    int result = 0;
 
     /* reading eressea/ships/ship */
     ships = xmlXPathEvalExpression(BAD_CAST "/eressea/ships/ship", xpath);
     if (ships->nodesetval != NULL) {
         xmlNodeSetPtr nodes = ships->nodesetval;
         int i;
+        result += nodes->nodeNr;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlNodePtr child, node = nodes->nodeTab[i];
             xmlChar *propValue;
@@ -481,7 +485,7 @@ static int parse_ships(xmlDocPtr doc)
     xmlXPathFreeObject(ships);
 
     xmlXPathFreeContext(xpath);
-    return 0;
+    return result;
 }
 
 static void xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
@@ -794,95 +798,98 @@ static int parse_resources(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr resources;
-    xmlNodeSetPtr nodes;
-    int i;
+    int results = 0;
 
     /* reading eressea/resources/resource */
     resources =
         xmlXPathEvalExpression(BAD_CAST "/eressea/resources/resource", xpath);
-    nodes = resources->nodesetval;
-    for (i = 0; i != nodes->nodeNr; ++i) {
-        xmlNodePtr node = nodes->nodeTab[i];
-        xmlChar *propValue, *name, *appearance;
-        resource_type *rtype;
-        unsigned int flags = RTF_NONE;
-        xmlXPathObjectPtr result;
+    if (resources->nodesetval) {
+        int i;
+        xmlNodeSetPtr nodes = resources->nodesetval;
+        results = nodes->nodeNr;
+        for (i = 0; i != nodes->nodeNr; ++i) {
+            xmlNodePtr node = nodes->nodeTab[i];
+            xmlChar *propValue, *name, *appearance;
+            resource_type *rtype;
+            unsigned int flags = RTF_NONE;
+            xmlXPathObjectPtr result;
 
-        if (xml_bvalue(node, "pooled", true))
-            flags |= RTF_POOLED;
+            if (xml_bvalue(node, "pooled", true))
+                flags |= RTF_POOLED;
 
-        name = xmlGetProp(node, BAD_CAST "name");
-        if (!name) {
-            assert(name);
-            log_error("invalid resource %d has no name", i);
-            continue;
-        }
-        rtype = rt_get_or_create((const char *)name);
-        rtype->flags |= flags;
-        xmlFree(name);
+            name = xmlGetProp(node, BAD_CAST "name");
+            if (!name) {
+                assert(name);
+                log_error("invalid resource %d has no name", i);
+                continue;
+            }
+            rtype = rt_get_or_create((const char *)name);
+            rtype->flags |= flags;
+            xmlFree(name);
 
-        /* reading eressea/resources/resource/function */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-        if (result->nodesetval != NULL) {
-            int k;
-            for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-                xmlNodePtr node = result->nodesetval->nodeTab[k];
-                pf_generic fun;
+            /* reading eressea/resources/resource/function */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
+            if (result->nodesetval != NULL) {
+                int k;
+                for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+                    xmlNodePtr node = result->nodesetval->nodeTab[k];
+                    pf_generic fun;
 
-                parse_function(node, &fun, &propValue);
-                if (fun == NULL) {
-                    log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name);
+                    parse_function(node, &fun, &propValue);
+                    if (fun == NULL) {
+                        log_error("unknown function name '%s' for resource %s\n", (const char *)propValue, rtype->_name);
+                        xmlFree(propValue);
+                        continue;
+                    }
+
+                    assert(propValue != NULL);
+                    if (strcmp((const char *)propValue, "change") == 0) {
+                        rtype->uchange = (rtype_uchange)fun;
+                    }
+                    else if (strcmp((const char *)propValue, "name") == 0) {
+                        rtype->name = (rtype_name)fun;
+                    }
+                    else {
+                        log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name);
+                    }
                     xmlFree(propValue);
-                    continue;
                 }
-
-                assert(propValue != NULL);
-                if (strcmp((const char *)propValue, "change") == 0) {
-                    rtype->uchange = (rtype_uchange)fun;
-                }
-                else if (strcmp((const char *)propValue, "name") == 0) {
-                    rtype->name = (rtype_name)fun;
-                }
-                else {
-                    log_error("unknown function type '%s' for resource %s\n", (const char *)propValue, rtype->_name);
-                }
-                xmlFree(propValue);
             }
-        }
-        xmlXPathFreeObject(result);
+            xmlXPathFreeObject(result);
 
-        if (xml_bvalue(node, "material", false)) {
-            rmt_create(rtype);
-        }
-
-        if (xml_bvalue(node, "limited", false)) {
-            rtype->flags |= RTF_LIMITED;
-        }
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
-        rtype->modifiers = xml_readmodifiers(result, node);
-        xmlXPathFreeObject(result);
-        /* reading eressea/resources/resource/resourcelimit/function */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/resources/resource/item */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "item", xpath);
-        assert(result->nodesetval->nodeNr <= 1);
-        if (result->nodesetval->nodeNr != 0) {
-            rtype->flags |= RTF_ITEM;
-            xpath->node = result->nodesetval->nodeTab[0];
-            rtype->itype = xml_readitem(xpath, rtype);
-            appearance = xmlGetProp(node, BAD_CAST "appearance");
-            if (appearance) {
-                it_set_appearance(rtype->itype, (const char *)appearance);
-                xmlFree(appearance);
+            if (xml_bvalue(node, "material", false)) {
+                rmt_create(rtype);
             }
+
+            if (xml_bvalue(node, "limited", false)) {
+                rtype->flags |= RTF_LIMITED;
+            }
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
+            rtype->modifiers = xml_readmodifiers(result, node);
+            xmlXPathFreeObject(result);
+            /* reading eressea/resources/resource/resourcelimit/function */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
+            xmlXPathFreeObject(result);
+
+            /* reading eressea/resources/resource/item */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "item", xpath);
+            assert(result->nodesetval->nodeNr <= 1);
+            if (result->nodesetval->nodeNr != 0) {
+                rtype->flags |= RTF_ITEM;
+                xpath->node = result->nodesetval->nodeTab[0];
+                rtype->itype = xml_readitem(xpath, rtype);
+                appearance = xmlGetProp(node, BAD_CAST "appearance");
+                if (appearance) {
+                    it_set_appearance(rtype->itype, (const char *)appearance);
+                    xmlFree(appearance);
+                }
+            }
+            xmlXPathFreeObject(result);
         }
-        xmlXPathFreeObject(result);
     }
     xmlXPathFreeObject(resources);
 
@@ -891,7 +898,7 @@ static int parse_resources(xmlDocPtr doc)
     /* make sure old items (used in requirements) are available */
     init_resources();
 
-    return 0;
+    return results;
 }
 
 static void add_items(equipment * eq, xmlNodeSetPtr nsetItems)
@@ -1055,6 +1062,7 @@ static int parse_equipment(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr xpathRaces;
+    int result = 0;
 
     /* reading eressea/equipment/set */
     xpathRaces = xmlXPathEvalExpression(BAD_CAST "/eressea/equipment/set", xpath);
@@ -1062,6 +1070,7 @@ static int parse_equipment(xmlDocPtr doc)
         xmlNodeSetPtr nsetRaces = xpathRaces->nodesetval;
         int i;
 
+        result += nsetRaces->nodeNr;
         for (i = 0; i != nsetRaces->nodeNr; ++i) {
             xmlNodePtr node = nsetRaces->nodeTab[i];
             xmlChar *propName = xmlGetProp(node, BAD_CAST "name");
@@ -1108,21 +1117,23 @@ static int parse_equipment(xmlDocPtr doc)
     xmlXPathFreeObject(xpathRaces);
     xmlXPathFreeContext(xpath);
 
-    return 0;
+    return result;
 }
 
 static int parse_spellbooks(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr spellbooks;
+    int results = 0;
 
     /* reading eressea/spells/spell */
-    spellbooks = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spellbook", xpath);
+    spellbooks = xmlXPathEvalExpression(BAD_CAST "/eressea/spellbook", xpath);
 
     if (spellbooks->nodesetval != NULL) {
         xmlNodeSetPtr nodes = spellbooks->nodesetval;
         int i, k;
 
+        results += nodes->nodeNr;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlXPathObjectPtr result;
             xmlNodePtr node = nodes->nodeTab[i];
@@ -1166,13 +1177,14 @@ static int parse_spellbooks(xmlDocPtr doc)
     }
     xmlXPathFreeObject(spellbooks);
     xmlXPathFreeContext(xpath);
-    return 0;
+    return results;
 }
 
 static int parse_spells(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr spells;
+    int result = 0;
 
     /* reading eressea/spells/spell */
     spells = xmlXPathEvalExpression(BAD_CAST "/eressea/spells/spell", xpath);
@@ -1180,6 +1192,7 @@ static int parse_spells(xmlDocPtr doc)
         xmlNodeSetPtr nodes = spells->nodesetval;
         int i;
 
+        result += nodes->nodeNr;
         for (i = 0; i != nodes->nodeNr; ++i) {
             xmlXPathObjectPtr result;
             xmlNodePtr node = nodes->nodeTab[i];
@@ -1299,7 +1312,7 @@ static int parse_spells(xmlDocPtr doc)
 
     xmlXPathFreeContext(xpath);
 
-    return 0;
+    return result;
 }
 
 static void parse_ai(race * rc, xmlNodePtr node)
@@ -1332,246 +1345,249 @@ static int parse_races(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr races;
-    xmlNodeSetPtr nodes;
-    int i;
+    int results = 0;
 
     /* reading eressea/races/race */
     races = xmlXPathEvalExpression(BAD_CAST "/eressea/races/race", xpath);
-    nodes = races->nodesetval;
-    for (i = 0; i != nodes->nodeNr; ++i) {
-        xmlNodePtr node = nodes->nodeTab[i];
-        xmlNodePtr child;
-        xmlChar *propValue;
-        race *rc, *frc = 0;
-        xmlXPathObjectPtr result;
-        int k, study_speed_base, attacks;
-        struct att *attack;
-        skill_t sk;
-
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        assert(propValue != NULL);
-        rc = rc_get_or_create((const char *)propValue);
-        xmlFree(propValue);
-
-        propValue = xmlGetProp(node, BAD_CAST "damage");
-        assert(propValue != NULL);
-        rc->def_damage = str_strdup((const char *)propValue);
-        xmlFree(propValue);
-
-        rc->magres = frac_make(xml_ivalue(node, "magres", 100), 100);
-        rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); /* TODO: store as int in XML */
-        rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); /* TODO: store as int in XML */
-        rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
-        rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
-        rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
-        rc->weight = xml_ivalue(node, "weight", rc->weight);
-        rc->capacity = xml_ivalue(node, "capacity", rc->capacity);
-        rc->income = xml_ivalue(node, "income", rc->income);
-        rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
-        rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
-        rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
-        study_speed_base = xml_ivalue(node, "studyspeed", 0);
-        if (study_speed_base != 0) {
-          for (sk = 0; sk < MAXSKILLS; ++sk) {
-            set_study_speed(rc, sk, study_speed_base);
-          }
-        }
-
-        rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
-        rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
-        rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
-        rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
-
-        if (!xml_bvalue(node, "playerrace", false)) {
-            assert(rc->recruitcost == 0);
-            rc->flags |= RCF_NPC;
-        }
-        if (xml_bvalue(node, "scarepeasants", false))
-            rc->flags |= RCF_SCAREPEASANTS;
-        if (!xml_bvalue(node, "cansteal", true))
-            rc->flags |= RCF_NOSTEAL;
-        if (xml_bvalue(node, "cansail", true))
-            rc->flags |= RCF_CANSAIL;
-        if (xml_bvalue(node, "cannotmove", false))
-            rc->flags |= RCF_CANNOTMOVE;
-        if (xml_bvalue(node, "fly", false))
-            rc->flags |= RCF_FLY;
-        if (xml_bvalue(node, "invisible", false))
-            rc->flags |= RCF_INVISIBLE;
-        if (xml_bvalue(node, "coastal", false))
-            rc->flags |= RCF_COASTAL;
-        if (xml_bvalue(node, "unarmedguard", false))
-            rc->flags |= RCF_UNARMEDGUARD;
-        if (xml_bvalue(node, "swim", false))
-            rc->flags |= RCF_SWIM;
-        if (xml_bvalue(node, "walk", false))
-            rc->flags |= RCF_WALK;
-        if (!xml_bvalue(node, "canlearn", true))
-            rc->flags |= RCF_NOLEARN;
-        if (!xml_bvalue(node, "canteach", true))
-            rc->flags |= RCF_NOTEACH;
-        if (xml_bvalue(node, "horse", false))
-            rc->flags |= RCF_HORSE;
-        if (xml_bvalue(node, "desert", false))
-            rc->flags |= RCF_DESERT;
-        if (xml_bvalue(node, "absorbpeasants", false))
-            rc->flags |= RCF_ABSORBPEASANTS;
-        if (xml_bvalue(node, "noheal", false))
-            rc->flags |= RCF_NOHEAL;
-        if (xml_bvalue(node, "noweapons", false))
-            rc->flags |= RCF_NOWEAPONS;
-        if (xml_bvalue(node, "shapeshift", false))
-            rc->flags |= RCF_SHAPESHIFT;
-        if (xml_bvalue(node, "shapeshiftany", false))
-            rc->flags |= RCF_SHAPESHIFTANY;
-        if (xml_bvalue(node, "illusionary", false))
-            rc->flags |= RCF_ILLUSIONARY;
-        if (xml_bvalue(node, "undead", false))
-            rc->flags |= RCF_UNDEAD;
-        if (xml_bvalue(node, "dragon", false))
-            rc->flags |= RCF_DRAGON;
-        if (xml_bvalue(node, "shipspeed", false))
-            rc->flags |= RCF_SHIPSPEED;
-
-        if (xml_bvalue(node, "giveperson", false))
-            rc->ec_flags |= ECF_GIVEPERSON;
-        if (xml_bvalue(node, "giveunit", false))
-            rc->ec_flags |= ECF_GIVEUNIT;
-        if (xml_bvalue(node, "getitem", false))
-            rc->ec_flags |= ECF_GETITEM;
-        if (xml_bvalue(node, "recruitethereal", false))
-            rc->ec_flags |= ECF_REC_ETHEREAL;
-        if (xml_bvalue(node, "recruitunlimited", false))
-            rc->ec_flags |= ECF_REC_UNLIMITED;
-        if (xml_bvalue(node, "stonegolem", false))
-            rc->ec_flags |= ECF_STONEGOLEM;
-        if (xml_bvalue(node, "irongolem", false))
-            rc->ec_flags |= ECF_IRONGOLEM;
-
-        if (xml_bvalue(node, "equipment", false))
-            rc->battle_flags |= BF_EQUIPMENT; /* TODO: invert this flag, so rc_get_or_create gets simpler */
-        if (xml_bvalue(node, "noblock", false))
-            rc->battle_flags |= BF_NOBLOCK;
-        if (xml_bvalue(node, "invinciblenonmagic", false))
-            rc->battle_flags |= BF_INV_NONMAGIC;
-        if (xml_bvalue(node, "resistbash", false))
-            rc->battle_flags |= BF_RES_BASH;
-        if (xml_bvalue(node, "resistcut", false))
-            rc->battle_flags |= BF_RES_CUT;
-        if (xml_bvalue(node, "resistpierce", false))
-            rc->battle_flags |= BF_RES_PIERCE;
-        if (xml_bvalue(node, "noattack", false))
-            rc->battle_flags |= BF_NO_ATTACK;
-
-        rc->recruit_multi = 1.0;
-        for (child = node->children; child; child = child->next) {
-            if (strcmp((const char *)child->name, "ai") == 0) {
-                parse_ai(rc, child);
-            }
-            else if (strcmp((const char *)child->name, "param") == 0) {
-                xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
-                xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
-                rc_set_param(rc, (const char *)propName, (const char *)propValue);
-                xmlFree(propName);
-                xmlFree(propValue);
-            }
-        }
-
-        /* reading eressea/races/race/skill */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
-        memset(rc->bonus, 0, sizeof(rc->bonus));
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            int mod = xml_ivalue(node, "modifier", 0);
-            int speed = xml_ivalue(node, "speed", study_speed_base);
+    if (races->nodesetval) {
+        xmlNodeSetPtr nodes = races->nodesetval;
+        int i;
+        results += nodes->nodeNr;
+        for (i = 0; i != nodes->nodeNr; ++i) {
+            xmlNodePtr node = nodes->nodeTab[i];
+            xmlNodePtr child;
+            xmlChar *propValue;
+            race *rc, *frc = 0;
+            xmlXPathObjectPtr result;
+            int k, study_speed_base, attacks;
+            struct att *attack;
+            skill_t sk;
 
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            sk = findskill((const char *)propValue);
-            if (sk != NOSKILL) {
-                rc->bonus[sk] = (char)mod;
-                if (speed) {
-                    set_study_speed(rc, sk, speed);
+            rc = rc_get_or_create((const char *)propValue);
+            xmlFree(propValue);
+
+            propValue = xmlGetProp(node, BAD_CAST "damage");
+            assert(propValue != NULL);
+            rc->def_damage = str_strdup((const char *)propValue);
+            xmlFree(propValue);
+
+            rc->magres = frac_make(xml_ivalue(node, "magres", 100), 100);
+            rc->healing = (int)(xml_fvalue(node, "healing", rc->healing) * 100); /* TODO: store as int in XML */
+            rc->maxaura = (int)(xml_fvalue(node, "maxaura", rc->maxaura) * 100); /* TODO: store as int in XML */
+            rc->regaura = (float)xml_fvalue(node, "regaura", rc->regaura);
+            rc->recruitcost = xml_ivalue(node, "recruitcost", rc->recruitcost);
+            rc->maintenance = xml_ivalue(node, "maintenance", rc->maintenance);
+            rc->weight = xml_ivalue(node, "weight", rc->weight);
+            rc->capacity = xml_ivalue(node, "capacity", rc->capacity);
+            rc->income = xml_ivalue(node, "income", rc->income);
+            rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
+            rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
+            rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
+            study_speed_base = xml_ivalue(node, "studyspeed", 0);
+            if (study_speed_base != 0) {
+                for (sk = 0; sk < MAXSKILLS; ++sk) {
+                    set_study_speed(rc, sk, study_speed_base);
                 }
             }
-            else {
-                log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name);
+
+            rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
+            rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
+            rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
+            rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
+
+            if (!xml_bvalue(node, "playerrace", false)) {
+                assert(rc->recruitcost == 0);
+                rc->flags |= RCF_NPC;
             }
-            xmlFree(propValue);
-        }
-        xmlXPathFreeObject(result);
+            if (xml_bvalue(node, "scarepeasants", false))
+                rc->flags |= RCF_SCAREPEASANTS;
+            if (!xml_bvalue(node, "cansteal", true))
+                rc->flags |= RCF_NOSTEAL;
+            if (xml_bvalue(node, "cansail", true))
+                rc->flags |= RCF_CANSAIL;
+            if (xml_bvalue(node, "cannotmove", false))
+                rc->flags |= RCF_CANNOTMOVE;
+            if (xml_bvalue(node, "fly", false))
+                rc->flags |= RCF_FLY;
+            if (xml_bvalue(node, "invisible", false))
+                rc->flags |= RCF_INVISIBLE;
+            if (xml_bvalue(node, "coastal", false))
+                rc->flags |= RCF_COASTAL;
+            if (xml_bvalue(node, "unarmedguard", false))
+                rc->flags |= RCF_UNARMEDGUARD;
+            if (xml_bvalue(node, "swim", false))
+                rc->flags |= RCF_SWIM;
+            if (xml_bvalue(node, "walk", false))
+                rc->flags |= RCF_WALK;
+            if (!xml_bvalue(node, "canlearn", true))
+                rc->flags |= RCF_NOLEARN;
+            if (!xml_bvalue(node, "canteach", true))
+                rc->flags |= RCF_NOTEACH;
+            if (xml_bvalue(node, "horse", false))
+                rc->flags |= RCF_HORSE;
+            if (xml_bvalue(node, "desert", false))
+                rc->flags |= RCF_DESERT;
+            if (xml_bvalue(node, "absorbpeasants", false))
+                rc->flags |= RCF_ABSORBPEASANTS;
+            if (xml_bvalue(node, "noheal", false))
+                rc->flags |= RCF_NOHEAL;
+            if (xml_bvalue(node, "noweapons", false))
+                rc->flags |= RCF_NOWEAPONS;
+            if (xml_bvalue(node, "shapeshift", false))
+                rc->flags |= RCF_SHAPESHIFT;
+            if (xml_bvalue(node, "shapeshiftany", false))
+                rc->flags |= RCF_SHAPESHIFTANY;
+            if (xml_bvalue(node, "illusionary", false))
+                rc->flags |= RCF_ILLUSIONARY;
+            if (xml_bvalue(node, "undead", false))
+                rc->flags |= RCF_UNDEAD;
+            if (xml_bvalue(node, "dragon", false))
+                rc->flags |= RCF_DRAGON;
+            if (xml_bvalue(node, "shipspeed", false))
+                rc->flags |= RCF_SHIPSPEED;
 
-        /* reading eressea/races/race/familiar */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "familiar", xpath);
-        if (result->nodesetval->nodeNr > MAXMAGIETYP) {
-            log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
-        }
-        else {
-            for (k = 0; k != MAXMAGIETYP; ++k) {
-                if (k < result->nodesetval->nodeNr) {
-                    xmlNodePtr node = result->nodesetval->nodeTab[k];
+            if (xml_bvalue(node, "giveperson", false))
+                rc->ec_flags |= ECF_GIVEPERSON;
+            if (xml_bvalue(node, "giveunit", false))
+                rc->ec_flags |= ECF_GIVEUNIT;
+            if (xml_bvalue(node, "getitem", false))
+                rc->ec_flags |= ECF_GETITEM;
+            if (xml_bvalue(node, "recruitethereal", false))
+                rc->ec_flags |= ECF_REC_ETHEREAL;
+            if (xml_bvalue(node, "recruitunlimited", false))
+                rc->ec_flags |= ECF_REC_UNLIMITED;
+            if (xml_bvalue(node, "stonegolem", false))
+                rc->ec_flags |= ECF_STONEGOLEM;
+            if (xml_bvalue(node, "irongolem", false))
+                rc->ec_flags |= ECF_IRONGOLEM;
 
-                    propValue = xmlGetProp(node, BAD_CAST "race");
-                    assert(propValue != NULL);
-                    frc = rc_get_or_create((const char *)propValue);
-                    frc->flags |= RCF_FAMILIAR;
-                    if (xml_bvalue(node, "default", false)) {
-                        rc->familiars[k] = rc->familiars[0];
-                        rc->familiars[0] = frc;
+            if (xml_bvalue(node, "equipment", false))
+                rc->battle_flags |= BF_EQUIPMENT; /* TODO: invert this flag, so rc_get_or_create gets simpler */
+            if (xml_bvalue(node, "noblock", false))
+                rc->battle_flags |= BF_NOBLOCK;
+            if (xml_bvalue(node, "invinciblenonmagic", false))
+                rc->battle_flags |= BF_INV_NONMAGIC;
+            if (xml_bvalue(node, "resistbash", false))
+                rc->battle_flags |= BF_RES_BASH;
+            if (xml_bvalue(node, "resistcut", false))
+                rc->battle_flags |= BF_RES_CUT;
+            if (xml_bvalue(node, "resistpierce", false))
+                rc->battle_flags |= BF_RES_PIERCE;
+            if (xml_bvalue(node, "noattack", false))
+                rc->battle_flags |= BF_NO_ATTACK;
+
+            rc->recruit_multi = 1.0;
+            for (child = node->children; child; child = child->next) {
+                if (strcmp((const char *)child->name, "ai") == 0) {
+                    parse_ai(rc, child);
+                }
+                else if (strcmp((const char *)child->name, "param") == 0) {
+                    xmlChar *propName = xmlGetProp(child, BAD_CAST "name");
+                    xmlChar *propValue = xmlGetProp(child, BAD_CAST "value");
+                    rc_set_param(rc, (const char *)propName, (const char *)propValue);
+                    xmlFree(propName);
+                    xmlFree(propValue);
+                }
+            }
+
+            /* reading eressea/races/race/skill */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "skill", xpath);
+            memset(rc->bonus, 0, sizeof(rc->bonus));
+            for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+                xmlNodePtr node = result->nodesetval->nodeTab[k];
+                int mod = xml_ivalue(node, "modifier", 0);
+                int speed = xml_ivalue(node, "speed", study_speed_base);
+
+                propValue = xmlGetProp(node, BAD_CAST "name");
+                assert(propValue != NULL);
+                sk = findskill((const char *)propValue);
+                if (sk != NOSKILL) {
+                    rc->bonus[sk] = (char)mod;
+                    if (speed) {
+                        set_study_speed(rc, sk, speed);
+                    }
+                }
+                else {
+                    log_error("unknown skill '%s' in race '%s'\n", (const char *)propValue, rc->_name);
+                }
+                xmlFree(propValue);
+            }
+            xmlXPathFreeObject(result);
+
+            /* reading eressea/races/race/familiar */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "familiar", xpath);
+            if (result->nodesetval->nodeNr > MAXMAGIETYP) {
+                log_error("race %s has %d potential familiars", rc->_name, result->nodesetval->nodeNr);
+            }
+            else {
+                for (k = 0; k != MAXMAGIETYP; ++k) {
+                    if (k < result->nodesetval->nodeNr) {
+                        xmlNodePtr node = result->nodesetval->nodeTab[k];
+
+                        propValue = xmlGetProp(node, BAD_CAST "race");
+                        assert(propValue != NULL);
+                        frc = rc_get_or_create((const char *)propValue);
+                        frc->flags |= RCF_FAMILIAR;
+                        if (xml_bvalue(node, "default", false)) {
+                            rc->familiars[k] = rc->familiars[0];
+                            rc->familiars[0] = frc;
+                        }
+                        else {
+                            rc->familiars[k] = frc;
+                        }
+                        xmlFree(propValue);
                     }
                     else {
                         rc->familiars[k] = frc;
                     }
+                }
+            }
+            xmlXPathFreeObject(result);
+
+            /* reading eressea/races/race/attack */
+            xpath->node = node;
+            result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
+            attack = rc->attack;
+            attacks = 0;
+            for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+                xmlNodePtr node = result->nodesetval->nodeTab[k];
+                while (attack->type != AT_NONE) {
+                    ++attack;
+                    if (attacks++ >= RACE_ATTACKS) {
+                        log_error("too many attacks for race '%s'\n", rc->_name);
+                        assert(!"aborting");
+                    }
+                }
+
+                propValue = xmlGetProp(node, BAD_CAST "damage");
+                if (propValue != NULL) {
+                    attack->data.dice = str_strdup((const char *)propValue);
                     xmlFree(propValue);
                 }
                 else {
-                    rc->familiars[k] = frc;
-                }
-            }
-        }
-        xmlXPathFreeObject(result);
-
-        /* reading eressea/races/race/attack */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "attack", xpath);
-        attack = rc->attack;
-        attacks = 0;
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            while (attack->type != AT_NONE) {
-                ++attack;
-                if (attacks++ >= RACE_ATTACKS) {
-                    log_error("too many attacks for race '%s'\n", rc->_name);
-                    assert(!"aborting");
-                }
-            }
-
-            propValue = xmlGetProp(node, BAD_CAST "damage");
-            if (propValue != NULL) {
-                attack->data.dice = str_strdup((const char *)propValue);
-                xmlFree(propValue);
-            }
-            else {
-                attack->data.sp = xml_spellref(node, "spell");
-                if (attack->data.sp) {
-                    attack->level = xml_ivalue(node, "level", 0);
-                    if (attack->level <= 0) {
-                        log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->name, rc->_name, attack->level);
+                    attack->data.sp = xml_spellref(node, "spell");
+                    if (attack->data.sp) {
+                        attack->level = xml_ivalue(node, "level", 0);
+                        if (attack->level <= 0) {
+                            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->name, rc->_name, attack->level);
+                        }
                     }
                 }
+                attack->type = xml_ivalue(node, "type", 0);
+                attack->flags = xml_ivalue(node, "flags", 0);
             }
-            attack->type = xml_ivalue(node, "type", 0);
-            attack->flags = xml_ivalue(node, "flags", 0);
+            xmlXPathFreeObject(result);
         }
-        xmlXPathFreeObject(result);
     }
     xmlXPathFreeObject(races);
 
     xmlXPathFreeContext(xpath);
 
-    return 0;
+    return results;
 }
 
 static int parse_messages(xmlDocPtr doc)
@@ -1579,7 +1595,7 @@ static int parse_messages(xmlDocPtr doc)
     xmlXPathContextPtr xpath;
     xmlXPathObjectPtr messages;
     xmlNodeSetPtr nodes;
-    int i;
+    int i, results;
 
     xpath = xmlXPathNewContext(doc);
 
@@ -1587,6 +1603,7 @@ static int parse_messages(xmlDocPtr doc)
     messages =
         xmlXPathEvalExpression(BAD_CAST "/eressea/messages/message", xpath);
     nodes = messages->nodesetval;
+    results = nodes->nodeNr;
     for (i = 0; i != nodes->nodeNr; ++i) {
         xmlNodePtr node = nodes->nodeTab[i];
         const char *default_section = "events";
@@ -1671,7 +1688,7 @@ static int parse_messages(xmlDocPtr doc)
     xmlXPathFreeObject(messages);
 
     xmlXPathFreeContext(xpath);
-    return 0;
+    return results;
 }
 
 static void
@@ -1726,21 +1743,24 @@ static int parse_strings(xmlDocPtr doc)
 {
     xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
     xmlXPathObjectPtr strings;
+    int results = 0;
 
     /* reading eressea/strings/string */
     strings = xmlXPathEvalExpression(BAD_CAST "/eressea/strings/string", xpath);
     xml_readstrings(xpath, strings->nodesetval->nodeTab,
         strings->nodesetval->nodeNr, false);
+    results += strings->nodesetval->nodeNr;
     xmlXPathFreeObject(strings);
 
     strings =
         xmlXPathEvalExpression(BAD_CAST "/eressea/strings/namespace/string", xpath);
     xml_readstrings(xpath, strings->nodesetval->nodeTab,
         strings->nodesetval->nodeNr, true);
+    results += strings->nodesetval->nodeNr;
     xmlXPathFreeObject(strings);
 
     xmlXPathFreeContext(xpath);
-    return 0;
+    return results;
 }
 
 void register_xmlreader(void)

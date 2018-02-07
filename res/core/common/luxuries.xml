@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <resources>
   <!-- this file contains luxury items that are part of the trade system -->
   <resource name="balm">
@@ -24,3 +25,4 @@
   </resource>
 
 </resources>
+</eressea>

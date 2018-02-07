@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="firesword">
   <item weight="100">
     <weapon magres="0.3" cut="true" skill="melee" offmod="1" defmod="1">
@@ -8,3 +10,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="runesword">
   <item weight="100" score="2000">
     <weapon cut="true" magical="yes" skill="melee" offmod="2" defmod="2">
@@ -8,3 +10,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

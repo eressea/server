@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
+<eressea>
 <strings>
   <string name="canoe_a">
     <text locale="de">ein Einbaum</text>
@@ -106,3 +107,4 @@
     <text locale="en">trireme</text>
   </string>
 </strings>
+</eressea>

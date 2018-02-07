@@ -1,9 +1,27 @@
 {
     "include": [
-        "keywords.json",
-        "calendar.json",
-        "prefixes.json",
-        "e2/terrains.json"
+        "config://conf/keywords.json",
+        "config://conf/calendar.json",
+        "config://conf/prefixes.json",
+        "config://conf/e2/locales.json",
+        "config://conf/e2/terrains.json",
+        "config://conf/e2/items.json",
+        "config://conf/e2/rules.xml",
+        "config://res/core/ships.xml",
+        "config://res/core/common/buildings.xml",
+        "config://res/eressea/buildings.xml",
+        "config://res/buildings/castle.xml",
+        "config://res/eressea/races.xml",
+        "config://res/eressea/artrewards.xml",
+        "config://res/eressea/familiars.xml",
+        "config://res/eressea/equipment.xml",
+        "config://res/eressea/spells.xml",
+        "config://res/eressea/spellbooks/gray.xml",
+        "config://res/eressea/spellbooks/gwyrrd.xml",
+        "config://res/eressea/spellbooks/draig.xml",
+        "config://res/eressea/spellbooks/illaun.xml",
+        "config://res/eressea/spellbooks/cerddor.xml",
+        "config://res/eressea/spellbooks/tybied.xml"
     ],
     "disabled": [
         "jsreport"

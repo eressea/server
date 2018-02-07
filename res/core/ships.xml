@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <ships>
   <ship name="trireme" range="7" storm="1.00" damage="1.00" cargo="200000" cptskill="4" minskill="1" sumskill="120" opensea="yes">
     <coast terrain="plain"/>
@@ -73,4 +74,4 @@
   </ship>
 
 </ships>
-
+</eressea>

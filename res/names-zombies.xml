@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <strings>
   <string name="zombie_prefix_0">
     <text locale="de">Faulende</text>
@@ -106,3 +107,4 @@
   </string>
 
 </strings>
+</eressea>
