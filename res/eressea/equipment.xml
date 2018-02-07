@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<equipment>
+<eressea><equipment>
 
   <!-- one equipment-set per player-race for the first unit in a faction -->
   <set name="seed_dwarf">
@@ -271,3 +271,5 @@
   </set>
 
 </equipment>
+</eressea>
+

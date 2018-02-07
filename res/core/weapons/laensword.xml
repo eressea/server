@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="laensword">
   <item weight="100" score="400">
     <construction skill="weaponsmithing" minskill="8">
@@ -10,3 +12,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

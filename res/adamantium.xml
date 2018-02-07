@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <resources>
 
   <resource name="adamantium" limited="yes" material="yes">
@@ -32,3 +33,4 @@
   </resource>
 
 </resources>
+</eressea>

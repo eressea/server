@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<buildings xmlns:xi="http://www.w3.org/2001/XInclude">
-
-  <xi:include href="config://default/buildings/castle-2.xml" />
+<eressea>
+<buildings>
 
   <building name="watch" maxsize="10" fort="yes" taxes="200">
     <construction skill="building" minskill="1" maxsize="5" name="scaffolding">
@@ -24,4 +23,4 @@
   </building>
 
 </buildings>
-
+</eressea>

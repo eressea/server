@@ -1,0 +1,14 @@
+{
+    "include": [
+      "config://res/core/messages.xml",
+      "config://res/core/de/strings.xml",
+      "config://res/core/en/strings.xml",
+      "config://res/eressea/strings.xml",
+      "config://res/eressea/spellinfo.xml",
+      "config://res/names-undead.xml",
+      "config://res/names-skeletons.xml",
+      "config://res/names-zombies.xml",
+      "config://res/names-ghouls.xml",
+      "config://res/names-dragons.xml"
+    ]
+}

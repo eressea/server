@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
+<eressea>
 <spellbook name="draig">
   <entry spell="fireball" level="2" />
   <entry spell="combatrust" level="6" />
@@ -30,3 +31,4 @@
   <entry spell="create_firesword" level="12" />
   <entry spell="create_trollbelt" level="9" />
 </spellbook>
+</eressea>

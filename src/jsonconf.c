@@ -887,6 +887,92 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
+/* TODO: much more configurable authority-to-file lookup */
+static const char * authority_to_path(const char *authority, char *name, size_t size) {
+    /* source and destination cannot share the same buffer */
+    assert(authority < name || authority > name + size);
+
+    return join_path(json_relpath, authority, name, size);
+}
+
+static const char * uri_to_file(const char * uri, char *name, size_t size) {
+    const char *pos, *scheme, *path = uri;
+
+    /* source and destination cannot share the same buffer */
+    assert(uri < name || uri > name + size);
+
+    /* identify scheme */
+    scheme = uri;
+    pos = strstr(scheme, "://");
+    if (pos) {
+        size_t slen = pos - scheme;
+        if (strncmp(scheme, "config", slen) == 0) {
+            const char *authority = pos + 3;
+            /* authority */
+            pos = strstr(authority, "/");
+            if (pos) {
+                char buffer[16];
+                size_t alen = pos - authority;
+                assert(alen < sizeof(buffer));
+                memcpy(buffer, authority, alen);
+                buffer[alen] = 0;
+
+                path = authority_to_path(buffer, name, size);
+                path = path_join(path, pos + 1, name, size);
+            }
+        }
+        else {
+            log_fatal("unknown URI scheme: %s", uri);
+        }
+    }
+    return path;
+}
+
+static int include_json(const char *uri) {
+    FILE *F;
+    char name[PATH_MAX];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+
+    F = fopen(filename, "r");
+    if (F) {
+        long pos;
+        fseek(F, 0, SEEK_END);
+        pos = ftell(F);
+        rewind(F);
+        if (pos > 0) {
+            cJSON *config;
+            char *data;
+            size_t sz;
+
+            data = malloc(pos + 1);
+            sz = fread(data, 1, (size_t)pos, F);
+            data[sz] = 0;
+            config = cJSON_Parse(data);
+            free(data);
+            if (config) {
+                json_config(config);
+                cJSON_Delete(config);
+            }
+            else {
+                log_error("could not parse JSON from %s", uri);
+                return -1;
+            }
+        }
+        fclose(F);
+    }
+    return 0;
+}
+
+static int include_xml(const char *uri) {
+    char name[PATH_MAX];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    int err = read_xml(filename);
+    if (err < 0) {
+        log_error("could not parse XML from %s", uri);
+    }
+    return err;
+}
+
 static void json_include(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
@@ -894,39 +980,17 @@ static void json_include(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        FILE *F;
-        if (json_relpath) {
-            char name[PATH_MAX];
-            path_join(json_relpath, child->valuestring, name, sizeof(name));
-            F = fopen(name, "r");
+        const char *uri = child->valuestring;
+        int err;
+
+        if (strstr(uri, ".xml") != NULL) {
+            err = include_xml(uri);
         }
         else {
-            F = fopen(child->valuestring, "r");
+            err = include_json(uri);
         }
-        if (F) {
-            long pos;
-            fseek(F, 0, SEEK_END);
-            pos = ftell(F);
-            rewind(F);
-            if (pos > 0) {
-                cJSON *config;
-                char *data;
-                size_t sz;
-
-                data = malloc(pos + 1);
-                sz = fread(data, 1, (size_t)pos, F);
-                data[sz] = 0;
-                config = cJSON_Parse(data);
-                free(data);
-                if (config) {
-                    json_config(config);
-                    cJSON_Delete(config);
-                }
-                else {
-                    log_error("invalid JSON, could not parse %s", child->valuestring);
-                }
-            }
-            fclose(F);
+        if (err != 0) {
+            log_error("no data found in %s", uri);
         }
     }
 }

@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="hp" pooled="false">
   <function name="change" value="lua_changeresource"/>
 </resource>
+</resources>
+</eressea>

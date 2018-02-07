@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <equipment>
 
   <!-- equipment given to familiars -->
@@ -101,4 +102,4 @@
   </set>
 
 </equipment>
-
+</eressea>

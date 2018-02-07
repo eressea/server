@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <equipment>
 
   <set name="spo_seaserpent">
@@ -7,3 +8,4 @@
   </set>
 
 </equipment>
+</eressea>

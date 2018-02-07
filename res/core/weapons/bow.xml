@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="bow">
   <item weight="100">
     <construction skill="weaponsmithing" minskill="2">
@@ -11,3 +13,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <strings>
-
   <string name="ghoul_prefix_0">
     <text locale="de">Faulende</text>
   </string>
@@ -113,3 +113,4 @@
   </string>
 
 </strings>
+</eressea>

@@ -53,6 +53,7 @@ function test_dwarf_no_mining_bonus()
     local r = region.create(0, 0, 'mountain')
     local f = create_faction('dwarf')
     local u = unit.create(f, r, 1)
+    u.name = 'Xolgrim'
 
     turn_begin()
     r:set_resource('iron', 100)

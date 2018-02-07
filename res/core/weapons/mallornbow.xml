@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="mallornbow">
   <item weight="100">
     <construction skill="weaponsmithing" minskill="5">
@@ -14,3 +16,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>

@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="iron" limited="yes" material="yes">
     <item weight="500" score="10">
         <construction skill="mining" minskill="1"/>
@@ -8,3 +10,5 @@
     <modifier building="mine" type="material" value="0.5"/>
     <modifier race="dwarf" type="material" value="0.6"/>
 </resource>
+</resources>
+</eressea>

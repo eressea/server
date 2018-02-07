@@ -897,10 +897,10 @@ static int tolua_get_spells(lua_State * L)
     return tolua_selist_push(L, "spell_list", "spell", spells);
 }
 
-static int init_data(const char *filename, const char *catalog)
+static int init_data(const char *filename)
 {
     int l;
-    l = read_xml(filename, catalog);
+    l = read_xml(filename);
     reset_locales();
     if (l) {
         return l;
@@ -915,8 +915,7 @@ static int init_data(const char *filename, const char *catalog)
 int tolua_read_xml(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, "config.xml");
-    const char *catalog = tolua_tostring(L, 2, "catalog.xml");
-    lua_pushinteger(L, init_data(filename, catalog));
+    lua_pushinteger(L, init_data(filename));
     return 1;
 }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<resources>
+<eressea><resources>
 
   <resource name="aurapotion50">
     <function name="change" value="changeitem"/>
@@ -11,4 +11,4 @@
     <item weight="0" use="yes"/>
   </resource>
 
-</resources>
+</resources></eressea>

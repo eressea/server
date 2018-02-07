@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<buildings xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="../buildings/castle.xml"/>
+<eressea>
+<buildings>
   <building name="temple" maxsize="50" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" auraregen="1.00" />
   <building name="portal" maxsize="2" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" />
   <building name="pavilion" maxsize="2" maxcapacity="2" nobuild="yes" nodestroy="yes" unique="yes" />
   <building name="artacademy" maxsize="100" nobuild="yes" nodestroy="yes" unique="yes"/>
 </buildings>
+</eressea>

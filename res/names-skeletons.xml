@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <strings>
-
   <string name="skeleton_prefix_0">
     <text locale="de">Klapperige</text>
   </string>
@@ -117,5 +117,5 @@
   <string name="skeleton_postfix_13">
     <text locale="de">aus der Unterwelt</text>
   </string>
-  
 </strings>
+</eressea>

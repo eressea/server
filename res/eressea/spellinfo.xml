@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <strings>
   <namespace name="spellinfo">
     <string name="concealing_aura">
@@ -117,3 +118,4 @@
     </string>
   </namespace>
 </strings>
+</eressea>

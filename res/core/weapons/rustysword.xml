@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="rustysword">
   <item weight="100" score="10">
     <construction skill="weaponsmithing" minskill="3">
@@ -10,3 +12,5 @@
     </weapon>
   </item>
 </resource>
+</resources>
+</eressea>
