@@ -932,6 +932,7 @@ static int include_json(const char *uri) {
     FILE *F;
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
+    int result = -1;
 
     F = fopen(filename, "r");
     if (F) {
@@ -952,15 +953,16 @@ static int include_json(const char *uri) {
             if (config) {
                 json_config(config);
                 cJSON_Delete(config);
+                result = 0;
             }
             else {
                 log_error("could not parse JSON from %s", uri);
-                return -1;
+                result = -1;
             }
         }
         fclose(F);
     }
-    return 0;
+    return result;
 }
 
 static int include_xml(const char *uri) {
