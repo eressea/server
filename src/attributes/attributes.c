@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "laws.h"
 #include "move.h"
+#include "magic.h"
 
 /* attributes includes */
 #include "follow.h"
@@ -29,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
-#include "magic.h"
 #include "moved.h"
 #include "movement.h"
 #include "dict.h"
@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "racename.h"
 #include "raceprefix.h"
 #include "reduceproduction.h"
+#include "seenspell.h"
 #include "targetregion.h"
 
 /* kernel includes */

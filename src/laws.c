@@ -48,6 +48,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* attributes includes */
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
+#include <attributes/seenspell.h>
 #include <attributes/stealth.h>
 
 #include <spells/buildingcurse.h>

@@ -191,13 +191,11 @@ extern "C" {
 
     void regenerate_aura(void);
 
-    extern struct attrib_type at_seenspell;
     extern struct attrib_type at_mage;
     extern struct attrib_type at_familiarmage;
     extern struct attrib_type at_familiar;
     extern struct attrib_type at_clonemage;
     extern struct attrib_type at_clone;
-    extern struct attrib_type at_reportspell;
     extern struct attrib_type at_icastle;
 
     void make_icastle(struct building *b, const struct building_type *btype, int timeout);

@@ -39,6 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/overrideroads.h>
 #include <attributes/otherfaction.h>
 #include <attributes/reduceproduction.h>
+#include <attributes/seenspell.h>
 
 /* gamecode includes */
 #include "alchemy.h"

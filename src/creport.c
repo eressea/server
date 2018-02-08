@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
+#include <attributes/seenspell.h>
 #include <attributes/stealth.h>
 
 /* gamecode includes */

@@ -93,6 +93,7 @@ set (ERESSEA_SRC
   battle.c
   alchemy.c
   academy.c
+  chaos.c
   upkeep.c
   names.c
   lighthouse.c
@@ -121,7 +122,6 @@ set (ERESSEA_SRC
   randenc.c
   renumber.c
   volcano.c
-  chaos.c
   spy.c
   study.c
   summary.c

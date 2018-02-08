@@ -20,6 +20,7 @@ racename.c
 raceprefix.c
 reduceproduction.c
 stealth.c
+seenspell.c
 targetregion.c
 )
 FOREACH(_FILE ${_FILES})
