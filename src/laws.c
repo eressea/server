@@ -2307,13 +2307,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
         }
 
         if (sp) {
-            attrib *a = a_find(u->faction->attribs, &at_seenspell);
-            while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
-                a = a->next;
-            }
-            if (a != NULL) {
-                a_remove(&u->faction->attribs, a);
-            }
+            reset_seen_spells(u->faction, sp);
             found = true;
         }
 
@@ -2331,7 +2325,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
 {
     switch (p) {
     case P_ZAUBER:
-        a_removeall(&u->faction->attribs, &at_seenspell);
+        reset_seen_spells(u->faction, NULL);
         break;
     case P_POTIONS:
         if (!display_potions(u)) {
@@ -3299,6 +3293,21 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
                 if (!spellbook_get(dst, sbe->sp)) {
                     spellbook_add(dst, sbe->sp, sbe->level);
                 }
+            }
+        }
+    }
+}
+
+static void show_new_spells(faction * f, int level, const spellbook *book)
+{
+    if (book) {
+        selist *ql = book->spells;
+        int qi;
+
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+            if (sbe->level <= level) {
+                show_spell(f, sbe);
             }
         }
     }

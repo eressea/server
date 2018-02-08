@@ -241,7 +241,6 @@ extern "C" {
     int u_hasspell(const struct unit *u, const struct spell *sp);
     /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
-    void show_new_spells(struct faction * f, int level, const struct spellbook *book);
     bool knowsspell(const struct region *r, const struct unit *u,
         const struct spell * sp);
     /* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh
