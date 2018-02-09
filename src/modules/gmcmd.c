@@ -34,6 +34,7 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/gamedata.h>
+#include <util/macros.h>
 
 #include <storage.h>
 
@@ -43,17 +44,19 @@
 #include <limits.h>
 #include <assert.h>
 
-static int read_permissions(attrib * a, void *owner, struct gamedata *data)
+static int read_permissions(variant *var, void *owner, struct gamedata *data)
 {
-    assert(!a);
+    attrib *a;
+    UNUSED_ARG(var);
     read_attribs(data, &a, owner);
     a_remove(&a, a);
     return AT_READ_OK;
 }
 
-static int read_gmcreate(attrib * a, void *owner, struct gamedata *data)
+static int read_gmcreate(variant *var, void *owner, struct gamedata *data)
 {
     char zText[32];
+    UNUSED_ARG(var);
     READ_TOK(data->store, zText, sizeof(zText));
     return AT_READ_OK;
 }

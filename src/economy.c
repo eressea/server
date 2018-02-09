@@ -1432,10 +1432,10 @@ int make_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-static void free_luxuries(struct attrib *a)
+static void free_luxuries(variant *var)
 {
-    item *itm = (item *)a->data.v;
-    a->data.v = NULL;
+    item *itm = (item *)var->v;
+    var->v = NULL;
     i_freeall(&itm);
 }
 

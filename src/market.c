@@ -53,11 +53,11 @@ static unsigned int get_markets(region * r, unit ** results, size_t size)
     return n;
 }
 
-static void free_market(attrib * a)
+static void free_market(variant *var)
 {
-    item *items = (item *)a->data.v;
+    item *items = (item *)var->v;
     i_freeall(&items);
-    a->data.v = 0;
+    var->v = NULL;
 }
 
 attrib_type at_market = {

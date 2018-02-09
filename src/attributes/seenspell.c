@@ -43,7 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * Spruch zu seiner List-of-known-spells hinzugefügt werden.
  */
 
-static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
+static int read_seenspell(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     spell *sp = 0;
@@ -59,14 +59,14 @@ static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
         log_info("read_seenspell: could not find spell '%s'\n", token);
         return AT_READ_FAIL;
     }
-    a->data.v = sp;
+    var->v = sp;
     return AT_READ_OK;
 }
 
 static void
-write_seenspell(const attrib * a, const void *owner, struct storage *store)
+write_seenspell(const variant *var, const void *owner, struct storage *store)
 {
-    const spell *sp = (const spell *)a->data.v;
+    const spell *sp = (const spell *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, sp->sname);
 }

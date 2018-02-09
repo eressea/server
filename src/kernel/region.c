@@ -181,14 +181,14 @@ void deathcounts(region * r, int fallen)
 /********************/
 /*   at_moveblock   */
 /********************/
-void a_initmoveblock(attrib * a)
+void a_initmoveblock(variant *var)
 {
-    a->data.v = calloc(1, sizeof(moveblock));
+    var->v = calloc(1, sizeof(moveblock));
 }
 
-int a_readmoveblock(attrib * a, void *owner, gamedata *data)
+int a_readmoveblock(variant *var, void *owner, gamedata *data)
 {
-    moveblock *m = (moveblock *)(a->data.v);
+    moveblock *m = (moveblock *)var->v;
     int i;
 
     READ_INT(data->store, &i);
@@ -197,9 +197,9 @@ int a_readmoveblock(attrib * a, void *owner, gamedata *data)
 }
 
 void
-a_writemoveblock(const attrib * a, const void *owner, struct storage *store)
+a_writemoveblock(const variant *var, const void *owner, struct storage *store)
 {
-    moveblock *m = (moveblock *)(a->data.v);
+    moveblock *m = (moveblock *)var->v;
     WRITE_INT(store, (int)m->dir);
 }
 

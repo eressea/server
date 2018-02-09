@@ -29,8 +29,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <assert.h>
 
-static void a_writekeys(const attrib *a, const void *o, storage *store) {
-    int i, *keys = (int *)a->data.v;
+static void a_writekeys(const variant *var, const void *o, storage *store) {
+    int i, *keys = (int *)var->v;
     int n = 0;
     if (keys) {
         assert(keys[0] < 4096 && keys[0]>0);
@@ -76,7 +76,7 @@ static int keys_size(int n) {
     return 4096;
 }
 
-static int a_readkeys(attrib * a, void *owner, gamedata *data) {
+static int a_readkeys(variant *var, void *owner, gamedata *data) {
     int i, n, *keys;
 
     READ_INT(data->store, &n);
@@ -135,26 +135,22 @@ static int a_readkeys(attrib * a, void *owner, gamedata *data) {
             }
         }
     }
-    a->data.v = keys;
+    var->v = keys;
     return AT_READ_OK;
 }
 
-static int a_readkey(attrib *a, void *owner, struct gamedata *data) {
-    int res = a_readint(a, owner, data);
+static int a_readkey(variant *var, void *owner, struct gamedata *data) {
+    int res = a_readint(var, owner, data);
     if (data->version >= KEYVAL_VERSION) {
         return AT_READ_FAIL;
     }
     return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
 }
 
-static void a_freekeys(attrib *a) {
-    free(a->data.v);
-}
-
 attrib_type at_keys = {
     "keys",
     NULL,
-    a_freekeys,
+    a_free_voidptr,
     NULL,
     a_writekeys,
     a_readkeys,

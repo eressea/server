@@ -34,20 +34,15 @@ typedef struct piracy_data {
     direction_t dir;
 } piracy_data;
 
-static void piracy_init(struct attrib *a)
+static void piracy_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(piracy_data));
-}
-
-static void piracy_done(struct attrib *a)
-{
-    free(a->data.v);
+    var->v = calloc(1, sizeof(piracy_data));
 }
 
 static attrib_type at_piracy_direction = {
     "piracy_direction",
     piracy_init,
-    piracy_done,
+    a_free_voidptr,
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ

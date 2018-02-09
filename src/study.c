@@ -173,16 +173,16 @@ int study_cost(struct unit *u, skill_t sk)
 
 /* ------------------------------------------------------------- */
 
-static void init_learning(struct attrib *a)
+static void init_learning(variant *var)
 {
-    a->data.v = calloc(sizeof(teaching_info), 1);
+    var->v = calloc(sizeof(teaching_info), 1);
 }
 
-static void done_learning(struct attrib *a)
+static void done_learning(variant *var)
 {
-    teaching_info *teach = (teaching_info *)a->data.v;
+    teaching_info *teach = (teaching_info *)var->v;
     selist_free(teach->teachers);
-    free(a->data.v);
+    free(teach);
 }
 
 const attrib_type at_learning = {

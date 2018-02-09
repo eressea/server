@@ -126,10 +126,10 @@ typedef struct icastle_data {
     int time;
 } icastle_data;
 
-static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
+static int a_readicastle(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    icastle_data *idata = (icastle_data *)a->data.v;
+    icastle_data *idata = (icastle_data *)var->v;
     char token[32];
 
     UNUSED_ARG(owner);
@@ -143,9 +143,9 @@ static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-a_writeicastle(const attrib * a, const void *owner, struct storage *store)
+a_writeicastle(const variant *var, const void *owner, struct storage *store)
 {
-    icastle_data *data = (icastle_data *)a->data.v;
+    icastle_data *data = (icastle_data *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->time);
@@ -168,20 +168,15 @@ static int a_ageicastle(struct attrib *a, void *owner)
     return AT_AGE_KEEP;
 }
 
-static void a_initicastle(struct attrib *a)
+static void a_initicastle(variant *var)
 {
-    a->data.v = calloc(sizeof(icastle_data), 1);
-}
-
-static void a_finalizeicastle(struct attrib *a) /*-V524 */
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(icastle_data), 1);
 }
 
 attrib_type at_icastle = {
     "zauber_icastle",
     a_initicastle,
-    a_finalizeicastle,
+    a_free_voidptr,
     a_ageicastle,
     a_writeicastle,
     a_readicastle
@@ -207,14 +202,14 @@ extern int dice(int count, int value);
  * Umwandlung von alt nach neu gebraucht werden */
  /* ------------------------------------------------------------- */
 
-static void init_mage(attrib * a)
+static void init_mage(variant *var)
 {
-    a->data.v = calloc(sizeof(sc_mage), 1);
+    var->v = calloc(sizeof(sc_mage), 1);
 }
 
-static void free_mage(attrib * a)
+static void free_mage(variant *var)
 {
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     if (mage->spellbook) {
         spellbook_clear(mage->spellbook);
         free(mage->spellbook);
@@ -239,11 +234,11 @@ int get_spell_level_mage(const spell * sp, void * cbdata)
     return sbe ? sbe->level : 0;
 }
 
-static int read_mage(attrib * a, void *owner, struct gamedata *data)
+static int read_mage(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int i, mtype;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     char spname[64];
 
     UNUSED_ARG(owner);
@@ -287,10 +282,10 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-write_mage(const attrib * a, const void *owner, struct storage *store)
+write_mage(const variant *var, const void *owner, struct storage *store)
 {
     int i;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, mage->magietyp);
@@ -2090,9 +2085,9 @@ bool is_familiar(const unit * u)
 }
 
 static void
-a_write_unit(const attrib * a, const void *owner, struct storage *store)
+a_write_unit(const variant *var, const void *owner, struct storage *store)
 {
-    unit *u = (unit *)a->data.v;
+    unit *u = (unit *)var->v;
     UNUSED_ARG(owner);
     write_unit_reference(u, store);
 }
@@ -2208,10 +2203,10 @@ static void * resolve_familiar(int id, void *data) {
     return data;
 }
 
-static int read_familiar(attrib * a, void *owner, struct gamedata *data)
+static int read_familiar(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2289,10 +2284,10 @@ static void * resolve_clone(int id, void *data) {
     return data;
 }
 
-static int read_clone(attrib * a, void *owner, struct gamedata *data)
+static int read_clone(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2312,10 +2307,10 @@ static void * resolve_mage(int id, void *data) {
     return data;
 }
 
-static int read_magician(attrib * a, void *owner, struct gamedata *data)
+static int read_magician(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

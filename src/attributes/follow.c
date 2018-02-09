@@ -28,7 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <storage.h>
 
-static int read_follow(attrib * a, void *owner, gamedata *data)
+static int read_follow(variant * var, void *owner, gamedata *data)
 {
     READ_INT(data->store, NULL);   /* skip it */
     return AT_READ_FAIL;

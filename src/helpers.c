@@ -306,12 +306,12 @@ struct trigger_type tt_caldera = {
 };
 
 
-static int building_action_read(struct attrib *a, void *owner, gamedata *data)
+static int building_action_read(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
 
     UNUSED_ARG(owner);
-    UNUSED_ARG(a);
+    UNUSED_ARG(var);
 
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);

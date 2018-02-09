@@ -506,13 +506,13 @@ int ualias(const unit * u)
     return a->data.i;
 }
 
-int a_readprivate(attrib * a, void *owner, gamedata *data)
+int a_readprivate(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = str_strdup(lbuf);
-    return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
+    var->v = str_strdup(lbuf);
+    return (var->v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
 /*********************/
@@ -644,15 +644,15 @@ void usettarget(unit * u, const unit * t)
 /*   at_siege   */
 /*********************/
 
-void a_writesiege(const attrib * a, const void *owner, struct storage *store)
+void a_writesiege(const variant *var, const void *owner, struct storage *store)
 {
-    struct building *b = (struct building *)a->data.v;
+    struct building *b = (struct building *)var->v;
     write_building_reference(b, store);
 }
 
-int a_readsiege(attrib * a, void *owner, gamedata *data)
+int a_readsiege(variant *var, void *owner, gamedata *data)
 {
-    if (read_building_reference(data, (building **)&a->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&var->v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

@@ -40,21 +40,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 
 /** skillmod attribut **/
-static void init_skillmod(attrib * a)
+static void init_skillmod(variant *var)
 {
-    a->data.v = calloc(sizeof(skillmod_data), 1);
-}
-
-static void finalize_skillmod(attrib * a)
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(skillmod_data), 1);
 }
 
 /** temporary skill modification (NOT SAVED!). */
 attrib_type at_skillmod = {
     "skillmod",
     init_skillmod,
-    finalize_skillmod,
+    a_free_voidptr,
     NULL,
     NULL,                         /* can't write function pointers */
     NULL,                         /* can't read function pointers */

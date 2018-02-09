@@ -2857,12 +2857,12 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
     return c;
 }
 
-static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
+static int dc_read_compat(variant *var, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
     struct storage *store = data->store;
 
-    UNUSED_ARG(a);
+    UNUSED_ARG(var);
     UNUSED_ARG(target);
     READ_INT(store, NULL);
     READ_FLT(store, NULL);

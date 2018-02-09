@@ -138,14 +138,9 @@ get_followers(unit * target, region * r, const region_list * route_end,
     }
 }
 
-static void shiptrail_init(attrib * a)
+static void shiptrail_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(traveldir));
-}
-
-static void shiptrail_finalize(attrib * a)
-{
-    free(a->data.v);
+    var->v = calloc(1, sizeof(traveldir));
 }
 
 static int shiptrail_age(attrib * a, void *owner)
@@ -157,11 +152,11 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
+static int shiptrail_read(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int n;
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     READ_INT(store, &t->no);
@@ -172,9 +167,9 @@ static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-shiptrail_write(const attrib * a, const void *owner, struct storage *store)
+shiptrail_write(const variant *var, const void *owner, struct storage *store)
 {
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, t->no);
@@ -185,7 +180,7 @@ shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_shiptrail = {
     "traveldir_new",
     shiptrail_init,
-    shiptrail_finalize,
+    a_free_voidptr,
     shiptrail_age,
     shiptrail_write,
     shiptrail_read

@@ -96,14 +96,14 @@ static group *find_group(int gid)
     return g;
 }
 
-static int read_group(attrib * a, void *owner, gamedata *data)
+static int read_group(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     group *g;
     int gid;
 
     READ_INT(store, &gid);
-    a->data.v = g = find_group(gid);
+    var->v = g = find_group(gid);
     if (g != 0) {
         g->members++;
         return AT_READ_OK;
@@ -112,9 +112,9 @@ static int read_group(attrib * a, void *owner, gamedata *data)
 }
 
 static void
-write_group(const attrib * a, const void *owner, struct storage *store)
+write_group(const variant *var, const void *owner, struct storage *store)
 {
-    group *g = (group *)a->data.v;
+    group *g = (group *)var->v;
     WRITE_INT(store, g->gid);
 }
 

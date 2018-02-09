@@ -34,15 +34,15 @@ static int age_moved(attrib * a, void *owner)
 }
 
 static void
-write_moved(const attrib * a, const void *owner, struct storage *store)
+write_moved(const variant *var, const void *owner, struct storage *store)
 {
-    WRITE_INT(store, a->data.i);
+    WRITE_INT(store, var->i);
 }
 
-static int read_moved(attrib * a, void *owner, gamedata *data)
+static int read_moved(variant *var, void *owner, gamedata *data)
 {
-    READ_INT(data->store, &a->data.i);
-    if (a->data.i != 0)
+    READ_INT(data->store, &var->i);
+    if (var->i != 0)
         return AT_READ_OK;
     else
         return AT_READ_FAIL;

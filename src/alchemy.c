@@ -284,13 +284,9 @@ typedef struct potiondelay {
     int amount;
 } potiondelay;
 
-static void init_potiondelay(attrib * a)
+static void init_potiondelay(variant *var)
 {
-    a->data.v = malloc(sizeof(potiondelay));
-}
-
-static void free_potiondelay(attrib * a) {
-    free(a->data.v);
+    var->v = malloc(sizeof(potiondelay));
 }
 
 static int age_potiondelay(attrib * a, void *owner)
@@ -304,7 +300,7 @@ static int age_potiondelay(attrib * a, void *owner)
 attrib_type at_potiondelay = {
     "potiondelay",
     init_potiondelay,
-    free_potiondelay,
+    a_free_voidptr,
     age_potiondelay, 0, 0
 };
 
@@ -337,31 +333,26 @@ struct order *ord)
 /*   at_effect   */
 /*****************/
 
-static void a_initeffect(attrib * a)
+static void a_initeffect(variant *var)
 {
-    a->data.v = calloc(sizeof(effect_data), 1);
-}
-
-static void a_finalizeeffect(attrib * a) /*-V524 */
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(effect_data), 1);
 }
 
 static void
-a_writeeffect(const attrib * a, const void *owner, struct storage *store)
+a_writeeffect(const variant *var, const void *owner, struct storage *store)
 {
-    effect_data *edata = (effect_data *)a->data.v;
+    effect_data *edata = (effect_data *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, resourcename(edata->type->rtype, 0));
     WRITE_INT(store, edata->value);
 }
 
-static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
+static int a_readeffect(variant *var, void *owner, struct gamedata *data)
 {
     struct storage *store = data->store;
     int power;
     const resource_type *rtype;
-    effect_data *edata = (effect_data *)a->data.v;
+    effect_data *edata = (effect_data *)var->v;
     char zText[32];
 
     UNUSED_ARG(owner);
@@ -386,7 +377,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
 attrib_type at_effect = {
     "effect",
     a_initeffect,
-    a_finalizeeffect,
+    a_free_voidptr,
     DEFAULT_AGE,
     a_writeeffect,
     a_readeffect,
