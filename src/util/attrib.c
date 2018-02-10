@@ -42,12 +42,13 @@ int read_attribs(gamedata *data, attrib **alist, void *owner) {
     }
     if (result == AT_READ_DEPR) {
         /* handle deprecated attributes */
-        attrib *a = *alist;
-        while (a) {
+        attrib **ap = alist;
+        while (*ap) {
+            attrib *a = *ap;
             if (a->type->upgrade) {
                 a->type->upgrade(alist, a);
             }
-            a = a->nexttype;
+            ap = &a->nexttype;
         }
     }
     return result;
@@ -66,7 +67,7 @@ int a_readint(variant * var, void *owner, struct gamedata *data)
 {
     int n;
     READ_INT(data->store, &n);
-    if (var) var->i = n;
+    var->i = n;
     return AT_READ_OK;
 }
 
@@ -426,11 +427,13 @@ static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int
     int retval = AT_READ_OK;
     int(*reader)(variant *, void *, struct gamedata *) = 0;
     attrib_type *at = at_find_key(key);
-    attrib * na = 0;
+    attrib * na = NULL;
+    variant var, *vp = &var;
 
     if (at) {
         reader = at->read;
         na = a_new(at);
+        vp = &na->data;
     }
     else {
         void *match;
@@ -444,16 +447,20 @@ static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int
         }
     }
     if (reader) {
-        int ret = reader(&na->data, owner, data);
+        int ret = reader(vp, owner, data);
         if (na) {
             switch (ret) {
             case AT_READ_DEPR:
             case AT_READ_OK:
-                a_add(attribs, na);
+                if (na) {
+                    a_add(attribs, na);
+                }
                 retval = ret;
                 break;
             case AT_READ_FAIL:
-                a_free(na);
+                if (na) {
+                    a_free(na);
+                }
                 break;
             default:
                 assert(!"invalid return value");
