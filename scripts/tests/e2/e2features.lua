@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
+    eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
 function test_calendar()
@@ -19,7 +20,7 @@ end
 function test_herbalism()
 -- OBS: herbalism is currently an E2-only skill
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "herbalism@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
 
     eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
