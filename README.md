@@ -18,3 +18,6 @@ This repository relies heavily on the use of submodules, and it pulls in most of
     ./s/build
 
 If you got this far and all went well, you have built a server (it is linked from the `game` subdirectory), and it will have passed some basic functionality tests.
+
+* [![Static Analysis](https://scan.coverity.com/projects/6742/badge.svg?flat=1)](https://scan.coverity.com/projects/6742/)
+* [![Build Status](https://api.travis-ci.org/eressea/server.svg?branch=develop)](https://travis-ci.org/eressea/server)
