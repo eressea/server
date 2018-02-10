@@ -66,7 +66,7 @@ static int read_seenspells(variant *var, void *owner, struct gamedata *data)
     return AT_READ_OK;
 }
 
-static bool cb_write_spell(const void *data, void *more) {
+static bool cb_write_spell(void *data, void *more) {
     const spell *sp = (const spell *)data;
     storage *store = (storage *)more;
     WRITE_TOK(store, sp->sname);
@@ -99,14 +99,6 @@ static int read_seenspell(variant *var, void *owner, struct gamedata *data)
     }
     var->v = sp;
     return AT_READ_DEPR;
-}
-
-static void
-write_seenspell(const variant *var, const void *owner, struct storage *store)
-{
-    const spell *sp = (const spell *)var->v;
-    UNUSED_ARG(owner);
-    WRITE_TOK(store, sp->sname);
 }
 
 static int cmp_spell(const void *a, const void *b) {
