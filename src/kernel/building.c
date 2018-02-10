@@ -673,17 +673,16 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     }
     return best;
 }
-/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern,
- * Modifikation f�r St�dter. */
+/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern */
 
-static const int wagetable[7][4] = {
-    { 10, 10, 11, -7 },             /* Baustelle */
-    { 10, 10, 11, -5 },             /* Handelsposten */
-    { 11, 11, 12, -3 },             /* Befestigung */
-    { 12, 11, 13, -1 },             /* Turm */
-    { 13, 12, 14, 0 },              /* Burg */
-    { 14, 12, 15, 1 },              /* Festung */
-    { 15, 13, 16, 2 }               /* Zitadelle */
+static const int wagetable[7][3] = {
+    { 10, 10, 11 },             /* Baustelle */
+    { 10, 10, 11 },             /* Handelsposten */
+    { 11, 11, 12 },             /* Befestigung */
+    { 12, 11, 13 },             /* Turm */
+    { 13, 12, 14 },             /* Burg */
+    { 14, 12, 15 },             /* Festung */
+    { 15, 13, 16 }              /* Zitadelle */
 };
 
 static int
