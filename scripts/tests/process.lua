@@ -2,11 +2,10 @@ require "lunit"
 
 module("tests.process", package.seeall, lunit.testcase)
 
-local u, r, f, turn
+local u, r, f
 
 function setup()
     eressea.free_game()
-    turn = get_turn()
     r = region.create(0, 0, "plain")
     f = faction.create("human", "bernd@eressea.de", "de")
     u = unit.create(f, r, 1)
@@ -25,8 +24,11 @@ local function assert_file(filename, exists)
 end
 
 function test_process_turn()
+    turn = get_turn()
+    turn_begin()
+    assert_equal(turn+1, get_turn())
     u:add_order("NUMMER PARTEI 777")
-    process_orders()
+    turn_process()
     assert_equal(0, init_reports())
     assert_equal(0, write_reports())
     assert_equal(0, eressea.write_game("test.dat"))
@@ -37,5 +39,6 @@ function test_process_turn()
     assert_file("reports/reports.txt")
     os.remove("reports")
     os.remove("data")
---    assert_equal(turn+1, get_turn())
+    turn_end()
+    assert_equal(turn+1, get_turn())
 end
