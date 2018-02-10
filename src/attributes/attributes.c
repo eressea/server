@@ -179,8 +179,8 @@ void register_attributes(void)
     at_register(&at_mage);
     at_register(&at_countdown);
     at_register(&at_curse);
-
     at_register(&at_seenspell);
+    at_register(&at_seenspells);
 
     /* neue REGION-Attribute */
     at_register(&at_moveblock);
