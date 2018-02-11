@@ -1190,15 +1190,13 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     assert(avail == 0 || nreq == 0);
 }
 
-typedef void(*allocate_function) (const resource_type *, struct region *,
-    struct allocation *);
-
-static allocate_function get_allocator(const struct resource_type *rtype)
-{
+static void allocate(const resource_type *rtype, region *r, allocation *data) {
     if (rtype->raw) {
-        return leveled_allocation;
+        leveled_allocation(rtype, r, data);
     }
-    return attrib_allocation;
+    else {
+        attrib_allocation(rtype, r, data);
+    }
 }
 
 void split_allocations(region * r)
@@ -1207,11 +1205,10 @@ void split_allocations(region * r)
     while (*p_alist) {
         allocation_list *alist = *p_alist;
         const resource_type *rtype = alist->type;
-        allocate_function alloc = get_allocator(rtype);
         const item_type *itype = resource2item(rtype);
         allocation **p_al = &alist->data;
 
-        alloc(rtype, r, alist->data);
+        allocate(rtype, r, alist->data);
 
         while (*p_al) {
             allocation *al = *p_al;

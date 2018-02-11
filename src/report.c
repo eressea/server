@@ -304,7 +304,6 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
         };
         starget *targetp;
         char cp = *params++;
-        int i, maxparam = 0;
         const char *locp;
         const char *syntaxp = sp->syntax;
 
@@ -359,6 +358,7 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
                 WARN_STATIC_BUFFER();
         }
         else if (cp == 'k') {
+            int i, maxparam = 0;
             bool multi = false;
             if (params && *params == 'c') {
                 /* skip over a potential id */

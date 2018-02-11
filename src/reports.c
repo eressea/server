@@ -575,7 +575,6 @@ report_resources(const region * r, resource_report * result, int size,
     if (see_unit) {
         rawmaterial *res = r->resources;
         while (res) {
-            int maxskill = 0;
             const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
             skill_t skill = itype->construction->skill;
@@ -588,6 +587,7 @@ report_resources(const region * r, resource_report * result, int size,
             }
             else {
                 const unit *u;
+                int maxskill = 0;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
                         int s = effskill(u, skill, 0);
@@ -923,7 +923,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     const struct unit * u, struct skill * sv, int *dh, int days)
 {
     char *bufp = buffer;
-    int i, effsk;
+    int effsk;
 
     if (!u->number)
         return 0;
@@ -953,7 +953,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     }
 
     if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
-        i = u_geteffstealth(u);
+        int i = u_geteffstealth(u);
         if (i >= 0) {
             if (wrptr(&bufp, &size, snprintf(bufp, size, "%d/", i)) != 0)
                 WARN_STATIC_BUFFER();
@@ -2276,7 +2276,6 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
-    int i, end = 0, begin = 0;
     const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[512];
     size_t size = sizeof(buf) - 1;
@@ -2288,6 +2287,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 #endif
 
     if (aregs != NULL) {
+        int i, end = 0, begin = 0;
         end = aregs->nregions;
         for (i = begin; i < end; ++i) {
             region *r = aregs->regions[i];

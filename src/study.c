@@ -475,10 +475,10 @@ typedef enum study_rule_t {
 static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 {
 #define MINTURN 16
-    double learnweeks = 0;
-    int i;
     if (turn > MINTURN) {
         if (rule == STUDY_FASTER) {
+            double learnweeks = 0;
+            int i;
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 if (sv->id == s) {
@@ -491,6 +491,8 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
             return 2.0; /* If the skill was not found it is the first study. */
         }
         if (rule == STUDY_AUTOTEACH) {
+            double learnweeks = 0;
+            int i;
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 learnweeks += (sv->level * (sv->level + 1) / 2.0);
@@ -547,7 +549,6 @@ int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
     int p;
-    magic_t mtyp;
     int l;
     int studycost, days;
     double multi = 1.0;
@@ -621,6 +622,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (sk == SK_MAGIC) {
+        magic_t mtyp;
         if (u->number > 1) {
             cmistake(u, ord, 106, MSG_MAGIC);
             return -1;
