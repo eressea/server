@@ -499,13 +499,13 @@ void unset_combatspell(unit * u, spell * sp)
 {
     sc_mage *m;
     int nr = 0;
-    int i;
 
     m = get_mage_depr(u);
     if (!m)
         return;
 
     if (!sp) {
+        int i;
         for (i = 0; i < MAXCOMBATSPELLS; i++) {
             m->combatspells[i].sp = NULL;
         }
@@ -1589,13 +1589,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     const spell *sp = co->sp;
     region *target_r = co_get_region(co);
     spellparameter *sa = co->par;
-    int i;
 
     *invalid = 0;
     *resist = 0;
     *success = 0;
 
     if (sa && sa->length) {
+        int i;
         /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
          * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
          * gar nicht global hätte suchen dürften, setzen wir das Objekt

@@ -284,7 +284,7 @@ static int ridingcapacity(const unit * u)
 int walkingcapacity(const struct unit *u)
 {
     int n, people, pferde_fuer_wagen, horses;
-    int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
+    int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
     const struct resource_type *rhorse = rt_find("horse");
@@ -312,6 +312,7 @@ int walkingcapacity(const struct unit *u)
     n = wagen_mit_pferden * vcap;
 
     if (u_race(u) == get_race(RC_TROLL)) {
+        int wagen_ohne_pferde, wagen_mit_trollen;
         /* 4 Trolle ziehen einen Wagen. */
         /* Unbesetzte Wagen feststellen */
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
@@ -682,7 +683,6 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    int c = 0;
     const building_type *bt_harbour = bt_find("harbour");
 
     if (sh->region && r_insectstalled(r)) {
@@ -708,6 +708,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         return SA_COAST;
     }
     if (sh->type->coasts) {
+        int c;
         for (c = 0; sh->type->coasts[c] != NULL; ++c) {
             if (sh->type->coasts[c] == r->terrain) {
                 return SA_COAST;

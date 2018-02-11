@@ -122,7 +122,6 @@ void piracy_cmd(unit * u)
         const faction *target;
         int value;
     } aff[MAXDIRECTIONS];
-    int saff = 0;
     int *il;
 
     assert(u->thisorder);
@@ -139,6 +138,7 @@ void piracy_cmd(unit * u)
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
     if (target_dir == NODIRECTION) {
+        int saff = 0;
         direction_t dir;
         /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
         * Nachbarregionen potentielle Opfer sind. */

@@ -2720,10 +2720,10 @@ static void age_stonecircle(building *b) {
             curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
                 int sk = effskill(mage, SK_MAGIC, 0);
-                float effect = 100;
                 if (sk > 0) {
                     int vig = sk;
                     int dur = (sk + 1) / 2;
+                    float effect = 100;
                     /* the mage reactivates the circle */
                     c = create_curse(mage, &rt->attribs, &ct_astralblock,
                         vig, dur, effect, 0);

@@ -537,7 +537,6 @@ static int sp_summon_familiar(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     const race *rc;
-    int dh;
     message *msg;
     char zText[2048];
 
@@ -553,7 +552,8 @@ static int sp_summon_familiar(castorder * co)
 
     if (fval(rc, RCF_SWIM) && !fval(rc, RCF_WALK)) {
         int coasts = is_coastregion(r);
-        int dir;
+        int dir, dh;
+
         if (coasts == 0) {
             cmistake(mage, co->order, 229, MSG_MAGIC);
             return 0;

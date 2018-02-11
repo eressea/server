@@ -333,7 +333,7 @@ static int do_recruiting(recruitment * recruits, int available)
         for (req = rec->requests; req; req = req->next) {
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
-            int number, dec;
+            int number;
             double multi = 2.0 * rc->recruit_multi;
 
             number = (int)(get / multi);
@@ -359,7 +359,7 @@ static int do_recruiting(recruitment * recruits, int available)
             }
             add_recruits(u, number, req->qty);
             if (number > 0) {
-                dec = (int)(number * multi);
+                int dec = (int)(number * multi);
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     recruited += dec;
                 }
@@ -1006,7 +1006,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         }
     }
 
-    assert(sk != NOSKILL || "limited resource needs a required skill for making it");
+    assert(sk != NOSKILL || !"limited resource needs a required skill for making it");
     skill = effskill(u, sk, 0);
     if (skill == 0) {
         add_message(&u->faction->msgs,
@@ -1075,13 +1075,12 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     const item_type *itype = resource2item(rtype);
     rawmaterial *rm = rm_get(r, rtype);
-    int need;
     bool first = true;
 
     if (rm != NULL) {
+        int need;
         do {
-            int avail = rm->amount;
-            int nreq = 0;
+            int avail = rm->amount, nreq = 0;
             allocation *al;
 
             if (avail <= 0) {
@@ -1093,7 +1092,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 
             assert(avail > 0);
 
-            for (al = alist; al; al = al->next)
+            for (al = alist; al; al = al->next) {
                 if (!fval(al, AFL_DONE)) {
                     int req = required(al->want - al->get, al->save);
                     assert(al->get <= al->want && al->get >= 0);
@@ -1112,6 +1111,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             fset(al, AFL_LOWSKILL);
                     }
                 }
+            }
             need = nreq;
 
             if (avail > nreq) avail = nreq;

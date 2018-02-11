@@ -124,7 +124,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
 static void json_maintenance(cJSON *json, maintenance **mtp) {
     cJSON *child;
     maintenance *mt;
-    int i, size = 1;
+    int size = 1;
 
     if (json->type == cJSON_Array) {
         size = cJSON_GetArraySize(json);
@@ -135,6 +135,7 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
     }
     *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
     if (json->type == cJSON_Array) {
+        int i;
         for (i = 0, child = json->child; child; child = child->next, ++i) {
             if (child->type == cJSON_Object) {
                 json_maintenance_i(child, mt + i);
