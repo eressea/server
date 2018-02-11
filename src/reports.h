@@ -29,6 +29,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    struct battle;
+    struct gamedate;
     struct selist;
     struct stream;
     struct seen_region;
@@ -96,6 +98,7 @@ extern "C" {
         const struct locale *lang);
     size_t report_status(const struct unit *u,
         const struct locale *lang, char *buf, size_t siz);
+    void report_battle_start(struct battle * b);
 
     void register_reports(void);
 
@@ -116,14 +119,14 @@ extern "C" {
         int size, const struct faction *viewer, bool see_unit);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
+    void report_warnings(struct faction *f, const struct gamedate *date);
+    void report_raceinfo(const struct race *rc, const struct locale *lang, char *buf, size_t length);
+    void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);
     void report_building(const struct building *b, const char **btype,
         const char **billusion);
-    void report_race(const struct unit *u, const char **rcname,
-        const char **rcillusion);
-
     void add_seen_faction(struct faction *self, struct faction *seen);
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
@@ -134,6 +137,8 @@ extern "C" {
 
     int count_travelthru(struct region *r, const struct faction *f);
     const char *get_mailcmd(const struct locale *loc);
+
+    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

@@ -1,4 +1,7 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <curses.h>
 
 #include "bind_gmtool.h"
@@ -9,6 +12,7 @@
 #include <kernel/terrain.h>
 #include <modules/autoseed.h>
 #include <util/log.h>
+#include <util/macros.h>
 
 #include <tolua.h>
 
@@ -16,6 +20,7 @@
 
 static int tolua_run_mapper(lua_State * L)
 {
+    UNUSED_ARG(L);
     run_mapper();
     return 0;
 }
@@ -24,6 +29,7 @@ static int tolua_highlight_region(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, 0);
     int select = tolua_toboolean(L, 2, 0);
+    UNUSED_ARG(L);
     highlight_region(r, select);
     return 0;
 }
@@ -41,6 +47,7 @@ static int tolua_select_coordinate(lua_State * L)
     int nx = (int)tolua_tonumber(L, 1, 0);
     int ny = (int)tolua_tonumber(L, 2, 0);
     int select = tolua_toboolean(L, 3, 0);
+    UNUSED_ARG(L);
     if (current_state) {
         select_coordinate(current_state->selected, nx, ny, select);
     }
@@ -186,8 +193,8 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
             if (!end)
                 break;
             else {
-                size_t len = end - str;
-                int bytes = MIN((int)len, size);
+                int bytes = (int)(end - str);
+                if (bytes < size) bytes = size;
                 mvwaddnstr(win, line++, 1, str, bytes);
                 wclrtoeol(win);
                 str = end + 1;

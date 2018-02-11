@@ -15,7 +15,7 @@ static void test_names(CuTest * tc)
 {
     unit *u;
     race *rc;
-    test_cleanup();
+    test_setup();
     register_names();
     CuAssertPtrNotNull(tc, get_function("name_undead"));
     CuAssertPtrNotNull(tc, get_function("name_skeleton"));
@@ -27,14 +27,14 @@ static void test_names(CuTest * tc)
     CuAssertPtrNotNull(tc, get_function("name_dracoid"));
     default_locale = test_create_locale();
     rc = test_create_race("undead");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     locale_setstring(default_locale, "undead_name_0", "Graue");
     locale_setstring(default_locale, "undead_postfix_0", "Kobolde");
     CuAssertPtrNotNull(tc, rc->name_unit);
     CuAssertTrue(tc, rc->name_unit == (race_func)get_function("name_undead"));
     name_unit(u);
     CuAssertStrEquals(tc, "Graue Kobolde", u->_name);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_monster_names(CuTest *tc) {
@@ -50,7 +50,7 @@ static void test_monster_names(CuTest *tc) {
     rc = test_create_race("irongolem");
     f = test_create_faction(rc);
     f->flags |= FFL_NPC;
-    u = test_create_unit(f, test_create_region(0, 0, 0));
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
     unit_setname(u, "Hodor");
     CuAssertPtrNotNull(tc, u->_name);
     name_unit(u);
@@ -58,7 +58,7 @@ static void test_monster_names(CuTest *tc) {
     CuAssertStrEquals(tc, "Eisengolem", unit_getname(u));
     u->number = 2;
     CuAssertStrEquals(tc, "Eisengolems", unit_getname(u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_names_suite(void)

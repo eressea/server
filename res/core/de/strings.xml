@@ -818,6 +818,10 @@
   <string name="section_events">
     <text locale="de">Ereignisse</text>
   </string>
+  <string name="section_nr">
+    <text locale="de">Hinweise</text>
+    <text locale="en">Notifications</text>
+  </string>
   <string name="section_mail">
     <text locale="de">Botschaften</text>
   </string>
@@ -3699,7 +3703,7 @@
     </string>
     <string name="sound_out">
       <text locale="de">Aushorchen</text>
-      <text locale="en">sound_out</text>
+      <text locale="en">Sound out</text>
     </string>
     <string name="bloodthirst">
       <text locale="de">Kriegsgesang</text>
@@ -7305,16 +7309,6 @@
     <text locale="en">regular spell</text>
   </string>
   
-  <string name="nr_insectwinter">
-    <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
-    <text locale="en">It is winter, and insects can only recruit in deserts or with the aid of nestwarmth potions.</text>
-  </string>
-
-  <string name="nr_insectfall">
-    <text locale="de">Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können.</text>
-    <text locale="en">It is the last week before winter in which insects can still recruit.</text>
-  </string>
-
   <string name="nr_owner">
     <text locale="de">Eigentümer</text>
     <text locale="en">Owner</text>
@@ -7337,8 +7331,8 @@
     </string>
 
     <string name="a_road_percent">
-      <text locale="de">eine zu %d%% vollendete Straße</text>
-      <text locale="en">a road that is %d%% complete</text>
+      <text locale="de">eine zu $percent% vollendete Straße</text>
+      <text locale="en">a road that is $percent% complete</text>
     </string>
 
     <string name="a_road_connection">

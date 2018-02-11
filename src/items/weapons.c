@@ -76,7 +76,7 @@ int *casualties)
             killed += terminate(dt, *at, AT_SPELL, damage, 1);
         }
     } while (force && killed < enemies);
-    if (casualties)
+    if (killed > 0 && casualties)
         *casualties = killed;
     return true;
 }

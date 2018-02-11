@@ -38,13 +38,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <storage.h>
@@ -54,6 +54,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <limits.h>
 
@@ -134,7 +135,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
-            btype->_name = strdup(name);
+            btype->_name = str_strdup(name);
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;
@@ -372,8 +373,8 @@ building *new_building(const struct building_type * btype, region * r,
         bname = parameters[P_GEBAEUDE];
     }
     assert(bname);
-    slprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = strdup(bname);
+    snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
+    b->name = str_strdup(bname);
     return b;
 }
 
@@ -385,14 +386,16 @@ static building *deleted_buildings;
 void remove_building(building ** blist, building * b)
 {
     unit *u;
-    const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
+    static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
+    static int btypes;
 
     assert(bfindhash(b->no));
 
-    bt_caravan = bt_find("caravan");
-    bt_dam = bt_find("dam");
-    bt_tunnel = bt_find("tunnel");
-
+    if (bt_changed(&btypes)) {
+        bt_caravan = bt_find("caravan");
+        bt_dam = bt_find("dam");
+        bt_tunnel = bt_find("tunnel");
+    }
     handle_event(b->attribs, "destroy", b);
     for (u = b->region->units; u; u = u->next) {
         if (u->building == b) leave(u, true);
@@ -404,7 +407,6 @@ void remove_building(building ** blist, building * b)
 
     /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
      * gebaute Strasse zur Haelfte vernichtet */
-    /* TODO: caravan, tunnel, dam modularization ? is_building_type ? */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         region *r = b->region;
         int d;
@@ -489,7 +491,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)
 {
-    slprintf(ibuf, size, "%s (%s)", b->name, itoa36(b->no));
+    snprintf(ibuf, size, "%s (%s)", b->name, itoa36(b->no));
     return ibuf;
 }
 
@@ -499,7 +501,7 @@ const char *buildingname(const building * b)
     static name idbuf[8];
     static int nextbuf = 0;
     char *ibuf = idbuf[(++nextbuf) % 8];
-    return write_buildingname(b, ibuf, sizeof(name));
+    return write_buildingname(b, ibuf, sizeof(idbuf[0]));
 }
 
 void building_set_owner(struct unit * owner)
@@ -568,7 +570,7 @@ void building_setname(building * self, const char *name)
 {
     free(self->name);
     if (name)
-        self->name = strdup(name);
+        self->name = str_strdup(name);
     else
         self->name = NULL;
 }
@@ -774,21 +776,10 @@ int cmp_wage(const struct building *b, const building * a)
     return -1;
 }
 
-bool is_owner_building(const struct building * b)
-{
-    region *r = b->region;
-    if (b->type->taxes && r->land && r->land->ownership) {
-        unit *u = building_owner(b);
-        return u && u->faction == r->land->ownership->owner;
-    }
-    return false;
-}
-
 int building_taxes(const building *b) {
     assert(b);
     return b->type->taxes;
 }
-
 
 int cmp_taxes(const building * b, const building * a)
 {

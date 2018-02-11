@@ -3,7 +3,7 @@ project(util C)
 SET(_TEST_FILES
 attrib.test.c
 base36.test.c
-bsdstring.test.c
+# bsdstring.test.c
 # crmessage.test.c
 # dice.test.c
 # event.test.c
@@ -22,7 +22,6 @@ password.test.c
 # resolve.test.c
 rng.test.c
 strings.test.c
-bsdstring.test.c
 functions.test.c
 log.test.c
 # translation.test.c
@@ -51,6 +50,7 @@ mt19937ar.c
 nrmessage.c
 parser.c
 password.c
+path.c
 rand.c
 resolve.c
 strings.c
@@ -60,6 +60,7 @@ unicode.c
 variant.c
 xml.c
 )
+
 FOREACH(_FILE ${_FILES})
     LIST(APPEND _SOURCES ${PROJECT_NAME}/${_FILE})
 ENDFOREACH(_FILE)

@@ -34,6 +34,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <util/gamedata.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 #include <util/unicode.h>
 
 #include <storage.h>
@@ -59,7 +60,7 @@ group *new_group(faction * f, const char *name, int gid)
     *gp = g;
 
     maxgid = MAX(gid, maxgid);
-    g->name = strdup(name);
+    g->name = str_strdup(name);
     g->gid = gid;
 
     g->nexthash = ghash[index];

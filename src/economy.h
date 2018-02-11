@@ -45,7 +45,24 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
-    struct request;
+    
+    typedef struct econ_request {
+        struct econ_request *next;
+        struct unit *unit;
+        int qty;
+        union {
+            struct {
+                struct order *ord;
+            } recruit;
+            struct {
+                int no;
+                bool goblin;             /* stealing */
+            } steal;
+            struct {
+                const struct luxury_type *ltype;    /* trading */
+            } trade;
+        } type;
+    } econ_request;
 
     int income(const struct unit *u);
     int entertainmoney(const struct region *r);
@@ -54,17 +71,26 @@ extern "C" {
     void produce(struct region *r);
     void auto_work(struct region *r);
 
-    enum { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT };
+    unsigned int expand_production(struct region * r, struct econ_request * requests, struct econ_request ***results);
+
+    typedef enum income_t { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT } income_t;
+    void add_income(struct unit * u, income_t type, int want, int qty);
+
     void maintain_buildings(struct region *r);
     void make_item(struct unit * u, const struct item_type * itype, int want);
     int make_cmd(struct unit *u, struct order *ord);
     void split_allocations(struct region *r);
     int give_control_cmd(struct unit *u, struct order *ord);
     void give_control(struct unit * u, struct unit * u2);
-    void tax_cmd(struct unit * u, struct order *ord, struct request ** taxorders);
-    void expandtax(struct region * r, struct request * taxorders);
+
+    void tax_cmd(struct unit * u, struct order *ord, struct econ_request ** taxorders);
+    void expandtax(struct region * r, struct econ_request * taxorders);
+
+    struct message * steal_message(const struct unit * u, struct order *ord);
+    void steal_cmd(struct unit * u, struct order *ord, struct econ_request ** stealorders);
+    void expandstealing(struct region * r, struct econ_request * stealorders);
+
     void add_recruits(struct unit * u, int number, int wanted);
-    struct message * check_steal(const struct unit * u, struct order *ord);
 
 #ifdef __cplusplus
 }

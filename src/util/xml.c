@@ -16,10 +16,8 @@
 #include "log.h"
 #include "assert.h"
 
-#ifdef USE_LIBXML2
 #include <libxml/catalog.h>
 #include <libxml/xmlstring.h>
-#endif
 
 /* libc includes */
 #include <stdio.h>
@@ -27,7 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef USE_LIBXML2
 int xml_ivalue(xmlNodePtr node, const char *name, int dflt)
 {
     int i = dflt;
@@ -110,11 +107,9 @@ void xml_register_callback(xml_callback callback)
         insert = &(*insert)->next;
     *insert = reader;
 }
-#endif
 
 int read_xml(const char *filename, const char *catalog)
 {
-#ifdef USE_LIBXML2
     xml_reader *reader = xmlReaders;
     xmlDocPtr doc;
     int result;
@@ -141,8 +136,4 @@ int read_xml(const char *filename, const char *catalog)
     }
     xmlFreeDoc(doc);
     return result;
-#else
-    log_error("LIBXML2 disabled, cannot read %s.\n", filename);
-    return -1;
-#endif
 }

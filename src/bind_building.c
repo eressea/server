@@ -1,16 +1,7 @@
-/*
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "bind_building.h"
 #include "bind_unit.h"
 
@@ -21,6 +12,8 @@ without prior permission by the authors of Eressea.
 
 #include <util/log.h>
 #include <util/language.h>
+#include <util/macros.h>
+#include <util/strings.h>
 
 #include <tolua.h>
 #include <stdlib.h>
@@ -84,7 +77,7 @@ static int tolua_building_set_info(lua_State * L)
     const char *info = tolua_tostring(L, 2, 0);
     free(self->display);
     if (info)
-        self->display = strdup(info);
+        self->display = str_strdup(info);
     else
         self->display = NULL;
     return 0;

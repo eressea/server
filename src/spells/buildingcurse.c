@@ -26,6 +26,7 @@
 #include <util/base36.h>
 #include <util/functions.h>
 #include <util/language.h>
+#include <util/macros.h>
 
 /* libc includes */
 #include <string.h>

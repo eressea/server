@@ -31,14 +31,14 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     ally *al;
     int fno;
 
-    test_cleanup();
-    f = test_create_faction(0);
+    test_setup();
+    f = test_create_faction(NULL);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
     CuAssertPtrEquals(tc, 0, f->next);
-    f2 = test_create_faction(0);
+    f2 = test_create_faction(NULL);
     CuAssertPtrEquals(tc, f2, factions->next);
-    u = test_create_unit(f2, test_create_region(0, 0, 0));
+    u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
@@ -66,7 +66,7 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     g = get_group(u);
     CuAssertPtrNotNull(tc, g);
     CuAssertPtrEquals(tc, 0, g->allies);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_group_readwrite(CuTest * tc)
@@ -78,10 +78,10 @@ static void test_group_readwrite(CuTest * tc)
     gamedata data;
     storage store;
 
-    test_cleanup();
+    test_setup();
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     new_group(f, "NW", 42);
     g = new_group(f, "Egoisten", 43);
     key_set(&g->attribs, 44, 44);
@@ -113,7 +113,7 @@ static void test_group_readwrite(CuTest * tc)
     CuAssertPtrEquals(tc, 0, g->allies->next);
     CuAssertPtrEquals(tc, f, g->allies->faction);
     CuAssertIntEquals(tc, HELP_GIVE, g->allies->status);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_group(CuTest * tc)
@@ -123,9 +123,9 @@ static void test_group(CuTest * tc)
     faction *f;
     group *g;
 
-    test_cleanup();
-    r = test_create_region(0, 0, 0);
-    f = test_create_faction(0);
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
     assert(r && f);
     u = test_create_unit(f, r);
     assert(u);
@@ -139,7 +139,7 @@ static void test_group(CuTest * tc)
     set_group(u, g);
     CuAssertIntEquals(tc, 1, g->members);
     CuAssertPtrEquals(tc, g, get_group(u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_group_suite(void)

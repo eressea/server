@@ -21,6 +21,8 @@ extern "C"
         NODIRECTION = -1
     } direction_t;
 
+    extern const char *shortdirections[MAXDIRECTIONS];
+
     direction_t get_direction(const char *s, const struct locale *);
     void init_directions(struct locale *lang);
     void init_direction(const struct locale *lang, direction_t dir, const char *str);
@@ -30,5 +32,6 @@ extern "C"
     extern const char * directions[];
 
 #ifdef __cplusplus
+}
 #endif
 #endif

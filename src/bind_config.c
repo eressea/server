@@ -1,23 +1,31 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
+
 #include "bind_config.h"
 
-#include <platform.h>
+#include "jsonconf.h"
+
 #include <kernel/config.h>
-#include <kernel/jsonconf.h>
-#include <util/bsdstring.h>
-#include <util/nrmessage.h>
+#include <kernel/building.h>
+#include <kernel/race.h>
+#include <kernel/ship.h>
+#include <kernel/spell.h>
+#include <kernel/spellbook.h>
+#include <kernel/terrain.h>
+
 #include <util/log.h>
 #include <util/language.h>
+#include <util/nrmessage.h>
+#include <util/path.h>
+#include <util/strings.h>
+
 #include <cJSON.h>
+
+#include <limits.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "kernel/building.h"
-#include "kernel/race.h"
-#include "kernel/ship.h"
-#include "kernel/spell.h"
-#include "kernel/spellbook.h"
-#include "kernel/terrain.h"
 
 void config_reset(void) {
     free_config();
@@ -46,7 +54,7 @@ int config_parse(const char *json)
             if (xp >= ep) break;
         }
         xp = (ep > json + 10) ? ep - 10 : json;
-        strlcpy(buffer, xp, sizeof(buffer));
+        str_strlcpy(buffer, xp, sizeof(buffer));
         buffer[9] = 0;
         log_error("json parse error in line %d, position %d, near `%s`\n", line, ep - lp, buffer);
     }
@@ -55,12 +63,12 @@ int config_parse(const char *json)
 
 int config_read(const char *filename, const char * relpath)
 {
-    char name[MAX_PATH];
+    char name[PATH_MAX];
     FILE *F;
 
     json_relpath = relpath;
     if (relpath) {
-        join_path(relpath, filename, name, sizeof(name));
+        path_join(relpath, filename, name, sizeof(name));
         F = fopen(name, "r");
     }
     else {

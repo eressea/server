@@ -46,7 +46,7 @@
   </resource>
 
   <resource name="magicbag">
-    <item big="yes" notlost="yes" weight="100" score="6000"/>
+    <item notlost="yes" big="yes" weight="100" score="6000"/>
   </resource>
 
   <resource name="magicherbbag" appearance="">

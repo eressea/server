@@ -7,6 +7,8 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
+#include <util/message.h>
+
 #include <magic.h>
 
 #include <CuTest.h>
@@ -26,13 +28,14 @@ static void test_flyingship(CuTest * tc)
     ship_type *shipType1, *shipType2;
     ship *sh1, *sh2;
 
-    test_cleanup();
+    test_setup();
+    mt_register(mt_new_va("flying_ship_result", "mage:unit", "ship:ship", NULL));
 
     par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
     par_data.flag = 0;
 
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     f = test_create_faction(test_create_race("human"));
     u = test_create_unit(f, r);
 
@@ -61,7 +64,7 @@ static void test_flyingship(CuTest * tc)
     CuAssertTrue(tc, !flying_ship(sh2));
     co.par = 0;
     free_castorder(&co);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_flyingship_suite(void)

@@ -59,7 +59,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/filereader.h>
 #include <util/gamedata.h>
@@ -70,15 +69,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/password.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
 #include <selist.h>
 #include <stream.h>
 #include <filestream.h>
+#include <limits.h>
 #include <storage.h>
 #include <binarystore.h>
 
@@ -101,71 +103,6 @@ int firstx = 0, firsty = 0;
 
 /* TODO: is this still important? */
 int enc_gamedata = ENCODING_UTF8;
-
-/* local symbols */
-static region *current_region;
-
-char *rns(FILE * f, char *c, size_t size)
-{
-    char *s = c;
-    do {
-        *s = (char)getc(f);
-    } while (*s != '"');
-
-    for (;;) {
-        *s = (char)getc(f);
-        if (*s == '"')
-            break;
-        if (s < c + size)
-            ++s;
-    }
-    *s = 0;
-    return c;
-}
-
-/* ------------------------------------------------------------- */
-
-/* #define INNER_WORLD  */
-/* fürs debuggen nur den inneren Teil der Welt laden */
-/* -9;-27;-1;-19;Sumpfloch */
-int inner_world(region * r)
-{
-    static int xy[2] = { 18, -45 };
-    static int size[2] = { 27, 27 };
-
-    if (r->x >= xy[0] && r->x < xy[0] + size[0] && r->y >= xy[1]
-        && r->y < xy[1] + size[1])
-        return 2;
-    if (r->x >= xy[0] - 9 && r->x < xy[0] + size[0] + 9 && r->y >= xy[1] - 9
-        && r->y < xy[1] + size[1] + 9)
-        return 1;
-    return 0;
-}
-
-int maxregions = -1;
-int loadplane = 0;
-
-enum {
-    U_MAN,
-    U_UNDEAD,
-    U_ILLUSION,
-    U_FIREDRAGON,
-    U_DRAGON,
-    U_WYRM,
-    U_SPELL,
-    U_TAVERNE,
-    U_MONSTER,
-    U_BIRTHDAYDRAGON,
-    U_TREEMAN,
-    MAXTYPES
-};
-
-race_t typus2race(unsigned char typus)
-{
-    if (typus > 0 && typus <= 11)
-        return (race_t)(typus - 1);
-    return NORACE;
-}
 
 static void read_alliances(gamedata *data)
 {
@@ -222,7 +159,7 @@ void read_planes(gamedata *data) {
         }
         pl->id = id;
         READ_STR(store, name, sizeof(name));
-        pl->name = strdup(name);
+        pl->name = str_strdup(name);
         READ_INT(store, &pl->minx);
         READ_INT(store, &pl->maxx);
         READ_INT(store, &pl->miny);
@@ -356,17 +293,17 @@ static void write_owner(gamedata *data, region_owner * owner)
 
 int current_turn(void)
 {
-    char zText[MAX_PATH];
+    char zText[PATH_MAX];
     int cturn = 0;
     FILE *F;
 
-    join_path(basepath(), "turn", zText, sizeof(zText));
+    path_join(basepath(), "turn", zText, sizeof(zText));
     F = fopen(zText, "r");
     if (!F) {
         perror(zText);
     }
     else {
-        int c = fscanf(F, "%d\n", &cturn);
+        int c = fscanf(F, "%4d\n", &cturn);
         fclose(F);
         if (c != 1) {
             return -1;
@@ -379,27 +316,52 @@ static void writeorder(gamedata *data, const struct order *ord,
     const struct locale *lang)
 {
     char obuf[1024];
-    write_order(ord, obuf, sizeof(obuf));
+    write_order(ord, lang, obuf, sizeof(obuf));
     if (obuf[0])
         WRITE_STR(data->store, obuf);
+}
+
+static void read_skill(gamedata *data, skill *sv) {
+    int val;
+    READ_INT(data->store, &val);
+    assert(val < MAXSKILLS);
+    sv->id = (skill_t)val;
+    if (sv->id != NOSKILL) {
+        READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
+        sv->old = sv->level = val;
+        READ_INT(data->store, &val);
+        assert(val < CHAR_MAX);
+        sv->weeks = val;
+    }
+}
+
+static int skill_cmp(const void *a, const void *b) {
+    const skill * sa = (const skill *)a;
+    const skill * sb = (const skill *)b;
+    return sa->id - sb->id;
 }
 
 static void read_skills(gamedata *data, unit *u)
 {
     if (data->version < SKILLSORT_VERSION) {
+        skill skills[MAXSKILLS], *sv = skills;
+
+        u->skill_size = 0;
         for (;;) {
-            int n = NOSKILL, level, weeks;
-            skill_t sk;
-            READ_INT(data->store, &n);
-            sk = (skill_t)n;
-            if (sk == NOSKILL) break;
-            READ_INT(data->store, &level);
-            READ_INT(data->store, &weeks);
-            if (level) {
-                skill *sv = add_skill(u, sk);
-                sv->level = sv->old = (unsigned char)level;
-                sv->weeks = (unsigned char)weeks;
+            read_skill(data, sv);
+            if (sv->id == NOSKILL) break;
+            if (sv->level > 0) {
+                ++sv;
+                ++u->skill_size;
             }
+        }
+        if (u->skill_size > 0) {
+            size_t sz = u->skill_size * sizeof(skill);
+
+            qsort(skills, u->skill_size, sizeof(skill), skill_cmp);
+            u->skills = malloc(sz);
+            memcpy(u->skills, skills, sz);
         }
     }
     else {
@@ -408,12 +370,7 @@ static void read_skills(gamedata *data, unit *u)
         u->skills = malloc(sizeof(skill)*u->skill_size);
         for (i = 0; i != u->skill_size; ++i) {
             skill *sv = u->skills + i;
-            int val;
-            READ_INT(data->store, &val);
-            sv->id = (skill_t)val;
-            READ_INT(data->store, &sv->level);
-            sv->old = sv->level;
-            READ_INT(data->store, &sv->weeks);
+            read_skill(data, sv);
         }
     }
 }
@@ -486,17 +443,12 @@ unit *read_unit(gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? strdup(obuf) : 0;
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
+    u->_name = obuf[0] ? str_strdup(obuf) : 0;
+    READ_STR(data->store, obuf, sizeof(obuf));
+    if (unicode_utf8_trim(obuf)!=0) {
+        log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
     }
-    else {
-        READ_STR(data->store, obuf, sizeof(obuf));
-		if (unicode_utf8_trim(obuf)!=0) {
-			log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
-		}
-        u->display = obuf[0] ? strdup(obuf) : 0;
-    }
+    u->display = obuf[0] ? str_strdup(obuf) : 0;
     READ_INT(data->store, &number);
     set_number(u, number);
 
@@ -557,24 +509,23 @@ unit *read_unit(gamedata *data)
     p = n = 0;
     orderp = &u->orders;
     while (obuf[0]) {
-        if (!lomem) {
-            order *ord = parse_order(obuf, u->faction->locale);
+        order *ord = parse_order(obuf, u->faction->locale);
+        if (ord != NULL) {
+            if (++n < MAXORDERS) {
+                if (!is_persistent(ord) || ++p < MAXPERSISTENT) {
+                    *orderp = ord;
+                    orderp = &ord->next;
+                    ord = NULL;
+                }
+                else if (p == MAXPERSISTENT) {
+                    log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
+                }
+            }
+            else if (n == MAXORDERS) {
+                log_info("%s had %d or more orders", unitname(u), MAXORDERS);
+            }
             if (ord != NULL) {
-                if (++n < MAXORDERS) {
-                    if (!is_persistent(ord) || ++p < MAXPERSISTENT) {
-                        *orderp = ord;
-                        orderp = &ord->next;
-                        ord = NULL;
-                    }
-                    else if (p == MAXPERSISTENT) {
-                        log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
-                    }
-                }
-                else if (n == MAXORDERS) {
-                    log_info("%s had %d or more orders", unitname(u), MAXORDERS);
-                }
-                if (ord != NULL)
-                    free_order(ord);
+                free_order(ord);
             }
         }
         READ_STR(data->store, obuf, sizeof(obuf));
@@ -659,14 +610,9 @@ void write_unit(gamedata *data, const unit * u)
 }
 
 static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
-    if (lomem) {
-        READ_STR(data->store, NULL, 0);
-    }
-    else {
-        READ_STR(data->store, info, len);
-        if (unicode_utf8_trim(info) != 0) {
-            log_warning("trim region %d info to '%s'", r->uid, info);
-        }
+    READ_STR(data->store, info, len);
+    if (unicode_utf8_trim(info) != 0) {
+        log_warning("trim region %d info to '%s'", r->uid, info);
     }
 }
 
@@ -687,7 +633,6 @@ static region *readregion(gamedata *data, int x, int y)
     }
     else {
         assert(uid == 0 || r->uid == uid);
-        current_region = r;
         while (r->attribs)
             a_remove(&r->attribs, r->attribs);
         if (r->land) {
@@ -725,7 +670,7 @@ static region *readregion(gamedata *data, int x, int y)
         if (unicode_utf8_trim(name) != 0) {
             log_warning("trim region %d name to '%s'", uid, name);
         };
-        r->land->name = strdup(name);
+        r->land->name = str_strdup(name);
     }
     if (r->land) {
         int i;
@@ -965,7 +910,7 @@ static char * getpasswd(int fno) {
                 assert(line[slen] == '\n');
                 line[slen] = 0;
                 fclose(F);
-                return strdup(line + len + 1);
+                return str_strdup(line + len + 1);
             }
         }
         fclose(F);
@@ -1057,19 +1002,21 @@ faction *read_faction(gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
 	};
-    f->name = strdup(name);
+    f->name = str_strdup(name);
     READ_STR(data->store, name, sizeof(name));
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = strdup(name);
+    f->banner = str_strdup(name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
     READ_STR(data->store, name, sizeof(name));
-    if (set_email(&f->email, name) != 0) {
-        log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
-        set_email(&f->email, "");
+    if (check_email(name) == 0) {
+      faction_setemail(f, name);
+    } else {
+      log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
+      faction_setemail(f, NULL);
     }
 
     read_password(data, f);
@@ -1124,14 +1071,14 @@ faction *read_faction(gamedata * data)
     READ_INT(data->store, &n);
     f->options = n;
 
-    n = want(O_REPORT) | want(O_COMPUTER);
+    n = WANT_OPTION(O_REPORT) | WANT_OPTION(O_COMPUTER);
     if ((f->options & n) == 0) {
         /* Kein Report eingestellt, Fehler */
         f->options |= n;
     }
     if (data->version < JSON_REPORT_VERSION) {
         /* mistakes were made in the past*/
-        f->options &= ~want(O_JSON);
+        f->options &= ~WANT_OPTION(O_JSON);
     }
     read_allies(data, f);
     read_groups(data, f);
@@ -1169,7 +1116,7 @@ void write_faction(gamedata *data, const faction * f)
 
     WRITE_STR(data->store, f->name);
     WRITE_STR(data->store, f->banner);
-    WRITE_STR(data->store, f->email);
+    WRITE_STR(data->store, f->email?f->email:"");
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
@@ -1192,7 +1139,7 @@ void write_faction(gamedata *data, const faction * f)
         WRITE_INT(data->store, ur->y);
     }
     WRITE_SECTION(data->store);
-    WRITE_INT(data->store, f->options & ~want(O_DEBUG));
+    WRITE_INT(data->store, f->options & ~WANT_OPTION(O_DEBUG));
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
@@ -1226,7 +1173,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 int readgame(const char *filename)
 {
     int n, stream_version;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata = { 0 };
     storage store;
     stream strm;
@@ -1234,7 +1181,7 @@ int readgame(const char *filename)
     size_t sz;
 
     log_debug("- reading game data from %s", filename);
-    join_path(datapath(), filename, path, sizeof(path));
+    path_join(datapath(), filename, path, sizeof(path));
 
     F = fopen(path, "rb");
     if (!F) {
@@ -1286,17 +1233,12 @@ struct building *read_building(gamedata *data) {
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
 	}
-    b->name = strdup(name);
-    if (lomem) {
-        READ_STR(store, NULL, 0);
+    b->name = str_strdup(name);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+        log_warning("trim building %s info to '%s'", itoa36(b->no), name);
     }
-    else {
-        READ_STR(store, name, sizeof(name));
-        if (unicode_utf8_trim(name)!=0) {
-            log_warning("trim building %s info to '%s'", itoa36(b->no), name);
-        }
-        b->display = strdup(name);
-    }
+    b->display = str_strdup(name);
     READ_INT(store, &b->size);
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
@@ -1345,17 +1287,12 @@ ship *read_ship(gamedata *data)
     if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
 	}
-    sh->name = strdup(name);
-    if (lomem) {
-        READ_STR(store, NULL, 0);
+    sh->name = str_strdup(name);
+    READ_STR(store, name, sizeof(name));
+    if (unicode_utf8_trim(name)!=0) {
+        log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
     }
-    else {
-        READ_STR(store, name, sizeof(name));
-        if (unicode_utf8_trim(name)!=0) {
-            log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
-        }
-        sh->display = strdup(name);
-    }
+    sh->display = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     sh->type = st_find(name);
     if (sh->type == NULL) {
@@ -1460,7 +1397,6 @@ int read_game(gamedata *data)
     building **bp;
     ship **shp;
     unit *u;
-    int rmax = maxregions;
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
     const struct race *rc_spell = rc_find("spell");
@@ -1504,11 +1440,9 @@ int read_game(gamedata *data)
     /* Regionen */
 
     READ_INT(store, &nread);
-    assert(nread < MAXREGIONS && nread>=0);
-    if (rmax < 0) {
-        rmax = nread;
-    }
-    log_debug(" - Einzulesende Regionen: %d/%d", rmax, nread);
+    assert(nread < MAXREGIONS && nread >=0);
+
+    log_debug(" - Einzulesende Regionen: %d", nread);
 
     while (--nread >= 0) {
         unit **up;
@@ -1518,7 +1452,7 @@ int read_game(gamedata *data)
         /* Burgen */
         READ_INT(store, &p);
         if (p > 0 && !r->land) {
-            log_error("%s, uid=%d has %d buildings", regionname(r, NULL), r->uid, p);
+            log_debug("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p==1) ? "building" : "buildings");
         }
         bp = &r->buildings;
 
@@ -1571,7 +1505,6 @@ int read_game(gamedata *data)
                 update_interval(u->faction, r);
             }
         }
-        --rmax;
     }
     read_borders(data);
 
@@ -1633,9 +1566,6 @@ int read_game(gamedata *data)
         fix_familiars();
     }
 
-    if (loadplane || maxregions >= 0) {
-        remove_empty_factions();
-    }
     log_debug("Done loading turn %d.", turn);
 
     return 0;
@@ -1654,22 +1584,20 @@ static void clear_npc_orders(faction *f)
 int writegame(const char *filename)
 {
     int n;
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     gamedata gdata;
     storage store;
     stream strm;
     FILE *F;
 
     create_directories();
-    join_path(datapath(), filename, path, sizeof(path));
-#ifdef HAVE_UNISTD_H
+    path_join(datapath(), filename, path, sizeof(path));
     /* make sure we don't overwrite an existing file (hard links) */
-    if (remove(path)!=0) {
-        if (errno==ENOENT) {
+    if (remove(path) != 0) {
+        if (errno == ENOENT) {
             errno = 0;
         }
     }
-#endif
     F = fopen(path, "wb");
     if (!F) {
         perror(path);

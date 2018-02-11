@@ -11,7 +11,9 @@
 
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "message.h"
 
 #include "strings.h"
@@ -60,8 +62,8 @@ arg_type *find_argtype(const char *name)
 
 message_type *mt_new(const char *name, const char *args[])
 {
-    int i, nparameters = 0;
-    message_type *mtype = (message_type *)malloc(sizeof(message_type));
+    int nparameters = 0;
+    message_type *mtype;
 
     assert(name != NULL);
     if (name == NULL) {
@@ -72,8 +74,9 @@ message_type *mt_new(const char *name, const char *args[])
         /* count the number of parameters */
         while (args[nparameters]) ++nparameters;
     }
+    mtype = (message_type *)malloc(sizeof(message_type));
     mtype->key = 0;
-    mtype->name = strdup(name);
+    mtype->name = str_strdup(name);
     mtype->nparameters = nparameters;
     if (nparameters > 0) {
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
@@ -84,6 +87,8 @@ message_type *mt_new(const char *name, const char *args[])
         mtype->types = NULL;
     }
     if (args != NULL) {
+        int i;
+
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -122,6 +127,7 @@ message_type *mt_new_va(const char *name, ...)
             break;
     }
     va_end(marker);
+    args[i] = 0;
     return mt_new(name, args);
 }
 
@@ -143,13 +149,14 @@ static void free_arg(const arg_type * atype, variant data)
 message *msg_create(const struct message_type *mtype, variant args[])
 {
     int i;
-    message *msg = (message *)malloc(sizeof(message));
+    message *msg;
 
     assert(mtype != NULL);
     if (mtype == NULL) {
         log_error("Trying to create message with type=0x0\n");
         return NULL;
     }
+    msg = (message *)malloc(sizeof(message));
     msg->type = mtype;
     msg->parameters = (variant *)(mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL);
     msg->refcount = 1;
@@ -188,7 +195,7 @@ void mt_clear(void) {
 
 const message_type *mt_find(const char *name)
 {
-    unsigned int hash = hashstring(name) % MT_MAXHASH;
+    unsigned int hash = str_hash(name) % MT_MAXHASH;
     selist *ql = messagetypes[hash];
     int qi;
 
@@ -207,6 +214,7 @@ static unsigned int mt_id(const message_type * mtype)
     size_t i = strlen(mtype->name);
 
     while (i > 0) {
+        /* TODO: why not use str_hash? */
         key = (mtype->name[--i] + key * 37);
     }
     return key % 0x7FFFFFFF;
@@ -214,7 +222,7 @@ static unsigned int mt_id(const message_type * mtype)
 
 const message_type *mt_register(message_type * type)
 {
-    unsigned int hash = hashstring(type->name) % MT_MAXHASH;
+    unsigned int hash = str_hash(type->name) % MT_MAXHASH;
     selist **qlp = messagetypes + hash;
 
     if (selist_set_insert(qlp, type, NULL)) {
@@ -236,7 +244,7 @@ void msg_free(message * msg)
 
 void msg_release(struct message *msg)
 {
-    assert(msg->refcount > 0);
+    assert(msg && msg->refcount > 0);
     if (--msg->refcount > 0)
         return;
     msg_free(msg);
@@ -244,7 +252,7 @@ void msg_release(struct message *msg)
 
 struct message *msg_addref(struct message *msg)
 {
-    assert(msg->refcount > 0);
+    assert(msg && msg->refcount > 0);
     ++msg->refcount;
     return msg;
 }

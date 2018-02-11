@@ -47,7 +47,6 @@ extern "C" {
 #define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
-
     typedef struct bfaction {
         struct bfaction *next;
         struct side *sides;
@@ -172,17 +171,6 @@ extern "C" {
         int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
         struct person {
             int hp;                   /* Trefferpunkte der Personen */
-#ifdef LOMEM
-            int attack : 8;             /* (Magie) Attackenbonus der Personen */
-            int defence : 8;            /* (Magie) Paradenbonus der Personen */
-            int damage : 8;             /* (Magie) Schadensbonus der Personen im Nahkampf */
-            int damage_rear : 8;        /* (Magie) Schadensbonus der Personen im Fernkampf */
-            int flags : 8;              /* (Magie) Diverse Flags auf Kaempfern */
-            int speed : 8;              /* (Magie) Geschwindigkeitsmultiplkator. */
-            int reload : 4;             /* Anzahl Runden, die die Waffe x noch laden muss.
-                                       * dahinter steckt ein array[RL_MAX] wenn er min. eine hat. */
-            int last_action : 4;        /* In welcher Runde haben wir zuletzt etwas getan */
-#else
             int attack;
             int defence;
             int damage;
@@ -191,7 +179,6 @@ extern "C" {
             int speed;
             int reload;
             int last_action;
-#endif
             struct weapon *missile;   /* missile weapon */
             struct weapon *melee;     /* melee weapon */
         } *person;
@@ -278,6 +265,9 @@ extern "C" {
         const struct faction * stealthfaction);
     int skilldiff(troop at, troop dt, int dist);
     void force_leave(struct region *r, struct battle *b);
+    bool seematrix(const struct faction * f, const struct side * s);
+    const char *sidename(const struct side * s);
+    void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
 
 #ifdef __cplusplus
 }

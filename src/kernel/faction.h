@@ -84,9 +84,6 @@ extern "C" {
         score_t score;
         struct alliance *alliance;
         int alliance_joindate;      /* the turn on which the faction joined its current alliance (or left the last one) */
-#ifdef VICTORY_DELAY
-        unsigned char victory_delay;
-#endif
         struct unit *units;
         struct attrib *attribs;
         struct message_list *msgs;
@@ -102,7 +99,7 @@ extern "C" {
 
     extern struct faction *factions;
 
-#define want(option) (1<<option)
+#define WANT_OPTION(option) (1<<option)
 
     void fhash(struct faction *f);
     void funhash(struct faction *f);
@@ -171,7 +168,13 @@ extern "C" {
     int count_maxmigrants(const struct faction * f);
     int max_magicians(const struct faction * f);
 
+#define MONSTER_ID 666
     struct faction *getfaction(void);
+    struct faction *get_monsters(void);
+    struct faction *get_or_create_monsters(void);
+    void save_special_items(struct unit *u);
+
+#define is_monsters(f) (f->no==MONSTER_ID)
 
 #ifdef __cplusplus
 }

@@ -121,9 +121,11 @@ function test_fleeing_units_can_be_transported()
   u1.number = 100
   u1:add_order("ATTACKIEREN " .. itoa36(u2.id))
   u2.number = 100
+  u2.name = 'Passagier'
   u2:add_order("FAHREN " .. itoa36(u3.id))
   u2:add_order("KAEMPFE FLIEHE")
   u3.number = 100
+  u3.name = 'Transporter'
   u3:add_order("KAEMPFE FLIEHE")
   u3:add_order("TRANSPORT " .. itoa36(u2.id))
   u3:add_order("NACH O ")
@@ -131,8 +133,8 @@ function test_fleeing_units_can_be_transported()
   u3:add_item("horse", u2.number)
   u3:add_order("KAEMPFE FLIEHE")
   process_orders()
-  assert_equal(u3.region.id, r1.id, "transporter did not move")
-  assert_equal(u2.region.id, r1.id, "transported unit did not move")
+  assert_equal(u3.region, r1, "transporter did not move")
+  assert_equal(u2.region, r1, "transported unit did not move")
 end
 
 function test_plane()
@@ -807,7 +809,6 @@ end
 function test_swim_and_survive()
     local r = region.create(0, 0, "plain")
     local f = create_faction('human')
-    f.nam = "chaos"
     local u = unit.create(f, r, 1)
     process_orders()
     r.terrain = "ocean"
@@ -1110,4 +1111,68 @@ function test_build_castle()
     assert_not_nil(u.building)
     assert_equal(1, u.building.size)
     assert_equal(u.building.name, "Burg")
+end
+
+function test_route()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE O W P")
+    process_orders()
+    assert_equal("ROUTE West PAUSE Ost", u:get_order(0))
+    assert_equal(r2, u.region)
+end
+
+function test_route_horse()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE O P W P")
+    u:add_item('horse', 1)
+    u:set_skill('riding', 1)
+    process_orders()
+    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(0))
+    assert_equal(r2, u.region)
+end
+
+function test_route_pause()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "route@example.com")
+    local u = unit.create(f, r1, 1)
+    u:add_order("ROUTE P O W")
+    process_orders()
+    assert_equal("ROUTE P O W", u:get_order(0))
+    assert_equal(r1, u.region)
+end
+
+function test_bug_2393_cart()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "cart@example.com")
+    local u = unit.create(f, r1, 2)
+    u:add_order("NACH O")
+    u:add_item('stone', 2)
+    u:add_item('horse', 2)
+    u:add_item('cart', 1)
+    process_orders()
+    assert_equal(r1, u.region)
+end
+
+function test_immunity_stops_guard()
+    eressea.settings.set("NewbieImmunity", 2)
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:set_skill('polearm', 2)
+    u:add_item('lance', 1)
+    u:add_order('BEWACHE')
+    process_orders()
+    assert_equal(f.age, 1)
+    assert_true(not u.guard)
+    process_orders()
+    assert_equal(f.age, 2)
+    assert_true(u.guard)
 end

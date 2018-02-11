@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef TERRAIN_H
 #define TERRAIN_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,12 +69,13 @@ extern "C" {
         struct terrain_type *next;
     } terrain_type;
 
-    extern terrain_type *get_or_create_terrain(const char *name);
-    extern const terrain_type *terrains(void);
-    extern const terrain_type *get_terrain(const char *name);
-    extern const char *terrain_name(const struct region *r);
+    terrain_type *get_or_create_terrain(const char *name);
+    const terrain_type *terrains(void);
+    const terrain_type *get_terrain(const char *name);
+    const char *terrain_name(const struct region *r);
+    bool terrain_changed(int *cache);
 
-    extern void init_terrains(void);
+    void init_terrains(void);
     void free_terrains(void);
 
 #ifdef __cplusplus

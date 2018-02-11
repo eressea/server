@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "spy.h"
 #include "guard.h"
 #include "laws.h"
@@ -44,14 +46,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,12 +101,12 @@ void spy_message(int spy, const unit * u, const unit * target)
                     first = 0;
                 }
                 else {
-                    strlcat(buf, ", ", sizeof(buf));
+                    str_strlcat(buf, ", ", sizeof(buf));
                 }
-                strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
+                str_strlcat(buf, (const char *)skillname((skill_t)sv->id, u->faction->locale),
                     sizeof(buf));
-                strlcat(buf, " ", sizeof(buf));
-                strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
+                str_strlcat(buf, " ", sizeof(buf));
+                str_strlcat(buf, itoa10(eff_skill(target, sv, target->region)),
                     sizeof(buf));
             }
         }
@@ -126,7 +129,7 @@ int spy_cmd(unit * u, struct order *ord)
     double spychance, observechance;
     region *r = u->region;
 
-    init_order(ord);
+    init_order_depr(ord);
     getunit(r, u->faction, &target);
 
     if (!target) {
@@ -146,7 +149,7 @@ int spy_cmd(unit * u, struct order *ord)
      * Fuer jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
      * des Opfers uebersteigt, erhoeht sich dieses um 5%*/
     spy = effskill(u, SK_SPY, 0) - effskill(target, SK_STEALTH, r);
-    spychance = 0.1 + MAX(spy * 0.05, 0.0);
+    spychance = 0.1 + fmax(spy * 0.05, 0.0);
 
     if (chance(spychance)) {
         produceexp(u, SK_SPY, u->number);
@@ -162,7 +165,7 @@ int spy_cmd(unit * u, struct order *ord)
         - (effskill(u, SK_STEALTH, 0) + effskill(u, SK_SPY, 0) / 2);
 
     if (invisible(u, target) >= u->number) {
-        observe = MIN(observe, 0);
+        if (observe > 0) observe = 0;
     }
 
     /* Anschliessend wird - unabhaengig vom Erfolg - gewuerfelt, ob der
@@ -219,7 +222,7 @@ int setstealth_cmd(unit * u, struct order *ord)
     const char *s;
     int level;
 
-    init_order(ord);
+    init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
     /* Tarne ohne Parameter: Setzt maximale Tarnung */
@@ -344,7 +347,7 @@ static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
     for (u = r->units; u; u = u->next) {
         if (u->ship == sh && u->faction == f) {
             int s = effskill(u, sk, 0);
-            value = MAX(s, value);
+            if (value < s) value = s;
         }
     }
     return value;
@@ -425,9 +428,8 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         }
     }
     for (ui = &r->units; *ui;) {
-        unit *u = *ui;
-
         /* inform this faction about the sinking ship: */
+        u = *ui;
         if (!(u->faction->flags & FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
             if (sink_msg == NULL) {
@@ -494,10 +496,10 @@ int sabotage_cmd(unit * u, struct order *ord)
     assert(u);
     assert(ord);
 
-    init_order(ord);
+    init_order_depr(ord);
     s = getstrtoken();
-
     p = findparam(s, u->faction->locale);
+    init_order_depr(NULL);
 
     switch (p) {
     case P_SHIP:

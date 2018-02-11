@@ -22,11 +22,12 @@ static void test_register_ship(CuTest * tc)
 {
     ship_type *stype;
 
-    test_cleanup();
+    test_setup();
 
     stype = st_get_or_create("herp");
     CuAssertPtrNotNull(tc, stype);
     CuAssertPtrEquals(tc, stype, (void *)st_find("herp"));
+    test_teardown();
 }
 
 static void test_ship_set_owner(CuTest * tc)
@@ -38,7 +39,7 @@ static void test_ship_set_owner(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -56,6 +57,7 @@ static void test_ship_set_owner(CuTest * tc)
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
     ship_set_owner(u2);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_next_when_empty(CuTest * tc)
@@ -67,7 +69,7 @@ static void test_shipowner_goes_to_next_when_empty(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -90,6 +92,7 @@ static void test_shipowner_goes_to_next_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     u->number = 0;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
@@ -101,7 +104,7 @@ static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -124,6 +127,7 @@ static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     u->number = 0;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_same_faction_when_empty(CuTest * tc)
@@ -135,7 +139,7 @@ static void test_shipowner_goes_to_same_faction_when_empty(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -163,6 +167,7 @@ static void test_shipowner_goes_to_same_faction_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, u3, ship_owner(sh));
     u3->number = 0;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_next_after_leave(CuTest * tc)
@@ -174,7 +179,7 @@ static void test_shipowner_goes_to_next_after_leave(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -197,6 +202,7 @@ static void test_shipowner_goes_to_next_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     leave_ship(u);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
@@ -208,7 +214,7 @@ static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -231,6 +237,7 @@ static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     leave_ship(u);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
@@ -242,7 +249,7 @@ static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -272,6 +279,7 @@ static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     leave_ship(u2);
     CuAssertPtrEquals(tc, 0, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_shipowner_resets_when_empty(CuTest * tc)
@@ -283,7 +291,7 @@ static void test_shipowner_resets_when_empty(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -306,6 +314,7 @@ static void test_shipowner_resets_when_empty(CuTest * tc)
     CuAssertPtrEquals(tc, 0, ship_owner(sh));
     u->number = 1;
     CuAssertPtrEquals(tc, u, ship_owner(sh));
+    test_teardown();
 }
 
 void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
@@ -317,7 +326,7 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     const struct ship_type *stype;
     const struct race *human;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
 
     human = rc_find("human");
@@ -347,11 +356,12 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     CuAssertPtrEquals(tc, 0, ship_owner(sh));
     u2->number = 1;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
+    test_teardown();
 }
 
 static void test_stype_defaults(CuTest *tc) {
     ship_type *stype;
-    test_cleanup();
+    test_setup();
     stype = st_get_or_create("hodor");
     CuAssertPtrNotNull(tc, stype);
     CuAssertStrEquals(tc, "hodor", stype->_name);
@@ -371,7 +381,7 @@ static void test_stype_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, stype->at_bonus);
     CuAssertIntEquals(tc, 0, stype->df_bonus);
     CuAssertIntEquals(tc, 0, stype->flags);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_crew_skill(CuTest *tc) {
@@ -380,10 +390,10 @@ static void test_crew_skill(CuTest *tc) {
     struct faction *f;
     int i;
 
-    test_cleanup();
+    test_setup();
     test_create_world();
-    r = findregion(0, 0);
-    f = test_create_faction(0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction(NULL);
     assert(r && f);
     sh = test_create_ship(r, st_find("boat"));
     for (i = 0; i != 4; ++i) {
@@ -392,7 +402,7 @@ static void test_crew_skill(CuTest *tc) {
         u->ship = sh;
     }
     CuAssertIntEquals(tc, 20, crew_skill(sh));
-    test_cleanup();
+    test_teardown();
 }
 
 static ship *setup_ship(void) {
@@ -400,7 +410,7 @@ static ship *setup_ship(void) {
     ship_type *stype;
 
     config_set("movement.shipspeed.skillbonus", "0");
-    r = test_create_region(0, 0, test_create_terrain("ocean", 0));
+    r = test_create_ocean(0, 0);
     stype = test_create_shiptype("longboat");
     stype->cptskill = 1;
     stype->sumskill = 10;
@@ -411,7 +421,7 @@ static ship *setup_ship(void) {
 }
 
 static void setup_crew(ship *sh, struct faction *f, unit **cap, unit **crew) {
-    if (!f) f = test_create_faction(0);
+    if (!f) f = test_create_faction(NULL);
     assert(cap);
     assert(crew);
     *cap = test_create_unit(f, sh->region);
@@ -422,11 +432,43 @@ static void setup_crew(ship *sh, struct faction *f, unit **cap, unit **crew) {
     set_level(*crew, SK_SAILING, sh->type->sumskill - sh->type->cptskill);
 }
 
+static void test_shipspeed_speedy(CuTest *tc) {
+    ship_type *stype;
+    ship *sh;
+    unit *cap, *crw;
+    test_setup();
+    stype = test_create_shiptype("dragonship");
+    stype->range = 5;
+    stype->range_max = -1;
+    stype->flags |= SFL_SPEEDY;
+    cap = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    crw = test_create_unit(cap->faction, cap->region);
+    sh = test_create_ship(cap->region, stype);
+    cap->ship = sh;
+    crw->ship = sh;
+    set_level(cap, SK_SAILING, stype->cptskill);
+    set_level(crw, SK_SAILING, stype->sumskill - stype->cptskill);
+    CuAssertPtrEquals(tc, cap, ship_owner(sh));
+    CuAssertIntEquals(tc, 5, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill * 3 - 1);
+    CuAssertIntEquals(tc, 5, shipspeed(sh, cap));
+    set_level(cap, SK_SAILING, stype->cptskill * 3);
+    CuAssertIntEquals(tc, 6, shipspeed(sh, cap));
+
+    set_level(cap, SK_SAILING, stype->cptskill * 3 * 3 - 1);
+    CuAssertIntEquals(tc, 6, shipspeed(sh, cap));
+    set_level(cap, SK_SAILING, stype->cptskill * 3 * 3);
+    CuAssertIntEquals(tc, 7, shipspeed(sh, cap));
+
+    test_teardown();
+}
+
 static void test_shipspeed_stormwind(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     register_shipcurse();
@@ -437,14 +479,14 @@ static void test_shipspeed_stormwind(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, shipspeed(sh, cap));
     a_age(&sh->attribs, sh);
     CuAssertPtrEquals(tc, NULL, sh->attribs);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed_nodrift(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     register_shipcurse();
@@ -452,14 +494,14 @@ static void test_shipspeed_nodrift(CuTest *tc) {
 
     create_curse(0, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
     CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed_shipspeedup(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     register_shipcurse();
@@ -467,7 +509,7 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
 
     create_curse(0, &sh->attribs, &ct_shipspeedup, 1, 1, 3, 0);
     CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed_at_speedup(CuTest *tc) {
@@ -475,7 +517,7 @@ static void test_shipspeed_at_speedup(CuTest *tc) {
     unit *cap, *crew;
     attrib *a;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     assert(sh && cap && crew);
@@ -484,7 +526,7 @@ static void test_shipspeed_at_speedup(CuTest *tc) {
     a->data.i = 3;
     a_add(&sh->attribs, a);
     CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed_race_bonus(CuTest *tc) {
@@ -492,7 +534,7 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
     unit *cap, *crew;
     race *rc;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     assert(sh && cap && crew);
@@ -500,14 +542,14 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
     rc = rc_get_or_create(cap->_race->_name);
     rc->flags |= RCF_SHIPSPEED;
     CuAssertIntEquals_Msg(tc, "captain with RCF_SHIPSPEED adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed_damage(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     assert(sh && cap && crew);
@@ -518,7 +560,7 @@ static void test_shipspeed_damage(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "damaged ships lose range", 1, shipspeed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE;
     CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_shipspeed(CuTest *tc) {
@@ -526,7 +568,7 @@ static void test_shipspeed(CuTest *tc) {
     const ship_type *stype;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     stype = sh->type;
 
@@ -549,6 +591,7 @@ static void test_shipspeed(CuTest *tc) {
     set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 11);
     set_level(cap, SK_SAILING, stype->cptskill + 10);
     CuAssertIntEquals_Msg(tc, "regular skills should not exceed sh.range", 2, shipspeed(sh, cap));
+    test_teardown();
 }
 
 static void test_shipspeed_max_range(CuTest *tc) {
@@ -558,12 +601,12 @@ static void test_shipspeed_max_range(CuTest *tc) {
     struct faction *f;
     unit *cap, *crew;
 
-    test_cleanup();
+    test_setup();
     sh = setup_ship();
     setup_crew(sh, 0, &cap, &crew);
     config_set("movement.shipspeed.skillbonus", "5");
     r = sh->region;
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     assert(r && f);
     stype = st_get_or_create(sh->type->_name);
 
@@ -576,9 +619,10 @@ static void test_shipspeed_max_range(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "skill bonus from movement.shipspeed.skillbonus", 3, shipspeed(sh, cap));
 
     set_level(cap, SK_SAILING, stype->cptskill + 15);
-    set_level(crew, SK_SAILING, (stype->sumskill - stype->cptskill) * 15);
+    scale_number(crew, 15);
+    set_level(crew, SK_SAILING, stype->sumskill - stype->cptskill);
     CuAssertIntEquals_Msg(tc, "skill-bonus cannot exceed max_range", 4, shipspeed(sh, cap));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_ship_suite(void)
@@ -597,6 +641,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_crew_skill);
     SUITE_ADD_TEST(suite, test_shipspeed);
+    SUITE_ADD_TEST(suite, test_shipspeed_speedy);
     SUITE_ADD_TEST(suite, test_shipspeed_stormwind);
     SUITE_ADD_TEST(suite, test_shipspeed_nodrift);
     SUITE_ADD_TEST(suite, test_shipspeed_shipspeedup);

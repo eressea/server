@@ -17,7 +17,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "move.h"
 #include "guard.h"
@@ -75,9 +77,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <storage.h>
 
@@ -261,6 +265,7 @@ static int ridingcapacity(const unit * u)
 {
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
+    int horses;
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
@@ -268,19 +273,22 @@ static int ridingcapacity(const unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    animals = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 2);
+    horses = effskill(u, SK_RIDING, 0) * u->number * 2;
+    if (animals > horses) animals = horses;
+
     if (fval(u_race(u), RCF_HORSE))
         animals += u->number;
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    vehicles = MIN(animals / HORSESNEEDED, vehicles);
+    horses = animals / HORSES_PER_CART;
+    if (horses < vehicles) vehicles = horses;
 
     return vehicles * vcap + animals * acap;
 }
 
 int walkingcapacity(const struct unit *u)
 {
-    int n, people, pferde_fuer_wagen;
+    int n, people, pferde_fuer_wagen, horses;
     int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
@@ -292,7 +300,8 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    pferde_fuer_wagen = MIN(animals, effskill(u, SK_RIDING, 0) * u->number * 4);
+    horses = effskill(u, SK_RIDING, 0) * u->number * 4;
+    pferde_fuer_wagen = (animals < horses) ? animals : horses;
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -302,7 +311,8 @@ int walkingcapacity(const struct unit *u)
     }
 
     /* maximal diese Pferde können zum Ziehen benutzt werden */
-    wagen_mit_pferden = MIN(vehicles, pferde_fuer_wagen / HORSESNEEDED);
+    horses = pferde_fuer_wagen / HORSES_PER_CART;
+    wagen_mit_pferden = (vehicles < horses) ? vehicles : horses;
 
     n = wagen_mit_pferden * vcap;
 
@@ -312,7 +322,8 @@ int walkingcapacity(const struct unit *u)
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
-        wagen_mit_trollen = MIN(u->number / 4, wagen_ohne_pferde);
+        wagen_mit_trollen = u->number / 4;
+        if (wagen_mit_trollen > wagen_ohne_pferde) wagen_mit_trollen = wagen_ohne_pferde;
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
@@ -336,7 +347,8 @@ int walkingcapacity(const struct unit *u)
         int belts = i_get(u->items, rbelt->itype);
         if (belts) {
             int multi = config_get_int("rules.trollbelt.multiplier", STRENGTHMULTIPLIER);
-            n += MIN(people, belts) * (multi - 1) * u_race(u)->capacity;
+            if (belts > people) belts = people;
+            n += belts * (multi - 1) * u_race(u)->capacity;
         }
     }
 
@@ -367,7 +379,8 @@ static int canwalk(unit * u)
     effsk = effskill(u, SK_RIDING, 0);
     maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
-        maxwagen = MAX(maxwagen, u->number / 4);
+        int trolls = u->number / 4;
+        if (maxwagen > trolls) maxwagen = trolls;
     }
     maxpferde = effsk * u->number * 4 + u->number;
 
@@ -509,8 +522,9 @@ static double overload(const region * r, ship * sh)
 
         getshipweight(sh, &n, &p);
         ovl = n / (double)sh->type->cargo;
-        if (mcabins)
-            ovl = MAX(ovl, p / (double)mcabins);
+        if (mcabins) {
+            ovl = fmax(ovl, p / (double)mcabins);
+        }
         return ovl;
     }
 }
@@ -678,16 +692,10 @@ int check_ship_allowed(struct ship *sh, const region * r)
 
     if (sh->region && r_insectstalled(r)) {
         /* insekten dürfen nicht hier rein. haben wir welche? */
-        unit *u;
+        unit *u = ship_owner(sh);
 
-        for (u = sh->region->units; u != NULL; u = u->next) {
-            if (u->ship != sh) {
-                continue;
-            }
-
-            if (is_freezing(u)) {
-                return SA_NO_INSECT;
-            }
+        if (u && is_freezing(u)) {
+            return SA_NO_INSECT;
         }
     }
 
@@ -757,7 +765,7 @@ double damage_overload(double overload)
     badness = overload - overload_worse();
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
-        damage += MIN(badness, overload_worst() - overload_worse()) *
+        damage += fmin(badness, overload_worst() - overload_worse()) *
             (overload_max_damage() - damage) /
             (overload_worst() - overload_worse());
     }
@@ -787,29 +795,34 @@ static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *
     msg_release(msg);
 }
 
-region * drift_target(ship *sh) {
-    int d, d_offset = rng_int() % MAXDIRECTIONS;
-    region *rnext = NULL;
+direction_t drift_target(ship *sh) {
+    direction_t d, dir = rng_int() % MAXDIRECTIONS;
+    direction_t result = NODIRECTION;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
         region *rn;
-        direction_t dir = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-        rn = rconnect(sh->region, dir);
+        direction_t dn = (direction_t)((d + dir) % MAXDIRECTIONS);
+        rn = rconnect(sh->region, dn);
         if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
-            rnext = rn;
-            if (!fval(rnext->terrain, SEA_REGION)) {
+            result = dn;
+            if (!fval(rn->terrain, SEA_REGION)) {
                 /* prefer drifting towards non-ocean regions */
                 break;
             }
         }
     }
-    return rnext;
+    return result;
 }
 
 static void drifting_ships(region * r)
 {
-    bool drift = config_get_int("rules.ship.drifting", 1) != 0;
-    double damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    static int config;
+    static bool drift;
+    static double damage_drift;
 
+    if (config_changed(&config)) {
+        drift = config_get_int("rules.ship.drifting", 1) != 0;
+        damage_drift = config_get_flt("rules.ship.damage_drift", 0.02);
+    }
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
         while (*shp) {
@@ -817,7 +830,7 @@ static void drifting_ships(region * r)
             region *rnext = NULL;
             region_list *route = NULL;
             unit *firstu = r->units, *lastu = NULL, *captain;
-            direction_t dir = 0;
+            direction_t dir = NODIRECTION;
             double ovl;
 
             if (sh->type->fishing > 0) {
@@ -846,13 +859,13 @@ static void drifting_ships(region * r)
             }
 
             ovl = overload(r, sh);
-            if (ovl >= overload_start()) {
-                rnext = NULL;
-            }
-            else {
+            if (ovl < overload_start()) {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
                  * zufällig. Falls unmögliches Resultat: vergiß es. */
-                rnext = drift_target(sh);
+                dir = drift_target(sh);
+                if (dir != NODIRECTION) {
+                    rnext = rconnect(sh->region, dir);
+                }
             }
 
             if (rnext != NULL) {
@@ -877,8 +890,9 @@ static void drifting_ships(region * r)
                     damage_ship(sh, damage_overload(ovl));
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
                 }
-                else
+                else {
                     damage_ship(sh, damage_drift);
+                }
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                     remove_ship(&sh->region->ships, sh);
@@ -951,7 +965,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
                 double prob_u = (sk - stealth) * skill_prob;
                 guard_count += u->number;
                 /* amulet counts at most once */
-                prob_u += MIN(1, MIN(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
+                prob_u += fmin(1, fmin(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
                 if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
                     prob_u += castle_prob*buildingeffsize(u->building, 0);
                 if (prob_u >= prob) {
@@ -1042,15 +1056,6 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
 }
 
-static const char *shortdirections[MAXDIRECTIONS] = {
-    "dir_nw",
-    "dir_ne",
-    "dir_east",
-    "dir_se",
-    "dir_sw",
-    "dir_west"
-};
-
 static void cycle_route(order * ord, unit * u, int gereist)
 {
     int cm = 0;
@@ -1063,13 +1068,11 @@ static void cycle_route(order * ord, unit * u, int gereist)
     order *norder;
     size_t size = sizeof(tail) - 1;
 
-    if (getkeyword(ord) != K_ROUTE)
-        return;
+    assert(getkeyword(ord) == K_ROUTE);
     tail[0] = '\0';
+    neworder[0] = '\0';
+    init_order(ord, u->faction->locale);
 
-    init_order(ord);
-
-    neworder[0] = 0;
     for (cm = 0;; ++cm) {
         const char *s;
         const struct locale *lang = u->faction->locale;
@@ -1092,6 +1095,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
             assert(!pause);
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
+                assert(loc);
                 if (bufp != tail) {
                     bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
                 }
@@ -1111,15 +1115,15 @@ static void cycle_route(order * ord, unit * u, int gereist)
              * hier keine normale direction), muss jede PAUSE einzeln
              * herausgefiltert und explizit gesetzt werden */
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
         }
         else {
             if (neworder != obuf) {
-                obuf += strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
             }
-            obuf += strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
+            obuf += str_strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
         }
     }
 
@@ -1144,7 +1148,7 @@ static bool transport(unit * ut, unit * u)
     for (ord = ut->orders; ord; ord = ord->next) {
         if (getkeyword(ord) == K_TRANSPORT) {
             unit *u2;
-            init_order(ord);
+            init_order_depr(ord);
             getunit(ut->region, ut->faction, &u2);
             if (u2 == u) {
                 return true;
@@ -1178,7 +1182,7 @@ static void init_transportation(void)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
                 unit *ut = 0;
 
-                init_order(u->thisorder);
+                init_order_depr(u->thisorder);
                 if (getunit(r, u->faction, &ut) != GET_UNIT) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", ""));
@@ -1207,7 +1211,7 @@ static void init_transportation(void)
 
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_TRANSPORT) {
-                        init_order(ord);
+                        init_order_depr(ord);
                         for (;;) {
                             unit *ut = 0;
 
@@ -1218,7 +1222,7 @@ static void init_transportation(void)
                                 can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
                                 !LongHunger(ut)) {
                                 unit *u2;
-                                init_order(ut->thisorder);
+                                init_order_depr(ut->thisorder);
                                 getunit(r, ut->faction, &u2);
                                 if (u2 == u) {
                                     w += weight(ut);
@@ -1371,7 +1375,7 @@ static void make_route(unit * u, order * ord, region_list ** routep)
         current = next;
         s = gettoken(token, sizeof(token));
         error = movewhere(u, s, current, &next);
-        if (error) {
+        if (error != E_MOVE_OK) {
             message *msg = movement_error(u, s, ord, error);
             if (msg != NULL) {
                 add_message(&u->faction->msgs, msg);
@@ -1397,47 +1401,45 @@ int movement_speed(const unit * u)
     const race *rc = u_race(u);
     double dk = rc->speed;
     assert(u->number);
+
     /* dragons have a fixed speed, and no other effects work on them: */
-    if (fval(rc, RCF_DRAGON)) {
-        return BP_DRAGON;
-    }
-    switch (old_race(u_race(u))) {
-    case RC_BIRTHDAYDRAGON: /* FIXME: catdragon has RCF_DRAGON, so this cannot happen */
-    case RC_SONGDRAGON:
+    if (u_race(u) == get_race(RC_SONGDRAGON)) {
         mp = BP_DRAGON;
-        break;
-    default:
-        mp = walk_mode(u);
-        if (mp>=BP_RIDING) {
-            dk = 1.0;
+    }
+    else {
+        if (fval(rc, RCF_DRAGON)) {
+            mp = BP_DRAGON;
         }
-        break;
-    }
+        else {
+            mp = walk_mode(u);
+            if (mp >= BP_RIDING) {
+                dk = 1.0;
+            }
+            if (u->attribs) {
+                curse *c = get_curse(u->attribs, &ct_speed);
+                if (c != NULL) {
+                    int men = get_cursedmen(u, c);
+                    dk *= 1.0 + (double)men / (double)u->number;
+                }
+            }
 
-    if (u->attribs) {
-        curse *c = get_curse(u->attribs, &ct_speed);
-        if (c != NULL) {
-            int men = get_cursedmen(u, c);
-            dk *= 1.0 + (double)men / (double)u->number;
-        }
-    }
-
-    /* unicorn in inventory */
-    if (u->number <= i_get(u->items, it_find("fairyboot"))) {
-        mp *= 2;
-    }
-
-    /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
-        * Nicht kumulativ mit anderen Beschleunigungen! */
-    if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
-        sc_mage *mage = get_mage(u);
-        if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
-            if (has_skill(u, SK_MAGIC)) {
+            /* unicorn in inventory */
+            if (u->number <= i_get(u->items, it_find("fairyboot"))) {
                 mp *= 2;
+            }
+
+            /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
+                * Nicht kumulativ mit anderen Beschleunigungen! */
+            if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
+                sc_mage *mage = get_mage(u);
+                if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
+                    if (has_skill(u, SK_MAGIC)) {
+                        mp *= 2;
+                    }
+                }
             }
         }
     }
-
     return (int)(dk * mp);
 }
 
@@ -1606,7 +1608,9 @@ static const region_list *travel_route(unit * u,
         int walkmode;
 
         setguard(u, false);
-        cycle_route(ord, u, steps);
+        if (getkeyword(ord) == K_ROUTE) {
+            cycle_route(ord, u, steps);
+        }
 
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
@@ -1764,9 +1768,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         }
 
         if (!flying_ship(sh)) {
-            int stormchance = 0;
             int reason;
             if (storms_enabled) {
+                int stormchance = 0;
                 int stormyness;
                 gamedate date;
                 get_gamedate(turn, &date);
@@ -1936,7 +1940,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         unit *harbourmaster;
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
-        cycle_route(ord, u, step);
+        if (getkeyword(ord) == K_ROUTE) {
+            cycle_route(ord, u, step);
+        }
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
 
@@ -1974,8 +1980,8 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
                                 int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
-                                st = MIN(itm->number, st);
 
+                                if (st > itm->number) st = itm->number;
                                 if (st > 0) {
                                     i_change(&u2->items, itm->type, -st);
                                     i_change(&harbourmaster->items, itm->type, st);
@@ -2026,7 +2032,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
     region *r = u->region;
     int mp;
     if (u->building && !can_leave(u)) {
-        cmistake(u, u->thisorder, 150, MSG_MOVE);
+        cmistake(u, ord, 150, MSG_MOVE);
         return route_begin;
     }
     switch (canwalk(u)) {
@@ -2062,7 +2068,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
 
-        init_order(ord);
+        init_order_depr(ord);
         if (getunit(r, u->faction, &ut) == GET_UNIT) {
             if (getkeyword(ut->thisorder) == K_DRIVE) {
                 if (ut->building && !can_leave(ut)) {
@@ -2077,7 +2083,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
                     if (!fval(ut, UFL_NOTMOVING) && !LongHunger(ut)) {
                         unit *u2;
-                        init_order(ut->thisorder);
+                        init_order_depr(ut->thisorder);
                         getunit(u->region, ut->faction, &u2);
                         if (u2 == u) {
                             const region_list *route_to =
@@ -2115,7 +2121,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 /** traveling without ships
  * walking, flying or riding units use this function
  */
-static void travel(unit * u, region_list ** routep)
+static void travel(unit * u, order *ord, region_list ** routep)
 {
     region *r = u->region;
     region_list *route_begin;
@@ -2129,7 +2135,7 @@ static void travel(unit * u, region_list ** routep)
         ship *sh = u->ship;
 
         if (!can_leave(u)) {
-            cmistake(u, u->thisorder, 150, MSG_MOVE);
+            cmistake(u, ord, 150, MSG_MOVE);
             return;
         }
 
@@ -2142,28 +2148,28 @@ static void travel(unit * u, region_list ** routep)
         if (sh) {
             unit *guard = is_guarded(r, u);
             if (guard) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                     "region_guarded", "guard", guard));
                 return;
             }
         }
         if (u->ship && u_race(u)->flags & RCF_SWIM) {
-            cmistake(u, u->thisorder, 143, MSG_MOVE);
+            cmistake(u, ord, 143, MSG_MOVE);
             return;
         }
     }
     else if (u->ship && fval(u->ship, SF_MOVED)) {
         /* die Einheit ist auf einem Schiff, das sich bereits bewegt hat */
-        cmistake(u, u->thisorder, 13, MSG_MOVE);
+        cmistake(u, ord, 13, MSG_MOVE);
         return;
     }
 
-    make_route(u, u->thisorder, routep);
+    make_route(u, ord, routep);
     route_begin = *routep;
 
     if (route_begin) {
         /* und ab die post: */
-        travel_i(u, route_begin, NULL, u->thisorder, TRAVEL_NORMAL, &followers);
+        travel_i(u, route_begin, NULL, ord, TRAVEL_NORMAL, &followers);
 
         /* followers */
         while (followers != NULL) {
@@ -2204,7 +2210,7 @@ void move_cmd(unit * u, order * ord)
         sail(u, ord, &route, drifting);
     }
     else {
-        travel(u, &route);
+        travel(u, ord, &route);
     }
 
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
@@ -2295,7 +2301,7 @@ int follow_ship(unit * u, order * ord)
 
     moves = 1;
 
-    speed = (int)getuint();
+    speed = getuint();
     if (speed == 0) {
         speed = shipspeed(u->ship, u);
     }
@@ -2323,22 +2329,6 @@ int follow_ship(unit * u, order * ord)
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
-void destroy_damaged_ships(void)
-{
-    region *r;
-    ship *sh, *shn;
-
-    for (r = regions; r; r = r->next) {
-        for (sh = r->ships; sh;) {
-            shn = sh->next;
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                remove_ship(&sh->region->ships, sh);
-            }
-            sh = shn;
-        }
-    }
-}
-
 /* Bewegung, Verfolgung, Piraterie */
 
 /** ships that folow other ships
@@ -2363,7 +2353,7 @@ static void move_hunters(void)
                     if (getkeyword(ord) == K_FOLLOW) {
                         param_t p;
 
-                        init_order(ord);
+                        init_order_depr(ord);
                         p = getparam(u->faction->locale);
                         if (p != P_SHIP) {
                             if (p != P_UNIT) {
@@ -2485,13 +2475,13 @@ void movement(void)
                     else {
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
-                                init_order(u->thisorder);
+                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
-                                init_order(u->thisorder);
+                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
@@ -2548,7 +2538,7 @@ void follow_unit(unit * u)
         if (getkeyword(ord) == K_FOLLOW) {
             int id;
             param_t p;
-            init_order(ord);
+            init_order_depr(ord);
             p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);

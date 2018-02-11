@@ -16,8 +16,11 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
+
+#include "config.h"
 
 /* kernel includes */
 #include "alliance.h"
@@ -48,23 +51,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "types.h"
 #include "unit.h"
 
-
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/crmessage.h>
 #include <util/event.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
+#include <util/macros.h>
 #include <util/parser.h>
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
 #include <util/xml.h>
@@ -73,11 +74,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "guard.h"
 #include "prefix.h"
 
-#ifdef USE_LIBXML2
 /* libxml includes */
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-#endif
 
 /* external libraries */
 #include <iniparser.h>
@@ -91,11 +90,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <time.h>
 #include <errno.h>
-#include <sys/stat.h>
 
+#ifdef WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
 struct settings global;
 
-bool lomem = false;
 int turn = 0;
 
 const char *parameters[MAXPARAMS] = {
@@ -261,15 +263,6 @@ param_t getparam(const struct locale * lang)
     return s ? findparam(s, lang) : NOPARAM;
 }
 
-unit *getnewunit(const region * r, const faction * f)
-{
-    int n;
-    n = getid();
-
-    return findnewunit(r, f, n);
-}
-
-
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
@@ -393,7 +386,7 @@ static void init_magic(struct locale *lang)
             str = "gwyrrd illaun draig cerddor tybied";
         }
 
-        sstr = strdup(str);
+        sstr = str_strdup(str);
         tok = strtok(sstr, " ");
         while (tok) {
             variant var;
@@ -500,7 +493,7 @@ int check_param(const struct param *p, const char *key, const char *searchvalue)
     if (!value) {
         return 0;
     }
-    p_value = strdup(value);
+    p_value = str_strdup(value);
     v = strtok(p_value, " ,;");
 
     while (v != NULL) {
@@ -527,34 +520,16 @@ void set_basepath(const char *path)
     g_basedir = path;
 }
 
-#ifdef WIN32
-#define PATH_DELIM '\\'
-#else
-#define PATH_DELIM '/'
-#endif
-
 char * join_path(const char *p1, const char *p2, char *dst, size_t len) {
-    size_t sz;
-    assert(p1 && p2);
-    assert(p2 != dst);
-    if (dst == p1) {
-        sz = strlen(p1);
-    }
-    else {
-        sz = strlcpy(dst, p1, len);
-    }
-    assert(sz < len);
-    dst[sz++] = PATH_DELIM;
-    strlcpy(dst + sz, p2, len - sz);
-    return dst;
+    return path_join(p1, p2, dst, len);
 }
 
 static const char * relpath(char *buf, size_t sz, const char *path) {
     if (g_basedir) {
-        join_path(g_basedir, path, buf, sz);
+        path_join(g_basedir, path, buf, sz);
     }
     else {
-        strlcpy(buf, path, sz);
+        str_strlcpy(buf, path, sz);
     }
     return buf;
 }
@@ -587,14 +562,23 @@ void set_reportpath(const char *path)
     g_reportdir = path;
 }
 
+static int sys_mkdir(const char *path, int mode) {
+#ifdef WIN32
+    UNUSED_ARG(mode);
+    return _mkdir(path);
+#else
+    return mkdir(path, mode);
+#endif
+}
+
 int create_directories(void) {
     int err;
-    err = mkdir(datapath(), 0777);
+    err = sys_mkdir(datapath(), 0777);
     if (err) {
         if (errno == EEXIST) errno = 0;
         else return err;
     }
-    err = mkdir(reportpath(), 0777);
+    err = sys_mkdir(reportpath(), 0777);
     if (err && errno == EEXIST) {
         errno = 0;
     }
@@ -612,9 +596,7 @@ void kernel_done(void)
     /* calling this function releases memory assigned to static variables, etc.
      * calling it is optional, e.g. a release server will most likely not do it.
      */
-#ifdef USE_LIBXML2
     xml_done();
-#endif
     attrib_done();
     item_done();
     message_done();

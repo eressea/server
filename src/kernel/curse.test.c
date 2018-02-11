@@ -31,6 +31,8 @@ static void test_curse(CuTest * tc)
     int cid;
 
     curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
+
+    test_setup();
     c = create_curse(NULL, &attrs, &ct_dummy, 1.0, 1, 1, 1);
     cid = c->no;
     result = findcurse(cid);
@@ -38,7 +40,7 @@ static void test_curse(CuTest * tc)
     a_remove(&attrs, attrs);
     result = findcurse(cid);
     CuAssertPtrEquals(tc, NULL, result);
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct {
@@ -48,14 +50,15 @@ typedef struct {
 } curse_fixture;
 
 static void setup_curse(curse_fixture *fix, const char *name) {
-    test_cleanup();
+    test_setup();
+    test_inject_messagetypes();
     fix->r = test_create_region(0, 0, NULL);
     fix->u = test_create_unit(test_create_faction(NULL), fix->r);
     fix->c = create_curse(fix->u, &fix->r->attribs, ct_find(name), 1.0, 1, 1.0, 0);
 }
 
-static void cleanup_curse(curse_fixture *fix) {
-    test_cleanup();
+static void teardown_curse(curse_fixture *fix) {
+    test_teardown();
 }
 
 static void test_magicstreet(CuTest *tc) {
@@ -66,7 +69,7 @@ static void test_magicstreet(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreet", test_get_messagetype(msg));
     msg_release(msg);
-    cleanup_curse(&fix);
+    teardown_curse(&fix);
 }
 
 static void test_magicstreet_warning(CuTest *tc) {
@@ -77,7 +80,7 @@ static void test_magicstreet_warning(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::magicstreetwarn", test_get_messagetype(msg));
     msg_release(msg);
-    cleanup_curse(&fix);
+    teardown_curse(&fix);
 }
 
 static void test_good_dreams(CuTest *tc) {
@@ -88,7 +91,7 @@ static void test_good_dreams(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::gooddream", test_get_messagetype(msg));
     msg_release(msg);
-    cleanup_curse(&fix);
+    teardown_curse(&fix);
 }
 
 static void test_bad_dreams(CuTest *tc) {
@@ -99,7 +102,7 @@ static void test_bad_dreams(CuTest *tc) {
     msg = fix.c->type->curseinfo(fix.r, TYP_REGION, fix.c, 0);
     CuAssertStrEquals(tc, "curseinfo::baddream", test_get_messagetype(msg));
     msg_release(msg);
-    cleanup_curse(&fix);
+    teardown_curse(&fix);
 }
 
 static void test_memstream(CuTest *tc) {
@@ -156,7 +159,7 @@ static void test_write_flag(CuTest *tc) {
 
     mstream_done(&data.strm);
     gamedata_done(&data);
-    cleanup_curse(&fix);
+    teardown_curse(&fix);
 }
 
 static void test_curse_ids(CuTest *tc) {
@@ -172,7 +175,7 @@ static void test_curse_ids(CuTest *tc) {
     CuAssertTrue(tc, c1->no != c2->no);
     a_remove(&a1, a1);
     a_remove(&a2, a2);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_curse_flags(CuTest *tc) {
@@ -181,7 +184,7 @@ static void test_curse_flags(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     c1 = create_curse(u, &u->attribs, &ct_dummy, 1, 1, 1, 0);
     CuAssertPtrEquals(tc, u, c1->magician);
     CuAssertIntEquals(tc, 1, (int)c1->effect);
@@ -193,7 +196,7 @@ static void test_curse_flags(CuTest *tc) {
     CuAssertIntEquals(tc, 2, (int)c1->effect);
     CuAssertIntEquals(tc, 1, (int)c1->vigour);
     CuAssertIntEquals(tc, 1, c1->duration);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_curse_suite(void)

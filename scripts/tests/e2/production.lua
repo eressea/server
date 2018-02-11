@@ -76,3 +76,29 @@ function test_dwarf_mining_bonus()
     assert_equal(20, u:get_item('iron'))
     assert_equal(84, r:get_resource('iron'))
 end
+
+function test_build_boat_low_skill()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "build@example.com")
+    local u = unit.create(f, r, 1)
+    u:set_skill("shipcraft", 3) -- humans get +1
+    u:add_item("log", 10)
+    u:add_order("MACHE BOOT")
+    process_orders()
+    assert_not_equal(nil, u.ship)
+    assert_equal(4, u.ship.size)
+    assert_equal(6, u:get_item('log'))
+end
+
+function test_build_boat_high_skill()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human", "build@example.com")
+    local u = unit.create(f, r, 1)
+    u:set_skill("shipcraft", 5) -- humans get +1
+    u:add_item("log", 10)
+    u:add_order("MACHE BOOT")
+    process_orders()
+    assert_not_equal(nil, u.ship)
+    assert_equal(5, u.ship.size)
+    assert_equal(5, u:get_item('log'))
+end

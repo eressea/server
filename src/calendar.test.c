@@ -16,7 +16,7 @@ static void test_calendar_config(CuTest * tc)
     CuAssertIntEquals(tc, 0, first_turn());
     config_set_int("game.start", 42);
     CuAssertIntEquals(tc, 42, first_turn());
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_calendar(CuTest * tc)
@@ -62,7 +62,7 @@ static void test_calendar(CuTest * tc)
     CuAssertIntEquals(tc, 2, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_calendar_season(CuTest * tc)
@@ -85,7 +85,7 @@ static void test_calendar_season(CuTest * tc)
     CuAssertIntEquals(tc, 1, gd.month);
     CuAssertIntEquals(tc, 1, gd.week);
 
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_calendar_suite(void)
