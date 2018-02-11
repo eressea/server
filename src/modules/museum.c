@@ -301,7 +301,6 @@ order * ord)
     attrib *a;
     region *r;
     unit *warden = findunit(atoi36("mwar"));
-    int unit_cookie;
 
     UNUSED_ARG(amount);
 
@@ -316,11 +315,11 @@ order * ord)
     r = findregion(a->data.sa[0], a->data.sa[1]);
     assert(r);
     a_remove(&u->attribs, a);
-    /* Übergebene Gegenstände zurückgeben */
+    /* Ãœbergebene GegenstÃ¤nde zurÃ¼ckgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
     if (a) {
-        unit_cookie = a->data.i;
+        int unit_cookie = a->data.i;
         a_remove(&u->attribs, a);
 
         for (a = a_find(warden->attribs, &at_museumgiveback);

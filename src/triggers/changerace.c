@@ -111,7 +111,7 @@ trigger *trigger_changerace(struct unit * u, const struct race * prace,
     trigger *t = t_new(&tt_changerace);
     changerace_data *td = (changerace_data *)t->data.v;
 
-    assert(u_race(u) == u_irace(u) || "!changerace-triggers cannot stack!");
+    assert(u_race(u) == u_irace(u) || !"changerace-triggers cannot stack!");
     td->u = u;
     td->race = prace;
     td->irace = irace;

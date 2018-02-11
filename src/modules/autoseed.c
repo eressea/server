@@ -807,9 +807,9 @@ static void smooth_island(region_list * island)
     region_list *rlist = NULL;
     for (rlist = island; rlist; rlist = rlist->next) {
         region *r = rlist->data;
-        int n, nland = 0;
 
         if (r->land) {
+            int n, nland = 0;
             get_neighbours(r, rn);
             for (n = 0; n != MAXDIRECTIONS && nland <= 1; ++n) {
                 if (rn[n]->land) {

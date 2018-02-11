@@ -225,7 +225,7 @@ border_type *find_bordertype(const char *name)
 void b_read(connection * b, gamedata * data)
 {
     storage * store = data->store;
-    int n, result = 0;
+    int n;
     switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
@@ -240,9 +240,7 @@ void b_read(connection * b, gamedata * data)
     case VAR_VOIDPTR:
     default:
         assert(!"invalid variant type in connection");
-        result = 0;
     }
-    assert(result >= 0 || "EOF encountered?");
 }
 
 void b_write(const connection * b, storage * store)

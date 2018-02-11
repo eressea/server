@@ -242,10 +242,10 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         va_start(marker, params);
         sbs_init(&sbs, zBuffer, sizeof(zBuffer));
         while (*params) {
-            int i;
             const char *s;
             tok = strchr(params, '%');
             if (tok) {
+                int i;
                 if (tok != params) {
                     sbs_strncat(&sbs, params, tok - params);
                 }

@@ -257,8 +257,9 @@ static lstr lstrs[MAXLOCALES];
 void ** get_translations(const struct locale *lang, int index)
 {
     assert(lang);
-    assert(lang->index < MAXLOCALES
-        || "you have to increase MAXLOCALES and recompile");
+    if (lang->index >= MAXLOCALES) {
+        log_fatal("you have to increase MAXLOCALES and recompile");
+    }
     if (lang->index < MAXLOCALES) {
         return lstrs[lang->index].tokens + index;
     }
