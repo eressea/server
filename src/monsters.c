@@ -615,11 +615,11 @@ static void recruit_dracoids(unit * dragon, int size)
     change_money(dragon, -un->number * 50);
     equip_unit(un, get_equipment("new_dracoid"));
 
-    setstatus(un, ST_FIGHT);
+    unit_setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
         const weapon_type *wtype = weapon->type->rtype->wtype;
         if (wtype && wtype->flags & WTF_MISSILE) {
-            setstatus(un, ST_BEHIND);
+            unit_setstatus(un, ST_BEHIND);
             break;
         }
     }

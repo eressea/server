@@ -267,7 +267,6 @@ extern "C" {
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
     int read_unitid(const struct faction *f, const struct region *r);
 
-    void setstatus(struct unit *u, int status);
     /* !< sets combatstatus of a unit */
     int besieged(const struct unit *u);
     bool has_horses(const struct unit *u);

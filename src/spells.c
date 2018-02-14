@@ -518,7 +518,7 @@ static unit * make_familiar(unit * mage, region *r, const race *rc, const char *
     unit *fam;
 
     fam = create_unit(r, mage->faction, 1, rc, 0, name, mage);
-    setstatus(fam, ST_FLEE);
+    unit_setstatus(fam, ST_FLEE);
     fset(fam, UFL_LOCKED);
 
     /* triggers: */
@@ -2161,7 +2161,7 @@ static int sp_ironkeeper(castorder * co)
         create_unit(r, mage->faction, 1, get_race(RC_IRONKEEPER), 0, NULL, mage);
 
     /*keeper->age = cast_level + 2; */
-    setstatus(keeper, ST_AVOID);  /* kaempft nicht */
+    unit_setstatus(keeper, ST_AVOID);  /* kaempft nicht */
     setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort wei�, wer dahinter steckt */
@@ -4630,7 +4630,7 @@ int sp_clonecopy(castorder * co)
     clone =
         create_unit(target_region, mage->faction, 1, get_race(RC_CLONE), 0, name,
             mage);
-    setstatus(clone, ST_FLEE);
+    unit_setstatus(clone, ST_FLEE);
     fset(clone, UFL_LOCKED);
 
     create_newclone(mage, clone);

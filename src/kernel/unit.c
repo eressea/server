@@ -1531,7 +1531,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         attrib *a;
 
         /* erbt Kampfstatus */
-        setstatus(u, creator->status);
+        unit_setstatus(u, creator->status);
 
         /* erbt Gebaeude/Schiff */
         if (creator->region == r) {
@@ -1984,14 +1984,6 @@ bool has_horses(const unit * u)
             return true;
     }
     return false;
-}
-
-void setstatus(unit *u, int status)
-{
-    assert(status >= ST_AGGRO && status <= ST_FLEE);
-    if (u->status != status) {
-        u->status = (status_t)status;
-    }
 }
 
 #define MAINTENANCE 10
