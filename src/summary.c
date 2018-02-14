@@ -16,7 +16,7 @@
 #include "summary.h"
 #include "laws.h"
 #include "monsters.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>

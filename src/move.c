@@ -20,7 +20,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
+
+/* kernel includes */
+#include "kernel/ally.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/connection.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/render.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+
 #include "move.h"
 #include "guard.h"
 #include "laws.h"
@@ -44,28 +65,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/stealth.h>
 #include <attributes/targetregion.h>
 
-/* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/connection.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/render.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-
 #include "teleport.h"
 #include "direction.h"
-#include "calendar.h"
 #include "skill.h"
 
 /* util includes */

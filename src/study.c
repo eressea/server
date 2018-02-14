@@ -21,11 +21,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 #include <kernel/config.h>
 #include "study.h"
+
 #include "laws.h"
 #include "move.h"
 #include "monsters.h"
 #include "alchemy.h"
 #include "academy.h"
+#include "kernel/calendar.h"
 
 #include <spells/regioncurse.h>
 

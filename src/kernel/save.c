@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "building.h"
+#include "calendar.h"
 #include "connection.h"
 #include "equipment.h"
 #include "faction.h"

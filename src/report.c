@@ -43,7 +43,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* gamecode includes */
 #include "alchemy.h"
-#include "calendar.h"
 #include "economy.h"
 #include "move.h"
 #include "upkeep.h"
@@ -51,30 +50,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/connection.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/objtypes.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/render.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-#include <kernel/alliance.h>
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/connection.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/objtypes.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/render.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+#include "kernel/alliance.h"
 
 /* util includes */
 #include <util/attrib.h>

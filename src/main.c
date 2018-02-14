@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #endif
 
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/database.h>
 #include <kernel/messages.h>

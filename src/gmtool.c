@@ -23,18 +23,19 @@
 #include <modules/museum.h>
 #include <modules/autoseed.h>
 
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-#include <kernel/resources.h>
-#include <kernel/save.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+#include "kernel/resources.h"
+#include "kernel/save.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
 
 #include <attributes/attributes.h>
 #include <triggers/triggers.h>
@@ -53,7 +54,6 @@
 #include "console.h"
 #include "listbox.h"
 #include "wormhole.h"
-#include "calendar.h"
 #include "teleport.h"
 #include "xmlreader.h"
 

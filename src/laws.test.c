@@ -6,6 +6,7 @@
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>

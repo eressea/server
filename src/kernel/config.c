@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "connection.h"
 #include "building.h"
-#include "calendar.h"
 #include "direction.h"
 #include "equipment.h"
 #include "faction.h"
@@ -97,8 +96,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <sys/stat.h>
 #endif
 struct settings global;
-
-int turn = 0;
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",

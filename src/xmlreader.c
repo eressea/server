@@ -29,7 +29,7 @@ without prior permission by the authors of Eressea.
 #include "kernel/spellbook.h"
 
 #include "alchemy.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "guard.h"
 #include "keyword.h"
 #include "move.h"

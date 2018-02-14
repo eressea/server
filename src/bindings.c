@@ -3,6 +3,28 @@
 #endif
 
 #include "bindings.h"
+
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/alliance.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/unit.h"
+#include "kernel/terrain.h"
+#include "kernel/messages.h"
+#include "kernel/region.h"
+#include "kernel/building.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/ship.h"
+#include "kernel/faction.h"
+#include "kernel/save.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+
 #include "bind_unit.h"
 #include "bind_storage.h"
 #include "bind_building.h"
@@ -13,33 +35,11 @@
 #include "bind_ship.h"
 #include "bind_gmtool.h"
 #include "bind_region.h"
+
 #include "helpers.h"
 #include "console.h"
 #include "reports.h"
 #include "study.h"
-#include "calendar.h"
-
-#include <kernel/config.h>
-
-#include <kernel/alliance.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/unit.h>
-#include <kernel/terrain.h>
-#include <kernel/messages.h>
-#include <kernel/region.h>
-#include <kernel/building.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/ship.h>
-#include <kernel/faction.h>
-#include <kernel/save.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-
 #include "economy.h"
 #include "summary.h"
 #include "teleport.h"

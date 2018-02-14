@@ -17,6 +17,7 @@ extern "C" {
     extern int months_per_year;
     extern int *month_season;
     extern int first_month;
+    extern int turn;
 
     extern char **weeknames;
     extern char **weeknames2;

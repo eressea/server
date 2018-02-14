@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 
 #include "battle.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"

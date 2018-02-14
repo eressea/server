@@ -86,7 +86,6 @@ ENDIF()
 
 set (ERESSEA_SRC
   vortex.c
-  calendar.c
   move.c
   piracy.c
   spells.c
@@ -198,7 +197,6 @@ set(TESTS_SRC
   academy.test.c
   alchemy.test.c
   battle.test.c
-  calendar.test.c
   creport.test.c
   direction.test.c
   donations.test.c

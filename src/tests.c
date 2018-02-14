@@ -3,7 +3,7 @@
 #include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "vortex.h"
 
 #include <kernel/config.h>

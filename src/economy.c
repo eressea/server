@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "morale.h"
 #include "reports.h"
-#include "calendar.h"
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
@@ -45,23 +44,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/ally.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>

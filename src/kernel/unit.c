@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "ally.h"
 #include "building.h"
+#include "calendar.h"
 #include "faction.h"
 #include "group.h"
 #include "connection.h"

@@ -17,12 +17,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "region.h"
 
 /* kernel includes */
 #include "alliance.h"
 #include "building.h"
+#include "calendar.h"
+#include "config.h"
 #include "connection.h"
 #include "curse.h"
 #include "equipment.h"
