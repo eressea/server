@@ -2438,22 +2438,22 @@ int status_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
     switch (findparam(s, u->faction->locale)) {
     case P_NOT:
-        setstatus(u, ST_AVOID);
+        unit_setstatus(u, ST_AVOID);
         break;
     case P_BEHIND:
-        setstatus(u, ST_BEHIND);
+        unit_setstatus(u, ST_BEHIND);
         break;
     case P_FLEE:
-        setstatus(u, ST_FLEE);
+        unit_setstatus(u, ST_FLEE);
         break;
     case P_CHICKEN:
-        setstatus(u, ST_CHICKEN);
+        unit_setstatus(u, ST_CHICKEN);
         break;
     case P_AGGRO:
-        setstatus(u, ST_AGGRO);
+        unit_setstatus(u, ST_AGGRO);
         break;
     case P_VORNE:
-        setstatus(u, ST_FIGHT);
+        unit_setstatus(u, ST_FIGHT);
         break;
     case P_HELP:
         if (getparam(u->faction->locale) == P_NOT) {
@@ -2469,7 +2469,7 @@ int status_cmd(unit * u, struct order *ord)
                 msg_feedback(u, ord, "unknown_status", ""));
         }
         else {
-            setstatus(u, ST_FIGHT);
+            unit_setstatus(u, ST_FIGHT);
         }
     }
     return 0;
@@ -2940,7 +2940,7 @@ void maketemp_cmd(unit *u, order **olist)
         if (sh) {
             set_leftship(u2, sh);
         }
-        setstatus(u2, u->status);
+        unit_setstatus(u2, u->status);
 
         /* copy orders until K_END from u to u2 */
         ordp = &makeord->next;

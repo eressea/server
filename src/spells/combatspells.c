@@ -731,7 +731,7 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     unit *u =
         create_unit(r, mage->faction, number, rc, 0, NULL, mage);
     leave(u, true);
-    setstatus(u, ST_FIGHT);
+    unit_setstatus(u, ST_FIGHT);
     
     u->hp = u->number * unit_max_hp(u);
     
@@ -797,7 +797,7 @@ int sp_shadowknights(struct castorder * co)
     u =
         create_unit(r, mage->faction, force, get_race(RC_SHADOWKNIGHT), 0, NULL,
         mage);
-    setstatus(u, ST_FIGHT);
+    unit_setstatus(u, ST_FIGHT);
 
     u->hp = u->number * unit_max_hp(u);
 
@@ -1280,7 +1280,7 @@ int sp_appeasement(struct castorder * co)
     }
     /* und bewachen nicht */
     setguard(mage, false);
-    setstatus(mage, ST_FLEE);
+    unit_setstatus(mage, ST_FLEE);
 
     /* wir tun so, als w�re die Person geflohen */
     fi->flags |= FIG_NOLOOT;
@@ -1624,7 +1624,7 @@ int sp_undeadhero(struct castorder * co)
             else {
                 unit_setinfo(u, NULL);
             }
-            setstatus(u, du->status);
+            unit_setstatus(u, du->status);
             setguard(u, false);
             for (ilist = &du->items; *ilist;) {
                 item *itm = *ilist;
