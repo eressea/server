@@ -16,6 +16,7 @@
 #include <spells/regioncurse.h>
 
 #include <kernel/curse.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -321,8 +322,8 @@ static int heal(unit * user, int effect)
 }
 
 static int
-use_healingpotion(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
+use_healingpotion(struct unit *user, const struct item_type *itype,
+    int amount, struct order *ord)
 {
     int effect = amount * 400;
     unit *u = user->region->units;
@@ -400,8 +401,7 @@ static int use_warmthpotion(unit *u, const item_type *itype,
         cmistake(u, ord, 163, MSG_EVENT);
         return ECUSTOM;
     }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
+    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
     usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
@@ -422,9 +422,9 @@ void register_itemfunctions(void)
     register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
-    register_item_use(use_healingpotion, "use_ointment");
+    register_item_use(use_potion, "use_ointment");
+    register_item_use(use_healingpotion, "use_p14");
     register_item_use(use_warmthpotion, "use_nestwarmth");
-
-    /* ungetestet: Wasser des Lebens */
-    register_item_use(use_potion_delayed, "use_p2");
+    /* p2 = P_LIFE = Wasser des Lebens */
+    register_item_use(use_potion, "use_p2");
 }

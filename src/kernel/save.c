@@ -496,7 +496,7 @@ unit *read_unit(gamedata *data)
     }
 
     READ_INT(data->store, &n);
-    unit_setstatus(u, n);
+    unit_setstatus(u, (status_t)n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
     if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {

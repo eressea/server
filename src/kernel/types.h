@@ -20,9 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ERESSEA_TYPES_H
 
 #include <settings.h>
-#include <util/variant.h>
-
-typedef short item_t;
 
 struct attrib;
 struct attrib_type;
@@ -77,15 +74,14 @@ typedef enum {
 
 /* ------------------ Status von Einheiten --------------------- */
 
-typedef unsigned char status_t;
-enum {
+typedef enum {
   ST_AGGRO,
   ST_FIGHT,
   ST_BEHIND,
   ST_CHICKEN,
   ST_AVOID,
   ST_FLEE
-};
+} status_t;
 
 /* ----------------- Parameter --------------------------------- */
 

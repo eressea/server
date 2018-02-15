@@ -211,7 +211,7 @@ void show_potions(faction *f, int sklevel)
     }
 }
 
-static int potion_healing(unit * u, int amount) {
+static int potion_ointment(unit * u, int amount) {
     int maxhp = unit_max_hp(u) * u->number;
     u->hp = u->hp + 400 * amount;
     if (u->hp > maxhp) u->hp = maxhp;
@@ -244,8 +244,8 @@ static int do_potion(unit * u, region *r, const item_type * itype, int amount)
     if (itype == oldpotiontype[P_LIFE]) {
         return potion_water_of_life(u, r, amount);
     }
-    else if (itype == oldpotiontype[P_HEILWASSER]) {
-        return potion_healing(u, amount);
+    else if (itype == oldpotiontype[P_OINTMENT]) {
+        return potion_ointment(u, amount);
     }
     else if (itype == oldpotiontype[P_PEOPLE]) {
         return potion_luck(u, r, &at_peasantluck, amount);
@@ -274,58 +274,6 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
         amount = do_potion(u, u->region, itype, amount);
         end_potion(u, itype, amount);
     }
-    return 0;
-}
-
-typedef struct potiondelay {
-    unit *u;
-    region *r;
-    const item_type *itype;
-    int amount;
-} potiondelay;
-
-static void init_potiondelay(variant *var)
-{
-    var->v = malloc(sizeof(potiondelay));
-}
-
-static int age_potiondelay(attrib * a, void *owner)
-{
-    potiondelay *pd = (potiondelay *)a->data.v;
-    UNUSED_ARG(owner);
-    pd->amount = do_potion(pd->u, pd->r, pd->itype, pd->amount);
-    return AT_AGE_REMOVE;
-}
-
-attrib_type at_potiondelay = {
-    "potiondelay",
-    init_potiondelay,
-    a_free_voidptr,
-    age_potiondelay, 0, 0
-};
-
-static attrib *make_potiondelay(unit * u, const item_type * itype, int amount)
-{
-    attrib *a = a_new(&at_potiondelay);
-    potiondelay *pd = (potiondelay *)a->data.v;
-    pd->u = u;
-    pd->r = u->region;
-    pd->itype = itype;
-    pd->amount = amount;
-    return a;
-}
-
-int
-use_potion_delayed(unit * u, const item_type * itype, int amount,
-struct order *ord)
-{
-    int result = begin_potion(u, itype, ord);
-    if (result)
-        return result;
-
-    a_add(&u->attribs, make_potiondelay(u, itype, amount));
-
-    end_potion(u, itype, amount);
     return 0;
 }
 

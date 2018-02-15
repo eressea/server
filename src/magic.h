@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_MAGIC
 
 #include <kernel/types.h>
+#include <util/variant.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
