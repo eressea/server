@@ -154,8 +154,6 @@ static int begin_potion(unit * u, const item_type * itype, struct order *ord)
 
 static void end_potion(unit * u, const item_type * itype, int amount)
 {
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
     usetpotionuse(u, itype);
 
     ADDMSG(&u->faction->msgs, msg_message("usepotion",
@@ -173,12 +171,10 @@ static int potion_water_of_life(unit * u, region *r, int amount) {
     }
     /* mallorn is required to make mallorn forests, wood for regular ones */
     if (fval(r, RF_MALLORN)) {
-        wood = use_pooled(u, rt_find("mallorn"),
-            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
+        wood = use_pooled(u, rt_find("mallorn"), GET_DEFAULT, tree_count * amount);
     }
     else {
-        wood = use_pooled(u, rt_find("log"),
-            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
+        wood = use_pooled(u, rt_find("log"), GET_DEFAULT, tree_count * amount);
     }
     if (r->land == 0)
         wood = 0;
@@ -211,13 +207,6 @@ void show_potions(faction *f, int sklevel)
     }
 }
 
-static int potion_ointment(unit * u, int amount) {
-    int maxhp = unit_max_hp(u) * u->number;
-    u->hp = u->hp + 400 * amount;
-    if (u->hp > maxhp) u->hp = maxhp;
-    return amount;
-}
-
 static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     attrib *a = (attrib *)a_find(r->attribs, atype);
     UNUSED_ARG(u);
@@ -239,19 +228,55 @@ static int potion_power(unit *u, int amount) {
     return amount;
 }
 
+static int heal(unit * user, int effect)
+{
+    int req = unit_max_hp(user) * user->number - user->hp;
+    if (req > 0) {
+        if (req > effect) req = effect;
+        effect -= req;
+        user->hp += req;
+    }
+    return effect;
+}
+
+static int potion_ointment(unit * u, int amount) {
+    int effect = amount * 400;
+    effect = heal(u, effect);
+    return amount;
+}
+
+static int potion_healing(struct unit *user, int amount)
+{
+    int effect = amount * 400;
+    unit *u = user->region->units;
+    effect = heal(user, effect);
+    while (effect > 0 && u != NULL) {
+        if (u->faction == user->faction) {
+            effect = heal(u, effect);
+        }
+        u = u->next;
+    }
+    return amount;
+}
+
+
 static int do_potion(unit * u, region *r, const item_type * itype, int amount)
 {
+    /* TODO: why do some of these take a region argument? */
     if (itype == oldpotiontype[P_LIFE]) {
         return potion_water_of_life(u, r, amount);
-    }
-    else if (itype == oldpotiontype[P_OINTMENT]) {
-        return potion_ointment(u, amount);
     }
     else if (itype == oldpotiontype[P_PEOPLE]) {
         return potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (itype == oldpotiontype[P_HORSE]) {
         return potion_luck(u, r, &at_horseluck, amount);
+    }
+    else if (itype == oldpotiontype[P_HEAL]) {
+        return potion_healing(u, amount);
+    }
+    else if (itype == oldpotiontype[P_OINTMENT]) {
+        return potion_ointment(u, amount);
     }
     else if (itype == oldpotiontype[P_MACHT]) {
         return potion_power(u, amount);
@@ -264,17 +289,12 @@ static int do_potion(unit * u, region *r, const item_type * itype, int amount)
 
 int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
-    if (oldpotiontype[P_HEAL] && itype == oldpotiontype[P_HEAL]) {
-        return EUNUSABLE;
-    }
-    else {
-        int result = begin_potion(u, itype, ord);
-        if (result)
-            return result;
-        amount = do_potion(u, u->region, itype, amount);
-        end_potion(u, itype, amount);
-    }
-    return 0;
+    int result = begin_potion(u, itype, ord);
+    if (result)
+        return result;
+    amount = do_potion(u, u->region, itype, amount);
+    end_potion(u, itype, amount);
+    return amount;
 }
 
 /*****************/

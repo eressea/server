@@ -310,39 +310,6 @@ struct order *ord)
     return 0;
 }
 
-static int heal(unit * user, int effect)
-{
-    int req = unit_max_hp(user) * user->number - user->hp;
-    if (req > 0) {
-        if (req > effect) req = effect;
-        effect -= req;
-        user->hp += req;
-    }
-    return effect;
-}
-
-static int
-use_healingpotion(struct unit *user, const struct item_type *itype,
-    int amount, struct order *ord)
-{
-    int effect = amount * 400;
-    unit *u = user->region->units;
-    effect = heal(user, effect);
-    while (effect > 0 && u != NULL) {
-        if (u->faction == user->faction) {
-            effect = heal(u, effect);
-        }
-        u = u->next;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(user, itype);
-
-    ADDMSG(&user->faction->msgs, msg_message("usepotion",
-        "unit potion", user, itype->rtype));
-    return 0;
-}
-
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
 * Runde um -1 - 4 Punkte. */
@@ -412,6 +379,7 @@ static int use_warmthpotion(unit *u, const item_type *itype,
 void register_itemfunctions(void)
 {
     /* have tests: */
+    /* TODO: potions should really use use_potion */
     register_item_use(use_mistletoe, "use_mistletoe");
     register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
@@ -423,7 +391,7 @@ void register_itemfunctions(void)
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_potion, "use_ointment");
-    register_item_use(use_healingpotion, "use_p14");
+    register_item_use(use_potion, "use_p14");
     register_item_use(use_warmthpotion, "use_nestwarmth");
     /* p2 = P_LIFE = Wasser des Lebens */
     register_item_use(use_potion, "use_p2");

@@ -1300,6 +1300,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
+    /* healing potions can avert a killing blow */
     if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
         if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
             message *m = msg_message("potionsave", "unit", du);
