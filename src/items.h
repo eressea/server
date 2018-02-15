@@ -12,11 +12,16 @@ without prior permission by the authors of Eressea.
 
 #ifndef H_KRNL_ITEMS
 #define H_KRNL_ITEMS
+
+#include <stdbool.h>
+
+struct unit;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    extern void register_itemfunctions(void);
+    void register_itemfunctions(void);
 
 #ifdef __cplusplus
 }
