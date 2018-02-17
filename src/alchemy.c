@@ -202,7 +202,9 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     region *r = u->region;
 
-    /* TODO: this function should only be used for effect-changing potions */
+    ADDMSG(&u->faction->msgs, msg_message("usepotion",
+        "unit potion", u, itype->rtype));
+
     if (itype == oldpotiontype[P_PEOPLE]) {
         return potion_luck(u, r, &at_peasantluck, amount);
     }

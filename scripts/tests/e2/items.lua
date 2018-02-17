@@ -119,95 +119,6 @@ function test_monthly_healing()
     assert_equal(130, u.hp)
 end
 
-function test_ointment()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u = unit.create(f, r, 30)
-    assert_equal(600, u.hp)
-    u.hp = 100
-    turn_begin()
-    u:add_item("ointment", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Wundsalbe")
-    turn_process()
-    assert_equal(530, u.hp)
-    assert_equal(0, u:get_item("ointment"))
-    turn_end()
-end
-
-function test_use_healing_potion()
-    -- Heiltrank kann (auch) mit BENUTZE eingesetzt werden
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u = unit.create(f, r, 30)
-    assert_equal(600, u.hp)
-    u.hp = 100
-    turn_begin()
-    u:add_item("p14", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Heiltrank")
-    turn_process()
-    assert_equal(530, u.hp)
-    assert_equal(0, u:get_item("p14"))
-    turn_end()
-end
-
-function test_use_healing_potion_multi_units()
-    -- Heiltrank kann mehrere Einheiten heilen
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u1 = unit.create(f, r, 30)
-    local u = unit.create(f, r, 30)
-    assert_equal(600, u1.hp)
-    assert_equal(600, u.hp)
-    u.hp = 400
-    u1.hp = 400
-    turn_begin()
-    u:add_item("p14", 1)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Heiltrank")
-    turn_process()
-    assert_equal(600, u.hp)
-    assert_equal(600, u1.hp)
-    assert_equal(0, u:get_item("p14"))
-    turn_end()
-end
-
-function test_use_multiple_healing_potions()
-    -- Einheit kann mehr als einen Heiltrank benutzen
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u = unit.create(f, r, 60)
-    assert_equal(1200, u.hp)
-    u.hp = 400
-    turn_begin()
-    u:add_item("p14", 2)
-    u:clear_orders()
-    u:add_order("BENUTZEN 2 Heiltrank")
-    turn_process()
-    assert_equal(1200, u.hp)
-    assert_equal(0, u:get_item("p14"))
-    turn_end()
-end
-
-function test_use_healing_potions_twice()
-    -- Einheit kann mehr als einen BENUTZE Heiltrank Befehl haben
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
-    local u = unit.create(f, r, 60)
-    assert_equal(1200, u.hp)
-    u.hp = 400
-    turn_begin()
-    u:add_item("p14", 2)
-    u:clear_orders()
-    u:add_order("BENUTZEN 1 Heiltrank")
-    u:add_order("BENUTZEN 1 Heiltrank")
-    turn_process()
-    assert_equal(1200, u.hp)
-    assert_equal(0, u:get_item("p14"))
-    turn_end()
-end
-
 function test_speedsail()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
@@ -227,7 +138,7 @@ function test_speedsail()
     assert_equal(1, u.ship:get_curse('shipspeed')) -- effect stays forever
 end
 
-function disable_test_foolpotion()
+function test_use_foolpotion()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
