@@ -186,7 +186,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
             return value;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)

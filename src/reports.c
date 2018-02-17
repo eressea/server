@@ -2114,10 +2114,14 @@ static void eval_resource(struct opstack **stack, const void *userdata)
     int j = opop(stack).i;
     const struct resource_type *res = (const struct resource_type *)opop(stack).v;
     const char *c = LOC(lang, resourcename(res, j != 1));
-    size_t len = strlen(c);
     variant var;
+    if (c) {
+        size_t len = strlen(c);
 
-    var.v = strcpy(balloc(len + 1), c);
+        var.v = strcpy(balloc(len + 1), c);
+    } else {
+        var.v = NULL;
+    }
     opush(stack, var);
 }
 
