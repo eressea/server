@@ -2113,13 +2113,15 @@ static void eval_resource(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const struct resource_type *res = (const struct resource_type *)opop(stack).v;
-    const char *c = LOC(lang, resourcename(res, j != 1));
+    const char *name = resourcename(res, j != 1);
+    const char *c = LOC(lang, name);
     variant var;
     if (c) {
         size_t len = strlen(c);
 
         var.v = strcpy(balloc(len + 1), c);
     } else {
+        log_error("missing translation for %s in eval_resource", name);
         var.v = NULL;
     }
     opush(stack, var);
@@ -2131,11 +2133,17 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
-    size_t len = strlen(c);
+    const char *name = rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL);
+    const char *c = LOC(lang, name);
     variant var;
-
-    var.v = strcpy(balloc(len + 1), c);
+    if (c) {
+        size_t len = strlen(c);
+        var.v = strcpy(balloc(len + 1), c);
+    }
+    else {
+        log_error("missing translation for %s in eval_race", name);
+        var.v = NULL;
+    }
     opush(stack, var);
 }
 
