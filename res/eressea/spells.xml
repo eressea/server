@@ -32,7 +32,7 @@
   <spell name="treegrow" rank="5" index="8" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
     <resource name="log" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
   <spell name="healing" rank="5" index="9" variable="true" combat="3">
     <resource name="aura" amount="1" cost="level"/>
@@ -101,12 +101,12 @@
   <spell name="stonegolem" rank="4" index="32" variable="true">
     <resource name="aura" amount="2" cost="level"/>
     <resource name="stone" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
   <spell name="irongolem" rank="4" index="33" variable="true">
     <resource name="aura" amount="2" cost="level"/>
     <resource name="iron" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
   <spell name="summonshadow" rank="5" index="34" variable="true">
     <resource name="aura" amount="3" cost="level"/>
@@ -433,7 +433,7 @@
   </spell>
   <spell name="puttorest" rank="5" index="168" variable="true">
     <resource name="aura" amount="3" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
   <spell name="unholypower" rank="5" index="169" parameters="u+" los="true" variable="true">
     <resource name="aura" amount="10" cost="level"/>
@@ -455,7 +455,7 @@
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="20" cost="fixed"/>
     <resource name="dragonblood" amount="5" cost="fixed"/>
-    <resource name="p2" amount="5" cost="fixed"/>
+    <resource name="lifepotion" amount="5" cost="fixed"/>
   </spell>
   <spell name="drain_skills" rank="5" index="174" combat="2">
     <resource name="aura" amount="4" cost="fixed"/>
@@ -466,7 +466,7 @@
   <spell name="mallorntreegrow" rank="5" index="177" far="true" variable="true">
     <resource name="aura" amount="6" cost="level"/>
     <resource name="mallorn" amount="1" cost="level"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
   <spell name="big_recruit" rank="5" index="179" variable="true">
     <resource name="aura" amount="20" cost="level"/>
@@ -515,7 +515,7 @@
   <spell name="create_magicherbbag" ship="true" rank="5" index="165">
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
 
   <!-- illaun spells -->

@@ -208,6 +208,7 @@ static const char *it_aliases[][2] = {
     { "Runenschwert", "runesword" },
     { "p12", "truthpotion" },
     { "p1", "goliathwater" },
+    { "p2", "lifepotion" },
     { "p4", "ointment" },
     { "p5", "peasantblood" },
     { "p8", "nestwarmth" },
@@ -555,7 +556,7 @@ static const char *resourcenames[MAX_RESOURCES] = {
     "laen", "fairyboot", "aoc", "pegasus",
     "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
     "aurafocus", "sphereofinv", "magicbag",
-    "magicherbbag", "dreameye", "p2"
+    "magicherbbag", "dreameye", "lifepotion"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -636,7 +637,7 @@ struct order *), const char *name)
 static void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
-        "p0", "goliathwater", "p2", "p3", "ointment", "peasantblood", "p6",
+        "p0", "goliathwater", "lifepotion", "p3", "ointment", "peasantblood", "p6",
         "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13", "p14"
     };
     int p;

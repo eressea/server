@@ -1085,7 +1085,7 @@
   <string name="p1_p">
     <text locale="fr">breuvage de Goliath</text>
   </string>
-  <string name="p2">
+  <string name="lifepotion">
     <text locale="fr">élixir de vie</text>
   </string>
   <string name="p2_p">

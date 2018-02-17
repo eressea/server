@@ -39,7 +39,7 @@
   <spell name="create_magicherbbag" ship="true" rank="5" index="165">
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
 
   <!-- illaun spells -->

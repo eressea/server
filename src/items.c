@@ -416,7 +416,7 @@ static int use_water_of_life(unit *u, const item_type *itype,
 void register_itemfunctions(void)
 {
     /* have tests: */
-    register_item_use(use_water_of_life, "use_p2");
+    register_item_use(use_water_of_life, "use_lifepotion");
     register_item_use(use_mistletoe, "use_mistletoe");
     register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
@@ -430,6 +430,4 @@ void register_itemfunctions(void)
     register_item_use(use_potion, "use_ointment");
     register_item_use(use_potion, "use_p14");
     register_item_use(use_warmthpotion, "use_nestwarmth");
-    /* p2 = P_LIFE = Wasser des Lebens */
-    register_item_use(use_potion, "use_p2");
 }

@@ -1863,7 +1863,7 @@
   <string name="goliathwater">
     <text locale="de">Goliathwasser</text>
   </string>
-  <string name="p2">
+  <string name="lifepotion">
     <text locale="de">Wasser des Lebens</text>
   </string>
   <string name="p3">
@@ -3592,7 +3592,7 @@
       <text locale="en">'First roast the Gurgelkraut quickly and add some Fjordwuchs to spice it up. Let it all boil slowly until almost all liquid has evaporated. Leave the mash overnight and finally squeeze it the next morning until a thick fluid drips out.' The liquid thus produced, 'Goliath Water' as we call it, is enough for 10 men and gives each man the carrying capacity of a horse for one week.</text>
       <text locale="de">Zuerst brate man das Gurgelkraut leicht an und würze das Zeug mit ein wenig Fjordwuchs. Man lasse alles so lange kochen, bis fast alle Flüssigkeit verdampft ist. Diesen Brei stelle man über Nacht raus. Am nächsten Morgen presse man den Brei aus. Die so gewonnene Flüssigkeit, Goliathwasser genannt, verleiht bis zu zehn Männern die Tragkraft eines Pferdes.</text>
     </string>
-    <string name="p2">
+    <string name="lifepotion">
       <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
       <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
     </string>

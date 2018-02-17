@@ -26,7 +26,7 @@ end
 
 -- Wasser des Lebens
 function create_potion_p2(r, mage, level, force)
-  return create_potion(mage, level, "p2", force)
+  return create_potion(mage, level, "lifepotion", force)
 end
 
 -- Siebenmeilentee
