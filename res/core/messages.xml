@@ -2800,7 +2800,7 @@
     <text locale="de">"$unit($unit) in $region($region) produziert $int($amount)$if($eq($wanted,$amount),""," von $int($wanted)") $resource($resource,$wanted)."</text>
     <text locale="en">"$unit($unit) in $region($region) produces $int($amount)$if($eq($wanted,$amount),""," of $int($wanted)") $resource($resource,$amount)."</text>
   </message>
-  <message name="buildbuilding" section="production">
+    <message name="buildbuilding" section="production">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="size" type="int"/>
@@ -6797,8 +6797,8 @@
       <arg name="item" type="resource"/>
       <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) benutzt $amount $resource($item,$amount)."</text>
-    <text locale="en">"$unit($unit) uses $amount $resource($item,$amount)."</text>
+    <text locale="de">"$unit($unit) benutzt $int($amount) $resource($item,$amount)."</text>
+    <text locale="en">"$unit($unit) uses $int($amount) $resource($item,$amount)."</text>
   </message>
   <message name="no_attack_after_advance" section="errors">
     <type>

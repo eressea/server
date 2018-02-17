@@ -1899,7 +1899,7 @@
   <string name="p13">
     <text locale="de">Elixier der Macht</text>
   </string>
-  <string name="p14">
+  <string name="healing">
     <text locale="de">Heiltrank</text>
   </string>
 
@@ -1945,7 +1945,7 @@
   <string name="p13_p">
     <text locale="de">Elixiere der Macht</text>
   </string>
-  <string name="p14_p">
+  <string name="healing_p">
     <text locale="de">Heiltränke</text>
   </string>
 
@@ -3640,7 +3640,7 @@
       <text locale="en">One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood. </text>
       <text locale="de">Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. Der Trank erhöht die Lebensenergie von maximal zehn Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme am stärksten und klingt danach langsam ab. Zur Herstellung benötigt der Alchemist ein Elfenlieb, einen Windbeutel, ein Stück Wasserfinder und einen Grünen Spinnerich. Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel und rühre dieses Pulver unter etwas Drachenblut.</text>
     </string>
-    <string name="p14">
+    <string name="healing">
       <text locale="en">For a healing potion one takes the peel of a windbag and some bugleweed, stirr in some chopped elvendear and sprinkle it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury.</text>
       <text locale="de">Für einen Heiltrank nehme man die Schale eines Windbeutels und etwas Gurgelkraut, rühre eine kleingehacktes Elfenlieb dazu und bestreue alles mit den Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
     </string>

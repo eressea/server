@@ -1150,10 +1150,10 @@
   <string name="p13_p">
     <text locale="en">elixirs of power</text>
   </string>
-  <string name="p14">
+  <string name="healing">
     <text locale="en">healing potion</text>
   </string>
-  <string name="p14_p">
+  <string name="healing_p">
     <text locale="en">healing potions</text>
   </string>
 

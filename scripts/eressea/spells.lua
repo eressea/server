@@ -55,8 +55,8 @@ function create_potion_p3(r, mage, level, force)
 end
 
 -- Heiltrank
-function create_potion_p14(r, mage, level, force)
-  return create_potion(mage, level, "p14", force)
+function create_potion_healing(r, mage, level, force)
+  return create_potion(mage, level, "healing", force)
 end
 
 -- Elixier der Macht

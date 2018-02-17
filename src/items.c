@@ -492,7 +492,7 @@ void register_itemfunctions(void)
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_ointment, "use_ointment");
-    register_item_use(use_healing_potion, "use_p14");
+    register_item_use(use_healing_potion, "use_healing");
     register_item_use(use_power_elixir, "use_p13");
     register_item_use(use_warmthpotion, "use_nestwarmth");
 }

@@ -1157,10 +1157,10 @@
   <string name="p13_p">
     <text locale="fr">elixir d'endurance</text>
   </string>
-  <string name="p14">
+  <string name="healing">
     <text locale="fr">potion de survie</text>
   </string>
-  <string name="p14_p">
+  <string name="healing_p">
     <text locale="fr">potions de survie</text>
   </string>
 

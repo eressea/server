@@ -129,12 +129,12 @@ function test_use_healing_potion()
     assert_equal(600, u.hp)
     u.hp = 100
     turn_begin()
-    u:add_item("p14", 1)
+    u:add_item("healing", 1)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Heiltrank")
     turn_process()
     assert_equal(530, u.hp)
-    assert_equal(0, u:get_item("p14"))
+    assert_equal(0, u:get_item("healing"))
     assert_equal(1, f:count_msg_type('use_item'))
     turn_end()
 end
@@ -150,13 +150,13 @@ function test_use_healing_potion_multi_units()
     u.hp = 400
     u1.hp = 400
     turn_begin()
-    u:add_item("p14", 1)
+    u:add_item("healing", 1)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Heiltrank")
     turn_process()
     assert_equal(600, u.hp)
     assert_equal(600, u1.hp)
-    assert_equal(0, u:get_item("p14"))
+    assert_equal(0, u:get_item("healing"))
     turn_end()
 end
 
@@ -168,12 +168,12 @@ function test_use_multiple_healing_potions()
     assert_equal(1200, u.hp)
     u.hp = 400
     turn_begin()
-    u:add_item("p14", 2)
+    u:add_item("healing", 2)
     u:clear_orders()
     u:add_order("BENUTZEN 2 Heiltrank")
     turn_process()
     assert_equal(1200, u.hp)
-    assert_equal(0, u:get_item("p14"))
+    assert_equal(0, u:get_item("healing"))
     turn_end()
 end
 

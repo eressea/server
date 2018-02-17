@@ -52,7 +52,6 @@ extern "C" {
         /* Stufe 4 */
         P_PEOPLE,
         P_WAHRHEIT,
-        P_MACHT,
         P_HEAL,
         MAX_POTIONS
     };

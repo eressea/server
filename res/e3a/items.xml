@@ -52,7 +52,7 @@
     </item>
   </resource>
 
-  <resource name="p14" appearance="vial">
+  <resource name="healing" appearance="vial">
     <!-- Heiltrank -->
     <item weight="0" score="120" use="yes">
       <potion level="4"/>

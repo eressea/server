@@ -206,12 +206,13 @@ resource_type *rt_get_or_create(const char *name) {
 
 static const char *it_aliases[][2] = {
     { "Runenschwert", "runesword" },
-    { "p12", "truthpotion" },
     { "p1", "goliathwater" },
     { "p2", "lifepotion" },
     { "p4", "ointment" },
     { "p5", "peasantblood" },
     { "p8", "nestwarmth" },
+    { "p14", "healing" },
+    { "p12", "truthpotion" },
     { "diamond", "adamantium" },
     { "diamondaxe", "adamantiumaxe" },
     { "diamondplate", "adamantiumplate" },
@@ -226,13 +227,18 @@ static const char *it_alias(const char *zname)
         if (strcmp(it_aliases[i][0], zname) == 0)
             return it_aliases[i][1];
     }
-    return zname;
+    return NULL;
 }
 
 item_type *it_find(const char *zname)
 {
-    const char *name = it_alias(zname);
-    resource_type *result = rt_find(name);
+    resource_type *result = rt_find(zname);
+    if (!result) {
+        const char *name = it_alias(zname);
+        if (name) {
+            result = rt_find(name);
+        }
+    }
     return result ? result->itype : 0;
 }
 
@@ -638,7 +644,7 @@ static void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
         "p0", "goliathwater", "lifepotion", "p3", "ointment", "peasantblood", "p6",
-        "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13", "p14"
+        "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "healing"
     };
     int p;
 

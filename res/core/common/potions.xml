@@ -167,7 +167,7 @@
     </item>
   </resource>
 
-  <resource name="p14" appearance="vial">
+  <resource name="healing" appearance="vial">
     <item weight="0" score="120" use="yes">
       <potion level="4"/>
       <construction skill="alchemy" minskill="8">
