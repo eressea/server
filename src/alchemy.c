@@ -129,37 +129,6 @@ void herbsearch(unit * u, int max_take)
     }
 }
 
-static int begin_potion(unit * u, const item_type * itype, struct order *ord)
-{
-    static int config;
-    static bool rule_multipotion;
-
-    assert(itype);
-    if (config_changed(&config)) {
-        /* should we allow multiple different potions to be used the same turn? */
-        rule_multipotion = config_get_int("rules.magic.multipotion", 0) != 0;
-    }
-
-    if (!rule_multipotion) {
-        const item_type *use = ugetpotionuse(u);
-        if (use != NULL && use != itype) {
-            ADDMSG(&u->faction->msgs,
-                msg_message("errusingpotion", "unit using command",
-                u, use->rtype, ord));
-            return ECUSTOM;
-        }
-    }
-    return 0;
-}
-
-static void end_potion(unit * u, const item_type * itype, int amount)
-{
-    usetpotionuse(u, itype);
-
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-}
-
 void show_potions(faction *f, int sklevel)
 {
     const potion_type *ptype;
@@ -229,8 +198,10 @@ static int potion_healing(struct unit *user, int amount)
 }
 
 
-static int do_potion(unit * u, region *r, const item_type * itype, int amount)
+int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
+    region *r = u->region;
+
     /* TODO: this function should only be used for effect-changing potions */
     if (itype == oldpotiontype[P_PEOPLE]) {
         return potion_luck(u, r, &at_peasantluck, amount);
@@ -250,16 +221,6 @@ static int do_potion(unit * u, region *r, const item_type * itype, int amount)
     else {
         change_effect(u, itype, 10 * amount);
     }
-    return amount;
-}
-
-int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
-{
-    int result = begin_potion(u, itype, ord);
-    if (result)
-        return result;
-    amount = do_potion(u, u->region, itype, amount);
-    end_potion(u, itype, amount);
     return amount;
 }
 

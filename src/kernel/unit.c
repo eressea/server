@@ -574,35 +574,6 @@ void usetprivate(unit * u, const char *str)
 }
 
 /*********************/
-/*   at_potionuser   */
-/*********************/
-/* Einheit BENUTZT einen Trank */
-attrib_type at_potionuser = {
-    "potionuser",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-void usetpotionuse(unit * u, const item_type * ptype)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        a = a_add(&u->attribs, a_new(&at_potionuser));
-    a->data.v = (void *)ptype;
-}
-
-const item_type *ugetpotionuse(const unit * u)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        return NULL;
-    return (const item_type *)a->data.v;
-}
-
-/*********************/
 /*   at_target   */
 /*********************/
 attrib_type at_target = {
