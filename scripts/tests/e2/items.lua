@@ -152,6 +152,27 @@ function test_use_healing_potion()
     turn_end()
 end
 
+function test_use_healing_potion_multi_units()
+    -- Heiltrank kann mehrere Einheiten heilen
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 30)
+    local u = unit.create(f, r, 30)
+    assert_equal(600, u1.hp)
+    assert_equal(600, u.hp)
+    u.hp = 400
+    u1.hp = 400
+    turn_begin()
+    u:add_item("p14", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Heiltrank")
+    turn_process()
+    assert_equal(600, u.hp)
+    assert_equal(600, u1.hp)
+    assert_equal(0, u:get_item("p14"))
+    turn_end()
+end
+
 function test_speedsail()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
