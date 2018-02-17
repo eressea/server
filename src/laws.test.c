@@ -883,7 +883,7 @@ static void test_luck_message(CuTest *tc) {
 
     demographics();
 
-    CuAssertPtrEquals_Msg(tc, "unexpected message", (void *)NULL, r->msgs);
+    CuAssertPtrEquals_Msg(tc, "unexpected message", NULL, r->msgs);
 
     a = (attrib *)a_find(r->attribs, &at_peasantluck);
     if (!a)

@@ -411,6 +411,53 @@ static int use_water_of_life(unit *u, const item_type *itype,
     return potion_water_of_life(u, u->region, amount);
 }
 
+static int heal(unit * user, int effect)
+{
+    int req = unit_max_hp(user) * user->number - user->hp;
+    if (req > 0) {
+        if (req > effect) req = effect;
+        effect -= req;
+        user->hp += req;
+    }
+    return effect;
+}
+
+static int potion_healing(struct unit *user, int amount)
+{
+    int effect = amount * 400;
+    unit *u = user->region->units;
+    effect = heal(u, effect);
+    while (effect > 0 && u != NULL) {
+        if (u->faction == user->faction) {
+            effect = heal(u, effect);
+        }
+        u = u->next;
+    }
+    return amount;
+}
+
+static int use_healing_potion(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_healing(u, amount);
+}
+
+static int potion_ointment(unit * u, int amount) {
+    int effect = amount * 400;
+    effect = heal(u, effect);
+    return amount;
+}
+
+static int use_ointment(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_ointment(u, amount);
+}
+
 void register_itemfunctions(void)
 {
     /* have tests: */
@@ -425,7 +472,7 @@ void register_itemfunctions(void)
     register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
-    register_item_use(use_potion, "use_ointment");
-    register_item_use(use_potion, "use_p14");
+    register_item_use(use_ointment, "use_ointment");
+    register_item_use(use_healing_potion, "use_p14");
     register_item_use(use_warmthpotion, "use_nestwarmth");
 }
