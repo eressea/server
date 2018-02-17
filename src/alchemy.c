@@ -155,17 +155,6 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     return amount;
 }
 
-static int potion_power(unit *u, int amount) {
-    int hp = 10 * amount;
-
-    if (hp > u->number) {
-        hp = u->number;
-        amount = (hp + 9) % 10;
-    }
-    u->hp += hp * unit_max_hp(u) * 4;
-    return amount;
-}
-
 int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     region *r = u->region;
@@ -175,9 +164,6 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
     }
     else if (itype == oldpotiontype[P_HORSE]) {
         amount = potion_luck(u, r, &at_horseluck, amount);
-    }
-    else if (itype == oldpotiontype[P_MACHT]) {
-        amount = potion_power(u, amount);
     }
     else {
         change_effect(u, itype, 10 * amount);

@@ -458,6 +458,25 @@ static int use_ointment(unit *u, const item_type *itype,
     return potion_ointment(u, amount);
 }
 
+static int potion_power(unit *u, int amount) {
+    int hp = 10 * amount;
+
+    if (hp > u->number) {
+        hp = u->number;
+        amount = (hp + 9) % 10;
+    }
+    u->hp += hp * unit_max_hp(u) * 4;
+    return amount;
+}
+
+static int use_power_elixir(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_power(u, amount);
+}
+
 void register_itemfunctions(void)
 {
     /* have tests: */
@@ -474,5 +493,6 @@ void register_itemfunctions(void)
     register_item_use(use_bloodpotion, "use_peasantblood");
     register_item_use(use_ointment, "use_ointment");
     register_item_use(use_healing_potion, "use_p14");
+    register_item_use(use_power_elixir, "use_p13");
     register_item_use(use_warmthpotion, "use_nestwarmth");
 }
