@@ -38,7 +38,7 @@ function test_nestwarmth_insect()
     turn_process()
     assert_equal(flags+64, u.flags) -- UFL_WARMTH
     assert_equal(1, u:get_item("nestwarmth"))
-    assert_equal(1, f:count_msg_type('usepotion'))
+    assert_equal(1, f:count_msg_type('use_item'))
     turn_end()
 end
 

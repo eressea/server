@@ -6783,6 +6783,14 @@
     <text locale="de">"$unit($unit) in $region($region): '$order($command)' - ${error}."</text>
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - ${error}."</text>
   </message>
+  <message name="usepotion" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="potion" type="resource"/>
+    </type>
+    <text locale="de">"$unit($unit) benutzt $resource($potion,1)."</text>
+    <text locale="en">"$unit($unit) uses $resource($potion,1)."</text>
+  </message>
   <message name="use_item" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -6973,14 +6981,6 @@
     </type>
     <text locale="de">"$unit($unit) verdient am Handel in $region($region) Steuern in Höhe von $int($amount) Silber."</text>
     <text locale="en">"$unit($unit) collected $int($amount) silver trade tax in $region($region)."</text>
-  </message>
-  <message name="usepotion" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="potion" type="resource"/>
-    </type>
-    <text locale="de">"$unit($unit) benutzt $resource($potion,1)."</text>
-    <text locale="en">"$unit($unit) uses $resource($potion,1)."</text>
   </message>
   <message name="pest" section="events">
     <type>

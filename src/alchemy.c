@@ -202,26 +202,27 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     region *r = u->region;
 
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-
     if (itype == oldpotiontype[P_PEOPLE]) {
-        return potion_luck(u, r, &at_peasantluck, amount);
+        amount = potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (itype == oldpotiontype[P_HORSE]) {
-        return potion_luck(u, r, &at_horseluck, amount);
+        amount = potion_luck(u, r, &at_horseluck, amount);
     }
     else if (itype == oldpotiontype[P_HEAL]) {
-        return potion_healing(u, amount);
+        amount = potion_healing(u, amount);
     }
     else if (itype == oldpotiontype[P_OINTMENT]) {
-        return potion_ointment(u, amount);
+        amount = potion_ointment(u, amount);
     }
     else if (itype == oldpotiontype[P_MACHT]) {
-        return potion_power(u, amount);
+        amount = potion_power(u, amount);
     }
     else {
         change_effect(u, itype, 10 * amount);
+    }
+    if (amount > 0) {
+        ADDMSG(&u->faction->msgs, msg_message("use_item",
+            "unit amount item", u, amount, itype->rtype));
     }
     return amount;
 }

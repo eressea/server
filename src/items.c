@@ -304,8 +304,8 @@ struct order *ord)
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
 
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
     return 0;
 }
 
@@ -369,8 +369,8 @@ static int use_warmthpotion(unit *u, const item_type *itype,
     }
     use_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
     return 0;
 }
 
