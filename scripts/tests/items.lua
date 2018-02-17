@@ -177,6 +177,21 @@ function test_use_multiple_healing_potions()
     turn_end()
 end
 
+function test_use_elixir()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 10)
+    assert_equal(200, u.hp)
+    u:add_item("p13", 1)
+    u:clear_orders()
+    u:add_order("BENUTZEN 1 Elixier~der~Macht")
+    process_orders()
+    -- potion makes hp 1000, monthly_healing takes away 400:
+    assert_equal(600, u.hp)
+    assert_equal(0, u:get_item("p13"))
+    assert_equal(1, f:count_msg_type('use_item'))
+end
+
 function test_use_ointment()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
