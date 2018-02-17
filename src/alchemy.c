@@ -160,37 +160,6 @@ static void end_potion(unit * u, const item_type * itype, int amount)
         "unit potion", u, itype->rtype));
 }
 
-static int potion_water_of_life(unit * u, region *r, int amount) {
-    static int config;
-    static int tree_type, tree_count;
-    int wood = 0;
-
-    if (config_changed(&config)) {
-        tree_type = config_get_int("rules.magic.wol_type", 1);
-        tree_count = config_get_int("rules.magic.wol_effect", 10);
-    }
-    /* mallorn is required to make mallorn forests, wood for regular ones */
-    if (fval(r, RF_MALLORN)) {
-        wood = use_pooled(u, rt_find("mallorn"), GET_DEFAULT, tree_count * amount);
-    }
-    else {
-        wood = use_pooled(u, rt_find("log"), GET_DEFAULT, tree_count * amount);
-    }
-    if (r->land == 0)
-        wood = 0;
-    if (wood < tree_count * amount) {
-        int x = wood / tree_count;
-        if (wood % tree_count)
-            ++x;
-        if (x < amount)
-            amount = x;
-    }
-    rsettrees(r, tree_type, rtrees(r, tree_type) + wood);
-    ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
-        "mage amount", u, wood));
-    return amount;
-}
-
 void show_potions(faction *f, int sklevel)
 {
     const potion_type *ptype;
@@ -262,11 +231,8 @@ static int potion_healing(struct unit *user, int amount)
 
 static int do_potion(unit * u, region *r, const item_type * itype, int amount)
 {
-    /* TODO: why do some of these take a region argument? */
-    if (itype == oldpotiontype[P_LIFE]) {
-        return potion_water_of_life(u, r, amount);
-    }
-    else if (itype == oldpotiontype[P_PEOPLE]) {
+    /* TODO: this function should only be used for effect-changing potions */
+    if (itype == oldpotiontype[P_PEOPLE]) {
         return potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (itype == oldpotiontype[P_HORSE]) {

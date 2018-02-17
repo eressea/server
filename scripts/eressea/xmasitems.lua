@@ -62,10 +62,11 @@ function use_snowglobe(u, amount, token, ord)
 end
 
 function use_snowman(u, amount)
-    if amount>0 and u.region.terrain == "glacier" then
-        local man = unit.create(u.faction, u.region, amount, "snowman")
+    if amount > 0 and u.region.terrain == "glacier" then
+        unit.create(u.faction, u.region, amount, "snowman")
         return amount
     end
+    -- print error76:
     return -4
 end
 
@@ -79,7 +80,8 @@ function use_xmastree(u, amount)
         msg:send_region(u.region)
         return amount
     end
-    return 0
+    -- print error76:
+    return -4
 end
 
 local self = {}

@@ -376,10 +376,47 @@ static int use_warmthpotion(unit *u, const item_type *itype,
     return 0;
 }
 
+static int potion_water_of_life(unit * u, region *r, int amount) {
+    static int config;
+    static int tree_type, tree_count;
+    int wood = 0;
+
+    if (config_changed(&config)) {
+        tree_type = config_get_int("rules.magic.wol_type", 1);
+        tree_count = config_get_int("rules.magic.wol_effect", 10);
+    }
+    /* mallorn is required to make mallorn forests, wood for regular ones */
+    if (fval(r, RF_MALLORN)) {
+        wood = use_pooled(u, rt_find("mallorn"), GET_DEFAULT, tree_count * amount);
+    }
+    else {
+        wood = use_pooled(u, rt_find("log"), GET_DEFAULT, tree_count * amount);
+    }
+    if (r->land == 0)
+        wood = 0;
+    if (wood < tree_count * amount) {
+        int x = wood / tree_count;
+        if (wood % tree_count)
+            ++x;
+        if (x < amount)
+            amount = x;
+    }
+    rsettrees(r, tree_type, rtrees(r, tree_type) + wood);
+    ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
+        "mage amount", u, wood));
+    return amount;
+}
+
+static int use_water_of_life(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    return potion_water_of_life(u, u->region, amount);
+}
+
 void register_itemfunctions(void)
 {
     /* have tests: */
-    /* TODO: potions should really use use_potion */
+    register_item_use(use_water_of_life, "use_p2");
     register_item_use(use_mistletoe, "use_mistletoe");
     register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
