@@ -94,7 +94,7 @@ static int read_seenspell(variant *var, void *owner, struct gamedata *data)
     }
     sp = find_spell(token);
     if (!sp) {
-        log_info("read_seenspell: could not find spell '%s'\n", token);
+        log_error("read_seenspell: could not find spell '%s'\n", token);
         return AT_READ_FAIL;
     }
     var->v = sp;
