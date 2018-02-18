@@ -1,8 +1,8 @@
 #!/bin/sh
 
-ERESSEA_DB=sqlite
-if [ -e /usr/include/db.h ] ; then
 ERESSEA_DB=db
+if [ -e /usr/include/sqlite3.h ] ; then
+ERESSEA_DB=sqlite
 fi
 
 # Parse command line arguments
