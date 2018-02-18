@@ -9,6 +9,7 @@
 
 #include "chaos.h"
 
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/region.h>

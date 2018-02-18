@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "reports.h"
 
 #include "battle.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
@@ -575,7 +575,6 @@ report_resources(const region * r, resource_report * result, int size,
     if (see_unit) {
         rawmaterial *res = r->resources;
         while (res) {
-            int maxskill = 0;
             const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
             skill_t skill = itype->construction->skill;
@@ -588,6 +587,7 @@ report_resources(const region * r, resource_report * result, int size,
             }
             else {
                 const unit *u;
+                int maxskill = 0;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
                         int s = effskill(u, skill, 0);
@@ -923,7 +923,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     const struct unit * u, struct skill * sv, int *dh, int days)
 {
     char *bufp = buffer;
-    int i, effsk;
+    int effsk;
 
     if (!u->number)
         return 0;
@@ -953,7 +953,7 @@ spskill(char *buffer, size_t size, const struct locale * lang,
     }
 
     if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
-        i = u_geteffstealth(u);
+        int i = u_geteffstealth(u);
         if (i >= 0) {
             if (wrptr(&bufp, &size, snprintf(bufp, size, "%d/", i)) != 0)
                 WARN_STATIC_BUFFER();
@@ -2113,11 +2113,17 @@ static void eval_resource(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const struct resource_type *res = (const struct resource_type *)opop(stack).v;
-    const char *c = LOC(lang, resourcename(res, j != 1));
-    size_t len = strlen(c);
+    const char *name = resourcename(res, j != 1);
+    const char *c = LOC(lang, name);
     variant var;
+    if (c) {
+        size_t len = strlen(c);
 
-    var.v = strcpy(balloc(len + 1), c);
+        var.v = strcpy(balloc(len + 1), c);
+    } else {
+        log_error("missing translation for %s in eval_resource", name);
+        var.v = NULL;
+    }
     opush(stack, var);
 }
 
@@ -2127,11 +2133,17 @@ static void eval_race(struct opstack **stack, const void *userdata)
     const struct locale *lang = report ? report->locale : default_locale;
     int j = opop(stack).i;
     const race *r = (const race *)opop(stack).v;
-    const char *c = LOC(lang, rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL));
-    size_t len = strlen(c);
+    const char *name = rc_name_s(r, (j == 1) ? NAME_SINGULAR : NAME_PLURAL);
+    const char *c = LOC(lang, name);
     variant var;
-
-    var.v = strcpy(balloc(len + 1), c);
+    if (c) {
+        size_t len = strlen(c);
+        var.v = strcpy(balloc(len + 1), c);
+    }
+    else {
+        log_error("missing translation for %s in eval_race", name);
+        var.v = NULL;
+    }
     opush(stack, var);
 }
 
@@ -2276,7 +2288,6 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
-    int i, end = 0, begin = 0;
     const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[512];
     size_t size = sizeof(buf) - 1;
@@ -2288,6 +2299,7 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 #endif
 
     if (aregs != NULL) {
+        int i, end = 0, begin = 0;
         end = aregs->nregions;
         for (i = begin; i < end; ++i) {
             region *r = aregs->regions[i];

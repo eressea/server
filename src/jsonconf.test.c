@@ -17,7 +17,7 @@
 
 #include "util/language.h"
 
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "direction.h"
 #include "keyword.h"
 #include "move.h"

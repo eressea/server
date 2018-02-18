@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_MAGIC
 
 #include <kernel/types.h>
+#include <util/variant.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -191,13 +192,11 @@ extern "C" {
 
     void regenerate_aura(void);
 
-    extern struct attrib_type at_seenspell;
     extern struct attrib_type at_mage;
     extern struct attrib_type at_familiarmage;
     extern struct attrib_type at_familiar;
     extern struct attrib_type at_clonemage;
     extern struct attrib_type at_clone;
-    extern struct attrib_type at_reportspell;
     extern struct attrib_type at_icastle;
 
     void make_icastle(struct building *b, const struct building_type *btype, int timeout);
@@ -243,7 +242,6 @@ extern "C" {
     int u_hasspell(const struct unit *u, const struct spell *sp);
     /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
-    void show_new_spells(struct faction * f, int level, const struct spellbook *book);
     bool knowsspell(const struct region *r, const struct unit *u,
         const struct spell * sp);
     /* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh

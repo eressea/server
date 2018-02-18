@@ -21,11 +21,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 #include <kernel/config.h>
 #include "study.h"
+
 #include "laws.h"
 #include "move.h"
 #include "monsters.h"
 #include "alchemy.h"
 #include "academy.h"
+#include "kernel/calendar.h"
 
 #include <spells/regioncurse.h>
 
@@ -173,16 +175,16 @@ int study_cost(struct unit *u, skill_t sk)
 
 /* ------------------------------------------------------------- */
 
-static void init_learning(struct attrib *a)
+static void init_learning(variant *var)
 {
-    a->data.v = calloc(sizeof(teaching_info), 1);
+    var->v = calloc(sizeof(teaching_info), 1);
 }
 
-static void done_learning(struct attrib *a)
+static void done_learning(variant *var)
 {
-    teaching_info *teach = (teaching_info *)a->data.v;
+    teaching_info *teach = (teaching_info *)var->v;
     selist_free(teach->teachers);
-    free(a->data.v);
+    free(teach);
 }
 
 const attrib_type at_learning = {
@@ -475,10 +477,10 @@ typedef enum study_rule_t {
 static double study_speedup(unit * u, skill_t s, study_rule_t rule)
 {
 #define MINTURN 16
-    double learnweeks = 0;
-    int i;
     if (turn > MINTURN) {
         if (rule == STUDY_FASTER) {
+            double learnweeks = 0;
+            int i;
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 if (sv->id == s) {
@@ -491,6 +493,8 @@ static double study_speedup(unit * u, skill_t s, study_rule_t rule)
             return 2.0; /* If the skill was not found it is the first study. */
         }
         if (rule == STUDY_AUTOTEACH) {
+            double learnweeks = 0;
+            int i;
             for (i = 0; i != u->skill_size; ++i) {
                 skill *sv = u->skills + i;
                 learnweeks += (sv->level * (sv->level + 1) / 2.0);
@@ -547,7 +551,6 @@ int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
     int p;
-    magic_t mtyp;
     int l;
     int studycost, days;
     double multi = 1.0;
@@ -621,6 +624,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (sk == SK_MAGIC) {
+        magic_t mtyp;
         if (u->number > 1) {
             cmistake(u, ord, 106, MSG_MAGIC);
             return -1;

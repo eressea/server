@@ -18,7 +18,6 @@
  */
 
 #include <platform.h>
-#include <kernel/config.h>
 
 #include "monsters.h"
 
@@ -29,32 +28,27 @@
 #include "laws.h"
 #include "keyword.h"
 #include "study.h"
-
-/* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/hate.h>
-
-#include <spells/regioncurse.h>
+#include "move.h"
 
 /* kernel includes */
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/pathfinder.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-
-#include <move.h>
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/pathfinder.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -67,6 +61,12 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
+
+/* attributes includes */
+#include <attributes/targetregion.h>
+#include <attributes/hate.h>
+
+#include <spells/regioncurse.h>
 
 #include <selist.h>
 
@@ -615,11 +615,11 @@ static void recruit_dracoids(unit * dragon, int size)
     change_money(dragon, -un->number * 50);
     equip_unit(un, get_equipment("new_dracoid"));
 
-    setstatus(un, ST_FIGHT);
+    unit_setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
         const weapon_type *wtype = weapon->type->rtype->wtype;
         if (wtype && wtype->flags & WTF_MISSILE) {
-            setstatus(un, ST_BEHIND);
+            unit_setstatus(un, ST_BEHIND);
             break;
         }
     }

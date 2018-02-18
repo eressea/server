@@ -3,7 +3,7 @@
 <resources>
 <resource name="firesword">
   <item weight="100">
-    <weapon magres="0.3" cut="true" skill="melee" offmod="1" defmod="1">
+    <weapon magres="0.3" cut="true" magical="true" skill="melee" offmod="1" defmod="1">
       <function name="attack" value="attack_firesword"/>
       <damage type="rider" value="3d6+10"/>
       <damage type="footman" value="3d6+10"/>

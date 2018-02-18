@@ -16,7 +16,7 @@
         <requirement type="adamantium" quantity="1"/>
         <requirement type="log" quantity="1"/>
       </construction>
-      <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
+      <weapon cut="true" magical="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
         <damage type="rider" value="3d4+15"/>
         <damage type="footman" value="3d4+15"/>
       </weapon>

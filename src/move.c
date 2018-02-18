@@ -20,7 +20,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
+
+/* kernel includes */
+#include "kernel/ally.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/connection.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/render.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+
 #include "move.h"
 #include "guard.h"
 #include "laws.h"
@@ -44,28 +65,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/stealth.h>
 #include <attributes/targetregion.h>
 
-/* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/connection.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/render.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-
 #include "teleport.h"
 #include "direction.h"
-#include "calendar.h"
 #include "skill.h"
 
 /* util includes */
@@ -138,14 +139,9 @@ get_followers(unit * target, region * r, const region_list * route_end,
     }
 }
 
-static void shiptrail_init(attrib * a)
+static void shiptrail_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(traveldir));
-}
-
-static void shiptrail_finalize(attrib * a)
-{
-    free(a->data.v);
+    var->v = calloc(1, sizeof(traveldir));
 }
 
 static int shiptrail_age(attrib * a, void *owner)
@@ -157,11 +153,11 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
+static int shiptrail_read(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int n;
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     READ_INT(store, &t->no);
@@ -172,9 +168,9 @@ static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-shiptrail_write(const attrib * a, const void *owner, struct storage *store)
+shiptrail_write(const variant *var, const void *owner, struct storage *store)
 {
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, t->no);
@@ -185,7 +181,7 @@ shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_shiptrail = {
     "traveldir_new",
     shiptrail_init,
-    shiptrail_finalize,
+    a_free_voidptr,
     shiptrail_age,
     shiptrail_write,
     shiptrail_read
@@ -289,7 +285,7 @@ static int ridingcapacity(const unit * u)
 int walkingcapacity(const struct unit *u)
 {
     int n, people, pferde_fuer_wagen, horses;
-    int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
+    int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
     const struct resource_type *rhorse = rt_find("horse");
@@ -317,6 +313,7 @@ int walkingcapacity(const struct unit *u)
     n = wagen_mit_pferden * vcap;
 
     if (u_race(u) == get_race(RC_TROLL)) {
+        int wagen_ohne_pferde, wagen_mit_trollen;
         /* 4 Trolle ziehen einen Wagen. */
         /* Unbesetzte Wagen feststellen */
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
@@ -687,7 +684,6 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    int c = 0;
     const building_type *bt_harbour = bt_find("harbour");
 
     if (sh->region && r_insectstalled(r)) {
@@ -713,6 +709,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         return SA_COAST;
     }
     if (sh->type->coasts) {
+        int c;
         for (c = 0; sh->type->coasts[c] != NULL; ++c) {
             if (sh->type->coasts[c] == r->terrain) {
                 return SA_COAST;

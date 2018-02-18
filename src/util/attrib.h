@@ -20,27 +20,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ATTRIB_H
 
 #include <stdbool.h>
-
+#include "variant.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+    union variant;
     struct gamedata;
     struct storage;
     typedef void(*afun) (void);
 
     typedef struct attrib {
         const struct attrib_type *type;
-        union {
-            afun f;
-            void *v;
-            int i;
-            float flt;
-            char c;
-            short s;
-            short sa[2];
-            char ca[4];
-        } data;
+        union variant data;
         /* internal data, do not modify: */
         struct attrib *next;        /* next attribute in the list */
         struct attrib *nexttype;    /* skip to attribute of a different type */
@@ -52,12 +44,12 @@ extern "C" {
 
     typedef struct attrib_type {
         const char *name;
-        void(*initialize) (struct attrib *);
-        void(*finalize) (struct attrib *);
+        void(*initialize) (union variant *);
+        void(*finalize) (union variant *);
         int(*age) (struct attrib *, void *owner);
         /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-        void(*write) (const struct attrib *, const void *owner, struct storage *);
-        int(*read) (struct attrib *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+        void(*write) (const union variant *, const void *owner, struct storage *);
+        int(*read) (union variant *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
         void(*upgrade) (struct attrib **alist, struct attrib *a);
         unsigned int flags;
         /* ---- internal data, do not modify: ---- */
@@ -66,7 +58,7 @@ extern "C" {
     } attrib_type;
 
     void at_register(attrib_type * at);
-    void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *));
+    void at_deprecate(const char * name, int (*reader)(variant *, void *, struct gamedata *));
     struct attrib_type *at_find(const char *name);
 
     void write_attribs(struct storage *store, struct attrib *alist, const void *owner);
@@ -80,25 +72,26 @@ extern "C" {
     attrib *a_new(const attrib_type * at);
     int a_age(attrib ** attribs, void *owner);
 
+    void a_free_voidptr(union variant *v);
     int a_read_orig(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write_orig(struct storage *store, const attrib * attribs, const void *owner);
 
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
 
-    int a_readint(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeint(const struct attrib *a, const void *owner,
+    int a_readint(union variant *v, void *owner, struct gamedata *);
+    void a_writeint(const union variant *v, const void *owner,
         struct storage *store);
-    int a_readshorts(struct attrib *a, void *owner, struct gamedata *);
-    void a_writeshorts(const struct attrib *a, const void *owner,
+    int a_readshorts(union variant *v, void *owner, struct gamedata *);
+    void a_writeshorts(const union variant *v, const void *owner,
         struct storage *store);
-    int a_readchars(struct attrib *a, void *owner, struct gamedata *);
-    void a_writechars(const struct attrib *a, const void *owner,
+    int a_readchars(union variant *v, void *owner, struct gamedata *);
+    void a_writechars(const union variant *v, const void *owner,
         struct storage *store);
-    int a_readstring(struct attrib *a, void *owner, struct gamedata *);
-    void a_writestring(const struct attrib *a, const void *owner,
+    int a_readstring(union variant *v, void *owner, struct gamedata *);
+    void a_writestring(const union variant *v, const void *owner,
         struct storage *);
-    void a_finalizestring(struct attrib *a);
+    void a_finalizestring(union variant *v);
 
     void attrib_done(void);
 

@@ -136,9 +136,9 @@ static int ally_mode(const ally * sf, int mode)
     return sf->status & mode;
 }
 
-static void init_npcfaction(struct attrib *a)
+static void init_npcfaction(variant *var)
 {
-    a->data.i = 1;
+    var->i = 1;
 }
 
 attrib_type at_npcfaction = {

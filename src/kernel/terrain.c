@@ -71,12 +71,12 @@ bool terrain_changed(int *cache) {
 void free_terrains(void)
 {
     while (registered_terrains) {
-        int n;
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
         free(t->herbs);
         if (t->production) {
+            int n;
             for (n = 0; t->production[n].type; ++n) {
                 free(t->production[n].base);
                 free(t->production[n].divisor);

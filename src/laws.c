@@ -41,42 +41,33 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "prefix.h"
 #include "reports.h"
 #include "teleport.h"
-#include "calendar.h"
 #include "guard.h"
 #include "volcano.h"
 
-/* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/raceprefix.h>
-#include <attributes/stealth.h>
-
-#include <spells/buildingcurse.h>
-#include <spells/regioncurse.h>
-#include <spells/unitcurse.h>
-
 /* kernel includes */
-#include <kernel/alliance.h>
-#include <kernel/ally.h>
-#include <kernel/callbacks.h>
-#include <kernel/connection.h>
-#include <kernel/curse.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/alliance.h"
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/callbacks.h"
+#include "kernel/connection.h"
+#include "kernel/curse.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -97,10 +88,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
+/* attributes includes */
 #include <attributes/otherfaction.h>
+#include <attributes/racename.h>
+#include <attributes/raceprefix.h>
+#include <attributes/seenspell.h>
+#include <attributes/stealth.h>
+
+#include <spells/buildingcurse.h>
+#include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
 
 #include <selist.h>
 #include <iniparser.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -2306,13 +2307,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
         }
 
         if (sp) {
-            attrib *a = a_find(u->faction->attribs, &at_seenspell);
-            while (a != NULL && a->type == &at_seenspell && a->data.v != sp) {
-                a = a->next;
-            }
-            if (a != NULL) {
-                a_remove(&u->faction->attribs, a);
-            }
+            reset_seen_spells(u->faction, sp);
             found = true;
         }
 
@@ -2330,7 +2325,7 @@ static void reshow(unit * u, struct order *ord, const char *s, param_t p)
 {
     switch (p) {
     case P_ZAUBER:
-        a_removeall(&u->faction->attribs, &at_seenspell);
+        reset_seen_spells(u->faction, NULL);
         break;
     case P_POTIONS:
         if (!display_potions(u)) {
@@ -2443,22 +2438,22 @@ int status_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
     switch (findparam(s, u->faction->locale)) {
     case P_NOT:
-        setstatus(u, ST_AVOID);
+        unit_setstatus(u, ST_AVOID);
         break;
     case P_BEHIND:
-        setstatus(u, ST_BEHIND);
+        unit_setstatus(u, ST_BEHIND);
         break;
     case P_FLEE:
-        setstatus(u, ST_FLEE);
+        unit_setstatus(u, ST_FLEE);
         break;
     case P_CHICKEN:
-        setstatus(u, ST_CHICKEN);
+        unit_setstatus(u, ST_CHICKEN);
         break;
     case P_AGGRO:
-        setstatus(u, ST_AGGRO);
+        unit_setstatus(u, ST_AGGRO);
         break;
     case P_VORNE:
-        setstatus(u, ST_FIGHT);
+        unit_setstatus(u, ST_FIGHT);
         break;
     case P_HELP:
         if (getparam(u->faction->locale) == P_NOT) {
@@ -2474,7 +2469,7 @@ int status_cmd(unit * u, struct order *ord)
                 msg_feedback(u, ord, "unknown_status", ""));
         }
         else {
-            setstatus(u, ST_FIGHT);
+            unit_setstatus(u, ST_FIGHT);
         }
     }
     return 0;
@@ -2725,10 +2720,10 @@ static void age_stonecircle(building *b) {
             curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
                 int sk = effskill(mage, SK_MAGIC, 0);
-                float effect = 100;
                 if (sk > 0) {
                     int vig = sk;
                     int dur = (sk + 1) / 2;
+                    float effect = 100;
                     /* the mage reactivates the circle */
                     c = create_curse(mage, &rt->attribs, &ct_astralblock,
                         vig, dur, effect, 0);
@@ -2945,7 +2940,7 @@ void maketemp_cmd(unit *u, order **olist)
         if (sh) {
             set_leftship(u2, sh);
         }
-        setstatus(u2, u->status);
+        unit_setstatus(u2, u->status);
 
         /* copy orders until K_END from u to u2 */
         ordp = &makeord->next;
@@ -3298,6 +3293,21 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
                 if (!spellbook_get(dst, sbe->sp)) {
                     spellbook_add(dst, sbe->sp, sbe->level);
                 }
+            }
+        }
+    }
+}
+
+static void show_new_spells(faction * f, int level, const spellbook *book)
+{
+    if (book) {
+        selist *ql = book->spells;
+        int qi;
+
+        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+            if (sbe->level <= level) {
+                show_spell(f, sbe);
             }
         }
     }

@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "ally.h"
 #include "building.h"
+#include "calendar.h"
 #include "faction.h"
 #include "group.h"
 #include "connection.h"
@@ -506,13 +507,13 @@ int ualias(const unit * u)
     return a->data.i;
 }
 
-int a_readprivate(attrib * a, void *owner, gamedata *data)
+int a_readprivate(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = str_strdup(lbuf);
-    return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
+    var->v = str_strdup(lbuf);
+    return (var->v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
 /*********************/
@@ -573,35 +574,6 @@ void usetprivate(unit * u, const char *str)
 }
 
 /*********************/
-/*   at_potionuser   */
-/*********************/
-/* Einheit BENUTZT einen Trank */
-attrib_type at_potionuser = {
-    "potionuser",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-void usetpotionuse(unit * u, const item_type * ptype)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        a = a_add(&u->attribs, a_new(&at_potionuser));
-    a->data.v = (void *)ptype;
-}
-
-const item_type *ugetpotionuse(const unit * u)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        return NULL;
-    return (const item_type *)a->data.v;
-}
-
-/*********************/
 /*   at_target   */
 /*********************/
 attrib_type at_target = {
@@ -644,15 +616,15 @@ void usettarget(unit * u, const unit * t)
 /*   at_siege   */
 /*********************/
 
-void a_writesiege(const attrib * a, const void *owner, struct storage *store)
+void a_writesiege(const variant *var, const void *owner, struct storage *store)
 {
-    struct building *b = (struct building *)a->data.v;
+    struct building *b = (struct building *)var->v;
     write_building_reference(b, store);
 }
 
-int a_readsiege(attrib * a, void *owner, gamedata *data)
+int a_readsiege(variant *var, void *owner, gamedata *data)
 {
-    if (read_building_reference(data, (building **)&a->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&var->v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -1530,7 +1502,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         attrib *a;
 
         /* erbt Kampfstatus */
-        setstatus(u, creator->status);
+        unit_setstatus(u, creator->status);
 
         /* erbt Gebaeude/Schiff */
         if (creator->region == r) {
@@ -1983,14 +1955,6 @@ bool has_horses(const unit * u)
             return true;
     }
     return false;
-}
-
-void setstatus(unit *u, int status)
-{
-    assert(status >= ST_AGGRO && status <= ST_FLEE);
-    if (u->status != status) {
-        u->status = (status_t)status;
-    }
 }
 
 #define MAINTENANCE 10

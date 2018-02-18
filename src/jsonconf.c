@@ -11,36 +11,36 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "jsonconf.h"
 
 /* kernel includes */
-#include <kernel/building.h>
-#include <kernel/equipment.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/equipment.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/crmessage.h>
-#include <util/functions.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/message.h>
-#include <util/nrmessage.h>
-#include <util/path.h>
-#include <util/strings.h>
-#include <util/xml.h>
+#include "util/attrib.h"
+#include "util/crmessage.h"
+#include "util/functions.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/message.h"
+#include "util/nrmessage.h"
+#include "util/path.h"
+#include "util/strings.h"
+#include "util/xml.h"
 
 /* game modules */
-#include "calendar.h"
 #include "direction.h"
 #include "keyword.h"
 #include "move.h"
@@ -124,7 +124,7 @@ static void json_maintenance_i(cJSON *json, maintenance *mt) {
 static void json_maintenance(cJSON *json, maintenance **mtp) {
     cJSON *child;
     maintenance *mt;
-    int i, size = 1;
+    int size = 1;
 
     if (json->type == cJSON_Array) {
         size = cJSON_GetArraySize(json);
@@ -135,6 +135,7 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
     }
     *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
     if (json->type == cJSON_Array) {
+        int i;
         for (i = 0, child = json->child; child; child = child->next, ++i) {
             if (child->type == cJSON_Object) {
                 json_maintenance_i(child, mt + i);
@@ -932,6 +933,7 @@ static int include_json(const char *uri) {
     FILE *F;
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
+    int result = -1;
 
     F = fopen(filename, "r");
     if (F) {
@@ -952,15 +954,16 @@ static int include_json(const char *uri) {
             if (config) {
                 json_config(config);
                 cJSON_Delete(config);
+                result = 0;
             }
             else {
                 log_error("could not parse JSON from %s", uri);
-                return -1;
+                result = -1;
             }
         }
         fclose(F);
     }
-    return 0;
+    return result;
 }
 
 static int include_xml(const char *uri) {

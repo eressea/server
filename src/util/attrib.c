@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "gamedata.h"
 #include "log.h"
+#include "variant.h"
 #include "storage.h"
 #include "strings.h"
 
@@ -41,12 +42,13 @@ int read_attribs(gamedata *data, attrib **alist, void *owner) {
     }
     if (result == AT_READ_DEPR) {
         /* handle deprecated attributes */
-        attrib *a = *alist;
-        while (a) {
+        attrib **ap = alist;
+        while (*ap) {
+            attrib *a = *ap;
             if (a->type->upgrade) {
                 a->type->upgrade(alist, a);
             }
-            a = a->nexttype;
+            ap = &a->nexttype;
         }
     }
     return result;
@@ -61,57 +63,57 @@ void write_attribs(storage *store, attrib *alist, const void *owner)
 #endif
 }
 
-int a_readint(attrib * a, void *owner, struct gamedata *data)
+int a_readint(variant * var, void *owner, struct gamedata *data)
 {
     int n;
     READ_INT(data->store, &n);
-    if (a) a->data.i = n;
+    var->i = n;
     return AT_READ_OK;
 }
 
-void a_writeint(const attrib * a, const void *owner, struct storage *store)
+void a_writeint(const variant * var, const void *owner, struct storage *store)
 {
-    WRITE_INT(store, a->data.i);
+    WRITE_INT(store, var->i);
 }
 
-int a_readshorts(attrib * a, void *owner, struct gamedata *data)
+int a_readshorts(variant * var, void *owner, struct gamedata *data)
 {
     int n;
     READ_INT(data->store, &n);
-    a->data.sa[0] = (short)n;
+    var->sa[0] = (short)n;
     READ_INT(data->store, &n);
-    a->data.sa[1] = (short)n;
+    var->sa[1] = (short)n;
     return AT_READ_OK;
 }
 
-void a_writeshorts(const attrib * a, const void *owner, struct storage *store)
+void a_writeshorts(const variant * var, const void *owner, struct storage *store)
 {
-    WRITE_INT(store, a->data.sa[0]);
-    WRITE_INT(store, a->data.sa[1]);
+    WRITE_INT(store, var->sa[0]);
+    WRITE_INT(store, var->sa[1]);
 }
 
-int a_readchars(attrib * a, void *owner, struct gamedata *data)
+int a_readchars(variant * var, void *owner, struct gamedata *data)
 {
     int i;
     for (i = 0; i != 4; ++i) {
         int n;
         READ_INT(data->store, &n);
-        a->data.ca[i] = (char)n;
+        var->ca[i] = (char)n;
     }
     return AT_READ_OK;
 }
 
-void a_writechars(const attrib * a, const void *owner, struct storage *store)
+void a_writechars(const variant * var, const void *owner, struct storage *store)
 {
     int i;
 
     for (i = 0; i != 4; ++i) {
-        WRITE_INT(store, a->data.ca[i]);
+        WRITE_INT(store, var->ca[i]);
     }
 }
 
 #define DISPLAYSIZE 8192
-int a_readstring(attrib * a, void *owner, struct gamedata *data)
+int a_readstring(variant * var, void *owner, struct gamedata *data)
 {
     char buf[DISPLAYSIZE];
     char * result = 0;
@@ -133,19 +135,19 @@ int a_readstring(attrib * a, void *owner, struct gamedata *data)
             result = str_strdup(buf);
         }
     } while (e == ENOMEM);
-    a->data.v = result;
+    var->v = result;
     return AT_READ_OK;
 }
 
-void a_writestring(const attrib * a, const void *owner, struct storage *store)
+void a_writestring(const variant * var, const void *owner, struct storage *store)
 {
-    assert(a->data.v);
-    WRITE_STR(store, (const char *)a->data.v);
+    assert(var && var->v);
+    WRITE_STR(store, (const char *)var->v);
 }
 
-void a_finalizestring(attrib * a)
+void a_finalizestring(variant * var)
 {
-    free(a->data.v);
+    free(var->v);
 }
 
 #define MAXATHASH 61
@@ -308,11 +310,16 @@ static int a_unlink(attrib ** pa, attrib * a)
     return 0;
 }
 
+void a_free_voidptr(union variant *var)
+{
+    free(var->v);
+}
+
 static void a_free(attrib * a)
 {
     const attrib_type *at = a->type;
     if (at->finalize)
-        at->finalize(a);
+        at->finalize(&a->data);
     free(a);
 }
 
@@ -376,7 +383,7 @@ attrib *a_new(const attrib_type * at)
     assert(at != NULL);
     a->type = at;
     if (at->initialize)
-        at->initialize(a);
+        at->initialize(&a->data);
     return a;
 }
 
@@ -404,10 +411,10 @@ static critbit_tree cb_deprecated = { 0 };
 
 typedef struct deprecated_s {
     unsigned int hash;
-    int(*reader)(attrib *, void *, struct gamedata *);
+    int(*reader)(variant *, void *, struct gamedata *);
 } deprecated_t;
 
-void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamedata *))
+void at_deprecate(const char * name, int(*reader)(variant *, void *, struct gamedata *))
 {
     deprecated_t value;
     
@@ -418,13 +425,15 @@ void at_deprecate(const char * name, int(*reader)(attrib *, void *, struct gamed
 
 static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int key) {
     int retval = AT_READ_OK;
-    int(*reader)(attrib *, void *, struct gamedata *) = 0;
+    int(*reader)(variant *, void *, struct gamedata *) = 0;
     attrib_type *at = at_find_key(key);
-    attrib * na = 0;
+    attrib * na = NULL;
+    variant var, *vp = &var;
 
     if (at) {
         reader = at->read;
         na = a_new(at);
+        vp = &na->data;
     }
     else {
         void *match;
@@ -438,16 +447,20 @@ static int a_read_i(gamedata *data, attrib ** attribs, void *owner, unsigned int
         }
     }
     if (reader) {
-        int ret = reader(na, owner, data);
+        int ret = reader(vp, owner, data);
         if (na) {
             switch (ret) {
             case AT_READ_DEPR:
             case AT_READ_OK:
-                a_add(attribs, na);
+                if (na) {
+                    a_add(attribs, na);
+                }
                 retval = ret;
                 break;
             case AT_READ_FAIL:
-                a_free(na);
+                if (na) {
+                    a_free(na);
+                }
                 break;
             default:
                 assert(!"invalid return value");
@@ -508,7 +521,7 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner) {
         if (na->type->write) {
             assert(na->type->hashkey || !"attribute not registered");
             WRITE_INT(store, na->type->hashkey);
-            na->type->write(na, owner, store);
+            na->type->write(&na->data, owner, store);
             na = na->next;
         }
         else {
@@ -526,7 +539,7 @@ void a_write_orig(struct storage *store, const attrib * attribs, const void *own
         if (na->type->write) {
             assert(na->type->hashkey || !"attribute not registered");
             WRITE_TOK(store, na->type->name);
-            na->type->write(na, owner, store);
+            na->type->write(&na->data, owner, store);
             na = na->next;
         }
         else {

@@ -86,7 +86,7 @@
     <construction skill="weaponsmithing" minskill="8">
       <requirement type="laen" quantity="1"/>
     </construction>
-    <weapon cut="true" skill="melee" offmod="1" defmod="1" magres="0.30">
+    <weapon cut="true" magical="true" skill="melee" offmod="1" defmod="1" magres="0.30">
       <damage type="rider" value="2d9+4"/>
       <damage type="footman" value="2d9+4"/>
     </weapon>

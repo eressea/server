@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "laws.h"
 #include "move.h"
+#include "magic.h"
 
 /* attributes includes */
 #include "follow.h"
@@ -29,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
-#include "magic.h"
 #include "moved.h"
 #include "movement.h"
 #include "dict.h"
@@ -38,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "racename.h"
 #include "raceprefix.h"
 #include "reduceproduction.h"
+#include "seenspell.h"
 #include "targetregion.h"
 
 /* kernel includes */
@@ -67,42 +68,45 @@ typedef struct obs_data {
     int timer;
 } obs_data;
 
-static void obs_init(struct attrib *a)
+static void obs_init(variant *var)
 {
-    a->data.v = malloc(sizeof(obs_data));
-}
-
-static void obs_done(struct attrib *a)
-{
-    free(a->data.v);
+    var->v = malloc(sizeof(obs_data));
 }
 
 static int obs_age(struct attrib *a, void *owner)
 {
     obs_data *od = (obs_data *)a->data.v;
+
+    UNUSED_ARG(owner);
     update_interval(od->f, (region *)owner);
     return --od->timer;
 }
 
-static void obs_write(const struct attrib *a, const void *owner, struct storage *store)
+static void obs_write(const variant *var, const void *owner,
+    struct storage *store)
 {
-    obs_data *od = (obs_data *)a->data.v;
+    obs_data *od = (obs_data *)var->v;
+
+    UNUSED_ARG(owner);
     write_faction_reference(od->f, store);
     WRITE_INT(store, od->skill);
     WRITE_INT(store, od->timer);
 }
 
-static int obs_read(struct attrib *a, void *owner, struct gamedata *data)
+static int obs_read(variant *var, void *owner, struct gamedata *data)
 {
-    obs_data *od = (obs_data *)a->data.v;
+    obs_data *od = (obs_data *)var->v;
 
+    UNUSED_ARG(owner);
     read_faction_reference(data, &od->f, NULL);
     READ_INT(data->store, &od->skill);
     READ_INT(data->store, &od->timer);
     return AT_READ_OK;
 }
 
-attrib_type at_observer = { "observer", obs_init, obs_done, obs_age, obs_write, obs_read };
+attrib_type at_observer = {
+    "observer", obs_init, a_free_voidptr, obs_age, obs_write, obs_read
+};
 
 static attrib *make_observer(faction *f, int perception)
 {
@@ -153,10 +157,11 @@ attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
-static int read_ext(attrib * a, void *owner, gamedata *data)
+static int read_ext(variant *var, void *owner, gamedata *data)
 {
     int len;
 
+    UNUSED_ARG(var);
     READ_INT(data->store, &len);
     data->store->api->r_bin(data->store->handle, NULL, (size_t)len);
     return AT_READ_OK;
@@ -174,8 +179,8 @@ void register_attributes(void)
     at_register(&at_mage);
     at_register(&at_countdown);
     at_register(&at_curse);
-
     at_register(&at_seenspell);
+    at_register(&at_seenspells);
 
     /* neue REGION-Attribute */
     at_register(&at_moveblock);

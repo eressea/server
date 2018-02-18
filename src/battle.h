@@ -28,6 +28,7 @@ extern "C" {
 
     struct message;
     struct selist;
+    union variant;
 
     /** more defines **/
 #define FS_ENEMY 1

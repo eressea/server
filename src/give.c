@@ -158,18 +158,15 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
     int n)
 {
-    double divisor;
-
     if (!limited_give(type)) {
         return n;
     }
     if (dst && src && src->faction != dst->faction) {
-        divisor = config_get_flt("rules.items.give_divisor", 1);
+        int divisor = config_get_int("rules.items.give_divisor", 1);
         assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
-            int x = (int)(n / divisor);
-            return x;
+            return n / divisor;
         }
     }
     return n;
@@ -306,7 +303,6 @@ static bool rule_transfermen(void)
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
     ship *sh;
-    int k = 0;
     int error = 0;
     message * msg;
     int maxt = max_transfers();
@@ -391,7 +387,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
-        k = count_skill(u2->faction, SK_ALCHEMY);
+        int k = count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
          * welche. */

@@ -1863,7 +1863,7 @@
   <string name="goliathwater">
     <text locale="de">Goliathwasser</text>
   </string>
-  <string name="p2">
+  <string name="lifepotion">
     <text locale="de">Wasser des Lebens</text>
   </string>
   <string name="p3">
@@ -1899,7 +1899,7 @@
   <string name="p13">
     <text locale="de">Elixier der Macht</text>
   </string>
-  <string name="p14">
+  <string name="healing">
     <text locale="de">Heiltrank</text>
   </string>
 
@@ -1909,7 +1909,7 @@
   <string name="goliathwater_p">
     <text locale="de">Goliathwasser</text>
   </string>
-  <string name="p2_p">
+  <string name="lifepotion_p">
     <text locale="de">Wasser des Lebens</text>
   </string>
   <string name="p3_p">
@@ -1945,7 +1945,7 @@
   <string name="p13_p">
     <text locale="de">Elixiere der Macht</text>
   </string>
-  <string name="p14_p">
+  <string name="healing_p">
     <text locale="de">Heiltränke</text>
   </string>
 
@@ -3592,7 +3592,7 @@
       <text locale="en">'First roast the Gurgelkraut quickly and add some Fjordwuchs to spice it up. Let it all boil slowly until almost all liquid has evaporated. Leave the mash overnight and finally squeeze it the next morning until a thick fluid drips out.' The liquid thus produced, 'Goliath Water' as we call it, is enough for 10 men and gives each man the carrying capacity of a horse for one week.</text>
       <text locale="de">Zuerst brate man das Gurgelkraut leicht an und würze das Zeug mit ein wenig Fjordwuchs. Man lasse alles so lange kochen, bis fast alle Flüssigkeit verdampft ist. Diesen Brei stelle man über Nacht raus. Am nächsten Morgen presse man den Brei aus. Die so gewonnene Flüssigkeit, Goliathwasser genannt, verleiht bis zu zehn Männern die Tragkraft eines Pferdes.</text>
     </string>
-    <string name="p2">
+    <string name="lifepotion">
       <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
       <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
     </string>
@@ -3640,7 +3640,7 @@
       <text locale="en">One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood. </text>
       <text locale="de">Eines der seltensten und wertvollsten alchemistischen Elixiere, verleiht dieser Trank dem Anwender für einige Wochen die Kraft eines Drachen. Der Trank erhöht die Lebensenergie von maximal zehn Personen auf das fünffache. Die Wirkung ist direkt nach der Einnahme am stärksten und klingt danach langsam ab. Zur Herstellung benötigt der Alchemist ein Elfenlieb, einen Windbeutel, ein Stück Wasserfinder und einen Grünen Spinnerich. Über dieses Mischung streue er schließlich einen zerriebenen Blasenmorchel und rühre dieses Pulver unter etwas Drachenblut.</text>
     </string>
-    <string name="p14">
+    <string name="healing">
       <text locale="en">For a healing potion one takes the peel of a windbag and some bugleweed, stirr in some chopped elvendear and sprinkle it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury.</text>
       <text locale="de">Für einen Heiltrank nehme man die Schale eines Windbeutels und etwas Gurgelkraut, rühre eine kleingehacktes Elfenlieb dazu und bestreue alles mit den Blüten einer Eisblume. Dies muß vier Tage lang gären, wobei man am zweiten Tag einen Spaltwachs dazutun muß. Dann ziehe man vorsichtig den oben schwimmenden Saft ab. Ein solcher Trank gibt vier Männern (oder einem Mann vier mal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt.</text>
     </string>

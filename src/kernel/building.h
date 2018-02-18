@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/types.h>
 #include <util/resolve.h>
+#include <util/variant.h>
 
 #include <stddef.h>
 #include <stdbool.h>

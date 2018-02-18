@@ -150,9 +150,6 @@ extern "C" {
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
 
-    const struct item_type *ugetpotionuse(const struct unit *u);        /* benutzt u einein trank? */
-    void usetpotionuse(struct unit *u, const struct item_type *p);      /* u benutzt trank p (es darf halt nur einer pro runde) */
-
     bool ucontact(const struct unit *u, const struct unit *u2);
     void usetcontact(struct unit *u, const struct unit *c);
 
@@ -267,7 +264,6 @@ extern "C" {
     int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
     int read_unitid(const struct faction *f, const struct region *r);
 
-    void setstatus(struct unit *u, int status);
     /* !< sets combatstatus of a unit */
     int besieged(const struct unit *u);
     bool has_horses(const struct unit *u);

@@ -421,7 +421,7 @@
     <resource name="h20" amount="1" cost="linear"/><!-- Schneekristall -->
     <resource name="h9" amount="1" cost="linear"/><!-- Wasserfinder -->
   </spell>
-  <spell name="create_potion_p14" ship="true" rank="5" variable="true">
+  <spell name="create_potion_healing" ship="true" rank="5" variable="true">
     <!-- Heiltrank -->
     <resource name="aura" amount="5" cost="linear"/>
     <resource name="h0" amount="1" cost="linear"/><!-- Flachwurz -->

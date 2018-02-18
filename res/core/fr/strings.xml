@@ -1085,10 +1085,10 @@
   <string name="p1_p">
     <text locale="fr">breuvage de Goliath</text>
   </string>
-  <string name="p2">
+  <string name="lifepotion">
     <text locale="fr">élixir de vie</text>
   </string>
-  <string name="p2_p">
+  <string name="lifepotion_p">
     <text locale="fr">élixir de vie</text>
   </string>
   <string name="p3">
@@ -1157,10 +1157,10 @@
   <string name="p13_p">
     <text locale="fr">elixir d'endurance</text>
   </string>
-  <string name="p14">
+  <string name="healing">
     <text locale="fr">potion de survie</text>
   </string>
-  <string name="p14_p">
+  <string name="healing_p">
     <text locale="fr">potions de survie</text>
   </string>
 

@@ -34,20 +34,15 @@ typedef struct piracy_data {
     direction_t dir;
 } piracy_data;
 
-static void piracy_init(struct attrib *a)
+static void piracy_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(piracy_data));
-}
-
-static void piracy_done(struct attrib *a)
-{
-    free(a->data.v);
+    var->v = calloc(1, sizeof(piracy_data));
 }
 
 static attrib_type at_piracy_direction = {
     "piracy_direction",
     piracy_init,
-    piracy_done,
+    a_free_voidptr,
     DEFAULT_AGE,
     NO_WRITE,
     NO_READ
@@ -127,7 +122,6 @@ void piracy_cmd(unit * u)
         const faction *target;
         int value;
     } aff[MAXDIRECTIONS];
-    int saff = 0;
     int *il;
 
     assert(u->thisorder);
@@ -144,6 +138,7 @@ void piracy_cmd(unit * u)
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
     if (target_dir == NODIRECTION) {
+        int saff = 0;
         direction_t dir;
         /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
         * Nachbarregionen potentielle Opfer sind. */

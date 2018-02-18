@@ -17,8 +17,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
+
 #include "faction.h"
+
+#include "calendar.h"
+#include "config.h"
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"

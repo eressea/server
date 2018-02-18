@@ -221,9 +221,9 @@ extern "C" {
 
     void curses_done(void); /* de-register all curse-types */
 
-    void curse_write(const struct attrib *a, const void *owner,
+    void curse_write(const union variant *v, const void *owner,
         struct storage *store);
-    int curse_read(struct attrib *a, void *owner, struct gamedata *store);
+    int curse_read(union variant *v, void *owner, struct gamedata *store);
 
     /* ------------------------------------------------------------- */
     /* Kommentare:
@@ -291,8 +291,8 @@ extern "C" {
 
     curse *findcurse(int curseid);
 
-    void curse_init(struct attrib *a);
-    void curse_done(struct attrib *a);
+    void curse_init(union variant *a);
+    void curse_done(union variant *a);
     int curse_age(struct attrib *a, void *owner);
 
     double destr_curse(struct curse *c, int cast_level, double force);

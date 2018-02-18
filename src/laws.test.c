@@ -6,6 +6,7 @@
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -882,7 +883,7 @@ static void test_luck_message(CuTest *tc) {
 
     demographics();
 
-    CuAssertPtrEquals_Msg(tc, "unexpected message", (void *)NULL, r->msgs);
+    CuAssertPtrEquals_Msg(tc, "unexpected message", NULL, r->msgs);
 
     a = (attrib *)a_find(r->attribs, &at_peasantluck);
     if (!a)

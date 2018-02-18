@@ -1,4 +1,4 @@
-/* 
+/*
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -228,7 +228,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
         if (lua_isfunction(L, -1)) {
             tolua_pushusertype(L, u, TOLUA_CAST "unit");
             lua_pushinteger(L, delta);
-            
+
             if (lua_pcall(L, 2, 1, 0) != 0) {
                 const char *error = lua_tostring(L, -1);
                 log_error("change(%s) calling '%s': %s.\n", unitname(u), fname, error);
@@ -249,19 +249,9 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 
 /** callback for an item-use function written in lua. */
 static int
-use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
+lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, struct order *ord)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    int len, result = 0;
-    char fname[64];
-    int (*callout)(unit *, const item_type *, int, struct order *);
-
-    len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
-    if (len > 0 && (size_t)len < sizeof(fname)) {
-    callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
-    if (callout) {
-        return callout(u, itype, amount, ord);
-    }
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
@@ -272,23 +262,52 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
         if (lua_pcall(L, 4, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
             log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
         }
         else {
-            result = (int)lua_tonumber(L, -1);
+            int result = (int)lua_tonumber(L, -1);
             lua_pop(L, 1);
+            return result;
         }
-        return result;
     }
     lua_pop(L, 1);
-    if (itype->flags & ITF_POTION) {
-        return use_potion(u, itype, amount, ord);
-    } else {
-        log_error("no such callout: %s", fname);
+    return 0;
+}
+
+static int
+use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord)
+{
+    int len;
+    char fname[64];
+    int(*callout)(unit *, const item_type *, int, struct order *);
+
+    len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        int result;
+
+        /* check if we have a register_item_use function */
+        callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
+        if (callout) {
+            return callout(u, itype, amount, ord);
+        }
+
+        /* check if we have a matching lua function */
+        result = lua_use_item(u, itype, fname, amount, ord);
+        if (result != 0) {
+            return result;
+        }
+
+        /* if the item is a potion, try use_potion, the generic function for 
+         * potions that add an effect: */
+        if (itype->flags & ITF_POTION) {
+            return use_potion(u, itype, amount, ord);
+        }
+        else {
+            log_error("no such callout: %s", fname);
+        }
+        log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
     }
-    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
-    }
-    return result;
+
+    return 0;
 }
 
 /* compat code for old data files */
@@ -306,12 +325,12 @@ struct trigger_type tt_caldera = {
 };
 
 
-static int building_action_read(struct attrib *a, void *owner, gamedata *data)
+static int building_action_read(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
 
     UNUSED_ARG(owner);
-    UNUSED_ARG(a);
+    UNUSED_ARG(var);
 
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);
@@ -328,7 +347,7 @@ void register_tolua_helpers(void)
     at_deprecate("lcbuilding", building_action_read);
 
     callbacks.cast_spell = lua_callspell;
-    callbacks.use_item = use_item_lua;
+    callbacks.use_item = use_item_callback;
     callbacks.produce_resource = produce_resource_lua;
     callbacks.limit_resource = limit_resource_lua;
 

@@ -9,7 +9,9 @@
  This program may not be used, modified or distributed
  without prior permission by the authors of Eressea.
  */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "combatspells.h"
 
 #include <spells/buildingcurse.h>
@@ -45,6 +47,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -131,8 +134,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (enemies == 0) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -171,8 +173,7 @@ int sp_petrify(struct castorder * co)
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -218,8 +219,7 @@ int sp_stun(struct castorder * co)
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -298,7 +298,8 @@ int sp_combatrosthauch(struct castorder * co)
 
         for (w = 0; df->weapons[w].type != NULL; ++w) {
             weapon *wp = df->weapons;
-            int n = MIN(force, wp->used);
+            int n = force;
+            if (n < wp->used) n = wp->used;
             if (n) {
                 requirement *mat = wp->type->itype->construction->materials;
                 bool iron = false;
@@ -682,8 +683,7 @@ int sp_immolation(struct castorder * co)
     force = 99999;
 
     if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -731,7 +731,7 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     unit *u =
         create_unit(r, mage->faction, number, rc, 0, NULL, mage);
     leave(u, true);
-    setstatus(u, ST_FIGHT);
+    unit_setstatus(u, ST_FIGHT);
     
     u->hp = u->number * unit_max_hp(u);
     
@@ -791,13 +791,13 @@ int sp_shadowknights(struct castorder * co)
     region *r = b->region;
     unit *mage = fi->unit;
     attrib *a;
-    int force = MAX(1, (int)get_force(power, 3));
+    int force = (int)fmax(1, get_force(power, 3));
     message *msg;
 
     u =
         create_unit(r, mage->faction, force, get_race(RC_SHADOWKNIGHT), 0, NULL,
         mage);
-    setstatus(u, ST_FIGHT);
+    unit_setstatus(u, ST_FIGHT);
 
     u->hp = u->number * unit_max_hp(u);
 
@@ -890,7 +890,6 @@ int sp_chaosrow(struct castorder * co)
             continue;
         if (power <= 0.0)
             break;
-        /* force sollte wegen des MAX(0,x) nicht unter 0 fallen k�nnen */
 
         if (is_magic_resistant(mage, df->unit, 0))
             continue;
@@ -925,7 +924,7 @@ int sp_chaosrow(struct castorder * co)
             }
             k += df->alive;
         }
-        power = MAX(0, power - n);
+        power = fmax(0, power - n);
     }
     selist_free(fgs);
 
@@ -1020,7 +1019,8 @@ int sp_hero(struct castorder * co)
     message *m;
 
     df_bonus = (int)(power / 5);
-    force = MAX(1, lovar(get_force(power, 4)));
+    force = lovar(get_force(power, 4));
+    if (force < 1) force = 1;
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
@@ -1065,7 +1065,8 @@ int sp_berserk(struct castorder * co)
     int targets = 0;
     message *m;
 
-    at_bonus = MAX(1, level / 3);
+    at_bonus = level / 3;
+    if (at_bonus < 1) at_bonus = 1;
     df_malus = 2;
     force = (int)get_force(power, 2);
 
@@ -1114,14 +1115,14 @@ int sp_frighten(struct castorder * co)
     int targets = 0;
     message *m;
 
-    at_malus = MAX(1, level - 4);
+    at_malus = level - 4;
+    if (at_malus < 1) at_malus = 1;
     df_malus = 2;
     force = (int)get_force(power, 2);
 
     enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (!enemies) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -1170,8 +1171,7 @@ int sp_tiredsoldiers(struct castorder * co)
 
     if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW,
         SELECT_ADVANCE | SELECT_FIND)) {
-        message *m =
-            msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
+        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
         return 0;
@@ -1280,7 +1280,7 @@ int sp_appeasement(struct castorder * co)
     }
     /* und bewachen nicht */
     setguard(mage, false);
-    setstatus(mage, ST_FLEE);
+    unit_setstatus(mage, ST_FLEE);
 
     /* wir tun so, als w�re die Person geflohen */
     fi->flags |= FIG_NOLOOT;
@@ -1367,7 +1367,8 @@ int sp_fumbleshield(struct castorder * co)
 
     /* der erste Zauber schl�gt mit 100% fehl  */
     duration = 100;
-    effect = MAX(1, 25 - level);
+    effect = 25 - level;
+    if (effect < 1) effect = 1;
 
     do_meffect(fi, SHIELD_BLOCK, effect, duration);
     return level;
@@ -1403,7 +1404,7 @@ int sp_reanimate(struct castorder * co)
     unit *mage = fi->unit;
     int healable, j = 0;
     double c = 0.50 + 0.02 * power;
-    double k = EFFECT_HEALING_SPELL * power;
+    int k = (int)(EFFECT_HEALING_SPELL * power);
     bool use_item = has_ao_healing(mage);
     message *msg;
 
@@ -1413,7 +1414,9 @@ int sp_reanimate(struct castorder * co)
     }
 
     healable = count_healable(b, fi);
-    healable = (int)MIN(k, healable);
+    if (healable > k) {
+        healable = k;
+    }
     while (healable--) {
         fighter *tf = select_corpse(b, fi);
         if (tf != NULL && tf->side->casualties > 0
@@ -1466,7 +1469,7 @@ int sp_keeploot(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    b->keeploot = (int)MAX(25, b->keeploot + 5 * power);
+    b->keeploot = (int)fmax(25, b->keeploot + 5 * power);
 
     return level;
 }
@@ -1497,10 +1500,14 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
                     ++wound;
 
                 if (wound > 0 && wound < hp) {
-                    int heal = MIN(healhp, wound);
+                    int heal = healhp;
+                    if (heal > wound) {
+                        heal = wound;
+                    }
                     assert(heal >= 0);
                     df->person[n].hp += heal;
-                    healhp = MAX(0, healhp - heal);
+                    healhp -= heal;
+                    if (healhp < 0) healhp = 0;
                     ++healed;
                     if (healhp <= 0)
                         break;
@@ -1617,7 +1624,7 @@ int sp_undeadhero(struct castorder * co)
             else {
                 unit_setinfo(u, NULL);
             }
-            setstatus(u, du->status);
+            unit_setstatus(u, du->status);
             setguard(u, false);
             for (ilist = &du->items; *ilist;) {
                 item *itm = *ilist;
@@ -1653,7 +1660,9 @@ int sp_undeadhero(struct castorder * co)
     }
     selist_free(fgs);
 
-    level = MIN(level, undead);
+    if (level > undead) {
+        level = undead;
+    }
     if (undead == 0) {
         msg =
             msg_message("summonundead_effect_0", "mage region", mage, mage->region);

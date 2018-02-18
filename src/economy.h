@@ -45,6 +45,7 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
+    struct item_type;
     
     typedef struct econ_request {
         struct econ_request *next;

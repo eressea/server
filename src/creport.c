@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
+#include <attributes/seenspell.h>
 #include <attributes/stealth.h>
 
 /* gamecode includes */
@@ -41,25 +42,26 @@ without prior permission by the authors of Eressea.
 #include "teleport.h"
 
 /* kernel includes */
-#include <kernel/alliance.h>
-#include <kernel/ally.h>
-#include <kernel/connection.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
+#include "kernel/alliance.h"
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/connection.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>

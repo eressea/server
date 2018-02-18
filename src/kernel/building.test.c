@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/region.h>

@@ -86,13 +86,13 @@ ENDIF()
 
 set (ERESSEA_SRC
   vortex.c
-  calendar.c
   move.c
   piracy.c
   spells.c
   battle.c
   alchemy.c
   academy.c
+  chaos.c
   upkeep.c
   names.c
   lighthouse.c
@@ -121,7 +121,6 @@ set (ERESSEA_SRC
   randenc.c
   renumber.c
   volcano.c
-  chaos.c
   spy.c
   study.c
   summary.c
@@ -198,7 +197,6 @@ set(TESTS_SRC
   academy.test.c
   alchemy.test.c
   battle.test.c
-  calendar.test.c
   creport.test.c
   direction.test.c
   donations.test.c

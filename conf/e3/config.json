@@ -93,7 +93,6 @@
         "rules.region_owners": true,
         "rules.cavalry.skill": 2,
         "rules.cavalry.mode": 1,
-        "rules.magic.multipotion": true,
         "rules.magic.wol_effect": 5,
         "rules.magic.factionlist": true,
         "rules.magic.wol_type": 2,

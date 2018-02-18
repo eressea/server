@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "morale.h"
 #include "reports.h"
-#include "calendar.h"
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
@@ -45,23 +44,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/ally.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -333,7 +333,7 @@ static int do_recruiting(recruitment * recruits, int available)
         for (req = rec->requests; req; req = req->next) {
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
-            int number, dec;
+            int number;
             double multi = 2.0 * rc->recruit_multi;
 
             number = (int)(get / multi);
@@ -359,7 +359,7 @@ static int do_recruiting(recruitment * recruits, int available)
             }
             add_recruits(u, number, req->qty);
             if (number > 0) {
-                dec = (int)(number * multi);
+                int dec = (int)(number * multi);
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     recruited += dec;
                 }
@@ -1006,7 +1006,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         }
     }
 
-    assert(sk != NOSKILL || "limited resource needs a required skill for making it");
+    assert(sk != NOSKILL || !"limited resource needs a required skill for making it");
     skill = effskill(u, sk, 0);
     if (skill == 0) {
         add_message(&u->faction->msgs,
@@ -1075,13 +1075,12 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     const item_type *itype = resource2item(rtype);
     rawmaterial *rm = rm_get(r, rtype);
-    int need;
     bool first = true;
 
     if (rm != NULL) {
+        int need;
         do {
-            int avail = rm->amount;
-            int nreq = 0;
+            int avail = rm->amount, nreq = 0;
             allocation *al;
 
             if (avail <= 0) {
@@ -1093,7 +1092,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 
             assert(avail > 0);
 
-            for (al = alist; al; al = al->next)
+            for (al = alist; al; al = al->next) {
                 if (!fval(al, AFL_DONE)) {
                     int req = required(al->want - al->get, al->save);
                     assert(al->get <= al->want && al->get >= 0);
@@ -1112,6 +1111,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             fset(al, AFL_LOWSKILL);
                     }
                 }
+            }
             need = nreq;
 
             if (avail > nreq) avail = nreq;
@@ -1190,15 +1190,13 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     assert(avail == 0 || nreq == 0);
 }
 
-typedef void(*allocate_function) (const resource_type *, struct region *,
-    struct allocation *);
-
-static allocate_function get_allocator(const struct resource_type *rtype)
-{
+static void allocate(const resource_type *rtype, region *r, allocation *data) {
     if (rtype->raw) {
-        return leveled_allocation;
+        leveled_allocation(rtype, r, data);
     }
-    return attrib_allocation;
+    else {
+        attrib_allocation(rtype, r, data);
+    }
 }
 
 void split_allocations(region * r)
@@ -1207,11 +1205,10 @@ void split_allocations(region * r)
     while (*p_alist) {
         allocation_list *alist = *p_alist;
         const resource_type *rtype = alist->type;
-        allocate_function alloc = get_allocator(rtype);
         const item_type *itype = resource2item(rtype);
         allocation **p_al = &alist->data;
 
-        alloc(rtype, r, alist->data);
+        allocate(rtype, r, alist->data);
 
         while (*p_al) {
             allocation *al = *p_al;
@@ -1432,10 +1429,10 @@ int make_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-static void free_luxuries(struct attrib *a)
+static void free_luxuries(variant *var)
 {
-    item *itm = (item *)a->data.v;
-    a->data.v = NULL;
+    item *itm = (item *)var->v;
+    var->v = NULL;
     i_freeall(&itm);
 }
 

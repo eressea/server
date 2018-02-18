@@ -3,6 +3,7 @@
 
 #include "orderfile.h"
 
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <util/message.h>
 

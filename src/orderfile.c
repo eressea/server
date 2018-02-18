@@ -2,10 +2,11 @@
 #include <kernel/config.h>
 #include "orderfile.h"
 
-#include <kernel/faction.h>
-#include <kernel/unit.h>
-#include <kernel/order.h>
-#include <kernel/messages.h>
+#include "kernel/calendar.h"
+#include "kernel/faction.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/unit.h"
 
 #include <util/base36.h>
 #include <util/message.h>

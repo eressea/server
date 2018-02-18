@@ -101,20 +101,6 @@ const char *magic_school[MAXMAGIETYP] = {
     "common"
 };
 
-static void a_init_reportspell(struct attrib *a) {
-    a->data.v = calloc(1, sizeof(spellbook_entry));
-}
-
-static void a_finalize_reportspell(struct attrib *a) {
-    free(a->data.v);
-}
-
-attrib_type at_reportspell = {
-    "reportspell",
-    a_init_reportspell,
-    a_finalize_reportspell,
-    0, NO_WRITE, NO_READ
-};
 /**
  ** at_icastle
  ** TODO: separate castle-appearance from illusion-effects
@@ -140,10 +126,10 @@ typedef struct icastle_data {
     int time;
 } icastle_data;
 
-static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
+static int a_readicastle(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    icastle_data *idata = (icastle_data *)a->data.v;
+    icastle_data *idata = (icastle_data *)var->v;
     char token[32];
 
     UNUSED_ARG(owner);
@@ -157,9 +143,9 @@ static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-a_writeicastle(const attrib * a, const void *owner, struct storage *store)
+a_writeicastle(const variant *var, const void *owner, struct storage *store)
 {
-    icastle_data *data = (icastle_data *)a->data.v;
+    icastle_data *data = (icastle_data *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->time);
@@ -182,20 +168,15 @@ static int a_ageicastle(struct attrib *a, void *owner)
     return AT_AGE_KEEP;
 }
 
-static void a_initicastle(struct attrib *a)
+static void a_initicastle(variant *var)
 {
-    a->data.v = calloc(sizeof(icastle_data), 1);
-}
-
-static void a_finalizeicastle(struct attrib *a) /*-V524 */
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(icastle_data), 1);
 }
 
 attrib_type at_icastle = {
     "zauber_icastle",
     a_initicastle,
-    a_finalizeicastle,
+    a_free_voidptr,
     a_ageicastle,
     a_writeicastle,
     a_readicastle
@@ -221,14 +202,14 @@ extern int dice(int count, int value);
  * Umwandlung von alt nach neu gebraucht werden */
  /* ------------------------------------------------------------- */
 
-static void init_mage(attrib * a)
+static void init_mage(variant *var)
 {
-    a->data.v = calloc(sizeof(sc_mage), 1);
+    var->v = calloc(sizeof(sc_mage), 1);
 }
 
-static void free_mage(attrib * a)
+static void free_mage(variant *var)
 {
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     if (mage->spellbook) {
         spellbook_clear(mage->spellbook);
         free(mage->spellbook);
@@ -253,11 +234,11 @@ int get_spell_level_mage(const spell * sp, void * cbdata)
     return sbe ? sbe->level : 0;
 }
 
-static int read_mage(attrib * a, void *owner, struct gamedata *data)
+static int read_mage(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int i, mtype;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     char spname[64];
 
     UNUSED_ARG(owner);
@@ -301,10 +282,10 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-write_mage(const attrib * a, const void *owner, struct storage *store)
+write_mage(const variant *var, const void *owner, struct storage *store)
 {
     int i;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, mage->magietyp);
@@ -354,81 +335,7 @@ sc_mage *get_mage_depr(const unit * u)
     return NULL;
 }
 
-/* ------------------------------------------------------------- */
-/* Ausgabe der Spruchbeschreibungen
-* Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
-* kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
-* werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
-* Spruch zu seiner List-of-known-spells hinzugefügt werden.
-*/
-
-static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
-{
-    storage *store = data->store;
-    spell *sp = 0;
-    char token[32];
-
-    UNUSED_ARG(owner);
-    READ_TOK(store, token, sizeof(token));
-    if (data->version < UNIQUE_SPELLS_VERSION) {
-        READ_INT(store, 0); /* ignore mtype */
-    }
-    sp = find_spell(token);
-    if (!sp) {
-        log_info("read_seenspell: could not find spell '%s'\n", token);
-        return AT_READ_FAIL;
-    }
-    a->data.v = sp;
-    return AT_READ_OK;
-}
-
-static void
-write_seenspell(const attrib * a, const void *owner, struct storage *store)
-{
-    const spell *sp = (const spell *)a->data.v;
-    UNUSED_ARG(owner);
-    WRITE_TOK(store, sp->sname);
-}
-
-attrib_type at_seenspell = {
-    "seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
-};
-
 #define MAXSPELLS 256
-
-static bool already_seen(const faction * f, const spell * sp)
-{
-    attrib *a;
-
-    for (a = a_find(f->attribs, &at_seenspell); a && a->type == &at_seenspell;
-        a = a->next) {
-        if (a->data.v == sp)
-            return true;
-    }
-    return false;
-}
-
-void show_new_spells(faction * f, int level, const spellbook *book)
-{
-    if (book) {
-        selist *ql = book->spells;
-        int qi;
-
-        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            if (sbe->level <= level) {
-                if (!already_seen(f, sbe->sp)) {
-                    attrib * a = a_new(&at_reportspell);
-                    spellbook_entry * entry = (spellbook_entry *)a->data.v;
-                    entry->level = sbe->level;
-                    entry->sp = sbe->sp;
-                    a_add(&f->attribs, a);
-                    a_add(&f->attribs, a_new(&at_seenspell))->data.v = sbe->sp;
-                }
-            }
-        }
-    }
-}
 
 /** update the spellbook with a new level
 * Written for E3
@@ -592,13 +499,13 @@ void unset_combatspell(unit * u, spell * sp)
 {
     sc_mage *m;
     int nr = 0;
-    int i;
 
     m = get_mage_depr(u);
     if (!m)
         return;
 
     if (!sp) {
+        int i;
         for (i = 0; i < MAXCOMBATSPELLS; i++) {
             m->combatspells[i].sp = NULL;
         }
@@ -1682,13 +1589,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     const spell *sp = co->sp;
     region *target_r = co_get_region(co);
     spellparameter *sa = co->par;
-    int i;
 
     *invalid = 0;
     *resist = 0;
     *success = 0;
 
     if (sa && sa->length) {
+        int i;
         /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
          * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
          * gar nicht global hätte suchen dürften, setzen wir das Objekt
@@ -2178,9 +2085,9 @@ bool is_familiar(const unit * u)
 }
 
 static void
-a_write_unit(const attrib * a, const void *owner, struct storage *store)
+a_write_unit(const variant *var, const void *owner, struct storage *store)
 {
-    unit *u = (unit *)a->data.v;
+    unit *u = (unit *)var->v;
     UNUSED_ARG(owner);
     write_unit_reference(u, store);
 }
@@ -2296,10 +2203,10 @@ static void * resolve_familiar(int id, void *data) {
     return data;
 }
 
-static int read_familiar(attrib * a, void *owner, struct gamedata *data)
+static int read_familiar(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2377,10 +2284,10 @@ static void * resolve_clone(int id, void *data) {
     return data;
 }
 
-static int read_clone(attrib * a, void *owner, struct gamedata *data)
+static int read_clone(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2400,10 +2307,10 @@ static void * resolve_mage(int id, void *data) {
     return data;
 }
 
-static int read_magician(attrib * a, void *owner, struct gamedata *data)
+static int read_magician(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
