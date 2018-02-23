@@ -4,6 +4,7 @@
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
+#include "kernel/faction.h"
 #include "kernel/building.h"
 #include "kernel/equipment.h"
 #include "kernel/item.h"
@@ -37,22 +38,17 @@
 #include <errno.h>
 #include <stdlib.h>
 
+/* manually free() everything at exit? */
+#undef CLEANUP_CODE
+
 void game_done(void)
 {
-#undef CLEANUP_CODE
+    log_dead_factions();
+
 #ifdef CLEANUP_CODE
-    /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-     * zum Debugging interessant, wenn man Leak Detection hat, und nach
-     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benoetigt
-     * wird (temporaere Hilsstrukturen) */
-
-    free_game();
-
+    free_gamedata();
     creport_cleanup();
-#ifdef REPORT_FORMAT_NR
     report_cleanup();
-#endif
-#endif
     calendar_cleanup();
     free_functions();
     free_config();
@@ -60,6 +56,7 @@ void game_done(void)
     free_locales();
     kernel_done();
     dblib_close();
+#endif
 }
 
 void game_init(void)
