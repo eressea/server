@@ -957,7 +957,7 @@
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="0d0"/>
   </race>
-  <race name="template" magres="100" maxaura="0.000000" regaura="0.000000" weight="0" capacity="1000" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
+  <race name="template" maintenance="0" magres="100" maxaura="0.000000" regaura="0.000000" weight="0" capacity="1000" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <attack type="1" damage="1d4"/>
   </race>

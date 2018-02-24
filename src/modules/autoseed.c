@@ -33,13 +33,13 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <selist.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -155,7 +155,7 @@ newfaction *read_newfactions(const char *filename)
         email[0] = '\0';
         password[0] = '\0';
 
-        if (sscanf(buf, "%54s %20s %8s %16s %d %d", email, race, lang, 
+        if (sscanf(buf, "%54s %19s %7s %15s %4d %4d", email, race, lang, 
             password, &subscription, &alliance) < 3) {
             break;
         }
@@ -166,12 +166,10 @@ newfaction *read_newfactions(const char *filename)
             break;
         }
         if (password[0] == '\0') {
-            size_t sz;
-            sz = strlcpy(password, itoa36(rng_int()), sizeof(password));
-            sz += strlcat(password, itoa36(rng_int()), sizeof(password));
+            snprintf(password, sizeof(password), "%s%s", itoa36(rng_int()), itoa36(rng_int()));
         }
         for (f = factions; f; f = f->next) {
-            if (strcmp(f->email, email) == 0 && f->age < MINAGE_MULTI) {
+            if (strcmp(faction_getemail(f), email) == 0 && f->age < MINAGE_MULTI) {
                 log_warning("email %s already in use by %s", email, factionname(f));
                 break;
             }
@@ -188,12 +186,14 @@ newfaction *read_newfactions(const char *filename)
             continue;
         }
         nf = calloc(sizeof(newfaction), 1);
-        if (set_email(&nf->email, email) != 0) {
+        if (check_email(email) == 0) {
+          nf->email = str_strdup(email);
+        } else {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
             free(nf);
             continue;
         }
-        nf->password = strdup(password);
+        nf->password = str_strdup(password);
         nf->race = rc_find(race);
         nf->subscription = subscription;
         if (alliances != NULL) {
@@ -619,6 +619,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             while (*nfp) {
                 newfaction *nf = *nfp;
                 if (strcmp(nextf->email, nf->email) == 0) {
+                    log_warning("Duplicate email %s\n", nf->email?nf->email:"");
                     *nfp = nf->next;
                     free_newfaction(nf);
                 }
@@ -960,8 +961,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }
@@ -975,8 +976,8 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
                 q = region_quality(r, rn);
                 if (q >= MIN_QUALITY * 4 / 3 && nfactions < numfactions && players && *players) {
                     starting_region(players, r, rn);
-                    minq = MIN(minq, q);
-                    maxq = MAX(maxq, q);
+                    if (minq > q) minq = q;
+                    if (maxq < q) maxq = q;
                     ++nfactions;
                 }
             }

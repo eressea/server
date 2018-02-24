@@ -141,24 +141,46 @@ region_list *all_in_range(const region * r, int n,
     return rlist;
 }
 
+#define MAX_BRAIN_SIZE 100
+
 void spawn_braineaters(float chance)
 {
+    const race * rc_brain = get_race(RC_HIRNTOETER);
     region *r;
-    faction *f0 = get_monsters();
+    faction *f = get_monsters();
     int next = rng_int() % (int)(chance * 100);
 
-    if (f0 == NULL)
+    if (f == NULL || rc_brain == NULL) {
         return;
+    }
 
     for (r = regions; r; r = r->next) {
+        unit *u, *ub = NULL;
         if (!is_astral(r) || fval(r->terrain, FORBIDDEN_REGION))
             continue;
 
+        for (u = r->units; u; u = u->next) {
+            if (u->_race == rc_brain) {
+                if (!ub) {
+                    ub = u;
+                }
+                else {
+                    int n = u->number + ub->number;
+                    if (n <= MAX_BRAIN_SIZE) {
+                        scale_number(ub, n);
+                        u->number = 0;
+                    }
+                    else {
+                        ub = u;
+                    }
+                }
+            }
+        }
+
         /* Neues Monster ? */
         if (next-- == 0) {
-            unit *u =
-                create_unit(r, f0, 1 + rng_int() % 10 + rng_int() % 10,
-                get_race(RC_HIRNTOETER), 0, NULL, NULL);
+            u = create_unit(r, f, 1 + rng_int() % 10 + rng_int() % 10,
+                rc_brain, 0, NULL, NULL);
             equip_unit(u, get_equipment("seed_braineater"));
 
             next = rng_int() % (int)(chance * 100);

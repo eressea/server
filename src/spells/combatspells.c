@@ -37,6 +37,7 @@
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -622,7 +623,6 @@ int sp_dragonodem(struct castorder * co)
     troop dt;
     troop at;
     int force, enemies;
-    int killed = 0;
     const char *damage;
 
     /* 11-26 HP */
@@ -641,6 +641,7 @@ int sp_dragonodem(struct castorder * co)
     }
     else {
         struct message *m;
+        int killed = 0;
 
         at.fighter = fi;
         at.index = 0;
@@ -712,53 +713,6 @@ int sp_immolation(struct castorder * co)
     m =
         msg_message("cast_combatspell", "mage spell killed", fi->unit, sp,
         killed);
-    message_all(b, m);
-    msg_release(m);
-    return level;
-}
-
-int sp_drainodem(fighter * fi, int level, double power, spell * sp)
-{
-    battle *b = fi->side->battle;
-    troop dt;
-    troop at;
-    int force, enemies;
-    int drained = 0;
-    int killed = 0;
-    const char *damage;
-    message *m;
-
-    /* 11-26 HP */
-    damage = spell_damage(4);
-    /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
-    force = lovar(get_force(power, 6));
-
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
-
-    if (!enemies) {
-        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
-        message_all(b, m);
-        msg_release(m);
-        return 0;
-    }
-
-    at.fighter = fi;
-    at.index = 0;
-
-    while (force && drained < enemies) {
-        dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
-        assert(dt.fighter);
-        if (hits(at, dt, NULL)) {
-            drain_exp(dt.fighter->unit, 90);
-            ++drained;
-            killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-        }
-        --force;
-    }
-
-    m =
-        msg_message("cast_drainlife_effect", "mage spell amount", fi->unit, sp,
-        drained);
     message_all(b, m);
     msg_release(m);
     return level;
@@ -1309,7 +1263,7 @@ int sp_reeling_arrows(struct castorder * co)
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
  * eine Nachbarregion, wobei ein NACH ber�cksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
-int sp_denyattack(struct castorder * co)
+int sp_appeasement(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
@@ -1326,7 +1280,7 @@ int sp_denyattack(struct castorder * co)
     }
     /* und bewachen nicht */
     setguard(mage, false);
-    /* irgendwie den langen befehl sperren */
+    setstatus(mage, ST_FLEE);
 
     /* wir tun so, als w�re die Person geflohen */
     fi->flags |= FIG_NOLOOT;

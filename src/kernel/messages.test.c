@@ -9,18 +9,22 @@
 
 void test_missing_message(CuTest *tc) {
     message *msg;
+
+    test_setup();
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     msg = msg_message("unknown", "unit", NULL);
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
     CuAssertStrEquals(tc, msg->type->name, "missing_message");
     msg_release(msg);
+    test_teardown();
 }
 
 void test_message(CuTest *tc) {
     message *msg;
     message_type *mtype = mt_new("custom", NULL);
 
-    test_cleanup();
+    test_setup();
     mt_register(mtype);
     CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
     CuAssertIntEquals(tc, 0, mtype->nparameters);
@@ -37,7 +41,7 @@ void test_message(CuTest *tc) {
     msg_release(msg);
     CuAssertIntEquals(tc, 1, msg->refcount);
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_merge_split(CuTest *tc) {
@@ -46,7 +50,7 @@ static void test_merge_split(CuTest *tc) {
     message_type *mtype = mt_new("custom", NULL);
     message *msg;
 
-    test_cleanup();
+    test_setup();
     mt_register(mtype);
     add_message(&mlist, msg = msg_message(mtype->name, ""));
     msg_release(msg);
@@ -68,7 +72,7 @@ static void test_merge_split(CuTest *tc) {
     free(mlist);
     free_messagelist(append->begin);
     free(append);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_noerror(CuTest *tc) {
@@ -83,7 +87,7 @@ static void test_noerror(CuTest *tc) {
     CuAssertTrue(tc, !is_persistent(u->thisorder));
     CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
     CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_messages_suite(void) {

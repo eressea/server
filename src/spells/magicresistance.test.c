@@ -29,6 +29,7 @@ static void test_magicresistance_unit(CuTest *tc) {
     curse *c;
 
     test_setup();
+    mt_register(mt_new_va("magicresistance_unit", "unit:unit", "id:int", NULL));
     r = test_create_plain(0, 0);
     f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);
@@ -41,10 +42,10 @@ static void test_magicresistance_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)u2->attribs->type);
     msg = c->type->curseinfo(u2, TYP_UNIT, c, 1);
     CuAssertPtrNotNull(tc, msg);
-    CuAssertStrEquals(tc, "curseinfo::magicresistance_unit", test_get_messagetype(msg));
+    CuAssertStrEquals(tc, "magicresistance_unit", test_get_messagetype(msg));
     msg_release(msg);
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_magicresistance_building(CuTest *tc) {
@@ -56,6 +57,7 @@ static void test_magicresistance_building(CuTest *tc) {
     curse *c;
 
     test_setup();
+    mt_register(mt_new_va("magicresistance_building", "building:building", "id:int", NULL));
     r = test_create_plain(0, 0);
     f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);
@@ -67,9 +69,9 @@ static void test_magicresistance_building(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)b1->attribs->type);
     msg = c->type->curseinfo(b1, TYP_BUILDING, c, 1);
     CuAssertPtrNotNull(tc, msg);
-    CuAssertStrEquals(tc, "curseinfo::magicresistance_building", test_get_messagetype(msg));
+    CuAssertStrEquals(tc, "magicresistance_building", test_get_messagetype(msg));
     msg_release(msg);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_magicresistance_suite(void)

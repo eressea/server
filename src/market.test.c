@@ -12,6 +12,7 @@
 #include <kernel/unit.h>
 
 #include <util/language.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -32,6 +33,7 @@ static void test_market_curse(CuTest * tc)
     building_type *btype;
 
     test_setup();
+    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", NULL));
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;
@@ -66,7 +68,7 @@ static void test_market_curse(CuTest * tc)
     b->flags |= BLD_MAINTAINED;
     b->size = b->type->maxsize;
 
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     u_set_building(u, b);
 
@@ -74,7 +76,7 @@ static void test_market_curse(CuTest * tc)
 
     CuAssertIntEquals(tc, 70, i_get(u->items, htype));
     CuAssertIntEquals(tc, 35, i_get(u->items, ltype));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_trade(CuTest *tc) {
@@ -87,7 +89,7 @@ static void test_rc_trade(CuTest *tc) {
     rc_set_param(rc, "herb_trade", "50");
     CuAssertIntEquals(tc, 100, rc_luxury_trade(rc));
     CuAssertIntEquals(tc, 50, rc_herb_trade(rc));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_market_suite(void)

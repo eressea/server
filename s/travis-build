@@ -16,12 +16,27 @@ cd tests
 ./run-turn.sh
 }
 
+cppcheck_tests() {
+ cppcheck --version
+ DIRS="util kernel modules races attributes triggers items tools spells"
+ IGNORE=""
+ for DIR in $DIRS ; do
+  IGNORE="$IGNORE -i src/$DIR"
+  echo "cppcheck src/$DIR"
+  cppcheck --quiet -Isrc -Iclibs -Istorage -IcJSON --error-exitcode=1 "src/$DIR"
+ done
+ echo "cppcheck src"
+ cppcheck --quiet -Isrc -Iclibs -Istorage -IcJSON --error-exitcode=1 $IGNORE src
+}
+
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 s/cmake-init
+# cppcheck_tests
 s/build
+cd process
+make
 cd $ROOT
 inifile
 s/runtests -V
-
 integration_tests

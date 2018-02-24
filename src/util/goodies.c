@@ -109,17 +109,13 @@ static int spc_email_isvalid(const char *address)
     return (count >= 1);
 }
 
-int set_email(char **pemail, const char *newmail)
+int check_email(const char *newmail)
 {
     if (newmail && *newmail) {
         if (spc_email_isvalid(newmail) <= 0)
             return -1;
-    }
-    if (*pemail)
-        free(*pemail);
-    *pemail = 0;
-    if (newmail) {
-        *pemail = strdup(newmail);
+    } else {
+      return -1;
     }
     return 0;
 }

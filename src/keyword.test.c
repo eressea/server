@@ -13,21 +13,23 @@ static void test_init_keywords(CuTest *tc) {
 
     test_setup();
     lang = get_or_create_locale("en");
+
     locale_setstring(lang, "keyword::move", "MOVE");
     init_keywords(lang);
     CuAssertIntEquals(tc, K_MOVE, get_keyword("move", lang));
     CuAssertStrEquals(tc, "keyword::move", keyword(K_MOVE));
     CuAssertPtrEquals(tc, NULL, (void *)keyword(NOKEYWORD));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_infinitive(CuTest *tc) {
     char buffer[32];
     struct locale *lang;
     struct order *ord;
-    test_cleanup();
 
+    test_setup();
     lang = get_or_create_locale("de");
+
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keyword(lang, K_STUDY, "LERNE");
     init_keyword(lang, K_STUDY, "LERNEN");
@@ -36,14 +38,15 @@ static void test_infinitive(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, get_keyword("LERNEN", lang));
 
     ord = create_order(K_STUDY, lang, "");
-    CuAssertStrEquals(tc, "LERNE", get_command(ord, buffer, sizeof(buffer)));
+    CuAssertStrEquals(tc, "LERNE", get_command(ord, lang, buffer, sizeof(buffer)));
     free_order(ord);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_init_keyword(CuTest *tc) {
     struct locale *lang;
-    test_cleanup();
+
+    test_setup();
 
     lang = get_or_create_locale("de");
     init_keyword(lang, K_MOVE, "NACH");
@@ -55,23 +58,23 @@ static void test_init_keyword(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, get_keyword("lerne", lang));
     CuAssertIntEquals(tc, K_DESTROY, get_keyword("zerst\xC3\xB6ren", lang));
     CuAssertIntEquals(tc, NOKEYWORD, get_keyword("potato", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_findkeyword(CuTest *tc) {
-    test_cleanup();
+    test_setup();
     CuAssertIntEquals(tc, K_MOVE, findkeyword("move"));
     CuAssertIntEquals(tc, K_STUDY, findkeyword("study"));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword(""));
     CuAssertIntEquals(tc, NOKEYWORD, findkeyword("potato"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_get_shortest_match(CuTest *tc) {
     struct locale *lang;
     critbit_tree ** cb;
 
-    test_cleanup();
+    test_setup();
     lang = get_or_create_locale("en");
 
     cb = (critbit_tree **)get_translations(lang, UT_KEYWORDS);
@@ -83,7 +86,7 @@ static void test_get_shortest_match(CuTest *tc) {
     CuAssertIntEquals(tc, K_STATUS, get_keyword("COM", lang));
     CuAssertIntEquals(tc, K_STATUS, get_keyword("COMBAT", lang));
     CuAssertIntEquals(tc, K_COMBATSPELL, get_keyword("COMBATS", lang));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_keyword_suite(void)

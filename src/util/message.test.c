@@ -19,7 +19,7 @@ static void test_mt_new(CuTest *tc)
     CuAssertPtrNotNull(tc, mt->types);
     CuAssertStrEquals(tc, "string", mt->types[0]->name);
     CuAssertStrEquals(tc, "int", mt->types[1]->name);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_message_suite(void)

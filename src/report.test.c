@@ -18,6 +18,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
+#include <util/strings.h>
 
 #include <stream.h>
 #include <memstream.h>
@@ -94,7 +95,7 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "see_travel", "durchgereist");
 
     mstream_init(&out);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
     r->land->peasants = 5;
@@ -104,7 +105,7 @@ static void test_report_region(CuTest *tc) {
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
     region_setname(r, "Hodor");
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->locale = lang;
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
@@ -138,7 +139,7 @@ static void test_report_region(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
 
     mstream_done(&out);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_report_travelthru(CuTest *tc) {
@@ -154,11 +155,11 @@ static void test_report_travelthru(CuTest *tc) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
     mstream_init(&out);
-    r = test_create_region(0, 0, 0);
+    r = test_create_region(0, 0, NULL);
     r->flags |= RF_TRAVELUNIT;
-    f = test_create_faction(0);
+    f = test_create_faction(NULL);
     f->locale = lang;
-    u = test_create_unit(f, test_create_region(0, 1, 0));
+    u = test_create_unit(f, test_create_region(0, 1, NULL));
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
@@ -185,7 +186,7 @@ static void test_report_travelthru(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
 
     mstream_done(&out);
-    test_cleanup();
+    test_teardown();
 }
 
 typedef struct {
@@ -219,12 +220,11 @@ static void setup_spell_fixture(spell_fixture * spf) {
 static void cleanup_spell_fixture(spell_fixture *spf) {
     spellbook_clear(spf->spb);
     free(spf->spb);
-    test_cleanup();
 }
 
 static void set_parameter(spell_fixture spell, char *value) {
     free(spell.sp->parameter);
-    spell.sp->parameter = strdup(value);
+    spell.sp->parameter = str_strdup(value);
 }
 
 static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
@@ -259,7 +259,7 @@ static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char
 static void test_write_spell_syntax(CuTest *tc) {
     spell_fixture spell;
 
-    test_cleanup();
+    test_setup();
     setup_spell_fixture(&spell);
 
     check_spell_syntax(tc, "vanilla", &spell, "  ZAUBERE \"Testzauber\"");
@@ -295,14 +295,14 @@ static void test_write_spell_syntax(CuTest *tc) {
 
     set_parameter(spell, "bc");
     free(spell.sp->syntax);
-    spell.sp->syntax = strdup("hodor");
+    spell.sp->syntax = str_strdup("hodor");
     check_spell_syntax(tc, "bc hodor", &spell, "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
     set_parameter(spell, "c?");
     free(spell.sp->syntax);
-    spell.sp->syntax = strdup("hodor");
+    spell.sp->syntax = str_strdup("hodor");
     check_spell_syntax(tc, "c?", &spell, "  ZAUBERE \"Testzauber\" [<Hodor>]");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
@@ -312,6 +312,7 @@ static void test_write_spell_syntax(CuTest *tc) {
         "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
 
     cleanup_spell_fixture(&spell);
+    test_teardown();
 }
 
 CuSuite *get_report_suite(void)

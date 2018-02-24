@@ -38,12 +38,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/attrib.h>
-#include <util/bsdstring.h>
 #include <util/functions.h>
 #include <util/umlaut.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
@@ -106,17 +106,18 @@ static void rc_setoption(race *rc, int k, const char *value) {
         rc->options->key[1] = RCO_NONE;
         v = rc->options->value;
     } else {
-        for (i=0;!v && i < MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+        for (i=0;!v && i < MAXOPTIONS;++i) {
             if (rc->options->key[i]==key) {
                 v = rc->options->value+i;
+                break;
             }
-        }
-        if (!v) {
-            assert(i<MAXOPTIONS || !"MAXOPTIONS too small for race");
-            v = rc->options->value+i;
-            rc->options->key[i] = key;
-            if (i+1<MAXOPTIONS) {
-                rc->options->key[i+1]=RCO_NONE;
+            if (rc->options->key[i]==RCO_NONE) {
+                v = rc->options->value+i;
+                rc->options->key[i] = key;
+                if (i+1 < MAXOPTIONS) {
+                    rc->options->key[i+1]=RCO_NONE;
+                }
+                break;
             }
         }
     }
@@ -131,7 +132,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
         v->v = rc_get_or_create(value);
     }
     else if (key == RCO_HUNGER) {
-        v->v = strdup(value);
+        v->v = str_strdup(value);
     }
     else if (key == RCO_TRADEHERB) {
         v->i = atoi(value);
@@ -358,7 +359,7 @@ race *rc_create(const char *zName)
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
     }
-    rc->_name = strdup(zName);
+    rc->_name = str_strdup(zName);
 
     rc->attack[0].type = AT_COMBATSPELL;
     for (i = 1; i < RACE_ATTACKS; ++i)
@@ -534,21 +535,18 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
 
     if (prefix != NULL) {
         static char lbuf[80]; /* FIXME: static return value */
-        char *bufp = lbuf;
-        size_t size = sizeof(lbuf) - 1;
-        int ch, bytes;
+        sbstring sbs;
+        char ch[2];
 
-        bytes = (int)strlcpy(bufp, LOC(loc, mkname("prefix", prefix)), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_init(&sbs, lbuf, sizeof(lbuf));
+        sbs_strcpy(&sbs, LOC(loc, mkname("prefix", prefix)));
 
-        bytes = (int)strlcpy(bufp, LOC(loc, rc_name_s(rc, u->number != 1)), size);
-        assert(~bufp[0] & 0x80 || !"unicode/not implemented");
-        ch = tolower(*(unsigned char *)bufp);
-        bufp[0] = (char)ch;
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        *bufp = 0;
+        str = LOC(loc, rc_name_s(rc, u->number != 1));
+        assert(~str[0] & 0x80 || !"unicode/not implemented");
+        ch[0] = (char)tolower(*(unsigned char *)str);
+        ch[1] = 0;
+        sbs_strcat(&sbs, ch);
+        sbs_strcat(&sbs, str + 1);
 
         return lbuf;
     }

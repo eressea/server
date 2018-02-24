@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "connection.h"
 
@@ -25,19 +27,22 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 #include <util/attrib.h>
-#include <util/bsdstring.h>
+#include <util/base36.h>
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <selist.h>
+#include <util/macros.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
+#include <selist.h>
 #include <storage.h>
 
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 int nextborder = 0;
@@ -131,7 +136,8 @@ static connection **get_borders_i(const region * r1, const region * r2)
     int key = reg_hashkey(r1);
     int k2 = reg_hashkey(r2);
 
-    key = MIN(k2, key) % BORDER_MAXHASH;
+    if (key > k2) key = k2;
+    key = key % BORDER_MAXHASH;
     bp = &borders[key];
     while (*bp) {
         connection *b = *bp;
@@ -512,10 +518,11 @@ static const char *b_nameroad(const connection * b, const region * r,
             }
         }
         else {
-            int percent = MAX(1, 100 * local / r->terrain->max_road);
             if (local) {
-                slprintf(buffer, sizeof(buffer), LOC(f->locale, mkname("border",
-                    "a_road_percent")), percent);
+                const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
+                int percent = 100 * local / r->terrain->max_road;
+                if (percent < 1) percent = 1;
+                str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
             }
             else {
                 return LOC(f->locale, mkname("border", "a_road_connection"));

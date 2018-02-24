@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 #include <util/lists.h>
 
 #include <storage.h>
@@ -234,7 +235,7 @@ plane *create_new_plane(int id, const char *name, int minx, int maxx, int miny,
     pl->next = NULL;
     pl->id = id;
     if (name)
-        pl->name = strdup(name);
+        pl->name = str_strdup(name);
     pl->minx = minx;
     pl->maxx = maxx;
     pl->miny = miny;

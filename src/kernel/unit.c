@@ -51,17 +51,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
@@ -394,11 +395,14 @@ faction *dfindhash(int no)
 }
 #else
 struct faction *dfindhash(int no) {
-    unit *u = deleted_units;
-    while (u && u->no != no) {
-        u = u->next;
+    unit *u;
+
+    for (u = deleted_units; u; u = u->next) {
+        if (u->no == no) {
+            return u->faction;
+        }
     }
-    return u ? u->faction : NULL;
+    return NULL;
 }
 #endif
 
@@ -507,7 +511,7 @@ int a_readprivate(attrib * a, void *owner, gamedata *data)
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = strdup(lbuf);
+    a->data.v = str_strdup(lbuf);
     return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
@@ -565,7 +569,7 @@ void usetprivate(unit * u, const char *str)
     if (a->data.v) {
         free(a->data.v);
     }
-    a->data.v = strdup(str);
+    a->data.v = str_strdup(str);
 }
 
 /*********************/
@@ -581,7 +585,7 @@ attrib_type at_potionuser = {
     NO_READ
 };
 
-void usetpotionuse(unit * u, const potion_type * ptype)
+void usetpotionuse(unit * u, const item_type * ptype)
 {
     attrib *a = a_find(u->attribs, &at_potionuser);
     if (!a)
@@ -589,12 +593,12 @@ void usetpotionuse(unit * u, const potion_type * ptype)
     a->data.v = (void *)ptype;
 }
 
-const potion_type *ugetpotionuse(const unit * u)
+const item_type *ugetpotionuse(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_potionuser);
     if (!a)
         return NULL;
-    return (const potion_type *)a->data.v;
+    return (const item_type *)a->data.v;
 }
 
 /*********************/
@@ -791,6 +795,7 @@ void set_level(unit * u, skill_t sk, int value)
     skill *sv = u->skills;
 
     assert(sk != SK_MAGIC || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
+    assert(value <= CHAR_MAX && value >= CHAR_MIN);
     if (!skill_enabled(sk))
         return;
 
@@ -1194,8 +1199,13 @@ void remove_skill(unit * u, skill_t sk)
     for (i = 0; i != u->skill_size; ++i) {
         sv = u->skills + i;
         if (sv->id == sk) {
-            memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
-            --u->skill_size;
+            if (u->skill_size - i - 1 > 0) {
+                memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
+            }
+            if (--u->skill_size == 0) {
+                free(u->skills);
+                u->skills = NULL;
+            }
             return;
         }
     }
@@ -1455,9 +1465,7 @@ void default_name(const unit *u, char name[], int len) {
     else {
         result = parameters[P_UNIT];
     }
-    strlcpy(name, result, len);
-    strlcat(name, " ", len);
-    strlcat(name, itoa36(u->no), len);
+    snprintf(name, len, "%s %s", result, itoa36(u->no));
 }
 
 void name_unit(unit * u)
@@ -1512,7 +1520,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
 
     if (dname) {
-        u->_name = strdup(dname);
+        u->_name = str_strdup(dname);
     }
     else if (urace->name_unit || playerrace(urace)) {
         name_unit(u);
@@ -1597,12 +1605,6 @@ int countheroes(const struct faction *f)
             n += u->number;
         u = u->nextF;
     }
-#ifdef DEBUG_MAXHEROES
-    int m = maxheroes(f);
-    if (n > m) {
-        log_warning("%s has %d of %d heroes\n", factionname(f), n, m);
-    }
-#endif
     return n;
 }
 
@@ -1621,7 +1623,7 @@ void unit_setname(unit * u, const char *name)
 {
     free(u->_name);
     if (name && name[0])
-        u->_name = strdup(name);
+        u->_name = str_strdup(name);
     else
         u->_name = NULL;
 }
@@ -1635,7 +1637,7 @@ void unit_setinfo(unit * u, const char *info)
 {
     free(u->display);
     if (info)
-        u->display = strdup(info);
+        u->display = str_strdup(info);
     else
         u->display = NULL;
 }
@@ -1708,7 +1710,6 @@ void unit_addorder(unit * u, order * ord)
 int unit_max_hp(const unit * u)
 {
     int h;
-    double p;
     static int config;
     static bool rule_stamina;
     h = u_race(u)->hitpoints;
@@ -1717,7 +1718,7 @@ int unit_max_hp(const unit * u)
         rule_stamina = config_get_int("rules.stamina", 1)!=0;
     }
     if (rule_stamina) {
-        p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
+        double p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
         h += (int)(h * p + 0.5);
     }
 
@@ -1733,38 +1734,22 @@ int unit_max_hp(const unit * u)
 
 void scale_number(unit * u, int n)
 {
-    const attrib *a;
-    int remain;
-
-    if (n == u->number)
+    if (n == u->number) {
         return;
-    if (n && u->number > 0) {
-        int full;
-        remain = ((u->hp % u->number) * (n % u->number)) % u->number;
-
-        full = u->hp / u->number;   /* wieviel kriegt jede person mindestens */
-        u->hp = full * n + (u->hp - full * u->number) * n / u->number;
-        assert(u->hp >= 0);
-        if ((rng_int() % u->number) < remain)
-            ++u->hp;                  /* Nachkommastellen */
-    }
-    else {
-        remain = 0;
-        u->hp = 0;
     }
     if (u->number > 0) {
-        for (a = a_find(u->attribs, &at_effect); a && a->type == &at_effect;
-        a = a->next) {
-            effect_data *data = (effect_data *)a->data.v;
-            int snew = data->value / u->number * n;
-            if (n) {
-                remain = data->value - snew / n * u->number;
-                snew += remain * n / u->number;
-                remain = (remain * n) % u->number;
-                if ((rng_int() % u->number) < remain)
-                    ++snew;               /* Nachkommastellen */
+        if (n>0) {
+            const attrib *a = a_find(u->attribs, &at_effect);
+
+            u->hp = (long long)u->hp * n / u->number;
+
+            for (; a && a->type == &at_effect; a = a->next) {
+                effect_data *data = (effect_data *)a->data.v;
+                data->value = (long long)data->value * n / u->number;
             }
-            data->value = snew;
+        }
+        else {
+            u->hp = 0;
         }
     }
     if (u->number == 0 || n == 0) {
@@ -1894,7 +1879,7 @@ static int nextbuf = 0;
 char *write_unitname(const unit * u, char *buffer, size_t size)
 {
     const char * name = unit_getname(u);
-    slprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
+    snprintf(buffer, size, "%s (%s)", name, itoa36(u->no));
     buffer[size - 1] = 0;
     return buffer;
 }
@@ -1903,7 +1888,7 @@ char *write_unitname(const unit * u, char *buffer, size_t size)
 const char *unitname(const unit * u)
 {
     char *ubuf = idbuf[(++nextbuf) % 8];
-    return write_unitname(u, ubuf, sizeof(name));
+    return write_unitname(u, ubuf, sizeof(idbuf[0]));
 }
 
 bool unit_name_equals_race(const unit *u) {
@@ -1944,10 +1929,6 @@ int read_unitid(const faction * f, const region * r)
 {
     char token[16];
     const char *s = gettoken(token, sizeof(token));
-
-    /* Da s nun nur einen string enthaelt, suchen wir ihn direkt in der
-    * paramliste. machen wir das nicht, dann wird getnewunit in s nach der
-    * nummer suchen, doch dort steht bei temp-units nur "temp" drinnen! */
 
     if (!s || *s == 0 || !isalnum(*s)) {
         return -1;

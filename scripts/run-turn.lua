@@ -25,20 +25,6 @@ function callbacks(rules, name, ...)
 	end
 end
 
-local function dbupdate()
-    update_scores()
-    if config.dbname then
-        dbname = config.basepath..'/'..config.dbname
-        edb = db.open(dbame)
-        if edb~=nil then
-            edb:update_factions()
-            edb:update_scores()
-        else
-            eressea.log.error("could not open "..dbname)
-        end
-    end
-end
-
 local function write_emails(locales)
   local files = {}
   local key
@@ -143,7 +129,6 @@ function process(rules, orders)
     end
 
     turn_begin()
-    init_summary()
 
     -- run the turn:
     if eressea.read_orders(orders) ~= 0 then
@@ -161,7 +146,7 @@ function process(rules, orders)
     turn_end() -- ageing, etc.
 
     write_files(config.locales)
-    dbupdate()
+    update_scores()
 
     file = '' .. get_turn() .. '.dat'
     if eressea.write_game(file)~=0 then

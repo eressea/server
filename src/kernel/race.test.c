@@ -1,7 +1,11 @@
 #include <platform.h>
-#include <kernel/config.h>
+#include "faction.h"
+#include "unit.h"
 #include "race.h"
 #include "item.h"
+
+#include <util/language.h>
+#include <attributes/raceprefix.h>
 
 #include <tests.h>
 #include <CuTest.h>
@@ -18,7 +22,7 @@ static void test_rc_name(CuTest *tc) {
     CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
     CuAssertStrEquals(tc, "race::human_d", rc_name_s(rc, NAME_DEFINITIVE));
     CuAssertStrEquals(tc, "race::human_x", rc_name_s(rc, NAME_CATEGORY));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_defaults(CuTest *tc) {
@@ -44,7 +48,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, rc->df_bonus);
     CuAssertIntEquals(tc, 0, rc->battle_flags);
     CuAssertIntEquals(tc, PERSON_WEIGHT, rc->weight);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_find(CuTest *tc) {
@@ -52,7 +56,7 @@ static void test_rc_find(CuTest *tc) {
     test_setup();
     rc = test_create_race("hungryhippos");
     CuAssertPtrEquals(tc, rc, (void *)rc_find("hungryhippos"));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_race_get(CuTest *tc) {
@@ -68,7 +72,7 @@ static void test_race_get(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)rc, (void *)rc_find("elf"));
     free_races();
     CuAssertTrue(tc, rc_changed(&cache));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_old_race(CuTest *tc)
@@ -83,7 +87,7 @@ static void test_old_race(CuTest *tc)
     rc2 = test_create_race("human");
     CuAssertIntEquals(tc, RC_ELF, old_race(rc1));
     CuAssertIntEquals(tc, RC_HUMAN, old_race(rc2));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_set_param(CuTest *tc) {
@@ -100,7 +104,7 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertIntEquals(tc, 400, rc_scare(rc));
     rc_set_param(rc, "hunger.damage", "1d10+12");
     CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_rc_can_use(CuTest *tc) {
@@ -148,7 +152,24 @@ static void test_rc_can_use(CuTest *tc) {
     rc->mask_item = 0;
     CuAssertTrue(tc, ! rc_can_use(rc, itype));
     
-    test_cleanup();
+    test_teardown();
+}
+
+static void test_racename(CuTest *tc) {
+    unit *u;
+    struct locale * lang;
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->faction->locale = lang = test_create_locale();
+    locale_setstring(lang, "race::human_p", "Menschen");
+    locale_setstring(lang, "race::human", "Mensch");
+    locale_setstring(lang, "prefix::dark", "Dunkel");
+    CuAssertStrEquals(tc, "Mensch", racename(lang, u, u->_race));
+    u->number = 2;
+    CuAssertStrEquals(tc, "Menschen", racename(lang, u, u->_race));
+    set_prefix(&u->faction->attribs, "dark");
+    CuAssertStrEquals(tc, "Dunkelmenschen", racename(lang, u, u->_race));
+    test_teardown();
 }
 
 CuSuite *get_race_suite(void)
@@ -161,6 +182,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_rc_find);
     SUITE_ADD_TEST(suite, test_rc_set_param);
     SUITE_ADD_TEST(suite, test_rc_can_use);
+    SUITE_ADD_TEST(suite, test_racename);
     return suite;
 }
 

@@ -31,10 +31,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/base36.h>
-#include <util/bsdstring.h>
-#include <util/language.h>
 #include <util/functions.h>
+#include <util/language.h>
+#include <util/macros.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/unicode.h>
 
 /* libc includes */
@@ -101,22 +102,22 @@ static void make_name(unit *u, const char *monster, int *num_postfix,
             sprintf(zText, "%s_prefix_%d", monster, uv);
             str = locale_getstring(default_locale, zText);
             if (str) {
-                size_t sz = strlcpy(name, (const char *)str, sizeof(name));
-                strlcpy(name + sz, " ", sizeof(name) - sz);
+                size_t sz = str_strlcpy(name, (const char *)str, sizeof(name));
+                str_strlcpy(name + sz, " ", sizeof(name) - sz);
             }
         }
 
         sprintf(zText, "%s_name_%d", monster, uu);
         str = locale_getstring(default_locale, zText);
         if (str)
-            strlcat(name, (const char *)str, sizeof(name));
+            str_strlcat(name, (const char *)str, sizeof(name));
 
         if (un < *num_postfix) {
             sprintf(zText, "%s_postfix_%d", monster, un);
             str = locale_getstring(default_locale, zText);
             if (str) {
-                strlcat(name, " ", sizeof(name));
-                strlcat(name, (const char *)str, sizeof(name));
+                str_strlcat(name, " ", sizeof(name));
+                str_strlcat(name, (const char *)str, sizeof(name));
             }
         }
         unit_setname(u, name);
@@ -248,6 +249,8 @@ static void dragon_name(unit * u)
     case T_GLACIER:
         ter = 5;
         break;
+    default:
+        ter = 0;
     }
 
     if (num_postfix <=0) {
@@ -260,37 +263,34 @@ static void dragon_name(unit * u)
         rnd = num_postfix / 6;
         rnd = (rng_int() % rnd) + ter * rnd;
     }
-    sprintf(zText, "dragon_postfix_%d", rnd);
+    snprintf(zText, sizeof(zText), "dragon_postfix_%d", rnd);
 
     str = locale_getstring(default_locale, zText);
     assert(str != NULL);
 
-    if (u->number > 1) {
+    if (u->region->land && (u->number > 1)) {
         const char *no_article = strchr((const char *)str, ' ');
         assert(no_article);
         /* TODO: localization */
-        sprintf(name, "Die %sn von %s", no_article + 1, rname(u->region,
+        snprintf(name, sizeof(name), "Die %sn von %s", no_article + 1, rname(u->region,
             default_locale));
     }
     else {
         char n[32];
-        size_t sz;
 
-        sz = strlcpy(n, silbe1[rng_int() % SIL1], sizeof(n));
-        sz += strlcat(n, silbe2[rng_int() % SIL2], sizeof(n));
-        sz += strlcat(n, silbe3[rng_int() % SIL3], sizeof(n));
+        snprintf(n, sizeof(n), "%s%s%s", silbe1[rng_int() % SIL1], silbe2[rng_int() % SIL2], silbe3[rng_int() % SIL3]);
         if (rng_int() % 5 > 2) {
             sprintf(name, "%s, %s", n, str);  /* "Name, der Titel" */
         }
         else {
-            sz = strlcpy(name, (const char *)str, sizeof(name));  /* "Der Titel Name" */
+            if (u->region->land && (rng_int() % 3 == 0)) {
+                /* TODO: localization */
+                snprintf(name, sizeof(name), "%s %s von %s", n, str, rname(u->region, default_locale));
+            }
+            else {
+                snprintf(name, sizeof(name), "%s %s", n, str);
+            }
             name[0] = (char)toupper(name[0]); /* TODO: UNICODE - should use towupper() */
-            sz += strlcat(name, " ", sizeof(name));
-            sz += strlcat(name, n, sizeof(name));
-        }
-        if (rng_int() % 3 == 0) {
-            sz += strlcat(name, " von ", sizeof(name));
-            sz += strlcat(name, (const char *)rname(u->region, default_locale), sizeof(name));
         }
     }
 
@@ -358,14 +358,14 @@ static void dracoid_name(unit * u)
 
     mid_syllabels = rng_int() % 4;
 
-    sz = strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
+    sz = str_strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
     while (mid_syllabels > 0) {
         mid_syllabels--;
         if (rng_int() % 10 < 4)
-            strlcat(name, "'", sizeof(name));
-        sz += strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
+            str_strlcat(name, "'", sizeof(name));
+        sz += str_strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
     }
-    sz += strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
+    sz += str_strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
     unit_setname(u, name);
 }
 

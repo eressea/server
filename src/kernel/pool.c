@@ -88,9 +88,9 @@ int get_reservation(const unit * u, const item_type * itype)
 {
     reservation *res = u->reservations;
 
-    if (itype->rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM))
+    if (itype->rtype == get_resourcetype(R_STONE) && (u_race(u)->ec_flags & ECF_STONEGOLEM))
         return (u->number * GOLEM_STONE);
-    if (itype->rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM))
+    if (itype->rtype == get_resourcetype(R_IRON) && (u_race(u)->ec_flags & ECF_IRONGOLEM))
         return (u->number * GOLEM_IRON);
     while (res && res->type != itype)
         res = res->next;
@@ -114,7 +114,7 @@ int change_reservation(unit * u, const item_type * itype, int value)
         res->type = itype;
         res->value = value;
     }
-    else if (res && res->value + value <= 0) {
+    else if (res->value + value <= 0) {
         *rp = res->next;
         free(res);
         return 0;
@@ -139,7 +139,7 @@ int set_resvalue(unit * u, const item_type * itype, int value)
         res->type = itype;
         res->value = value;
     }
-    else if (res && value <= 0) {
+    else if (value <= 0) {
         *rp = res->next;
         free(res);
         return 0;

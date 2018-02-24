@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <messages>
+  <message name="nr_insectwinter" section="nr">
+    <text locale="de">Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren.</text>
+    <text locale="en">It is winter, and insects can only recruit in deserts or with the aid of nestwarmth potions.</text>
+  </message>
+  <message name="nr_insectfall" section="nr">
+    <text locale="de">Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können.</text>
+    <text locale="en">It is the last week before winter in which insects can still recruit.</text>
+  </message>
   <message name="newbie_info_game" section="events">
     <type>
       <arg name="subject" type="string"/>
@@ -157,8 +165,8 @@
   </message>
   <message name="curseinfo::maelstrom">
     <type><arg name="id" type="int"/></type>
-    <text locale="de">Dieser Zauber verursacht einen gigantischen magischen Strudel. Der Mahlstrom wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))</text>
-    <text locale="en">This spell causes a gargantuan vortex. The maelstrom will heavily damage all ships coming into its wake. ($int36($id))</text>
+    <text locale="de">Der Mahlstrom in dieser Region wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))</text>
+    <text locale="en">The maelstrom in this area will heavily damage all ships coming into its wake. ($int36($id))</text>
   </message>
   <message name="curseinfo::healingzone">
     <type><arg name="id" type="int"/></type>
@@ -460,7 +468,7 @@
     <text locale="de">"Die Ausrüstung von $unit($unit) scheint unsichtbar. ($int36($id))"</text>
     <text locale="en">"$unit($unit)'s equipment is invisible. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::magicresistance_unit" section="events">
+  <message name="magicresistance_unit" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="id" type="int"/>
@@ -468,7 +476,7 @@
     <text locale="de">"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))"</text>
     <text locale="en">"The magical resistance has been strengthened. ($int36($id))"</text>
   </message>
-  <message name="curseinfo::magicresistance_building" section="events">
+  <message name="magicresistance_building" section="events">
     <type>
       <arg name="building" type="building"/>
       <arg name="id" type="int"/>
@@ -6807,19 +6815,10 @@
     <type>
       <arg name="unit" type="unit"/>
       <arg name="item" type="resource"/>
+      <arg name="amount" type="int"/>
     </type>
-    <text locale="de">"$unit($unit) benutzt ein $resource($item,1)."</text>
-    <text locale="en">"$unit($unit) uses a $resource($item,1)."</text>
-  </message>
-  <message name="use_singleperson" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="item" type="resource"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-    <text locale="de">"$unit($unit) in $region($region): '$order($command)' - $resource($item,0) können nur von Ein-Personen Einheiten benutzt werden."</text>
-    <text locale="en">"$unit($unit) in $region($region): '$order($command)' - $resource($item,0) can only be used by single-person units."</text>
+    <text locale="de">"$unit($unit) benutzt $amount $resource($item,$amount)."</text>
+    <text locale="en">"$unit($unit) uses $amount $resource($item,$amount)."</text>
   </message>
   <message name="no_attack_after_advance" section="errors">
     <type>
@@ -7061,7 +7060,7 @@
     <text locale="en">"Please send in orders for the next turn if you want to continue playing."</text>
   </message>
 
-  <message name="newbieimmunity" section="events">
+  <message name="newbieimmunity" section="nr">
     <type>
       <arg name="turns" type="int"/>
     </type>

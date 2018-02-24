@@ -30,7 +30,7 @@ extern "C" {
     int sp_berserk(struct castorder * co);
     int sp_tiredsoldiers(struct castorder * co);
     int sp_reeling_arrows(struct castorder * co);
-    int sp_denyattack(struct castorder * co);
+    int sp_appeasement(struct castorder * co);
     int sp_sleep(struct castorder * co);
     int sp_windshield(struct castorder * co);
     int sp_strong_wall(struct castorder * co);

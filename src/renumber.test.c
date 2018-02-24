@@ -9,6 +9,7 @@
 #include <kernel/order.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
 
 #include <stddef.h>
 #include <CuTest.h>
@@ -19,7 +20,7 @@ static void test_renumber_faction(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = u->faction->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -27,7 +28,7 @@ static void test_renumber_faction(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     renumber_factions();
     CuAssertIntEquals(tc, uno, u->faction->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_faction_duplicate(CuTest *tc) {
@@ -37,8 +38,9 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    f2 = test_create_faction(0);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    mt_register(mt_new_va("renumber_inuse", "id:int", NULL));
+    f2 = test_create_faction(NULL);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = f->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_FACTION]), itoa36(f2->no));
@@ -46,7 +48,7 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     renumber_factions();
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "renumber_inuse"));
     CuAssertIntEquals(tc, no, u->faction->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_faction_invalid(CuTest *tc) {
@@ -77,7 +79,7 @@ static void test_renumber_faction_invalid(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_building(CuTest *tc) {
@@ -86,15 +88,15 @@ static void test_renumber_building(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->building = test_create_building(u->region, 0);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->building->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_building_duplicate(CuTest *tc) {
@@ -104,17 +106,17 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
-    u->building = test_create_building(u->region, 0);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->building = test_create_building(u->region, NULL);
     uno = u->building->no;
-    u->building = test_create_building(u->region, 0);
+    u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->building->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship(CuTest *tc) {
@@ -123,15 +125,15 @@ static void test_renumber_ship(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->ship = test_create_ship(u->region, 0);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship_twice(CuTest *tc) {
@@ -140,8 +142,8 @@ static void test_renumber_ship_twice(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
-    u->ship = test_create_ship(u->region, 0);
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -152,7 +154,7 @@ static void test_renumber_ship_twice(CuTest *tc) {
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(no));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_ship_duplicate(CuTest *tc) {
@@ -162,17 +164,17 @@ static void test_renumber_ship_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
-    u->ship = test_create_ship(u->region, 0);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->ship = test_create_ship(u->region, NULL);
     uno = u->ship->no;
-    u->ship = test_create_ship(u->region, 0);
+    u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->ship->no);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit(CuTest *tc) {
@@ -181,7 +183,7 @@ static void test_renumber_unit(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = u->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -189,7 +191,7 @@ static void test_renumber_unit(CuTest *tc) {
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->no);
     CuAssertIntEquals(tc, -no, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_duplicate(CuTest *tc) {
@@ -199,7 +201,7 @@ static void test_renumber_unit_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = u->no;
     u2 = test_create_unit(f, u->region);
     lang = f->locale;
@@ -208,7 +210,7 @@ static void test_renumber_unit_duplicate(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_limit(CuTest *tc) {
@@ -218,7 +220,7 @@ static void test_renumber_unit_limit(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = u->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s 10000", LOC(lang, parameters[P_UNIT]));
@@ -226,7 +228,7 @@ static void test_renumber_unit_limit(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_renumber_unit_invalid(CuTest *tc) {
@@ -236,7 +238,7 @@ static void test_renumber_unit_invalid(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = u->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s TEMP", LOC(lang, parameters[P_UNIT]));
@@ -244,7 +246,7 @@ static void test_renumber_unit_invalid(CuTest *tc) {
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error116"));
     CuAssertIntEquals(tc, 0, ualias(u));
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_renumber_suite(void)

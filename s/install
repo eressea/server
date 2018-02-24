@@ -10,7 +10,7 @@ done
 if [ "$FORCE" != "yes" ] ; then
   BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
   if [ "$BRANCH" != "master" ] ; then
-    echo "you should only install stable versions from the master branch"
+    echo "You should only install stable versions from the master branch. Use -f to override."
     exit
   fi
 fi

@@ -20,7 +20,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/config.h>
 
-#if MUSEUM_MODULE
 #include "museum.h"
 
 /* kernel includes */
@@ -45,6 +44,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
+#include <util/macros.h>
 
 #include <storage.h>
 
@@ -460,7 +460,7 @@ static void use_key1(connection *b, void *data) {
     if (b->type == &bt_questportal) {
         const struct item_type *itype = it_find("questkey1");
         ADDMSG(&u->faction->msgs,
-            msg_message("use_item", "unit item", u, itype->rtype));
+            msg_message("use_item", "unit amount item", u, 1, itype->rtype));
         b->data.i &= 0xFE;
     }
 }
@@ -470,7 +470,7 @@ static void use_key2(connection *b, void *data) {
     if (b->type == &bt_questportal) {
         const struct item_type *itype = it_find("questkey2");
         ADDMSG(&u->faction->msgs,
-            msg_message("use_item", "unit item", u, itype->rtype));
+            msg_message("use_item", "unit amount item", u, 1, itype->rtype));
         b->data.i &= 0xFD;
     }
 }
@@ -502,5 +502,3 @@ void register_museum(void)
     register_item_use(use_museumkey, "use_questkey1");
     register_item_use(use_museumkey, "use_questkey2");
 }
-
-#endif

@@ -5,9 +5,8 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
-include_directories (${LUA_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
-include_directories (${BSON_INCLUDE_DIR})
+include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
 IF(DEFINED ERESSEA_VERSION)
@@ -26,9 +25,9 @@ ENDIF()
 IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
+#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Wall /WX /MP")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /Za /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
@@ -100,6 +99,7 @@ set (ERESSEA_SRC
   reports.c
   teleport.c
   guard.c
+  jsonconf.c
   prefix.c
   donations.c
   eressea.c
@@ -109,6 +109,7 @@ set (ERESSEA_SRC
   json.c
   creport.c
   report.c
+  steal.c
   economy.c
   give.c
   items.c
@@ -127,6 +128,7 @@ set (ERESSEA_SRC
   travelthru.c
   monsters.c
   wormhole.c
+  xmlreader.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -134,12 +136,12 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
+  ${DB_SRC}
   ${UTIL_SRC}
 )
 
 set(SERVER_SRC
   main.c
-  building_action.c
   console.c
   helpers.c
   bind_tolua.c
@@ -158,13 +160,6 @@ set(SERVER_SRC
   bind_storage.c
   bind_unit.c
 )
-
-if (SQLITE3_FOUND)
-set (SERVER_SRC ${SERVER_SRC}
-  sqlite.c
-  bind_sqlite.c
-)
-endif (SQLITE3_FOUND)
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
@@ -200,6 +195,7 @@ target_link_libraries(convert
 set(TESTS_SRC
   test_eressea.c
   tests.c
+  academy.test.c
   alchemy.test.c
   battle.test.c
   calendar.test.c
@@ -210,6 +206,7 @@ set(TESTS_SRC
   give.test.c
   guard.test.c
   json.test.c
+  jsonconf.test.c
   keyword.test.c
   laws.test.c
   lighthouse.test.c
@@ -235,6 +232,7 @@ set(TESTS_SRC
   volcano.test.c
   vortex.test.c
   wormhole.test.c
+# xmlreader.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
@@ -265,9 +263,36 @@ add_test(server test_eressea)
 
 install(TARGETS eressea DESTINATION "bin")
 
+if (HAVE_LIBBSD)
+  add_definitions(-DHAVE_LIBBSD)
+endif (HAVE_LIBBSD)
+
+if (HAVE_STRLCAT)
+  add_definitions(-DHAVE_BSDSTRING)
+endif (HAVE_STRLCAT)
+
+if (HAVE_STRDUP)
+  add_definitions(-DHAVE_STRDUP)
+endif(HAVE_STRDUP)
+
+if (HAVE_LIBBSD)
+target_link_libraries(test_eressea bsd)
+target_link_libraries(eressea bsd)
+target_link_libraries(convert bsd)
+endif (HAVE_LIBBSD)
+
 if (SQLITE3_FOUND)
+include_directories (${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
+target_link_libraries(convert ${SQLITE3_LIBRARIES})
+target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
 add_definitions(-DUSE_SQLITE)
+elseif (DB_FOUND)
+include_directories (${DB_INCLUDE_DIR})
+target_link_libraries(convert ${DB_LIBRARIES})
+target_link_libraries(eressea ${DB_LIBRARIES})
+target_link_libraries(test_eressea ${DB_LIBRARIES})
+add_definitions(-DUSE_DB)
 endif(SQLITE3_FOUND)
 
 if (CURSES_FOUND)
@@ -281,5 +306,4 @@ include_directories (${LIBXML2_INCLUDE_DIR})
 target_link_libraries(eressea ${LIBXML2_LIBRARIES})
 target_link_libraries(convert ${LIBXML2_LIBRARIES})
 target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
-add_definitions(-DUSE_LIBXML2)
 endif (LIBXML2_FOUND)

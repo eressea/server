@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "curse.h"
 
@@ -38,6 +40,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/resolve.h>
@@ -323,7 +326,8 @@ const curse_type *ct_find(const char *c)
                 return type;
             }
             else {
-                size_t k = MIN(c_len, strlen(type->cname));
+                size_t k = strlen(type->cname);
+                if (k > c_len) k = c_len;
                 if (!memcmp(c, type->cname, k)) {
                     return type;
                 }
@@ -482,7 +486,7 @@ int get_cursedmen(const unit * u, const curse * c)
         cursedmen = c->data.i;
     }
 
-    return MIN(u->number, cursedmen);
+    return (u->number < cursedmen) ? u->number : cursedmen;
 }
 
 /* setzt die Anzahl der betroffenen Personen auf cursedmen */
@@ -571,19 +575,19 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     /* es gibt schon eins diese Typs */
     if (c && ct->mergeflags != NO_MERGE) {
         if (ct->mergeflags & M_DURATION) {
-            c->duration = MAX(c->duration, duration);
+            if (c->duration < duration) c->duration = duration;
         }
         else if (ct->mergeflags & M_SUMDURATION) {
             c->duration += duration;
         }
         if (ct->mergeflags & M_MAXEFFECT) {
-            c->effect = MAX(c->effect, effect);
+            if (c->effect < effect) c->effect = effect;
         }
         else if (ct->mergeflags & M_SUMEFFECT) {
             c->effect += effect;
         }
         if (ct->mergeflags & M_VIGOUR) {
-            c->vigour = MAX(vigour, c->vigour);
+            if (c->vigour < vigour) c->vigour = vigour;
         }
         else if (ct->mergeflags & M_VIGOUR_ADD) {
             c->vigour = vigour + c->vigour;
@@ -722,6 +726,7 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
     UNUSED_ARG(obj);
 
     msg = msg_message(mkname("curseinfo", c->type->cname), "id", c->no);
+    /* TODO: this is never NULL, because of the missing_message logic (used in many tests) */
     if (msg == NULL) {
         log_error("There is no curseinfo for %s.\n", c->type->cname);
     }

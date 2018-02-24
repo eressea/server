@@ -106,8 +106,8 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
         int damage = dice_rand(dam);
         if (magic) {
             variant magres = magic_resistance(u);
-            magres = frac_sub(frac_make(1, 1), magres);
-            damage = damage * magres.sa[0] / magres.sa[1];
+            int save = magres.sa[0] / magres.sa[1];
+            damage -= damage * save;
         }
         if (physical) {
             damage -= nb_armor(u, i);
@@ -133,8 +133,8 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
                     change_effect(u, oldpotiontype[P_HEAL], -1);
                     heiltrank = 1;
                 }
-                else if (i_get(u->items, oldpotiontype[P_HEAL]->itype) > 0) {
-                    i_change(&u->items, oldpotiontype[P_HEAL]->itype, -1);
+                else if (i_get(u->items, oldpotiontype[P_HEAL]) > 0) {
+                    i_change(&u->items, oldpotiontype[P_HEAL], -1);
                     change_effect(u, oldpotiontype[P_HEAL], 3);
                     heiltrank = 1;
                 }
@@ -225,7 +225,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
             if (!fval(u->faction, FFL_SELECT)) {
                 fset(u->faction, FFL_SELECT);
                 ADDMSG(&u->faction->msgs, msg_message("volcanooutbreaknn",
-                    "region", r));
+                    "region", volcano));
             }
         }
         if (u == *up) {
@@ -313,4 +313,14 @@ void volcano_update(void)
             }
         }
     }
+}
+
+bool volcano_module(void)
+{
+    static int cache;
+    static bool active;
+    if (config_changed(&cache)) {
+        active = config_get_int("modules.volcano", 0) != 0;
+    }
+    return active;
 }

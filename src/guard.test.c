@@ -23,16 +23,16 @@ static void test_is_guarded(CuTest *tc) {
     region *r;
     race *rc;
 
-    test_cleanup();
+    test_setup();
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
-    r = test_create_region(0, 0, 0);
-    u1 = test_create_unit(test_create_faction(0), r);
+    r = test_create_region(0, 0, NULL);
+    u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(rc), r);
     CuAssertPtrEquals(tc, 0, is_guarded(r, u1));
     setguard(u2, true);
     CuAssertPtrEquals(tc, u2, is_guarded(r, u1));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_unskilled(CuTest * tc)
@@ -44,15 +44,20 @@ static void test_guard_unskilled(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
-    ug = test_create_unit(test_create_faction(0), r);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(test_create_faction(NULL), r);
+    ug = test_create_unit(test_create_faction(NULL), r);
     i_change(&ug->items, itype, 1);
+
+    setguard(ug, true);
+    CuAssertPtrEquals(tc, NULL, is_guarded(r, u));
+
     set_level(ug, SK_MELEE, 1);
     setguard(ug, true);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u));
-    test_cleanup();
+    CuAssertPtrEquals(tc, ug, is_guarded(r, u));
+
+    test_teardown();
 }
 
 static void test_guard_armed(CuTest * tc)
@@ -63,15 +68,15 @@ static void test_guard_armed(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
-    ug = test_create_unit(test_create_faction(0), r);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(test_create_faction(NULL), r);
+    ug = test_create_unit(test_create_faction(NULL), r);
     i_change(&ug->items, itype, 1);
     set_level(ug, SK_MELEE, 2);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_is_guard(CuTest * tc)
@@ -82,21 +87,17 @@ static void test_is_guard(CuTest * tc)
 
     test_setup();
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
-    r = test_create_region(0, 0, 0);
-    ug = test_create_unit(test_create_faction(0), r);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    r = test_create_region(0, 0, NULL);
+    ug = test_create_unit(test_create_faction(NULL), r);
     i_change(&ug->items, itype, 1);
-    set_level(ug, SK_MELEE, 2);
     setguard(ug, true);
-    CuAssertIntEquals(tc, 1, armedmen(ug, false));
-    CuAssertTrue(tc, is_guard(ug));
-    set_level(ug, SK_MELEE, 1);
     CuAssertIntEquals(tc, 0, armedmen(ug, false));
     CuAssertTrue(tc, !is_guard(ug));
-    set_level(ug, SK_MELEE, 2);
+    set_level(ug, SK_MELEE, 1);
     CuAssertIntEquals(tc, 1, armedmen(ug, false));
     CuAssertTrue(tc, is_guard(ug));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_unarmed(CuTest * tc)
@@ -108,12 +109,12 @@ static void test_guard_unarmed(CuTest * tc)
     test_setup();
     rc = test_create_race("mountainguard");
     rc->flags |= RCF_UNARMEDGUARD;
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(test_create_faction(NULL), r);
     ug = test_create_unit(test_create_faction(rc), r);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_monsters(CuTest * tc)
@@ -122,12 +123,12 @@ static void test_guard_monsters(CuTest * tc)
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, 0);
-    u = test_create_unit(test_create_faction(0), r);
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(test_create_faction(NULL), r);
     ug = test_create_unit(get_monsters(), r);
     setguard(ug, true);
     CuAssertPtrEquals(tc, ug, is_guarded(r, u));
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_update_guard(CuTest * tc)
@@ -142,11 +143,11 @@ static void test_update_guard(CuTest * tc)
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("packice", ARCTIC_REGION);
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     r = test_create_region(0, 0, t_plain);
-    ug = test_create_unit(test_create_faction(0), r);
+    ug = test_create_unit(test_create_faction(NULL), r);
     i_change(&ug->items, itype, 1);
-    set_level(ug, SK_MELEE, 2);
+    set_level(ug, SK_MELEE, 1);
     setguard(ug, true);
     CuAssertIntEquals(tc, 1, armedmen(ug, false));
     CuAssertTrue(tc, is_guard(ug));
@@ -155,7 +156,7 @@ static void test_update_guard(CuTest * tc)
     update_guards();
     CuAssertTrue(tc, ! is_guard(ug));
 
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_guard_on(CuTest * tc)
@@ -169,11 +170,11 @@ static void test_guard_on(CuTest * tc)
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     t_plain = test_create_terrain("plain", LAND_REGION);
     itype = it_get_or_create(rt_get_or_create("sword"));
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE, 2);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     r = test_create_region(0, 0, t_plain);
-    ug = test_create_unit(test_create_faction(0), r);
+    ug = test_create_unit(test_create_faction(NULL), r);
     i_change(&ug->items, itype, 1);
-    set_level(ug, SK_MELEE, 2);
+    set_level(ug, SK_MELEE, 1);
     ug->thisorder = create_order(K_GUARD, ug->faction->locale, NULL);
 
     setguard(ug, false);
@@ -228,7 +229,7 @@ static void test_guard_on(CuTest * tc)
     config_set("NewbieImmunity", NULL);
 
     test_clear_messages(ug->faction);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_guard_suite(void)

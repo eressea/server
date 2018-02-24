@@ -21,6 +21,9 @@
 extern "C" {
 #endif
 
+    struct locale;
+    struct stream;
+
     /* Encapsulation of an order
      *
      * This structure contains one order given by a unit. These used to be
@@ -30,8 +33,6 @@ extern "C" {
      * implemented yet) saving approx. 50% of all string-related memory.
      */
 
-    struct order_data;
-
 #define CMD_QUIET   0x010000
 #define CMD_PERSIST 0x020000
 #define CMD_DEFAULT 0x040000
@@ -39,7 +40,7 @@ extern "C" {
     typedef struct order {
         struct order *next;
         /* do not access this data: */
-        struct order_data *data;
+        int id;
         int command;
     } order;
 
@@ -59,15 +60,19 @@ extern "C" {
     /* access functions for orders */
     keyword_t getkeyword(const order * ord);
     void set_order(order ** destp, order * src);
-    char* get_command(const order *ord, char *buffer, size_t size);
+    char* get_command(const order *ord, const struct locale *lang,
+        char *buffer, size_t size);
     bool is_persistent(const order * ord);
     bool is_silent(const order * ord);
     bool is_exclusive(const order * ord);
     bool is_repeated(keyword_t kwd);
     bool is_long(keyword_t kwd);
 
-    char *write_order(const order * ord, char *buffer, size_t size);
-    keyword_t init_order(const struct order *ord);
+    char *write_order(const order * ord, const struct locale *lang,
+        char *buffer, size_t size);
+    int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape);
+    keyword_t init_order_depr(const struct order *ord);
+    keyword_t init_order(const struct order *ord, const struct locale *lang);
 
     void close_orders(void);
 

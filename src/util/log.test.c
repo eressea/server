@@ -1,7 +1,10 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include <CuTest.h>
 
 #include "log.h"
+#include "macros.h"
 
 #include <stdarg.h>
 #include <string.h>

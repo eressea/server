@@ -41,8 +41,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/goodies.h>
 #include <util/log.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/message.h>
 #include <util/rng.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <critbit.h>
@@ -58,7 +60,6 @@ static critbit_tree inames[MAXLOCALES];
 static critbit_tree rnames[MAXLOCALES];
 static critbit_tree cb_resources;
 luxury_type *luxurytypes;
-potion_type *potiontypes;
 
 #define RTYPENAMELEN 24
 typedef struct rt_entry {
@@ -105,10 +106,10 @@ static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {
-    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->flags & RCF_STONEGOLEM)) {
+    if (rtype == get_resourcetype(R_STONE) && (u_race(u)->ec_flags & ECF_STONEGOLEM)) {
         return GOLEM_STONE;
     }
-    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->flags & RCF_IRONGOLEM)) {
+    if (rtype == get_resourcetype(R_IRON) && (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
         return GOLEM_IRON;
     }
     return 0;
@@ -196,7 +197,7 @@ resource_type *rt_get_or_create(const char *name) {
             perror("resource_type allocation failed");
         }
         else {
-            rtype->_name = strdup(name);
+            rtype->_name = str_strdup(name);
             rt_register(rtype);
         }
     }
@@ -271,23 +272,21 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 
 weapon_type *new_weapontype(item_type * itype,
     int wflags, variant magres, const char *damage[], int offmod, int defmod,
-    int reload, skill_t sk, int minskill)
+    int reload, skill_t sk)
 {
     weapon_type *wtype;
 
-    assert(minskill > 0);
     assert(itype && (!itype->rtype || !resource2weapon(itype->rtype)));
 
     wtype = calloc(sizeof(weapon_type), 1);
     if (damage) {
-        wtype->damage[0] = strdup(damage[0]);
-        wtype->damage[1] = strdup(damage[1]);
+        wtype->damage[0] = str_strdup(damage[0]);
+        wtype->damage[1] = str_strdup(damage[1]);
     }
     wtype->defmod = defmod;
     wtype->flags |= wflags;
     wtype->itype = itype;
     wtype->magres = magres;
-    wtype->minskill = minskill;
     wtype->offmod = offmod;
     wtype->reload = reload;
     wtype->skill = sk;
@@ -315,33 +314,15 @@ armor_type *new_armortype(item_type * itype, double penalty, variant magres,
     return atype;
 }
 
-static void pt_register(potion_type * ptype)
+void it_set_appearance(item_type *itype, const char *appearance)
 {
-    ptype->itype->rtype->ptype = ptype;
-    ptype->next = potiontypes;
-    potiontypes = ptype;
-}
-
-potion_type *new_potiontype(item_type * itype, int level)
-{
-    potion_type *ptype;
-
-    assert(resource2potion(itype->rtype) == NULL);
-
-    ptype = (potion_type *)calloc(sizeof(potion_type), 1);
-    ptype->itype = itype;
-    ptype->level = level;
-    pt_register(ptype);
-
-    return ptype;
-}
-
-void it_set_appearance(item_type *itype, const char *appearance) {
     assert(itype);
     assert(itype->rtype);
     if (appearance) {
-        itype->_appearance[0] = strdup(appearance);
-        itype->_appearance[1] = strcat(strcpy((char *)malloc(strlen((char *)appearance) + 3), (char *)appearance), "_p");
+        char plural[32];
+        itype->_appearance[0] = str_strdup(appearance);
+        snprintf(plural, sizeof(plural), "%s_p", appearance);
+        itype->_appearance[1] = str_strdup(plural);
     } else {
         itype->_appearance[0] = 0;
         itype->_appearance[1] = 0;
@@ -372,18 +353,6 @@ const luxury_type *resource2luxury(const resource_type * rtype)
     return NULL;
 #else
     return rtype->ltype;
-#endif
-}
-
-const potion_type *resource2potion(const resource_type * rtype)
-{
-#ifdef AT_PTYPE
-    attrib *a = a_find(rtype->attribs, &at_ptype);
-    if (a)
-        return (const potion_type *)a->data.v;
-    return NULL;
-#else
-    return rtype->ptype;
 #endif
 }
 
@@ -571,7 +540,7 @@ item *i_new(const item_type * itype, int size)
     return i;
 }
 
-const potion_type *oldpotiontype[MAX_POTIONS + 1];
+const item_type *oldpotiontype[MAX_POTIONS + 1];
 
 /*** alte items ***/
 
@@ -594,7 +563,7 @@ const resource_type *get_resourcetype(resource_t type) {
     static struct resource_type * rtypes[MAX_RESOURCES];
     const resource_type *rtype = NULL;
     if (update != num_resources) {
-        memset(rtypes, 0, sizeof(rtypes));
+        memset(rtypes, 0, sizeof(resource_type *) * MAX_RESOURCES);
         update = num_resources;
     }
     else {
@@ -629,27 +598,6 @@ int set_item(unit * u, const item_type *itype, int value)
     return value;
 }
 
-/* t_item::flags */
-#define FL_ITEM_CURSED  (1<<0)
-#define FL_ITEM_NOTLOST (1<<1)
-#define FL_ITEM_NOTINBAG  (1<<2)        /* nicht im Bag Of Holding */
-#define FL_ITEM_ANIMAL  (1<<3)  /* ist ein Tier */
-#define FL_ITEM_MOUNT ((1<<4) | FL_ITEM_ANIMAL) /* ist ein Reittier */
-
-typedef struct t_item {
-    const char *name;
-    /* [0]: Einzahl fuer eigene; [1]: Mehrzahl fuer eigene;
-     * [2]: Einzahl fuer Fremde; [3]: Mehrzahl fuer Fremde */
-    bool is_resource;
-    skill_t skill;
-    int minskill;
-    int gewicht;
-    int preis;
-    unsigned int flags;
-    void(*benutze_funktion) (struct region *, struct unit *, int amount,
-    struct order *);
-} t_item;
-
 #include "move.h"
 
 static int
@@ -665,7 +613,7 @@ static int
 mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
 {
     UNUSED_ARG(r);
-    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->flags & RCF_IRONGOLEM)) {
+    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
         return value;
     }
     return -118;
@@ -696,7 +644,7 @@ static void init_oldpotions(void)
     for (p = 0; p != MAX_POTIONS; ++p) {
         item_type *itype = it_find(potionnames[p]);
         if (itype != NULL) {
-            oldpotiontype[p] = itype->rtype->ptype;
+            oldpotiontype[p] = itype;
         }
     }
 }
@@ -744,11 +692,13 @@ void init_resources(void)
 int get_money(const unit * u)
 {
     const struct resource_type *rtype = get_resourcetype(R_SILVER);
-    const item *i = u->items;
-    while (i && i->type->rtype != rtype) {
-        i = i->next;
+    const item *i;
+    for (i = u->items; i; i = i->next) {
+        if (i->type->rtype == rtype) {
+            return i->number;
+        }
     }
-    return i ? i->number : 0;
+    return 0;
 }
 
 int set_money(unit * u, int v)
@@ -1030,3 +980,18 @@ void register_resources(void)
     register_function((pf_generic)res_changehp, "changehp");
     register_function((pf_generic)res_changeaura, "changeaura");
 }
+
+void show_item(unit * u, const item_type * itype)
+{
+    faction * f = u->faction;
+    attrib *a;
+
+    a = a_find(f->attribs, &at_showitem);
+    while (a && a->data.v != itype)
+        a = a->next;
+    if (!a) {
+        a = a_add(&f->attribs, a_new(&at_showitem));
+        a->data.v = (void *)itype;
+    }
+}
+

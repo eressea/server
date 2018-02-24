@@ -10,18 +10,21 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "helpers.h"
 #include "vortex.h"
 #include "alchemy.h"
 
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/functions.h>
 #include <util/gamedata.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 
@@ -52,66 +55,65 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
 {
     lua_State *L = (lua_State *)global.vm_state;
     char fname[64];
-    int result = -1;
+    int result = -1, len;
     const char *iname = itype->rtype->_name;
 
+    UNUSED_ARG(ord);
     assert(s != NULL);
-    strlcpy(fname, iname, sizeof(fname));
-    strlcat(fname, "_give", sizeof(fname));
+    len = snprintf(fname, sizeof(fname), "%s_give", iname);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, s, TOLUA_CAST "unit");
+            tolua_pushusertype(L, d, TOLUA_CAST "unit");
+            tolua_pushstring(L, iname);
+            lua_pushinteger(L, n);
 
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, s, TOLUA_CAST "unit");
-        tolua_pushusertype(L, d, TOLUA_CAST "unit");
-        tolua_pushstring(L, iname);
-        lua_pushinteger(L, n);
-
-        if (lua_pcall(L, 4, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("unit %s calling '%s': %s.\n", unitname(s), fname, error);
-            lua_pop(L, 1);
+            if (lua_pcall(L, 4, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("unit %s calling '%s': %s.\n", unitname(s), fname, error);
+                lua_pop(L, 1);
+            }
+            else {
+                result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+            }
         }
         else {
-            result = (int)lua_tonumber(L, -1);
+            log_error("unit %s trying to call '%s' : not a function.\n", unitname(s), fname);
             lua_pop(L, 1);
         }
     }
-    else {
-        log_error("unit %s trying to call '%s' : not a function.\n", unitname(s), fname);
-        lua_pop(L, 1);
-    }
-
     return result;
 }
 
 static int limit_resource_lua(const region * r, const resource_type * rtype)
 {
     char fname[64];
-    int result = -1;
+    int result = -1, len;
     lua_State *L = (lua_State *)global.vm_state;
 
-    strlcpy(fname, rtype->_name, sizeof(fname));
-    strlcat(fname, "_limit", sizeof(fname));
+    len = snprintf(fname, sizeof(fname), "%s_limit", rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
 
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
-
-        if (lua_pcall(L, 1, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("limit(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
-            lua_pop(L, 1);
+            if (lua_pcall(L, 1, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("limit(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
+                lua_pop(L, 1);
+            }
+            else {
+                result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+            }
         }
         else {
-            result = (int)lua_tonumber(L, -1);
+            log_error("limit(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
             lua_pop(L, 1);
         }
     }
-    else {
-        log_error("limit(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
-        lua_pop(L, 1);
-    }
-
     return result;
 }
 
@@ -120,24 +122,25 @@ produce_resource_lua(region * r, const resource_type * rtype, int norders)
 {
     lua_State *L = (lua_State *)global.vm_state;
     char fname[64];
+    int len;
 
-    strlcpy(fname, rtype->_name, sizeof(fname));
-    strlcat(fname, "_produce", sizeof(fname));
+    len = snprintf(fname, sizeof(fname), "%s_produce", rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
+            lua_pushinteger(L, norders);
 
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
-        lua_pushinteger(L, norders);
-
-        if (lua_pcall(L, 2, 0, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("produce(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
+            if (lua_pcall(L, 2, 0, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("produce(%s) calling '%s': %s.\n", regionname(r, NULL), fname, error);
+                lua_pop(L, 1);
+            }
+        }
+        else {
+            log_error("produce(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
             lua_pop(L, 1);
         }
-    }
-    else {
-        log_error("produce(%s) calling '%s': not a function.\n", regionname(r, NULL), fname);
-        lua_pop(L, 1);
     }
 }
 
@@ -216,32 +219,31 @@ static int
 lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    int result = -1;
+    int len, result = -1;
     char fname[64];
 
-    strlcpy(fname, rtype->_name, sizeof(fname));
-    strlcat(fname, "_changeresource", sizeof(fname));
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, u, TOLUA_CAST "unit");
-        lua_pushinteger(L, delta);
-
-        if (lua_pcall(L, 2, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("change(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
+    len = snprintf(fname, sizeof(fname), "%s_changeresource", rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, u, TOLUA_CAST "unit");
+            lua_pushinteger(L, delta);
+            
+            if (lua_pcall(L, 2, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("change(%s) calling '%s': %s.\n", unitname(u), fname, error);
+                lua_pop(L, 1);
+            }
+            else {
+                result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+            }
         }
         else {
-            result = (int)lua_tonumber(L, -1);
+            log_error("change(%s) calling '%s': not a function.\n", unitname(u), fname);
             lua_pop(L, 1);
         }
     }
-    else {
-        log_error("change(%s) calling '%s': not a function.\n", unitname(u), fname);
-        lua_pop(L, 1);
-    }
-
     return result;
 }
 
@@ -250,13 +252,12 @@ static int
 use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    int result = 0;
+    int len, result = 0;
     char fname[64];
     int (*callout)(unit *, const item_type *, int, struct order *);
 
-    strlcpy(fname, "use_", sizeof(fname));
-    strlcat(fname, itype->rtype->_name, sizeof(fname));
-
+    len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
     callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
     if (callout) {
         return callout(u, itype, amount, ord);
@@ -280,13 +281,13 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
         return result;
     }
     lua_pop(L, 1);
-    if (itype->rtype->ptype) {
+    if (itype->flags & ITF_POTION) {
         return use_potion(u, itype, amount, ord);
     } else {
         log_error("no such callout: %s", fname);
     }
     log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
-
+    }
     return result;
 }
 
@@ -304,11 +305,27 @@ struct trigger_type tt_caldera = {
     caldera_read
 };
 
+
+static int building_action_read(struct attrib *a, void *owner, gamedata *data)
+{
+    struct storage *store = data->store;
+
+    UNUSED_ARG(owner);
+    UNUSED_ARG(a);
+
+    if (data->version < ATTRIBOWNER_VERSION) {
+        READ_INT(data->store, NULL);
+    }
+    READ_TOK(store, NULL, 0);
+    READ_TOK(store, NULL, 0);
+    return AT_READ_DEPR;
+}
+
 void register_tolua_helpers(void)
 {
     tt_register(&tt_caldera);
     at_register(&at_direction);
-    at_register(&at_building_action);
+    at_deprecate("lcbuilding", building_action_read);
 
     callbacks.cast_spell = lua_callspell;
     callbacks.use_item = use_item_lua;

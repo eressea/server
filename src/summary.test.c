@@ -12,15 +12,15 @@ static void test_summary(CuTest * tc)
 {
     struct summary *sum;
     test_setup();
-    test_create_faction(0);
-    test_create_faction(0);
+    test_create_faction(NULL);
+    test_create_faction(NULL);
     sum = make_summary();
-    report_summary(sum, sum, true);
+    report_summary(sum, true);
     CuAssertIntEquals(tc, 0, remove("parteien.full"));
     CuAssertIntEquals(tc, 0, remove("datum"));
     CuAssertIntEquals(tc, 0, remove("turn"));
     free_summary(sum);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_summary_suite(void)

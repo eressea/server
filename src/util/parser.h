@@ -18,6 +18,7 @@
 extern "C" {
 #endif
 
+    void init_tokens_ex(const char *initstr, void *data, void(*dtor)(void *));
     void init_tokens_str(const char *initstr);  /* initialize token parsing */
     void skip_token(void);
     const char *parse_token_depr(const char **str);
@@ -27,7 +28,7 @@ extern "C" {
     bool parser_end(void);
     const char *getstrtoken(void);
     const char *gettoken(char *lbuf, size_t bufsize);
-    unsigned int getuint(void);
+    int getuint(void);
     int getint(void);
     int getid(void);
     unsigned int atoip(const char *s);

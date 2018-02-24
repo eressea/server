@@ -1,5 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
-
+#endif
 #include "borders.h"
 #include "vortex.h"
 
@@ -15,6 +16,7 @@
 #include <util/attrib.h>
 #include <util/gamedata.h>
 #include <util/language.h>
+#include <util/macros.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/resolve.h>
@@ -119,7 +121,7 @@ struct region *from, struct region *to, bool routing)
     wall_data *fd = (wall_data *)b->data.v;
     if (!routing && fd->active) {
         int hp = dice(3, fd->force) * u->number;
-        hp = MIN(u->hp, hp);
+        if (u->hp < hp) hp = u->hp;
         u->hp -= hp;
         if (u->hp) {
             ADDMSG(&u->faction->msgs, msg_message("firewall_damage",

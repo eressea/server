@@ -1,11 +1,13 @@
 #include <platform.h>
 #include <eressea.h>
 #include <kernel/config.h>
+#include <kernel/database.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/variant.h>
 
 #pragma warning(disable: 4210)
@@ -34,7 +36,7 @@ static void add_suite(CuSuite *(*csuite)(void), const char *name, int argc, char
     }
     if (s) {
         s->next = suites;
-        s->name = strdup(name);
+        s->name = str_strdup(name);
         s->csuite = csuite();
         suites = s;
     }
@@ -76,7 +78,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(config);
     ADD_SUITE(attrib);
     ADD_SUITE(base36);
-    ADD_SUITE(bsdstring);
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);
@@ -91,31 +92,34 @@ int RunAllTests(int argc, char *argv[])
     /* items */
     ADD_SUITE(xerewards);
     /* kernel */
+    ADD_SUITE(academy);
+    ADD_SUITE(alchemy);
     ADD_SUITE(alliance);
+    ADD_SUITE(ally);
+    ADD_SUITE(building);
     ADD_SUITE(command);
-    ADD_SUITE(plane);
-    ADD_SUITE(unit);
+    ADD_SUITE(db);
     ADD_SUITE(faction);
     ADD_SUITE(group);
     ADD_SUITE(build);
-    ADD_SUITE(pool);
     ADD_SUITE(curse);
     ADD_SUITE(equipment);
     ADD_SUITE(familiar);
     ADD_SUITE(item);
     ADD_SUITE(magic);
-    ADD_SUITE(alchemy);
+    ADD_SUITE(magicresistance);
+    ADD_SUITE(messages);
+    ADD_SUITE(plane);
+    ADD_SUITE(pool);
     ADD_SUITE(reports);
     ADD_SUITE(region);
     ADD_SUITE(save);
     ADD_SUITE(ship);
+    ADD_SUITE(skills);
     ADD_SUITE(spellbook);
-    ADD_SUITE(building);
     ADD_SUITE(spell);
     ADD_SUITE(spells);
-    ADD_SUITE(magicresistance);
-    ADD_SUITE(ally);
-    ADD_SUITE(messages);
+    ADD_SUITE(unit);
     /* gamecode */
     ADD_SUITE(battle);
     ADD_SUITE(calendar);
@@ -132,6 +136,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(names);
+    ADD_SUITE(orderdb);
     ADD_SUITE(orderfile);
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);

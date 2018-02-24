@@ -27,6 +27,7 @@ extern "C" {
 
     void volcano_outbreak(struct region * r, struct region *rn);
     void volcano_update(void);
+    bool volcano_module(void);
     
 #ifdef __cplusplus
 }

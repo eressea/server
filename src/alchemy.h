@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_ALCHEMY_H
 #define H_KRNL_ALCHEMY_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,8 +28,11 @@ extern "C" {
     struct potion_type;
     struct unit;
     struct region;
+    struct faction;
     struct item_type;
     struct order;
+
+    extern struct attrib_type at_effect;
 
     enum {
         /* Stufe 1 */
@@ -41,11 +46,7 @@ extern "C" {
         /* Stufe 3 */
         P_WISE,                     /* 6 */
         P_FOOL,
-#ifdef INSECT_POTION
-        P_WARMTH,
-#else
         P_STEEL,
-#endif
         P_HORSE,
         P_BERSERK,                  /* 10 */
         /* Stufe 4 */
@@ -56,22 +57,24 @@ extern "C" {
         MAX_POTIONS
     };
 
+    void new_potiontype(struct item_type * itype, int level);
+    int potion_level(const struct item_type *itype);
+    void show_potions(struct faction *f, int sklevel);
+
     void herbsearch(struct unit *u, int max);
-    extern int use_potion(struct unit *u, const struct item_type *itype,
+    int use_potion(struct unit *u, const struct item_type *itype,
         int amount, struct order *);
-    extern int use_potion_delayed(struct unit *u, const struct item_type *itype,
+    int use_potion_delayed(struct unit *u, const struct item_type *itype,
         int amount, struct order *);
-    extern void init_potions(void);
 
-
-    extern int get_effect(const struct unit *u, const struct potion_type *effect);
-    extern int change_effect(struct unit *u, const struct potion_type *effect,
+    int get_effect(const struct unit *u, const struct item_type *effect);
+    int change_effect(struct unit *u, const struct item_type *effect,
         int value);
-    extern struct attrib_type at_effect;
+    bool display_potions(struct unit *u);
 
-    /* rausnehmen, sobald man attribute splitten kann: */
+    /* TODO: rausnehmen, sobald man attribute splitten kann: */
     typedef struct effect_data {
-        const struct potion_type *type;
+        const struct item_type *type;
         int value;
     } effect_data;
 

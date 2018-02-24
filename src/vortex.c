@@ -8,6 +8,7 @@
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/variant.h>
 
@@ -43,7 +44,7 @@ void register_special_direction(struct locale *lang, const char *name)
     if (token) {
         void **tokens = get_translations(lang, UT_SPECDIR);
         variant var;
-        char *str = strdup(name);
+        char *str = str_strdup(name);
 
         var.v = str;
         addtoken((struct tnode **)tokens, token, var);
@@ -96,9 +97,9 @@ static int a_readdirection(attrib * a, void *owner, struct gamedata *data)
     READ_INT(store, &d->y);
     READ_INT(store, &d->duration);
     READ_TOK(store, lbuf, sizeof(lbuf));
-    d->desc = strdup(lbuf);
+    d->desc = str_strdup(lbuf);
     READ_TOK(store, lbuf, sizeof(lbuf));
-    d->keyword = strdup(lbuf);
+    d->keyword = str_strdup(lbuf);
     d->active = true;
     return AT_READ_OK;
 }
@@ -153,8 +154,8 @@ attrib *create_special_direction(region * r, region * rt, int duration,
     d->x = rt->x;
     d->y = rt->y;
     d->duration = duration;
-    d->desc = strdup(desc);
-    d->keyword = strdup(keyword);
+    d->desc = str_strdup(desc);
+    d->keyword = str_strdup(keyword);
 
     return a;
 }

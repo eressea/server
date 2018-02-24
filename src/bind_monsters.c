@@ -1,4 +1,7 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "spells/shipcurse.h"
 #include "monsters.h"
 
@@ -10,6 +13,8 @@
 #include <kernel/ship.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
+
+#include <util/macros.h>
 
 #include <tolua.h>
 #include <stdlib.h>
@@ -40,6 +45,7 @@ static int tolua_planmonsters(lua_State * L)
 
 static int tolua_spawn_dragons(lua_State * L)
 {
+    UNUSED_ARG(L);
     spawn_dragons();
     return 0;
 }
@@ -52,6 +58,7 @@ static int tolua_get_monsters(lua_State * L)
 
 static int tolua_spawn_undead(lua_State * L)
 {
+    UNUSED_ARG(L);
     spawn_undead();
     return 0;
 }

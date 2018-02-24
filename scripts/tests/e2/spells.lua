@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("magic.fumble.enable", "0")
 end
 
 function test_shapeshift()
@@ -101,4 +102,25 @@ function test_earn_silver()
     process_orders() -- not enough
     assert_equal(350, u:get_item("money"))
     assert_equal(0, r:get_resource("money"))
+end
+
+function test_familiar()
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    local uid = u.id
+    u.name = 'Hodor'
+    u.magic = "gwyrrd"
+    u.race = "elf"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    local err = u:add_spell("summon_familiar")
+    assert_equal(0, err)
+    u:add_order("ZAUBERE Vertrauten~rufen")
+    process_orders()
+    for u in r.units do 
+        if u.id ~= uid then
+            assert_equal('Vertrauter von Hodor (' .. itoa36(uid) ..')', u.name)
+        end
+    end
 end

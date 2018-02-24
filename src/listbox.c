@@ -8,8 +8,10 @@
 *
 */
 
-/* wenn platform.h nicht vor curses included wird, kompiliert es unter windows nicht */
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <curses.h>
 #include <kernel/config.h>
 
@@ -17,6 +19,7 @@
 #include "gmtool_structs.h"
 
 #include <util/log.h>
+#include <util/strings.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +30,7 @@ insert_selection(list_selection ** p_sel, list_selection * prev,
 const char *str, void *payload)
 {
     list_selection *sel = calloc(sizeof(list_selection), 1);
-    sel->str = strdup(str);
+    sel->str = str_strdup(str);
     sel->data = payload;
     if (*p_sel) {
         list_selection *s;

@@ -1,16 +1,7 @@
-/*
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "bindings.h"
 #include "bind_unit.h"
 #include "bind_storage.h"
@@ -65,11 +56,12 @@ without prior permission by the authors of Eressea.
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <selist.h>
+#include <util/macros.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/xml.h>
 
+#include <selist.h>
 #include <storage.h>
 
 #include <iniparser.h>
@@ -112,20 +104,6 @@ int log_lua_error(lua_State * L)
     log_fatal("Lua call failed.\n%s\n", error);
     lua_pop(L, 1);
     return 1;
-}
-
-int tolua_orderlist_next(lua_State * L)
-{
-    order **order_ptr = (order **)lua_touserdata(L, lua_upvalueindex(1));
-    order *ord = *order_ptr;
-    if (ord != NULL) {
-        char cmd[8192];
-        write_order(ord, cmd, sizeof(cmd));
-        tolua_pushstring(L, cmd);
-        *order_ptr = ord->next;
-        return 1;
-    }
-    return 0;
 }
 
 static int tolua_selist_iter(lua_State * L)
@@ -287,6 +265,7 @@ static int tolua_message_region(lua_State * L)
 
 static int tolua_update_guards(lua_State * L)
 {
+    UNUSED_ARG(L);
     update_guards();
     return 0;
 }
@@ -391,6 +370,7 @@ static int tolua_learn_skill(lua_State * L)
 
 static int tolua_update_scores(lua_State * L)
 {
+    UNUSED_ARG(L);
     score();
     return 0;
 }
@@ -398,6 +378,7 @@ static int tolua_update_scores(lua_State * L)
 static int tolua_update_owners(lua_State * L)
 {
     region *r;
+    UNUSED_ARG(L);
     for (r = regions; r; r = r->next) {
         update_owners(r);
     }
@@ -406,12 +387,14 @@ static int tolua_update_owners(lua_State * L)
 
 static int tolua_update_subscriptions(lua_State * L)
 {
+    UNUSED_ARG(L);
     update_subscriptions();
     return 0;
 }
 
 static int tolua_remove_empty_units(lua_State * L)
 {
+    UNUSED_ARG(L);
     remove_empty_units();
     return 0;
 }
@@ -496,24 +479,34 @@ static int tolua_write_reports(lua_State * L)
 
 static int tolua_process_orders(lua_State * L)
 {
+    UNUSED_ARG(L);
+#if 0
+    order * ord = parse_order("@GIB xmis ALLES Gurgelkraut", default_locale);
+    assert(ord);
+    free_order(ord);
+    return 0;
+#endif
     processorders();
     return 0;
 }
 
 static int tolua_turn_begin(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_begin();
     return 0;
 }
 
 static int tolua_turn_process(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_process();
     return 0;
 }
 
 static int tolua_turn_end(lua_State * L)
 {
+    UNUSED_ARG(L);
     turn_end();
     return 0;
 }
@@ -525,24 +518,15 @@ static int tolua_write_passwords(lua_State * L)
     return 0;
 }
 
-static struct summary *sum_begin = 0;
-static int tolua_init_summary(lua_State * L)
-{
-    sum_begin = make_summary();
-    return 0;
-}
-
 static int tolua_write_summary(lua_State * L)
 {
-    if (sum_begin) {
-        struct summary *sum_end = make_summary();
-        report_summary(sum_end, sum_begin, false);
-        report_summary(sum_end, sum_begin, true);
-        free_summary(sum_end);
-        free_summary(sum_begin);
-        sum_begin = 0;
-        return 0;
-    }
+    struct summary *sum;
+    UNUSED_ARG(L);
+    
+    sum = make_summary();
+    report_summary(sum, false);
+    report_summary(sum, true);
+    free_summary(sum);
     return 0;
 }
 /*
@@ -724,7 +708,6 @@ static int config_get_resource(lua_State * L)
                 lua_settable(L, -3);
             }
             if (itype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, itype->construction->minskill);
                 lua_settable(L, -3);
@@ -732,6 +715,7 @@ static int config_get_resource(lua_State * L)
                 lua_pushstring(L, skillnames[itype->construction->skill]);
                 lua_settable(L, -3);
                 if (itype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; itype->construction->materials[i].number; ++i) {
@@ -788,7 +772,6 @@ static int config_get_btype(lua_State * L)
                 lua_settable(L, -3);
             }
             if (btype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, btype->construction->minskill);
                 lua_settable(L, -3);
@@ -796,6 +779,7 @@ static int config_get_btype(lua_State * L)
                 lua_pushstring(L, skillnames[btype->construction->skill]);
                 lua_settable(L, -3);
                 if (btype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; btype->construction->materials[i].number; ++i) {
@@ -854,7 +838,6 @@ static int config_get_stype(lua_State * L)
                 }
             }
             if (stype->construction) {
-                int i;
                 lua_pushstring(L, "build_skill_min");
                 lua_pushinteger(L, stype->construction->minskill);
                 lua_settable(L, -3);
@@ -862,6 +845,7 @@ static int config_get_stype(lua_State * L)
                 lua_pushstring(L, skillnames[stype->construction->skill]);
                 lua_settable(L, -3);
                 if (stype->construction->materials) {
+                    int i;
                     lua_pushstring(L, "materials");
                     lua_newtable(L);
                     for (i = 0; stype->construction->materials[i].number; ++i) {
@@ -935,12 +919,6 @@ int tolua_read_xml(lua_State * L)
     lua_pushinteger(L, init_data(filename, catalog));
     return 1;
 }
-
-typedef struct event_args {
-    int hfunction;
-    int hargs;
-    const char *sendertype;
-} event_args;
 
 static int tolua_report_unit(lua_State * L)
 {
@@ -1084,7 +1062,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "init_reports", tolua_init_reports);
         tolua_function(L, TOLUA_CAST "write_reports", tolua_write_reports);
         tolua_function(L, TOLUA_CAST "write_report", tolua_write_report);
-        tolua_function(L, TOLUA_CAST "init_summary", tolua_init_summary);
         tolua_function(L, TOLUA_CAST "write_summary", tolua_write_summary);
         tolua_function(L, TOLUA_CAST "write_passwords", tolua_write_passwords);
         tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);
@@ -1136,9 +1113,6 @@ lua_State *lua_init(const dictionary *inifile) {
     register_tolua_helpers();
     tolua_bindings_open(L, inifile);
     tolua_eressea_open(L);
-#ifdef USE_SQLITE
-    tolua_sqlite_open(L);
-#endif
     tolua_unit_open(L);
     tolua_building_open(L);
     tolua_ship_open(L);
@@ -1186,7 +1160,6 @@ int eressea_run(lua_State *L, const char *luafile)
 {
     int err;
     global.vm_state = L;
-
     /* push an error handling function on the stack: */
     lua_getglobal(L, "debug");
     lua_getfield(L, -1, "traceback");

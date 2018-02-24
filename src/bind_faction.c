@@ -10,7 +10,10 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
@@ -31,6 +34,7 @@ without prior permission by the authors of Eressea.
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/macros.h>
 #include <util/password.h>
 
 #include <tolua.h>

@@ -2,6 +2,7 @@
 #include "attrib.h"
 
 #include <util/gamedata.h>
+#include <util/strings.h>
 
 #include <storage.h>
 #include <memstream.h>
@@ -119,7 +120,7 @@ static void test_attrib_rwstring(CuTest *tc) {
     attrib a = { 0 };
 
     test_setup();
-    a.data.v = strdup("Hello World");
+    a.data.v = str_strdup("Hello World");
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     a_writestring(&a, NULL, &store);
@@ -130,7 +131,7 @@ static void test_attrib_rwstring(CuTest *tc) {
     a_finalizestring(&a);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_attrib_rwint(CuTest *tc) {
@@ -149,7 +150,7 @@ static void test_attrib_rwint(CuTest *tc) {
     CuAssertIntEquals(tc, 42, a.data.i);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_attrib_rwchars(CuTest *tc) {
@@ -170,7 +171,7 @@ static void test_attrib_rwchars(CuTest *tc) {
     CuAssertIntEquals(tc, 42, a.data.ca[3]);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 static void test_attrib_rwshorts(CuTest *tc) {
@@ -191,7 +192,7 @@ static void test_attrib_rwshorts(CuTest *tc) {
     CuAssertIntEquals(tc, 42, a.data.sa[1]);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    test_cleanup();
+    test_teardown();
 }
 
 CuSuite *get_attrib_suite(void)
