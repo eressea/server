@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
+    eressea.settings.set("study.random_progress", "0")
 end
 
 function test_water_of_life()
@@ -162,8 +163,7 @@ function test_use_foolpotion()
     turn_process()
     assert_equal(0, u:get_item('p7'))
     assert_equal(0, u2:effect('p7'))
---    disabled, intermittent:
---    assert_equal(0, u2:get_skill('crossbow'))
+    assert_equal(0, u2:get_skill('crossbow'))
     assert_equal(1, f:count_msg_type('givedumb'))
     turn_end()
 end
