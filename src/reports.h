@@ -90,8 +90,8 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit(const struct faction *f, const struct unit *u, unsigned int indent,
-        seen_mode mode, char *buf, size_t size);
+    int bufunit(const struct faction *f, const struct unit *u, seen_mode mode,
+        char *buf, size_t size);
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);

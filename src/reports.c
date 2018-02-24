@@ -677,7 +677,7 @@ static size_t spskill(char *buffer, size_t size, const struct locale * lang,
 }
 
 int
-bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, char *buf,
+bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     size_t size)
 {
     int i, dh;
@@ -1055,7 +1055,7 @@ spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned in
     seen_mode mode)
 {
     char buf[DISPLAYSIZE];
-    int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
+    int dh = bufunit(f, u, mode, buf, sizeof(buf));
     lparagraph(SP, buf, indent,
         (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
