@@ -37,10 +37,10 @@ BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
 if [ "$BRANCH" = "master" ] ; then
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
 echo "$BRANCH $VERSION"
-CMAKE_ARGS="-DERESSEA_VERSION=$VERSION ${CMAKE_ARGS}"
+CMAKE_ARGS="-DERESSEA_VERSION:STRING=$VERSION ${CMAKE_ARGS}"
 else
 REV=$(git rev-parse --short HEAD)
-CMAKE_ARGS="-DERESSEA_BUILDNO=$REV $CMAKE_ARGS"
+CMAKE_ARGS="-DERESSEA_BUILDNO:STRING=$REV $CMAKE_ARGS"
 fi
 
 cmake ${CMAKE_ARGS}
