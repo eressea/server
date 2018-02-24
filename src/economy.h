@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_GC_ECONOMY
 #define H_GC_ECONOMY
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

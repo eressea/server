@@ -16,49 +16,52 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
+
 #include "randenc.h"
 
-#include "volcano.h"
+#include "chaos.h"
 #include "economy.h"
 #include "monsters.h"
 #include "move.h"
-#include "chaos.h"
 #include "study.h"
+#include "volcano.h"
 
-#include <spells/unitcurse.h>
-#include <spells/regioncurse.h>
+#include "spells/unitcurse.h"
+#include "spells/regioncurse.h"
 
 /* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/reduceproduction.h>
+#include "attributes/racename.h"
+#include "attributes/reduceproduction.h"
 
 /* kernel includes */
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/building.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/rand.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include "util/attrib.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/log.h"
+#include "util/rand.h"
+#include "util/message.h"
+#include "util/rng.h"
 
 /* libc includes */
 #include <string.h>
@@ -785,9 +788,8 @@ static void rotting_herbs(void)
                 int n = itm->number;
                 double k = n * rot_chance / 100.0;
                 if (fval(itm->type, ITF_HERB)) {
-                    double nv = normalvariate(k, k / 4);
-                    int inv = (int)nv;
-                    int delta = MIN(n, inv);
+                    int delta = (int)normalvariate(k, k / 4);
+                    if (n < delta) delta = n;
                     if (!i_change(itmp, itm->type, -delta)) {
                         continue;
                     }
@@ -823,7 +825,9 @@ void randomevents(void)
         while (*blist) {
             building *b = *blist;
             if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-                b->size -= MAX(1, (b->size * 20) / 100);
+                int delta = (b->size * 20) / 100;
+                if (delta < 1) delta = 1;
+                b->size -= delta;
                 if (b->size == 0) {
                     remove_building(blist, r->buildings);
                 }
