@@ -29,7 +29,7 @@
 #define lua_strlen(L, idx) lua_rawlen(L, idx)
 #endif
 
-#if defined(LUA_USE_READLINE)
+#ifdef LUA_USE_READLINE
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -58,7 +58,7 @@ static int lua_readline(lua_State * l, char *b, const char *prompt)
     }
 }
 
-void set_readline(readline foo)
+void set_readline(readline_fun foo)
 {
     my_readline = foo;
 }
@@ -190,7 +190,6 @@ static int pushline(lua_State * L, int firstline)
         lua_pushfstring(L, "return %s", b + 1);     /* change it to `return' */
     else
         lua_pushstring(L, b);
-    lua_freeline(L, b);
     return 1;
 }
 
