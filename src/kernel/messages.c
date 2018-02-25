@@ -46,16 +46,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 #include <assert.h>
 
-typedef struct msg_setting {
-    struct msg_setting *next;
-    const struct message_type *type;
-    int level;
-} msg_setting;
-
-/************ Compatibility function *************/
 #define MAXSTRLEN (4*DISPLAYSIZE+3)
-#include "region.h"
-#include <kernel/config.h>
 
 static void
 arg_set(variant args[], const message_type * mtype, const char *buffer,
@@ -267,7 +258,7 @@ void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 message * msg_error(const unit * u, struct order *ord, int mno) {
     static char msgname[20];
 
-    if (fval(u->faction, FFL_NPC)) {
+    if (u->faction->flags & FFL_NPC) {
         return NULL;
     }
     sprintf(msgname, "error%d", mno);
