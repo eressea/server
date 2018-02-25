@@ -162,7 +162,7 @@ static message *missing_message(const char *name) {
         log_warning("trying to create undefined message of type \"%s\"\n", name);
         if (strcmp(name, "missing_message") != 0) {
             if (!mt_find("missing_message")) {
-                mt_register(mt_new_va("missing_message", "name:string", NULL));
+                mt_register(mt_new_va("missing_message", "name:string", MT_NEW_END));
             }
             return msg_message("missing_message", "name", name);
         }

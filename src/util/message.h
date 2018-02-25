@@ -45,8 +45,9 @@ extern "C" {
     void mt_clear(void);
     struct message_type *mt_new(const char *name, const char *args[]);
     struct message_type *mt_new_va(const char *name, ...);
+#define MT_NEW_END ((const char *)0)
     /* mt_new("simple_sentence", "subject:string", "predicate:string",
-     *        "object:string", "lang:locale", NULL); */
+     *        "object:string", "lang:locale", MT_NEW_END); */
 
     struct message *msg_create(const struct message_type *type,
         variant args[]);
