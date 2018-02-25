@@ -281,8 +281,10 @@ static void test_calculate_armor(CuTest * tc)
     b = NULL;
     i_change(&du->items, ibelt, 1);
     dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "without natural armor", 0, natural_armor(du));
     CuAssertIntEquals_Msg(tc, "magical armor", 1, calculate_armor(dt, 0, 0, 0));
     rc->armor = 2;
+    CuAssertIntEquals_Msg(tc, "with natural armor", 2, natural_armor(du));
     CuAssertIntEquals_Msg(tc, "natural armor", 3, calculate_armor(dt, 0, 0, 0));
     rc->armor = 0;
     free_battle(b);
