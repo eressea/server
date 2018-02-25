@@ -241,11 +241,7 @@ extern "C" {
     struct alliance *region_get_alliance(const struct region *r);
 
     struct region *r_connect(const struct region *, direction_t dir);
-#ifdef FAST_CONNECT
-# define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, (direction_t)dir))
-#else
-# define rconnect(r, dir) r_connect(r, (direction_t)dir)
-#endif
+#define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, (direction_t)dir))
 
     void free_regions(void);
     void free_land(struct land_region * lr);
