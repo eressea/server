@@ -83,7 +83,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         log_warning("trying to create message of unknown type \"%s\"\n", name);
         if (!mt_find("missing_feedback")) {
             mt_register(mt_new_va("missing_feedback", "unit:unit", 
-                "region:region", "command:order", "name:string", NULL));
+                "region:region", "command:order", "name:string", MT_NEW_END));
         }
         return msg_message("missing_feedback", "name unit region command",
             name, u, u->region, ord);

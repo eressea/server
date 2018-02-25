@@ -466,7 +466,7 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
                 move_unit(u, safety, NULL);
             }
             else {
-                msg = msg_message("sink_lost_msg", "dead region unit", dead, NULL, u);
+                msg = msg_message("sink_lost_msg", "dead region unit", dead, (region *)NULL, u);
             }
             add_message(&u->faction->msgs, msg);
             msg_release(msg);
