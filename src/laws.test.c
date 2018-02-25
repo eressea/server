@@ -257,7 +257,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     building * b;
 
     test_setup();
-    mt_register(mt_new_va("force_leave_building", "unit:unit", "owner:unit", "building:building", NULL));
+    mt_register(mt_new_va("force_leave_building", "unit:unit", "owner:unit", "building:building", MT_NEW_END));
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(u1->faction, r);
@@ -287,7 +287,7 @@ static void test_force_leave_ships(CuTest *tc) {
     ship *sh;
 
     test_setup();
-    mt_register(mt_new_va("force_leave_ship", "unit:unit", "owner:unit", "ship:ship", NULL));
+    mt_register(mt_new_va("force_leave_ship", "unit:unit", "owner:unit", "ship:ship", MT_NEW_END));
     r = test_create_region(0, 0, test_create_terrain("plain", LAND_REGION));
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -875,7 +875,7 @@ static void test_luck_message(CuTest *tc) {
     attrib *a;
 
     test_setup();
-    mt_register(mt_new_va("peasantluck_success", "births:int", NULL));
+    mt_register(mt_new_va("peasantluck_success", "births:int", MT_NEW_END));
     setup_terrains(tc);
     r = test_create_region(0, 0, NULL);
     rsetpeasants(r, 1);
@@ -900,8 +900,8 @@ static unit * setup_name_cmd(void) {
     faction *f;
 
     test_setup();
-    mt_register(mt_new_va("renamed_building_seen", "renamer:unit", "region:region", "building:building", NULL));
-    mt_register(mt_new_va("renamed_building_notseen", "region:region", "building:building", NULL));
+    mt_register(mt_new_va("renamed_building_seen", "renamer:unit", "region:region", "building:building", MT_NEW_END));
+    mt_register(mt_new_va("renamed_building_notseen", "region:region", "building:building", MT_NEW_END));
     f = test_create_faction(NULL);
     return test_create_unit(f, test_create_region(0, 0, NULL));
 }
@@ -1300,9 +1300,9 @@ static void test_ally_cmd(CuTest *tc) {
 static void test_nmr_warnings(CuTest *tc) {
     faction *f1, *f2;
     test_setup();
-    mt_register(mt_new_va("nmr_warning", NULL));
-    mt_register(mt_new_va("nmr_warning_final", NULL));
-    mt_register(mt_new_va("warn_dropout", "faction:faction", "turn:int", NULL));
+    mt_register(mt_new_va("nmr_warning", MT_NEW_END));
+    mt_register(mt_new_va("nmr_warning_final", MT_NEW_END));
+    mt_register(mt_new_va("warn_dropout", "faction:faction", "turn:int", MT_NEW_END));
     config_set("nmr.timeout", "3");
     f1 = test_create_faction(NULL);
     f2 = test_create_faction(NULL);
@@ -1324,9 +1324,9 @@ static unit * setup_mail_cmd(void) {
     faction *f;
     
     test_setup();
-    mt_register(mt_new_va("regionmessage", "region:region", "sender:unit", "string:string", NULL));
-    mt_register(mt_new_va("unitmessage", "region:region", "sender:unit", "string:string", "unit:unit", NULL));
-    mt_register(mt_new_va("mail_result", "message:string", "unit:unit", NULL));
+    mt_register(mt_new_va("regionmessage", "region:region", "sender:unit", "string:string", MT_NEW_END));
+    mt_register(mt_new_va("unitmessage", "region:region", "sender:unit", "string:string", "unit:unit", MT_NEW_END));
+    mt_register(mt_new_va("mail_result", "message:string", "unit:unit", MT_NEW_END));
     f = test_create_faction(NULL);
     return test_create_unit(f, test_create_region(0, 0, NULL));
 }
@@ -1443,7 +1443,7 @@ static void test_show_without_item(CuTest *tc)
     struct locale *loc;
 
     test_setup();
-    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", NULL));
+    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", MT_NEW_END));
 
     loc = get_or_create_locale("de");
     locale_setstring(loc, parameters[P_ANY], "ALLE");
@@ -1488,7 +1488,7 @@ static void test_show_race(CuTest *tc) {
 
     test_setup();
 
-    mt_register(mt_new_va("msg_event", "string:string", NULL));
+    mt_register(mt_new_va("msg_event", "string:string", MT_NEW_END));
     test_create_race("human");
     rc = test_create_race("elf");
 
@@ -1528,8 +1528,8 @@ static void test_show_both(CuTest *tc) {
     message * msg;
 
     test_setup();
-    mt_register(mt_new_va("msg_event", "string:string", NULL));
-    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", NULL));
+    mt_register(mt_new_va("msg_event", "string:string", MT_NEW_END));
+    mt_register(mt_new_va("displayitem", "weight:int", "item:resource", "description:string", MT_NEW_END));
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 

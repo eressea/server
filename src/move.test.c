@@ -28,8 +28,8 @@
 #include <assert.h>
 
 static void setup_move(void) {
-    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", NULL));
-    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", NULL));
+    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END));
+    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", MT_NEW_END));
 }
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
@@ -285,9 +285,9 @@ void setup_drift (struct drift_fixture *fix) {
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->sh);
 
-    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", NULL));
-    mt_register(mt_new_va("shipsink", "ship:ship", NULL));
-    mt_register(mt_new_va("massive_overload", "ship:ship", NULL));
+    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", MT_NEW_END));
+    mt_register(mt_new_va("shipsink", "ship:ship", MT_NEW_END));
+    mt_register(mt_new_va("massive_overload", "ship:ship", MT_NEW_END));
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -482,7 +482,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     td->dir = D_NORTHWEST;
     td->age = 2;
 
-    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", NULL));
+    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", MT_NEW_END));
 
     init_order_depr(ord);
     getstrtoken();

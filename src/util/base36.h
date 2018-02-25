@@ -25,6 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    const char *itoa36_r(int i, char *result, size_t len);
     const char *itoab_r(int i, int base, char *result, size_t len);
     const char *itoab(int i, int base);
     const char *itoa36(int i);

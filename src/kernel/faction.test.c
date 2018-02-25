@@ -242,7 +242,7 @@ static void test_set_email(CuTest *tc) {
 
     sprintf(email, "enno");
     faction_setemail(f, email);
-    email[0] = 0;
+    CuAssertTrue(tc, email != f->email);
     CuAssertStrEquals(tc, "enno", f->email);
     CuAssertStrEquals(tc, "enno", faction_getemail(f));
     faction_setemail(f, "bugs@eressea.de");

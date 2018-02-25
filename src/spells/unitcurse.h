@@ -23,7 +23,6 @@ extern "C" {
     struct curse_type;
     struct message;
 
-    extern const struct curse_type ct_fleechance;
     extern const struct curse_type ct_slavery;
     extern const struct curse_type ct_calmmonster;
     extern const struct curse_type ct_speed;

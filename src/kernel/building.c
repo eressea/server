@@ -350,7 +350,7 @@ building *new_building(const struct building_type * btype, region * r,
 {
     building **bptr = &r->buildings;
     building *b = (building *)calloc(1, sizeof(building));
-    const char *bname = 0;
+    const char *bname;
     char buffer[32];
 
     b->no = newcontainerid();
@@ -363,14 +363,12 @@ building *new_building(const struct building_type * btype, region * r,
     *bptr = b;
 
     update_lighthouse(b);
-    if (!bname) {
-        bname = LOC(lang, btype->_name);
-    }
+    bname = LOC(lang, btype->_name);
     if (!bname) {
         bname = LOC(lang, parameters[P_GEBAEUDE]);
-    }
-    if (!bname) {
-        bname = parameters[P_GEBAEUDE];
+        if (!bname) {
+            bname = parameters[P_GEBAEUDE];
+        }
     }
     assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));

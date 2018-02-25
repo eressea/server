@@ -449,8 +449,7 @@ static int use_materials(unit *u, const construction *type, int n, int completed
                 required(completed, type->reqsize, type->materials[c].number);
             int need =
                 required(completed + n, type->reqsize, type->materials[c].number);
-            int multi = 1;
-            int canuse = 100;       /* normalization */
+            int multi, canuse = 100;       /* normalization */
             canuse = matmod(u, rtype, canuse);
             assert(canuse >= 0);
             assert(canuse % 100 == 0
@@ -472,19 +471,19 @@ static int count_materials(unit *u, const construction *type, int n, int complet
         int c;
         for (c = 0; n > 0 && type->materials[c].number; c++) {
             const struct resource_type *rtype = type->materials[c].rtype;
-            int need, prebuilt;
             int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
             canuse = matmod(u, rtype, canuse);
 
             assert(canuse >= 0);
             if (type->reqsize > 1) {
-                prebuilt =
-                    required(completed, type->reqsize, type->materials[c].number);
-                for (; n;) {
-                    need =
+                int prebuilt = required(completed, type->reqsize,
+                    type->materials[c].number);
+                while (n > 0) {
+                    int need =
                         required(completed + n, type->reqsize, type->materials[c].number);
-                    if (need - prebuilt <= canuse)
+                    if (need - prebuilt <= canuse) {
                         break;
+                    }
                     --n;                /* TODO: optimieren? */
                 }
             }
@@ -705,7 +704,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
      * gefunden wurde, dann wird nicht einfach eine neue erbaut. Ansonsten
      * baut man an der eigenen burg weiter. */
 
-    /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
+     /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
     if (id > 0) {                 /* eine Nummer angegeben, keine neue Burg bauen */
         b = findbuilding(id);
         if (!b || b->region != u->region) { /* eine Burg mit dieser Nummer gibt es hier nicht */
@@ -894,12 +893,12 @@ static void build_ship(unit * u, ship * sh, int want)
 
     if (n)
         ADDMSG(&u->faction->msgs,
-        msg_message("buildship", "ship unit size", sh, u, n));
+            msg_message("buildship", "ship unit size", sh, u, n));
 }
 
 void
 create_ship(unit * u, const struct ship_type *newtype, int want,
-order * ord)
+    order * ord)
 {
     ship *sh;
     int msize;
@@ -941,7 +940,7 @@ order * ord)
     }
     new_order =
         create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale,
-        parameters[P_SHIP]), sh->no);
+            parameters[P_SHIP]), sh->no);
     replace_order(&u->orders, ord, new_order);
     free_order(new_order);
 

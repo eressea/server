@@ -12,7 +12,7 @@ void test_missing_message(CuTest *tc) {
 
     test_setup();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
-    msg = msg_message("unknown", "unit", NULL);
+    msg = msg_message("unknown", "unit", (unit *)NULL);
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
     CuAssertStrEquals(tc, msg->type->name, "missing_message");

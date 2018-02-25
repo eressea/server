@@ -49,8 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 void expandstealing(region * r, econ_request * stealorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
-    unsigned int j;
-    unsigned int norders;
+    int norders, j;
     econ_request **requests;
 
     assert(rsilver);
@@ -72,7 +71,7 @@ void expandstealing(region * r, econ_request * stealorders)
             break;
         }
 
-        u = findunitg(requests[j]->type.steal.no, r);
+        u = findunit(requests[j]->type.steal.no);
 
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);

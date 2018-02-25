@@ -346,14 +346,7 @@ const weapon_type *resource2weapon(const resource_type * rtype)
 
 const luxury_type *resource2luxury(const resource_type * rtype)
 {
-#ifdef AT_LTYPE
-    attrib *a = a_find(rtype->attribs, &at_ltype);
-    if (a)
-        return (const luxury_type *)a->data.v;
-    return NULL;
-#else
     return rtype->ltype;
-#endif
 }
 
 resource_type *rt_find(const char *name)
@@ -670,11 +663,6 @@ void init_resources(void)
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
 
-    rtype = rt_get_or_create(resourcenames[R_SAPLING]);
-    rtype = rt_get_or_create(resourcenames[R_TREE]);
-    rtype = rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
-    rtype = rt_get_or_create(resourcenames[R_MALLORN_TREE]);
-
     /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);
     rtype->uchange = res_changeaura;
@@ -684,6 +672,12 @@ void init_resources(void)
     rtype->uchange = res_changehp;
     rtype = rt_get_or_create(resourcenames[R_PEASANT]);
     rtype->uchange = res_changepeasants;
+
+    /* trees are important, too: */
+    rt_get_or_create(resourcenames[R_SAPLING]);
+    rt_get_or_create(resourcenames[R_TREE]);
+    rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
+    rt_get_or_create(resourcenames[R_MALLORN_TREE]);
 
     /* alte typen registrieren: */
     init_oldpotions();

@@ -874,17 +874,6 @@ int writepasswd(void)
 }
 
 void free_factions(void) {
-#ifdef DMAXHASH
-    int i;
-    for (i = 0; i != DMAXHASH; ++i) {
-        while (deadhash[i]) {
-            dead *d = deadhash[i];
-            deadhash[i] = d->nexthash;
-            free(d);
-        }
-    }
-#endif
     free_flist(&factions);
     free_flist(&dead_factions);
 }
-

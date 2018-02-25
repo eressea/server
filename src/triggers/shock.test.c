@@ -12,7 +12,7 @@
 #include <CuTest.h>
 
 static void shock_setup(void) {
-    mt_register(mt_new_va("shock", "mage:unit", "reason:string", NULL));
+    mt_register(mt_new_va("shock", "mage:unit", "reason:string", MT_NEW_END));
 }
 
 static void test_shock(CuTest *tc) {

@@ -63,11 +63,11 @@ int config_parse(const char *json)
 
 int config_read(const char *filename, const char * relpath)
 {
-    char name[PATH_MAX];
     FILE *F;
 
     json_relpath = relpath;
     if (relpath) {
+        char name[PATH_MAX];
         path_join(relpath, filename, name, sizeof(name));
         F = fopen(name, "r");
     }
