@@ -121,10 +121,8 @@ static unit *unitorders(input *in, faction *f)
 
 static faction *factionorders(void)
 {
-    faction *f = NULL;
     int fid = getid();
-
-    f = findfaction(fid);
+    faction *f = findfaction(fid);
 
     if (f != NULL && !fval(f, FFL_NPC)) {
         char token[128];
@@ -231,9 +229,8 @@ int readorders(const char *filename)
 {
     input in;
     int result;
+    FILE *F = fopen(filename, "r");
 
-    FILE *F = NULL;
-    F = fopen(filename, "r");
     if (!F) {
         perror(filename);
         return -1;
