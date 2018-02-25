@@ -71,7 +71,7 @@ void expandstealing(region * r, econ_request * stealorders)
             break;
         }
 
-        u = findunitg(requests[j]->type.steal.no, r);
+        u = findunit(requests[j]->type.steal.no);
 
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);

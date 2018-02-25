@@ -113,7 +113,7 @@ int renumber_cmd(unit * u, order * ord)
                 break;
             }
 
-            if (findunitg(i, u->region)) {
+            if (findunit(i)) {
                 cmistake(u, ord, 115, MSG_EVENT);
                 break;
             }

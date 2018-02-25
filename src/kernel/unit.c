@@ -75,8 +75,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #include <math.h>
 
-#define FIND_FOREIGN_TEMP
-
 int weight(const unit * u)
 {
     int w = 0, n = 0, in_bag = 0;
@@ -122,19 +120,6 @@ unit *findunitr(const region * r, int n)
     assert(n > 0);
     u = ufindhash(n);
     return (u && u->region == r) ? u : 0;
-}
-
-/* TODO: deprecated, replace with findunit(n) */
-unit *findunitg(int n, const region * hint)
-{
-    UNUSED_ARG(hint);
-    /* Abfangen von Syntaxfehlern. */
-    if (n <= 0)
-        return NULL;
-
-    /* findunit global! */
-    hint = 0;
-    return ufindhash(n);
 }
 
 #define UMAXHASH MAXUNITS
@@ -416,9 +401,6 @@ int remove_unit(unit ** ulist, unit * u)
 
     u->next = deleted_units;
     deleted_units = u;
-#ifdef DMAXHASH
-    dhash(u->no, u->faction);
-#endif
 
     u->region = NULL;
 
@@ -435,11 +417,11 @@ unit *findnewunit(const region * r, const faction * f, int n)
     for (u2 = r->units; u2; u2 = u2->next)
         if (u2->faction == f && ualias(u2) == n)
             return u2;
-#ifdef FIND_FOREIGN_TEMP
+
     for (u2 = r->units; u2; u2 = u2->next)
         if (ualias(u2) == n)
             return u2;
-#endif
+
     return 0;
 }
 

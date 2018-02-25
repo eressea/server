@@ -27,7 +27,7 @@ static unit *unitorders(input *in, faction *f)
         return NULL;
 
     i = getid();
-    u = findunitg(i, NULL);
+    u = findunit(i);
 
     if (u && u->faction == f) {
         order **ordp;
