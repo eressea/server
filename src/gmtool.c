@@ -946,6 +946,7 @@ static void handlekey(state * st, int c)
     static int findmode = 0;
     region *r;
     char sbuffer[80];
+    const char *loc = locate;
     int n, nx, ny, minpop, maxpop;
 
     switch (c) {
@@ -1247,7 +1248,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                itoa36_r(f->no, locate, sizeof(locate));
+                loc = itoa36_r(f->no, locate, sizeof(locate));
                 findmode = 'f';
             }
             else {
@@ -1260,8 +1261,9 @@ static void handlekey(state * st, int c)
             break;
         }
         /* achtung: fall-through ist absicht: */
-        if (!strlen(locate))
+        if (!strlen(loc)) {
             break;
+        }
     case 'n':
         if (findmode == 'u') {
             unit *u = findunit(atoi36(locate));
@@ -1273,9 +1275,9 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
+                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", loc);
                 statusline(st->wnd_status->handle, sbuffer);
-                f = findfaction(atoi36(locate));
+                f = findfaction(atoi36(loc));
                 if (f == NULL) {
                     statusline(st->wnd_status->handle, "faction not found.");
                     beep();
