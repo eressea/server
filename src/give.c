@@ -163,9 +163,9 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
     }
     if (dst && src && src->faction != dst->faction) {
         static int config;
-        static double divisor = 1.0;
+        static int divisor = 1;
         if (config_changed(&config)) {
-            divisor = config_get_flt("rules.items.give_divisor", divisor);
+            divisor = config_get_int("rules.items.give_divisor", divisor);
         }
         assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {

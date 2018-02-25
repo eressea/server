@@ -252,9 +252,6 @@ static int
 lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, struct order *ord)
 {
     lua_State *L = (lua_State *)global.vm_state;
-    int len, result = 0;
-    char fname[64];
-    int (*callout)(unit *, const item_type *, int, struct order *);
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {

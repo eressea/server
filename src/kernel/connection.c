@@ -242,7 +242,6 @@ void b_read(connection * b, gamedata * data)
     default:
         assert(!"invalid variant type in connection");
     }
-    assert(result >= 0 || !"EOF encountered?");
 }
 
 void b_write(const connection * b, storage * store)
