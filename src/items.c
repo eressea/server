@@ -121,14 +121,14 @@ use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
 struct order *ord)
 {
     region *r = u->region;
-    const resource_type *rt_crystal = NULL;
+    const resource_type *rt_crystal;
     int i;
 
     rt_crystal = rt_find("antimagic");
     assert(rt_crystal != NULL);
 
     for (i = 0; i != amount; ++i) {
-        int effect, duration = 2;
+        int effect;
         double force;
         spell *sp = find_spell("antimagiczone");
         attrib **ap = &r->attribs;
@@ -172,6 +172,7 @@ struct order *ord)
         }
 
         if (force > 0) {
+            int duration = 2;
             create_curse(u, &r->attribs, &ct_antimagiczone, force, duration,
                 effect, 0);
         }

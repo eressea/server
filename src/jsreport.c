@@ -27,7 +27,7 @@ static int report_json(const char *filename, report_context * ctx, const char *c
     if (config_get_int("jsreport.enabled", 0) != 0) {
         FILE * F = fopen(filename, "w");
         if (F) {
-            int x, y, minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
+            int minx = INT_MAX, maxx = INT_MIN, miny = INT_MAX, maxy = INT_MIN;
             seen_region *sr;
             region *r;
             /* traverse all regions */
@@ -44,12 +44,13 @@ static int report_json(const char *filename, report_context * ctx, const char *c
                 else if (tx > maxx) maxx = tx;
             }
             if (maxx >= minx && maxy >= miny) {
-                int w = maxx - minx + 1, h = maxy - miny + 1;
+                int y, w = maxx - minx + 1, h = maxy - miny + 1;
                 fputs("{ \"orientation\":\"hexagonal\",\"staggeraxis\":\"y\",", F);
                 fprintf(F, "\"staggerindex\":\"%s\", \"height\":%d, \"width\":%d, \"layers\":[", (miny & 1) ? "odd" : "even", h, w);
                 fprintf(F, "{ \"height\":%d, \"width\":%d, ", h, w);
                 fputs("\"visible\":true, \"opacity\":1, \"type\":\"tilelayer\", \"name\":\"terrain\", \"x\":0, \"y\":0, \"data\":[", F);
                 for (y = miny; y <= maxy; ++y) {
+                    int x;
                     for (x = minx; x <= maxx; ++x) {
                         int data = 0;
                         int tx = x, ty = y;

@@ -609,7 +609,6 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
 
 static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
 {
-    int cursedmen = 0;
     int men = get_cursedmen(u, c);
     bool dogive = false;
     const curse_type *ct = c->type;
@@ -622,6 +621,7 @@ static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
 
     case CURSE_SPREADMODULO:
     {
+        int cursedmen = 0;
         int i;
         int u_number = u->number;
         for (i = 0; i < n + 1 && u_number > 0; i++) {
