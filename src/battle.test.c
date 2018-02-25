@@ -116,10 +116,12 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     at.index = 0;
 
     bld->size = 10; /* stage 1 building */
+    CuAssertIntEquals(tc, 1, buildingeffsize(bld, false));
     CuAssertIntEquals(tc, -1, skilldiff(at, dt, 0));
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
     bld->size = 1; /* stage 0 building */
+    CuAssertIntEquals(tc, 0, buildingeffsize(bld, false));
     CuAssertIntEquals(tc, 0, skilldiff(at, dt, 0));
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
