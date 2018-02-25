@@ -107,7 +107,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
 
 int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape)
 {
-    const char *str, *text;
+    const char *text;
     order_data *od = NULL;
     keyword_t kwd = ORD_KEYWORD(ord);
 
@@ -128,7 +128,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         text = OD_STRING(od);
     }
     if (kwd != NOKEYWORD) {
-        str = (const char *)LOC(lang, keyword(kwd));
+        const char *str = (const char *)LOC(lang, keyword(kwd));
         assert(str);
         swrite(str, 1, strlen(str), out);
     }
@@ -242,10 +242,10 @@ order *create_order(keyword_t kwd, const struct locale * lang,
         va_start(marker, params);
         sbs_init(&sbs, zBuffer, sizeof(zBuffer));
         while (*params) {
-            int i;
-            const char *s;
             tok = strchr(params, '%');
             if (tok) {
+                const char *s;
+                int i;
                 if (tok != params) {
                     sbs_strncat(&sbs, params, tok - params);
                 }

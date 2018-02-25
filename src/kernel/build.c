@@ -449,8 +449,7 @@ static int use_materials(unit *u, const construction *type, int n, int completed
                 required(completed, type->reqsize, type->materials[c].number);
             int need =
                 required(completed + n, type->reqsize, type->materials[c].number);
-            int multi = 1;
-            int canuse = 100;       /* normalization */
+            int multi, canuse = 100;       /* normalization */
             canuse = matmod(u, rtype, canuse);
             assert(canuse >= 0);
             assert(canuse % 100 == 0
@@ -472,12 +471,12 @@ static int count_materials(unit *u, const construction *type, int n, int complet
         int c;
         for (c = 0; n > 0 && type->materials[c].number; c++) {
             const struct resource_type *rtype = type->materials[c].rtype;
-            int need, prebuilt;
             int canuse = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
             canuse = matmod(u, rtype, canuse);
 
             assert(canuse >= 0);
             if (type->reqsize > 1) {
+                int need, prebuilt;
                 prebuilt =
                     required(completed, type->reqsize, type->materials[c].number);
                 for (; n;) {

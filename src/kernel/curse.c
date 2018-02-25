@@ -291,25 +291,6 @@ void ct_register(const curse_type * ct)
     selist_set_insert(ctlp, (void *)ct, NULL);
 }
 
-void ct_remove(const char *c)
-{
-    unsigned int hash = tolower(c[0]);
-    selist *ctl = cursetypes[hash];
-
-    if (ctl) {
-        int qi;
-
-        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)selist_get(ctl, qi);
-
-            if (strcmp(c, type->cname) == 0) {
-                selist_delete(&ctl, qi);
-                break;
-            }
-        }
-    }
-}
-
 const curse_type *ct_find(const char *c)
 {
     unsigned int hash = tolower(c[0]);

@@ -54,11 +54,7 @@ int read_attribs(gamedata *data, attrib **alist, void *owner) {
 
 void write_attribs(storage *store, attrib *alist, const void *owner)
 {
-#if RELEASE_VERSION < ATHASH_VERSION
-    a_write_orig(store, alist, owner);
-#else
     a_write(store, alist, owner);
-#endif
 }
 
 int a_readint(attrib * a, void *owner, struct gamedata *data)
@@ -516,24 +512,6 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner) {
         }
     }
     WRITE_INT(store, 0);
-}
-
-void a_write_orig(struct storage *store, const attrib * attribs, const void *owner)
-{
-    const attrib *na = attribs;
-
-    while (na) {
-        if (na->type->write) {
-            assert(na->type->hashkey || !"attribute not registered");
-            WRITE_TOK(store, na->type->name);
-            na->type->write(na, owner, store);
-            na = na->next;
-        }
-        else {
-            na = na->nexttype;
-        }
-    }
-    WRITE_TOK(store, "end");
 }
 
 void attrib_done(void) {
