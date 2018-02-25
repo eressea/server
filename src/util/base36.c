@@ -58,7 +58,7 @@ const char *itoab_r(int i, int base, char *s, size_t len)
 
     assert(len > 2);
     dst = s + len - 2;
-    *dst = 0;
+    dst[1] = 0;
     if (i != 0) {
         int neg = 0;
 
@@ -92,10 +92,16 @@ const char *itoab_r(int i, int base, char *s, size_t len)
             assert(i == 0 || !"itoab: static buffer exhausted");
         }
     }
-    else
-        *dst = '0';
+    else {
+        dst[0] = '0';
+    }
 
     return dst;
+}
+
+const char *itoa36_r(int i, char *result, size_t len)
+{
+    return itoab_r(i, 36, result, len);
 }
 
 const char *itoab(int i, int base)

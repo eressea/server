@@ -38,6 +38,8 @@ else (MSVC)
 find_package (Curses)
 endif (MSVC)
 
+find_package (Readline)
+
 if (ERESSEA_DB STREQUAL "db")
 find_package (BerkeleyDB REQUIRED QUIET)
 else()

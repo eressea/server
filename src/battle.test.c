@@ -116,10 +116,12 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     at.index = 0;
 
     bld->size = 10; /* stage 1 building */
+    CuAssertIntEquals(tc, 1, buildingeffsize(bld, false));
     CuAssertIntEquals(tc, -1, skilldiff(at, dt, 0));
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
     bld->size = 1; /* stage 0 building */
+    CuAssertIntEquals(tc, 0, buildingeffsize(bld, false));
     CuAssertIntEquals(tc, 0, skilldiff(at, dt, 0));
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
@@ -281,8 +283,10 @@ static void test_calculate_armor(CuTest * tc)
     b = NULL;
     i_change(&du->items, ibelt, 1);
     dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "without natural armor", 0, natural_armor(du));
     CuAssertIntEquals_Msg(tc, "magical armor", 1, calculate_armor(dt, 0, 0, 0));
     rc->armor = 2;
+    CuAssertIntEquals_Msg(tc, "with natural armor", 2, natural_armor(du));
     CuAssertIntEquals_Msg(tc, "natural armor", 3, calculate_armor(dt, 0, 0, 0));
     rc->armor = 0;
     free_battle(b);
@@ -446,7 +450,6 @@ static void test_battle_skilldiff(CuTest *tc)
     td.index = 0;
     ta.fighter = setup_fighter(&b, ua);
     ta.index = 0;
-    ua = test_create_unit(test_create_faction(NULL), r);
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ta.fighter->person[0].attack = 2;
@@ -483,7 +486,6 @@ static void test_battle_skilldiff_building(CuTest *tc)
     td.index = 0;
     ta.fighter = setup_fighter(&b, ua);
     ta.index = 0;
-    ua = test_create_unit(test_create_faction(NULL), r);
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ud->building->size = 10;
@@ -502,8 +504,8 @@ static void test_battle_skilldiff_building(CuTest *tc)
 static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
 {
     skill *sv = unit_skill(u, sk);
-    char buf[256];
     if (sv) {
+        char buf[256];
         sprintf(buf, "%s level %d != %d", msg, sv->level, level);
         CuAssertIntEquals_Msg(tc, buf, level, sv->level);
         sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);

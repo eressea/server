@@ -2396,29 +2396,6 @@ struct fsee {
 #define REPORT_ZIP (1 << O_COMPRESS)
 #define REPORT_BZIP2 (1 << O_BZIP2)
 
-unit *can_find(faction * f, faction * f2)
-{
-    int key = f->no % FMAXHASH;
-    struct fsee *fs = fsee[key];
-    struct see *ss;
-    if (f == f2)
-        return f->units;
-    while (fs && fs->f != f)
-        fs = fs->nexthash;
-    if (!fs)
-        return NULL;
-    ss = fs->see;
-    while (ss && ss->seen != f2)
-        ss = ss->next;
-    if (ss) {
-        /* bei TARNE PARTEI yxz muss die Partei von unit proof nicht
-         * wirklich Partei f2 sein! */
-         /* assert(ss->proof->faction==f2); */
-        return ss->proof;
-    }
-    return NULL;
-}
-
 void register_nr(void)
 {
     if (!nocr)

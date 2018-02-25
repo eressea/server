@@ -1511,6 +1511,31 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
     }
 }
 
+static void report_itemtype(FILE *F, faction *f, const item_type *itype) {
+    const char *ch;
+    const char *description = NULL;
+    const char *pname = resourcename(itype->rtype, 0);
+    const char *potiontext = mkname("potion", pname);
+    
+    ch = resourcename(itype->rtype, 0);
+    fprintf(F, "TRANK %d\n", str_hash(ch));
+    fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
+    fprintf(F, "%d;Stufe\n", potion_level(itype));
+    description = LOC(f->locale, potiontext);
+    fprintf(F, "\"%s\";Beschr\n", description);
+    if (itype->construction) {
+        requirement *m = itype->construction->materials;
+        
+        fprintf(F, "ZUTATEN\n");
+        
+        while (m->number) {
+            ch = resourcename(m->rtype, 0);
+            fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
+            m++;
+        }
+    }
+}
+    
 /* main function of the creport. creates the header and traverses all regions */
 static int
 report_computer(const char *filename, report_context * ctx, const char *bom)
@@ -1655,33 +1680,9 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
-        const char *ch;
-        const char *description = NULL;
 
-        if (itype == NULL)
-            continue;
-        ch = resourcename(itype->rtype, 0);
-        fprintf(F, "TRANK %d\n", str_hash(ch));
-        fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
-        fprintf(F, "%d;Stufe\n", potion_level(itype));
-
-        if (description == NULL) {
-            const char *pname = resourcename(itype->rtype, 0);
-            const char *potiontext = mkname("potion", pname);
-            description = LOC(f->locale, potiontext);
-        }
-
-        fprintf(F, "\"%s\";Beschr\n", description);
-        if (itype->construction) {
-            requirement *m = itype->construction->materials;
-
-            fprintf(F, "ZUTATEN\n");
-
-            while (m->number) {
-                ch = resourcename(m->rtype, 0);
-                fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
-                m++;
-            }
+        if (itype) {
+            report_itemtype(F, f, itype);
         }
     }
 

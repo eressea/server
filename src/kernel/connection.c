@@ -156,9 +156,10 @@ connection *get_borders(const region * r1, const region * r2)
 
 connection *new_border(border_type * type, region * from, region * to)
 {
-    connection *b, **bp = get_borders_i(from, to);
+    connection *b, **bp;
 
     assert(from && to);
+    bp = get_borders_i(from, to);
     while (*bp) {
         bp = &(*bp)->next;
     }
@@ -241,6 +242,7 @@ void b_read(connection * b, gamedata * data)
     default:
         assert(!"invalid variant type in connection");
     }
+    assert(result >= 0 || !"EOF encountered?");
 }
 
 void b_write(const connection * b, storage * store)
@@ -557,8 +559,7 @@ static bool b_validroad(const connection * b)
 
 static bool b_rvisibleroad(const connection * b, const region * r)
 {
-    int x = b->data.i;
-    x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
+    int x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
     if (x == 0) {
         return false;
     }

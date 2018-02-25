@@ -49,6 +49,8 @@ void game_done(void)
     free_gamedata();
     creport_cleanup();
     report_cleanup();
+#endif
+#endif
     calendar_cleanup();
     free_functions();
     free_config();
