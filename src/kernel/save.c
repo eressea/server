@@ -1014,7 +1014,7 @@ faction *read_faction(gamedata * data)
     READ_STR(data->store, name, sizeof(name));
     if (check_email(name) == 0) {
       faction_setemail(f, name);
-    } else {
+    } else if (name[0]) {
       log_warning("Invalid email address for faction %s: %s", itoa36(f->no), name);
       faction_setemail(f, NULL);
     }

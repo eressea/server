@@ -1,0 +1,3 @@
+#!/bin/sh
+cppcheck -U_MSC_VER --enable=all -IcJSON -Isrc -Iclibs -Istorage src
+
