@@ -249,7 +249,6 @@ extern "C" {
     void remove_empty_units(void);
 
     struct unit *findunit(int n);
-
     struct unit *findunitr(const struct region *r, int n);
 
     void default_name(const unit *u, char name[], int len);

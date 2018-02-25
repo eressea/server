@@ -1247,7 +1247,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                itoab_r(f->no, 36, locate, sizeof(locate));
+                itoa36_r(f->no, locate, sizeof(locate));
                 findmode = 'f';
             }
             else {
