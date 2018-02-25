@@ -458,8 +458,7 @@ static int tolua_write_report(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     if (f) {
-        time_t ltime = time(0);
-        int result = write_reports(f, ltime);
+        int result = write_reports(f);
         lua_pushinteger(L, result);
     }
     else {
@@ -924,7 +923,7 @@ static int tolua_report_unit(lua_State * L)
     char buffer[512];
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     faction *f = (faction *)tolua_tousertype(L, 2, 0);
-    bufunit(f, u, 0, seen_unit, buffer, sizeof(buffer));
+    bufunit(f, u, seen_unit, buffer, sizeof(buffer));
     tolua_pushstring(L, buffer);
     return 1;
 }

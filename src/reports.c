@@ -16,12 +16,12 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 #include "reports.h"
 
 #include "battle.h"
-#include "kernel/calendar.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
@@ -30,48 +30,50 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "donations.h"
 
 /* attributes includes */
-#include <attributes/attributes.h>
-#include <attributes/follow.h>
-#include <attributes/otherfaction.h>
-#include <attributes/racename.h>
-#include <attributes/stealth.h>
+#include "attributes/attributes.h"
+#include "attributes/follow.h"
+#include "attributes/otherfaction.h"
+#include "attributes/racename.h"
+#include "attributes/stealth.h"
 
-#include <spells/unitcurse.h>
+#include "spells/unitcurse.h"
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/alliance.h>
-#include <kernel/connection.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
+#include "kernel/config.h"
+#include "kernel/calendar.h"
+#include "kernel/ally.h"
+#include "kernel/alliance.h"
+#include "kernel/connection.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/bsdstring.h>
-#include <util/functions.h>
-#include <util/goodies.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/macros.h>
-#include <util/path.h>
-#include <util/strings.h>
-#include <util/translation.h>
+#include "util/attrib.h"
+#include "util/base36.h"
+#include "util/bsdstring.h"
+#include "util/functions.h"
+#include "util/goodies.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/log.h"
+#include "util/macros.h"
+#include "util/path.h"
+#include "util/strings.h"
+#include "util/translation.h"
 #include <stream.h>
 #include <selist.h>
 
@@ -610,8 +612,72 @@ report_resources(const region * r, resource_report * result, int size,
     return n;
 }
 
+static size_t spskill(char *buffer, size_t size, const struct locale * lang,
+    const struct unit * u, struct skill * sv, int *dh)
+{
+    char *bufp = buffer;
+    int effsk;
+
+    if (!u->number)
+        return 0;
+    if (sv->level <= 0) {
+        if (sv->old <= 0 || (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) == 0) {
+            return 0;
+        }
+    }
+
+    bufp = STRLCPY(bufp, ", ", size);
+
+    if (!*dh) {
+        bufp = STRLCPY(bufp, LOC(lang, "nr_skills"), size);
+        bufp = STRLCPY(bufp, ": ", size);
+        *dh = 1;
+    }
+    bufp = STRLCPY(bufp, skillname(sv->id, lang), size);
+    bufp = STRLCPY(bufp, " ", size);
+
+    if (sv->id == SK_MAGIC) {
+        sc_mage *mage = get_mage(u);
+        if (mage && mage->magietyp != M_GRAY) {
+            bufp = STRLCPY(bufp, LOC(lang, mkname("school",
+                magic_school[mage->magietyp])), size);
+            bufp = STRLCPY(bufp, " ", size);
+        }
+    }
+
+    if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
+        int i = u_geteffstealth(u);
+        if (i >= 0) {
+            if (wrptr(&bufp, &size, snprintf(bufp, size, "%d/", i)) != 0)
+                WARN_STATIC_BUFFER();
+        }
+    }
+
+    effsk = eff_skill(u, sv, 0);
+    if (wrptr(&bufp, &size, snprintf(bufp, size, "%d", effsk)) != 0)
+        WARN_STATIC_BUFFER();
+
+    if (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) {
+        int oldeff = 0;
+        int diff;
+
+        if (sv->old > 0) {
+            oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
+            if (oldeff < 0) oldeff = 0;
+        }
+
+        diff = effsk - oldeff;
+
+        if (diff != 0) {
+            if (wrptr(&bufp, &size, snprintf(bufp, size, " (%s%d)", (diff > 0) ? "+" : "", diff)) != 0)
+                WARN_STATIC_BUFFER();
+        }
+    }
+    return bufp - buffer;
+}
+
 int
-bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, char *buf,
+bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     size_t size)
 {
     int i, dh;
@@ -750,7 +816,7 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     if (u->faction == f) {
         skill *sv;
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            size_t bytes = spskill(bufp, size, lang, u, sv, &dh, 1);
+            size_t bytes = spskill(bufp, size, lang, u, sv, &dh);
             assert(bytes <= INT_MAX);
             if (wrptr(&bufp, &size, (int)bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -918,71 +984,6 @@ bufunit(const faction * f, const unit * u, unsigned int indent, seen_mode mode, 
     return dh;
 }
 
-size_t
-spskill(char *buffer, size_t size, const struct locale * lang,
-    const struct unit * u, struct skill * sv, int *dh, int days)
-{
-    char *bufp = buffer;
-    int effsk;
-
-    if (!u->number)
-        return 0;
-    if (sv->level <= 0) {
-        if (sv->old <= 0 || (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) == 0) {
-            return 0;
-        }
-    }
-
-    bufp = STRLCPY(bufp, ", ", size);
-
-    if (!*dh) {
-        bufp = STRLCPY(bufp, LOC(lang, "nr_skills"), size);
-        bufp = STRLCPY(bufp, ": ", size);
-        *dh = 1;
-    }
-    bufp = STRLCPY(bufp, skillname(sv->id, lang), size);
-    bufp = STRLCPY(bufp, " ", size);
-
-    if (sv->id == SK_MAGIC) {
-        sc_mage *mage = get_mage(u);
-        if (mage && mage->magietyp != M_GRAY) {
-            bufp = STRLCPY(bufp, LOC(lang, mkname("school",
-                magic_school[mage->magietyp])), size);
-            bufp = STRLCPY(bufp, " ", size);
-        }
-    }
-
-    if (sv->id == SK_STEALTH && fval(u, UFL_STEALTH)) {
-        int i = u_geteffstealth(u);
-        if (i >= 0) {
-            if (wrptr(&bufp, &size, snprintf(bufp, size, "%d/", i)) != 0)
-                WARN_STATIC_BUFFER();
-        }
-    }
-
-    effsk = eff_skill(u, sv, 0);
-    if (wrptr(&bufp, &size, snprintf(bufp, size, "%d", effsk)) != 0)
-        WARN_STATIC_BUFFER();
-
-    if (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) {
-        int oldeff = 0;
-        int diff;
-
-        if (sv->old > 0) {
-            oldeff = sv->old + get_modifier(u, sv->id, sv->old, u->region, false);
-        }
-
-        oldeff = MAX(0, oldeff);
-        diff = effsk - oldeff;
-
-        if (diff != 0) {
-            if (wrptr(&bufp, &size, snprintf(bufp, size, " (%s%d)", (diff > 0) ? "+" : "", diff)) != 0)
-                WARN_STATIC_BUFFER();
-        }
-    }
-    return bufp - buffer;
-}
-
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
 {
     bool firstline;
@@ -1013,7 +1014,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
             firstline = false;
         }
         if (!cut) {
-            cut = s + MIN(len, REPORTWIDTH);
+            cut = s + ((len < REPORTWIDTH) ? len : REPORTWIDTH);
         }
         memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
@@ -1054,7 +1055,7 @@ spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned in
     seen_mode mode)
 {
     char buf[DISPLAYSIZE];
-    int dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
+    int dh = bufunit(f, u, mode, buf, sizeof(buf));
     lparagraph(SP, buf, indent,
         (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
@@ -1669,7 +1670,7 @@ void finish_reports(report_context *ctx) {
     }
 }
 
-int write_reports(faction * f, time_t ltime)
+int write_reports(faction * f)
 {
     bool gotit = false;
     struct report_context ctx;
@@ -1758,7 +1759,6 @@ int reports(void)
 {
     faction *f;
     FILE *mailit;
-    time_t ltime = time(NULL);
     int retval = 0;
     char path[4096];
     const char * rpath = reportpath();
@@ -1775,7 +1775,7 @@ int reports(void)
 
     for (f = factions; f; f = f->next) {
         if (f->email && !fval(f, FFL_NPC)) {
-            int error = write_reports(f, ltime);
+            int error = write_reports(f);
             if (error)
                 retval = error;
             if (mailit)
@@ -1998,6 +1998,7 @@ static void eval_unitsize(struct opstack **stack, const void *userdata)
     const struct unit *u = (const struct unit *)opop(stack).v;
     variant var;
 
+    UNUSED_ARG(userdata);
     var.i = u->number;
     opush(stack, var);
 }
@@ -2009,6 +2010,7 @@ static void eval_faction(struct opstack **stack, const void *userdata)
     size_t len = strlen(c);
     variant var;
 
+    UNUSED_ARG(userdata);
     var.v = strcpy(balloc(len + 1), c);
     opush(stack, var);
 }
@@ -2018,6 +2020,8 @@ static void eval_alliance(struct opstack **stack, const void *userdata)
     const struct alliance *al = (const struct alliance *)opop(stack).v;
     const char *c = alliancename(al);
     variant var;
+
+    UNUSED_ARG(userdata);
     if (c != NULL) {
         size_t len = strlen(c);
         var.v = strcpy(balloc(len + 1), c);

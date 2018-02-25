@@ -778,8 +778,8 @@ void free_gamedata(void)
     free(forbidden_ids);
     forbidden_ids = NULL;
 
-    free_donations();
     free_factions();
+    free_donations();
     free_units();
     free_regions();
     free_borders();

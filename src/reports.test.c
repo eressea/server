@@ -199,56 +199,56 @@ static void test_bufunit_fstealth(CuTest *tc) {
     key_set(&u->attribs, 42, 42);
 
     /* report to ourselves */
-    bufunit(f1, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressive.", buf);
 
     /* ... also when we are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f1, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human, aggressive.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see that our unit is cloaked */
     set_factionstealth(u, f2);
     CuAssertPtrNotNull(tc, u->attribs);
-    bufunit(f1, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human, aggressive.", buf);
 
     /* ... also when we are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f1, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human, aggressive.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we can see that someone is presenting as us */
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human.", buf);
 
     /* ... but not if they are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see the same thing as them when we are an ally */
     al = ally_add(&f1->allies, f2);
     al->status = HELP_FSTEALTH;
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
 
     /* ... also when they are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* fstealth has no influence when we are allies, same results again */
     set_factionstealth(u, NULL);
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buf);
 
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, 0, seen_unit, buf, sizeof(buf));
+    bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
@@ -278,20 +278,20 @@ static void test_bufunit(CuTest *tc) {
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
-    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv.", buffer);
 
     set_level(u, SK_ALCHEMY, 1);
-    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2.", buffer);
 
     set_level(u, SK_SAILING, 1);
-    bufunit(u->faction, u, 0, 0, buffer, sizeof(buffer));
+    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2, Segeln 1.", buffer);
 
     f = test_create_faction(NULL);
     f->locale = get_or_create_locale("de");
-    bufunit(f, u, 0, 0, buffer, sizeof(buffer));
+    bufunit(f, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buffer);
 
     test_teardown();

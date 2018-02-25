@@ -695,7 +695,7 @@ nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_
         return;
 
     newline(out);
-    dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
+    dh = bufunit(f, u, mode, buf, sizeof(buf));
 
     if (u->faction == f) {
         marker = '*';

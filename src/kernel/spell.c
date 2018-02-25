@@ -135,6 +135,7 @@ spell * create_spell(const char * name)
 }
 
 static const char *sp_aliases[][2] = {
+    { "create_potion_p14", "create_potion_healing" },
     { "gwyrrdfamiliar", "summon_familiar" },
     { "illaunfamiliar", "summon_familiar" },
     { "draigfamiliar", "summon_familiar" },
@@ -150,16 +151,20 @@ static const char *sp_alias(const char *zname)
         if (strcmp(sp_aliases[i][0], zname) == 0)
             return sp_aliases[i][1];
     }
-    return zname;
+    return NULL;
 }
 
 spell *find_spell(const char *name)
 {
     const char * match;
     spell * sp = 0;
-    const char * alias = sp_alias(name);
-
-    match = cb_find_str(&cb_spells, alias);
+    match = cb_find_str(&cb_spells, name);
+    if (!match) {
+        const char * alias = sp_alias(name);
+        if (alias) {
+            match = cb_find_str(&cb_spells, alias);
+        }
+    }
     if (match) {
         cb_get_kv(match, &sp, sizeof(sp));
     }

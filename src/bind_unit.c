@@ -55,7 +55,7 @@ static int tolua_bufunit(lua_State * L) {
         if (f) {
             char buf[8192];
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
-            bufunit(f, u, 0, mode, buf, sizeof(buf));
+            bufunit(f, u, mode, buf, sizeof(buf));
             tolua_pushstring(L, buf);
             return 1;
         }

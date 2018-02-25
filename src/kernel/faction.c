@@ -738,7 +738,6 @@ void remove_empty_factions(void)
         faction *f = *fp;
 
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
-            log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
         }
         else {
@@ -874,6 +873,27 @@ int writepasswd(void)
         return 0;
     }
     return 1;
+}
+
+void log_dead_factions(void)
+{
+    if (dead_factions) {
+        const char *logname = config_get("game.deadlog");
+        if (logname) {
+            FILE *F;
+            char path[PATH_MAX];
+
+            join_path(basepath(), logname, path, sizeof(path));
+            F = fopen(path, "at");
+            if (F) {
+                faction *f;
+                for (f = dead_factions; f; f = f->next) {
+                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, f->age, itoa36(f->no), f->email, f->name);
+                }
+                fclose(F);
+            }
+        }
+    }
 }
 
 void free_factions(void) {
