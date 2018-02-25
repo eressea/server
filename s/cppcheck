@@ -1,3 +1,8 @@
 #!/bin/sh
-cppcheck -U_MSC_VER --enable=all -IcJSON -Isrc -Iclibs -Istorage src
+IGNORE=$(find src -name "*.test.c" | awk '{ print "-i"$1 }')
+
+cppcheck $IGNORE \
+ --quiet --enable=all -U_MSC_VER -UCLEANUP_CODE -UTODO \
+ -UERESSEA_BUILDNO -UERESSEA_VERSION \
+ -IcJSON -Isrc -Iclibs -Istorage src
 

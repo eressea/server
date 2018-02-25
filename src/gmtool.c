@@ -137,14 +137,14 @@ int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
 
 static void init_curses(void)
 {
-    int fg, bg;
     initscr();
 
     if (has_colors() || force_color) {
+        int fg, bg;
         short bcol = COLOR_BLACK;
         short hcol = COLOR_MAGENTA;
         start_color();
-#ifdef WIN32
+#ifdef __PDCURSES__
         /* looks crap on putty with TERM=linux */
         if (can_change_color()) {
             init_color(COLOR_YELLOW, 1000, 1000, 0);
@@ -316,11 +316,11 @@ static void paint_map(window * wnd, const state * st)
         int yp = (lines - vy - 1) * THEIGHT;
         for (vx = 0; vx != cols; ++vx) {
             map_region *mr = mr_get(&st->display, vx, vy);
-            int attr = 0;
-            int hl = 0;
             int xp = vx * TWIDTH + (vy & 1) * TWIDTH / 2;
             int nx, ny;
             if (mr) {
+                int attr = 0;
+                int hl = 0;
                 cnormalize(&mr->coord, &nx, &ny);
                 if (tagged_region(st->selected, nx, ny)) {
                     attr |= A_REVERSE;
@@ -335,10 +335,10 @@ static void paint_map(window * wnd, const state * st)
 
 map_region *cursor_region(const view * v, const coordinate * c)
 {
-    coordinate relpos;
-    int cx, cy;
-
     if (c) {
+        int cx, cy;
+        coordinate relpos;
+
         relpos.x = c->x - v->topleft.x;
         relpos.y = c->y - v->topleft.y;
         cy = relpos.y;
@@ -422,17 +422,27 @@ static bool handle_info_region(window * wnd, state * st, int c)
     return false;
 }
 
+int wxborder(WINDOW *win)
+{
+#ifdef __PDCURSES__
+    return wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+#else
+    return wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+#endif
+}
+
 static void paint_info_region(window * wnd, const state * st)
 {
     WINDOW *win = wnd->handle;
     int size = getmaxx(win) - 2;
-    int line = 0, maxline = getmaxy(win) - 2;
+    int maxline = getmaxy(win) - 2;
     map_region *mr = cursor_region(&st->display, &st->cursor);
 
     UNUSED_ARG(st);
     werase(win);
     wxborder(win);
     if (mr && mr->r) {
+        int line = 0;
         const region *r = mr->r;
         if (r->land) {
             umvwaddnstr(win, line++, 1, (char *)r->land->name, size);
@@ -708,10 +718,10 @@ static void select_regions(state * st, int selectmode)
     doupdate();
     findmode = getch();
     if (findmode == 'n') {        /* none */
-        int i;
         sprintf(sbuffer, "%snone", status);
         statusline(st->wnd_status->handle, sbuffer);
         if (selectmode & MODE_SELECT) {
+            int i;
             for (i = 0; i != MAXTHASH; ++i) {
                 tag **tp = &st->selected->tags[i];
                 while (*tp) {
@@ -936,7 +946,7 @@ static void handlekey(state * st, int c)
     static int findmode = 0;
     region *r;
     char sbuffer[80];
-    static char kbuffer[80];
+    const char *loc = locate;
     int n, nx, ny, minpop, maxpop;
 
     switch (c) {
@@ -1238,7 +1248,7 @@ static void handlekey(state * st, int c)
         else if (findmode == 'F') {
             faction *f = select_faction(st);
             if (f != NULL) {
-                itoab_r(f->no, 36, locate, sizeof(locate));
+                loc = itoa36_r(f->no, locate, sizeof(locate));
                 findmode = 'f';
             }
             else {
@@ -1251,8 +1261,9 @@ static void handlekey(state * st, int c)
             break;
         }
         /* achtung: fall-through ist absicht: */
-        if (!strlen(locate))
+        if (!strlen(loc)) {
             break;
+        }
     case 'n':
         if (findmode == 'u') {
             unit *u = findunit(atoi36(locate));
@@ -1264,9 +1275,9 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", locate);
+                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", loc);
                 statusline(st->wnd_status->handle, sbuffer);
-                f = findfaction(atoi36(locate));
+                f = findfaction(atoi36(loc));
                 if (f == NULL) {
                     statusline(st->wnd_status->handle, "faction not found.");
                     beep();
@@ -1319,6 +1330,7 @@ static void handlekey(state * st, int c)
             }
         }
         if (wnd == NULL) {
+            static char kbuffer[80];
             if (kbuffer[0] == 0) {
                 strcpy(kbuffer, "getch:");
             }
@@ -1390,9 +1402,9 @@ void run_mapper(void)
     int split = 20;
     state *st;
     point tl;
-    char sbuffer[512];
 
     if (!new_players) {
+        char sbuffer[512];
         path_join(basepath(), "newfactions", sbuffer, sizeof(sbuffer));
         new_players = read_newfactions(sbuffer);
     }
@@ -1434,8 +1446,6 @@ void run_mapper(void)
         view *vi = &st->display;
 
         getbegyx(hwinmap, x, y);
-        width = getmaxx(hwinmap) - x;
-        height = getmaxy(hwinmap) - y;
         coor2point(&st->cursor, &p);
 
         if (st->cursor.pl != vi->pl) {

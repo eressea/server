@@ -158,13 +158,15 @@ static bool limited_give(const item_type * type)
 int give_quota(const unit * src, const unit * dst, const item_type * type,
     int n)
 {
-    double divisor;
-
     if (!limited_give(type)) {
         return n;
     }
     if (dst && src && src->faction != dst->faction) {
-        divisor = config_get_flt("rules.items.give_divisor", 1);
+        static int config;
+        static double divisor = 1.0;
+        if (config_changed(&config)) {
+            divisor = config_get_flt("rules.items.give_divisor", divisor);
+        }
         assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
@@ -305,8 +307,6 @@ static bool rule_transfermen(void)
 
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
-    ship *sh;
-    int k = 0;
     int error = 0;
     message * msg;
     int maxt = max_transfers();
@@ -391,7 +391,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
-        k = count_skill(u2->faction, SK_ALCHEMY);
+        int k = count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
          * welche. */
@@ -414,6 +414,14 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (error == 0) {
+        ship *sh = leftship(u);
+
+        /* Einheiten von Schiffen können nicht NACH in von
+        * Nicht-alliierten bewachten Regionen ausführen */
+        if (sh) {
+            set_leftship(u2, sh);
+        }
+
         if (u2->number == 0) {
             set_racename(&u2->attribs, get_racename(u->attribs));
             u_setrace(u2, u_race(u));
@@ -426,12 +434,6 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
             }
         }
 
-        /* Einheiten von Schiffen können nicht NACH in von
-            * Nicht-alliierten bewachten Regionen ausführen */
-        sh = leftship(u);
-        if (sh) {
-            set_leftship(u2, sh);
-        }
         transfermen(u, u2, n);
         if (maxt >= 0 && u->faction != u2->faction) {
             u2->faction->newbies += n;

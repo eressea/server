@@ -50,9 +50,7 @@ void game_done(void)
     free_game();
 
     creport_cleanup();
-#ifdef REPORT_FORMAT_NR
     report_cleanup();
-#endif
 #endif
     calendar_cleanup();
     free_functions();

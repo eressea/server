@@ -172,19 +172,6 @@ struct ship *findship(int i)
     return sfindhash(i);
 }
 
-struct ship *findshipr(const region * r, int n)
-{
-    ship *sh;
-
-    for (sh = r->ships; sh; sh = sh->next) {
-        if (sh->no == n) {
-            assert(sh->region == r);
-            return sh;
-        }
-    }
-    return 0;
-}
-
 void damage_ship(ship * sh, double percent)
 {
     double damage =

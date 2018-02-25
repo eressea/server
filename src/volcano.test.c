@@ -20,7 +20,7 @@ static void test_volcano_update(CuTest *tc) {
     const struct terrain_type *t_volcano, *t_active;
     
     test_setup();
-    mt_register(mt_new_va("volcanostopsmoke", "region:region", NULL));
+    mt_register(mt_new_va("volcanostopsmoke", "region:region", MT_NEW_END));
     t_volcano = test_create_terrain("volcano", LAND_REGION);
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);
@@ -42,9 +42,9 @@ static void test_volcano_outbreak(CuTest *tc) {
     const struct terrain_type *t_volcano, *t_active;
     
     test_setup();
-    mt_register(mt_new_va("volcanooutbreak", "regionv:region", "regionn:region", NULL));
-    mt_register(mt_new_va("volcanooutbreaknn", "region:region", NULL));
-    mt_register(mt_new_va("volcano_dead", "unit:unit", "region:region", "dead:int", NULL));
+    mt_register(mt_new_va("volcanooutbreak", "regionv:region", "regionn:region", MT_NEW_END));
+    mt_register(mt_new_va("volcanooutbreaknn", "region:region", MT_NEW_END));
+    mt_register(mt_new_va("volcano_dead", "unit:unit", "region:region", "dead:int", MT_NEW_END));
     t_volcano = test_create_terrain("volcano", LAND_REGION);
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);

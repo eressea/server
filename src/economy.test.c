@@ -143,10 +143,10 @@ static struct unit *create_recruiter(void) {
 
 static void setup_production(void) {
     init_resources();
-    mt_register(mt_new_va("produce", "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", NULL));
-    mt_register(mt_new_va("income", "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", NULL));
-    mt_register(mt_new_va("buy", "unit:unit", "money:int", NULL));
-    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", NULL));
+    mt_register(mt_new_va("produce", "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END));
+    mt_register(mt_new_va("income", "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END));
+    mt_register(mt_new_va("buy", "unit:unit", "money:int", MT_NEW_END));
+    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", MT_NEW_END));
 }
 
 static void test_heroes_dont_recruit(CuTest * tc) {
@@ -377,11 +377,11 @@ static void test_tax_cmd(CuTest *tc) {
 }
 
 static void setup_economy(void) {
-    mt_register(mt_new_va("recruit", "unit:unit", "region:region", "amount:int", "want:int", NULL));
-    mt_register(mt_new_va("maintenance", "unit:unit", "building:building", NULL));
-    mt_register(mt_new_va("maintenancefail", "unit:unit", "building:building", NULL));
-    mt_register(mt_new_va("maintenance_nowork", "building:building", NULL));
-    mt_register(mt_new_va("maintenance_noowner", "building:building", NULL));
+    mt_register(mt_new_va("recruit", "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END));
+    mt_register(mt_new_va("maintenance", "unit:unit", "building:building", MT_NEW_END));
+    mt_register(mt_new_va("maintenancefail", "unit:unit", "building:building", MT_NEW_END));
+    mt_register(mt_new_va("maintenance_nowork", "building:building", MT_NEW_END));
+    mt_register(mt_new_va("maintenance_noowner", "building:building", MT_NEW_END));
 }
 
 /** 

@@ -1,4 +1,4 @@
-/* 
+/*
 +-------------------+
 |                   |  Enno Rehling <enno@eressea.de>
 | Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -228,7 +228,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
         if (lua_isfunction(L, -1)) {
             tolua_pushusertype(L, u, TOLUA_CAST "unit");
             lua_pushinteger(L, delta);
-            
+
             if (lua_pcall(L, 2, 1, 0) != 0) {
                 const char *error = lua_tostring(L, -1);
                 log_error("change(%s) calling '%s': %s.\n", unitname(u), fname, error);
@@ -254,39 +254,40 @@ use_item_lua(unit *u, const item_type *itype, int amount, struct order *ord)
     lua_State *L = (lua_State *)global.vm_state;
     int len, result = 0;
     char fname[64];
-    int (*callout)(unit *, const item_type *, int, struct order *);
 
     len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
     if (len > 0 && (size_t)len < sizeof(fname)) {
-    callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
-    if (callout) {
-        return callout(u, itype, amount, ord);
-    }
+        int(*callout)(unit *, const item_type *, int, struct order *);
+        callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
+        if (callout) {
+            return callout(u, itype, amount, ord);
+        }
 
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
-        lua_pushinteger(L, amount);
-        lua_pushstring(L, getstrtoken());
-        tolua_pushusertype(L, (void *)ord, TOLUA_CAST "order");
-        if (lua_pcall(L, 4, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
-            lua_pop(L, 1);
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
+            lua_pushinteger(L, amount);
+            lua_pushstring(L, getstrtoken());
+            tolua_pushusertype(L, (void *)ord, TOLUA_CAST "order");
+            if (lua_pcall(L, 4, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
+                lua_pop(L, 1);
+            }
+            else {
+                result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+            }
+            return result;
+        }
+        lua_pop(L, 1);
+        if (itype->flags & ITF_POTION) {
+            return use_potion(u, itype, amount, ord);
         }
         else {
-            result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
+            log_error("no such callout: %s", fname);
         }
-        return result;
-    }
-    lua_pop(L, 1);
-    if (itype->flags & ITF_POTION) {
-        return use_potion(u, itype, amount, ord);
-    } else {
-        log_error("no such callout: %s", fname);
-    }
-    log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
+        log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
     }
     return result;
 }

@@ -295,6 +295,12 @@ target_link_libraries(test_eressea ${DB_LIBRARIES})
 add_definitions(-DUSE_DB)
 endif(SQLITE3_FOUND)
 
+if (READLINE_FOUND)
+include_directories (${READLINE_INCLUDE_DIR})
+target_link_libraries(eressea ${READLINE_LIBRARY})
+add_definitions(-DUSE_READLINE)
+endif (READLINE_FOUND)
+
 if (CURSES_FOUND)
 include_directories (${CURSES_INCLUDE_DIR})
 target_link_libraries(eressea ${CURSES_LIBRARIES})
