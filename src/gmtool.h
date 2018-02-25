@@ -41,8 +41,6 @@ extern "C" {
   void make_block(int x, int y, int radius, const struct terrain_type *terrain);
   void seed_players(struct newfaction **players, bool new_island);
 
-  int wxborder(WINDOW *win);
-
 #ifdef __cplusplus
 }
 #endif
