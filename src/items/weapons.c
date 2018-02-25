@@ -138,7 +138,6 @@ int *casualties)
         /* If battle succeeds */
         if (hits(*at, dt, wp)) {
             d += terminate(dt, *at, AT_STANDARD, wp->type->damage[0], true);
-#ifdef CATAPULT_STRUCTURAL_DAMAGE
             if (dt.fighter->unit->building && rng_int() % 100 < 5) {
                 double dmg = config_get_flt("rules.building.damage.catapult", 1);
                 damage_building(b, dt.fighter->unit->building, dmg);
@@ -147,7 +146,6 @@ int *casualties)
                 double dmg = config_get_flt("rules.ship.damage.catapult", 0.01);
                 damage_ship(dt.fighter->unit->ship, dmg)
             }
-#endif
         }
     }
 

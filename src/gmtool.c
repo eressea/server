@@ -144,7 +144,7 @@ static void init_curses(void)
         short bcol = COLOR_BLACK;
         short hcol = COLOR_MAGENTA;
         start_color();
-#ifdef WIN32
+#ifdef __PDCURSES__
         /* looks crap on putty with TERM=linux */
         if (can_change_color()) {
             init_color(COLOR_YELLOW, 1000, 1000, 0);
@@ -420,6 +420,15 @@ static void paint_status(window * wnd, const state * st)
 static bool handle_info_region(window * wnd, state * st, int c)
 {
     return false;
+}
+
+int wxborder(WINDOW *win)
+{
+#ifdef __PDCURSES__
+    return wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+#else
+    return wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+#endif
 }
 
 static void paint_info_region(window * wnd, const state * st)

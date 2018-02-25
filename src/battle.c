@@ -86,7 +86,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 #define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
-#define CATAPULT_STRUCTURAL_DAMAGE
 
 #define BASE_CHANCE    70       /* 70% Basis-�berlebenschance */
 #define TDIFF_CHANGE    5       /* 5% h�her pro Stufe */
