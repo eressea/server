@@ -393,7 +393,6 @@ static int get_row(const side * s, int row, const side * vs)
     int line, result;
     int retreat = 0;
     int size[NUMROWS];
-    int front = 0;
     battle *b = s->battle;
 
     memset(counted, 0, sizeof(counted));
@@ -426,6 +425,7 @@ static int get_row(const side * s, int row, const side * vs)
             break;
     }
     if (enemyfront) {
+        int front = 0;
         for (line = FIRST_ROW; line != NUMROWS; ++line) {
             front += size[line];
             if (!front || front < enemyfront / ROW_FACTOR)
@@ -1142,7 +1142,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     /* Schild */
     side *ds = df->side;
-    int hp, ar;
+    int ar;
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
@@ -1257,7 +1257,7 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
                 /* jeder Schaden wird um effect% reduziert bis der Schild duration
                  * Trefferpunkte aufgefangen hat */
                 if (me->typ == SHIELD_REDUCE) {
-                    hp = rda * (me->effect / 100);
+                    int hp = rda * (me->effect / 100);
                     rda -= hp;
                     me->duration -= hp;
                 }
@@ -2875,11 +2875,8 @@ static void print_stats(battle * b)
 {
     side *s2;
     side *s;
-    int i = 0;
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         bfaction *bf;
-
-        ++i;
 
         for (bf = b->factions; bf; bf = bf->next) {
             faction *f = bf->faction;
@@ -3046,8 +3043,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 {
 #define WMAX 20
     weapon weapons[WMAX];
-    int owp[WMAX];
-    int dwp[WMAX];
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
@@ -3160,6 +3155,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     /* F�r alle Waffengattungen wird bestimmt, wie viele der Personen mit
      * ihr k�mpfen k�nnten, und was ihr Wert darin ist. */
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
+        int owp[WMAX];
+        int dwp[WMAX];
         int oi = 0, di = 0, w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
@@ -3480,7 +3477,6 @@ static int battle_report(battle * b)
 {
     side *s, *s2;
     bool cont = false;
-    bool komma;
     bfaction *bf;
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
@@ -3503,6 +3499,7 @@ static int battle_report(battle * b)
         char buf[32 * MAXSIDES];
         message *m;
         sbstring sbs;
+        bool komma = false;
 
         sbs_init(&sbs, buf, sizeof(buf));
         battle_message_faction(b, fac, msg_separator);
@@ -3514,7 +3511,6 @@ static int battle_report(battle * b)
         battle_message_faction(b, fac, m);
         msg_release(m);
 
-        komma = false;
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             if (s->alive) {
                 int r, k = 0, *alive = get_alive(s);

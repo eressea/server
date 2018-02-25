@@ -52,13 +52,7 @@ typedef struct dict_data {
     char *name;
     union {
         int i;
-        char *str;
         double real;
-        struct unit *u;
-        struct region *r;
-        struct building *b;
-        struct ship *sh;
-        struct faction *f;
     } data;
 } dict_data;
 
