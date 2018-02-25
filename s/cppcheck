@@ -1,4 +1,5 @@
 #!/bin/sh
 cppcheck --enable=all -U_MSC_VER -UCLEANUP_CODE -UTODO \
+ -UERESSEA_BUILDNO -UERESSEA_VERSION \
  -IcJSON -Isrc -Iclibs -Istorage src
 
