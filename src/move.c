@@ -696,8 +696,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
     }
 
     if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        unit* harbourmaster = NULL;
-        harbourmaster = owner_buildingtyp(r, bt_harbour);
+        unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
         if (!harbourmaster || !sh->_owner) {
             return SA_HARBOUR;
         }

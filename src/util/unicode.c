@@ -107,7 +107,6 @@ int unicode_utf8_tolower(utf8_t * op, size_t outlen, const utf8_t * ip)
             outlen -= size;
         }
     }
-
     *op = 0;
     return 0;
 }

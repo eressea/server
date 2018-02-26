@@ -1,7 +1,7 @@
 #!/bin/sh
 IGNORE=$(find src -name "*.test.c" | awk '{ print "-i"$1 }')
 
-cppcheck $IGNORE \
+cppcheck $IGNORE -isrc/tests.c \
  --quiet --enable=all -U_MSC_VER -UCLEANUP_CODE -UTODO \
  -UERESSEA_BUILDNO -UERESSEA_VERSION \
  -IcJSON -Isrc -Iclibs -Istorage src

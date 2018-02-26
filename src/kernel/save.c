@@ -935,6 +935,7 @@ static void read_password(gamedata *data, faction *f) {
     else {
         faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
     }
+    (void)_test_read_password;
 }
 
 void _test_read_password(gamedata *data, faction *f) {
@@ -943,6 +944,7 @@ void _test_read_password(gamedata *data, faction *f) {
 
 static void write_password(gamedata *data, const faction *f) {
     WRITE_TOK(data->store, (const char *)f->_password);
+    (void)_test_write_password;
 }
 
 void _test_write_password(gamedata *data, const faction *f) {

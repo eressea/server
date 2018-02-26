@@ -57,7 +57,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/key.h>
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
-#include <attributes/moved.h>
 
 /* util includes */
 #include <util/assert.h>

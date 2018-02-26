@@ -2393,17 +2393,6 @@ unit *get_clone(const unit * u)
     return NULL;
 }
 
-unit *get_clone_mage(const unit * u)
-{
-    attrib *a = a_find(u->attribs, &at_clonemage);
-    if (a != NULL) {
-        unit *um = (unit *)a->data.v;
-        if (um->number > 0)
-            return um;
-    }
-    return NULL;
-}
-
 static bool is_moving_ship(ship * sh)
 {
     const unit *u = ship_owner(sh);

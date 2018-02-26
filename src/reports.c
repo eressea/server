@@ -1083,14 +1083,6 @@ struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
     }
 }
 
-const struct unit *ucansee(const struct faction *f, const struct unit *u,
-    const struct unit *x)
-{
-    if (cansee(f, u->region, u, 0))
-        return u;
-    return x;
-}
-
 int stealth_modifier(const region *r, const faction *f, seen_mode mode)
 {
     switch (mode) {

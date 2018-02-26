@@ -38,9 +38,6 @@ extern "C" {
     } museumgiveback;
 
     extern void register_museum(void);
-    extern void create_museum(void);
-    extern void warden_add_give(struct unit *src, struct unit *u,
-        const struct item_type *itype, int n);
 
 #ifdef __cplusplus
 }

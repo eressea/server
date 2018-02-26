@@ -39,7 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 #include "terrain.h"
 
-#include <attributes/moved.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/stealth.h>

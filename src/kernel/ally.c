@@ -203,8 +203,9 @@ alliedgroup(const struct plane *pl, const struct faction *f,
     if (!(faction_alive(f) && faction_alive(f2))) {
         return 0;
     }
-    while (sf && sf->faction != f2)
+    while (sf && sf->faction != f2) {
         sf = sf->next;
+    }
     if (sf == NULL) {
         mode = mode & autoalliance(pl, f, f2);
     }
