@@ -472,7 +472,7 @@ static skill_t random_skill(unit * u, bool weighted)
 /** The mind blast spell for regular folks.
 * This spell temporarily reduces the skill of the victims
 */
-int sp_mindblast_temp(struct castorder * co)
+int sp_mindblast(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
@@ -529,85 +529,6 @@ int sp_mindblast_temp(struct castorder * co)
     }
 
     m = msg_message("sp_mindblast_temp_effect", "mage spell amount", mage, sp, k);
-    message_all(b, m);
-    msg_release(m);
-    return level;
-}
-
-/** A mind blast spell for monsters.
- * This spell PERMANENTLY reduces the skill of the victims or kills them
- * when they have no skills left. Not currently in use.
- */
-int sp_mindblast(struct castorder * co)
-{
-    fighter * fi = co->magician.fig;
-    int level = co->level;
-    double power = co->force;
-    const spell * sp = co->sp;
-    battle *b = fi->side->battle;
-    unit *mage = fi->unit;
-    int killed = 0, k = 0, reset = 0;
-    message *m;
-    int force = lovar(power * 25);
-    int enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-
-    if (!enemies) {
-        m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
-        message_all(b, m);
-        msg_release(m);
-        return 0;
-    }
-
-    while (enemies > 0 && force > 0) {
-        unit *du;
-        troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-
-        assert(dt.fighter);
-        du = dt.fighter->unit;
-        if (du->flags & UFL_MARK) {
-            /* not this one again */
-            continue;
-        }
-
-        if (humanoidrace(u_race(du)) && force >= du->number) {
-            if (!is_magic_resistant(mage, du, 0)) {
-                skill_t sk = random_skill(du, false);
-                if (sk != NOSKILL) {
-                    skill *sv = unit_skill(du, sk);
-                    if (sv) {
-                        int n = 1 + rng_int() % 3;
-
-                        reduce_skill(du, sv, n);
-                        k += du->number;
-                    }
-                }
-                else {
-                    /* unit has no skill. kill it. */
-                    kill_troop(dt);
-                    ++killed;
-                }
-            }
-            force -= du->number;
-        }
-        else {
-            /* only works against humanoids, don't try others. but do remove them
-             * from 'force' once or we may never terminate. */
-            du->flags |= UFL_MARK;
-            reset = 1;
-        }
-        enemies -= du->number;
-    }
-
-    if (reset) {
-        unit *u;
-        for (u = b->region->units; u; u = u->next) {
-            u->flags &= ~UFL_MARK;
-        }
-    }
-
-    m =
-        msg_message("sp_mindblast_effect", "mage spell amount dead", mage, sp, k,
-        killed);
     message_all(b, m);
     msg_release(m);
     return level;

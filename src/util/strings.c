@@ -111,25 +111,6 @@ size_t str_slprintf(char * dst, size_t size, const char * format, ...)
     return (size_t)result;
 }
 
-char *set_string(char **s, const char *neu)
-{
-    if (neu == NULL) {
-        free(*s);
-        *s = NULL;
-    }
-    else if (*s == NULL) {
-        *s = malloc(strlen(neu) + 1);
-        strcpy(*s, neu);
-    }
-    else {
-        char *rs = realloc(*s, strlen(neu) + 1);
-        assert_alloc(rs);
-        *s = rs;
-        strcpy(*s, neu);
-    }
-    return *s;
-}
-
 void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value)
 {
     size_t val_len = strlen(value);

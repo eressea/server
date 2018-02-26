@@ -621,12 +621,11 @@ void create_icebergs(void)
         if (r->terrain == t_sleep && chance(0.05)) {
             bool has_ocean_neighbour = false;
             direction_t dir;
-            region *rc;
             unit *u;
 
             freset(r, RF_SELECT);
             for (dir = 0; dir < MAXDIRECTIONS; dir++) {
-                rc = rconnect(r, dir);
+                region *rc = rconnect(r, dir);
                 if (rc && fval(rc->terrain, SEA_REGION)) {
                     has_ocean_neighbour = true;
                     break;
