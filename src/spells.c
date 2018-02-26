@@ -1883,10 +1883,9 @@ static int sp_treewalkexit(castorder * co)
     rt = pa->param[0]->data.r;
     tax = rt->x;
     tay = rt->y;
-    rt = NULL;
 
     rl = astralregions(r, inhabitable);
-    rt = 0;
+    rt = NULL;
 
     rl2 = rl;
     while (rl2) {
@@ -1991,7 +1990,6 @@ static int sp_treewalkexit(castorder * co)
  */
 static int sp_holyground(castorder * co)
 {
-    const curse_type *ctype = NULL;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -2000,8 +1998,7 @@ static int sp_holyground(castorder * co)
     report_spell(mage, r, msg);
     msg_release(msg);
 
-    ctype = &ct_holyground;
-    create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
+    create_curse(mage, &r->attribs, &ct_holyground, power * power, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
 
@@ -6445,7 +6442,7 @@ static spelldata spell_functions[] = {
     { "illaundestroymagic", sp_destroy_magic, 0 },
     { "clone", sp_clonecopy, 0 },
     { "bad_dreams", sp_baddreams, 0 },
-    { "mindblast", sp_mindblast_temp, 0 },
+    { "mindblast", sp_mindblast, 0 },
     { "orkdream", sp_sweetdreams, 0 },
     /* M_CERDDOR */
     { "appeasement", sp_appeasement, 0 },

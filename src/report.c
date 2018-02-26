@@ -2278,9 +2278,11 @@ report_plaintext(const char *filename, report_context * ctx,
                     m = msg_message("nr_market_info_p", "p1 p2",
                         lux->rtype, herb->rtype);
                 }
-                else if (lux || herb) {
-                    m = msg_message("nr_market_info_s", "p1",
-                        lux ? lux->rtype : herb->rtype);
+                else if (lux) {
+                    m = msg_message("nr_market_info_s", "p1",lux->rtype);
+                }
+                else if (herb) {
+                    m = msg_message("nr_market_info_s", "p1", herb->rtype);
                 }
                 if (m) {
                     newline(out);

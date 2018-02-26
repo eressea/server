@@ -38,7 +38,6 @@ extern "C" {
     int sp_hero(struct castorder * co);
     int sp_frighten(struct castorder * co);
     int sp_mindblast(struct castorder * co);
-    int sp_mindblast_temp(struct castorder * co);
     int sp_speed(struct castorder * co);
     int sp_wolfhowl(struct castorder * co);
     int sp_igjarjuk(struct castorder * co);
