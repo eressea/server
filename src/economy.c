@@ -1554,6 +1554,20 @@ attrib_type at_trades = {
     NO_READ
 };
 
+static bool trade_needs_castle(const region *r, const race *rc) {
+    static int rc_change, terrain_change;
+    static const race *rc_insect;
+    static const terrain_type *t_desert, *t_swamp;
+    if (rc_changed(&rc_change)) {
+        rc_insect = get_race(RC_INSECT);
+    }
+    if (terrain_changed(&terrain_change)) {
+        t_swamp = newterrain(T_SWAMP);
+        t_desert = newterrain(T_DESERT);
+    }
+    return rc != rc_insect && (r->terrain == t_swamp || r->terrain == t_desert);
+}
+
 static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
@@ -1592,7 +1606,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
-    if (u_race(u) != get_race(RC_INSECT) || (r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT))) {
+    if (trade_needs_castle(r, u_race(u))) {
         building *b = NULL;
         if (r->buildings) {
             static int cache;
