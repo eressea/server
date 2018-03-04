@@ -266,9 +266,14 @@ void test_teardown(void)
 }
 
 terrain_type *
-test_create_terrain(const char * name, unsigned int flags)
+test_create_terrain(const char * name, int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+
+    if (flags < 0) {
+        /* sensible defaults for most terrains */
+        flags = LAND_REGION | WALK_INTO | FLY_INTO;
+    }
     if (flags & LAND_REGION) {
         t->size = 1000;
     }
