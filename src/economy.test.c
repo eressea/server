@@ -254,6 +254,7 @@ static void test_trade_insect(CuTest *tc) {
     CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
     produce(u->region);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));
 

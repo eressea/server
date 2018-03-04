@@ -1202,12 +1202,17 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
 
     if (oldterrain == NULL || terrain->size != oldterrain->size) {
+        static int changed;
+        static const terrain_type *t_plain;
         int horses = 0, trees = 0;
+        if (terrain_changed(&changed)) {
+            t_plain = get_terrain(terrainnames[T_PLAIN]);
+        }
         if (terrain->size>0) {
             horses = rng_int() % (terrain->size / 50);
             trees = terrain->size * (30 + rng_int() % 40) / 1000;
         }
-        if (terrain == newterrain(T_PLAIN)) {
+        if (t_plain && terrain == t_plain) {
             rsethorses(r, horses);
             if (chance(0.4)) {
                 rsettrees(r, 2, trees);
