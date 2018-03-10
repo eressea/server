@@ -52,6 +52,10 @@ LUA_DIR=/usr
 if [ -d /usr/include/lua5.1 ]; then
    LUA_VERSION="5.1"
    LUA_INCLUDE=/usr/include/lua5.1
+elif [ -d /usr/include/lua5.2 ]; then
+   export LUA_DIR=/usr
+   LUA_VERSION="5.2"
+   LUA_INCLUDE=/usr/include/lua5.2
 elif [ -d /usr/local/include/lua5.1 ]; then
    export LUA_DIR=/usr/local
    LUA_VERSION="5.1"
@@ -59,7 +63,7 @@ elif [ -d /usr/local/include/lua5.1 ]; then
 fi
 
 if [ ! -e ${LUA_INCLUDE}/lua.h ]; then
-  echo "no compatible version of lua is installed."
+  echo "no compatible version of lua is installed in $LUA_INCLUDE."
   exit 1
 fi
 
