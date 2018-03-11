@@ -4226,12 +4226,6 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
     return (rings <= 0 && stealth <= 0);
 }
 
-bool cansee_ex(const faction * f, const region * r, const unit * u, int modifier, seen_mode mode)
-{
-    UNUSED_ARG(mode);
-    return cansee(f, r, u, modifier);
-}
-
 bool cansee_unit(const unit * u, const unit * target, int modifier)
 /* target->region kann != u->region sein, wenn es um durchreisen geht */
 {

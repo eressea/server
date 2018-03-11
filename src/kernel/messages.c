@@ -46,16 +46,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <ctype.h>
 #include <assert.h>
 
-typedef struct msg_setting {
-    struct msg_setting *next;
-    const struct message_type *type;
-    int level;
-} msg_setting;
-
-/************ Compatibility function *************/
 #define MAXSTRLEN (4*DISPLAYSIZE+3)
-#include "region.h"
-#include <kernel/config.h>
 
 static void
 arg_set(variant args[], const message_type * mtype, const char *buffer,
@@ -92,7 +83,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         log_warning("trying to create message of unknown type \"%s\"\n", name);
         if (!mt_find("missing_feedback")) {
             mt_register(mt_new_va("missing_feedback", "unit:unit", 
-                "region:region", "command:order", "name:string", NULL));
+                "region:region", "command:order", "name:string", MT_NEW_END));
         }
         return msg_message("missing_feedback", "name unit region command",
             name, u, u->region, ord);
@@ -162,7 +153,7 @@ static message *missing_message(const char *name) {
         log_warning("trying to create undefined message of type \"%s\"\n", name);
         if (strcmp(name, "missing_message") != 0) {
             if (!mt_find("missing_message")) {
-                mt_register(mt_new_va("missing_message", "name:string", NULL));
+                mt_register(mt_new_va("missing_message", "name:string", MT_NEW_END));
             }
             return msg_message("missing_message", "name", name);
         }
@@ -267,7 +258,7 @@ void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
 message * msg_error(const unit * u, struct order *ord, int mno) {
     static char msgname[20];
 
-    if (fval(u->faction, FFL_NPC)) {
+    if (u->faction->flags & FFL_NPC) {
         return NULL;
     }
     sprintf(msgname, "error%d", mno);

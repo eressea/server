@@ -43,7 +43,7 @@ static void test_manacrystal(CuTest *tc) {
 static void test_skillpotion(CuTest *tc) {
     unit *u;
     const struct item_type *itype;
-    skill* pSkill = NULL;
+    skill* pSkill;
     int initialWeeks_Entertainment = 0;
     int initialWeeks_Stamina = 0;
     int initialWeeks_Magic = 0;

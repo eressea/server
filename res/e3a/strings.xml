@@ -283,10 +283,10 @@
     </string>
   </namespace>
 
-  <namespace name="potion">
+  <namespace name="describe">
     <string name="lifepotion">
-      <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for five trees to be grown from logs.</text>
       <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht um aus fünf Holzstämmen neue Bäume wachsen zu lassen.</text>
+      <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for five trees to be grown from logs.</text>
     </string>
   </namespace>
 

@@ -1471,7 +1471,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
 
         cr_output_travelthru(F, r, f);
-        if (r->seen.mode >= seen_travel) {
+        if (see_region_details(r)) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {
@@ -1503,7 +1503,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
         /* visible units */
         for (u = r->units; u; u = u->next) {
-
             if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                 cr_output_unit_compat(F, f, u, r->seen.mode);
             }
@@ -1511,6 +1510,31 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
     }
 }
 
+static void report_itemtype(FILE *F, faction *f, const item_type *itype) {
+    const char *ch;
+    const char *description = NULL;
+    const char *pname = resourcename(itype->rtype, 0);
+    const char *potiontext = mkname("describe", pname);
+    
+    ch = resourcename(itype->rtype, 0);
+    fprintf(F, "TRANK %d\n", str_hash(ch));
+    fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
+    fprintf(F, "%d;Stufe\n", potion_level(itype));
+    description = LOC(f->locale, potiontext);
+    fprintf(F, "\"%s\";Beschr\n", description);
+    if (itype->construction) {
+        requirement *m = itype->construction->materials;
+        
+        fprintf(F, "ZUTATEN\n");
+        
+        while (m->number) {
+            ch = resourcename(m->rtype, 0);
+            fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
+            m++;
+        }
+    }
+}
+    
 /* main function of the creport. creates the header and traverses all regions */
 static int
 report_computer(const char *filename, report_context * ctx, const char *bom)
@@ -1655,33 +1679,9 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
-        const char *ch;
-        const char *description = NULL;
 
-        if (itype == NULL)
-            continue;
-        ch = resourcename(itype->rtype, 0);
-        fprintf(F, "TRANK %d\n", str_hash(ch));
-        fprintf(F, "\"%s\";Name\n", translate(ch, LOC(f->locale, ch)));
-        fprintf(F, "%d;Stufe\n", potion_level(itype));
-
-        if (description == NULL) {
-            const char *pname = resourcename(itype->rtype, 0);
-            const char *potiontext = mkname("potion", pname);
-            description = LOC(f->locale, potiontext);
-        }
-
-        fprintf(F, "\"%s\";Beschr\n", description);
-        if (itype->construction) {
-            requirement *m = itype->construction->materials;
-
-            fprintf(F, "ZUTATEN\n");
-
-            while (m->number) {
-                ch = resourcename(m->rtype, 0);
-                fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
-                m++;
-            }
+        if (itype) {
+            report_itemtype(F, f, itype);
         }
     }
 

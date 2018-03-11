@@ -30,13 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define MAXDEPTH 1024
 
-bool allowed_swim(const region * src, const region * r)
-{
-    if (fval(r->terrain, SWIM_INTO))
-        return true;
-    return false;
-}
-
 bool allowed_walk(const region * src, const region * r)
 {
     if (fval(r->terrain, WALK_INTO))

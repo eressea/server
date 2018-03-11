@@ -74,8 +74,6 @@ extern "C" {
 
     void a_free_voidptr(union variant *v);
     int a_read_orig(struct gamedata *data, attrib ** attribs, void *owner);
-    void a_write_orig(struct storage *store, const attrib * attribs, const void *owner);
-
     int a_read(struct gamedata *data, attrib ** attribs, void *owner);
     void a_write(struct storage *store, const attrib * attribs, const void *owner);
 

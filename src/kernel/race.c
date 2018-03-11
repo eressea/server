@@ -98,7 +98,6 @@ enum {
 
 static void rc_setoption(race *rc, int k, const char *value) {
     unsigned char key = (unsigned char)k;
-    int i;
     variant *v = NULL;
     if (!rc->options) {
         rc->options = malloc(sizeof(rcoption));
@@ -106,6 +105,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
         rc->options->key[1] = RCO_NONE;
         v = rc->options->value;
     } else {
+        int i;
         for (i=0;!v && i < MAXOPTIONS;++i) {
             if (rc->options->key[i]==key) {
                 v = rc->options->value+i;
@@ -196,9 +196,10 @@ static rc_xref *xrefs;
 race_t old_race(const struct race * rc)
 {
     static int cache;
-    int i, l, r;
+    int l, r;
     
     if (rc_changed(&cache)) {
+        int i;
         if (!xrefs) {
             xrefs = malloc(sizeof(rc_xref) * MAXRACES);
         }

@@ -248,7 +248,7 @@ static void test_buildingowner_resets_when_empty(CuTest * tc)
     u_set_building(u, bld);
     CuAssertPtrEquals(tc, u, building_owner(bld));
     u->number = 0;
-    CuAssertPtrEquals(tc, 0, building_owner(bld));
+    CuAssertPtrEquals(tc, NULL, building_owner(bld));
     u->number = 1;
     CuAssertPtrEquals(tc, u, building_owner(bld));
     test_teardown();

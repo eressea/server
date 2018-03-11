@@ -141,11 +141,11 @@ static void scramble(void *data, unsigned int n, size_t width)
     }
 }
 
-unsigned int expand_production(region * r, econ_request * requests, econ_request ***results)
+int expand_production(region * r, econ_request * requests, econ_request ***results)
 {
     unit *u;
     econ_request *o;
-    unsigned int norders = 0;
+    int norders = 0;
 
     /* Alle Units ohne production haben ein -1, alle units mit orders haben ein
      * 0 hier stehen */
@@ -190,7 +190,7 @@ static void free_requests(econ_request *requests) {
     }
 }
 
-static unsigned int expandorders(region * r, econ_request * requests) {
+static int expandorders(region * r, econ_request * requests) {
     return expand_production(r, requests, &g_requests);
 }
 
@@ -388,8 +388,7 @@ void free_recruitments(recruitment * recruits)
 /* Rekrutierung */
 static void expandrecruit(region * r, econ_request * recruitorders)
 {
-    recruitment *recruits = NULL;
-
+    recruitment *recruits;
     int orc_total = 0;
 
     /* peasant limited: */
@@ -430,12 +429,10 @@ static int recruit_cost(const faction * f, const race * rc)
 static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
 {
     region *r = u->region;
-    plane *pl;
     econ_request *o;
     int recruitcost = -1;
     const faction *f = u->faction;
     const struct race *rc = u_race(u);
-    const char *str;
     int n;
 
     init_order_depr(ord);
@@ -447,6 +444,8 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
 
     if (u->number == 0) {
         char token[128];
+        const char *str;
+
         str = gettoken(token, sizeof(token));
         if (str && str[0]) {
             /* Monsters can RECRUIT 15 DRACOID
@@ -506,7 +505,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     }
 
     if (recruitcost) {
-        pl = getplane(r);
+        plane *pl = getplane(r);
         if (pl && fval(pl, PFL_NORECRUITS)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_pflnorecruit", ""));
             return;
@@ -1075,10 +1074,10 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 {
     const item_type *itype = resource2item(rtype);
     rawmaterial *rm = rm_get(r, rtype);
-    bool first = true;
 
     if (rm != NULL) {
         int need;
+        bool first = true;
         do {
             int avail = rm->amount, nreq = 0;
             allocation *al;
@@ -1299,7 +1298,6 @@ int make_cmd(unit * u, struct order *ord)
     int m = INT_MAX;
     const char *s;
     const struct locale *lang = u->faction->locale;
-    char ibuf[16];
     keyword_t kwd;
 
     kwd = init_order_depr(ord);
@@ -1307,6 +1305,7 @@ int make_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s) {
+        char ibuf[16];
         m = atoip(s);
         sprintf(ibuf, "%d", m);
         if (!strcmp(ibuf, (const char *)s)) {
@@ -1555,6 +1554,20 @@ attrib_type at_trades = {
     NO_READ
 };
 
+static bool trade_needs_castle(const region *r, const race *rc) {
+    static int rc_change, terrain_change;
+    static const race *rc_insect;
+    static const terrain_type *t_desert, *t_swamp;
+    if (rc_changed(&rc_change)) {
+        rc_insect = get_race(RC_INSECT);
+    }
+    if (terrain_changed(&terrain_change)) {
+        t_swamp = newterrain(T_SWAMP);
+        t_desert = newterrain(T_DESERT);
+    }
+    return rc != rc_insect && (r->terrain == t_swamp || r->terrain == t_desert);
+}
+
 static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
@@ -1593,7 +1606,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
-    if (u_race(u) != get_race(RC_INSECT) || (r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT))) {
+    if (trade_needs_castle(r, u_race(u))) {
         building *b = NULL;
         if (r->buildings) {
             static int cache;
@@ -1673,8 +1686,8 @@ static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 
 static void expandselling(region * r, econ_request * sellorders, int limit)
 {
-    int money, price, max_products;
-    unsigned int j, norders;
+    int money, max_products;
+    int norders;
     /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
@@ -1751,11 +1764,12 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 
     norders = expandorders(r, sellorders);
     if (norders > 0) {
+        int j;
         for (j = 0; j != norders; j++) {
             const luxury_type *search = NULL;
             const luxury_type *ltype = g_requests[j]->type.trade.ltype;
             int multi = r_demand(r, ltype);
-            int i;
+            int i, price;
             int use = 0;
             for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
                 /* TODO: this is slow and lame! */
@@ -2336,13 +2350,13 @@ static void research_cmd(unit * u, struct order *ord)
 
 static void expandentertainment(region * r)
 {
-    unit *u;
     int m = entertainmoney(r);
     econ_request *o;
 
     for (o = &entertainers[0]; o != nextentertainer; ++o) {
         double part = m / (double)entertaining;
-        u = o->unit;
+        unit *u = o->unit;
+
         if (entertaining <= m)
             u->n = o->qty;
         else

@@ -622,6 +622,37 @@ static void test_transfermen(CuTest *tc) {
     test_teardown();
 }
 
+static void test_get_modifier(CuTest *tc) {
+    race * rc;
+    region *r;
+    unit *u;
+    terrain_type *t_plain, *t_desert;
+
+    test_setup();
+    t_desert = test_create_terrain("desert", -1);
+    t_plain = test_create_terrain("plain", -1);
+    rc = test_create_race("insect");
+    rc->bonus[SK_ARMORER] = 1;
+    rc->bonus[SK_TAXING] = 0;
+    rc->bonus[SK_TRADE] = -1;
+    u = test_create_unit(test_create_faction(rc), r = test_create_region(0, 0, t_plain));
+
+    /* no effects for insects in plains: */
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 0, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 1, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 7, r, true));
+
+    r = test_create_region(1, 0, t_desert);
+    /* terrain effect: +1 for insects in deserts: */
+    CuAssertIntEquals(tc, 1, get_modifier(u, SK_TAXING, 1, r, true));
+    /* no terrain effects if no region is given: */
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 1, NULL, true));
+    /* only get terrain effect if they have at least level 1: */
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 0, r, true));
+
+    test_teardown();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -652,5 +683,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
+    SUITE_ADD_TEST(suite, test_get_modifier);
     return suite;
 }

@@ -231,9 +231,9 @@ static void test_reset(void) {
     }
     random_source_reset();
 
-    mt_register(mt_new_va("changepasswd", "value:string", NULL));
-    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", NULL));
-    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", NULL));
+    mt_register(mt_new_va("changepasswd", "value:string", MT_NEW_END));
+    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", MT_NEW_END));
+    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", MT_NEW_END));
 
     if (errno) {
         int error = errno;
@@ -266,9 +266,14 @@ void test_teardown(void)
 }
 
 terrain_type *
-test_create_terrain(const char * name, unsigned int flags)
+test_create_terrain(const char * name, int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+
+    if (flags < 0) {
+        /* sensible defaults for most terrains */
+        flags = LAND_REGION | WALK_INTO | FLY_INTO;
+    }
     if (flags & LAND_REGION) {
         t->size = 1000;
     }

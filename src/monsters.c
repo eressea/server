@@ -780,7 +780,7 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (tu) {
-                    tu = findunitg(ta->data.i, NULL);
+                    tu = findunit(ta->data.i);
                     if (tu != NULL) {
                         long_order = make_movement_order(u, tu->region, 2, allowed_walk);
                     }

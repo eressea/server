@@ -2263,14 +2263,6 @@ static void set_clone(unit * mage, unit * clone)
         assert(!a->data.v || a->data.v == mage);
 }
 
-unit *has_clone(unit * mage)
-{
-    attrib *a = a_find(mage->attribs, &at_clone);
-    if (a)
-        return (unit *)a->data.v;
-    return NULL;
-}
-
 static void * resolve_clone(int id, void *data) {
     UNUSED_ARG(id);
     if (data) {
@@ -2397,17 +2389,6 @@ unit *get_clone(const unit * u)
         unit *uc = (unit *)a->data.v;
         if (uc->number > 0)
             return uc;
-    }
-    return NULL;
-}
-
-unit *get_clone_mage(const unit * u)
-{
-    attrib *a = a_find(u->attribs, &at_clonemage);
-    if (a != NULL) {
-        unit *um = (unit *)a->data.v;
-        if (um->number > 0)
-            return um;
     }
     return NULL;
 }

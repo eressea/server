@@ -11,7 +11,6 @@ follow.c
 hate.c
 iceberg.c
 key.c
-moved.c
 movement.c
 dict.c
 otherfaction.c
