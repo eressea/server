@@ -86,6 +86,7 @@ static const char * valid_keys[] = {
     "game.maxnmr",
     "game.name",
     "game.start",
+    "game.seed",
     "game.locale",
     "game.verbose",
     "game.report",
