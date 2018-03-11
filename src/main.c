@@ -83,6 +83,7 @@ static void load_inifile(void)
 static const char * valid_keys[] = {
     "game.id",
     "game.deadlog",
+    "game.maxnmr",
     "game.name",
     "game.start",
     "game.locale",
@@ -257,7 +258,7 @@ static int parse_args(int argc, char **argv)
     return 0;
 }
 
-#if defined(HAVE_BACKTRACE)
+#ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #include <signal.h>
 
