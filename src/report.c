@@ -2239,7 +2239,7 @@ report_plaintext(const char *filename, report_context * ctx,
             *bufp = 0;
             centre(out, buf, true);
             newline(out);
-            description = mkname("potion", pname);
+            description = mkname("describe", pname);
             description = LOC(f->locale, description);
             centre(out, description, true);
         }
