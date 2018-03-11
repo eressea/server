@@ -1471,7 +1471,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
 
         cr_output_travelthru(F, r, f);
-        if (r->seen.mode >= seen_travel) {
+        if (see_region_details(r)) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {
@@ -1503,7 +1503,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
         /* visible units */
         for (u = r->units; u; u = u->next) {
-
             if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                 cr_output_unit_compat(F, f, u, r->seen.mode);
             }

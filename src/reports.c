@@ -2445,11 +2445,16 @@ bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mod
         return true;
     }
     else {
-        if (stealthmod > INT_MIN && mode >= seen_unit) {
+        if (stealthmod > INT_MIN && (mode == seen_lighthouse || mode >= seen_unit)) {
             return cansee(f, u->region, u, stealthmod);
         }
     }
     return false;
+}
+
+bool see_region_details(const region *r)
+{
+    return r->seen.mode >= seen_travel;
 }
 
 void register_reports(void)

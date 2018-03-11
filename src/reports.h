@@ -135,6 +135,7 @@ extern "C" {
     const char *get_mailcmd(const struct locale *loc);
 
     bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
+    bool see_region_details(const struct region *r);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
