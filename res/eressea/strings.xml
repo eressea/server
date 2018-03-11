@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <strings>
+  <namespace name="describe">
+    <string name="p2">
+      <text locale="en">The "Water of Life" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood.</text>
+      <text locale="de">Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme.</text>
+    </string>
+  </namespace>
   <namespace name="spellinfo">
   <string name="headache">
       <text locale="de">
