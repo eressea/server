@@ -109,12 +109,12 @@ static int cmp_spell(const void *a, const void *b) {
 
 static bool set_seen(attrib **alist, struct spell *sp) {
     attrib *a = a_find(*alist, &at_seenspells);
-    selist *sl;
+    selist **sl;
     if (!a) {
         a = a_add(alist, a_new(&at_seenspells));
     }
-    sl = (selist *)a->data.v;
-    return selist_set_insert(&sl, sp, cmp_spell);
+    sl = (selist **)&a->data.v;
+    return selist_set_insert(sl, sp, cmp_spell);
 }
 
 static void upgrade_seenspell(attrib **alist, attrib *abegin) {

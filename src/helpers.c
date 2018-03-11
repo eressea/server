@@ -278,11 +278,11 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
 {
     int len;
     char fname[64];
-    int(*callout)(unit *, const item_type *, int, struct order *);
 
     len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
     if (len > 0 && (size_t)len < sizeof(fname)) {
         int result;
+        int(*callout)(unit *, const item_type *, int, struct order *);
 
         /* check if we have a register_item_use function */
         callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);

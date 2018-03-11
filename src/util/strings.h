@@ -27,7 +27,6 @@ extern "C" {
 
     void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value);
     const char *str_escape(const char *str, char *buffer, size_t len);
-    char *set_string(char **s, const char *neu);
     unsigned int str_hash(const char *s);
     size_t str_slprintf(char * dst, size_t size, const char * format, ...);
     size_t str_strlcpy(char *dst, const char *src, size_t len);

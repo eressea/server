@@ -44,7 +44,6 @@ extern "C" {
 
     extern struct attrib_type at_skillmod;
 
-    int rc_skillmod(const struct race *rc, const struct region *r, skill_t sk);
     int skillmod(const struct unit *u, const struct region *r, skill_t sk, int value);
     struct attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus);
 

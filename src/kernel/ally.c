@@ -203,8 +203,9 @@ alliedgroup(const struct plane *pl, const struct faction *f,
     if (!(faction_alive(f) && faction_alive(f2))) {
         return 0;
     }
-    while (sf && sf->faction != f2)
+    while (sf && sf->faction != f2) {
         sf = sf->next;
+    }
     if (sf == NULL) {
         mode = mode & autoalliance(pl, f, f2);
     }
@@ -233,7 +234,6 @@ alliedfaction(const struct plane *pl, const struct faction *f,
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
 int alliedunit(const unit * u, const faction * f2, int mode)
 {
-    ally *sf;
     int automode;
 
     assert(u);
@@ -242,6 +242,7 @@ int alliedunit(const unit * u, const faction * f2, int mode)
     if (u->faction == f2)
         return mode;
     if (u->faction != NULL && f2 != NULL) {
+        ally *sf;
         plane *pl;
 
         if (mode & HELP_FIGHT) {

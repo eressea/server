@@ -823,21 +823,37 @@ static void test_newbie_warning(CuTest *tc) {
     test_teardown();
 }
 
-static void test_cansee_spell(CuTest *tc) {
+static void test_visible_unit(CuTest *tc) {
     unit *u2;
     faction *f;
+    ship *sh;
 
     test_setup();
     f = test_create_faction(NULL);
     u2 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    sh = test_create_ship(u2->region, NULL);
 
     CuAssertTrue(tc, cansee(f, u2->region, u2, 0));
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_unit));
     CuAssertTrue(tc, visible_unit(u2, f, 0, seen_spell));
     CuAssertTrue(tc, visible_unit(u2, f, 0, seen_battle));
+    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_travel));
+    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_neighbour));
+
+    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u2, f, -2, seen_lighthouse));
+    u2->ship = sh;
+    CuAssertTrue(tc, visible_unit(u2, f, -2, seen_lighthouse));
+    u2->ship = NULL;
 
     set_level(u2, SK_STEALTH, 1);
     CuAssertTrue(tc, !cansee(f, u2->region, u2, 0));
     CuAssertTrue(tc, cansee(f, u2->region, u2, 1));
+
+    u2->ship = sh;
+    CuAssertTrue(tc, visible_unit(u2, f, -2, seen_lighthouse));
+    u2->ship = NULL;
     CuAssertTrue(tc, visible_unit(u2, f, 1, seen_spell));
     CuAssertTrue(tc, visible_unit(u2, f, 1, seen_battle));
 
@@ -873,6 +889,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_arg_resources);
     SUITE_ADD_TEST(suite, test_insect_warnings);
     SUITE_ADD_TEST(suite, test_newbie_warning);
-    SUITE_ADD_TEST(suite, test_cansee_spell);
+    SUITE_ADD_TEST(suite, test_visible_unit);
     return suite;
 }

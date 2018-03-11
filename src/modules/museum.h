@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef HEADER_MUSEUM_H
 #define HEADER_MUSEUM_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,9 +39,6 @@ extern "C" {
     } museumgiveback;
 
     extern void register_museum(void);
-    extern void create_museum(void);
-    extern void warden_add_give(struct unit *src, struct unit *u,
-        const struct item_type *itype, int n);
 
 #ifdef __cplusplus
 }

@@ -320,8 +320,6 @@ void runhash(region * r)
 {
     unsigned int rid = coor_hashkey(r->x, r->y);
     int key = HASH1(rid, RMAXHASH), gk = HASH2(rid, RMAXHASH);
-
-#ifdef FAST_CONNECT
     int d, di;
     for (d = 0, di = MAXDIRECTIONS / 2; d != MAXDIRECTIONS; ++d, ++di) {
         region *rc = r->connect[d];
@@ -332,7 +330,6 @@ void runhash(region * r)
             r->connect[d] = NULL;
         }
     }
-#endif
     while (regionhash[key] != NULL && regionhash[key] != r) {
         key = (key + gk) % RMAXHASH;
     }
@@ -344,23 +341,19 @@ region *r_connect(const region * r, direction_t dir)
 {
     region *result;
     int x, y;
-#ifdef FAST_CONNECT
     region *rmodify = (region *)r;
     assert(dir >= 0 && dir < MAXDIRECTIONS);
     if (r->connect[dir])
         return r->connect[dir];
-#endif
     assert(dir < MAXDIRECTIONS);
     x = r->x + delta_x[dir];
     y = r->y + delta_y[dir];
     pnormalize(&x, &y, rplane(r));
     result = rfindhash(x, y);
-#ifdef FAST_CONNECT
     if (result) {
         rmodify->connect[dir] = result;
         result->connect[back[dir]] = rmodify;
     }
-#endif
     return result;
 }
 
@@ -974,7 +967,7 @@ void free_regions(void)
  */
 static char *makename(void)
 {
-    int s, v, k, e, p = 0, x = 0;
+    int s, k, e, p = 0, x = 0;
     size_t nk, ne, nv, ns;
     static char name[16];
     const char *kons = "bcdfghklmnprstvwz",
@@ -990,6 +983,7 @@ static char *makename(void)
     ns = strlen(start);
 
     for (s = rng_int() % 3 + 2; s > 0; s--) {
+        int v;
         if (x > 0) {
             k = rng_int() % (int)nk;
             name[p] = kons[k];
@@ -1208,12 +1202,17 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
 
     if (oldterrain == NULL || terrain->size != oldterrain->size) {
+        static int changed;
+        static const terrain_type *t_plain;
         int horses = 0, trees = 0;
+        if (terrain_changed(&changed)) {
+            t_plain = get_terrain(terrainnames[T_PLAIN]);
+        }
         if (terrain->size>0) {
             horses = rng_int() % (terrain->size / 50);
             trees = terrain->size * (30 + rng_int() % 40) / 1000;
         }
-        if (terrain == newterrain(T_PLAIN)) {
+        if (t_plain && terrain == t_plain) {
             rsethorses(r, horses);
             if (chance(0.4)) {
                 rsettrees(r, 2, trees);

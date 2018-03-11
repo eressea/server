@@ -90,11 +90,7 @@ extern "C" {
 #define TWIDTH  2               /* width of tile */
 #define THEIGHT 1               /* height of tile */
 
-#ifdef WIN32
-#define wxborder(win) wborder(win, 0, 0, 0, 0, 0, 0, 0, 0)
-#else
-#define wxborder(win) wborder(win, '|', '|', '-', '-', '+', '+', '+', '+')
-#endif
+int wxborder(WINDOW *win);
 
 #ifdef __cplusplus
 }

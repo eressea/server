@@ -53,7 +53,7 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_game(&data);
     free_gamedata();
-    f = f2 = NULL;
+    f = NULL;
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
     mstream_done(&data.strm);

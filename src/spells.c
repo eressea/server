@@ -838,7 +838,7 @@ static int sp_magicstreet(castorder * co)
     /* melden, 1x pro Partei */
     {
         message *seen = msg_message("path_effect", "mage region", mage, r);
-        message *unseen = msg_message("path_effect", "mage region", NULL, r);
+        message *unseen = msg_message("path_effect", "mage region", (unit *)NULL, r);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -895,7 +895,7 @@ static int sp_summonent(castorder * co)
     /* melden, 1x pro Partei */
     {
         message *seen = msg_message("ent_effect", "mage amount", mage, ents);
-        message *unseen = msg_message("ent_effect", "mage amount", NULL, ents);
+        message *unseen = msg_message("ent_effect", "mage amount", (unit *)NULL, ents);
         report_effect(r, mage, seen, unseen);
         msg_release(unseen);
         msg_release(seen);
@@ -989,7 +989,7 @@ static int sp_maelstrom(castorder * co)
     /* melden, 1x pro Partei */
     if (c) {
         message *seen = msg_message("maelstrom_effect", "mage", mage);
-        message *unseen = msg_message("maelstrom_effect", "mage", NULL);
+        message *unseen = msg_message("maelstrom_effect", "mage", (unit *)NULL);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -1033,7 +1033,7 @@ static int sp_mallorn(castorder * co)
     /* melden, 1x pro Partei */
     {
         message *seen = msg_message("mallorn_effect", "mage", mage);
-        message *unseen = msg_message("mallorn_effect", "mage", NULL);
+        message *unseen = msg_message("mallorn_effect", "mage", (unit *)NULL);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -1068,7 +1068,7 @@ static int sp_blessedharvest(castorder * co)
         duration, 1.0, 0)) {
         const char * effect = co->sp->sname[0]=='b' ? "harvest_effect" : "raindance_effect";
         message *seen = msg_message(effect, "mage", mage);
-        message *unseen = msg_message(effect, "mage", NULL);
+        message *unseen = msg_message(effect, "mage", (unit *)NULL);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -1114,7 +1114,7 @@ static int sp_hain(castorder * co)
     {
         message *seen = msg_message("growtree_effect", "mage amount", mage, trees);
         message *unseen =
-            msg_message("growtree_effect", "mage amount", NULL, trees);
+            msg_message("growtree_effect", "mage amount", (unit *)NULL, trees);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -1160,7 +1160,7 @@ static int sp_mallornhain(castorder * co)
     {
         message *seen = msg_message("growtree_effect", "mage amount", mage, trees);
         message *unseen =
-            msg_message("growtree_effect", "mage amount", NULL, trees);
+            msg_message("growtree_effect", "mage amount", (unit *)NULL, trees);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -1883,10 +1883,9 @@ static int sp_treewalkexit(castorder * co)
     rt = pa->param[0]->data.r;
     tax = rt->x;
     tay = rt->y;
-    rt = NULL;
 
     rl = astralregions(r, inhabitable);
-    rt = 0;
+    rt = NULL;
 
     rl2 = rl;
     while (rl2) {
@@ -1991,7 +1990,6 @@ static int sp_treewalkexit(castorder * co)
  */
 static int sp_holyground(castorder * co)
 {
-    const curse_type *ctype = NULL;
     region *r = co_get_region(co);
     unit *mage = co->magician.u;
     int cast_level = co->level;
@@ -2000,8 +1998,7 @@ static int sp_holyground(castorder * co)
     report_spell(mage, r, msg);
     msg_release(msg);
 
-    ctype = &ct_holyground;
-    create_curse(mage, &r->attribs, ctype, power * power, 1, zero_effect, 0);
+    create_curse(mage, &r->attribs, &ct_holyground, power * power, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
 
@@ -2675,7 +2672,7 @@ static int sp_firewall(castorder * co)
     /* melden, 1x pro Partei */
     {
         message *seen = msg_message("firewall_effect", "mage region", mage, r);
-        message *unseen = msg_message("firewall_effect", "mage region", NULL, r);
+        message *unseen = msg_message("firewall_effect", "mage region", (unit *)NULL, r);
         report_effect(r, mage, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
@@ -4368,7 +4365,7 @@ int sp_puttorest(castorder * co)
     int dead = deathcount(r);
     int laid_to_rest = dice((int)(co->force * 2), 100);
     message *seen = msg_message("puttorest", "mage", mage);
-    message *unseen = msg_message("puttorest", "mage", NULL);
+    message *unseen = msg_message("puttorest", "mage", (unit *)NULL);
 
     if (laid_to_rest < dead) laid_to_rest = dead;
 
@@ -6445,7 +6442,7 @@ static spelldata spell_functions[] = {
     { "illaundestroymagic", sp_destroy_magic, 0 },
     { "clone", sp_clonecopy, 0 },
     { "bad_dreams", sp_baddreams, 0 },
-    { "mindblast", sp_mindblast_temp, 0 },
+    { "mindblast", sp_mindblast, 0 },
     { "orkdream", sp_sweetdreams, 0 },
     /* M_CERDDOR */
     { "appeasement", sp_appeasement, 0 },

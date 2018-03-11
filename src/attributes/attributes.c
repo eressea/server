@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
-#include "moved.h"
+#include "magic.h"
 #include "movement.h"
 #include "dict.h"
 #include "otherfaction.h"
@@ -212,6 +212,7 @@ void register_attributes(void)
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */
+    at_deprecate("moved", a_readint);
     at_deprecate("gm", a_readint);
     at_deprecate("guard", a_readint); /* used to contain guard-flags (v3.10.0-259-g8597e8b) */
     at_register(&at_stealth);
@@ -231,5 +232,4 @@ void register_attributes(void)
     at_register(&at_racename);
     at_register(&at_speedup);
     at_register(&at_movement);
-    at_register(&at_moved);
 }
