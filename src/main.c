@@ -257,7 +257,7 @@ static int parse_args(int argc, char **argv)
     return 0;
 }
 
-#if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
+#if defined(HAVE_BACKTRACE)
 #include <execinfo.h>
 #include <signal.h>
 
