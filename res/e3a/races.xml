@@ -4,6 +4,10 @@
 
   <!-- begin main races -->
 
+  <race name="template" maintenance="0" magres="100" maxaura="0.000000" regaura="0.000000" weight="0" capacity="1000" speed="10.000000" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" shapeshiftany="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
+    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <attack type="1" damage="1d4"/>
+  </race>
   <race name="lynx" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" getitem="yes">
     <ai splitsize="99999"/>
     <skill name="crossbow" modifier="-99"/>

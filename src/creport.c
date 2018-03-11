@@ -1515,7 +1515,7 @@ static void report_itemtype(FILE *F, faction *f, const item_type *itype) {
     const char *ch;
     const char *description = NULL;
     const char *pname = resourcename(itype->rtype, 0);
-    const char *potiontext = mkname("potion", pname);
+    const char *potiontext = mkname("describe", pname);
     
     ch = resourcename(itype->rtype, 0);
     fprintf(F, "TRANK %d\n", str_hash(ch));
