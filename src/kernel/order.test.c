@@ -335,7 +335,7 @@ static void test_study_orders(CuTest *tc) {
     test_teardown();
 }
 
-static void test_stream_order(CuTest *tc) {
+static void test_study_order(CuTest *tc) {
     char token[32];
     stream out;
     unit *u;
@@ -352,6 +352,8 @@ static void test_stream_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, skillname(SK_ALCHEMY, lang), gettoken(token, sizeof(token)));
 
+    CuAssertStrEquals(tc, "LERNE Alchemie", get_command(u->thisorder, lang, token, sizeof(token)));
+
     mstream_init(&out);
     stream_order(&out, u->thisorder, lang, true);
     swrite("\n", 1, 1, &out);
@@ -363,7 +365,7 @@ static void test_stream_order(CuTest *tc) {
     test_teardown();
 }
 
-static void test_stream_order_quoted(CuTest *tc) {
+static void test_study_order_quoted(CuTest *tc) {
     char token[32];
     stream out;
     unit *u;
@@ -379,6 +381,8 @@ static void test_stream_order_quoted(CuTest *tc) {
     u->thisorder = create_order(K_STUDY, lang, "Waffenloser~Kampf");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, skillname(SK_WEAPONLESS, lang), gettoken(token, sizeof(token)));
+
+    CuAssertStrEquals(tc, "LERNE 'Waffenloser Kampf'", get_command(u->thisorder, lang, token, sizeof(token)));
 
     mstream_init(&out);
     stream_order(&out, u->thisorder, lang, true);
@@ -396,8 +400,8 @@ CuSuite *get_order_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_create_order);
     SUITE_ADD_TEST(suite, test_study_orders);
-    SUITE_ADD_TEST(suite, test_stream_order);
-    SUITE_ADD_TEST(suite, test_stream_order_quoted);
+    SUITE_ADD_TEST(suite, test_study_order);
+    SUITE_ADD_TEST(suite, test_study_order_quoted);
     SUITE_ADD_TEST(suite, test_parse_order);
     SUITE_ADD_TEST(suite, test_parse_make);
     SUITE_ADD_TEST(suite, test_parse_make_temp);
