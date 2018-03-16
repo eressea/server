@@ -67,8 +67,6 @@ keyword_t getkeyword(const order * ord)
  * keywords are expanded to their full length.
  */
 char* get_command(const order *ord, const struct locale *lang, char *sbuffer, size_t size) {
-    order_data *od = NULL;
-    const char * text;
     keyword_t kwd = ORD_KEYWORD(ord);
     sbstring sbs;
 
@@ -80,27 +78,34 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         sbs_strcat(&sbs, "@");
     }
 
-    if (ord->id < 0) {
-        skill_t sk = (skill_t)(100+ord->id);
-        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
-        text = skillname(sk, lang);
-    } else {
-        od = odata_load(ord->id);
-        text = OD_STRING(od);
-    }
     if (kwd != NOKEYWORD) {
         const char *str = (const char *)LOC(lang, keyword(kwd));
         assert(str);
         sbs_strcat(&sbs, str);
-        if (text) {
-            sbs_strcat(&sbs, " ");
+        if (ord->id < 0) {
+            skill_t sk = (skill_t)(100+ord->id);
+            assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+            str = skillname(sk, lang);
+            if (str) {
+                if (strchr(str, ' ') == NULL) {
+                    sbs_strcat(&sbs, " ");
+                    sbs_strcat(&sbs, str);
+                } 
+                else {
+                    sbs_strcat(&sbs, " '");
+                    sbs_strcat(&sbs, str);
+                    sbs_strcat(&sbs, "'");
+                }
+            }
+        } else {
+            order_data *od = odata_load(ord->id);
+            str = OD_STRING(od);
+            if (str) {
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, str);
+            }
+            odata_release(od);
         }
-    }
-    if (text) {
-        sbs_strcat(&sbs, text);
-    }
-    if (od) {
-        odata_release(od);
     }
     return sbuffer;
 }
@@ -118,30 +123,38 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         swrite("@", 1, 1, out);
     }
 
-    if (ord->id < 0) {
-        skill_t sk = (skill_t)(100 + ord->id);
-        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
-        text = skillname(sk, lang);
-    }
-    else {
-        od = odata_load(ord->id);
-        text = OD_STRING(od);
-    }
     if (kwd != NOKEYWORD) {
         const char *str = (const char *)LOC(lang, keyword(kwd));
         assert(str);
         swrite(str, 1, strlen(str), out);
     }
 
-    if (text) {
-        char obuf[1024];
-        swrite(" ", 1, 1, out);
-        if (escape) {
-            text = str_escape(text, obuf, sizeof(obuf));
+    if (ord->id < 0) {
+        skill_t sk = (skill_t)(100 + ord->id);
+
+        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+        text = skillname(sk, lang);
+        if (strchr(text, ' ') != NULL) {
+            swrite(" '", 1, 2, out);
+            swrite(text, 1, strlen(text), out);
+            swrite("'", 1, 1, out);
         }
-        swrite(text, 1, strlen(text), out);
+        else {
+            swrite(" ", 1, 1, out);
+            swrite(text, 1, strlen(text), out);
+        }
     }
-    if (od) {
+    else {
+        od = odata_load(ord->id);
+        text = OD_STRING(od);
+        if (text) {
+            char obuf[1024];
+            swrite(" ", 1, 1, out);
+            if (escape) {
+                text = str_escape(text, obuf, sizeof(obuf));
+            }
+            swrite(text, 1, strlen(text), out);
+        }
         odata_release(od);
     }
 
@@ -514,11 +527,27 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
             parser_od = NULL;
         }
         if (ord->id < 0) {
+            const char *str;
             skill_t sk = (skill_t)(100 + ord->id);
+
             assert(sk < MAXSKILLS);
             assert(lang);
             assert(kwd == K_STUDY);
-            init_tokens_str(skillname(sk, lang));
+            str = skillname(sk, lang);
+            if (strchr(str, ' ') == NULL) {
+                init_tokens_str(str);
+            }
+            else {
+                char token[32], *dup;
+                size_t len = strlen(str);
+                assert(len + 3 < sizeof(token));
+                token[0] = '\'';
+                memcpy(token + 1, str, len);
+                token[len + 1] = '\'';
+                token[len + 2] = '\0';
+                dup = str_strdup(token);
+                init_tokens_ex(dup, dup, free);
+            }
         }
         else {
             const char *str;
