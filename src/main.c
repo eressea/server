@@ -280,7 +280,7 @@ static int setup_signal_handler(void)
 {
     struct sigaction act;
 
-    act.sa_flags = SA_ONESHOT | SA_SIGINFO;
+    act.sa_flags = SA_RESETHAND | SA_SIGINFO;
     act.sa_sigaction = report_segfault;
     sigfillset(&act.sa_mask);
     return sigaction(SIGSEGV, &act, NULL);
