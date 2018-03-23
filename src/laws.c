@@ -141,7 +141,15 @@ bool IsImmune(const faction * f)
 
 int NMRTimeout(void)
 {
-    return config_get_int("nmr.timeout", 0);
+    int nmr_timeout = config_get_int("nmr.timeout", 0);
+    int ini_timeout = config_get_int("game.maxnmr", 0);
+    if (nmr_timeout > 0) {
+        if (ini_timeout > nmr_timeout) {
+            return nmr_timeout;
+        }
+        return (ini_timeout > 0) ? ini_timeout : nmr_timeout;
+    }
+    return ini_timeout;
 }
 
 bool LongHunger(const struct unit *u)

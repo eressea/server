@@ -13,9 +13,13 @@ include(MSVC)
 set (HAVE_STRDUP 0)
 set (HAVE_STRLCAT 0)
 set (HAVE_LIBBSD 0)
+set (HAVE_SIGNAL_H 0)
+set (HAVE_EXECINFO_H 0)
 else (MSVC)
 
 INCLUDE (CheckIncludeFile)
+CHECK_INCLUDE_FILE(signal.h HAVE_SIGNAL_H)
+CHECK_INCLUDE_FILE(execinfo.h HAVE_EXECINFO_H)
 CHECK_INCLUDE_FILE(bsd/string.h HAVE_LIBBSD)
 
 INCLUDE (CheckFunctionExists)

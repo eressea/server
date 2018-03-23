@@ -1745,6 +1745,20 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+static void test_nmr_timeout(CuTest *tc) {
+    test_setup();
+    CuAssertIntEquals(tc, 0, NMRTimeout());
+    config_set_int("nmr.timeout", 5);
+    CuAssertIntEquals(tc, 5, NMRTimeout());
+    config_set_int("game.maxnmr", 4);
+    CuAssertIntEquals(tc, 4, NMRTimeout());
+    config_set("nmr.timeout", NULL);
+    CuAssertIntEquals(tc, 4, NMRTimeout());
+    config_set("game.maxnmr", NULL);
+    CuAssertIntEquals(tc, 0, NMRTimeout());
+    test_teardown();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1816,6 +1830,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee);
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
+    SUITE_ADD_TEST(suite, test_nmr_timeout);
 
     return suite;
 }

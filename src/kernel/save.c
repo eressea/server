@@ -1418,7 +1418,7 @@ int read_game(gamedata *data)
     read_attribs(data, &global.attribs, NULL);
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
-    rng_init(turn);
+    rng_init(turn + config_get_int("game.seed", 0));
     READ_INT(store, NULL);          /* max_unique_id = ignore */
     READ_INT(store, &nextborder);
 
