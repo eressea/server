@@ -173,6 +173,9 @@ static order *monster_attack(unit * u, const unit * target)
     if (monster_is_waiting(u))
         return NULL;
 
+    if (u->region->land) {
+        assert(u->region->flags & RF_GUARDED);
+    }
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
@@ -747,7 +750,14 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool attacking = chance(attack_chance);
+        bool attacking = false;
+        /* Tiny optimization: Monsters on land only attack randomly when
+        * they are guarding. If nobody is guarding this region (RF_GUARDED),
+        * there can't be any random attacks.
+        */
+        if (!r->land || r->flags & RF_GUARDED) {
+            attacking = chance(attack_chance);
+        }
 
         for (u = r->units; u; u = u->next) {
             const race *rc = u_race(u);
@@ -768,8 +778,7 @@ void plan_monsters(faction * f)
             if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, false);
             }
-
-            /* units with a plan to kill get ATTACK orders: */
+            /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
@@ -780,15 +789,15 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (tu) {
-                    tu = findunit(ta->data.i);
-                    if (tu != NULL) {
-                        long_order = make_movement_order(u, tu->region, 2, allowed_walk);
+                    bool(*allowed)(const struct region * src, const struct region * r) = allowed_walk;
+                    if (canfly(u)) {
+                        allowed = allowed_fly;
                     }
+                    long_order = make_movement_order(u, tu->region, 2, allowed);
                 }
                 else
                     a_remove(&u->attribs, ta);
             }
-
             /* All monsters guard the region: */
             if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
                 addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
