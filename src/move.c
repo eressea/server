@@ -1131,6 +1131,30 @@ order * cycle_route(order * ord, const struct locale *lang, int gereist)
     return norder;
 }
 
+order * make_movement_order(const struct locale *lang, direction_t steps[], int length)
+{
+    char zOrder[128], *bufp = zOrder;
+    size_t size = sizeof(zOrder) - 1;
+    int i;
+
+    for (i = 0; i != length; ++i) {
+        int bytes;
+        direction_t dir = steps[i];
+        if (size > 1 && bufp != zOrder) {
+            *bufp++ = ' ';
+            --size;
+        }
+        bytes =
+            (int)str_strlcpy(bufp,
+            (const char *)LOC(lang, directions[dir]), size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
+    }
+
+    *bufp = 0;
+    return create_order(K_MOVE, lang, zOrder);
+}
+
 static bool transport(unit * ut, unit * u)
 {
     order *ord;
