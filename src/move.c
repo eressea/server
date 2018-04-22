@@ -1052,7 +1052,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
 }
 
-static void cycle_route(order * ord, unit * u, int gereist)
+order * cycle_route(order * ord, const struct locale *lang, int gereist)
 {
     int cm = 0;
     char tail[1024], *bufp = tail;
@@ -1067,11 +1067,10 @@ static void cycle_route(order * ord, unit * u, int gereist)
     assert(getkeyword(ord) == K_ROUTE);
     tail[0] = '\0';
     neworder[0] = '\0';
-    init_order(ord, u->faction->locale);
+    init_order(ord, lang);
 
     for (cm = 0;; ++cm) {
         const char *s;
-        const struct locale *lang = u->faction->locale;
         pause = false;
         s = gettoken(token, sizeof(token));
         if (s && *s) {
@@ -1087,7 +1086,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
             break;
         }
         if (cm < gereist) {
-            /* hier sollte keine PAUSE auftreten */
+            /* TODO: hier sollte keine PAUSE auftreten */
             assert(!pause);
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
@@ -1124,13 +1123,12 @@ static void cycle_route(order * ord, unit * u, int gereist)
     }
 
     if (neworder[0]) {
-        norder = create_order(K_ROUTE, u->faction->locale, "%s %s", neworder, tail);
+        norder = create_order(K_ROUTE, lang, "%s %s", neworder, tail);
     }
     else {
-        norder = create_order(K_ROUTE, u->faction->locale, "%s", tail);
+        norder = create_order(K_ROUTE, lang, "%s", tail);
     }
-    replace_order(&u->orders, ord, norder);
-    free_order(norder);
+    return norder;
 }
 
 static bool transport(unit * ut, unit * u)
@@ -1605,7 +1603,9 @@ static const region_list *travel_route(unit * u,
 
         setguard(u, false);
         if (getkeyword(ord) == K_ROUTE) {
-            cycle_route(ord, u, steps);
+            order * norder = cycle_route(ord, u->faction->locale, steps);
+            replace_order(&u->orders, ord, norder);
+            free_order(norder);
         }
 
         if (mode == TRAVEL_RUNNING) {
@@ -1937,7 +1937,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
         if (getkeyword(ord) == K_ROUTE) {
-            cycle_route(ord, u, step);
+            order * norder = cycle_route(ord, u->faction->locale, step);
+            replace_order(&u->orders, ord, norder);
+            free_order(norder);
         }
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);

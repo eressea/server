@@ -26,12 +26,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    struct unit;
+    struct attrib_type;
+    struct building_type;
+    struct locale;
+    struct order;
     struct region;
     struct region_list;
     struct ship;
-    struct building_type;
-    struct order;
+    struct unit;
 
     extern struct attrib_type at_shiptrail;
     extern int *storms;
@@ -95,6 +97,7 @@ extern "C" {
 
     int check_ship_allowed(struct ship *sh, const struct region * r);
     direction_t drift_target(struct ship *sh);
+    struct order * cycle_route(struct order * ord, const struct locale *lang, int gereist);
 #ifdef __cplusplus
 }
 #endif

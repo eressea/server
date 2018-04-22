@@ -3548,7 +3548,7 @@ enum {
     PROC_LONGORDER = 1 << 1
 };
 
-typedef enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
+typedef enum processor_t { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
 
 typedef struct processor {
     struct processor *next;

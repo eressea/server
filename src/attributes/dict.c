@@ -43,7 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-typedef enum {
+typedef enum dict_type {
     TNONE = 0, TINTEGER = 1, TREAL = 2
 } dict_type;
 
