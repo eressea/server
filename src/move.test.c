@@ -654,6 +654,26 @@ static void test_movement_speed_dragon(CuTest *tc) {
     test_teardown();
 }
 
+static void test_make_movement_order(CuTest *tc) {
+    order *ord;
+    char buffer[32];
+    struct locale *lang;
+    direction_t steps[] = { D_EAST, D_WEST, D_EAST, D_WEST };
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = make_movement_order(lang, steps, 2);
+    CuAssertStrEquals(tc, "move east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    ord = make_movement_order(lang, steps, 4);
+    CuAssertStrEquals(tc, "move east west east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -684,5 +704,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_route_cycle);
     SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);
+    SUITE_ADD_TEST(suite, test_make_movement_order);
     return suite;
 }
