@@ -1,7 +1,41 @@
 #include "exparse.h"
 
+#include "util/log.h"
+
 #include <expat.h>
 
 int exparse_readfile(const char * filename) {
-    return 1;
+    XML_Parser xp;
+    FILE *F;
+    int err = 1;
+    char buf[4096];
+
+    F = fopen(filename, "r");
+    if (!F) {
+        return 2;
+    }
+    xp = XML_ParserCreate("UTF-8");
+    for (;;) {
+        size_t len = (int) fread(buf, 1, sizeof(buf), F);
+        int done;
+        
+        if (ferror(F)) {
+            log_error("read error in %s", filename);
+            return -1;
+        }
+        done = feof(F);
+        if (XML_Parse(xp, buf, len, done) == XML_STATUS_ERROR) {
+            log_error("parse error at line %u of %s: %s", 
+                    XML_GetCurrentLineNumber(xp),
+                    filename,
+                    XML_ErrorString(XML_GetErrorCode(xp)));
+            return -1;
+        }
+        if (done) {
+            break;
+        }
+    }
+    XML_ParserFree(xp);
+    fclose(F);
+    return err;
 }
