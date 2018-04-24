@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#include <platform.h>
+#endif
 #include "exparse.h"
 
 #include "util/log.h"
@@ -21,7 +24,8 @@ int exparse_readfile(const char * filename) {
         
         if (ferror(F)) {
             log_error("read error in %s", filename);
-            return -1;
+            err = -2;
+            break;
         }
         done = feof(F);
         if (XML_Parse(xp, buf, len, done) == XML_STATUS_ERROR) {
@@ -29,7 +33,8 @@ int exparse_readfile(const char * filename) {
                     XML_GetCurrentLineNumber(xp),
                     filename,
                     XML_ErrorString(XML_GetErrorCode(xp)));
-            return -1;
+            err = -1;
+            break;
         }
         if (done) {
             break;
