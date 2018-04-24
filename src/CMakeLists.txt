@@ -139,6 +139,11 @@ set (ERESSEA_SRC
   ${UTIL_SRC}
 )
 
+IF(EXPAT_FOUND)
+set (ERESSEA_SRC ${ERESSEA_SRC} exparse.c)
+ENDIF(EXPAT_FOUND)
+
+
 set(SERVER_SRC
   main.c
   console.c
@@ -308,6 +313,14 @@ include_directories (${CURSES_INCLUDE_DIR})
 target_link_libraries(eressea ${CURSES_LIBRARIES})
 add_definitions(-DUSE_CURSES)
 endif(CURSES_FOUND)
+
+if (EXPAT_FOUND)
+include_directories (${EXPAT_INCLUDE_DIRS})
+target_link_libraries(eressea ${EXPAT_LIBRARIES})
+target_link_libraries(convert ${EXPAT_LIBRARIES})
+target_link_libraries(test_eressea ${EXPAT_LIBRARIES})
+add_definitions(-DUSE_EXPAT)
+endif (EXPAT_FOUND)
 
 if (LIBXML2_FOUND)
 include_directories (${LIBXML2_INCLUDE_DIR})

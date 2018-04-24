@@ -50,6 +50,7 @@ else()
 find_package (SQLite3 REQUIRED QUIET)
 endif()
 
+find_package(EXPAT)
 find_package (LibXml2 REQUIRED)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
