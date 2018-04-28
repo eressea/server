@@ -159,9 +159,9 @@ extern "C" {
         const item_type *itype;
         unsigned int flags;
         double penalty;
+        double projectile; /* chance, dass ein projektil abprallt */
         variant magres;
         int prot;
-        float projectile;           /* chance, dass ein projektil abprallt */
     } armor_type;
 
 #define WTF_NONE          0x00

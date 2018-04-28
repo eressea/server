@@ -66,6 +66,10 @@ static int xml_int(const XML_Char *val) {
     return atoi((const char *)val);
 }
 
+static double xml_float(const XML_Char *val) {
+    return atof((const char *)val);
+}
+
 static variant xml_fraction(const XML_Char *val) {
     int num, den = 100;
     double fval = atof((const char *)val);
@@ -176,6 +180,32 @@ static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr)
     itype->flags = flags;
 }
 
+static void handle_armor(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+    const char *flag_names[] = { "shield", "laen", NULL };
+    resource_type *rtype = (resource_type *)ud->object;
+    item_type * itype = rtype->itype;
+    armor_type *atype = new_armortype(itype, 0.0, frac_zero, 0, 0);
+    int i, flags = 0;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "penalty") == 0) {
+            atype->penalty = xml_float(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "projectile") == 0) {
+            atype->projectile = xml_float(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "ac") == 0) {
+            atype->prot = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "magres") == 0) {
+            atype->magres = xml_fraction(attr[i + 1]);
+        }
+        else if (!handle_flag(&flags, attr + i, flag_names)) {
+            handle_bad_input(ud, el, attr[i]);
+        }
+    }
+    atype->flags = flags;
+}
+
 static void handle_weapon(userdata *ud, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "missile", "magical", "pierce", "cut", "bash", "siege", "armorpiercing", "horse", "useshield", NULL };
     resource_type *rtype = (resource_type *)ud->object;
@@ -254,8 +284,7 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
                 /* TODO */
             }
             else if (xml_strcmp(el, "armor") == 0) {
-                /* TODO */
-                rtype->atype = new_armortype(itype, 0.0, frac_zero, 0, 0);
+                handle_armor(ud, el, attr);
             }
             else if (xml_strcmp(el, "weapon") == 0) {
                 handle_weapon(ud, el, attr);
