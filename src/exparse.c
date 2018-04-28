@@ -235,7 +235,11 @@ static void handle_weapon(userdata *ud, const XML_Char *el, const XML_Char **att
     wtype->flags = flags;
 }
 
-static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+#define MAX_REQUIREMENTS 8
+static requirement reqs[MAX_REQUIREMENTS];
+static int nreqs;
+
+static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)ud->object;
     if (xml_strcmp(el, "resource") == 0) {
         handle_resource(ud, el, attr);
@@ -273,11 +277,23 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
                     }
                 }
                 itype->construction = con;
+                nreqs = 0;
             }
             else if (xml_strcmp(el, "requirement") == 0) {
+                requirement *req;
+                int i;
                 assert(itype->construction);
-                /* TODO */
-                ++ud->errors;
+                assert(nreqs < MAX_REQUIREMENTS);
+                req = reqs + nreqs;
+                for (i = 0; attr[i]; i += 2) {
+                    if (xml_strcmp(attr[i], "type") == 0) {
+                        req->rtype = rt_get_or_create((const char *)attr[i + 1]);
+                    }
+                    else if (xml_strcmp(attr[i], "quantity") == 0) {
+                        req->number = xml_int(attr[i + 1]);
+                    }
+                }
+                ++nreqs;
             }
             else if (xml_strcmp(el, "luxury") == 0) {
                 rtype->ltype = new_luxurytype(itype, 0);
@@ -359,7 +375,7 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
     else {
         switch (ud->type) {
         case EXP_RESOURCES:
-            handle_resources(ud, el, attr);
+            start_resources(ud, el, attr);
             break;
         default:
             /* not implemented */
@@ -369,14 +385,32 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
     ++ud->depth;
 }
 
+static void end_resources(userdata *ud, const XML_Char *el) {
+    resource_type *rtype = (resource_type *)ud->object;
+    if (xml_strcmp(el, "construction") == 0) {
+        if (nreqs > 0) {
+            construction *con = rtype->itype->construction;
+            con->materials = calloc(sizeof(requirement), nreqs + 1);
+            memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
+            nreqs = 0;
+        }
+    }
+}
+
 static void XMLCALL handle_end(void *data, const XML_Char *el) {
     userdata *ud = (userdata *)data;
-    --ud->depth;
-    if (ud->cdata) {
-        free(ud->cdata);
-        ud->cdata = NULL;
-        ud->clength = 0;
+
+    if (ud->type == EXP_RESOURCES) {
+        end_resources(ud, el);
     }
+    else {
+        if (ud->cdata) {
+            free(ud->cdata);
+            ud->cdata = NULL;
+            ud->clength = 0;
+        }
+    }
+    --ud->depth;
     if (ud->depth == 0) {
         ud->type = EXP_UNKNOWN;
     }
