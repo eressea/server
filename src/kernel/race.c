@@ -574,3 +574,20 @@ struct race * read_race_reference(struct storage *store)
 void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
 }
+
+static int race_mask = 1;
+
+int rc_mask(char *list) {
+    int mask = 0;
+    char * tok = strtok(list, " ,");
+    while (tok) {
+        race * rc = rc_get_or_create(tok);
+        if (!rc->mask_item) {
+            rc->mask_item = race_mask;
+            race_mask = race_mask << 1;
+        }
+        mask |= rc->mask_item;
+        tok = strtok(NULL, " ,");
+    }
+    return mask;
+}

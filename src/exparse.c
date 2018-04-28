@@ -5,6 +5,7 @@
 
 #include "kernel/build.h"
 #include "kernel/item.h"
+#include "kernel/race.h"
 #include "kernel/resources.h"
 
 #include "util/log.h"
@@ -156,6 +157,7 @@ static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr)
         itype = it_get_or_create(rtype);
     }
     for (i = 0; attr[i]; i += 2) {
+        char buffer[64];
         if (xml_strcmp(attr[i], "weight") == 0) {
             itype->weight = xml_int(attr[i + 1]);
         }
@@ -164,6 +166,18 @@ static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr)
         }
         else if (xml_strcmp(attr[i], "score") == 0) {
             itype->score = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "allow") == 0) {
+            size_t len = strlen(attr[i + 1]);
+            assert(len < sizeof(buffer));
+            memcpy(buffer, attr[i + 1], len + 1);
+            itype->mask_allow = rc_mask(buffer);
+        }
+        else if (xml_strcmp(attr[i], "deny") == 0) {
+            size_t len = strlen(attr[i + 1]);
+            assert(len < sizeof(buffer));
+            memcpy(buffer, attr[i + 1], len + 1);
+            itype->mask_deny = rc_mask(buffer);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
             handle_bad_input(ud, el, attr[i]);

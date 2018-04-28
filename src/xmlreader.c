@@ -667,23 +667,12 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     return wtype;
 }
 
-static int race_mask = 1;
-
 static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
     int mask = 0;
     assert(maskp);
     if (propValue) {
-        char * tok = strtok((char *)propValue, " ,");
-        while (tok) {
-            race * rc = rc_get_or_create(tok);
-            if (!rc->mask_item) {
-                rc->mask_item = race_mask;
-                race_mask = race_mask << 1;
-            }
-            mask |= rc->mask_item;
-            tok = strtok(NULL, " ,");
-        }
+        mask = rc_mask((char *)propValue);
         xmlFree(propValue);
     }
     *maskp = mask;
