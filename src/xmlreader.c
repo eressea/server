@@ -654,9 +654,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         }
         assert(propValue != NULL);
         if (strcmp((const char *)propValue, "attack") == 0) {
-            wtype->attack =
-                (bool(*)(const struct troop *, const struct weapon_type *,
-                int *))fun;
+            wtype->attack = (wtype_attack)fun;
         }
         else {
             log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, itype->rtype->_name);

@@ -8,6 +8,7 @@
 #include "kernel/race.h"
 #include "kernel/resources.h"
 
+#include "util/functions.h"
 #include "util/log.h"
 #include "util/strings.h"
 
@@ -250,7 +251,35 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
             handle_item(ud, el, attr);
         }
         else if (xml_strcmp(el, "function") == 0) {
+            const XML_Char *name = NULL;
+            pf_generic fun = NULL;
+            int i;
+
+            for (i = 0; attr[i]; i += 2) {
+                if (xml_strcmp(attr[i], "name") == 0) {
+                    name = attr[i + 1];
+                }
+                else if (xml_strcmp(attr[i], "value") == 0) {
+                    fun = get_function((const char *)attr[i + 1]);
+                }
+                else {
+                    handle_bad_input(ud, el, attr[i]);
+                }
+            }
+
             assert(rtype);
+            if (name && fun) {
+                if (xml_strcmp(name, "change") == 0) {
+                    rtype->uchange = (rtype_uchange)fun;
+                }
+                else if (xml_strcmp(name, "name") == 0) {
+                    rtype->name = (rtype_name)fun;
+                }
+                else if (xml_strcmp(name, "attack") == 0) {
+                    assert(rtype->wtype);
+                    rtype->wtype->attack = (wtype_attack)fun;
+                }
+            }
             ++ud->errors;
             /* TODO */
         }

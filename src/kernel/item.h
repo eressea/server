@@ -40,6 +40,7 @@ extern "C" {
     struct gamedata;
     struct rawmaterial_type;
     struct resource_mod;
+    struct weapon_type;
 
     typedef struct item {
         struct item *next;
@@ -66,9 +67,12 @@ extern "C" {
 
     void item_done(void);
 
+    typedef bool(*wtype_attack)(const struct troop *,
+        const struct weapon_type *, int *);
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
+
     typedef struct resource_type {
         /* --- constants --- */
         char *_name;             /* wie es hei�t */
