@@ -686,7 +686,6 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     item_type *itype = NULL;
     unsigned int flags = ITF_NONE;
     xmlXPathObjectPtr result;
-    int k;
 
     if (xml_bvalue(node, "cursed", false))
         flags |= ITF_CURSED;
@@ -766,27 +765,8 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     }
     xmlXPathFreeObject(result);
 
-    /* reading item/function */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "function", xpath);
-    for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-        xmlNodePtr node = result->nodesetval->nodeTab[k];
-        xmlChar *propValue;
-        pf_generic fun;
-
-        parse_function(node, &fun, &propValue);
-        if (fun == NULL) {
-            log_error("unknown function name '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
-            xmlFree(propValue);
-            continue;
-        }
-        assert(propValue != NULL);
-        log_error("unknown function type '%s' for item '%s'\n", (const char *)propValue, rtype->_name);
-        xmlFree(propValue);
-    }
     itype->score = xml_ivalue(node, "score", 0);
     if (!itype->score) itype->score = default_score(itype);
-    xmlXPathFreeObject(result);
 
     return itype;
 }
@@ -872,11 +852,6 @@ static int parse_resources(xmlDocPtr doc)
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
             rtype->modifiers = xml_readmodifiers(result, node);
-            xmlXPathFreeObject(result);
-
-            /* reading eressea/resources/resource/resourcelimit/function */
-            xpath->node = node;
-            result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
             xmlXPathFreeObject(result);
 
             /* reading eressea/resources/resource/item */
