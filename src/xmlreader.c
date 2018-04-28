@@ -498,6 +498,10 @@ static void xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
 static luxury_type *xml_readluxury(xmlXPathContextPtr xpath, item_type * itype)
 {
     int price = xml_ivalue(xpath->node, "price", 0);
+    if (itype->rtype->ltype) {
+        itype->rtype->ltype->price = price;
+        return itype->rtype->ltype;
+    }
     return new_luxurytype(itype, price);
 }
 
