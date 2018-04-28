@@ -224,9 +224,10 @@ extern "C" {
     weapon_type *new_weapontype(item_type * itype, int wflags,
         variant magres, const char *damage[], int offmod, int defmod, int reload,
         skill_t sk);
+    void free_wtype(struct weapon_type *wtype);
     armor_type *new_armortype(item_type * itype, double penalty,
         variant magres, int prot, unsigned int flags);
-
+    void free_atype(struct armor_type *wtype);
     /* these constants are used with get_resourcetype.
      * The order of the enum is not important for stored data.
      * The resourcenames array must be updated to match.

@@ -916,7 +916,11 @@ static void free_itype(item_type *itype) {
     free(itype);
 }
 
-static void free_wtype(weapon_type *wtype) {
+void free_atype(armor_type *atype) {
+    free(atype);
+}
+
+void free_wtype(weapon_type *wtype) {
     assert(wtype);
     free(wtype->damage[0]);
     free(wtype->damage[1]);
@@ -931,7 +935,9 @@ void free_rtype(resource_type *rtype) {
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
-    free(rtype->atype);
+    if (rtype->atype) {
+        free_atype(rtype->atype);
+    }
     free(rtype->modifiers);
     free(rtype->raw);
     free(rtype->_name);

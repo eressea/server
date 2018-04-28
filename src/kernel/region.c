@@ -971,16 +971,16 @@ static char *makename(void)
     size_t nk, ne, nv, ns;
     static char name[16];
     const char *kons = "bcdfghklmnprstvwz",
-        *start = "bcdgtskpvfr",
-        *end = "nlrdst",
+        *handle_start = "bcdgtskpvfr",
+        *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
     /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
 
     nk = strlen(kons);
-    ne = strlen(end);
+    ne = strlen(handle_end);
     nv = strlen(vowels);
-    ns = strlen(start);
+    ns = strlen(handle_start);
 
     for (s = rng_int() % 3 + 2; s > 0; s--) {
         int v;
@@ -991,7 +991,7 @@ static char *makename(void)
         }
         else {
             k = rng_int() % (int)ns;
-            name[p] = start[k];
+            name[p] = handle_start[k];
             p++;
         }
         v = rng_int() % (int)nv;
@@ -999,7 +999,7 @@ static char *makename(void)
         p++;
         if (rng_int() % 3 == 2 || s == 1) {
             e = rng_int() % (int)ne;
-            name[p] = end[e];
+            name[p] = handle_end[e];
             p++;
             x = 1;
         }

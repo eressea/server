@@ -559,8 +559,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     assert(sk != NOSKILL);
     xmlFree(propValue);
 
-    wtype =
-        new_weapontype(itype, flags, magres, NULL, offmod, defmod, reload, sk);
+    wtype = new_weapontype(itype, flags, magres, NULL, offmod, defmod, reload, sk);
 
     /* reading weapon/damage */
     xpath->node = node;
@@ -712,7 +711,14 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
         flags |= ITF_ANIMAL;
     if (xml_bvalue(node, "vehicle", false))
         flags |= ITF_VEHICLE;
+
     itype = rtype->itype ? rtype->itype : it_get_or_create(rtype);
+    /* exparse: recreate child data. */
+    if (itype->construction) {
+        free_construction(itype->construction);
+        itype->construction = NULL;
+    }
+
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
     mask_races(node, "allow", &itype->mask_allow);
@@ -823,7 +829,18 @@ static int parse_resources(xmlDocPtr doc)
                 log_error("invalid resource %d has no name", i);
                 continue;
             }
+
             rtype = rt_get_or_create((const char *)name);
+            /* exparse: recreate child data. */
+            if (rtype->atype) {
+                free_atype(rtype->atype);
+                rtype->atype = NULL;
+            }
+            if (rtype->wtype) {
+                free_wtype(rtype->wtype);
+                rtype->wtype = NULL;
+            }
+
             rtype->flags |= flags;
             xmlFree(name);
 
@@ -858,10 +875,6 @@ static int parse_resources(xmlDocPtr doc)
             }
             xmlXPathFreeObject(result);
 
-            if (xml_bvalue(node, "material", false)) {
-                rmt_create(rtype);
-            }
-
             if (xml_bvalue(node, "limited", false)) {
                 rtype->flags |= RTF_LIMITED;
             }
@@ -869,6 +882,7 @@ static int parse_resources(xmlDocPtr doc)
             result = xmlXPathEvalExpression(BAD_CAST "modifier", xpath);
             rtype->modifiers = xml_readmodifiers(result, node);
             xmlXPathFreeObject(result);
+
             /* reading eressea/resources/resource/resourcelimit/function */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "resourcelimit/function", xpath);
@@ -889,6 +903,11 @@ static int parse_resources(xmlDocPtr doc)
                 }
             }
             xmlXPathFreeObject(result);
+
+            if (xml_bvalue(node, "material", false)) {
+                assert(!rtype->itype || rtype->itype->construction);
+                rmt_create(rtype);
+            }
         }
     }
     xmlXPathFreeObject(resources);
