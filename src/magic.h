@@ -272,7 +272,7 @@ extern "C" {
 
     typedef struct spellrank {
         struct castorder *begin;
-        struct castorder **end;
+        struct castorder **handle_end;
     } spellrank;
 
     struct castorder *create_castorder(struct castorder * co, struct unit *caster,

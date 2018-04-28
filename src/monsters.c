@@ -848,15 +848,15 @@ static double chaosfactor(region * r)
     return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
 }
 
-static int nrand(int start, int sub)
+static int nrand(int handle_start, int sub)
 {
     int res = 0;
 
     do {
-        if (rng_int() % 100 < start)
+        if (rng_int() % 100 < handle_start)
             res++;
-        start -= sub;
-    } while (start > 0);
+        handle_start -= sub;
+    } while (handle_start > 0);
 
     return res;
 }

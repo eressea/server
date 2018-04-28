@@ -181,7 +181,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     char marker)
 {
     size_t length = REPORTWIDTH;
-    const char *end, *begin, *mark = 0;
+    const char *handle_end, *begin, *mark = 0;
 
     if (!str) return;
     /* find out if there's a mark + indent already encoded in the string. */
@@ -200,7 +200,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     else {
         mark = &marker;
     }
-    begin = end = str;
+    begin = handle_end = str;
 
     do {
         const char *last_space = begin;
@@ -217,25 +217,25 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
         else {
             write_spaces(out, indent + hanging_indent);
         }
-        while (*end && end <= begin + length - indent) {
-            if (*end == ' ') {
-                last_space = end;
+        while (*handle_end && handle_end <= begin + length - indent) {
+            if (*handle_end == ' ') {
+                last_space = handle_end;
             }
-            ++end;
+            ++handle_end;
         }
-        if (*end == 0)
-            last_space = end;
+        if (*handle_end == 0)
+            last_space = handle_end;
         if (last_space == begin) {
             /* there was no space in this line. clip it */
-            last_space = end;
+            last_space = handle_end;
         }
         swrite(begin, sizeof(char), last_space - begin, out);
         begin = last_space;
         while (*begin == ' ') {
             ++begin;
         }
-        if (begin > end)
-            begin = end;
+        if (begin > handle_end)
+            begin = handle_end;
         sputs("", out);
     } while (*begin);
 }
@@ -1939,7 +1939,7 @@ static void nr_paragraph(struct stream *out, message * m, faction * f)
 
 typedef struct cb_data {
     struct stream *out;
-    char *start, *writep;
+    char *handle_start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
@@ -1948,7 +1948,7 @@ typedef struct cb_data {
 static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
-    data->start = buffer;
+    data->handle_start = buffer;
     data->size = size;
     data->f = f;
     data->maxtravel = 0;
@@ -1965,7 +1965,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     if (travelthru_cansee(r, f, u)) {
         ++data->counter;
         do {
-            size_t len, size = data->size - (data->writep - data->start);
+            size_t len, size = data->size - (data->writep - data->handle_start);
             const char *str;
             char *writep = data->writep;
 
@@ -2000,13 +2000,13 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
             if (len >= size || data->counter == data->maxtravel) {
                 /* buffer is full */
                 *writep = 0;
-                paragraph(data->out, data->start, 0, 0, 0);
-                data->writep = data->start;
+                paragraph(data->out, data->handle_start, 0, 0, 0);
+                data->writep = data->handle_start;
                 if (data->counter == data->maxtravel) {
                     break;
                 }
             }
-        } while (data->writep == data->start);
+        } while (data->writep == data->handle_start);
     }
 }
 

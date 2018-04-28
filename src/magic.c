@@ -2056,11 +2056,11 @@ void free_castorder(struct castorder *co)
 void add_castorder(spellrank * cll, castorder * co)
 {
     if (cll->begin == NULL) {
-        cll->end = &cll->begin;
+        cll->handle_end = &cll->begin;
     }
 
-    *cll->end = co;
-    cll->end = &co->next;
+    *cll->handle_end = co;
+    cll->handle_end = &co->next;
 
     return;
 }

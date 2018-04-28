@@ -4103,11 +4103,11 @@ static void reset_game(void)
 
 void turn_begin(void)
 {
-    int start = first_turn();
+    int handle_start = first_turn();
     assert(turn >= 0);
-    if (turn < start) {
+    if (turn < handle_start) {
         /* this should only happen during tests */
-        turn = start;
+        turn = handle_start;
     }
     ++turn;
     reset_game();
