@@ -247,6 +247,7 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
         }
         else if (xml_strcmp(el, "function") == 0) {
             assert(rtype);
+            ++ud->errors;
             /* TODO */
         }
         else if (rtype->itype) {
@@ -276,12 +277,14 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
             else if (xml_strcmp(el, "requirement") == 0) {
                 assert(itype->construction);
                 /* TODO */
+                ++ud->errors;
             }
             else if (xml_strcmp(el, "luxury") == 0) {
                 rtype->ltype = new_luxurytype(itype, 0);
             }
             else if (xml_strcmp(el, "potion") == 0) {
                 /* TODO */
+                ++ud->errors;
             }
             else if (xml_strcmp(el, "armor") == 0) {
                 handle_armor(ud, el, attr);
