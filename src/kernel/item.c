@@ -291,7 +291,7 @@ weapon_type *new_weapontype(item_type * itype,
         wtype->damage[1] = str_strdup(damage[1]);
     }
     wtype->defmod = defmod;
-    wtype->flags |= wflags;
+    wtype->flags = wflags;
     wtype->itype = itype;
     wtype->magres = magres;
     wtype->offmod = offmod;

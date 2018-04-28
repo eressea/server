@@ -548,7 +548,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         flags |= WTF_PIERCE;
     if (xml_bvalue(node, "cut", false))
         flags |= WTF_CUT;
-    if (xml_bvalue(node, "blunt", false))
+    if (xml_bvalue(node, "bash", false))
         flags |= WTF_BLUNT;
     if (xml_bvalue(node, "siege", false))
         flags |= WTF_SIEGE;
@@ -581,8 +581,6 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
         propValue = xmlGetProp(node, BAD_CAST "value");
         wtype->damage[pos] = str_strdup((const char *)propValue); /* TODO: this is a memory leak */
-        if (k == 0)
-            wtype->damage[1 - pos] = wtype->damage[pos];
         xmlFree(propValue);
     }
     xmlXPathFreeObject(result);

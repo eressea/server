@@ -9,6 +9,7 @@
 #include "kernel/resources.h"
 
 #include "util/log.h"
+#include "util/strings.h"
 
 #include <expat.h>
 
@@ -63,6 +64,13 @@ static bool xml_bool(const XML_Char *val) {
 
 static int xml_int(const XML_Char *val) {
     return atoi((const char *)val);
+}
+
+static variant xml_fraction(const XML_Char *val) {
+    int num, den = 100;
+    double fval = atof((const char *)val);
+    num = (int)(fval * den + 0.5);
+    return frac_make(num, den);
 }
 
 static void handle_bad_input(userdata *ud, const XML_Char *el, const XML_Char *attr) {
@@ -168,6 +176,35 @@ static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr)
     itype->flags = flags;
 }
 
+static void handle_weapon(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+    const char *flag_names[] = { "missile", "magical", "pierce", "cut", "bash", "siege", "armorpiercing", "horse", "useshield", NULL };
+    resource_type *rtype = (resource_type *)ud->object;
+    item_type * itype = rtype->itype;
+    weapon_type *wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, NOSKILL);
+    int i, flags = 0;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "offmod") == 0) {
+            wtype->offmod = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "defmod") == 0) {
+            wtype->defmod = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "reload") == 0) {
+            wtype->reload = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "skill") == 0) {
+            wtype->skill = findskill(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "magres") == 0) {
+            wtype->magres = xml_fraction(attr[i + 1]);;
+        }
+        else if (!handle_flag(&flags, attr + i, flag_names)) {
+            handle_bad_input(ud, el, attr[i]);
+        }
+    }
+    wtype->flags = flags;
+}
+
 static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)ud->object;
     if (xml_strcmp(el, "resource") == 0) {
@@ -221,12 +258,30 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
                 rtype->atype = new_armortype(itype, 0.0, frac_zero, 0, 0);
             }
             else if (xml_strcmp(el, "weapon") == 0) {
-                rtype->wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
-                /* TODO */
+                handle_weapon(ud, el, attr);
             }
-            else if (xml_strcmp(el, "damage") == 0) {
-                assert(rtype->wtype);
-                /* TODO */
+            else if (rtype->wtype) {
+                weapon_type *wtype = rtype->wtype;
+                if (xml_strcmp(el, "damage") == 0) {
+                    int i, pos = 0;
+                    for (i = 0; attr[i]; i += 2) {
+                        if (xml_strcmp(attr[i], "type") == 0) {
+                            /* damage vs. rider(1) or not(0)? */
+                            if (xml_strcmp(attr[i + 1], "rider") == 0) {
+                                pos = 1;
+                            }
+                        }
+                        else if (xml_strcmp(attr[i], "value") == 0) {
+                            wtype->damage[pos] = str_strdup(attr[i + 1]);
+                        }
+                        else {
+                            handle_bad_input(ud, el, NULL);
+                        }
+                    }
+                }
+                else {
+                    handle_bad_input(ud, el, NULL);
+                }
             }
             else {
                 handle_bad_input(ud, el, NULL);
