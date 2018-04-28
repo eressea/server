@@ -54,16 +54,6 @@ static int xml_strcmp(const XML_Char *xs, const char *cs) {
     return strcmp(xs, cs);
 }
 
-static const char * attr_get(const XML_Char **attr, const char *key) {
-    int i;
-    for (i = 0; attr[i]; i += 2) {
-        if (xml_strcmp(attr[i], key) == 0) {
-            return (const char *)attr[i + 1];
-        }
-    }
-    return NULL;
-}
-
 static bool xml_bool(const XML_Char *val) {
     if (xml_strcmp(val, "yes") == 0) return true;
     if (xml_strcmp(val, "true") == 0) return true;
@@ -73,13 +63,6 @@ static bool xml_bool(const XML_Char *val) {
 
 static int xml_int(const XML_Char *val) {
     return atoi((const char *)val);
-}
-
-static bool attr_bool(XML_Char **pair, const char *key) {
-    if (xml_strcmp(pair[0], key) == 0) {
-        return xml_bool(pair[1]);
-    }
-    return false;
 }
 
 static void handle_bad_input(userdata *ud, const XML_Char *el, const XML_Char *attr) {
@@ -125,7 +108,6 @@ static void handle_resource(userdata *ud, const XML_Char *el, const XML_Char **a
             flags |= RTF_ITEM;
         }
         else if (xml_strcmp(attr[i], "material") == 0) {
-            /* TODO: appearance should be a property of item, not resource */
             material = xml_bool(attr[i + 1]);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
@@ -229,7 +211,7 @@ static void XMLCALL handle_resources(userdata *ud, const XML_Char *el, const XML
                 /* TODO */
             }
             else if (xml_strcmp(el, "luxury") == 0) {
-                /* TODO */
+                rtype->ltype = new_luxurytype(itype, 0);
             }
             else if (xml_strcmp(el, "potion") == 0) {
                 /* TODO */
@@ -291,6 +273,7 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         switch (ud->type) {
         case EXP_RESOURCES:
             handle_resources(ud, el, attr);
+            break;
         default:
             /* not implemented */
             handle_bad_input(ud, el, NULL);
@@ -328,7 +311,7 @@ static void XMLCALL handle_data(void *data, const XML_Char *xs, int len) {
 int exparse_readfile(const char * filename) {
     XML_Parser xp;
     FILE *F;
-    int err = 1;
+    int err = 0;
     char buf[4096];
     userdata ud;
 
