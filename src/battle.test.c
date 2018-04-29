@@ -68,6 +68,54 @@ static void test_make_fighter(CuTest * tc)
     test_teardown();
 }
 
+static void test_select_weapon(CuTest *tc) {
+    item_type *itype;
+    weapon_type *wtype;
+    unit *au;
+    fighter *af;
+    battle *b;
+    race * rc;
+
+    test_setup();
+    au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    itype = test_create_itemtype("halberd");
+    wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    i_change(&au->items, itype, 1);
+    rc = test_create_race("smurf");
+    CuAssertIntEquals(tc, 0, rc->mask_item & au->_race->mask_item);
+
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertIntEquals(tc, 1, af->weapons[0].count);
+    free_battle(b);
+
+    itype->mask_deny = rc_mask(au->_race);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertIntEquals(tc, 0, af->weapons[0].count);
+    free_battle(b);
+
+    itype->mask_deny = 0;
+    itype->mask_allow = rc_mask(rc);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertIntEquals(tc, 0, af->weapons[0].count);
+    free_battle(b);
+
+    itype->mask_deny = 0;
+    itype->mask_allow = rc_mask(au->_race);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertIntEquals(tc, 1, af->weapons[0].count);
+    free_battle(b);
+
+    test_teardown();
+}
+
 static building_type * setup_castle(void) {
     building_type * btype;
     construction *cons;
@@ -583,6 +631,7 @@ CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
+    SUITE_ADD_TEST(suite, test_select_weapon);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
