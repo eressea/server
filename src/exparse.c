@@ -40,7 +40,6 @@ enum {
     EXP_UNKNOWN,
     EXP_RESOURCES,
     EXP_WEAPON,
-    EXP_ARMOR,
     EXP_BUILDINGS,
     EXP_SHIPS,
     EXP_MESSAGES,
@@ -241,15 +240,6 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
 }
 
 
-static void XMLCALL start_armor(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
-    resource_type *rtype = (resource_type *)pi->object;
-
-    assert(rtype && rtype->atype);
-    if (xml_strcmp(el, "modifier") == 0) {
-    }
-    handle_bad_input(pi, el, NULL);
-}
-
 #define WMOD_MAX 8
 static weapon_mod wmods[WMOD_MAX];
 static int nwmods;
@@ -273,7 +263,7 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             else if (xml_strcmp(attr[i], "value") == 0) {
                 value = xml_int(attr[i + 1]);
             }
-            else if (xml_strcmp(type, "races") == 0) {
+            else if (xml_strcmp(attr[i], "races") == 0) {
                 char list[64];
                 strcpy(list, attr[i + 1]);
                 race_mask = rc_get_mask(list);
@@ -352,6 +342,10 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
 static requirement reqs[MAX_REQUIREMENTS];
 static int nreqs;
 
+#define RMOD_MAX 8
+static resource_mod rmods[RMOD_MAX];
+static int nrmods;
+
 static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resource") == 0) {
@@ -420,37 +414,41 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
             }
             else if (xml_strcmp(el, "modifier") == 0) {
                 int i;
-                double value = 0;
-                building_type * btype = NULL;
-                race *rc = NULL;
                 const XML_Char *type = NULL;
+                resource_mod * mod = rmods + nrmods;
 
+                assert(nrmods < RMOD_MAX);
+                ++nrmods;
                 for (i = 0; attr[i]; i += 2) {
                     if (xml_strcmp(attr[i], "type") == 0) {
                         type = attr[i + 1];
                     }
                     else if (xml_strcmp(attr[i], "building") == 0) {
-                        btype = bt_get_or_create(attr[i + 1]);
+                        mod->btype = bt_get_or_create(attr[i + 1]);
                     }
-                    else if (xml_strcmp(attr[i], "race") == 0) {
-                        rc = rc_get_or_create(attr[i + 1]);
+                    else if (xml_strcmp(attr[i], "races") == 0) {
+                        char list[64];
+                        strcpy(list, attr[i + 1]);
+                        mod->race_mask = rc_get_mask(list);
                     }
                     else if (xml_strcmp(attr[i], "value") == 0) {
-                        value = xml_float(attr[i + 1]);
+                        mod->value = xml_fraction(attr[i + 1]);
                     }
                     else {
                         handle_bad_input(pi, el, attr[i]);
                     }
                 }
-                /* resource modifiers */
                 if (xml_strcmp(type, "skill") == 0) {
-                    /* TODO: dupe with weapons! */
-                }
-                else if (xml_strcmp(type, "save") == 0) {
-                }
-                else if (xml_strcmp(type, "require") == 0) {
+                    mod->type = RMT_PROD_SKILL;
                 }
                 else if (xml_strcmp(type, "material") == 0) {
+                    mod->type = RMT_PROD_SAVE;
+                }
+                else if (xml_strcmp(type, "require") == 0) {
+                    mod->type = RMT_PROD_REQUIRE;
+                }
+                else if (xml_strcmp(type, "save") == 0) {
+                    mod->type = RMT_USE_SAVE;
                 }
                 else {
                     handle_bad_input(pi, el, type);
@@ -491,7 +489,6 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
                 new_potiontype(itype, level);
             }
             else if (xml_strcmp(el, "armor") == 0) {
-                pi->type = EXP_ARMOR;
                 handle_armor(pi, el, attr);
             }
             else if (xml_strcmp(el, "weapon") == 0) {
@@ -570,29 +567,12 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         case EXP_WEAPON:
             start_weapon(pi, el, attr);
             break;
-        case EXP_ARMOR:
-            start_armor(pi, el, attr);
-            break;
         default:
             /* not implemented */
             handle_bad_input(pi, el, NULL);
         }
     }
     ++pi->depth;
-}
-
-static void end_armor(parseinfo *pi, const XML_Char *el) {
-    resource_type *rtype = (resource_type *)pi->object;
-    assert(rtype && rtype->atype);
-
-    if (xml_strcmp(el, "armor") == 0) {
-        pi->type = EXP_RESOURCES;
-    }
-    else if (xml_strcmp(el, "modifier") == 0) {
-    }
-    else {
-        handle_bad_input(pi, el, NULL);
-    }
 }
 
 static void end_weapon(parseinfo *pi, const XML_Char *el) {
@@ -618,6 +598,11 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
 static void end_resources(parseinfo *pi, const XML_Char *el) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resources") == 0) {
+        if (nrmods > 0) {
+            rtype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
+            memcpy(rtype->modifiers, rmods, sizeof(resource_mod) * nrmods);
+            nrmods = 0;
+        }
         pi->type = EXP_UNKNOWN;
     }
     else if (xml_strcmp(el, "construction") == 0) {
@@ -636,9 +621,6 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     switch (pi->type) {
     case EXP_RESOURCES:
         end_resources(pi, el);
-        break;
-    case EXP_ARMOR:
-        end_armor(pi, el);
         break;
     case EXP_WEAPON:
         end_weapon(pi, el);
