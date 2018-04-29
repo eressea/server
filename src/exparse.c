@@ -422,6 +422,8 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
                 resource_mod * mod = rmods + nrmods;
                 const XML_Char *value = NULL;
 
+                mod->race_mask = 0;
+                mod->btype = NULL;
                 assert(nrmods < RMOD_MAX);
                 ++nrmods;
                 for (i = 0; attr[i]; i += 2) {
