@@ -170,13 +170,13 @@ static void handle_item(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             size_t len = strlen(attr[i + 1]);
             assert(len < sizeof(buffer));
             memcpy(buffer, attr[i + 1], len + 1);
-            itype->mask_allow = rc_mask(buffer);
+            itype->mask_allow = rc_get_mask(buffer);
         }
         else if (xml_strcmp(attr[i], "deny") == 0) {
             size_t len = strlen(attr[i + 1]);
             assert(len < sizeof(buffer));
             memcpy(buffer, attr[i + 1], len + 1);
-            itype->mask_deny = rc_mask(buffer);
+            itype->mask_deny = rc_get_mask(buffer);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
             handle_bad_input(pi, el, attr[i]);
@@ -263,8 +263,7 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
     }
     else if (xml_strcmp(el, "modifier") == 0) {
         const XML_Char *type = NULL;
-        race *rc = NULL;
-        int i, flags = 0;
+        int i, flags = 0, race_mask = 0;
         int value = 0;
 
         for (i = 0; attr[i]; i += 2) {
@@ -274,8 +273,10 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             else if (xml_strcmp(attr[i], "value") == 0) {
                 value = xml_int(attr[i + 1]);
             }
-            else if (xml_strcmp(attr[i], "race") == 0) {
-                rc = rc_get_or_create(attr[i + 1]);
+            else if (xml_strcmp(type, "races") == 0) {
+                char list[64];
+                strcpy(list, attr[i + 1]);
+                race_mask = rc_get_mask(list);
             }
             else if (xml_strcmp(attr[i], "offensive") == 0) {
                 if (xml_bool(attr[i + 1])) {
@@ -336,7 +337,7 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             }
             mod->value = value;
             mod->flags = flags;
-            mod->races = NULL;
+            mod->race_mask = race_mask;
         }
         else {
             ++pi->errors;
