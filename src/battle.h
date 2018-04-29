@@ -143,7 +143,7 @@ extern "C" {
     } troop;
 
     typedef struct armor {
-        struct armor *next;
+        struct armor *next; /* TODO: make this an array, not a list, like weapon */
         const struct armor_type *atype;
         int count;
     } armor;

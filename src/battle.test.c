@@ -68,7 +68,7 @@ static void test_make_fighter(CuTest * tc)
     test_teardown();
 }
 
-static void test_select_weapon(CuTest *tc) {
+static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
     weapon_type *wtype;
     unit *au;
@@ -88,6 +88,7 @@ static void test_select_weapon(CuTest *tc) {
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
     CuAssertIntEquals(tc, 1, af->weapons[0].count);
+    CuAssertIntEquals(tc, 0, af->weapons[1].count);
     free_battle(b);
 
     itype->mask_deny = rc_mask(au->_race);
@@ -111,6 +112,35 @@ static void test_select_weapon(CuTest *tc) {
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
     CuAssertIntEquals(tc, 1, af->weapons[0].count);
+    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    free_battle(b);
+
+    test_teardown();
+}
+
+static void test_select_armor(CuTest *tc) {
+    item_type *itype, *iscale;
+    unit *au;
+    fighter *af;
+    battle *b;
+
+    test_setup();
+    au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    itype = test_create_itemtype("plate");
+    new_armortype(itype, 0.0, frac_zero, 1, 0);
+    i_change(&au->items, itype, 2);
+    iscale = test_create_itemtype("scale");
+    new_armortype(iscale, 0.0, frac_zero, 2, 0);
+    i_change(&au->items, iscale, 1);
+
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->armors);
+    CuAssertIntEquals(tc, 1, af->armors->count);
+    CuAssertPtrEquals(tc, iscale->rtype->atype, (armor_type *)af->armors->atype);
+    CuAssertIntEquals(tc, 2, af->armors->next->count);
+    CuAssertPtrEquals(tc, itype->rtype->atype, (armor_type *)af->armors->next->atype);
+    CuAssertPtrEquals(tc, NULL, af->armors->next->next);
     free_battle(b);
 
     test_teardown();
@@ -631,7 +661,8 @@ CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
-    SUITE_ADD_TEST(suite, test_select_weapon);
+    SUITE_ADD_TEST(suite, test_select_weapon_restricted);
+    SUITE_ADD_TEST(suite, test_select_armor);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
