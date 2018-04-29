@@ -417,8 +417,10 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
             }
             else if (xml_strcmp(el, "modifier") == 0) {
                 int i;
+                skill_t sk = NOSKILL;
                 const XML_Char *type = NULL;
                 resource_mod * mod = rmods + nrmods;
+                const XML_Char *value = NULL;
 
                 assert(nrmods < RMOD_MAX);
                 ++nrmods;
@@ -429,13 +431,16 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
                     else if (xml_strcmp(attr[i], "building") == 0) {
                         mod->btype = bt_get_or_create(attr[i + 1]);
                     }
+                    else if (xml_strcmp(attr[i], "skill") == 0) {
+                        sk = findskill(attr[i + 1]);
+                    }
                     else if (xml_strcmp(attr[i], "races") == 0) {
                         char list[64];
                         strcpy(list, attr[i + 1]);
                         mod->race_mask = rc_get_mask(list);
                     }
                     else if (xml_strcmp(attr[i], "value") == 0) {
-                        mod->value = xml_fraction(attr[i + 1]);
+                        value = attr[i + 1];
                     }
                     else {
                         handle_bad_input(pi, el, attr[i]);
@@ -443,15 +448,19 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
                 }
                 if (xml_strcmp(type, "skill") == 0) {
                     mod->type = RMT_PROD_SKILL;
-                }
-                else if (xml_strcmp(type, "material") == 0) {
-                    mod->type = RMT_PROD_SAVE;
+                    mod->value.sa[0] = (short)sk;
+                    mod->value.sa[1] = (short)xml_int(value);
                 }
                 else if (xml_strcmp(type, "require") == 0) {
                     mod->type = RMT_PROD_REQUIRE;
                 }
+                else if (xml_strcmp(type, "material") == 0) {
+                    mod->type = RMT_PROD_SAVE;
+                    mod->value = xml_fraction(value);
+                }
                 else if (xml_strcmp(type, "save") == 0) {
                     mod->type = RMT_USE_SAVE;
+                    mod->value = xml_fraction(value);
                 }
                 else {
                     handle_bad_input(pi, el, type);
@@ -601,12 +610,14 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
 static void end_resources(parseinfo *pi, const XML_Char *el) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resources") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+    else if (xml_strcmp(el, "resource") == 0) {
         if (nrmods > 0) {
             rtype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
             memcpy(rtype->modifiers, rmods, sizeof(resource_mod) * nrmods);
             nrmods = 0;
         }
-        pi->type = EXP_UNKNOWN;
     }
     else if (xml_strcmp(el, "construction") == 0) {
         if (nreqs > 0) {
