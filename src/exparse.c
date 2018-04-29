@@ -3,7 +3,10 @@
 #endif
 #include "exparse.h"
 
+#include "alchemy.h"
+
 #include "kernel/build.h"
+#include "kernel/building.h"
 #include "kernel/item.h"
 #include "kernel/race.h"
 #include "kernel/resources.h"
@@ -35,22 +38,23 @@
 
 enum {
     EXP_UNKNOWN,
-
     EXP_RESOURCES,
+    EXP_WEAPON,
+    EXP_ARMOR,
     EXP_BUILDINGS,
     EXP_SHIPS,
     EXP_MESSAGES,
     EXP_STRINGS,
 };
 
-typedef struct userdata {
+typedef struct parseinfo {
     int type;
     int depth;
     int errors;
     XML_Char *cdata;
     size_t clength;
     void *object;
-} userdata;
+} parseinfo;
 
 static int xml_strcmp(const XML_Char *xs, const char *cs) {
     return strcmp(xs, cs);
@@ -64,28 +68,28 @@ static bool xml_bool(const XML_Char *val) {
 }
 
 static int xml_int(const XML_Char *val) {
-    return atoi((const char *)val);
+    return atoi(val);
 }
 
 static double xml_float(const XML_Char *val) {
-    return atof((const char *)val);
+    return atof(val);
 }
 
 static variant xml_fraction(const XML_Char *val) {
     int num, den = 100;
-    double fval = atof((const char *)val);
+    double fval = atof(val);
     num = (int)(fval * den + 0.5);
     return frac_make(num, den);
 }
 
-static void handle_bad_input(userdata *ud, const XML_Char *el, const XML_Char *attr) {
+static void handle_bad_input(parseinfo *pi, const XML_Char *el, const XML_Char *attr) {
     if (attr) {
-        log_error("unknown attribute in <%s>: %s", (const char *)el, (const char *)attr);
+        log_error("unknown attribute in <%s>: %s", el, attr);
     }
     else {
-        log_error("unexpected element <%s>", (const char *)el);
+        log_error("unexpected element <%s>", el);
     }
-    ++ud->errors;
+    ++pi->errors;
 }
 
 static bool handle_flag(int *flags, const XML_Char **pair, const char *names[]) {
@@ -104,7 +108,7 @@ static bool handle_flag(int *flags, const XML_Char **pair, const char *names[]) 
     return false;
 }
 
-static void handle_resource(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+static void handle_resource(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "item", "limited", "pooled", NULL };
     int i;
     const char *name = NULL, *appear = NULL;
@@ -113,18 +117,18 @@ static void handle_resource(userdata *ud, const XML_Char *el, const XML_Char **a
     (void)el;
     for (i = 0; attr[i]; i += 2) {
         if (xml_strcmp(attr[i], "name") == 0) {
-            name = (const char *)attr[i + 1];
+            name = attr[i + 1];
         }
         else if (xml_strcmp(attr[i], "appearance") == 0) {
             /* TODO: appearance should be a property of item, not resource */
-            appear = (const char *)attr[i + 1];
+            appear = attr[i + 1];
             flags |= RTF_ITEM;
         }
         else if (xml_strcmp(attr[i], "material") == 0) {
             material = xml_bool(attr[i + 1]);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
-            handle_bad_input(ud, el, attr[i]);
+            handle_bad_input(pi, el, attr[i]);
         }
     }
     if (name) {
@@ -138,14 +142,14 @@ static void handle_resource(userdata *ud, const XML_Char *el, const XML_Char **a
         if (material) {
             rmt_create(rtype);
         }
-        ud->object = rtype;
+        pi->object = rtype;
     }
 }
 
-static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+static void handle_item(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "herb", "cursed", "notlost", "big", "animal", "vehicle", "use", NULL };
     int i, flags = ITF_NONE;
-    resource_type *rtype = (resource_type *)ud->object;
+    resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     assert(rtype);
     if (!itype) {
@@ -175,15 +179,15 @@ static void handle_item(userdata *ud, const XML_Char *el, const XML_Char **attr)
             itype->mask_deny = rc_mask(buffer);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
-            handle_bad_input(ud, el, attr[i]);
+            handle_bad_input(pi, el, attr[i]);
         }
     }
     itype->flags = flags;
 }
 
-static void handle_armor(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+static void handle_armor(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "shield", "laen", NULL };
-    resource_type *rtype = (resource_type *)ud->object;
+    resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     armor_type *atype = new_armortype(itype, 0.0, frac_zero, 0, 0);
     int i, flags = 0;
@@ -201,15 +205,15 @@ static void handle_armor(userdata *ud, const XML_Char *el, const XML_Char **attr
             atype->magres = xml_fraction(attr[i + 1]);
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
-            handle_bad_input(ud, el, attr[i]);
+            handle_bad_input(pi, el, attr[i]);
         }
     }
     atype->flags = flags;
 }
 
-static void handle_weapon(userdata *ud, const XML_Char *el, const XML_Char **attr) {
+static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "missile", "magical", "pierce", "cut", "bash", "siege", "armorpiercing", "horse", "useshield", NULL };
-    resource_type *rtype = (resource_type *)ud->object;
+    resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     weapon_type *wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, NOSKILL);
     int i, flags = 0;
@@ -230,25 +234,132 @@ static void handle_weapon(userdata *ud, const XML_Char *el, const XML_Char **att
             wtype->magres = xml_fraction(attr[i + 1]);;
         }
         else if (!handle_flag(&flags, attr + i, flag_names)) {
-            handle_bad_input(ud, el, attr[i]);
+            handle_bad_input(pi, el, attr[i]);
         }
     }
     wtype->flags = flags;
+}
+
+
+static void XMLCALL start_armor(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    resource_type *rtype = (resource_type *)pi->object;
+
+    assert(rtype && rtype->atype);
+    if (xml_strcmp(el, "modifier") == 0) {
+    }
+    handle_bad_input(pi, el, NULL);
+}
+
+#define WMOD_MAX 8
+static weapon_mod wmods[WMOD_MAX];
+static int nwmods;
+
+static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    resource_type *rtype = (resource_type *)pi->object;
+
+    assert(rtype && rtype->wtype);
+    if (xml_strcmp(el, "function") == 0) {
+        ++pi->errors;
+    }
+    else if (xml_strcmp(el, "modifier") == 0) {
+        const XML_Char *type = NULL;
+        race *rc = NULL;
+        int i, flags = 0;
+        int value = 0;
+
+        for (i = 0; attr[i]; i += 2) {
+            if (xml_strcmp(attr[i], "type") == 0) {
+                type = attr[i + 1];
+            }
+            else if (xml_strcmp(attr[i], "value") == 0) {
+                value = xml_int(attr[i + 1]);
+            }
+            else if (xml_strcmp(attr[i], "race") == 0) {
+                rc = rc_get_or_create(attr[i + 1]);
+            }
+            else if (xml_strcmp(attr[i], "offensive") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_OFFENSIVE;
+                }
+            }
+            else if (xml_strcmp(attr[i], "defensive") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_DEFENSIVE;
+                }
+            }
+            else if (xml_strcmp(attr[i], "walking") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_WALKING;
+                }
+            }
+            else if (xml_strcmp(attr[i], "riding") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_RIDING;
+                }
+            }
+            else if (xml_strcmp(attr[i], "against_riding") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_AGAINST_RIDING;
+                }
+            }
+            else if (xml_strcmp(attr[i], "against_walking") == 0) {
+                if (xml_bool(attr[i + 1])) {
+                    flags |= WMF_AGAINST_WALKING;
+                }
+            }
+            else {
+                handle_bad_input(pi, el, attr[i]);
+            }
+        }
+        if (type) {
+            weapon_mod *mod = wmods + nwmods;
+
+            assert(nwmods < WMOD_MAX);
+            ++nwmods;
+
+            /* weapon modifiers */
+            if (xml_strcmp(type, "missile_target") == 0) {
+                flags |= WMF_MISSILE_TARGET;
+            }
+            else if (xml_strcmp(type, "require") == 0) {
+                /* does require even work? */
+                flags = flags;
+            }
+            else if (xml_strcmp(type, "damage") == 0) {
+                flags |= WMF_DAMAGE;
+            }
+            else if (xml_strcmp(type, "skill") == 0) {
+                flags |= WMF_SKILL;
+            }
+            else {
+                handle_bad_input(pi, el, type);
+            }
+            mod->value = value;
+            mod->flags = flags;
+            mod->races = NULL;
+        }
+        else {
+            ++pi->errors;
+        }
+    }
+    else {
+        handle_bad_input(pi, el, NULL);
+    }
 }
 
 #define MAX_REQUIREMENTS 8
 static requirement reqs[MAX_REQUIREMENTS];
 static int nreqs;
 
-static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_Char **attr) {
-    resource_type *rtype = (resource_type *)ud->object;
+static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resource") == 0) {
-        handle_resource(ud, el, attr);
+        handle_resource(pi, el, attr);
     }
     else if (rtype) {
         if (xml_strcmp(el, "item") == 0) {
             assert(rtype);
-            handle_item(ud, el, attr);
+            handle_item(pi, el, attr);
         }
         else if (xml_strcmp(el, "function") == 0) {
             const XML_Char *name = NULL;
@@ -260,10 +371,10 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                     name = attr[i + 1];
                 }
                 else if (xml_strcmp(attr[i], "value") == 0) {
-                    fun = get_function((const char *)attr[i + 1]);
+                    fun = get_function(attr[i + 1]);
                 }
                 else {
-                    handle_bad_input(ud, el, attr[i]);
+                    handle_bad_input(pi, el, attr[i]);
                 }
             }
 
@@ -280,8 +391,6 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                     rtype->wtype->attack = (wtype_attack)fun;
                 }
             }
-            ++ud->errors;
-            /* TODO */
         }
         else if (rtype->itype) {
             item_type *itype = rtype->itype;
@@ -290,7 +399,7 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                 int i;
                 for (i = 0; attr[i]; i += 2) {
                     if (xml_strcmp(attr[i], "skill") == 0) {
-                        con->skill = findskill((const char *)attr[i + 1]);
+                        con->skill = findskill(attr[i + 1]);
                     }
                     else if (xml_strcmp(attr[i], "maxsize") == 0) {
                         con->maxsize = xml_int(attr[i + 1]);
@@ -302,11 +411,49 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                         con->minskill = xml_int(attr[i + 1]);
                     }
                     else {
-                        handle_bad_input(ud, el, attr[i]);
+                        handle_bad_input(pi, el, attr[i]);
                     }
                 }
                 itype->construction = con;
                 nreqs = 0;
+            }
+            else if (xml_strcmp(el, "modifier") == 0) {
+                int i;
+                double value = 0;
+                building_type * btype = NULL;
+                race *rc = NULL;
+                const XML_Char *type = NULL;
+
+                for (i = 0; attr[i]; i += 2) {
+                    if (xml_strcmp(attr[i], "type") == 0) {
+                        type = attr[i + 1];
+                    }
+                    else if (xml_strcmp(attr[i], "building") == 0) {
+                        btype = bt_get_or_create(attr[i + 1]);
+                    }
+                    else if (xml_strcmp(attr[i], "race") == 0) {
+                        rc = rc_get_or_create(attr[i + 1]);
+                    }
+                    else if (xml_strcmp(attr[i], "value") == 0) {
+                        value = xml_float(attr[i + 1]);
+                    }
+                    else {
+                        handle_bad_input(pi, el, attr[i]);
+                    }
+                }
+                /* resource modifiers */
+                if (xml_strcmp(type, "skill") == 0) {
+                    /* TODO: dupe with weapons! */
+                }
+                else if (xml_strcmp(type, "save") == 0) {
+                }
+                else if (xml_strcmp(type, "require") == 0) {
+                }
+                else if (xml_strcmp(type, "material") == 0) {
+                }
+                else {
+                    handle_bad_input(pi, el, type);
+                }
             }
             else if (xml_strcmp(el, "requirement") == 0) {
                 requirement *req;
@@ -316,10 +463,13 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                 req = reqs + nreqs;
                 for (i = 0; attr[i]; i += 2) {
                     if (xml_strcmp(attr[i], "type") == 0) {
-                        req->rtype = rt_get_or_create((const char *)attr[i + 1]);
+                        req->rtype = rt_get_or_create(attr[i + 1]);
                     }
                     else if (xml_strcmp(attr[i], "quantity") == 0) {
                         req->number = xml_int(attr[i + 1]);
+                    }
+                    else {
+                        handle_bad_input(pi, el, attr[i]);
                     }
                 }
                 ++nreqs;
@@ -328,14 +478,24 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                 rtype->ltype = new_luxurytype(itype, 0);
             }
             else if (xml_strcmp(el, "potion") == 0) {
-                /* TODO */
-                ++ud->errors;
+                int i, level = 0;
+                for (i = 0; attr[i]; i += 2) {
+                    if (xml_strcmp(attr[i], "level") == 0) {
+                        level = xml_int(attr[i + 1]);
+                    }
+                    else {
+                        handle_bad_input(pi, el, attr[i]);
+                    }
+                }
+                new_potiontype(itype, level);
             }
             else if (xml_strcmp(el, "armor") == 0) {
-                handle_armor(ud, el, attr);
+                pi->type = EXP_ARMOR;
+                handle_armor(pi, el, attr);
             }
             else if (xml_strcmp(el, "weapon") == 0) {
-                handle_weapon(ud, el, attr);
+                pi->type = EXP_WEAPON;
+                handle_weapon(pi, el, attr);
             }
             else if (rtype->wtype) {
                 weapon_type *wtype = rtype->wtype;
@@ -352,71 +512,114 @@ static void XMLCALL start_resources(userdata *ud, const XML_Char *el, const XML_
                             wtype->damage[pos] = str_strdup(attr[i + 1]);
                         }
                         else {
-                            handle_bad_input(ud, el, NULL);
+                            handle_bad_input(pi, el, NULL);
                         }
                     }
                 }
                 else {
-                    handle_bad_input(ud, el, NULL);
+                    handle_bad_input(pi, el, NULL);
                 }
             }
             else {
-                handle_bad_input(ud, el, NULL);
+                handle_bad_input(pi, el, NULL);
             }
         }
         else {
-            handle_bad_input(ud, el, NULL);
+            handle_bad_input(pi, el, NULL);
         }
     }
     else {
-        handle_bad_input(ud, el, NULL);
+        handle_bad_input(pi, el, NULL);
     }
 }
 
 static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char **attr) {
-    userdata *ud = (userdata *)data;
-    if (ud->depth == 0) {
-        ud->type = EXP_UNKNOWN;
+    parseinfo *pi = (parseinfo *)data;
+    if (pi->depth == 0) {
+        pi->type = EXP_UNKNOWN;
         if (xml_strcmp(el, "eressea") != 0) {
-            handle_bad_input(ud, el, NULL);
+            handle_bad_input(pi, el, NULL);
         }
     }
-    else if (ud->depth == 1) {
+    else if (pi->depth == 1) {
         if (xml_strcmp(el, "resources") == 0) {
-            ud->type = EXP_RESOURCES;
+            pi->type = EXP_RESOURCES;
         }
         else if (xml_strcmp(el, "buildings") == 0) {
-            ud->type = EXP_BUILDINGS;
+            pi->type = EXP_BUILDINGS;
         }
         else if (xml_strcmp(el, "ships") == 0) {
-            ud->type = EXP_SHIPS;
+            pi->type = EXP_SHIPS;
         }
         else if (xml_strcmp(el, "messages") == 0) {
-            ud->type = EXP_MESSAGES;
+            pi->type = EXP_MESSAGES;
         }
         else if (xml_strcmp(el, "strings") == 0) {
-            ud->type = EXP_STRINGS;
+            pi->type = EXP_STRINGS;
         }
         else {
-            handle_bad_input(ud, el, NULL);
+            handle_bad_input(pi, el, NULL);
         }
     }
     else {
-        switch (ud->type) {
+        switch (pi->type) {
         case EXP_RESOURCES:
-            start_resources(ud, el, attr);
+            start_resources(pi, el, attr);
+            break;
+        case EXP_WEAPON:
+            start_weapon(pi, el, attr);
+            break;
+        case EXP_ARMOR:
+            start_armor(pi, el, attr);
             break;
         default:
             /* not implemented */
-            handle_bad_input(ud, el, NULL);
+            handle_bad_input(pi, el, NULL);
         }
     }
-    ++ud->depth;
+    ++pi->depth;
 }
 
-static void end_resources(userdata *ud, const XML_Char *el) {
-    resource_type *rtype = (resource_type *)ud->object;
-    if (xml_strcmp(el, "construction") == 0) {
+static void end_armor(parseinfo *pi, const XML_Char *el) {
+    resource_type *rtype = (resource_type *)pi->object;
+    assert(rtype && rtype->atype);
+
+    if (xml_strcmp(el, "armor") == 0) {
+        pi->type = EXP_RESOURCES;
+    }
+    else if (xml_strcmp(el, "modifier") == 0) {
+    }
+    else {
+        handle_bad_input(pi, el, NULL);
+    }
+}
+
+static void end_weapon(parseinfo *pi, const XML_Char *el) {
+    resource_type *rtype = (resource_type *)pi->object;
+    assert(rtype && rtype->wtype);
+
+    if (xml_strcmp(el, "weapon") == 0) {
+        pi->type = EXP_RESOURCES;
+    }
+    else if (xml_strcmp(el, "modifier") == 0) {
+        if (nwmods > 0) {
+            weapon_type *wtype = rtype->wtype;
+            wtype->modifiers = calloc(sizeof(weapon_mod), nwmods + 1);
+            memcpy(wtype->modifiers, wmods, sizeof(weapon_mod) * nwmods);
+            nwmods = 0;
+        }
+    }
+    else {
+        handle_bad_input(pi, el, NULL);
+    }
+}
+
+static void end_resources(parseinfo *pi, const XML_Char *el) {
+    resource_type *rtype = (resource_type *)pi->object;
+    if (xml_strcmp(el, "resources") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+    else if (xml_strcmp(el, "construction") == 0) {
         if (nreqs > 0) {
             construction *con = rtype->itype->construction;
             con->materials = calloc(sizeof(requirement), nreqs + 1);
@@ -427,43 +630,52 @@ static void end_resources(userdata *ud, const XML_Char *el) {
 }
 
 static void XMLCALL handle_end(void *data, const XML_Char *el) {
-    userdata *ud = (userdata *)data;
+    parseinfo *pi = (parseinfo *)data;
 
-    if (ud->type == EXP_RESOURCES) {
-        end_resources(ud, el);
-    }
-    else {
-        if (ud->cdata) {
-            free(ud->cdata);
-            ud->cdata = NULL;
-            ud->clength = 0;
+    switch (pi->type) {
+    case EXP_RESOURCES:
+        end_resources(pi, el);
+        break;
+    case EXP_ARMOR:
+        end_armor(pi, el);
+        break;
+    case EXP_WEAPON:
+        end_weapon(pi, el);
+        break;
+    default:
+        if (pi->depth == 1) {
+            pi->type = EXP_UNKNOWN;
+        }
+        if (pi->cdata) {
+            free(pi->cdata);
+            pi->cdata = NULL;
+            pi->clength = 0;
         }
     }
-    --ud->depth;
-    if (ud->depth == 0) {
-        ud->type = EXP_UNKNOWN;
+    --pi->depth;
+    if (pi->depth == 0) {
+        assert(pi->type == EXP_UNKNOWN);
     }
 }
 
 static void XMLCALL handle_data(void *data, const XML_Char *xs, int len) {
-    userdata *ud = (userdata *)data;
+    parseinfo *pi = (parseinfo *)data;
     if (len > 0) {
-        if (ud->type == EXP_MESSAGES && ud->depth == 4) {
+        if (pi->type == EXP_MESSAGES && pi->depth == 4) {
             size_t bytes = (size_t)len;
-            ud->cdata = realloc(ud->cdata, ud->clength + bytes);
-            memcpy(ud->cdata + ud->clength, xs, bytes);
-            ud->clength = ud->clength + bytes;
+            pi->cdata = realloc(pi->cdata, pi->clength + bytes);
+            memcpy(pi->cdata + pi->clength, xs, bytes);
+            pi->clength = pi->clength + bytes;
         }
     }
 }
-
 
 int exparse_readfile(const char * filename) {
     XML_Parser xp;
     FILE *F;
     int err = 0;
     char buf[4096];
-    userdata ud;
+    parseinfo pi;
 
     F = fopen(filename, "r");
     if (!F) {
@@ -472,8 +684,8 @@ int exparse_readfile(const char * filename) {
     xp = XML_ParserCreate("UTF-8");
     XML_SetElementHandler(xp, handle_start, handle_end);
     XML_SetCharacterDataHandler(xp, handle_data);
-    XML_SetUserData(xp, &ud);
-    memset(&ud, 0, sizeof(ud));
+    XML_SetUserData(xp, &pi);
+    memset(&pi, 0, sizeof(pi));
     for (;;) {
         size_t len = (int) fread(buf, 1, sizeof(buf), F);
         int done;
@@ -496,11 +708,11 @@ int exparse_readfile(const char * filename) {
             break;
         }
     }
-    assert(ud.depth == 0);
+    assert(pi.depth == 0);
     XML_ParserFree(xp);
     fclose(F);
     if (err != 0) {
         return err;
     }
-    return ud.errors;
+    return pi.errors;
 }
