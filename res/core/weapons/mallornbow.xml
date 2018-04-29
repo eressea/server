@@ -10,9 +10,7 @@
       <damage type="rider" value="1d11+2"/>
       <damage type="footman" value="1d11+2"/>
       <modifier type="missile_target" value="2"/>
-      <modifier type="damage" value="1">
-        <race name="elf"/>
-      </modifier>
+      <modifier type="damage" value="1" races="elf"/>
     </weapon>
   </item>
 </resource>

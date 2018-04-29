@@ -198,7 +198,8 @@ extern "C" {
 #define MIGRANTS_LOG10 1
     int rc_migrants_formula(const race *rc);
     
-    int rc_mask(char *list);
+    int rc_mask(const race *rc);
+    int rc_get_mask(char *list);
 
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
 #define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */

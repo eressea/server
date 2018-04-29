@@ -50,7 +50,7 @@ extern "C" {
         resource_modifier_type type;
         variant value;
         const struct building_type *btype;
-        const struct race *race;
+        int race_mask;
     } resource_mod;
 
     typedef struct rawmaterial_type {

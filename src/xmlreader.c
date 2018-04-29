@@ -61,6 +61,17 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 
+static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
+    int mask = 0;
+    assert(maskp);
+    if (propValue) {
+        mask = rc_get_mask((char *)propValue);
+        xmlFree(propValue);
+    }
+    *maskp = mask;
+}
+
 static variant xml_fraction(xmlNodePtr node, const char *name) {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
     if (propValue != NULL) {
@@ -129,16 +140,8 @@ static resource_mod * xml_readmodifiers(xmlXPathObjectPtr result, xmlNodePtr nod
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             xmlChar *propValue;
             building_type *btype = NULL;
-            const race *rc = NULL;
 
-            propValue = xmlGetProp(node, BAD_CAST "race");
-            if (propValue != NULL) {
-                rc = rc_find((const char *)propValue);
-                if (rc == NULL)
-                    rc = rc_get_or_create((const char *)propValue);
-                xmlFree(propValue);
-            }
-            modifiers[k].race = rc;
+            mask_races(node, "races", &modifiers[k].race_mask);
 
             propValue = xmlGetProp(node, BAD_CAST "building");
             if (propValue != NULL) {
@@ -592,8 +595,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     wtype->modifiers = calloc(result->nodesetval->nodeNr + 1, sizeof(weapon_mod));
     for (k = 0; k != result->nodesetval->nodeNr; ++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
-        xmlXPathObjectPtr races;
-        int r, flags = 0;
+        int flags = 0;
 
         if (xml_bvalue(node, "walking", false))
             flags |= WMF_WALKING;
@@ -620,21 +622,8 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         wtype->modifiers[k].flags = flags;
         wtype->modifiers[k].value = xml_ivalue(node, "value", 0);
 
-        xpath->node = node;
-        races = xmlXPathEvalExpression(BAD_CAST "race", xpath);
-        for (r = 0; r != races->nodesetval->nodeNr; ++r) {
-            xmlNodePtr node = races->nodesetval->nodeTab[r];
-
-            propValue = xmlGetProp(node, BAD_CAST "name");
-            if (propValue != NULL) {
-                const race *rc = rc_find((const char *)propValue);
-                if (rc == NULL)
-                    rc = rc_get_or_create((const char *)propValue);
-                racelist_insert(&wtype->modifiers[k].races, rc);
-                xmlFree(propValue);
-            }
-        }
-        xmlXPathFreeObject(races);
+        mask_races(node, "races", &wtype->modifiers[k].race_mask);
+        wtype->modifiers[k].race_mask = 0;
     }
     xmlXPathFreeObject(result);
 
@@ -665,17 +654,6 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
     xpath->node = node;
     return wtype;
-}
-
-static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
-    int mask = 0;
-    assert(maskp);
-    if (propValue) {
-        mask = rc_mask((char *)propValue);
-        xmlFree(propValue);
-    }
-    *maskp = mask;
 }
 
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
@@ -1318,7 +1296,7 @@ static void parse_ai(race * rc, xmlNodePtr node)
         rc->flags |= RCF_ATTACK_MOVED;
 }
 
-static void set_study_speed(race *rc, skill_t sk, int modifier){
+static void set_study_speed(race *rc, skill_t sk, int modifier) {
     if (!rc->study_speed)
         rc->study_speed = calloc(1, MAXSKILLS);
     rc->study_speed[sk] = (char)modifier;

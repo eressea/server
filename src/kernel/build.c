@@ -419,7 +419,7 @@ static int matmod(const unit * u, const resource_type * rtype, int value)
         for (mod = rtype->modifiers; mod->type != RMT_END; ++mod) {
             if (mod->type == RMT_USE_SAVE) {
                 if (!mod->btype || mod->btype == btype) {
-                    if (!mod->race || mod->race == rc) {
+                    if (!mod->race_mask || (mod->race_mask & rc->mask_item)) {
                         save = frac_mul(save, mod->value);
                     }
                 }

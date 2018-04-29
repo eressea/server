@@ -609,16 +609,6 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
     return -118;
 }
 
-static int
-mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
-{
-    UNUSED_ARG(r);
-    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
-        return value;
-    }
-    return -118;
-}
-
 void
 register_item_give(int(*foo) (struct unit *, struct unit *,
 const struct item_type *, int, struct order *), const char *name)
@@ -979,7 +969,6 @@ void register_resources(void)
     registered = true;
 
     register_function((pf_generic)mod_elves_only, "mod_elves_only");
-    register_function((pf_generic)mod_dwarves_only, "mod_dwarves_only");
     register_function((pf_generic)res_changeitem, "changeitem");
     register_function((pf_generic)res_changeperson, "changeperson");
     register_function((pf_generic)res_changepeasants, "changepeasants");
