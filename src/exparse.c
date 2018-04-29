@@ -392,6 +392,9 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
             if (xml_strcmp(el, "construction") == 0) {
                 construction *con = calloc(sizeof(construction), 1);
                 int i;
+                con->maxsize = -1;
+                con->minskill = -1;
+                con->reqsize = 1;
                 for (i = 0; attr[i]; i += 2) {
                     if (xml_strcmp(attr[i], "skill") == 0) {
                         con->skill = findskill(attr[i + 1]);
