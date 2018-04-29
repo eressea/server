@@ -312,10 +312,6 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             if (xml_strcmp(type, "missile_target") == 0) {
                 flags |= WMF_MISSILE_TARGET;
             }
-            else if (xml_strcmp(type, "require") == 0) {
-                /* does require even work? */
-                flags = flags;
-            }
             else if (xml_strcmp(type, "damage") == 0) {
                 flags |= WMF_DAMAGE;
             }
