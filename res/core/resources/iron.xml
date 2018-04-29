@@ -8,7 +8,7 @@
     <modifier building="smithy" type="save" value="2"/>
     <modifier building="mine" type="skill" value="1"/>
     <modifier building="mine" type="material" value="0.5"/>
-    <modifier race="dwarf" type="material" value="0.6"/>
+    <modifier races="dwarf" type="material" value="0.6"/>
 </resource>
 </resources>
 </eressea>

@@ -259,7 +259,10 @@ void racelist_insert(struct race_list **rl, const struct race *r)
     *rl = rl2;
 }
 
+static int race_mask = 0;
+
 void free_races(void) {
+    race_mask = 0;
     while (races) {
         int i;
         race * rc = races->next;
@@ -347,6 +350,10 @@ race *rc_create(const char *zName)
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
+
+    rc->mask_item = 1 << race_mask;
+    ++race_mask;
+
     rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
     rc->weight = PERSON_WEIGHT;
@@ -575,18 +582,17 @@ void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
 }
 
-static int race_mask = 1;
+int rc_mask(const race * rc) {
+    assert(rc->mask_item);
+    return rc->mask_item;
+}
 
-int rc_mask(char *list) {
+int rc_get_mask(char *list) {
     int mask = 0;
     char * tok = strtok(list, " ,");
     while (tok) {
         race * rc = rc_get_or_create(tok);
-        if (!rc->mask_item) {
-            rc->mask_item = race_mask;
-            race_mask = race_mask << 1;
-        }
-        mask |= rc->mask_item;
+        mask |= rc_mask(rc);
         tok = strtok(NULL, " ,");
     }
     return mask;

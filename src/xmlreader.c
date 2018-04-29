@@ -61,6 +61,17 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 
 
+static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
+    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
+    int mask = 0;
+    assert(maskp);
+    if (propValue) {
+        mask = rc_get_mask((char *)propValue);
+        xmlFree(propValue);
+    }
+    *maskp = mask;
+}
+
 static variant xml_fraction(xmlNodePtr node, const char *name) {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
     if (propValue != NULL) {
@@ -129,16 +140,8 @@ static resource_mod * xml_readmodifiers(xmlXPathObjectPtr result, xmlNodePtr nod
             xmlNodePtr node = result->nodesetval->nodeTab[k];
             xmlChar *propValue;
             building_type *btype = NULL;
-            const race *rc = NULL;
 
-            propValue = xmlGetProp(node, BAD_CAST "race");
-            if (propValue != NULL) {
-                rc = rc_find((const char *)propValue);
-                if (rc == NULL)
-                    rc = rc_get_or_create((const char *)propValue);
-                xmlFree(propValue);
-            }
-            modifiers[k].race = rc;
+            mask_races(node, "races", &modifiers[k].race_mask);
 
             propValue = xmlGetProp(node, BAD_CAST "building");
             if (propValue != NULL) {
@@ -520,8 +523,6 @@ static armor_type *xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
     return atype;
 }
 
-static void mask_races(xmlNodePtr node, const char *key, int *maskp);
-
 static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 {
     xmlNodePtr node = xpath->node;
@@ -654,17 +655,6 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
     xpath->node = node;
     return wtype;
-}
-
-static void mask_races(xmlNodePtr node, const char *key, int *maskp) {
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST key);
-    int mask = 0;
-    assert(maskp);
-    if (propValue) {
-        mask = rc_mask((char *)propValue);
-        xmlFree(propValue);
-    }
-    *maskp = mask;
 }
 
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)

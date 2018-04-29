@@ -7,7 +7,7 @@
     </item>
     <modifier building="quarry" type="skill" value="1"/>
     <modifier building="quarry" type="material" value="0.5"/>
-    <modifier race="troll" type="material" value="0.75"/>
+    <modifier races="troll" type="material" value="0.75"/>
 </resource>
 </resources>
 </eressea>

@@ -2,7 +2,7 @@
 <eressea>
 <resources>
 <resource name="greatbow">
-  <modifier type="require" race="elf"/>
+  <modifier type="require" races="elf"/>
   <item weight="100">
     <construction skill="weaponsmithing" minskill="5">
       <requirement type="mallorn" quantity="2"/>

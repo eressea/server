@@ -2,8 +2,7 @@
 <eressea>
 <resources>
 <resource name="towershield">
-  <modifier type="require" race="dwarf"/>
-  <modifier type="require" race="irongolem"/>
+  <modifier type="require" races="dwarf irongolem"/>
   <item weight="200" score="60" allow="dwarf">
     <construction skill="armorer" minskill="4">
       <requirement type="iron" quantity="1"/>
@@ -20,8 +19,7 @@
   </item>
 </resource>
 <resource name="scale">
-  <modifier type="require" race="dwarf"/>
-  <modifier type="require" race="irongolem"/>
+  <modifier type="require" races="dwarf irongolem"/>
   <item weight="300" score="150" allow="dwarf halfling">
     <construction skill="armorer" minskill="5">
       <requirement type="iron" quantity="2"/>

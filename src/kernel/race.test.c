@@ -178,10 +178,10 @@ static void test_rc_mask(CuTest *tc) {
     char list[64];
     test_setup();
     strcpy(list, "goblin dwarf");
-    mask = rc_mask(list);
+    mask = rc_get_mask(list);
     CuAssertIntEquals(tc, 3, mask);
     CuAssertStrEquals(tc, "goblin", list);
-    mask = rc_mask(list);
+    mask = rc_get_mask(list);
     CuAssertIntEquals(tc, 1, mask);
     test_teardown();
 }
