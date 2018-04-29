@@ -723,6 +723,7 @@ bool missile)
         }
         if (wtype->modifiers != NULL) {
             /* Pferdebonus, Lanzenbonus, usw. */
+            const race *rc = u_race(tu);
             int m;
             unsigned int flags =
                 WMF_SKILL | (attacking ? WMF_OFFENSIVE : WMF_DEFENSIVE);
@@ -738,17 +739,10 @@ bool missile)
 
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 if ((wtype->modifiers[m].flags & flags) == flags) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == u_race(tu))
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & rc->mask_item)) {
+                        skill += wtype->modifiers[m].value;
                     }
-                    skill += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1029,17 +1023,10 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 /* weapon damage for this weapon, possibly by race */
                 if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == ar)
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & ar->mask_item)) {
+                        modifier += wtype->modifiers[m].value;
                     }
-                    modifier += wtype->modifiers[m].value;
                 }
             }
         }
@@ -3272,8 +3259,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
                     adata->atype = itm->type->rtype->atype;
                     adata->count = itm->number;
                     for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
-                        if (adata->atype->prot > (*aptr)->atype->prot)
+                        if (adata->atype->prot > (*aptr)->atype->prot) {
                             break;
+                        }
                     }
                     adata->next = *aptr;
                     *aptr = adata;

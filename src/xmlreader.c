@@ -520,6 +520,8 @@ static armor_type *xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
     return atype;
 }
 
+static void mask_races(xmlNodePtr node, const char *key, int *maskp);
+
 static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 {
     xmlNodePtr node = xpath->node;
@@ -591,8 +593,7 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
     wtype->modifiers = calloc(result->nodesetval->nodeNr + 1, sizeof(weapon_mod));
     for (k = 0; k != result->nodesetval->nodeNr; ++k) {
         xmlNodePtr node = result->nodesetval->nodeTab[k];
-        xmlXPathObjectPtr races;
-        int r, flags = 0;
+        int flags = 0;
 
         if (xml_bvalue(node, "walking", false))
             flags |= WMF_WALKING;
@@ -619,21 +620,8 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
         wtype->modifiers[k].flags = flags;
         wtype->modifiers[k].value = xml_ivalue(node, "value", 0);
 
-        xpath->node = node;
-        races = xmlXPathEvalExpression(BAD_CAST "race", xpath);
-        for (r = 0; r != races->nodesetval->nodeNr; ++r) {
-            xmlNodePtr node = races->nodesetval->nodeTab[r];
-
-            propValue = xmlGetProp(node, BAD_CAST "name");
-            if (propValue != NULL) {
-                const race *rc = rc_find((const char *)propValue);
-                if (rc == NULL)
-                    rc = rc_get_or_create((const char *)propValue);
-                racelist_insert(&wtype->modifiers[k].races, rc);
-                xmlFree(propValue);
-            }
-        }
-        xmlXPathFreeObject(races);
+        mask_races(node, "races", &wtype->modifiers[k].race_mask);
+        wtype->modifiers[k].race_mask = 0;
     }
     xmlXPathFreeObject(result);
 
@@ -1311,7 +1299,7 @@ static void parse_ai(race * rc, xmlNodePtr node)
         rc->flags |= RCF_ATTACK_MOVED;
 }
 
-static void set_study_speed(race *rc, skill_t sk, int modifier){
+static void set_study_speed(race *rc, skill_t sk, int modifier) {
     if (!rc->study_speed)
         rc->study_speed = calloc(1, MAXSKILLS);
     rc->study_speed[sk] = (char)modifier;

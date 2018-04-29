@@ -10,9 +10,7 @@
         <damage type="footman" value="3d8+8"/>
         <modifier type="missile_target" value="2"/>
         <modifier type="skill" value="-90"/>
-        <modifier type="skill" value="100">
-          <race name="snowman"/>
-        </modifier>
+        <modifier type="skill" value="100" races="snowman"/>
       </weapon>
     </item>
   </resource>

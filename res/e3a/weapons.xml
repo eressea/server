@@ -136,9 +136,7 @@
       <damage type="rider" value="2d4+5"/>
       <damage type="footman" value="2d4+5"/>
       <modifier type="missile_target" value="2"/>
-      <modifier type="damage" value="1">
-        <race name="elf"/>
-      </modifier>
+      <modifier type="damage" value="1" races="elf"/>
     </weapon>
   </item>
 </resource>
