@@ -328,7 +328,6 @@ int shipspeed(const ship * sh, const unit * u)
     assert(u->ship == sh);
     assert(u == ship_owner(sh));
     assert(sh->type->construction);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
     k = sh->type->range;
     if (sh->size != sh->type->construction->maxsize)
@@ -395,10 +394,6 @@ const char *shipname(const ship * sh)
 int shipcapacity(const ship * sh)
 {
     int i = sh->type->cargo;
-
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
 
     if (sh->type->construction && sh->size != sh->type->construction->maxsize)
         return 0;

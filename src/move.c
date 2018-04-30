@@ -847,7 +847,6 @@ static void drifting_ships(region * r)
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
 
-            assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
                 && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
@@ -1669,7 +1668,6 @@ static bool ship_ready(const region * r, unit * u, order * ord)
         return false;
     }
     if (u->ship->type->construction) {
-        assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
         if (u->ship->size != u->ship->type->construction->maxsize) {
             cmistake(u, ord, 15, MSG_MOVE);
             return false;

@@ -642,7 +642,6 @@ message *msg_materials_required(unit * u, order * ord,
 
 int maxbuild(const unit * u, const construction * cons)
 /* calculate maximum size that can be built from available material */
-/* !! ignores maximum objectsize and improvements... */
 {
     int c;
     int maximum = INT_MAX;
