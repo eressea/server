@@ -679,7 +679,69 @@ int maxbuild(const unit * u, const construction * cons)
     return maximum;
 }
 
-/** old build routines */
+static int build_failure(unit *u, order *ord, const building_type *btype, int want, int err) {
+    switch (err) {
+    case ECOMPLETE:
+        /* the building is already complete */
+        cmistake(u, ord, 4, MSG_PRODUCE);
+        break;
+    case ENOMATERIALS:
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+            btype->construction, want));
+        break;
+    case ELOWSKILL:
+    case ENEEDSKILL:
+        /* no skill, or not enough skill points to build */
+        cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    }
+    return err;
+}
+
+int build_stages(unit *u, construction * con, int built, int n) {
+    int made = 0;
+    while (con) {
+        if (con->maxsize < 0 || con->maxsize > built) {
+            int err, want = INT_MAX;
+            if (n < INT_MAX) {
+                /* do not build more than n total */
+                want = n - made;
+            }
+            if (con->maxsize > 0) {
+                /* do not build more than the rest of the stage */
+                int todo = con->maxsize - built;
+                if (todo < want) {
+                    want = todo;
+                }
+            }
+            err = build(u, con, built, want, 0);
+            if (err < 0) {
+                if (made == 0) {
+                    /* could not make any part at all */
+                    return err;
+                }
+                else {
+                    /* could not build any part of this stage (low skill, etc). */
+                    break;
+                }
+            }
+            else {
+                /* err is the amount we built of this stage */
+                made += err;
+                if (err != con->maxsize && con->maxsize > 0) {
+                    /* we did not finish the stage, can quit here */
+                    break;
+                }
+            }
+        }
+        /* build the next stage: */
+        if (built >= con->maxsize && con->maxsize > 0) {
+            built -= con->maxsize;
+        }
+        con = con->improvement;
+    }
+    return made;
+}
 
 int
 build_building(unit * u, const building_type * btype, int id, int want, order * ord)
@@ -783,30 +845,19 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
             }
         }
     }
-    built = build(u, btype->construction, built, n, 0);
 
-    switch (built) {
-    case ECOMPLETE:
-        /* the building is already complete */
-        cmistake(u, ord, 4, MSG_PRODUCE);
-        break;
-    case ENOMATERIALS:
-        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
-            btype->construction, want));
-        break;
-    case ELOWSKILL:
-    case ENEEDSKILL:
-        /* no skill, or not enough skill points to build */
-        cmistake(u, ord, 50, MSG_PRODUCE);
-        break;
+    built = build_stages(u, btype->construction, built, n);
+
+    if (built < 0) {
+        return build_failure(u, ord, btype, want, built);
     }
-    if (built <= 0) {
-        return built;
-    }
-    /* at this point, the building size is increased. */
-    if (b == NULL) {
+
+    if (b) {
+        b->size += built;
+    } else {
         /* build a new building */
         b = new_building(btype, r, lang);
+        b->size = built;
         b->type = btype;
         fset(b, BLD_MAINTAINED);
 
@@ -818,7 +869,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     btname = LOC(lang, btype->_name);
 
-    if (want - built <= 0) {
+    if (want <= built) {
         /* geb�ude fertig */
         new_order = default_order(lang);
     }
@@ -850,7 +901,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         free_order(new_order);
     }
 
-    b->size += built;
+    ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
+        "building unit size", b, u, built));
+
     if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
         log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
     }
@@ -858,8 +911,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     update_lighthouse(b);
 
-    ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
-        "building unit size", b, u, built));
     return built;
 }
 
