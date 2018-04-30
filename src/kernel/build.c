@@ -589,9 +589,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         if (con->maxsize > 0) {
             int req = con->maxsize - completed;
             if (req < n) n = req;
-            if (con->improvement == NULL) {
-                want = n;
-            }
+            want = n;
         }
 
         n = count_materials(u, con, n, completed);

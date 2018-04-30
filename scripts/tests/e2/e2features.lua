@@ -284,8 +284,6 @@ function test_block_movement()
   end
 end
 
-
-
 function test_block_movement_aots()
   eressea.settings.set("rules.guard.base_stop_prob", "0.0")
   eressea.settings.set("rules.guard.skill_stop_prob", "1.0")
