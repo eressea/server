@@ -70,7 +70,6 @@ static void test_make_fighter(CuTest * tc)
 
 static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
-    weapon_type *wtype;
     unit *au;
     fighter *af;
     battle *b;
@@ -79,7 +78,7 @@ static void test_select_weapon_restricted(CuTest *tc) {
     test_setup();
     au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("halberd");
-    wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&au->items, itype, 1);
     rc = test_create_race("smurf");
     CuAssertIntEquals(tc, 0, rc->mask_item & au->_race->mask_item);
