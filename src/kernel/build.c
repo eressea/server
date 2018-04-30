@@ -512,15 +512,16 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
 
     if (want <= 0)
         return 0;
-    if (con == NULL)
+    if (con == NULL) {
         return ENOMATERIALS;
-    if (con->improvement == NULL && completed == con->maxsize)
+    }
+    if (completed == con->maxsize) {
         return ECOMPLETE;
+    }
     if (con->skill != NOSKILL) {
         int effsk;
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
-        assert(u->number);
         basesk = effskill(u, con->skill, 0);
         if (basesk == 0)
             return ENEEDSKILL;
@@ -543,23 +544,6 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
     }
     for (; want > 0 && skills > 0;) {
         int err, n;
-
-        /* skip over everything that's already been done:
-         * type->improvement==NULL means no more improvements, but no size limits
-         * type->improvement==type means build another object of the same time
-         * while material lasts type->improvement==x means build x when type
-         * is finished */
-        while (con && con->improvement &&
-            con->improvement != con &&
-            con->maxsize > 0 && con->maxsize <= completed) {
-            completed -= con->maxsize;
-            con = con->improvement;
-        }
-        if (con == NULL) {
-            if (made == 0)
-                return ECOMPLETE;
-            break;                    /* completed */
-        }
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
