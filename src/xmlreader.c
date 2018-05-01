@@ -214,9 +214,9 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     }
 }
 
-void
+static void
 xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
-construction ** consPtr, construct_t type)
+construction ** consPtr, bool is_building)
 {
     xmlNodePtr pushNode = xpath->node;
     int k;
@@ -243,13 +243,12 @@ construction ** consPtr, construct_t type)
         *consPtr = con = (construction *)calloc(sizeof(construction), 1);
         consPtr = &con->improvement;
 
-        con->type = type;
         con->skill = sk;
         con->maxsize = xml_ivalue(node, "maxsize", -1);
         con->minskill = xml_ivalue(node, "minskill", -1);
         con->reqsize = xml_ivalue(node, "reqsize", 1);
 
-        if (type == CONS_BUILDING) {
+        if (is_building) {
             propValue = xmlGetProp(node, BAD_CAST "name");
             if (propValue != NULL) {
                 con->name = str_strdup((const char *)propValue);
@@ -342,7 +341,7 @@ static int parse_buildings(xmlDocPtr doc)
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &btype->construction, CONS_BUILDING);
+            xml_readconstruction(xpath, result->nodesetval, &btype->construction, true);
             xmlXPathFreeObject(result);
 
             /* reading eressea/buildings/building/function */
@@ -442,7 +441,7 @@ static int parse_ships(xmlDocPtr doc)
             /* reading eressea/ships/ship/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &st->construction, CONS_OTHER);
+            xml_readconstruction(xpath, result->nodesetval, &st->construction, false);
             xmlXPathFreeObject(result);
 
             for (child = node->children; child; child = child->next) {
@@ -688,7 +687,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     /* reading item/construction */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval, &itype->construction, CONS_ITEM);
+    xml_readconstruction(xpath, result->nodesetval, &itype->construction, false);
     xmlXPathFreeObject(result);
 
     /* reading item/weapon */
