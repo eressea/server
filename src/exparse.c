@@ -541,6 +541,70 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
     }
 }
 
+const XML_Char *attr_get(const XML_Char **attr, const char *key) {
+    int i;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], key) == 0) {
+            return attr[i + 1];
+        }
+    }
+    return NULL;
+}
+
+static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    const char *flag_names[] = { "nodestroy", "nobuild", "unique", "decay", "magic", "namechange", "fort", "oneperturn", NULL };
+    if (xml_strcmp(el, "building") == 0) {
+        const XML_Char *name;
+
+        name = attr_get(attr, "name");
+        if (name) {
+            building_type *btype = bt_get_or_create(name);
+            int i, flags = BTF_DEFAULT;
+
+            for (i = 0; attr[i]; i += 2) {
+                if (xml_strcmp(attr[i], "maxsize") == 0) {
+                    btype->maxsize = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "capacity") == 0) {
+                    btype->capacity = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "maxcapacity") == 0) {
+                    btype->maxcapacity = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "magresbonus") == 0) {
+                    btype->magresbonus = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "fumblebonus") == 0) {
+                    btype->fumblebonus = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "taxes") == 0) {
+                    btype->taxes = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "auraregen") == 0) {
+                    btype->auraregen = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "magres") == 0) {
+                    /* magres is specified in percent! */
+                    btype->magres = frac_make(xml_int(attr[i + 1]), 100);
+                }
+                else if (!handle_flag(&flags, attr + i, flag_names)) {
+                    /* we already handled the name earlier */
+                    if (xml_strcmp(attr[i], "name") != 0) {
+                        handle_bad_input(pi, el, attr[i]);
+                    }
+                }
+            }
+            btype->flags = flags;
+            pi->object = btype;
+        }
+    }
+    else {
+        building_type *btype = (building_type *)pi->object;
+        assert(btype);
+        handle_bad_input(pi, el, NULL);
+    }
+}
+
 static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char **attr) {
     parseinfo *pi = (parseinfo *)data;
     if (pi->depth == 0) {
@@ -571,6 +635,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
     }
     else {
         switch (pi->type) {
+        case EXP_BUILDINGS:
+            start_buildings(pi, el, attr);
+            break;
         case EXP_RESOURCES:
             start_resources(pi, el, attr);
             break;
@@ -639,6 +706,7 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
         break;
     default:
         if (pi->depth == 1) {
+            pi->object = NULL;
             pi->type = EXP_UNKNOWN;
         }
         if (pi->cdata) {

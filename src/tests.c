@@ -338,7 +338,6 @@ building_type * test_create_buildingtype(const char * name)
 {
     construction *con;
     building_type *btype = bt_get_or_create(name);
-    btype->flags = BTF_NAMECHANGE;
     if (btype->stages) {
         con = btype->stages->construction;
     } else {

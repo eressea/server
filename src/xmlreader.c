@@ -325,20 +325,20 @@ static int parse_buildings(xmlDocPtr doc)
 
             if (xml_bvalue(node, "nodestroy", false))
                 btype->flags |= BTF_INDESTRUCTIBLE;
-            if (xml_bvalue(node, "oneperturn", false))
-                btype->flags |= BTF_ONEPERTURN;
             if (xml_bvalue(node, "nobuild", false))
                 btype->flags |= BTF_NOBUILD;
-            if (xml_bvalue(node, "namechange", true))
-                btype->flags |= BTF_NAMECHANGE;
             if (xml_bvalue(node, "unique", false))
                 btype->flags |= BTF_UNIQUE;
             if (xml_bvalue(node, "decay", false))
                 btype->flags |= BTF_DECAY;
             if (xml_bvalue(node, "magic", false))
                 btype->flags |= BTF_MAGIC;
+            if (xml_bvalue(node, "namechange", true))
+                btype->flags |= BTF_NAMECHANGE;
             if (xml_bvalue(node, "fort", false))
                 btype->flags |= BTF_FORTIFICATION;
+            if (xml_bvalue(node, "oneperturn", false))
+                btype->flags |= BTF_ONEPERTURN;
 
             /* reading eressea/buildings/building/modifier */
             xpath->node = node;
@@ -1172,18 +1172,6 @@ static int parse_spells(xmlDocPtr doc)
                 sp->syntax = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
-#ifdef TODO /* no longer need it, spellbooks! */
-            /* magic type */
-            propValue = xmlGetProp(node, BAD_CAST "type");
-            assert(propValue != NULL);
-            for (sp->magietyp = 0; sp->magietyp != MAXMAGIETYP; ++sp->magietyp) {
-                if (strcmp(magic_school[sp->magietyp], (const char *)propValue) == 0)
-                    break;
-            }
-            assert(sp->magietyp != MAXMAGIETYP);
-            xmlFree(propValue);
-            /* level, rank and flags */
-#endif
             sp->rank = (char)xml_ivalue(node, "rank", -1);
             if (xml_bvalue(node, "los", false))
                 sp->sptyp |= TESTCANSEE;        /* must see or have contact */
