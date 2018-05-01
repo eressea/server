@@ -305,7 +305,7 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, btype->magres.sa[0]);
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
-    CuAssertIntEquals(tc, 0, btype->flags);
+    CuAssertIntEquals(tc, BTF_DEFAULT, btype->flags);
     test_teardown();
 }
 
