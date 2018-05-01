@@ -284,8 +284,6 @@ function test_block_movement()
   end
 end
 
-
-
 function test_block_movement_aots()
   eressea.settings.set("rules.guard.base_stop_prob", "0.0")
   eressea.settings.set("rules.guard.skill_stop_prob", "1.0")
@@ -339,11 +337,11 @@ function test_stonegolems()
   u1:set_skill("building", 1)
   u2:set_skill("building", 1)
 
--- test that no server crash occur
+-- test that no server crash occurs
   u1:clear_orders()
   u1:add_order("Mache Burg")
   process_orders()
-  assert_equal(0 ,u1.number, "There shoud be no Stone Golems")
+  assert_equal(0, u1.number, "There should be no more stone golems")
 -- end test server crash
 
 -- test that Stone Golems build for four stones
@@ -351,7 +349,7 @@ function test_stonegolems()
   u2:add_order("MACHE 4 BURG " .. itoa36(c1.id))
   process_orders()
   assert_equal(230, c1.size, "resulting size should be 230")
-  assert_equal(1 ,u2.number, "There shoud be one Stone Golems")
+  assert_equal(1, u2.number, "There should be one stone golem")
 -- end test Stone Golems four stones
 end
 

@@ -110,7 +110,7 @@ static void test_prefixes(CuTest * tc)
     CuAssertPtrNotNull(tc, race_prefixes);
     CuAssertStrEquals(tc, "snow", race_prefixes[0]);
     CuAssertStrEquals(tc, "dark", race_prefixes[2]);
-    CuAssertPtrEquals(tc, 0, race_prefixes[3]);
+    CuAssertPtrEquals(tc, NULL, race_prefixes[3]);
     cJSON_Delete(json);
     test_teardown();
 }
@@ -189,7 +189,7 @@ static void test_races(CuTest * tc)
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, races);
+    CuAssertPtrEquals(tc, NULL, races);
     json_config(json);
 
     CuAssertPtrNotNull(tc, races);
@@ -222,7 +222,7 @@ static void test_findrace(CuTest *tc) {
     CuAssertPtrNotNull(tc, json);
     test_setup();
     lang = get_or_create_locale("de");
-    CuAssertPtrEquals(tc, 0, (void *)findrace("Zwerg", lang));
+    CuAssertPtrEquals(tc, NULL, (void *)findrace("Zwerg", lang));
 
     json_config(json);
     init_locale(lang);
@@ -245,9 +245,9 @@ static void test_items(CuTest * tc)
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, it_find("axe"));
-    CuAssertPtrEquals(tc, 0, rt_find("axe"));
-    CuAssertPtrEquals(tc, 0, (void *)get_resourcetype(R_HORSE));
+    CuAssertPtrEquals(tc, NULL, it_find("axe"));
+    CuAssertPtrEquals(tc, NULL, rt_find("axe"));
+    CuAssertPtrEquals(tc, NULL, (void *)get_resourcetype(R_HORSE));
 
     json_config(json);
 
@@ -283,7 +283,7 @@ static void test_ships(CuTest * tc)
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, shiptypes);
+    CuAssertPtrEquals(tc, NULL, shiptypes);
     json_config(json);
 
     CuAssertPtrNotNull(tc, shiptypes);
@@ -301,7 +301,7 @@ static void test_ships(CuTest * tc)
 
     CuAssertPtrNotNull(tc, st->coasts);
     CuAssertPtrEquals(tc, (void *)ter, (void *)st->coasts[0]);
-    CuAssertPtrEquals(tc, 0, (void *)st->coasts[1]);
+    CuAssertPtrEquals(tc, NULL, (void *)st->coasts[1]);
 
     cJSON_Delete(json);
     test_teardown();
@@ -309,28 +309,42 @@ static void test_ships(CuTest * tc)
 
 static void test_castles(CuTest *tc) {
     const char * data = "{\"buildings\": { \"castle\" : { "
-        "\"construction\" : ["
-        "{ \"maxsize\" : 2 },"
-        "{ \"maxsize\" : 8 }"
+        "\"stages\" : ["
+        "{ \"construction\": { \"maxsize\" : 2 }, \"name\": \"site\" },"
+        "{ \"construction\": { \"maxsize\" : 8 } },"
+        "{ \"construction\": { \"maxsize\" : -1 } }"
         "]}}}";
 
     cJSON *json = cJSON_Parse(data);
     const building_type *bt;
+    const building_stage *stage;
+    const construction *con;
 
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, buildingtypes);
+    CuAssertPtrEquals(tc, NULL, buildingtypes);
     json_config(json);
 
     CuAssertPtrNotNull(tc, buildingtypes);
     bt = bt_find("castle");
     CuAssertPtrNotNull(tc, bt);
-    CuAssertPtrNotNull(tc, bt->construction);
-    CuAssertIntEquals(tc, 2, bt->construction->maxsize);
-    CuAssertPtrNotNull(tc, bt->construction->improvement);
-    CuAssertIntEquals(tc, 6, bt->construction->improvement->maxsize);
-    CuAssertPtrEquals(tc, 0, bt->construction->improvement->improvement);
+    CuAssertPtrNotNull(tc, stage = bt->stages);
+    CuAssertStrEquals(tc, "site", stage->name);
+    CuAssertPtrNotNull(tc, con = stage->construction);
+    CuAssertIntEquals(tc, 2, con->maxsize);
+
+    CuAssertPtrNotNull(tc, stage = stage->next);
+    CuAssertPtrEquals(tc, NULL, stage->name);
+    CuAssertPtrNotNull(tc, con = stage->construction);
+    CuAssertIntEquals(tc, 6, con->maxsize);
+
+    CuAssertPtrNotNull(tc, stage = stage->next);
+    CuAssertPtrNotNull(tc, con = stage->construction);
+    CuAssertIntEquals(tc, -1, con->maxsize);
+
+    CuAssertPtrEquals(tc, NULL, stage->next);
+
     cJSON_Delete(json);
     test_teardown();
 }
@@ -344,7 +358,7 @@ static void test_spells(CuTest * tc)
 
     test_setup();
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, find_spell("fireball"));
+    CuAssertPtrEquals(tc, NULL, find_spell("fireball"));
 
     json_config(json);
     sp = find_spell("fireball");
@@ -353,7 +367,7 @@ static void test_spells(CuTest * tc)
 
     cJSON_Delete(json);
     test_teardown();
-    CuAssertPtrEquals(tc, 0, find_spell("fireball"));
+    CuAssertPtrEquals(tc, NULL, find_spell("fireball"));
 }
 
 static const char * building_data = "{\"buildings\": { "
@@ -380,11 +394,12 @@ static void test_buildings(CuTest * tc)
 {
     cJSON *json = cJSON_Parse(building_data);
     const building_type *bt;
+    const construction *con;
 
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, buildingtypes);
+    CuAssertPtrEquals(tc, NULL, buildingtypes);
     json_config(json);
 
     CuAssertPtrNotNull(tc, buildingtypes);
@@ -406,17 +421,19 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, MTF_VARIABLE, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
-    CuAssertPtrNotNull(tc, bt->construction);
-    CuAssertPtrNotNull(tc, bt->construction->materials);
-    CuAssertIntEquals(tc, 2, bt->construction->materials[0].number);
-    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)bt->construction->materials[0].rtype);
-    CuAssertIntEquals(tc, 1, bt->construction->materials[1].number);
-    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->construction->materials[1].rtype);
-    CuAssertIntEquals(tc, 0, bt->construction->materials[2].number);
-    CuAssertIntEquals(tc, 10, bt->construction->reqsize);
-    CuAssertIntEquals(tc, 20, bt->construction->maxsize);
-    CuAssertIntEquals(tc, 1, bt->construction->minskill);
-    CuAssertPtrEquals(tc, 0, bt->construction->improvement);
+    CuAssertPtrNotNull(tc, bt->stages);
+    CuAssertPtrEquals(tc, NULL, bt->stages->next);
+    CuAssertPtrNotNull(tc, bt->stages->construction);
+    CuAssertPtrNotNull(tc, con = bt->stages->construction);
+    CuAssertPtrNotNull(tc, con->materials);
+    CuAssertIntEquals(tc, 2, con->materials[0].number);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)con->materials[0].rtype);
+    CuAssertIntEquals(tc, 1, con->materials[1].number);
+    CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)con->materials[1].rtype);
+    CuAssertIntEquals(tc, 0, con->materials[2].number);
+    CuAssertIntEquals(tc, 10, con->reqsize);
+    CuAssertIntEquals(tc, 20, con->maxsize);
+    CuAssertIntEquals(tc, 1, con->minskill);
     cJSON_Delete(json);
     test_teardown();
 }
@@ -483,7 +500,7 @@ static void test_configs(CuTest * tc)
     fwrite(building_data, 1, strlen(building_data), F);
     fclose(F);
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, buildingtypes);
+    CuAssertPtrEquals(tc, NULL, buildingtypes);
     json_config(json);
     CuAssertPtrNotNull(tc, buildingtypes);
     if (remove("test.json")!=0 && errno==ENOENT) {
@@ -508,7 +525,7 @@ static void test_terrains(CuTest * tc)
 
     test_setup();
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, 0, (void *)get_terrain("plain"));
+    CuAssertPtrEquals(tc, NULL, (void *)get_terrain("plain"));
 
     json_config(json);
     ter = get_terrain("plain");
@@ -520,7 +537,7 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrNotNull(tc, ter->herbs);
     CuAssertPtrEquals(tc, rt_get_or_create("h0"), ter->herbs[0]->rtype);
     CuAssertPtrEquals(tc, rt_get_or_create("h1"), ter->herbs[1]->rtype);
-    CuAssertPtrEquals(tc, 0, (void *)ter->herbs[2]);
+    CuAssertPtrEquals(tc, NULL, (void *)ter->herbs[2]);
     CuAssertPtrNotNull(tc, ter->name); /* anything named "plain" uses plain_name() */
     CuAssertPtrNotNull(tc, ter->production);
     CuAssertPtrEquals(tc, rt_get_or_create("stone"), (resource_type *)ter->production[0].type);
@@ -529,7 +546,7 @@ static void test_terrains(CuTest * tc)
     CuAssertStrEquals(tc, "1d5", ter->production[0].divisor);
     CuAssertStrEquals(tc, "1d6", ter->production[0].startlevel);
     CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
-    CuAssertPtrEquals(tc, 0, (void *)ter->production[2].type);
+    CuAssertPtrEquals(tc, NULL, (void *)ter->production[2].type);
 
     cJSON_Delete(json);
     test_teardown();

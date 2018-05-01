@@ -222,6 +222,9 @@ void score(void)
 
 int default_score(const item_type *itype) {
     int result = 0;
+    if (itype->rtype->wtype || itype->rtype->atype) {
+        result += 10;
+    }
     if (itype->construction) {
         requirement *req = itype->construction->materials;
         while (req->number) {

@@ -26,6 +26,18 @@ static void test_rc_name(CuTest *tc) {
     test_teardown();
 }
 
+static void test_rc_item_mask(CuTest *tc) {
+    struct race *rc;
+    test_setup();
+    rc = rc_get_or_create("hooman");
+    CuAssertIntEquals(tc, 1, rc->mask_item);
+    rc = rc_get_or_create("aelf");
+    CuAssertIntEquals(tc, 2, rc->mask_item);
+    rc = rc_get_or_create("dorf");
+    CuAssertIntEquals(tc, 4, rc->mask_item);
+    test_teardown();
+}
+
 static void test_rc_defaults(CuTest *tc) {
     struct race *rc;
     test_setup();
@@ -193,6 +205,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_old_race);
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
+    SUITE_ADD_TEST(suite, test_rc_item_mask);
     SUITE_ADD_TEST(suite, test_rc_find);
     SUITE_ADD_TEST(suite, test_rc_mask);
     SUITE_ADD_TEST(suite, test_rc_set_param);

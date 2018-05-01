@@ -145,13 +145,25 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
     }
 }
 
+static int recycle(unit *u, construction *con, int size) {
+    /* TODO: Nicht an ZERST�RE mit Punktangabe angepasst! */
+    int c;
+    for (c = 0; con->materials[c].number; ++c) {
+        const requirement *rq = con->materials + c;
+        int num = (rq->number * size / con->reqsize) / 2;
+        if (num) {
+            change_resource(u, rq->rtype, num);
+        }
+    }
+    return size;
+}
+
 int destroy_cmd(unit * u, struct order *ord)
 {
     char token[128];
     ship *sh;
     unit *u2;
     region *r = u->region;
-    const construction *con = NULL;
     int size = 0;
     const char *s;
     int n = INT_MAX;
@@ -194,6 +206,7 @@ int destroy_cmd(unit * u, struct order *ord)
             return 138;
         }
         if (n >= b->size) {
+            building_stage *stage;
             /* destroy completly */
             /* all units leave the building */
             for (u2 = r->units; u2; u2 = u2->next) {
@@ -202,11 +215,13 @@ int destroy_cmd(unit * u, struct order *ord)
                 }
             }
             ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
-            con = b->type->construction;
+            for (stage = b->type->stages; stage; stage = stage->next) {
+                size = recycle(u, stage->construction, size);
+            }
             remove_building(&r->buildings, b);
         }
         else {
-            /* partial destroy */
+            /* TODO: partial destroy does not recycle */
             b->size -= n;
             ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
                 "building unit", b, u));
@@ -234,7 +249,7 @@ int destroy_cmd(unit * u, struct order *ord)
             }
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
                 "unit region ship", u, r, sh));
-            con = sh->type->construction;
+            size = recycle(u, sh->type->construction, size);
             remove_ship(&sh->region->ships, sh);
         }
         else {
@@ -247,18 +262,6 @@ int destroy_cmd(unit * u, struct order *ord)
     else {
         cmistake(u, ord, 138, MSG_PRODUCE);
         return 138;
-    }
-
-    if (con) {
-        /* TODO: Nicht an ZERST�RE mit Punktangabe angepasst! */
-        int c;
-        for (c = 0; con->materials[c].number; ++c) {
-            const requirement *rq = con->materials + c;
-            int recycle = (rq->number * size / con->reqsize) / 2;
-            if (recycle) {
-                change_resource(u, rq->rtype, recycle);
-            }
-        }
     }
     return 0;
 }
@@ -512,15 +515,16 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
 
     if (want <= 0)
         return 0;
-    if (con == NULL)
+    if (con == NULL) {
         return ENOMATERIALS;
-    if (con->improvement == NULL && completed == con->maxsize)
+    }
+    if (completed == con->maxsize) {
         return ECOMPLETE;
+    }
     if (con->skill != NOSKILL) {
         int effsk;
         int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
-        assert(u->number);
         basesk = effskill(u, con->skill, 0);
         if (basesk == 0)
             return ENEEDSKILL;
@@ -543,23 +547,6 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
     }
     for (; want > 0 && skills > 0;) {
         int err, n;
-
-        /* skip over everything that's already been done:
-         * type->improvement==NULL means no more improvements, but no size limits
-         * type->improvement==type means build another object of the same time
-         * while material lasts type->improvement==x means build x when type
-         * is finished */
-        while (con && con->improvement &&
-            con->improvement != con &&
-            con->maxsize > 0 && con->maxsize <= completed) {
-            completed -= con->maxsize;
-            con = con->improvement;
-        }
-        if (con == NULL) {
-            if (made == 0)
-                return ECOMPLETE;
-            break;                    /* completed */
-        }
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
@@ -605,9 +592,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         if (con->maxsize > 0) {
             int req = con->maxsize - completed;
             if (req < n) n = req;
-            if (con->improvement == NULL) {
-                want = n;
-            }
+            want = n;
         }
 
         n = count_materials(u, con, n, completed);
@@ -660,7 +645,6 @@ message *msg_materials_required(unit * u, order * ord,
 
 int maxbuild(const unit * u, const construction * cons)
 /* calculate maximum size that can be built from available material */
-/* !! ignores maximum objectsize and improvements... */
 {
     int c;
     int maximum = INT_MAX;
@@ -679,7 +663,72 @@ int maxbuild(const unit * u, const construction * cons)
     return maximum;
 }
 
-/** old build routines */
+static int build_failure(unit *u, order *ord, const building_type *btype, int want, int err) {
+    switch (err) {
+    case ECOMPLETE:
+        /* the building is already complete */
+        cmistake(u, ord, 4, MSG_PRODUCE);
+        break;
+    case ENOMATERIALS:
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+            btype->stages->construction, want));
+        break;
+    case ELOWSKILL:
+    case ENEEDSKILL:
+        /* no skill, or not enough skill points to build */
+        cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    }
+    return err;
+}
+
+static int build_stages(unit *u, const building_type *btype, int built, int n) {
+    
+    const building_stage *stage;
+    int made = 0;
+
+    for (stage = btype->stages; stage; stage = stage->next) {
+        const construction * con = stage->construction;
+        if (con->maxsize < 0 || con->maxsize > built) {
+            int err, want = INT_MAX;
+            if (n < INT_MAX) {
+                /* do not build more than n total */
+                want = n - made;
+            }
+            if (con->maxsize > 0) {
+                /* do not build more than the rest of the stage */
+                int todo = con->maxsize - built;
+                if (todo < want) {
+                    want = todo;
+                }
+            }
+            err = build(u, con, built, want, 0);
+            if (err < 0) {
+                if (made == 0) {
+                    /* could not make any part at all */
+                    return err;
+                }
+                else {
+                    /* could not build any part of this stage (low skill, etc). */
+                    break;
+                }
+            }
+            else {
+                /* err is the amount we built of this stage */
+                made += err;
+                if (err != con->maxsize && con->maxsize > 0) {
+                    /* we did not finish the stage, can quit here */
+                    break;
+                }
+            }
+        }
+        /* build the next stage: */
+        if (built >= con->maxsize && con->maxsize > 0) {
+            built -= con->maxsize;
+        }
+    }
+    return made;
+}
 
 int
 build_building(unit * u, const building_type * btype, int id, int want, order * ord)
@@ -693,7 +742,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     const struct locale *lang = u->faction->locale;
 
     assert(u->number);
-    assert(btype->construction);
+    assert(btype->stages && btype->stages->construction);
     if (effskill(u, SK_BUILDING, 0) == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
         return 0;
@@ -783,30 +832,19 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
             }
         }
     }
-    built = build(u, btype->construction, built, n, 0);
 
-    switch (built) {
-    case ECOMPLETE:
-        /* the building is already complete */
-        cmistake(u, ord, 4, MSG_PRODUCE);
-        break;
-    case ENOMATERIALS:
-        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
-            btype->construction, want));
-        break;
-    case ELOWSKILL:
-    case ENEEDSKILL:
-        /* no skill, or not enough skill points to build */
-        cmistake(u, ord, 50, MSG_PRODUCE);
-        break;
+    built = build_stages(u, btype, built, n);
+
+    if (built < 0) {
+        return build_failure(u, ord, btype, want, built);
     }
-    if (built <= 0) {
-        return built;
-    }
-    /* at this point, the building size is increased. */
-    if (b == NULL) {
+
+    if (b) {
+        b->size += built;
+    } else {
         /* build a new building */
         b = new_building(btype, r, lang);
+        b->size = built;
         b->type = btype;
         fset(b, BLD_MAINTAINED);
 
@@ -818,7 +856,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     btname = LOC(lang, btype->_name);
 
-    if (want - built <= 0) {
+    if (want <= built) {
         /* geb�ude fertig */
         new_order = default_order(lang);
     }
@@ -850,7 +888,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         free_order(new_order);
     }
 
-    b->size += built;
+    ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
+        "building unit size", b, u, built));
+
     if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
         log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
     }
@@ -858,8 +898,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
 
     update_lighthouse(b);
 
-    ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
-        "building unit size", b, u, built));
     return built;
 }
 
@@ -970,7 +1008,6 @@ void continue_ship(unit * u, int want)
         return;
     }
     cons = sh->type->construction;
-    assert(cons->improvement == NULL);    /* sonst ist construction::size nicht ship_type::maxsize */
     if (sh->size == cons->maxsize && !sh->damage) {
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
@@ -994,11 +1031,6 @@ void continue_ship(unit * u, int want)
 
 void free_construction(struct construction *cons)
 {
-    while (cons) {
-        construction *next = cons->improvement;
-        free(cons->name);
-        free(cons->materials);
-        free(cons);
-        cons = next;
-    }
+    free(cons->materials);
+    free(cons);
 }

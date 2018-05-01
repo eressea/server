@@ -214,57 +214,64 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     }
 }
 
-void
-xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
-construction ** consPtr, construct_t type)
+static construction *
+xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node)
 {
-    xmlNodePtr pushNode = xpath->node;
-    int k;
-    for (k = 0; k != nodeSet->nodeNr; ++k) {
-        xmlNodePtr node = nodeSet->nodeTab[k];
-        xmlChar *propValue;
-        construction *con;
-        xmlXPathObjectPtr req;
-        skill_t sk = NOSKILL;
+    construction *con;
+    xmlChar *propValue;
+    xmlXPathObjectPtr req;
+    skill_t sk = NOSKILL;
 
-        propValue = xmlGetProp(node, BAD_CAST "skill");
+    propValue = xmlGetProp(node, BAD_CAST "skill");
+    if (propValue != NULL) {
+        sk = findskill((const char *)propValue);
+        if (sk == NOSKILL) {
+            log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
+            xmlFree(propValue);
+            return NULL;
+        }
+        xmlFree(propValue);
+    }
+
+    con = (construction *)calloc(sizeof(construction), 1);
+
+    con->skill = sk;
+    con->maxsize = xml_ivalue(node, "maxsize", -1);
+    con->minskill = xml_ivalue(node, "minskill", -1);
+    con->reqsize = xml_ivalue(node, "reqsize", 1);
+
+    /* read construction/requirement */
+    xpath->node = node;
+    req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
+    xml_readrequirements(req->nodesetval->nodeTab,
+        req->nodesetval->nodeNr, &con->materials);
+    xmlXPathFreeObject(req);
+
+    return con;
+}
+
+static void
+xml_readconstructions(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, building_type *btype)
+{
+    building_stage **stage_ptr = &btype->stages;
+    int k;
+
+    for (k = 0; k != nodeSet->nodeNr; ++k) {
+        building_stage *stage = calloc(1, sizeof(building_stage));
+        xmlNodePtr node = nodeSet->nodeTab[k];
+        construction *con = xml_readconstruction(xpath, node);
+        xmlChar *propValue = xmlGetProp(node, BAD_CAST "name");
+
         if (propValue != NULL) {
-            sk = findskill((const char *)propValue);
-            if (sk == NOSKILL) {
-                log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
-                xmlFree(propValue);
-                continue;
-            }
+            stage->name = str_strdup((const char *)propValue);
             xmlFree(propValue);
         }
+        stage->next = NULL;
+        stage->construction = con;
 
-        assert(*consPtr == NULL);
-
-        *consPtr = con = (construction *)calloc(sizeof(construction), 1);
-        consPtr = &con->improvement;
-
-        con->type = type;
-        con->skill = sk;
-        con->maxsize = xml_ivalue(node, "maxsize", -1);
-        con->minskill = xml_ivalue(node, "minskill", -1);
-        con->reqsize = xml_ivalue(node, "reqsize", 1);
-
-        if (type == CONS_BUILDING) {
-            propValue = xmlGetProp(node, BAD_CAST "name");
-            if (propValue != NULL) {
-                con->name = str_strdup((const char *)propValue);
-                xmlFree(propValue);
-            }
-        }
-
-        /* read construction/requirement */
-        xpath->node = node;
-        req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
-        xml_readrequirements(req->nodesetval->nodeTab,
-            req->nodesetval->nodeNr, &con->materials);
-        xmlXPathFreeObject(req);
+        *stage_ptr = stage;
+        stage_ptr = &stage->next;
     }
-    xpath->node = pushNode;
 }
 
 static int
@@ -342,7 +349,7 @@ static int parse_buildings(xmlDocPtr doc)
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &btype->construction, CONS_BUILDING);
+            xml_readconstructions(xpath, result->nodesetval, btype);
             xmlXPathFreeObject(result);
 
             /* reading eressea/buildings/building/function */
@@ -439,12 +446,6 @@ static int parse_ships(xmlDocPtr doc)
             st->range_max = xml_ivalue(node, "maxrange", st->range_max);
             st->storm = xml_fvalue(node, "storm", st->storm);
 
-            /* reading eressea/ships/ship/construction */
-            xpath->node = node;
-            result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &st->construction, CONS_OTHER);
-            xmlXPathFreeObject(result);
-
             for (child = node->children; child; child = child->next) {
                 if (strcmp((const char *)child->name, "modifier") == 0) {
                     double value = xml_fvalue(child, "value", 0.0);
@@ -456,6 +457,10 @@ static int parse_ships(xmlDocPtr doc)
                     else if (strcmp((const char *)propValue, "defense") == 0)
                         st->df_bonus = (int)value;
                     xmlFree(propValue);
+                }
+                else if (strcmp((const char *)child->name, "construction") == 0) {
+                    assert(!st->construction);
+                    st->construction = xml_readconstruction(xpath, child);
                 }
             }
             /* reading eressea/ships/ship/coast */
@@ -491,16 +496,20 @@ static int parse_ships(xmlDocPtr doc)
     return result;
 }
 
-static void xml_readpotion(xmlXPathContextPtr xpath, item_type * itype)
+static void xml_readpotion(xmlNodePtr node, item_type * itype)
 {
-    int level = xml_ivalue(xpath->node, "level", 0);
+    int level = xml_ivalue(node, "level", 0);
 
+    if ((itype->flags & ITF_CANUSE) == 0) {
+        log_error("potion %s has no use attribute", itype->rtype->_name);
+        itype->flags |= ITF_CANUSE;
+    }
     new_potiontype(itype, level);
 }
 
-static luxury_type *xml_readluxury(xmlXPathContextPtr xpath, item_type * itype)
+static luxury_type *xml_readluxury(xmlNodePtr node, item_type * itype)
 {
-    int price = xml_ivalue(xpath->node, "price", 0);
+    int price = xml_ivalue(node, "price", 0);
     if (itype->rtype->ltype) {
         itype->rtype->ltype->price = price;
         return itype->rtype->ltype;
@@ -508,9 +517,8 @@ static luxury_type *xml_readluxury(xmlXPathContextPtr xpath, item_type * itype)
     return new_luxurytype(itype, price);
 }
 
-static armor_type *xml_readarmor(xmlXPathContextPtr xpath, item_type * itype)
+static armor_type *xml_readarmor(xmlNodePtr node, item_type * itype)
 {
-    xmlNodePtr node = xpath->node;
     armor_type *atype = NULL;
     unsigned int flags = ATF_NONE;
     int ac = xml_ivalue(node, "ac", 0);
@@ -658,10 +666,9 @@ static weapon_type *xml_readweapon(xmlXPathContextPtr xpath, item_type * itype)
 
 static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 {
-    xmlNodePtr node = xpath->node;
+    xmlNodePtr child, node = xpath->node;
     item_type *itype = NULL;
     unsigned int flags = ITF_NONE;
-    xmlXPathObjectPtr result;
 
     if (xml_bvalue(node, "cursed", false))
         flags |= ITF_CURSED;
@@ -687,63 +694,45 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
 
     itype->weight = xml_ivalue(node, "weight", 0);
     itype->capacity = xml_ivalue(node, "capacity", 0);
+    itype->score = xml_ivalue(node, "score", 0);
+
     mask_races(node, "allow", &itype->mask_allow);
     mask_races(node, "deny", &itype->mask_deny);
     itype->flags |= flags;
 
-    /* reading item/construction */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval, &itype->construction, CONS_ITEM);
-    xmlXPathFreeObject(result);
-
-    /* reading item/weapon */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "weapon", xpath);
-    assert(result->nodesetval->nodeNr <= 1);
-    if (result->nodesetval->nodeNr != 0) {
-        xpath->node = result->nodesetval->nodeTab[0];
-        rtype->wtype = xml_readweapon(xpath, itype);
-    }
-    xmlXPathFreeObject(result);
-
-    /* reading item/potion */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "potion", xpath);
-    assert(result->nodesetval->nodeNr <= 1);
-    if (result->nodesetval->nodeNr != 0) {
-        if ((itype->flags & ITF_CANUSE) == 0) {
-            log_error("potion %s has no use attribute", rtype->_name);
-            itype->flags |= ITF_CANUSE;
+    for (child = node->children; child; child = child->next) {
+        if (strcmp((const char *)child->name, "construction") == 0) {
+            /* reading item/construction */
+            assert(!itype->construction);
+            xpath->node = child;
+            itype->construction = xml_readconstruction(xpath, child);
         }
-        xpath->node = result->nodesetval->nodeTab[0];
-        xml_readpotion(xpath, itype);
+        else if (strcmp((const char *)child->name, "weapon") == 0) {
+            /* reading item/weapon */
+            assert(!rtype->wtype);
+            xpath->node = child;
+            rtype->wtype = xml_readweapon(xpath, itype);
+        }
+        else if (strcmp((const char *)child->name, "armor") == 0) {
+            /* reading item/weapon */
+            assert(!rtype->atype);
+            rtype->atype = xml_readarmor(child, itype);
+        }
+        else if (strcmp((const char *)child->name, "luxury") == 0) {
+            /* reading item/luxury */
+            assert(!rtype->ltype);
+            rtype->ltype = xml_readluxury(child, itype);
+        }
+        else if (strcmp((const char *)child->name, "potion") == 0) {
+            /* reading item/potion */
+            xml_readpotion(child, itype);
+        }
     }
-    xmlXPathFreeObject(result);
 
-    /* reading item/luxury */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "luxury", xpath);
-    assert(result->nodesetval->nodeNr <= 1);
-    if (result->nodesetval->nodeNr != 0) {
-        xpath->node = result->nodesetval->nodeTab[0];
-        rtype->ltype = xml_readluxury(xpath, itype);
+    if (!itype->score) {
+        /* do this last, because score depends on itype data */
+        itype->score = default_score(itype);
     }
-    xmlXPathFreeObject(result);
-
-    /* reading item/armor */
-    xpath->node = node;
-    result = xmlXPathEvalExpression(BAD_CAST "armor", xpath);
-    assert(result->nodesetval->nodeNr <= 1);
-    if (result->nodesetval->nodeNr != 0) {
-        xpath->node = result->nodesetval->nodeTab[0];
-        rtype->atype = xml_readarmor(xpath, itype);
-    }
-    xmlXPathFreeObject(result);
-
-    itype->score = xml_ivalue(node, "score", 0);
-    if (!itype->score) itype->score = default_score(itype);
-
     return itype;
 }
 

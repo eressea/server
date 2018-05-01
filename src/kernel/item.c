@@ -900,7 +900,9 @@ void write_items(struct storage *store, item * ilist)
 
 static void free_itype(item_type *itype) {
     assert(itype);
-    free_construction(itype->construction);
+    if (itype->construction) {
+        free_construction(itype->construction);
+    }
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);

@@ -336,20 +336,27 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
+    construction *con;
     building_type *btype = bt_get_or_create(name);
     btype->flags = BTF_NAMECHANGE;
-    if (!btype->construction) {
-        btype->construction = (construction *)calloc(sizeof(construction), 1);
-        btype->construction->skill = SK_BUILDING;
-        btype->construction->maxsize = -1;
-        btype->construction->minskill = 1;
-        btype->construction->reqsize = 1;
+    if (btype->stages) {
+        con = btype->stages->construction;
+    } else {
+        btype->stages = calloc(1, sizeof(building_stage));
+        con = (construction *)calloc(1, sizeof(construction));
+        if (con) {
+            con->skill = SK_BUILDING;
+            con->maxsize = -1;
+            con->minskill = 1;
+            con->reqsize = 1;
+            btype->stages->construction = con;
+        }
     }
-    if (!btype->construction->materials) {
-        btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
-        btype->construction->materials[1].number = 0;
-        btype->construction->materials[0].number = 1;
-        btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    if (con && !con->materials) {
+        con->materials = (requirement *)calloc(2, sizeof(requirement));
+        con->materials[1].number = 0;
+        con->materials[0].number = 1;
+        con->materials[0].rtype = get_resourcetype(R_STONE);
     }
     if (default_locale) {
         locale_setstring(default_locale, name, name);
