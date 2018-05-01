@@ -81,6 +81,20 @@ static variant xml_fraction(const XML_Char *val) {
     return frac_make(num, den);
 }
 
+static building_stage *stage;
+
+#define MAX_REQUIREMENTS 8
+static requirement reqs[MAX_REQUIREMENTS];
+static int nreqs;
+
+#define RMOD_MAX 8
+static resource_mod rmods[RMOD_MAX];
+static int nrmods;
+
+#define WMOD_MAX 8
+static weapon_mod wmods[WMOD_MAX];
+static int nwmods;
+
 static void handle_bad_input(parseinfo *pi, const XML_Char *el, const XML_Char *attr) {
     if (attr) {
         log_error("unknown attribute in <%s>: %s", el, attr);
@@ -239,11 +253,6 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
     wtype->flags = flags;
 }
 
-
-#define WMOD_MAX 8
-static weapon_mod wmods[WMOD_MAX];
-static int nwmods;
-
 static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)pi->object;
 
@@ -334,13 +343,25 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
     }
 }
 
-#define MAX_REQUIREMENTS 8
-static requirement reqs[MAX_REQUIREMENTS];
-static int nreqs;
+static void handle_requirement(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    requirement *req;
+    int i;
 
-#define RMOD_MAX 8
-static resource_mod rmods[RMOD_MAX];
-static int nrmods;
+    assert(nreqs < MAX_REQUIREMENTS);
+    req = reqs + nreqs;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "type") == 0) {
+            req->rtype = rt_get_or_create(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "quantity") == 0) {
+            req->number = xml_int(attr[i + 1]);
+        }
+        else {
+            handle_bad_input(pi, el, attr[i]);
+        }
+    }
+    ++nreqs;
+}
 
 static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     int i;
@@ -396,6 +417,37 @@ static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **
     }
 }
 
+static construction *parse_construction(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    construction *con = calloc(sizeof(construction), 1);
+    int i;
+    con->maxsize = -1;
+    con->minskill = -1;
+    con->reqsize = 1;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "skill") == 0) {
+            con->skill = findskill(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "maxsize") == 0) {
+            con->maxsize = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "reqsize") == 0) {
+            con->reqsize = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "minskill") == 0) {
+            con->minskill = xml_int(attr[i + 1]);
+        }
+        else if (stage != NULL && xml_strcmp(attr[i], "name") == 0) {
+            /* only building stages have names */
+            stage->name = str_strdup(attr[i + 1]);
+        }
+        else {
+            handle_bad_input(pi, el, attr[i]);
+        }
+    }
+    nreqs = 0;
+    return con;
+}
+
 static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resource") == 0) {
@@ -440,52 +492,14 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
         else if (rtype->itype) {
             item_type *itype = rtype->itype;
             if (xml_strcmp(el, "construction") == 0) {
-                construction *con = calloc(sizeof(construction), 1);
-                int i;
-                con->maxsize = -1;
-                con->minskill = -1;
-                con->reqsize = 1;
-                for (i = 0; attr[i]; i += 2) {
-                    if (xml_strcmp(attr[i], "skill") == 0) {
-                        con->skill = findskill(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "maxsize") == 0) {
-                        con->maxsize = xml_int(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "reqsize") == 0) {
-                        con->reqsize = xml_int(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "minskill") == 0) {
-                        con->minskill = xml_int(attr[i + 1]);
-                    }
-                    else {
-                        handle_bad_input(pi, el, attr[i]);
-                    }
-                }
-                itype->construction = con;
-                nreqs = 0;
+                itype->construction = parse_construction(pi, el, attr);
             }
             else if (xml_strcmp(el, "modifier") == 0) {
                 handle_modifier(pi, el, attr);
             }
             else if (xml_strcmp(el, "requirement") == 0) {
-                requirement *req;
-                int i;
                 assert(itype->construction);
-                assert(nreqs < MAX_REQUIREMENTS);
-                req = reqs + nreqs;
-                for (i = 0; attr[i]; i += 2) {
-                    if (xml_strcmp(attr[i], "type") == 0) {
-                        req->rtype = rt_get_or_create(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "quantity") == 0) {
-                        req->number = xml_int(attr[i + 1]);
-                    }
-                    else {
-                        handle_bad_input(pi, el, attr[i]);
-                    }
-                }
-                ++nreqs;
+                handle_requirement(pi, el, attr);
             }
             else if (xml_strcmp(el, "luxury") == 0) {
                 rtype->ltype = new_luxurytype(itype, 0);
@@ -560,6 +574,7 @@ static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML
     if (xml_strcmp(el, "building") == 0) {
         const XML_Char *name;
 
+        assert(stage == NULL);
         name = attr_get(attr, "name");
         if (name) {
             building_type *btype = bt_get_or_create(name);
@@ -602,13 +617,25 @@ static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML
             pi->object = btype;
         }
     }
-    else if (xml_strcmp(el, "modifier") == 0) {
-        handle_modifier(pi, el, attr);
-    }
     else {
         building_type *btype = (building_type *)pi->object;
         assert(btype);
-        handle_bad_input(pi, el, NULL);
+        if (xml_strcmp(el, "modifier") == 0) {
+            handle_modifier(pi, el, attr);
+        }
+        else if (xml_strcmp(el, "requirement") == 0) {
+            assert(stage);
+            assert(stage->construction);
+            handle_requirement(pi, el, attr);
+        }
+        else if (xml_strcmp(el, "construction") == 0) {
+            assert(stage == NULL);
+            stage = calloc(1, sizeof(building_stage));
+            stage->construction = parse_construction(pi, el, attr);
+        }
+        else {
+            handle_bad_input(pi, el, NULL);
+        }
     }
 }
 
@@ -701,9 +728,32 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
     }
 }
 
+
 static void end_buildings(parseinfo *pi, const XML_Char *el) {
+    /* stores the end of the building's stage list: */
+    static building_stage **stage_ptr;
+
     building_type *btype = (building_type *)pi->object;
-    if (xml_strcmp(el, "building") == 0) {
+    if (xml_strcmp(el, "construction") == 0) {
+        if (stage) {
+            if (nreqs > 0) {
+                construction *con = stage->construction;
+                con->materials = calloc(sizeof(requirement), nreqs + 1);
+                memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
+                nreqs = 0;
+            }
+            if (stage_ptr == NULL) {
+                /* at the first build stage, initialize stage_ptr: */
+                assert(btype->stages == NULL);
+                stage_ptr = &btype->stages;
+            }
+            *stage_ptr = stage;
+            stage_ptr = &stage->next;
+            stage = NULL;
+        }
+    }
+    else if (xml_strcmp(el, "building") == 0) {
+        stage_ptr = NULL;
         if (nrmods > 0) {
             btype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
             memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
