@@ -214,53 +214,63 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
     }
 }
 
+static construction *
+xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node, bool is_building)
+{
+    construction *con;
+    xmlChar *propValue;
+    xmlXPathObjectPtr req;
+    skill_t sk = NOSKILL;
+
+    propValue = xmlGetProp(node, BAD_CAST "skill");
+    if (propValue != NULL) {
+        sk = findskill((const char *)propValue);
+        if (sk == NOSKILL) {
+            log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
+            xmlFree(propValue);
+            return NULL;
+        }
+        xmlFree(propValue);
+    }
+
+    con = (construction *)calloc(sizeof(construction), 1);
+
+    con->skill = sk;
+    con->maxsize = xml_ivalue(node, "maxsize", -1);
+    con->minskill = xml_ivalue(node, "minskill", -1);
+    con->reqsize = xml_ivalue(node, "reqsize", 1);
+
+    if (is_building) {
+        propValue = xmlGetProp(node, BAD_CAST "name");
+        if (propValue != NULL) {
+            con->name = str_strdup((const char *)propValue);
+            xmlFree(propValue);
+        }
+    }
+
+    /* read construction/requirement */
+    xpath->node = node;
+    req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
+    xml_readrequirements(req->nodesetval->nodeTab,
+        req->nodesetval->nodeNr, &con->materials);
+    xmlXPathFreeObject(req);
+
+    return con;
+}
+
 static void
-xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
+xml_readconstructions(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
     construction **consPtr, bool is_building)
 {
     int k;
     for (k = 0; k != nodeSet->nodeNr; ++k) {
         xmlNodePtr node = nodeSet->nodeTab[k];
-        xmlChar *propValue;
-        construction *con;
-        xmlXPathObjectPtr req;
-        skill_t sk = NOSKILL;
+        construction *con = xml_readconstruction(xpath, node, is_building);
 
-        propValue = xmlGetProp(node, BAD_CAST "skill");
-        if (propValue != NULL) {
-            sk = findskill((const char *)propValue);
-            if (sk == NOSKILL) {
-                log_error("construction requires skill '%s' that does not exist.\n", (const char *)propValue);
-                xmlFree(propValue);
-                continue;
-            }
-            xmlFree(propValue);
+        if (con) {
+            *consPtr = con;
+            consPtr = &con->improvement;
         }
-
-        assert(*consPtr == NULL);
-
-        *consPtr = con = (construction *)calloc(sizeof(construction), 1);
-        consPtr = &con->improvement;
-
-        con->skill = sk;
-        con->maxsize = xml_ivalue(node, "maxsize", -1);
-        con->minskill = xml_ivalue(node, "minskill", -1);
-        con->reqsize = xml_ivalue(node, "reqsize", 1);
-
-        if (is_building) {
-            propValue = xmlGetProp(node, BAD_CAST "name");
-            if (propValue != NULL) {
-                con->name = str_strdup((const char *)propValue);
-                xmlFree(propValue);
-            }
-        }
-
-        /* read construction/requirement */
-        xpath->node = node;
-        req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
-        xml_readrequirements(req->nodesetval->nodeTab,
-            req->nodesetval->nodeNr, &con->materials);
-        xmlXPathFreeObject(req);
     }
 }
 
@@ -339,7 +349,7 @@ static int parse_buildings(xmlDocPtr doc)
             /* reading eressea/buildings/building/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &btype->construction, true);
+            xml_readconstructions(xpath, result->nodesetval, &btype->construction, true);
             xmlXPathFreeObject(result);
 
             /* reading eressea/buildings/building/function */
@@ -439,7 +449,7 @@ static int parse_ships(xmlDocPtr doc)
             /* reading eressea/ships/ship/construction */
             xpath->node = node;
             result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-            xml_readconstruction(xpath, result->nodesetval, &st->construction, false);
+            xml_readconstructions(xpath, result->nodesetval, &st->construction, false);
             xmlXPathFreeObject(result);
 
             for (child = node->children; child; child = child->next) {
@@ -685,7 +695,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
     /* reading item/construction */
     xpath->node = node;
     result = xmlXPathEvalExpression(BAD_CAST "construction", xpath);
-    xml_readconstruction(xpath, result->nodesetval, &itype->construction, false);
+    xml_readconstructions(xpath, result->nodesetval, &itype->construction, false);
     xmlXPathFreeObject(result);
 
     /* reading item/weapon */
