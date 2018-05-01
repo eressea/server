@@ -216,9 +216,8 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 
 static void
 xml_readconstruction(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet,
-construction ** consPtr, bool is_building)
+    construction **consPtr, bool is_building)
 {
-    xmlNodePtr pushNode = xpath->node;
     int k;
     for (k = 0; k != nodeSet->nodeNr; ++k) {
         xmlNodePtr node = nodeSet->nodeTab[k];
@@ -263,7 +262,6 @@ construction ** consPtr, bool is_building)
             req->nodesetval->nodeNr, &con->materials);
         xmlXPathFreeObject(req);
     }
-    xpath->node = pushNode;
 }
 
 static int
