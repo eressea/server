@@ -342,7 +342,61 @@ static int nreqs;
 static resource_mod rmods[RMOD_MAX];
 static int nrmods;
 
-static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    int i;
+    skill_t sk = NOSKILL;
+    const XML_Char *type = NULL;
+    resource_mod * mod = rmods + nrmods;
+    const XML_Char *value = NULL;
+
+    mod->race_mask = 0;
+    mod->btype = NULL;
+    assert(nrmods < RMOD_MAX);
+    ++nrmods;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "type") == 0) {
+            type = attr[i + 1];
+        }
+        else if (xml_strcmp(attr[i], "building") == 0) {
+            mod->btype = bt_get_or_create(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "skill") == 0) {
+            sk = findskill(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "races") == 0) {
+            char list[64];
+            strcpy(list, attr[i + 1]);
+            mod->race_mask = rc_get_mask(list);
+        }
+        else if (xml_strcmp(attr[i], "value") == 0) {
+            value = attr[i + 1];
+        }
+        else {
+            handle_bad_input(pi, el, attr[i]);
+        }
+    }
+    if (xml_strcmp(type, "skill") == 0) {
+        mod->type = RMT_PROD_SKILL;
+        mod->value.sa[0] = (short)sk;
+        mod->value.sa[1] = (short)xml_int(value);
+    }
+    else if (xml_strcmp(type, "require") == 0) {
+        mod->type = RMT_PROD_REQUIRE;
+    }
+    else if (xml_strcmp(type, "material") == 0) {
+        mod->type = RMT_PROD_SAVE;
+        mod->value = xml_fraction(value);
+    }
+    else if (xml_strcmp(type, "save") == 0) {
+        mod->type = RMT_USE_SAVE;
+        mod->value = xml_fraction(value);
+    }
+    else {
+        handle_bad_input(pi, el, type);
+    }
+}
+
+static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strcmp(el, "resource") == 0) {
         handle_resource(pi, el, attr);
@@ -412,57 +466,7 @@ static void XMLCALL start_resources(parseinfo *pi, const XML_Char *el, const XML
                 nreqs = 0;
             }
             else if (xml_strcmp(el, "modifier") == 0) {
-                int i;
-                skill_t sk = NOSKILL;
-                const XML_Char *type = NULL;
-                resource_mod * mod = rmods + nrmods;
-                const XML_Char *value = NULL;
-
-                mod->race_mask = 0;
-                mod->btype = NULL;
-                assert(nrmods < RMOD_MAX);
-                ++nrmods;
-                for (i = 0; attr[i]; i += 2) {
-                    if (xml_strcmp(attr[i], "type") == 0) {
-                        type = attr[i + 1];
-                    }
-                    else if (xml_strcmp(attr[i], "building") == 0) {
-                        mod->btype = bt_get_or_create(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "skill") == 0) {
-                        sk = findskill(attr[i + 1]);
-                    }
-                    else if (xml_strcmp(attr[i], "races") == 0) {
-                        char list[64];
-                        strcpy(list, attr[i + 1]);
-                        mod->race_mask = rc_get_mask(list);
-                    }
-                    else if (xml_strcmp(attr[i], "value") == 0) {
-                        value = attr[i + 1];
-                    }
-                    else {
-                        handle_bad_input(pi, el, attr[i]);
-                    }
-                }
-                if (xml_strcmp(type, "skill") == 0) {
-                    mod->type = RMT_PROD_SKILL;
-                    mod->value.sa[0] = (short)sk;
-                    mod->value.sa[1] = (short)xml_int(value);
-                }
-                else if (xml_strcmp(type, "require") == 0) {
-                    mod->type = RMT_PROD_REQUIRE;
-                }
-                else if (xml_strcmp(type, "material") == 0) {
-                    mod->type = RMT_PROD_SAVE;
-                    mod->value = xml_fraction(value);
-                }
-                else if (xml_strcmp(type, "save") == 0) {
-                    mod->type = RMT_USE_SAVE;
-                    mod->value = xml_fraction(value);
-                }
-                else {
-                    handle_bad_input(pi, el, type);
-                }
+                handle_modifier(pi, el, attr);
             }
             else if (xml_strcmp(el, "requirement") == 0) {
                 requirement *req;
@@ -598,6 +602,9 @@ static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML
             pi->object = btype;
         }
     }
+    else if (xml_strcmp(el, "modifier") == 0) {
+        handle_modifier(pi, el, attr);
+    }
     else {
         building_type *btype = (building_type *)pi->object;
         assert(btype);
@@ -674,10 +681,7 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
 
 static void end_resources(parseinfo *pi, const XML_Char *el) {
     resource_type *rtype = (resource_type *)pi->object;
-    if (xml_strcmp(el, "resources") == 0) {
-        pi->type = EXP_UNKNOWN;
-    }
-    else if (xml_strcmp(el, "resource") == 0) {
+    if (xml_strcmp(el, "resource") == 0) {
         if (nrmods > 0) {
             rtype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
             memcpy(rtype->modifiers, rmods, sizeof(resource_mod) * nrmods);
@@ -692,12 +696,32 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
             nreqs = 0;
         }
     }
+    else if (xml_strcmp(el, "resources") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+}
+
+static void end_buildings(parseinfo *pi, const XML_Char *el) {
+    building_type *btype = (building_type *)pi->object;
+    if (xml_strcmp(el, "building") == 0) {
+        if (nrmods > 0) {
+            btype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
+            memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
+            nrmods = 0;
+        }
+    }
+    else if (xml_strcmp(el, "buildings") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
 }
 
 static void XMLCALL handle_end(void *data, const XML_Char *el) {
     parseinfo *pi = (parseinfo *)data;
 
     switch (pi->type) {
+    case EXP_BUILDINGS:
+        end_buildings(pi, el);
+        break;
     case EXP_RESOURCES:
         end_resources(pi, el);
         break;
