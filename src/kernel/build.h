@@ -44,11 +44,6 @@ extern "C" {
         int maxsize;                /* maximum size of this type */
         int reqsize;                /* size of object using up 1 set of requirement. */
         requirement *materials;     /* material req'd to build one object */
-
-        /* only used by CONS_BUILDING: */
-        char * name; /* building level name */
-        struct construction *improvement;
-        /* next level, if upgradable. */
     } construction;
 
     void free_construction(struct construction *cons);

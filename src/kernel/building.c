@@ -116,7 +116,13 @@ static void bt_register(building_type * btype)
 
 static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
-    free_construction(btype->construction);
+    while (btype->stages) {
+        building_stage *next = btype->stages->next;
+        free_construction(btype->stages->construction);
+        free(btype->stages->name);
+        free(btype->stages);
+        btype->stages = next;
+    }
     free(btype->maintenance);
     free(btype->_name);
     free(btype);
@@ -189,8 +195,6 @@ static int adjust_size(const building *b, int bsize) {
  */
 const char *buildingtype(const building_type * btype, const building * b, int bsize)
 {
-    const construction *con;
-
     assert(btype);
 
     if (b && b->attribs) {
@@ -201,14 +205,15 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             }
         }
     }
-    if (btype->construction && btype->construction->name) {
+    if (btype->stages && btype->stages->name) {
+        const building_stage *stage;
         if (b) {
             bsize = adjust_size(b, bsize);
         }
-        for (con = btype->construction; con; con = con->improvement) {
-            bsize -= con->maxsize;
-            if (!con->improvement || bsize <0) {
-                return con->name;
+        for (stage = btype->stages; stage; stage = stage->next) {
+            bsize -= stage->construction->maxsize;
+            if (!stage->next || bsize <0) {
+                return stage->name;
             }
         }
     }
@@ -476,24 +481,30 @@ int buildingeffsize(const building * b, int img)
 
 int bt_effsize(const building_type * btype, const building * b, int bsize)
 {
-    int n = 0;
-    const construction *cons = btype->construction;
-
     if (b) {
         bsize = adjust_size(b, bsize);
     }
 
-    if (!cons) {
-        return 0;
+    if (btype->stages) {
+        int n = 0;
+        const building_stage *stage = btype->stages;
+        do {
+            const construction *con = stage->construction;
+            if (con->maxsize < 0) {
+                break;
+            }
+            else {
+                if (bsize >= con->maxsize) {
+                    bsize -= con->maxsize;
+                    ++n;
+                }
+                stage = stage->next;
+            }
+        } while (stage && bsize > 0);
+        return n;
     }
 
-    while (cons && cons->maxsize != -1 && bsize >= cons->maxsize) {
-        bsize -= cons->maxsize;
-        cons = cons->improvement;
-        ++n;
-    }
-
-    return n;
+    return 0;
 }
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)

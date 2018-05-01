@@ -17,9 +17,11 @@
 #include <util/functions.h>
 #include <util/rand.h>
 #include <util/rng.h>
+#include <util/strings.h>
 
 #include <CuTest.h>
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "tests.h"
@@ -149,12 +151,17 @@ static building_type * setup_castle(void) {
     building_type * btype;
     construction *cons;
 
-    btype = bt_get_or_create("castle");
+    btype = test_create_buildingtype("castle");
+    assert(btype->stages);
+    assert(btype->stages->construction);
+
     btype->flags |= BTF_FORTIFICATION;
-    cons = btype->construction = calloc(1, sizeof(construction));
+    cons = btype->stages->construction;
     cons->maxsize = 5;
-    cons = cons->improvement = calloc(1, sizeof(construction));
+    btype->stages->next = calloc(1, sizeof(building_stage));
+    cons = calloc(1, sizeof(construction));
     cons->maxsize = -1;
+    btype->stages->next->construction = cons;
     return btype;
 }
 
@@ -563,9 +570,11 @@ static void test_battle_skilldiff_building(CuTest *tc)
     td.index = 0;
     ta.fighter = setup_fighter(&b, ua);
     ta.index = 0;
+    CuAssertIntEquals(tc, 0, buildingeffsize(ud->building, false));
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ud->building->size = 10;
+    CuAssertIntEquals(tc, 1, buildingeffsize(ud->building, false));
     CuAssertIntEquals(tc, -1, skilldiff(ta, td, 0));
 
     create_curse(NULL, &ud->building->attribs, &ct_magicwalls, 1, 1, 1, 1);

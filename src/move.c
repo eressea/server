@@ -479,10 +479,6 @@ static bool cansail(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
 
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
     if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
         return false;
     }
@@ -504,10 +500,6 @@ static bool cansail(const region * r, ship * sh)
 static double overload(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
-
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
 
     if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
         return DBL_MAX;

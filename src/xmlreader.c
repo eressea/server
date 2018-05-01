@@ -253,23 +253,24 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node)
 static void
 xml_readconstructions(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, building_type *btype)
 {
-    construction **consPtr = &btype->construction;
+    building_stage **stage_ptr = &btype->stages;
     int k;
 
     for (k = 0; k != nodeSet->nodeNr; ++k) {
+        building_stage *stage = calloc(1, sizeof(building_stage));
         xmlNodePtr node = nodeSet->nodeTab[k];
         construction *con = xml_readconstruction(xpath, node);
         xmlChar *propValue = xmlGetProp(node, BAD_CAST "name");
 
         if (propValue != NULL) {
-            con->name = str_strdup((const char *)propValue);
+            stage->name = str_strdup((const char *)propValue);
             xmlFree(propValue);
         }
+        stage->next = NULL;
+        stage->construction = con;
 
-        if (con) {
-            *consPtr = con;
-            consPtr = &con->improvement;
-        }
+        *stage_ptr = stage;
+        stage_ptr = &stage->next;
     }
 }
 

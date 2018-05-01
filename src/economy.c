@@ -1409,7 +1409,7 @@ int make_cmd(unit * u, struct order *ord)
         if (pl && fval(pl, PFL_NOBUILD)) {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else if (btype->construction) {
+        else if (btype->stages && btype->stages->construction) {
             int id = getid();
             build_building(u, btype, id, m, ord);
         }
