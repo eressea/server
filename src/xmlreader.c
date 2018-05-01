@@ -215,7 +215,7 @@ xml_readrequirements(xmlNodePtr * nodeTab, int nodeNr, requirement ** reqArray)
 }
 
 static construction *
-xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node, bool is_building)
+xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node)
 {
     construction *con;
     xmlChar *propValue;
@@ -240,14 +240,6 @@ xml_readconstruction(xmlXPathContextPtr xpath, xmlNodePtr node, bool is_building
     con->minskill = xml_ivalue(node, "minskill", -1);
     con->reqsize = xml_ivalue(node, "reqsize", 1);
 
-    if (is_building) {
-        propValue = xmlGetProp(node, BAD_CAST "name");
-        if (propValue != NULL) {
-            con->name = str_strdup((const char *)propValue);
-            xmlFree(propValue);
-        }
-    }
-
     /* read construction/requirement */
     xpath->node = node;
     req = xmlXPathEvalExpression(BAD_CAST "requirement", xpath);
@@ -266,7 +258,13 @@ xml_readconstructions(xmlXPathContextPtr xpath, xmlNodeSetPtr nodeSet, building_
 
     for (k = 0; k != nodeSet->nodeNr; ++k) {
         xmlNodePtr node = nodeSet->nodeTab[k];
-        construction *con = xml_readconstruction(xpath, node, true);
+        construction *con = xml_readconstruction(xpath, node);
+        xmlChar *propValue = xmlGetProp(node, BAD_CAST "name");
+
+        if (propValue != NULL) {
+            con->name = str_strdup((const char *)propValue);
+            xmlFree(propValue);
+        }
 
         if (con) {
             *consPtr = con;
@@ -461,7 +459,7 @@ static int parse_ships(xmlDocPtr doc)
                 }
                 else if (strcmp((const char *)child->name, "construction") == 0) {
                     assert(!st->construction);
-                    st->construction = xml_readconstruction(xpath, child, false);
+                    st->construction = xml_readconstruction(xpath, child);
                 }
             }
             /* reading eressea/ships/ship/coast */
@@ -700,7 +698,7 @@ static item_type *xml_readitem(xmlXPathContextPtr xpath, resource_type * rtype)
             /* reading item/construction */
             assert(!itype->construction);
             xpath->node = child;
-            itype->construction = xml_readconstruction(xpath, child, false);
+            itype->construction = xml_readconstruction(xpath, child);
         }
         else if (strcmp((const char *)child->name, "weapon") == 0) {
             /* reading item/weapon */
