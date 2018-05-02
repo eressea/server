@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<spellbook name="tybied">
-    <entry spell="create_roi" level="6" />
-    <entry spell="earn_silver#tybied" level="1" />
-    <entry spell="create_aots" level="6" />
-    <entry spell="create_antimagic" level="7" />
-    <entry spell="create_rop" level="9" />
-    <entry spell="create_bagofholding" level="10" />
-</spellbook>
