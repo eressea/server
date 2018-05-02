@@ -83,6 +83,10 @@ static variant xml_fraction(const XML_Char *val) {
 
 static building_stage *stage;
 
+#define UPKEEP_MAX 4
+static maintenance upkeep[UPKEEP_MAX];
+static int nupkeep;
+
 #define MAX_REQUIREMENTS 8
 static requirement reqs[MAX_REQUIREMENTS];
 static int nreqs;
@@ -363,6 +367,32 @@ static void handle_requirement(parseinfo *pi, const XML_Char *el, const XML_Char
     ++nreqs;
 }
 
+static void handle_maintenance(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    maintenance *up;
+    int i;
+
+    assert(nupkeep < UPKEEP_MAX);
+    up = upkeep + nupkeep;
+    memset(up, 0, sizeof(maintenance));
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], "type") == 0) {
+            up->rtype = rt_get_or_create(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "amount") == 0) {
+            up->number = xml_int(attr[i + 1]);
+        }
+        else if (xml_strcmp(attr[i], "variable") == 0) {
+            if (xml_bool(attr[i + 1])) {
+                up->flags |= MTF_VARIABLE;
+            }
+        }
+        else {
+            handle_bad_input(pi, el, attr[i]);
+        }
+    }
+    ++nupkeep;
+}
+
 static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     int i;
     skill_t sk = NOSKILL;
@@ -633,6 +663,10 @@ static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML
             stage = calloc(1, sizeof(building_stage));
             stage->construction = parse_construction(pi, el, attr);
         }
+        else if (xml_strcmp(el, "maintenance") == 0) {
+            assert(!btype->maintenance);
+            handle_maintenance(pi, el, attr);
+        }
         else {
             handle_bad_input(pi, el, NULL);
         }
@@ -754,6 +788,11 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
     }
     else if (xml_strcmp(el, "building") == 0) {
         stage_ptr = NULL;
+        if (nupkeep > 0) {
+            btype->maintenance = calloc(sizeof(maintenance), nupkeep + 1);
+            memcpy(btype->maintenance, upkeep, sizeof(maintenance) * nupkeep);
+            nupkeep = 0;
+        }
         if (nrmods > 0) {
             btype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
             memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
