@@ -448,14 +448,19 @@ static int parse_ships(xmlDocPtr doc)
 
             for (child = node->children; child; child = child->next) {
                 if (strcmp((const char *)child->name, "modifier") == 0) {
-                    double value = xml_fvalue(child, "value", 0.0);
                     propValue = xmlGetProp(child, BAD_CAST "type");
-                    if (strcmp((const char *)propValue, "tactics") == 0)
-                        st->tac_bonus = (float)value;
-                    else if (strcmp((const char *)propValue, "attack") == 0)
-                        st->at_bonus = (int)value;
-                    else if (strcmp((const char *)propValue, "defense") == 0)
-                        st->df_bonus = (int)value;
+                    if (strcmp((const char *)propValue, "tactics") == 0) {
+                        st->tac_bonus = xml_fvalue(child, "factor", 1.0);
+                    }
+                    else {
+                        int value = xml_ivalue(child, "value", 0);
+                        if (strcmp((const char *)propValue, "attack") == 0) {
+                            st->at_bonus = (int)value;
+                        }
+                        else if (strcmp((const char *)propValue, "defense") == 0) {
+                            st->df_bonus = (int)value;
+                        }
+                    }
                     xmlFree(propValue);
                 }
                 else if (strcmp((const char *)child->name, "construction") == 0) {
