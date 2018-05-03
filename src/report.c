@@ -96,7 +96,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -110,17 +109,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
-
-static void check_errno(const char * file, int line) {
-    if (errno) {
-        char zText[64];
-        sprintf(zText, "error %d during report at %s:%d", errno, file, line);
-        perror(zText);
-        errno = 0;
-    }
-}
-
-#define CHECK_ERRNO() check_errno(__FILE__, __LINE__)
 
 static char *gamedate_season(const struct locale *lang)
 {
@@ -2195,7 +2183,7 @@ report_plaintext(const char *filename, report_context * ctx,
     }
 
     ch = 0;
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
@@ -2245,7 +2233,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
     newline(out);
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -2253,7 +2241,7 @@ report_plaintext(const char *filename, report_context * ctx,
 
     rpline(out);
 
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
@@ -2367,7 +2355,7 @@ report_plaintext(const char *filename, report_context * ctx,
 
         newline(out);
         rpline(out);
-        CHECK_ERRNO();
+        ERRNO_CHECK();
     }
     if (!is_monsters(f)) {
         if (!anyunits) {
@@ -2379,7 +2367,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
     fstream_done(&strm);
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     return 0;
 }
 
