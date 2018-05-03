@@ -47,6 +47,8 @@ enum {
     EXP_RACES,
     EXP_MESSAGES,
     EXP_STRINGS,
+    EXP_SPELLS,
+    EXP_SPELLBOOKS,
 };
 
 typedef struct parseinfo {
@@ -818,6 +820,12 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         }
         else if (xml_strcmp(el, "strings") == 0) {
             pi->type = EXP_STRINGS;
+        }
+        else if (xml_strcmp(el, "spells") == 0) {
+            pi->type = EXP_SPELLS;
+        }
+        else if (xml_strcmp(el, "spellbooks") == 0) {
+            pi->type = EXP_SPELLBOOKS;
         }
         else if (xml_strcmp(el, "races") == 0) {
             pi->type = EXP_RACES;
