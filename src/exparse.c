@@ -10,6 +10,8 @@
 #include "kernel/item.h"
 #include "kernel/race.h"
 #include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
 
 #include "util/functions.h"
 #include "util/log.h"
@@ -42,6 +44,7 @@ enum {
     EXP_WEAPON,
     EXP_BUILDINGS,
     EXP_SHIPS,
+    EXP_RACES,
     EXP_MESSAGES,
     EXP_STRINGS,
 };
@@ -79,6 +82,16 @@ static variant xml_fraction(const XML_Char *val) {
     double fval = atof(val);
     num = (int)(fval * den + 0.5);
     return frac_make(num, den);
+}
+
+const XML_Char *attr_get(const XML_Char **attr, const char *key) {
+    int i;
+    for (i = 0; attr[i]; i += 2) {
+        if (xml_strcmp(attr[i], key) == 0) {
+            return attr[i + 1];
+        }
+    }
+    return NULL;
 }
 
 static building_stage *stage;
@@ -393,6 +406,20 @@ static void handle_maintenance(parseinfo *pi, const XML_Char *el, const XML_Char
     ++nupkeep;
 }
 
+#define COASTS_MAX 16
+static int ncoasts;
+static struct terrain_type *coasts[COASTS_MAX];
+
+static void handle_coast(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    const XML_Char *tname = attr_get(attr, "terrain");
+
+    if (tname) {
+        terrain_type *coast = get_or_create_terrain(tname);
+        assert(ncoasts < COASTS_MAX);
+        coasts[ncoasts++] = coast;
+    }
+}
+
 static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     int i;
     skill_t sk = NOSKILL;
@@ -589,14 +616,109 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
     }
 }
 
-const XML_Char *attr_get(const XML_Char **attr, const char *key) {
-    int i;
-    for (i = 0; attr[i]; i += 2) {
-        if (xml_strcmp(attr[i], key) == 0) {
-            return attr[i + 1];
+static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    const char *flag_names[] = { "opensea", "fly", "nocoast", "speedy", NULL };
+    if (xml_strcmp(el, "ship") == 0) {
+        const XML_Char *name;
+
+        name = attr_get(attr, "name");
+        if (name) {
+            ship_type *stype = st_get_or_create(name);
+            int i, flags = SFL_DEFAULT;
+
+            for (i = 0; attr[i]; i += 2) {
+                if (xml_strcmp(attr[i], "range") == 0) {
+                    stype->range = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "maxrange") == 0) {
+                    stype->range_max = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "cabins") == 0) {
+                    stype->cabins = PERSON_WEIGHT * xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "cargo") == 0) {
+                    stype->cargo = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "combat") == 0) {
+                    stype->combat = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "fishing") == 0) {
+                    stype->fishing = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "cptskill") == 0) {
+                    stype->cptskill = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "minskill") == 0) {
+                    stype->minskill = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "sumskill") == 0) {
+                    stype->sumskill = xml_int(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "damage") == 0) {
+                    stype->damage = xml_float(attr[i + 1]);
+                }
+                else if (xml_strcmp(attr[i], "storm") == 0) {
+                    stype->storm = xml_float(attr[i + 1]);
+                }
+                else if (!handle_flag(&flags, attr + i, flag_names)) {
+                    /* we already handled the name earlier */
+                    if (xml_strcmp(attr[i], "name") != 0) {
+                        handle_bad_input(pi, el, attr[i]);
+                    }
+                }
+            }
+            stype->flags = flags;
+            pi->object = stype;
         }
     }
-    return NULL;
+    else {
+        ship_type *stype = (ship_type *)pi->object;
+        assert(stype);
+        if (xml_strcmp(el, "modifier") == 0) {
+            /* these modifiers are not like buildings */
+            int i;
+            const XML_Char *type = NULL, *value = NULL;
+            for (i = 0; attr[i]; i += 2) {
+                if (xml_strcmp(attr[i], "type") == 0) {
+                    type = attr[i + 1];
+                }
+                else if (xml_strcmp(attr[i], "value") == 0) {
+                    value = attr[i + 1];
+                }
+                else if (xml_strcmp(attr[i], "factor") == 0) {
+                    value = attr[i + 1];
+                }
+                else {
+                    handle_bad_input(pi, el, attr[i]);
+                }
+            }
+            if (type) {
+                if (xml_strcmp(type, "tactics") == 0) {
+                    stype->tac_bonus = xml_float(value);
+                }
+                else if (xml_strcmp(type, "attack") == 0) {
+                    stype->at_bonus = xml_int(value);
+                }
+                else if (xml_strcmp(type, "defense") == 0) {
+                    stype->df_bonus = xml_int(value);
+                }
+            }
+        }
+        else if (xml_strcmp(el, "requirement") == 0) {
+            assert(stype->construction);
+            handle_requirement(pi, el, attr);
+        }
+        else if (xml_strcmp(el, "construction") == 0) {
+            assert(!stype->construction);
+            stype->construction = parse_construction(pi, el, attr);
+        }
+        else if (xml_strcmp(el, "coast") == 0) {
+            handle_coast(pi, el, attr);
+        }
+        else {
+            handle_bad_input(pi, el, NULL);
+        }
+    }
 }
 
 static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
@@ -697,6 +819,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         else if (xml_strcmp(el, "strings") == 0) {
             pi->type = EXP_STRINGS;
         }
+        else if (xml_strcmp(el, "races") == 0) {
+            pi->type = EXP_RACES;
+        }
         else {
             handle_bad_input(pi, el, NULL);
         }
@@ -705,6 +830,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         switch (pi->type) {
         case EXP_BUILDINGS:
             start_buildings(pi, el, attr);
+            break;
+        case EXP_SHIPS:
+            start_ships(pi, el, attr);
             break;
         case EXP_RESOURCES:
             start_resources(pi, el, attr);
@@ -762,6 +890,30 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
     }
 }
 
+static void end_ships(parseinfo *pi, const XML_Char *el) {
+    ship_type *stype = (ship_type *)pi->object;
+    if (xml_strcmp(el, "construction") == 0) {
+        assert(stype);
+        assert(stype->construction);
+        if (nreqs > 0) {
+            construction *con = stype->construction;
+            con->materials = calloc(sizeof(requirement), nreqs + 1);
+            memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
+            nreqs = 0;
+        }
+    }
+    else if (xml_strcmp(el, "ship") == 0) {
+        if (ncoasts > 0) {
+            stype->coasts = calloc(sizeof(const terrain_type *), ncoasts + 1);
+            memcpy(stype->coasts, coasts, sizeof(const terrain_type *) * ncoasts);
+            ncoasts = 0;
+        }
+        pi->object = NULL;
+    }
+    else if (xml_strcmp(el, "ships") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+}
 
 static void end_buildings(parseinfo *pi, const XML_Char *el) {
     /* stores the end of the building's stage list: */
@@ -769,6 +921,7 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
 
     building_type *btype = (building_type *)pi->object;
     if (xml_strcmp(el, "construction") == 0) {
+        assert(btype);
         if (stage) {
             if (nreqs > 0) {
                 construction *con = stage->construction;
@@ -798,6 +951,7 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
             memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
             nrmods = 0;
         }
+        pi->object = NULL;
     }
     else if (xml_strcmp(el, "buildings") == 0) {
         pi->type = EXP_UNKNOWN;
@@ -808,6 +962,9 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     parseinfo *pi = (parseinfo *)data;
 
     switch (pi->type) {
+    case EXP_SHIPS:
+        end_ships(pi, el);
+        break;
     case EXP_BUILDINGS:
         end_buildings(pi, el);
         break;
