@@ -36,6 +36,8 @@ extern "C" {
 #define SFL_NOCOAST 0x04
 #define SFL_SPEEDY  0x08
 
+#define SFL_DEFAULT 0
+
     typedef struct ship_type {
         char *_name;
 
@@ -57,7 +59,7 @@ extern "C" {
 
         int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
         int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
-        float tac_bonus;
+        double tac_bonus;
 
         struct terrain_type ** coasts; /* coast that this ship can land on */
 

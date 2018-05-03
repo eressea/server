@@ -369,7 +369,7 @@ static void test_stype_defaults(CuTest *tc) {
     CuAssertPtrEquals(tc, 0, stype->coasts);
     CuAssertDblEquals(tc, 0.0, stype->damage, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->storm, 0.0);
-    CuAssertDblEquals(tc, 0.0, stype->tac_bonus, 0.0);
+    CuAssertDblEquals(tc, 1.0, stype->tac_bonus, 0.01);
     CuAssertIntEquals(tc, 0, stype->cabins);
     CuAssertIntEquals(tc, 0, stype->cargo);
     CuAssertIntEquals(tc, 0, stype->combat);

@@ -26,7 +26,8 @@ order_data *db_driver_order_load(int id)
 {
     order_data * od = NULL;
     int err;
-    
+
+    ERRNO_CHECK();
     if (g_order_tx_size > 0) {
         g_order_tx_size = 0;
         err = sqlite3_exec(g_db, "COMMIT", NULL, NULL, NULL);
@@ -45,10 +46,12 @@ order_data *db_driver_order_load(int id)
             assert(bytes > 0);
             text = sqlite3_column_text(g_stmt_select, 0);
             odata_create(&od, 1+(size_t)bytes, (const char *)text);
+            ERRNO_CHECK();
             return od;
         }
     } while (err == SQLITE_ROW);
     assert(err == SQLITE_DONE);
+    ERRNO_CHECK();
     return NULL;
 }
 
@@ -58,7 +61,9 @@ int db_driver_order_save(order_data *od)
     sqlite3_int64 id;
     
     assert(od && od->_str);
-    
+   
+    ERRNO_CHECK();
+
     if (g_order_batchsize > 0) {
         if (g_order_tx_size == 0) {
             err = sqlite3_exec(g_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
@@ -82,7 +87,7 @@ int db_driver_order_save(order_data *od)
             g_order_tx_size = 0;
         }
     }
-    
+    ERRNO_CHECK(); 
     return (int)id;
 }
 
@@ -91,6 +96,7 @@ void db_driver_open(void)
     int err;
     const char *dbname;
 
+    ERRNO_CHECK();
     g_order_batchsize = config_get_int("game.dbbatch", 100);
     dbname = config_get("game.dbname");
     if (!dbname) {
@@ -108,16 +114,20 @@ void db_driver_open(void)
     assert(err == SQLITE_OK);
     err = sqlite3_prepare_v2(g_db, "SELECT data FROM orders WHERE id = ?", -1, &g_stmt_select, NULL);
     assert(err == SQLITE_OK);
+    ERRNO_CHECK();
 }
 
 void db_driver_close(void)
 {
     int err;
 
+    ERRNO_CHECK();
     err = sqlite3_finalize(g_stmt_select);
     assert(err == SQLITE_OK);
     err = sqlite3_finalize(g_stmt_insert);
     assert(err == SQLITE_OK);
     err = sqlite3_close(g_db);
     assert(err == SQLITE_OK);
+    ERRNO_CHECK();
 }
+

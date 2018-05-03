@@ -1539,6 +1539,17 @@ static int get_tactics(const side * as, const side * ds)
     return result - defense;
 }
 
+double tactics_chance(const unit *u, int skilldiff) {
+    double tacch = 0.1 * skilldiff;
+    if (fval(u->region->terrain, SEA_REGION)) {
+        const ship *sh = u->ship;
+        if (sh) {
+            tacch *= sh->type->tac_bonus;
+        }
+    }
+    return tacch;
+}
+
 static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 {
     fighter *af = at.fighter;
@@ -1560,12 +1571,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 
             /* percentage chance to get this attack */
             if (tactics > 0) {
-                double tacch = 0.1 * tactics;
-                if (fval(b->region->terrain, SEA_REGION)) {
-                    ship *sh = at.fighter->unit->ship;
-                    if (sh)
-                        tacch *= sh->type->tac_bonus;
-                }
+                double tacch = tactics_chance(af->unit, tactics);
                 if (!chance(tacch)) {
                     dt.fighter = NULL;
                 }
