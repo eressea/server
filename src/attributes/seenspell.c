@@ -46,7 +46,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 static int read_seenspells(variant *var, void *owner, struct gamedata *data)
 {
-    selist *ql;
+    selist *ql = NULL;
     storage *store = data->store;
     spell *sp = 0;
     char token[32];
