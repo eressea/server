@@ -270,6 +270,7 @@ extern "C" {
     const char *sidename(const struct side * s);
     void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
 
+    double tactics_chance(const struct unit *u, int skilldiff);
 #ifdef __cplusplus
 }
 #endif

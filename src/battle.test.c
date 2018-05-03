@@ -10,6 +10,7 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/ship.h>
 #include <kernel/unit.h>
 
 #include <spells/buildingcurse.h>
@@ -665,6 +666,22 @@ static void test_drain_exp(CuTest *tc)
     test_teardown();
 }
 
+static void test_tactics_chance(CuTest *tc) {
+    unit *u;
+    ship_type *stype;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_ocean(0, 0));
+    CuAssertDblEquals(tc, 0.1, tactics_chance(u, 1), 0.01);
+    CuAssertDblEquals(tc, 0.3, tactics_chance(u, 3), 0.01);
+    stype = test_create_shiptype("brot");
+    u->ship = test_create_ship(u->region, stype);
+    CuAssertDblEquals(tc, 0.2, tactics_chance(u, 2), 0.01);
+    stype->tac_bonus = 2.0;
+    CuAssertDblEquals(tc, 0.4, tactics_chance(u, 2), 0.01);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -681,6 +698,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
+    SUITE_ADD_TEST(suite, test_tactics_chance);
     DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }
