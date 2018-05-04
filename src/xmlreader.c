@@ -386,7 +386,7 @@ static int parse_buildings(xmlDocPtr doc)
 
                 propValue = xmlGetProp(node, BAD_CAST "type");
                 assert(propValue != NULL);
-                mt->rtype = rt_find((const char *)propValue);
+                mt->rtype = rt_get_or_create((const char *)propValue);
                 assert(mt->rtype != NULL);
                 xmlFree(propValue);
 
@@ -1219,12 +1219,7 @@ static int parse_spells(xmlDocPtr doc)
                 xmlNodePtr node = result->nodesetval->nodeTab[k];
                 propValue = xmlGetProp(node, BAD_CAST "name");
                 assert(propValue);
-                rtype = rt_find((const char *)propValue);
-                if (!rtype) {
-                    log_error("spell %s uses unknown component %s.\n", sp->sname, (const char *)propValue);
-                    xmlFree(propValue);
-                    continue;
-                }
+                rtype = rt_get_or_create((const char *)propValue);
                 component->type = rtype;
                 xmlFree(propValue);
                 component->amount = xml_ivalue(node, "amount", 1);
@@ -1708,11 +1703,10 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-    xml_register_callback(parse_races);
     xml_register_callback(parse_resources);
-
     xml_register_callback(parse_buildings); /* requires resources */
     xml_register_callback(parse_ships);     /* requires resources, terrains */
+    xml_register_callback(parse_races);
     xml_register_callback(parse_equipment); /* requires resources */
 
     xml_register_callback(parse_spells); /* requires resources */
