@@ -1703,9 +1703,11 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
+#if 0
     xml_register_callback(parse_resources);
     xml_register_callback(parse_buildings); /* requires resources */
     xml_register_callback(parse_ships);     /* requires resources, terrains */
+#endif
     xml_register_callback(parse_races);
     xml_register_callback(parse_equipment); /* requires resources */
 

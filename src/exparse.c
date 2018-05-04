@@ -277,7 +277,27 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
 
     assert(rtype && rtype->wtype);
     if (xml_strcmp(el, "function") == 0) {
-        ++pi->errors;
+        const XML_Char *name = NULL, *type = NULL;
+        int i;
+
+        for (i = 0; attr[i]; i += 2) {
+            if (xml_strcmp(attr[i], "name") == 0) {
+                type = attr[i + 1];
+            }
+            else if (xml_strcmp(attr[i], "value") == 0) {
+                name = attr[i + 1];
+            }
+            else {
+                handle_bad_input(pi, el, attr[i]);
+            }
+        }
+        if (type && xml_strcmp(type, "attack") == 0) {
+            pf_generic fun = get_function(name);
+            rtype->wtype->attack = (wtype_attack)fun;
+        }
+        else {
+            handle_bad_input(pi, el, attr[i]);
+        }
     }
     else if (xml_strcmp(el, "modifier") == 0) {
         const XML_Char *type = NULL;
@@ -354,7 +374,7 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             mod->race_mask = race_mask;
         }
         else {
-            ++pi->errors;
+            handle_bad_input(pi, el, NULL);
         }
     }
     else if (xml_strcmp(el, "damage") == 0) {
@@ -566,13 +586,13 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
                 }
             }
         }
+        else if (xml_strcmp(el, "modifier") == 0) {
+            handle_modifier(pi, el, attr);
+        }
         else if (rtype->itype) {
             item_type *itype = rtype->itype;
             if (xml_strcmp(el, "construction") == 0) {
                 itype->construction = parse_construction(pi, el, attr);
-            }
-            else if (xml_strcmp(el, "modifier") == 0) {
-                handle_modifier(pi, el, attr);
             }
             else if (xml_strcmp(el, "requirement") == 0) {
                 assert(itype->construction);
@@ -865,9 +885,6 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
             memcpy(wtype->modifiers, wmods, sizeof(weapon_mod) * nwmods);
             nwmods = 0;
         }
-    }
-    else {
-        handle_bad_input(pi, el, NULL);
     }
 }
 
