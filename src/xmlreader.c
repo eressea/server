@@ -864,10 +864,12 @@ static void add_items(equipment * eq, xmlNodeSetPtr nsetItems)
             xmlNodePtr node = nsetItems->nodeTab[i];
             xmlChar *propValue;
             const struct item_type *itype;
+            struct resource_type *rtype;
 
             propValue = xmlGetProp(node, BAD_CAST "name");
             assert(propValue != NULL);
-            itype = it_find((const char *)propValue);
+            rtype = rt_get_or_create((const char *)propValue);
+            itype = it_get_or_create(rtype);
             xmlFree(propValue);
             if (itype != NULL) {
                 propValue = xmlGetProp(node, BAD_CAST "amount");
@@ -1705,14 +1707,14 @@ void register_xmlreader(void)
 {
 #if 0
     xml_register_callback(parse_resources);
-    xml_register_callback(parse_buildings); /* requires resources */
-    xml_register_callback(parse_ships);     /* requires resources, terrains */
+    xml_register_callback(parse_buildings);
+    xml_register_callback(parse_ships);
 #endif
     xml_register_callback(parse_races);
-    xml_register_callback(parse_equipment); /* requires resources */
+    xml_register_callback(parse_equipment);
 
-    xml_register_callback(parse_spells); /* requires resources */
-    xml_register_callback(parse_spellbooks);  /* requires spells */
+    xml_register_callback(parse_spells);
+    xml_register_callback(parse_spellbooks);
 
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);

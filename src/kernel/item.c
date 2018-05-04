@@ -243,17 +243,16 @@ item_type *it_find(const char *zname)
 }
 
 item_type *it_get_or_create(resource_type *rtype) {
-    item_type * itype;
     assert(rtype);
-    itype = it_find(rtype->_name);
-    if (!itype) {
+    if (!rtype->itype) {
+        item_type * itype;
         itype = (item_type *)calloc(sizeof(item_type), 1);
+        itype->rtype = rtype;
+        rtype->uchange = res_changeitem;
+        rtype->itype = itype;
+        rtype->flags |= RTF_ITEM;
     }
-    itype->rtype = rtype;
-    rtype->uchange = res_changeitem;
-    rtype->itype = itype;
-    rtype->flags |= RTF_ITEM;
-    return itype;
+    return rtype->itype;
 }
 
 static void lt_register(luxury_type * ltype)
