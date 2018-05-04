@@ -1705,7 +1705,7 @@ static int parse_strings(xmlDocPtr doc)
 
 void register_xmlreader(void)
 {
-#if 0
+#ifdef _MSC_VER /* gcc and clang complain about unused function */
     xml_register_callback(parse_resources);
     xml_register_callback(parse_buildings);
     xml_register_callback(parse_ships);
