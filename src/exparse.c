@@ -357,6 +357,24 @@ static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Ch
             ++pi->errors;
         }
     }
+    else if (xml_strcmp(el, "damage") == 0) {
+        weapon_type *wtype = rtype->wtype;
+        int i, pos = 0;
+        for (i = 0; attr[i]; i += 2) {
+            if (xml_strcmp(attr[i], "type") == 0) {
+                /* damage vs. rider(1) or not(0)? */
+                if (xml_strcmp(attr[i + 1], "rider") == 0) {
+                    pos = 1;
+                }
+            }
+            else if (xml_strcmp(attr[i], "value") == 0) {
+                wtype->damage[pos] = str_strdup(attr[i + 1]);
+            }
+            else {
+                handle_bad_input(pi, el, NULL);
+            }
+        }
+    }
     else {
         handle_bad_input(pi, el, NULL);
     }
@@ -581,29 +599,6 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
             else if (xml_strcmp(el, "weapon") == 0) {
                 pi->type = EXP_WEAPON;
                 handle_weapon(pi, el, attr);
-            }
-            else if (rtype->wtype) {
-                weapon_type *wtype = rtype->wtype;
-                if (xml_strcmp(el, "damage") == 0) {
-                    int i, pos = 0;
-                    for (i = 0; attr[i]; i += 2) {
-                        if (xml_strcmp(attr[i], "type") == 0) {
-                            /* damage vs. rider(1) or not(0)? */
-                            if (xml_strcmp(attr[i + 1], "rider") == 0) {
-                                pos = 1;
-                            }
-                        }
-                        else if (xml_strcmp(attr[i], "value") == 0) {
-                            wtype->damage[pos] = str_strdup(attr[i + 1]);
-                        }
-                        else {
-                            handle_bad_input(pi, el, NULL);
-                        }
-                    }
-                }
-                else {
-                    handle_bad_input(pi, el, NULL);
-                }
             }
             else {
                 handle_bad_input(pi, el, NULL);
@@ -1028,9 +1023,9 @@ int exparse_readfile(const char * filename) {
     XML_SetUserData(xp, &pi);
     memset(&pi, 0, sizeof(pi));
     for (;;) {
-        size_t len = (int) fread(buf, 1, sizeof(buf), F);
+        size_t len = (int)fread(buf, 1, sizeof(buf), F);
         int done;
-        
+
         if (ferror(F)) {
             log_error("read error in %s", filename);
             err = -2;
@@ -1039,9 +1034,9 @@ int exparse_readfile(const char * filename) {
         done = feof(F);
         if (XML_Parse(xp, buf, len, done) == XML_STATUS_ERROR) {
             log_error("parse error at line %" XML_FMT_INT_MOD " of %s: %" XML_FMT_STR,
-                    XML_GetCurrentLineNumber(xp),
-                    filename,
-                    XML_ErrorString(XML_GetErrorCode(xp)));
+                XML_GetCurrentLineNumber(xp),
+                filename,
+                XML_ErrorString(XML_GetErrorCode(xp)));
             err = -1;
             break;
         }
