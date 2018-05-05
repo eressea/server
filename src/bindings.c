@@ -860,7 +860,7 @@ static int tolua_get_spell_name(lua_State * L)
 static int tolua_get_spell_entry_name(lua_State * L)
 {
     spellbook_entry *self = (spellbook_entry*)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, self->sp->sname);
+    lua_pushstring(L, spellref_name(&self->spref));
     return 1;
 }
 

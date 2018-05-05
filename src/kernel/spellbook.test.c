@@ -40,7 +40,7 @@ void test_named_spellbooks(CuTest * tc)
     sbe = spellbook_get(sb, sp);
     CuAssertPtrNotNull(tc, sbe);
     CuAssertIntEquals(tc, 1, sbe->level);
-    CuAssertPtrEquals(tc, sp, sbe->sp);
+    CuAssertPtrEquals(tc, sp, spellref_get(&sbe->spref));
 
     spellbook_foreach(sb, count_spell_cb, &counter);
     CuAssertIntEquals(tc, 1, counter);

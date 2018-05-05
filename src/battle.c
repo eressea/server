@@ -1870,7 +1870,7 @@ static void do_extra_spell(troop at, const att * a)
     const spell *sp = spellref_get(a->data.sp);
 
     if (!sp) {
-        log_error("no such spell: '%s'", a->data.sp->name);
+        log_error("no such spell: '%s'", a->data.sp->_name);
     }
     else {
         assert(a->level > 0);

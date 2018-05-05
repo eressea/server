@@ -67,11 +67,21 @@ void write_spellbook(const struct spellbook *book, struct storage *store)
     if (book) {
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            WRITE_TOK(store, sbe->sp->sname);
+            WRITE_TOK(store, spellref_name(&sbe->spref));
             WRITE_INT(store, sbe->level);
         }
     }
     WRITE_TOK(store, "end");
+}
+
+void spellbook_addref(spellbook *sb, const char *name, int level) {
+    spellbook_entry * sbe;
+
+    assert(sb && name && level > 0);
+    sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
+    spellref_init(&sbe->spref, NULL, name);
+    sbe->level = level;
+    selist_push(&sb->spells, sbe);
 }
 
 void spellbook_add(spellbook *sb, spell *sp, int level)
@@ -85,7 +95,7 @@ void spellbook_add(spellbook *sb, spell *sp, int level)
     }
 #endif  
     sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
-    sbe->sp = sp;
+    spellref_init(&sbe->spref, sp, NULL);
     sbe->level = level;
     selist_push(&sb->spells, sbe);
 }
@@ -98,6 +108,7 @@ void spellbook_clear(spellbook *sb)
     assert(sb);
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        spellref_done(&sbe->spref);
         free(sbe);
     }
     selist_free(sb->spells);
@@ -127,7 +138,7 @@ spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp)
 
         for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            if (sbe->sp==sp) {
+            if (spellref_get(&sbe->spref) == sp) {
                 return sbe;
             }
         }

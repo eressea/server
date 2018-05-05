@@ -180,19 +180,37 @@ struct spellref *spellref_create(spell *sp, const char *name)
 
     if (sp) {
         spref->sp = sp;
-        spref->name = str_strdup(sp->sname);
+        spref->_name = str_strdup(sp->sname);
     }
     else if (name) {
-        spref->name = str_strdup(name);
+        spref->_name = str_strdup(name);
         spref->sp = NULL;
     }
     return spref;
 }
 
+void spellref_init(spellref *spref, spell *sp, const char *name)
+{
+    if (sp) {
+        spref->sp = sp;
+        spref->_name = str_strdup(sp->sname);
+    }
+    else if (name) {
+        spref->_name = str_strdup(name);
+        spref->sp = NULL;
+    }
+}
+
+void spellref_done(spellref *spref) {
+    if (spref) {
+        free(spref->_name);
+    }
+}
+
 void spellref_free(spellref *spref)
 {
     if (spref) {
-        free(spref->name);
+        spellref_done(spref);
         free(spref);
     }
 }
@@ -200,12 +218,21 @@ void spellref_free(spellref *spref)
 struct spell *spellref_get(struct spellref *spref)
 {
     if (!spref->sp) {
-        assert(spref->name);
-        spref->sp = find_spell(spref->name);
+        assert(spref->_name);
+        spref->sp = find_spell(spref->_name);
         if (spref->sp) {
-            free(spref->name);
-            spref->name = NULL;
+            free(spref->_name);
+            spref->_name = NULL;
         }
     }
     return spref->sp;
+}
+
+const char *spellref_name(const struct spellref *spref)
+{
+    if (spref->_name) {
+        return spref->_name;
+    }
+    assert(spref->sp);
+    return spref->sp->sname;
 }

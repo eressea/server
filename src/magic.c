@@ -375,13 +375,16 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                     sbe = 0;
                 }
                 else {
-                    if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                        /* already have this spell, remove it from the list of candidates */
-                        commonspells[spellno] = commonspells[--numspells];
-                        if (maxspell > numspells) {
-                            maxspell = numspells;
+                    if (f->spellbook) {
+                        const spell *sp = spellref_get(&sbe->spref);
+                        if (sp && spellbook_get(f->spellbook, sp)) {
+                            /* already have this spell, remove it from the list of candidates */
+                            commonspells[spellno] = commonspells[--numspells];
+                            if (maxspell > numspells) {
+                                maxspell = numspells;
+                            }
+                            sbe = 0;
                         }
-                        sbe = 0;
                     }
                 }
             }
@@ -390,7 +393,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 if (!f->spellbook) {
                     f->spellbook = create_spellbook(0);
                 }
-                spellbook_add(f->spellbook, sbe->sp, sbe->level);
+                spellbook_add(f->spellbook, spellref_get(&sbe->spref), sbe->level);
                 commonspells[spellno] = commonspells[--numspells];
             }
         }
@@ -2840,14 +2843,14 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
 
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-
-        const char *n = spell_name(sbe->sp, lang);
+        const spell *sp = spellref_get(&sbe->spref);
+        const char *n = spell_name(sp, lang);
         if (!n) {
-            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sbe->sp->sname);
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
         }
         else {
             variant token;
-            token.v = sbe->sp;
+            token.v = (void *)sp;
             addtoken((struct tnode **)tokens, n, token);
         }
     }

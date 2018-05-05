@@ -86,7 +86,7 @@ static void test_spellbooks(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
     entry = spellbook_get(herp, sp);
     CuAssertPtrNotNull(tc, entry);
-    CuAssertPtrEquals(tc, sp, entry->sp);
+    CuAssertPtrEquals(tc, sp, spellref_get(&entry->spref));
 
     test_teardown();
     test_setup();

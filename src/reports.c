@@ -870,6 +870,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
+                const spell *sp = spellref_get(&sbe->spref);
                 if (sbe->level <= maxlevel) {
                     if (!header) {
                         n = snprintf(bufp, size, ", %s: ", LOC(lang, "nr_spells"));
@@ -882,7 +883,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
                         WARN_STATIC_BUFFER();
                     }
                     /* TODO: no need to deref the spellref here (spref->name is good) */
-                    bufp = STRLCPY(bufp, spell_name(sbe->sp, lang), size);
+                    bufp = STRLCPY(bufp, spell_name(sp, lang), size);
                 }
             }
 
