@@ -285,13 +285,13 @@ static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XM
             handle_bad_input(pi, el, NULL);
         }
     }
-    if (xml_strcmp(el, "entry") == 0) {
-        int i, level;
+    else if (xml_strcmp(el, "entry") == 0) {
+        int i, level = 0;
         const XML_Char *name = NULL;
 
         assert(sb);
         for (i = 0; attr[i]; i += 2) {
-            if (xml_strcmp(attr[i], "name") == 0) {
+            if (xml_strcmp(attr[i], "spell") == 0) {
                 name = attr[i + 1];
             }
             else if (xml_strcmp(attr[i], "level") == 0) {
@@ -301,8 +301,12 @@ static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XM
                 handle_bad_input(pi, el, attr[i]);
             }
         }
-
-        handle_bad_input(pi, el, NULL);
+        if (name && level > 0) {
+            spellbook_addref(sb, name, level);
+        }
+        else {
+            handle_bad_input(pi, el, NULL);
+        }
     }
     else {
         handle_bad_input(pi, el, NULL);
@@ -876,8 +880,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         else if (xml_strcmp(el, "spells") == 0) {
             pi->type = EXP_SPELLS;
         }
-        else if (xml_strcmp(el, "spellbooks") == 0) {
+        else if (xml_strcmp(el, "spellbook") == 0) {
             pi->type = EXP_SPELLBOOKS;
+            start_spellbooks(pi, el, attr);
         }
         else if (xml_strcmp(el, "races") == 0) {
             pi->type = EXP_RACES;
