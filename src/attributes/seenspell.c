@@ -107,14 +107,14 @@ static int cmp_spell(const void *a, const void *b) {
     return strcmp(spa->sname, spb->sname);
 }
 
-static bool set_seen(attrib **alist, struct spell *sp) {
+static bool set_seen(attrib **alist, const struct spell *sp) {
     attrib *a = a_find(*alist, &at_seenspells);
     selist **sl;
     if (!a) {
         a = a_add(alist, a_new(&at_seenspells));
     }
     sl = (selist **)&a->data.v;
-    return selist_set_insert(sl, sp, cmp_spell);
+    return selist_set_insert(sl, (void *)sp, cmp_spell);
 }
 
 static void upgrade_seenspell(attrib **alist, attrib *abegin) {
@@ -123,7 +123,7 @@ static void upgrade_seenspell(attrib **alist, attrib *abegin) {
     ak = a_find(*alist, &at_seenspells);
     if (ak) alist = &ak;
     for (a = abegin; a && a->type == abegin->type; a = a->next) {
-        set_seen(alist, (struct spell *)a->data.v);
+        set_seen(alist, (const struct spell *)a->data.v);
     }
 }
 
@@ -156,11 +156,12 @@ attrib_type at_reportspell = {
     "reportspell", NULL
 };
 
-void show_spell(faction *f, const spellbook_entry *sbe)
+void show_spell(faction *f, spellbook_entry *sbe)
 {
-    if (!already_seen(f, sbe->sp)) {
+    const spell *sp = spellref_get(&sbe->spref);
+    if (!already_seen(f, sp)) {
         /* mark the spell as seen by this faction: */
-        if (set_seen(&f->attribs, sbe->sp)) {
+        if (set_seen(&f->attribs, sp)) {
             /* add the spell to the report: */
             attrib * a = a_new(&at_reportspell);
             a->data.v = (void *)sbe;

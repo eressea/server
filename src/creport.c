@@ -758,7 +758,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                spell * sp = sbe->sp;
+                const spell *sp = spellref_get(&sbe->spref);
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
                     stream_printf(out, "SPRUECHE\n");
@@ -1083,7 +1083,7 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
-static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale *lang)
+static void cr_reportspell(FILE * F, const spell * sp, int level, const struct locale *lang)
 {
     int k;
     const char *name =
@@ -1673,7 +1673,8 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     a = a_find(f->attribs, &at_reportspell);
     while (a && a->type == &at_reportspell) {
         spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-        cr_reportspell(F, sbe->sp, sbe->level, f->locale);
+        const spell *sp = spellref_get(&sbe->spref);
+        cr_reportspell(F, sp, sbe->level, f->locale);
         a = a->next;
     }
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;

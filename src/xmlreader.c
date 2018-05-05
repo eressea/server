@@ -1093,16 +1093,11 @@ static int parse_spellbooks(xmlDocPtr doc)
             if (result->nodesetval->nodeNr > 0) {
                 for (k = 0; k != result->nodesetval->nodeNr; ++k) {
                     xmlNodePtr node = result->nodesetval->nodeTab[k];
-                    spell * sp = 0;
                     int level = xml_ivalue(node, "level", -1);
 
-                    propValue = xmlGetProp(node, BAD_CAST "spell");
-                    if (propValue) {
-                        sp = find_spell((const char *)propValue);
+                    if (level > 0 && (propValue = xmlGetProp(node, BAD_CAST "spell")) != NULL) {
+                        spellbook_addref(sb, (const char *)propValue, level);
                         xmlFree(propValue);
-                    }
-                    if (sp && level > 0) {
-                        spellbook_add(sb, sp, level);
                     }
                     else {
                         log_error("invalid entry at index '%d' in spellbook '%s'\n", k, sb->name);
@@ -1510,7 +1505,8 @@ static int parse_races(xmlDocPtr doc)
                     if (attack->data.sp) {
                         attack->level = xml_ivalue(node, "level", 0);
                         if (attack->level <= 0) {
-                            log_error("magical attack '%s' for race '%s' needs a level: %d\n", attack->data.sp->name, rc->_name, attack->level);
+                            log_error("magical attack '%s' for race '%s' needs a level: %d\n",
+                                spellref_name(attack->data.sp), rc->_name, attack->level);
                         }
                     }
                 }
@@ -1709,8 +1705,8 @@ void register_xmlreader(void)
     xml_register_callback(parse_ships);     /* requires resources, terrains */
     xml_register_callback(parse_equipment); /* requires resources */
 
-    xml_register_callback(parse_spells); /* requires resources */
     xml_register_callback(parse_spellbooks);  /* requires spells */
+    xml_register_callback(parse_spells); /* requires resources */
 
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);

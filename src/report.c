@@ -249,7 +249,7 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
     char buf[4096];
     char *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    const spell * sp = sbe->sp;
+    const spell *sp = spellref_get(&sbe->spref);
     const char *params = sp->parameter;
 
     if (sp->sptyp & ISCOMBATSPELL) {
@@ -439,7 +439,7 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     char buf[4096];
     char *startp, *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    const spell * sp = sbe->sp;
+    const spell *sp = spellref_get(&sbe->spref);
 
     newline(out);
     centre(out, spell_name(sp, lang), true);
