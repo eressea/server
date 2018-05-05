@@ -11,6 +11,7 @@
 #include "kernel/race.h"
 #include "kernel/resources.h"
 #include "kernel/ship.h"
+#include "kernel/spellbook.h"
 #include "kernel/terrain.h"
 
 #include "util/functions.h"
@@ -270,6 +271,42 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
         }
     }
     wtype->flags = flags;
+}
+
+static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    spellbook * sb = (spellbook *)pi->object;
+    if (xml_strcmp(el, "spellbook") == 0) {
+        const XML_Char *name = attr_get(attr, "name");
+
+        if (name) {
+            pi->object = sb = get_spellbook(name);
+        }
+        else {
+            handle_bad_input(pi, el, NULL);
+        }
+    }
+    if (xml_strcmp(el, "entry") == 0) {
+        int i, level;
+        const XML_Char *name = NULL;
+
+        assert(sb);
+        for (i = 0; attr[i]; i += 2) {
+            if (xml_strcmp(attr[i], "name") == 0) {
+                name = attr[i + 1];
+            }
+            else if (xml_strcmp(attr[i], "level") == 0) {
+                level = xml_int(attr[i + 1]);
+            }
+            else {
+                handle_bad_input(pi, el, attr[i]);
+            }
+        }
+
+        handle_bad_input(pi, el, NULL);
+    }
+    else {
+        handle_bad_input(pi, el, NULL);
+    }
 }
 
 static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
@@ -862,6 +899,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
             break;
         case EXP_WEAPON:
             start_weapon(pi, el, attr);
+            break;
+        case EXP_SPELLBOOKS:
+            start_spellbooks(pi, el, attr);
             break;
         default:
             /* not implemented */
