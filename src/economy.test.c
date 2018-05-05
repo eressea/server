@@ -509,7 +509,7 @@ static void test_modify_material(CuTest *tc) {
     mod = rtype->modifiers = calloc(2, sizeof(resource_mod));
     mod[0].type = RMT_USE_SAVE;
     mod[0].value = frac_make(2, 1);
-    mod[0].race = u_race(u);
+    mod[0].race_mask = rc_mask(u_race(u));
 
     itype = test_create_itemtype("sword");
     make_item(u, itype, 1);
@@ -574,7 +574,7 @@ static void test_modify_skill(CuTest *tc) {
     mod[0].type = RMT_PROD_SKILL;
     mod[0].value.sa[0] = SK_WEAPONSMITH;
     mod[0].value.sa[1] = 1;
-    mod[0].race = u_race(u);
+    mod[0].race_mask = rc_mask(u_race(u));
 
     set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
     make_item(u, itype, 2);
@@ -647,7 +647,7 @@ static void test_modify_production(CuTest *tc) {
 
     rtype->modifiers = calloc(3, sizeof(resource_mod));
     rtype->modifiers[0].type = RMT_PROD_SAVE;
-    rtype->modifiers[0].race = u->_race;
+    rtype->modifiers[0].race_mask = rc_mask(u->_race);
     rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
     rtype->modifiers[0].value.sa[1] = 100;
     rtype->modifiers[1].type = RMT_END;
@@ -668,7 +668,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertIntEquals(tc, 280, region_getresource(u->region, rtype)); /* 50% saving = 3 stones make 6 stones */
 
     rtype->modifiers[0].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[0].race = NULL;
+    rtype->modifiers[0].race_mask = 0;
     rtype->modifiers[0].btype = bt_get_or_create("mine");
 
     test_clear_messages(u->faction);
@@ -677,7 +677,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "building_needed"));
 
     rtype->modifiers[0].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[0].race = test_create_race("smurf");
+    rtype->modifiers[0].race_mask = rc_mask(test_create_race("smurf"));
     rtype->modifiers[0].btype = NULL;
 
     test_clear_messages(u->faction);
@@ -686,7 +686,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error117"));
 
     rtype->modifiers[1].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[1].race = u_race(u);
+    rtype->modifiers[1].race_mask = rc_mask(u_race(u));
     rtype->modifiers[1].btype = NULL;
     rtype->modifiers[2].type = RMT_END;
 

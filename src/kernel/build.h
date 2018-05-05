@@ -37,25 +37,13 @@ extern "C" {
         int number;
     } requirement;
 
-    typedef enum construct_t {
-        CONS_OTHER,
-        CONS_ITEM,
-        CONS_BUILDING
-    } construct_t;
-
     typedef struct construction {
-        construct_t type;
         skill_t skill;              /* skill req'd per point of size */
         int minskill;               /* skill req'd per point of size */
 
         int maxsize;                /* maximum size of this type */
         int reqsize;                /* size of object using up 1 set of requirement. */
         requirement *materials;     /* material req'd to build one object */
-
-        /* only used by CONS_BUILDING: */
-        char * name; /* building level name */
-        struct construction *improvement;
-        /* next level, if upgradable. */
     } construction;
 
     void free_construction(struct construction *cons);

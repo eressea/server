@@ -11,6 +11,7 @@
 #include <CuTest.h>
 
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 #include <assert.h>
 
@@ -22,6 +23,18 @@ static void test_rc_name(CuTest *tc) {
     CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
     CuAssertStrEquals(tc, "race::human_d", rc_name_s(rc, NAME_DEFINITIVE));
     CuAssertStrEquals(tc, "race::human_x", rc_name_s(rc, NAME_CATEGORY));
+    test_teardown();
+}
+
+static void test_rc_item_mask(CuTest *tc) {
+    struct race *rc;
+    test_setup();
+    rc = rc_get_or_create("hooman");
+    CuAssertIntEquals(tc, 1, rc->mask_item);
+    rc = rc_get_or_create("aelf");
+    CuAssertIntEquals(tc, 2, rc->mask_item);
+    rc = rc_get_or_create("dorf");
+    CuAssertIntEquals(tc, 4, rc->mask_item);
     test_teardown();
 }
 
@@ -172,6 +185,19 @@ static void test_racename(CuTest *tc) {
     test_teardown();
 }
 
+static void test_rc_mask(CuTest *tc) {
+    int mask;
+    char list[64];
+    test_setup();
+    strcpy(list, "goblin dwarf");
+    mask = rc_get_mask(list);
+    CuAssertIntEquals(tc, 3, mask);
+    CuAssertStrEquals(tc, "goblin", list);
+    mask = rc_get_mask(list);
+    CuAssertIntEquals(tc, 1, mask);
+    test_teardown();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -179,7 +205,9 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_old_race);
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
+    SUITE_ADD_TEST(suite, test_rc_item_mask);
     SUITE_ADD_TEST(suite, test_rc_find);
+    SUITE_ADD_TEST(suite, test_rc_mask);
     SUITE_ADD_TEST(suite, test_rc_set_param);
     SUITE_ADD_TEST(suite, test_rc_can_use);
     SUITE_ADD_TEST(suite, test_racename);

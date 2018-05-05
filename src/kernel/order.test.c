@@ -365,6 +365,35 @@ static void test_study_order(CuTest *tc) {
     test_teardown();
 }
 
+static void test_study_order_unknown(CuTest *tc) {
+    char token[32];
+    stream out;
+    unit *u;
+    struct locale *lang;
+
+    test_setup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "keyword::study", "LERNE");
+    init_keywords(lang);
+    init_skills(lang);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_STUDY, lang, "Schiffsbau");
+    CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
+    CuAssertStrEquals(tc, "Schiffsbau", gettoken(token, sizeof(token)));
+
+    CuAssertStrEquals(tc, "LERNE Schiffsbau", get_command(u->thisorder, lang, token, sizeof(token)));
+
+    mstream_init(&out);
+    stream_order(&out, u->thisorder, lang, true);
+    swrite("\n", 1, 1, &out);
+    out.api->rewind(out.handle);
+    out.api->readln(out.handle, token, sizeof(token));
+    CuAssertStrEquals(tc, "LERNE Schiffsbau", token);
+    mstream_done(&out);
+
+    test_teardown();
+}
+
 static void test_study_order_quoted(CuTest *tc) {
     char token[32];
     stream out;
@@ -395,12 +424,73 @@ static void test_study_order_quoted(CuTest *tc) {
     test_teardown();
 }
 
+static void test_study_order_unknown_tilde(CuTest *tc) {
+    char token[32];
+    stream out;
+    unit *u;
+    struct locale *lang;
+
+    test_setup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "keyword::study", "LERNE");
+    init_keywords(lang);
+    init_skills(lang);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_STUDY, lang, "Waffenloser~Mampf");
+    CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
+    CuAssertStrEquals(tc, "Waffenloser Mampf", gettoken(token, sizeof(token)));
+
+    CuAssertStrEquals(tc, "LERNE Waffenloser~Mampf", get_command(u->thisorder, lang, token, sizeof(token)));
+
+    mstream_init(&out);
+    stream_order(&out, u->thisorder, lang, true);
+    swrite("\n", 1, 1, &out);
+    out.api->rewind(out.handle);
+    out.api->readln(out.handle, token, sizeof(token));
+    CuAssertStrEquals(tc, "LERNE Waffenloser~Mampf", token);
+    mstream_done(&out);
+
+    test_teardown();
+}
+
+static void test_study_order_unknown_quoted(CuTest *tc) {
+    char token[32];
+    stream out;
+    unit *u;
+    struct locale *lang;
+
+    test_setup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "keyword::study", "LERNE");
+    init_keywords(lang);
+    init_skills(lang);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_STUDY, lang, "'Waffenloser Dampf'");
+    CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
+    CuAssertStrEquals(tc, "Waffenloser Dampf", gettoken(token, sizeof(token)));
+
+    CuAssertStrEquals(tc, "LERNE 'Waffenloser Dampf'", get_command(u->thisorder, lang, token, sizeof(token)));
+
+    mstream_init(&out);
+    stream_order(&out, u->thisorder, lang, true);
+    swrite("\n", 1, 1, &out);
+    out.api->rewind(out.handle);
+    out.api->readln(out.handle, token, sizeof(token));
+    CuAssertStrEquals(tc, "LERNE 'Waffenloser Dampf'", token);
+    mstream_done(&out);
+
+    test_teardown();
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_create_order);
     SUITE_ADD_TEST(suite, test_study_orders);
     SUITE_ADD_TEST(suite, test_study_order);
+    SUITE_ADD_TEST(suite, test_study_order_unknown);
+    SUITE_ADD_TEST(suite, test_study_order_unknown_tilde);
+    SUITE_ADD_TEST(suite, test_study_order_unknown_quoted);
     SUITE_ADD_TEST(suite, test_study_order_quoted);
     SUITE_ADD_TEST(suite, test_parse_order);
     SUITE_ADD_TEST(suite, test_parse_make);

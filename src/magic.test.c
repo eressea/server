@@ -86,7 +86,7 @@ static void test_spellbooks(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
     entry = spellbook_get(herp, sp);
     CuAssertPtrNotNull(tc, entry);
-    CuAssertPtrEquals(tc, sp, entry->sp);
+    CuAssertPtrEquals(tc, sp, spellref_get(&entry->spref));
 
     test_teardown();
     test_setup();
@@ -477,7 +477,7 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
     CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->construction->name = str_strdup("site");
+    btype->stages->name = str_strdup("site");
     CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
     test_teardown();
 }

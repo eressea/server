@@ -723,6 +723,7 @@ bool missile)
         }
         if (wtype->modifiers != NULL) {
             /* Pferdebonus, Lanzenbonus, usw. */
+            const race *rc = u_race(tu);
             int m;
             unsigned int flags =
                 WMF_SKILL | (attacking ? WMF_OFFENSIVE : WMF_DEFENSIVE);
@@ -738,17 +739,10 @@ bool missile)
 
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 if ((wtype->modifiers[m].flags & flags) == flags) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == u_race(tu))
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & rc->mask_item)) {
+                        skill += wtype->modifiers[m].value;
                     }
-                    skill += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1029,17 +1023,10 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 /* weapon damage for this weapon, possibly by race */
                 if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == ar)
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & ar->mask_item)) {
+                        modifier += wtype->modifiers[m].value;
                     }
-                    modifier += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1552,6 +1539,17 @@ static int get_tactics(const side * as, const side * ds)
     return result - defense;
 }
 
+double tactics_chance(const unit *u, int skilldiff) {
+    double tacch = 0.1 * skilldiff;
+    if (fval(u->region->terrain, SEA_REGION)) {
+        const ship *sh = u->ship;
+        if (sh) {
+            tacch *= sh->type->tac_bonus;
+        }
+    }
+    return tacch;
+}
+
 static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 {
     fighter *af = at.fighter;
@@ -1573,12 +1571,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 
             /* percentage chance to get this attack */
             if (tactics > 0) {
-                double tacch = 0.1 * tactics;
-                if (fval(b->region->terrain, SEA_REGION)) {
-                    ship *sh = at.fighter->unit->ship;
-                    if (sh)
-                        tacch *= sh->type->tac_bonus;
-                }
+                double tacch = tactics_chance(af->unit, tactics);
                 if (!chance(tacch)) {
                     dt.fighter = NULL;
                 }
@@ -1877,7 +1870,7 @@ static void do_extra_spell(troop at, const att * a)
     const spell *sp = spellref_get(a->data.sp);
 
     if (!sp) {
-        log_error("no such spell: '%s'", a->data.sp->name);
+        log_error("no such spell: '%s'", a->data.sp->_name);
     }
     else {
         assert(a->level > 0);
@@ -3272,8 +3265,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
                     adata->atype = itm->type->rtype->atype;
                     adata->count = itm->number;
                     for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
-                        if (adata->atype->prot > (*aptr)->atype->prot)
+                        if (adata->atype->prot > (*aptr)->atype->prot) {
                             break;
+                        }
                     }
                     adata->next = *aptr;
                     *aptr = adata;

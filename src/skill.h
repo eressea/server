@@ -6,7 +6,7 @@
 #include <stdbool.h>
 struct locale;
 
-typedef enum {
+typedef enum skill_t {
     SK_ALCHEMY,
     SK_CROSSBOW,
     SK_MINING,

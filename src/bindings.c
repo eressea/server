@@ -770,26 +770,6 @@ static int config_get_btype(lua_State * L)
                 }
                 lua_settable(L, -3);
             }
-            if (btype->construction) {
-                lua_pushstring(L, "build_skill_min");
-                lua_pushinteger(L, btype->construction->minskill);
-                lua_settable(L, -3);
-                lua_pushstring(L, "build_skill_name");
-                lua_pushstring(L, skillnames[btype->construction->skill]);
-                lua_settable(L, -3);
-                if (btype->construction->materials) {
-                    int i;
-                    lua_pushstring(L, "materials");
-                    lua_newtable(L);
-                    for (i = 0; btype->construction->materials[i].number; ++i) {
-                        lua_pushstring(L,
-                            btype->construction->materials[i].rtype->_name);
-                        lua_pushinteger(L, btype->construction->materials[i].number);
-                        lua_settable(L, -3);
-                    }
-                    lua_settable(L, -3);
-                }
-            }
             return 1;
         }
     }
@@ -880,7 +860,7 @@ static int tolua_get_spell_name(lua_State * L)
 static int tolua_get_spell_entry_name(lua_State * L)
 {
     spellbook_entry *self = (spellbook_entry*)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, self->sp->sname);
+    lua_pushstring(L, spellref_name(&self->spref));
     return 1;
 }
 

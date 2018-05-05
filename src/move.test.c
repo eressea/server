@@ -593,6 +593,30 @@ static void test_route_cycle(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cycle_route(CuTest *tc) {
+    struct locale *lang;
+    char buffer[32];
+    order *ord, *onew;
+
+    test_setup();
+    lang = test_create_locale();
+    CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
+
+    ord = create_order(K_ROUTE, lang, "WEST EAST PAUSE NW");
+    CuAssertStrEquals(tc, "route WEST EAST PAUSE NW", get_command(ord, lang, buffer, sizeof(buffer)));
+
+    onew = cycle_route(ord, lang, 1);
+    CuAssertStrEquals(tc, "route east PAUSE nw west", get_command(onew, lang, buffer, sizeof(buffer)));
+    free_order(onew);
+
+    onew = cycle_route(ord, lang, 2);
+    CuAssertStrEquals(tc, "route nw west east PAUSE", get_command(onew, lang, buffer, sizeof(buffer)));
+    free_order(onew);
+
+    free_order(ord);
+    test_teardown();
+}
+
 static void test_route_pause(CuTest *tc) {
     unit *u;
     region *r;
@@ -630,6 +654,26 @@ static void test_movement_speed_dragon(CuTest *tc) {
     test_teardown();
 }
 
+static void test_make_movement_order(CuTest *tc) {
+    order *ord;
+    char buffer[32];
+    struct locale *lang;
+    direction_t steps[] = { D_EAST, D_WEST, D_EAST, D_WEST };
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = make_movement_order(lang, steps, 2);
+    CuAssertStrEquals(tc, "move east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    ord = make_movement_order(lang, steps, 4);
+    CuAssertStrEquals(tc, "move east west east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -658,6 +702,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
     SUITE_ADD_TEST(suite, test_route_cycle);
+    SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);
+    SUITE_ADD_TEST(suite, test_make_movement_order);
     return suite;
 }

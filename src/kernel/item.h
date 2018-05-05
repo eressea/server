@@ -147,8 +147,8 @@ extern "C" {
     struct race_list;
     typedef struct weapon_mod {
         int value;
-        unsigned int flags;
-        struct race_list *races;
+        int flags;
+        int race_mask;
     } weapon_mod;
 
 #define ATF_NONE   0x00

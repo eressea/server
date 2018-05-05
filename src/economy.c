@@ -833,7 +833,8 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
 
     for (mod = rtype->modifiers; mod && mod->type != RMT_END; ++mod) {
         if (mod->btype == NULL || mod->btype == btype) {
-            if (mod->race == NULL || mod->race == u_race(u)) {
+            const race * rc = u_race(u);
+            if (mod->race_mask == 0 || (mod->race_mask & rc->mask_item)) {
                 switch (mod->type) {
                 case RMT_PROD_SAVE:
                     if (savep) {
@@ -845,7 +846,7 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
                     mod_skill(mod, sk, &skill);
                     break;
                 case RMT_PROD_REQUIRE:
-                    if (mod->race) need_race |= 1;
+                    if (mod->race_mask) need_race |= 1;
                     if (mod->btype) {
                         need_bldg |= 1;
                     }
@@ -857,7 +858,7 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
             }
         }
         if (mod->type == RMT_PROD_REQUIRE) {
-            if (mod->race) need_race |= 2;
+            if (mod->race_mask) need_race |= 2;
             if (mod->btype) {
                 btype_needed = mod->btype;
                 need_bldg |= 2;
@@ -1408,7 +1409,7 @@ int make_cmd(unit * u, struct order *ord)
         if (pl && fval(pl, PFL_NOBUILD)) {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else if (btype->construction) {
+        else if (btype->stages && btype->stages->construction) {
             int id = getid();
             build_building(u, btype, id, m, ord);
         }

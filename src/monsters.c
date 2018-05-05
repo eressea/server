@@ -55,7 +55,6 @@
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -173,6 +172,9 @@ static order *monster_attack(unit * u, const unit * target)
     if (monster_is_waiting(u))
         return NULL;
 
+    if (u->region->land) {
+        assert(u->region->flags & RF_GUARDED);
+    }
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
@@ -499,41 +501,30 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
     return NULL;
 }
 
-static order *make_movement_order(unit * u, const region * target, int moves,
+static order *plan_move_to_target(unit * u, const region * target, int moves,
     bool(*allowed) (const region *, const region *))
 {
     region *r = u->region;
     region **plan;
-    int position = 0;
-    char zOrder[128], *bufp = zOrder;
-    size_t size = sizeof(zOrder) - 1;
+    direction_t steps[DRAGON_RANGE];
+    int position;
 
     if (monster_is_waiting(u))
         return NULL;
 
-    plan = path_find(r, target, DRAGON_RANGE * 5, allowed);
+    plan = path_find(r, target, DRAGON_RANGE, allowed);
     if (plan == NULL)
         return NULL;
 
-    while (position != moves && plan[position + 1]) {
-        int bytes;
+    for (position = 0; position != moves && plan[position + 1]; ++position) {
         region *prev = plan[position];
-        region *next = plan[++position];
+        region *next = plan[position + 1];
         direction_t dir = reldirection(prev, next);
         assert(dir != NODIRECTION && dir != D_SPECIAL);
-        if (size > 1 && bufp != zOrder) {
-            *bufp++ = ' ';
-            --size;
-        }
-        bytes =
-            (int)str_strlcpy(bufp,
-            (const char *)LOC(u->faction->locale, directions[dir]), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        steps[position] = dir;
     }
 
-    *bufp = 0;
-    return create_order(K_MOVE, u->faction->locale, zOrder);
+    return make_movement_order(u->faction->locale, steps, position);
 }
 
 void random_growl(const unit *u, region *target, int rand)
@@ -686,15 +677,15 @@ static order *plan_dragon(unit * u)
         assert(long_order == NULL);
         /* TODO: per-race planning functions? */
         if (rc == rc_wyrm) {
-            long_order = make_movement_order(u, tr, 1, allowed_dragon);
+            long_order = plan_move_to_target(u, tr, 1, allowed_dragon);
         }
         else {
             switch (old_race(rc)) {
             case RC_FIREDRAGON:
-                long_order = make_movement_order(u, tr, 4, allowed_dragon);
+                long_order = plan_move_to_target(u, tr, 4, allowed_dragon);
                 break;
             case RC_DRAGON:
-                long_order = make_movement_order(u, tr, 3, allowed_dragon);
+                long_order = plan_move_to_target(u, tr, 3, allowed_dragon);
                 break;
             default:
                 break;
@@ -747,7 +738,14 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool attacking = chance(attack_chance);
+        bool attacking = false;
+        /* Tiny optimization: Monsters on land only attack randomly when
+        * they are guarding. If nobody is guarding this region (RF_GUARDED),
+        * there can't be any random attacks.
+        */
+        if (!r->land || r->flags & RF_GUARDED) {
+            attacking = chance(attack_chance);
+        }
 
         for (u = r->units; u; u = u->next) {
             const race *rc = u_race(u);
@@ -768,8 +766,7 @@ void plan_monsters(faction * f)
             if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, false);
             }
-
-            /* units with a plan to kill get ATTACK orders: */
+            /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
@@ -780,15 +777,15 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (tu) {
-                    tu = findunit(ta->data.i);
-                    if (tu != NULL) {
-                        long_order = make_movement_order(u, tu->region, 2, allowed_walk);
+                    bool(*allowed)(const struct region * src, const struct region * r) = allowed_walk;
+                    if (canfly(u)) {
+                        allowed = allowed_fly;
                     }
+                    long_order = plan_move_to_target(u, tu->region, 2, allowed);
                 }
                 else
                     a_remove(&u->attribs, ta);
             }
-
             /* All monsters guard the region: */
             if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
                 addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));

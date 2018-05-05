@@ -151,20 +151,6 @@ static void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
     construction * cons;
     
-    if (json->type == cJSON_Array) {
-        int size = 0;
-        for (child = json->child; child; child = child->next) {
-            construction *cons = 0;
-            json_construction(child, &cons);
-            if (cons) {
-                cons->maxsize -= size;
-                size += cons->maxsize + size;
-                *consp = cons;
-                consp = &cons->improvement;
-            }
-        }
-        return;
-    }
     if (json->type != cJSON_Object) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
@@ -309,6 +295,57 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
     }
 }
 
+static void json_stage(cJSON *json, building_stage *stage) {
+    cJSON *child;
+
+    if (json->type != cJSON_Object) {
+        log_error("building stages is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "construction") == 0) {
+                json_construction(child, &stage->construction);
+            }
+            break;
+        case cJSON_String:
+            if (strcmp(child->string, "name") == 0) {
+                stage->name = str_strdup(child->valuestring);
+            }
+            break;
+        }
+    }
+}
+
+static void json_stages(cJSON *json, building_type *bt) {
+    cJSON *child;
+    building_stage *stage, **sp = &bt->stages;
+    int size = 0;
+
+    if (json->type != cJSON_Array) {
+        log_error("building stages is not a json array: %d", json->type);
+        return;
+    }
+
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_Object:
+            stage = calloc(sizeof(building_stage), 1);
+            json_stage(child, stage);
+            if (stage->construction->maxsize > 0) {
+                stage->construction->maxsize -= size;
+                size += stage->construction->maxsize;
+            }
+            *sp = stage;
+            sp = &stage->next;
+            break;
+        default:
+            log_error("building stage contains non-object type %d", child->type);
+        }
+    }
+}
+
 static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     const char *flags[] = {
@@ -321,8 +358,10 @@ static void json_building(cJSON *json, building_type *bt) {
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Array:
-            if (strcmp(child->string, "construction") == 0) {
-                json_construction(child, &bt->construction);
+            if (strcmp(child->string, "stages") == 0) {
+                if (!bt->stages) {
+                    json_stages(child, bt);
+                }
             }
             else if (strcmp(child->string, "maintenance") == 0) {
                 json_maintenance(child, &bt->maintenance);
@@ -333,9 +372,14 @@ static void json_building(cJSON *json, building_type *bt) {
             break;
         case cJSON_Object:
             if (strcmp(child->string, "construction") == 0) {
-                json_construction(child, &bt->construction);
+                /* simple, single-stage building */
+                if (!bt->stages) {
+                    building_stage *stage = calloc(sizeof(building_stage), 1);
+                    json_construction(child, &stage->construction);
+                    bt->stages = stage;
+                }
             }
-            else if (strcmp(child->string, "maintenance") == 0) {
+            if (strcmp(child->string, "maintenance") == 0) {
                 json_maintenance(child, &bt->maintenance);
             }
             break;

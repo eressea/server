@@ -31,7 +31,7 @@
   </item>
 </resource>
 <resource name="rep_crossbow">
-  <modifier type="require" race="dwarf"/>
+  <modifier type="require" races="dwarf"/>
   <item weight="100" allow="dwarf halfling">
     <construction skill="weaponsmithing" minskill="5">
       <requirement type="log" quantity="1"/>
@@ -127,7 +127,7 @@
      * has a lua canuse function
      * has lower damage
 -->
-  <modifier type="require" race="elf"/>
+  <modifier type="require" races="elf"/>
   <item weight="100" allow="elf">
     <construction skill="weaponsmithing" minskill="5">
       <requirement type="mallorn" quantity="2"/>
@@ -136,9 +136,7 @@
       <damage type="rider" value="2d4+5"/>
       <damage type="footman" value="2d4+5"/>
       <modifier type="missile_target" value="2"/>
-      <modifier type="damage" value="1">
-        <race name="elf"/>
-      </modifier>
+      <modifier type="damage" value="1" races="elf"/>
     </weapon>
   </item>
 </resource>

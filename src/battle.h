@@ -143,7 +143,7 @@ extern "C" {
     } troop;
 
     typedef struct armor {
-        struct armor *next;
+        struct armor *next; /* TODO: make this an array, not a list, like weapon */
         const struct armor_type *atype;
         int count;
     } armor;
@@ -270,6 +270,7 @@ extern "C" {
     const char *sidename(const struct side * s);
     void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
 
+    double tactics_chance(const struct unit *u, int skilldiff);
 #ifdef __cplusplus
 }
 #endif

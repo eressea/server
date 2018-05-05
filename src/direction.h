@@ -8,7 +8,7 @@ extern "C"
 
     struct locale;
 
-    typedef enum {
+    typedef enum direction_t {
         D_NORTHWEST,
         D_NORTHEAST,
         D_EAST,

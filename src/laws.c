@@ -3298,8 +3298,9 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
         for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                if (!spellbook_get(dst, sbe->sp)) {
-                    spellbook_add(dst, sbe->sp, sbe->level);
+                spell *sp = spellref_get(&sbe->spref);
+                if (!spellbook_get(dst, sp)) {
+                    spellbook_add(dst, sp, sbe->level);
                 }
             }
         }
@@ -3548,7 +3549,7 @@ enum {
     PROC_LONGORDER = 1 << 1
 };
 
-typedef enum { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
+typedef enum processor_t { PR_GLOBAL, PR_REGION_PRE, PR_UNIT, PR_ORDER, PR_REGION_POST } processor_t;
 
 typedef struct processor {
     struct processor *next;

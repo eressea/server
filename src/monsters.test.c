@@ -18,9 +18,12 @@
 #include "skill.h"
 #include "study.h"
 
+#include <util/attrib.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+
+#include <attributes/hate.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -267,10 +270,35 @@ static void test_spawn_seaserpent(CuTest *tc) {
     test_teardown();
 }
 
+static void test_monsters_hate(CuTest *tc) {
+    unit *mu, *tu;
+    order *ord;
+    char buffer[32];
+    const struct locale *lang;
+
+    test_setup();
+    tu = test_create_unit(test_create_faction(NULL), test_create_plain(1, 0));
+    mu = test_create_unit(get_monsters(), test_create_plain(0, 0));
+    lang = mu->faction->locale;
+    a_add(&mu->attribs, make_hate(tu));
+    plan_monsters(mu->faction);
+    CuAssertPtrNotNull(tc, mu->orders);
+    for (ord = mu->orders; ord; ord = ord->next) {
+        if (K_MOVE == getkeyword(ord)) {
+            break;
+        }
+    }
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+    CuAssertStrEquals(tc, "move east", get_command(ord, lang, buffer, sizeof(buffer)));
+    test_teardown();
+}
+
 CuSuite *get_monsters_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_monsters_attack);
+    SUITE_ADD_TEST(suite, test_monsters_hate);
     SUITE_ADD_TEST(suite, test_spawn_seaserpent);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
     SUITE_ADD_TEST(suite, test_seaserpent_piracy);
