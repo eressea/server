@@ -2422,7 +2422,7 @@ static bool is_moving_ship(ship * sh)
     return false;
 }
 
-#define MAX_PARAMETERS 8
+#define MAX_PARAMETERS 32
 static castorder *cast_cmd(unit * u, order * ord)
 {
     char token[128];
