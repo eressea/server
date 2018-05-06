@@ -1706,11 +1706,11 @@ void register_xmlreader(void)
     xml_register_callback(parse_buildings);
     xml_register_callback(parse_ships);
     xml_register_callback(parse_spellbooks);
+    xml_register_callback(parse_spells);
 #endif
     xml_register_callback(parse_races);
     xml_register_callback(parse_equipment);
 
-    xml_register_callback(parse_spells);
 
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);

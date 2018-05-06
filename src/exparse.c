@@ -277,7 +277,13 @@ static void XMLCALL start_spells(parseinfo *pi, const XML_Char *el, const XML_Ch
     const char *flag_names[] = {
         "far", "variable", "ocean", "ship", "los", 
         "unittarget", "shiptarget", "buildingtarget", "regiontarget", NULL };
-    if (xml_strcmp(el, "spell") == 0) {
+
+    if (xml_strcmp(el, "resource") == 0) {
+        spell_component *spc = NULL;
+        (void)spc;
+        handle_bad_input(pi, el, NULL);
+    }
+    else if (xml_strcmp(el, "spell") == 0) {
         spell *sp;
         const XML_Char *name = NULL, *syntax = NULL, *parameter = NULL;
         int i, rank = 0, flags = 0;
