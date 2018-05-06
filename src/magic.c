@@ -1819,12 +1819,12 @@ static int addparam_building(const char *const param[], spllprm ** spobjp)
 
 static int
 addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
-    order * ord)
+    order * ord, message **err)
 {
     assert(param[0]);
     if (param[1] == NULL) {
         /* Fehler: Zielregion vergessen */
-        cmistake(u, ord, 194, MSG_MAGIC);
+        *err = msg_error(u, ord, 194);
         return -1;
     }
     else {
@@ -1846,7 +1846,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
         }
         else {
             /* Fehler: Zielregion vergessen */
-            cmistake(u, ord, 194, MSG_MAGIC);
+            *err = msg_error(u, ord, 194);
             return -1;
         }
         return 2;
@@ -1855,7 +1855,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
 
 static int
 addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
-    order * ord)
+    order * ord, message **err)
 {
     spllprm *spobj;
     int i = 0;
@@ -1865,7 +1865,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
     if (isparam(param[0], u->faction->locale, P_TEMP)) {
         if (param[1] == NULL) {
             /* Fehler: Ziel vergessen */
-            cmistake(u, ord, 203, MSG_MAGIC);
+            *err = msg_error(u, ord, 203);
             return -1;
         }
         ++i;
@@ -1883,7 +1883,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
 static spellparameter *add_spellparameter(region * target_r, unit * u,
     const char *syntax, const char *const param[], int size, struct order *ord)
 {
-    bool fail = false;
+    struct message *err = NULL;
     int i = 0;
     int p = 0;
     const char *c;
@@ -1919,7 +1919,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
     }
     par->param = malloc(size * sizeof(spllprm *));
 
-    while (!fail && *c && i < size && param[i] != NULL) {
+    while (!err && *c && i < size && param[i] != NULL) {
         spllprm *spobj = NULL;
         int j = -1;
         switch (*c) {
@@ -1938,13 +1938,13 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             break;
         case 'u':
             /* Parameter ist eine Einheit, evtl. TEMP */
-            j = addparam_unit(param + i, &spobj, u, ord);
+            j = addparam_unit(param + i, &spobj, u, ord, &err);
             ++c;
             break;
         case 'r':
             /* Parameter sind zwei Regionskoordinaten innerhalb der "normalen" Plane */
             if (i + 1 < size) {
-                j = addparam_region(param + i, &spobj, u, ord);
+                j = addparam_region(param + i, &spobj, u, ord, &err);
             }
             ++c;
             break;
@@ -1979,7 +1979,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
                 break;
             case P_UNIT:
                 if (i < size) {
-                    j = addparam_unit(param + i, &spobj, u, ord);
+                    j = addparam_unit(param + i, &spobj, u, ord, &err);
                     ++c;
                 }
                 break;
@@ -2005,8 +2005,10 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             j = -1;
             break;
         }
-        if (j < 0)
-            fail = true;
+        if (j < 0 && !err) {
+            /* syntax error */
+            err = msg_error(u, ord, 209);
+        }
         else {
             if (spobj != NULL)
                 par->param[p++] = spobj;
@@ -2014,15 +2016,19 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
         }
     }
 
-    /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
+    /* im Endeffekt waren es evtl. nur p parameter (weniger weil TEMP nicht gilt) */
     par->length = p;
-    if (par->length < minlen) {
-        cmistake(u, ord, 209, MSG_MAGIC);
-        free_spellparameter(par);
-        return NULL;
-    }
 
-    return fail ? NULL : par;
+    if (!err && p < minlen) {
+        /* syntax error */
+        err = msg_error(u, ord, 209);
+    }
+    if (err) {
+        ADDMSG(&u->faction->msgs, err);
+        free_spellparameter(par);
+        par = NULL;
+    }
+    return par;
 }
 
 struct unit * co_get_caster(const struct castorder * co) {
