@@ -2624,14 +2624,17 @@ static castorder *cast_cmd(unit * u, order * ord)
     /* Weitere Argumente zusammenbasteln */
     if (sp->parameter) {
         char *params[MAX_PARAMETERS];
-        int i, p = 0;
-        for (;;) {
+        int i, p;
+        for (p = 0; p != MAX_PARAMETERS; ++p) {
             s = gettoken(token, sizeof(token));
             if (!s || *s == 0) {
                 break;
             }
-            assert(p + 1 < MAX_PARAMETERS);
-            params[p++] = str_strdup(s);
+            params[p] = str_strdup(s);
+        }
+        if (p == MAX_PARAMETERS) {
+            log_error("%s: MAX_PARAMETERS (%d) too small to CAST %s, parsing stopped early.",
+                unitname(u), MAX_PARAMETERS, sp->sname);
         }
         args =
             add_spellparameter(target_r, caster, sp->parameter,
