@@ -2390,8 +2390,9 @@ unit *get_clone(const unit * u)
     attrib *a = a_find(u->attribs, &at_clone);
     if (a != NULL) {
         unit *uc = (unit *)a->data.v;
-        if (uc->number > 0)
+        if (uc->number > 0) {
             return uc;
+        }
     }
     return NULL;
 }
@@ -2400,7 +2401,7 @@ static bool is_moving_ship(ship * sh)
 {
     const unit *u = ship_owner(sh);
 
-    if (u)
+    if (u) {
         switch (getkeyword(u->thisorder)) {
         case K_ROUTE:
         case K_MOVE:
@@ -2409,6 +2410,7 @@ static bool is_moving_ship(ship * sh)
         default:
             return false;
         }
+    }
     return false;
 }
 
