@@ -1174,7 +1174,7 @@ static int parse_spells(xmlDocPtr doc)
                 sp->syntax = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
-            sp->rank = (char)xml_ivalue(node, "rank", 0);
+            sp->rank = (char)xml_ivalue(node, "rank", sp->rank);
             if (xml_bvalue(node, "los", false))
                 sp->sptyp |= TESTCANSEE;        /* must see or have contact */
             if (!xml_bvalue(node, "target_global", false))
@@ -1705,12 +1705,12 @@ void register_xmlreader(void)
     xml_register_callback(parse_resources);
     xml_register_callback(parse_buildings);
     xml_register_callback(parse_ships);
+    xml_register_callback(parse_spellbooks);
 #endif
     xml_register_callback(parse_races);
     xml_register_callback(parse_equipment);
 
     xml_register_callback(parse_spells);
-    xml_register_callback(parse_spellbooks);
 
     xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);

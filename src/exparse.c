@@ -273,6 +273,51 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
     wtype->flags = flags;
 }
 
+static void XMLCALL start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    const char *flag_names[] = {
+        "far", "variable", "ocean", "ship", "los", 
+        "unittarget", "shiptarget", "buildingtarget", "regiontarget", NULL };
+    if (xml_strcmp(el, "spell") == 0) {
+        spell *sp;
+        const XML_Char *name = NULL, *syntax = NULL, *parameter = NULL;
+        int i, rank = 0, flags = 0;
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "name") == 0) {
+                name = val;
+            }
+            else if (xml_strcmp(key, "syntax") == 0) {
+                syntax = val;
+            }
+            else if (xml_strcmp(key, "parameters") == 0) {
+                parameter = val;
+            }
+            else if (xml_strcmp(key, "rank") == 0) {
+                rank = xml_int(val);
+            }
+            else if (xml_strcmp(key, "combat") == 0) {
+                int mode = PRECOMBATSPELL;
+                int k = xml_int(val);
+                if (k > 1 && k <= 3) {
+                   mode = mode << (k - 1);
+                }
+                flags |= mode;
+            }
+            else if (!handle_flag(&flags, attr + i, flag_names)) {
+                handle_bad_input(pi, el, attr[i]);
+            }
+        }
+        pi->object = sp = create_spell(name);
+        sp->rank = rank;
+        sp->syntax = str_strdup(syntax);
+        sp->parameter = str_strdup(parameter);
+        sp->sptyp = flags;
+    }
+    else {
+        handle_bad_input(pi, el, NULL);
+    }
+}
+
 static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     spellbook * sb = (spellbook *)pi->object;
     if (xml_strcmp(el, "spellbook") == 0) {
@@ -907,6 +952,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
             break;
         case EXP_SPELLBOOKS:
             start_spellbooks(pi, el, attr);
+            break;
+        case EXP_SPELLS:
+            start_spells(pi, el, attr);
             break;
         default:
             /* not implemented */
