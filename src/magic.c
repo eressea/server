@@ -1822,7 +1822,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
     order * ord)
 {
     assert(param[0]);
-    if (param[1] == 0) {
+    if (param[1] == NULL) {
         /* Fehler: Zielregion vergessen */
         cmistake(u, ord, 194, MSG_MAGIC);
         return -1;
@@ -2014,13 +2014,13 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
 
     /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
     par->length = p;
-    if (fail || par->length < minlen) {
+    if (par->length < minlen) {
         cmistake(u, ord, 209, MSG_MAGIC);
         free_spellparameter(par);
         return NULL;
     }
 
-    return par;
+    return fail ? NULL : par;
 }
 
 struct unit * co_get_caster(const struct castorder * co) {
@@ -2412,6 +2412,7 @@ static bool is_moving_ship(ship * sh)
     return false;
 }
 
+#define MAX_PARAMETERS 8
 static castorder *cast_cmd(unit * u, order * ord)
 {
     char token[128];
@@ -2612,33 +2613,22 @@ static castorder *cast_cmd(unit * u, order * ord)
     }
     /* Weitere Argumente zusammenbasteln */
     if (sp->parameter) {
-        char **params = (char**)malloc(2 * sizeof(char *));
-        int p = 0, size = 2;
+        char *params[MAX_PARAMETERS];
+        int i, p = 0;
         for (;;) {
             s = gettoken(token, sizeof(token));
-            if (!s || *s == 0)
+            if (!s || *s == 0) {
                 break;
-            if (p + 1 >= size) {
-                char ** tmp;
-                tmp = (char**)realloc(params, sizeof(char *) * size * 2);
-                if (tmp) {
-                    size *= 2;
-                    params = tmp;
-                }
-                else {
-                    log_error("error allocationg %d bytes: %s", size * 2, strerror(errno));
-                    break;
-                }
             }
+            assert(p + 1 < MAX_PARAMETERS);
             params[p++] = str_strdup(s);
         }
-        params[p] = 0;
         args =
             add_spellparameter(target_r, caster, sp->parameter,
             (const char *const *)params, p, ord);
-        for (p = 0; params[p]; ++p)
-            free(params[p]);
-        free(params);
+        for (i = 0; i != p; ++i) {
+            free(params[i]);
+        }
         if (args == NULL) {
             /* Syntax war falsch */
             return 0;

@@ -21,7 +21,7 @@ function test_create_bogus()
     u:clear_orders()
     u:add_order("ZAUBERE 'Erschaffe Katastrophe'")
     process_orders()
-    assert_equal(f.messages[3], 'error173') -- HACKity HACK
+    assert_equal(1, f:count_msg_type('error173'), 'spell not found')
 end
 
 function test_create_roi()

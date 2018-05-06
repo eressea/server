@@ -4140,13 +4140,6 @@ void turn_end(void)
     update_spells();
 }
 
-void processorders(void)
-{
-    turn_begin();
-    turn_process();
-    turn_end();
-}
-
 void update_subscriptions(void)
 {
     FILE *F;

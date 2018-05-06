@@ -12,6 +12,39 @@ function setup()
     eressea.settings.set("magic.fumble.enable", "0")
 end
 
+function disable_pull_astral()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.magic = "gray"
+    u1:set_skill("magic", 6)
+    u1.aura = 1
+    u1:add_spell("pull_astral")
+    u1:clear_orders()
+    u1:add_order("ZAUBERE Astraler~Ruf " .. itoa36(u2.id))
+    -- process_orders()
+    -- assert_equal(1, f:count_msg_type('error194'), 'no target region')
+    -- assert_equal(1, f:count_msg_type('error209'), 'bad arguments')
+    u1:clear_orders()
+
+    u1:add_order("ZAUBERE Astraler~Ruf 1 0 " .. itoa36(u2.id))
+    process_orders()
+    assert_equal(1, f:count_msg_type('error194'), 'no target region')
+    assert_equal(0, f:count_msg_type('error209'), 'bad arguments')
+    assert_equal(1, f:count_msg_type('spellregionresists'), 'no such region')
+
+    u1:add_order("ZAUBERE Astraler~Ruf 0 0 " .. itoa36(u2.id))
+    process_orders()
+    assert_equal(0, f:count_msg_type('error194'), 'no target region')
+    assert_equal(0, f:count_msg_type('error209'), 'bad arguments')
+    assert_equal(0, f:count_msg_type('spellregionresists'), 'no such region')
+    for k, v in ipairs(f.messages) do
+        print(v)
+    end
+    assert_equal(u1, u2)
+end
+
 function test_shapeshift()
     local r = region.create(42, 0, "plain")
     local f = faction.create("demon", "noreply@eressea.de", "de")
