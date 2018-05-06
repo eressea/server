@@ -1943,7 +1943,9 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             break;
         case 'r':
             /* Parameter sind zwei Regionskoordinaten innerhalb der "normalen" Plane */
-            j = addparam_region(param + i, &spobj, u, ord);
+            if (i + 1 < size) {
+                j = addparam_region(param + i, &spobj, u, ord);
+            }
             ++c;
             break;
         case 'b':
