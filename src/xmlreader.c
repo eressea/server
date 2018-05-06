@@ -1174,7 +1174,7 @@ static int parse_spells(xmlDocPtr doc)
                 sp->syntax = str_strdup((const char *)propValue);
                 xmlFree(propValue);
             }
-            sp->rank = (char)xml_ivalue(node, "rank", -1);
+            sp->rank = (char)xml_ivalue(node, "rank", 0);
             if (xml_bvalue(node, "los", false))
                 sp->sptyp |= TESTCANSEE;        /* must see or have contact */
             if (!xml_bvalue(node, "target_global", false))
