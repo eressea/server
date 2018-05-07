@@ -39,8 +39,6 @@ function test_fetch_astral()
     assert_equal(12, u1.aura)
     assert_equal(1, f:count_msg_type('spellfail_astralonly'), 'astral space')
 
-    u1.name = 'Xolgrim'
-    u1.aura = 12 -- 2 Aura pro Stufe
     u2.region = u2.region:get_astral('fog')
     process_orders()
     assert_equal(0, u1.aura)
