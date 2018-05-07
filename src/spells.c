@@ -5311,7 +5311,7 @@ int sp_fetchastral(castorder * co)
 {
     int n;
     unit *mage = co->magician.u;
-    int cast_level = co->level;
+    int cast_level = 0;
     spellparameter *pa = co->par;
     double power = co->force;
     int remaining_cap = (int)((power - 3) * 1500);
@@ -5343,6 +5343,7 @@ int sp_fetchastral(castorder * co)
                     "spellfail_astralonly", ""));
                 continue;
             }
+
             if (rtl != NULL)
                 free_regionlist(rtl);
             rtl = astralregions(u->region, NULL);
@@ -5359,6 +5360,7 @@ int sp_fetchastral(castorder * co)
             ro = u->region;
         }
 
+        cast_level = co->level; /* at least one unit could have been teleported */
         if (is_cursed(ro->attribs, &ct_astralblock)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "spellfail_astralblock", ""));

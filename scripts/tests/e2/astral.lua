@@ -19,6 +19,34 @@ local function dump_messages(f)
     end
 end
 
+function test_fetch_astral()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.magic = "gray"
+    u1:set_skill("magic", 6)
+    u1.aura = 0
+    u1:add_spell("fetch_astral")
+
+    u1:clear_orders()
+    u1:add_order("ZAUBERE Ruf~der~Realitaet " .. itoa36(u2.id))
+    process_orders()
+    assert_equal(1, f:count_msg_type('missing_components_list'), 'no components')
+
+    u1.aura = 12 -- 2 Aura pro Stufe
+    process_orders()
+    assert_equal(12, u1.aura)
+    assert_equal(1, f:count_msg_type('spellfail_astralonly'), 'astral space')
+
+    u1.name = 'Xolgrim'
+    u1.aura = 12 -- 2 Aura pro Stufe
+    u2.region = u2.region:get_astral('fog')
+    process_orders()
+    assert_equal(0, u1.aura)
+    assert_equal(u1.region, u2.region)
+end
+
 function test_pull_astral()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
