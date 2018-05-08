@@ -313,8 +313,8 @@
   <spell name="analysesong_unit" rank="5" parameters="u" los="true" ship="true">
     <resource name="aura" amount="10" cost="fixed"/>
   </spell>
-  <spell name="analyse_object" rank="5" parameters="kc+" ship="true" variable="true">
-    <resource name="aura" amount="3" cost="level" regiontarget="true" unittarget="false" buildingtarget="true" shiptarget="true"/>
+  <spell name="analyse_object" rank="5" parameters="kc+" ship="true" variable="true" regiontarget="true" unittarget="false" buildingtarget="true" shiptarget="true">
+	  <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="destroy_magic" rank="2" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
