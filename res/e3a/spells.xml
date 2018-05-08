@@ -68,7 +68,6 @@
   </spell>
   <spell name="readmind" parameters="u" rank="5">
     <!-- Traumdeuten -->
-    <function name="cast" value="cast_readmind"/>
     <resource name="aura" amount="20" cost="fixed"/>
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>
@@ -113,7 +112,6 @@
   </spell>
   <spell name="fireball" rank="5" variable="true" combat="2">
     <!-- Feuerball -->
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="magicboost" rank="3" ship="true">
@@ -213,7 +211,6 @@
   </spell>
   <spell name="blabbermouth" parameters="u" los="true" rank="5">
     <!-- Plappermaul -->
-    <function name="cast" value="cast_babbler"/>
     <resource name="aura" amount="10" cost="fixed"/>
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>
@@ -290,7 +287,6 @@
   <!-- new gwyrrd -->
   <spell name="blessedharvest" rank="5" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
-    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5">
@@ -311,7 +307,6 @@
   </spell>
   <spell name="hail" rank="5" variable="true" combat="2">
     <!-- Hagel -->
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="goodwinds" rank="5" parameters="s" ship="true" variable="true">
@@ -489,7 +484,6 @@
   </spell>
   <spell name="raindance" rank="5" ship="true" far="true" variable="true">
     <!-- Regentanz -->
-    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="irongolem" rank="4" variable="true">
@@ -580,7 +574,6 @@
     <resource name="laen" amount="5" cost="fixed"/>
   </spell>
   <spell name="summon_familiar" rank="5">
-    <function name="cast" value="cast_familiar"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
@@ -619,7 +612,6 @@
     <resource name="aura" amount="3" cost="fixed"/>
   </spell>
   <spell name="meteor_rain" rank="5" variable="true" combat="2">
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="wyrm_transformation" rank="5">
