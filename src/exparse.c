@@ -273,15 +273,50 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
     wtype->flags = flags;
 }
 
+#define MAX_COMPONENTS 8
+static spell_component components[MAX_COMPONENTS];
+static int ncomponents;
+
 static void XMLCALL start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = {
         "far", "variable", "ocean", "ship", "los", 
-        "unittarget", "shiptarget", "buildingtarget", "regiontarget", NULL };
+        "unittarget", "shiptarget", "buildingtarget", "regiontarget", "globaltarget", NULL };
 
     if (xml_strcmp(el, "resource") == 0) {
-        spell_component *spc = NULL;
-        (void)spc;
-        handle_bad_input(pi, el, NULL);
+        spell_component *spc;
+        int i;
+
+        assert(ncomponents < MAX_COMPONENTS);
+        spc = components + ncomponents;
+        spc->cost = SPC_FIX;
+        ++ncomponents;
+        memset(spc, 0, sizeof(spell_component));
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "name") == 0) {
+                spc->type = rt_get_or_create(val);
+            }
+            else if (xml_strcmp(key, "amount") == 0) {
+                spc->amount = xml_int(val);
+            }
+            else if (xml_strcmp(key, "cost") == 0) {
+                if (xml_strcmp(val, "level") == 0) {
+                    spc->cost = SPC_LEVEL;
+                }
+                else if (xml_strcmp(val, "linear") == 0) {
+                    spc->cost = SPC_LINEAR;
+                }
+                else if (xml_strcmp(val, "fixed") == 0) {
+                    spc->cost = SPC_FIX;
+                }
+                else {
+                    handle_bad_input(pi, key, val);
+                }
+            }
+            else {
+                handle_bad_input(pi, el, key);
+            }
+        }
     }
     else if (xml_strcmp(el, "spell") == 0) {
         spell *sp;
@@ -962,12 +997,31 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         case EXP_SPELLS:
             start_spells(pi, el, attr);
             break;
+        case EXP_UNKNOWN:
+            handle_bad_input(pi, el, NULL);
+            break;
         default:
             /* not implemented */
             handle_bad_input(pi, el, NULL);
+            return;
         }
     }
     ++pi->depth;
+}
+
+static void end_spells(parseinfo *pi, const XML_Char *el) {
+    if (xml_strcmp(el, "spells") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+    else if (xml_strcmp(el, "spell") == 0) {
+        spell *sp = (spell *)pi->object;
+        if (ncomponents > 0) {
+            sp->components = calloc(sizeof(spell_component), ncomponents + 1);
+            memcpy(sp->components, components, sizeof(spell_component) * ncomponents);
+            ncomponents = 0;
+        }
+        pi->object = NULL;
+    }
 }
 
 static void end_weapon(parseinfo *pi, const XML_Char *el) {
@@ -1093,6 +1147,9 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     case EXP_WEAPON:
         end_weapon(pi, el);
         break;
+    case EXP_SPELLS:
+        end_spells(pi, el);
+        break;
     default:
         if (pi->depth == 1) {
             pi->object = NULL;
@@ -1160,7 +1217,9 @@ int exparse_readfile(const char * filename) {
             break;
         }
     }
-    assert(pi.depth == 0);
+    if (pi.depth != 0) {
+        err = -3;
+    }
     XML_ParserFree(xp);
     fclose(F);
     if (err != 0) {
