@@ -16,11 +16,9 @@
   </spell>
 
   <spell name="fireball" rank="5" variable="true" combat="2">
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="hail" rank="5" variable="true" combat="2">
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="rustweapon" rank="5" parameters="u+" los="true" far="true" variable="true">
@@ -290,7 +288,6 @@
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="igjarjuk" rank="5" variable="true" combat="1">
-    <function name="cast" value="igjarjuk"/>
   </spell>
   <spell name="resist_magic" rank="2" parameters="u+" los="true" ship="true" variable="true">
     <resource name="aura" amount="5" cost="level"/>
@@ -326,7 +323,6 @@
     <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="meteor_rain" rank="5" variable="true" combat="2">
-    <function name="cast" value="combat_spell"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
   <spell name="fish_shield" rank="2" variable="true" combat="1">
@@ -356,7 +352,6 @@
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
   <spell name="summon_familiar" rank="5">
-    <function name="cast" value="cast_familiar"/>
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
@@ -504,7 +499,6 @@
   <!-- gwyrrd spells -->
   <spell name="blessedharvest" rank="5" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
-    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
@@ -537,7 +531,6 @@
   <!-- cerddor spells -->
   <spell name="raindance" rank="5" ship="true" far="true" variable="true">
     <!-- Segen der Erde -->
-    <function name="cast" value="cast_blessedharvest"/>
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
@@ -552,13 +545,11 @@
   </spell>
 
   <spell name="blabbermouth" parameters="u" los="true" rank="5">
-    <function name="cast" value="cast_babbler"/>
     <resource name="aura" amount="10" cost="fixed"/>
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>
 
   <spell name="readmind" parameters="u" rank="5">
-    <function name="cast" value="cast_readmind"/>
     <resource name="aura" amount="20" cost="fixed"/>
     <!-- missing syntactical info: ONETARGET | UNITSPELL -->
   </spell>

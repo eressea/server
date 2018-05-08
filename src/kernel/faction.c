@@ -237,7 +237,7 @@ faction *addfaction(const char *email, const char *password,
     if (check_email(email) == 0) {
         faction_setemail(f, email);
     } else {
-        log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email?email:"");
+        log_info("Invalid email address for faction %s: %s\n", itoa36(f->no), email?email:"");
         faction_setemail(f, NULL);
     }
 
