@@ -1177,8 +1177,6 @@ static int parse_spells(xmlDocPtr doc)
             sp->rank = (char)xml_ivalue(node, "rank", sp->rank);
             if (xml_bvalue(node, "los", false))
                 sp->sptyp |= TESTCANSEE;        /* must see or have contact */
-            if (!xml_bvalue(node, "target_global", false))
-                sp->sptyp |= SEARCHLOCAL;       /* must be in same region */
             if (xml_bvalue(node, "ship", false))
                 sp->sptyp |= ONSHIPCAST;
             if (xml_bvalue(node, "ocean", false))
@@ -1188,6 +1186,8 @@ static int parse_spells(xmlDocPtr doc)
             if (xml_bvalue(node, "variable", false))
                 sp->sptyp |= SPELLLEVEL;
 
+            if (xml_bvalue(node, "globaltarget", false))
+                sp->sptyp |= GLOBALTARGET;       /* target need not be in same region */
             if (xml_bvalue(node, "buildingtarget", false))
                 sp->sptyp |= BUILDINGSPELL;
             if (xml_bvalue(node, "shiptarget", false))

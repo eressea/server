@@ -174,7 +174,7 @@ extern "C" {
 
 #define TESTRESISTANCE  (1<<12) /* alle Zielobjekte (u, s, b, r) auf
                                        Magieresistenz prüfen */
-#define SEARCHLOCAL     (1<<13) /* Ziel muss in der target_region sein */
+#define GLOBALTARGET    (1<<13) /* Ziel muss in der target_region sein */
 #define NOTFAMILIARCAST (1<<14) /* not used by XML? */
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
 

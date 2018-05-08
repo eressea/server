@@ -411,10 +411,10 @@
   <spell name="sparkledream" rank="5" parameters="u" los="true" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="pull_astral" rank="7" parameters="ru+" variable="true" target_global="true">
+  <spell name="pull_astral" rank="7" parameters="ru+" variable="true" globaltarget="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
-  <spell name="fetch_astral" rank="7" parameters="u+" variable="true" target_global="true">
+  <spell name="fetch_astral" rank="7" parameters="u+" variable="true" globaltarget="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="shockwave" rank="5" variable="true" combat="2">
