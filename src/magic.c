@@ -1475,7 +1475,7 @@ verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
 {
     ship *sh = findship(spobj->data.i);
 
-    if (sh != NULL && sh->region != r && (sp->sptyp & SEARCHLOCAL)) {
+    if (sh != NULL && sh->region != r && (sp->sptyp & GLOBALTARGET) == 0) {
         /* Burg muss in gleicher Region sein */
         sh = NULL;
     }
@@ -1498,7 +1498,7 @@ verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj,
 {
     building *b = findbuilding(spobj->data.i);
 
-    if (b != NULL && b->region != r && (sp->sptyp & SEARCHLOCAL)) {
+    if (b != NULL && b->region != r && (sp->sptyp & GLOBALTARGET) == 0) {
         /* Burg muss in gleicher Region sein */
         b = NULL;
     }
@@ -1552,13 +1552,14 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
     default:
         assert(!"shouldn't happen, this");
     }
-    if (u != NULL && (sp->sptyp & SEARCHLOCAL)) {
-        if (u->region != r)
-            u = NULL;
-        else if (sp->sptyp & TESTCANSEE) {
+    if (u != NULL) {
+        if (u->region == r) {
             if (!cansee(mage->faction, r, u, 0) && !ucontact(u, mage)) {
                 u = NULL;
             }
+        }
+        else if ((sp->sptyp & GLOBALTARGET) == 0) {
+            u = NULL;
         }
     }
 
