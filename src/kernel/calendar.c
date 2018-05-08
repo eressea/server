@@ -4,7 +4,8 @@
 #include "calendar.h"
 #include "move.h" /* storms */
 
-#include <kernel/config.h>
+#include "kernel/config.h"
+#include "util/log.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -45,6 +46,10 @@ const gamedate *get_gamedate(int turn_now, gamedate * gd)
     int t = turn_now - first_turn();
 
     assert(gd);
+    if (t<0) {
+        log_fatal("current turn %d is before first %d",
+                turn_now, first_turn());
+    }
     assert(t>=0);
 
     gd->turn = turn_now;

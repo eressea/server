@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
+    eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("study.random_progress", "0")
 end
 

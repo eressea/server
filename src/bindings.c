@@ -476,22 +476,17 @@ static int tolua_write_reports(lua_State * L)
     return 1;
 }
 
-static int tolua_process_orders(lua_State * L)
-{
-    UNUSED_ARG(L);
-#if 0
-    order * ord = parse_order("@GIB xmis ALLES Gurgelkraut", default_locale);
-    assert(ord);
-    free_order(ord);
-    return 0;
-#endif
-    processorders();
-    return 0;
-}
-
 static int tolua_turn_begin(lua_State * L)
 {
+    faction *f;
     UNUSED_ARG(L);
+    for (f = factions; f; f = f->next) {
+        if (f->msgs) {
+            free_messagelist(f->msgs->begin);
+            free(f->msgs);
+            f->msgs = NULL;
+        }
+    }
     turn_begin();
     return 0;
 }
@@ -508,6 +503,14 @@ static int tolua_turn_end(lua_State * L)
     UNUSED_ARG(L);
     turn_end();
     return 0;
+}
+
+static int tolua_process_orders(lua_State * L)
+{
+    UNUSED_ARG(L);
+    tolua_turn_begin(L);
+    tolua_turn_process(L);
+    return tolua_turn_end(L);
 }
 
 static int tolua_write_passwords(lua_State * L)

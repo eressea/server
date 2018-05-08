@@ -53,7 +53,6 @@ extern "C" {
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
     int enter_ship(struct unit *u, struct order *ord, int id, bool report);
 
-    void processorders(void);
     void turn_begin(void);
     void turn_process(void);
     void turn_end(void);

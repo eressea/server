@@ -8,6 +8,7 @@
 #include "bind_building.h"
 
 #include "chaos.h"
+#include "teleport.h"
 
 #include <kernel/calendar.h>
 #include <kernel/config.h>
@@ -561,6 +562,24 @@ static int tolua_region_getkey(lua_State * L)
     return 1;
 }
 
+static int tolua_region_getastral(lua_State * L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, 0);
+    region *rt = r_standard_to_astral(r);
+
+    if (!rt) {
+        const char *tname = tolua_tostring(L, 2, 0);
+        plane *pl = get_astralplane();
+        rt = new_region(real2tp(r->x), real2tp(r->y), pl, 0);
+        if (tname) {
+            const terrain_type *terrain = get_terrain(tname);
+            terraform_region(rt, terrain);
+        }
+    }
+    tolua_pushusertype(L, rt, TOLUA_CAST "region");
+    return 1;
+}
+
 static int tolua_region_setkey(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, 0);
@@ -771,6 +790,8 @@ void tolua_region_open(lua_State * L)
                 &tolua_region_get_terrainname, &tolua_region_set_terrainname);
             tolua_variable(L, TOLUA_CAST "owner", &tolua_region_get_owner,
                 &tolua_region_set_owner);
+
+            tolua_function(L, TOLUA_CAST "get_astral", tolua_region_getastral);
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_region_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_region_setkey);
