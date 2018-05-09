@@ -1321,8 +1321,8 @@ static int parse_races(xmlDocPtr doc)
                 }
             }
 
-            rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
-            rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
+            rc->at_default = (char)xml_ivalue(node, "unarmedattack", rc->at_default);
+            rc->df_default = (char)xml_ivalue(node, "unarmeddefense", rc->df_default);
             rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
             rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 

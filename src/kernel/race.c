@@ -363,6 +363,8 @@ race *rc_create(const char *zName)
     rc->regaura = 1.0F;
     rc->speed = 1.0F;
     rc->battle_flags = 0;
+    rc->at_default = -2;
+    rc->df_default = -2;
     if (strchr(zName, ' ') != NULL) {
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
