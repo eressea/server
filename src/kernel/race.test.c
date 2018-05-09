@@ -112,8 +112,7 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, rc->options);
     rc_set_param(rc, "recruit_multi", "0.5");
     CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
-    rc_set_param(rc, "migrants.formula", "1");
-    CuAssertIntEquals(tc, RCF_MIGRANTS, rc->flags&RCF_MIGRANTS);
+    rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
     rc_set_param(rc, "scare", "400");
     CuAssertIntEquals(tc, 400, rc_scare(rc));
