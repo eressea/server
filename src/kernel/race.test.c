@@ -59,6 +59,8 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, rc->armor);
     CuAssertIntEquals(tc, 0, rc->at_bonus);
     CuAssertIntEquals(tc, 0, rc->df_bonus);
+    CuAssertIntEquals(tc, -2, rc->df_default);
+    CuAssertIntEquals(tc, -2, rc->at_default);
     CuAssertIntEquals(tc, 0, rc->battle_flags);
     CuAssertIntEquals(tc, PERSON_WEIGHT, rc->weight);
     test_teardown();
