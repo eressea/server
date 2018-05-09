@@ -129,7 +129,7 @@ extern "C" {
         int weight;
         int capacity;
         int income;
-        float speed;
+        double speed;
         int hitpoints;
         char *def_damage;
         int armor;
@@ -229,9 +229,11 @@ extern "C" {
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
 #define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
-#define RCF_MIGRANTS       (1<<27)      /* may have migrant units (human bonus) */
-#define RCF_FAMILIAR       (1<<28)      /* may be a familiar */
-#define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
+#define RCF_ATTACK_MOVED   (1<<27)      /* may attack if it has moved */
+#define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
+#define RCF_FAMILIAR       (1<<29)      /* may be a familiar */
+
+#define RCF_DEFAULT (RCF_NOSTEAL|RCF_CANSAIL|RCF_NOLEARN)
 
     /* Economic flags */
 #define ECF_GIVEPERSON     (1<<2)   /* �bergibt Personen */
@@ -271,6 +273,7 @@ extern "C" {
     const char *raceprefix(const struct unit *u);
     void register_race_function(race_func, const char *);
 
+    void set_study_speed(struct race *rc, skill_t sk, int modifier);
 #ifdef __cplusplus
 }
 #endif

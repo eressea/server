@@ -3,7 +3,7 @@
 <race name="dragon" magres="70" maxaura="1.0" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac=
 "6" damage="2d30" unarmedattack="0" unarmeddefense="0"
 attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes"
-income="1000" walk="yes" teach="no" getitem="yes" resistbash="yes"
+income="1000" walk="yes" canteach="no" getitem="yes" resistbash="yes"
 dragon="yes">
   <ai splitsize="2" killpeasants="yes" learn="yes" scare="400"/>
   <function name="name" value="namedragon"/>

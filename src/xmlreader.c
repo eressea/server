@@ -1256,7 +1256,7 @@ static void parse_ai(race * rc, xmlNodePtr node)
     
     propValue = xmlGetProp(node, BAD_CAST "scare");
     if (propValue) {
-        rc_set_param(rc, "ai.scare", (const char *)propValue);
+        rc_set_param(rc, "scare", (const char *)propValue);
         xmlFree(propValue);
     }
     rc->splitsize = xml_ivalue(node, "splitsize", 0);
@@ -1268,12 +1268,6 @@ static void parse_ai(race * rc, xmlNodePtr node)
         rc->flags |= RCF_LEARN;
     if (xml_bvalue(node, "moveattack", false))
         rc->flags |= RCF_ATTACK_MOVED;
-}
-
-static void set_study_speed(race *rc, skill_t sk, int modifier) {
-    if (!rc->study_speed)
-        rc->study_speed = calloc(1, MAXSKILLS);
-    rc->study_speed[sk] = (char)modifier;
 }
 
 static int parse_races(xmlDocPtr doc)
@@ -1319,7 +1313,7 @@ static int parse_races(xmlDocPtr doc)
             rc->income = xml_ivalue(node, "income", rc->income);
             rc->speed = (float)xml_fvalue(node, "speed", rc->speed);
             rc->hitpoints = xml_ivalue(node, "hp", rc->hitpoints);
-            rc->armor = (char)xml_ivalue(node, "ac", rc->armor);
+            rc->armor = xml_ivalue(node, "ac", rc->armor);
             study_speed_base = xml_ivalue(node, "studyspeed", 0);
             if (study_speed_base != 0) {
                 for (sk = 0; sk < MAXSKILLS; ++sk) {
@@ -1332,14 +1326,18 @@ static int parse_races(xmlDocPtr doc)
             rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
             rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
+            if (!xml_bvalue(node, "canteach", true))
+                rc->flags |= RCF_NOTEACH;
+            if (!xml_bvalue(node, "cansteal", true))
+                rc->flags |= RCF_NOSTEAL;
+            if (!xml_bvalue(node, "canlearn", true))
+                rc->flags |= RCF_NOLEARN;
             if (!xml_bvalue(node, "playerrace", false)) {
                 assert(rc->recruitcost == 0);
                 rc->flags |= RCF_NPC;
             }
             if (xml_bvalue(node, "scarepeasants", false))
                 rc->flags |= RCF_SCAREPEASANTS;
-            if (!xml_bvalue(node, "cansteal", true))
-                rc->flags |= RCF_NOSTEAL;
             if (xml_bvalue(node, "cansail", true))
                 rc->flags |= RCF_CANSAIL;
             if (xml_bvalue(node, "cannotmove", false))
@@ -1356,10 +1354,6 @@ static int parse_races(xmlDocPtr doc)
                 rc->flags |= RCF_SWIM;
             if (xml_bvalue(node, "walk", false))
                 rc->flags |= RCF_WALK;
-            if (!xml_bvalue(node, "canlearn", true))
-                rc->flags |= RCF_NOLEARN;
-            if (!xml_bvalue(node, "canteach", true))
-                rc->flags |= RCF_NOTEACH;
             if (xml_bvalue(node, "horse", false))
                 rc->flags |= RCF_HORSE;
             if (xml_bvalue(node, "desert", false))

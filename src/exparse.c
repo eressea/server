@@ -128,7 +128,19 @@ static void handle_bad_input(parseinfo *pi, const XML_Char *el, const XML_Char *
 static bool handle_flag(int *flags, const XML_Char **pair, const char *names[]) {
     int i;
     for (i = 0; names[i]; ++i) {
-        if (xml_strcmp(pair[0], names[i]) == 0) {
+        const char * name = names[i];
+        if (name[0] == '!') {
+            if (xml_strcmp(pair[0], name+1) == 0) {
+                if (xml_bool(pair[1])) {
+                    *flags &= ~(1 << i);
+                }
+                else {
+                    *flags |= (1 << i);
+                }
+                return true;
+            }
+        }
+        else if (xml_strcmp(pair[0], name) == 0) {
             if (xml_bool(pair[1])) {
                 *flags |= (1 << i);
             }
@@ -865,6 +877,173 @@ static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Cha
     }
 }
 
+static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    race *rc = (race *)pi->object;
+    const char *flag_names[] = {
+        "!playerrace", "killpeasants", "scarepeasants", "!cansteal",
+        "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
+        "!canlearn", "!canteach", "horse", "desert", "illusionary",
+        "absorbpeasants", "noheal", "noweapons", "shapeshift",
+        "shapeshiftany", "undead", "dragon", "coastal", "unarmedguard",
+        "cansail", "invisible", "shipspeed", "moveattack", "migrants", NULL };
+    const char *bflag_names[] = {
+        "equipment", "noblock", "resistpierce", "resistcut", "resistbash",
+        "invinciblenonmagic", "noattack", NULL };
+    const char *eflag_names[] = {
+        "giveperson", "giveunit", "getitem", "recruitethereal", 
+        "recruitunlimited", "stonegolem", "irongolem", NULL };
+
+    if (xml_strcmp(el, "attack") == 0) {
+        assert(rc);
+    }
+    else if (xml_strcmp(el, "familiar") == 0) {
+        assert(rc);
+    }
+    else if (xml_strcmp(el, "skill") == 0) {
+        const XML_Char *name = NULL;
+        int i, speed = 0, mod = 0;
+
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "name") == 0) {
+                name = val;
+            }
+            else if (xml_strcmp(key, "modifier") == 0) {
+                mod = xml_int(val);
+            }
+            else if (xml_strcmp(key, "speed") == 0) {
+                speed = xml_int(val);
+            }
+            else {
+                handle_bad_input(pi, el, key);
+            }
+        }
+        if (name) {
+            skill_t sk = findskill(name);
+            if (sk != NOSKILL) {
+                rc->bonus[sk] = (char)mod;
+                if (speed != 0) {
+                    set_study_speed(rc, sk, speed);
+                }
+            }
+        }
+    }
+    else if (xml_strcmp(el, "param") == 0) {
+        const XML_Char *key = attr_get(attr, "name"), *val = attr_get(attr, "value");
+        if (key && val) {
+            rc_set_param(rc, key, val);
+        }
+    }
+    else if (xml_strcmp(el, "ai") == 0) {
+        /* AI flags are cumulative to race flags. XML format is dumb */
+        int i, flags = 0;
+        assert(rc);
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "splitsize") == 0) {
+                rc->splitsize = xml_int(val);
+            }
+            else if (xml_strcmp(key, "scare") == 0) {
+                rc_set_param(rc, "scare", val);
+            }
+            else if (!handle_flag(&flags, attr + i, flag_names)) {
+                handle_bad_input(pi, el, key);
+            }
+        }
+        rc->flags |= flags;
+    }
+    else if (xml_strcmp(el, "race") == 0) {
+        const XML_Char *name;
+
+        name = attr_get(attr, "name");
+        if (name) {
+            assert(!rc);
+            pi->object = rc = rc_get_or_create(name);
+            int i;
+
+            for (i = 0; attr[i]; i += 2) {
+                const XML_Char *key = attr[i], *val = attr[i + 1];
+                if (xml_strcmp(key, "maxaura") == 0) {
+                    rc->maxaura = (int)(100 * xml_float(val));
+                }
+                else if (xml_strcmp(key, "magres") == 0) {
+                    /* specified in percent: */
+                    rc->magres = frac_make(xml_int(val), 100);
+                }
+                else if (xml_strcmp(key, "healing") == 0) {
+                    rc->healing = (int)(xml_float(val) * 100);
+                }
+                else if (xml_strcmp(key, "regaura") == 0) {
+                    rc->regaura = xml_float(val);
+                }
+                else if (xml_strcmp(key, "recruitcost") == 0) {
+                    rc->recruitcost = xml_int(val);
+                }
+                else if (xml_strcmp(key, "maintenance") == 0) {
+                    rc->maintenance = xml_int(val);
+                }
+                else if (xml_strcmp(key, "income") == 0) {
+                    rc->income = xml_int(val);
+                }
+                else if (xml_strcmp(key, "weight") == 0) {
+                    rc->weight = xml_int(val);
+                }
+                else if (xml_strcmp(key, "capacity") == 0) {
+                    rc->capacity = xml_int(val);
+                }
+                else if (xml_strcmp(key, "speed") == 0) {
+                    rc->speed = xml_float(val);
+                }
+                else if (xml_strcmp(key, "hp") == 0) {
+                    rc->hitpoints = xml_int(val);
+                }
+                else if (xml_strcmp(key, "ac") == 0) {
+                    rc->armor = xml_int(val);
+                }
+                else if (xml_strcmp(key, "damage") == 0) {
+                    rc->def_damage = str_strdup(val);
+                }
+                else if (xml_strcmp(key, "unarmedattack") == 0) {
+                    rc->at_default = xml_int(val);
+                }
+                else if (xml_strcmp(key, "unarmeddefense") == 0) {
+                    rc->df_default = xml_int(val);
+                }
+                else if (xml_strcmp(key, "attackmodifier") == 0) {
+                    rc->at_bonus = xml_int(val);
+                }
+                else if (xml_strcmp(key, "defensemodifier") == 0) {
+                    rc->df_bonus = xml_int(val);
+                }
+                else if (xml_strcmp(key, "studyspeed") == 0) {
+                    int study_speed = xml_int(val);
+                    if (study_speed != 0) {
+                        skill_t sk;
+                        for (sk = 0; sk < MAXSKILLS; ++sk) {
+                            set_study_speed(rc, sk, study_speed);
+                        }
+                    }
+
+                }
+                else if (!handle_flag(&rc->flags, attr + i, flag_names)) {
+                    if (!handle_flag(&rc->battle_flags, attr + i, bflag_names)) {
+                        if (!handle_flag(&rc->ec_flags, attr + i, eflag_names)) {
+                            /* we already handled the name earlier: */
+                            if (xml_strcmp(key, "name") != 0) {
+                                handle_bad_input(pi, el, attr[i]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        assert(rc);
+        handle_bad_input(pi, el, NULL);
+    }
+}
+
 static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "nodestroy", "nobuild", "unique", "decay", "magic", "namechange", "fort", "oneperturn", NULL };
     if (xml_strcmp(el, "building") == 0) {
@@ -979,6 +1158,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
     }
     else {
         switch (pi->type) {
+        case EXP_RACES:
+            start_races(pi, el, attr);
+            break;
         case EXP_BUILDINGS:
             start_buildings(pi, el, attr);
             break;
@@ -1063,6 +1245,15 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
     }
 }
 
+static void end_races(parseinfo *pi, const XML_Char *el) {
+    if (xml_strcmp(el, "race") == 0) {
+        pi->object = NULL;
+    }
+    else if (xml_strcmp(el, "races") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+}
+
 static void end_ships(parseinfo *pi, const XML_Char *el) {
     ship_type *stype = (ship_type *)pi->object;
     if (xml_strcmp(el, "construction") == 0) {
@@ -1135,6 +1326,9 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     parseinfo *pi = (parseinfo *)data;
 
     switch (pi->type) {
+    case EXP_RACES:
+        end_races(pi, el);
+        break;
     case EXP_SHIPS:
         end_ships(pi, el);
         break;
