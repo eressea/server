@@ -218,6 +218,7 @@ unsigned int wang_hash(unsigned int a)
 }
 
 char *str_strdup(const char *s) {
+    if (s == NULL) return NULL;
 #ifdef HAVE_STRDUP
     return strdup(s);
 #elif defined(_MSC_VER)
