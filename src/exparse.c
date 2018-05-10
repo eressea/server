@@ -878,13 +878,14 @@ static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Cha
 }
 
 static int nattacks;
+static int nfamiliars;
 
 static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
         "!playerrace", "killpeasants", "scarepeasants", "!cansteal",
         "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
-        "!canlearn", "!canteach", "horse", "desert", "illusionary",
+        "!learn", "!teach", "horse", "desert", "illusionary",
         "absorbpeasants", "noheal", "noweapons", "shapeshift",
         "shapeshiftany", "undead", "dragon", "coastal", "unarmedguard",
         "cansail", "invisible", "shipspeed", "moveattack", "migrants", NULL };
@@ -922,10 +923,31 @@ static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Cha
             else if (xml_strcmp(key, "spell") == 0) {
                 at->data.sp = spellref_create(NULL, val);
             }
+            else {
+                handle_bad_input(pi, el, key);
+            }
         }
     }
     else if (xml_strcmp(el, "familiar") == 0) {
+        race *frc = NULL;
+        int i;
+
         assert(rc);
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "race") == 0) {
+                frc = rc_get_or_create(val);
+                frc->flags |= RCF_FAMILIAR;
+            }
+            else {
+                handle_bad_input(pi, el, key);
+            }
+        }
+        if (frc) {
+            if (nfamiliars < MAXMAGIETYP) {
+                rc->familiars[nfamiliars++] = frc;
+            }
+        }
     }
     else if (xml_strcmp(el, "skill") == 0) {
         const XML_Char *name = NULL;
@@ -982,6 +1004,9 @@ static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Cha
     }
     else if (xml_strcmp(el, "race") == 0) {
         const XML_Char *name;
+
+        nfamiliars = 0;
+        nattacks = 0;
 
         name = attr_get(attr, "name");
         if (name) {
@@ -1279,6 +1304,13 @@ static void end_races(parseinfo *pi, const XML_Char *el) {
         assert(rc);
         rc->attack[nattacks].type = AT_NONE;
         nattacks = 0;
+        if (nfamiliars > 0 && nfamiliars < MAXMAGIETYP) {
+            int i;
+            for (i = nfamiliars - 1; i != MAXMAGIETYP; ++i) {
+                rc->familiars[i] = rc->familiars[nfamiliars - 1];
+            }
+        }
+        nfamiliars = 0;
         pi->object = NULL;
     }
     else if (xml_strcmp(el, "races") == 0) {

@@ -1326,11 +1326,11 @@ static int parse_races(xmlDocPtr doc)
             rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
             rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
-            if (!xml_bvalue(node, "canteach", true))
+            if (!xml_bvalue(node, "teach", true))
                 rc->flags |= RCF_NOTEACH;
             if (!xml_bvalue(node, "cansteal", true))
                 rc->flags |= RCF_NOSTEAL;
-            if (!xml_bvalue(node, "canlearn", true))
+            if (!xml_bvalue(node, "learn", true))
                 rc->flags |= RCF_NOLEARN;
             if (!xml_bvalue(node, "playerrace", false)) {
                 assert(rc->recruitcost == 0);
@@ -1695,8 +1695,8 @@ void register_xmlreader(void)
     xml_register_callback(parse_ships);
     xml_register_callback(parse_spellbooks);
     xml_register_callback(parse_spells);
-#endif
     xml_register_callback(parse_races);
+#endif
     xml_register_callback(parse_equipment);
 
 
