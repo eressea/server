@@ -877,6 +877,8 @@ static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Cha
     }
 }
 
+static int nattacks;
+
 static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
@@ -894,7 +896,33 @@ static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Cha
         "recruitunlimited", "stonegolem", "irongolem", NULL };
 
     if (xml_strcmp(el, "attack") == 0) {
+        int i;
+        struct att * at;
         assert(rc);
+        at = rc->attack + nattacks;
+        at->type = AT_NONE;
+        ++nattacks;
+        if (nattacks >= RACE_ATTACKS) {
+            log_fatal("too many attacks for race '%s'\n", rc->_name);
+        }
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "type") == 0) {
+                at->type = xml_int(val);
+            }
+            else if (xml_strcmp(key, "flags") == 0) {
+                at->flags = xml_int(val);
+            }
+            else if (xml_strcmp(key, "level") == 0) {
+                at->level = xml_int(val);
+            }
+            else if (xml_strcmp(key, "damage") == 0) {
+                at->data.dice = str_strdup(val);
+            }
+            else if (xml_strcmp(key, "spell") == 0) {
+                at->data.sp = spellref_create(NULL, val);
+            }
+        }
     }
     else if (xml_strcmp(el, "familiar") == 0) {
         assert(rc);
@@ -1246,7 +1274,11 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
 }
 
 static void end_races(parseinfo *pi, const XML_Char *el) {
+    race *rc = (race *)pi->object;
     if (xml_strcmp(el, "race") == 0) {
+        assert(rc);
+        rc->attack[nattacks].type = AT_NONE;
+        nattacks = 0;
         pi->object = NULL;
     }
     else if (xml_strcmp(el, "races") == 0) {
