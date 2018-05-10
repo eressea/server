@@ -50,7 +50,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertDblEquals(tc, 1.0, rc->recruit_multi, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->speed, 0.0);
-    CuAssertIntEquals(tc, 0, rc->flags);
+    CuAssertIntEquals(tc, RCF_DEFAULT, rc->flags);
     CuAssertIntEquals(tc, 0, rc->recruitcost);
     CuAssertIntEquals(tc, 0, rc->maintenance);
     CuAssertIntEquals(tc, 540, rc->capacity);

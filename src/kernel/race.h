@@ -233,7 +233,7 @@ extern "C" {
 #define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
 #define RCF_FAMILIAR       (1<<29)      /* may be a familiar */
 
-#define RCF_DEFAULT 0
+#define RCF_DEFAULT RCF_CANSAIL
 
     /* Economic flags */
 #define ECF_GIVEPERSON     (1<<0)   /* �bergibt Personen */
