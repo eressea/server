@@ -19,7 +19,7 @@
     <skill name="sailing" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="wolf" default="yes"/>
+    <familiar race="wolf"/>
     <familiar race="dreamcat"/>
     <familiar race="owl"/>
     <familiar race="owl"/>
@@ -748,7 +748,7 @@
     <skill name="roadwork" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="giantturtle" default="yes"/>
+    <familiar race="giantturtle"/>
     <familiar race="dolphin"/>
     <familiar race="giantturtle"/>
     <familiar race="dolphin"/>
@@ -773,7 +773,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="lynx" default="yes"/>
+    <familiar race="lynx"/>
     <familiar race="dreamcat"/>
     <familiar race="lynx"/>
     <familiar race="songdragon"/>
@@ -805,7 +805,7 @@
     <skill name="taxation" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="owl" default="yes"/>
+    <familiar race="owl"/>
     <familiar race="rat"/>
     <familiar race="eagle"/>
     <familiar race="songdragon"/>
@@ -833,7 +833,7 @@
     <skill name="perception" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="ghost" default="yes"/>
+    <familiar race="ghost"/>
     <familiar race="rat"/>
     <familiar race="owl"/>
     <familiar race="rat"/>
@@ -863,7 +863,7 @@
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
     <attack type="5"/>
-    <familiar race="imp" default="yes"/>
+    <familiar race="imp"/>
     <familiar race="imp"/>
     <familiar race="ghost"/>
     <familiar race="rat"/>
@@ -893,7 +893,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5+3"/>
-    <familiar race="tunnelworm" default="yes"/>
+    <familiar race="tunnelworm"/>
     <familiar race="rat"/>
     <familiar race="rat"/>
     <familiar race="eagle"/>
@@ -917,7 +917,7 @@
     <skill name="cartmaking" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="rat" default="yes"/>
+    <familiar race="rat"/>
     <familiar race="songdragon"/>
     <familiar race="imp"/>
     <familiar race="rat"/>
@@ -1108,7 +1108,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="goblin" default="yes"/>
+    <familiar race="goblin"/>
     <familiar race="ghost"/>
     <familiar race="imp"/>
     <familiar race="rat"/>
@@ -1134,7 +1134,7 @@
     <skill name="perception" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="lynx" default="yes"/>
+    <familiar race="lynx"/>
     <familiar race="fairy"/>
     <familiar race="owl"/>
     <familiar race="nymph"/>
@@ -1165,7 +1165,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="tunnelworm" default="yes"/>
+    <familiar race="tunnelworm"/>
     <familiar race="eagle"/>
     <familiar race="owl"/>
     <familiar race="lynx"/>
@@ -1195,7 +1195,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="goblin" default="yes"/>
+    <familiar race="goblin"/>
     <familiar race="ghost"/>
     <familiar race="imp"/>
     <familiar race="rat"/>

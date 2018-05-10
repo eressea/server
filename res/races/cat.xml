@@ -17,7 +17,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="lynx" default="yes"/>
+    <familiar race="lynx"/>
     <familiar race="dreamcat"/>
     <familiar race="lynx"/>
     <familiar race="songdragon"/>

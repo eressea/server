@@ -23,7 +23,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="tunnelworm" default="yes"/>
+    <familiar race="tunnelworm"/>
     <familiar race="eagle"/>
     <familiar race="owl"/>
     <familiar race="lynx"/>

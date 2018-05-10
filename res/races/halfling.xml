@@ -24,7 +24,7 @@
     <skill name="taxation" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="owl" default="yes"/>
+    <familiar race="owl"/>
     <familiar race="rat"/>
     <familiar race="eagle"/>
     <familiar race="songdragon"/>

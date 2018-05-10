@@ -1461,13 +1461,7 @@ static int parse_races(xmlDocPtr doc)
                         assert(propValue != NULL);
                         frc = rc_get_or_create((const char *)propValue);
                         frc->flags |= RCF_FAMILIAR;
-                        if (xml_bvalue(node, "default", false)) {
-                            rc->familiars[k] = rc->familiars[0];
-                            rc->familiars[0] = frc;
-                        }
-                        else {
-                            rc->familiars[k] = frc;
-                        }
+                        rc->familiars[k] = frc;
                         xmlFree(propValue);
                     }
                     else {
