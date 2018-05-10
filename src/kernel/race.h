@@ -236,13 +236,13 @@ extern "C" {
 #define RCF_DEFAULT (RCF_NOSTEAL|RCF_CANSAIL|RCF_NOLEARN)
 
     /* Economic flags */
-#define ECF_GIVEPERSON     (1<<2)   /* �bergibt Personen */
-#define ECF_GIVEUNIT       (1<<3)   /* Einheiten an andere Partei �bergeben */
-#define ECF_GETITEM        (1<<4)   /* nimmt Gegenst�nde an */
-#define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
-#define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
-#define ECF_STONEGOLEM     (1<<9)      /* race gets stonegolem properties */
-#define ECF_IRONGOLEM      (1<<10)      /* race gets irongolem properties */
+#define ECF_GIVEPERSON     (1<<0)   /* �bergibt Personen */
+#define ECF_GIVEUNIT       (1<<1)   /* Einheiten an andere Partei �bergeben */
+#define ECF_GETITEM        (1<<2)   /* nimmt Gegenst�nde an */
+#define ECF_REC_ETHEREAL   (1<<3)       /* Rekrutiert aus dem Nichts */
+#define ECF_REC_UNLIMITED  (1<<4)       /* Rekrutiert ohne Limit */
+#define ECF_STONEGOLEM     (1<<5)      /* race gets stonegolem properties */
+#define ECF_IRONGOLEM      (1<<6)      /* race gets irongolem properties */
 
     /* Battle-Flags */
 #define BF_EQUIPMENT    (1<<0)  /* Kann Ausr�stung benutzen */

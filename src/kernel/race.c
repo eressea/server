@@ -310,7 +310,7 @@ static race *rc_find_i(const char *name)
         for (i = 0; rc_depr[i]; i += 2) {
             if (strcmp(name, rc_depr[i]) == 0) {
                 rc = rc_find_i(rc_depr[i + 1]);
-                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                log_info("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
                 break;
             }
         }
