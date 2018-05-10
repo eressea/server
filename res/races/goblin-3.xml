@@ -21,7 +21,7 @@ getitem="yes" equipment="yes" healing="2.0">
   <skill name="unarmed" modifier="-99"/>
   <skill name="weaponsmithing" modifier="-1"/>
   <attack type="1" damage="1d5"/>
-  <familiar race="rat" default="yes"/>
+  <familiar race="rat"/>
   <familiar race="imp"/>
 </race>
 </races>

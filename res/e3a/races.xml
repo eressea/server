@@ -40,7 +40,7 @@
     <skill name="magic" modifier="-99"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="dolphin" default="yes"/>
+    <familiar race="dolphin"/>
     <familiar race="giantturtle"/>
   </race>
 
@@ -67,7 +67,7 @@
     <skill name="unarmed" modifier="-99"/>
     <skill name="weaponsmithing" modifier="2"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="wolf" default="yes"/>
+    <familiar race="wolf"/>
     <familiar race="ghost"/>
   </race>
 
@@ -95,7 +95,7 @@
     <skill name="magic" modifier="-99"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="eagle" default="yes"/>
+    <familiar race="eagle"/>
     <familiar race="imp"/>
   </race>
   
@@ -116,7 +116,7 @@
     <skill name="weaponsmithing" modifier="1"/>
     <attack type="1" damage="1d5"/>
     <attack type="5"/>
-    <familiar race="imp" default="yes"/>
+    <familiar race="imp"/>
     <familiar race="ghost"/>
   </race>
 
@@ -138,7 +138,7 @@
     <skill name="training" modifier="2"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="nymph" default="yes"/>
+    <familiar race="nymph"/>
     <familiar race="unicorn"/>
   </race>
 
@@ -160,7 +160,7 @@
     <skill name="training" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5+3"/>
-    <familiar race="tunnelworm" default="yes"/>
+    <familiar race="tunnelworm"/>
     <familiar race="rat"/>
   </race>
 
@@ -186,7 +186,7 @@
     <skill name="weaponsmithing" modifier="2"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="lynx" default="yes"/>
+    <familiar race="lynx"/>
     <familiar race="songdragon"/>
   </race>
 

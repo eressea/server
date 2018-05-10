@@ -7,7 +7,7 @@
     <skill name="sailing" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="wolf" default="yes"/>
+    <familiar race="wolf"/>
     <familiar race="dreamcat"/>
     <familiar race="owl"/>
     <familiar race="owl"/>

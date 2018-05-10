@@ -18,7 +18,7 @@
     <skill name="perception" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="lynx" default="yes"/>
+    <familiar race="lynx"/>
     <familiar race="fairy"/>
     <familiar race="owl"/>
     <familiar race="nymph"/>
