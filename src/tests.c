@@ -43,7 +43,7 @@ struct race *test_create_race(const char *name)
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
-    rc->flags |= RCF_WALK;
+    rc->flags |= (RCF_WALK|RCF_PLAYABLE);
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;

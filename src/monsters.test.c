@@ -55,12 +55,16 @@ static void create_monsters(unit **up, unit **um) {
     test_create_horse();
     default_locale = test_create_locale();
     fp = test_create_faction(NULL);
+
     fm = get_or_create_monsters();
+    fset(fm, FFL_NOIDLEOUT);
+    assert(fval(fm, FFL_NPC));
+    assert(fval(fm, FFL_NOIDLEOUT));
+
     assert(rc_find(fm->race->_name));
     rc = rc_get_or_create(fm->race->_name);
-    fset(rc, RCF_UNARMEDGUARD|RCF_NPC|RCF_DRAGON);
-    fset(fm, FFL_NOIDLEOUT);
-    assert(fval(fm, FFL_NPC) && fval(fm->race, RCF_UNARMEDGUARD) && fval(fm->race, RCF_NPC) && fval(fm, FFL_NOIDLEOUT));
+    fset(rc, RCF_UNARMEDGUARD|RCF_DRAGON);
+    assert(!fval(fm->race, RCF_PLAYABLE));
 
     test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
@@ -261,12 +265,12 @@ static void test_spawn_seaserpent(CuTest *tc) {
     race *rc;
     test_setup();
     rc = test_create_race("seaserpent");
-    rc->flags |= RCF_NPC;
+    rc->flags &= ~RCF_PLAYABLE;
     r = test_create_region(0, 0, NULL);
     f = test_create_faction(NULL);
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);
-    CuAssertPtrEquals(tc, 0, u->_name);
+    CuAssertPtrEquals(tc, NULL, u->_name);
     test_teardown();
 }
 

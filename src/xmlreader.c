@@ -1332,9 +1332,9 @@ static int parse_races(xmlDocPtr doc)
                 rc->flags |= RCF_NOSTEAL;
             if (!xml_bvalue(node, "learn", true))
                 rc->flags |= RCF_NOLEARN;
-            if (!xml_bvalue(node, "playerrace", false)) {
+            if (xml_bvalue(node, "playerrace", false)) {
                 assert(rc->recruitcost == 0);
-                rc->flags |= RCF_NPC;
+                rc->flags |= RCF_PLAYABLE;
             }
             if (xml_bvalue(node, "scarepeasants", false))
                 rc->flags |= RCF_SCAREPEASANTS;

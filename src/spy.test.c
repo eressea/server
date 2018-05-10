@@ -196,7 +196,10 @@ static void test_setstealth_demon_bad(CuTest *tc) {
     lang = test_create_locale();
     rc = test_create_race("demon");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+
     rc = test_create_race("smurf");
+    rc->flags &= ~RCF_PLAYABLE;
+
     init_races(lang);
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
     setstealth_cmd(u, u->thisorder);

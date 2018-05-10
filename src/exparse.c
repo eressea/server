@@ -883,7 +883,7 @@ static int nfamiliars;
 static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
-        "!playerrace", "killpeasants", "scarepeasants", "!cansteal",
+        "playerrace", "killpeasants", "scarepeasants", "!cansteal",
         "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
         "!learn", "!teach", "horse", "desert", "illusionary",
         "absorbpeasants", "noheal", "noweapons", "shapeshift",

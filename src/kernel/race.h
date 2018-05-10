@@ -202,7 +202,7 @@ extern "C" {
     int rc_get_mask(char *list);
 
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
-#define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
+#define RCF_PLAYABLE       (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
 #define RCF_SCAREPEASANTS  (1<<2)   /* a monster that scares peasants out of the hex */
 #define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
@@ -233,7 +233,7 @@ extern "C" {
 #define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
 #define RCF_FAMILIAR       (1<<29)      /* may be a familiar */
 
-#define RCF_DEFAULT (RCF_NOSTEAL|RCF_CANSAIL|RCF_NOLEARN)
+#define RCF_DEFAULT 0
 
     /* Economic flags */
 #define ECF_GIVEPERSON     (1<<0)   /* �bergibt Personen */
@@ -256,7 +256,7 @@ extern "C" {
     const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
 
-#define playerrace(rc) (!((rc)->flags & RCF_NPC))
+#define playerrace(rc) ((rc)->flags & RCF_PLAYABLE)
 #define dragonrace(rc) ((rc)->flags & RCF_DRAGON)
 #define humanoidrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) ((rc)->flags & RCF_ILLUSIONARY)

@@ -480,17 +480,16 @@ static void json_ship(cJSON *json, ship_type *st) {
 static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
-        "npc", "killpeasants", "scarepeasants",
+        "player", "killpeasants", "scarepeasants",
         "nosteal", "moverandom", "cannotmove",
         "learn", "fly", "swim", "walk", "nolearn",
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal",
         "noweapons", "shapeshift", "", "undead", "dragon",
-        "coastal", "", "cansail", 0
+        "coastal", "", "cansail", NULL
     };
     const char *ecflags[] = {
-        "", "keepitem", "giveperson",
-        "giveunit", "getitem", 0
+        "giveperson", "giveunit", "getitem", NULL
     };
     if (json->type != cJSON_Object) {
         log_error("race %s is not a json object: %d", json->string, json->type);

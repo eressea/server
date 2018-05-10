@@ -356,6 +356,7 @@ race *rc_create(const char *zName)
 
     rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
+    rc->flags = RCF_DEFAULT;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
     rc->income = 20;
