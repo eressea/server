@@ -1355,7 +1355,7 @@ static int parse_races(xmlDocPtr doc)
                 rc->flags |= RCF_WALK;
             if (!xml_bvalue(node, "canlearn", true))
                 rc->flags |= RCF_NOLEARN;
-            if (!xml_bvalue(node, "canteach", true))
+            if (!xml_bvalue(node, "teach", true))
                 rc->flags |= RCF_NOTEACH;
             if (xml_bvalue(node, "horse", false))
                 rc->flags |= RCF_HORSE;

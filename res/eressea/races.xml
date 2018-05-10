@@ -6,7 +6,7 @@
         regaura="0" weight="500" capacity="200" equipment="no"
         speed="1" hp="1000" ac="4" damage="2d4" unarmedattack="10"
         unarmeddefense="10" attackmodifier="8" defensemodifier="8"
-        fly="no" walk="no" canteach="no" getitem="yes">
+        fly="no" walk="no" teach="no" getitem="yes">
     <attack type="4" damage="2d6+2"/>
     <attack type="3" damage="2d6+2"/>
   </race>
