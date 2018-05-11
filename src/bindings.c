@@ -47,7 +47,6 @@
 #include "monsters.h"
 #include "market.h"
 
-#include <modules/autoseed.h>
 #include <modules/score.h>
 #include <attributes/key.h>
 
@@ -150,25 +149,6 @@ int tolua_itemlist_next(lua_State * L)
         tolua_pushstring(L, itm->type->rtype->_name);
         *item_ptr = itm->next;
         return 1;
-    }
-    return 0;
-}
-
-static int tolua_autoseed(lua_State * L)
-{
-    const char *filename = tolua_tostring(L, 1, 0);
-    int new_island = tolua_toboolean(L, 2, 0);
-    newfaction *players = read_newfactions(filename);
-    if (players != NULL) {
-        while (players) {
-            int n = listlen(players);
-            int k = (n + ISLANDSIZE - 1) / ISLANDSIZE;
-            k = n / k;
-            n = autoseed(&players, k, new_island ? 0 : TURNS_PER_ISLAND);
-            if (n == 0) {
-                break;
-            }
-        }
     }
     return 0;
 }
@@ -1068,7 +1048,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
         tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
-        tolua_function(L, TOLUA_CAST "autoseed", tolua_autoseed);
         tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
         tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
