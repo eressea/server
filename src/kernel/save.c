@@ -1349,7 +1349,7 @@ static void fix_familiars(void) {
                             log_error("%s seems to be a familiar with no spells.",
                                 unitname(u));
                             /* magical familiar, no spells */
-                            equip_unit_mask(u, eq, EQUIP_SPELLS);
+                            equip_unit_set(u, eq, EQUIP_SPELLS);
                         }
                     }
                 }

@@ -21,11 +21,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "equipment.h"
 
 /* kernel includes */
-#include "item.h"
-#include "unit.h"
+#include "callbacks.h"
 #include "faction.h"
+#include "item.h"
 #include "race.h"
 #include "spell.h"
+#include "unit.h"
 
 /* util includes */
 #include <selist.h>
@@ -88,80 +89,90 @@ equipment_setitem(equipment * eq, const item_type * itype, const char *value)
 }
 
 void
-equipment_setcallback(struct equipment *eq,
-void(*callback) (const struct equipment *, struct unit *))
+equipment_setcallback(struct equipment *eq, equip_callback_fun callback)
 {
     eq->callback = callback;
 }
 
-void equip_unit(struct unit *u, const struct equipment *eq)
+bool equip_unit(struct unit *u, const char *eqname)
 {
-    equip_unit_mask(u, eq, EQUIP_ALL);
+    return equip_unit_mask(u, eqname, EQUIP_ALL);
 }
 
-void equip_unit_mask(struct unit *u, const struct equipment *eq, int mask)
+bool equip_unit_mask(struct unit *u, const char *eqname, int mask)
 {
+    const equipment * eq = get_equipment(eqname);
     if (eq) {
+        equip_unit_set(u, eq, mask);
+        return true;
+    }
+    if (callbacks.equip_unit) {
+        return callbacks.equip_unit(u, eqname, mask);
+    }
+    return false;
+}
 
-        if (mask & EQUIP_SKILLS) {
-            int sk;
-            for (sk = 0; sk != MAXSKILLS; ++sk) {
-                if (eq->skills[sk] != NULL) {
-                    int i = dice_rand(eq->skills[sk]);
-                    if (i > 0) {
-                        set_level(u, (skill_t)sk, i);
-                        if (sk == SK_STAMINA) {
-                            u->hp = unit_max_hp(u) * u->number;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (mask & EQUIP_SPELLS) {
-            if (eq->spells) {
-                selist * ql = eq->spells;
-                int qi;
-                sc_mage * mage = get_mage_depr(u);
-
-                for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-                    lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
-                    spell *sp = spellref_get(sbe->spref);
-                    unit_add_spell(u, mage, sp, sbe->level);
-                }
-            }
-        }
-
-        if (mask & EQUIP_ITEMS) {
-            itemdata *idata;
-            for (idata = eq->items; idata != NULL; idata = idata->next) {
-                int i = u->number * dice_rand(idata->value);
+void equip_unit_set(struct unit *u, const equipment *eq, int mask)
+{
+    if (mask & EQUIP_SKILLS) {
+        int sk;
+        for (sk = 0; sk != MAXSKILLS; ++sk) {
+            if (eq->skills[sk] != NULL) {
+                int i = dice_rand(eq->skills[sk]);
                 if (i > 0) {
-                    i_add(&u->items, i_new(idata->itype, i));
-                }
-            }
-        }
-
-        if (eq->subsets) {
-            int i;
-            for (i = 0; eq->subsets[i].sets; ++i) {
-                if (chance(eq->subsets[i].chance)) {
-                    double rnd = (1 + rng_int() % 1000) / 1000.0;
-                    int k;
-                    for (k = 0; eq->subsets[i].sets[k].set; ++k) {
-                        if (rnd <= eq->subsets[i].sets[k].chance) {
-                            equip_unit_mask(u, eq->subsets[i].sets[k].set, mask);
-                            break;
-                        }
-                        rnd -= eq->subsets[i].sets[k].chance;
+                    set_level(u, (skill_t)sk, i);
+                    if (sk == SK_STAMINA) {
+                        u->hp = unit_max_hp(u) * u->number;
                     }
                 }
             }
         }
+    }
 
-        if (mask & EQUIP_SPECIAL) {
-            if (eq->callback)
-                eq->callback(eq, u);
+    if (mask & EQUIP_SPELLS) {
+        if (eq->spells) {
+            selist * ql = eq->spells;
+            int qi;
+            sc_mage * mage = get_mage_depr(u);
+
+            for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+                lazy_spell *sbe = (lazy_spell *)selist_get(ql, qi);
+                spell *sp = spellref_get(sbe->spref);
+                unit_add_spell(u, mage, sp, sbe->level);
+            }
+        }
+    }
+
+    if (eq->items && mask & EQUIP_ITEMS) {
+        itemdata *idata;
+        for (idata = eq->items; idata != NULL; idata = idata->next) {
+            int i = u->number * dice_rand(idata->value);
+            if (i > 0) {
+                i_add(&u->items, i_new(idata->itype, i));
+            }
+        }
+    }
+
+    if (eq->subsets) {
+        int i;
+        for (i = 0; eq->subsets[i].sets; ++i) {
+            if (chance(eq->subsets[i].chance)) {
+                double rnd = (1 + rng_int() % 1000) / 1000.0;
+                int k;
+                for (k = 0; eq->subsets[i].sets[k].set; ++k) {
+                    if (rnd <= eq->subsets[i].sets[k].chance) {
+                        equip_unit_set(u, eq->subsets[i].sets[k].set, mask);
+                        break;
+                    }
+                    rnd -= eq->subsets[i].sets[k].chance;
+                }
+            }
+        }
+    }
+
+    if (mask & EQUIP_SPECIAL) {
+        if (eq->callback) {
+            eq->callback(eq, u);
         }
     }
 }

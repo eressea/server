@@ -265,7 +265,7 @@ static void get_villagers(region * r, unit * u)
         u);
     leave(newunit, true);
     fset(newunit, UFL_ISNEW | UFL_MOVED);
-    equip_unit(newunit, get_equipment("rand_villagers"));
+    equip_unit(newunit, "rand_villagers");
 }
 
 static void get_allies(region * r, unit * u)
@@ -352,7 +352,7 @@ static void get_allies(region * r, unit * u)
     newunit =
         create_unit(r, u->faction, number, u->faction->race, 0,
         LOC(u->faction->locale, name), u);
-    equip_unit(newunit, get_equipment(equip));
+    equip_unit(newunit, equip);
 
     u_setfaction(newunit, u->faction);
     set_racename(&newunit->attribs, get_racename(u->attribs));

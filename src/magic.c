@@ -2181,18 +2181,13 @@ void remove_familiar(unit * mage)
 void create_newfamiliar(unit * mage, unit * fam)
 {
     /* skills and spells: */
-    const struct equipment *eq;
     char eqname[64];
     const race *rc = u_race(fam);
 
     set_familiar(mage, fam);
 
     snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
-    eq = get_equipment(eqname);
-    if (eq != NULL) {
-        equip_unit(fam, eq);
-    }
-    else {
+    if (!equip_unit(fam, eqname)) {
         log_info("could not perform initialization for familiar %s.\n", rc->_name);
     }
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */

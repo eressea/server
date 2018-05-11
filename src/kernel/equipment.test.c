@@ -2,6 +2,7 @@
 
 #include "magic.h"
 
+#include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
@@ -35,7 +36,7 @@ static void test_equipment(CuTest * tc)
     equipment_addspell(eq, sp->sname, 1);
 
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    equip_unit_mask(u, eq, EQUIP_ALL);
+    equip_unit_set(u, eq, EQUIP_ALL);
     CuAssertIntEquals(tc, 1, i_get(u->items, it_horses));
     CuAssertIntEquals(tc, 5, get_level(u, SK_MAGIC));
 
@@ -69,10 +70,35 @@ static void test_get_equipment(CuTest * tc)
     test_teardown();
 }
 
+static bool equip_test(unit *u, const char *name, int mask) {
+    if (mask & EQUIP_ITEMS) {
+        i_change(&u->items, it_find("horse"), 1);
+        return true;
+    }
+    return false;
+}
+
+static void test_equipment_callback(CuTest *tc) {
+    unit *u;
+    item_type *itype;
+    test_setup();
+    itype = test_create_horse();
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    CuAssertTrue(tc, !equip_unit_mask(u, "horse", EQUIP_ITEMS));
+    CuAssertPtrEquals(tc, NULL, u->items);
+    callbacks.equip_unit = equip_test;
+    CuAssertTrue(tc, equip_unit(u, "horse"));
+    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
+    CuAssertTrue(tc, !equip_unit_mask(u, "horse", EQUIP_SPELLS));
+    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
+    test_teardown();
+}
+
 CuSuite *get_equipment_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_equipment);
     SUITE_ADD_TEST(suite, test_get_equipment);
+    SUITE_ADD_TEST(suite, test_equipment_callback);
     return suite;
 }

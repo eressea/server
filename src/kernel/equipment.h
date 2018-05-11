@@ -21,6 +21,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,12 +46,14 @@ extern "C" {
         subsetitem *sets;
     } subset;
 
+    typedef void(*equip_callback_fun) (const struct equipment *, struct unit *);
+
     typedef struct equipment {
         struct itemdata *items;
         char *skills[MAXSKILLS];
         struct selist *spells;
         struct subset *subsets;
-        void(*callback) (const struct equipment *, struct unit *);
+        equip_callback_fun callback;
     } equipment;
 
     void equipment_done(void);
@@ -64,18 +68,17 @@ extern "C" {
     void equipment_setskill(struct equipment *eq, skill_t sk,
         const char *value);
     void equipment_addspell(struct equipment *eq, const char *name, int level);
-    void equipment_setcallback(struct equipment *eq,
-        void(*callback) (const struct equipment *, struct unit *));
+    void equipment_setcallback(struct equipment *eq, equip_callback_fun callback);
 
-    void equip_unit(struct unit *u, const struct equipment *eq);
 #define EQUIP_SKILLS  (1<<1)
 #define EQUIP_SPELLS  (1<<2)
 #define EQUIP_ITEMS   (1<<3)
 #define EQUIP_SPECIAL (1<<4)
 #define EQUIP_ALL     (0xFF)
-    void equip_unit_mask(struct unit *u, const struct equipment *eq,
-        int mask);
     void equip_items(struct item **items, const struct equipment *eq);
+    void equip_unit_set(struct unit *u, const struct equipment *eq, int mask);
+    bool equip_unit_mask(struct unit *u, const char *eqname, int mask);
+    bool equip_unit(struct unit *u, const char *eqname);
 
 #ifdef __cplusplus
 }

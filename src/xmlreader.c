@@ -875,8 +875,7 @@ static void add_callbacks(equipment * eq, xmlNodeSetPtr nsetItems)
             if (propValue != NULL) {
                 fun = get_function((const char *)propValue);
                 if (fun) {
-                    equipment_setcallback(eq, (void(*)(const struct equipment *,
-                    struct unit *))fun);
+                    equipment_setcallback(eq, (equip_callback_fun)fun);
                 }
                 xmlFree(propValue);
             }
