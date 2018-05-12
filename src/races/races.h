@@ -18,6 +18,7 @@ extern "C" {
 
     void register_races(void);
     void make_undead_unit(struct unit *);
+    void equip_newunits(struct unit *u);
 
 #ifdef __cplusplus
 }

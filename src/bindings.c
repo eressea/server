@@ -23,6 +23,7 @@
 #include "kernel/save.h"
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
+#include "races/races.h"
 
 #include "bind_unit.h"
 #include "bind_storage.h"
@@ -845,8 +846,13 @@ static int init_data(const char *filename)
     return 0;
 }
 
+static int tolua_equip_newunits(lua_State * L) {
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    equip_newunits(u);
+    return 0;
+}
 
-int tolua_read_xml(lua_State * L)
+static int tolua_read_xml(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, "config.xml");
     lua_pushinteger(L, init_data(filename));
@@ -1023,6 +1029,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
+        tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);
     } tolua_endmodule(L);
     return 1;
 }
