@@ -6,7 +6,6 @@
         "config://conf/e2/locales.json",
         "config://conf/e2/terrains.json",
         "config://conf/e2/items.json",
-        "config://conf/e2/rules.xml",
         "config://res/core/ships.xml",
         "config://res/core/common/buildings.xml",
         "config://res/eressea/buildings.xml",

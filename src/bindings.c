@@ -9,7 +9,6 @@
 #include "kernel/alliance.h"
 #include "kernel/building.h"
 #include "kernel/curse.h"
-#include "kernel/equipment.h"
 #include "kernel/unit.h"
 #include "kernel/terrain.h"
 #include "kernel/messages.h"
@@ -391,16 +390,6 @@ static int tolua_get_nmrs(lua_State * L)
     }
     lua_pushinteger(L, result);
     return 1;
-}
-
-static int tolua_equipunit(lua_State * L)
-{
-    unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    const char *eqname = tolua_tostring(L, 2, 0);
-    int mask = (int)tolua_tonumber(L, 3, EQUIP_ALL);
-    assert(u && mask > 0);
-    equip_unit_mask(u, eqname, mask);
-    return 0;
 }
 
 static int tolua_spawn_braineaters(lua_State * L)
@@ -1019,7 +1008,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "set_turn", &tolua_set_turn);
         tolua_function(L, TOLUA_CAST "get_turn", &tolua_get_turn);
         tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
-        tolua_function(L, TOLUA_CAST "equip_unit", tolua_equipunit);
         tolua_function(L, TOLUA_CAST "atoi36", tolua_atoi36);
         tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
