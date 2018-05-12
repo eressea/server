@@ -6,7 +6,6 @@
         "config://conf/e2/locales.json",
         "config://conf/e2/terrains.json",
         "config://conf/e2/items.json",
-        "config://conf/e2/rules.xml",
         "config://res/core/ships.xml",
         "config://res/core/common/buildings.xml",
         "config://res/eressea/buildings.xml",
@@ -28,6 +27,7 @@
     ],
     "settings": {
         "game.name" : "Eressea",
+        "game.mailcmd" : "ERESSEA",
         "game.id" : 2,
         "orders.default": "work",
         "NewbieImmunity": 8,

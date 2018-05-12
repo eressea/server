@@ -11,8 +11,8 @@ return {
     require('eressea.tunnels'),
     require('eressea.ponnuki'),
     require('eressea.astral'),
---    require('eressea.locales'),
     require('eressea.jsreport'),
     require('eressea.ents'),
+    require('eressea.equipment'),
     require('eressea.cursed')
 }

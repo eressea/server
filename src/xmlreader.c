@@ -862,28 +862,6 @@ static void add_items(equipment * eq, xmlNodeSetPtr nsetItems)
     }
 }
 
-static void add_callbacks(equipment * eq, xmlNodeSetPtr nsetItems)
-{
-    if (nsetItems != NULL && nsetItems->nodeNr > 0) {
-        int i;
-        for (i = 0; i != nsetItems->nodeNr; ++i) {
-            xmlNodePtr node = nsetItems->nodeTab[i];
-            xmlChar *propValue;
-            pf_generic fun;
-
-            propValue = xmlGetProp(node, BAD_CAST "name");
-            if (propValue != NULL) {
-                fun = get_function((const char *)propValue);
-                if (fun) {
-                    equipment_setcallback(eq, (void(*)(const struct equipment *,
-                    struct unit *))fun);
-                }
-                xmlFree(propValue);
-            }
-        }
-    }
-}
-
 static void add_spells(equipment * eq, xmlNodeSetPtr nsetItems)
 {
     if (nsetItems != NULL && nsetItems->nodeNr > 0) {
@@ -1021,11 +999,6 @@ static int parse_equipment(xmlDocPtr doc)
                 }
 
                 xpath->node = node;
-
-                xpathResult = xmlXPathEvalExpression(BAD_CAST "callback", xpath);
-                assert(!eq->callback);
-                add_callbacks(eq, xpathResult->nodesetval);
-                xmlXPathFreeObject(xpathResult);
 
                 xpathResult = xmlXPathEvalExpression(BAD_CAST "item", xpath);
                 assert(!eq->items);
@@ -1166,11 +1139,9 @@ static int parse_spells(xmlDocPtr doc)
             xmlFree(propValue);
             /* level, rank and flags */
 #endif
-            sp->rank = (char)xml_ivalue(node, "rank", -1);
+            sp->rank = (char)xml_ivalue(node, "rank", 0);
             if (xml_bvalue(node, "los", false))
                 sp->sptyp |= TESTCANSEE;        /* must see or have contact */
-            if (!xml_bvalue(node, "target_global", false))
-                sp->sptyp |= SEARCHLOCAL;       /* must be in same region */
             if (xml_bvalue(node, "ship", false))
                 sp->sptyp |= ONSHIPCAST;
             if (xml_bvalue(node, "ocean", false))
@@ -1180,6 +1151,8 @@ static int parse_spells(xmlDocPtr doc)
             if (xml_bvalue(node, "variable", false))
                 sp->sptyp |= SPELLLEVEL;
 
+            if (xml_bvalue(node, "globaltarget", false))
+                sp->sptyp |= GLOBALTARGET;       /* target need not be in same region */
             if (xml_bvalue(node, "buildingtarget", false))
                 sp->sptyp |= BUILDINGSPELL;
             if (xml_bvalue(node, "shiptarget", false))
@@ -1324,8 +1297,8 @@ static int parse_races(xmlDocPtr doc)
                 }
             }
 
-            rc->at_default = (char)xml_ivalue(node, "unarmedattack", -2);
-            rc->df_default = (char)xml_ivalue(node, "unarmeddefense", -2);
+            rc->at_default = (char)xml_ivalue(node, "unarmedattack", rc->at_default);
+            rc->df_default = (char)xml_ivalue(node, "unarmeddefense", rc->df_default);
             rc->at_bonus = (char)xml_ivalue(node, "attackmodifier", rc->at_bonus);
             rc->df_bonus = (char)xml_ivalue(node, "defensemodifier", rc->df_bonus);
 
@@ -1355,7 +1328,7 @@ static int parse_races(xmlDocPtr doc)
                 rc->flags |= RCF_WALK;
             if (!xml_bvalue(node, "canlearn", true))
                 rc->flags |= RCF_NOLEARN;
-            if (!xml_bvalue(node, "canteach", true))
+            if (!xml_bvalue(node, "teach", true))
                 rc->flags |= RCF_NOTEACH;
             if (xml_bvalue(node, "horse", false))
                 rc->flags |= RCF_HORSE;
@@ -1464,13 +1437,7 @@ static int parse_races(xmlDocPtr doc)
                         assert(propValue != NULL);
                         frc = rc_get_or_create((const char *)propValue);
                         frc->flags |= RCF_FAMILIAR;
-                        if (xml_bvalue(node, "default", false)) {
-                            rc->familiars[k] = rc->familiars[0];
-                            rc->familiars[0] = frc;
-                        }
-                        else {
-                            rc->familiars[k] = frc;
-                        }
+                        rc->familiars[k] = frc;
                         xmlFree(propValue);
                     }
                     else {

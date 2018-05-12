@@ -39,6 +39,7 @@ without prior permission by the authors of Eressea.
 
 #include <tolua.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 typedef struct helpmode {

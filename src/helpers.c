@@ -162,6 +162,36 @@ static void push_param(lua_State * L, char c, spllprm * param)
     }
 }
 
+/** callback to use lua functions isntead of equipment */
+static bool lua_equipunit(unit *u, const char *eqname, int mask) {
+    lua_State *L = (lua_State *)global.vm_state;
+    bool result = false;
+    static bool disabled = false;
+
+    if (disabled) {
+        return false;
+    }
+    lua_getglobal(L, "equip_unit");
+    if (lua_isfunction(L, -1)) {
+        tolua_pushusertype(L, u, TOLUA_CAST "unit");
+        lua_pushstring(L, eqname);
+        lua_pushinteger(L, mask);
+        if (lua_pcall(L, 3, 1, 0) != 0) {
+            const char *error = lua_tostring(L, -1);
+            log_error("equip(%s) with '%s/%d': %s.\n", unitname(u), eqname, mask, error);
+            lua_pop(L, 1);
+        }
+        else {
+            result = (bool)lua_toboolean(L, -1);
+            lua_pop(L, 1);
+        }
+    }
+    else {
+        disabled = true;
+    }
+    return result;
+}
+
 /** callback to use lua for spell functions */
 static int lua_callspell(castorder * co, const char *fname)
 {
@@ -346,6 +376,7 @@ void register_tolua_helpers(void)
     at_register(&at_direction);
     at_deprecate("lcbuilding", building_action_read);
 
+    callbacks.equip_unit = lua_equipunit;
     callbacks.cast_spell = lua_callspell;
     callbacks.use_item = use_item_callback;
     callbacks.produce_resource = produce_resource_lua;

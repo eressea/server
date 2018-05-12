@@ -43,6 +43,7 @@
     ],
     "settings": {
         "game.name" : "Eressea",
+        "game.mailcmd" : "ERESSEA",
         "game.id" : 3,
         "orders.default": "work",
         "database.gameid": 7,
