@@ -515,9 +515,8 @@ static void icebergs(void)
     move_icebergs();
 }
 
-#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
 #define HERBROTCHANCE 5         /* Verrottchance f�r Kr�uter (ifdef HERBS_ROT) */
-#ifdef HERBS_ROT
+
 static void rotting_herbs(void)
 {
     region *r;
@@ -550,7 +549,6 @@ static void rotting_herbs(void)
         }
     }
 }
-#endif
 
 void randomevents(void)
 {
@@ -594,9 +592,7 @@ void randomevents(void)
     }
 
     chaos_update();
-#ifdef HERBS_ROT
     rotting_herbs();
-#endif
 
     dissolve_units();
 }
