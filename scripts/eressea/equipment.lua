@@ -1,6 +1,46 @@
--- Equipment
+-- forward declaration required:
+local sets = {}
 
-local sets = {
+local function equip_new_orc(u, flags)
+    local eqname = 'orc_' .. config.rules
+    local set = sets[eqname]
+    if set then
+        return equip_unit(u, eqname, flags)
+    end
+    return false
+end
+
+function equip_unit(u, name, flags)
+    local set = sets[name]
+    if set then
+        local items = set['items']
+        if items then
+            for k,v in pairs(items) do
+                u:add_item(k, v)
+            end
+        end
+        local skills = set['skills']
+        if skills then
+            for k,v in pairs(skills) do
+                u:set_skill(k, v)
+            end
+        end
+        local spells = set['spells']
+        if spells then
+            for k, v in ipairs(spells) do
+                u:add_spell(v)
+            end
+        end
+        local callback = set['callback']
+        if callback and type(callback) == 'function' then
+            callback(u, flags)
+        end
+        return true
+    end
+    return false
+end
+
+sets = {
     ['first_unit'] = {
         ['items'] = {
             ['money'] = 2500,
@@ -22,6 +62,15 @@ local sets = {
         },
         ['skills'] = {
             ['perception'] = 30,
+            ['melee'] = 1
+        }
+    },
+    ['new_orc'] = {
+        ['callback'] = equip_new_orc
+    },
+    ['orc_e2'] = {
+        ['skills'] = {
+            ['polearm'] = 1,
             ['melee'] = 1
         }
     },
@@ -107,35 +156,5 @@ local sets = {
         ['callback'] = equip_newunits
     },
 }
-
-function equip_unit(u, name, flags)
-    local set = sets[name]
-    if set then
-        local items = set['items']
-        if items then
-            for k,v in pairs(items) do
-                u:add_item(k, v)
-            end
-        end
-        local skills = set['skills']
-        if skills then
-            for k,v in pairs(skills) do
-                u:set_skill(k, v)
-            end
-        end
-        local spells = set['spells']
-        if spells then
-            for k, v in ipairs(spells) do
-                u:add_spell(v)
-            end
-        end
-        local callback = set['callback']
-        if callback and type(callback) == 'function' then
-            callback(u)
-        end
-        return true
-    end
-    return false
-end
 
 return nil
