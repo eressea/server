@@ -36,6 +36,28 @@
     <skill name="perception" level="3"/>
   </set>
 
+  <set name="new_dracoid">
+    <!-- dracoiden, von drachen rekrutiert -->
+    <skill name="polearm" level="d4+2"/>
+    <skill name="melee" level="d4+2"/>
+    <skill name="bow" level="d3+1"/>
+    <subset>
+      <!-- dracoiden haben immer eine von drei waffen -->
+      <set name="i_sword" chance="0.33"/>
+      <set name="i_spear" chance="0.33"/>
+      <set name="i_bow" chance="0.34"/>
+    </subset>
+  </set>
+
+  <set name="rising_undead">
+    <!-- untote, von den graebern auferstanden -->
+    <item name="rustysword" amount="1"/>
+    <item name="rustychainmail" amount="d2-1"/>
+    <subset chance="0.3">
+      <set name="i_rustyshield"/>
+    </subset>
+  </set>
+
 </equipment>
 </eressea>
 
