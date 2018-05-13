@@ -36,11 +36,6 @@
     <skill name="perception" level="3"/>
   </set>
 
-  <set name="spo_seaserpent">
-    <item name="dragonblood" amount="6"/>
-    <item name="seaserpenthead" amount="1"/>
-  </set>
-
 </equipment>
 </eressea>
 

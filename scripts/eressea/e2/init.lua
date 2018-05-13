@@ -1,5 +1,22 @@
 require 'eressea.spells'
-eressea.log.debug("rules for game E2")
+eressea.log.debug('rules for game E2')
+
+local equipment = require('eressea.equipment')
+local sets = {
+    ['new_orc'] = {
+        ['skills'] = {
+            ['polearm'] = 1,
+            ['melee'] = 1
+        }
+    },
+    ['spo_seaserpent'] = {
+        ['items'] = {
+            ['dragonblood'] = 6,
+            ['seaserpenthead'] = 1
+        }
+    }
+}
+equipment.add_multiple(sets)
 
 return {
     require('eressea'),
@@ -13,6 +30,5 @@ return {
     require('eressea.astral'),
     require('eressea.jsreport'),
     require('eressea.ents'),
-    require('eressea.equipment'),
-    require('eressea.cursed')
+    require('eressea.cursed'),
 }
