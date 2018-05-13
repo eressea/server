@@ -444,3 +444,16 @@ function test_faction_anonymous()
     assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
     assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
 end
+
+function test_new_orc_has_skills()
+    local f = faction.create('orc')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:add_item('money', 400)
+    u.number = 0
+    u:add_order("REKRUTIEREN 2")
+    process_orders()
+    assert_equal(2, u.number)
+    assert_equal(1, u:get_skill('polearm'))
+    assert_equal(1, u:get_skill('melee'))
+end
