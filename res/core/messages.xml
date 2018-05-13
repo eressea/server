@@ -7991,23 +7991,6 @@
     <text locale="en">"A message from $unit($unit): '$message'"</text>
   </message>
 
-  <message name="encounter_allies" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="name" type="string"/>
-    </type>
-    <text locale="de">"Plötzlich stolpert $unit($unit) über einige $localize($name). Nach kurzem Zögern entschließen die $localize($name), sich Deiner Partei anzuschließen."</text>
-    <text locale="en">"$unit($unit) stumbles upon $localize($name). After short hesitation, $localize($name) agrees to join your faction."</text>
-  </message>
-
-  <message name="encounter_villagers" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) entdeckt ein kleines Dorf. Die meisten Häuser wurden durch einen über die Ufer getretenen Fluß zerstört. Eine Gruppe der verzweifelten Menschen schließt sich deiner Partei an."</text>
-    <text locale="en">"$unit($unit) discovers a small village. Most of the houses have been destroyed by flooding, and a group of the distressed villagers join your faction."</text>
-  </message>
-
   <message name="mob_warning" section="events">
     <text locale="de">"Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier."</text>
     <text locale="en">"An angry mob forms and hunts practitioners of the dark arts."</text>

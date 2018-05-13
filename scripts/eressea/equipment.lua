@@ -105,7 +105,7 @@ local sets = {
             ['sailing'] = 1
         },
         ['callback'] = equip_newunits
-    }
+    },
 }
 
 function equip_unit(u, name, flags)

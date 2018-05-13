@@ -33,7 +33,6 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.peasants.growth", "1")
     eressea.settings.set("study.random_progress", "0")
 end
@@ -968,7 +967,6 @@ module("tests.parser", package.seeall, lunit.testcase)
 function setup()
     eressea.free_game()
     eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
-    eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.move.owner_leave", "0")
 end
 

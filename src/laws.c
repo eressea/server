@@ -4040,11 +4040,6 @@ void init_processor(void)
     p += 10;
     add_proc_order(p, K_GUARD, guard_on_cmd, 0, "Bewache (an)");
 
-    if (config_get_int("rules.encounters", 0)) {
-        p += 10;
-        add_proc_global(p, encounters, "Zufallsbegegnungen");
-    }
-
     p += 10;
     add_proc_unit(p, monster_kills_peasants,
         "Monster fressen und vertreiben Bauern");

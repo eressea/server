@@ -8,7 +8,6 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
-    eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
