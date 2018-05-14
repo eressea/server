@@ -115,7 +115,7 @@ function equip_unit(u, name, flags)
         local items = set['items']
         if items then
             for k,v in pairs(items) do
-                u:add_item(k, v)
+                u:add_item(k, v * u.number)
             end
         end
         local skills = set['skills']
