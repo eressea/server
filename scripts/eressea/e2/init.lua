@@ -14,6 +14,29 @@ local sets = {
             ['dragonblood'] = 6,
             ['seaserpenthead'] = 1
         }
+    },
+    ['spo_dragon'] = {
+        ['items'] = {
+            ['dragonblood'] = 4,
+            ['seaserpenthead'] = 1
+        }
+    },
+    ['spo_dragon'] = {
+        ['items'] = {
+            ['dragonblood'] = 4,
+            ['dragonhead'] = 1
+        }
+    },
+    ['spo_youngdragon'] = {
+        ['items'] = {
+            ['dragonblood'] = 1
+        }
+    },
+    ['spo_wyrm'] = {
+        ['items'] = {
+            ['dragonblood'] = 10,
+            ['dragonhead'] = 1
+        }
     }
 }
 equipment.add_multiple(sets)

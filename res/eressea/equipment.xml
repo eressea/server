@@ -1,20 +1,6 @@
 <?xml version="1.0"?>
 <eressea><equipment>
 
-  <set name="spo_dragon">
-    <item name="dragonblood" amount="4"/>
-    <item name="dragonhead" amount="1"/>
-  </set>
-
-  <set name="spo_youngdragon">
-    <item name="dragonblood" amount="1"/>
-  </set>
-
-  <set name="spo_wyrm">
-    <item name="dragonblood" amount="10"/>
-    <item name="dragonhead" amount="1"/>
-  </set>
-
   <!-- sets that are used by the monster-spawning code -->
   <set name="seed_dragon">
     <skill name="magic" level="4"/>
