@@ -155,19 +155,6 @@ static void dissolve_units(void)
     remove_empty_units();
 }
 
-static bool improve_all(faction * f, skill_t sk, int by_weeks)
-{
-    unit *u;
-    bool result = false;
-    for (u = f->units; u; u = u->nextF) {
-        if (has_skill(u, sk)) {
-            increase_skill(u, sk, by_weeks);
-            result = true;
-        }
-    }
-    return result;
-}
-
 void drown(region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
