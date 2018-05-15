@@ -212,7 +212,6 @@ static void test_reset(void) {
     free_config();
     default_locale = 0;
     calendar_cleanup();
-    equipment_done();
     close_orders();
     free_special_directions();
     free_locales();

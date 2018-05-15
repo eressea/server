@@ -17,5 +17,6 @@ return {
     require('eressea'),
     require('eressea.xmasitems'),
     require('eressea.frost'),
-    require('eressea.ents')
+    require('eressea.ents'),
+    require('eressea.e3.familiars'),
 }
