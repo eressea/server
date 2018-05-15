@@ -47,7 +47,8 @@ const gamedate *get_gamedate(int turn_now, gamedate * gd)
 
     assert(gd);
     if (t<0) {
-        log_fatal("current turn %d is before first %d",
+        t = 0;
+        log_error("current turn %d is before first %d",
                 turn_now, first_turn());
     }
     assert(t>=0);

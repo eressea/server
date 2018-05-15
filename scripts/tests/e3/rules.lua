@@ -1026,3 +1026,17 @@ function test_demons_using_mallornlance()
     end
     assert_true(u.guard)
 end
+
+function test_new_orc_has_no_skills()
+-- orcs in E2 get starting skills, but in E3 they do not
+    local f = faction.create('orc')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:add_item('money', 400)
+    u.number = 0
+    u:add_order("REKRUTIEREN 2")
+    process_orders()
+    assert_equal(2, u.number)
+    assert_equal(0, u:get_skill('polearm'))
+    assert_equal(0, u:get_skill('melee'))
+end

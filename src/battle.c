@@ -916,17 +916,13 @@ void kill_troop(troop dt)
     rmtroop(dt);
     if (!df->alive) {
         char eqname[64];
-        const struct equipment *eq;
         const race *rc = u_race(du);
         item *drops = item_spoil(rc, du->number - df->run.number);
         if (drops != NULL) {
             i_merge(&du->items, &drops);
         }
         sprintf(eqname, "spo_%s", rc->_name);
-        eq = get_equipment(eqname);
-        if (eq != NULL) {
-            equip_items(&du->items, eq);
-        }
+        equip_unit_mask(du, eqname, EQUIP_ITEMS);
     }
 }
 

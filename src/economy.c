@@ -263,7 +263,7 @@ void add_recruits(unit * u, int number, int wanted)
 
         len = snprintf(equipment, sizeof(equipment), "new_%s", u_race(u)->_name);
         if (len > 0 && (size_t)len < sizeof(equipment)) {
-            equip_unit(unew, get_equipment(equipment));
+            equip_unit(unew, equipment);
         }
         if (unew != u) {
             transfermen(unew, u, unew->number);

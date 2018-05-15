@@ -612,7 +612,7 @@ static void recruit_dracoids(unit * dragon, int size)
 
     name_unit(un);
     change_money(dragon, -un->number * 50);
-    equip_unit(un, get_equipment("new_dracoid"));
+    equip_unit(un, "new_dracoid");
 
     unit_setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
@@ -864,7 +864,7 @@ static int nrand(int handle_start, int sub)
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
     fset(u, UFL_ISNEW | UFL_MOVED);
-    equip_unit(u, get_equipment("seed_seaserpent"));
+    equip_unit(u, "seed_seaserpent");
     return u;
 }
 
@@ -903,7 +903,7 @@ void spawn_dragons(void)
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
             fset(u, UFL_ISNEW | UFL_MOVED);
-            equip_unit(u, get_equipment("seed_dragon"));
+            equip_unit(u, "seed_dragon");
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
@@ -965,7 +965,7 @@ void spawn_undead(void)
             fset(u, UFL_ISNEW | UFL_MOVED);
             if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
                 && rng_int() % 10 < 4) {
-                equip_unit(u, get_equipment("rising_undead"));
+                equip_unit(u, "rising_undead");
             }
 
             for (i = 0; i < MAXSKILLS; i++) {

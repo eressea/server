@@ -212,7 +212,6 @@ static void test_reset(void) {
     free_config();
     default_locale = 0;
     calendar_cleanup();
-    equipment_done();
     close_orders();
     free_special_directions();
     free_locales();
@@ -257,6 +256,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
     else {
         log_debug("start test in %s:%d", file, line);
     }
+    errno = 0;
 }
 
 void test_teardown(void)

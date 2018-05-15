@@ -30,7 +30,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "connection.h"
 #include "building.h"
 #include "direction.h"
-#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -564,7 +563,6 @@ void kernel_done(void)
     attrib_done();
     item_done();
     message_done();
-    equipment_done();
     reports_done();
     curses_done();
     crmessage_done();

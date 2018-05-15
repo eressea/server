@@ -124,3 +124,15 @@ function test_familiar()
         end
     end
 end
+
+function test_familiar_lynx()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r)
+    u.race = 'lynx'
+    u:equip('fam_lynx')
+    assert_equal(1, u:get_skill('stealth'))
+    assert_equal(1, u:get_skill('espionage'))
+    assert_equal(1, u:get_skill('magic'))
+    assert_equal(1, u:get_skill('perception'))
+end

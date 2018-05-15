@@ -12,7 +12,6 @@
 #include "races.h"
 
 #include <kernel/building.h>
-#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/pathfinder.h>
@@ -36,7 +35,7 @@ void age_skeleton(struct unit *u);
 void age_zombie(struct unit *u);
 void age_ghoul(struct unit *u);
 
-static void equip_newunits(const struct equipment *eq, struct unit *u)
+void equip_newunits(struct unit *u)
 {
     struct region *r = u->region;
     const struct resource_type *rtype;
@@ -81,8 +80,6 @@ static void equip_newunits(const struct equipment *eq, struct unit *u)
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {
-    register_function((pf_generic)equip_newunits, "equip_newunits");
-
     /* function age for race->age() */
     register_function((pf_generic)age_undead, "age_undead");
     register_function((pf_generic)age_skeleton, "age_skeleton");

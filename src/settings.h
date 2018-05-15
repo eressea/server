@@ -31,6 +31,5 @@
 /* Gebaeudegroesse = Minimalbelagerer */
 #define SIEGEFACTOR     2
 
-#define ENCCHANCE           10  /* %-Chance fuer einmalige Zufallsbegegnung */
 #define BAGCAPACITY         20000   /* soviel passt in einen Bag of Holding */
 #define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */

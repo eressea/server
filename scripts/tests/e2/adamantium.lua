@@ -7,7 +7,6 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
-    eressea.settings.set("rules.encounters", "0")
 end
 
 local function create_faction(race)
