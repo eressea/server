@@ -115,4 +115,5 @@ return {
     require('eressea.jsreport'),
     require('eressea.ents'),
     require('eressea.cursed'),
+    require('eressea.e2.familiars')
 }

@@ -114,20 +114,20 @@ function equip_unit(u, name, flags)
     if set then
         local items = set['items']
         if items then
-            for k,v in pairs(items) do
-                u:add_item(k, v * u.number)
+            for name, count in pairs(items) do
+                u:add_item(name, count * u.number)
             end
         end
         local skills = set['skills']
         if skills then
-            for k,v in pairs(skills) do
-                u:set_skill(k, v)
+            for name, level in pairs(skills) do
+                u:set_skill(name, level)
             end
         end
         local spells = set['spells']
         if spells then
-            for k, v in ipairs(spells) do
-                u:add_spell(v)
+            for name, level in ipairs(spells) do
+                u:add_spell(name, level)
             end
         end
         local callback = set['callback']
@@ -144,8 +144,8 @@ self.add = function(name, set)
 end
 
 self.add_multiple = function(sets)
-    for name, v in pairs(sets) do
-        mysets[name] = v
+    for name, set in pairs(sets) do
+        mysets[name] = set
     end
 end
 
