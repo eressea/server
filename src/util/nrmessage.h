@@ -14,6 +14,7 @@
 #define H_UTIL_NRMESSAGE
 
 #include <stddef.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,7 @@ extern "C" {
     int nr_level(const struct message *msg);
     const char *nr_section(const struct message *msg);
 
+    void export_messages(const struct locale * lang, FILE *F);
     /* before:
      * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.
      * after:

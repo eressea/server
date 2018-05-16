@@ -190,3 +190,14 @@ void free_nrmesssages(void) {
         }
     }
 }
+
+void export_messages(const struct locale * lang, FILE *F) {
+    int i;
+    for (i = 0; i != NRT_MAXHASH; ++i) {
+        nrmessage_type *nrt = nrtypes[i];
+        while (nrt) {
+            po_write_msg(F, nrt->mtype->name, nrt->string, "message");
+            nrt = nrt->next;
+        }
+    }
+}

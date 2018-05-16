@@ -56,6 +56,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/xml.h>
@@ -913,6 +914,25 @@ static int lua_rng_default(lua_State *L) {
     return 0;
 }
 
+static void export_locale(const struct locale *lang, const char *name) {
+    char fname[64];
+    FILE * F;
+
+    sprintf(fname, "strings.%s.po", name);
+    F = fopen(fname, "wt");
+    if (F) {
+        export_strings(lang, F);
+        export_messages(lang, F);
+        fclose(F);
+    }
+}
+
+static int tolua_export_locales(lua_State *L) {
+    UNUSED_ARG(L);
+    locale_foreach(export_locale);
+    return 0;
+}
+
 void tolua_bind_open(lua_State * L);
 
 int tolua_bindings_open(lua_State * L, const dictionary *inifile)
@@ -1030,6 +1050,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
         tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);
+        tolua_function(L, TOLUA_CAST "export_locales", tolua_export_locales);
     } tolua_endmodule(L);
     return 1;
 }
