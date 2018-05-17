@@ -1365,107 +1365,17 @@ static int parse_messages(xmlDocPtr doc)
         }
 
         propSection = xmlGetProp(node, BAD_CAST "section");
-        if (propSection == NULL)
+        if (propSection == NULL) {
             propSection = BAD_CAST default_section;
-
+        }
         nrt_register(mtype, (const char *)propSection);
 
-        /* strings */
-        xpath->node = node;
-        result = xmlXPathEvalExpression(BAD_CAST "text", xpath);
-        assert(result->nodesetval->nodeNr>0);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr node = result->nodesetval->nodeTab[k];
-            struct locale *lang;
-            xmlChar *propText;
-
-            xml_readtext(node, &lang, &propText);
-            if (lang) {
-                xml_cleanup_string(propText);
-                locale_setstring(lang, mtype->name, (const char *)propText);
-            }
-            xmlFree(propText);
-
-        }
-        xmlXPathFreeObject(result);
-
-        if (propSection != BAD_CAST default_section)
+        if (propSection != BAD_CAST default_section) {
             xmlFree(propSection);
+        }
     }
 
     xmlXPathFreeObject(messages);
-
-    xmlXPathFreeContext(xpath);
-    return results;
-}
-
-static void
-xml_readstrings(xmlXPathContextPtr xpath, xmlNodePtr * nodeTab, int nodeNr,
-bool names)
-{
-    int i;
-
-    for (i = 0; i != nodeNr; ++i) {
-        xmlNodePtr stringNode = nodeTab[i];
-        xmlChar *propName = xmlGetProp(stringNode, BAD_CAST "name");
-        xmlChar *propNamespace = NULL;
-        xmlXPathObjectPtr result;
-        int k;
-        char zName[128];
-
-        assert(propName != NULL);
-        if (names)
-            propNamespace = xmlGetProp(stringNode->parent, BAD_CAST "name");
-        mkname_buf((const char *)propNamespace, (const char *)propName, zName);
-        if (propNamespace != NULL)
-            xmlFree(propNamespace);
-        xmlFree(propName);
-
-        /* strings */
-        xpath->node = stringNode;
-        result = xmlXPathEvalExpression(BAD_CAST "text", xpath);
-        for (k = 0; k != result->nodesetval->nodeNr; ++k) {
-            xmlNodePtr textNode = result->nodesetval->nodeTab[k];
-            struct locale *lang;
-            xmlChar *propText;
-
-            xml_readtext(textNode, &lang, &propText);
-            if (propText != NULL) {
-                assert(strcmp(zName,
-                    (const char *)xml_cleanup_string(BAD_CAST zName)) == 0);
-                if (lang) {
-                    xml_cleanup_string(propText);
-                    locale_setstring(lang, zName, (const char *)propText);
-                }
-                xmlFree(propText);
-            }
-            else {
-                log_warning("string %s has no text in locale %s\n", zName, locale_name(lang));
-            }
-        }
-        xmlXPathFreeObject(result);
-    }
-}
-
-static int parse_strings(xmlDocPtr doc)
-{
-    xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-    xmlXPathObjectPtr strings;
-    int results = 0;
-
-    /* reading eressea/strings/string */
-    strings = xmlXPathEvalExpression(BAD_CAST "/eressea/strings/string", xpath);
-    xml_readstrings(xpath, strings->nodesetval->nodeTab,
-        strings->nodesetval->nodeNr, false);
-    results += strings->nodesetval->nodeNr;
-    xmlXPathFreeObject(strings);
-
-    strings =
-        xmlXPathEvalExpression(BAD_CAST "/eressea/strings/namespace/string", xpath);
-    xml_readstrings(xpath, strings->nodesetval->nodeTab,
-        strings->nodesetval->nodeNr, true);
-    results += strings->nodesetval->nodeNr;
-    xmlXPathFreeObject(strings);
 
     xmlXPathFreeContext(xpath);
     return results;
@@ -1482,6 +1392,5 @@ void register_xmlreader(void)
     xml_register_callback(parse_spellbooks);  /* requires spells */
     xml_register_callback(parse_spells); /* requires resources */
 
-    xml_register_callback(parse_strings);
     xml_register_callback(parse_messages);
 }
