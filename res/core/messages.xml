@@ -1650,7 +1650,7 @@
     <text locale="de">"$string"</text>
     <text locale="en">"$string"</text>
   </message>
-  <message name="battle_army" section="battle">
+  <message name="battle_army_index" section="battle">
     <type>
       <arg name="index" type="int"/>
       <arg name="name" type="string"/>
@@ -7184,13 +7184,6 @@
     </type>
     <text locale="de">"Einheiten nach dem Kampf:"</text>
     <text locale="en">"Units after the battle:"</text>
-  </message>
-  
-  <message name="section_battle" section="battle">
-    <type>
-    </type>
-    <text locale="de">""</text>
-    <text locale="en">""</text>
   </message>
   
   <message name="sp_wolfhowl_effect" section="battle">
