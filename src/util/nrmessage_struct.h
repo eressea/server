@@ -7,11 +7,8 @@
 
 typedef struct nrmessage_type {
   const struct message_type *mtype;
-  const struct locale *lang;
-  char *string;
   char *vars;
   struct nrmessage_type *next;
-  int level;
   const char *section;
 } nrmessage_type;
 

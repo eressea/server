@@ -512,14 +512,14 @@ static void report_crtypes(FILE * F, const struct locale *lang)
     for (i = 0; i != MTMAXHASH; ++i) {
         struct known_mtype *kmt;
         for (kmt = mtypehash[i]; kmt; kmt = kmt->nexthash) {
-            const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
+            const struct nrmessage_type *nrt = nrt_find(kmt->mtype);
             if (nrt) {
                 char buffer[DISPLAYSIZE];
                 int hash = (int)kmt->mtype->key;
                 assert(hash > 0);
                 fprintf(F, "MESSAGETYPE %d\n", hash);
                 fputc('\"', F);
-                fputs(str_escape(nrt_string(nrt), buffer, sizeof(buffer)), F);
+                fputs(str_escape(nrt_string(nrt, lang), buffer, sizeof(buffer)), F);
                 fputs("\";text\n", F);
                 fprintf(F, "\"%s\";section\n", nrt_section(nrt));
             }

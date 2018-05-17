@@ -1368,6 +1368,8 @@ static int parse_messages(xmlDocPtr doc)
         if (propSection == NULL)
             propSection = BAD_CAST default_section;
 
+        nrt_register(mtype, (const char *)propSection);
+
         /* strings */
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "text", xpath);
@@ -1380,8 +1382,7 @@ static int parse_messages(xmlDocPtr doc)
             xml_readtext(node, &lang, &propText);
             if (lang) {
                 xml_cleanup_string(propText);
-                nrt_register(mtype, lang, (const char *)propText, 0,
-                    (const char *)propSection);
+                locale_setstring(lang, mtype->name, (const char *)propText);
             }
             xmlFree(propText);
 

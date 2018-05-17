@@ -86,7 +86,7 @@ function test_aurapotion50()
     turn_begin()
     turn_process()
     assert_equal(0, u:get_item("aurapotion50"))
-    assert_equal(1, f:count_msg_type('aurapotion50'))
+    assert_equal(1, f:count_msg_type('aurapotion50_effect'))
     assert_equal(50, u.aura)
     turn_end()
 end

@@ -750,38 +750,6 @@
     <text locale="de">"$unit($unit) hat Glück und findet einen Hort von $int($amount) $resource($item,$amount)."</text>
     <text locale="en">"$unit($unit) luckily finds a cache of $int($amount) $resource($item,$amount)."</text>
   </message>
-  <message name="birthday_firework_noname_local" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-    </type>
-    <text locale="de">"$unit($unit) brennt ein großes Feuerwerk ab und Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
-    <text locale="en">"A large firework is visible all over the sky."</text>
-  </message>
-  <message name="birthday_firework_noname" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-    </type>
-    <text locale="de">"In $region($region) wird ein großes Feuerwerk abgebrannt, welches noch hier zu bewundern ist. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
-    <text locale="en">"A large firework, visible all over the sky, has been started in $region($region)."</text>
-  </message>
-  <message name="birthday_firework_local" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="name" type="string"/>
-    </type>
-    <text locale="de">"Zur Feier des Geburtstags von ${name} brennt $unit($unit) ein großes Feuerwerk ab. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
-    <text locale="en">"A large firework in honor of ${name} is visible all over the sky."</text>
-  </message>
-  <message name="birthday_firework" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="name" type="string"/>
-    </type>
-    <text locale="de">"Zur Feier des Geburtstags von ${name} wird in $region($region) ein großes Feuerwerk abgebrannt, welches noch hier zu bewundern ist. Kaskaden bunter Sterne, leuchtende Wasserfälle aus Licht und strahlende Feuerdrachen erhellen den Himmel."</text>
-    <text locale="en">"A large firework in honor of ${name}, visible all over the sky, has been started in $region($region)."</text>
-  </message>
   <message name="battle_critical" section="battle">
     <type>
       <arg name="unit" type="unit"/>
@@ -7628,7 +7596,7 @@
     <text locale="en">"$unit($unit) in $region($region): '$order($command)' - The $ship($ship) will now be faster."</text>
   </message>
 
-  <message name="aurapotion50" section="magic">
+  <message name="aurapotion50_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
