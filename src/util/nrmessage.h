@@ -47,14 +47,7 @@ extern "C" {
     int nr_level(const struct message *msg);
     const char *nr_section(const struct message *msg);
 
-    void export_messages(const struct locale * lang, FILE *F);
-    /* before:
-     * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.
-     * after:
-     * fogblock:movement:0
-     * $unit($unit) konnte von $region($region) nicht nach $direction($direction) ausreisen, der Nebel war zu dicht.
-     * unit:unit region:region direction:int
-     */
+    void export_messages(const struct locale * lang, FILE *F, const char *context);
 
 #ifdef __cplusplus
 }
