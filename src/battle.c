@@ -2886,7 +2886,7 @@ static void print_stats(battle * b)
             message *msg;
             char buf[1024];
 
-            msg = msg_message("battle_army_index", "index name", army_index(s), sname);
+            msg = msg_message("para_army_index", "index name", army_index(s), sname);
             battle_message_faction(b, f, msg);
             msg_release(msg);
 
@@ -3497,9 +3497,9 @@ static int battle_report(battle * b)
         sbs_init(&sbs, buf, sizeof(buf));
 
         if (cont)
-            m = msg_message("lineup_battle", "turn", b->turn);
+            m = msg_message("para_lineup_battle", "turn", b->turn);
         else
-            m = msg_message("after_battle", "");
+            m = msg_message("para_after_battle", "");
         battle_message_faction(b, fac, m);
         msg_release(m);
 

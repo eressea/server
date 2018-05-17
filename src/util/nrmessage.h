@@ -43,6 +43,8 @@ extern "C" {
         char *buffer, size_t size, const void *userdata);
     const char *nr_section(const struct message *msg);
 
+    void export_messages(const struct locale * lang, FILE *F, const char *msgctxt);
+
 #ifdef __cplusplus
 }
 #endif

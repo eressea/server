@@ -1650,7 +1650,7 @@
     <text locale="de">"$string"</text>
     <text locale="en">"$string"</text>
   </message>
-  <message name="battle_army_index" section="battle">
+  <message name="para_army_index" section="battle">
     <type>
       <arg name="index" type="int"/>
       <arg name="name" type="string"/>
@@ -7179,7 +7179,7 @@
     <text locale="en">"$unit($mage) casts $spell($spell), but nobody was in range."</text>
   </message>
 
-  <message name="after_battle" section="battle">
+  <message name="para_after_battle" section="battle">
     <type>
     </type>
     <text locale="de">"Einheiten nach dem Kampf:"</text>
@@ -7245,7 +7245,7 @@
     <text locale="en">"$unit($mage) causes the walls of $building($building) to glow in an eerie magic light."</text>
   </message>
   
-  <message name="lineup_battle" section="battle">
+  <message name="para_lineup_battle" section="battle">
     <type>
       <arg name="turn" type="int"/>
     </type>

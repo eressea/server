@@ -32,7 +32,12 @@ static nrmessage_type *nrtypes[NRT_MAXHASH];
 
 const char *nrt_string(const struct nrmessage_type *nrt, const struct locale *lang)
 {
-    return locale_getstring(lang, nrt->mtype->name);
+    const char * str = locale_getstring(lang, nrt->mtype->name);
+    if (!str) {
+        str = locale_getstring(default_locale, nrt->mtype->name);
+    }
+    assert(str);
+    return str;
 }
 
 nrmessage_type *nrt_find(const struct message_type * mtype)
@@ -166,6 +171,17 @@ void free_nrmesssages(void) {
             nrtypes[i] = nr->next;
             free(nr->vars);
             free(nr);
+        }
+    }
+}
+
+void export_messages(const struct locale * lang, FILE *F, const char *msgctxt) {
+    int i;
+    for (i = 0; i != NRT_MAXHASH; ++i) {
+        nrmessage_type *nrt = nrtypes[i];
+        while (nrt) {
+            po_write_msg(F, nrt->mtype->name, nrt_string(nrt, lang), msgctxt);
+            nrt = nrt->next;
         }
     }
 }

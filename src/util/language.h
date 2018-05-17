@@ -58,7 +58,6 @@ extern "C" {
     void make_locales(const char *str);
 
     void locale_foreach(void(*callback)(const struct locale *lang, const char *name));
-    void export_strings(const struct locale * lang, FILE *F);
     void po_write_msg(FILE *F, const char *id, const char *str, const char *ctxt);
 
 #define LOC(lang, s) (lang?locale_string(lang, s, true):s)
