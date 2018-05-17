@@ -45,6 +45,7 @@ without prior permission by the authors of Eressea.
 #include "keyword.h"
 #include "move.h"
 #include "prefix.h"
+#include "pofile.h"
 #include "skill.h"
 
 /* external libraries */
@@ -1020,6 +1021,40 @@ static int include_xml(const char *uri) {
     return err;
 }
 
+static int add_po_string(const char *msgid, const char *msgstr, const char *msgctxt, void *data) {
+    struct locale * lang = (struct locale *)data;
+    const char * key = msgid;
+    if (msgctxt) {
+        key = mkname(msgctxt, msgid);
+    }
+    locale_setstring(lang, key, msgstr);
+    return 0;
+}
+
+static int include_po(const char *uri) {
+    char name[PATH_MAX], lname[8];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    const char *pos = strstr(filename, ".po");
+    if (pos) {
+        const char *str = --pos;
+        while (str > filename && *str != '.') --str;
+        if ((pos - str) < sizeof(lname)) {
+            struct locale * lang;
+            memcpy(lname, str+1, pos - str);
+            lname[pos - str] = 0;
+            lang = get_or_create_locale(lname);
+            if (lang) {
+                int err = pofile_read(filename, add_po_string, lang);
+                if (err < 0) {
+                    log_error("could not parse XML from %s", uri);
+                }
+                return err;
+            }
+        }
+    }
+    return -1;
+}
+
 static void json_include(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
@@ -1030,7 +1065,10 @@ static void json_include(cJSON *json) {
         const char *uri = child->valuestring;
         int err;
 
-        if (strstr(uri, ".xml") != NULL) {
+        if (strstr(uri, ".po") != NULL) {
+            err = include_po(uri);
+        }
+        else if (strstr(uri, ".xml") != NULL) {
             err = include_xml(uri);
         }
         else {

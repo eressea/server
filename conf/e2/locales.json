@@ -1,8 +1,8 @@
 {
     "include": [
+      "config://res/translations/strings.de.po",
+      "config://res/translations/strings.en.po",
       "config://res/core/messages.xml",
-      "config://res/core/de/strings.xml",
-      "config://res/core/en/strings.xml",
       "config://res/eressea/strings.xml",
       "config://res/eressea/spellinfo.xml",
       "config://res/names-undead.xml",
