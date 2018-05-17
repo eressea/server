@@ -3,9 +3,8 @@
 #endif
 
 #include "pofile.h"
-
-#include "util/log.h"
-#include "util/strings.h"
+#include "log.h"
+#include "strings.h"
 
 #include <ctype.h>
 #include <stdio.h>

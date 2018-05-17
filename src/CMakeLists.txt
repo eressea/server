@@ -126,7 +126,6 @@ set (ERESSEA_SRC
   summary.c
   travelthru.c
   monsters.c
-  pofile.c
   wormhole.c
   xmlreader.c
   ${SPELLS_SRC}

@@ -37,6 +37,7 @@ without prior permission by the authors of Eressea.
 #include "util/message.h"
 #include "util/nrmessage.h"
 #include "util/path.h"
+#include "util/pofile.h"
 #include "util/strings.h"
 #include "util/xml.h"
 
@@ -45,7 +46,6 @@ without prior permission by the authors of Eressea.
 #include "keyword.h"
 #include "move.h"
 #include "prefix.h"
-#include "pofile.h"
 #include "skill.h"
 
 /* external libraries */
