@@ -32,7 +32,10 @@ static nrmessage_type *nrtypes[NRT_MAXHASH];
 
 const char *nrt_string(const struct nrmessage_type *type)
 {
-    return type->string;
+    if (type->string) {
+        return type->string;
+    }
+    return locale_get(type->lang, type->mtype->name);
 }
 
 nrmessage_type *nrt_find(const struct locale * lang,
@@ -148,7 +151,7 @@ size_t size, const void *userdata)
 
     if (nrt) {
         const char *m =
-            translate(nrt->string, userdata, nrt->vars, msg->parameters);
+            translate(nrt_string(nrt), userdata, nrt->vars, msg->parameters);
         if (m) {
             return str_strlcpy((char *)buffer, m, size);
         }

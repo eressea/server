@@ -3,7 +3,10 @@ msgstr "Rostiges Kettenhemd"
 
 msgctxt "spellinfo"
 msgid "destroy_magic"
-msgstr "Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, eines Schiffes, Gebäudes oder auch der Region aufzulösen."
+msgstr ""
+"Dieser Zauber ermöglicht dem Magier, Verzauberungen "
+"einer Einheit, eines Schiffes, Gebäudes oder auch "
+"der Region aufzulösen."
 
 msgctxt "spell"
 msgid "shadowknights"

@@ -10,12 +10,23 @@ This program may not be used, modified or distributed
 without prior permission by the authors of Eressea.
 */
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 
 #include "xmlreader.h"
 
+#include "alchemy.h"
+#include "guard.h"
+#include "keyword.h"
+#include "move.h"
+#include "prefix.h"
+
+#include "attributes/attributes.h"
+#include "modules/score.h"
+
 #include "kernel/building.h"
+#include "kernel/calendar.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/race.h"
@@ -27,26 +38,15 @@ without prior permission by the authors of Eressea.
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 
-#include "alchemy.h"
-#include "kernel/calendar.h"
-#include "guard.h"
-#include "keyword.h"
-#include "move.h"
-#include "prefix.h"
-
-#include <modules/score.h>
-#include <attributes/attributes.h>
-
-/* util includes */
-#include <util/attrib.h>
-#include <util/crmessage.h>
-#include <util/functions.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/message.h>
-#include <util/nrmessage.h>
-#include <util/strings.h>
-#include <util/xml.h>
+#include "util/attrib.h"
+#include "util/crmessage.h"
+#include "util/functions.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/message.h"
+#include "util/nrmessage.h"
+#include "util/strings.h"
+#include "util/xml.h"
 
 /* libxml includes */
 #include <libxml/tree.h>

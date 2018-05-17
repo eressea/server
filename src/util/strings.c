@@ -270,3 +270,38 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
     }
     sbs->end = sbs->begin + len;
 }
+
+char *str_unescape(char *str) {
+    char *read = str, *write = str;
+    while (*read) {
+        char * pos = strchr(read, '\\');
+        if (pos) {
+            size_t len = pos - read;
+            memmove(write, read, len);
+            write += len;
+            read += (len + 1);
+            switch (read[0]) {
+            case 'r':
+                *write++ = '\r';
+                break;
+            case 'n':
+                *write++ = '\n';
+                break;
+            case 't':
+                *write++ = '\t';
+                break;
+            default: 
+                *write++ = read[0];
+            }
+            *write = 0;
+            ++read;
+        }
+        else {
+            size_t len = strlen(read);
+            memmove(write, read, len);
+            write[len] = 0;
+            break;
+        }
+    }
+    return str;
+}
