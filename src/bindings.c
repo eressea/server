@@ -922,8 +922,16 @@ static void export_locale(const struct locale *lang, const char *name) {
     F = fopen(fname, "wt");
     if (F) {
         export_messages(lang, F, NULL);
+    }
+#if 0
+    /* disabled, because it also export message text */
+    sprintf(fname, "strings.%2s.po", name);
+    F = fopen(fname, "wt");
+    if (F) {
+        export_strings(lang, F);
         fclose(F);
     }
+#endif
 }
 
 static int tolua_export_locales(lua_State *L) {
