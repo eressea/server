@@ -10,18 +10,6 @@ msgstr "Heilige Nußhälfte"
 msgid "rpg_item_3"
 msgstr "Flaschengeist Zhardamon"
 
-msgctxt "keyword"
-msgid "entertain"
-msgstr "UNTERHALTE"
-
-msgctxt "keyword"
-msgid "default"
-msgstr "DEFAULT"
-
-msgctxt "keyword"
-msgid "reserve"
-msgstr "RESERVIERE"
-
 msgctxt "spell"
 msgid "create_potion_p0"
 msgstr "Braue Siebenmeilentee"
@@ -50,24 +38,8 @@ msgctxt "spellinfo"
 msgid "create_potion_peasantblood"
 msgstr "Zu dem gefährlichsten und geheimsten Wissen der Magier zählt das Wissen über die Macht des Todes. Auch wenn die meisten es nicht zugeben, so fasziniert dieses Thema jeden Magier. Früher oder später beschäftigen sich alle mit diesem teilweise verbotenen Gebiet. Sodann werden sie feststellen, dass es noch eine weitere Ebene der Existenz gibt, in der die Dämonen beheimatet sind. Nur Blut allein vermag den Hunger dieser Wesen zu befriedigen, wenn sie ihre Ebene verlassen und unsere betreten. Erfahrene Magier werden jedoch feststellen, dass man den Blutwein, den die Dämonen zu sich nehmen, strecken kann, so dass davon 100 anstatt nur 10 Dämonen satt werden. Da die Dämonen davon jedoch nichts wissen dürfen, muss der Magier selbst klammheimlich einen seiner urplötzlich verfügbar gewordenen Untergebenen opfern. "
 
-msgctxt "keyword"
-msgid "forget"
-msgstr "VERGISS"
-
 msgid "scaffolding"
 msgstr "Gerüst"
-
-msgctxt "keyword"
-msgid "origin"
-msgstr "URSPRUNG"
-
-msgctxt "keyword"
-msgid "pay"
-msgstr "BEZAHLE"
-
-msgctxt "keyword"
-msgid "buy"
-msgstr "KAUFE"
 
 msgctxt "spellinfo"
 msgid "raindance"
@@ -89,10 +61,6 @@ msgctxt "spell"
 msgid "create_potion_ointment"
 msgstr "Braue Wundsalbe"
 
-msgctxt "keyword"
-msgid "email"
-msgstr "EMAIL"
-
 msgctxt "spell"
 msgid "create_potion_healing"
 msgstr "Braue Heiltrank"
@@ -100,20 +68,8 @@ msgstr "Braue Heiltrank"
 msgid "frigate_a"
 msgstr "eine Fregatte"
 
-msgctxt "keyword"
-msgid "message"
-msgstr "BOTSCHAFT"
-
-msgctxt "keyword"
-msgid "claim"
-msgstr "BEANSPRUCHE"
-
 msgid "trireme"
 msgstr "Trireme"
-
-msgctxt "keyword"
-msgid "alliance"
-msgstr "ALLIANZ"
 
 msgctxt "spellinfo"
 msgid "create_potion_healing"
@@ -126,17 +82,9 @@ msgctxt "spellinfo"
 msgid "create_potion_p13"
 msgstr "Ebenso wie das Wissen über den Tod ist das Wissen über gewisse Monster bei der abergläubigen Bevölkerung nicht gerne gesehen. Einige wenige Krieger jedoch, die diesen Kreaturen schon mal im Kampf gegenüberstanden, haben entdeckt, dass deren Blut eine belebende Wirkung auf sie hatte. So soll es schon Krieger gegeben haben, die im Blut der erschlagenen Monster badeten, um deren Stärke in sich aufzunehmen. Diese Wirkung verfliegt jedoch rasch und wirkt nur bei frischen Blut. Da niemand vor dem Kampf gegen seinen Nachbarn die Zeit hat, schnell noch einen Wyrm zu erschlagen, musste ein Weg gefunden werden, die Wirkung haltbar zu machen. Manasouf dem Schwarzen gelang dies nach zahlreichen Experimenten, die das Leben vieler guter Männer kosteten, welche ständig neues Drachenblut für seine Versuche beschaffen mussten. Ursprünglich ein streng gehütetes Geheimnis ist das Rezept inzwischen im ganzen Land bekannt. Zunächst muss geronnenes Drachenblut in heißem Zinn verflüssigt werden. Anschließend wird der Geist des erschlagenen Drachen in der Geisterebene wieder an sein Blut gebunden und kann so lange nicht in Frieden ruhen, bis das letzte bisschen seines Blutes verbraucht wurde."
 
-msgctxt "keyword"
-msgid "follow"
-msgstr "FOLGE"
-
 msgctxt "spellinfo"
 msgid "earn_silver#gwyrrd"
 msgstr "Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei den Bauern sehr begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen besseren Preis zu verkaufen. Pro Stufe kann der Magier so 25 Silber verdienen."
-
-msgctxt "keyword"
-msgid "study"
-msgstr "LERNE"
 
 msgctxt "describe"
 msgid "lifepotion"
@@ -154,20 +102,8 @@ msgstr "Adamantiumrüstungen"
 msgid "cutter"
 msgstr "Kutter"
 
-msgctxt "keyword"
-msgid "hide"
-msgstr "TARNE"
-
-msgctxt "keyword"
-msgid "move"
-msgstr "NACH"
-
 msgid "caravel_a"
 msgstr "eine Karavelle"
-
-msgctxt "keyword"
-msgid "describe"
-msgstr "BESCHREIBE"
 
 msgctxt "spellinfo"
 msgid "blessedharvest"
@@ -179,45 +115,17 @@ msgstr "Adamantiumaxt"
 msgid "charger_p"
 msgstr "Streitrösser"
 
-msgctxt "keyword"
-msgid "password"
-msgstr "PASSWORT"
-
 msgid "raft"
 msgstr "Floß"
 
 msgid "guardhouse"
 msgstr "Wachstube"
 
-msgctxt "keyword"
-msgid "attack"
-msgstr "ATTACKIERE"
-
 msgid "caravel"
 msgstr "Karavelle"
 
 msgid "canoe"
 msgstr "Einbaum"
-
-msgctxt "keyword"
-msgid "leave"
-msgstr "VERLASSE"
-
-msgctxt "keyword"
-msgid "option"
-msgstr "OPTION"
-
-msgctxt "keyword"
-msgid "spy"
-msgstr "SPIONIERE"
-
-msgctxt "keyword"
-msgid "loot"
-msgstr "PLÜNDERE"
-
-msgctxt "keyword"
-msgid "guard"
-msgstr "BEWACHE"
 
 msgctxt "morale"
 msgid "0"
@@ -265,10 +173,6 @@ msgstr "Repetierarmbrust"
 msgid "packice"
 msgstr "Packeis"
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BELAGERE"
-
 msgctxt "spellinfo"
 msgid "commonfamiliar"
 msgstr "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem Magier anschließen wird."
@@ -279,23 +183,11 @@ msgstr "eine Trireme"
 msgid "royalbarge_a"
 msgstr "eine Königsbarke"
 
-msgctxt "keyword"
-msgid "recruit"
-msgstr "REKRUTIERE"
-
-msgctxt "keyword"
-msgid "steal"
-msgstr "BEKLAUE"
-
 msgid "adamantiumaxe_p"
 msgstr "Adamantiumäxte"
 
 msgid "rpg_item_2_p"
 msgstr "Nußhälften"
-
-msgctxt "keyword"
-msgid "name"
-msgstr "BENENNE"
 
 msgid "watch"
 msgstr "Wache"
@@ -304,40 +196,12 @@ msgctxt "spellinfo"
 msgid "earn_silver#draig"
 msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll: niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 25 Silber pro Stufe ein."
 
-msgctxt "keyword"
-msgid "//"
-msgstr "//"
-
-msgctxt "keyword"
-msgid "enter"
-msgstr "BETRETE"
-
-msgctxt "keyword"
-msgid "work"
-msgstr "ARBEITE"
-
 msgid "catamaran"
 msgstr "Katamaran"
-
-msgctxt "keyword"
-msgid "cast"
-msgstr "ZAUBERE"
-
-msgctxt "keyword"
-msgid "destroy"
-msgstr "ZERSTÖRE"
 
 msgctxt "spell"
 msgid "create_potion_p13"
 msgstr "Braue Elixier der Macht"
-
-msgctxt "keyword"
-msgid "ride"
-msgstr "FAHRE"
-
-msgctxt "keyword"
-msgid "sort"
-msgstr "SORTIERE"
 
 msgctxt "spellinfo"
 msgid "create_potion_ointment"
@@ -346,23 +210,11 @@ msgstr "Nach einem harten Kampf sollte man sich heilen lassen. Diese Möglichkei
 msgid "packice_trail"
 msgstr "%s"
 
-msgctxt "keyword"
-msgid "number"
-msgstr "NUMMER"
-
 msgid "cog_a"
 msgstr "eine Kogge"
 
-msgctxt "keyword"
-msgid "group"
-msgstr "GRUPPE"
-
 msgid "canoe_a"
 msgstr "ein Einbaum"
-
-msgctxt "keyword"
-msgid "carry"
-msgstr "TRANSPORTIERE"
 
 msgid "galleon_a"
 msgstr "eine Galeone"
@@ -372,22 +224,6 @@ msgstr "Turmschilde"
 
 msgid "cutter_a"
 msgstr "ein Kutter"
-
-msgctxt "keyword"
-msgid "make"
-msgstr "MACHE"
-
-msgctxt "keyword"
-msgid "route"
-msgstr "ROUTE"
-
-msgctxt "keyword"
-msgid "ready"
-msgstr "KAMPFZAUBER"
-
-msgctxt "keyword"
-msgid "help"
-msgstr "HELFE"
 
 msgid "royalbarge"
 msgstr "Königsbarke"
@@ -399,77 +235,29 @@ msgstr "Vertrauten binden"
 msgid "barge"
 msgstr "Barke"
 
-msgctxt "keyword"
-msgid "grow"
-msgstr "ZÜCHTE"
-
 msgctxt "spell"
 msgid "create_potion_peasantblood"
 msgstr "Braue Bauernblut"
-
-msgctxt "keyword"
-msgid "banner"
-msgstr "BANNER"
-
-msgctxt "keyword"
-msgid "use"
-msgstr "BENUTZE"
 
 msgctxt "spellinfo"
 msgid "earn_silver#cerddor"
 msgstr "Cerddormagier sind _die_ Gaukler unter den Magiern; sie lieben es, das Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen die kleinen Kunststücke und magischen Tricks, mit denen man das Volk locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und am Ende der Woche wird der Gaukler 25 Silber pro Stufe verdient haben."
 
-msgctxt "keyword"
-msgid "tax"
-msgstr "TREIBE"
-
-msgctxt "keyword"
-msgid "promote"
-msgstr "BEFÖRDERE"
-
 msgctxt "spellinfo"
 msgid "earn_silver#illaun"
 msgstr "Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch die Kunst der Wahrsagerei, des Kartenlegens und des Handlesens sind ihm geläufig. Dafür zahlen ihm die Bauern 25 Silber pro Stufe."
 
-msgctxt "keyword"
-msgid "sell"
-msgstr "VERKAUFE"
-
 msgid "rpg_item_1_p"
 msgstr "Urkunden"
-
-msgctxt "keyword"
-msgid "contact"
-msgstr "KONTAKT"
 
 msgid "guardtower"
 msgstr "Wachturm"
 
-msgctxt "keyword"
-msgid "plant"
-msgstr "PFLANZE"
-
 msgid "raft_a"
 msgstr "ein Floß"
 
-msgctxt "keyword"
-msgid "give"
-msgstr "GIB"
-
-msgctxt "keyword"
-msgid "prefix"
-msgstr "PRÄFIX"
-
-msgctxt "keyword"
-msgid "show"
-msgstr "ZEIGE"
-
 msgid "dragonship"
 msgstr "Drachenschiff"
-
-msgctxt "keyword"
-msgid "piracy"
-msgstr "PIRATERIE"
 
 msgid "galleon"
 msgstr "Galeone"
@@ -479,10 +267,6 @@ msgstr "Turmschild"
 
 msgid "rm_adamantium"
 msgstr "Adamantium"
-
-msgctxt "keyword"
-msgid "research"
-msgstr "FORSCHE"
 
 msgid "adamantium_p"
 msgstr "Adamantium"
@@ -510,33 +294,9 @@ msgctxt "spellinfo"
 msgid "earn_silver#tybied"
 msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat -- nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 25 Silber pro Stufe lassen sich so in einer Woche verdienen."
 
-msgctxt "keyword"
-msgid "teach"
-msgstr "LEHRE"
-
-msgctxt "keyword"
-msgid "combat"
-msgstr "KÄMPFE"
-
-msgctxt "keyword"
-msgid "sabotage"
-msgstr "SABOTIERE"
-
-msgctxt "keyword"
-msgid "maketemp"
-msgstr "MACHE TEMP"
-
 msgid "market"
 msgstr "Marktplatz"
 
 msgid "rep_crossbow_p"
 msgstr "Repetierarmbrüste"
-
-msgctxt "keyword"
-msgid "quit"
-msgstr "STIRB"
-
-msgctxt "keyword"
-msgid "end"
-msgstr "ENDE"
 
