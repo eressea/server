@@ -881,12 +881,6 @@
   <string name="mallornseed_p">
     <text locale="fr">graines de mallorn</text>
   </string>
-  <string name="birthday_firework">
-    <text locale="fr">feu d'artifice</text>
-  </string>
-  <string name="birthday_firework_p">
-    <text locale="fr">feux d'artifice</text>
-  </string>
   <string name="lebkuchenherz">
     <text locale="fr">coeur de pain d'épices</text>
   </string>

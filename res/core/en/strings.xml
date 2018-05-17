@@ -874,12 +874,6 @@
   <string name="mallornseed_p">
     <text locale="en">mallorn seeds</text>
   </string>
-  <string name="birthday_firework">
-    <text locale="en">firework</text>
-  </string>
-  <string name="birthday_firework_p">
-    <text locale="en">fireworks</text>
-  </string>
   <string name="lebkuchenherz">
     <text locale="en">gingerbread heart</text>
   </string>

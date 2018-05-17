@@ -258,29 +258,6 @@ void po_write_msg(FILE *F, const char *id, const char *str, const char *ctxt) {
     fputs("\"\n\n", F);
 }
 
-void export_strings(const struct locale * lang, FILE *F) {
-    int i;
-
-    for (i = 0; i != SMAXHASH; ++i) {
-        const struct locale_str *find = lang->strings[i];
-        while (find) {
-            const char *dcolon = strstr(find->key, "::");
-            if (dcolon) {
-                size_t len = dcolon - find->key;
-                char ctxname[16];
-                assert(sizeof(ctxname) > len);
-                memcpy(ctxname, find->key, len);
-                ctxname[len] = '\0';
-                po_write_msg(F, dcolon + 2, find->str, ctxname);
-            }
-            else {
-                po_write_msg(F, find->key, find->str, NULL);
-            }
-            find = find->nexthash;
-        }
-    }
-}
-
 const char *locale_name(const locale * lang)
 {
     return lang ? lang->name : "(null)";

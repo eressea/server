@@ -34,20 +34,16 @@ extern "C" {
 
     void free_nrmesssages(void);
 
-    void nrt_register(const struct message_type *mtype,
-        const struct locale *lang, const char *script,
-        int level, const char *section);
-    struct nrmessage_type *nrt_find(const struct locale *,
-        const struct message_type *);
-    const char *nrt_string(const struct nrmessage_type *type);
-    const char *nrt_section(const struct nrmessage_type *mt);
+    void nrt_register(const struct message_type *mtype, const char *section);
+    struct nrmessage_type *nrt_find(const struct message_type *);
+    const char *nrt_string(const struct nrmessage_type *nrt, const struct locale *lang);
+    const char *nrt_section(const struct nrmessage_type *nrt);
 
     size_t nr_render(const struct message *msg, const struct locale *lang,
         char *buffer, size_t size, const void *userdata);
-    int nr_level(const struct message *msg);
     const char *nr_section(const struct message *msg);
 
-    void export_messages(const struct locale * lang, FILE *F, const char *context);
+    void export_messages(const struct locale * lang, FILE *F, const char *msgctxt);
 
 #ifdef __cplusplus
 }

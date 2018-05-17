@@ -918,12 +918,6 @@ static void export_locale(const struct locale *lang, const char *name) {
     char fname[64];
     FILE * F;
 
-    sprintf(fname, "strings.%2s.po", name);
-    F = fopen(fname, "wt");
-    if (F) {
-        export_strings(lang, F);
-        fclose(F);
-    }
     sprintf(fname, "messages.%2s.po", name);
     F = fopen(fname, "wt");
     if (F) {
