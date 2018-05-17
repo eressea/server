@@ -1036,12 +1036,14 @@ static int include_po(const char *uri) {
     const char *filename = uri_to_file(uri, name, sizeof(name));
     const char *pos = strstr(filename, ".po");
     if (pos) {
+        size_t len;
         const char *str = --pos;
         while (str > filename && *str != '.') --str;
-        if ((pos - str) < sizeof(lname)) {
+        len = (size_t)(pos - str);
+        if (len < sizeof(lname)) {
             struct locale * lang;
-            memcpy(lname, str+1, pos - str);
-            lname[pos - str] = 0;
+            memcpy(lname, str+1, len);
+            lname[len] = 0;
             lang = get_or_create_locale(lname);
             if (lang) {
                 int err = pofile_read(filename, add_po_string, lang);

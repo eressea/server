@@ -83,16 +83,6 @@ static variant xml_fraction(xmlNodePtr node, const char *name) {
     return frac_make(0, 1);
 }
 
-static void xml_readtext(xmlNodePtr node, struct locale **lang, xmlChar ** text)
-{
-    xmlChar *propValue = xmlGetProp(node, BAD_CAST "locale");
-    assert(propValue != NULL);
-    *lang = get_locale((const char *)propValue);
-    xmlFree(propValue);
-
-    *text = xmlNodeListGetString(node->doc, node->children, 1);
-}
-
 static spellref *xml_spellref(xmlNode * node, const char *name)
 {
     xmlChar *propValue = xmlGetProp(node, BAD_CAST name);
@@ -102,31 +92,6 @@ static spellref *xml_spellref(xmlNode * node, const char *name)
         return ref;
     }
     return NULL;
-}
-
-static xmlChar *xml_cleanup_string(xmlChar * str)
-{
-    xmlChar *read = str;
-    xmlChar *write = str;
-
-    while (*read) {
-        /* eat leading whitespace */
-        if (*read && isspace(*read)) {
-            while (*read && isspace(*read)) {
-                ++read;
-            }
-            *write++ = ' ';
-        }
-        while (*read) {
-            if (*read == '\n')
-                break;
-            if (*read == '\r')
-                break;
-            *write++ = *read++;
-        }
-    }
-    *write = 0;
-    return str;
 }
 
 static resource_mod * xml_readmodifiers(xmlXPathObjectPtr result, xmlNodePtr node) {
