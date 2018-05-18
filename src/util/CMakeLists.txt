@@ -28,7 +28,6 @@ log.test.c
 umlaut.test.c
 unicode.test.c
 variant.test.c
-# xml.test.c
 )
 
 SET(_FILES
@@ -59,7 +58,6 @@ translation.c
 umlaut.c
 unicode.c
 variant.c
-xml.c
 )
 
 FOREACH(_FILE ${_FILES})
