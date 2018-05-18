@@ -79,16 +79,9 @@ message_type *mt_new(const char *name, const char *args[])
     mtype->name = str_strdup(name);
     mtype->nparameters = nparameters;
     if (nparameters > 0) {
+        int i;
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
         mtype->types = (arg_type **)malloc(sizeof(arg_type *) * nparameters);
-    }
-    else {
-        mtype->pnames = NULL;
-        mtype->types = NULL;
-    }
-    if (args != NULL) {
-        int i;
-
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -109,6 +102,10 @@ message_type *mt_new(const char *name, const char *args[])
                 mtype->types[i] = atype;
             }
         }
+    }
+    else {
+        mtype->pnames = NULL;
+        mtype->types = NULL;
     }
     return mtype;
 }

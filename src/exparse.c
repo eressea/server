@@ -16,6 +16,7 @@
 
 #include "util/functions.h"
 #include "util/log.h"
+#include "util/message.h"
 #include "util/strings.h"
 
 #include <expat.h>
@@ -47,7 +48,6 @@ enum {
     EXP_SHIPS,
     EXP_RACES,
     EXP_MESSAGES,
-    EXP_STRINGS,
     EXP_SPELLS,
     EXP_SPELLBOOKS,
 };
@@ -283,6 +283,25 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
         }
     }
     wtype->flags = flags;
+}
+
+static void XMLCALL start_messages(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    if (xml_strcmp(el, "message") == 0) {
+        const XML_Char *name = NULL, *section = NULL;
+        int i;
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "name") == 0) {
+                name = val;
+            }
+            else if (xml_strcmp(key, "section") == 0) {
+                section = val;
+            }
+        }
+        if (name) {
+            pi->object = mt_new(name, NULL);
+        }
+    }
 }
 
 #define MAX_COMPONENTS 8
@@ -1192,9 +1211,6 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
         else if (xml_strcmp(el, "messages") == 0) {
             pi->type = EXP_MESSAGES;
         }
-        else if (xml_strcmp(el, "strings") == 0) {
-            pi->type = EXP_STRINGS;
-        }
         else if (xml_strcmp(el, "spells") == 0) {
             pi->type = EXP_SPELLS;
         }
@@ -1231,6 +1247,9 @@ static void XMLCALL handle_start(void *data, const XML_Char *el, const XML_Char 
             break;
         case EXP_SPELLS:
             start_spells(pi, el, attr);
+            break;
+        case EXP_MESSAGES:
+            start_messages(pi, el, attr);
             break;
         case EXP_UNKNOWN:
             handle_bad_input(pi, el, NULL);

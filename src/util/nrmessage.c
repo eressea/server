@@ -27,10 +27,10 @@
 #include <stdlib.h>
 
 typedef struct nrmessage_type {
-  const struct message_type *mtype;
-  char *vars;
-  struct nrmessage_type *next;
-  const char *section;
+    const struct message_type *mtype;
+    char *vars;
+    struct nrmessage_type *next;
+    const char *section;
 } nrmessage_type;
 
 #define NRT_MAXHASH 1021
