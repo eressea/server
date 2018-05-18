@@ -355,7 +355,7 @@ static void start_messages(parseinfo *pi, const XML_Char *el, const XML_Char **a
             pi->object = mt_new(name, section);
         }
     }
-    else if (xml_strcmp(el, "type") != 0 && xml_strcmp(el, "text") != 0) {
+    else if (xml_strcmp(el, "type") != 0) {
         handle_bad_input(pi, el, NULL);
     }
 }
