@@ -122,6 +122,42 @@ message_type *mt_create(message_type * mtype, const char *args[], int nparameter
     return mtype;
 }
 
+char *sections[MAXSECTIONS];
+
+const char *section_find(const char *name)
+{
+    int i;
+
+    if (name == NULL) {
+        return NULL;
+    }
+
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
+    }
+    return NULL;
+}
+
+const char *section_add(const char *name) {
+    int i;
+    if (name == NULL) {
+        return NULL;
+    }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
+    }
+    assert(i < MAXSECTIONS);
+    assert(sections[i] == NULL);
+    if (i + 1 < MAXSECTIONS) {
+        sections[i + 1] = NULL;
+    }
+    return sections[i] = str_strdup(name);
+}
+
 message_type *mt_new(const char *name, const char *section)
 {
     message_type *mtype;
@@ -134,7 +170,10 @@ message_type *mt_new(const char *name, const char *section)
     mtype = (message_type *)malloc(sizeof(message_type));
     mtype->key = 0;
     mtype->name = str_strdup(name);
-    mtype->section = section;
+    mtype->section = section_find(section);
+    if (!mtype->section) {
+        mtype->section = section_add(section);
+    }
     mtype->nparameters = 0;
     mtype->pnames = NULL;
     mtype->types = NULL;
@@ -267,3 +306,4 @@ void message_done(void) {
         free(at);
     }
 }
+

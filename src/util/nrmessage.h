@@ -25,9 +25,6 @@ extern "C" {
     struct message_type;
     struct nrmessage_type;
 
-#define MAXSECTIONS 8
-    extern char *sections[MAXSECTIONS];
-
     void free_nrmesssages(void);
 
     void nrt_register(const struct message_type *mtype);

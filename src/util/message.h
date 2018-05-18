@@ -20,6 +20,9 @@ extern "C" {
 
 #define MSG_MAXARGS 8
 #define MT_NEW_END ((const char *)0)
+#define MAXSECTIONS 16
+
+    extern char *sections[MAXSECTIONS];
 
     typedef struct arg_type {
         struct arg_type *next;

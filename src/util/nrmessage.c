@@ -65,42 +65,6 @@ static nrmessage_type *nrt_find(const struct message_type * mtype)
     return found;
 }
 
-char *sections[MAXSECTIONS];
-
-const char *section_find(const char *name)
-{
-    int i;
-
-    if (name == NULL) {
-        return NULL;
-    }
-
-    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
-        if (strcmp(sections[i], name) == 0) {
-            return sections[i];
-        }
-    }
-    return NULL;
-}
-
-const char *section_add(const char *name) {
-    int i;
-    if (name == NULL) {
-        return NULL;
-    }
-    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
-        if (strcmp(sections[i], name) == 0) {
-            return sections[i];
-        }
-    }
-    assert(i < MAXSECTIONS);
-    assert(sections[i] == NULL);
-    if (i + 1 < MAXSECTIONS) {
-        sections[i + 1] = NULL;
-    }
-    return sections[i] = str_strdup(name);
-}
-
 void
 nrt_register(const struct message_type *mtype)
 {
