@@ -30,12 +30,18 @@ static void setup_piracy(void) {
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
 
-    mt_register(mt_new_va("piratenovictim", "ship:ship", "unit:unit", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("piratesawvictim", "ship:ship", "unit:unit", "region:region", "dir:int", MT_NEW_END));
-    mt_register(mt_new_va("shipsail", "ship:ship", "from:region", "to:region", MT_NEW_END));
-    mt_register(mt_new_va("shipfly", "ship:ship", "from:region", "to:region", MT_NEW_END));
-    mt_register(mt_new_va("shipnoshore", "ship:ship", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END));
+    mt_create_va(mt_new("piratenovictim", NULL),
+        "ship:ship", "unit:unit", "region:region", MT_NEW_END);
+    mt_create_va(mt_new("piratesawvictim", NULL),
+        "ship:ship", "unit:unit", "region:region", "dir:int", MT_NEW_END);
+    mt_create_va(mt_new("shipsail", NULL),
+        "ship:ship", "from:region", "to:region", MT_NEW_END);
+    mt_create_va(mt_new("shipfly", NULL),
+        "ship:ship", "from:region", "to:region", MT_NEW_END);
+    mt_create_va(mt_new("shipnoshore", NULL),
+        "ship:ship", "region:region", MT_NEW_END);
+    mt_create_va(mt_new("travel", NULL),
+        "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END);
 }
 
 static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const char *p_shiptype,

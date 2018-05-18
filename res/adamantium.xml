@@ -6,8 +6,8 @@
     <item weight="200" score="200">
       <construction skill="mining" minskill="8"/>
     </item>
-      <modifier building="mine" type="skill" value="1"/>
-      <modifier type="require" building="mine"/>
+    <modifier building="mine" type="skill" value="1"/>
+    <modifier type="require" building="mine"/>
   </resource>
 
   <resource name="adamantiumaxe">

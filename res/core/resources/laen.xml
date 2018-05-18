@@ -2,9 +2,9 @@
 <eressea>
 <resources>
 <resource name="laen" limited="yes" material="yes">
-    <item weight="200" score="100">
-        <construction skill="mining" minskill="7"/>
-    </item>
+  <item weight="200" score="100">
+    <construction skill="mining" minskill="7"/>
+  </item>
   <modifier building="mine" type="skill" value="1"/>
   <modifier type="require" building="mine"/>
 </resource>

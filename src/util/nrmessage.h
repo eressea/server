@@ -25,19 +25,11 @@ extern "C" {
     struct message_type;
     struct nrmessage_type;
 
-    typedef struct nrsection {
-        char *name;
-        struct nrsection *next;
-    } nrsection;
-
-    extern nrsection *sections;
-
     void free_nrmesssages(void);
 
-    void nrt_register(const struct message_type *mtype, const char *section);
+    void nrt_register(const struct message_type *mtype);
     const char *nrt_string(const struct message_type *mtype,
             const struct locale *lang);
-    const char *nrt_section(const struct message_type *mtype);
 
     size_t nr_render(const struct message *msg, const struct locale *lang,
         char *buffer, size_t size, const void *userdata);

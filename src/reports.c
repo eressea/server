@@ -2243,7 +2243,7 @@ static void eval_regions(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;
     int i = opop(stack).i;
-    int end, begin = opop(stack).i;
+    int handle_end, begin = opop(stack).i;
     const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[256];
     size_t size = sizeof(buf) - 1;
@@ -2251,19 +2251,19 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     char *bufp = buf;
 
     if (aregs == NULL) {
-        end = begin;
+        handle_end = begin;
     }
     else {
         if (i >= 0)
-            end = begin + i;
+            handle_end = begin + i;
         else
-            end = aregs->nregions + i;
+            handle_end = aregs->nregions + i;
     }
-    for (i = begin; i < end; ++i) {
+    for (i = begin; i < handle_end; ++i) {
         const char *rname = (const char *)regionname(aregs->regions[i], report);
         bufp = STRLCPY(bufp, rname, size);
 
-        if (i + 1 < end && size > 2) {
+        if (i + 1 < handle_end && size > 2) {
             strcat(bufp, ", ");
             bufp += 2;
             size -= 2;
@@ -2296,9 +2296,9 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 #endif
 
     if (aregs != NULL) {
-        int i, end = 0, begin = 0;
-        end = aregs->nregions;
-        for (i = begin; i < end; ++i) {
+        int i, handle_end = 0, begin = 0;
+        handle_end = aregs->nregions;
+        for (i = begin; i < handle_end; ++i) {
             region *r = aregs->regions[i];
             const char *trail = trailinto(r, lang);
             const char *rn = f_regionid_s(r, report);
@@ -2306,10 +2306,10 @@ static void eval_trail(struct opstack **stack, const void *userdata)
             if (wrptr(&bufp, &size, snprintf(bufp, size, trail, rn)) != 0)
                 WARN_STATIC_BUFFER();
 
-            if (i + 2 < end) {
+            if (i + 2 < handle_end) {
                 bufp = STRLCPY(bufp, ", ", size);
             }
-            else if (i + 1 < end) {
+            else if (i + 1 < handle_end) {
                 bufp = STRLCPY(bufp, LOC(lang, "list_and"), size);
             }
         }

@@ -42,7 +42,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
-#include <util/xml.h>
 
 #include <storage.h>
 #include <selist.h>

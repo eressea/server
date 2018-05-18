@@ -169,7 +169,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     char marker)
 {
     size_t length = REPORTWIDTH;
-    const char *end, *begin, *mark = 0;
+    const char *handle_end, *begin, *mark = 0;
 
     if (!str) return;
     /* find out if there's a mark + indent already encoded in the string. */
@@ -188,7 +188,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     else {
         mark = &marker;
     }
-    begin = end = str;
+    begin = handle_end = str;
 
     do {
         const char *last_space = begin;
@@ -205,25 +205,25 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
         else {
             write_spaces(out, indent + hanging_indent);
         }
-        while (*end && end <= begin + length - indent) {
-            if (*end == ' ') {
-                last_space = end;
+        while (*handle_end && handle_end <= begin + length - indent) {
+            if (*handle_end == ' ') {
+                last_space = handle_end;
             }
-            ++end;
+            ++handle_end;
         }
-        if (*end == 0)
-            last_space = end;
+        if (*handle_end == 0)
+            last_space = handle_end;
         if (last_space == begin) {
             /* there was no space in this line. clip it */
-            last_space = end;
+            last_space = handle_end;
         }
         swrite(begin, sizeof(char), last_space - begin, out);
         begin = last_space;
         while (*begin == ' ') {
             ++begin;
         }
-        if (begin > end)
-            begin = end;
+        if (begin > handle_end)
+            begin = handle_end;
         sputs("", out);
     } while (*begin);
 }
@@ -714,16 +714,17 @@ static void
 rp_messages(struct stream *out, message_list * msgs, faction * viewer, int indent,
     bool categorized)
 {
-    nrsection *section;
-
-    if (!msgs)
+    int i;
+    if (!msgs) {
         return;
-    for (section = sections; section; section = section->next) {
+    }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        const char * section = sections[i];
         int k = 0;
         struct mlist *m = msgs->begin;
         while (m) {
             /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(nrt_section(m->msg->type), section->name) == 0) {
+            if (!categorized || strcmp(m->msg->type->section, section) == 0) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
@@ -731,14 +732,14 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
                     char cat_identifier[24];
 
                     newline(out);
-                    sprintf(cat_identifier, "section_%s", section->name);
+                    sprintf(cat_identifier, "section_%s", section);
                     section_title = LOC(viewer->locale, cat_identifier);
                     if (section_title) {
                         centre(out, section_title, true);
                         newline(out);
                     }
                     else {
-                        log_error("no title defined for section %s in locale %s", section->name, locale_name(viewer->locale));
+                        log_error("no title defined for section %s in locale %s", section, locale_name(viewer->locale));
                     }
                     k = 1;
                 }
@@ -1930,7 +1931,7 @@ static void nr_paragraph(struct stream *out, message * m, faction * f)
 
 typedef struct cb_data {
     struct stream *out;
-    char *start, *writep;
+    char *handle_start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
@@ -1939,7 +1940,7 @@ typedef struct cb_data {
 static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
-    data->start = buffer;
+    data->handle_start = buffer;
     data->size = size;
     data->f = f;
     data->maxtravel = 0;
@@ -1956,7 +1957,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     if (travelthru_cansee(r, f, u)) {
         ++data->counter;
         do {
-            size_t len, size = data->size - (data->writep - data->start);
+            size_t len, size = data->size - (data->writep - data->handle_start);
             const char *str;
             char *writep = data->writep;
 
@@ -1991,13 +1992,13 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
             if (len >= size || data->counter == data->maxtravel) {
                 /* buffer is full */
                 *writep = 0;
-                paragraph(data->out, data->start, 0, 0, 0);
-                data->writep = data->start;
+                paragraph(data->out, data->handle_start, 0, 0, 0);
+                data->writep = data->handle_start;
                 if (data->counter == data->maxtravel) {
                     break;
                 }
             }
-        } while (data->writep == data->start);
+        } while (data->writep == data->handle_start);
     }
 }
 

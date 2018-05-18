@@ -59,7 +59,6 @@
 #include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/xml.h>
 
 #include <selist.h>
 #include <storage.h>
@@ -833,31 +832,10 @@ static int tolua_get_spells(lua_State * L)
     return tolua_selist_push(L, "spell_list", "spell", spells);
 }
 
-static int init_data(const char *filename)
-{
-    int l;
-    l = read_xml(filename);
-    reset_locales();
-    if (l) {
-        return l;
-    }
-    if (turn <= 0) {
-        turn = first_turn();
-    }
-    return 0;
-}
-
 static int tolua_equip_newunits(lua_State * L) {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     equip_newunits(u);
     return 0;
-}
-
-static int tolua_read_xml(lua_State * L)
-{
-    const char *filename = tolua_tostring(L, 1, "config.xml");
-    lua_pushinteger(L, init_data(filename));
-    return 1;
 }
 
 static int tolua_report_unit(lua_State * L)
@@ -1029,7 +1007,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
-        tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
         tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);
     } tolua_endmodule(L);
     return 1;

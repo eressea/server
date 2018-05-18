@@ -48,11 +48,13 @@ extern "C" {
 #define BTF_NOBUILD        0x02 /* special, can't be built */
 #define BTF_UNIQUE         0x04 /* only one per struct region (harbour) */
 #define BTF_DECAY          0x08 /* decays when not occupied */
-#define BTF_DYNAMIC        0x10 /* dynamic type, needs bt_write */
-#define BTF_MAGIC          0x40 /* magical effect */
+#define BTF_MAGIC          0x10 /* magical effect */
+#define BTF_NAMECHANGE     0x20 /* name and description can be changed more than once */
+#define BTF_FORTIFICATION  0x40 /* building_protection, safe from monsters */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
-#define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
-#define BTF_FORTIFICATION 0x200 /* building_protection, safe from monsters */
+#define BTF_DYNAMIC        0x100 /* dynamic type, needs bt_write */
+
+#define BTF_DEFAULT (BTF_NAMECHANGE)
 
     typedef struct building_stage {
         /* construction of this building stage: */

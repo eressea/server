@@ -253,7 +253,7 @@ static void test_build_destroy_road(CuTest *tc)
     message *m;
 
     test_setup();
-    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", MT_NEW_END));
+    mt_create_va(mt_new("destroy_road", NULL), "unit:unit", "from:region", "to:region", MT_NEW_END);
     r2 = test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);

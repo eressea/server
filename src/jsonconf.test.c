@@ -56,7 +56,7 @@ static void check_flag(CuTest *tc, const char *name, int flag) {
 
 static void test_flags(CuTest *tc) {
     test_setup();
-    check_flag(tc, "npc", RCF_NPC);
+    check_flag(tc, "player", RCF_PLAYABLE);
     check_flag(tc, "scarepeasants", RCF_SCAREPEASANTS);
     check_flag(tc, "nosteal", RCF_NOSTEAL);
     check_flag(tc, "noheal", RCF_NOHEAL);
@@ -181,7 +181,7 @@ static void test_races(CuTest * tc)
         "\"income\" : 30,"
         "\"hp\" : 5,"
         "\"ac\" : 6,"
-        "\"flags\" : [ \"npc\", \"walk\", \"undead\" ]"
+        "\"flags\" : [ \"player\", \"walk\", \"undead\" ]"
         "}}}";
     cJSON *json = cJSON_Parse(data);
     const struct race *rc;
@@ -195,7 +195,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, RCF_NPC | RCF_WALK | RCF_UNDEAD, rc->flags);
+    CuAssertIntEquals(tc, RCF_PLAYABLE | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertTrue(tc, frac_equal(frac_one, rc->magres));
     CuAssertIntEquals(tc, 200, rc->maxaura);

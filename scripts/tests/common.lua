@@ -154,7 +154,7 @@ end
 
 function test_pure()
   local r = region.create(0, 0, "plain")
-  assert_not_equal(nil, r)
+  assert_not_nil(r)
   assert_equal(r, get_region(0, 0))
 end
 
@@ -169,21 +169,21 @@ function test_read_write()
   assert_equal(r.terrain, "plain")
   result = eressea.write_game("test.dat")
   assert_equal(result, 0)
-  assert_not_equal(get_region(0, 0), nil)
-  assert_not_equal(get_faction(fno), nil)
-  assert_not_equal(get_unit(uno), nil)
+  assert_not_nil(get_region(0, 0))
+  assert_not_nil(get_faction(fno))
+  assert_not_nil(get_unit(uno))
   r = nil
   f = nil
   u = nil
   eressea.free_game()
-  assert_equal(get_region(0, 0), nil)
-  assert_equal(nil, get_faction(fno))
-  assert_equal(nil, get_unit(uno))
+  assert_nil(get_region(0, 0))
+  assert_nil(get_faction(fno))
+  assert_nil(get_unit(uno))
   result = eressea.read_game("test.dat")
   assert_equal(0, result)
-  assert_not_equal(nil, get_region(0, 0))
-  assert_not_equal(nil, get_faction(fno))
-  assert_not_equal(nil, get_unit(uno))
+  assert_not_nil(get_region(0, 0))
+  assert_not_nil(get_faction(fno))
+  assert_not_nil(get_unit(uno))
 end
 
 function test_descriptions()
@@ -237,7 +237,7 @@ function test_gmtool()
         selections=selections+1
     end
     assert_equal(2, selections)
-    assert_equal(nil, gmtool.get_cursor())
+    assert_nil(gmtool.get_cursor())
 
     gmtool.close()
 end
@@ -567,7 +567,7 @@ function test_coordinate_translation()
     local pe = plane.create(1, -8761, 3620, 23, 23) -- eternath
     local r = region.create(1000, 1000, "plain")
     local f = create_faction('human')
-    assert_not_equal(nil, r)
+    assert_not_nil(r)
     assert_equal(r.x, 1000)
     assert_equal(r.y, 1000)
     local nx, ny = plane.normalize(pl, r.x, r.y)
@@ -633,8 +633,8 @@ end
 -- segfault above
 
 function test_config()
-  assert_not_equal(nil, config.basepath)
-  assert_not_equal(nil, config.locales)
+  assert_not_nil(config.basepath)
+  assert_not_nil(config.locales)
 end
 
 local function _test_create_laen()
@@ -826,9 +826,9 @@ function test_swim_and_die()
     process_orders()
     r.terrain = "ocean"
     u = get_unit(uid)
-    assert_not_equal(get_unit(uid), nil)
+    assert_not_nil(get_unit(uid))
     process_orders()
-    assert_equal(get_unit(uid), nil)
+    assert_nil(get_unit(uid))
 end
 
 function test_ride_with_horse()

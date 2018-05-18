@@ -310,7 +310,7 @@ static race *rc_find_i(const char *name)
         for (i = 0; rc_depr[i]; i += 2) {
             if (strcmp(name, rc_depr[i]) == 0) {
                 rc = rc_find_i(rc_depr[i + 1]);
-                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                log_info("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
                 break;
             }
         }
@@ -356,6 +356,7 @@ race *rc_create(const char *zName)
 
     rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
+    rc->flags = RCF_DEFAULT;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
     rc->income = 20;
@@ -453,6 +454,12 @@ int rc_herb_trade(const struct race *rc)
     return 500;
 }
 
+void set_study_speed(race *rc, skill_t sk, int modifier) {
+    if (!rc->study_speed)
+        rc->study_speed = calloc(1, MAXSKILLS);
+    rc->study_speed[sk] = (char)modifier;
+}
+
 const race *rc_otherrace(const race *rc)
 {
     variant *v = rc_getoption(rc, RCO_OTHER);
@@ -468,18 +475,13 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
     if (strcmp(key, "recruit_multi") == 0) {
         rc->recruit_multi = atof(value);
     }
-    else if (strcmp(key, "migrants.formula") == 0) {
-        if (value[0] == '1') {
-            rc->flags |= RCF_MIGRANTS;
-        }
-    }
     else if (strcmp(key, "other_race")==0) {
         rc_setoption(rc, RCO_OTHER, value);
     }
-    else if (strcmp(key, "ai.scare")==0) {
+    else if (strcmp(key, "scare")==0) {
         rc_setoption(rc, RCO_SCARE, value);
     }
-    else if (strcmp(key, "hunger.damage")==0) {
+    else if (strcmp(key, "hunger_damage")==0) {
         rc_setoption(rc, RCO_HUNGER, value);
     }
     else if (strcmp(key, "armor.stamina")==0) {

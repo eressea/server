@@ -13,6 +13,7 @@ function setup()
 end
 
 function test_water_of_life()
+    eressea.settings.set("rules.grow.formula", 0) -- no tree growth
     local r = region.create(0, 0, "plain")
     r:set_flag(1, false) -- no mallorn
     local f = faction.create("human")

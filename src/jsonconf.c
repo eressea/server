@@ -39,7 +39,6 @@ without prior permission by the authors of Eressea.
 #include "util/path.h"
 #include "util/pofile.h"
 #include "util/strings.h"
-#include "util/xml.h"
 
 /* game modules */
 #include "direction.h"
@@ -47,6 +46,7 @@ without prior permission by the authors of Eressea.
 #include "move.h"
 #include "prefix.h"
 #include "skill.h"
+#include "exparse.h"
 
 /* external libraries */
 #include <cJSON.h>
@@ -478,17 +478,16 @@ static void json_ship(cJSON *json, ship_type *st) {
 static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
-        "npc", "killpeasants", "scarepeasants",
+        "player", "killpeasants", "scarepeasants",
         "nosteal", "moverandom", "cannotmove",
         "learn", "fly", "swim", "walk", "nolearn",
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal",
         "noweapons", "shapeshift", "", "undead", "dragon",
-        "coastal", "", "cansail", 0
+        "coastal", "", "cansail", NULL
     };
     const char *ecflags[] = {
-        "", "keepitem", "giveperson",
-        "giveunit", "getitem", 0
+        "giveperson", "giveunit", "getitem", NULL
     };
     if (json->type != cJSON_Object) {
         log_error("race %s is not a json object: %d", json->string, json->type);
@@ -1014,8 +1013,9 @@ static int include_json(const char *uri) {
 static int include_xml(const char *uri) {
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
-    int err = read_xml(filename);
-    if (err < 0) {
+    int err;
+    err = exparse_readfile(filename);
+    if (err != 0) {
         log_error("could not parse XML from %s", uri);
     }
     return err;
@@ -1048,7 +1048,7 @@ static int include_po(const char *uri) {
             if (lang) {
                 int err = pofile_read(filename, add_po_string, lang);
                 if (err < 0) {
-                    log_error("could not parse XML from %s", uri);
+                    log_error("could not parse translations from %s", uri);
                 }
                 return err;
             }
