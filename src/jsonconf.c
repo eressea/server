@@ -39,7 +39,6 @@ without prior permission by the authors of Eressea.
 #include "util/path.h"
 #include "util/pofile.h"
 #include "util/strings.h"
-#include "util/xml.h"
 
 /* game modules */
 #include "direction.h"
@@ -47,9 +46,7 @@ without prior permission by the authors of Eressea.
 #include "move.h"
 #include "prefix.h"
 #include "skill.h"
-#ifdef USE_EXPAT
 #include "exparse.h"
-#endif
 
 /* external libraries */
 #include <cJSON.h>
@@ -1017,14 +1014,7 @@ static int include_xml(const char *uri) {
     char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
     int err;
-#ifdef USE_EXPAT
     err = exparse_readfile(filename);
-    if (err != 0) {
-        err = read_xml(filename);
-    }
-#else
-    err = read_xml(filename);
-#endif
     if (err != 0) {
         log_error("could not parse XML from %s", uri);
     }
@@ -1058,7 +1048,7 @@ static int include_po(const char *uri) {
             if (lang) {
                 int err = pofile_read(filename, add_po_string, lang);
                 if (err < 0) {
-                    log_error("could not parse XML from %s", uri);
+                    log_error("could not parse translations from %s", uri);
                 }
                 return err;
             }

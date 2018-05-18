@@ -60,7 +60,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/parser.h>
 #include <util/resolve.h>
-#include <util/xml.h>
 
 /* from libc */
 #include <assert.h>

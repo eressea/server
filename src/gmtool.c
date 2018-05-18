@@ -55,7 +55,6 @@
 #include "listbox.h"
 #include "wormhole.h"
 #include "teleport.h"
-#include "xmlreader.h"
 
 #include <storage.h>
 #include <lua.h>
