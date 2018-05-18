@@ -31,7 +31,6 @@ without prior permission by the authors of Eressea.
 #include <kernel/callbacks.h>
 #include <kernel/config.h>
 #include <kernel/callbacks.h>
-#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/spell.h>
 #include <kernel/race.h>

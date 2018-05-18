@@ -37,6 +37,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+int test_set_item(unit * u, const item_type *itype, int value)
+{
+    item *i;
+
+    assert(itype);
+    i = *i_find(&u->items, itype);
+    if (!i) {
+        i = i_add(&u->items, i_new(itype, value));
+    }
+    else {
+        i->number = value;
+        assert(i->number >= 0);
+    }
+    return value;
+}
+
 struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name ? name : "smurf");
@@ -212,7 +228,6 @@ static void test_reset(void) {
     free_config();
     default_locale = 0;
     calendar_cleanup();
-    equipment_done();
     close_orders();
     free_special_directions();
     free_locales();
@@ -257,6 +272,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
     else {
         log_debug("start test in %s:%d", file, line);
     }
+    errno = 0;
 }
 
 void test_teardown(void)

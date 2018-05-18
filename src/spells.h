@@ -15,9 +15,6 @@
 #ifndef H_SPL_SPELLS
 #define H_SPL_SPELLS
 
-#include "magic.h"
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

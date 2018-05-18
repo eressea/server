@@ -285,7 +285,6 @@ unit *addplayer(region * r, faction * f)
 {
     unit *u;
     const char * name;
-    const struct equipment* eq;
 
     assert(r->land);
     if (rpeasants(r) < PEASANT_MIN) {
@@ -296,10 +295,7 @@ unit *addplayer(region * r, faction * f)
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     name = config_get("rules.equip_first");
-    eq = get_equipment(name ? name  : "first_unit");
-    if (eq) {
-        equip_items(&u->items, eq);
-    }
+    equip_unit(u, name ? name : "first_unit");
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {

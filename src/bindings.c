@@ -56,6 +56,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/xml.h>

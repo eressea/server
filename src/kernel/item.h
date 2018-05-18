@@ -284,7 +284,6 @@ extern "C" {
     struct item *item_spoil(const struct race *rc, int size);
 
     int get_item(const struct unit * u, const struct item_type *itype);
-    int set_item(struct unit * u, const struct item_type *itype, int value);
     int get_money(const struct unit *);
     int set_money(struct unit *, int);
     int change_money(struct unit *, int);

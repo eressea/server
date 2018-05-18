@@ -1091,7 +1091,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsethorses(r, 0);
         rsetpeasants(r, 0);
         rsetmoney(r, 0);
-        freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
         return;
     }
@@ -1195,9 +1194,6 @@ void terraform_region(region * r, const terrain_type * terrain)
                 fset(r, RF_MALLORN);
             else
                 freset(r, RF_MALLORN);
-            if (rng_int() % 100 < ENCCHANCE) {
-                fset(r, RF_ENCOUNTER);
-            }
         }
     }
 
