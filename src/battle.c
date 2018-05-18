@@ -948,22 +948,6 @@ void drain_exp(struct unit *u, int n)
     }
 }
 
-const char *rel_dam(int dam, int hp)
-{
-    double q = (double)dam / (double)hp;
-
-    if (q > 0.75) {
-        return "eine klaffende Wunde";
-    }
-    else if (q > 0.5) {
-        return "eine schwere Wunde";
-    }
-    else if (q > 0.25) {
-        return "eine Wunde";
-    }
-    return "eine kleine Wunde";
-}
-
 static void vampirism(troop at, int damage)
 {
     if (rule_vampire > 0) {

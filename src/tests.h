@@ -58,6 +58,7 @@ extern "C" {
     struct building_type *test_create_buildingtype(const char *name);
     void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
     struct spell * test_create_spell(void);
+    int test_set_item(struct unit * u, const struct item_type *itype, int value);
 
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
