@@ -561,6 +561,7 @@ void kernel_done(void)
     curses_done();
     crmessage_done();
     translation_done();
+    mt_clear();
 }
 
 bool rule_stealth_other(void)

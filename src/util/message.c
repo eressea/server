@@ -255,6 +255,10 @@ void mt_clear(void) {
         selist_free(ql);
         messagetypes[i] = 0;
     }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        free(sections[i]);
+        sections[i] = NULL;
+    }
 }
 
 const message_type *mt_find(const char *name)
