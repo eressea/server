@@ -714,16 +714,17 @@ static void
 rp_messages(struct stream *out, message_list * msgs, faction * viewer, int indent,
     bool categorized)
 {
-    nrsection *section;
-
-    if (!msgs)
+    int i;
+    if (!msgs) {
         return;
-    for (section = sections; section; section = section->next) {
+    }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        const char * section = sections[i];
         int k = 0;
         struct mlist *m = msgs->begin;
         while (m) {
             /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(nrt_section(m->msg->type), section->name) == 0) {
+            if (!categorized || strcmp(m->msg->type->section, section) == 0) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
@@ -731,14 +732,14 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
                     char cat_identifier[24];
 
                     newline(out);
-                    sprintf(cat_identifier, "section_%s", section->name);
+                    sprintf(cat_identifier, "section_%s", section);
                     section_title = LOC(viewer->locale, cat_identifier);
                     if (section_title) {
                         centre(out, section_title, true);
                         newline(out);
                     }
                     else {
-                        log_error("no title defined for section %s in locale %s", section->name, locale_name(viewer->locale));
+                        log_error("no title defined for section %s in locale %s", section, locale_name(viewer->locale));
                     }
                     k = 1;
                 }

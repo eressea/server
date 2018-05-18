@@ -33,7 +33,7 @@ static void test_market_curse(CuTest * tc)
     building_type *btype;
 
     test_setup();
-    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", MT_NEW_END));
+    mt_create_va(mt_new("buyamount", NULL), "unit:unit", "amount:int", "resource:resource", MT_NEW_END);
 
     htype = test_create_itemtype("herb");
     htype->flags |= ITF_HERB;

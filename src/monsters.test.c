@@ -51,7 +51,8 @@ static void create_monsters(unit **up, unit **um) {
     region *r;
     faction *fp, *fm;
 
-    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", MT_NEW_END));
+    mt_create_va(mt_new("dragon_growl", NULL),
+        "dragon:unit", "number:int", "target:region", "growl:string", MT_NEW_END);
     test_create_horse();
     default_locale = test_create_locale();
     fp = test_create_faction(NULL);
@@ -222,8 +223,6 @@ static void test_dragon_moves(CuTest * tc)
 
     plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("move east", m));
-
-    mt_register(mt_new_va("dragon_growl", "dragon:unit", "number:int", "target:region", "growl:string", MT_NEW_END));
 
     random_growl(m, findregion(1, 0), 3);
 

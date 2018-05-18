@@ -54,24 +54,24 @@ static void setup_give(struct give *env) {
     }
 
     /* success messages: */
-    mt_register(mt_new_va("receive_person", "unit:unit", "target:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person", "unit:unit", "target:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person_peasants", "unit:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person_ocean", "unit:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("receive", "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give", "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_peasants", "unit:unit", "resource:resource", "amount:int", MT_NEW_END));
+    mt_create_va(mt_new("receive_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person_peasants", NULL), "unit:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person_ocean", NULL), "unit:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("receive", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_peasants", NULL), "unit:unit", "resource:resource", "amount:int", MT_NEW_END);
     /* error messages: */
-    mt_register(mt_new_va("too_many_units_in_faction", "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END));
-    mt_register(mt_new_va("too_many_units_in_alliance", "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END));
-    mt_register(mt_new_va("feedback_no_contact", "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END));
-    mt_register(mt_new_va("feedback_give_forbidden", "unit:unit", "region:region", "command:order", MT_NEW_END));
-    mt_register(mt_new_va("peasants_give_invalid", "unit:unit", "region:region", "command:order", MT_NEW_END));
-    mt_register(mt_new_va("giverestriction", "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END));
-    mt_register(mt_new_va("error_unit_size", "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END));
-    mt_register(mt_new_va("nogive_reserved", "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END));
-    mt_register(mt_new_va("race_notake", "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END));
-    mt_register(mt_new_va("race_noregroup", "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END));
+    mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
+    mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
+    mt_create_va(mt_new("feedback_no_contact", NULL), "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END);
+    mt_create_va(mt_new("feedback_give_forbidden", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("peasants_give_invalid", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("giverestriction", NULL), "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END);
+    mt_create_va(mt_new("error_unit_size", NULL), "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END);
+    mt_create_va(mt_new("nogive_reserved", NULL), "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END);
+    mt_create_va(mt_new("race_notake", NULL), "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END);
+    mt_create_va(mt_new("race_noregroup", NULL), "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END);
 }
 
 static void test_give_unit(CuTest * tc) {

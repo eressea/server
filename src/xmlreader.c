@@ -1304,34 +1304,34 @@ static int parse_messages(xmlDocPtr doc)
         xmlXPathFreeObject(result);
 
         /* add the messagetype */
+        propSection = xmlGetProp(node, BAD_CAST "section");
+        if (propSection == NULL) {
+            propSection = BAD_CAST default_section;
+        }
+
         propValue = xmlGetProp(node, BAD_CAST "name");
         mtype = mt_find((const char *)propValue);
         if (mtype == NULL) {
-            mtype = mt_register(mt_new((const char *)propValue, (const char **)argv));
+            mtype = mt_create(mt_new((const char *)propValue, (const char *)propSection), (const char **)argv);
         }
         else {
             assert(argv != NULL || !"cannot redefine arguments of message now");
         }
         xmlFree(propValue);
 
-        /* register the type for the CR */
+        if (propSection != BAD_CAST default_section) {
+            xmlFree(propSection);
+        }
+
+        /* register the type for CR and NR */
         crt_register(mtype);
+        nrt_register(mtype);
 
         /* let's clean up the mess */
         if (argv != NULL) {
             for (k = 0; argv[k] != NULL; ++k)
                 free(argv[k]);
             free(argv);
-        }
-
-        propSection = xmlGetProp(node, BAD_CAST "section");
-        if (propSection == NULL) {
-            propSection = BAD_CAST default_section;
-        }
-        nrt_register(mtype, (const char *)propSection);
-
-        if (propSection != BAD_CAST default_section) {
-            xmlFree(propSection);
         }
     }
 

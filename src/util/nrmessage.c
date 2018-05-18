@@ -30,7 +30,6 @@ typedef struct nrmessage_type {
     const struct message_type *mtype;
     char *vars;
     struct nrmessage_type *next;
-    const char *section;
 } nrmessage_type;
 
 #define NRT_MAXHASH 1021
@@ -66,41 +65,44 @@ static nrmessage_type *nrt_find(const struct message_type * mtype)
     return found;
 }
 
-nrsection *sections;
+char *sections[MAXSECTIONS];
 
-const nrsection *section_find(const char *name)
+const char *section_find(const char *name)
 {
-    nrsection **mcp = &sections;
-    if (name == NULL)
+    int i;
+
+    if (name == NULL) {
         return NULL;
-    for (; *mcp; mcp = &(*mcp)->next) {
-        nrsection *mc = *mcp;
-        if (!strcmp(mc->name, name))
-            break;
     }
-    return *mcp;
+
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
+    }
+    return NULL;
 }
 
-const nrsection *section_add(const char *name)
-{
-    nrsection **mcp = &sections;
-    if (name == NULL)
+const char *section_add(const char *name) {
+    int i;
+    if (name == NULL) {
         return NULL;
-    for (; *mcp; mcp = &(*mcp)->next) {
-        nrsection *mc = *mcp;
-        if (!strcmp(mc->name, name))
-            break;
     }
-    if (!*mcp) {
-        nrsection *mc = calloc(sizeof(nrsection), 1);
-        mc->name = str_strdup(name);
-        *mcp = mc;
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
     }
-    return *mcp;
+    assert(i < MAXSECTIONS);
+    assert(sections[i] == NULL);
+    if (i + 1 < MAXSECTIONS) {
+        sections[i + 1] = NULL;
+    }
+    return sections[i] = str_strdup(name);
 }
 
 void
-nrt_register(const struct message_type *mtype, const char *section)
+nrt_register(const struct message_type *mtype)
 {
     unsigned int hash = mtype->key % NRT_MAXHASH;
     nrmessage_type *nrt = nrtypes[hash];
@@ -118,15 +120,6 @@ nrt_register(const struct message_type *mtype, const char *section)
         nrt = malloc(sizeof(nrmessage_type));
         nrt->mtype = mtype;
         nrt->next = nrtypes[hash];
-        if (section) {
-            const nrsection *s = section_find(section);
-            if (s == NULL) {
-                s = section_add(section);
-            }
-            nrt->section = s->name;
-        }
-        else
-            nrt->section = NULL;
         nrtypes[hash] = nrt;
         *c = '\0';
         for (i = 0; i != mtype->nparameters; ++i) {
@@ -157,12 +150,6 @@ size_t size, const void *userdata)
     if (size > 0 && buffer)
         buffer[0] = 0;
     return 0;
-}
-
-const char *nrt_section(const struct message_type * mtype)
-{
-    nrmessage_type *nrt = nrt_find(mtype);
-    return nrt ? nrt->section : NULL;
 }
 
 void free_nrmesssages(void) {

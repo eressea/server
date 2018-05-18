@@ -33,19 +33,32 @@ typedef struct {
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
-    mt_register(mt_new_va("spyreport", "spy:unit", "target:unit", "status:int", MT_NEW_END));
-    mt_register(mt_new_va("spyreport_mage", "spy:unit", "target:unit", "type:int", MT_NEW_END));
-    mt_register(mt_new_va("spyreport_faction", "spy:unit", "target:unit", "faction:faction", MT_NEW_END));
-    mt_register(mt_new_va("spyreport_skills", "spy:unit", "target:unit", "skills:string", MT_NEW_END));
-    mt_register(mt_new_va("spyreport_items", "spy:unit", "target:unit", "items:items", MT_NEW_END));
-    mt_register(mt_new_va("destroy_ship_0", "unit:unit", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("destroy_ship_1", "unit:unit", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("destroy_ship_2", "unit:unit", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("destroy_ship_3", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("destroy_ship_4", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("sink_msg", "ship:ship", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("sink_lost_msg", "unit:unit", "region:region", "dead:int", MT_NEW_END));
-    mt_register(mt_new_va("sink_saved_msg", "unit:unit", "region:region", MT_NEW_END));
+    mt_create_va(mt_new("spyreport", NULL),
+        "spy:unit", "target:unit", "status:int", MT_NEW_END);
+    mt_create_va(mt_new("spyreport_mage", NULL),
+        "spy:unit", "target:unit", "type:int", MT_NEW_END);
+    mt_create_va(mt_new("spyreport_faction", NULL),
+        "spy:unit", "target:unit", "faction:faction", MT_NEW_END);
+    mt_create_va(mt_new("spyreport_skills", NULL),
+        "spy:unit", "target:unit", "skills:string", MT_NEW_END);
+    mt_create_va(mt_new("spyreport_items", NULL),
+        "spy:unit", "target:unit", "items:items", MT_NEW_END);
+    mt_create_va(mt_new("destroy_ship_0", NULL),
+        "unit:unit", "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("destroy_ship_1", NULL), 
+        "unit:unit", "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("destroy_ship_2", NULL), 
+        "unit:unit", "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("destroy_ship_3", NULL),
+        "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("destroy_ship_4", NULL),
+        "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("sink_msg", NULL), 
+        "ship:ship", "region:region", MT_NEW_END);
+    mt_create_va(mt_new("sink_lost_msg", NULL), 
+        "unit:unit", "region:region", "dead:int", MT_NEW_END);
+    mt_create_va(mt_new("sink_saved_msg", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
 
     if (fix) {
         fix->r = test_create_region(0, 0, NULL);

@@ -19,10 +19,14 @@ void sort_wormhole_regions(selist *rlist, region **match, int count);
 void make_wormholes(region **match, int count, const building_type *bt_wormhole);
 
 static void setup_wormholes(void) {
-    mt_register(mt_new_va("wormhole_appear", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("wormhole_dissolve", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("wormhole_exit", "unit:unit", "region:region", MT_NEW_END));
-    mt_register(mt_new_va("wormhole_requirements", "unit:unit", "region:region", MT_NEW_END));
+    mt_create_va(mt_new("wormhole_appear", NULL),
+        "region:region", MT_NEW_END);
+    mt_create_va(mt_new("wormhole_dissolve", NULL),
+        "region:region", MT_NEW_END);
+    mt_create_va(mt_new("wormhole_exit", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
+    mt_create_va(mt_new("wormhole_requirements", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
 }
 
 static void test_make_wormholes(CuTest *tc) {
