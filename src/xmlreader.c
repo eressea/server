@@ -1354,8 +1354,6 @@ void register_xmlreader(void)
     xml_register_callback(parse_spellbooks);
     xml_register_callback(parse_spells);
     xml_register_callback(parse_races);
-#endif
-
-
     xml_register_callback(parse_messages);
+#endif
 }
