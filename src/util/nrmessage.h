@@ -35,13 +35,12 @@ extern "C" {
     void free_nrmesssages(void);
 
     void nrt_register(const struct message_type *mtype, const char *section);
-    struct nrmessage_type *nrt_find(const struct message_type *);
-    const char *nrt_string(const struct nrmessage_type *nrt, const struct locale *lang);
-    const char *nrt_section(const struct nrmessage_type *nrt);
+    const char *nrt_string(const struct message_type *mtype,
+            const struct locale *lang);
+    const char *nrt_section(const struct message_type *mtype);
 
     size_t nr_render(const struct message *msg, const struct locale *lang,
         char *buffer, size_t size, const void *userdata);
-    const char *nr_section(const struct message *msg);
 
 #ifdef __cplusplus
 }

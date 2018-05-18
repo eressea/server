@@ -30,17 +30,18 @@
 #define NRT_MAXHASH 1021
 static nrmessage_type *nrtypes[NRT_MAXHASH];
 
-const char *nrt_string(const struct nrmessage_type *nrt, const struct locale *lang)
+const char *nrt_string(const struct message_type *mtype, 
+        const struct locale *lang)
 {
-    const char * str = locale_getstring(lang, nrt->mtype->name);
+    const char * str = locale_getstring(lang, mtype->name);
     if (!str) {
-        str = locale_getstring(default_locale, nrt->mtype->name);
+        str = locale_getstring(default_locale, mtype->name);
     }
     assert(str);
     return str;
 }
 
-nrmessage_type *nrt_find(const struct message_type * mtype)
+static nrmessage_type *nrt_find(const struct message_type * mtype)
 {
     nrmessage_type *found = NULL;
     unsigned int hash = mtype->key % NRT_MAXHASH;
@@ -139,7 +140,7 @@ size_t size, const void *userdata)
 
     if (nrt) {
         const char *m =
-            translate(nrt_string(nrt, lang), userdata, nrt->vars, msg->parameters);
+            translate(nrt_string(msg->type, lang), userdata, nrt->vars, msg->parameters);
         if (m) {
             return str_strlcpy((char *)buffer, m, size);
         }
@@ -152,14 +153,9 @@ size_t size, const void *userdata)
     return 0;
 }
 
-const char *nr_section(const struct message *msg)
+const char *nrt_section(const struct message_type * mtype)
 {
-    nrmessage_type *nrt = nrt_find(msg->type);
-    return nrt ? nrt->section : NULL;
-}
-
-const char *nrt_section(const nrmessage_type * nrt)
-{
+    nrmessage_type *nrt = nrt_find(mtype);
     return nrt ? nrt->section : NULL;
 }
 

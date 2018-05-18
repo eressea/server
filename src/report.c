@@ -723,7 +723,7 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
         struct mlist *m = msgs->begin;
         while (m) {
             /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(nr_section(m->msg), section->name) == 0) {
+            if (!categorized || strcmp(nrt_section(m->msg->type), section->name) == 0) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
