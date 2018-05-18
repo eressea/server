@@ -103,11 +103,3 @@ struct trigger_type tt_gate = {
     gate_read
 };
 
-trigger *trigger_gate(building * b, region * target)
-{
-    trigger *t = t_new(&tt_gate);
-    gate_data *td = (gate_data *)t->data.v;
-    td->gate = b;
-    td->target = target;
-    return t;
-}
