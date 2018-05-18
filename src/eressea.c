@@ -53,9 +53,9 @@ void game_done(void)
     free_config();
     free_special_directions();
     free_locales();
+#endif
     kernel_done();
     dblib_close();
-#endif
 }
 
 void game_init(void)
