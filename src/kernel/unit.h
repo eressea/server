@@ -141,12 +141,6 @@ extern "C" {
     struct building *usiege(const struct unit *u);
     void usetsiege(struct unit *u, const struct building *b);
 
-    struct unit *utarget(const struct unit *u);
-    void usettarget(struct unit *u, const struct unit *b);
-
-    struct unit *utarget(const struct unit *u);
-    void usettarget(struct unit *u, const struct unit *b);
-
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
 

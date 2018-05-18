@@ -9,6 +9,19 @@
 #include <string.h>
 #include "strings.h"
 
+static void test_str_unescape(CuTest * tc)
+{
+    char scratch[64];
+
+    strcpy(scratch, "1234 5678");
+    str_unescape(scratch);
+    CuAssertStrEquals(tc, "1234 5678", scratch);
+
+    strcpy(scratch, "\\\"\\\\\\n\\t\\r\\a");
+    str_unescape(scratch);
+    CuAssertStrEquals(tc, "\"\\\n\t\ra", scratch);
+}
+
 static void test_str_escape(CuTest * tc)
 {
     char scratch[64];
@@ -122,6 +135,7 @@ CuSuite *get_strings_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_str_hash);
     SUITE_ADD_TEST(suite, test_str_escape);
+    SUITE_ADD_TEST(suite, test_str_unescape);
     SUITE_ADD_TEST(suite, test_str_replace);
     SUITE_ADD_TEST(suite, test_str_slprintf);
     SUITE_ADD_TEST(suite, test_str_strlcat);

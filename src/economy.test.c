@@ -250,7 +250,7 @@ static void test_trade_insect(CuTest *tc) {
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
 
-    set_item(u, it_silver, 10);
+    test_set_item(u, it_silver, 10);
     CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
     produce(u->region);
@@ -283,7 +283,7 @@ static void test_buy_cmd(CuTest *tc) {
 
     u = test_create_unit(test_create_faction(NULL), r);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
-    set_item(u, rt_silver->itype, 1000);
+    test_set_item(u, rt_silver->itype, 1000);
 
     produce(r);
     CuAssertPtrNotNullMsg(tc, "trading requires a castle", test_find_messagetype(u->faction->msgs, "error119"));
@@ -525,13 +525,13 @@ static void test_modify_material(CuTest *tc) {
     itype->construction->materials[0].rtype = rtype;
     itype->construction->materials[0].number = 2;
 
-    set_item(u, rtype->itype, 1); /* 1 iron should get us 1 sword */
+    test_set_item(u, rtype->itype, 1); /* 1 iron should get us 1 sword */
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 1, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
     u_setrace(u, test_create_race("smurf"));
-    set_item(u, rtype->itype, 2); /* 2 iron should be required now */
+    test_set_item(u, rtype->itype, 2); /* 2 iron should be required now */
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 2, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
@@ -576,20 +576,20 @@ static void test_modify_skill(CuTest *tc) {
     mod[0].value.sa[1] = 1;
     mod[0].race_mask = rc_mask(u_race(u));
 
-    set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
+    test_set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
     make_item(u, itype, 2);
     CuAssertIntEquals(tc, 2, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
     mod[0].value.sa[0] = NOSKILL; /* match any skill */
-    set_item(u, rtype->itype, 2);
+    test_set_item(u, rtype->itype, 2);
     make_item(u, itype, 2);
     CuAssertIntEquals(tc, 4, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
 
     u_setrace(u, test_create_race("smurf"));
-    set_item(u, rtype->itype, 2);
+    test_set_item(u, rtype->itype, 2);
     make_item(u, itype, 1); /* only enough skill to make 1 now */
     CuAssertIntEquals(tc, 5, get_item(u, itype));
     CuAssertIntEquals(tc, 1, get_item(u, rtype->itype));
@@ -626,7 +626,7 @@ static void test_modify_production(CuTest *tc) {
     itype->construction->materials[0].rtype = rt_silver;
     itype->construction->materials[0].number = 1;
     set_level(u, SK_ALCHEMY, 1);
-    set_item(u, rt_silver->itype, 1);
+    test_set_item(u, rt_silver->itype, 1);
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 1, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rt_silver->itype));

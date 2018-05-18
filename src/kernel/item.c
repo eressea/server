@@ -581,22 +581,6 @@ int get_item(const unit * u, const item_type *itype)
     return i ? i->number : 0;
 }
 
-int set_item(unit * u, const item_type *itype, int value)
-{
-    item *i;
-
-    assert(itype);
-    i = *i_find(&u->items, itype);
-    if (!i) {
-        i = i_add(&u->items, i_new(itype, value));
-    }
-    else {
-        i->number = value;
-        assert(i->number >= 0);
-    }
-    return value;
-}
-
 #include "move.h"
 
 static int

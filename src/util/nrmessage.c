@@ -13,7 +13,6 @@
 
 #include <platform.h>
 #include "nrmessage.h"
-#include "nrmessage_struct.h"
 
 /* util includes */
 #include "log.h"
@@ -27,38 +26,42 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef struct nrmessage_type {
+  const struct message_type *mtype;
+  char *vars;
+  struct nrmessage_type *next;
+  const char *section;
+} nrmessage_type;
+
 #define NRT_MAXHASH 1021
 static nrmessage_type *nrtypes[NRT_MAXHASH];
 
-const char *nrt_string(const struct nrmessage_type *type)
+const char *nrt_string(const struct message_type *mtype, 
+        const struct locale *lang)
 {
-    return type->string;
+    const char * str = locale_getstring(lang, mtype->name);
+    if (!str) {
+        str = locale_getstring(default_locale, mtype->name);
+    }
+    assert(str);
+    return str;
 }
 
-nrmessage_type *nrt_find(const struct locale * lang,
-    const struct message_type * mtype)
+static nrmessage_type *nrt_find(const struct message_type * mtype)
 {
     nrmessage_type *found = NULL;
     unsigned int hash = mtype->key % NRT_MAXHASH;
     nrmessage_type *type = nrtypes[hash];
     while (type) {
         if (type->mtype == mtype) {
-            if (found == NULL)
+            if (found == NULL) {
                 found = type;
-            else if (type->lang == NULL)
-                found = type;
-            if (lang == type->lang) {
-                found = type;
-                break;
             }
         }
         type = type->next;
     }
     if (!found) {
-        log_warning("could not find nr-type %s for locale %s\n", mtype->name, locale_name(lang));
-    }
-    if (lang && found && found->lang != lang) {
-        log_warning("could not find nr-type %s for locale %s, using %s\n", mtype->name, locale_name(lang), locale_name(found->lang));
+        log_warning("could not find nr-type %s\n", mtype->name);
     }
     return found;
 }
@@ -97,12 +100,11 @@ const nrsection *section_add(const char *name)
 }
 
 void
-nrt_register(const struct message_type *mtype, const struct locale *lang,
-const char *string, int level, const char *section)
+nrt_register(const struct message_type *mtype, const char *section)
 {
     unsigned int hash = mtype->key % NRT_MAXHASH;
     nrmessage_type *nrt = nrtypes[hash];
-    while (nrt && (nrt->lang != lang || nrt->mtype != mtype)) {
+    while (nrt && nrt->mtype != mtype) {
         nrt = nrt->next;
     }
     if (nrt) {
@@ -114,10 +116,8 @@ const char *string, int level, const char *section)
         char zNames[256];
         char *c = zNames;
         nrt = malloc(sizeof(nrmessage_type));
-        nrt->lang = lang;
         nrt->mtype = mtype;
         nrt->next = nrtypes[hash];
-        nrt->level = level;
         if (section) {
             const nrsection *s = section_find(section);
             if (s == NULL) {
@@ -128,8 +128,6 @@ const char *string, int level, const char *section)
         else
             nrt->section = NULL;
         nrtypes[hash] = nrt;
-        assert(string && *string);
-        nrt->string = str_strdup(string);
         *c = '\0';
         for (i = 0; i != mtype->nparameters; ++i) {
             if (i != 0)
@@ -144,11 +142,11 @@ size_t
 nr_render(const struct message *msg, const struct locale *lang, char *buffer,
 size_t size, const void *userdata)
 {
-    struct nrmessage_type *nrt = nrt_find(lang, msg->type);
+    struct nrmessage_type *nrt = nrt_find(msg->type);
 
     if (nrt) {
         const char *m =
-            translate(nrt->string, userdata, nrt->vars, msg->parameters);
+            translate(nrt_string(msg->type, lang), userdata, nrt->vars, msg->parameters);
         if (m) {
             return str_strlcpy((char *)buffer, m, size);
         }
@@ -161,20 +159,9 @@ size_t size, const void *userdata)
     return 0;
 }
 
-int nr_level(const struct message *msg)
+const char *nrt_section(const struct message_type * mtype)
 {
-    nrmessage_type *nrt = nrt_find(NULL, msg->type);
-    return nrt ? nrt->level : 0;
-}
-
-const char *nr_section(const struct message *msg)
-{
-    nrmessage_type *nrt = nrt_find(default_locale, msg->type);
-    return nrt ? nrt->section : NULL;
-}
-
-const char *nrt_section(const nrmessage_type * nrt)
-{
+    nrmessage_type *nrt = nrt_find(mtype);
     return nrt ? nrt->section : NULL;
 }
 
@@ -184,9 +171,9 @@ void free_nrmesssages(void) {
         while (nrtypes[i]) {
             nrmessage_type *nr = nrtypes[i];
             nrtypes[i] = nr->next;
-            free(nr->string);
             free(nr->vars);
             free(nr);
         }
     }
 }
+

@@ -320,11 +320,12 @@ int walkingcapacity(const struct unit *u)
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
         wagen_mit_trollen = u->number / 4;
-        if (wagen_mit_trollen > wagen_ohne_pferde) wagen_mit_trollen = wagen_ohne_pferde;
+        if (wagen_mit_trollen > wagen_ohne_pferde) {
+            wagen_mit_trollen = wagen_ohne_pferde;
+        }
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
-        wagen_ohne_pferde -= wagen_mit_trollen;
     }
 
     n += animals * acap;
@@ -2020,17 +2021,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
 *
 * the token parser needs to be initialized before calling this function!
 */
-
-/** fleeing units use this function
-*/
-void run_to(unit * u, region * to)
-{
-    region_list *route = NULL;
-    add_regionlist(&route, to);
-    travel_route(u, route, NULL, NULL, TRAVEL_RUNNING);
-    free_regionlist(route);
-    /* weder transport noch follow */
-}
 
 static const region_list *travel_i(unit * u, const region_list * route_begin,
     const region_list * route_end, order * ord, int mode, follower ** followers)

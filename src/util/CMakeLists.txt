@@ -51,6 +51,7 @@ nrmessage.c
 parser.c
 password.c
 path.c
+pofile.c
 rand.c
 resolve.c
 strings.c

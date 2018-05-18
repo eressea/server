@@ -1,14 +1,11 @@
 {
     "include": [
-      "config://res/core/messages.xml",
-      "config://res/core/de/strings.xml",
-      "config://res/core/en/strings.xml",
-      "config://res/e3a/strings.xml",
-      "config://res/e3a/shipnames.xml",
-      "config://res/names-undead.xml",
-      "config://res/names-skeletons.xml",
-      "config://res/names-zombies.xml",
-      "config://res/names-ghouls.xml",
-      "config://res/names-dragons.xml"
+      "config://res/translations/strings.de.po",
+      "config://res/translations/strings-e3.de.po",
+      "config://res/translations/messages.de.po",
+      "config://res/translations/strings.en.po",
+      "config://res/translations/strings-e3.en.po",
+      "config://res/translations/messages.en.po",
+      "config://res/core/messages.xml"
     ]
 }

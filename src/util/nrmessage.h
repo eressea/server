@@ -14,6 +14,7 @@
 #define H_UTIL_NRMESSAGE
 
 #include <stddef.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,26 +34,13 @@ extern "C" {
 
     void free_nrmesssages(void);
 
-    void nrt_register(const struct message_type *mtype,
-        const struct locale *lang, const char *script,
-        int level, const char *section);
-    struct nrmessage_type *nrt_find(const struct locale *,
-        const struct message_type *);
-    const char *nrt_string(const struct nrmessage_type *type);
-    const char *nrt_section(const struct nrmessage_type *mt);
+    void nrt_register(const struct message_type *mtype, const char *section);
+    const char *nrt_string(const struct message_type *mtype,
+            const struct locale *lang);
+    const char *nrt_section(const struct message_type *mtype);
 
     size_t nr_render(const struct message *msg, const struct locale *lang,
         char *buffer, size_t size, const void *userdata);
-    int nr_level(const struct message *msg);
-    const char *nr_section(const struct message *msg);
-
-    /* before:
-     * fogblock;movement:0;de;{unit} konnte von {region} nicht nach {$dir direction} ausreisen, der Nebel war zu dicht.
-     * after:
-     * fogblock:movement:0
-     * $unit($unit) konnte von $region($region) nicht nach $direction($direction) ausreisen, der Nebel war zu dicht.
-     * unit:unit region:region direction:int
-     */
 
 #ifdef __cplusplus
 }

@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define MY_LOCALE_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +56,9 @@ extern "C" {
     char *mkname_buf(const char *namespc, const char *key, char *buffer);
 
     void make_locales(const char *str);
+
+    void locale_foreach(void(*callback)(const struct locale *lang, const char *name));
+    void po_write_msg(FILE *F, const char *id, const char *str, const char *ctxt);
 
 #define LOC(lang, s) (lang?locale_string(lang, s, true):s)
 

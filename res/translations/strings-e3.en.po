@@ -1,0 +1,302 @@
+msgid "catamaran_a"
+msgstr "a catamaran"
+
+msgid "rpg_item_1"
+msgstr "Pandora's Certificate"
+
+msgid "rpg_item_2"
+msgstr "piece of a holy nut"
+
+msgid "rpg_item_3"
+msgstr "bottle demon Zhardamon"
+
+msgctxt "spell"
+msgid "create_potion_p0"
+msgstr "brew seven mile tea"
+
+msgctxt "spell"
+msgid "create_potion_p2"
+msgstr "brew water of life"
+
+msgctxt "spell"
+msgid "create_potion_p3"
+msgstr "brew busy beer"
+
+msgctxt "spellinfo"
+msgid "concealing_aura"
+msgstr "This spell will hide the whole equipment of a target unit from the looks of others. It will not protect against thieves or spies."
+
+msgctxt "spell"
+msgid "create_potion_p9"
+msgstr "brew horsepower potion"
+
+msgctxt "morale"
+msgid "10"
+msgstr "subservient"
+
+msgctxt "spellinfo"
+msgid "create_potion_peasantblood"
+msgstr "One of the most dangerous and best guarded secrets of all mages is the knowledge about the power of death. Even though most of them would not openly admit it, and it is at least partially forbidden in most countries, each of them studies death sooner or later. When they do, they quickly find out that there is another plane of existance: the home of the demons. Only blood can quelch the thirst of those, when they switch from their home to our world. But experienced mages will find out that the demons bloodwine can be deluted when appropiate herbs are included, making it enough for 100 instead of 10 demons. As the demons may not know about that, the magician has to secretly sacrifice one of his freed minions."
+
+msgid "scaffolding"
+msgstr "scaffolding"
+
+msgctxt "spellinfo"
+msgid "raindance"
+msgstr "This ancient rite calls upon the forces of life and fertility. For the next few weeks, the peasants' harvest will be extraordinary good."
+
+msgid "adamantium"
+msgstr "adamantium"
+
+msgid "adamantiumplate"
+msgstr "adamantium plate"
+
+msgid "rpg_item_3_p"
+msgstr "bottle demons"
+
+msgid "barge_a"
+msgstr "a barge"
+
+msgctxt "spell"
+msgid "create_potion_ointment"
+msgstr "brew ointment"
+
+msgctxt "spell"
+msgid "create_potion_healing"
+msgstr "brew healing potion"
+
+msgid "frigate_a"
+msgstr "a frigate"
+
+msgid "trireme"
+msgstr "trireme"
+
+msgctxt "spellinfo"
+msgid "create_potion_healing"
+msgstr "Some mages research death's secrets until they can bring the dead back to life. But those who are brought back are often only shadows of ther former self and turn against their erstwhile friends. But those mages that study life and its iteraction with death find a possibility to bring the deceased back as their original selves. A drawback is that this is only possible in the very first minutes after death. As even mages can not be everywhere at the same time, a way had to be found to give this ability to helpers. All healers who tried to learn this from the mages failed, though, until one of those healers was backstabbingly killed. In the moment of his death he used the knowledge gained and was able to have his murderer executed the following day. The potion he designed has to be blessed by a magician before usage at any given time. This potion gives four people (or one person four times) a 50% chance to survive an otherwise deadly wound. It is used automatically by the victom."
+
+msgid "frigate"
+msgstr "frigate"
+
+msgctxt "spellinfo"
+msgid "create_potion_p13"
+msgstr "Just like with the knowledge about death, the peasants feel uncomfortable with the knowledge about monsters. A few warriors though, who have already faced these creatures in combat, found that the monsters blood had an invigourating effect on them. There is talk about some warriors who bathed in the blood of the slain monsters to take up their strength. But this effect ends soon, and only occurs with fresh blood. As no one has time to quickly slay a wyrm before attacking their neighbors, a way had to be found to make the effect last longer. After lots of experiments that cost the life of lots of good warriors who had to constantly bring in fresh dragon blood, Manasouf the black finally found a way. Originally a closely guarded secret, the recipe is now known in all lands. First, the hardened dragon blood needs to be melted in hot tin. After that, the magician binds the spirit of the dragon to its blood once again. It can not find eternal rest until the last bit of blood has been used. "
+
+msgctxt "spellinfo"
+msgid "earn_silver#gwyrrd"
+msgstr "The abilities of the mages of Gwyrrd concerning the breeding and healing of cattle are highly appreciated among the peasants. Especially at the markets their services are demanded frequently. Some of them also use their talents to sell an animal at a higher price. A magician can earn 25 silver pieces per level in this way."
+
+msgctxt "describe"
+msgid "lifepotion"
+msgstr "The \"Water of Life\" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for five trees to be grown from logs."
+
+msgid "charger"
+msgstr "charger"
+
+msgid "cog"
+msgstr "cog"
+
+msgid "adamantiumplate_p"
+msgstr "adamantium plates"
+
+msgid "cutter"
+msgstr "cutter"
+
+msgid "caravel_a"
+msgstr "a caravel"
+
+msgctxt "spellinfo"
+msgid "blessedharvest"
+msgstr "This ritual not only increases the output of the local farms. Activating the astral ley lines, the druid is capable of activating even the nature spirits far away. Peasants' harvest in the affected regions will be extraordinarily good for a few weeks. "
+
+msgid "adamantiumaxe"
+msgstr "adamantium axe"
+
+msgid "charger_p"
+msgstr "chargers"
+
+msgid "raft"
+msgstr "raft"
+
+msgid "guardhouse"
+msgstr "guard house"
+
+msgid "caravel"
+msgstr "caravel"
+
+msgid "canoe"
+msgstr "canoe"
+
+msgctxt "morale"
+msgid "0"
+msgstr "rebellious"
+
+msgctxt "morale"
+msgid "1"
+msgstr "mad"
+
+msgctxt "morale"
+msgid "2"
+msgstr "angry"
+
+msgctxt "morale"
+msgid "3"
+msgstr "agitated"
+
+msgctxt "morale"
+msgid "4"
+msgstr "indifferent"
+
+msgctxt "morale"
+msgid "5"
+msgstr "relaxed"
+
+msgctxt "morale"
+msgid "6"
+msgstr "content"
+
+msgctxt "morale"
+msgid "7"
+msgstr "happy"
+
+msgctxt "morale"
+msgid "8"
+msgstr "loyal"
+
+msgctxt "morale"
+msgid "9"
+msgstr "devoted"
+
+msgid "rep_crossbow"
+msgstr "repeating crossbow"
+
+msgid "packice"
+msgstr "fast ice"
+
+msgctxt "spellinfo"
+msgid "commonfamiliar"
+msgstr "During their travel, seasoned magicians will occasionally befriend an extraordinary creature of an unusual species that will join them."
+
+msgid "trireme_a"
+msgstr "a trireme"
+
+msgid "royalbarge_a"
+msgstr "a royal barge"
+
+msgid "adamantiumaxe_p"
+msgstr "adamantium axes"
+
+msgid "rpg_item_2_p"
+msgstr "nut halves"
+
+msgid "watch"
+msgstr "watch"
+
+msgctxt "spellinfo"
+msgid "earn_silver#draig"
+msgstr "In the dark alleys you can find those who sell curses and hexes on demand -- but you can buy the apropriate counterspells from the followers of Draig as well. May it be a love spell for the son of a neighbour or a wart in the face of a rival. For offering these services, the sorcerer charges 25 silver pieces per level."
+
+msgid "catamaran"
+msgstr "catamaran"
+
+msgctxt "spell"
+msgid "create_potion_p13"
+msgstr "brew elixir of power"
+
+msgctxt "spellinfo"
+msgid "create_potion_ointment"
+msgstr "In the aftermath of battle it is vital to heal your own troops. This can be done by a healer as well as by a magician. In contrast to a healer, the magician can fullfill this treatment already before the battle by binding magical powers into a potent salve. This salve can be stored and only needs to be applied to the wounds after the battle. "
+
+msgid "packice_trail"
+msgstr "%s"
+
+msgid "cog_a"
+msgstr "a cog"
+
+msgid "canoe_a"
+msgstr "a canoe"
+
+msgid "galleon_a"
+msgstr "a galleon"
+
+msgid "towershield_p"
+msgstr "tower shields"
+
+msgid "cutter_a"
+msgstr "a cutter"
+
+msgid "royalbarge"
+msgstr "royal barge"
+
+msgctxt "spell"
+msgid "commonfamiliar"
+msgstr "Bind Familiar"
+
+msgid "barge"
+msgstr "barge"
+
+msgctxt "spell"
+msgid "create_potion_peasantblood"
+msgstr "brew peasant blood"
+
+msgctxt "spellinfo"
+msgid "earn_silver#cerddor"
+msgstr "The mages of Cerddor truly are the bards of the wizards; they love to use their sorcery to entertain the crowds and to be the center of attention. Even the apprentices study those little magic tricks, which attract and fascinate the people and thus ensnare them into leaving a few coins or more for the artist. By the end of the week, the bard will have earned 25 silver per level. "
+
+msgctxt "spellinfo"
+msgid "earn_silver#illaun"
+msgstr "No one can read dreams as well as the mages of Illaun. Furthermore, they are also familiar with all other common means of foretelling the future like crystal balls, tarot cards or palms. A mentalist can earn 25 silver pieces per level and week for offering these services to peasants."
+
+msgid "rpg_item_1_p"
+msgstr "Certificates"
+
+msgid "guardtower"
+msgstr "guard tower"
+
+msgid "raft_a"
+msgstr "a raft"
+
+msgid "dragonship"
+msgstr "dragonship"
+
+msgid "galleon"
+msgstr "galleon"
+
+msgid "towershield"
+msgstr "tower shield"
+
+msgid "rm_adamantium"
+msgstr "adamantium"
+
+msgid "adamantium_p"
+msgstr "adamantium"
+
+msgctxt "spellinfo"
+msgid "create_potion_p0"
+msgstr "Time is one of the first mysteries every magician tries to solve. If they succeed, they can focus all their energies on their magical studies as the ways between dormatory, library and magician tower now pass much faster. To keep their heart in tune the magicians use a special self-made tea. Some mages even share it with up to 10 people"
+
+msgctxt "spellinfo"
+msgid "create_potion_p2"
+msgstr "One of the most strange spells enables the magician to withdraw a little life energy from their surroundings to produce the so called water of life. The juice of some selected herbs is used to conserve the energies of life. As the magician is protected by his magical abilities, he is the only one who can touch the juice without taking damage. This is necessary because the juice must be carried around from place to place to avoid damaging one region by taking too much energy at once."
+
+msgctxt "spellinfo"
+msgid "create_potion_p3"
+msgstr "Busybeer is another application for the knowledge about time a magician accumulates. Even though manual labour is only seldom done by mages, they still show interest in increasing the efficiency of their minions that do this work for them. Mornac the Wise was the first to discover how to produce a potion that would enable 10 minions to do the work of 20, thus freeing the other 10 for different experiments."
+
+msgid "dragonship_a"
+msgstr "a dragonship"
+
+msgctxt "spellinfo"
+msgid "create_potion_p9"
+msgstr "Even though mages live in strict celibacy, they know a lot about creating certain longings. Peasants keep asking them for this love potion or that. But the penality for bewitching a peasant is death, so the mages offer their services only to farmers for their breeding stock. In an elaborate ritual, which only serves to hide the simplicity of the procedure, the magician draws the fluids from certains plants. While doing so he calls upon the spirits of fertility, which of course only listen when he talkes to them. Now the farmer knows that any attempt to draw the fluids himself will only result in a useless waste of resources. Finally, the magician hands the vial with the fluids to the farmer, who pours it into his horses' drinking water."
+
+msgctxt "spellinfo"
+msgid "earn_silver#tybied"
+msgstr "If the local alchemist could not help you, you should visit a scholar of Tybied. His potions and tinctures may help when nothing else does. If the cryptic formula under the wooden shoes of the unfaithful husband really helped? - Well, the peasant, who isn't capable of reading, will never know. At least it helped the magician... to fill his purse. In one week he can earn 25 silver per level that way."
+
+msgid "market"
+msgstr "marketplace"
+
+msgid "rep_crossbow_p"
+msgstr "repeating crossbows"
+

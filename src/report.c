@@ -723,7 +723,7 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
         struct mlist *m = msgs->begin;
         while (m) {
             /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(nr_section(m->msg), section->name) == 0) {
+            if (!categorized || strcmp(nrt_section(m->msg->type), section->name) == 0) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
@@ -743,6 +743,10 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
                     k = 1;
                 }
                 nr_render(m->msg, viewer->locale, lbuf, sizeof(lbuf), viewer);
+                /* Hack: some messages should start a new paragraph with a newline: */
+                if (strncmp("para_", m->msg->type->name, 5) == 0) {
+                    newline(out);
+                }
                 paragraph(out, lbuf, indent, 2, 0);
             }
             m = m->next;

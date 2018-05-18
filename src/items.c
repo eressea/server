@@ -224,7 +224,7 @@ int amount, struct order *ord)
 
     change_spellpoints(u, 50);
 
-    ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
+    ADDMSG(&u->faction->msgs, msg_message("aurapotion50_effect",
         "unit region command", u, u->region, ord));
 
     use_pooled(u, itype->rtype, GET_DEFAULT, 1);

@@ -37,6 +37,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+int test_set_item(unit * u, const item_type *itype, int value)
+{
+    item *i;
+
+    assert(itype);
+    i = *i_find(&u->items, itype);
+    if (!i) {
+        i = i_add(&u->items, i_new(itype, value));
+    }
+    else {
+        i->number = value;
+        assert(i->number >= 0);
+    }
+    return value;
+}
+
 struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name ? name : "smurf");

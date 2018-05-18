@@ -110,8 +110,6 @@ typedef enum combatmagic {
 static int missile_range[2] = { FIGHT_ROW, BEHIND_ROW };
 static int melee_range[2] = { FIGHT_ROW, FIGHT_ROW };
 
-static message *msg_separator;
-
 const troop no_troop = { 0, 0 };
 
 #define FORMULA_ORIG 0
@@ -948,22 +946,6 @@ void drain_exp(struct unit *u, int n)
     if (sk != NOSKILL) {
         reduce_skill_days(u, sk, n);
     }
-}
-
-const char *rel_dam(int dam, int hp)
-{
-    double q = (double)dam / (double)hp;
-
-    if (q > 0.75) {
-        return "eine klaffende Wunde";
-    }
-    else if (q > 0.5) {
-        return "eine schwere Wunde";
-    }
-    else if (q > 0.25) {
-        return "eine Wunde";
-    }
-    return "eine kleine Wunde";
 }
 
 static void vampirism(troop at, int damage)
@@ -2888,9 +2870,7 @@ static void print_stats(battle * b)
             message *msg;
             char buf[1024];
 
-            battle_message_faction(b, f, msg_separator);
-
-            msg = msg_message("battle_army", "index name", army_index(s), sname);
+            msg = msg_message("para_army_index", "index name", army_index(s), sname);
             battle_message_faction(b, f, msg);
             msg_release(msg);
 
@@ -2958,8 +2938,6 @@ static void print_stats(battle * b)
 
         print_fighters(b, s);
     }
-
-    message_all(b, msg_separator);
 
     /* Besten Taktiker ermitteln */
 
@@ -3501,12 +3479,11 @@ static int battle_report(battle * b)
         bool komma = false;
 
         sbs_init(&sbs, buf, sizeof(buf));
-        battle_message_faction(b, fac, msg_separator);
 
         if (cont)
-            m = msg_message("lineup_battle", "turn", b->turn);
+            m = msg_message("para_lineup_battle", "turn", b->turn);
         else
-            m = msg_message("after_battle", "");
+            m = msg_message("para_after_battle", "");
         battle_message_faction(b, fac, m);
         msg_release(m);
 
@@ -4006,11 +3983,8 @@ void force_leave(region *r, battle *b) {
 void do_battle(region * r)
 {
     battle *b = NULL;
-    bool fighting = false;
+    bool fighting;
     ship *sh;
-    if (msg_separator == NULL) {
-        msg_separator = msg_message("section_battle", "");
-    }
 
     fighting = start_battle(r, &b);
 
