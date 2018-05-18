@@ -3999,7 +3999,7 @@ void force_leave(region *r, battle *b) {
 void do_battle(region * r)
 {
     battle *b = NULL;
-    bool fighting = false;
+    bool fighting;
     ship *sh;
 
     fighting = start_battle(r, &b);

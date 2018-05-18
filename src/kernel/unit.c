@@ -530,33 +530,6 @@ attrib_type at_target = {
     NO_READ
 };
 
-unit *utarget(const unit * u)
-{
-    attrib *a;
-    if (!fval(u, UFL_TARGET))
-        return NULL;
-    a = a_find(u->attribs, &at_target);
-    assert(a || !"flag set, but no target found");
-    return (unit *)a->data.v;
-}
-
-void usettarget(unit * u, const unit * t)
-{
-    attrib *a = a_find(u->attribs, &at_target);
-    if (!a && t)
-        a = a_add(&u->attribs, a_new(&at_target));
-    if (a) {
-        if (!t) {
-            a_remove(&u->attribs, a);
-            freset(u, UFL_TARGET);
-        }
-        else {
-            a->data.v = (void *)t;
-            fset(u, UFL_TARGET);
-        }
-    }
-}
-
 /*********************/
 /*   at_siege   */
 /*********************/

@@ -320,11 +320,12 @@ int walkingcapacity(const struct unit *u)
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
         wagen_mit_trollen = u->number / 4;
-        if (wagen_mit_trollen > wagen_ohne_pferde) wagen_mit_trollen = wagen_ohne_pferde;
+        if (wagen_mit_trollen > wagen_ohne_pferde) {
+            wagen_mit_trollen = wagen_ohne_pferde;
+        }
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
-        wagen_ohne_pferde -= wagen_mit_trollen;
     }
 
     n += animals * acap;

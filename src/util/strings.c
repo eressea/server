@@ -144,9 +144,9 @@ void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, c
     *s = 0;
 }
 
-unsigned int str_hash(const char *s)
+int str_hash(const char *s)
 {
-    unsigned int key = 0;
+    int key = 0;
     assert(s);
     while (*s) {
         key = key * 37 + *s++;
