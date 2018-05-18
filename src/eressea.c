@@ -33,7 +33,6 @@
 #include "spells.h"
 #include "vortex.h"
 #include "wormhole.h"
-#include "xmlreader.h"
 
 #include <errno.h>
 #include <stdlib.h>
@@ -54,9 +53,9 @@ void game_done(void)
     free_config();
     free_special_directions();
     free_locales();
+#endif
     kernel_done();
     dblib_close();
-#endif
 }
 
 void game_init(void)
@@ -80,7 +79,6 @@ void game_init(void)
 
     register_weapons();
     register_xerewards();
-    register_xmlreader();
     register_attributes();
     register_gmcmd();
 

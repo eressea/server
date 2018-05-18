@@ -144,6 +144,7 @@ building_type *bt_get_or_create(const char *name)
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
             btype->_name = str_strdup(name);
+            btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;

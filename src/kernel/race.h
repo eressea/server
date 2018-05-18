@@ -129,7 +129,7 @@ extern "C" {
         int weight;
         int capacity;
         int income;
-        float speed;
+        double speed;
         int hitpoints;
         char *def_damage;
         int armor;
@@ -202,7 +202,7 @@ extern "C" {
     int rc_get_mask(char *list);
 
     /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
-#define RCF_NPC            (1<<0)   /* cannot be the race for a player faction (and other limits?) */
+#define RCF_PLAYABLE       (1<<0)   /* cannot be the race for a player faction (and other limits?) */
 #define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
 #define RCF_SCAREPEASANTS  (1<<2)   /* a monster that scares peasants out of the hex */
 #define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
@@ -229,18 +229,20 @@ extern "C" {
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
 #define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
-#define RCF_MIGRANTS       (1<<27)      /* may have migrant units (human bonus) */
-#define RCF_FAMILIAR       (1<<28)      /* may be a familiar */
-#define RCF_ATTACK_MOVED   (1<<29)      /* may attack if it has moved */
+#define RCF_ATTACK_MOVED   (1<<27)      /* may attack if it has moved */
+#define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
+#define RCF_FAMILIAR       (1<<29)      /* may be a familiar */
+
+#define RCF_DEFAULT RCF_CANSAIL
 
     /* Economic flags */
-#define ECF_GIVEPERSON     (1<<2)   /* �bergibt Personen */
-#define ECF_GIVEUNIT       (1<<3)   /* Einheiten an andere Partei �bergeben */
-#define ECF_GETITEM        (1<<4)   /* nimmt Gegenst�nde an */
-#define ECF_REC_ETHEREAL   (1<<7)       /* Rekrutiert aus dem Nichts */
-#define ECF_REC_UNLIMITED  (1<<8)       /* Rekrutiert ohne Limit */
-#define ECF_STONEGOLEM     (1<<9)      /* race gets stonegolem properties */
-#define ECF_IRONGOLEM      (1<<10)      /* race gets irongolem properties */
+#define ECF_GIVEPERSON     (1<<0)   /* �bergibt Personen */
+#define ECF_GIVEUNIT       (1<<1)   /* Einheiten an andere Partei �bergeben */
+#define ECF_GETITEM        (1<<2)   /* nimmt Gegenst�nde an */
+#define ECF_REC_ETHEREAL   (1<<3)       /* Rekrutiert aus dem Nichts */
+#define ECF_REC_UNLIMITED  (1<<4)       /* Rekrutiert ohne Limit */
+#define ECF_STONEGOLEM     (1<<5)      /* race gets stonegolem properties */
+#define ECF_IRONGOLEM      (1<<6)      /* race gets irongolem properties */
 
     /* Battle-Flags */
 #define BF_EQUIPMENT    (1<<0)  /* Kann Ausr�stung benutzen */
@@ -254,7 +256,7 @@ extern "C" {
     const char *racename(const struct locale *lang, const struct unit *u,
         const race * rc);
 
-#define playerrace(rc) (!((rc)->flags & RCF_NPC))
+#define playerrace(rc) ((rc)->flags & RCF_PLAYABLE)
 #define dragonrace(rc) ((rc)->flags & RCF_DRAGON)
 #define humanoidrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define illusionaryrace(rc) ((rc)->flags & RCF_ILLUSIONARY)
@@ -271,6 +273,7 @@ extern "C" {
     const char *raceprefix(const struct unit *u);
     void register_race_function(race_func, const char *);
 
+    void set_study_speed(struct race *rc, skill_t sk, int modifier);
 #ifdef __cplusplus
 }
 #endif

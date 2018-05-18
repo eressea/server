@@ -26,7 +26,6 @@
 #include "randenc.h"
 #include "monsters.h"
 #include "teleport.h"
-#include "xmlreader.h"
 
  /* triggers includes */
 #include <triggers/changefaction.h>

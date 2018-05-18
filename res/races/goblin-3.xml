@@ -7,7 +7,7 @@ speed="1.0" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0"
 playerrace="yes" walk="yes" giveperson="yes" giveunit="yes"
 getitem="yes" equipment="yes" healing="2.0">
   <ai splitsize="10000" moverandom="yes" learn="yes"/>
-  <param name="hunger.damage" value="1d8+7"/>
+  <param name="hunger_damage" value="1d8+7"/>
   <param name="other_race" value="demon"/>
   <param name="recruit_multi" value="0.5"/>
   <skill name="cartmaking" modifier="-1"/>

@@ -58,9 +58,12 @@ typedef struct {
 } study_fixture;
 
 static void setup_study(void) {
-    mt_register(mt_new_va("studycost", "unit:unit", "region:region", "cost:int", "skill:int", MT_NEW_END));
-    mt_register(mt_new_va("teach_teacher", "teacher:unit", "student:unit", "skill:int", "level:int", MT_NEW_END));
-    mt_register(mt_new_va("teach_student", "teacher:unit", "student:unit", "skill:int", MT_NEW_END));
+    mt_create_va(mt_new("studycost", NULL),
+        "unit:unit", "region:region", "cost:int", "skill:int", MT_NEW_END);
+    mt_create_va(mt_new("teach_teacher", NULL),
+        "teacher:unit", "student:unit", "skill:int", "level:int", MT_NEW_END);
+    mt_create_va(mt_new("teach_student", NULL),
+        "teacher:unit", "student:unit", "skill:int", MT_NEW_END);
 }
 
 static void setup_locale(struct locale *lang) {
@@ -218,7 +221,8 @@ static void test_academy_building(CuTest *tc) {
     message * msg;
 
     test_setup();
-    mt_register(mt_new_va("teach_asgood", "unit:unit", "region:region", "command:order", "student:unit", MT_NEW_END));
+    mt_create_va(mt_new("teach_asgood", NULL),
+        "unit:unit", "region:region", "command:order", "student:unit", MT_NEW_END);
 
     random_source_inject_constant(0.0);
     init_resources();
@@ -636,8 +640,10 @@ static void test_teach_message(CuTest *tc) {
     teaching_info *teach;
 
     test_setup();
-    mt_register(mt_new_va("teach_teacher", "teacher:unit", "student:unit", "skill:int", "level:int", MT_NEW_END));
-    mt_register(mt_new_va("teach_student", "teacher:unit", "student:unit", "skill:int", MT_NEW_END));
+    mt_create_va(mt_new("teach_teacher", NULL),
+        "teacher:unit", "student:unit", "skill:int", "level:int", MT_NEW_END);
+    mt_create_va(mt_new("teach_student", NULL),
+        "teacher:unit", "student:unit", "skill:int", MT_NEW_END);
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 20);

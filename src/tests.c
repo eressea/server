@@ -59,7 +59,7 @@ struct race *test_create_race(const char *name)
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
-    rc->flags |= RCF_WALK;
+    rc->flags |= (RCF_WALK|RCF_PLAYABLE);
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
@@ -246,9 +246,12 @@ static void test_reset(void) {
     }
     random_source_reset();
 
-    mt_register(mt_new_va("changepasswd", "value:string", MT_NEW_END));
-    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", MT_NEW_END));
-    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", MT_NEW_END));
+    mt_create_va(mt_new("changepasswd", NULL),
+        "value:string", MT_NEW_END);
+    mt_create_va(mt_new("starvation", NULL),
+        "unit:unit", "region:region", "dead:int", "live:int", MT_NEW_END);
+    mt_create_va(mt_new("malnourish", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
 
     if (errno) {
         int error = errno;
@@ -354,7 +357,6 @@ building_type * test_create_buildingtype(const char * name)
 {
     construction *con;
     building_type *btype = bt_get_or_create(name);
-    btype->flags = BTF_NAMECHANGE;
     if (btype->stages) {
         con = btype->stages->construction;
     } else {

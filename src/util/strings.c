@@ -157,13 +157,13 @@ int str_hash(const char *s)
 const char *str_escape(const char *str, char *buffer,
     size_t len)
 {
-    const char *start = strchr(str, '\"');
-    if (!start) start = strchr(str, '\\');
+    const char *handle_start = strchr(str, '\"');
+    if (!handle_start) handle_start = strchr(str, '\\');
     assert(buffer);
-    if (start) {
+    if (handle_start) {
         const char *p;
         char *o;
-        size_t skip = start - str;
+        size_t skip = handle_start - str;
 
         if (skip > len) {
             skip = len;
@@ -218,6 +218,7 @@ unsigned int wang_hash(unsigned int a)
 }
 
 char *str_strdup(const char *s) {
+    if (s == NULL) return NULL;
 #ifdef HAVE_STRDUP
     return strdup(s);
 #elif defined(_MSC_VER)

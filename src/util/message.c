@@ -60,35 +60,43 @@ arg_type *find_argtype(const char *name)
     return NULL;
 }
 
-message_type *mt_new(const char *name, const char *args[])
+static unsigned int mt_id(const message_type * mtype)
 {
-    int nparameters = 0;
-    message_type *mtype;
+    unsigned int key = 0;
+    size_t i = strlen(mtype->name);
 
-    assert(name != NULL);
-    if (name == NULL) {
-        log_error("Trying to create message_type with name=0x0\n");
-        return NULL;
+    while (i > 0) {
+        /* TODO: why not use str_hash? */
+        key = (mtype->name[--i] + key * 37);
     }
-    if (args != NULL) {
+    return key % 0x7FFFFFFF;
+}
+
+#define MT_MAXHASH 1021
+static selist *messagetypes[MT_MAXHASH];
+
+static void mt_register(message_type * mtype) {
+    unsigned int hash = str_hash(mtype->name) % MT_MAXHASH;
+    selist **qlp = messagetypes + hash;
+
+    if (selist_set_insert(qlp, mtype, NULL)) {
+        mtype->key = mt_id(mtype);
+    }
+}
+
+message_type *mt_create(message_type * mtype, const char *args[], int nparameters)
+{
+    if (args != NULL && args[nparameters]) {
         /* count the number of parameters */
-        while (args[nparameters]) ++nparameters;
+        do {
+            ++nparameters;
+        } while (args[nparameters]);
     }
-    mtype = (message_type *)malloc(sizeof(message_type));
-    mtype->key = 0;
-    mtype->name = str_strdup(name);
-    mtype->nparameters = nparameters;
     if (nparameters > 0) {
+        int i;
+        mtype->nparameters = nparameters;
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
         mtype->types = (arg_type **)malloc(sizeof(arg_type *) * nparameters);
-    }
-    else {
-        mtype->pnames = NULL;
-        mtype->types = NULL;
-    }
-    if (args != NULL) {
-        int i;
-
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -110,16 +118,75 @@ message_type *mt_new(const char *name, const char *args[])
             }
         }
     }
+    mt_register(mtype);
     return mtype;
 }
 
-message_type *mt_new_va(const char *name, ...)
+char *sections[MAXSECTIONS];
+
+const char *section_find(const char *name)
+{
+    int i;
+
+    if (name == NULL) {
+        return NULL;
+    }
+
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
+    }
+    return NULL;
+}
+
+const char *section_add(const char *name) {
+    int i;
+    if (name == NULL) {
+        return NULL;
+    }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        if (strcmp(sections[i], name) == 0) {
+            return sections[i];
+        }
+    }
+    assert(i < MAXSECTIONS);
+    assert(sections[i] == NULL);
+    if (i + 1 < MAXSECTIONS) {
+        sections[i + 1] = NULL;
+    }
+    return sections[i] = str_strdup(name);
+}
+
+message_type *mt_new(const char *name, const char *section)
+{
+    message_type *mtype;
+
+    assert(name != NULL);
+    if (name == NULL) {
+        log_error("Trying to create message_type with name=0x0\n");
+        return NULL;
+    }
+    mtype = (message_type *)malloc(sizeof(message_type));
+    mtype->key = 0;
+    mtype->name = str_strdup(name);
+    mtype->section = section_find(section);
+    if (!mtype->section) {
+        mtype->section = section_add(section);
+    }
+    mtype->nparameters = 0;
+    mtype->pnames = NULL;
+    mtype->types = NULL;
+    return mtype;
+}
+
+message_type *mt_create_va(message_type *mtype, ...)
 {
     const char *args[16];
     int i = 0;
     va_list marker;
 
-    va_start(marker, name);
+    va_start(marker, mtype);
     for (;;) {
         const char *c = va_arg(marker, const char *);
         args[i++] = c;
@@ -127,8 +194,8 @@ message_type *mt_new_va(const char *name, ...)
             break;
     }
     va_end(marker);
-    args[i] = 0;
-    return mt_new(name, args);
+    args[i] = NULL;
+    return mt_create(mtype, args, i - 1);
 }
 
 static variant copy_arg(const arg_type * atype, variant data)
@@ -168,9 +235,6 @@ message *msg_create(const struct message_type *mtype, variant args[])
     return msg;
 }
 
-#define MT_MAXHASH 1021
-static selist *messagetypes[MT_MAXHASH];
-
 static void mt_free(void *val) {
     message_type *mtype = (message_type *)val;
     int i;
@@ -191,6 +255,10 @@ void mt_clear(void) {
         selist_free(ql);
         messagetypes[i] = 0;
     }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        free(sections[i]);
+        sections[i] = NULL;
+    }
 }
 
 const message_type *mt_find(const char *name)
@@ -206,29 +274,6 @@ const message_type *mt_find(const char *name)
         }
     }
     return 0;
-}
-
-static unsigned int mt_id(const message_type * mtype)
-{
-    unsigned int key = 0;
-    size_t i = strlen(mtype->name);
-
-    while (i > 0) {
-        /* TODO: why not use str_hash? */
-        key = (mtype->name[--i] + key * 37);
-    }
-    return key % 0x7FFFFFFF;
-}
-
-const message_type *mt_register(message_type * type)
-{
-    unsigned int hash = str_hash(type->name) % MT_MAXHASH;
-    selist **qlp = messagetypes + hash;
-
-    if (selist_set_insert(qlp, type, NULL)) {
-        type->key = mt_id(type);
-    }
-    return type;
 }
 
 void msg_free(message * msg)
@@ -265,3 +310,4 @@ void message_done(void) {
         free(at);
     }
 }
+

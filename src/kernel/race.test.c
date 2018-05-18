@@ -50,7 +50,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertDblEquals(tc, 1.0, rc->recruit_multi, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->speed, 0.0);
-    CuAssertIntEquals(tc, 0, rc->flags);
+    CuAssertIntEquals(tc, RCF_DEFAULT, rc->flags);
     CuAssertIntEquals(tc, 0, rc->recruitcost);
     CuAssertIntEquals(tc, 0, rc->maintenance);
     CuAssertIntEquals(tc, 540, rc->capacity);
@@ -112,12 +112,11 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, rc->options);
     rc_set_param(rc, "recruit_multi", "0.5");
     CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
-    rc_set_param(rc, "migrants.formula", "1");
-    CuAssertIntEquals(tc, RCF_MIGRANTS, rc->flags&RCF_MIGRANTS);
+    rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
-    rc_set_param(rc, "ai.scare", "400");
+    rc_set_param(rc, "scare", "400");
     CuAssertIntEquals(tc, 400, rc_scare(rc));
-    rc_set_param(rc, "hunger.damage", "1d10+12");
+    rc_set_param(rc, "hunger_damage", "1d10+12");
     CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
     test_teardown();
 }

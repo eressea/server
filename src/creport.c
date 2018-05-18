@@ -519,7 +519,7 @@ static void report_crtypes(FILE * F, const struct locale *lang)
             fputc('\"', F);
             fputs(str_escape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
             fputs("\";text\n", F);
-            fprintf(F, "\"%s\";section\n", nrt_section(kmt->mtype));
+            fprintf(F, "\"%s\";section\n", kmt->mtype->section);
         }
         while (mtypehash[i]) {
             kmt = mtypehash[i];

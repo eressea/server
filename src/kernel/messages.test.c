@@ -22,10 +22,10 @@ void test_missing_message(CuTest *tc) {
 
 void test_message(CuTest *tc) {
     message *msg;
-    message_type *mtype = mt_new("custom", NULL);
+    message_type *mtype;
 
     test_setup();
-    mt_register(mtype);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
     CuAssertIntEquals(tc, 0, mtype->nparameters);
     CuAssertPtrEquals(tc, NULL, (void *)mtype->pnames);
@@ -47,11 +47,11 @@ void test_message(CuTest *tc) {
 static void test_merge_split(CuTest *tc) {
     message_list *mlist = 0, *append = 0;
     struct mlist **split; /* TODO: why is this a double asterisk? */
-    message_type *mtype = mt_new("custom", NULL);
+    message_type *mtype;
     message *msg;
 
     test_setup();
-    mt_register(mtype);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     add_message(&mlist, msg = msg_message(mtype->name, ""));
     msg_release(msg);
     add_message(&append, msg = msg_message(mtype->name, ""));

@@ -40,6 +40,7 @@ extern "C" {
     struct gamedata;
     struct rawmaterial_type;
     struct resource_mod;
+    struct weapon_type;
 
     typedef struct item {
         struct item *next;
@@ -66,9 +67,12 @@ extern "C" {
 
     void item_done(void);
 
+    typedef bool(*wtype_attack)(const struct troop *,
+        const struct weapon_type *, int *);
     typedef int(*rtype_uchange) (struct unit * user,
         const struct resource_type * rtype, int delta);
     typedef char *(*rtype_name) (const struct resource_type * rtype, int flags);
+
     typedef struct resource_type {
         /* --- constants --- */
         char *_name;             /* wie es hei�t */
@@ -159,9 +163,9 @@ extern "C" {
         const item_type *itype;
         unsigned int flags;
         double penalty;
+        double projectile; /* chance, dass ein projektil abprallt */
         variant magres;
         int prot;
-        float projectile;           /* chance, dass ein projektil abprallt */
     } armor_type;
 
 #define WTF_NONE          0x00
@@ -224,9 +228,10 @@ extern "C" {
     weapon_type *new_weapontype(item_type * itype, int wflags,
         variant magres, const char *damage[], int offmod, int defmod, int reload,
         skill_t sk);
+    void free_wtype(struct weapon_type *wtype);
     armor_type *new_armortype(item_type * itype, double penalty,
         variant magres, int prot, unsigned int flags);
-
+    void free_atype(struct armor_type *wtype);
     /* these constants are used with get_resourcetype.
      * The order of the enum is not important for stored data.
      * The resourcenames array must be updated to match.

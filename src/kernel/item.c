@@ -243,17 +243,16 @@ item_type *it_find(const char *zname)
 }
 
 item_type *it_get_or_create(resource_type *rtype) {
-    item_type * itype;
     assert(rtype);
-    itype = it_find(rtype->_name);
-    if (!itype) {
+    if (!rtype->itype) {
+        item_type * itype;
         itype = (item_type *)calloc(sizeof(item_type), 1);
+        itype->rtype = rtype;
+        rtype->uchange = res_changeitem;
+        rtype->itype = itype;
+        rtype->flags |= RTF_ITEM;
     }
-    itype->rtype = rtype;
-    rtype->uchange = res_changeitem;
-    rtype->itype = itype;
-    rtype->flags |= RTF_ITEM;
-    return itype;
+    return rtype->itype;
 }
 
 static void lt_register(luxury_type * ltype)
@@ -291,7 +290,7 @@ weapon_type *new_weapontype(item_type * itype,
         wtype->damage[1] = str_strdup(damage[1]);
     }
     wtype->defmod = defmod;
-    wtype->flags |= wflags;
+    wtype->flags = wflags;
     wtype->itype = itype;
     wtype->magres = magres;
     wtype->offmod = offmod;
@@ -892,7 +891,11 @@ static void free_itype(item_type *itype) {
     free(itype);
 }
 
-static void free_wtype(weapon_type *wtype) {
+void free_atype(armor_type *atype) {
+    free(atype);
+}
+
+void free_wtype(weapon_type *wtype) {
     assert(wtype);
     free(wtype->damage[0]);
     free(wtype->damage[1]);
@@ -907,7 +910,9 @@ void free_rtype(resource_type *rtype) {
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
-    free(rtype->atype);
+    if (rtype->atype) {
+        free_atype(rtype->atype);
+    }
     free(rtype->modifiers);
     free(rtype->raw);
     free(rtype->_name);

@@ -111,6 +111,7 @@ set (ERESSEA_SRC
   report.c
   steal.c
   economy.c
+  exparse.c
   give.c
   items.c
   laws.c
@@ -127,7 +128,6 @@ set (ERESSEA_SRC
   travelthru.c
   monsters.c
   wormhole.c
-  xmlreader.c
   ${SPELLS_SRC}
   ${RACES_SRC}
   ${ITEMS_SRC}
@@ -182,15 +182,6 @@ target_link_libraries(eressea
   ${INIPARSER_LIBRARIES}
 )
 
-add_executable(convert convert.c)
-target_link_libraries(convert
-  game
-  ${LUA_MATH_LIBRARY}
-  ${STORAGE_LIBRARIES}
-  ${CLIBS_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
-)
-
 set(TESTS_SRC
   test_eressea.c
   tests.c
@@ -230,7 +221,6 @@ set(TESTS_SRC
   volcano.test.c
   vortex.test.c
   wormhole.test.c
-# xmlreader.test.c
   spells/flyingship.test.c
   spells/magicresistance.test.c
   triggers/shock.test.c
@@ -280,18 +270,15 @@ endif(HAVE_STRDUP)
 if (HAVE_LIBBSD)
 target_link_libraries(test_eressea bsd)
 target_link_libraries(eressea bsd)
-target_link_libraries(convert bsd)
 endif (HAVE_LIBBSD)
 
 if (SQLITE3_FOUND)
 include_directories (${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARIES})
-target_link_libraries(convert ${SQLITE3_LIBRARIES})
 target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
 add_definitions(-DUSE_SQLITE)
 elseif (DB_FOUND)
 include_directories (${DB_INCLUDE_DIR})
-target_link_libraries(convert ${DB_LIBRARIES})
 target_link_libraries(eressea ${DB_LIBRARIES})
 target_link_libraries(test_eressea ${DB_LIBRARIES})
 add_definitions(-DUSE_DB)
@@ -309,9 +296,8 @@ target_link_libraries(eressea ${CURSES_LIBRARIES})
 add_definitions(-DUSE_CURSES)
 endif(CURSES_FOUND)
 
-if (LIBXML2_FOUND)
-include_directories (${LIBXML2_INCLUDE_DIR})
-target_link_libraries(eressea ${LIBXML2_LIBRARIES})
-target_link_libraries(convert ${LIBXML2_LIBRARIES})
-target_link_libraries(test_eressea ${LIBXML2_LIBRARIES})
-endif (LIBXML2_FOUND)
+if (EXPAT_FOUND)
+include_directories (${EXPAT_INCLUDE_DIRS})
+target_link_libraries(eressea ${EXPAT_LIBRARIES})
+target_link_libraries(test_eressea ${EXPAT_LIBRARIES})
+endif (EXPAT_FOUND)
