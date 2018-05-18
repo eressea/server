@@ -17,6 +17,8 @@
 #include "util/functions.h"
 #include "util/log.h"
 #include "util/message.h"
+#include "util/crmessage.h"
+#include "util/nrmessage.h"
 #include "util/strings.h"
 
 #include <expat.h>
@@ -285,8 +287,56 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
     wtype->flags = flags;
 }
 
-static void XMLCALL start_messages(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static int msg_nargs;
+static char * msg_args[MSG_MAXARGS];
+
+static void end_messages(parseinfo *pi, const XML_Char *el) {
     if (xml_strcmp(el, "message") == 0) {
+        int i;
+        struct message_type *mtype = (struct message_type *)pi->object;
+        assert(mtype);
+        assert(msg_nargs < MSG_MAXARGS);
+        mt_create(mtype, (const char **)msg_args, msg_nargs);
+        /* register the type for CR and NR */
+        crt_register(mtype);
+        nrt_register(mtype);
+
+        for (i = 0; i != msg_nargs; ++i) {
+            free(msg_args[i]);
+            msg_args[i] = NULL;
+        }
+        msg_nargs = 0;
+    }
+    else if (xml_strcmp(el, "messages") == 0) {
+        pi->type = EXP_UNKNOWN;
+    }
+}
+
+static void start_messages(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+    if (xml_strcmp(el, "arg") == 0) {
+        int i;
+        const XML_Char *name = NULL, *type = NULL;
+
+        assert(msg_nargs < MSG_MAXARGS);
+        for (i = 0; attr[i]; i += 2) {
+            const XML_Char *key = attr[i], *val = attr[i + 1];
+            if (xml_strcmp(key, "name") == 0) {
+                name = val;
+            }
+            else if (xml_strcmp(key, "type") == 0) {
+                type = val;
+            }
+            else {
+                handle_bad_input(pi, el, key);
+            }
+        }
+        if (name && type) {
+            char zBuffer[128];
+            sprintf(zBuffer, "%s:%s", name, type);
+            msg_args[msg_nargs++] = str_strdup(zBuffer);
+        }
+    }
+    else if (xml_strcmp(el, "message") == 0) {
         const XML_Char *name = NULL, *section = NULL;
         int i;
         for (i = 0; attr[i]; i += 2) {
@@ -297,10 +347,16 @@ static void XMLCALL start_messages(parseinfo *pi, const XML_Char *el, const XML_
             else if (xml_strcmp(key, "section") == 0) {
                 section = val;
             }
+            else {
+                handle_bad_input(pi, el, key);
+            }
         }
         if (name) {
-            pi->object = mt_new(name, NULL);
+            pi->object = mt_new(name, section);
         }
+    }
+    else if (xml_strcmp(el, "type") != 0 && xml_strcmp(el, "text") != 0) {
+        handle_bad_input(pi, el, NULL);
     }
 }
 
@@ -308,7 +364,7 @@ static void XMLCALL start_messages(parseinfo *pi, const XML_Char *el, const XML_
 static spell_component components[MAX_COMPONENTS];
 static int ncomponents;
 
-static void XMLCALL start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = {
         "far", "variable", "ocean", "ship", "los", 
         "unittarget", "shiptarget", "buildingtarget", "regiontarget", "globaltarget", NULL };
@@ -390,7 +446,7 @@ static void XMLCALL start_spells(parseinfo *pi, const XML_Char *el, const XML_Ch
     }
 }
 
-static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_spellbooks(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     spellbook * sb = (spellbook *)pi->object;
     if (xml_strcmp(el, "spellbook") == 0) {
         const XML_Char *name = attr_get(attr, "name");
@@ -430,7 +486,7 @@ static void XMLCALL start_spellbooks(parseinfo *pi, const XML_Char *el, const XM
     }
 }
 
-static void XMLCALL start_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     resource_type *rtype = (resource_type *)pi->object;
 
     assert(rtype && rtype->wtype);
@@ -791,7 +847,7 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
     }
 }
 
-static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "opensea", "fly", "nocoast", "speedy", NULL };
     if (xml_strcmp(el, "ship") == 0) {
         const XML_Char *name;
@@ -899,7 +955,7 @@ static void XMLCALL start_ships(parseinfo *pi, const XML_Char *el, const XML_Cha
 static int nattacks;
 static int nfamiliars;
 
-static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
         "playerrace", "killpeasants", "scarepeasants", "!cansteal",
@@ -1116,7 +1172,7 @@ static void XMLCALL start_races(parseinfo *pi, const XML_Char *el, const XML_Cha
     }
 }
 
-static void XMLCALL start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "nodestroy", "nobuild", "unique", "decay", "magic", "namechange", "fort", "oneperturn", NULL };
     if (xml_strcmp(el, "building") == 0) {
         const XML_Char *name;
@@ -1427,6 +1483,9 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     case EXP_SPELLS:
         end_spells(pi, el);
         break;
+    case EXP_MESSAGES:
+        end_messages(pi, el);
+        break;
     default:
         if (pi->depth == 1) {
             pi->object = NULL;
@@ -1444,18 +1503,6 @@ static void XMLCALL handle_end(void *data, const XML_Char *el) {
     }
 }
 
-static void XMLCALL handle_data(void *data, const XML_Char *xs, int len) {
-    parseinfo *pi = (parseinfo *)data;
-    if (len > 0) {
-        if (pi->type == EXP_MESSAGES && pi->depth == 4) {
-            size_t bytes = (size_t)len;
-            pi->cdata = realloc(pi->cdata, pi->clength + bytes);
-            memcpy(pi->cdata + pi->clength, xs, bytes);
-            pi->clength = pi->clength + bytes;
-        }
-    }
-}
-
 int exparse_readfile(const char * filename) {
     XML_Parser xp;
     FILE *F;
@@ -1469,7 +1516,6 @@ int exparse_readfile(const char * filename) {
     }
     xp = XML_ParserCreate("UTF-8");
     XML_SetElementHandler(xp, handle_start, handle_end);
-    XML_SetCharacterDataHandler(xp, handle_data);
     XML_SetUserData(xp, &pi);
     memset(&pi, 0, sizeof(pi));
     for (;;) {

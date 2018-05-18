@@ -25,7 +25,7 @@ void test_message(CuTest *tc) {
     message_type *mtype;
 
     test_setup();
-    mtype = mt_create(mt_new("custom", NULL), NULL);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
     CuAssertIntEquals(tc, 0, mtype->nparameters);
     CuAssertPtrEquals(tc, NULL, (void *)mtype->pnames);
@@ -51,7 +51,7 @@ static void test_merge_split(CuTest *tc) {
     message *msg;
 
     test_setup();
-    mtype = mt_create(mt_new("custom", NULL), NULL);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     add_message(&mlist, msg = msg_message(mtype->name, ""));
     msg_release(msg);
     add_message(&append, msg = msg_message(mtype->name, ""));

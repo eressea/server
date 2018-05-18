@@ -75,15 +75,22 @@ static unsigned int mt_id(const message_type * mtype)
 #define MT_MAXHASH 1021
 static selist *messagetypes[MT_MAXHASH];
 
-message_type *mt_create(message_type * mtype, const char *args[])
-{
-    int nparameters = 0;
+static void mt_register(message_type * mtype) {
     unsigned int hash = str_hash(mtype->name) % MT_MAXHASH;
     selist **qlp = messagetypes + hash;
 
-    if (args != NULL) {
+    if (selist_set_insert(qlp, mtype, NULL)) {
+        mtype->key = mt_id(mtype);
+    }
+}
+
+message_type *mt_create(message_type * mtype, const char *args[], int nparameters)
+{
+    if (args != NULL && args[nparameters]) {
         /* count the number of parameters */
-        while (args[nparameters]) ++nparameters;
+        do {
+            ++nparameters;
+        } while (args[nparameters]);
     }
     if (nparameters > 0) {
         int i;
@@ -111,9 +118,7 @@ message_type *mt_create(message_type * mtype, const char *args[])
             }
         }
     }
-    if (selist_set_insert(qlp, mtype, NULL)) {
-        mtype->key = mt_id(mtype);
-    }
+    mt_register(mtype);
     return mtype;
 }
 
@@ -151,7 +156,7 @@ message_type *mt_create_va(message_type *mtype, ...)
     }
     va_end(marker);
     args[i] = NULL;
-    return mt_create(mtype, args);
+    return mt_create(mtype, args, i - 1);
 }
 
 static variant copy_arg(const arg_type * atype, variant data)

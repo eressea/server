@@ -1277,7 +1277,7 @@ static int parse_messages(xmlDocPtr doc)
         xmlChar *propSection;
         xmlChar *propValue;
         xmlXPathObjectPtr result;
-        int k;
+        int nargs = 0;
         char **argv = NULL;
         const message_type *mtype;
 
@@ -1285,8 +1285,10 @@ static int parse_messages(xmlDocPtr doc)
         xpath->node = node;
         result = xmlXPathEvalExpression(BAD_CAST "type/arg", xpath);
         if (result->nodesetval && result->nodesetval->nodeNr > 0) {
-            argv = malloc(sizeof(char *) * (result->nodesetval->nodeNr + 1));
-            for (k = 0; k != result->nodesetval->nodeNr; ++k) {
+            int k;
+            nargs = result->nodesetval->nodeNr;
+            argv = malloc(sizeof(char *) * (nargs + 1));
+            for (k = 0; k != nargs; ++k) {
                 xmlNodePtr node = result->nodesetval->nodeTab[k];
                 char zBuffer[128];
                 xmlChar *propName, *propType;
@@ -1299,7 +1301,7 @@ static int parse_messages(xmlDocPtr doc)
                 xmlFree(propType);
                 argv[k] = str_strdup(zBuffer);
             }
-            argv[result->nodesetval->nodeNr] = NULL;
+            argv[nargs] = NULL;
         }
         xmlXPathFreeObject(result);
 
@@ -1312,7 +1314,7 @@ static int parse_messages(xmlDocPtr doc)
         propValue = xmlGetProp(node, BAD_CAST "name");
         mtype = mt_find((const char *)propValue);
         if (mtype == NULL) {
-            mtype = mt_create(mt_new((const char *)propValue, (const char *)propSection), (const char **)argv);
+            mtype = mt_create(mt_new((const char *)propValue, (const char *)propSection), (const char **)argv, nargs);
         }
         else {
             assert(argv != NULL || !"cannot redefine arguments of message now");
@@ -1329,8 +1331,10 @@ static int parse_messages(xmlDocPtr doc)
 
         /* let's clean up the mess */
         if (argv != NULL) {
-            for (k = 0; argv[k] != NULL; ++k)
+            int k;
+            for (k = 0; argv[k] != NULL; ++k) {
                 free(argv[k]);
+            }
             free(argv);
         }
     }

@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+#define MSG_MAXARGS 8
+#define MT_NEW_END ((const char *)0)
+
     typedef struct arg_type {
         struct arg_type *next;
         variant_type vtype;
@@ -44,9 +47,6 @@ extern "C" {
     void message_done(void);
 
     void mt_clear(void);
-#define MT_NEW_END ((const char *)0)
-    /* mt_new("simple_sentence", "subject:string", "predicate:string",
-     *        "object:string", "lang:locale", MT_NEW_END); */
 
     struct message *msg_create(const struct message_type *type,
         variant args[]);
@@ -60,7 +60,7 @@ extern "C" {
 
     struct message_type *mt_new(const char *name, const char *section);
     /** message_type registry (optional): **/
-    struct message_type *mt_create(struct message_type *, const char *args[]);
+    struct message_type *mt_create(struct message_type *, const char *args[], int nargs);
     struct message_type *mt_create_va(struct message_type *, ...);
     const struct message_type *mt_find(const char *);
 
