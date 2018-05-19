@@ -93,7 +93,7 @@ static void test_steal_okay(CuTest * tc) {
     rc->flags = 0;
     setup_steal(&env, ter, rc);
     CuAssertPtrEquals(tc, NULL, msg = steal_message(env.u, 0));
-    msg_release(msg);
+    assert(!msg);
     test_teardown();
 }
 

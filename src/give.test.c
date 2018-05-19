@@ -147,7 +147,7 @@ static void test_give_men(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
     CuAssertPtrEquals(tc, NULL, msg = give_men(1, env.src, env.dst, NULL));
-    msg_release(msg);
+    assert(!msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();
@@ -233,7 +233,7 @@ static void test_give_men_too_many(CuTest * tc) {
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
     CuAssertPtrEquals(tc, NULL, msg = give_men(2, env.src, env.dst, NULL));
-    msg_release(msg);
+    assert(!msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();

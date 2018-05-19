@@ -7,6 +7,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <assert.h>
+
 void test_missing_message(CuTest *tc) {
     message *msg;
 
@@ -87,9 +89,9 @@ static void test_noerror(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
     CuAssertTrue(tc, !is_persistent(u->thisorder));
     CuAssertPtrEquals(tc, NULL, msg = msg_error(u, u->thisorder, 100));
-    msg_release(msg);
+    assert(!msg);
     CuAssertPtrEquals(tc, NULL, msg = msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
-    msg_release(msg);
+    assert(!msg);
     test_teardown();
 }
 
