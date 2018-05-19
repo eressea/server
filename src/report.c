@@ -1037,6 +1037,9 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (is_mourning(r, turn + 1)) {
+            bytes = (int)str_strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1877,6 +1880,9 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     }
 
     if (!building_finished(b)) {
+        bytes = (int)str_strlcpy(bufp, " ", size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
         bytes = (int)str_strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
