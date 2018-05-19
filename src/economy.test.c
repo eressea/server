@@ -85,13 +85,15 @@ static void test_steal_okay(CuTest * tc) {
     struct steal env;
     race *rc;
     struct terrain_type *ter;
+    message *msg;
 
     test_setup();
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = 0;
     setup_steal(&env, ter, rc);
-    CuAssertPtrEquals(tc, 0, steal_message(env.u, 0));
+    CuAssertPtrEquals(tc, NULL, msg = steal_message(env.u, 0));
+    msg_release(msg);
     test_teardown();
 }
 
@@ -739,6 +741,7 @@ static void test_expand_production(CuTest *tc) {
     CuAssertPtrEquals(tc, u, results[0]->unit);
     CuAssertPtrEquals(tc, u, results[1]->unit);
     CuAssertIntEquals(tc, 0, u->n);
+    free(results);
     test_teardown();
 }
 

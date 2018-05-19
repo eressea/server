@@ -40,12 +40,15 @@ static void setup_give(struct give *env) {
 
     env->r = test_create_region(0, 0, ter);
     env->src = test_create_unit(env->f1, env->r);
-    env->dst = env->f2 ? test_create_unit(env->f2, env->r) : 0;
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
-    if (env->f1 && env->f2) {
+    if (env->f2) {
         ally * al = ally_add(&env->f2->allies, env->f1);
         al->status = HELP_GIVE;
+        env->dst = test_create_unit(env->f2, env->r);
+    }
+    else {
+        env->dst = NULL;
     }
     if (env->lang) {
         locale_setstring(env->lang, env->itype->rtype->_name, "SILBER");
@@ -139,10 +142,12 @@ static void test_give_unit_to_ocean(CuTest * tc) {
 
 static void test_give_men(CuTest * tc) {
     struct give env = { 0 };
+    message * msg;
     test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
-    CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, msg = give_men(1, env.src, env.dst, NULL));
+    msg_release(msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();
@@ -222,10 +227,13 @@ static void test_give_men_in_ocean(CuTest * tc) {
 
 static void test_give_men_too_many(CuTest * tc) {
     struct give env = { 0 };
+    message * msg;
+
     test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
-    CuAssertPtrEquals(tc, 0, give_men(2, env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, msg = give_men(2, env.src, env.dst, NULL));
+    msg_release(msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();
