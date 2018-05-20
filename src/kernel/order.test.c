@@ -239,6 +239,7 @@ static void test_is_persistent(CuTest *tc) {
 
     ord = parse_order("@invalid", lang);
     CuAssertPtrEquals(tc, NULL, ord);
+    free_order(ord);
 
     ord = parse_order("give", lang);
     CuAssertIntEquals(tc, K_GIVE, ord->command);
@@ -290,6 +291,7 @@ static void test_is_silent(CuTest *tc) {
 
     ord = parse_order("@invalid", lang);
     CuAssertPtrEquals(tc, NULL, ord);
+    free_order(ord);
 
     ord = parse_order("// comment", lang);
     CuAssertTrue(tc, is_persistent(ord));

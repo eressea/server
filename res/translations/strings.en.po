@@ -233,7 +233,7 @@ msgstr "Calm Monster"
 
 msgctxt "spellinfo"
 msgid "sound_out"
-msgstr " Should the unit succumb to the spell, they will tell the mage everything  they know about the region is question. Is no unit of their faction in  that region, they'll have nothing to report. Also, they can only report,  what they themselves could see. "
+msgstr "Should the unit succumb to the spell, they will tell the mage everything they know about the region is question. Is no unit of their faction in that region, they'll have nothing to report. Also, they can only report, what they themselves could see."
 
 msgctxt "spell"
 msgid "readmind"
@@ -267,7 +267,7 @@ msgstr "young dragon"
 
 msgctxt "spellinfo"
 msgid "calm_monster"
-msgstr " This disarming chant can tame almost any intelligent monster. It will  refrain from attacks on the mage and his companions. But one should not  deceive oneself about the persisting unpredictable nature of the creature. "
+msgstr "This disarming chant can tame almost any intelligent monster. It will refrain from attacks on the mage and his companions. But one should not deceive oneself about the persisting unpredictable nature of the creature."
 
 msgctxt "spell"
 msgid "clone"
@@ -289,7 +289,7 @@ msgstr "mage tower"
 
 msgctxt "spellinfo"
 msgid "migration"
-msgstr " This ritual facilitates the migration of an unit to the own faction.  The candidate has to be able and willing to leave his previous faction.  He attests to that by CONTACTing the mage and will otherwise be  occupied with preparations for the ritual. The ritual will fail, if  the candidate owes the previous faction fealty for an expensive  training. The mage performing the ritual has to invest permanent aura  to bind the candidate to the faction. Per level and per point of  permanent aura the mage can bind one person. "
+msgstr "This ritual facilitates the migration of an unit to the own faction. The candidate has to be able and willing to leave his previous faction. He attests to that by CONTACTing the mage and will otherwise be occupied with preparations for the ritual. The ritual will fail, if the candidate owes the previous faction fealty for an expensive training. The mage performing the ritual has to invest permanent aura to bind the candidate to the faction. Per level and per point of permanent aura the mage can bind one person."
 
 msgctxt "race"
 msgid "illusion"
@@ -435,7 +435,7 @@ msgstr "laen shields"
 
 msgctxt "spellinfo"
 msgid "break_curse"
-msgstr "This spell allows a magician to remove a specific enchantment from a unit, ship, bulding or region. "
+msgstr "This spell allows a magician to remove a specific enchantment from a unit, ship, bulding or region."
 
 msgctxt "race"
 msgid "irongolem_x"
@@ -449,7 +449,7 @@ msgid "draigfumbleshield"
 msgstr "This ritual, performed before a battle, causes the astral energies on the battlefield to whirl and churn and thereby makes spellcasting more difficult for the enemy mages."
 
 msgid "nr_schemes_postfix"
-msgstr " can be discerned."
+msgstr "can be discerned."
 
 msgid "SILBER"
 msgstr "SILVER"
@@ -523,7 +523,7 @@ msgstr "ORIGIN"
 
 msgctxt "spellinfo"
 msgid "raise_mob"
-msgstr " Employing this magic chant the mage convinces the peasants of the region  to join him. The peasants won't leave their home region and won't give up  their possessions, though. Additionally each week some peasants will  shake off the spell and return to their fields. How many peasants join  the mage depends on the power of his chant. "
+msgstr "Employing this magic chant the mage convinces the peasants of the region to join him. The peasants won't leave their home region and won't give up their possessions, though. Additionally each week some peasants will shake off the spell and return to their fields. How many peasants join the mage depends on the power of his chant."
 
 msgid "wand"
 msgstr "wand"
@@ -572,7 +572,7 @@ msgstr "wolves"
 
 msgctxt "spellinfo"
 msgid "living_rock"
-msgstr " This draining ritual summons a gigantic earth elemental from a sphere  of laen and binds it to a building. The elemental can then be commanded  to move the building with all its occupants to a neighbouring region.  The strength of the elemental depends of the mage's skill: it can move  up to [level-12]*250 size units of building. The building won't remain  undamaged by the process. "
+msgstr "This draining ritual summons a gigantic earth elemental from a sphere of laen and binds it to a building. The elemental can then be commanded to move the building with all its occupants to a neighbouring region. The strength of the elemental depends of the mage's skill: it can move up to [level-12]*250 size units of building. The building won't remain undamaged by the process."
 
 msgctxt "race"
 msgid "museumghost_p"
@@ -686,7 +686,7 @@ msgstr "sea serpents"
 
 msgctxt "spellinfo"
 msgid "antimagiczone"
-msgstr "This spell allows a magician to create a local instability in the astral field. This zone needs to return to its equilibrium, soaking up part of the power of all spells cast in the region - or even all of some of the weaker ones. "
+msgstr "This spell allows a magician to create a local instability in the astral field. This zone needs to return to its equilibrium, soaking up part of the power of all spells cast in the region - or even all of some of the weaker ones."
 
 msgid "villagers"
 msgstr "Villagers"
@@ -801,7 +801,7 @@ msgid "sacrifice_strength"
 msgstr "Sacrifice Strength"
 
 msgid "nr_building_inprogress"
-msgstr " (under construction)"
+msgstr "(under construction)"
 
 msgid "ring_of_levitation_p"
 msgstr "rings of levitation"
@@ -836,7 +836,7 @@ msgstr "pyramid"
 
 msgctxt "spellinfo"
 msgid "big_recruit"
-msgstr " From 'Journeys' by Firudin the Wise: 'There's a small, scarcely visited inn in Weilersweide, near  Wytharhafen. It is a little known fact, that it was home to the  banished itinerant preacher Grauwolf until a few years ago. After he  recruited almost the whole peasantry with one of his notorious  speeches, he was convicted and banished for inciting unrest. Only  hesitantly did he disclose the secret to his powers of persuasion  to me.' "
+msgstr "From 'Journeys' by Firudin the Wise: 'There's a small, scarcely visited inn in Weilersweide, near Wytharhafen. It is a little known fact, that it was home to the banished itinerant preacher Grauwolf until a few years ago. After he recruited almost the whole peasantry with one of his notorious speeches, he was convicted and banished for inciting unrest. Only hesitantly did he disclose the secret to his powers of persuasion to me.'"
 
 msgid "catapultammo"
 msgstr "ammunition"
@@ -992,11 +992,11 @@ msgstr "insects"
 
 msgctxt "spellinfo"
 msgid "bad_dreams"
-msgstr " This spell enables the dreamer to disturb the sleep of all non-allied  units (HELP GUARD) in the region so severely they lose parts of their memories. "
+msgstr "This spell enables the dreamer to disturb the sleep of all non-allied units (HELP GUARD) in the region so severely they lose parts of their memories."
 
 msgctxt "spellinfo"
 msgid "bloodthirst"
-msgstr " Like many magic chants this one also originates from the ancient  knowledge of the cats who always were aware of the powerful effect  of the voice. This song inflames the temper of the warriors, enrages  them even, into a murderous frenzy. Ignoring their own pain, they fight  until death and will never flee from battle. They fight with little  regard for themselves. "
+msgstr "Like many magic chants this one also originates from the ancient knowledge of the cats who always were aware of the powerful effect of the voice. This song inflames the temper of the warriors, enrages them even, into a murderous frenzy. Ignoring their own pain, they fight until death and will never flee from battle. They fight with little regard for themselves."
 
 msgctxt "spell"
 msgid "nodrift"
@@ -1033,7 +1033,7 @@ msgstr "While being aboard a ship, the druid uses this ritual to force the Eleme
 
 msgctxt "spellinfo"
 msgid "astral_disruption"
-msgstr " This spell causes a severe disturbance of the atral plane. Within an  astral radius of level/5 regions all astral creatures not able to  resist the spell will be thrown from the astral plane. The astral  contact with all affected regions will be disrupted for level/3  weeks. "
+msgstr "This spell causes a severe disturbance of the atral plane. Within an astral radius of level/5 regions all astral creatures not able to resist the spell will be thrown from the astral plane. The astral contact with all affected regions will be disrupted for level/3 weeks."
 
 msgctxt "spell"
 msgid "earthquake"
@@ -1051,7 +1051,7 @@ msgstr "Is hard to hit by blunt weapons and catapults."
 
 msgctxt "spellinfo"
 msgid "combat_speed"
-msgstr " This spell accelerates some fighters of the own side, which empowers  them to attack twice every round throughout the battle. "
+msgstr "This spell accelerates some fighters of the own side, which empowers them to attack twice every round throughout the battle."
 
 msgctxt "keyword"
 msgid "claim"
@@ -1111,7 +1111,7 @@ msgstr "sea serpent"
 
 msgctxt "spellinfo"
 msgid "fish_shield"
-msgstr " This spell can project a slightly distorted image of the own troops,  like the surface of the lake distorts the position of a fish. Half  the damage of each hit can be deflected harmlessly through those  means. The shield will only last a few hundred hits before it  dissipates. The stronger the mage, the more damage the shield can take. "
+msgstr "This spell can project a slightly distorted image of the own troops, like the surface of the lake distorts the position of a fish. Half the damage of each hit can be deflected harmlessly through those means. The shield will only last a few hundred hits before it dissipates. The stronger the mage, the more damage the shield can take."
 
 msgid "section_newpotions"
 msgstr "New Potions"
@@ -1192,7 +1192,7 @@ msgstr "desert"
 
 msgctxt "iteminfo"
 msgid "snowglobe"
-msgstr " A sphere with a diameter of three inches made of crystal glass, sitting  on a granite base. On the inside countless tiny snowflakes dance around lively. On the  bottom of the base a golden compass rose is engraved. A beautiful sight  to behold, but it emanates a nameless cold. Among mages and others knowledgeable in the arcane arts the function and  effect of the artefact are disputed intensely. Although there is  agreement about something: upon release the intensity of the contained  cold would have permanent repercussions for a large area. Gigantic fires  would be extinguished, volcanos quelled and large bodies of water frozen  solid. In less extreme environments permanent changes were also probable. Therefore it isn't recommended to drop the cold treasure. It should be  thrown far off instead, while making sure there is no living being  within the impact zone, if one is willing to risk the usage.  (USE \"snow globe\" <DIRECTION>) "
+msgstr "A sphere with a diameter of three inches made of crystal glass, sitting on a granite base. On the inside countless tiny snowflakes dance around lively. On the bottom of the base a golden compass rose is engraved. A beautiful sight to behold, but it emanates a nameless cold. Among mages and others knowledgeable in the arcane arts the function and effect of the artefact are disputed intensely. Although there is agreement about something: upon release the intensity of the contained cold would have permanent repercussions for a large area. Gigantic fires would be extinguished, volcanos quelled and large bodies of water frozen solid. In less extreme environments permanent changes were also probable. Therefore it isn't recommended to drop the cold treasure. It should be thrown far off instead, while making sure there is no living being within the impact zone, if one is willing to risk the usage. (USE \"snow globe\" <DIRECTION>) "
 
 msgctxt "race"
 msgid "dolphin"
@@ -1207,7 +1207,7 @@ msgstr "goblins"
 
 msgctxt "spellinfo"
 msgid "song_of_slavery"
-msgstr " This powerful spell robs the victim of their own free will and enslaves  them to the commands of the bard. For some time the victim will turn  their back on their own people and join the faction of the bard. "
+msgstr "This powerful spell robs the victim of their own free will and enslaves them to the commands of the bard. For some time the victim will turn their back on their own people and join the faction of the bard."
 
 msgctxt "spell"
 msgid "healingzone"
@@ -1335,7 +1335,7 @@ msgstr "troll horn"
 
 msgctxt "spellinfo"
 msgid "great_drought"
-msgstr " This powerful ritual opens a gate to the elemental plane of  fire. A great drought comes over the land. Farmers, animals and  plants of the region are fighting for survival, but only half of  all living things will be able to survive a drought like this.  The region will suffer the consequences of such a drought for years to come. "
+msgstr "This powerful ritual opens a gate to the elemental plane of fire. A great drought comes over the land. Farmers, animals and plants of the region are fighting for survival, but only half of all living things will be able to survive a drought like this. The region will suffer the consequences of such a drought for years to come."
 
 msgid "fog"
 msgstr "fog"
@@ -1572,7 +1572,7 @@ msgstr "black "
 
 msgctxt "spellinfo"
 msgid "magic_roots"
-msgstr " Through a elaborate ritual a druid permanently channels a fragment of his  power into the soil and the forests of the region. This forever changes  the equilibrium of nature in the region. From this point on only the  fierce but strong mallorn trees will grow there. "
+msgstr "Through a elaborate ritual a druid permanently channels a fragment of his power into the soil and the forests of the region. This forever changes the equilibrium of nature in the region. From this point on only the fierce but strong mallorn trees will grow there."
 
 msgctxt "race"
 msgid "undead_d"
@@ -1674,11 +1674,11 @@ msgid "fetch_astral"
 msgstr "Call of Reality"
 
 msgid "nr_mourning"
-msgstr " (in mourning)"
+msgstr "(in mourning)"
 
 msgctxt "spellinfo"
 msgid "analyse_object"
-msgstr " Like creatures ships, buildings and even regions also have their own  song, even though it's faint and harder to hear. Like it can be  discerned from the life song of a person, if the person is affected  by a spell, it can also be done for ships, buildings and regions. "
+msgstr "Like creatures ships, buildings and even regions also have their own song, even though it's faint and harder to hear. Like it can be discerned from the life song of a person, if the person is affected by a spell, it can also be done for ships, buildings and regions."
 
 msgctxt "race"
 msgid "shadowbat_x"
@@ -1704,7 +1704,7 @@ msgstr "eye of dragon"
 
 msgctxt "spellinfo"
 msgid "fetch_astral"
-msgstr "A magician in the material world can summon units from the adjacent part of the astral plane. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will. "
+msgstr "A magician in the material world can summon units from the adjacent part of the astral plane. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will."
 
 msgid "chainmail_p"
 msgstr "chainmails"
@@ -1816,7 +1816,7 @@ msgstr "LOCALE"
 
 msgctxt "spellinfo"
 msgid "song_suscept_magic"
-msgstr " This song, which is woven into the magical essence of the region,  weakens the natural resistance against a singular enchantment by 15%.  Only the allies of the bard (HELP GUARD) are immune to the effect of  the chant. "
+msgstr "This song, which is woven into the magical essence of the region, weakens the natural resistance against a singular enchantment by 15%. Only the allies of the bard (HELP GUARD) are immune to the effect of the chant."
 
 msgid "plate"
 msgstr "platemail"
@@ -2110,7 +2110,7 @@ msgstr "Rank:"
 
 msgctxt "spellinfo"
 msgid "stonegolem"
-msgstr "'Take a flawless block of crystaline stone and humidify it with a vial of Water of Life until the potion has been soaked up completely. Then focus your power on the forming aura of life and shape a container for the unbound forces'. The more power a magician invests, the more golems can be created before the aura dissipates. Every week, there is a 10 percent chance that the golem will crumble to dust. If you command a golem to 'MAKE CASTLE' or 'MAKE ROAD', it will turn itself into 4 stones that it uses in construction, and disintegrate afterwards. "
+msgstr "'Take a flawless block of crystaline stone and humidify it with a vial of Water of Life until the potion has been soaked up completely. Then focus your power on the forming aura of life and shape a container for the unbound forces'. The more power a magician invests, the more golems can be created before the aura dissipates. Every week, there is a 10 percent chance that the golem will crumble to dust. If you command a golem to 'MAKE CASTLE' or 'MAKE ROAD', it will turn itself into 4 stones that it uses in construction, and disintegrate afterwards."
 
 msgid "dolphin"
 msgstr "dolphin"
@@ -2213,7 +2213,7 @@ msgstr "The peasant love potion enamors both Man and Woman to the same degree an
 
 msgctxt "describe"
 msgid "p13"
-msgstr "One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood. "
+msgstr "One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood."
 
 msgid "an_unknown_curse"
 msgstr "an unknown curse"
@@ -2412,7 +2412,7 @@ msgstr "eagle"
 
 msgctxt "spellinfo"
 msgid "calm_riot"
-msgstr " By means of this magical chant the mage can calm a rioting region.  The peasant mobs will disperse and return to their fields. "
+msgstr "By means of this magical chant the mage can calm a rioting region. The peasant mobs will disperse and return to their fields."
 
 msgctxt "race"
 msgid "stonegolem"
@@ -2745,7 +2745,7 @@ msgstr "Song of Slavery"
 
 msgctxt "spellinfo"
 msgid "song_of_confusion"
-msgstr "If is used before battle, this chant, taken from the ancient tunes of the cats, might give you the critical tactical advantage. Those under the spell's influence will act uncoordinated and inconsequent due to the nonsensical ideas planted into their minds through the melody. So it is supposed to have come to pass that well-organized armies found their archers up at the front (while the cavalry was back at the camp playing cards) or that even a famous general overslept a battle in his tent, as tale-tellers claim it really happened during the Great Wars in the Old World. "
+msgstr "If is used before battle, this chant, taken from the ancient tunes of the cats, might give you the critical tactical advantage. Those under the spell's influence will act uncoordinated and inconsequent due to the nonsensical ideas planted into their minds through the melody. So it is supposed to have come to pass that well-organized armies found their archers up at the front (while the cavalry was back at the camp playing cards) or that even a famous general overslept a battle in his tent, as tale-tellers claim it really happened during the Great Wars in the Old World."
 
 msgctxt "border"
 msgid "gate_locked"
@@ -2907,7 +2907,7 @@ msgstr "ERESSEA"
 
 msgctxt "spellinfo"
 msgid "airship"
-msgstr "These magic runes allow a boat with a capacity of up  to 50 weight units to fly for a week and allow the boat to cross land.  The enchanted ink's components include a windbag and a snowcrystal petal. "
+msgstr "These magic runes allow a boat with a capacity of up to 50 weight units to fly for a week and allow the boat to cross land. The enchanted ink's components include a windbag and a snowcrystal petal."
 
 msgid "bagpipeoffear_p"
 msgstr "bagpipes of fear"
@@ -2944,7 +2944,7 @@ msgstr "Astral Gaze"
 
 msgctxt "iteminfo"
 msgid "skillpotion"
-msgstr " The recipe of this potion is a well kept secret. Some even say it  couldn't be brewed by mere mortals. One thing is certain though, the  drinker receives further insight into any learned skills, which furthers  their progress towards the mastery of those skills. "
+msgstr "The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned skills, which furthers their progress towards the mastery of those skills."
 
 msgctxt "keyword"
 msgid "cast"
@@ -2963,7 +2963,7 @@ msgstr "dwarf"
 
 msgctxt "spellinfo"
 msgid "irongolem"
-msgstr "The more power a magician invests, the more golems can be created before the aura dissipates. Each golem has a 15% chance per week to turn to dust. If you command a golem to 'MAKE SWORD/MAKE CLAYMORE' or 'MAKE SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron ingots and disintegrate afterwards. "
+msgstr "The more power a magician invests, the more golems can be created before the aura dissipates. Each golem has a 15% chance per week to turn to dust. If you command a golem to 'MAKE SWORD/MAKE CLAYMORE' or 'MAKE SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron ingots and disintegrate afterwards."
 
 msgid "cookie_p"
 msgstr "cookies"
@@ -3087,7 +3087,7 @@ msgstr "permauras"
 
 msgctxt "spellinfo"
 msgid "song_of_peace"
-msgstr " This powerful spell prevents any attacks. Noone in the entire region  will be able to raise his weapon against another. The effect can last  for weeks. "
+msgstr "This powerful spell prevents any attacks. Noone in the entire region will be able to raise his weapon against another. The effect can last for weeks."
 
 msgctxt "spell"
 msgid "nocostbuilding"
@@ -3189,7 +3189,7 @@ msgstr "Acceleration"
 
 msgctxt "spellinfo"
 msgid "clone"
-msgstr " This powerful spell can keep the mage from certain death. The mage  creates a clone of himself from a small blood sample and puts it into  a bath of dragon's blood and thinned water of life. Subsequently he transfers a fragment of his soul into the clone in a  complex ritual. If the mage dies afterwards, his soul takes possession  of the clone which will serve as his new vessel. There is however a  small chance the soul is to weak to reach the vessel in the wake of the  mage's death. "
+msgstr "This powerful spell can keep the mage from certain death. The mage creates a clone of himself from a small blood sample and puts it into a bath of dragon's blood and thinned water of life. Subsequently he transfers a fragment of his soul into the clone in a complex ritual. If the mage dies afterwards, his soul takes possession of the clone which will serve as his new vessel. There is however a small chance the soul is to weak to reach the vessel in the wake of the mage's death."
 
 msgctxt "race"
 msgid "elf_p"
@@ -3200,7 +3200,7 @@ msgstr "elven horses"
 
 msgctxt "spellinfo"
 msgid "frighten"
-msgstr " This warsong sows panic among the enemy front line and weakens their  fighting strength significantly. Fear will weaken their sword arm and  dread will freeze their shield arm. "
+msgstr "This warsong sows panic among the enemy front line and weakens their fighting strength significantly. Fear will weaken their sword arm and dread will freeze their shield arm."
 
 msgctxt "keyword"
 msgid "ride"
@@ -3393,7 +3393,7 @@ msgstr "krakens"
 
 msgctxt "spellinfo"
 msgid "sleep"
-msgstr "This spell causes several enemies to fall asleep. Sleeping warriors don't attack and defend themselves worse than normal, but they'll wake up if they get hit during combat. "
+msgstr "This spell causes several enemies to fall asleep. Sleeping warriors don't attack and defend themselves worse than normal, but they'll wake up if they get hit during combat."
 
 msgctxt "spellinfo"
 msgid "tiredsoldiers"
@@ -3502,7 +3502,7 @@ msgstr "shields"
 
 msgctxt "spellinfo"
 msgid "melancholy"
-msgstr " With this chant the bard spreads a melancholic, sad mood among the  peasants. For a few weeks they will retreat to their huts and not  spend any silver in the theatres and taverns. "
+msgstr "With this chant the bard spreads a melancholic, sad mood among the peasants. For a few weeks they will retreat to their huts and not spend any silver in the theatres and taverns."
 
 msgctxt "spell"
 msgid "earn_silver#gwyrrd"
@@ -3778,7 +3778,7 @@ msgstr "AFTER"
 
 msgctxt "spellinfo"
 msgid "seduction"
-msgstr " With this song a unit can be bewitched in a manner, which compels  them to bequeath a large portion of their possessions to the bard.  They will keep enough for their own survival, though. "
+msgstr "With this song a unit can be bewitched in a manner, which compels them to bequeath a large portion of their possessions to the bard. They will keep enough for their own survival, though."
 
 msgctxt "race"
 msgid "dwarf_d"
@@ -3985,7 +3985,7 @@ msgstr "a solid wall"
 
 msgctxt "spellinfo"
 msgid "double_time"
-msgstr "Abstract theories of space and time at last find  practical application in this spell which warps the very fabric of  time around a person. Such a person has twice as many movement points  and doubles their attacks per round for a few weeks."
+msgstr "Abstract theories of space and time at last find practical application in this spell which warps the very fabric of time around a person. Such a person has twice as many movement points and doubles their attacks per round for a few weeks."
 
 msgctxt "race"
 msgid "direwolf"
@@ -4260,7 +4260,7 @@ msgstr "knotroots"
 
 msgctxt "spellinfo"
 msgid "mindblast"
-msgstr "With this spell the mentalist directly attacks his enemies' souls. A blast of astral and electrical energy strikes the foes. If a victim fails to resist the magic, he will permanently lose part of his memories. Being the target of this spell for too many times may result in death. "
+msgstr "With this spell the mentalist directly attacks his enemies' souls. A blast of astral and electrical energy strikes the foes. If a victim fails to resist the magic, he will permanently lose part of his memories. Being the target of this spell for too many times may result in death."
 
 msgid "nr_spell_description"
 msgstr "Description:"
@@ -4378,7 +4378,7 @@ msgstr "wands"
 
 msgctxt "spellinfo"
 msgid "earn_silver#cerddor"
-msgstr "The mages of Cerddor truly are the bards of the wizards; they love to use their sorcery to entertain the crowds and to be the center of attention. Even the apprentices study those little magic tricks, which attract and fascinate the people and thus ensnare them into leaving a few coins or more for the artist. By the end of the week, the bard will have earned 50 silver per level. "
+msgstr "The mages of Cerddor truly are the bards of the wizards; they love to use their sorcery to entertain the crowds and to be the center of attention. Even the apprentices study those little magic tricks, which attract and fascinate the people and thus ensnare them into leaving a few coins or more for the artist. By the end of the week, the bard will have earned 50 silver per level."
 
 msgctxt "spell"
 msgid "strength"
@@ -4450,7 +4450,7 @@ msgstr "SELL"
 
 msgctxt "spellinfo"
 msgid "auratransfer"
-msgstr " With this spell the mage can transfer aura of his own to a mage of  the same school with a rate of 2:1 or to a mage of a different school  with a rate of 3:1. "
+msgstr "With this spell the mage can transfer aura of his own to a mage of the same school with a rate of 2:1 or to a mage of a different school with a rate of 3:1."
 
 msgctxt "race"
 msgid "wyrm"
@@ -4479,7 +4479,7 @@ msgstr "aggressive"
 
 msgctxt "spellinfo"
 msgid "song_resist_magic"
-msgstr " This magical song, once performed with vigor, will propagate in the  region by wandering from mouth to mouth. It will be heard everywhere.  How long the song will last in the public perception depends on the  bard's skill. Until it is gone it will give him and all his allies  (HELP GUARD) a bonus of 15% to their natural resistance to magic. "
+msgstr "This magical song, once performed with vigor, will propagate in the region by wandering from mouth to mouth. It will be heard everywhere. How long the song will last in the public perception depends on the bard's skill. Until it is gone it will give him and all his allies (HELP GUARD) a bonus of 15% to their natural resistance to magic."
 
 msgctxt "keyword"
 msgid "contact"
@@ -4516,7 +4516,7 @@ msgstr "Hangover"
 
 msgctxt "spellinfo"
 msgid "maelstrom"
-msgstr " This ritual summons a mighty water elemental from the depths of the ocean. The elemental creates an enormous maelstrom which damages any passing ships. "
+msgstr "This ritual summons a mighty water elemental from the depths of the ocean. The elemental creates an enormous maelstrom which damages any passing ships."
 
 msgid "dolphin_p"
 msgstr "dolphins"
@@ -4529,7 +4529,7 @@ msgstr "NOT"
 
 msgctxt "spellinfo"
 msgid "view_reality"
-msgstr " With this spell the mage can glance from the astral to the material  plane and recognize regions and units. "
+msgstr "With this spell the mage can glance from the astral to the material plane and recognize regions and units."
 
 msgid "vortex"
 msgstr "vortex"
@@ -4735,7 +4735,7 @@ msgstr "Create A Bag of Holding"
 
 msgctxt "spellinfo"
 msgid "orkdream"
-msgstr "This spell - whose use is forbidden in most cultures - creates an uncontrollable desire for physical love in the victim. The affected persons will rush head over heels into a love affair, unable to think of anything else. Most of them will regret this a few months later... "
+msgstr "This spell - whose use is forbidden in most cultures - creates an uncontrollable desire for physical love in the victim. The affected persons will rush head over heels into a love affair, unable to think of anything else. Most of them will regret this a few months later..."
 
 msgctxt "spell"
 msgid "hail"
@@ -4851,7 +4851,7 @@ msgstr "claymore"
 
 msgctxt "spellinfo"
 msgid "show_astral"
-msgstr " The mage kann glance in the astral plane for a short time and  perceives all units within an astral radius of level/5 regions. "
+msgstr "The mage kann glance in the astral plane for a short time and perceives all units within an astral radius of level/5 regions."
 
 msgctxt "race"
 msgid "demon_d"
@@ -4891,7 +4891,7 @@ msgstr "lynx"
 
 msgctxt "spellinfo"
 msgid "cerddor_destroymagic"
-msgstr " Every enchantment influences the life song, weakens and distorts it.  The skillful bard can try to catch the life song, to strengthen it and  cleanse the alteration from the song. "
+msgstr "Every enchantment influences the life song, weakens and distorts it. The skillful bard can try to catch the life song, to strengthen it and cleanse the alteration from the song."
 
 msgctxt "spellinfo"
 msgid "treegrow"
@@ -5052,7 +5052,7 @@ msgstr "Warnings and Errors"
 
 msgctxt "spellinfo"
 msgid "protective_runes"
-msgstr " Drawn on the walls of a building or on the planks of a ship these  runes will protect it from magic influence. Every ritual increases  the resistance of the building or ship against enchantments by 20%.  The effect can be increased by performing the ritual multiple times,  but perfect protection is unlikely. The runes last at least three  weeks, depending on the mage's skill maybe much longer. "
+msgstr "Drawn on the walls of a building or on the planks of a ship these runes will protect it from magic influence. Every ritual increases the resistance of the building or ship against enchantments by 20%. The effect can be increased by performing the ritual multiple times, but perfect protection is unlikely. The runes last at least three weeks, depending on the mage's skill maybe much longer."
 
 msgctxt "race"
 msgid "ghast"
@@ -5072,7 +5072,7 @@ msgstr "RESEARCH"
 
 msgctxt "spellinfo"
 msgid "song_of_healing"
-msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magic melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones and even regenerate lost lims. "
+msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magic melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones and even regenerate lost lims."
 
 msgctxt "coast"
 msgid "nw"
@@ -5254,7 +5254,7 @@ msgstr "ocean"
 
 msgctxt "spellinfo"
 msgid "headache"
-msgstr " Transcript to the lecture of Selen Ard'Ragorn in Bar'Glingal: 'It is said, this spell had its beginnings in the drinking holes of the  Westgassen, but every other disreputable quarter is just as likely. Its  most important ingredient is about a cask of terrible wine, the cheaper  and more unbecoming, the more effective will be the essence. The art to  distill this wine into pure essence is far more demanding than the simple  brewery of an alchemist. Even more so to bind and conserve it, preventing  its natural tendency to evaporate. This can only be accomplished by a  master of Cerddor. Say, you manage to produce a vial of this ruby red,  shimmering - well, not fluid, but also not exactly vapor - let's call it  elixir. More challenges still lie ahead. The effective properties of the  elixir are quick to dissipate. Therefore it has to be dribbled into the  drink of the chosen victim within days. That is when you masters of  infatuation and seduction can truly proof your worth. But take care not  to drink of the concoction yourselves, for one taste will ensnare you to  the tastes of wine and you will spend a full week on a bender. And as  sure as day follows night, a dreadful agony will claim your head  afterwards. You will lose knowledge of your best skill, two weeks worth  of study just gone. Another word of warning: this spell is very complex. Should you try  further spells during the same week, they will be far more difficult to  perform.' "
+msgstr "Transcript to the lecture of Selen Ard'Ragorn in Bar'Glingal: 'It is said, this spell had its beginnings in the drinking holes of the Westgassen, but every other disreputable quarter is just as likely. Its most important ingredient is about a cask of terrible wine, the cheaper and more unbecoming, the more effective will be the essence. The art to distill this wine into pure essence is far more demanding than the simple brewery of an alchemist. Even more so to bind and conserve it, preventing its natural tendency to evaporate. This can only be accomplished by a master of Cerddor. Say, you manage to produce a vial of this ruby red, shimmering - well, not fluid, but also not exactly vapor - let's call it elixir. More challenges still lie ahead. The effective properties of the elixir are quick to dissipate. Therefore it has to be dribbled into the drink of the chosen victim within days. That is when you masters of infatuation and seduction can truly proof your worth. But take care not to drink of the concoction yourselves, for one taste will ensnare you to the tastes of wine and you will spend a full week on a bender. And as sure as day follows night, a dreadful agony will claim your head afterwards. You will lose knowledge of your best skill, two weeks worth of study just gone. Another word of warning: this spell is very complex. Should you try further spells during the same week, they will be far more difficult to perform.'"
 
 msgctxt "keyword"
 msgid "sabotage"
@@ -5379,7 +5379,7 @@ msgstr "This complicated but effective spell uses the Elemental Spirits of Stone
 
 msgctxt "spellinfo"
 msgid "armor_shield"
-msgstr " This ritual, to be performed before battle, gives the own troops an  added bonus to their armor. Every hit reduces the strength of the  spell until it dissipates during battle. "
+msgstr "This ritual, to be performed before battle, gives the own troops an added bonus to their armor. Every hit reduces the strength of the spell until it dissipates during battle."
 
 msgid "desert_trail"
 msgstr "the deserts of %s"
@@ -5440,7 +5440,7 @@ msgstr "laen"
 
 msgctxt "spellinfo"
 msgid "incite_riot"
-msgstr " By means of this magical chant the mage incites riots in a region.  Rebelling peasant mobs prevent taxation and recruiting and almost  noone will pay money for entertainment. After a few weeks the mob  will calm down again. "
+msgstr "By means of this magical chant the mage incites riots in a region. Rebelling peasant mobs prevent taxation and recruiting and almost noone will pay money for entertainment. After a few weeks the mob will calm down again."
 
 msgid "longboat"
 msgstr "longboat"
@@ -5504,7 +5504,7 @@ msgstr "oil"
 
 msgctxt "spellinfo"
 msgid "pull_astral"
-msgstr "A magician in the astral plane can summon units from the material world. The magician can bring (level-3)*15 GE through the temporary portal. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will. "
+msgstr "A magician in the astral plane can summon units from the material world. The magician can bring (level-3)*15 GE through the temporary portal. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will."
 
 msgid "smod_far"
 msgstr "far"

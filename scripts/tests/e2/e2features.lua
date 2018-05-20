@@ -486,3 +486,13 @@ function test_rising_undead()
     assert_equal(2, u.number)
     assert_equal(u.number, u:get_item('rustysword'))
 end
+
+function test_dwarf_mining()
+    local f = faction.create('dwarf')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u.name = 'Xolgrim'
+    u:set_skill('mining', 2)
+    assert_equal(2, u:get_skill('mining'))
+    assert_equal(4, u:eff_skill('mining'))
+end

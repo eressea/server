@@ -111,7 +111,8 @@ size_t str_slprintf(char * dst, size_t size, const char * format, ...)
     return (size_t)result;
 }
 
-void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value)
+void str_replace(char *buffer, size_t size, const char *tmpl, const char *var,
+    const char *value)
 {
     size_t val_len = strlen(value);
     size_t var_len = strlen(var);
@@ -154,8 +155,7 @@ int str_hash(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *str_escape(const char *str, char *buffer,
-    size_t len)
+const char *str_escape(const char *str, char *buffer, size_t len)
 {
     const char *handle_start = strchr(str, '\"');
     if (!handle_start) handle_start = strchr(str, '\\');
