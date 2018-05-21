@@ -488,7 +488,6 @@ static void test_study_order_unknown_quoted(CuTest *tc) {
 static void test_create_order_long(CuTest *tc) {
     char buffer[2048];
     order *ord;
-    size_t len;
     struct locale *lang;
     stream out;
     const char * longstr = "// BESCHREIBEN EINHEIT \"In weiÃ&#131; &#131; &#131; &#131; &#131; &#131; &#131; &#"
@@ -508,7 +507,6 @@ static void test_create_order_long(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     ord = parse_order(longstr, lang);
-    len = strlen(longstr);
     CuAssertIntEquals(tc, 0, ord->command);
     mstream_init(&out);
     stream_order(&out, ord, lang, true);
