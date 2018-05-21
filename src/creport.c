@@ -517,7 +517,7 @@ static void report_crtypes(FILE * F, const struct locale *lang)
             assert(hash > 0);
             fprintf(F, "MESSAGETYPE %d\n", hash);
             fputc('\"', F);
-            fputs(str_escape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
+            fputs(crescape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
             fputs("\";text\n", F);
             fprintf(F, "\"%s\";section\n", kmt->mtype->section);
         }

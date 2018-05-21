@@ -14,6 +14,7 @@
 #include <tests.h>
 #include <CuTest.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void test_create_order(CuTest *tc) {
     char cmd[32];
@@ -484,10 +485,62 @@ static void test_study_order_unknown_quoted(CuTest *tc) {
     test_teardown();
 }
 
+static void test_create_order_long(CuTest *tc) {
+    char buffer[2048];
+    order *ord;
+    size_t len;
+    struct locale *lang;
+    stream out;
+    const char * longstr = "// BESCHREIBEN EINHEIT \"In weiÃ&#131; &#131; &#131; &#131; &#131; &#131; &#131; &#"
+        "131;&#131;&#131;&#131;&#131;&#131;&#131;?e GewÃ&#131;&#131;&#131;&#131;&#13"
+        "1;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;Ã&#131;&#131;&#131;"
+        "&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;Ã&#131;&#131;&#131;&#"
+        "131;&#131;&#131;&#131;&#131;&#131;&#131;&#130;Ã&#131;&#131;&#131;&#131;&#13"
+        "1;&#131;&#131;&#131;&#131;&#130;Ã&#131;&#131;&#131;&#131;&#131;&#131;&#131;"
+        "&#131;&#130;Ã&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#130;Ã&#131;&#131;&"
+        "#131;&#131;&#131;&#131;&#130;Ã&#131;&#131;&#131;&#131;&#131;&#130;Ã&#131;&#"
+        "131;&#131;&#131;&#130;Ã&#131;&#131;&#131;&#130;Ã&#131;&#131;&#130;Ã&#131;&#"
+        "130;Ã&#130;Â¢&#130;Ã&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&"
+        "#131;&#131;&#130;Ã&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#1"
+        "31;&#130;Ã&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#130;Ã&#13"
+        "1;&#131;&#131;&#131;&#131;&#131;&#131;&#131;&#130;Ã&#131;&#131;&#131;&#131;"
+        "&#131;&#131;&#131;&#130[...]hB&#65533;&#65533;2&#65533;xa&#65533;Hv$P&#65533;xa&#65533;&#65533;A&#65533;&#65533;&#65533;A&#65533;&#65533;";
+    test_setup();
+    lang = test_create_locale();
+    ord = parse_order(longstr, lang);
+    len = strlen(longstr);
+    CuAssertIntEquals(tc, 0, ord->command);
+    mstream_init(&out);
+    stream_order(&out, ord, lang, true);
+    out.api->rewind(out.handle);
+    out.api->readln(out.handle, buffer, sizeof(buffer));
+    mstream_done(&out);
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_crescape(CuTest *tc) {
+    char buffer[16];
+    const char *input = "12345678901234567890";
+
+    CuAssertStrEquals(tc, "1234", crescape("1234", buffer, 16));
+    CuAssertPtrEquals(tc, (void *)input, (void *)crescape(input, buffer, 16));
+
+    CuAssertStrEquals(tc, "\\\"1234\\\"", crescape("\"1234\"", buffer, 16));
+    CuAssertStrEquals(tc, "\\\"1234\\\"", buffer);
+
+    CuAssertStrEquals(tc, "\\\"1234", crescape("\"1234\"", buffer, 8));
+
+    /* unlike in C strings, only " and \ are escaped: */
+    CuAssertStrEquals(tc, "\\\"\\\\\n\r\'", crescape("\"\\\n\r\'", buffer, 16));
+}
+
 CuSuite *get_order_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_crescape);
     SUITE_ADD_TEST(suite, test_create_order);
+    SUITE_ADD_TEST(suite, test_create_order_long);
     SUITE_ADD_TEST(suite, test_study_orders);
     SUITE_ADD_TEST(suite, test_study_order);
     SUITE_ADD_TEST(suite, test_study_order_unknown);

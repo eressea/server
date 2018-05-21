@@ -24,10 +24,24 @@ static void test_str_unescape(CuTest * tc)
 
 static void test_str_escape(CuTest * tc)
 {
-    char scratch[64];
-    CuAssertStrEquals(tc, "12345678901234567890", str_escape("12345678901234567890", scratch, 16));
-    CuAssertStrEquals(tc, "123456789\\\"12345", str_escape("123456789\"1234567890", scratch, 16));
-    CuAssertStrEquals(tc, "1234567890123456", str_escape("1234567890123456\"890", scratch, 16));
+    char scratch[16];
+
+    CuAssertPtrEquals(tc, NULL, (void *)str_escape("1234", scratch, 0));
+    CuAssertStrEquals(tc, "", str_escape("1234", scratch, 1));
+    CuAssertStrEquals(tc, "1", str_escape("1234", scratch, 2));
+    CuAssertStrEquals(tc, "\\n", str_escape("\n234", scratch, 3));
+
+    CuAssertStrEquals(tc, "\\n\\r\\t\\\\\\\"\\\'", str_escape("\n\r\t\\\"\'", scratch, 16));
+    CuAssertStrEquals(tc, "12345678", str_escape("12345678", scratch, 16));
+    CuAssertStrEquals(tc, "123456789012345", str_escape("123456789012345", scratch, 16));
+    CuAssertStrEquals(tc, "12345678901234", str_escape("12345678901234\n", scratch, 15));
+    CuAssertStrEquals(tc, "123456789012345", str_escape("12345678901234567890", scratch, 16));
+
+    CuAssertStrEquals(tc, "\\\\\\\"234", str_escape("\\\"234567890", scratch, 8));
+    CuAssertStrEquals(tc, "\\\"\\\\234", str_escape("\"\\234567890", scratch, 8));
+    CuAssertStrEquals(tc, "123456789012345", str_escape("12345678901234567890", scratch, 16));
+    CuAssertStrEquals(tc, "123456789\\\"1234", str_escape("123456789\"1234567890", scratch, 16));
+    CuAssertStrEquals(tc, "123456789012345", str_escape("1234567890123456\"890", scratch, 16));
     CuAssertStrEquals(tc, "hello world", str_escape("hello world", scratch, sizeof(scratch)));
     CuAssertStrEquals(tc, "hello \\\"world\\\"", str_escape("hello \"world\"", scratch, sizeof(scratch)));
     CuAssertStrEquals(tc, "\\\"\\\\", str_escape("\"\\", scratch, sizeof(scratch)));
