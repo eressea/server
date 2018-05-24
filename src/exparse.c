@@ -5,6 +5,8 @@
 
 #include "alchemy.h"
 
+#include "modules/score.h"
+
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/item.h"
@@ -228,6 +230,9 @@ static void handle_item(parseinfo *pi, const XML_Char *el, const XML_Char **attr
         else if (!handle_flag(&flags, attr + i, flag_names)) {
             handle_bad_input(pi, el, attr[i]);
         }
+    }
+    if (itype->score == 0) {
+        itype->score = default_score(itype);
     }
     itype->flags = flags;
 }
