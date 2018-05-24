@@ -2960,10 +2960,10 @@ static void print_stats(battle * b)
                     unit *u = tf->unit;
                     message *m = NULL;
                     if (!is_attacker(tf)) {
-                        m = msg_message("tactics_lost", "unit", u);
+                        m = msg_message("para_tactics_lost", "unit", u);
                     }
                     else {
-                        m = msg_message("tactics_won", "unit", u);
+                        m = msg_message("para_tactics_won", "unit", u);
                     }
                     message_all(b, m);
                     msg_release(m);
