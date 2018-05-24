@@ -2859,7 +2859,7 @@ msgid "Blut"
 msgstr "Blut"
 
 msgid "nr_guarding_prefix"
-msgstr "Die Region wird von"
+msgstr "Die Region wird von "
 
 msgctxt "race"
 msgid "giantturtle"
@@ -4083,7 +4083,7 @@ msgid "section_newspells"
 msgstr "Neue Zauber"
 
 msgid "nr_borderlist_prefix"
-msgstr "Im"
+msgstr "Im "
 
 msgctxt "race"
 msgid "greenscarab_d"
@@ -4156,7 +4156,7 @@ msgid "seed"
 msgstr "Same"
 
 msgid "nr_nb_next"
-msgstr ", im"
+msgstr ", im "
 
 msgctxt "spellinfo"
 msgid "undeadhero"
@@ -4823,7 +4823,7 @@ msgid "juju_d"
 msgstr "Juju-Zombies"
 
 msgid "nr_guarding_postfix"
-msgstr "bewacht."
+msgstr " bewacht."
 
 msgctxt "border"
 msgid "fogwall"
@@ -5852,7 +5852,7 @@ msgid "clone_of"
 msgstr "Klon von %s"
 
 msgid "travelthru_header"
-msgstr "Die Region wurde durchquert von"
+msgstr "Die Region wurde durchquert von "
 
 msgctxt "race"
 msgid "template_x"
