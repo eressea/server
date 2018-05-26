@@ -172,8 +172,8 @@ static order *monster_attack(unit * u, const unit * target)
     if (monster_is_waiting(u))
         return NULL;
 
-    if (u->region->land) {
-        assert(u->region->flags & RF_GUARDED);
+    if (u->region->land && (u->region->flags & RF_GUARDED) == 0) {
+        return NULL;
     }
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }

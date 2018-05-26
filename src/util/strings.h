@@ -32,7 +32,8 @@ extern "C" {
     size_t str_strlcat(char *dst, const char *src, size_t len);
     char *str_strdup(const char *s);
 
-    const char *str_escape(const char *str, char *buffer, size_t len);
+    const char *str_escape(const char *str, char *buffer, size_t size);
+    const char *str_escape_ex(const char *str, char *buffer, size_t size, const char *chars);
     char *str_unescape(char *str);
 
     unsigned int jenkins_hash(unsigned int a);
