@@ -275,6 +275,11 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
     sbs->end = sbs->begin + len;
 }
 
+size_t sbs_length(const struct sbstring *sbs)
+{
+    return sbs->end - sbs->begin;
+}
+
 char *str_unescape(char *str) {
     char *read = str, *write = str;
     while (*read) {

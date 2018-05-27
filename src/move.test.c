@@ -495,6 +495,7 @@ static void test_follow_ship_msg(CuTest * tc) {
 
     follow_ship(u, ord);
 
+    CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "error18"));
     p = msg->parameters[2].v;
     CuAssertPtrNotNull(tc, p);
