@@ -22,6 +22,16 @@ static void test_str_unescape(CuTest * tc)
     CuAssertStrEquals(tc, "\"\\\n\t\ra", scratch);
 }
 
+static void test_str_escape_ex(CuTest * tc)
+{
+    char scratch[16];
+
+    CuAssertPtrEquals(tc, NULL, (void *)str_escape_ex("1234", scratch, 0, "\\\""));
+    memset(scratch, 0, sizeof(scratch));
+    CuAssertStrEquals(tc, "1234", (void *)str_escape_ex("1234\000abcd", scratch, 16, "\\\""));
+    CuAssertIntEquals(tc, 0, scratch[5]);
+}
+
 static void test_str_escape(CuTest * tc)
 {
     char scratch[16];
@@ -149,6 +159,7 @@ CuSuite *get_strings_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_str_hash);
     SUITE_ADD_TEST(suite, test_str_escape);
+    SUITE_ADD_TEST(suite, test_str_escape_ex);
     SUITE_ADD_TEST(suite, test_str_unescape);
     SUITE_ADD_TEST(suite, test_str_replace);
     SUITE_ADD_TEST(suite, test_str_slprintf);

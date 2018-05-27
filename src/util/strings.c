@@ -312,10 +312,13 @@ char *str_unescape(char *str) {
 
 const char *str_escape_ex(const char *str, char *buffer, size_t size, const char *chars)
 {
+    size_t slen = strlen(str);
     const char *read = str;
     char *write = buffer;
-    if (size < 1) return NULL;
-    while (size > 1 && *read) {
+    if (size < 1) {
+        return NULL;
+    }
+    while (slen > 0 && size > 1 && *read) {
         const char *pos = strpbrk(read, chars);
         size_t len = size;
         if (pos) {
@@ -324,7 +327,11 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
         if (len < size) {
             unsigned char ch = *(const unsigned char *)pos;
             if (len > 0) {
+                if (len > slen) {
+                    len = slen;
+                }
                 memmove(write, read, len);
+                slen -= len;
                 write += len;
                 read += len;
                 size -= len;
@@ -376,13 +383,18 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
                 else size = 1;
             }
             ++read;
+            --slen;
         } else {
             /* end of buffer space */
             len = size - 1;
             if (len > 0) {
+                if (len > slen) {
+                    len = slen;
+                }
                 memmove(write, read, len);
                 write += len;
                 size -= len;
+                slen -= len;
                 break;
             }
         }
