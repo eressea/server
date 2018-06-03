@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<resource name="plate">
-  <item weight="400" score="150" deny="goblin">
-    <construction skill="armorer" minskill="4">
-      <requirement type="iron" quantity="4"/>
-    </construction>
-    <armor ac="3" penalty="0.15" projectile="0.10" magres="0.0"/>
-  </item>
-</resource>

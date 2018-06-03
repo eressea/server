@@ -783,12 +783,12 @@ function test_p2()
     r:set_resource("tree", 0)
     u:clear_orders()
     u:add_order("BENUTZE 'Wasser des Lebens'")
-    u:add_item("p2", 1)
+    u:add_item("lifepotion", 1)
     u:add_item("log", 10)
     u:add_item("mallorn", 10)
     process_orders()
     assert_equal(5, r:get_resource("tree"))
-    assert_equal(0, u:get_item("p2"))
+    assert_equal(0, u:get_item("lifepotion"))
     assert_equal(15, u:get_item("log") + u:get_item("mallorn"))
 end
 
@@ -803,7 +803,7 @@ function test_p2_move()
     u:add_order("BENUTZE 'Wasser des Lebens'")
     u:add_order("NACH OST")
     u:add_item("horse", 1)
-    u:add_item("p2", 1)
+    u:add_item("lifepotion", 1)
     u:add_item("log", 1)
     u:add_item("mallorn", 1)
     process_orders()
@@ -1025,4 +1025,18 @@ function test_demons_using_mallornlance()
         write_report(f)
     end
     assert_true(u.guard)
+end
+
+function test_new_orc_has_no_skills()
+-- orcs in E2 get starting skills, but in E3 they do not
+    local f = faction.create('orc')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:add_item('money', 400)
+    u.number = 0
+    u:add_order("REKRUTIEREN 2")
+    process_orders()
+    assert_equal(2, u.number)
+    assert_equal(0, u:get_skill('polearm'))
+    assert_equal(0, u:get_skill('melee'))
 end

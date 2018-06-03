@@ -1,0 +1,9 @@
+{
+    "include": [
+        "config://res/races/goblin-3.xml",
+        "config://res/races/wyrm.xml",
+        "config://res/races/dragon.xml",
+        "config://res/races/youngdragon.xml",
+        "config://res/e3a/races.xml"
+    ]
+}

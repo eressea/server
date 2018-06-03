@@ -259,7 +259,10 @@ void racelist_insert(struct race_list **rl, const struct race *r)
     *rl = rl2;
 }
 
+static int race_mask = 0;
+
 void free_races(void) {
+    race_mask = 0;
     while (races) {
         int i;
         race * rc = races->next;
@@ -307,7 +310,7 @@ static race *rc_find_i(const char *name)
         for (i = 0; rc_depr[i]; i += 2) {
             if (strcmp(name, rc_depr[i]) == 0) {
                 rc = rc_find_i(rc_depr[i + 1]);
-                log_warning("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
+                log_info("a reference was made to the retired race '%s', returning '%s'.", name, rc->_name);
                 break;
             }
         }
@@ -347,8 +350,13 @@ race *rc_create(const char *zName)
 
     assert(zName);
     rc = (race *)calloc(sizeof(race), 1);
+
+    rc->mask_item = 1 << race_mask;
+    ++race_mask;
+
     rc->magres.sa[1] = 1;
     rc->hitpoints = 1;
+    rc->flags = RCF_DEFAULT;
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
     rc->income = 20;
@@ -356,6 +364,8 @@ race *rc_create(const char *zName)
     rc->regaura = 1.0F;
     rc->speed = 1.0F;
     rc->battle_flags = 0;
+    rc->at_default = -2;
+    rc->df_default = -2;
     if (strchr(zName, ' ') != NULL) {
         log_error("race '%s' has an invalid name. remove spaces\n", zName);
         assert(strchr(zName, ' ') == NULL);
@@ -444,6 +454,12 @@ int rc_herb_trade(const struct race *rc)
     return 500;
 }
 
+void set_study_speed(race *rc, skill_t sk, int modifier) {
+    if (!rc->study_speed)
+        rc->study_speed = calloc(1, MAXSKILLS);
+    rc->study_speed[sk] = (char)modifier;
+}
+
 const race *rc_otherrace(const race *rc)
 {
     variant *v = rc_getoption(rc, RCO_OTHER);
@@ -459,18 +475,13 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
     if (strcmp(key, "recruit_multi") == 0) {
         rc->recruit_multi = atof(value);
     }
-    else if (strcmp(key, "migrants.formula") == 0) {
-        if (value[0] == '1') {
-            rc->flags |= RCF_MIGRANTS;
-        }
-    }
     else if (strcmp(key, "other_race")==0) {
         rc_setoption(rc, RCO_OTHER, value);
     }
-    else if (strcmp(key, "ai.scare")==0) {
+    else if (strcmp(key, "scare")==0) {
         rc_setoption(rc, RCO_SCARE, value);
     }
-    else if (strcmp(key, "hunger.damage")==0) {
+    else if (strcmp(key, "hunger_damage")==0) {
         rc_setoption(rc, RCO_HUNGER, value);
     }
     else if (strcmp(key, "armor.stamina")==0) {
@@ -573,4 +584,20 @@ struct race * read_race_reference(struct storage *store)
 
 void register_race_function(race_func func, const char *name) {
     register_function((pf_generic)func, name);
+}
+
+int rc_mask(const race * rc) {
+    assert(rc->mask_item);
+    return rc->mask_item;
+}
+
+int rc_get_mask(char *list) {
+    int mask = 0;
+    char * tok = strtok(list, " ,");
+    while (tok) {
+        race * rc = rc_get_or_create(tok);
+        mask |= rc_mask(rc);
+        tok = strtok(NULL, " ,");
+    }
+    return mask;
 }

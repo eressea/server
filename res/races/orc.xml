@@ -22,7 +22,7 @@
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="goblin" default="yes"/>
+    <familiar race="goblin"/>
     <familiar race="ghost"/>
     <familiar race="imp"/>
     <familiar race="rat"/>

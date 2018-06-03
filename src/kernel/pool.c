@@ -16,11 +16,14 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
+
 #include "pool.h"
 
 #include "ally.h"
+#include "config.h"
 #include "faction.h"
 #include "item.h"
 #include "order.h"
@@ -168,7 +171,8 @@ int count)
         use = have;
     else if (rtype->itype && mode & (GET_SLACK | GET_RESERVE)) {
         int reserve = get_reservation(u, rtype->itype);
-        int slack = MAX(0, have - reserve);
+        int slack = have - reserve;
+        if (slack < 0) slack = 0;
         if (mode & GET_RESERVE)
             use = have - slack;
         else if (mode & GET_SLACK)
@@ -206,18 +210,20 @@ use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
     }
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
-        n = MIN(use, have);
+        n = (use < have) ? use : have;
     }
     else if (rtype->itype) {
         int reserve = get_reservation(u, rtype->itype);
-        int slack = MAX(0, have - reserve);
+        int slack = have - reserve;
+        if (slack < 0) slack = 0;
         if (mode & GET_RESERVE) {
             n = have - slack;
-            n = MIN(use, n);
+            if (n > use) n = use;
             change_reservation(u, rtype->itype, -n);
         }
         else if (mode & GET_SLACK) {
-            n = MIN(use, slack);
+            n = slack;
+            if (n > use) n = use;
         }
     }
     if (n > 0) {

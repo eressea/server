@@ -1,5 +1,4 @@
 -- new tests 2014-06-11
-require 'tests.config'
 require 'tests.faction'
 require 'tests.locale'
 require 'tests.movement'

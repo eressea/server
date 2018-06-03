@@ -38,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
-static const char *terrainnames[MAXTERRAINS] = {
+const char *terrainnames[MAXTERRAINS] = {
     "ocean",
     "plain",
     "swamp",
@@ -71,12 +71,12 @@ bool terrain_changed(int *cache) {
 void free_terrains(void)
 {
     while (registered_terrains) {
-        int n;
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
         free(t->herbs);
         if (t->production) {
+            int n;
             for (n = 0; t->production[n].type; ++n) {
                 free(t->production[n].base);
                 free(t->production[n].divisor);
@@ -114,8 +114,12 @@ static terrain_type *terrain_find_i(const char *name)
     return terrain;
 }
 
-const terrain_type *get_terrain(const char *name) {
+static terrain_type *get_terrain_i(const char *name) {
     return terrain_find_i(name);
+}
+
+const terrain_type *get_terrain(const char *name) {
+    return get_terrain_i(name);
 }
 
 terrain_type * get_or_create_terrain(const char *name) {
@@ -127,7 +131,7 @@ terrain_type * get_or_create_terrain(const char *name) {
             terrain->_name = str_strdup(name);
             terrain->next = registered_terrains;
             registered_terrains = terrain;
-            if (strcmp("plain", name) == 0) {
+            if (strcmp(terrainnames[T_PLAIN], name) == 0) {
                 /* TODO: this is awful, it belongs in config */
                 terrain->name = &plain_name;
             }
@@ -136,19 +140,26 @@ terrain_type * get_or_create_terrain(const char *name) {
     return terrain;
 }
 
-static const terrain_type *newterrains[MAXTERRAINS];
+static terrain_type *newterrains[MAXTERRAINS];
 
 const struct terrain_type *newterrain(terrain_t t)
 {
+    static int changed;
     const struct terrain_type *result;
     if (t == NOTERRAIN) {
         return NULL;
     }
     assert(t >= 0);
     assert(t < MAXTERRAINS);
-    result = newterrains[t];
+    if (terrain_changed(&changed)) {
+        memset(newterrains, 0, sizeof(newterrains));
+        result = NULL;
+    }
+    else {
+        result = newterrains[t];
+    }
     if (!result) {
-        result = newterrains[t] = get_terrain(terrainnames[t]);
+        result = newterrains[t] = get_terrain_i(terrainnames[t]);
     }
     if (!result) {
         log_error("no such terrain: %s.", terrainnames[t]);
@@ -194,11 +205,11 @@ void init_terrains(void)
 {
     terrain_t t;
     for (t = 0; t != MAXTERRAINS; ++t) {
-        const terrain_type *newterrain = newterrains[t];
+        terrain_type *newterrain = newterrains[t];
         if (newterrain != NULL)
             continue;
         if (terrainnames[t] != NULL) {
-            newterrain = get_terrain(terrainnames[t]);
+            newterrain = get_terrain_i(terrainnames[t]);
             if (newterrain != NULL) {
                 newterrains[t] = newterrain;
             }

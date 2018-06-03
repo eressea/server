@@ -186,7 +186,7 @@ const char *locale_string(const locale * lang, const char *key, bool warn)
             return value;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void locale_setstring(locale * lang, const char *key, const char *value)
@@ -219,6 +219,43 @@ void locale_setstring(locale * lang, const char *key, const char *value)
         free(find->str);
         find->str = str_strdup(value);
     }
+}
+
+static const char *escape_str(const char *in, FILE *F) {
+    while (*in) {
+        char buffer[64];
+        size_t len = 0;
+        char *out = buffer;
+        while (sizeof(buffer) > len + 2) {
+            if (*in == '\0') break;
+            if (strchr("\\\"", *in) != NULL) {
+                *out++ = '\\';
+                ++len;
+            }
+            *out++ = *in++;
+            ++len;
+        }
+        if (len > 0) {
+            fwrite(buffer, 1, len, F);
+        }
+    }
+    return in;
+}
+
+void po_write_msg(FILE *F, const char *id, const char *str, const char *ctxt) {
+    if (ctxt) {
+        fputs("msgctxt \"", F);
+        escape_str(ctxt, F);
+        fputs("\"\nmsgid \"", F);
+        escape_str(id, F);
+    }
+    else {
+        fputs("msgid \"", F);
+        escape_str(id, F);
+    }
+    fputs("\"\nmsgstr \"", F);
+    escape_str(str, F);
+    fputs("\"\n\n", F);
 }
 
 const char *locale_name(const locale * lang)
@@ -314,6 +351,13 @@ void *get_translation(const struct locale *lang, const char *str, int index) {
         return var.v;
     }
     return NULL;
+}
+
+void locale_foreach(void(*callback)(const struct locale *, const char *)) {
+    const locale * lang;
+    for (lang = locales; lang; lang = lang->next) {
+        callback(lang, lang->name);
+    }
 }
 
 const char *localenames[] = {

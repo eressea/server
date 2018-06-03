@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <resources>
 
   <resource name="money">
@@ -33,8 +34,8 @@
     <item weight="0" score="6000"/>
   </resource>
 
-  <resource name="presspass" cursed="yes">
-    <item weight="0" score="6000"/>
+  <resource name="presspass">
+    <item weight="0" score="6000" cursed="yes"/>
   </resource>
 
   <resource name="aurafocus">
@@ -133,3 +134,4 @@
   </resource>
 
 </resources>
+</eressea>

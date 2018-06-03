@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="cart">
   <item capacity="14000" weight="4000" score="60" vehicle="yes" big="yes">
     <construction skill="cartmaking" minskill="1">
@@ -6,3 +8,5 @@
     </construction>
   </item>
 </resource>
+</resources>
+</eressea>

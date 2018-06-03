@@ -29,9 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "curse.h"
 #include "connection.h"
 #include "building.h"
-#include "calendar.h"
 #include "direction.h"
-#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -68,15 +66,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/strings.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
-#include <util/xml.h>
 
 #include "donations.h"
 #include "guard.h"
 #include "prefix.h"
-
-/* libxml includes */
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
 
 /* external libraries */
 #include <iniparser.h>
@@ -97,8 +90,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <sys/stat.h>
 #endif
 struct settings global;
-
-int turn = 0;
 
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
@@ -146,39 +137,6 @@ const char *parameters[MAXPARAMS] = {
     "BAEUME",
     "ALLIANZ"
 };
-
-FILE *debug;
-
-void
-parse(keyword_t kword, int(*dofun) (unit *, struct order *), bool thisorder)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        unit **up = &r->units;
-        while (*up) {
-            unit *u = *up;
-            order **ordp = &u->orders;
-            if (thisorder)
-                ordp = &u->thisorder;
-            while (*ordp) {
-                order *ord = *ordp;
-                if (getkeyword(ord) == kword) {
-                    if (dofun(u, ord) != 0)
-                        break;
-                    if (u->orders == NULL)
-                        break;
-                }
-                if (thisorder)
-                    break;
-                if (*ordp == ord)
-                    ordp = &ord->next;
-            }
-            if (*up == u)
-                up = &u->next;
-        }
-    }
-}
 
 int findoption(const char *s, const struct locale *lang)
 {
@@ -596,15 +554,14 @@ void kernel_done(void)
     /* calling this function releases memory assigned to static variables, etc.
      * calling it is optional, e.g. a release server will most likely not do it.
      */
-    xml_done();
     attrib_done();
     item_done();
     message_done();
-    equipment_done();
     reports_done();
     curses_done();
     crmessage_done();
     translation_done();
+    mt_clear();
 }
 
 bool rule_stealth_other(void)
@@ -814,8 +771,8 @@ void free_gamedata(void)
     free(forbidden_ids);
     forbidden_ids = NULL;
 
-    free_donations();
     free_factions();
+    free_donations();
     free_units();
     free_regions();
     free_borders();

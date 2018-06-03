@@ -110,8 +110,6 @@ typedef enum combatmagic {
 static int missile_range[2] = { FIGHT_ROW, BEHIND_ROW };
 static int melee_range[2] = { FIGHT_ROW, FIGHT_ROW };
 
-static message *msg_separator;
-
 const troop no_troop = { 0, 0 };
 
 #define FORMULA_ORIG 0
@@ -723,6 +721,7 @@ bool missile)
         }
         if (wtype->modifiers != NULL) {
             /* Pferdebonus, Lanzenbonus, usw. */
+            const race *rc = u_race(tu);
             int m;
             unsigned int flags =
                 WMF_SKILL | (attacking ? WMF_OFFENSIVE : WMF_DEFENSIVE);
@@ -738,17 +737,10 @@ bool missile)
 
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 if ((wtype->modifiers[m].flags & flags) == flags) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == u_race(tu))
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & rc->mask_item)) {
+                        skill += wtype->modifiers[m].value;
                     }
-                    skill += wtype->modifiers[m].value;
                 }
             }
         }
@@ -922,17 +914,13 @@ void kill_troop(troop dt)
     rmtroop(dt);
     if (!df->alive) {
         char eqname[64];
-        const struct equipment *eq;
         const race *rc = u_race(du);
         item *drops = item_spoil(rc, du->number - df->run.number);
         if (drops != NULL) {
             i_merge(&du->items, &drops);
         }
         sprintf(eqname, "spo_%s", rc->_name);
-        eq = get_equipment(eqname);
-        if (eq != NULL) {
-            equip_items(&du->items, eq);
-        }
+        equip_unit_mask(du, eqname, EQUIP_ITEMS);
     }
 }
 
@@ -958,22 +946,6 @@ void drain_exp(struct unit *u, int n)
     if (sk != NOSKILL) {
         reduce_skill_days(u, sk, n);
     }
-}
-
-const char *rel_dam(int dam, int hp)
-{
-    double q = (double)dam / (double)hp;
-
-    if (q > 0.75) {
-        return "eine klaffende Wunde";
-    }
-    else if (q > 0.5) {
-        return "eine schwere Wunde";
-    }
-    else if (q > 0.25) {
-        return "eine Wunde";
-    }
-    return "eine kleine Wunde";
 }
 
 static void vampirism(troop at, int damage)
@@ -1029,17 +1001,10 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
             for (m = 0; wtype->modifiers[m].value; ++m) {
                 /* weapon damage for this weapon, possibly by race */
                 if (wtype->modifiers[m].flags & WMF_DAMAGE) {
-                    race_list *rlist = wtype->modifiers[m].races;
-                    if (rlist != NULL) {
-                        while (rlist) {
-                            if (rlist->data == ar)
-                                break;
-                            rlist = rlist->next;
-                        }
-                        if (rlist == NULL)
-                            continue;
+                    int mask = wtype->modifiers[m].race_mask;
+                    if ((mask == 0) || (mask & ar->mask_item)) {
+                        modifier += wtype->modifiers[m].value;
                     }
-                    modifier += wtype->modifiers[m].value;
                 }
             }
         }
@@ -1126,6 +1091,21 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     }
 
     return ar;
+}
+
+static bool resurrect_troop(troop dt)
+{
+    fighter *df = dt.fighter;
+    unit *du = df->unit;
+    if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
+        if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
+            fset(&df->person[dt.index], FL_HEALING_USED);
+            i_change(&du->items, oldpotiontype[P_HEAL], -1);
+            df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
+            return true;
+        }
+    }
+    return false;
 }
 
 bool
@@ -1298,16 +1278,12 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         return false;
     }
 
-    if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
-        if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
-            message *m = msg_message("potionsave", "unit", du);
-            battle_message_faction(b, du->faction, m);
-            msg_release(m);
-            i_change(&du->items, oldpotiontype[P_HEAL], -1);
-            fset(&df->person[dt.index], FL_HEALING_USED);
-            df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
-            return false;
-        }
+    /* healing potions can avert a killing blow */
+    if (resurrect_troop(dt)) {
+        message *m = msg_message("potionsave", "unit", du);
+        battle_message_faction(b, du->faction, m);
+        msg_release(m);
+        return false;
     }
     ++at.fighter->kills;
 
@@ -1541,6 +1517,17 @@ static int get_tactics(const side * as, const side * ds)
     return result - defense;
 }
 
+double tactics_chance(const unit *u, int skilldiff) {
+    double tacch = 0.1 * skilldiff;
+    if (fval(u->region->terrain, SEA_REGION)) {
+        const ship *sh = u->ship;
+        if (sh) {
+            tacch *= sh->type->tac_bonus;
+        }
+    }
+    return tacch;
+}
+
 static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 {
     fighter *af = at.fighter;
@@ -1562,12 +1549,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 
             /* percentage chance to get this attack */
             if (tactics > 0) {
-                double tacch = 0.1 * tactics;
-                if (fval(b->region->terrain, SEA_REGION)) {
-                    ship *sh = at.fighter->unit->ship;
-                    if (sh)
-                        tacch *= sh->type->tac_bonus;
-                }
+                double tacch = tactics_chance(af->unit, tactics);
                 if (!chance(tacch)) {
                     dt.fighter = NULL;
                 }
@@ -1866,7 +1848,7 @@ static void do_extra_spell(troop at, const att * a)
     const spell *sp = spellref_get(a->data.sp);
 
     if (!sp) {
-        log_error("no such spell: '%s'", a->data.sp->name);
+        log_error("no such spell: '%s'", a->data.sp->_name);
     }
     else {
         assert(a->level > 0);
@@ -2888,9 +2870,7 @@ static void print_stats(battle * b)
             message *msg;
             char buf[1024];
 
-            battle_message_faction(b, f, msg_separator);
-
-            msg = msg_message("battle_army", "index name", army_index(s), sname);
+            msg = msg_message("para_army_index", "index name", army_index(s), sname);
             battle_message_faction(b, f, msg);
             msg_release(msg);
 
@@ -2959,8 +2939,6 @@ static void print_stats(battle * b)
         print_fighters(b, s);
     }
 
-    message_all(b, msg_separator);
-
     /* Besten Taktiker ermitteln */
 
     b->max_tactics = 0;
@@ -2982,10 +2960,10 @@ static void print_stats(battle * b)
                     unit *u = tf->unit;
                     message *m = NULL;
                     if (!is_attacker(tf)) {
-                        m = msg_message("tactics_lost", "unit", u);
+                        m = msg_message("para_tactics_lost", "unit", u);
                     }
                     else {
-                        m = msg_message("tactics_won", "unit", u);
+                        m = msg_message("para_tactics_won", "unit", u);
                     }
                     message_all(b, m);
                     msg_release(m);
@@ -3261,8 +3239,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
                     adata->atype = itm->type->rtype->atype;
                     adata->count = itm->number;
                     for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
-                        if (adata->atype->prot > (*aptr)->atype->prot)
+                        if (adata->atype->prot > (*aptr)->atype->prot) {
                             break;
+                        }
                     }
                     adata->next = *aptr;
                     *aptr = adata;
@@ -3500,12 +3479,11 @@ static int battle_report(battle * b)
         bool komma = false;
 
         sbs_init(&sbs, buf, sizeof(buf));
-        battle_message_faction(b, fac, msg_separator);
 
         if (cont)
-            m = msg_message("lineup_battle", "turn", b->turn);
+            m = msg_message("para_lineup_battle", "turn", b->turn);
         else
-            m = msg_message("after_battle", "");
+            m = msg_message("para_after_battle", "");
         battle_message_faction(b, fac, m);
         msg_release(m);
 
@@ -4005,11 +3983,8 @@ void force_leave(region *r, battle *b) {
 void do_battle(region * r)
 {
     battle *b = NULL;
-    bool fighting = false;
+    bool fighting;
     ship *sh;
-    if (msg_separator == NULL) {
-        msg_separator = msg_message("section_battle", "");
-    }
 
     fighting = start_battle(r, &b);
 

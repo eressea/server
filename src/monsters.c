@@ -17,8 +17,9 @@
  * permission from the authors.
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 
 #include "monsters.h"
 
@@ -29,37 +30,31 @@
 #include "laws.h"
 #include "keyword.h"
 #include "study.h"
-
-/* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/hate.h>
-
-#include <spells/regioncurse.h>
+#include "move.h"
 
 /* kernel includes */
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/pathfinder.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-
-#include <move.h>
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/pathfinder.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/event.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -67,6 +62,12 @@
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
+
+/* attributes includes */
+#include <attributes/targetregion.h>
+#include <attributes/hate.h>
+
+#include <spells/regioncurse.h>
 
 #include <selist.h>
 
@@ -132,7 +133,10 @@ static void reduce_weight(unit * u)
             if (itype->weight >= 10 && itype->rtype->wtype == 0
                 && itype->rtype->atype == 0) {
                 if (itype->capacity < itype->weight) {
-                    int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
+                    int reduce = (weight - capacity) / itype->weight;
+                    if (reduce > itm->number) {
+                        reduce = itm->number;
+                    }
                     give_peasants(u, itm->type, reduce);
                     weight -= reduce * itype->weight;
                 }
@@ -147,7 +151,10 @@ static void reduce_weight(unit * u)
         const item_type *itype = itm->type;
         weight += itm->number * itype->weight;
         if (itype->capacity < itype->weight) {
-            int reduce = MIN(itm->number, -((capacity - weight) / itype->weight));
+            int reduce = (weight - capacity) / itype->weight;
+            if (reduce > itm->number) {
+                reduce = itm->number;
+            }
             give_peasants(u, itm->type, reduce);
             weight -= reduce * itype->weight;
         }
@@ -165,6 +172,9 @@ static order *monster_attack(unit * u, const unit * target)
     if (monster_is_waiting(u))
         return NULL;
 
+    if (u->region->land && (u->region->flags & RF_GUARDED) == 0) {
+        return NULL;
+    }
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
@@ -491,41 +501,30 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
     return NULL;
 }
 
-static order *make_movement_order(unit * u, const region * target, int moves,
+static order *plan_move_to_target(unit * u, const region * target, int moves,
     bool(*allowed) (const region *, const region *))
 {
     region *r = u->region;
     region **plan;
-    int position = 0;
-    char zOrder[128], *bufp = zOrder;
-    size_t size = sizeof(zOrder) - 1;
+    direction_t steps[DRAGON_RANGE];
+    int position;
 
     if (monster_is_waiting(u))
         return NULL;
 
-    plan = path_find(r, target, DRAGON_RANGE * 5, allowed);
+    plan = path_find(r, target, DRAGON_RANGE, allowed);
     if (plan == NULL)
         return NULL;
 
-    while (position != moves && plan[position + 1]) {
-        int bytes;
+    for (position = 0; position != moves && plan[position + 1]; ++position) {
         region *prev = plan[position];
-        region *next = plan[++position];
+        region *next = plan[position + 1];
         direction_t dir = reldirection(prev, next);
         assert(dir != NODIRECTION && dir != D_SPECIAL);
-        if (size > 1 && bufp != zOrder) {
-            *bufp++ = ' ';
-            --size;
-        }
-        bytes =
-            (int)str_strlcpy(bufp,
-            (const char *)LOC(u->faction->locale, directions[dir]), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        steps[position] = dir;
     }
 
-    *bufp = 0;
-    return create_order(K_MOVE, u->faction->locale, zOrder);
+    return make_movement_order(u->faction->locale, steps, position);
 }
 
 void random_growl(const unit *u, region *target, int rand)
@@ -613,13 +612,13 @@ static void recruit_dracoids(unit * dragon, int size)
 
     name_unit(un);
     change_money(dragon, -un->number * 50);
-    equip_unit(un, get_equipment("new_dracoid"));
+    equip_unit(un, "new_dracoid");
 
-    setstatus(un, ST_FIGHT);
+    unit_setstatus(un, ST_FIGHT);
     for (weapon = un->items; weapon; weapon = weapon->next) {
         const weapon_type *wtype = weapon->type->rtype->wtype;
         if (wtype && wtype->flags & WTF_MISSILE) {
-            setstatus(un, ST_BEHIND);
+            unit_setstatus(un, ST_BEHIND);
             break;
         }
     }
@@ -678,15 +677,15 @@ static order *plan_dragon(unit * u)
         assert(long_order == NULL);
         /* TODO: per-race planning functions? */
         if (rc == rc_wyrm) {
-            long_order = make_movement_order(u, tr, 1, allowed_dragon);
+            long_order = plan_move_to_target(u, tr, 1, allowed_dragon);
         }
         else {
             switch (old_race(rc)) {
             case RC_FIREDRAGON:
-                long_order = make_movement_order(u, tr, 4, allowed_dragon);
+                long_order = plan_move_to_target(u, tr, 4, allowed_dragon);
                 break;
             case RC_DRAGON:
-                long_order = make_movement_order(u, tr, 3, allowed_dragon);
+                long_order = plan_move_to_target(u, tr, 3, allowed_dragon);
                 break;
             default:
                 break;
@@ -739,7 +738,14 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool attacking = chance(attack_chance);
+        bool attacking = false;
+        /* Tiny optimization: Monsters on land only attack randomly when
+        * they are guarding. If nobody is guarding this region (RF_GUARDED),
+        * there can't be any random attacks.
+        */
+        if (!r->land || r->flags & RF_GUARDED) {
+            attacking = chance(attack_chance);
+        }
 
         for (u = r->units; u; u = u->next) {
             const race *rc = u_race(u);
@@ -760,8 +766,7 @@ void plan_monsters(faction * f)
             if (attacking && (!r->land || is_guard(u))) {
                 monster_attacks(u, false);
             }
-
-            /* units with a plan to kill get ATTACK orders: */
+            /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
@@ -772,15 +777,15 @@ void plan_monsters(faction * f)
                     }
                 }
                 else if (tu) {
-                    tu = findunit(ta->data.i);
-                    if (tu != NULL) {
-                        long_order = make_movement_order(u, tu->region, 2, allowed_walk);
+                    bool(*allowed)(const struct region * src, const struct region * r) = allowed_walk;
+                    if (canfly(u)) {
+                        allowed = allowed_fly;
                     }
+                    long_order = plan_move_to_target(u, tu->region, 2, allowed);
                 }
                 else
                     a_remove(&u->attribs, ta);
             }
-
             /* All monsters guard the region: */
             if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
                 addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
@@ -843,15 +848,15 @@ static double chaosfactor(region * r)
     return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
 }
 
-static int nrand(int start, int sub)
+static int nrand(int handle_start, int sub)
 {
     int res = 0;
 
     do {
-        if (rng_int() % 100 < start)
+        if (rng_int() % 100 < handle_start)
             res++;
-        start -= sub;
-    } while (start > 0);
+        handle_start -= sub;
+    } while (handle_start > 0);
 
     return res;
 }
@@ -859,7 +864,7 @@ static int nrand(int start, int sub)
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
     fset(u, UFL_ISNEW | UFL_MOVED);
-    equip_unit(u, get_equipment("seed_seaserpent"));
+    equip_unit(u, "seed_seaserpent");
     return u;
 }
 
@@ -898,7 +903,7 @@ void spawn_dragons(void)
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
             fset(u, UFL_ISNEW | UFL_MOVED);
-            equip_unit(u, get_equipment("seed_dragon"));
+            equip_unit(u, "seed_dragon");
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
@@ -960,7 +965,7 @@ void spawn_undead(void)
             fset(u, UFL_ISNEW | UFL_MOVED);
             if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
                 && rng_int() % 10 < 4) {
-                equip_unit(u, get_equipment("rising_undead"));
+                equip_unit(u, "rising_undead");
             }
 
             for (i = 0; i < MAXSKILLS; i++) {
@@ -1027,10 +1032,12 @@ static void eaten_by_monster(unit * u)
 
     n = (int)(n * multi);
     if (n > 0) {
+
         n = lovar(n);
-        n = MIN(rpeasants(u->region), n);
 
         if (n > 0) {
+            int p = rpeasants(u->region);
+            if (p < n) n = p;
             deathcounts(u->region, n);
             rsetpeasants(u->region, rpeasants(u->region) - n);
             ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
@@ -1048,8 +1055,9 @@ static void absorbed_by_monster(unit * u)
 
     if (n > 0) {
         n = lovar(n);
-        n = MIN(rpeasants(u->region), n);
         if (n > 0) {
+            int p = rpeasants(u->region);
+            if (p < n) n = p;
             rsetpeasants(u->region, rpeasants(u->region) - n);
             scale_number(u, u->number + n);
             ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
@@ -1063,7 +1071,10 @@ static int scareaway(region * r, int anzahl)
     int n, p, diff = 0, emigrants[MAXDIRECTIONS];
     direction_t d;
 
-    anzahl = MIN(MAX(1, anzahl), rpeasants(r));
+    p = rpeasants(r);
+    if (anzahl < 1) anzahl = 1;
+    if (anzahl > p) anzahl = p;
+    assert(p >= 0 && anzahl >= 0);
 
     /* Wandern am Ende der Woche (normal) oder wegen Monster. Die
      * Wanderung wird erst am Ende von demographics () ausgefuehrt.
@@ -1073,9 +1084,7 @@ static int scareaway(region * r, int anzahl)
     for (d = 0; d != MAXDIRECTIONS; d++)
         emigrants[d] = 0;
 
-    p = rpeasants(r);
-    assert(p >= 0 && anzahl >= 0);
-    for (n = MIN(p, anzahl); n; n--) {
+    for (n = anzahl; n; n--) {
         direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
         region *rc = rconnect(r, dir);
 
@@ -1104,8 +1113,9 @@ static void scared_by_monster(unit * u)
     }
     if (n > 0) {
         n = lovar(n);
-        n = MIN(rpeasants(u->region), n);
         if (n > 0) {
+            int p = rpeasants(u->region);
+            if (p < n) n = p;
             n = scareaway(u->region, n);
             if (n > 0) {
                 ADDMSG(&u->region->msgs, msg_message("fleescared",

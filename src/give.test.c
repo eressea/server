@@ -40,12 +40,15 @@ static void setup_give(struct give *env) {
 
     env->r = test_create_region(0, 0, ter);
     env->src = test_create_unit(env->f1, env->r);
-    env->dst = env->f2 ? test_create_unit(env->f2, env->r) : 0;
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
-    if (env->f1 && env->f2) {
+    if (env->f2) {
         ally * al = ally_add(&env->f2->allies, env->f1);
         al->status = HELP_GIVE;
+        env->dst = test_create_unit(env->f2, env->r);
+    }
+    else {
+        env->dst = NULL;
     }
     if (env->lang) {
         locale_setstring(env->lang, env->itype->rtype->_name, "SILBER");
@@ -54,24 +57,24 @@ static void setup_give(struct give *env) {
     }
 
     /* success messages: */
-    mt_register(mt_new_va("receive_person", "unit:unit", "target:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person", "unit:unit", "target:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person_peasants", "unit:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_person_ocean", "unit:unit", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("receive", "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give", "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END));
-    mt_register(mt_new_va("give_peasants", "unit:unit", "resource:resource", "amount:int", MT_NEW_END));
+    mt_create_va(mt_new("receive_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person_peasants", NULL), "unit:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_person_ocean", NULL), "unit:unit", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("receive", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
+    mt_create_va(mt_new("give_peasants", NULL), "unit:unit", "resource:resource", "amount:int", MT_NEW_END);
     /* error messages: */
-    mt_register(mt_new_va("too_many_units_in_faction", "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END));
-    mt_register(mt_new_va("too_many_units_in_alliance", "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END));
-    mt_register(mt_new_va("feedback_no_contact", "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END));
-    mt_register(mt_new_va("feedback_give_forbidden", "unit:unit", "region:region", "command:order", MT_NEW_END));
-    mt_register(mt_new_va("peasants_give_invalid", "unit:unit", "region:region", "command:order", MT_NEW_END));
-    mt_register(mt_new_va("giverestriction", "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END));
-    mt_register(mt_new_va("error_unit_size", "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END));
-    mt_register(mt_new_va("nogive_reserved", "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END));
-    mt_register(mt_new_va("race_notake", "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END));
-    mt_register(mt_new_va("race_noregroup", "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END));
+    mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
+    mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
+    mt_create_va(mt_new("feedback_no_contact", NULL), "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END);
+    mt_create_va(mt_new("feedback_give_forbidden", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("peasants_give_invalid", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("giverestriction", NULL), "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END);
+    mt_create_va(mt_new("error_unit_size", NULL), "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END);
+    mt_create_va(mt_new("nogive_reserved", NULL), "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END);
+    mt_create_va(mt_new("race_notake", NULL), "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END);
+    mt_create_va(mt_new("race_noregroup", NULL), "unit:unit", "region:region", "command:order", "race:race", MT_NEW_END);
 }
 
 static void test_give_unit(CuTest * tc) {
@@ -139,10 +142,12 @@ static void test_give_unit_to_ocean(CuTest * tc) {
 
 static void test_give_men(CuTest * tc) {
     struct give env = { 0 };
+    message * msg;
     test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
-    CuAssertPtrEquals(tc, 0, give_men(1, env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, msg = give_men(1, env.src, env.dst, NULL));
+    assert(!msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();
@@ -222,10 +227,13 @@ static void test_give_men_in_ocean(CuTest * tc) {
 
 static void test_give_men_too_many(CuTest * tc) {
     struct give env = { 0 };
+    message * msg;
+
     test_setup_ex(tc);
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
-    CuAssertPtrEquals(tc, 0, give_men(2, env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, msg = give_men(2, env.src, env.dst, NULL));
+    assert(!msg);
     CuAssertIntEquals(tc, 2, env.dst->number);
     CuAssertIntEquals(tc, 0, env.src->number);
     test_teardown();

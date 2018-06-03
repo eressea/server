@@ -135,6 +135,7 @@ spell * create_spell(const char * name)
 }
 
 static const char *sp_aliases[][2] = {
+    { "create_potion_p14", "create_potion_healing" },
     { "gwyrrdfamiliar", "summon_familiar" },
     { "illaunfamiliar", "summon_familiar" },
     { "draigfamiliar", "summon_familiar" },
@@ -150,16 +151,20 @@ static const char *sp_alias(const char *zname)
         if (strcmp(sp_aliases[i][0], zname) == 0)
             return sp_aliases[i][1];
     }
-    return zname;
+    return NULL;
 }
 
 spell *find_spell(const char *name)
 {
     const char * match;
     spell * sp = 0;
-    const char * alias = sp_alias(name);
-
-    match = cb_find_str(&cb_spells, alias);
+    match = cb_find_str(&cb_spells, name);
+    if (!match) {
+        const char * alias = sp_alias(name);
+        if (alias) {
+            match = cb_find_str(&cb_spells, alias);
+        }
+    }
     if (match) {
         cb_get_kv(match, &sp, sizeof(sp));
     }
@@ -175,19 +180,37 @@ struct spellref *spellref_create(spell *sp, const char *name)
 
     if (sp) {
         spref->sp = sp;
-        spref->name = str_strdup(sp->sname);
+        spref->_name = str_strdup(sp->sname);
     }
     else if (name) {
-        spref->name = str_strdup(name);
+        spref->_name = str_strdup(name);
         spref->sp = NULL;
     }
     return spref;
 }
 
+void spellref_init(spellref *spref, spell *sp, const char *name)
+{
+    if (sp) {
+        spref->sp = sp;
+        spref->_name = str_strdup(sp->sname);
+    }
+    else if (name) {
+        spref->_name = str_strdup(name);
+        spref->sp = NULL;
+    }
+}
+
+void spellref_done(spellref *spref) {
+    if (spref) {
+        free(spref->_name);
+    }
+}
+
 void spellref_free(spellref *spref)
 {
     if (spref) {
-        free(spref->name);
+        spellref_done(spref);
         free(spref);
     }
 }
@@ -195,12 +218,21 @@ void spellref_free(spellref *spref)
 struct spell *spellref_get(struct spellref *spref)
 {
     if (!spref->sp) {
-        assert(spref->name);
-        spref->sp = find_spell(spref->name);
+        assert(spref->_name);
+        spref->sp = find_spell(spref->_name);
         if (spref->sp) {
-            free(spref->name);
-            spref->name = NULL;
+            free(spref->_name);
+            spref->_name = NULL;
         }
     }
     return spref->sp;
+}
+
+const char *spellref_name(const struct spellref *spref)
+{
+    if (spref->_name) {
+        return spref->_name;
+    }
+    assert(spref->sp);
+    return spref->sp->sname;
 }

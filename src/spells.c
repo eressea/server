@@ -26,7 +26,6 @@
 #include "randenc.h"
 #include "monsters.h"
 #include "teleport.h"
-#include "xmlreader.h"
 
  /* triggers includes */
 #include <triggers/changefaction.h>
@@ -518,7 +517,7 @@ static unit * make_familiar(unit * mage, region *r, const race *rc, const char *
     unit *fam;
 
     fam = create_unit(r, mage->faction, 1, rc, 0, name, mage);
-    setstatus(fam, ST_FLEE);
+    unit_setstatus(fam, ST_FLEE);
     fset(fam, UFL_LOCKED);
 
     /* triggers: */
@@ -537,7 +536,6 @@ static int sp_summon_familiar(castorder * co)
     unit *mage = co->magician.u;
     int cast_level = co->level;
     const race *rc;
-    int dh;
     message *msg;
     char zText[2048];
 
@@ -553,7 +551,8 @@ static int sp_summon_familiar(castorder * co)
 
     if (fval(rc, RCF_SWIM) && !fval(rc, RCF_WALK)) {
         int coasts = is_coastregion(r);
-        int dir;
+        int dir, dh;
+
         if (coasts == 0) {
             cmistake(mage, co->order, 229, MSG_MAGIC);
             return 0;
@@ -2158,7 +2157,7 @@ static int sp_ironkeeper(castorder * co)
         create_unit(r, mage->faction, 1, get_race(RC_IRONKEEPER), 0, NULL, mage);
 
     /*keeper->age = cast_level + 2; */
-    setstatus(keeper, ST_AVOID);  /* kaempft nicht */
+    unit_setstatus(keeper, ST_AVOID);  /* kaempft nicht */
     setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
     /* Parteitarnen, damit man nicht sofort wei�, wer dahinter steckt */
@@ -2854,12 +2853,12 @@ static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
     return c;
 }
 
-static int dc_read_compat(struct attrib *a, void *target, gamedata *data)
+static int dc_read_compat(variant *var, void *target, gamedata *data)
 /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
 {
     struct storage *store = data->store;
 
-    UNUSED_ARG(a);
+    UNUSED_ARG(var);
     UNUSED_ARG(target);
     READ_INT(store, NULL);
     READ_FLT(store, NULL);
@@ -4627,7 +4626,7 @@ int sp_clonecopy(castorder * co)
     clone =
         create_unit(target_region, mage->faction, 1, get_race(RC_CLONE), 0, name,
             mage);
-    setstatus(clone, ST_FLEE);
+    unit_setstatus(clone, ST_FLEE);
     fset(clone, UFL_LOCKED);
 
     create_newclone(mage, clone);
@@ -5311,7 +5310,7 @@ int sp_fetchastral(castorder * co)
 {
     int n;
     unit *mage = co->magician.u;
-    int cast_level = co->level;
+    int cast_level = 0;
     spellparameter *pa = co->par;
     double power = co->force;
     int remaining_cap = (int)((power - 3) * 1500);
@@ -5343,6 +5342,7 @@ int sp_fetchastral(castorder * co)
                     "spellfail_astralonly", ""));
                 continue;
             }
+
             if (rtl != NULL)
                 free_regionlist(rtl);
             rtl = astralregions(u->region, NULL);
@@ -5359,6 +5359,7 @@ int sp_fetchastral(castorder * co)
             ro = u->region;
         }
 
+        cast_level = co->level; /* at least one unit could have been teleported */
         if (is_cursed(ro->attribs, &ct_astralblock)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "spellfail_astralblock", ""));

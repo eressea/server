@@ -350,7 +350,6 @@ static void dracoid_name(unit * u)
 {
     static char name[NAMESIZE + 1];
     int mid_syllabels;
-    size_t sz;
 
     /* ignore u */
     UNUSED_ARG(u);
@@ -358,14 +357,14 @@ static void dracoid_name(unit * u)
 
     mid_syllabels = rng_int() % 4;
 
-    sz = str_strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
+    str_strlcpy(name, drac_pre[rng_int() % DRAC_PRE], sizeof(name));
     while (mid_syllabels > 0) {
         mid_syllabels--;
         if (rng_int() % 10 < 4)
             str_strlcat(name, "'", sizeof(name));
-        sz += str_strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
+        str_strlcat(name, drac_mid[rng_int() % DRAC_MID], sizeof(name));
     }
-    sz += str_strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
+    str_strlcat(name, drac_suf[rng_int() % DRAC_SUF], sizeof(name));
     unit_setname(u, name);
 }
 

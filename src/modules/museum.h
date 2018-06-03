@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef HEADER_MUSEUM_H
 #define HEADER_MUSEUM_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif

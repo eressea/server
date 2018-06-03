@@ -29,23 +29,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <assert.h>
 
-static void
-write_movement(const attrib * a, const void *owner, struct storage *store)
+static int read_movement(variant *var, void *owner, gamedata *data)
 {
-    WRITE_INT(store, a->data.i);
-}
-
-static int read_movement(attrib * a, void *owner, gamedata *data)
-{
-    READ_INT(data->store, &a->data.i);
-    if (a->data.i != 0)
+    READ_INT(data->store, &var->i);
+    if (var->i != 0)
         return AT_READ_OK;
     else
         return AT_READ_FAIL;
 }
 
 attrib_type at_movement = {
-    "movement", NULL, NULL, NULL, write_movement, read_movement
+    "movement", NULL, NULL, NULL, a_writeint, read_movement
 };
 
 bool get_movement(attrib * const *alist, int type)

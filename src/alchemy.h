@@ -41,7 +41,7 @@ extern "C" {
         P_LIFE,
         /* Stufe 2 */
         P_DOMORE,
-        P_HEILWASSER,
+        P_OINTMENT,
         P_BAUERNBLUT,
         /* Stufe 3 */
         P_WISE,                     /* 6 */
@@ -52,7 +52,6 @@ extern "C" {
         /* Stufe 4 */
         P_PEOPLE,
         P_WAHRHEIT,
-        P_MACHT,
         P_HEAL,
         MAX_POTIONS
     };
@@ -63,8 +62,6 @@ extern "C" {
 
     void herbsearch(struct unit *u, int max);
     int use_potion(struct unit *u, const struct item_type *itype,
-        int amount, struct order *);
-    int use_potion_delayed(struct unit *u, const struct item_type *itype,
         int amount, struct order *);
 
     int get_effect(const struct unit *u, const struct item_type *effect);

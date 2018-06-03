@@ -29,7 +29,8 @@ static void test_magicresistance_unit(CuTest *tc) {
     curse *c;
 
     test_setup();
-    mt_register(mt_new_va("magicresistance_unit", "unit:unit", "id:int", MT_NEW_END));
+    mt_create_va(mt_new("magicresistance_unit", NULL),
+        "unit:unit", "id:int", MT_NEW_END);
     r = test_create_plain(0, 0);
     f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);
@@ -57,7 +58,8 @@ static void test_magicresistance_building(CuTest *tc) {
     curse *c;
 
     test_setup();
-    mt_register(mt_new_va("magicresistance_building", "building:building", "id:int", MT_NEW_END));
+    mt_create_va(mt_new("magicresistance_building", NULL),
+        "building:building", "id:int", MT_NEW_END);
     r = test_create_plain(0, 0);
     f1 = test_create_faction(NULL);
     u1 = test_create_unit(f1, r);

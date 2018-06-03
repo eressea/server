@@ -1,12 +1,79 @@
 <?xml version="1.0"?>
-<resources xmlns:xi="http://www.w3.org/2001/XInclude">
-  <xi:include href="armor/chainmail.xml"/>
-  <xi:include href="armor/laenmail.xml"/>
-  <xi:include href="armor/laenshield.xml"/>
-  <xi:include href="armor/plate.xml"/>
-  <xi:include href="armor/rustychainmail.xml"/>
-  <xi:include href="armor/rustyshield.xml"/>
-  <xi:include href="armor/scale.xml"/>
-  <xi:include href="armor/shield.xml"/>
-  <xi:include href="armor/towershield.xml"/>
+<eressea>
+<resources>
+<resource name="towershield">
+  <modifier type="require" races="dwarf irongolem"/>
+  <item weight="200" score="60" allow="dwarf">
+    <construction skill="armorer" minskill="4">
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <armor ac="0" penalty="-0.15" projectile="0.25" magres="0.0" shield="yes"/>
+  </item>
+</resource>
+<resource name="shield">
+  <item weight="100" score="30">
+    <construction skill="armorer" minskill="2">
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <armor ac="0" penalty="-0.10" magres="0.0" shield="yes"/>
+  </item>
+</resource>
+<resource name="scale">
+  <modifier type="require" races="dwarf irongolem"/>
+  <item weight="300" score="150" allow="dwarf halfling">
+    <construction skill="armorer" minskill="5">
+      <requirement type="iron" quantity="2"/>
+    </construction>
+    <armor ac="3" penalty="0.10" projectile="0.05" magres="0.0"/>
+  </item>
+</resource>
+<resource name="rustyshield">
+  <item weight="100" score="10">
+    <construction skill="armorer" minskill="2">
+      <requirement type="iron" quantity="1"/>
+    </construction>
+    <armor ac="0" penalty="-0.05" magres="0.0" shield="yes"/>
+  </item>
+</resource>
+<resource name="rustychainmail">
+  <item weight="200" score="30">
+    <construction skill="armorer" minskill="3">
+      <requirement type="iron" quantity="3"/>
+    </construction>
+    <armor ac="1" penalty="0.20" magres="0.0"/>
+  </item>
+</resource>
+<resource name="plate">
+  <item weight="400" score="150" deny="goblin">
+    <construction skill="armorer" minskill="4">
+      <requirement type="iron" quantity="4"/>
+    </construction>
+    <armor ac="3" penalty="0.15" projectile="0.10" magres="0.0"/>
+  </item>
+</resource>
+<resource name="laenshield">
+  <item weight="0" score="1000">
+    <construction skill="armorer" minskill="7">
+      <requirement type="laen" quantity="1"/>
+    </construction>
+    <armor ac="1" penalty="-0.10" magres="0.3" laen="yes" shield="yes" />
+  </item>
+</resource>
+<resource name="laenmail">
+  <item weight="100" score="1000">
+    <construction skill="armorer" minskill="9">
+      <requirement type="laen" quantity="2"/>
+    </construction>
+    <armor ac="3" penalty="0.0" projectile="0.10" magres="0.3" laen="yes" />
+  </item>
+</resource>
+<resource name="chainmail">
+  <item weight="200" score="90">
+    <construction skill="armorer" minskill="3">
+      <requirement type="iron" quantity="2"/>
+    </construction>
+    <armor ac="2" penalty="0.10" projectile="0.0" magres="0.0"/>
+  </item>
+</resource>
 </resources>
+</eressea>

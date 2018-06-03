@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="mallornseed" limited="yes">
   <item weight="10" score="100">
     <construction skill="herbalism" minskill="4"/>
   </item>
 </resource>
+</resources>
+</eressea>

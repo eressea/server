@@ -43,7 +43,7 @@ extern "C" {
     } spell;
 
     typedef struct spellref {
-        char * name;
+        char * _name;
         struct spell *sp;
     } spellref;
 
@@ -56,6 +56,10 @@ extern "C" {
     struct spellref *spellref_create(struct spell *sp, const char *name);
     void spellref_free(struct spellref *spref);
     struct spell *spellref_get(struct spellref *spref);
+    const char *spellref_name(const struct spellref *spref);
+
+    void spellref_init(struct spellref *spref, struct spell *sp, const char *name);
+    void spellref_done(struct spellref *spref);
 
     int sp_antimagiczone(struct castorder *co);
 

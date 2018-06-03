@@ -13,7 +13,7 @@ static void test_add_donation(CuTest *tc) {
     region *r;
 
     test_setup();
-    mt_register(mt_new_va("donation", "from:faction", "to:faction", "amount:int", MT_NEW_END));
+    mt_create_va(mt_new("donation", NULL), "from:faction", "to:faction", "amount:int", MT_NEW_END);
     r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(NULL);
     f2 = test_create_faction(NULL);

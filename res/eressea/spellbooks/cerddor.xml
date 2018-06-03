@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="cerddor">
   <entry spell="song_of_healing" level="2" />
   <entry spell="song_of_confusion" level="4" />
@@ -36,3 +37,4 @@
   <entry spell="create_roqf" level="11" />
   <entry spell="blabbermouth" level="4" />
 </spellbook>
+</eressea>

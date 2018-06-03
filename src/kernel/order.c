@@ -110,6 +110,15 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
     return sbuffer;
 }
 
+const char *crescape(const char *str, char *buffer, size_t size) {
+    const char *replace = "\"\\";
+    const char * pos = strpbrk(str, replace);
+    if (!pos) {
+        return str;
+    }
+    return str_escape_ex(str, buffer, size, replace);
+}
+
 int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape)
 {
     const char *text;
@@ -151,7 +160,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
             char obuf[1024];
             swrite(" ", 1, 1, out);
             if (escape) {
-                text = str_escape(text, obuf, sizeof(obuf));
+                text = crescape(text, obuf, sizeof(obuf));
             }
             swrite(text, 1, strlen(text), out);
         }

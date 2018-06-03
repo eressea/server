@@ -30,7 +30,6 @@ extern "C" {
 #define PLAGUE_HEALCHANCE  0.25        /* Wahrscheinlichkeit Heilung */
 #define PLAGUE_HEALCOST    30   /* Heilkosten */
     void plagues(struct region *r);
-    void encounters(void);
     void randomevents(void);
 
 #ifdef __cplusplus

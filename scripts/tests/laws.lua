@@ -6,7 +6,7 @@ function setup()
     eressea.free_game()
     conf = [[{
         "races": {
-            "human" : {}
+            "human" : { "flags" : [ "player" ] }
         },
         "terrains" : {
             "plain": { "flags" : [ "land", "walk", "sail" ] }
@@ -61,7 +61,7 @@ end
 
 function test_make_temp()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("human", "owner@eressea.de", "de")
+    local f1 = faction.create("human", "temp@eressea.de", "de")
     local u1 = unit.create(f1, r, 10)
     local u, u2
 

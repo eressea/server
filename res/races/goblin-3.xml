@@ -1,11 +1,13 @@
 <?xml version="1.0" ?>
+<eressea>
+<races>
 <race name="goblin" magres="-5" maxaura="1.0"
 recruitcost="60" maintenance="6" weight="600" capacity="440"
 speed="1.0" hp="16" damage="1d5" unarmedattack="-2" unarmeddefense="0"
 playerrace="yes" walk="yes" giveperson="yes" giveunit="yes"
 getitem="yes" equipment="yes" healing="2.0">
   <ai splitsize="10000" moverandom="yes" learn="yes"/>
-  <param name="hunger.damage" value="1d8+7"/>
+  <param name="hunger_damage" value="1d8+7"/>
   <param name="other_race" value="demon"/>
   <param name="recruit_multi" value="0.5"/>
   <skill name="cartmaking" modifier="-1"/>
@@ -19,6 +21,8 @@ getitem="yes" equipment="yes" healing="2.0">
   <skill name="unarmed" modifier="-99"/>
   <skill name="weaponsmithing" modifier="-1"/>
   <attack type="1" damage="1d5"/>
-  <familiar race="rat" default="yes"/>
+  <familiar race="rat"/>
   <familiar race="imp"/>
 </race>
+</races>
+</eressea>

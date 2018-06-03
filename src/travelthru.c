@@ -37,9 +37,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <string.h>
 
-static void travel_done(attrib *a) {
-    selist *ql = (selist *)a->data.v;
-    selist_free(ql);
+static void travel_done(variant *var) {
+    selist_free((selist *)var->v);
 }
 
 /*********************/

@@ -43,7 +43,6 @@ void make_undead_unit(unit * u)
 void age_undead(unit * u)
 {
     region *r = u->region;
-    int n = 0;
 
     /* untote, die einer partei angehoeren, koennen sich
      * absplitten, anstatt sich zu vermehren. monster
@@ -51,10 +50,9 @@ void age_undead(unit * u)
 
     if (u->number > UNDEAD_MIN && !is_monsters(u->faction)
         && rng_int() % 100 < UNDEAD_BREAKUP) {
-        int m;
+        int m, n = 0;
         unit *u2;
 
-        n = 0;
         for (m = u->number; m; m--) {
             if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
                 ++n;

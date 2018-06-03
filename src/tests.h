@@ -41,7 +41,7 @@ extern "C" {
     void test_log_stop(struct log_t *log, struct strlist *slist);
 
     struct locale * test_create_locale(void);
-    struct terrain_type * test_create_terrain(const char * name, unsigned int flags);
+    struct terrain_type * test_create_terrain(const char * name, int flags);
     struct race *test_create_race(const char *name);
     struct region *test_create_region(int x, int y, const struct terrain_type *terrain);
     struct region *test_create_ocean(int x, int y);
@@ -58,6 +58,7 @@ extern "C" {
     struct building_type *test_create_buildingtype(const char *name);
     void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
     struct spell * test_create_spell(void);
+    int test_set_item(struct unit * u, const struct item_type *itype, int value);
 
     void test_translate_param(const struct locale *lang, param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);

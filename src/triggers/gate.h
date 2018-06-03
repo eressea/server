@@ -24,8 +24,6 @@ extern "C" {
 
     extern struct trigger_type tt_gate;
 
-    struct trigger *trigger_gate(struct building *b, struct region *r);
-
 #ifdef __cplusplus
 }
 #endif

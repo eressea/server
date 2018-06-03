@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #endif
 
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/database.h>
 #include <kernel/messages.h>
@@ -81,8 +82,11 @@ static void load_inifile(void)
 
 static const char * valid_keys[] = {
     "game.id",
+    "game.deadlog",
+    "game.maxnmr",
     "game.name",
     "game.start",
+    "game.seed",
     "game.locale",
     "game.verbose",
     "game.report",
@@ -255,7 +259,7 @@ static int parse_args(int argc, char **argv)
     return 0;
 }
 
-#if defined(HAVE_SIGACTION) && defined(HAVE_EXECINFO)
+#ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #include <signal.h>
 
@@ -276,7 +280,7 @@ static int setup_signal_handler(void)
 {
     struct sigaction act;
 
-    act.sa_flags = SA_ONESHOT | SA_SIGINFO;
+    act.sa_flags = SA_RESETHAND | SA_SIGINFO;
     act.sa_sigaction = report_segfault;
     sigfillset(&act.sa_mask);
     return sigaction(SIGSEGV, &act, NULL);

@@ -1,0 +1,29 @@
+{
+    "include": [
+        "config://res/core/spoils.xml",
+        "config://res/core/common/herbs.xml",
+        "config://res/core/common/items.xml",
+        "config://res/core/common/luxuries.xml",
+        "config://res/core/resources/cart.xml",
+        "config://res/core/resources/horse.xml",
+        "config://res/core/resources/hp.xml",
+        "config://res/core/resources/laen.xml",
+        "config://res/core/resources/log.xml",
+        "config://res/core/resources/mallorn.xml",
+        "config://res/core/resources/peasant.xml",
+        "config://res/core/weapons/bow.xml",
+        "config://res/core/weapons/catapult.xml",
+        "config://res/core/weapons/mallornbow.xml",
+        "config://res/core/weapons/mallornspear.xml",
+        "config://res/core/weapons/runesword.xml",
+        "config://res/core/weapons/rustyaxe.xml",
+        "config://res/core/weapons/rustysword.xml",
+        "config://res/core/weapons/spear.xml",
+        "config://res/core/weapons/sword.xml",
+        "config://res/core/weapons/firesword.xml",
+        "config://res/e3a/weapons.xml",
+        "config://res/e3a/armor.xml",
+        "config://res/e3a/items.xml",
+        "config://res/adamantium.xml"
+    ]
+}

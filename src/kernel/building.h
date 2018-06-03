@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/types.h>
 #include <util/resolve.h>
+#include <util/variant.h>
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -47,11 +48,22 @@ extern "C" {
 #define BTF_NOBUILD        0x02 /* special, can't be built */
 #define BTF_UNIQUE         0x04 /* only one per struct region (harbour) */
 #define BTF_DECAY          0x08 /* decays when not occupied */
-#define BTF_DYNAMIC        0x10 /* dynamic type, needs bt_write */
-#define BTF_MAGIC          0x40 /* magical effect */
+#define BTF_MAGIC          0x10 /* magical effect */
+#define BTF_NAMECHANGE     0x20 /* name and description can be changed more than once */
+#define BTF_FORTIFICATION  0x40 /* building_protection, safe from monsters */
 #define BTF_ONEPERTURN     0x80 /* one one sizepoint can be added per turn */
-#define BTF_NAMECHANGE    0x100 /* name and description can be changed more than once */
-#define BTF_FORTIFICATION 0x200 /* building_protection, safe from monsters */
+#define BTF_DYNAMIC        0x100 /* dynamic type, needs bt_write */
+
+#define BTF_DEFAULT (BTF_NAMECHANGE)
+
+    typedef struct building_stage {
+        /* construction of this building stage: */
+        struct construction *construction;  
+        /* building stage name: */
+        char * name;
+        /* next stage, if upgradable: */
+        struct building_stage * next; 
+    } building_stage;
 
     typedef struct building_type {
         char *_name;
@@ -66,8 +78,8 @@ extern "C" {
         int taxes;                  /* receive $1 tax per `taxes` in region */
         double auraregen;           /* modifier for aura regeneration inside building */
         struct maintenance *maintenance;    /* array of requirements */
-        struct construction *construction;  /* construction of 1 building-level */
         struct resource_mod *modifiers; /* modify production skills */
+        struct building_stage *stages;
     } building_type;
 
     extern struct selist *buildingtypes;

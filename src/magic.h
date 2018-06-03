@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define H_KRNL_MAGIC
 
 #include <kernel/types.h>
+#include <util/variant.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -153,28 +154,28 @@ extern "C" {
 #define FARCASTING      (1<<0)  /* ZAUBER [struct region x y] */
 #define SPELLLEVEL      (1<<1)  /* ZAUBER [STUFE x] */
 
-    /* ID's können zu drei unterschiedlichen Entitäten gehören: Einheiten,
-     * Gebäuden und Schiffen. */
-#define UNITSPELL       (1<<2)  /* ZAUBER .. <Einheit-Nr> [<Einheit-Nr> ..] */
-#define SHIPSPELL       (1<<3)  /* ZAUBER .. <Schiff-Nr> [<Schiff-Nr> ..] */
-#define BUILDINGSPELL   (1<<4)  /* ZAUBER .. <Gebaeude-Nr> [<Gebaeude-Nr> ..] */
-#define REGIONSPELL     (1<<5)  /* wirkt auf struct region */
+#define OCEANCASTABLE   (1<<2) /* Können auch nicht-Meermenschen auf
+     hoher See zaubern */
+#define ONSHIPCAST      (1<<3) /* kann auch auf von Land ablegenden
+     Schiffen stehend gezaubert werden */
+#define TESTCANSEE      (1<<4) /* alle Zielunits auf cansee prüfen */
 
-#define PRECOMBATSPELL	(1<<7)  /* PRÄKAMPFZAUBER .. */
-#define COMBATSPELL     (1<<8)  /* KAMPFZAUBER .. */
-#define POSTCOMBATSPELL	(1<<9)  /* POSTKAMPFZAUBER .. */
+     /* ID's können zu drei unterschiedlichen Entitäten gehören: Einheiten,
+     * Gebäuden und Schiffen. */
+#define UNITSPELL       (1<<5)  /* ZAUBER .. <Einheit-Nr> [<Einheit-Nr> ..] */
+#define SHIPSPELL       (1<<6)  /* ZAUBER .. <Schiff-Nr> [<Schiff-Nr> ..] */
+#define BUILDINGSPELL   (1<<7)  /* ZAUBER .. <Gebaeude-Nr> [<Gebaeude-Nr> ..] */
+#define REGIONSPELL     (1<<8)  /* wirkt auf struct region */
+#define GLOBALTARGET    (1<<9) /* Ziel kann ausserhalb der region sein */
+
+#define PRECOMBATSPELL	(1<<10)  /* PRÄKAMPFZAUBER .. */
+#define COMBATSPELL     (1<<11)  /* KAMPFZAUBER .. */
+#define POSTCOMBATSPELL	(1<<12)  /* POSTKAMPFZAUBER .. */
 #define ISCOMBATSPELL   (PRECOMBATSPELL|COMBATSPELL|POSTCOMBATSPELL)
 
-#define OCEANCASTABLE   (1<<10) /* Können auch nicht-Meermenschen auf
-     hoher See zaubern */
-#define ONSHIPCAST      (1<<11) /* kann auch auf von Land ablegenden
-     Schiffen stehend gezaubert werden */
-    /*  */
-#define NOTFAMILIARCAST (1<<12)
-#define TESTRESISTANCE  (1<<13) /* alle Zielobjekte (u, s, b, r) auf
-                                       Magieresistenz prüfen */
-#define SEARCHLOCAL     (1<<14) /* Ziel muss in der target_region sein */
-#define TESTCANSEE      (1<<15) /* alle Zielunits auf cansee prüfen */
+
+#define TESTRESISTANCE  (1<<13) /* Zielobjekte auf Magieresistenz prüfen. not used in XML? */
+#define NOTFAMILIARCAST (1<<14) /* not used by XML? */
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
 
     /* Flag Spruchkostenberechnung: */
@@ -191,13 +192,11 @@ extern "C" {
 
     void regenerate_aura(void);
 
-    extern struct attrib_type at_seenspell;
     extern struct attrib_type at_mage;
     extern struct attrib_type at_familiarmage;
     extern struct attrib_type at_familiar;
     extern struct attrib_type at_clonemage;
     extern struct attrib_type at_clone;
-    extern struct attrib_type at_reportspell;
     extern struct attrib_type at_icastle;
 
     void make_icastle(struct building *b, const struct building_type *btype, int timeout);
@@ -243,7 +242,6 @@ extern "C" {
     int u_hasspell(const struct unit *u, const struct spell *sp);
     /* prüft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
-    void show_new_spells(struct faction * f, int level, const struct spellbook *book);
     bool knowsspell(const struct region *r, const struct unit *u,
         const struct spell * sp);
     /* prüft, ob die Einheit diesen Spruch gerade beherrscht, dh
@@ -274,7 +272,7 @@ extern "C" {
 
     typedef struct spellrank {
         struct castorder *begin;
-        struct castorder **end;
+        struct castorder **handle_end;
     } spellrank;
 
     struct castorder *create_castorder(struct castorder * co, struct unit *caster,

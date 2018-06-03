@@ -101,20 +101,6 @@ const char *magic_school[MAXMAGIETYP] = {
     "common"
 };
 
-static void a_init_reportspell(struct attrib *a) {
-    a->data.v = calloc(1, sizeof(spellbook_entry));
-}
-
-static void a_finalize_reportspell(struct attrib *a) {
-    free(a->data.v);
-}
-
-attrib_type at_reportspell = {
-    "reportspell",
-    a_init_reportspell,
-    a_finalize_reportspell,
-    0, NO_WRITE, NO_READ
-};
 /**
  ** at_icastle
  ** TODO: separate castle-appearance from illusion-effects
@@ -140,10 +126,10 @@ typedef struct icastle_data {
     int time;
 } icastle_data;
 
-static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
+static int a_readicastle(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    icastle_data *idata = (icastle_data *)a->data.v;
+    icastle_data *idata = (icastle_data *)var->v;
     char token[32];
 
     UNUSED_ARG(owner);
@@ -157,9 +143,9 @@ static int a_readicastle(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-a_writeicastle(const attrib * a, const void *owner, struct storage *store)
+a_writeicastle(const variant *var, const void *owner, struct storage *store)
 {
-    icastle_data *data = (icastle_data *)a->data.v;
+    icastle_data *data = (icastle_data *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, data->type->_name);
     WRITE_INT(store, data->time);
@@ -182,20 +168,15 @@ static int a_ageicastle(struct attrib *a, void *owner)
     return AT_AGE_KEEP;
 }
 
-static void a_initicastle(struct attrib *a)
+static void a_initicastle(variant *var)
 {
-    a->data.v = calloc(sizeof(icastle_data), 1);
-}
-
-static void a_finalizeicastle(struct attrib *a) /*-V524 */
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(icastle_data), 1);
 }
 
 attrib_type at_icastle = {
     "zauber_icastle",
     a_initicastle,
-    a_finalizeicastle,
+    a_free_voidptr,
     a_ageicastle,
     a_writeicastle,
     a_readicastle
@@ -221,14 +202,14 @@ extern int dice(int count, int value);
  * Umwandlung von alt nach neu gebraucht werden */
  /* ------------------------------------------------------------- */
 
-static void init_mage(attrib * a)
+static void init_mage(variant *var)
 {
-    a->data.v = calloc(sizeof(sc_mage), 1);
+    var->v = calloc(sizeof(sc_mage), 1);
 }
 
-static void free_mage(attrib * a)
+static void free_mage(variant *var)
 {
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     if (mage->spellbook) {
         spellbook_clear(mage->spellbook);
         free(mage->spellbook);
@@ -253,11 +234,11 @@ int get_spell_level_mage(const spell * sp, void * cbdata)
     return sbe ? sbe->level : 0;
 }
 
-static int read_mage(attrib * a, void *owner, struct gamedata *data)
+static int read_mage(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int i, mtype;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
     char spname[64];
 
     UNUSED_ARG(owner);
@@ -301,10 +282,10 @@ static int read_mage(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-write_mage(const attrib * a, const void *owner, struct storage *store)
+write_mage(const variant *var, const void *owner, struct storage *store)
 {
     int i;
-    sc_mage *mage = (sc_mage *)a->data.v;
+    sc_mage *mage = (sc_mage *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, mage->magietyp);
@@ -354,81 +335,7 @@ sc_mage *get_mage_depr(const unit * u)
     return NULL;
 }
 
-/* ------------------------------------------------------------- */
-/* Ausgabe der Spruchbeschreibungen
-* Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
-* kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
-* werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
-* Spruch zu seiner List-of-known-spells hinzugefügt werden.
-*/
-
-static int read_seenspell(attrib * a, void *owner, struct gamedata *data)
-{
-    storage *store = data->store;
-    spell *sp = 0;
-    char token[32];
-
-    UNUSED_ARG(owner);
-    READ_TOK(store, token, sizeof(token));
-    if (data->version < UNIQUE_SPELLS_VERSION) {
-        READ_INT(store, 0); /* ignore mtype */
-    }
-    sp = find_spell(token);
-    if (!sp) {
-        log_info("read_seenspell: could not find spell '%s'\n", token);
-        return AT_READ_FAIL;
-    }
-    a->data.v = sp;
-    return AT_READ_OK;
-}
-
-static void
-write_seenspell(const attrib * a, const void *owner, struct storage *store)
-{
-    const spell *sp = (const spell *)a->data.v;
-    UNUSED_ARG(owner);
-    WRITE_TOK(store, sp->sname);
-}
-
-attrib_type at_seenspell = {
-    "seenspell", NULL, NULL, NULL, write_seenspell, read_seenspell
-};
-
 #define MAXSPELLS 256
-
-static bool already_seen(const faction * f, const spell * sp)
-{
-    attrib *a;
-
-    for (a = a_find(f->attribs, &at_seenspell); a && a->type == &at_seenspell;
-        a = a->next) {
-        if (a->data.v == sp)
-            return true;
-    }
-    return false;
-}
-
-void show_new_spells(faction * f, int level, const spellbook *book)
-{
-    if (book) {
-        selist *ql = book->spells;
-        int qi;
-
-        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-            if (sbe->level <= level) {
-                if (!already_seen(f, sbe->sp)) {
-                    attrib * a = a_new(&at_reportspell);
-                    spellbook_entry * entry = (spellbook_entry *)a->data.v;
-                    entry->level = sbe->level;
-                    entry->sp = sbe->sp;
-                    a_add(&f->attribs, a);
-                    a_add(&f->attribs, a_new(&at_seenspell))->data.v = sbe->sp;
-                }
-            }
-        }
-    }
-}
 
 /** update the spellbook with a new level
 * Written for E3
@@ -468,13 +375,16 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                     sbe = 0;
                 }
                 else {
-                    if (f->spellbook && spellbook_get(f->spellbook, sbe->sp)) {
-                        /* already have this spell, remove it from the list of candidates */
-                        commonspells[spellno] = commonspells[--numspells];
-                        if (maxspell > numspells) {
-                            maxspell = numspells;
+                    if (f->spellbook) {
+                        const spell *sp = spellref_get(&sbe->spref);
+                        if (sp && spellbook_get(f->spellbook, sp)) {
+                            /* already have this spell, remove it from the list of candidates */
+                            commonspells[spellno] = commonspells[--numspells];
+                            if (maxspell > numspells) {
+                                maxspell = numspells;
+                            }
+                            sbe = 0;
                         }
-                        sbe = 0;
                     }
                 }
             }
@@ -483,7 +393,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
                 if (!f->spellbook) {
                     f->spellbook = create_spellbook(0);
                 }
-                spellbook_add(f->spellbook, sbe->sp, sbe->level);
+                spellbook_add(f->spellbook, spellref_get(&sbe->spref), sbe->level);
                 commonspells[spellno] = commonspells[--numspells];
             }
         }
@@ -592,13 +502,13 @@ void unset_combatspell(unit * u, spell * sp)
 {
     sc_mage *m;
     int nr = 0;
-    int i;
 
     m = get_mage_depr(u);
     if (!m)
         return;
 
     if (!sp) {
+        int i;
         for (i = 0; i < MAXCOMBATSPELLS; i++) {
             m->combatspells[i].sp = NULL;
         }
@@ -1565,7 +1475,7 @@ verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
 {
     ship *sh = findship(spobj->data.i);
 
-    if (sh != NULL && sh->region != r && (sp->sptyp & SEARCHLOCAL)) {
+    if (sh != NULL && sh->region != r && (sp->sptyp & GLOBALTARGET) == 0) {
         /* Burg muss in gleicher Region sein */
         sh = NULL;
     }
@@ -1588,7 +1498,7 @@ verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj,
 {
     building *b = findbuilding(spobj->data.i);
 
-    if (b != NULL && b->region != r && (sp->sptyp & SEARCHLOCAL)) {
+    if (b != NULL && b->region != r && (sp->sptyp & GLOBALTARGET) == 0) {
         /* Burg muss in gleicher Region sein */
         b = NULL;
     }
@@ -1642,13 +1552,14 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
     default:
         assert(!"shouldn't happen, this");
     }
-    if (u != NULL && (sp->sptyp & SEARCHLOCAL)) {
-        if (u->region != r)
-            u = NULL;
-        else if (sp->sptyp & TESTCANSEE) {
+    if (u != NULL) {
+        if (u->region == r) {
             if (!cansee(mage->faction, r, u, 0) && !ucontact(u, mage)) {
                 u = NULL;
             }
+        }
+        else if ((sp->sptyp & GLOBALTARGET) == 0) {
+            u = NULL;
         }
     }
 
@@ -1682,13 +1593,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     const spell *sp = co->sp;
     region *target_r = co_get_region(co);
     spellparameter *sa = co->par;
-    int i;
 
     *invalid = 0;
     *resist = 0;
     *success = 0;
 
     if (sa && sa->length) {
+        int i;
         /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
          * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
          * gar nicht global hätte suchen dürften, setzen wir das Objekt
@@ -1909,12 +1820,12 @@ static int addparam_building(const char *const param[], spllprm ** spobjp)
 
 static int
 addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
-    order * ord)
+    order * ord, message **err)
 {
     assert(param[0]);
-    if (param[1] == 0) {
+    if (param[1] == NULL) {
         /* Fehler: Zielregion vergessen */
-        cmistake(u, ord, 194, MSG_MAGIC);
+        *err = msg_error(u, ord, 194);
         return -1;
     }
     else {
@@ -1936,7 +1847,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
         }
         else {
             /* Fehler: Zielregion vergessen */
-            cmistake(u, ord, 194, MSG_MAGIC);
+            *err = msg_error(u, ord, 194);
             return -1;
         }
         return 2;
@@ -1945,7 +1856,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
 
 static int
 addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
-    order * ord)
+    order * ord, message **err)
 {
     spllprm *spobj;
     int i = 0;
@@ -1955,7 +1866,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
     if (isparam(param[0], u->faction->locale, P_TEMP)) {
         if (param[1] == NULL) {
             /* Fehler: Ziel vergessen */
-            cmistake(u, ord, 203, MSG_MAGIC);
+            *err = msg_error(u, ord, 203);
             return -1;
         }
         ++i;
@@ -1973,7 +1884,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
 static spellparameter *add_spellparameter(region * target_r, unit * u,
     const char *syntax, const char *const param[], int size, struct order *ord)
 {
-    bool fail = false;
+    struct message *err = NULL;
     int i = 0;
     int p = 0;
     const char *c;
@@ -2009,7 +1920,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
     }
     par->param = malloc(size * sizeof(spllprm *));
 
-    while (!fail && *c && i < size && param[i] != NULL) {
+    while (!err && *c && i < size && param[i] != NULL) {
         spllprm *spobj = NULL;
         int j = -1;
         switch (*c) {
@@ -2028,12 +1939,14 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             break;
         case 'u':
             /* Parameter ist eine Einheit, evtl. TEMP */
-            j = addparam_unit(param + i, &spobj, u, ord);
+            j = addparam_unit(param + i, &spobj, u, ord, &err);
             ++c;
             break;
         case 'r':
             /* Parameter sind zwei Regionskoordinaten innerhalb der "normalen" Plane */
-            j = addparam_region(param + i, &spobj, u, ord);
+            if (i + 1 < size) {
+                j = addparam_region(param + i, &spobj, u, ord, &err);
+            }
             ++c;
             break;
         case 'b':
@@ -2067,7 +1980,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
                 break;
             case P_UNIT:
                 if (i < size) {
-                    j = addparam_unit(param + i, &spobj, u, ord);
+                    j = addparam_unit(param + i, &spobj, u, ord, &err);
                     ++c;
                 }
                 break;
@@ -2093,8 +2006,10 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             j = -1;
             break;
         }
-        if (j < 0)
-            fail = true;
+        if (j < 0 && !err) {
+            /* syntax error */
+            err = msg_error(u, ord, 209);
+        }
         else {
             if (spobj != NULL)
                 par->param[p++] = spobj;
@@ -2102,14 +2017,18 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
         }
     }
 
-    /* im Endeffekt waren es evtl. nur p parameter (wegen TEMP) */
+    /* im Endeffekt waren es evtl. nur p parameter (weniger weil TEMP nicht gilt) */
     par->length = p;
-    if (fail || par->length < minlen) {
-        cmistake(u, ord, 209, MSG_MAGIC);
-        free_spellparameter(par);
-        return NULL;
-    }
 
+    if (!err && p < minlen) {
+        /* syntax error */
+        err = msg_error(u, ord, 209);
+    }
+    if (err) {
+        ADDMSG(&u->faction->msgs, err);
+        free_spellparameter(par);
+        par = NULL;
+    }
     return par;
 }
 
@@ -2149,11 +2068,11 @@ void free_castorder(struct castorder *co)
 void add_castorder(spellrank * cll, castorder * co)
 {
     if (cll->begin == NULL) {
-        cll->end = &cll->begin;
+        cll->handle_end = &cll->begin;
     }
 
-    *cll->end = co;
-    cll->end = &co->next;
+    *cll->handle_end = co;
+    cll->handle_end = &co->next;
 
     return;
 }
@@ -2178,9 +2097,9 @@ bool is_familiar(const unit * u)
 }
 
 static void
-a_write_unit(const attrib * a, const void *owner, struct storage *store)
+a_write_unit(const variant *var, const void *owner, struct storage *store)
 {
-    unit *u = (unit *)a->data.v;
+    unit *u = (unit *)var->v;
     UNUSED_ARG(owner);
     write_unit_reference(u, store);
 }
@@ -2262,18 +2181,13 @@ void remove_familiar(unit * mage)
 void create_newfamiliar(unit * mage, unit * fam)
 {
     /* skills and spells: */
-    const struct equipment *eq;
     char eqname[64];
     const race *rc = u_race(fam);
 
     set_familiar(mage, fam);
 
     snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
-    eq = get_equipment(eqname);
-    if (eq != NULL) {
-        equip_unit(fam, eq);
-    }
-    else {
+    if (!equip_unit(fam, eqname)) {
         log_info("could not perform initialization for familiar %s.\n", rc->_name);
     }
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
@@ -2296,10 +2210,10 @@ static void * resolve_familiar(int id, void *data) {
     return data;
 }
 
-static int read_familiar(attrib * a, void *owner, struct gamedata *data)
+static int read_familiar(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_familiar) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_familiar) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2369,10 +2283,10 @@ static void * resolve_clone(int id, void *data) {
     return data;
 }
 
-static int read_clone(attrib * a, void *owner, struct gamedata *data)
+static int read_clone(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_clone) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_clone) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2392,10 +2306,10 @@ static void * resolve_mage(int id, void *data) {
     return data;
 }
 
-static int read_magician(attrib * a, void *owner, struct gamedata *data)
+static int read_magician(variant *var, void *owner, struct gamedata *data)
 {
     UNUSED_ARG(owner);
-    if (read_unit_reference(data, (unit **)&a->data.v, resolve_mage) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, resolve_mage) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -2480,8 +2394,9 @@ unit *get_clone(const unit * u)
     attrib *a = a_find(u->attribs, &at_clone);
     if (a != NULL) {
         unit *uc = (unit *)a->data.v;
-        if (uc->number > 0)
+        if (uc->number > 0) {
             return uc;
+        }
     }
     return NULL;
 }
@@ -2490,7 +2405,7 @@ static bool is_moving_ship(ship * sh)
 {
     const unit *u = ship_owner(sh);
 
-    if (u)
+    if (u) {
         switch (getkeyword(u->thisorder)) {
         case K_ROUTE:
         case K_MOVE:
@@ -2499,9 +2414,11 @@ static bool is_moving_ship(ship * sh)
         default:
             return false;
         }
+    }
     return false;
 }
 
+#define MAX_PARAMETERS 32
 static castorder *cast_cmd(unit * u, order * ord)
 {
     char token[128];
@@ -2702,33 +2619,25 @@ static castorder *cast_cmd(unit * u, order * ord)
     }
     /* Weitere Argumente zusammenbasteln */
     if (sp->parameter) {
-        char **params = (char**)malloc(2 * sizeof(char *));
-        int p = 0, size = 2;
-        for (;;) {
+        char *params[MAX_PARAMETERS];
+        int i, p;
+        for (p = 0; p != MAX_PARAMETERS; ++p) {
             s = gettoken(token, sizeof(token));
-            if (!s || *s == 0)
+            if (!s || *s == 0) {
                 break;
-            if (p + 1 >= size) {
-                char ** tmp;
-                tmp = (char**)realloc(params, sizeof(char *) * size * 2);
-                if (tmp) {
-                    size *= 2;
-                    params = tmp;
-                }
-                else {
-                    log_error("error allocationg %d bytes: %s", size * 2, strerror(errno));
-                    break;
-                }
             }
-            params[p++] = str_strdup(s);
+            params[p] = str_strdup(s);
         }
-        params[p] = 0;
+        if (p == MAX_PARAMETERS) {
+            log_error("%s: MAX_PARAMETERS (%d) too small to CAST %s, parsing stopped early.",
+                unitname(u), MAX_PARAMETERS, sp->sname);
+        }
         args =
             add_spellparameter(target_r, caster, sp->parameter,
             (const char *const *)params, p, ord);
-        for (p = 0; params[p]; ++p)
-            free(params[p]);
-        free(params);
+        for (i = 0; i != p; ++i) {
+            free(params[i]);
+        }
         if (args == NULL) {
             /* Syntax war falsch */
             return 0;
@@ -2933,14 +2842,14 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
 
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
-
-        const char *n = spell_name(sbe->sp, lang);
+        const spell *sp = spellref_get(&sbe->spref);
+        const char *n = spell_name(sp, lang);
         if (!n) {
-            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sbe->sp->sname);
+            log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
         }
         else {
             variant token;
-            token.v = sbe->sp;
+            token.v = (void *)sp;
             addtoken((struct tnode **)tokens, n, token);
         }
     }

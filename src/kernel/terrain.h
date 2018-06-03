@@ -36,6 +36,8 @@ extern "C" {
 #define SWIM_INTO		     (1<<8)     /* man darf hierhin schwimmen */
 #define WALK_INTO		     (1<<9)     /* man darf hierhin laufen */
 
+    extern const char *terrainnames[];
+
     typedef struct production_rule {
         char *name;
         const struct resource_type *rtype;
