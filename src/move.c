@@ -73,7 +73,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -2247,10 +2246,9 @@ static direction_t hunted_dir(attrib * at, int id)
 int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
-    size_t bytes;
+    sbstring sbcmd;
     int  moves, id, speed;
-    char command[256], *bufp = command;
-    size_t size = sizeof(command);
+    char command[256];
     direction_t dir;
 
     if (fval(u, UFL_NOTMOVING)) {
@@ -2286,11 +2284,10 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    bufp = command;
-    bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keyword(K_MOVE)), LOC(u->faction->locale, directions[dir]));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_init(&sbcmd, command, sizeof(command));
+    sbs_strcpy(&sbcmd, LOC(u->faction->locale, keyword(K_MOVE)));
+    sbs_strcat(&sbcmd, " ");
+    sbs_strcat(&sbcmd, LOC(u->faction->locale, directions[dir]));
 
     moves = 1;
 
@@ -2306,8 +2303,8 @@ int follow_ship(unit * u, order * ord)
     rc = rconnect(rc, dir);
     while (rc && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
-        bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
-        bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
+        sbs_strcat(&sbcmd, " ");
+        sbs_strcat(&sbcmd, loc);
         moves++;
         rc = rconnect(rc, dir);
     }
