@@ -7,6 +7,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <assert.h>
+
 void test_missing_message(CuTest *tc) {
     message *msg;
 
@@ -78,6 +80,7 @@ static void test_merge_split(CuTest *tc) {
 static void test_noerror(CuTest *tc) {
     unit *u;
     struct locale *lang;
+    message *msg;
 
     test_setup();
     lang = test_create_locale();
@@ -85,8 +88,10 @@ static void test_noerror(CuTest *tc) {
     u->thisorder = parse_order("!@move", lang);
     CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
     CuAssertTrue(tc, !is_persistent(u->thisorder));
-    CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
-    CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    CuAssertPtrEquals(tc, NULL, msg = msg_error(u, u->thisorder, 100));
+    assert(!msg);
+    CuAssertPtrEquals(tc, NULL, msg = msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    assert(!msg);
     test_teardown();
 }
 

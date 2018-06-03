@@ -308,7 +308,7 @@ msgstr "\"$unit($mage) legt einen Schleier um die Ausrüstung von $unit.dative($
 msgid "error5"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
 
-msgid "tactics_lost"
+msgid "para_tactics_lost"
 msgstr "\"$unit($unit) konnte dem Gegner eine Falle stellen.\""
 
 msgid "error_lowstealth"
@@ -1052,7 +1052,7 @@ msgstr "\"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen 
 msgid "recruit_archetype"
 msgstr "\"$unit($unit) rekrutiert $int($amount) $localize($archetype).\""
 
-msgid "tactics_won"
+msgid "para_tactics_won"
 msgstr "\"$unit($unit) überrascht den Gegner.\""
 
 msgid "raindance_effect"

@@ -20,9 +20,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #endif
 #include "strings.h"
-#include "assert.h"
 
 /* libc includes */
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
@@ -111,7 +111,8 @@ size_t str_slprintf(char * dst, size_t size, const char * format, ...)
     return (size_t)result;
 }
 
-void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value)
+void str_replace(char *buffer, size_t size, const char *tmpl, const char *var,
+    const char *value)
 {
     size_t val_len = strlen(value);
     size_t var_len = strlen(var);
@@ -154,28 +155,28 @@ int str_hash(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *str_escape(const char *str, char *buffer,
-    size_t len)
+const char *str_escape_wrong(const char *str, char *buffer, size_t len)
 {
     const char *handle_start = strchr(str, '\"');
     if (!handle_start) handle_start = strchr(str, '\\');
     assert(buffer);
     if (handle_start) {
-        const char *p;
-        char *o;
+        const char *p = str;
+        char *o = buffer;
         size_t skip = handle_start - str;
 
         if (skip > len) {
             skip = len;
         }
-        memcpy(buffer, str, skip);
-        o = buffer + skip;
-        p = str + skip;
-        len -= skip;
+        if (skip > 0) {
+            memcpy(buffer, str, skip);
+            o += skip;
+            p += skip;
+            len -= skip;
+        }
         do {
             if (*p == '\"' || *p == '\\') {
                 if (len < 2) {
-                    *o = '\0';
                     break;
                 }
                 (*o++) = '\\';
@@ -183,13 +184,15 @@ const char *str_escape(const char *str, char *buffer,
             }
             else {
                 if (len < 1) {
-                    *o = '\0';
                     break;
                 }
                 --len;
             }
-            (*o++) = (*p);
-        } while (*p++);
+            if (len > 0) {
+                (*o++) = (*p);
+            }
+        } while (len > 0 && *p++);
+        *o = '\0';
         return buffer;
     }
     return str;
@@ -305,4 +308,101 @@ char *str_unescape(char *str) {
         }
     }
     return str;
+}
+
+const char *str_escape_ex(const char *str, char *buffer, size_t size, const char *chars)
+{
+    size_t slen = strlen(str);
+    const char *read = str;
+    char *write = buffer;
+    if (size < 1) {
+        return NULL;
+    }
+    while (slen > 0 && size > 1 && *read) {
+        const char *pos = strpbrk(read, chars);
+        size_t len = size;
+        if (pos) {
+            len = pos - read;
+        }
+        if (len < size) {
+            unsigned char ch = *(const unsigned char *)pos;
+            if (len > 0) {
+                if (len > slen) {
+                    len = slen;
+                }
+                memmove(write, read, len);
+                slen -= len;
+                write += len;
+                read += len;
+                size -= len;
+            }
+            switch (ch) {
+            case '\t':
+                if (size > 2) {
+                    *write++ = '\\';
+                    *write++ = 't';
+                    size -= 2;
+                }
+                else size = 1;
+                break;
+            case '\n':
+                if (size > 2) {
+                    *write++ = '\\';
+                    *write++ = 'n';
+                    size -= 2;
+                }
+                else size = 1;
+                break;
+            case '\r':
+                if (size > 2) {
+                    *write++ = '\\';
+                    *write++ = 'r';
+                    size -= 2;
+                }
+                else size = 1;
+                break;
+            case '\"':
+            case '\'':
+            case '\\':
+                if (size > 2) {
+                    *write++ = '\\';
+                    *write++ = ch;
+                    size -= 2;
+                }
+                break;
+            default:
+                if (size > 5) {
+                    int n = sprintf(write, "\\%03o", ch);
+                    if (n > 0) {
+                        assert(n == 5);
+                        write += n;
+                        size -= n;
+                    }
+                    else size = 1;
+                }
+                else size = 1;
+            }
+            ++read;
+            --slen;
+        } else {
+            /* end of buffer space */
+            len = size - 1;
+            if (len > 0) {
+                if (len > slen) {
+                    len = slen;
+                }
+                memmove(write, read, len);
+                write += len;
+                size -= len;
+                slen -= len;
+                break;
+            }
+        }
+    }
+    *write = '\0';
+    return buffer;
+}
+
+const char *str_escape(const char *str, char *buffer, size_t size) {
+    return str_escape_ex(str, buffer, size, "\n\t\r\'\"\\");
 }

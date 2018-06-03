@@ -308,7 +308,7 @@ msgstr "\"$unit($mage) shrouds the equipment of $unit($target) in shadows.\""
 msgid "error5"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The building is not ours.\""
 
-msgid "tactics_lost"
+msgid "para_tactics_lost"
 msgstr "\"$unit($unit) lured the enemy into an ambush.\""
 
 msgid "error_lowstealth"
@@ -1052,7 +1052,7 @@ msgstr "\"This region was cursed by the gods. Stinking vapors billow over the de
 msgid "recruit_archetype"
 msgstr "\"$unit($unit) recruits $int($amount) $localize($archetype).\""
 
-msgid "tactics_won"
+msgid "para_tactics_won"
 msgstr "\"$unit($unit) surprises the enemies.\""
 
 msgid "raindance_effect"

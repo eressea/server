@@ -17,9 +17,7 @@ msgstr "Rostiges Kettenhemd"
 msgctxt "spellinfo"
 msgid "destroy_magic"
 msgstr ""
-"Dieser Zauber ermöglicht dem Magier, Verzauberungen "
-"einer Einheit, eines Schiffes, Gebäudes oder auch "
-"der Region aufzulösen."
+"Dieser Zauber ermöglicht dem Magier, Verzauberungen einer Einheit, eines Schiffes, Gebäudes oder auch der Region aufzulösen."
 
 msgctxt "spell"
 msgid "shadowknights"
@@ -168,9 +166,6 @@ msgstr "TRÄNKE"
 msgid "northwest"
 msgstr "Nordwesten"
 
-msgid "spinx09"
-msgstr "Das Schiff mit dem Stern im Wappen liegt neben dem der einen Mandelkern hat"
-
 msgctxt "iteminfo"
 msgid "cookie"
 msgstr "Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e"
@@ -216,7 +211,7 @@ msgstr "Untoter Pharaonen"
 
 msgctxt "iteminfo"
 msgid "magicbag"
-msgstr "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass sie auf das Traggewicht angerechnet werden.  Pferde und andere Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem Beutel transportiert werden.  Auch ist es nicht möglich, einen Zauberbeutel in einem anderen zu transportieren.  Der Beutel selber wiegt 1 GE."
+msgstr "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass sie auf das Traggewicht angerechnet werden. Pferde und andere Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem Beutel transportiert werden. Auch ist es nicht möglich, einen Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1 GE."
 
 msgid "lighthouse"
 msgstr "Leuchtturm"
@@ -280,7 +275,7 @@ msgstr "Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kre
 
 msgctxt "spellinfo"
 msgid "sound_out"
-msgstr " Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen,  was sie über die gefragte Region weiß. Ist in der Region niemand  ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das  erzählen, was sie selber sehen könnte. "
+msgstr "Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, was sie über die gefragte Region weiß. Ist in der Region niemand ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das erzählen, was sie selber sehen könnte."
 
 msgctxt "spell"
 msgid "readmind"
@@ -326,7 +321,7 @@ msgstr "Jungdrachen"
 
 msgctxt "spellinfo"
 msgid "calm_monster"
-msgstr " Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster  zähmen. Es wird von Angriffen auf den Magier absehen und auch seine  Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es  wird dennoch ein unberechenbares Wesen bleiben. "
+msgstr "Dieser einschmeichelnde Gesang kann fast jedes intelligente Monster zähmen. Es wird von Angriffen auf den Magier absehen und auch seine Begleiter nicht anrühren. Doch sollte man sich nicht täuschen, es wird dennoch ein unberechenbares Wesen bleiben."
 
 msgctxt "spell"
 msgid "clone"
@@ -338,7 +333,7 @@ msgstr "Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Z
 
 msgctxt "shipinfo"
 msgid "balloon"
-msgstr "Der Sumpfgasballon besteht aus einem großen  Weidenkorb, welcher Platz für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines Ballons ist nicht einfach, und der Kapitän muss mindestens ein Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein Exemplar nachzubauen."
+msgstr "Der Sumpfgasballon besteht aus einem großen Weidenkorb, welcher Platz für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines Ballons ist nicht einfach, und der Kapitän muss mindestens ein Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein Exemplar nachzubauen."
 
 msgctxt "iteminfo"
 msgid "toad"
@@ -359,7 +354,7 @@ msgstr "Vampire"
 
 msgctxt "spellinfo"
 msgid "migration"
-msgstr " Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die  eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig  und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er  durch KONTAKTIEREn des Magiers. Auch wird er die Woche über  ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein.  Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei  gebunden ist, dieser etwa Dienst für seine teuere Ausbildung  schuldet. Der das Ritual leitende Magier muss für die permanente  Bindung des Aufnahmewilligen an seine Partei naturgemäß auch  permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann  er eine Person aufnehmen. "
+msgstr "Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er durch KONTAKTIEREn des Magiers. Auch wird er die Woche über ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein. Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei gebunden ist, dieser etwa Dienst für seine teuere Ausbildung schuldet. Der das Ritual leitende Magier muss für die permanente Bindung des Aufnahmewilligen an seine Partei naturgemäß auch permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann er eine Person aufnehmen."
 
 msgctxt "race"
 msgid "illusion"
@@ -580,7 +575,7 @@ msgid "balloon"
 msgstr "Ballon"
 
 msgid "nr_schemes_postfix"
-msgstr " sind erkennbar."
+msgstr "sind erkennbar."
 
 msgid "SILBER"
 msgstr "SILBER"
@@ -650,7 +645,7 @@ msgstr "Flammenschwerter"
 
 msgctxt "spellinfo"
 msgid "raise_mob"
-msgstr " Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern  der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch  nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche  werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder  zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der  Kraft seines Gesangs ab. "
+msgstr "Mit Hilfe dieses magischen Gesangs überzeugt der Magier die Bauern der Region, sich ihm anzuschließen. Die Bauern werden ihre Heimat jedoch nicht verlassen, und keine ihrer Besitztümer fortgeben. Jede Woche werden zudem einige der Bauern den Bann abwerfen und auf ihre Felder zurückkehren. Wie viele Bauern sich dem Magier anschließen hängt von der Kraft seines Gesangs ab."
 
 msgctxt "keyword"
 msgid "origin"
@@ -733,7 +728,7 @@ msgstr "Wölfe"
 
 msgctxt "spellinfo"
 msgid "living_rock"
-msgstr " Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn  in ein Gebäude. Dem Elementar kann dann befohlen werden, das  Gebäude mitsamt aller Bewohner in eine Nachbarregion zu tragen.  Die Stärke des beschworenen Elementars hängt vom Talent des  Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten  große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht  unbeschädigt überstehen. "
+msgstr "Dieses kräftezehrende Ritual beschwört mit Hilfe einer Kugel aus konzentriertem Laen einen gewaltigen Erdelementar und bannt ihn in ein Gebäude. Dem Elementar kann dann befohlen werden, das Gebäude mitsamt aller Bewohner in eine Nachbarregion zu tragen. Die Stärke des beschworenen Elementars hängt vom Talent des Magiers ab: Der Elementar kann maximal [Stufe-12]*250 Größeneinheiten große Gebäude versetzen. Das Gebäude wird diese Prozedur nicht unbeschädigt überstehen."
 
 msgctxt "race"
 msgid "museumghost_p"
@@ -904,7 +899,7 @@ msgstr "Seeschlangen"
 
 msgctxt "spellinfo"
 msgid "antimagiczone"
-msgstr "Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses Zone wird bestrebt sein, wieder in den Gleichgewichtszustand  zu gelangen. Dazu wird sie jedem in dieser Region gesprochenen  Zauber einen Teil seiner Stärke entziehen, die schwächeren gar  ganz absorbieren."
+msgstr "Mit diesem Zauber kann der Magier eine Zone der astralen Schwächung erzeugen, ein lokales Ungleichgewicht im Astralen Feld. Dieses Zone wird bestrebt sein, wieder in den Gleichgewichtszustand zu gelangen. Dazu wird sie jedem in dieser Region gesprochenen Zauber einen Teil seiner Stärke entziehen, die schwächeren gar ganz absorbieren."
 
 msgid "villagers"
 msgstr "Dorfbewohner"
@@ -1013,7 +1008,7 @@ msgstr "kleiner Scarabäus"
 
 msgctxt "iteminfo"
 msgid "nut"
-msgstr "Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen Früchte oder Samen, die eine Schale besitzen, die sich leicht vom inneren, eßbaren Kern entfernen läßt. In der botanischen Terminologie beschränkt sich die Bezeichnung Nuß auf eine einsamige Frucht, die aus einem Fruchtknoten (Ovarium) entstanden ist, dessen äußere Wände sich verholzt haben und der sich nicht öffnet, um seinen Samen zu entlassen. Solche echten Nüsse können eßbar, aber auch ungenießbar sein. Bekannte Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse. Beispiele für Früchte oder Samen, die vom Volksmund fälschlich als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im botanischen Sinne sind dies Steinfrüchte, denen die fleischige äußere Schale entfernt wurde.  Andere Beispiele für unechte Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie Roßkastanien und Paranüsse, bei denen es sich um von Kapseln umhüllte Samen handelt."
+msgstr "Nuß, im umgangssprachlichen Sinne alle trockenen, hartschaligen Früchte oder Samen, die eine Schale besitzen, die sich leicht vom inneren, eßbaren Kern entfernen läßt. In der botanischen Terminologie beschränkt sich die Bezeichnung Nuß auf eine einsamige Frucht, die aus einem Fruchtknoten (Ovarium) entstanden ist, dessen äußere Wände sich verholzt haben und der sich nicht öffnet, um seinen Samen zu entlassen. Solche echten Nüsse können eßbar, aber auch ungenießbar sein. Bekannte Beispiele sind Eicheln, Bucheckern, Kastanien und Haselnüsse. Beispiele für Früchte oder Samen, die vom Volksmund fälschlich als Nüsse bezeichnet werden, sind Mandeln und Walnüsse: Im botanischen Sinne sind dies Steinfrüchte, denen die fleischige äußere Schale entfernt wurde. Andere Beispiele für unechte Nüsse sind Erdnüsse - in Hülsen eingeschlossene Samen - sowie Roßkastanien und Paranüsse, bei denen es sich um von Kapseln umhüllte Samen handelt."
 
 msgctxt "spell"
 msgid "sacrifice_strength"
@@ -1023,7 +1018,7 @@ msgid "spice_p"
 msgstr "Gewürze"
 
 msgid "nr_building_inprogress"
-msgstr " (im Bau)"
+msgstr "(im Bau)"
 
 msgid "ring_of_levitation_p"
 msgstr "Ringe der Levitation"
@@ -1058,7 +1053,7 @@ msgstr "Pyramide"
 
 msgctxt "spellinfo"
 msgid "big_recruit"
-msgstr " Aus 'Wanderungen' von Firudin dem Weisen: 'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt und verbannt. Nur zögerlich war er bereit mir das Geheimnis seiner Überzeugungskraft zu lehren.' "
+msgstr "Aus 'Wanderungen' von Firudin dem Weisen: 'In Weilersweide, nahe dem Wytharhafen, liegt ein kleiner Gasthof, der nur wenig besucht ist. Niemanden bekannt ist, das dieser Hof bis vor einigen Jahren die Bleibe des verbannten Wanderpredigers Grauwolf war. Nachdem er bei einer seiner berüchtigten flammenden Reden fast die gesammte Bauernschaft angeworben hatte, wurde er wegen Aufruhr verurteilt und verbannt. Nur zögerlich war er bereit mir das Geheimnis seiner Überzeugungskraft zu lehren.'"
 
 msgid "catapultammo"
 msgstr "Katapultmunition"
@@ -1217,11 +1212,11 @@ msgstr "Insekten"
 
 msgctxt "spellinfo"
 msgid "bad_dreams"
-msgstr " Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie vorübergehend einen Teil ihrer Erinnerungen verlieren. "
+msgstr "Dieser Zauber ermöglicht es dem Träumer, den Schlaf aller nichtaliierten Einheiten (HELFE BEWACHE) in der Region so stark zu stören, das sie vorübergehend einen Teil ihrer Erinnerungen verlieren."
 
 msgctxt "spellinfo"
 msgid "bloodthirst"
-msgstr " Wie viele magischen Gesänge, so entstammt auch dieser den altem  Wissen der Katzen, die schon immer um die machtvolle Wirkung der Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger aufgepeitscht, sie gar in wilde Raserrei und Blutrausch versetzt. Ungeachtet eigener Schmerzen werden sie kämpfen bis zum Tode und niemals fliehen. Während ihre Attacke verstärkt ist achten sie kaum auf sich selbst. "
+msgstr "Wie viele magischen Gesänge, so entstammt auch dieser den altem Wissen der Katzen, die schon immer um die machtvolle Wirkung der Stimme wussten. Mit diesem Lied wird die Stimmung der Krieger aufgepeitscht, sie gar in wilde Raserrei und Blutrausch versetzt. Ungeachtet eigener Schmerzen werden sie kämpfen bis zum Tode und niemals fliehen. Während ihre Attacke verstärkt ist achten sie kaum auf sich selbst."
 
 msgctxt "spell"
 msgid "nodrift"
@@ -1258,7 +1253,7 @@ msgstr "Der Magier zwingt mit diesem Ritual die Elementargeister des Wassers in 
 
 msgctxt "spellinfo"
 msgid "astral_disruption"
-msgstr " Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb  eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen,  die dem Zauber nicht wiederstehen können, aus der astralen Ebene  geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist  für Stufe/3 Wochen gestört. "
+msgstr "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb eines astralen Radius von Stufe/5 Regionen werden alle Astralwesen, die dem Zauber nicht wiederstehen können, aus der astralen Ebene geschleudert. Der astrale Kontakt mit allen betroffenen Regionen ist für Stufe/3 Wochen gestört."
 
 msgctxt "spell"
 msgid "earthquake"
@@ -1273,7 +1268,7 @@ msgstr "Ist durch Schlagwaffen und Katapulte schwer zu verwunden."
 
 msgctxt "spellinfo"
 msgid "combat_speed"
-msgstr " Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal angreifen können. "
+msgstr "Dieser Zauber beschleunigt einige Kämpfer auf der eigenen Seite so, dass sie während des gesamten Kampfes in einer Kampfrunde zweimal angreifen können."
 
 msgctxt "keyword"
 msgid "claim"
@@ -1333,7 +1328,7 @@ msgstr "Seeschlange"
 
 msgctxt "spellinfo"
 msgid "fish_shield"
-msgstr " Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur einige Hundert Schwerthiebe aus, danach wird er sich auflösen. Je stärker der Magier, desto mehr Schaden hält der Schild aus. "
+msgstr "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der eigenen Truppen vorzuspiegeln, so wie der Fisch im Wasser auch nicht dort ist wo er zu sein scheint. Von jedem Treffer kann so die Hälfte des Schadens unschädlich abgeleitet werden. Doch hält der Schild nur einige Hundert Schwerthiebe aus, danach wird er sich auflösen. Je stärker der Magier, desto mehr Schaden hält der Schild aus."
 
 msgid "section_newpotions"
 msgstr "Neue Tränke"
@@ -1432,7 +1427,7 @@ msgstr "Lebkuchenherz mit der Aufschrift 'Erz und Stein, das ist fein'"
 
 msgctxt "iteminfo"
 msgid "snowglobe"
-msgstr " Eine Kugel aus Kristallglas von circa drei Zoll Durchmesser, welche auf  einem Sockel aus Granit ruht. Im Inneren tanzen unzählige winzige Schneeflocken munter umher. Auf der  Unterseite des Sockels ist eine goldene Windrose mit den sechs  Himmelsrichtungen abgebildet. Eigentlich ein sehr schöner Anblick, doch  strahlt sie eine namenlose Kälte aus. Unter Magiern und anderen der arkanen Künste kundigen ist die Funktion  und Wirkungsweise des Artefaktes heftig umstritten. Einig scheint man  sich darüber zu sein, dass in dieser kleinen Kugel so viel Kälte  gefangen ist, dass es dauerhafte Folgen für eine weiträumige Umgebung  hätte wenn man sie zerstört. Größte Brände ließen sich damit wohl  löschen, Vulkane besänftigen und Unmengen von Wasser zum gefrieren  bringen. Doch auch in weniger extremen Umgebungen würden sich bestimmt  dauerhafte Veränderungen ereignen. Es wäre sicherlich nicht zu empfehlen das Kleinod einfach fallen zu  lassen. Man sollte es anstelle dessen so weit wie möglich von sich  schleudern und dafür sorge tragen, dass sich am Einschlagsort kein  Lebewesen aufhält. So man denn eine Benutzung tatsächlich riskieren  will.  (BENUTZE Schneekugel <HIMMELSRICHTUNG>) "
+msgstr "Eine Kugel aus Kristallglas von circa drei Zoll Durchmesser, welche auf einem Sockel aus Granit ruht. Im Inneren tanzen unzählige winzige Schneeflocken munter umher. Auf der Unterseite des Sockels ist eine goldene Windrose mit den sechs Himmelsrichtungen abgebildet. Eigentlich ein sehr schöner Anblick, doch strahlt sie eine namenlose Kälte aus. Unter Magiern und anderen der arkanen Künste kundigen ist die Funktion und Wirkungsweise des Artefaktes heftig umstritten. Einig scheint man sich darüber zu sein, dass in dieser kleinen Kugel so viel Kälte gefangen ist, dass es dauerhafte Folgen für eine weiträumige Umgebung hätte wenn man sie zerstört. Größte Brände ließen sich damit wohl löschen, Vulkane besänftigen und Unmengen von Wasser zum gefrieren bringen. Doch auch in weniger extremen Umgebungen würden sich bestimmt dauerhafte Veränderungen ereignen. Es wäre sicherlich nicht zu empfehlen das Kleinod einfach fallen zu lassen. Man sollte es anstelle dessen so weit wie möglich von sich schleudern und dafür sorge tragen, dass sich am Einschlagsort kein Lebewesen aufhält. So man denn eine Benutzung tatsächlich riskieren will. (BENUTZE Schneekugel <HIMMELSRICHTUNG>)"
 
 msgid "desert"
 msgstr "Wüste"
@@ -1450,7 +1445,7 @@ msgstr "Goblins"
 
 msgctxt "spellinfo"
 msgid "song_of_slavery"
-msgstr " Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft  sie den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig  von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig  fühlen. "
+msgstr "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig fühlen."
 
 msgctxt "spell"
 msgid "healingzone"
@@ -1586,7 +1581,7 @@ msgstr "Trollhorn"
 
 msgctxt "spellinfo"
 msgid "great_drought"
-msgstr " Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der  Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und  Pflanzen der Region kämpfen um das nackte Überleben, aber eine  solche Dürre überlebt wohl nur die Hälfte aller Lebewesen.  Der Landstrich kann über Jahre hinaus von den Folgen einer  solchen Dürre betroffen sein. "
+msgstr "Dieses mächtige Ritual öffnet ein Tor in die Elementarebene der Hitze. Eine grosse Dürre kommt über das Land. Bauern, Tiere und Pflanzen der Region kämpfen um das nackte Überleben, aber eine solche Dürre überlebt wohl nur die Hälfte aller Lebewesen. Der Landstrich kann über Jahre hinaus von den Folgen einer solchen Dürre betroffen sein."
 
 msgid "fog"
 msgstr "Nebel"
@@ -1662,7 +1657,7 @@ msgstr "Akkreditionen des Xontormia-Expreß"
 
 msgctxt "spellinfo"
 msgid "create_runesword"
-msgstr "Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des schwarzen  Schwertes ist mit alten, magischen Runen verziert, und ein seltsames  Eigenleben erfüllt die warme Klinge. Um es zu benutzen, muss man  ein Schwertkämpfer von beachtlichem Talent (7) sein.  Der Träger des Runenschwertes erhält einen Talentbonus von +4 im Kampf und wird so gut wie immun gegen alle Formen von Magie."
+msgstr "Mit diesem Spruch erzeugt man ein Runenschwert. Die Klinge des schwarzen Schwertes ist mit alten, magischen Runen verziert, und ein seltsames Eigenleben erfüllt die warme Klinge. Um es zu benutzen, muss man ein Schwertkämpfer von beachtlichem Talent (7) sein. Der Träger des Runenschwertes erhält einen Talentbonus von +4 im Kampf und wird so gut wie immun gegen alle Formen von Magie."
 
 msgctxt "spell"
 msgid "magicboost"
@@ -1823,7 +1818,7 @@ msgstr "Schwarz"
 
 msgctxt "spellinfo"
 msgid "magic_roots"
-msgstr " Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner Kraft  dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird  das Gleichgewicht der Natur in der Region für immer verändert, und in  Zukunft werden nur noch die anspruchsvollen, aber kräftigen  Mallorngewächse in der Region gedeihen. "
+msgstr "Mit Hilfe dieses aufwändigen Rituals läßt der Druide einen Teil seiner Kraft dauerhaft in den Boden und die Wälder der Region fliessen. Dadurch wird das Gleichgewicht der Natur in der Region für immer verändert, und in Zukunft werden nur noch die anspruchsvollen, aber kräftigen Mallorngewächse in der Region gedeihen."
 
 msgctxt "race"
 msgid "undead_d"
@@ -1912,7 +1907,7 @@ msgid "castle"
 msgstr "Burg"
 
 msgid "nr_borderlist_infix"
-msgstr ", im "
+msgstr ", im"
 
 msgctxt "race"
 msgid "shadowbat_p"
@@ -1943,15 +1938,15 @@ msgid "password"
 msgstr "PASSWORT"
 
 msgid "nr_mourning"
-msgstr " (trauernd)"
+msgstr "(trauernd)"
 
 msgctxt "spellinfo"
 msgid "create_chastitybelt"
-msgstr "Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork  mit Amulett der Keuschheit wird sich nicht mehr vermehren."
+msgstr "Dieses Amulett in Gestalt einer orkischen Matrone unterdrückt den Fortpflanzungstrieb eines einzelnen Orks sehr zuverlässig. Ein Ork mit Amulett der Keuschheit wird sich nicht mehr vermehren."
 
 msgctxt "spellinfo"
 msgid "analyse_object"
-msgstr " Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen  ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören.  Und so, wie aus dem Lebenslied einer Person erkannt werden kann,  ob diese unter einem Zauber steht, so ist dies auch bei Burgen,  Schiffen oder Regionen möglich. "
+msgstr "Wie Lebewesen, so haben auch Schiffe und Gebäude und sogar Regionen ihr eigenes Lied, wenn auch viel schwächer und schwerer zu hören. Und so, wie aus dem Lebenslied einer Person erkannt werden kann, ob diese unter einem Zauber steht, so ist dies auch bei Burgen, Schiffen oder Regionen möglich."
 
 msgctxt "race"
 msgid "shadowbat_x"
@@ -1977,7 +1972,7 @@ msgstr "Auge des Drachen"
 
 msgctxt "spellinfo"
 msgid "fetch_astral"
-msgstr "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, kann er andere Einheiten auch gegen ihren Willen in die materielle  Welt zwingen."
+msgstr "Ein Magier, welcher sich in der materiellen Welt befindet, kann er mit Hilfe dieses Zaubers Einheiten aus der angrenzenden Astralwelt herbeiholen. Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, kann er andere Einheiten auch gegen ihren Willen in die materielle Welt zwingen."
 
 msgid "chainmail_p"
 msgstr "Kettenhemden"
@@ -2039,7 +2034,7 @@ msgstr "Zuerst brate man das Gurgelkraut leicht an und würze das Zeug mit ein w
 
 msgctxt "spellinfo"
 msgid "eternal_walls"
-msgstr "Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist  gegen den Zahn der Zeit geschützt und benötigt keinen Unterhalt mehr."
+msgstr "Mit dieser Formel bindet der Magier auf ewig die Kräfte der Erde in die Mauern des Gebäudes. Ein solchermaßen verzaubertes Gebäude ist gegen den Zahn der Zeit geschützt und benötigt keinen Unterhalt mehr."
 
 msgid "snowglobe_p"
 msgstr "Schneekugeln"
@@ -2106,7 +2101,7 @@ msgstr "der Steinerne"
 
 msgctxt "spellinfo"
 msgid "song_suscept_magic"
-msgstr " Dieses Lied, das in die magische Essenz der Region gewoben wird, schwächt die natürliche Widerstandskraft gegen eine  Verzauberung einmalig um 15%. Nur die Verbündeten des Barden  (HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit. "
+msgstr "Dieses Lied, das in die magische Essenz der Region gewoben wird, schwächt die natürliche Widerstandskraft gegen eine Verzauberung einmalig um 15%. Nur die Verbündeten des Barden (HELFE BEWACHE) sind gegen die Wirkung des Gesangs gefeit."
 
 msgid "dragon_postfix_13"
 msgstr "die Alte"
@@ -2463,7 +2458,7 @@ msgstr "Dieser Ring ist ein wahres Meisterwerk. Obwohl er sehr gross ist (weil a
 
 msgctxt "spellinfo"
 msgid "stonegolem"
-msgstr "Man befeuchte einen kluftfreien Block aus feinkristallinen Gestein mit einer Phiole des Lebenswassers bis dieses vollständig vom Gestein aufgesogen wurde. Sodann richte man seine Kraft auf die sich bildende feine Aura des Lebens und forme der ungebundenen Kraft ein Gehäuse. Je mehr Kraft der Magier investiert, desto mehr Golems können geschaffen werden, bevor die Aura sich verflüchtigt. Jeder Golem hat jede Runde eine Chance von 10 Prozent zu Staub zu zerfallen. Gibt man den Golems die Befehle MACHE BURG oder MACHE STRASSE, so werden pro Golem 4 Steine verbaut und der Golem löst sich auf. "
+msgstr "Man befeuchte einen kluftfreien Block aus feinkristallinen Gestein mit einer Phiole des Lebenswassers bis dieses vollständig vom Gestein aufgesogen wurde. Sodann richte man seine Kraft auf die sich bildende feine Aura des Lebens und forme der ungebundenen Kraft ein Gehäuse. Je mehr Kraft der Magier investiert, desto mehr Golems können geschaffen werden, bevor die Aura sich verflüchtigt. Jeder Golem hat jede Runde eine Chance von 10 Prozent zu Staub zu zerfallen. Gibt man den Golems die Befehle MACHE BURG oder MACHE STRASSE, so werden pro Golem 4 Steine verbaut und der Golem löst sich auf."
 
 msgid "dolphin"
 msgstr "Delphin"
@@ -2765,7 +2760,7 @@ msgstr "Schild"
 
 msgctxt "spellinfo"
 msgid "calm_riot"
-msgstr " Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen und wieder auf ihre Felder zurückkehren. "
+msgstr "Mit Hilfe dieses magischen Gesangs kann der Magier eine Region in Aufruhr wieder beruhigen. Die Bauernhorden werden sich verlaufen und wieder auf ihre Felder zurückkehren."
 
 msgctxt "race"
 msgid "stonegolem"
@@ -3157,7 +3152,7 @@ msgstr "Erzeugt einen Aurafokus."
 
 msgctxt "spellinfo"
 msgid "earn_silver#draig"
-msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll, niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben.  Für diese Dienstleistung streicht der Magier 50 Silber pro Stufe ein."
+msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll, niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 50 Silber pro Stufe ein."
 
 msgctxt "spell"
 msgid "song_of_slavery"
@@ -3340,7 +3335,7 @@ msgstr "BETRETE"
 
 msgctxt "spellinfo"
 msgid "airship"
-msgstr "Diese magischen Runen bringen ein Boot bis zu einer  Kapazität von 50 Gewichtseinheiten für eine Woche zum Fliegen. Dies  ermöglicht dem Boot die Überquerung von Land. Für die Farbe der Runen  muss eine spezielle Tinte aus einem Windbeutel und einem Schneekristall  angerührt werden."
+msgstr "Diese magischen Runen bringen ein Boot bis zu einer Kapazität von 50 Gewichtseinheiten für eine Woche zum Fliegen. Dies ermöglicht dem Boot die Überquerung von Land. Für die Farbe der Runen muss eine spezielle Tinte aus einem Windbeutel und einem Schneekristall angerührt werden."
 
 msgid "ERESSEA"
 msgstr "ERESSEA"
@@ -3380,7 +3375,7 @@ msgstr "Astraler Blick"
 
 msgctxt "iteminfo"
 msgid "skillpotion"
-msgstr " Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche  behaupten gar, von Sterblichen könne er gar nicht gebraut werden.  Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten  Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt. "
+msgstr "Die Herstellung dieses Trunkes ist ein wohlgehütetes Geheimnis. Manche behaupten gar, von Sterblichen könne er gar nicht gebraut werden. Tatsache ist, dass er dem Trinkenden tiefere Einsicht in seine erlernten Talente gewährt, was ihn in der Meisterung dieser Talente voranbringt."
 
 msgctxt "keyword"
 msgid "cast"
@@ -3399,7 +3394,7 @@ msgstr "Zwerg"
 
 msgctxt "spellinfo"
 msgid "irongolem"
-msgstr "Je mehr Kraft der Magier investiert, desto mehr Golems können geschaffen werden. Jeder Golem hat jede Runde eine Chance von 15 Prozent zu Staub zu zerfallen. Gibt man den Golems den Befehl MACHE SCHWERT/BIHÄNDER oder MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4 Eisenbarren verbaut und der Golem löst sich auf. "
+msgstr "Je mehr Kraft der Magier investiert, desto mehr Golems können geschaffen werden. Jeder Golem hat jede Runde eine Chance von 15 Prozent zu Staub zu zerfallen. Gibt man den Golems den Befehl MACHE SCHWERT/BIHÄNDER oder MACHE SCHILD/KETTENHEMD/PLATTENPANZER, so werden pro Golem 4 Eisenbarren verbaut und der Golem löst sich auf."
 
 msgctxt "race"
 msgid "ghoul_d"
@@ -3524,7 +3519,7 @@ msgstr "Mallornschößling"
 
 msgctxt "spellinfo"
 msgid "song_of_peace"
-msgstr " Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. Die Wirkung kann etliche Wochen andauern. "
+msgstr "Dieser mächtige Bann verhindert jegliche Attacken. Niemand in der ganzen Region ist fähig seine Waffe gegen irgendjemanden zu erheben. Die Wirkung kann etliche Wochen andauern."
 
 msgctxt "spell"
 msgid "nocostbuilding"
@@ -3635,7 +3630,7 @@ msgstr "Beschleunigung"
 
 msgctxt "spellinfo"
 msgid "clone"
-msgstr " Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod  bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen  Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem  Wasser des Lebens.  Anschließend transferiert er in einem aufwändigen Ritual einen Teil  seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den  Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß.  Es besteht allerdings eine geringe Wahrscheinlichkeit, dass die Seele  nach dem Tod zu schwach ist, das neue Gefäß zu erreichen. "
+msgstr "Dieser mächtige Zauber kann einen Magier vor dem sicheren Tod bewahren. Der Magier erschafft anhand einer kleinen Blutprobe einen Klon von sich, und legt diesen in ein Bad aus Drachenblut und verdünntem Wasser des Lebens. Anschließend transferiert er in einem aufwändigen Ritual einen Teil seiner Seele in den Klon. Stirbt der Magier, reist seine Seele in den Klon und der erschaffene Körper dient nun dem Magier als neues Gefäß. Es besteht allerdings eine geringe Wahrscheinlichkeit, dass die Seele nach dem Tod zu schwach ist, das neue Gefäß zu erreichen."
 
 msgctxt "race"
 msgid "elf_p"
@@ -3646,7 +3641,7 @@ msgstr "Elfenpferde"
 
 msgctxt "spellinfo"
 msgid "frighten"
-msgstr " Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt  so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen  und Furcht ihren Schildarm lähmen. "
+msgstr "Dieser Kriegsgesang sät Panik in der Front der Gegner und schwächt so ihre Kampfkraft erheblich. Angst wird ihren Schwertarm schwächen und Furcht ihren Schildarm lähmen."
 
 msgctxt "keyword"
 msgid "ride"
@@ -3684,7 +3679,7 @@ msgstr "Unbekannte Partei"
 
 msgctxt "spellinfo"
 msgid "wyrm_transformation"
-msgstr " Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen  mächtigen Wyrm verwandeln. Der Magier behält seine Talente und  Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften  eines Wyrms. Der Odem des Wyrms wird sich mit steigendem Magie-Talent  verbessern. Der Zauber ist sehr kraftraubend und der Wyrm wird einige  Zeit brauchen, um sich zu erholen. "
+msgstr "Mit Hilfe dieses Zaubers kann sich der Magier permanent in einen mächtigen Wyrm verwandeln. Der Magier behält seine Talente und Möglichkeiten, bekommt jedoch die Kampf- und Bewegungseigenschaften eines Wyrms. Der Odem des Wyrms wird sich mit steigendem Magie-Talent verbessern. Der Zauber ist sehr kraftraubend und der Wyrm wird einige Zeit brauchen, um sich zu erholen."
 
 msgid "questkey2_p"
 msgstr "Saphirne Schlüssel"
@@ -3712,7 +3707,7 @@ msgid "analyse_object"
 msgstr "Lied des Ortes analysieren"
 
 msgid "nr_borderlist_lastfix"
-msgstr " und im "
+msgstr "und im"
 
 msgctxt "race"
 msgid "shadowknight_d"
@@ -3843,7 +3838,7 @@ msgstr "Kraken"
 
 msgctxt "spellinfo"
 msgid "sleep"
-msgstr "Dieser Zauber läßt einige feindliche Kämpfer einschlafen. Schlafende Kämpfer greifen nicht an und verteidigen sich schlechter, sie wachen jedoch auf, sobald sie im Kampf getroffen werden. "
+msgstr "Dieser Zauber läßt einige feindliche Kämpfer einschlafen. Schlafende Kämpfer greifen nicht an und verteidigen sich schlechter, sie wachen jedoch auf, sobald sie im Kampf getroffen werden."
 
 msgctxt "spellinfo"
 msgid "tiredsoldiers"
@@ -3949,7 +3944,7 @@ msgstr "Steingolems"
 
 msgctxt "spellinfo"
 msgid "melancholy"
-msgstr " Mit diesem Gesang verbreitet der Barde eine melancholische, traurige  Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre  Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen. "
+msgstr "Mit diesem Gesang verbreitet der Barde eine melancholische, traurige Stimmung unter den Bauern. Einige Wochen lang werden sie sich in ihre Hütten zurückziehen und kein Silber in den Theatern und Tavernen lassen."
 
 msgctxt "spell"
 msgid "earn_silver#gwyrrd"
@@ -4035,7 +4030,7 @@ msgstr "Schaden"
 
 msgctxt "raceinfo"
 msgid "songdragon"
-msgstr "Singdrachen sind von der Größe eines ausgewachsenden Tigers. Ihre Färbung reicht von schillerndem Rot, über dunkles Grün bis hin zu tiefem Schwarz. Alle bekannten Drachen dieser Art weisen eine hohe Intelligenz und ein hohes Maß an magischen Fähigkeiten auf. Wie Ihre großen Verwandten verfügen sie über einen Feuerodem. Sie lieben den Gesang und das üppige Mahl. Von Zeit zu Zeit gehen sie eine engen magisches Bund zu einem Magier ein. Wenn dies geschieht, so steht dem Magier ein äußerst loyaler und lohnender Vertrauter zur Seite. "
+msgstr "Singdrachen sind von der Größe eines ausgewachsenden Tigers. Ihre Färbung reicht von schillerndem Rot, über dunkles Grün bis hin zu tiefem Schwarz. Alle bekannten Drachen dieser Art weisen eine hohe Intelligenz und ein hohes Maß an magischen Fähigkeiten auf. Wie Ihre großen Verwandten verfügen sie über einen Feuerodem. Sie lieben den Gesang und das üppige Mahl. Von Zeit zu Zeit gehen sie eine engen magisches Bund zu einem Magier ein. Wenn dies geschieht, so steht dem Magier ein äußerst loyaler und lohnender Vertrauter zur Seite."
 
 msgid "axe_p"
 msgstr "Kriegsäxte"
@@ -4238,7 +4233,7 @@ msgstr "Alraunen"
 
 msgctxt "spellinfo"
 msgid "seduction"
-msgstr " Mit diesem Lied kann eine Einheit derartig betört werden, so dass  sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes  schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben  braucht. "
+msgstr "Mit diesem Lied kann eine Einheit derartig betört werden, so dass sie dem Barden den größten Teil ihres Bargelds und ihres Besitzes schenkt. Sie behält jedoch immer soviel, wie sie zum Überleben braucht."
 
 msgctxt "race"
 msgid "dwarf_d"
@@ -4439,7 +4434,7 @@ msgid "see_lighthouse"
 msgstr "vom Turm erblickt"
 
 msgid "nr_schemes_prefix"
-msgstr "Schemen der Regionen "
+msgstr "Schemen der Regionen"
 
 msgid "aoc_p"
 msgstr "Katzenamulette"
@@ -4461,7 +4456,7 @@ msgstr "eine mächtige Mauer"
 
 msgctxt "spellinfo"
 msgid "double_time"
-msgstr "Diese praktische Anwendung des theoretischen Wissens um  Raum und Zeit ermöglicht es, den Zeitfluß für einige Personen zu  verändern. Auf diese Weise veränderte Personen bekommen für einige  Wochen doppelt soviele Bewegungspunkte und doppelt soviele Angriffe pro Runde."
+msgstr "Diese praktische Anwendung des theoretischen Wissens um Raum und Zeit ermöglicht es, den Zeitfluß für einige Personen zu verändern. Auf diese Weise veränderte Personen bekommen für einige Wochen doppelt soviele Bewegungspunkte und doppelt soviele Angriffe pro Runde."
 
 msgctxt "race"
 msgid "direwolf"
@@ -4619,7 +4614,7 @@ msgstr "Wargen"
 
 msgctxt "spellinfo"
 msgid "ironkeeper"
-msgstr "Erschafft einen Wächtergeist, der in Gletschern und Bergen Eisen- und Laenabbau durch nichtalliierte Parteien (HELFE BEWACHE) verhindert,  solange er die Region bewacht. Der Bergwächter ist  an den Ort der Beschwörung gebunden."
+msgstr "Erschafft einen Wächtergeist, der in Gletschern und Bergen Eisen- und Laenabbau durch nichtalliierte Parteien (HELFE BEWACHE) verhindert, solange er die Region bewacht. Der Bergwächter ist an den Ort der Beschwörung gebunden."
 
 msgid "h20_p"
 msgstr "Schneekristalle"
@@ -4802,7 +4797,7 @@ msgstr "Ghasten"
 
 msgctxt "spellinfo"
 msgid "mindblast"
-msgstr "Mit diesem Zauber greift der Magier direkt den Geist seiner Gegner an. Ein Schlag aus astraler und elektrischer Energie trifft die Gegner, wird die Magieresistenz durchbrochen, verliert ein Opfer permanent einen Teil seiner Erinnerungen. Wird es zu oft ein Opfer dieses Zaubers kann es daran sterben. "
+msgstr "Mit diesem Zauber greift der Magier direkt den Geist seiner Gegner an. Ein Schlag aus astraler und elektrischer Energie trifft die Gegner, wird die Magieresistenz durchbrochen, verliert ein Opfer permanent einen Teil seiner Erinnerungen. Wird es zu oft ein Opfer dieses Zaubers kann es daran sterben."
 
 msgid "h7_p"
 msgstr "Knotige Saugwurze"
@@ -5025,7 +5020,7 @@ msgstr "VERKAUFE"
 
 msgctxt "spellinfo"
 msgid "auratransfer"
-msgstr " Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis 2:1 auf einen anderen Magier des gleichen Magiegebietes oder im Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes übertragen. "
+msgstr "Mit Hilfe dieses Zaubers kann der Magier eigene Aura im Verhältnis 2:1 auf einen anderen Magier des gleichen Magiegebietes oder im Verhältnis 3:1 auf einen Magier eines anderen Magiegebietes übertragen."
 
 msgctxt "race"
 msgid "wyrm"
@@ -5054,7 +5049,7 @@ msgstr "aggressiv"
 
 msgctxt "spellinfo"
 msgid "song_resist_magic"
-msgstr " Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der  Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang  überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem  Gedächtnis der Region entschwunden ist, ist von dem Geschick des Barden  abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen  Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen  eigenem Volk, einen einmaligen Bonus von 15%  auf die natürliche Widerstandskraft gegen eine Verzauberung  verleihen. "
+msgstr "Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der Region fortpflanzen, von Mund zu Mund springen und eine Zeitlang überall zu vernehmen sein. Nach wie vielen Wochen der Gesang aus dem Gedächtnis der Region entschwunden ist, ist von dem Geschick des Barden abhängig. Bis das Lied ganz verklungen ist, wird seine Magie allen Verbündeten des Barden (HELFE BEWACHE), und natürlich auch seinen eigenem Volk, einen einmaligen Bonus von 15% auf die natürliche Widerstandskraft gegen eine Verzauberung verleihen."
 
 msgctxt "keyword"
 msgid "contact"
@@ -5100,7 +5095,7 @@ msgstr "Grauenhafte"
 
 msgctxt "spellinfo"
 msgid "maelstrom"
-msgstr " Dieses Ritual beschört einen großen Wasserelementar aus den Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, schwer beschädigen kann.       "
+msgstr "Dieses Ritual beschört einen großen Wasserelementar aus den Tiefen des Ozeans. Der Elementar erzeugt einen gewaltigen Strudel, einen Mahlstrom, welcher alle Schiffe, die ihn passieren, schwer beschädigen kann."
 
 msgid "undead_prefix_13"
 msgstr "Furchtbare"
@@ -5125,7 +5120,7 @@ msgstr "Schreckliche"
 
 msgctxt "spellinfo"
 msgid "view_reality"
-msgstr " Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die materielle Ebene blicken und die Regionen und Einheiten genau erkennen. "
+msgstr "Der Magier kann mit Hilfe dieses Zaubers aus der Astral- in die materielle Ebene blicken und die Regionen und Einheiten genau erkennen."
 
 msgid "vortex"
 msgstr "Wirbel"
@@ -5499,7 +5494,7 @@ msgstr "Bihänder"
 
 msgctxt "spellinfo"
 msgid "show_astral"
-msgstr " Der Magier kann kurzzeitig in die Astralebene blicken und erfährt so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen. "
+msgstr "Der Magier kann kurzzeitig in die Astralebene blicken und erfährt so alle Einheiten innerhalb eines astralen Radius von Stufe/5 Regionen."
 
 msgctxt "race"
 msgid "demon_d"
@@ -5539,11 +5534,11 @@ msgstr "Luchse"
 
 msgctxt "spellinfo"
 msgid "cerddor_destroymagic"
-msgstr " Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es.  Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu  verstärken und die Veränderungen aus dem Lied zu tilgen. "
+msgstr "Jede Verzauberung beeinflußt das Lebenslied, schwächt und verzerrt es. Der kundige Barde kann versuchen, das Lebenslied aufzufangen und zu verstärken und die Veränderungen aus dem Lied zu tilgen."
 
 msgctxt "spellinfo"
 msgid "treegrow"
-msgstr "Wo sonst aus einem Stecken nur ein Baum sprießen konnte, so treibt nun jeder Ast Wurzeln. "
+msgstr "Wo sonst aus einem Stecken nur ein Baum sprießen konnte, so treibt nun jeder Ast Wurzeln."
 
 msgctxt "race"
 msgid "lynx_x"
@@ -5578,7 +5573,7 @@ msgid "swamp_trail"
 msgstr "der Sumpf von %s"
 
 msgid "nr_nb_final"
-msgstr "und im "
+msgstr "und im"
 
 msgid "aoc"
 msgstr "Katzenamulett"
@@ -5702,7 +5697,7 @@ msgstr "Erschlagene"
 
 msgctxt "spellinfo"
 msgid "protective_runes"
-msgstr " Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die Planken eines Schiffes, so wird es schwerer durch Zauber zu beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des Gebäudes oder Schiffes gegen Verzauberung um 20%. Werden mehrere Schutzzauber übereinander gelegt, so addiert sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach Talent des Magiers aber auch viel länger. "
+msgstr "Zeichnet man diese Runen auf die Wände eines Gebäudes oder auf die Planken eines Schiffes, so wird es schwerer durch Zauber zu beeinflussen sein. Jedes Ritual erhöht die Widerstandskraft des Gebäudes oder Schiffes gegen Verzauberung um 20%. Werden mehrere Schutzzauber übereinander gelegt, so addiert sich ihre Wirkung, doch ein hundertprozentiger Schutz läßt sich so nicht erreichen. Der Zauber hält mindestens drei Wochen an, je nach Talent des Magiers aber auch viel länger."
 
 msgid "h9"
 msgstr "Wasserfinder"
@@ -5812,7 +5807,7 @@ msgstr "Bergwächter"
 
 msgctxt "spellinfo"
 msgid "enterastral"
-msgstr "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene zwingen. "
+msgstr "Alte arkane Formeln ermöglichen es dem Magier, sich und andere in die astrale Ebene zu schicken. Der Magier kann (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, den Zauber auf Stufen von 11 oder mehr zu zaubern, kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene zwingen."
 
 msgctxt "spell"
 msgid "flyingship"
@@ -5926,7 +5921,7 @@ msgstr "Bannlied"
 
 msgctxt "spellinfo"
 msgid "earn_silver#tybied"
-msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels.  50 Silber pro Stufe lassen sich so in einer Woche verdienen."
+msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 50 Silber pro Stufe lassen sich so in einer Woche verdienen."
 
 msgid "ANZAHL"
 msgstr "ANZAHL"
@@ -5950,7 +5945,7 @@ msgstr "Ozean"
 
 msgctxt "spellinfo"
 msgid "headache"
-msgstr " Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal:  'Es heisst, dieser Spruch wäre wohl in den Spelunken der Westgassen  entstanden, doch es kann genausogut in jedem andern verrufenen  Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass  schlechtesten Weines, je billiger und ungesunder, desto  wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure  Essenz zu destillieren, die weitaus anspruchsvoller als das einfache  Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden  und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie  es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit  einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht  ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist  die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht  verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränk  des Opfers geträufelt werden. Ihr Meister der Betöhrung und  Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis  stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu  kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr  lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht  die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier  innewohnt, sondern das der Trunkenheit so sicher ein gar  fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die  Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit  einige Tage bis hin zu den Studien zweier Wochen vergessen haben.  Noch ein Wort der Warnung: dieses ist sehr aufwendig, und so Ihr  noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch  schwerer fallen.' "
+msgstr "Aufzeichung des Vortrags von Selen Ard'Ragorn in Bar'Glingal: 'Es heisst, dieser Spruch wäre wohl in den Spelunken der Westgassen entstanden, doch es kann genausogut in jedem andern verrufenen Viertel gewesen sein. Seine wichtigste Zutat ist etwa ein Fass schlechtesten Weines, je billiger und ungesunder, desto wirkungsvoller wird die Essenz. Die Kunst, diesen Wein in pure Essenz zu destillieren, die weitaus anspruchsvoller als das einfache Rezeptmischen eines Alchemisten ist, und diese dergestalt zu binden und konservieren, das sie sich nicht gleich wieder verflüchtigt, wie es ihre Natur wäre, ja, dies ist etwas, das nur ein Meister des Cerddor vollbringen kann. Nun besitzt Ihr eine kleine Phiola mit einer rubinrotschimmernden - nun, nicht flüssig, doch auch nicht ganz Dunst - nennen wir es einfach nur Elixier. Doch nicht dies ist die wahre Herausforderung, sodann muss, da sich ihre Wirkung leicht verflüchtigt, diese innerhalb weniger Tage unbemerkt in das Getränk des Opfers geträufelt werden. Ihr Meister der Betöhrung und Verführung, hier nun könnt Ihr Eure ganze Kunst unter Beweis stellen. Doch gebt Acht, nicht unbedacht selbst von dem Elixier zu kosten, denn wer einmal gekostet hat, der kann vom Weine nicht mehr lassen, und er säuft sicherlich eine volle Woche lang. Jedoch nicht die Verführung zum Trunke ist die wahre Gefahr, die dem Elixier innewohnt, sondern das der Trunkenheit so sicher ein gar fürchterliches Leid des Kopfes folgen wird, wie der Tag auf die Nacht folgt. Und er wird gar sicherlich von seiner besten Fähigkeit einige Tage bis hin zu den Studien zweier Wochen vergessen haben. Noch ein Wort der Warnung: dieses ist sehr aufwendig, und so Ihr noch weitere Zauber in der selben Woche wirken wollt, so werden sie Euch schwerer fallen.'"
 
 msgid "spear"
 msgstr "Speer"
@@ -6011,7 +6006,7 @@ msgstr "Wiederbelebung"
 
 msgctxt "spellinfo"
 msgid "create_bagofholding"
-msgstr "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass sie auf das Traggewicht angerechnet werden.  Pferde und andere Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem Beutel transportiert werden. Auch ist es nicht möglich, einen Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1 GE."
+msgstr "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass sie auf das Traggewicht angerechnet werden. Pferde und andere Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem Beutel transportiert werden. Auch ist es nicht möglich, einen Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1 GE."
 
 msgid "questkey1"
 msgstr "Achatener Schlüssel"
@@ -6076,7 +6071,7 @@ msgstr "Dieser schwierige, aber effektive Kampfzauber benutzt die Elementargeist
 
 msgctxt "spellinfo"
 msgid "armor_shield"
-msgstr " Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann im Kampf auflösen wird. "
+msgstr "Diese vor dem Kampf zu zaubernde Ritual gibt den eigenen Truppen einen zusätzlichen Bonus auf ihre Rüstung. Jeder Treffer reduziert die Kraft des Zaubers, so dass der Schild sich irgendwann im Kampf auflösen wird."
 
 msgid "desert_trail"
 msgstr "die Wüste von %s"
@@ -6146,7 +6141,7 @@ msgstr "Laen"
 
 msgctxt "spellinfo"
 msgid "incite_riot"
-msgstr " Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und es können keine neuen Leute angeworben werden. Nach einigen Wochen beruhigt sich der Mob wieder. "
+msgstr "Mit Hilfe dieses magischen Gesangs versetzt der Magier eine ganze Region in Aufruhr. Rebellierende Bauernhorden machen jedes Besteuern unmöglich, kaum jemand wird mehr für Gaukeleien Geld spenden und es können keine neuen Leute angeworben werden. Nach einigen Wochen beruhigt sich der Mob wieder."
 
 msgid "longboat"
 msgstr "Langboot"
@@ -6207,7 +6202,7 @@ msgstr "durchgereist"
 
 msgctxt "spellinfo"
 msgid "pull_astral"
-msgstr "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe dieses Zaubers andere Einheiten zu sich holen. Der Magier kann  (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der  Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern,  kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene  zwingen."
+msgstr "Ein Magier, der sich in der astralen Ebene befindet, kann mit Hilfe dieses Zaubers andere Einheiten zu sich holen. Der Magier kann (Stufe-3)*15 GE durch das kurzzeitig entstehende Tor schicken. Ist der Magier erfahren genug, den Zauber auf Stufen von 13 oder mehr zu zaubern, kann er andere Einheiten auch gegen ihren Willen auf die andere Ebene zwingen."
 
 msgid "smod_far"
 msgstr "Fernzauber"

@@ -46,7 +46,7 @@
 
 static int read_permissions(variant *var, void *owner, struct gamedata *data)
 {
-    attrib *a;
+    attrib *a = NULL;
     UNUSED_ARG(var);
     read_attribs(data, &a, owner);
     a_remove(&a, a);

@@ -723,8 +723,9 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
         int k = 0;
         struct mlist *m = msgs->begin;
         while (m) {
-            /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(m->msg->type->section, section) == 0) {
+            /* categorized messages need a section: */
+            assert(!categorized || (m->msg->type->section != NULL));
+            if (!categorized || m->msg->type->section == section) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
@@ -1037,6 +1038,9 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (is_mourning(r, turn + 1)) {
+            bytes = (int)str_strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1877,6 +1881,9 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     }
 
     if (!building_finished(b)) {
+        bytes = (int)str_strlcpy(bufp, " ", size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
         bytes = (int)str_strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -2306,11 +2313,11 @@ report_plaintext(const char *filename, report_context * ctx,
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
-                rp_messages(out, mlist, f, 0, true);
+                rp_messages(out, mlist, f, 0, false);
                 split_messages(mlist, split);
             }
             else {
-                rp_messages(out, r->msgs, f, 0, true);
+                rp_messages(out, r->msgs, f, 0, false);
             }
         }
 

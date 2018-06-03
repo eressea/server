@@ -67,6 +67,7 @@ extern "C" {
     bool is_exclusive(const order * ord);
     bool is_repeated(keyword_t kwd);
     bool is_long(keyword_t kwd);
+    const char *crescape(const char *str, char *buffer, size_t size);
 
     char *write_order(const order * ord, const struct locale *lang,
         char *buffer, size_t size);
