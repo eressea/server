@@ -1,3 +1,5 @@
 #!/bin/sh
+SCRIPT=$(readlink -f $0)
+cd $(dirname $SCRIPT)
 python process-orders.py "$@"
 
