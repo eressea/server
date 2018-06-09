@@ -5494,12 +5494,12 @@
       <arg name="unit" type="unit"/>
     </type>
   </message>
-  <message name="tactics_lost" section="battle">
+  <message name="para_tactics_lost" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
   </message>
-  <message name="tactics_won" section="battle">
+  <message name="para_tactics_won" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
