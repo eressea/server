@@ -20,16 +20,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "morale.h"
 
-#include <spells/regioncurse.h>
-
-#include <kernel/config.h>
-#include <kernel/curse.h>
-#include <kernel/region.h>
-#include <kernel/faction.h>
-#include <kernel/race.h>
-#include <kernel/building.h>
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/region.h"
+#include "kernel/faction.h"
+#include "kernel/race.h"
+#include "kernel/building.h"
 
 #include <util/rand.h>
+
+#include <spells/regioncurse.h>
 
 #include <assert.h>
 

@@ -39,10 +39,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/overrideroads.h>
 #include <attributes/otherfaction.h>
 #include <attributes/reduceproduction.h>
+#include <attributes/seenspell.h>
 
 /* gamecode includes */
 #include "alchemy.h"
-#include "calendar.h"
 #include "economy.h"
 #include "move.h"
 #include "upkeep.h"
@@ -50,30 +50,31 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/connection.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/objtypes.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/render.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-#include <kernel/alliance.h>
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/connection.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/objtypes.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/render.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+#include "kernel/alliance.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -95,7 +96,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -109,17 +109,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern int *storms;
 extern int weeks_per_month;
 extern int months_per_year;
-
-static void check_errno(const char * file, int line) {
-    if (errno) {
-        char zText[64];
-        sprintf(zText, "error %d during report at %s:%d", errno, file, line);
-        perror(zText);
-        errno = 0;
-    }
-}
-
-#define CHECK_ERRNO() check_errno(__FILE__, __LINE__)
 
 static char *gamedate_season(const struct locale *lang)
 {
@@ -180,7 +169,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     char marker)
 {
     size_t length = REPORTWIDTH;
-    const char *end, *begin, *mark = 0;
+    const char *handle_end, *begin, *mark = 0;
 
     if (!str) return;
     /* find out if there's a mark + indent already encoded in the string. */
@@ -199,7 +188,7 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     else {
         mark = &marker;
     }
-    begin = end = str;
+    begin = handle_end = str;
 
     do {
         const char *last_space = begin;
@@ -216,25 +205,25 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
         else {
             write_spaces(out, indent + hanging_indent);
         }
-        while (*end && end <= begin + length - indent) {
-            if (*end == ' ') {
-                last_space = end;
+        while (*handle_end && handle_end <= begin + length - indent) {
+            if (*handle_end == ' ') {
+                last_space = handle_end;
             }
-            ++end;
+            ++handle_end;
         }
-        if (*end == 0)
-            last_space = end;
+        if (*handle_end == 0)
+            last_space = handle_end;
         if (last_space == begin) {
             /* there was no space in this line. clip it */
-            last_space = end;
+            last_space = handle_end;
         }
         swrite(begin, sizeof(char), last_space - begin, out);
         begin = last_space;
         while (*begin == ' ') {
             ++begin;
         }
-        if (begin > end)
-            begin = end;
+        if (begin > handle_end)
+            begin = handle_end;
         sputs("", out);
     } while (*begin);
 }
@@ -260,7 +249,7 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
     char buf[4096];
     char *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    const spell * sp = sbe->sp;
+    const spell *sp = spellref_get(&sbe->spref);
     const char *params = sp->parameter;
 
     if (sp->sptyp & ISCOMBATSPELL) {
@@ -303,7 +292,6 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
         };
         starget *targetp;
         char cp = *params++;
-        int i, maxparam = 0;
         const char *locp;
         const char *syntaxp = sp->syntax;
 
@@ -358,6 +346,7 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
                 WARN_STATIC_BUFFER();
         }
         else if (cp == 'k') {
+            int i, maxparam = 0;
             bool multi = false;
             if (params && *params == 'c') {
                 /* skip over a potential id */
@@ -450,7 +439,7 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     char buf[4096];
     char *startp, *bufp = buf;
     size_t size = sizeof(buf) - 1;
-    const spell * sp = sbe->sp;
+    const spell *sp = spellref_get(&sbe->spref);
 
     newline(out);
     centre(out, spell_name(sp, lang), true);
@@ -687,14 +676,14 @@ nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_
 {
     char marker;
     int dh;
-    bool isbattle = (bool)(mode == seen_battle);
+    bool isbattle = (mode == seen_battle);
     char buf[8192];
 
     if (fval(u_race(u), RCF_INVISIBLE))
         return;
 
     newline(out);
-    dh = bufunit(f, u, indent, mode, buf, sizeof(buf));
+    dh = bufunit(f, u, mode, buf, sizeof(buf));
 
     if (u->faction == f) {
         marker = '*';
@@ -725,16 +714,18 @@ static void
 rp_messages(struct stream *out, message_list * msgs, faction * viewer, int indent,
     bool categorized)
 {
-    nrsection *section;
-
-    if (!msgs)
+    int i;
+    if (!msgs) {
         return;
-    for (section = sections; section; section = section->next) {
+    }
+    for (i = 0; i != MAXSECTIONS && sections[i]; ++i) {
+        const char * section = sections[i];
         int k = 0;
         struct mlist *m = msgs->begin;
         while (m) {
-            /* messagetype * mt = m->type; */
-            if (!categorized || strcmp(nr_section(m->msg), section->name) == 0) {
+            /* categorized messages need a section: */
+            assert(!categorized || (m->msg->type->section != NULL));
+            if (!categorized || m->msg->type->section == section) {
                 char lbuf[8192];
 
                 if (!k && categorized) {
@@ -742,18 +733,22 @@ rp_messages(struct stream *out, message_list * msgs, faction * viewer, int inden
                     char cat_identifier[24];
 
                     newline(out);
-                    sprintf(cat_identifier, "section_%s", section->name);
+                    sprintf(cat_identifier, "section_%s", section);
                     section_title = LOC(viewer->locale, cat_identifier);
                     if (section_title) {
                         centre(out, section_title, true);
                         newline(out);
                     }
                     else {
-                        log_error("no title defined for section %s in locale %s", section->name, locale_name(viewer->locale));
+                        log_error("no title defined for section %s in locale %s", section, locale_name(viewer->locale));
                     }
                     k = 1;
                 }
                 nr_render(m->msg, viewer->locale, lbuf, sizeof(lbuf), viewer);
+                /* Hack: some messages should start a new paragraph with a newline: */
+                if (strncmp("para_", m->msg->type->name, 5) == 0) {
+                    newline(out);
+                }
                 paragraph(out, lbuf, indent, 2, 0);
             }
             m = m->next;
@@ -1043,6 +1038,9 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
         if (is_mourning(r, turn + 1)) {
+            bytes = (int)str_strlcpy(bufp, " ", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
@@ -1802,7 +1800,6 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
     if (wrptr(&bufp, &size, bytes) != 0)
         WARN_STATIC_BUFFER();
 
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
     if (sh->size != sh->type->construction->maxsize) {
         bytes = snprintf(bufp, size, ", %s (%d/%d)",
             LOC(f->locale, "nr_undercons"), sh->size,
@@ -1884,6 +1881,9 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     }
 
     if (!building_finished(b)) {
+        bytes = (int)str_strlcpy(bufp, " ", size);
+        if (wrptr(&bufp, &size, bytes) != 0)
+            WARN_STATIC_BUFFER();
         bytes = (int)str_strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
         if (wrptr(&bufp, &size, bytes) != 0)
             WARN_STATIC_BUFFER();
@@ -1938,7 +1938,7 @@ static void nr_paragraph(struct stream *out, message * m, faction * f)
 
 typedef struct cb_data {
     struct stream *out;
-    char *start, *writep;
+    char *handle_start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
@@ -1947,7 +1947,7 @@ typedef struct cb_data {
 static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
-    data->start = buffer;
+    data->handle_start = buffer;
     data->size = size;
     data->f = f;
     data->maxtravel = 0;
@@ -1964,7 +1964,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
     if (travelthru_cansee(r, f, u)) {
         ++data->counter;
         do {
-            size_t len, size = data->size - (data->writep - data->start);
+            size_t len, size = data->size - (data->writep - data->handle_start);
             const char *str;
             char *writep = data->writep;
 
@@ -1999,13 +1999,13 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
             if (len >= size || data->counter == data->maxtravel) {
                 /* buffer is full */
                 *writep = 0;
-                paragraph(data->out, data->start, 0, 0, 0);
-                data->writep = data->start;
+                paragraph(data->out, data->handle_start, 0, 0, 0);
+                data->writep = data->handle_start;
                 if (data->counter == data->maxtravel) {
                     break;
                 }
             }
-        } while (data->writep == data->start);
+        } while (data->writep == data->handle_start);
     }
 }
 
@@ -2195,7 +2195,7 @@ report_plaintext(const char *filename, report_context * ctx,
     }
 
     ch = 0;
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
@@ -2245,7 +2245,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
     newline(out);
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -2253,7 +2253,7 @@ report_plaintext(const char *filename, report_context * ctx,
 
     rpline(out);
 
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
@@ -2313,11 +2313,11 @@ report_plaintext(const char *filename, report_context * ctx,
             message_list *mlist = r_getmessages(r, f);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
-                rp_messages(out, mlist, f, 0, true);
+                rp_messages(out, mlist, f, 0, false);
                 split_messages(mlist, split);
             }
             else {
-                rp_messages(out, r->msgs, f, 0, true);
+                rp_messages(out, r->msgs, f, 0, false);
             }
         }
 
@@ -2331,7 +2331,9 @@ report_plaintext(const char *filename, report_context * ctx,
             if (b) {
                 nr_building(out, r, b, f);
                 while (u && u->building == b) {
-                    nr_unit(out, f, u, 6, r->seen.mode);
+                    if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                        nr_unit(out, f, u, 6, r->seen.mode);
+                    }
                     u = u->next;
                 }
                 b = b->next;
@@ -2352,7 +2354,9 @@ report_plaintext(const char *filename, report_context * ctx,
             if (sh) {
                 nr_ship(out, r, sh, f, u);
                 while (u && u->ship == sh) {
-                    nr_unit(out, f, u, 6, r->seen.mode);
+                    if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                        nr_unit(out, f, u, 6, r->seen.mode);
+                    }
                     u = u->next;
                 }
                 sh = sh->next;
@@ -2363,7 +2367,7 @@ report_plaintext(const char *filename, report_context * ctx,
 
         newline(out);
         rpline(out);
-        CHECK_ERRNO();
+        ERRNO_CHECK();
     }
     if (!is_monsters(f)) {
         if (!anyunits) {
@@ -2375,7 +2379,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
     fstream_done(&strm);
-    CHECK_ERRNO();
+    ERRNO_CHECK();
     return 0;
 }
 

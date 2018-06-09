@@ -11,6 +11,7 @@
 #include <CuTest.h>
 
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 #include <assert.h>
 
@@ -22,6 +23,18 @@ static void test_rc_name(CuTest *tc) {
     CuAssertStrEquals(tc, "race::human_p", rc_name_s(rc, NAME_PLURAL));
     CuAssertStrEquals(tc, "race::human_d", rc_name_s(rc, NAME_DEFINITIVE));
     CuAssertStrEquals(tc, "race::human_x", rc_name_s(rc, NAME_CATEGORY));
+    test_teardown();
+}
+
+static void test_rc_item_mask(CuTest *tc) {
+    struct race *rc;
+    test_setup();
+    rc = rc_get_or_create("hooman");
+    CuAssertIntEquals(tc, 1, rc->mask_item);
+    rc = rc_get_or_create("aelf");
+    CuAssertIntEquals(tc, 2, rc->mask_item);
+    rc = rc_get_or_create("dorf");
+    CuAssertIntEquals(tc, 4, rc->mask_item);
     test_teardown();
 }
 
@@ -37,7 +50,7 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertDblEquals(tc, 1.0, rc->recruit_multi, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->speed, 0.0);
-    CuAssertIntEquals(tc, 0, rc->flags);
+    CuAssertIntEquals(tc, RCF_DEFAULT, rc->flags);
     CuAssertIntEquals(tc, 0, rc->recruitcost);
     CuAssertIntEquals(tc, 0, rc->maintenance);
     CuAssertIntEquals(tc, 540, rc->capacity);
@@ -46,6 +59,8 @@ static void test_rc_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, rc->armor);
     CuAssertIntEquals(tc, 0, rc->at_bonus);
     CuAssertIntEquals(tc, 0, rc->df_bonus);
+    CuAssertIntEquals(tc, -2, rc->df_default);
+    CuAssertIntEquals(tc, -2, rc->at_default);
     CuAssertIntEquals(tc, 0, rc->battle_flags);
     CuAssertIntEquals(tc, PERSON_WEIGHT, rc->weight);
     test_teardown();
@@ -97,12 +112,11 @@ static void test_rc_set_param(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, rc->options);
     rc_set_param(rc, "recruit_multi", "0.5");
     CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
-    rc_set_param(rc, "migrants.formula", "1");
-    CuAssertIntEquals(tc, RCF_MIGRANTS, rc->flags&RCF_MIGRANTS);
+    rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
-    rc_set_param(rc, "ai.scare", "400");
+    rc_set_param(rc, "scare", "400");
     CuAssertIntEquals(tc, 400, rc_scare(rc));
-    rc_set_param(rc, "hunger.damage", "1d10+12");
+    rc_set_param(rc, "hunger_damage", "1d10+12");
     CuAssertStrEquals(tc, "1d10+12", rc_hungerdamage(rc));
     test_teardown();
 }
@@ -172,6 +186,19 @@ static void test_racename(CuTest *tc) {
     test_teardown();
 }
 
+static void test_rc_mask(CuTest *tc) {
+    int mask;
+    char list[64];
+    test_setup();
+    strcpy(list, "goblin dwarf");
+    mask = rc_get_mask(list);
+    CuAssertIntEquals(tc, 3, mask);
+    CuAssertStrEquals(tc, "goblin", list);
+    mask = rc_get_mask(list);
+    CuAssertIntEquals(tc, 1, mask);
+    test_teardown();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -179,7 +206,9 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_old_race);
     SUITE_ADD_TEST(suite, test_rc_name);
     SUITE_ADD_TEST(suite, test_rc_defaults);
+    SUITE_ADD_TEST(suite, test_rc_item_mask);
     SUITE_ADD_TEST(suite, test_rc_find);
+    SUITE_ADD_TEST(suite, test_rc_mask);
     SUITE_ADD_TEST(suite, test_rc_set_param);
     SUITE_ADD_TEST(suite, test_rc_can_use);
     SUITE_ADD_TEST(suite, test_racename);

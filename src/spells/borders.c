@@ -31,13 +31,13 @@ typedef struct wallcurse {
     connection *wall;
 } wallcurse;
 
-static int cw_read_depr(attrib * a, void *target, gamedata *data)
+static int cw_read_depr(variant *var, void *target, gamedata *data)
 {
     storage *store = data->store;
 
-    curse_init(a);
-    curse_read(a, store, target);
-    curse_done(a);
+    curse_init(var);
+    curse_read(var, store, target);
+    curse_done(var);
     READ_INT(store, NULL);
     return AT_READ_DEPR;
 }

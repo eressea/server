@@ -136,11 +136,11 @@ static const char *getbuf_latin1(FILE * F)
                 continue;
             }
             else if (c == CONTINUE_CHAR) {
-                const char *end = ++bp;
-                while (*end && isspace(*(unsigned char *)end))
-                    ++end;                /* eatwhite */
-                if (*end == '\0') {
-                    bp = end;
+                const char *handle_end = ++bp;
+                while (*handle_end && isspace(*(unsigned char *)handle_end))
+                    ++handle_end;                /* eatwhite */
+                if (*handle_end == '\0') {
+                    bp = handle_end;
                     cont = true;
                     continue;
                 }
@@ -303,11 +303,11 @@ static const char *getbuf_utf8(FILE * F)
             }
             else {
                 if (*bp == CONTINUE_CHAR) {
-                    const char *end;
+                    const char *handle_end;
                     eatwhite(bp + 1, &white);
-                    end = bp + 1 + white;
-                    if (*end == '\0') {
-                        bp = end;
+                    handle_end = bp + 1 + white;
+                    if (*handle_end == '\0') {
+                        bp = handle_end;
                         cont = true;
                         continue;
                     }

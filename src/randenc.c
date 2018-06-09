@@ -16,49 +16,52 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
+
 #include "randenc.h"
 
-#include "volcano.h"
+#include "chaos.h"
 #include "economy.h"
 #include "monsters.h"
 #include "move.h"
-#include "chaos.h"
 #include "study.h"
+#include "volcano.h"
 
-#include <spells/unitcurse.h>
-#include <spells/regioncurse.h>
+#include "spells/unitcurse.h"
+#include "spells/regioncurse.h"
 
 /* attributes includes */
-#include <attributes/racename.h>
-#include <attributes/reduceproduction.h>
+#include "attributes/racename.h"
+#include "attributes/reduceproduction.h"
 
 /* kernel includes */
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/building.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/rand.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include "util/attrib.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/log.h"
+#include "util/rand.h"
+#include "util/message.h"
+#include "util/rng.h"
 
 /* libc includes */
 #include <string.h>
@@ -150,267 +153,6 @@ static void dissolve_units(void)
     }
 
     remove_empty_units();
-}
-
-static bool improve_all(faction * f, skill_t sk, int by_weeks)
-{
-    unit *u;
-    bool result = false;
-    for (u = f->units; u; u = u->nextF) {
-        if (has_skill(u, sk)) {
-            increase_skill(u, sk, by_weeks);
-            result = true;
-        }
-    }
-    return result;
-}
-
-void find_manual(region * r, unit * u)
-{
-    char zLocation[32];
-    char zBook[32];
-    skill_t skill = NOSKILL;
-    message *msg;
-
-    switch (rng_int() % 36) {
-    case 0:
-        skill = SK_MAGIC;
-        break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-        skill = SK_WEAPONSMITH;
-        break;
-    case 5:
-    case 6:
-        skill = SK_TACTICS;
-        break;
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-        skill = SK_SHIPBUILDING;
-        break;
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-        skill = SK_SAILING;
-        break;
-    case 15:
-    case 16:
-    case 17:
-        skill = SK_HERBALISM;
-        break;
-    case 18:
-    case 19:
-        skill = SK_ALCHEMY;
-        break;
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-        skill = SK_BUILDING;
-        break;
-    case 24:
-    case 25:
-    case 26:
-    case 27:
-        skill = SK_ARMORER;
-        break;
-    case 28:
-    case 29:
-    case 30:
-    case 31:
-        skill = SK_MINING;
-        break;
-    case 32:
-    case 33:
-    case 34:
-    case 35:
-        skill = SK_ENTERTAINMENT;
-        break;
-    }
-
-    snprintf(zLocation, sizeof(zLocation), "manual_location_%d",
-        (int)(rng_int() % 4));
-    snprintf(zBook, sizeof(zLocation), "manual_title_%s", skillnames[skill]);
-
-    msg = msg_message("find_manual", "unit location book", u, zLocation, zBook);
-    if (msg) {
-        r_addmessage(r, u->faction, msg);
-        msg_release(msg);
-    }
-
-    if (!improve_all(u->faction, skill, 3)) {
-        increase_skill(u, skill, 9);
-    }
-}
-
-static void get_villagers(region * r, unit * u)
-{
-    unit *newunit;
-    message *msg = msg_message("encounter_villagers", "unit", u);
-    const char *name = LOC(u->faction->locale, "villagers");
-
-    r_addmessage(r, u->faction, msg);
-    msg_release(msg);
-
-    newunit =
-        create_unit(r, u->faction, rng_int() % 20 + 3, u->faction->race, 0, name,
-        u);
-    leave(newunit, true);
-    fset(newunit, UFL_ISNEW | UFL_MOVED);
-    equip_unit(newunit, get_equipment("rand_villagers"));
-}
-
-static void get_allies(region * r, unit * u)
-{
-    unit *newunit = NULL;
-    const char *name;
-    const char *equip;
-    int number;
-    message *msg;
-
-    assert(u->number);
-
-    switch (rterrain(r)) {
-    case T_PLAIN:
-        if (!r_isforest(r)) {
-            if (get_money(u) / u->number < 100 + rng_int() % 200)
-                return;
-            name = "random_plain_men";
-            equip = "rand_plain";
-            number = rng_int() % 8 + 2;
-            break;
-        }
-        else {
-            if (effskill(u, SK_LONGBOW, r) < 3
-                && effskill(u, SK_HERBALISM, r) < 2
-                && effskill(u, SK_MAGIC, r) < 2) {
-                return;
-            }
-            name = "random_forest_men";
-            equip = "rand_forest";
-            number = rng_int() % 6 + 2;
-        }
-        break;
-
-    case T_SWAMP:
-        if (effskill(u, SK_MELEE, r) <= 1) {
-            return;
-        }
-        name = "random_swamp_men";
-        equip = "rand_swamp";
-        number = rng_int() % 6 + 2;
-        break;
-
-    case T_DESERT:
-        if (effskill(u, SK_RIDING, r) <= 2) {
-            return;
-        }
-        name = "random_desert_men";
-        equip = "rand_desert";
-        number = rng_int() % 12 + 2;
-        break;
-
-    case T_HIGHLAND:
-        if (effskill(u, SK_MELEE, r) <= 1) {
-            return;
-        }
-        name = "random_highland_men";
-        equip = "rand_highland";
-        number = rng_int() % 8 + 2;
-        break;
-
-    case T_MOUNTAIN:
-        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 2) {
-            return;
-        }
-        name = "random_mountain_men";
-        equip = "rand_mountain";
-        number = rng_int() % 6 + 2;
-        break;
-
-    case T_GLACIER:
-        if (effskill(u, SK_MELEE, r) <= 1 || effskill(u, SK_TRADE, r) <= 1) {
-            return;
-        }
-        name = "random_glacier_men";
-        equip = "rand_glacier";
-        number = rng_int() % 4 + 2;
-        break;
-
-    default:
-        return;
-    }
-
-    newunit =
-        create_unit(r, u->faction, number, u->faction->race, 0,
-        LOC(u->faction->locale, name), u);
-    equip_unit(newunit, get_equipment(equip));
-
-    u_setfaction(newunit, u->faction);
-    set_racename(&newunit->attribs, get_racename(u->attribs));
-    if (u_race(u)->flags & RCF_SHAPESHIFT) {
-        newunit->irace = u->irace;
-    }
-    if (fval(u, UFL_ANON_FACTION))
-        fset(newunit, UFL_ANON_FACTION);
-    fset(newunit, UFL_ISNEW);
-
-    msg = msg_message("encounter_allies", "unit name", u, name);
-    r_addmessage(r, u->faction, msg);
-    msg_release(msg);
-}
-
-static void encounter(region * r, unit * u)
-{
-    if (!fval(r, RF_ENCOUNTER))
-        return;
-    freset(r, RF_ENCOUNTER);
-    if (rng_int() % 100 >= ENCCHANCE)
-        return;
-    switch (rng_int() % 3) {
-    case 0:
-        find_manual(r, u);
-        break;
-    case 1:
-        get_villagers(r, u);
-        break;
-    case 2:
-        get_allies(r, u);
-        break;
-    }
-}
-
-void encounters(void)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        if (fval(r->terrain, LAND_REGION) && fval(r, RF_ENCOUNTER)) {
-            int c = 0;
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                c += u->number;
-            }
-
-            if (c > 0) {
-                int i = 0;
-                int n = rng_int() % c;
-
-                for (u = r->units; u; u = u->next) {
-                    if (i + u->number > n)
-                        break;
-                    i += u->number;
-                }
-                assert(u && u->number);
-                encounter(r, u);
-            }
-        }
-    }
 }
 
 void drown(region * r)
@@ -608,7 +350,7 @@ static void move_icebergs(void)
     }
 }
 
-void create_icebergs(void)
+static void create_icebergs(void)
 {
     region *r;
     const struct terrain_type *t_iceberg, *t_sleep;
@@ -760,9 +502,8 @@ static void icebergs(void)
     move_icebergs();
 }
 
-#define HERBS_ROT               /* herbs owned by units have a chance to rot. */
 #define HERBROTCHANCE 5         /* Verrottchance f�r Kr�uter (ifdef HERBS_ROT) */
-#ifdef HERBS_ROT
+
 static void rotting_herbs(void)
 {
     region *r;
@@ -784,9 +525,8 @@ static void rotting_herbs(void)
                 int n = itm->number;
                 double k = n * rot_chance / 100.0;
                 if (fval(itm->type, ITF_HERB)) {
-                    double nv = normalvariate(k, k / 4);
-                    int inv = (int)nv;
-                    int delta = MIN(n, inv);
+                    int delta = (int)normalvariate(k, k / 4);
+                    if (n < delta) delta = n;
                     if (!i_change(itmp, itm->type, -delta)) {
                         continue;
                     }
@@ -796,7 +536,6 @@ static void rotting_herbs(void)
         }
     }
 }
-#endif
 
 void randomevents(void)
 {
@@ -822,7 +561,9 @@ void randomevents(void)
         while (*blist) {
             building *b = *blist;
             if (fval(b->type, BTF_DECAY) && !building_owner(b)) {
-                b->size -= MAX(1, (b->size * 20) / 100);
+                int delta = (b->size * 20) / 100;
+                if (delta < 1) delta = 1;
+                b->size -= delta;
                 if (b->size == 0) {
                     remove_building(blist, r->buildings);
                 }
@@ -838,9 +579,7 @@ void randomevents(void)
     }
 
     chaos_update();
-#ifdef HERBS_ROT
     rotting_herbs();
-#endif
 
     dissolve_units();
 }

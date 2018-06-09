@@ -28,13 +28,17 @@ extern "C" {
     int log_level(struct log_t *log, int flags);
     void log_close(void);
 
-    extern void log_fatal(const char *format, ...);
-    extern void log_error(const char *format, ...);
-    extern void log_warning(const char *format, ...);
-    extern void log_debug(const char *format, ...);
-    extern void log_info(const char *format, ...);
-    extern void log_printf(FILE * ios, const char *format, ...);
+    void log_fatal(const char *format, ...);
+    void log_error(const char *format, ...);
+    void log_warning(const char *format, ...);
+    void log_debug(const char *format, ...);
+    void log_info(const char *format, ...);
+    void log_printf(FILE * ios, const char *format, ...);
 
+    void errno_check(const char *file, int line);
+#define ERRNO_CHECK() errno_check(__FILE__, __LINE__)
+
+    
 #define LOG_CPERROR    0x01
 #define LOG_CPWARNING  0x02
 #define LOG_CPINFO     0x04

@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea><resources>
 <resource name="chainmail">
   <item weight="200" score="90">
     <construction skill="armorer" minskill="3">
@@ -7,3 +8,4 @@
     <armor ac="3" penalty="0.15" magres="0.0"/>
   </item>
 </resource>
+</resources></eressea>

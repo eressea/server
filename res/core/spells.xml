@@ -1,123 +1,116 @@
 <?xml version="1.0"?>
-<spells xmlns:xi="http://www.w3.org/2001/XInclude">
-
-  <xi:include href="spellbooks/gray.xml"/>
-  <xi:include href="spellbooks/gwyrrd.xml"/>
-  <xi:include href="spellbooks/draig.xml"/>
-  <xi:include href="spellbooks/illaun.xml"/>
-  <xi:include href="spellbooks/cerddor.xml"/>
-  <xi:include href="spellbooks/tybied.xml"/>
+<spells>
 
   <!-- shared spells -->
-  <spell name="create_roi" ship="true" rank="5" index="130">
+  <spell name="create_roi" ship="true" rank="5">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
-  <spell name="create_aots" ship="true" rank="5" index="125">
+  <spell name="create_aots" ship="true" rank="5">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <!-- draig spells -->
-  <spell name="earn_silver#draig" ship="true" variable="true" rank="5" index="159">
+  <spell name="earn_silver#draig" ship="true" variable="true" rank="5">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_firesword" ship="true" rank="5" index="148">
+  <spell name="create_firesword" ship="true" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="p10" amount="1" cost="fixed"/>
     <resource name="sword" amount="1" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
-  <spell name="create_trollbelt" ship="true" rank="5" index="48">
+  <spell name="create_trollbelt" ship="true" rank="5">
     <resource name="aura" amount="20" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <!-- gwyrrd spells -->
-  <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5" index="159">
+  <spell name="earn_silver#gwyrrd" ship="true" variable="true" rank="5">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_magicherbbag" ship="true" rank="5" index="165">
+  <spell name="create_magicherbbag" ship="true" rank="5">
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
-    <resource name="p2" amount="1" cost="fixed"/>
+    <resource name="lifepotion" amount="1" cost="fixed"/>
   </spell>
 
   <!-- illaun spells -->
-  <spell name="earn_silver#illaun" ship="true" variable="true" rank="5" index="159">
+  <spell name="earn_silver#illaun" ship="true" variable="true" rank="5">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_dreameye" ship="true" rank="5" index="149">
+  <spell name="create_dreameye" ship="true" rank="5">
     <resource name="dragonhead" amount="1" cost="fixed"/>
     <resource name="permaura" amount="5" cost="fixed"/>
   </spell>
 
-  <spell name="create_invisibility_sphere" ship="true" rank="5" index="178">
+  <spell name="create_invisibility_sphere" ship="true" rank="5">
     <resource name="aura" amount="150" cost="fixed"/>
     <resource name="money" amount="30000" cost="fixed"/>
     <resource name="permaura" amount="3" cost="fixed"/>
   </spell>
 
   <!-- cerddor spells -->
-  <spell name="earn_silver#cerddor" ship="true" variable="true" rank="5" index="159">
+  <spell name="earn_silver#cerddor" ship="true" variable="true" rank="5">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_roqf" ship="true" rank="5" index="63">
+  <spell name="create_roqf" ship="true" rank="5">
     <resource name="aura" amount="20" cost="fixed"/>
     <resource name="money" amount="1000" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
   <!-- tybied spells -->
-  <spell name="earn_silver#tybied" ship="true" variable="true" rank="5" index="159">
+  <spell name="earn_silver#tybied" ship="true" variable="true" rank="5">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
 
-  <spell name="create_antimagic" ship="true" rank="5" index="38">
+  <spell name="create_antimagic" ship="true" rank="5">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
   </spell>
 
-  <spell name="create_rop" ship="true" rank="5" index="1">
+  <spell name="create_rop" ship="true" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="4000" cost="fixed"/>
   </spell>
 
-  <spell name="create_bagofholding" ship="true" rank="5" index="155">
+  <spell name="create_bagofholding" ship="true" rank="5">
     <resource name="aura" amount="30" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="5000" cost="fixed"/>
   </spell>
 
   <!-- gray magic -->
-  <spell name="create_runesword" ship="true" rank="5" index="135">
+  <spell name="create_runesword" ship="true" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="1000" cost="fixed"/>
     <resource name="laensword" amount="1" cost="fixed"/>
   </spell>
 
-  <spell name="create_chastitybelt" ship="true" rank="5" index="134">
+  <spell name="create_chastitybelt" ship="true" rank="5">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
     <resource name="money" amount="3000" cost="fixed"/>
   </spell>
 
-  <spell name="create_focus" ship="true" rank="5" index="2">
+  <spell name="create_focus" ship="true" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
 
-  <spell name="create_ror" ship="true" rank="5" index="3">
+  <spell name="create_ror" ship="true" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>

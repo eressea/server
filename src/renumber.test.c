@@ -38,7 +38,7 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup_ex(tc);
-    mt_register(mt_new_va("renumber_inuse", "id:int", MT_NEW_END));
+    mt_create_va(mt_new("renumber_inuse", NULL), "id:int", MT_NEW_END);
     f2 = test_create_faction(NULL);
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     no = f->no;

@@ -42,7 +42,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
-#include <util/xml.h>
 
 #include <storage.h>
 #include <selist.h>
@@ -127,6 +126,7 @@ ship_type *st_get_or_create(const char * name) {
         st = (ship_type *)calloc(sizeof(ship_type), 1);
         st->_name = str_strdup(name);
         st->storm = 1.0;
+        st->tac_bonus = 1.0;
         st_register(st);
     }
     return st;
@@ -249,7 +249,9 @@ static void free_shiptype(void *ptr) {
     ship_type *stype = (ship_type *)ptr;
     free(stype->_name);
     free(stype->coasts);
-    free_construction(stype->construction);
+    if (stype->construction) {
+        free_construction(stype->construction);
+    }
     free(stype);
 }
 
@@ -328,7 +330,6 @@ int shipspeed(const ship * sh, const unit * u)
     assert(u->ship == sh);
     assert(u == ship_owner(sh));
     assert(sh->type->construction);
-    assert(sh->type->construction->improvement == NULL);  /* sonst ist construction::size nicht ship_type::maxsize */
 
     k = sh->type->range;
     if (sh->size != sh->type->construction->maxsize)
@@ -395,10 +396,6 @@ const char *shipname(const ship * sh)
 int shipcapacity(const ship * sh)
 {
     int i = sh->type->cargo;
-
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
 
     if (sh->type->construction && sh->size != sh->type->construction->maxsize)
         return 0;

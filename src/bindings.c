@@ -3,6 +3,28 @@
 #endif
 
 #include "bindings.h"
+
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/alliance.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/unit.h"
+#include "kernel/terrain.h"
+#include "kernel/messages.h"
+#include "kernel/region.h"
+#include "kernel/building.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/ship.h"
+#include "kernel/faction.h"
+#include "kernel/save.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "races/races.h"
+
 #include "bind_unit.h"
 #include "bind_storage.h"
 #include "bind_building.h"
@@ -13,33 +35,11 @@
 #include "bind_ship.h"
 #include "bind_gmtool.h"
 #include "bind_region.h"
+
 #include "helpers.h"
 #include "console.h"
 #include "reports.h"
 #include "study.h"
-#include "calendar.h"
-
-#include <kernel/config.h>
-
-#include <kernel/alliance.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/unit.h>
-#include <kernel/terrain.h>
-#include <kernel/messages.h>
-#include <kernel/region.h>
-#include <kernel/building.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/ship.h>
-#include <kernel/faction.h>
-#include <kernel/save.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-
 #include "economy.h"
 #include "summary.h"
 #include "teleport.h"
@@ -47,7 +47,6 @@
 #include "monsters.h"
 #include "market.h"
 
-#include <modules/autoseed.h>
 #include <modules/score.h>
 #include <attributes/key.h>
 
@@ -57,9 +56,9 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/xml.h>
 
 #include <selist.h>
 #include <storage.h>
@@ -150,25 +149,6 @@ int tolua_itemlist_next(lua_State * L)
         tolua_pushstring(L, itm->type->rtype->_name);
         *item_ptr = itm->next;
         return 1;
-    }
-    return 0;
-}
-
-static int tolua_autoseed(lua_State * L)
-{
-    const char *filename = tolua_tostring(L, 1, 0);
-    int new_island = tolua_toboolean(L, 2, 0);
-    newfaction *players = read_newfactions(filename);
-    if (players != NULL) {
-        while (players) {
-            int n = listlen(players);
-            int k = (n + ISLANDSIZE - 1) / ISLANDSIZE;
-            k = n / k;
-            n = autoseed(&players, k, new_island ? 0 : TURNS_PER_ISLAND);
-            if (n == 0) {
-                break;
-            }
-        }
     }
     return 0;
 }
@@ -413,33 +393,6 @@ static int tolua_get_nmrs(lua_State * L)
     return 1;
 }
 
-static int tolua_equipunit(lua_State * L)
-{
-    unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    const char *eqname = tolua_tostring(L, 2, 0);
-    int mask = (int)tolua_tonumber(L, 3, EQUIP_ALL);
-    assert(u && mask > 0);
-    equip_unit_mask(u, get_equipment(eqname), mask);
-    return 0;
-}
-
-static int tolua_equipment_setitem(lua_State * L)
-{
-    int result = -1;
-    const char *eqname = tolua_tostring(L, 1, 0);
-    const char *iname = tolua_tostring(L, 2, 0);
-    const char *value = tolua_tostring(L, 3, 0);
-    if (iname != NULL) {
-        const struct item_type *itype = it_find(iname);
-        if (itype != NULL) {
-            equipment_setitem(get_or_create_equipment(eqname), itype, value);
-            result = 0;
-        }
-    }
-    lua_pushinteger(L, result);
-    return 1;
-}
-
 static int tolua_spawn_braineaters(lua_State * L)
 {
     float chance = (float)tolua_tonumber(L, 1, 0);
@@ -458,8 +411,7 @@ static int tolua_write_report(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     if (f) {
-        time_t ltime = time(0);
-        int result = write_reports(f, ltime);
+        int result = write_reports(f);
         lua_pushinteger(L, result);
     }
     else {
@@ -477,22 +429,17 @@ static int tolua_write_reports(lua_State * L)
     return 1;
 }
 
-static int tolua_process_orders(lua_State * L)
-{
-    UNUSED_ARG(L);
-#if 0
-    order * ord = parse_order("@GIB xmis ALLES Gurgelkraut", default_locale);
-    assert(ord);
-    free_order(ord);
-    return 0;
-#endif
-    processorders();
-    return 0;
-}
-
 static int tolua_turn_begin(lua_State * L)
 {
+    faction *f;
     UNUSED_ARG(L);
+    for (f = factions; f; f = f->next) {
+        if (f->msgs) {
+            free_messagelist(f->msgs->begin);
+            free(f->msgs);
+            f->msgs = NULL;
+        }
+    }
     turn_begin();
     return 0;
 }
@@ -509,6 +456,14 @@ static int tolua_turn_end(lua_State * L)
     UNUSED_ARG(L);
     turn_end();
     return 0;
+}
+
+static int tolua_process_orders(lua_State * L)
+{
+    UNUSED_ARG(L);
+    tolua_turn_begin(L);
+    tolua_turn_process(L);
+    return tolua_turn_end(L);
 }
 
 static int tolua_write_passwords(lua_State * L)
@@ -771,26 +726,6 @@ static int config_get_btype(lua_State * L)
                 }
                 lua_settable(L, -3);
             }
-            if (btype->construction) {
-                lua_pushstring(L, "build_skill_min");
-                lua_pushinteger(L, btype->construction->minskill);
-                lua_settable(L, -3);
-                lua_pushstring(L, "build_skill_name");
-                lua_pushstring(L, skillnames[btype->construction->skill]);
-                lua_settable(L, -3);
-                if (btype->construction->materials) {
-                    int i;
-                    lua_pushstring(L, "materials");
-                    lua_newtable(L);
-                    for (i = 0; btype->construction->materials[i].number; ++i) {
-                        lua_pushstring(L,
-                            btype->construction->materials[i].rtype->_name);
-                        lua_pushinteger(L, btype->construction->materials[i].number);
-                        lua_settable(L, -3);
-                    }
-                    lua_settable(L, -3);
-                }
-            }
             return 1;
         }
     }
@@ -881,7 +816,7 @@ static int tolua_get_spell_name(lua_State * L)
 static int tolua_get_spell_entry_name(lua_State * L)
 {
     spellbook_entry *self = (spellbook_entry*)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, self->sp->sname);
+    lua_pushstring(L, spellref_name(&self->spref));
     return 1;
 }
 
@@ -897,27 +832,10 @@ static int tolua_get_spells(lua_State * L)
     return tolua_selist_push(L, "spell_list", "spell", spells);
 }
 
-static int init_data(const char *filename, const char *catalog)
-{
-    int l;
-    l = read_xml(filename, catalog);
-    reset_locales();
-    if (l) {
-        return l;
-    }
-    if (turn <= 0) {
-        turn = first_turn();
-    }
+static int tolua_equip_newunits(lua_State * L) {
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    equip_newunits(u);
     return 0;
-}
-
-
-int tolua_read_xml(lua_State * L)
-{
-    const char *filename = tolua_tostring(L, 1, "config.xml");
-    const char *catalog = tolua_tostring(L, 2, "catalog.xml");
-    lua_pushinteger(L, init_data(filename, catalog));
-    return 1;
 }
 
 static int tolua_report_unit(lua_State * L)
@@ -925,7 +843,7 @@ static int tolua_report_unit(lua_State * L)
     char buffer[512];
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     faction *f = (faction *)tolua_tousertype(L, 2, 0);
-    bufunit(f, u, 0, seen_unit, buffer, sizeof(buffer));
+    bufunit(f, u, seen_unit, buffer, sizeof(buffer));
     tolua_pushstring(L, buffer);
     return 1;
 }
@@ -1075,8 +993,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "set_turn", &tolua_set_turn);
         tolua_function(L, TOLUA_CAST "get_turn", &tolua_get_turn);
         tolua_function(L, TOLUA_CAST "get_season", tolua_get_season);
-        tolua_function(L, TOLUA_CAST "equipment_setitem", tolua_equipment_setitem);
-        tolua_function(L, TOLUA_CAST "equip_unit", tolua_equipunit);
         tolua_function(L, TOLUA_CAST "atoi36", tolua_atoi36);
         tolua_function(L, TOLUA_CAST "itoa36", tolua_itoa36);
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
@@ -1087,12 +1003,11 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
         tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
-        tolua_function(L, TOLUA_CAST "autoseed", tolua_autoseed);
         tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
         tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
-        tolua_function(L, TOLUA_CAST "read_xml", tolua_read_xml);
+        tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);
     } tolua_endmodule(L);
     return 1;
 }

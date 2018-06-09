@@ -33,20 +33,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * simple attributes that do not yet have their own file
  */
 
-void write_of(const struct attrib *a, const void *owner, struct storage *store)
+void write_of(const variant *var, const void *owner, struct storage *store)
 {
-    const faction *f = (faction *)a->data.v;
+    const faction *f = (faction *)var->v;
     WRITE_INT(store, f->no);
 }
 
-int read_of(struct attrib *a, void *owner, gamedata *data)
+int read_of(variant *var, void *owner, gamedata *data)
 {                               /* return 1 on success, 0 if attrib needs removal */
     int of;
 
     READ_INT(data->store, &of);
     if (rule_stealth_other()) {
-        a->data.v = findfaction(of);
-        if (a->data.v) {
+        var->v = findfaction(of);
+        if (var->v) {
             return AT_READ_OK;
         }
     }

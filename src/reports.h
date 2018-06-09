@@ -60,12 +60,11 @@ extern "C" {
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
-    size_t spskill(char *pbuf, size_t siz, const struct locale *lang, const struct unit *u, struct skill *sv, int *dh, int days);  /* mapper */
     void spunit(struct strlist **SP, const struct faction *f,
         const struct unit *u, unsigned int indent, seen_mode mode);
 
     int reports(void);
-    int write_reports(struct faction *f, time_t ltime);
+    int write_reports(struct faction *f);
     int init_reports(void);
     void reorder_units(struct region * r);
 
@@ -88,8 +87,8 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit(const struct faction *f, const struct unit *u, unsigned int indent,
-        seen_mode mode, char *buf, size_t size);
+    int bufunit(const struct faction *f, const struct unit *u, seen_mode mode,
+        char *buf, size_t size);
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);
@@ -136,6 +135,7 @@ extern "C" {
     const char *get_mailcmd(const struct locale *loc);
 
     bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
+    bool see_region_details(const struct region *r);
 
 #define GR_PLURAL     0x01      /* grammar: plural */
 #define MAX_INVENTORY 128       /* maimum number of different items in an inventory */

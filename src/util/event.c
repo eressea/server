@@ -127,32 +127,32 @@ typedef struct handler_info {
     trigger *triggers;
 } handler_info;
 
-static void init_handler(attrib * a)
+static void init_handler(variant *var)
 {
-    a->data.v = calloc(sizeof(handler_info), 1);
+    var->v = calloc(sizeof(handler_info), 1);
 }
 
-static void free_handler(attrib * a)
+static void free_handler(variant *var)
 {
-    handler_info *hi = (handler_info *)a->data.v;
+    handler_info *hi = (handler_info *)var->v;
     free_triggers(hi->triggers);
     free(hi->event);
     free(hi);
 }
 
 static void
-write_handler(const attrib * a, const void *owner, struct storage *store)
+write_handler(const variant *var, const void *owner, struct storage *store)
 {
-    handler_info *hi = (handler_info *)a->data.v;
+    handler_info *hi = (handler_info *)var->v;
     WRITE_TOK(store, hi->event);
     write_triggers(store, hi->triggers);
 }
 
-static int read_handler(attrib * a, void *owner, gamedata *data)
+static int read_handler(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     char zText[128];
-    handler_info *hi = (handler_info *)a->data.v;
+    handler_info *hi = (handler_info *)var->v;
 
     READ_TOK(store, zText, sizeof(zText));
     hi->event = str_strdup(zText);

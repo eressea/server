@@ -81,58 +81,6 @@ const terrain_type *random_terrain(const terrain_type * terrains[],
     return terrain;
 }
 
-static int count_demand(const region * r)
-{
-    struct demand *dmd;
-    int c = 0;
-    if (r->land) {
-        for (dmd = r->land->demands; dmd; dmd = dmd->next)
-            c++;
-    }
-    return c;
-}
-
-static int
-recurse_regions(region * r, region_list ** rlist,
-    bool(*fun) (const region * r))
-{
-    if (!fun(r))
-        return 0;
-    else {
-        int len = 0;
-        direction_t d;
-        region_list *rl = calloc(sizeof(region_list), 1);
-        rl->next = *rlist;
-        rl->data = r;
-        (*rlist) = rl;
-        fset(r, RF_MARK);
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *nr = rconnect(r, d);
-            if (nr && !fval(nr, RF_MARK))
-                len += recurse_regions(nr, rlist, fun);
-        }
-        return len + 1;
-    }
-}
-
-static bool f_nolux(const region * r)
-{
-    return (r->land && count_demand(r) != get_maxluxuries());
-}
-
-int fix_all_demand(region *rd) {
-    region_list *rl, *rlist = NULL;
-    recurse_regions(rd, &rlist, f_nolux);
-    for (rl = rlist; rl; rl = rl->next) {
-        region *r = rl->data;
-        freset(r, RF_MARK);         /* undo recursive marker */
-        if (!fix_demand(r)) {
-            return -1;
-        }
-    }
-    return 0;
-}
-
 /* nach 150 Runden ist Neustart erlaubt */
 #define MINAGE_MULTI 150
 newfaction *read_newfactions(const char *filename)
@@ -859,9 +807,9 @@ static void smooth_island(region_list * island)
     region_list *rlist = NULL;
     for (rlist = island; rlist; rlist = rlist->next) {
         region *r = rlist->data;
-        int n, nland = 0;
 
         if (r->land) {
+            int n, nland = 0;
             get_neighbours(r, rn);
             for (n = 0; n != MAXDIRECTIONS && nland <= 1; ++n) {
                 if (rn[n]->land) {

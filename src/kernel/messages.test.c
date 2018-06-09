@@ -7,6 +7,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <assert.h>
+
 void test_missing_message(CuTest *tc) {
     message *msg;
 
@@ -22,10 +24,10 @@ void test_missing_message(CuTest *tc) {
 
 void test_message(CuTest *tc) {
     message *msg;
-    message_type *mtype = mt_new("custom", NULL);
+    message_type *mtype;
 
     test_setup();
-    mt_register(mtype);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
     CuAssertIntEquals(tc, 0, mtype->nparameters);
     CuAssertPtrEquals(tc, NULL, (void *)mtype->pnames);
@@ -47,11 +49,11 @@ void test_message(CuTest *tc) {
 static void test_merge_split(CuTest *tc) {
     message_list *mlist = 0, *append = 0;
     struct mlist **split; /* TODO: why is this a double asterisk? */
-    message_type *mtype = mt_new("custom", NULL);
+    message_type *mtype;
     message *msg;
 
     test_setup();
-    mt_register(mtype);
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
     add_message(&mlist, msg = msg_message(mtype->name, ""));
     msg_release(msg);
     add_message(&append, msg = msg_message(mtype->name, ""));
@@ -78,6 +80,7 @@ static void test_merge_split(CuTest *tc) {
 static void test_noerror(CuTest *tc) {
     unit *u;
     struct locale *lang;
+    message *msg;
 
     test_setup();
     lang = test_create_locale();
@@ -85,8 +88,10 @@ static void test_noerror(CuTest *tc) {
     u->thisorder = parse_order("!@move", lang);
     CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
     CuAssertTrue(tc, !is_persistent(u->thisorder));
-    CuAssertPtrEquals(tc, NULL, msg_error(u, u->thisorder, 100));
-    CuAssertPtrEquals(tc, NULL, msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    CuAssertPtrEquals(tc, NULL, msg = msg_error(u, u->thisorder, 100));
+    assert(!msg);
+    CuAssertPtrEquals(tc, NULL, msg = msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    assert(!msg);
     test_teardown();
 }
 

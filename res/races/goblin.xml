@@ -21,7 +21,7 @@ healing="2.0">
     <skill name="cartmaking" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="rat" default="yes"/>
+    <familiar race="rat"/>
     <familiar race="songdragon"/>
     <familiar race="imp"/>
     <familiar race="rat"/>

@@ -17,8 +17,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
+
 #include "faction.h"
+
+#include "calendar.h"
+#include "config.h"
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -234,7 +237,7 @@ faction *addfaction(const char *email, const char *password,
     if (check_email(email) == 0) {
         faction_setemail(f, email);
     } else {
-        log_warning("Invalid email address for faction %s: %s\n", itoa36(f->no), email?email:"");
+        log_info("Invalid email address for faction %s: %s\n", itoa36(f->no), email?email:"");
         faction_setemail(f, NULL);
     }
 
@@ -282,7 +285,6 @@ unit *addplayer(region * r, faction * f)
 {
     unit *u;
     const char * name;
-    const struct equipment* eq;
 
     assert(r->land);
     if (rpeasants(r) < PEASANT_MIN) {
@@ -293,10 +295,7 @@ unit *addplayer(region * r, faction * f)
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     name = config_get("rules.equip_first");
-    eq = get_equipment(name ? name  : "first_unit");
-    if (eq) {
-        equip_items(&u->items, eq);
-    }
+    equip_unit(u, name ? name : "first_unit");
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
@@ -735,7 +734,6 @@ void remove_empty_factions(void)
         faction *f = *fp;
 
         if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
-            log_debug("dead: %s", factionname(f));
             destroyfaction(fp);
         }
         else {
@@ -871,6 +869,27 @@ int writepasswd(void)
         return 0;
     }
     return 1;
+}
+
+void log_dead_factions(void)
+{
+    if (dead_factions) {
+        const char *logname = config_get("game.deadlog");
+        if (logname) {
+            FILE *F;
+            char path[PATH_MAX];
+
+            join_path(basepath(), logname, path, sizeof(path));
+            F = fopen(path, "at");
+            if (F) {
+                faction *f;
+                for (f = dead_factions; f; f = f->next) {
+                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, f->age, itoa36(f->no), f->email, f->name);
+                }
+                fclose(F);
+            }
+        }
+    }
 }
 
 void free_factions(void) {

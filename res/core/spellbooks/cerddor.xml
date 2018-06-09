@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<spellbook name="cerddor">
-    <entry spell="create_roi" level="6" />
-    <entry spell="earn_silver#cerddor" level="1" />
-    <entry spell="create_aots" level="6" />
-    <entry spell="create_roqf" level="11" />
-</spellbook>

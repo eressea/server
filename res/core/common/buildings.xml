@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <buildings>
   <building name="wormhole" maxsize="4" maxcapacity="4" nobuild="yes" nodestroy="yes" unique="yes" />
   <building name="illusioncastle" capacity="0" maxcapacity="0" maxsize="0" nobuild="yes"/>
@@ -167,4 +168,4 @@
   </building>
 
 </buildings>
-
+</eressea>

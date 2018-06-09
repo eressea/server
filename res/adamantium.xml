@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<eressea>
 <resources>
 
   <resource name="adamantium" limited="yes" material="yes">
     <item weight="200" score="200">
       <construction skill="mining" minskill="8"/>
     </item>
-      <modifier building="mine" type="skill" value="1"/>
-      <modifier type="require" building="mine"/>
+    <modifier building="mine" type="skill" value="1"/>
+    <modifier type="require" building="mine"/>
   </resource>
 
   <resource name="adamantiumaxe">
@@ -15,7 +16,7 @@
         <requirement type="adamantium" quantity="1"/>
         <requirement type="log" quantity="1"/>
       </construction>
-      <weapon cut="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
+      <weapon cut="true" magical="true" skill="melee" offmod="2" defmod="-2" magres="0.30">
         <damage type="rider" value="3d4+15"/>
         <damage type="footman" value="3d4+15"/>
       </weapon>
@@ -32,3 +33,4 @@
   </resource>
 
 </resources>
+</eressea>

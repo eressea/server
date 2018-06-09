@@ -7,6 +7,7 @@ ally.test.c
 build.test.c
 building.test.c
 # callbacks.test.c
+calendar.test.c
 command.test.c
 config.test.c
 # connection.test.c
@@ -49,6 +50,7 @@ ally.c
 build.c
 building.c
 callbacks.c
+calendar.c
 command.c
 config.c
 connection.c
@@ -67,7 +69,6 @@ pool.c
 race.c
 region.c
 resources.c
-rules.c
 save.c
 ship.c
 skills.c

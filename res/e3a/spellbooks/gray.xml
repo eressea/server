@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="gray">
     <entry spell="acidrain" level="8" />
     <entry spell="airship" level="6" />
@@ -37,7 +38,7 @@
     <entry spell="create_potion_ointment" level="6" />
     <entry spell="create_potion_p0" level="3" />
     <entry spell="create_potion_p13" level="9" />
-    <entry spell="create_potion_p14" level="8" />
+    <entry spell="create_potion_healing" level="8" />
     <entry spell="create_potion_p2" level="2" />
     <entry spell="create_potion_p3" level="7" />
     <entry spell="create_potion_p9" level="4" />
@@ -142,3 +143,4 @@
     <entry spell="wolfhowl" level="7" />
     <entry spell="wyrm_transformation" level="1" />
 </spellbook>
+</eressea>

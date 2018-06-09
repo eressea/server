@@ -11,19 +11,20 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "alliance.h"
 
-#include <attributes/key.h>
-
 /* kernel includes */
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/command.h>
+#include "calendar.h"
+#include "config.h"
+#include "building.h"
+#include "faction.h"
+#include "messages.h"
+#include "order.h"
+#include "region.h"
+#include "unit.h"
+#include "command.h"
+
+#include <attributes/key.h>
 
 /* util includes */
 #include <util/attrib.h>

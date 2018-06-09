@@ -97,8 +97,6 @@ extern "C" {
         struct border_type *next;   /* for internal use only */
     } border_type;
 
-    connection *find_border(int id);
-    int resolve_borderid(variant data, void *addr);
     void free_borders(void);
 
     void walk_connections(struct region *r, void(*cb)(struct connection *, void *), void *data);

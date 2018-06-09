@@ -17,6 +17,7 @@
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
+#include "kernel/equipment.h"
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -55,7 +56,7 @@ static int tolua_bufunit(lua_State * L) {
         if (f) {
             char buf[8192];
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
-            bufunit(f, u, 0, mode, buf, sizeof(buf));
+            bufunit(f, u, mode, buf, sizeof(buf));
             tolua_pushstring(L, buf);
             return 1;
         }
@@ -962,6 +963,16 @@ static int tolua_event_get(lua_State * L)
     return 0;
 }
 
+static int tolua_equipunit(lua_State * L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    const char *eqname = tolua_tostring(L, 2, 0);
+    int mask = (int)tolua_tonumber(L, 3, EQUIP_ALL);
+    assert(u && mask > 0);
+    equip_unit_mask(u, eqname, mask);
+    return 0;
+}
+
 void tolua_unit_open(lua_State * L)
 {
     /* register user types */
@@ -1062,6 +1073,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "hp_max", tolua_unit_get_hpmax, 0);
             tolua_variable(L, TOLUA_CAST "aura_max", tolua_unit_get_auramax, 0);
 
+            tolua_function(L, TOLUA_CAST "equip", tolua_equipunit);
             tolua_function(L, TOLUA_CAST "show", tolua_bufunit);
         }
         tolua_endmodule(L);

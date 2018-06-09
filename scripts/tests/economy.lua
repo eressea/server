@@ -9,6 +9,22 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
+    eressea.settings.set("rules.peasants.growth.factor", "0")
+end
+
+function test_work()
+    local r = region.create(0, 0, "plain")
+    r:set_resource('tree', 0)
+    r:set_resource('seed', 0)
+    r:set_resource('sapling', 0)
+    r:set_resource('peasant', 100)
+    r:set_resource('money', 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("ARBEITE")
+    process_orders()
+    assert_equal(10, u:get_item('money'))
+    assert_equal(100, r:get_resource('money'))
 end
 
 function test_bug_2361_forget_magic()

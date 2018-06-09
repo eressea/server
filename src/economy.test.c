@@ -85,13 +85,15 @@ static void test_steal_okay(CuTest * tc) {
     struct steal env;
     race *rc;
     struct terrain_type *ter;
+    message *msg;
 
     test_setup();
     ter = test_create_terrain("plain", LAND_REGION);
     rc = test_create_race("human");
     rc->flags = 0;
     setup_steal(&env, ter, rc);
-    CuAssertPtrEquals(tc, 0, steal_message(env.u, 0));
+    CuAssertPtrEquals(tc, NULL, msg = steal_message(env.u, 0));
+    assert(!msg);
     test_teardown();
 }
 
@@ -143,10 +145,10 @@ static struct unit *create_recruiter(void) {
 
 static void setup_production(void) {
     init_resources();
-    mt_register(mt_new_va("produce", "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END));
-    mt_register(mt_new_va("income", "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END));
-    mt_register(mt_new_va("buy", "unit:unit", "money:int", MT_NEW_END));
-    mt_register(mt_new_va("buyamount", "unit:unit", "amount:int", "resource:resource", MT_NEW_END));
+    mt_create_va(mt_new("produce", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END);
+    mt_create_va(mt_new("income", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END);
+    mt_create_va(mt_new("buy", NULL), "unit:unit", "money:int", MT_NEW_END);
+    mt_create_va(mt_new("buyamount", NULL), "unit:unit", "amount:int", "resource:resource", MT_NEW_END);
 }
 
 static void test_heroes_dont_recruit(CuTest * tc) {
@@ -250,10 +252,11 @@ static void test_trade_insect(CuTest *tc) {
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
 
-    set_item(u, it_silver, 10);
+    test_set_item(u, it_silver, 10);
     CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
     produce(u->region);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 5, get_item(u, it_silver));
 
@@ -282,7 +285,7 @@ static void test_buy_cmd(CuTest *tc) {
 
     u = test_create_unit(test_create_faction(NULL), r);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
-    set_item(u, rt_silver->itype, 1000);
+    test_set_item(u, rt_silver->itype, 1000);
 
     produce(r);
     CuAssertPtrNotNullMsg(tc, "trading requires a castle", test_find_messagetype(u->faction->msgs, "error119"));
@@ -377,11 +380,11 @@ static void test_tax_cmd(CuTest *tc) {
 }
 
 static void setup_economy(void) {
-    mt_register(mt_new_va("recruit", "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END));
-    mt_register(mt_new_va("maintenance", "unit:unit", "building:building", MT_NEW_END));
-    mt_register(mt_new_va("maintenancefail", "unit:unit", "building:building", MT_NEW_END));
-    mt_register(mt_new_va("maintenance_nowork", "building:building", MT_NEW_END));
-    mt_register(mt_new_va("maintenance_noowner", "building:building", MT_NEW_END));
+    mt_create_va(mt_new("recruit", NULL), "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END);
+    mt_create_va(mt_new("maintenance", NULL), "unit:unit", "building:building", MT_NEW_END);
+    mt_create_va(mt_new("maintenancefail", NULL), "unit:unit", "building:building", MT_NEW_END);
+    mt_create_va(mt_new("maintenance_nowork", NULL), "building:building", MT_NEW_END);
+    mt_create_va(mt_new("maintenance_noowner", NULL), "building:building", MT_NEW_END);
 }
 
 /** 
@@ -508,7 +511,7 @@ static void test_modify_material(CuTest *tc) {
     mod = rtype->modifiers = calloc(2, sizeof(resource_mod));
     mod[0].type = RMT_USE_SAVE;
     mod[0].value = frac_make(2, 1);
-    mod[0].race = u_race(u);
+    mod[0].race_mask = rc_mask(u_race(u));
 
     itype = test_create_itemtype("sword");
     make_item(u, itype, 1);
@@ -524,13 +527,13 @@ static void test_modify_material(CuTest *tc) {
     itype->construction->materials[0].rtype = rtype;
     itype->construction->materials[0].number = 2;
 
-    set_item(u, rtype->itype, 1); /* 1 iron should get us 1 sword */
+    test_set_item(u, rtype->itype, 1); /* 1 iron should get us 1 sword */
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 1, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
     u_setrace(u, test_create_race("smurf"));
-    set_item(u, rtype->itype, 2); /* 2 iron should be required now */
+    test_set_item(u, rtype->itype, 2); /* 2 iron should be required now */
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 2, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
@@ -573,22 +576,22 @@ static void test_modify_skill(CuTest *tc) {
     mod[0].type = RMT_PROD_SKILL;
     mod[0].value.sa[0] = SK_WEAPONSMITH;
     mod[0].value.sa[1] = 1;
-    mod[0].race = u_race(u);
+    mod[0].race_mask = rc_mask(u_race(u));
 
-    set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
+    test_set_item(u, rtype->itype, 2); /* 2 iron should get us 2 swords */
     make_item(u, itype, 2);
     CuAssertIntEquals(tc, 2, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
     mod[0].value.sa[0] = NOSKILL; /* match any skill */
-    set_item(u, rtype->itype, 2);
+    test_set_item(u, rtype->itype, 2);
     make_item(u, itype, 2);
     CuAssertIntEquals(tc, 4, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rtype->itype));
 
 
     u_setrace(u, test_create_race("smurf"));
-    set_item(u, rtype->itype, 2);
+    test_set_item(u, rtype->itype, 2);
     make_item(u, itype, 1); /* only enough skill to make 1 now */
     CuAssertIntEquals(tc, 5, get_item(u, itype));
     CuAssertIntEquals(tc, 1, get_item(u, rtype->itype));
@@ -625,7 +628,7 @@ static void test_modify_production(CuTest *tc) {
     itype->construction->materials[0].rtype = rt_silver;
     itype->construction->materials[0].number = 1;
     set_level(u, SK_ALCHEMY, 1);
-    set_item(u, rt_silver->itype, 1);
+    test_set_item(u, rt_silver->itype, 1);
     make_item(u, itype, 1);
     CuAssertIntEquals(tc, 1, get_item(u, itype));
     CuAssertIntEquals(tc, 0, get_item(u, rt_silver->itype));
@@ -646,7 +649,7 @@ static void test_modify_production(CuTest *tc) {
 
     rtype->modifiers = calloc(3, sizeof(resource_mod));
     rtype->modifiers[0].type = RMT_PROD_SAVE;
-    rtype->modifiers[0].race = u->_race;
+    rtype->modifiers[0].race_mask = rc_mask(u->_race);
     rtype->modifiers[0].value.sa[0] = (short)(0.5+100*d);
     rtype->modifiers[0].value.sa[1] = 100;
     rtype->modifiers[1].type = RMT_END;
@@ -667,7 +670,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertIntEquals(tc, 280, region_getresource(u->region, rtype)); /* 50% saving = 3 stones make 6 stones */
 
     rtype->modifiers[0].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[0].race = NULL;
+    rtype->modifiers[0].race_mask = 0;
     rtype->modifiers[0].btype = bt_get_or_create("mine");
 
     test_clear_messages(u->faction);
@@ -676,7 +679,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "building_needed"));
 
     rtype->modifiers[0].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[0].race = test_create_race("smurf");
+    rtype->modifiers[0].race_mask = rc_mask(test_create_race("smurf"));
     rtype->modifiers[0].btype = NULL;
 
     test_clear_messages(u->faction);
@@ -685,7 +688,7 @@ static void test_modify_production(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error117"));
 
     rtype->modifiers[1].type = RMT_PROD_REQUIRE;
-    rtype->modifiers[1].race = u_race(u);
+    rtype->modifiers[1].race_mask = rc_mask(u_race(u));
     rtype->modifiers[1].btype = NULL;
     rtype->modifiers[2].type = RMT_END;
 
@@ -738,6 +741,7 @@ static void test_expand_production(CuTest *tc) {
     CuAssertPtrEquals(tc, u, results[0]->unit);
     CuAssertPtrEquals(tc, u, results[1]->unit);
     CuAssertIntEquals(tc, 0, u->n);
+    free(results);
     test_teardown();
 }
 

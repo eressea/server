@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<spellbook name="gwyrrd">
-    <entry spell="create_roi" level="6" />
-    <entry spell="earn_silver#gwyrrd" level="1" />
-    <entry spell="create_aots" level="6" />
-    <entry spell="create_magicherbbag" level="5" />
-</spellbook>

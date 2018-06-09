@@ -19,6 +19,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_CALLBACKS_H
 #define H_KRNL_CALLBACKS_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +33,7 @@ extern "C" {
     struct resource_type;
 
     struct callback_struct {
+        bool (*equip_unit)(struct unit *u, const char *eqname, int mask);
         int (*cast_spell)(struct castorder *co, const char *fname);
         int (*use_item)(struct unit *u, const struct item_type *itype,
             int amount, struct order *ord);

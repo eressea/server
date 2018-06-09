@@ -129,72 +129,6 @@ void herbsearch(unit * u, int max_take)
     }
 }
 
-static int begin_potion(unit * u, const item_type * itype, struct order *ord)
-{
-    static int config;
-    static bool rule_multipotion;
-
-    assert(itype);
-    if (config_changed(&config)) {
-        /* should we allow multiple different potions to be used the same turn? */
-        rule_multipotion = config_get_int("rules.magic.multipotion", 0) != 0;
-    }
-
-    if (!rule_multipotion) {
-        const item_type *use = ugetpotionuse(u);
-        if (use != NULL && use != itype) {
-            ADDMSG(&u->faction->msgs,
-                msg_message("errusingpotion", "unit using command",
-                u, use->rtype, ord));
-            return ECUSTOM;
-        }
-    }
-    return 0;
-}
-
-static void end_potion(unit * u, const item_type * itype, int amount)
-{
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(u, itype);
-
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-}
-
-static int potion_water_of_life(unit * u, region *r, int amount) {
-    static int config;
-    static int tree_type, tree_count;
-    int wood = 0;
-
-    if (config_changed(&config)) {
-        tree_type = config_get_int("rules.magic.wol_type", 1);
-        tree_count = config_get_int("rules.magic.wol_effect", 10);
-    }
-    /* mallorn is required to make mallorn forests, wood for regular ones */
-    if (fval(r, RF_MALLORN)) {
-        wood = use_pooled(u, rt_find("mallorn"),
-            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
-    }
-    else {
-        wood = use_pooled(u, rt_find("log"),
-            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, tree_count * amount);
-    }
-    if (r->land == 0)
-        wood = 0;
-    if (wood < tree_count * amount) {
-        int x = wood / tree_count;
-        if (wood % tree_count)
-            ++x;
-        if (x < amount)
-            amount = x;
-    }
-    rsettrees(r, tree_type, rtrees(r, tree_type) + wood);
-    ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
-        "mage amount", u, wood));
-    return amount;
-}
-
 void show_potions(faction *f, int sklevel)
 {
     const potion_type *ptype;
@@ -211,13 +145,6 @@ void show_potions(faction *f, int sklevel)
     }
 }
 
-static int potion_healing(unit * u, int amount) {
-    int maxhp = unit_max_hp(u) * u->number;
-    u->hp = u->hp + 400 * amount;
-    if (u->hp > maxhp) u->hp = maxhp;
-    return amount;
-}
-
 static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     attrib *a = (attrib *)a_find(r->attribs, atype);
     UNUSED_ARG(u);
@@ -228,140 +155,50 @@ static int potion_luck(unit *u, region *r, attrib_type *atype, int amount) {
     return amount;
 }
 
-static int potion_power(unit *u, int amount) {
-    int hp = 10 * amount;
-
-    if (hp > u->number) {
-        hp = u->number;
-        amount = (hp + 9) % 10;
-    }
-    u->hp += hp * unit_max_hp(u) * 4;
-    return amount;
-}
-
-static int do_potion(unit * u, region *r, const item_type * itype, int amount)
+int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 {
-    if (itype == oldpotiontype[P_LIFE]) {
-        return potion_water_of_life(u, r, amount);
-    }
-    else if (itype == oldpotiontype[P_HEILWASSER]) {
-        return potion_healing(u, amount);
-    }
-    else if (itype == oldpotiontype[P_PEOPLE]) {
-        return potion_luck(u, r, &at_peasantluck, amount);
+    region *r = u->region;
+
+    if (itype == oldpotiontype[P_PEOPLE]) {
+        amount = potion_luck(u, r, &at_peasantluck, amount);
     }
     else if (itype == oldpotiontype[P_HORSE]) {
-        return potion_luck(u, r, &at_horseluck, amount);
-    }
-    else if (itype == oldpotiontype[P_MACHT]) {
-        return potion_power(u, amount);
+        amount = potion_luck(u, r, &at_horseluck, amount);
     }
     else {
         change_effect(u, itype, 10 * amount);
     }
+    if (amount > 0) {
+        ADDMSG(&u->faction->msgs, msg_message("use_item",
+            "unit amount item", u, amount, itype->rtype));
+    }
     return amount;
-}
-
-int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
-{
-    if (oldpotiontype[P_HEAL] && itype == oldpotiontype[P_HEAL]) {
-        return EUNUSABLE;
-    }
-    else {
-        int result = begin_potion(u, itype, ord);
-        if (result)
-            return result;
-        amount = do_potion(u, u->region, itype, amount);
-        end_potion(u, itype, amount);
-    }
-    return 0;
-}
-
-typedef struct potiondelay {
-    unit *u;
-    region *r;
-    const item_type *itype;
-    int amount;
-} potiondelay;
-
-static void init_potiondelay(attrib * a)
-{
-    a->data.v = malloc(sizeof(potiondelay));
-}
-
-static void free_potiondelay(attrib * a) {
-    free(a->data.v);
-}
-
-static int age_potiondelay(attrib * a, void *owner)
-{
-    potiondelay *pd = (potiondelay *)a->data.v;
-    UNUSED_ARG(owner);
-    pd->amount = do_potion(pd->u, pd->r, pd->itype, pd->amount);
-    return AT_AGE_REMOVE;
-}
-
-attrib_type at_potiondelay = {
-    "potiondelay",
-    init_potiondelay,
-    free_potiondelay,
-    age_potiondelay, 0, 0
-};
-
-static attrib *make_potiondelay(unit * u, const item_type * itype, int amount)
-{
-    attrib *a = a_new(&at_potiondelay);
-    potiondelay *pd = (potiondelay *)a->data.v;
-    pd->u = u;
-    pd->r = u->region;
-    pd->itype = itype;
-    pd->amount = amount;
-    return a;
-}
-
-int
-use_potion_delayed(unit * u, const item_type * itype, int amount,
-struct order *ord)
-{
-    int result = begin_potion(u, itype, ord);
-    if (result)
-        return result;
-
-    a_add(&u->attribs, make_potiondelay(u, itype, amount));
-
-    end_potion(u, itype, amount);
-    return 0;
 }
 
 /*****************/
 /*   at_effect   */
 /*****************/
 
-static void a_initeffect(attrib * a)
+static void a_initeffect(variant *var)
 {
-    a->data.v = calloc(sizeof(effect_data), 1);
-}
-
-static void a_finalizeeffect(attrib * a) /*-V524 */
-{
-    free(a->data.v);
+    var->v = calloc(sizeof(effect_data), 1);
 }
 
 static void
-a_writeeffect(const attrib * a, const void *owner, struct storage *store)
+a_writeeffect(const variant *var, const void *owner, struct storage *store)
 {
-    effect_data *edata = (effect_data *)a->data.v;
+    effect_data *edata = (effect_data *)var->v;
     UNUSED_ARG(owner);
     WRITE_TOK(store, resourcename(edata->type->rtype, 0));
     WRITE_INT(store, edata->value);
 }
 
-static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
+static int a_readeffect(variant *var, void *owner, struct gamedata *data)
 {
     struct storage *store = data->store;
     int power;
     const resource_type *rtype;
-    effect_data *edata = (effect_data *)a->data.v;
+    effect_data *edata = (effect_data *)var->v;
     char zText[32];
 
     UNUSED_ARG(owner);
@@ -386,7 +223,7 @@ static int a_readeffect(attrib * a, void *owner, struct gamedata *data)
 attrib_type at_effect = {
     "effect",
     a_initeffect,
-    a_finalizeeffect,
+    a_free_voidptr,
     DEFAULT_AGE,
     a_writeeffect,
     a_readeffect,

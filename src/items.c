@@ -16,6 +16,7 @@
 #include <spells/regioncurse.h>
 
 #include <kernel/curse.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -223,7 +224,7 @@ int amount, struct order *ord)
 
     change_spellpoints(u, 50);
 
-    ADDMSG(&u->faction->msgs, msg_message("aurapotion50",
+    ADDMSG(&u->faction->msgs, msg_message("aurapotion50_effect",
         "unit region command", u, u->region, ord));
 
     use_pooled(u, itype->rtype, GET_DEFAULT, 1);
@@ -303,43 +304,9 @@ struct order *ord)
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
         amount);
-    usetpotionuse(u, itype);
 
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
-    return 0;
-}
-
-static int heal(unit * user, int effect)
-{
-    int req = unit_max_hp(user) * user->number - user->hp;
-    if (req > 0) {
-        if (req > effect) req = effect;
-        effect -= req;
-        user->hp += req;
-    }
-    return effect;
-}
-
-static int
-use_healingpotion(struct unit *user, const struct item_type *itype, int amount,
-struct order *ord)
-{
-    int effect = amount * 400;
-    unit *u = user->region->units;
-    effect = heal(user, effect);
-    while (effect > 0 && u != NULL) {
-        if (u->faction == user->faction) {
-            effect = heal(u, effect);
-        }
-        u = u->next;
-    }
-    use_pooled(user, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(user, itype);
-
-    ADDMSG(&user->faction->msgs, msg_message("usepotion",
-        "unit potion", user, itype->rtype));
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
     return 0;
 }
 
@@ -401,18 +368,120 @@ static int use_warmthpotion(unit *u, const item_type *itype,
         cmistake(u, ord, 163, MSG_EVENT);
         return ECUSTOM;
     }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
-        amount);
-    usetpotionuse(u, itype);
+    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
 
-    ADDMSG(&u->faction->msgs, msg_message("usepotion",
-        "unit potion", u, itype->rtype));
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
     return 0;
+}
+
+static int potion_water_of_life(unit * u, region *r, int amount) {
+    static int config;
+    static int tree_type, tree_count;
+    int wood = 0;
+
+    if (config_changed(&config)) {
+        tree_type = config_get_int("rules.magic.wol_type", 1);
+        tree_count = config_get_int("rules.magic.wol_effect", 10);
+    }
+    /* mallorn is required to make mallorn forests, wood for regular ones */
+    if (fval(r, RF_MALLORN)) {
+        wood = use_pooled(u, rt_find("mallorn"), GET_DEFAULT, tree_count * amount);
+    }
+    else {
+        wood = use_pooled(u, rt_find("log"), GET_DEFAULT, tree_count * amount);
+    }
+    if (r->land == 0)
+        wood = 0;
+    if (wood < tree_count * amount) {
+        int x = wood / tree_count;
+        if (wood % tree_count)
+            ++x;
+        if (x < amount)
+            amount = x;
+    }
+    rsettrees(r, tree_type, rtrees(r, tree_type) + wood);
+    ADDMSG(&u->faction->msgs, msg_message("growtree_effect",
+        "mage amount", u, wood));
+    return amount;
+}
+
+static int use_water_of_life(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    return potion_water_of_life(u, u->region, amount);
+}
+
+static int heal(unit * user, int effect)
+{
+    int req = unit_max_hp(user) * user->number - user->hp;
+    if (req > 0) {
+        if (req > effect) req = effect;
+        effect -= req;
+        user->hp += req;
+    }
+    return effect;
+}
+
+static int potion_healing(struct unit *user, int amount)
+{
+    int effect = amount * 400;
+    unit *u = user->region->units;
+    effect = heal(u, effect);
+    while (effect > 0 && u != NULL) {
+        if (u->faction == user->faction) {
+            effect = heal(u, effect);
+        }
+        u = u->next;
+    }
+    return amount;
+}
+
+static int use_healing_potion(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_healing(u, amount);
+}
+
+static int potion_ointment(unit * u, int amount) {
+    int effect = amount * 400;
+    effect = heal(u, effect);
+    return amount;
+}
+
+static int use_ointment(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_ointment(u, amount);
+}
+
+static int potion_power(unit *u, int amount) {
+    int hp = 10 * amount;
+
+    if (hp > u->number) {
+        hp = u->number;
+        amount = (hp + 9) % 10;
+    }
+    u->hp += hp * unit_max_hp(u) * 4;
+    return amount;
+}
+
+static int use_power_elixir(unit *u, const item_type *itype,
+    int amount, struct order *ord)
+{
+    ADDMSG(&u->faction->msgs, msg_message("use_item",
+        "unit amount item", u, amount, itype->rtype));
+    return potion_power(u, amount);
 }
 
 void register_itemfunctions(void)
 {
     /* have tests: */
+    register_item_use(use_water_of_life, "use_lifepotion");
     register_item_use(use_mistletoe, "use_mistletoe");
     register_item_use(use_tacticcrystal, "use_dreameye");
     register_item_use(use_studypotion, "use_studypotion");
@@ -423,9 +492,8 @@ void register_itemfunctions(void)
     register_item_use(use_birthdayamulet, "use_aoc");
     register_item_use(use_foolpotion, "use_p7");
     register_item_use(use_bloodpotion, "use_peasantblood");
-    register_item_use(use_healingpotion, "use_ointment");
+    register_item_use(use_ointment, "use_ointment");
+    register_item_use(use_healing_potion, "use_healing");
+    register_item_use(use_power_elixir, "use_p13");
     register_item_use(use_warmthpotion, "use_nestwarmth");
-
-    /* ungetestet: Wasser des Lebens */
-    register_item_use(use_potion_delayed, "use_p2");
 }

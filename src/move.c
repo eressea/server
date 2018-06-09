@@ -20,7 +20,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
+
+/* kernel includes */
+#include "kernel/ally.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/connection.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/render.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
+
 #include "move.h"
 #include "guard.h"
 #include "laws.h"
@@ -44,28 +65,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/stealth.h>
 #include <attributes/targetregion.h>
 
-/* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/connection.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/render.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
-
 #include "teleport.h"
 #include "direction.h"
-#include "calendar.h"
 #include "skill.h"
 
 /* util includes */
@@ -138,14 +139,9 @@ get_followers(unit * target, region * r, const region_list * route_end,
     }
 }
 
-static void shiptrail_init(attrib * a)
+static void shiptrail_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(traveldir));
-}
-
-static void shiptrail_finalize(attrib * a)
-{
-    free(a->data.v);
+    var->v = calloc(1, sizeof(traveldir));
 }
 
 static int shiptrail_age(attrib * a, void *owner)
@@ -157,11 +153,11 @@ static int shiptrail_age(attrib * a, void *owner)
     return (t->age > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
+static int shiptrail_read(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
     int n;
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     READ_INT(store, &t->no);
@@ -172,9 +168,9 @@ static int shiptrail_read(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-shiptrail_write(const attrib * a, const void *owner, struct storage *store)
+shiptrail_write(const variant *var, const void *owner, struct storage *store)
 {
-    traveldir *t = (traveldir *)(a->data.v);
+    traveldir *t = (traveldir *)var->v;
 
     UNUSED_ARG(owner);
     WRITE_INT(store, t->no);
@@ -185,7 +181,7 @@ shiptrail_write(const attrib * a, const void *owner, struct storage *store)
 attrib_type at_shiptrail = {
     "traveldir_new",
     shiptrail_init,
-    shiptrail_finalize,
+    a_free_voidptr,
     shiptrail_age,
     shiptrail_write,
     shiptrail_read
@@ -289,7 +285,7 @@ static int ridingcapacity(const unit * u)
 int walkingcapacity(const struct unit *u)
 {
     int n, people, pferde_fuer_wagen, horses;
-    int wagen_ohne_pferde, wagen_mit_pferden, wagen_mit_trollen;
+    int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
     const struct resource_type *rhorse = rt_find("horse");
@@ -317,17 +313,19 @@ int walkingcapacity(const struct unit *u)
     n = wagen_mit_pferden * vcap;
 
     if (u_race(u) == get_race(RC_TROLL)) {
+        int wagen_ohne_pferde, wagen_mit_trollen;
         /* 4 Trolle ziehen einen Wagen. */
         /* Unbesetzte Wagen feststellen */
         wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
         /* Genug Trolle, um die Restwagen zu ziehen? */
         wagen_mit_trollen = u->number / 4;
-        if (wagen_mit_trollen > wagen_ohne_pferde) wagen_mit_trollen = wagen_ohne_pferde;
+        if (wagen_mit_trollen > wagen_ohne_pferde) {
+            wagen_mit_trollen = wagen_ohne_pferde;
+        }
 
         /* Wagenkapazität hinzuzählen */
         n += wagen_mit_trollen * vcap;
-        wagen_ohne_pferde -= wagen_mit_trollen;
     }
 
     n += animals * acap;
@@ -482,10 +480,6 @@ static bool cansail(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
 
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
-
     if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
         return false;
     }
@@ -507,10 +501,6 @@ static bool cansail(const region * r, ship * sh)
 static double overload(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
-
-    /* sonst ist construction:: size nicht ship_type::maxsize */
-    assert(!sh->type->construction
-        || sh->type->construction->improvement == NULL);
 
     if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
         return DBL_MAX;
@@ -687,7 +677,6 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    int c = 0;
     const building_type *bt_harbour = bt_find("harbour");
 
     if (sh->region && r_insectstalled(r)) {
@@ -712,6 +701,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         return SA_COAST;
     }
     if (sh->type->coasts) {
+        int c;
         for (c = 0; sh->type->coasts[c] != NULL; ++c) {
             if (sh->type->coasts[c] == r->terrain) {
                 return SA_COAST;
@@ -850,7 +840,6 @@ static void drifting_ships(region * r)
             /* Kapitän da? Beschädigt? Genügend Matrosen?
              * Genügend leicht? Dann ist alles OK. */
 
-            assert(sh->type->construction->improvement == NULL); /* sonst ist construction::size nicht ship_type::maxsize */
             if (captain && sh->size == sh->type->construction->maxsize
                 && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
@@ -1055,7 +1044,7 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
     return E_MOVE_OK;
 }
 
-static void cycle_route(order * ord, unit * u, int gereist)
+order * cycle_route(order * ord, const struct locale *lang, int gereist)
 {
     int cm = 0;
     char tail[1024], *bufp = tail;
@@ -1070,11 +1059,10 @@ static void cycle_route(order * ord, unit * u, int gereist)
     assert(getkeyword(ord) == K_ROUTE);
     tail[0] = '\0';
     neworder[0] = '\0';
-    init_order(ord, u->faction->locale);
+    init_order(ord, lang);
 
     for (cm = 0;; ++cm) {
         const char *s;
-        const struct locale *lang = u->faction->locale;
         pause = false;
         s = gettoken(token, sizeof(token));
         if (s && *s) {
@@ -1090,7 +1078,7 @@ static void cycle_route(order * ord, unit * u, int gereist)
             break;
         }
         if (cm < gereist) {
-            /* hier sollte keine PAUSE auftreten */
+            /* TODO: hier sollte keine PAUSE auftreten */
             assert(!pause);
             if (!pause) {
                 const char *loc = LOC(lang, shortdirections[d]);
@@ -1127,13 +1115,30 @@ static void cycle_route(order * ord, unit * u, int gereist)
     }
 
     if (neworder[0]) {
-        norder = create_order(K_ROUTE, u->faction->locale, "%s %s", neworder, tail);
+        norder = create_order(K_ROUTE, lang, "%s %s", neworder, tail);
     }
     else {
-        norder = create_order(K_ROUTE, u->faction->locale, "%s", tail);
+        norder = create_order(K_ROUTE, lang, "%s", tail);
     }
-    replace_order(&u->orders, ord, norder);
-    free_order(norder);
+    return norder;
+}
+
+order * make_movement_order(const struct locale *lang, direction_t steps[], int length)
+{
+    sbstring sbs;
+    char zOrder[128];
+    int i;
+
+    sbs_init(&sbs, zOrder, sizeof(zOrder));
+    for (i = 0; i != length; ++i) {
+        direction_t dir = steps[i];
+        if (i > 0) {
+            sbs_strcat(&sbs, " ");
+        }
+        sbs_strcat(&sbs, LOC(lang, directions[dir]));
+    }
+
+    return create_order(K_MOVE, lang, zOrder);
 }
 
 static bool transport(unit * ut, unit * u)
@@ -1608,7 +1613,9 @@ static const region_list *travel_route(unit * u,
 
         setguard(u, false);
         if (getkeyword(ord) == K_ROUTE) {
-            cycle_route(ord, u, steps);
+            order * norder = cycle_route(ord, u->faction->locale, steps);
+            replace_order(&u->orders, ord, norder);
+            free_order(norder);
         }
 
         if (mode == TRAVEL_RUNNING) {
@@ -1654,7 +1661,6 @@ static bool ship_ready(const region * r, unit * u, order * ord)
         return false;
     }
     if (u->ship->type->construction) {
-        assert(!u->ship->type->construction->improvement);     /* sonst ist construction::size nicht ship_type::maxsize */
         if (u->ship->size != u->ship->type->construction->maxsize) {
             cmistake(u, ord, 15, MSG_MOVE);
             return false;
@@ -1940,7 +1946,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl gelöscht werden. */
         if (getkeyword(ord) == K_ROUTE) {
-            cycle_route(ord, u, step);
+            order * norder = cycle_route(ord, u->faction->locale, step);
+            replace_order(&u->orders, ord, norder);
+            free_order(norder);
         }
         set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
@@ -2013,17 +2021,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
 *
 * the token parser needs to be initialized before calling this function!
 */
-
-/** fleeing units use this function
-*/
-void run_to(unit * u, region * to)
-{
-    region_list *route = NULL;
-    add_regionlist(&route, to);
-    travel_route(u, route, NULL, NULL, TRAVEL_RUNNING);
-    free_regionlist(route);
-    /* weder transport noch follow */
-}
 
 static const region_list *travel_i(unit * u, const region_list * route_begin,
     const region_list * route_end, order * ord, int mode, follower ** followers)

@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="tybied">
   <entry spell="auratransfer" level="5" />
   <entry spell="antimagiczone" level="5" />
@@ -34,3 +35,4 @@
   <entry spell="create_rop" level="9" />
   <entry spell="create_bagofholding" level="10" />
 </spellbook>
+</eressea>

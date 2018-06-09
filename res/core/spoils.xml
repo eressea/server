@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea>
 <resources>
 
   <resource name="elfspoil">
@@ -57,3 +58,4 @@
   </resource>
 
 </resources>
+</eressea>

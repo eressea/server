@@ -232,7 +232,7 @@ static message *cinfo_sparkle(const void *obj, objtype_t typ, const curse * c,
         "sparkle_18",
         NULL,                       /* end draig */
     };
-    int m, begin = 0, end = 0;
+    int m, begin = 0, handle_end = 0;
     unit *u;
     UNUSED_ARG(typ);
 
@@ -243,18 +243,18 @@ static message *cinfo_sparkle(const void *obj, objtype_t typ, const curse * c,
         return NULL;
 
     for (m = 0; m != c->magician->faction->magiegebiet; ++m) {
-        while (effects[end] != NULL)
-            ++end;
-        begin = end + 1;
-        end = begin;
+        while (effects[handle_end] != NULL)
+            ++handle_end;
+        begin = handle_end + 1;
+        handle_end = begin;
     }
 
-    while (effects[end] != NULL)
-        ++end;
-    if (end == begin)
+    while (effects[handle_end] != NULL)
+        ++handle_end;
+    if (handle_end == begin)
         return NULL;
     else {
-        int index = begin + curse_geteffect_int(c) % (end - begin);
+        int index = begin + curse_geteffect_int(c) % (handle_end - begin);
         return msg_message(mkname("curseinfo", effects[index]), "unit id", u,
             c->no);
     }

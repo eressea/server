@@ -102,9 +102,9 @@ static void cunhash(curse * c)
 
 /* ------------------------------------------------------------- */
 /* at_curse */
-void curse_init(attrib * a)
+void curse_init(variant *var)
 {
-    a->data.v = calloc(1, sizeof(curse));
+    var->v = calloc(1, sizeof(curse));
 }
 
 int curse_age(attrib * a, void *owner)
@@ -133,9 +133,9 @@ void destroy_curse(curse * c)
     free(c);
 }
 
-void curse_done(attrib * a)
+void curse_done(variant * var)
 {
-    destroy_curse((curse *)a->data.v);
+    destroy_curse((curse *)var->v);
 }
 
 /** reads curses that have been removed from the code */
@@ -177,10 +177,10 @@ static int read_ccompat(const char *cursename, struct storage *store)
     return -1;
 }
 
-int curse_read(attrib * a, void *owner, gamedata *data)
+int curse_read(variant *var, void *owner, gamedata *data)
 {
     storage *store = data->store;
-    curse *c = (curse *)a->data.v;
+    curse *c = (curse *)var->v;
     int ur;
     char cursename[64];
     int n;
@@ -238,9 +238,9 @@ int curse_read(attrib * a, void *owner, gamedata *data)
     return AT_READ_OK;
 }
 
-void curse_write(const attrib * a, const void *owner, struct storage *store)
+void curse_write(const variant * var, const void *owner, struct storage *store)
 {
-    curse *c = (curse *)a->data.v;
+    curse *c = (curse *)var->v;
     const curse_type *ct = c->type;
     unit *mage = (c->magician && c->magician->number) ? c->magician : NULL;
 

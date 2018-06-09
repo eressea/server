@@ -16,7 +16,7 @@
 #include "summary.h"
 #include "laws.h"
 #include "monsters.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
@@ -178,9 +178,14 @@ static int count_umlaut(const char *s)
         ucs4_t ucs = *cp;
         if (ucs & 0x80) {
             size_t size;
-            ++result;
-            unicode_utf8_to_ucs4(&ucs, cp, &size);
+            int err;
+            err = unicode_utf8_to_ucs4(&ucs, cp, &size);
+            if (err != 0) {
+                log_error("illegal utf8 encoding %s at %s", s, cp);
+                return result;
+            }
             cp += size;
+            ++result;
         }
     }
     return result;

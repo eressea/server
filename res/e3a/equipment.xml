@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<equipment>
-
-  <set name="spo_seaserpent">
-    <item name="dragonblood" amount="2"/>
-    <item name="seaserpenthead" amount="1"/>
-  </set>
-
-</equipment>

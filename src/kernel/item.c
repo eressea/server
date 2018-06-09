@@ -206,11 +206,13 @@ resource_type *rt_get_or_create(const char *name) {
 
 static const char *it_aliases[][2] = {
     { "Runenschwert", "runesword" },
-    { "p12", "truthpotion" },
     { "p1", "goliathwater" },
+    { "p2", "lifepotion" },
     { "p4", "ointment" },
     { "p5", "peasantblood" },
     { "p8", "nestwarmth" },
+    { "p14", "healing" },
+    { "p12", "truthpotion" },
     { "diamond", "adamantium" },
     { "diamondaxe", "adamantiumaxe" },
     { "diamondplate", "adamantiumplate" },
@@ -225,28 +227,32 @@ static const char *it_alias(const char *zname)
         if (strcmp(it_aliases[i][0], zname) == 0)
             return it_aliases[i][1];
     }
-    return zname;
+    return NULL;
 }
 
 item_type *it_find(const char *zname)
 {
-    const char *name = it_alias(zname);
-    resource_type *result = rt_find(name);
+    resource_type *result = rt_find(zname);
+    if (!result) {
+        const char *name = it_alias(zname);
+        if (name) {
+            result = rt_find(name);
+        }
+    }
     return result ? result->itype : 0;
 }
 
 item_type *it_get_or_create(resource_type *rtype) {
-    item_type * itype;
     assert(rtype);
-    itype = it_find(rtype->_name);
-    if (!itype) {
+    if (!rtype->itype) {
+        item_type * itype;
         itype = (item_type *)calloc(sizeof(item_type), 1);
+        itype->rtype = rtype;
+        rtype->uchange = res_changeitem;
+        rtype->itype = itype;
+        rtype->flags |= RTF_ITEM;
     }
-    itype->rtype = rtype;
-    rtype->uchange = res_changeitem;
-    rtype->itype = itype;
-    rtype->flags |= RTF_ITEM;
-    return itype;
+    return rtype->itype;
 }
 
 static void lt_register(luxury_type * ltype)
@@ -284,7 +290,7 @@ weapon_type *new_weapontype(item_type * itype,
         wtype->damage[1] = str_strdup(damage[1]);
     }
     wtype->defmod = defmod;
-    wtype->flags |= wflags;
+    wtype->flags = wflags;
     wtype->itype = itype;
     wtype->magres = magres;
     wtype->offmod = offmod;
@@ -548,7 +554,7 @@ static const char *resourcenames[MAX_RESOURCES] = {
     "laen", "fairyboot", "aoc", "pegasus",
     "elvenhorse", "charger", "dolphin", "roqf", "trollbelt",
     "aurafocus", "sphereofinv", "magicbag",
-    "magicherbbag", "dreameye", "p2"
+    "magicherbbag", "dreameye", "lifepotion"
 };
 
 const resource_type *get_resourcetype(resource_t type) {
@@ -575,22 +581,6 @@ int get_item(const unit * u, const item_type *itype)
     return i ? i->number : 0;
 }
 
-int set_item(unit * u, const item_type *itype, int value)
-{
-    item *i;
-
-    assert(itype);
-    i = *i_find(&u->items, itype);
-    if (!i) {
-        i = i_add(&u->items, i_new(itype, value));
-    }
-    else {
-        i->number = value;
-        assert(i->number >= 0);
-    }
-    return value;
-}
-
 #include "move.h"
 
 static int
@@ -599,16 +589,6 @@ mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
     if (u_race(u) == get_race(RC_ELF))
         return value;
     UNUSED_ARG(r);
-    return -118;
-}
-
-static int
-mod_dwarves_only(const unit * u, const region * r, skill_t sk, int value)
-{
-    UNUSED_ARG(r);
-    if (u_race(u) == get_race(RC_DWARF) || (u_race(u)->ec_flags & ECF_IRONGOLEM)) {
-        return value;
-    }
     return -118;
 }
 
@@ -629,8 +609,8 @@ struct order *), const char *name)
 static void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
-        "p0", "goliathwater", "p2", "p3", "ointment", "peasantblood", "p6",
-        "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "p13", "p14"
+        "p0", "goliathwater", "lifepotion", "p3", "ointment", "peasantblood", "p6",
+        "p7", "nestwarmth", "p9", "p10", "p11", "truthpotion", "healing"
     };
     int p;
 
@@ -903,13 +883,19 @@ void write_items(struct storage *store, item * ilist)
 
 static void free_itype(item_type *itype) {
     assert(itype);
-    free_construction(itype->construction);
+    if (itype->construction) {
+        free_construction(itype->construction);
+    }
     free(itype->_appearance[0]);
     free(itype->_appearance[1]);
     free(itype);
 }
 
-static void free_wtype(weapon_type *wtype) {
+void free_atype(armor_type *atype) {
+    free(atype);
+}
+
+void free_wtype(weapon_type *wtype) {
     assert(wtype);
     free(wtype->damage[0]);
     free(wtype->damage[1]);
@@ -924,7 +910,9 @@ void free_rtype(resource_type *rtype) {
     if (rtype->itype) {
         free_itype(rtype->itype);
     }
-    free(rtype->atype);
+    if (rtype->atype) {
+        free_atype(rtype->atype);
+    }
     free(rtype->modifiers);
     free(rtype->raw);
     free(rtype->_name);
@@ -966,7 +954,6 @@ void register_resources(void)
     registered = true;
 
     register_function((pf_generic)mod_elves_only, "mod_elves_only");
-    register_function((pf_generic)mod_dwarves_only, "mod_dwarves_only");
     register_function((pf_generic)res_changeitem, "changeitem");
     register_function((pf_generic)res_changeperson, "changeperson");
     register_function((pf_generic)res_changepeasants, "changepeasants");

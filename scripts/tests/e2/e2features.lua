@@ -9,6 +9,7 @@ function setup()
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
+    eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
 function test_calendar()
@@ -19,7 +20,7 @@ end
 function test_herbalism()
 -- OBS: herbalism is currently an E2-only skill
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "herbalism@eressea.de", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
 
     eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
@@ -283,8 +284,6 @@ function test_block_movement()
   end
 end
 
-
-
 function test_block_movement_aots()
   eressea.settings.set("rules.guard.base_stop_prob", "0.0")
   eressea.settings.set("rules.guard.skill_stop_prob", "1.0")
@@ -338,11 +337,11 @@ function test_stonegolems()
   u1:set_skill("building", 1)
   u2:set_skill("building", 1)
 
--- test that no server crash occur
+-- test that no server crash occurs
   u1:clear_orders()
   u1:add_order("Mache Burg")
   process_orders()
-  assert_equal(0 ,u1.number, "There shoud be no Stone Golems")
+  assert_equal(0, u1.number, "There should be no more stone golems")
 -- end test server crash
 
 -- test that Stone Golems build for four stones
@@ -350,7 +349,7 @@ function test_stonegolems()
   u2:add_order("MACHE 4 BURG " .. itoa36(c1.id))
   process_orders()
   assert_equal(230, c1.size, "resulting size should be 230")
-  assert_equal(1 ,u2.number, "There shoud be one Stone Golems")
+  assert_equal(1, u2.number, "There should be one stone golem")
 -- end test Stone Golems four stones
 end
 
@@ -444,4 +443,56 @@ function test_faction_anonymous()
     process_orders()
     assert_equal(get_name(u) .. ", 1 Mensch, aggressiv.", u:show(f))
     assert_equal(get_name(u) .. ", " .. get_name(f) .. ", 1 Mensch.", u:show(f2))
+end
+
+function test_new_orc_has_skills()
+    local f = faction.create('orc')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:add_item('money', 400)
+    u.number = 0
+    u:add_order("REKRUTIEREN 2")
+    process_orders()
+    assert_equal(2, u.number)
+    assert_equal(1, u:get_skill('polearm'))
+    assert_equal(1, u:get_skill('melee'))
+end
+
+function test_new_dracoid()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r, 'dracoid')
+    u.number = 2
+    u:equip("new_dracoid")
+    assert_equal(2, u.number)
+    item = nil
+    if u:get_skill('bow') > 1 then
+        item = 'bow'
+    elseif u:get_skill('polearm') > 1 then
+        item = 'spear'
+    elseif u:get_skill('melee') > 1 then
+        item = 'sword'
+    end
+    assert_not_nil(item)
+    assert_equal(u.number, u:get_item(item))
+end
+
+function test_rising_undead()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r, 'undead')
+    u.number = 2
+    u:equip("rising_undead")
+    assert_equal(2, u.number)
+    assert_equal(u.number, u:get_item('rustysword'))
+end
+
+function test_dwarf_mining()
+    local f = faction.create('dwarf')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u.name = 'Xolgrim'
+    u:set_skill('mining', 2)
+    assert_equal(2, u:get_skill('mining'))
+    assert_equal(4, u:eff_skill('mining'))
 end

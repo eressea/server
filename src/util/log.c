@@ -24,6 +24,14 @@ without prior permission by the authors of Eressea.
 #include <stdarg.h>
 #include <time.h>
 
+void errno_check(const char * file, int line) {
+    if (errno) {
+        log_info("errno is %d (%s) at %s:%d", 
+                 errno, strerror(errno), file, line);
+        errno = 0;
+    }
+}
+
 #ifdef STDIO_CP
 static int stdio_codepage = STDIO_CP;
 #else

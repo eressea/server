@@ -4,6 +4,7 @@
 #include "teleport.h"
 #include "give.h"
 
+#include <kernel/callbacks.h>
 #include <kernel/building.h>
 #include <kernel/race.h>
 #include <kernel/equipment.h>
@@ -86,7 +87,7 @@ static void test_spellbooks(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
     entry = spellbook_get(herp, sp);
     CuAssertPtrNotNull(tc, entry);
-    CuAssertPtrEquals(tc, sp, entry->sp);
+    CuAssertPtrEquals(tc, sp, spellref_get(&entry->spref));
 
     test_teardown();
     test_setup();
@@ -477,7 +478,7 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
     CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->construction->name = str_strdup("site");
+    btype->stages->name = str_strdup("site");
     CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
     test_teardown();
 }
@@ -556,39 +557,32 @@ static void test_familiar_age(CuTest *tc) {
     test_teardown();
 }
 
+static unit *eq_unit;
+static char *eq_name;
+static int eq_mask;
+
+static bool equip_callback(unit *u, const char *eqname, int mask) {
+    eq_unit = u;
+    eq_name = str_strdup(eqname);
+    eq_mask = mask;
+    return true;
+}
+
 static void test_familiar_equip(CuTest *tc) {
     unit *mag, *u;
-    equipment *eq;
-    const item_type * itype;
-    spell *sp;
-    sc_mage * mage;
 
     test_setup();
-
-    itype = test_create_itemtype("horse");
-    CuAssertPtrNotNull(tc, itype);
-    sp = create_spell("testspell");
-    CuAssertPtrNotNull(tc, sp);
-
-    eq = get_or_create_equipment("fam_human");
-    equipment_setitem(eq, itype, "1");
-    equipment_setskill(eq, SK_ENTERTAINMENT, "5");
-    equipment_addspell(eq, sp->sname, 1);
-
+    callbacks.equip_unit = equip_callback;
     mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     u = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
+    CuAssertStrEquals(tc, "human", u->_race->_name);
     set_familiar(mag, u);
     create_newfamiliar(mag, u);
-    CuAssertIntEquals(tc, 1, i_get(u->items, itype));
-    CuAssertIntEquals(tc, 5, get_level(u, SK_ENTERTAINMENT));
-    CuAssertIntEquals(tc, 0, get_level(u, SK_MAGIC));
 
-    mage = get_mage(u);
-    CuAssertPtrNotNull(tc, mage);
-    CuAssertPtrNotNull(tc, mage->spellbook);
-    set_level(u, SK_MAGIC, 1);
-    CuAssertPtrEquals(tc, mage, get_mage_depr(u));
-    CuAssertTrue(tc, u_hasspell(u, sp));
+    CuAssertIntEquals(tc, EQUIP_ALL, eq_mask);
+    CuAssertPtrEquals(tc, u, eq_unit);
+    CuAssertStrEquals(tc, "fam_human", eq_name);
+    free(eq_name);
 
     test_teardown();
 }

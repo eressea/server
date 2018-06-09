@@ -18,6 +18,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifndef H_GC_ECONOMY
 #define H_GC_ECONOMY
+
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,6 +48,7 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
+    struct item_type;
     
     typedef struct econ_request {
         struct econ_request *next;

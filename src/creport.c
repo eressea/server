@@ -30,6 +30,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/raceprefix.h>
+#include <attributes/seenspell.h>
 #include <attributes/stealth.h>
 
 /* gamecode includes */
@@ -41,25 +42,26 @@ without prior permission by the authors of Eressea.
 #include "teleport.h"
 
 /* kernel includes */
-#include <kernel/alliance.h>
-#include <kernel/ally.h>
-#include <kernel/connection.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
+#include "kernel/alliance.h"
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/connection.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -510,17 +512,14 @@ static void report_crtypes(FILE * F, const struct locale *lang)
     for (i = 0; i != MTMAXHASH; ++i) {
         struct known_mtype *kmt;
         for (kmt = mtypehash[i]; kmt; kmt = kmt->nexthash) {
-            const struct nrmessage_type *nrt = nrt_find(lang, kmt->mtype);
-            if (nrt) {
-                char buffer[DISPLAYSIZE];
-                int hash = (int)kmt->mtype->key;
-                assert(hash > 0);
-                fprintf(F, "MESSAGETYPE %d\n", hash);
-                fputc('\"', F);
-                fputs(str_escape(nrt_string(nrt), buffer, sizeof(buffer)), F);
-                fputs("\";text\n", F);
-                fprintf(F, "\"%s\";section\n", nrt_section(nrt));
-            }
+            char buffer[DISPLAYSIZE];
+            int hash = (int)kmt->mtype->key;
+            assert(hash > 0);
+            fprintf(F, "MESSAGETYPE %d\n", hash);
+            fputc('\"', F);
+            fputs(crescape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
+            fputs("\";text\n", F);
+            fprintf(F, "\"%s\";section\n", kmt->mtype->section);
         }
         while (mtypehash[i]) {
             kmt = mtypehash[i];
@@ -756,7 +755,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
         for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
-                spell * sp = sbe->sp;
+                const spell *sp = spellref_get(&sbe->spref);
                 const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
                 if (!header) {
                     stream_printf(out, "SPRUECHE\n");
@@ -1081,7 +1080,7 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
-static void cr_reportspell(FILE * F, spell * sp, int level, const struct locale *lang)
+static void cr_reportspell(FILE * F, const spell * sp, int level, const struct locale *lang)
 {
     int k;
     const char *name =
@@ -1469,7 +1468,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
 
         cr_output_travelthru(F, r, f);
-        if (r->seen.mode >= seen_travel) {
+        if (see_region_details(r)) {
             message_list *mlist = r_getmessages(r, f);
             cr_output_messages(F, r->msgs, f);
             if (mlist) {
@@ -1501,7 +1500,6 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
         /* visible units */
         for (u = r->units; u; u = u->next) {
-
             if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                 cr_output_unit_compat(F, f, u, r->seen.mode);
             }
@@ -1672,7 +1670,8 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     a = a_find(f->attribs, &at_reportspell);
     while (a && a->type == &at_reportspell) {
         spellbook_entry *sbe = (spellbook_entry *)a->data.v;
-        cr_reportspell(F, sbe->sp, sbe->level, f->locale);
+        const spell *sp = spellref_get(&sbe->spref);
+        cr_reportspell(F, sp, sbe->level, f->locale);
         a = a->next;
     }
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;

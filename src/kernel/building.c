@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 
 #include <kernel/config.h>
 #include "building.h"
@@ -114,7 +116,13 @@ static void bt_register(building_type * btype)
 
 static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
-    free_construction(btype->construction);
+    while (btype->stages) {
+        building_stage *next = btype->stages->next;
+        free_construction(btype->stages->construction);
+        free(btype->stages->name);
+        free(btype->stages);
+        btype->stages = next;
+    }
     free(btype->maintenance);
     free(btype->_name);
     free(btype);
@@ -136,6 +144,7 @@ building_type *bt_get_or_create(const char *name)
         if (btype == NULL) {
             btype = calloc(sizeof(building_type), 1);
             btype->_name = str_strdup(name);
+            btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;
             btype->maxsize = -1;
             btype->capacity = 1;
@@ -150,10 +159,11 @@ building_type *bt_get_or_create(const char *name)
 int buildingcapacity(const building * b)
 {
     if (b->type->capacity >= 0) {
-        if (b->type->maxcapacity >= 0) {
-            return MIN(b->type->maxcapacity, b->size * b->type->capacity);
+        int cap = b->size * b->type->capacity;
+        if (b->type->maxcapacity > 0 && b->type->maxcapacity < cap) {
+            cap = b->type->maxcapacity;
         }
-        return b->size * b->type->capacity;
+        return cap;
     }
     if (building_finished(b)) {
         if (b->type->maxcapacity >= 0) {
@@ -186,8 +196,6 @@ static int adjust_size(const building *b, int bsize) {
  */
 const char *buildingtype(const building_type * btype, const building * b, int bsize)
 {
-    const construction *con;
-
     assert(btype);
 
     if (b && b->attribs) {
@@ -198,14 +206,15 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             }
         }
     }
-    if (btype->construction && btype->construction->name) {
+    if (btype->stages && btype->stages->name) {
+        const building_stage *stage;
         if (b) {
             bsize = adjust_size(b, bsize);
         }
-        for (con = btype->construction; con; con = con->improvement) {
-            bsize -= con->maxsize;
-            if (!con->improvement || bsize <0) {
-                return con->name;
+        for (stage = btype->stages; stage; stage = stage->next) {
+            bsize -= stage->construction->maxsize;
+            if (!stage->next || bsize <0) {
+                return stage->name;
             }
         }
     }
@@ -313,9 +322,15 @@ int building_protection(const building_type * btype, int stage)
 {
     assert(btype->flags & BTF_FORTIFICATION);
     if (btype->maxsize < 0) {
-        return castle_bonus[MIN(stage, 5)];
+        if (stage > 5) {
+            stage = 5;
+        }
+        return castle_bonus[stage];
     }
-    return watch_bonus[MIN(stage, 2)];
+    if (stage > 2) {
+        stage = 2;
+    }
+    return watch_bonus[stage];
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -467,24 +482,30 @@ int buildingeffsize(const building * b, int img)
 
 int bt_effsize(const building_type * btype, const building * b, int bsize)
 {
-    int n = 0;
-    const construction *cons = btype->construction;
-
     if (b) {
         bsize = adjust_size(b, bsize);
     }
 
-    if (!cons) {
-        return 0;
+    if (btype->stages) {
+        int n = 0;
+        const building_stage *stage = btype->stages;
+        do {
+            const construction *con = stage->construction;
+            if (con->maxsize < 0) {
+                break;
+            }
+            else {
+                if (bsize >= con->maxsize) {
+                    bsize -= con->maxsize;
+                    ++n;
+                }
+                stage = stage->next;
+            }
+        } while (stage && bsize > 0);
+        return n;
     }
 
-    while (cons && cons->maxsize != -1 && bsize >= cons->maxsize) {
-        bsize -= cons->maxsize;
-        cons = cons->improvement;
-        ++n;
-    }
-
-    return n;
+    return 0;
 }
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)
@@ -662,17 +683,16 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     }
     return best;
 }
-/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern,
- * Modifikation f�r St�dter. */
+/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern */
 
-static const int wagetable[7][4] = {
-    { 10, 10, 11, -7 },             /* Baustelle */
-    { 10, 10, 11, -5 },             /* Handelsposten */
-    { 11, 11, 12, -3 },             /* Befestigung */
-    { 12, 11, 13, -1 },             /* Turm */
-    { 13, 12, 14, 0 },              /* Burg */
-    { 14, 12, 15, 1 },              /* Festung */
-    { 15, 13, 16, 2 }               /* Zitadelle */
+static const int wagetable[7][3] = {
+    { 10, 10, 11 },             /* Baustelle */
+    { 10, 10, 11 },             /* Handelsposten */
+    { 11, 11, 12 },             /* Befestigung */
+    { 12, 11, 13 },             /* Turm */
+    { 13, 12, 14 },             /* Burg */
+    { 14, 12, 15 },             /* Festung */
+    { 15, 13, 16 }              /* Zitadelle */
 };
 
 static int
@@ -680,7 +700,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
     building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
-    double wage;
+    int wage;
 
     if (b != NULL) {
         /* TODO: this reveals imaginary castles */
@@ -713,25 +733,28 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
     if (r->attribs) {
         attrib *a;
         curse *c;
+        variant vm;
 
         /* Godcurse: Income -10 */
         c = get_curse(r->attribs, &ct_godcursezone);
         if (c && curse_active(c)) {
-            wage = MAX(0, wage - 10);
+            wage = (wage < 10) ? 0 : (wage - 10);
         }
+        vm = frac_make(wage, 1);
 
         /* Bei einer D�rre verdient man nur noch ein Viertel  */
         c = get_curse(r->attribs, &ct_drought);
         if (c && curse_active(c)) {
-            wage /= curse_geteffect(c);
+            vm = frac_mul(vm, frac_make(1, curse_geteffect_int(c)));
         }
 
         a = a_find(r->attribs, &at_reduceproduction);
         if (a) {
-            wage = (wage * a->data.sa[0]) / 100;
+            vm = frac_mul(vm, frac_make(a->data.sa[0], 100));
         }
+        wage = vm.sa[0] / vm.sa[1];
     }
-    return (int)wage;
+    return wage;
 }
 
 static int

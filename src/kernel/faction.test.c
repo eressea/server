@@ -2,6 +2,7 @@
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/plane.h>
