@@ -491,8 +491,29 @@ function test_dwarf_mining()
     local f = faction.create('dwarf')
     local r = region.create(0, 0, 'plain')
     local u = unit.create(f, r)
-    u.name = 'Xolgrim'
     u:set_skill('mining', 2)
     assert_equal(2, u:get_skill('mining'))
     assert_equal(4, u:eff_skill('mining'))
+end
+
+function test_buy_sell()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    local lux = r.luxury
+    local b = building.create(r, 'castle')
+    b.size = 10
+    u:set_skill('trade', 1)
+    item = 'silk'
+    name = 'Seide'
+    if lux == 'silk' then
+        item = 'balm'
+        name = 'Balsam'
+    end
+    u:add_item(item, 5)
+    u:add_order('VERKAUFE 1 ' .. name)
+    assert_equal(0, u:get_item('money'))
+    process_orders()
+    assert_equal(4, u:get_item(item))
+    assert_not_equal(0, u:get_item('money'))
 end
