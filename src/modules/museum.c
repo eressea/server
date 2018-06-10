@@ -59,29 +59,22 @@ attrib_type at_museumexit = {
     "museumexit", NULL, NULL, NULL, a_writeshorts, a_readshorts
 };
 
-static void a_initmuseumgivebackcookie(attrib * a)
+static void a_initmuseumgivebackcookie(variant *var)
 {
-    a->data.v = calloc(1, sizeof(museumgivebackcookie));
+    var->v = calloc(1, sizeof(museumgivebackcookie));
 }
 
-static void a_finalizemuseumgivebackcookie(attrib * a)
+static void a_writemuseumgivebackcookie(const variant *var,
+    const void *owner, struct storage *store)
 {
-    free(a->data.v);
-}
-
-static void
-a_writemuseumgivebackcookie(const attrib * a, const void *owner,
-struct storage *store)
-{
-    museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
+    museumgivebackcookie *gbc = (museumgivebackcookie *)var->v;
     WRITE_INT(store, gbc->warden_no);
     WRITE_INT(store, gbc->cookie);
 }
 
-static int
-a_readmuseumgivebackcookie(attrib * a, void *owner, gamedata *data)
+static int a_readmuseumgivebackcookie(variant *var, void *owner, gamedata *data)
 {
-    museumgivebackcookie *gbc = (museumgivebackcookie *)a->data.v;
+    museumgivebackcookie *gbc = (museumgivebackcookie *)var->v;
     READ_INT(data->store, &gbc->warden_no);
     READ_INT(data->store, &gbc->cookie);
     return AT_READ_OK;
@@ -90,7 +83,7 @@ a_readmuseumgivebackcookie(attrib * a, void *owner, gamedata *data)
 attrib_type at_museumgivebackcookie = {
     "museumgivebackcookie",
     a_initmuseumgivebackcookie,
-    a_finalizemuseumgivebackcookie,
+    a_free_voidptr,
     NULL,
     a_writemuseumgivebackcookie,
     a_readmuseumgivebackcookie
@@ -100,30 +93,30 @@ attrib_type at_warden = {
     "itemwarden", NULL, NULL, NULL, a_writeint, a_readint
 };
 
-static void a_initmuseumgiveback(attrib * a)
+static void a_initmuseumgiveback(variant *var)
 {
-    a->data.v = calloc(1, sizeof(museumgiveback));
+    var->v = calloc(1, sizeof(museumgiveback));
 }
 
-static void a_finalizemuseumgiveback(attrib * a)
+static void a_finalizemuseumgiveback(variant *var)
 {
-    museumgiveback *gb = (museumgiveback *)a->data.v;
+    museumgiveback *gb = (museumgiveback *)var->v;
     i_freeall(&gb->items);
-    free(a->data.v);
+    free(gb);
 }
 
 static void
-a_writemuseumgiveback(const attrib * a, const void *owner,
+a_writemuseumgiveback(const variant *var, const void *owner,
 struct storage *store)
 {
-    museumgiveback *gb = (museumgiveback *)a->data.v;
+    museumgiveback *gb = (museumgiveback *)var->v;
     WRITE_INT(store, gb->cookie);
     write_items(store, gb->items);
 }
 
-static int a_readmuseumgiveback(attrib * a, void *owner, struct gamedata *data)
+static int a_readmuseumgiveback(variant *var, void *owner, struct gamedata *data)
 {
-    museumgiveback *gb = (museumgiveback *)a->data.v;
+    museumgiveback *gb = (museumgiveback *)var->v;
     READ_INT(data->store, &gb->cookie);
     read_items(data->store, &gb->items);
     return AT_READ_OK;
@@ -145,7 +138,6 @@ order * ord)
     attrib *a;
     region *r;
     unit *warden = findunit(atoi36("mwar"));
-    int unit_cookie;
 
     UNUSED_ARG(amount);
 
@@ -160,11 +152,11 @@ order * ord)
     r = findregion(a->data.sa[0], a->data.sa[1]);
     assert(r);
     a_remove(&u->attribs, a);
-    /* Übergebene Gegenstände zurückgeben */
+    /* Ãœbergebene GegenstÃ¤nde zurÃ¼ckgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
     if (a) {
-        unit_cookie = a->data.i;
+        int unit_cookie = a->data.i;
         a_remove(&u->attribs, a);
 
         for (a = a_find(warden->attribs, &at_museumgiveback);

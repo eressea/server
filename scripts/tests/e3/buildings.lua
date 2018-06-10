@@ -41,6 +41,11 @@ function test_build_watch()
     u:add_order("MACHE Wache")
     process_orders()
     assert_not_nil(u.building)
+    if 5 ~= u.building.size then
+        for k,v in f.messages do
+            print(v)
+        end
+    end
     assert_equal(5, u.building.size)
 
     u:set_skill("building", 2)

@@ -29,14 +29,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <storage.h>
 
 static void
-write_targetregion(const attrib * a, const void *owner, struct storage *store)
+write_targetregion(const variant *var, const void *owner, struct storage *store)
 {
-    write_region_reference((region *)a->data.v, store);
+    write_region_reference((region *)var->v, store);
 }
 
-static int read_targetregion(attrib * a, void *owner, gamedata *data)
+static int read_targetregion(variant *var, void *owner, gamedata *data)
 {
-    if (read_region_reference(data, (region **)&a->data.v, NULL) <= 0) {
+    if (read_region_reference(data, (region **)&var->v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

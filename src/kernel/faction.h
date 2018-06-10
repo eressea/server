@@ -133,6 +133,7 @@ extern "C" {
 
     void renumber_faction(faction * f, int no);
     void free_factions(void);
+    void log_dead_factions(void);
     void remove_empty_factions(void);
 
     void update_interval(struct faction *f, struct region *r);

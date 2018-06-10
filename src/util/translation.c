@@ -77,7 +77,7 @@ void opstack_push(opstack ** stackp, variant data)
 #define BBUFSIZE 0x10000
 static struct {
     char *begin;
-    char *end;
+    char *handle_end;
     char *last;
     char *current;
 } buffer;
@@ -88,9 +88,9 @@ char *balloc(size_t size)
     if (!init) {
         init = 1;
         buffer.current = buffer.begin = malloc(BBUFSIZE * sizeof(char));
-        buffer.end = buffer.begin + BBUFSIZE;
+        buffer.handle_end = buffer.begin + BBUFSIZE;
     }
-    assert(buffer.current + size <= buffer.end || !"balloc is out of memory");
+    assert(buffer.current + size <= buffer.handle_end || !"balloc is out of memory");
     buffer.last = buffer.current;
     buffer.current += size;
     return buffer.last;

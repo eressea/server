@@ -117,18 +117,18 @@ static void test_attrib_nexttype(CuTest * tc)
 static void test_attrib_rwstring(CuTest *tc) {
     gamedata data;
     storage store;
-    attrib a = { 0 };
+    variant var = { 0 };
 
     test_setup();
-    a.data.v = str_strdup("Hello World");
+    var.v = str_strdup("Hello World");
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    a_writestring(&a, NULL, &store);
-    a_finalizestring(&a);
+    a_writestring(&var, NULL, &store);
+    a_finalizestring(&var);
     data.strm.api->rewind(data.strm.handle);
-    a_readstring(&a, NULL, &data);
-    CuAssertStrEquals(tc, "Hello World", (const char *)a.data.v);
-    a_finalizestring(&a);
+    a_readstring(&var, NULL, &data);
+    CuAssertStrEquals(tc, "Hello World", (const char *)var.v);
+    a_finalizestring(&var);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_teardown();
@@ -137,17 +137,17 @@ static void test_attrib_rwstring(CuTest *tc) {
 static void test_attrib_rwint(CuTest *tc) {
     gamedata data;
     storage store;
-    attrib a = { 0 };
+    variant var = { 0 };
 
     test_setup();
-    a.data.i = 42;
+    var.i = 42;
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    a_writeint(&a, NULL, &store);
-    a.data.i = 0;
+    a_writeint(&var, NULL, &store);
+    var.i = 0;
     data.strm.api->rewind(data.strm.handle);
-    a_readint(&a, NULL, &data);
-    CuAssertIntEquals(tc, 42, a.data.i);
+    a_readint(&var, NULL, &data);
+    CuAssertIntEquals(tc, 42, var.i);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_teardown();
@@ -156,19 +156,19 @@ static void test_attrib_rwint(CuTest *tc) {
 static void test_attrib_rwchars(CuTest *tc) {
     gamedata data;
     storage store;
-    attrib a = { 0 };
+    variant var = { 0 };
 
     test_setup();
-    a.data.ca[0] = 1;
-    a.data.ca[3] = 42;
+    var.ca[0] = 1;
+    var.ca[3] = 42;
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    a_writeint(&a, NULL, &store);
-    memset(a.data.ca, 0, 4);
+    a_writeint(&var, NULL, &store);
+    memset(var.ca, 0, 4);
     data.strm.api->rewind(data.strm.handle);
-    a_readint(&a, NULL, &data);
-    CuAssertIntEquals(tc, 1, a.data.ca[0]);
-    CuAssertIntEquals(tc, 42, a.data.ca[3]);
+    a_readint(&var, NULL, &data);
+    CuAssertIntEquals(tc, 1, var.ca[0]);
+    CuAssertIntEquals(tc, 42, var.ca[3]);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_teardown();
@@ -177,19 +177,19 @@ static void test_attrib_rwchars(CuTest *tc) {
 static void test_attrib_rwshorts(CuTest *tc) {
     gamedata data;
     storage store;
-    attrib a = { 0 };
-    a.data.sa[0] = -4;
-    a.data.sa[1] = 42;
+    variant var = { 0 };
+    var.sa[0] = -4;
+    var.sa[1] = 42;
 
     test_setup();
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    a_writeint(&a, NULL, &store);
-    memset(a.data.ca, 0, 4);
+    a_writeint(&var, NULL, &store);
+    memset(var.ca, 0, 4);
     data.strm.api->rewind(data.strm.handle);
-    a_readint(&a, NULL, &data);
-    CuAssertIntEquals(tc, -4, a.data.sa[0]);
-    CuAssertIntEquals(tc, 42, a.data.sa[1]);
+    a_readint(&var, NULL, &data);
+    CuAssertIntEquals(tc, -4, var.sa[0]);
+    CuAssertIntEquals(tc, 42, var.sa[1]);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_teardown();

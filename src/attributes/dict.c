@@ -43,7 +43,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-typedef enum {
+typedef enum dict_type {
     TNONE = 0, TINTEGER = 1, TREAL = 2
 } dict_type;
 
@@ -56,11 +56,11 @@ typedef struct dict_data {
     } data;
 } dict_data;
 
-static int dict_read(attrib * a, void *owner, gamedata *data)
+static int dict_read(variant * var, void *owner, gamedata *data)
 {
     storage *store = data->store;
     char name[NAMESIZE];
-    dict_data *dd = (dict_data *)a->data.v;
+    dict_data *dd = (dict_data *)var->v;
     int n;
 
     READ_STR(store, name, sizeof(name));
@@ -82,19 +82,19 @@ static int dict_read(attrib * a, void *owner, gamedata *data)
     return AT_READ_DEPR;
 }
 
-static void dict_init(attrib * a)
+static void dict_init(variant *var)
 {
     dict_data *dd;
-    a->data.v = malloc(sizeof(dict_data));
-    dd = (dict_data *)a->data.v;
+    var->v = malloc(sizeof(dict_data));
+    dd = (dict_data *)var->v;
     dd->type = TNONE;
 }
 
-static void dict_done(attrib * a)
+static void dict_done(variant *var)
 {
-    dict_data *dd = (dict_data *)a->data.v;
+    dict_data *dd = (dict_data *)var->v;
     free(dd->name);
-    free(a->data.v);
+    free(var->v);
 }
 
 static void upgrade_keyval(const dict_data *dd, int keyval[], int v) {

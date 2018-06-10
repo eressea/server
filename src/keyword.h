@@ -11,7 +11,7 @@ extern "C"
 
     struct locale;
 
-    typedef enum {
+    typedef enum keyword_t {
         K_KOMMENTAR,
         K_BANNER,
         K_WORK,

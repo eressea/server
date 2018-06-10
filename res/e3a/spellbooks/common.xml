@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="common">
     <entry spell="goodwinds" level="4" />
     <entry spell="create_trollbelt" level="9" />
@@ -42,3 +43,4 @@
     <entry spell="shockwave" level="5" />
     <entry spell="eternal_walls" level="7" />
 </spellbook>
+</eressea>

@@ -4,12 +4,12 @@ set -e
 ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 
-UNIT_TESTS=$BUILD/eressea/test_eressea
-RUN_TESTS=$BUILD/eressea/eressea
+UNIT_TESTS=$ROOT/$BUILD/eressea/test_eressea
+RUN_TESTS=$ROOT/$BUILD/eressea/eressea
 if [ "$1" = "-V" ]; then
 VALGRIND=$(which valgrind)
 if [ -n "$VALGRIND" ]; then
-SUPP=share/ubuntu-12_04.supp
+SUPP=$ROOT/share/ubuntu-12_04.supp
 UNIT_TESTS="$VALGRIND --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $UNIT_TESTS"
 RUN_TESTS="$VALGRIND --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $RUN_TESTS"
 fi
@@ -21,12 +21,11 @@ if [ ! -e $ROOT/$BUILD ]; then
 fi
 
 $UNIT_TESTS
-cd $ROOT
-[ -e eressea.ini ] || ln -sf conf/eressea.ini
-$RUN_TESTS -v1 scripts/run-tests.lua
-$RUN_TESTS -v1 scripts/run-tests-e2.lua
-$RUN_TESTS -v1 scripts/run-tests-e3.lua
+cd $ROOT/tests
+$RUN_TESTS -v1 ../scripts/run-tests.lua
+$RUN_TESTS -v1 ../scripts/run-tests-e2.lua
+$RUN_TESTS -v1 ../scripts/run-tests-e3.lua
 $RUN_TESTS --version
-rm -rf data reports orders.txt score score.alliances datum turn
+rm -rf reports orders.txt score score.alliances datum turn
 
 cd $OLDWPD

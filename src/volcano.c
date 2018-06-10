@@ -74,12 +74,31 @@ static int nb_armor(const unit * u, int index)
     return av;
 }
 
-static int
-damage_unit(unit * u, const char *dam, bool physical, bool magic)
+static bool resurrect_unit(unit *u) {
+    if (oldpotiontype[P_HEAL]) {
+        bool heiltrank = false;
+        if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
+            change_effect(u, oldpotiontype[P_HEAL], -1);
+            heiltrank = true;
+        }
+        else if (i_get(u->items, oldpotiontype[P_HEAL]) > 0) {
+            i_change(&u->items, oldpotiontype[P_HEAL], -1);
+            change_effect(u, oldpotiontype[P_HEAL], 3);
+            heiltrank = true;
+        }
+        if (heiltrank && (rng_int() % 2)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static int damage_unit(unit * u, const char *dam, bool physical, bool magic)
 {
     int *hp, hpstack[20];
     int h;
-    int i, dead = 0, hp_rem = 0, heiltrank;
+    int healings;
+    int i, dead = 0, hp_rem = 0;
 
     assert(u->number);
     if (fval(u_race(u), RCF_ILLUSIONARY)) {
@@ -115,36 +134,31 @@ damage_unit(unit * u, const char *dam, bool physical, bool magic)
         hp[i] -= damage;
     }
 
+    /* does this unit have any healing potions or effects? */
+    healings = i_get(u->items, oldpotiontype[P_HEAL]) * 4;
+    healings += get_effect(u, oldpotiontype[P_HEAL]);
     /* Auswirkungen */
     for (i = 0; i < u->number; i++) {
         if (hp[i] <= 0) {
-            heiltrank = 0;
-
             /* Sieben Leben */
             if (u_race(u) == get_race(RC_CAT) && (chance(1.0 / 7))) {
                 hp[i] = u->hp / u->number;
                 hp_rem += hp[i];
-                continue;
             }
-
-            /* Heiltrank */
-            if (oldpotiontype[P_HEAL]) {
-                if (get_effect(u, oldpotiontype[P_HEAL]) > 0) {
-                    change_effect(u, oldpotiontype[P_HEAL], -1);
-                    heiltrank = 1;
-                }
-                else if (i_get(u->items, oldpotiontype[P_HEAL]) > 0) {
-                    i_change(&u->items, oldpotiontype[P_HEAL], -1);
-                    change_effect(u, oldpotiontype[P_HEAL], 3);
-                    heiltrank = 1;
-                }
-                if (heiltrank && (chance(0.50))) {
+            else if (healings > 0) {
+                --healings;
+                if (resurrect_unit(u)) {
+                    /* Heiltrank benutzen */
                     hp[i] = u->hp / u->number;
                     hp_rem += hp[i];
-                    continue;
+                }
+                else {
+                    ++dead;
                 }
             }
-            dead++;
+            else {
+                ++dead;
+            }
         }
         else {
             hp_rem += hp[i];
@@ -263,7 +277,7 @@ static bool stop_smoke_chance(void) {
     if (config_changed(&cache)) {
         percent = config_get_int("volcano.stop.percent", 12);
     }
-    return percent!=0 && (rng_int() % 100) < percent;
+    return percent != 0 && (rng_int() % 100) < percent;
 }
 
 static bool outbreak_chance(void) {
@@ -271,12 +285,12 @@ static bool outbreak_chance(void) {
     if (config_changed(&cache)) {
         percent = config_get_int("volcano.outbreak.percent", 8);
     }
-    return percent!=0 && (rng_int() % 100) < percent;
+    return percent != 0 && (rng_int() % 100) < percent;
 }
 
-void volcano_update(void) 
+void volcano_update(void)
 {
-    region *r; 
+    region *r;
     const struct terrain_type *t_active, *t_volcano;
 
     t_volcano = get_terrain("volcano");

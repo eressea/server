@@ -1,0 +1,2803 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"X-Generator: Poedit 2.0.7\n"
+
+msgid "homestone_effect"
+msgstr "\"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde in die Mauern von $building($building).\""
+
+msgid "nogive_reserved"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Gegenstand zwar, aber sämtliche $int($reservation) $resource($resource,$reservation) sind reserviert.\""
+
+msgid "recruit"
+msgstr "\"$unit($unit) in $region($region) rekrutiert $int($amount) von $int($want) Personen.\""
+
+msgid "sp_dreamreading_effect"
+msgstr "\"$unit($mage) verliert sich in die Träume von $unit($unit) und erhält einen Eindruck von $region($region).\""
+
+msgid "analyse_ship_age"
+msgstr "\"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt.\""
+
+msgid "curseinfo::sparkle_2"
+msgstr "\"$unit($unit) wird von bösen Alpträumen geplagt. ($int36($id))\""
+
+msgid "absorbpeasants"
+msgstr "\"$int($amount) Bauern werden zu $race($race,0) und schliessen sich $unit($unit) an.\""
+
+msgid "unholypower_effect"
+msgstr "\"$unit($mage) verwandelt $unit($target) in $race($race,0).\""
+
+msgid "give_person"
+msgstr "\"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),\"\",\"en\") an $unit($target).\""
+
+msgid "rust_effect_2"
+msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde. Der magischen Regen lässt alles Eisen rosten.\""
+
+msgid "heroes_maxed"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei hat bereits $int($count) von $int($max) Helden.\""
+
+msgid "error_build_skill_low"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um das zu bauen, braucht man ein Talent von mindestens $int($value).\""
+
+msgid "analyse_building_age"
+msgstr "\"$unit($mage) fand heraus, dass auf $building($building) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt.\""
+
+msgid "curseinfo::auraboost_1"
+msgstr "\"$unit($unit) hat Schwierigkeiten seine magischen Energien zu sammeln. ($int36($id))\""
+
+msgid "harbor_trade"
+msgstr "\"$unit($unit) erhielt $resources($items) von der $ship($ship).\""
+
+msgid "reduce_spell"
+msgstr "\"$unit($self) schwächt in $region($region) einen Zauber von $unit.dative($mage) durch Antimagie ab.\""
+
+msgid "raised"
+msgstr "\"$unit($unit) züchtet $int($amount) Pferde.\""
+
+msgid "speed_time_effect"
+msgstr "\"In $region($region) dehnt $unit($unit) die Zeit für $int($amount) Personen.\""
+
+msgid "error199"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier hat bereits einen Vertrauten.\""
+
+msgid "error195"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg.\""
+
+msgid "healall"
+msgstr "\"Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt.\""
+
+msgid "build_required"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $resources($required).\""
+
+msgid "newbie_immunity_error"
+msgstr "\"Eine Partei muß mindestens $int($turns) Wochen alt sein, bevor sie angegriffen oder bestohlen werden kann.\""
+
+msgid "error191"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in Wäldern.\""
+
+msgid "error156"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zuviele Alchemisten in der Partei.\""
+
+msgid "error266"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Gegenstand funktioniert nur in der Eingangshalle.\""
+
+msgid "error81"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit muß zuerst die Region bewachen.\""
+
+msgid "hornofpeace_u_nosuccess"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keine Region konnte befriedet werden.\""
+
+msgid "error70"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region wird von Nichtalliierten bewacht.\""
+
+msgid "error92"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keinen normalen Wald.\""
+
+msgid "error262"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei kann keine weiteren Wyrme besitzen.\""
+
+msgid "massive_overload"
+msgstr "\"Die $ship($ship) ist zu stark überladen und wird stark beschädigt.\""
+
+msgid "curseinfo::shipspeedup"
+msgstr "\"Die Winde scheinen dieses Schiff besonders zu beguenstigen. ($int36($id))\""
+
+msgid "error152"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit springt über Bord und ertrinkt.\""
+
+msgid "error108"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es sind keine Kräuter zu finden.\""
+
+msgid "spellfail::contact"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit $unit($target) hat keinen Kontakt mit uns aufgenommen.\""
+
+msgid "error214"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit ist kein Magier.\""
+
+msgid "patzer6"
+msgstr "\"Eine Botschaft von $unit.dative($unit) in $region($region): 'Ups! Quack, Quack!'\""
+
+msgid "lucky_item"
+msgstr "\"$unit($unit) hat Glück und findet einen Hort von $int($amount) $resource($item,$amount).\""
+
+msgid "error104"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Metall kann nur in einem Bergwerk abgebaut werden.\""
+
+msgid "error100"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier ist gelernter Schiffbauer.\""
+
+msgid "curseinfo::gooddream"
+msgstr "\"Die Leute haben schöne Träume. ($int36($id))\""
+
+msgid "error2"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf hoher See kann man nicht bewachen.\""
+
+msgid "nr_stat_maxentertainment"
+msgstr "\"Unterhaltung: max. $int($max) Silber\""
+
+msgid "blessedstonecircle_effect"
+msgstr "\"$unit($mage) weiht $building($building).\""
+
+msgid "income_tax_reduced"
+msgstr "\"$unit($unit) treibt in $region($region) Steuern in Höhe von $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber ein.\""
+
+msgid "curseinfo::holyground"
+msgstr "\"Untote schrecken vor dieser Region zurück. ($int36($id))\""
+
+msgid "changemail"
+msgstr "\"Die Reportadresse wurde auf ${value} geändert.\""
+
+msgid "song_of_peace_effect_0"
+msgstr "\"Die Gesangskunst von $unit($mage) begeistert die Leute. Die friedfertige Stimmung des Lieds überträgt sich auf alle Zuhörer. Einige werfen ihre Waffen weg.\""
+
+msgid "emptyeog"
+msgstr "\"Die Laenader in $region($region) ist erschöpft.\""
+
+msgid "entrise"
+msgstr "\"In $region($region) erschienen die Herren der Bäume.\""
+
+msgid "victory_murder_cfulfilled"
+msgstr "\"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),\"einer Woche\",\"$int($remain) Wochen\") zum Sieger erklärt werden.\""
+
+msgid "headache_effect_1"
+msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing....\""
+
+msgid "feedback_no_contact"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen.\""
+
+msgid "sailforbiddendir"
+msgstr "\"Die Mannschaft der $ship($ship) weigert sich, nach $direction($direction) zu reisen.\""
+
+msgid "receive"
+msgstr "\"$unit($target) erhält $int($amount) $resource($resource,$amount) von $unit($unit).\""
+
+msgid "missing_feedback"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Interner Fehler: Meldung '$name' nicht definiert.\""
+
+msgid "thiefdiscover"
+msgstr "\"$unit($target) ertappte $unit($unit) beim versuchten Diebstahl.\""
+
+msgid "museumgiveback"
+msgstr "\"In $region($region) erhielt $unit($unit) von $unit.dative($sender) $resources($items)\""
+
+msgid "curseinfo::sparkle_17"
+msgstr "\"Eine dunkle Fee erscheint $unit($unit) im Schlaf. Sie ist von schauriger Schönheit. ($int36($id))\""
+
+msgid "caldera_handle_0"
+msgstr "\"$unit($unit) springt in die ewigen Feuer des Kraters.\""
+
+msgid "researchherb_none"
+msgstr "\"$unit($unit) in $region($region) kann keine Kräuter finden.\""
+
+msgid "moveblockedbyguard"
+msgstr "\"$unit($unit) wurde in $region($region) von $unit.dative($guard) aufgehalten.\""
+
+msgid "cast_frighten_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden eingeschüchtert.\""
+
+msgid "curseinfo::Feuerwand"
+msgstr "Eine Feuerwand blockiert die Ein- und Ausreise. ($int36($id))"
+
+msgid "renamed_building_notseen"
+msgstr "\"$building($building) in $region($region) bekommt einen Spitznamen.\""
+
+msgid "heroes_race"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können keine Helden erwählen.\""
+
+msgid "summon_effect"
+msgstr "\"$unit($mage) beschwört $int($amount) $race($race,$amount).\""
+
+msgid "error28"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Bauern sind schlecht gelaunt.\""
+
+msgid "error39"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keine Spionage gelernt.\""
+
+msgid "destroy_magic_noeffect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier konnte keinen Fluch zerstören.\""
+
+msgid "cast_auraleak_effect"
+msgstr "\"$unit($mage) rief in $region($region) einen Riss in dem Gefüge der Magie hervor, der alle magische Kraft aus der Region riss.\""
+
+msgid "newbie_info_game"
+msgstr "Bitte denke daran, deine Befehle mit dem Betreff $subject an $email zu senden."
+
+msgid "mob_warning"
+msgstr "\"Ein Bauernmob erhebt sich und macht Jagd auf Schwarzmagier.\""
+
+msgid "dissolve_units_5"
+msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"verschwand\", \"verschwanden\") über Nacht.\""
+
+msgid "fleescared"
+msgstr "\"$int($amount) Bauern flohen aus Furcht vor $unit($unit).\""
+
+msgid "drought_effect_3"
+msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt. Die Dürre verändert die Region für immer.\""
+
+msgid "spellfail_pump"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) wusste trotz intensivem Verhör nichts über $region($tregion) zu berichten.\""
+
+msgid "maintenance_nowork"
+msgstr "\"$building($building) hat diese Woche nicht funktioniert, da zu Beginn der Woche der Unterhalt nicht gezahlt werden konnte.\""
+
+msgid "error_spell_on_flying_ship"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es ist zu gefährlich, diesen Zauber auf das fliegende Schiff $ship($ship) zu legen.\""
+
+msgid "error275"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man keine Gebäude errichten.\""
+
+msgid "error165"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Trank bekommt der Einheit nicht.\""
+
+msgid "siege_catapults"
+msgstr "\"$unit($unit) belagert $building($building). Dabei richten die Katapulte Zerstörungen von $int($destruction) Größenpunkten an.\""
+
+msgid "curseinfo::magicstreet"
+msgstr "\"Die Straßen sind erstaunlich trocken und gut begehbar. ($int36($id))\""
+
+msgid "curseinfo::sparkle_13"
+msgstr "\"Über $unit($unit) zieht eine Gruppe Geier ihre Kreise. ($int36($id))\""
+
+msgid "error161"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit besitzt den Trank nicht.\""
+
+msgid "error271"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man niemanden angreifen.\""
+
+msgid "renamed_faction_notseen"
+msgstr "\"Die Partei bekommt einen Spitznamen.\""
+
+msgid "error227"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür braucht ein Einheit mindestens Kräuterkunde 7.\""
+
+msgid "error117"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann das nicht herstellen.\""
+
+msgid "sp_depression_effect"
+msgstr "\"$unit($mage) sorgt in $region($region) für Trübsal unter den Bauern.\""
+
+msgid "sp_mindblast_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren Erinnerungen, $int($dead) wurden getötet.\""
+
+msgid "error113"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nichts angegeben, was wir übergeben sollen.\""
+
+msgid "undeadrise"
+msgstr "\"In $region($region) erhoben sich die Toten aus den Gräbern.\""
+
+msgid "reanimate_effect_0"
+msgstr "\"$unit($mage) beginnt ein Ritual der Wiederbelebung. $int($amount) Krieger stehen von den Toten auf.\""
+
+msgid "error223"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hungernde Einheiten können nicht bewachen.\""
+
+msgid "sp_confusion_effect_1"
+msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander.\""
+
+msgid "itemcloak"
+msgstr "\"$unit($mage) legt einen Schleier um die Ausrüstung von $unit.dative($target).\""
+
+msgid "error5"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
+
+msgid "para_tactics_lost"
+msgstr "\"$unit($unit) konnte dem Gegner eine Falle stellen.\""
+
+msgid "error_lowstealth"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann sich nicht so gut tarnen.\""
+
+msgid "chaosgate_effect_1"
+msgstr "\"$unit($mage) öffnet ein Chaostor.\""
+
+msgid "shipsail"
+msgstr "\"Die $ship($ship) segelt von $region($from) nach $region($to).\""
+
+msgid "magicresistance_unit"
+msgstr "\"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))\""
+
+msgid "destroy_partial"
+msgstr "\"$unit($unit) reißt einen Teil von $building($building) ein.\""
+
+msgid "nr_stat_morale"
+msgstr "\"Moral der Bauern: $int($morale)\""
+
+msgid "changemail_invalid"
+msgstr "\"Die Reportadresse wurde nicht geändert, '${value}' ist keine gültige email.\""
+
+msgid "block_spell"
+msgstr "\"Antimagie von $unit.dative($self) blockiert in $region($region) einen Zauber von $unit.dative($mage).\""
+
+msgid "enter_overload"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit darf nicht an Bord kommen, da sie das Schiff überladen würde.\""
+
+msgid "herbfound"
+msgstr "\"$unit($unit) in $region($region) findet $int($amount) $resource($herb,$amount).\""
+
+msgid "maintenance"
+msgstr "\"$unit($unit) bezahlt den Unterhalt von $building($building).\""
+
+msgid "heroes_cost"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nur $int($have) von $int($cost) benötigtem Silber.\""
+
+msgid "error36"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Gegenstand nicht.\""
+
+msgid "error58"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit weiß nicht, wie man gaukelt.\""
+
+msgid "magiccreate_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) erschafft $int($amount) ${object}.\""
+
+msgid "error25"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Fluch verhindert das.\""
+
+msgid "error47"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit uns alliiert.\""
+
+msgid "error69"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region wird bewacht.\""
+
+msgid "overrun_by_iceberg"
+msgstr "\"Die $ship($ship) wird bei einer Kollision mit einem Eisberg beschädigt.\""
+
+msgid "song_of_peace_effect_1"
+msgstr "\"In der Luft liegt ein wunderschönes Lied, dessen friedfertiger Stimmung sich niemand entziehen kann. Einige Leute werfen sogar ihre Waffen weg.\""
+
+msgid "error99"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit will nicht transportiert werden.\""
+
+msgid "disrupt_astral"
+msgstr "\"$unit($unit) wird aus der astralen Ebene nach $region($region) geschleudert.\""
+
+msgid "curseinfo::badmagicresistancezone"
+msgstr "\"Die natürliche Widerstandskraft gegen Verzauberung bestimmter Einheiten in dieser Region wurde geschwächt. ($int36($id))\""
+
+msgid "error288"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wieviel sollen wir einreißen?\""
+
+msgid "curseinfo::badlearn"
+msgstr "\"Alle Leute in der Region haben Schlafstörungen. ($int36($id))\""
+
+msgid "error_nopeasants"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keine Bauern.\""
+
+msgid "spellregionresists"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region konnte nicht verzaubert werden.\""
+
+msgid "curseinfo::calmmonster"
+msgstr "Dieser Beeinflussungszauber scheint die Einheit einem ganz bestimmten Volk wohlgesonnen zu machen. ($int36($id))"
+
+msgid "error169"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Zauber kennt die Einheit nicht.\""
+
+msgid "error174"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber ist nur im Kampf sinnvoll.\""
+
+msgid "error284"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur noch nicht gestärkte Untote können das Ziel dieses Zaubers sein.\""
+
+msgid "growtree_effect"
+msgstr "$if($isnull($mage),\"Ein unentdeckter Magier\",$unit($mage)) erschuf einen heiligen Hain von $int($amount) Schößlingen."
+
+msgid "error280"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu muss erst die Spezialeigenschaft erworben werden.\""
+
+msgid "curseinfo::shipnodrift_0"
+msgstr "\"Ein silberner Schimmer umgibt die $ship($ship). ($int36($id))\""
+
+msgid "error170"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Bauern nehmen dieses großzügige Geschenk nicht an.\""
+
+msgid "dumbeffect"
+msgstr "\"$unit($unit) vergisst durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill).\""
+
+msgid "renamed_ship_seen"
+msgstr "\"Die $ship($ship) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
+
+msgid "error126"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht verkaufen.\""
+
+msgid "error236"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude ist noch nicht fertig gebaut.\""
+
+msgid "error_unit_size"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheiten dürfen nicht mehr als $int($maxsize) Personen enthalten.\""
+
+msgid "error232"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Typ Einheit kann keine Gebäude betreten.\""
+
+msgid "error122"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Pferde kann man nur in einer Pferdezucht züchten.\""
+
+msgid "error307"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Snotlinge sind zu dumm, um auf den Feldern zu arbeiten.\""
+
+msgid "godcurse_destroy_ship"
+msgstr "\"Die Mannschaft krank vom vergifteten Wasser, Planken, Ruder und Segel zerfressen von den Wassern des verfluchten Meeres, ergibt sich die $ship($ship) in ihr Schicksal und sinkt.\""
+
+msgid "too_many_units_in_faction"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Partei darf nicht aus mehr als $int($allowed) Einheiten bestehen.\""
+
+msgid "entermaelstrom"
+msgstr "\"Die $ship($ship) fährt in den Mahlstrom von $region($region) und nimmt $int($damage) Schaden$if($sink,\" und sinkt\",\"\").\""
+
+msgid "error303"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Region kann man nichts verkaufen.\""
+
+msgid "patzer3"
+msgstr "\"Als $unit($unit) in $region($region) versucht, $spell($spell) zu zaubern, scheint plötzlich ein Beben durch die magische Essenz zu laufen und ein furchtbarer Sog versucht $unit($unit) in eine andere Dimension zu ziehen. Mit letzter Kraft gelingt es $unit($unit) sich zu retten.\""
+
+msgid "heat_effect"
+msgstr "\"$unit($mage) belegt $unit($target) mit einem Kälteschutz.\""
+
+msgid "gbdream_noteach"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Zauber in dieser Region verhindert das.\""
+
+msgid "path_effect"
+msgstr "\"$unit($mage) sorgt für trockene Straßen in $region($region).\""
+
+msgid "summonshadow_effect"
+msgstr "\"$unit($mage) beschwört $int($number) Dämonen aus dem Reich der Schatten.\""
+
+msgid "error8"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das ist sinnlos.\""
+
+msgid "eathorse"
+msgstr "\"$unit($unit) verspeiste $int($amount) Pferde.\""
+
+msgid "confusion_result"
+msgstr "\"$unit($mage) beschwört einen Schleier der Verwirrung.\""
+
+msgid "resource_missing"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu benötigt man $resource($missing,0).\""
+
+msgid "give_person_peasants"
+msgstr "\"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),\"\",\"en\") an die Bauern.\""
+
+msgid "curseinfo::magicwalls"
+msgstr "\"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))\""
+
+msgid "sp_clone_effect"
+msgstr "\"$unit($mage) erschafft einen Klon.\""
+
+msgid "enemy_discovers_spy_msg"
+msgstr "\"$unit($unit) wurde beim versenken von $ship($ship) entdeckt.\""
+
+msgid "curseinfo::nocostbuilding"
+msgstr "\"Der Zahn der Zeit kann diesen Mauern nichts anhaben. ($int36($id))\""
+
+msgid "income_fishing"
+msgstr "\"$unit($unit) fängt in $region($region) Fische im Wert von $int($amount) Silber.\""
+
+msgid "analyse_unit_noage"
+msgstr "\"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.\""
+
+msgid "buildingcrash"
+msgstr "\"In $region($region) stürzte $building($building) ein.$if($road,\" Beim Einsturz wurde die halbe Straße vernichtet.\",\"\")$if($opfer,\" $int($opfer) Opfer $if($eq($opfer,1),\"ist\",\"sind\") zu beklagen.\",\"\")\""
+
+msgid "alliance::kickattempt"
+msgstr "\"$int($votes) Mitglieder von $alliance($alliance) haben versucht, Deine Partei aus der Allianz auszuschliessen.\""
+
+msgid "becomewyrm"
+msgstr "\"$unit($mage) verwandelt sich in einen Wyrm.\""
+
+msgid "casualties"
+msgstr "\"$unit($unit) verlor $int($fallen) Personen$if($alive,\", $int($alive) überlebten\",\"\")$if($run,\" und $int($run) flohen$if($isnull($runto),\"\",\" nach $region($runto)\")\",\"\").\""
+
+msgid "feedback_give_forbidden"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Einheit kann nichts gegeben werden.\""
+
+msgid "babbler_effect"
+msgstr "\"$unit($unit) hat einen feuchtfröhlichen Abend in der Taverne verbracht. Ausser einem fürchterlichen Brummschädel ist da auch noch das dumme Gefühl die ganze Taverne mit seiner Lebensgeschichte unterhalten zu haben.\""
+
+msgid "babbler_resist"
+msgstr "\"$unit($unit) hat einen feuchtfröhlichen Abend in der Taverne verbracht. Ausser einem fürchterlichen Brummschädel ist da auch noch das dumme Gefühl $unit($mage) seine ganze Lebensgeschichte erzählt zu haben.\""
+
+msgid "tidalwave_kill"
+msgstr "\"Eine gewaltige Flutwelle verschlingt $unit($unit) in $region($region).\""
+
+msgid "error14"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist auf hoher See.\""
+
+msgid "renamed_notseen"
+msgstr "\"$unit($renamed) in $region($region) bekommt einen Spitznamen.\""
+
+msgid "curseinfo::goodmagicresistancezone"
+msgstr "\"Die natürliche Widerstandskraft gegen Verzauberung bestimmter Einheiten in dieser Region wurde gestärkt. ($int36($id))\""
+
+msgid "error66"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei wurde nicht gefunden.\""
+
+msgid "error88"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genügend Materialien für den Schiffbau.\""
+
+msgid "error55"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann sich nicht fortbewegen.\""
+
+msgid "error77"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Talent wurde nicht erkannt.\""
+
+msgid "error178"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Magiegebiet angegeben.\""
+
+msgid "error297"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gebäude auf dem Ozean können nicht betreten werden.\""
+
+msgid "generous_effect_1"
+msgstr "\"Die Darbietungen eines fahrenden Gauklers begeistern die Leute. Die fröhliche und ausgelassene Stimmung seiner Lieder überträgt sich auf alle Zuhörer.\""
+
+msgid "unit_unarmed"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht bewaffnet und kampffähig.\""
+
+msgid "error293"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Verbände können nur zwischen Einheiten derselben Partei gebildet werden.\""
+
+msgid "error183"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier befindet sich nicht auf einem Schiff.\""
+
+msgid "error_nograves"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In $region($target) sind keine Gräber.\""
+
+msgid "error139"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unterschiedliche Typen können nicht gemischt werden.\""
+
+msgid "error249"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff kann nicht aufs offene Meer hinaus segeln.\""
+
+msgid "killedbygm"
+msgstr "\"$unit($unit) wurde in $region($region) von einem GM gelöscht: \\\"$string\\\".\""
+
+msgid "spellfail_distance"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region ist zu weit entfernt.\""
+
+msgid "para_lineup_battle"
+msgstr "\"Einheiten vor der $int($turn). Runde:\""
+
+msgid "error245"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat schon einen Namen.\""
+
+msgid "sp_chaosrow_effect_0"
+msgstr "\"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
+
+msgid "error135"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannte Option.\""
+
+msgid "error131"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden.\""
+
+msgid "error241"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei muß mindestens 81 Wochen alt sein, um einen Neustart mit einer anderen Rasse zu versuchen.\""
+
+msgid "feedback_unit_not_found"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wurde nicht gefunden.\""
+
+msgid "error206"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Gebäude liegt bereits so ein Zauber.\""
+
+msgid "error316"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ohne Zutaten kann ein Alchemist nichts herstellen.\""
+
+msgid "error312"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Werwesen können nicht mit anderen Personen gemischt werden.\""
+
+msgid "mallorn_effect"
+msgstr "\"$unit($mage) läßt einen Teil seiner selbst in die Erde fliessen. Die Bäume, die Transformation überlebt haben, erscheinen nun viel kräftiger.\""
+
+msgid "useflamingsword"
+msgstr "\"$int($amount) Krieger von $unit($unit) benutzen ihre Flammenschwerter.\""
+
+msgid "error202"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das ist keine gültige Rasse.\""
+
+msgid "curseinfo::magicrunes_building"
+msgstr "\"Auf den Mauern von $building($building) erkennt man seltsame Runen. ($int36($id))\""
+
+msgid "analyse_unit_fail"
+msgstr "\"$unit($mage) meint, dass $unit($unit) verzaubert ist, konnte aber über den Zauber nichts herausfinden.\""
+
+msgid "spellunitresists"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) widersteht dem Zauber.\""
+
+msgid "give_peasants"
+msgstr "\"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an die Bauern.\""
+
+msgid "leftship"
+msgstr "\"$unit($unit) ist in dieser Runde gelandet und kann nicht weiter ins Landesinnere nach $region($region) vorstossen.\""
+
+msgid "astral_appear"
+msgstr "\"$unit($unit) erscheint plötzlich.\""
+
+msgid "magicresistance_effect"
+msgstr "\"$unit($unit) wird kurz von einem magischen Licht umhüllt.\""
+
+msgid "siege"
+msgstr "\"$unit($unit) belagert $building($building).\""
+
+msgid "missing_force"
+msgstr "\"$unit($unit) schafft es nicht, genug Kraft aufzubringen, um $spell($spell) auf Stufe $int($level) zu zaubern.\""
+
+msgid "shipdestroy_partial"
+msgstr "\"$unit($unit) in $region($region) beschädigt die $ship($ship).\""
+
+msgid "forget"
+msgstr "\"$unit($unit) vergisst $skill($skill).\""
+
+msgid "spell_astral_only"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nur im Astralraum gezaubert werden.\""
+
+msgid "sp_movecastle_fail_0"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Elementar ist zu klein, um das Gebäude zu tragen.\""
+
+msgid "summonundead_effect_1"
+msgstr "\"$unit($mage) erweckt in $region($region) $int($amount) Untote aus ihren Gräbern.\""
+
+msgid "drown"
+msgstr "\"$unit($unit) ertrinkt in $region($region).\""
+
+msgid "travel"
+msgstr "\"$unit($unit) $if($eq($mode,1),\"reitet\", \"wandert\") von $region($start) nach $region($end).$if($isnull($regions),\"\",\" Dabei wurde $trail($regions) durchquert.\")\""
+
+msgid "curseinfo::skill_1"
+msgstr "\"$unit($unit) ist ungewöhnlich geschickt in $skill($skill). ($int36($id))\""
+
+msgid "error11"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff befindet sich auf hoher See.\""
+
+msgid "error33"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht in unserer Burg.\""
+
+msgid "error22"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Befehl wurde nicht erkannt.\""
+
+msgid "error44"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf hoher See.\""
+
+msgid "spydetect"
+msgstr "\"$unit($target) fühlt sich $if($isnull($spy),\"\",\"durch $unit($spy) \")beobachtet.\""
+
+msgid "income_trade"
+msgstr "\"$unit($unit) verdient in $region($region) $int($amount) Silber durch den Verkauf von Luxusgütern.\""
+
+msgid "error74"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kann niemanden weggeben.\""
+
+msgid "error96"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Einheit gibt es niemanden, den man transferieren könnte.\""
+
+msgid "error187"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie sich bewegt hat.\""
+
+msgid "error85"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde keine Emailadresse angegeben.\""
+
+msgid "starvation"
+msgstr "\"$unit($unit) verliert in $region($region) $int($dead) von $int($add($live,$dead)) Personen durch Unterernährung.\""
+
+msgid "error258"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Zieleinheit ist ungültig.\""
+
+msgid "curseinfo::fogtrap"
+msgstr "\"Dichte Nebel bedecken diese Woche die Region. Keine Einheit schafft es, diese Nebel zu durchdringen und die Region zu verlassen. ($int36($id))\""
+
+msgid "error148"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Burgherr.\""
+
+msgid "poison_damage"
+msgstr "\"$unit($unit) nimmt Schaden durch den Giftelementar in $region($region).\""
+
+msgid "error144"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf keinem Schiff.\""
+
+msgid "magicboost_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Sphären des Chaos geben dem Magier einen Teil ihrer Kraft.\""
+
+msgid "error254"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auraangabe fehlerhaft oder zuwenig Aura.\""
+
+msgid "error250"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nicht genug Karma.\""
+
+msgid "error140"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich weder in einer Burg noch auf einem Schiff.\""
+
+msgid "error215"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Von hier aus kann man die astrale Ebene nicht erreichen.\""
+
+msgid "destroy_ship_4"
+msgstr "\"$ship($ship) wurde zerstört.\""
+
+msgid "error211"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff liegt bereits so ein Zauber.\""
+
+msgid "forestfire_effect"
+msgstr "\"$unit($mage) erschafft in $region($region) eine verheerende Feuersbrunst. $int($amount) Bäume fallen den Flammen zum Opfer.\""
+
+msgid "error101"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann ein Gebäude errichten.\""
+
+msgid "orcgrowth"
+msgstr "\"$unit($unit) vermehrt sich um $int($amount) $race($race,$amount).\""
+
+msgid "sp_wolfhowl_effect"
+msgstr "\"$unit($mage) ruft $int($amount) $race($race, $amount) zu Hilfe.\""
+
+msgid "tidalwave"
+msgstr "\"Eine gewaltige Flutwelle verschlingt $region($region) und alle Bewohner.\""
+
+msgid "cast_hero_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden moralisch gestärkt.\""
+
+msgid "detectforbidden"
+msgstr "\"$unit($unit) weigert sich, nach $region($region) zu reisen.\""
+
+msgid "parse_error"
+msgstr "\"$unit($unit): '$command' - Dieser Befehl ist unbekannt.\""
+
+msgid "fogblock"
+msgstr "\"$unit($unit) konnte von $region($region) nicht nach $direction($direction) ausreisen, der Nebel war zu dicht.\""
+
+msgid "curseinfo::antimagiczone"
+msgstr "\"Dieser Zauber scheint magische Energien irgendwie abzuleiten und so alle in der Region gezauberten Sprüche in ihrer Wirkung zu schwächen oder ganz zu verhindern. ($int36($id))\""
+
+msgid "nr_market_sale"
+msgstr "\"Auf dem Markt wird für $resource($product,0) $int($price) Silber verlangt.\""
+
+msgid "stealfail"
+msgstr "\"$unit($unit) gelang es nicht, sich nahe genug an $unit($target) heranzuschleichen.\""
+
+msgid "sp_disturbingdreams_effect"
+msgstr "\"$unit($mage) sorgt für schlechten Schlaf in $region($region).\""
+
+msgid "spy_discovered_msg"
+msgstr "\"$unit($unit) entdeckte $unit($saboteur) beim Versenken von $ship($ship).\""
+
+msgid "wrongpasswd"
+msgstr "\"Deine Befehle hatten ein falsches Passwort (${password}).\""
+
+msgid "curseinfo::sparkle_9"
+msgstr "\"$unit($unit) bekommt von einer Schlange einen Apfel angeboten. ($int36($id))\""
+
+msgid "skill_needed"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu braucht man das Talent $skill($skill).\""
+
+msgid "renamed_seen"
+msgstr "\"$unit($renamed) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
+
+msgid "analyse_unit_nospell"
+msgstr "\"$unit($mage) meint, dass auf $unit($target) kein Zauber liegt.\""
+
+msgid "army_report"
+msgstr "\"Heer $int($index)($abbrev): $int($dead) Tote, $int($fled) Geflohene, $int($survived) Überlebende.\""
+
+msgid "receive_person"
+msgstr "\"$unit($target) erhält $int($amount) Person$if($eq($amount,1),\"\",\"en\") von $unit($unit).\""
+
+msgid "donation"
+msgstr "\"$faction($from) gibt ein Almosen von $int($amount) Silber an $faction($to).\""
+
+msgid "scunicorn"
+msgstr "\"$unit($unit) $if($eq($amount,1),\"schließt\",\"schließen\") sich $int($amount) $resource($rtype,$amount) an.\""
+
+msgid "try_astral"
+msgstr "\"$unit($unit) versuchte erfolglos, $unit($target) in eine andere Welt zu schleudern.\""
+
+msgid "error196"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das ist keine Waldregion.\""
+
+msgid "objmagic_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) verzaubert ${target}.\""
+
+msgid "puttorest"
+msgstr "\"$unit($mage) erlöst die gequälten Seelen der Toten.\""
+
+msgid "error41"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genug Silber.\""
+
+msgid "error30"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Botschaft enthält keinen Text.\""
+
+msgid "error52"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren langen Befehle ausführen.\""
+
+msgid "recruit_effect"
+msgstr "\"$unit($mage) konnte $int($amount) $if($eq($amount,1),\"Bauer\",\"Bauern\") anwerben.\""
+
+msgid "spell_failed"
+msgstr "\"$unit($unit) versucht $spell($spell) zu zaubern, doch der Zauber schlägt fehl!\""
+
+msgid "error157"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei hat ein anderes Magiegebiet.\""
+
+msgid "auratransfer_success"
+msgstr "\"$unit($unit) transferiert $int($aura) Aura auf $unit($target).\""
+
+msgid "error267"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur eine Einzelperson kann das Ticket benutzen.\""
+
+msgid "error263"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Gut wird hier produziert.\""
+
+msgid "error153"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit schließt sich den Bauern an.\""
+
+msgid "error_onlandonly"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit muß sich an Land befinden.\""
+
+msgid "error_herorecruit"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Helden können nicht rekrutieren.\""
+
+msgid "error109"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Einheit, eine Region oder eine Partei benannt werden soll.\""
+
+msgid "msg_event"
+msgstr "\"$string\""
+
+msgid "error224"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hungernde Einheiten können nicht zaubern.\""
+
+msgid "piratesawvictim"
+msgstr "\"$if($isnull($ship),\"$unit($unit)\",\"Die $ship($ship)\") in $region($region) entdeckt ein Opfer im $direction($dir).\""
+
+msgid "spyreport_items"
+msgstr "\"Im Gepäck von $unit($target) sind $resources($items).\""
+
+msgid "curseinfo::shipnodrift_1"
+msgstr "\"Die $ship($ship) ist mit gutem Wind gesegnet$if($lt($duration,3),\", doch der Zauber beginnt sich bereits aufzulösen\",\"\"). ($int36($id))\""
+
+msgid "error105"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Leere Einheiten können nicht übergeben werden.\""
+
+msgid "curseinfo::sparkle_7"
+msgstr "\"Die Frauen des nahegelegenen Dorfes bewundern $unit($unit) verstohlen. ($int36($id))\""
+
+msgid "error110"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Region oder eine Einheit beschrieben werden soll.\""
+
+msgid "curseinfo::sparkle_18"
+msgstr "\"Fäulnisgeruch dringt $unit($unit) aus allen Körperöffnungen. ($int36($id))\""
+
+msgid "error_captain_skill_low"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Kapitän muß ein Segeltalent von mindestens $int($value) haben, um $ship($ship) zu befehligen.\""
+
+msgid "error220"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Im astralen Nebel konnte niemand entdeckt werden.\""
+
+msgid "arena_enter"
+msgstr "\"In $region($region) öffnet sich ein Portal. Eine Stimme ertönt, und spricht: 'Willkommen in der Ebene der Herausforderung'. $unit($unit) durchschreitet das Tor zu einer anderen Welt.\""
+
+msgid "stealfatal"
+msgstr "\"$unit($unit) wurde von $unit.dative($target) beim versuchten Diebstahl ertappt.\""
+
+msgid "analyse_unit_age"
+msgstr "\"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt.\""
+
+msgid "sp_permtransfer_effect"
+msgstr "\"$unit($mage) opfert $unit($target) $int($amount) Aura.\""
+
+msgid "shipfly"
+msgstr "\"Die $ship($ship) fliegt von $region($from) nach $region($to).\""
+
+msgid "curseinfo::unit_unknown"
+msgstr "\"Ein unbekannter Zauber liegt auf der Einheit. ($int36($id))\""
+
+msgid "force_leave_ship"
+msgstr "$unit($owner) bittet $unit($unit), $ship($ship) zu verlassen."
+
+msgid "dissolve_units_1"
+msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"kehrte auf seine\", \"kehrten auf ihre\") Felder zurück.\""
+
+msgid "hornofpeace_r_nosuccess"
+msgstr "\"$unit($unit) in $region($region) bläst das Horn des Tanzes, doch niemand hier lässt sich von Stimmung anstecken.\""
+
+msgid "malnourish"
+msgstr "\"$unit($unit) in $region($region) wird durch unzureichende Nahrung geschwächt.\""
+
+msgid "iceberg_land"
+msgstr "\"Der Eisberg $region($region) treibt an eine Küste.\""
+
+msgid "produce_lowskill"
+msgstr "\"$unit($unit) in $region($region) hat ein zu niedriges Talent, um $resource($resource,0) abzubauen.\""
+
+msgid "income_steal_reduced"
+msgstr "\"$unit($unit) klaut in $region($region) $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber.\""
+
+msgid "error_cannotmake"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht machen.\""
+
+msgid "meow"
+msgstr "\"Miiauuuuuu...\""
+
+msgid "spelltargetnotfound"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Ziel gefunden.\""
+
+msgid "curseinfo::fumble"
+msgstr "\"$unit($unit) kann sich kaum konzentrieren. ($int36($id))\""
+
+msgid "curseinfo::sparkle_14"
+msgstr "\"Der Kopf von $unit($unit) hat sich in einen grinsenden Totenschädel verwandelt. ($int36($id))\""
+
+msgid "reanimate_effect_1"
+msgstr "\"$unit($mage) beginnt ein Ritual der Wiederbelebung und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Krieger stehen von den Toten auf.\""
+
+msgid "analyse_building_nospell"
+msgstr "\"$unit($mage) meint, dass auf $building($building) kein Zauber liegt.\""
+
+msgid "magicresistance_building"
+msgstr "\"Die natürliche Widerstandskraft gegen Verzauberung ist gestärkt. ($int36($id))\""
+
+msgid "race_notake"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) nehmen nichts an.\""
+
+msgid "cast_drainlife_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurde ihre Lebenskraft entzogen.\""
+
+msgid "headache_effect_0"
+msgstr "\"$unit($mage) verschafft $unit($unit) einige feuchtfröhliche Stunden mit heftigen Nachwirkungen.\""
+
+msgid "unholypower_limitedeffect"
+msgstr "\"$unit($mage) verwandelt $int($amount) aus $unit($target) in $race($race,0).\""
+
+msgid "income_work_reduced"
+msgstr "\"$unit($unit) arbeitet in $region($region) für einen Lohn von $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber.\""
+
+msgid "maintenancespecialfail"
+msgstr "\"$unit($unit) fehlen $resource($item,0) für den Betrieb von $building($building).\""
+
+msgid "healing_effect_1"
+msgstr "\"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource($item,1), um den Zauber zu verstärken. $int($amount) Verwundete werden geheilt.\""
+
+msgid "error276"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man keine Schiffe bauen.\""
+
+msgid "error166"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann eine Burg nicht belagern.\""
+
+msgid "chaosgate_effect_2"
+msgstr "\"Ein Wirbel aus blendendem Licht erscheint.\""
+
+msgid "hornofpeace_u_success"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $int($pacified) Regionen wurden befriedet.\""
+
+msgid "error71"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Richtung wurde nicht erkannt.\""
+
+msgid "error93"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier gibt es schon einen Hafen.\""
+
+msgid "no_attack_after_advance"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist noch zu erschöpft vom Einmarsch um zu attackieren.\""
+
+msgid "error82"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es gibt keine Abstimmung mit dieser Nummer.\""
+
+msgid "error60"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wird belagert.\""
+
+msgid "error162"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Heiltrank wird automatisch bei Bedarf benutzt.\""
+
+msgid "error272"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Pferde müssen leider draußen bleiben.\""
+
+msgid "warn_dropout"
+msgstr "\"Achtung: $faction($faction) hat seit $int($turns) Wochen keine Züge eingeschickt und könnte dadurch in Kürze aus dem Spiel ausscheiden.\""
+
+msgid "arena_leave_fail"
+msgstr "\"Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. $unit($unit) konnte die Ebene der Herausforderung nicht verlassen.\""
+
+msgid "battle_critical"
+msgstr "\"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer.\""
+
+msgid "error_spell_on_ship_already"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt beeits ein Zauber.\""
+
+msgid "error228"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur normale Personen können Steuern eintreiben.\""
+
+msgid "error118"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Gegenstand kann die Einheit nicht herstellen.\""
+
+msgid "curseinfo::sparkle_10"
+msgstr "\"Ein Einhorn berührt $unit($unit) mit seinem Horn und verschwindet kurz darauf im Unterholz. ($int36($id))\""
+
+msgid "error114"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nummer ist nicht im gültigen Bereich.\""
+
+msgid "error233"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Typ Einheit kann keine Schiffe betreten.\""
+
+msgid "iceberg_create"
+msgstr "\"Der Gletscher von $region($region) bricht und treibt davon.\""
+
+msgid "chaos_disease"
+msgstr "\"$unit($unit) scheint von einer seltsamen Krankheit befallen.\""
+
+msgid "error1"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.\""
+
+msgid "sp_icastle_effect"
+msgstr "\"Verwundert blicken die Bauern von $region($region) auf ein neues Gebäude.\""
+
+msgid "curseinfo::godcurse"
+msgstr "\"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen über die tote Erde und furchtbare Kreaturen ziehen über das Land. Die Brunnen sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz überzogen. Niemand kann hier lange überleben. ($int36($id))\""
+
+msgid "recruit_archetype"
+msgstr "\"$unit($unit) rekrutiert $int($amount) $localize($archetype).\""
+
+msgid "para_tactics_won"
+msgstr "\"$unit($unit) überrascht den Gegner.\""
+
+msgid "raindance_effect"
+msgstr "\"$if($isnull($mage),\"Ein unentdeckter Magier\",$unit($mage)) führt einen sonderbaren Tanz auf. Kurz darauf beginnt es zu regnen.\""
+
+msgid "mistake"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - ${error}.\""
+
+msgid "income_tax"
+msgstr "\"$unit($unit) treibt in $region($region) Steuern in Höhe von $int($amount) Silber ein.\""
+
+msgid "give_person_ocean"
+msgstr "\"$unit($unit) ertränkt $int($amount) Person$if($eq($amount,1),\"\",\"en\").\""
+
+msgid "error_no_tax_skill"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht geschult im Eintreiben von Steuern.\""
+
+msgid "sparkle_effect"
+msgstr "\"$unit($mage) belegt $unit($target) mit einem Zauber.\""
+
+msgid "error18"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist zu schwer beladen, um in See zu stechen.\""
+
+msgid "sp_raisepeasants_effect"
+msgstr "\"$unit($mage) wiegelt in $region($region) $int($amount) Bauern zum Aufstand auf.\""
+
+msgid "pump_effect"
+msgstr "\"$unit($mage) horcht $unit($unit) über $region($tregion) aus.\""
+
+msgid "curseinfo::sparkle_5"
+msgstr "\"Eine Melodie erklingt, und $unit($unit) tanzt bis spät in die Nacht hinein. ($int36($id))\""
+
+msgid "dragon_growl"
+msgstr "\"$unit($dragon): \\\"$localize($growl) $if($eq($number,1), \"Ich rieche\", \"Wir riechen\") etwas in $region($target)\\\".\""
+
+msgid "produce"
+msgstr "\"$unit($unit) in $region($region) produziert $int($amount)$if($eq($wanted,$amount),\"\",\" von $int($wanted)\") $resource($resource,$wanted).\""
+
+msgid "income_work"
+msgstr "\"$unit($unit) arbeitet in $region($region) für einen Lohn von $int($amount) Silber.\""
+
+msgid "nr_stat_people"
+msgstr "\"Personen: $int($max)\""
+
+msgid "destroy_curse_noeffect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber ist nicht stark genug, um den Fluch ($id) auf ${target} zu zerstören.\""
+
+msgid "detectocean"
+msgstr "\"$unit($unit) entdeckt, dass $region($region) $localize($terrain) ist.\""
+
+msgid "spell_resist"
+msgstr "\"$unit($unit) gelingt es $spell($spell) zu zaubern, doch der Spruch zeigt keine Wirkung.\""
+
+msgid "shipdestroy"
+msgstr "\"$unit($unit) in $region($region) versenkt die $ship($ship).\""
+
+msgid "destroy_ship_3"
+msgstr "\"Es wurde versucht, $ship($ship) zu zerstören.\""
+
+msgid "error289"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wie sollen wir uns tarnen?\""
+
+msgid "spellbuildingnotfound"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gebäude $int36($id) wurde nicht gefunden.\""
+
+msgid "error179"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Magiegebiet kann die Einheit nicht lernen.\""
+
+msgid "sp_migranten"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) wird von uns aufgenommen.\""
+
+msgid "error175"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann man nicht auf einem sich bewegenden Schiff stehend zaubern.\""
+
+msgid "error285"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kennt keine Trankrezepte.\""
+
+msgid "dissolve_units_4"
+msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"zerfiel\", \"zerfielen\") zu Staub.\""
+
+msgid "error281"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen welche Rasse soll der Jihad ausgerufen werden?\""
+
+msgid "error171"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Kampfzauber gibt es nicht.\""
+
+msgid "astral_disappear"
+msgstr "\"$unit($unit) wird durchscheinend und verschwindet.\""
+
+msgid "error127"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann Deine Partei nicht aufnehmen.\""
+
+msgid "drought_effect_2"
+msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt.\""
+
+msgid "usepotion"
+msgstr "\"$unit($unit) benutzt $resource($potion,1).\""
+
+msgid "error237"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region befindet sich in Aufruhr.\""
+
+msgid "error90"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit fährt nicht mit uns.\""
+
+msgid "orcified"
+msgstr "\"Vor den vielen Orks in $region($region) fliehen die anderen Einwohner.\""
+
+msgid "plant_skills"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu pflanzen.\""
+
+msgid "renamed_ship_notseen"
+msgstr "\"Die $ship($ship) in $region($region) bekommt einen Spitznamen.\""
+
+msgid "error123"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas hat die Einheit nicht.\""
+
+msgid "error308"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Talent kann nicht höher gelernt werden.\""
+
+msgid "spyreport_faction"
+msgstr "\"$unit($target) gehört der Partei $faction($faction) an.\""
+
+msgid "ship_drift"
+msgstr "\"Die $ship($ship) treibt nach $direction($dir).\""
+
+msgid "error_max_magicians"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es kann maximal $int($amount) Magier pro Partei geben.\""
+
+msgid "error304"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheiten einer Partei, die noch immun gegen Angriffe ist, dürfen nicht bewachen.\""
+
+msgid "error300"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ungültiges Synonym.\""
+
+msgid "error4"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude ist bereits fertig.\""
+
+msgid "curseinfo::magicstreetwarn"
+msgstr "\"Die Straßen sind erstaunlich trocken und gut begehbar, doch an manchen Stellen bilden sich wieder die erste Schlammlöcher. ($int36($id))\""
+
+msgid "moveblocked"
+msgstr "\"$unit($unit) entdeckt, dass es keinen Weg nach $direction($direction) gibt.\""
+
+msgid "nr_market_info_p"
+msgstr "\"Auf dem Markt werden $resource($p1,0) und $resource($p2,0) feilgeboten.\""
+
+msgid "stealeffect"
+msgstr "\"$unit($unit) wurden in $region($region) $int($amount) Silberstücke geklaut.\""
+
+msgid "curseinfo::calm_1"
+msgstr "\"$unit($unit) scheint $faction($faction) zu mögen. ($int36($id))\""
+
+msgid "plant"
+msgstr "\"$unit($unit) pflanzt in $region($region) $int($amount) $resource($herb,$amount).\""
+
+msgid "nr_region_owner"
+msgstr "\"Die Region ist im Besitz von $faction($faction).\""
+
+msgid "analyse_region_nospell"
+msgstr "\"$unit($mage) meint, dass auf $region($region) kein Zauber liegt.\""
+
+msgid "one_circle_only"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei hat bereits ein Magiegebiet.\""
+
+msgid "race_nosteal"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nichts stehelen.\""
+
+msgid "error26"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl zu kaufender Produkte fehlt.\""
+
+msgid "error48"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht bewaffnet und kampffähig.\""
+
+msgid "sailfail"
+msgstr "\"Die $ship($ship) konnte $region($region) nicht verlassen.\""
+
+msgid "error15"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist noch nicht fertig gebaut.\""
+
+msgid "error37"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diesen Trank nicht.\""
+
+msgid "error59"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit weiß nichts über Botanik.\""
+
+msgid "ent_effect"
+msgstr "\"$unit($mage) belebt $int($amount) Bäume.\""
+
+msgid "error89"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Geldgebot fehlt.\""
+
+msgid "nr_header_date"
+msgstr "\"Report für $game, $date\""
+
+msgid "error188"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht im Sumpf gezaubert werden.\""
+
+msgid "error298"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier hat bereits einen Klon.\""
+
+msgid "fail_tooheavy"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist zu schwer.\""
+
+msgid "familiar_farcast"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann Zauber, die durch $unit($unit) gewirkt werden, nicht zusätzlich in die Ferne richten.\""
+
+msgid "error184"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit bewegt sich nicht.\""
+
+msgid "income_entertainment"
+msgstr "\"$unit($unit) verdient in $region($region) $int($amount) Silber durch Unterhaltung.\""
+
+msgid "error180"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber schlägt fehl.\""
+
+msgid "sp_shapeshift_fail"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) kann nicht $race($race,1) werden.\""
+
+msgid "error290"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Einheit kann nur in einem Verband Mitglied sein.\""
+
+msgid "cast_rally_effect"
+msgstr "\"$unit($mage) besänftigt den Bauernaufstand in $region($region).\""
+
+msgid "error246"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude hat schon einen Namen.\""
+
+msgid "stealaura_fail"
+msgstr "\"$unit($unit) konnte $unit($target) keine Aura entziehen.\""
+
+msgid "nmr_warning"
+msgstr "Deine Partei hat letzte Runde keinen Zug abgegeben!"
+
+msgid "destroy"
+msgstr "\"$unit($unit) zerstört $building($building).\""
+
+msgid "volcanooutbreaknn"
+msgstr "\"Der Vulkan in $region($region) bricht aus.\""
+
+msgid "error132"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Sümpfen Straßen bauen zu können, muß zuerst ein Damm errichtet werden.\""
+
+msgid "error251"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Kraft können selbst die Götter nicht mehr mächtiger machen.\""
+
+msgid "error207"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zu dieser Einheit kann keine Aura übertragen werden.\""
+
+msgid "error317"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Objekt ist unzerstörbar.\""
+
+msgid "error_different_magic"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) versteht unsere Art von Magie nicht.\""
+
+msgid "curseinfo::sparkle_3"
+msgstr "\"$unit($unit) wird von einem glitzernden Funkenregen umgeben. ($int36($id))\""
+
+msgid "error313"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Werwesen können nicht arbeiten.\""
+
+msgid "mail_result"
+msgstr "\"Eine Botschaft von $unit($unit): '$message'\""
+
+msgid "error203"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Ziel wurde vergessen.\""
+
+msgid "cast_storm_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): Ein Sturm kommt auf und die Schützen können kaum noch zielen.\""
+
+msgid "patzer4"
+msgstr "\"Als $unit($unit) in $region($region) versucht, $spell($spell) zu zaubern erhebt sich plötzlich ein dunkler Wind. Bizarre geisterhafte Gestalten kreisen um den Magier und scheinen sich von den magischen Energien des Zaubers zu ernähren. Mit letzter Kraft gelingt es $unit($unit) dennoch den Spruch zu zaubern.\""
+
+msgid "curseinfo::magicrunes_ship"
+msgstr "\"Auf den Planken von $ship($ship) erkennt man seltsame Runen. ($int36($id))\""
+
+msgid "santa_f"
+msgstr "'Ho ho ho!' Ein dicker Gnom fliegt auf einem von 8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner Partei eine $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)')."
+
+msgid "cast_spell_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell).\""
+
+msgid "curseinfo::disorientationzone"
+msgstr "\"Ein Schleier der Verwirrung liegt über der Region. ($int36($id))\""
+
+msgid "calm_effect"
+msgstr "\"$unit($mage) besänftigt $unit($unit).\""
+
+msgid "error7"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das geht nicht mehr.\""
+
+msgid "summonundead_effect_2"
+msgstr "\"$unit($mage) stört in $region($region) die Ruhe der Toten.\""
+
+msgid "generous_effect_0"
+msgstr "\"Die Darbietungen von $unit($mage) begeistern die Leute. Die fröhliche und ausgelassene Stimmung seiner Lieder überträgt sich auf alle Zuhörer.\""
+
+msgid "curseinfo::generous"
+msgstr "\"Es herrscht eine fröhliche und ausgelassene Stimmung. ($int36($id))\""
+
+msgid "buildroad"
+msgstr "\"$unit($unit) erweitert in $region($region) das Straßennetz um $int($size).\""
+
+msgid "nr_borderlist_postfix"
+msgstr "\"$if($transparent,\" befindet sich\",\" versperrt\") ${object}$if($transparent,\"\",\" die Sicht\").\""
+
+msgid "effectstrength"
+msgstr "\"$unit($mage) erhöht die Körperkraft von $unit.dative($target) beträchtlich.\""
+
+msgid "wormhole_appear"
+msgstr "\"In $region($region) erscheint ein Wurmloch.\""
+
+msgid "givecommand"
+msgstr "\"$unit($unit) gibt das Kommando an $unit($recipient).\""
+
+msgid "sink_msg"
+msgstr "\"$ship($ship) versinkt in den Fluten von $region($region).\""
+
+msgid "force_leave_building"
+msgstr "$unit($owner) bittet $unit($unit), $building($building) zu verlassen."
+
+msgid "hero_promotion"
+msgstr "\"$unit($unit) wird mit $int($cost) Silber zum Helden ernannt.\""
+
+msgid "renumber_inuse"
+msgstr "\"NUMMER PARTEI $int36($id): Diese Nummer wird von einer anderen Partei benutzt.\""
+
+msgid "firewall_death"
+msgstr "\"$unit($unit) stirbt beim Versuch, die Feuerwand nach $region($region) zu durchqueren.\""
+
+msgid "skillpotion_use"
+msgstr "\"$unit($unit) benutzt einen Talenttrunk und fühlt, wie sein Wissen zunimmt.\""
+
+msgid "drown_on_ship"
+msgstr "\"$unit($unit) ertrinkt beim Untergang der $ship($ship) in $region($region).\""
+
+msgid "curseinfo::riotzone"
+msgstr "\"Eine Wolke negativer Energie liegt über der Region. ($int36($id))\""
+
+msgid "send_astral"
+msgstr "\"$unit($target) wird von $unit($unit) in eine andere Welt geschleudert.\""
+
+msgid "earthquake_effect"
+msgstr "\"$unit($mage) läßt die Erde in $region($region) erzittern.\""
+
+msgid "error56"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann soviele Pferde nicht bändigen.\""
+
+msgid "error78"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Fluch verhindert die Übergabe.\""
+
+msgid "questportal_lock"
+msgstr "\"$unit($unit) verschließt eines der Schlösser in $region($region) mit $if($eq($key,1),\"dem Achatenen Schlüssel\",\"dem Saphirnen Schlüssel\").\""
+
+msgid "error45"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist eine der unsrigen.\""
+
+msgid "error67"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Pferde würden ertrinken.\""
+
+msgid "detectforbiddendir"
+msgstr "\"$unit($unit) weigert sich, nach $direction($direction) zu reisen.\""
+
+msgid "error197"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um einen Heimstein zu erschaffen, muß der Zauberer in einer Burg sein.\""
+
+msgid "sp_flee_effect_1"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden von Furcht gepackt.\""
+
+msgid "overrun_by_iceberg_des"
+msgstr "\"Die $ship($ship) wird bei einer Kollision mit einem Eisberg zerstört.\""
+
+msgid "curseinfo::region_unknown"
+msgstr "\"Ein unbekannter Zauber liegt auf der Region. ($int36($id))\""
+
+msgid "nr_market_price"
+msgstr "\"$resource($product,0) $int($price) Silber\""
+
+msgid "error259"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Befehl ist nur auf Einheiten innerhalb des selben Gebäudes oder Schiffes anwendbar.\""
+
+msgid "building_needed"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht nicht im benötigten Gebäude, $localize($building).\""
+
+msgid "error149"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wohin soll die Botschaft gehen?\""
+
+msgid "curseinfo::building_unknown"
+msgstr "\"Ein unbekannter Zauber liegt auf dem Gebäude. ($int36($id))\""
+
+msgid "error145"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Burg.\""
+
+msgid "piratenovictim"
+msgstr "\"$if($isnull($ship),\"$unit($unit)\",\"Die $ship($ship)\") in $region($region) kann keine Schiffe aufbringen.\""
+
+msgid "questportal_unlock"
+msgstr "\"$unit($unit) öffnet eines der Schlösser in $region($region) mit $if($eq($key,1),\"dem Achatenen Schlüssel\",\"dem Saphirnen Schlüssel\").\""
+
+msgid "error255"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht opfern.\""
+
+msgid "entrance_besieged"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) wird belagert.\""
+
+msgid "error260"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Besitzer eines Schiffes oder Gebäudes kann nicht neu sortiert werden.\""
+
+msgid "nr_market_info_s"
+msgstr "\"Auf dem Markt wird $resource($p1,0) feilgeboten.\""
+
+msgid "error141"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht mehr genug Kristalle für so viele Personen.\""
+
+msgid "error106"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Magier müssen zum studieren allein sein.\""
+
+msgid "race_no_attack"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) sind friedliebend und attackieren niemand.\""
+
+msgid "error216"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keine Verbindung zur astralen Welt.\""
+
+msgid "error771"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Talent kann die Einheit nicht lernen.\""
+
+msgid "error212"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier befindet sich nicht auf einem Schiff.\""
+
+msgid "stormwinds_effect"
+msgstr "\"$unit($unit) beschwört einen magischen Wind, der die Schiffe über das Wasser treibt.\""
+
+msgid "error102"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren Güter handeln.\""
+
+msgid "sp_drought_effect"
+msgstr "\"$unit($mage) verflucht das Land in $region($region), und eine Dürreperiode beginnt.\""
+
+msgid "error_giveeye"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine höhere Macht hindert $unit($unit) daran, das Objekt zu übergeben. 'ES IST DEINS, MEIN KIND. DEINS GANZ ALLEIN'.\""
+
+msgid "curseinfo::buildingunknown"
+msgstr "\"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))\""
+
+msgid "changebanner"
+msgstr "\"Das Banner wurde auf '$value' geändert.\""
+
+msgid "curseinfo::skill_2"
+msgstr "\"$unit($unit) ist ungewöhnlich ungeschickt in $skill($skill). ($int36($id))\""
+
+msgid "spellfail::noway"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg.\""
+
+msgid "spellbuildingresists"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gebäude $int36($id) konnte nicht verzaubert werden.\""
+
+msgid "nr_claims"
+msgstr "\"Einheiten können die folgenden Gegenstände beanspruchen: $resources($items)\""
+
+msgid "destroy_ship_2"
+msgstr "\"$unit($unit) wurde beim Versuch $ship($ship) zu zerstören entdeckt.\""
+
+msgid "destroy_magic_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier zerstört $int($succ) Flüche auf ${target}.\""
+
+msgid "battle_row"
+msgstr "\"... in der $int($row). Kampflinie:\""
+
+msgid "renamed_faction_seen"
+msgstr "\"Die Partei bekommt von $unit.dative($unit) in $region($region) einen Spitznamen.\""
+
+msgid "error_not_on_undead"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Untote gezaubert werden.\""
+
+msgid "iceberg_melt"
+msgstr "\"Der Eisberg $region($region) schmilzt.\""
+
+msgid "cast_berserk_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden in einen Blutrausch versetzt.\""
+
+msgid "curseinfo::sparkle_1"
+msgstr "\"$unit($unit) ist im Traum eine Fee erschienen. ($int36($id))\""
+
+msgid "rust_effect_0"
+msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte.\""
+
+msgid "error1222"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
+
+msgid "header_battle"
+msgstr "\"In $region($region) findet ein Kampf statt.\""
+
+msgid "wormhole_dissolve"
+msgstr "\"Das Wurmloch in $region($region) schließt sich.\""
+
+msgid "error23"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht die Kontaktaufnahme unmöglich.\""
+
+msgid "error12"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht.\""
+
+msgid "error34"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit darf nicht an Bord kommen.\""
+
+msgid "income_steal"
+msgstr "\"$unit($unit) klaut in $region($region) $int($amount) Silber.\""
+
+msgid "itemcrumble"
+msgstr "\"$unit($unit) in $region($region): $int($amount) $resource($item,$amount) zerfallen zu Staub.\""
+
+msgid "error86"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Falsches Passwort.\""
+
+msgid "luxury_notsold"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Luxusgut wird hier nicht verkauft.\""
+
+msgid "error75"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit nimmt niemanden an.\""
+
+msgid "error97"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In Gletschern können keine Insekten rekrutiert werden.\""
+
+msgid "regionmagic_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gelingt es die Region zu verzaubern.\""
+
+msgid "error158"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Magier arbeiten grundsätzlich nur alleine!\""
+
+msgid "spyreport_mage"
+msgstr "\"$unit($target) ist ein ${type}-Magier.\""
+
+msgid "error268"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man nichts übergeben.\""
+
+msgid "error264"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieses Gut hat die Einheit nicht.\""
+
+msgid "error154"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hochqualifizierte Personen weigern sich, für andere Parteien zu arbeiten.\""
+
+msgid "error_notstonecircle"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) ist kein Steinkreis.\""
+
+msgid "error150"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Besitzer muss das Gebäude zuerst verlassen.\""
+
+msgid "error229"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Vertrauter wird beschworen, verschwindet jedoch wieder, als er keine Verbindung zu seinem Element herstellen kann.\""
+
+msgid "error_migrants_nolearn"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Migranten können keine kostenpflichtigen Talente lernen.\""
+
+msgid "error225"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hungernde Soldaten kämpfen nicht.\""
+
+msgid "error115"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nummer ist schon belegt.\""
+
+msgid "spell_out_of_range"
+msgstr "\"$unit($mage) zaubert $spell($spell), aber niemand war in Reichweite.\""
+
+msgid "error111"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nachricht zu lang - gekürzt.\""
+
+msgid "error221"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man hier nicht bauen.\""
+
+msgid "error_race_nolearn"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nichts lernen.\""
+
+msgid "buy"
+msgstr "\"$unit($unit) bezahlt $int($money) Silber für den Kauf von Luxusgütern.\""
+
+msgid "curseinfo::sparkle_15"
+msgstr "\"Ratten folgen $unit($unit) auf Schritt und Tritt. ($int36($id))\""
+
+msgid "arena_enter_fail"
+msgstr "\"In $region($region) erklingt die Stimme des Torwächters: 'Nur wer ohne materielle Güter und noch lernbegierig ist, der darf die Ebene der Herausforderung betreten. Und vergiß nicht mein Trinkgeld.'. $unit($unit) erhielt keinen Einlaß.\""
+
+msgid "curseinfo::deathcloud"
+msgstr "\"In der Region treibt ein Giftelementar sein Unwesen. ($int36($id))\""
+
+msgid "income"
+msgstr "\"$unit($unit) verdient$if($eq($mode,4),\" am Handel\",\"\") in $region($region) $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber$if($eq($mode,1),\" durch Unterhaltung\",$if($eq($mode,2),\" durch Steuern\",$if($eq($mode,3),\" durch Handel\",$if($eq($mode,5),\" durch Diebstahl\",$if($eq($mode,6),\" durch Zauberei\",$if($eq($mode,7),\" durch Plündern\",\"\")))))).\""
+
+msgid "researchherb"
+msgstr "\"$unit($unit) in $region($region) stellt fest, dass es hier $localize($amount) $resource($herb,0) gibt.\""
+
+msgid "poison_death"
+msgstr "\"$unit($unit) stirbt am Schaden durch den Giftelementar in $region($region).\""
+
+msgid "error_notcomplete"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) muss vor der Weihe fertiggestellt sein.\""
+
+msgid "regenaura"
+msgstr "\"$unit($unit) in $region($region) regeneriert $int($amount) Aura.\""
+
+msgid "regionmagic_patzer"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gelingt es zwar die Region zu verzaubern, aber irgendwas ging schief.\""
+
+msgid "curseinfo::sparkle_11"
+msgstr "\"Vogelzwitschern begleitet $unit($unit) auf all seinen Wegen. ($int36($id))\""
+
+msgid "wdw_pyramidspell_notfound"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Region können keine Pyramiden gebaut werden. Die nächste Pyramidenregion ist zwischen $int($mindist) und $int($maxdist) Regionen entfernt.\""
+
+msgid "sailforbidden"
+msgstr "\"Die Mannschaft der $ship($ship) weigert sich, nach $region($region) zu reisen.\""
+
+msgid "sp_raisepeasantmob_effect"
+msgstr "\"$unit($mage) wiegelt in $region($region) die Bauern zum Aufstand auf.\""
+
+msgid "error31"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Burg wurde nicht gefunden.\""
+
+msgid "error53"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine Tränke herstellen.\""
+
+msgid "error20"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff wurde nicht gefunden.\""
+
+msgid "error42"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genug Wagenlenker oder zuviel andere Fracht, um die Wagen aufzuladen.\""
+
+msgid "error64"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ist nicht ausreichend getarnt.\""
+
+msgid "curseinfo::itemcloak"
+msgstr "\"Die Ausrüstung von $unit($unit) scheint unsichtbar. ($int36($id))\""
+
+msgid "error277"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das kann die Einheit nicht.\""
+
+msgid "error94"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man keine Straße bauen.\""
+
+msgid "error167"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit geht nicht zu den Bauern.\""
+
+msgid "use_realworld_only"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Gegenstand kann nur in der realen Welt benutzt werden.\""
+
+msgid "error163"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Nestwärme kann nur von Insektenvölkern benutzt werden.\""
+
+msgid "error273"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man nicht unterrichten.\""
+
+msgid "error238"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier können nur Orks rekrutiert werden.\""
+
+msgid "spellfail::nocontact"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zu $region($target) kann kein Kontakt hergestellt werden.\""
+
+msgid "error119"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ohne einen Handelsposten gibt es keinen Markt.\""
+
+msgid "error124"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht auf dem Markt kaufen.\""
+
+msgid "santa_m"
+msgstr "'Ho ho ho!' Ein dicker Gnom fliegt auf einem von 8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner Partei einen $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)')."
+
+msgid "error234"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt..\""
+
+msgid "spellfail::nolevel"
+msgstr "\"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden.\""
+
+msgid "nr_score"
+msgstr "\"Deine Partei hat ${score} Punkte. Der Durchschnitt für Parteien ähnlichen Alters ist ${average} Punkte.\""
+
+msgid "curseinfo::ship_unknown"
+msgstr "\"Ein unbekannter Zauber liegt auf dem Schiff. ($int36($id))\""
+
+msgid "alliance::kickedout"
+msgstr "\"$faction($member) ist mit $int($votes) Stimmen aus $alliance($alliance) ausgeschlossen worden.\""
+
+msgid "error230"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin kann die Einheit uns nicht transportieren.\""
+
+msgid "error120"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Personen können nur an Menschen übergeben werden.\""
+
+msgid "error_max_alchemists"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es kann maximal $int($amount) Alchemisten pro Partei geben.\""
+
+msgid "error305"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Optionen ZIP und BZIP2 können nur um-, nicht ausgeschaltet werden.\""
+
+msgid "error301"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Kein Synonym angegeben.\""
+
+msgid "iceberg_drift"
+msgstr "\"Der Eisberg $region($region) treibt nach $direction($dir).\""
+
+msgid "hornofpeace_r_success"
+msgstr "\"$unit($unit) in $region($region) bläst das Horn des Tanzes. In der ganzen Region breitet sich eine friedliche Feststimmmung aus.\""
+
+msgid "nr_vicinitystart"
+msgstr "\"Im $direction($dir) der Region liegt $trailto($region)\""
+
+msgid "giverestriction"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Deine Partei muss mindestens $int($turns) alt sein, um etwas an andere Parteien übergeben zu können.\""
+
+msgid "curseinfo::depression"
+msgstr "\"Die Bauern sind unzufrieden. ($int36($id))\""
+
+msgid "patzer"
+msgstr "\"$unit($unit) unterläuft in $region($region) beim Zaubern von $spell($spell) ein Patzer.\""
+
+msgid "potionsave"
+msgstr "\"Eine Person von $unit($unit) konnte durch einen Heiltrank überleben.\""
+
+msgid "storm"
+msgstr "\"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$if($sink,\" und sinkt\",\"\").\""
+
+msgid "nr_insectwinter"
+msgstr "Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."
+
+msgid "spellfail_nomonsters"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Monster gezaubert werden.\""
+
+msgid "bagpipeoffear_region"
+msgstr "\"$unit($unit) spielt einen Dudelsack. Ausser sich vor Furcht geben die Bauern $int($money) Silber.\""
+
+msgid "sp_chaosrow_effect_1"
+msgstr "\"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander.\""
+
+msgid "use_item"
+msgstr "\"$unit($unit) benutzt $int($amount) $resource($item,$amount).\""
+
+msgid "sp_movecastle_effect"
+msgstr "\"Ein Beben erschüttert $building($building). Viele kleine Pseudopodien erheben das Gebäude und tragen es in Richtung $direction($direction).\""
+
+msgid "feedback_no_contact_resist"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen und widersteht dem Zauber.\""
+
+msgid "error176"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann man nicht in die Ferne richten.\""
+
+msgid "error286"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit transportiert uns nicht.\""
+
+msgid "error83"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnte kein Bauer gefangen werden.\""
+
+msgid "error50"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht erfahren genug dafür.\""
+
+msgid "error282"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen diese Rasse kann kein Jihad ausgerufen werden.\""
+
+msgid "nmr_warning_final"
+msgstr "\"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest.\""
+
+msgid "error172"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Zauber angegeben.\""
+
+msgid "entrance_denied"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Eintritt in $building($building) wurde verwehrt.\""
+
+msgid "maelstrom_effect"
+msgstr "\"$unit($mage) beschwört die Mächte des Wassers und ein gigantischer Strudel bildet sich.\""
+
+msgid "displayitem"
+msgstr "\"$resource($item,1) (Gewicht: $weight($weight)): $description\""
+
+msgid "error128"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann die Partei nicht aufnehmen.\""
+
+msgid "error247"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei hat schon einen Namen.\""
+
+msgid "spellfail_generous"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Stimmung in der Region ist so schlecht, dass niemand auf den Zauber reagiert.\""
+
+msgid "healing_effect_0"
+msgstr "\"$unit($mage) kümmert sich um die Verletzten und heilt $int($amount) Verwundete.\""
+
+msgid "use_questkey_wrongregion"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier ist kein passendes Schloss.\""
+
+msgid "error243"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keine gültige Rasse angegeben.\""
+
+msgid "error133"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Wüsten Straßen bauen zu können, muß zuerst eine Karawanserei errichtet werden.\""
+
+msgid "changepasswd"
+msgstr "\"Das Passwort für diese Partei lautet ${value}.\""
+
+msgid "cast_combatspell"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($dead) $if($eq($dead,1),\"Krieger wurde\", \"Krieger wurden\") getötet.\""
+
+msgid "cast_petrify_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurden versteinert.\""
+
+msgid "error309"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit ist schon ein Werwesen.\""
+
+msgid "nr_stat_salary_new"
+msgstr "\"Bauerneinnahmen: $int($max) Silber\""
+
+msgid "income_magic_reduced"
+msgstr "\"$unit($unit) verdient in $region($region) $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber durch Zauberei.\""
+
+msgid "destroy_ship_1"
+msgstr "\"$unit($unit) konnte $ship($ship) nicht zerstören.\""
+
+msgid "error314"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Partei kann nur einmal neu starten.\""
+
+msgid "error310"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit ist kein Werwesen.\""
+
+msgid "error_pflnorecruit"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In der Ebene der Herausforderung kann niemand rekrutiert werden.\""
+
+msgid "sp_mindblast_temp_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren kurzzeitig ihr Gedächtnis.\""
+
+msgid "buildbuilding"
+msgstr "\"$unit($unit) baut für $int($size) an $building($building) weiter.\""
+
+msgid "spellfail_astralblock"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Wege zwischen Geisterwelt und Realität scheinen blockiert zu sein.\""
+
+msgid "familiar_toofar"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann nicht genug Energie aufbringen, um diesen Spruch durch $unit($unit) zu wirken.\""
+
+msgid "wdw_pyramidspell_found"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Regione können Pyramiden gebaut werden.\""
+
+msgid "deorcified"
+msgstr "\"Langsam kehren andere Völker nach $region($region) zurück.\""
+
+msgid "sp_movecastle_fail_1"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Elementar weigert sich, nach $direction($direction) zu gehen.\""
+
+msgid "curseinfo::strength"
+msgstr "\"Die Leute strotzen nur so vor Kraft. ($int36($id))\""
+
+msgid "magic_fumble"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier verfängt sich im eigenen Zauber.\""
+
+msgid "teach_nolearn"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($student) lernt nicht.\""
+
+msgid "regionowned"
+msgstr "\"$unit($unit) konnte nicht von $region($region) nach $region($target) reisen, da der Besitzer der Region es verhinderte.\""
+
+msgid "income_tradetax"
+msgstr "\"$unit($unit) verdient am Handel in $region($region) Steuern in Höhe von $int($amount) Silber.\""
+
+msgid "error19"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff muß erst verlassen werden.\""
+
+msgid "buyamount"
+msgstr "\"$unit($unit) kauft $int($amount) $resource($resource,$amount).\""
+
+msgid "fumblecurse"
+msgstr "\"$unit($unit) in $region($region) wird von einem Unbekannten verflucht.\""
+
+msgid "regionmessage"
+msgstr "\"Eine Botschaft von $unit.dative($sender) aus $region($region): '$string'\""
+
+msgid "spellfail_noundead"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Untote  gezaubert werden.\""
+
+msgid "studycost"
+msgstr "\"$unit($unit) in $region($region) verbraucht $int($cost) Silber für das Studium von $skill($skill).\""
+
+msgid "flying_ship_result"
+msgstr "\"$unit($mage) beschwört einen Luftgeist, der die $ship($ship) in die Wolken hebt.\""
+
+msgid "forestfire_spread"
+msgstr "\"Der Waldbrand in $region($region) griff auch auf $region($next) über, und $int($trees) verbrannten.\""
+
+msgid "maintenancefail"
+msgstr "\"$unit($unit) kann den Unterhalt von $building($building) nicht bezahlen.\""
+
+msgid "bagpipeoffear_faction"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ausser sich vor Furcht geben die Bauern dem Barden $int($money) Silber.\""
+
+msgid "unitmessage"
+msgstr "\"In $region($region) erhielt $unit($unit) eine Botschaft von $unit.dative($sender): '$string'\""
+
+msgid "para_after_battle"
+msgstr "\"Einheiten nach dem Kampf:\""
+
+msgid "error189"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Selbst der mächtigste Magier der Welt könnte keinen Ozean austrocknen lassen.\""
+
+msgid "teach_student"
+msgstr "\"$unit($teacher) lehrt $unit($student) $skill($skill).\""
+
+msgid "curseinfo::astralblock"
+msgstr "\"Mächtige Magie verhindert den Kontakt zur Realität. ($int36($id))\""
+
+msgid "error299"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ungültiges Prefix.\""
+
+msgid "curseinfo::baddream"
+msgstr "\"Albträume plagen die Leute. ($int36($id))\""
+
+msgid "error295"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur ein Magier kann einen Astralkristall benutzen.\""
+
+msgid "error185"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber scheint ungewöhnlich schwach zu sein. Irgendetwas hat die magischen Energien abgeleitet.\""
+
+msgid "error181"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu muß sich der Magier in der Burg oder an Bord des Schiffes befinden.\""
+
+msgid "error291"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keinem Verband.\""
+
+msgid "curseinfo::calm_0"
+msgstr "\"$unit($unit) scheint $race($race, 0) zu mögen. ($int36($id))\""
+
+msgid "error256"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um so etwas kann man nicht beten.\""
+
+msgid "desertion"
+msgstr "\"$unit($unit) in $region($region) desertiert.\""
+
+msgid "error91"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier gibt es keine Mallornbäume.\""
+
+msgid "error137"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannter Hilfe-Modus.\""
+
+msgid "error80"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit ist nicht bewaffnet und kampffähig.\""
+
+msgid "error142"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat zuwenig Silber, um zu rekrutieren.\""
+
+msgid "rust_fail"
+msgstr "\"$unit($mage) legt einen Rosthauch auf $unit($target), doch der Rosthauch fand keine Nahrung.\""
+
+msgid "error252"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Was und wieviel soll geopfert werden?\""
+
+msgid "dissolve_units_3"
+msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"verfaulte\", \"verfaulten\").\""
+
+msgid "trappedairelemental_success"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die $ship($ship) wird jetzt schneller ihr Ziel erreichen.\""
+
+msgid "error208"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auraangabe fehlerhaft.\""
+
+msgid "error318"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude kann nur einmal pro Runde erweitert werden.\""
+
+msgid "teach_asgood"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) muß mindestens 2 Stufen besser sein als $unit($student).\""
+
+msgid "drought_effect_1"
+msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Eis schmilzt und verwandelt sich in Morast. Reißende Ströme spülen die mageren Felder weg und ersäufen Mensch und Tier. Was an Bauten nicht den Fluten zum Opfer fiel, verschlingt der Morast. Die sengende Hitze verändert die Region für immer.\""
+
+msgid "error204"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In einer Region ohne Bäume kann man diesen Zauber nicht wirken.\""
+
+msgid "patzer5"
+msgstr "\"$unit($unit) fühlt sich nach dem Zaubern von $spell($spell) viel erschöpfter als sonst und hat das Gefühl, dass alle weiteren Zauber deutlich mehr Kraft als normalerweise kosten werden.\""
+
+msgid "analyse_region_age"
+msgstr "\"$unit($mage) fand heraus, dass auf $region($region) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt.\""
+
+msgid "plague_spell"
+msgstr "\"$unit($mage) ruft in $region($region) eine Pest hervor.\""
+
+msgid "error200"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die maximale Aura reicht nicht für diesen Zauber.\""
+
+msgid "shipnoshore"
+msgstr "\"Die $ship($ship) entdeckt, dass $region($region) Festland ist.\""
+
+msgid "sp_sweetdreams_effect"
+msgstr "\"$unit($mage) verschafft $unit($unit) ein schönes Nachtleben in $region($region).\""
+
+msgid "error3"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Beschreibung zu lang - gekürzt.\""
+
+msgid "charming_effect"
+msgstr "\"$unit($mage) gelingt es $unit($unit) zu verzaubern. $unit($unit) wird für etwa $int($duration) Wochen unseren Befehlen gehorchen.\""
+
+msgid "target_region_invalid"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ungültige Zielregion.\""
+
+msgid "nr_heroes"
+msgstr "\"Deine Partei hat $int($units) Helden und kann maximal $int($maxunits) Helden ernennen.\""
+
+msgid "cast_tired_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger schleppten sich müde in den Kampf.\""
+
+msgid "caldera_handle_1"
+msgstr "\"$unit($unit) springt in die ewigen Feuer des Kraters.\""
+
+msgid "weakmagic"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber von $unit.dative($unit) war viel zu schwach und löst sich gleich wieder auf.\""
+
+msgid "analyse_building_fail"
+msgstr "\"$unit($mage) meint, dass auf $building($building) ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.\""
+
+msgid "spellfail_toomanytargets"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Persoenen übersteigen die Kräfte des Magiers.\""
+
+msgid "harvest_effect"
+msgstr "\"$if($isnull($mage),\"Ein unentdeckter Magier\",$unit($mage)) segnet in einem kurzen Ritual die Felder.\""
+
+msgid "buildship"
+msgstr "\"$unit($unit) baut für $int($size) an $ship($ship) weiter.\""
+
+msgid "spellshipnotfound"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Schiff $int36($id) wurde nicht gefunden.\""
+
+msgid "unveileog"
+msgstr "\"$unit($unit) in $region($region) entdeckt eine Laenader.\""
+
+msgid "error_roads_finished"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Richtung gibt es keine Brücken und Straßen mehr zu bauen.\""
+
+msgid "item_create_spell"
+msgstr "\"$unit($mage) erschafft $int($number) $resource($item,$number).\""
+
+msgid "curseinfo::slavery"
+msgstr "Dieser mächtige Bann scheint die Einheit ihres freien Willens zu berauben. Solange der Zauber wirkt, wird sie nur den Befehlen ihres neuen Herrn gehorchen. ($int36($id))"
+
+msgid "start_battle"
+msgstr "\"Der Kampf wurde ausgelöst von ${factions}.\""
+
+msgid "stealaura_fail_detect"
+msgstr "\"$unit($unit) fühlt sich einen Moment seltsam geschwächt.\""
+
+msgid "battle_msg"
+msgstr "\"$string\""
+
+msgid "error16"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist schon fertig.\""
+
+msgid "error38"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keine Kräuter.\""
+
+msgid "volcano_dead"
+msgstr "\"Beim Vulkanausbruch in $region($region) sterben $int($dead) Personen in $unit($unit).\""
+
+msgid "curseinfo::warmth_1"
+msgstr "\"$int($number) $if($eq($number,1), \"Person\", \"Personen\") von $unit($unit) $if($eq($number,1), \"fühlt\", \"fühlen\") sich vor Kälte geschützt. ($int36($id))\""
+
+msgid "maintenance_noowner"
+msgstr "\"Der Unterhalt von $building($building) konnte nicht gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig.\""
+
+msgid "error27"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl zu verkaufender Produkte fehlt.\""
+
+msgid "error49"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Eigentümer.\""
+
+msgid "missing_components"
+msgstr "\"$unit($unit) hat nicht genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern.\""
+
+msgid "seduce_effect_1"
+msgstr "\"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und gut verspielt.\""
+
+msgid "xmastree_effect"
+msgstr "\"In der Region erstrahlen des Nachts bunte Lichter, Gloeckchen klingeln und frohes Kindergelaechter klingt durch den Wald.\""
+
+msgid "cast_sleep_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden in Schlaf versetzt.\""
+
+msgid "nr_alliance"
+msgstr "\"Seit $int($age) Wochen Mitglied der Allianz '$name ($int36($id))', angeführt von $faction($leader).\""
+
+msgid "deathcloud_effect"
+msgstr "\"$unit($mage) beschwört einen Giftelementar in $region($region).\""
+
+msgid "nr_building_besieged"
+msgstr "\", belagert von $int($soldiers) Personen$if($lt($diff,0),\"\",\" (abgeschnitten)\")\""
+
+msgid "nr_population"
+msgstr "\"Deine Partei hat $int($population) Personen in $int($units) von maximal $int($limit) Einheiten.\""
+
+msgid "curseinfo::shipdisorientation"
+msgstr "Dieses Schiff hat sich verfahren. ($int36($id))"
+
+msgid "error198"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Flammen finden keine Nahrung. Das Feuer erlischt, ohne Schaden anzurichten.\""
+
+msgid "error194"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Zielregion wurde nicht korrekt angegeben.\""
+
+msgid "illusionantimagic"
+msgstr "\"$unit($unit) marschiert in eine Antimagiezone und löst sich auf.\""
+
+msgid "curseinfo::sparkle_8"
+msgstr "\"Eine Gruppe vorbeiziehender Bergarbeiter rufen $unit($unit) eindeutig Zweideutiges nach. ($int36($id))\""
+
+msgid "too_many_units_in_alliance"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Allianz darf aus nicht mehr als $int($allowed) Einheiten bestehen.\""
+
+msgid "error190"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in der materiellen Welt.\""
+
+msgid "sp_flee_effect_0"
+msgstr "\"$unit($mage) zaubert $spell($spell), aber es gab niemanden, der beeinflusst werden konnte.\""
+
+msgid "error146"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht der Kapitän des Schiffes.\""
+
+msgid "error265"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Gegenstand funktioniert nur in der normalen Welt.\""
+
+msgid "error261"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Vor den Besitzer eines Schiffes oder Gebäudes kann nicht sortiert werden.\""
+
+msgid "icastle_dissolve"
+msgstr "\"Plötzlich löst sich $building($building) in kleine Traumwolken auf.\""
+
+msgid "error151"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zum Straßenbau braucht man Steine.\""
+
+msgid "slave_active"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit kämpft nicht.\""
+
+msgid "error107"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man braucht mindestens zwei Pferde, um sie zu züchten.\""
+
+msgid "error213"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Parameter nicht korrekt angegeben.\""
+
+msgid "error103"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann Straßen bauen.\""
+
+msgid "curseinfo::slave_1"
+msgstr "\"$unit($unit) wird noch $int($duration) $if($eq($duration,1), \"Woche\", \"Wochen\") unter unserem Bann stehen. ($int36($id))\""
+
+msgid "alliance::lost"
+msgstr "\"$alliance($alliance) scheidet aus dem Spiel aus, nachdem alle Tempel verloren gingen.\""
+
+msgid "nr_stat_salary"
+msgstr "\"Lohn für Arbeit: $int($max) Silber\""
+
+msgid "nr_stat_luxuries"
+msgstr "\"Luxusgüter zum angegebenen Preis: $int($max)\""
+
+msgid "curseinfo::flyingship"
+msgstr "\"Kräftige Stürme haben dieses Schiff in die Luft gehoben. ($int36($id))\""
+
+msgid "curseinfo::blessedharvest"
+msgstr "\"In dieser Gegend steht das Korn besonders gut im Feld. ($int36($id))\""
+
+msgid "killed_battle"
+msgstr "\"$unit($unit) tötete $int($dead) Krieger.\""
+
+msgid "error6"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude wurde nicht gefunden.\""
+
+msgid "sailnolandingstorm"
+msgstr "\"Die Mannschaft der $ship($ship) kann in letzter Sekunde verhindern, dass das Schiff in $region($region) auf Land aufläuft.\""
+
+msgid "teachdumb"
+msgstr "\"$unit($teacher) kann durch Dumpfbackenbrot nur $int($amount) Schüler lehren.\""
+
+msgid "teleport_success"
+msgstr "\"$unit($unit) wurde von $region($source) nach $unit($target) teleportiert.\""
+
+msgid "becomewere"
+msgstr "\"$unit($unit) in $region($region) verwandelt sich in ein Werwesen.\""
+
+msgid "spellshipresists"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $ship($ship) widersteht dem Zauber.\""
+
+msgid "nr_potion_effect"
+msgstr "\"Auf der Einheit $if($eq($left,1),\"liegt\",\"liegen\") $int($left) Wirkung$if($eq($left,1),\"\",\"en\") $resource($potion,1).\""
+
+msgid "curseinfo::peacezone"
+msgstr "\"Die ganze Region ist von einer friedlichen Stimmung erfasst. ($int36($id))\""
+
+msgid "rust_effect_1"
+msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch der magische Regen zeigt keinen Effekt.\""
+
+msgid "find_manual"
+msgstr "\"$unit($unit) stolpert bei der Erforschung der Region über $localize($location). Nähere Durchsuchung fördert ein zerfleddertes altes Buch mit dem Titel '$localize($book)' zu Tage. Der Wissensschub ist enorm.\""
+
+msgid "curseinfo::healingzone"
+msgstr "Heilung ist in dieser Region magisch beeinflusst. ($int36($id))"
+
+msgid "income_entertainment_reduced"
+msgstr "\"$unit($unit) verdient in $region($region) $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber durch Unterhaltung.\""
+
+msgid "errusingpotion"
+msgstr "\"$unit($unit): '$order($command)' - Die Einheit benutzt bereits $resource($using,0).\""
+
+msgid "missing_components_list"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Für diesen Zauber fehlen noch $resources($list).\""
+
+msgid "volcanostopsmoke"
+msgstr "\"Aus dem Vulkankrater von $region($region) steigt kein Rauch mehr.\""
+
+msgid "summondragon"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($target).\""
+
+msgid "use_antimagiccrystal"
+msgstr "\"$unit($unit) benutzt einen Antimagiekristall.\""
+
+msgid "cast_stun_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger sind für einen Moment benommen.\""
+
+msgid "error46"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Taverne.\""
+
+msgid "error35"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat diese Kräuter nicht.\""
+
+msgid "error57"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit trägt zuviel Gewicht, um sich bewegen zu können.\""
+
+msgid "feedback_no_contact_no_resist"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen, aber widersteht dem Zauber nicht.\""
+
+msgid "error79"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Schiff oder eine Burg muß angegeben werden.\""
+
+msgid "drought_effect_4"
+msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Das Eis zerbricht und eine gewaltige Flutwelle verschlingt die Region.\""
+
+msgid "destroy_ship_0"
+msgstr "\"$ship($ship) wurde von $unit($unit) zerstört.\""
+
+msgid "curseinfo::sparkle_16"
+msgstr "\"Pestbeulen befallen den Körper von $unit($unit). ($int36($id))\""
+
+msgid "missing_direction"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - keine Richtung angegeben.\""
+
+msgid "error159"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Personen übergeben werden.\""
+
+msgid "shock"
+msgstr "\"$unit($mage) erleidet durch den Tod seines Vertrauten einen Schock.\""
+
+msgid "error269"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man nicht zaubern.\""
+
+msgid "sink_saved_msg"
+msgstr "\"$unit($unit) überlebt unbeschadet und rettet sich nach $region($region).\""
+
+msgid "race_noregroup"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nicht neu gruppiert werden.\""
+
+msgid "curseinfo::worse"
+msgstr "\"$unit($unit) wird von einem Alp geritten. ($int36($id))\""
+
+msgid "error274"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht unterrichten.\""
+
+msgid "region_guarded"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region wird von $unit($guard), einer nichtalliierten Einheit, bewacht.\""
+
+msgid "error155"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zuviele Magier in der Partei.\""
+
+msgid "curseinfo::speed_1"
+msgstr "\"$int($number) $if($eq($number,1), \"Person\", \"Personen\") von $unit($unit) $if($eq($number,1), \"ist\", \"sind\") noch $int($duration) $if($eq($duration,1), \"Woche\", \"Wochen\") beschleunigt. ($int36($id))\""
+
+msgid "error160"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Luxusgüter gekauft werden.\""
+
+msgid "error270"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man niemanden bestehlen.\""
+
+msgid "error226"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheiten in den hinteren Reihen können nicht angreifen.\""
+
+msgid "sailnolanding"
+msgstr "\"Die $ship($ship) konnte in $region($region) nicht einreisen, die Küste ist zu gefährlich für das Schiff.\""
+
+msgid "error116"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nummer kann nicht vergeben werden.\""
+
+msgid "error112"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Namen dürfen keine Klammern enthalten.\""
+
+msgid "error222"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Zeige alle was?\""
+
+msgid "teach_teacher"
+msgstr "\"$unit($teacher) lehrt $unit($student) $skill($skill) auf Stufe $int($level).\""
+
+msgid "patzer2"
+msgstr "\"$unit($unit) in $region($region) hat rasende Kopfschmerzen und kann sich nicht mehr richtig konzentrieren. Irgendwas bei diesem Zauber ist fürchterlich schiefgelaufen.\""
+
+msgid "curseinfo::magicboost"
+msgstr "Der Magier besitzt die Gabe des Chaos. ($int36($id))"
+
+msgid "illegal_password"
+msgstr "\"Dein Passwort enthält Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passwortenur aus Buchstaben von A bis Z und Zahlen bestehen dürfen. Dein neues Passwort ist '${newpass}'.\""
+
+msgid "curseinfo::sparkle_12"
+msgstr "\"Leuchtende Blumen erblühen rund um das Lager von $unit($unit). ($int36($id))\""
+
+msgid "familiar_name"
+msgstr "\"Vertrauter von $unit($unit)\""
+
+msgid "error9"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das kann man nicht sabotieren.\""
+
+msgid "curseinfo::sparkle_6"
+msgstr "\"$unit($unit) findet eine kleine Flöte, die eine wundersame Melodie spielt. ($int36($id))\""
+
+msgid "renamed_building_seen"
+msgstr "\"$building($building) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
+
+msgid "sp_shadowknights_effect"
+msgstr "\"$unit($mage) beschwört Trugbilder herauf.\""
+
+msgid "give"
+msgstr "\"$unit($unit) übergibt $int($amount) $resource($resource,$amount) an $unit($target).\""
+
+msgid "sellamount"
+msgstr "\"$unit($unit) verkauft $int($amount) $resource($resource,$amount).\""
+
+msgid "sp_migranten_fail1"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist von unserer Art, das Ritual wäre verschwendete Aura.\""
+
+msgid "victory_murder_complete"
+msgstr "\"SIEG! $if($eq($n,1), \"Die Partei $winners hat\", \"Die Parteien $winners haben\") die Siegbedingung für die erforderliche Zeit erfüllt. Das Spiel ist damit beendet.\""
+
+msgid "shipsink"
+msgstr "\"Die $ship($ship) ist zu stark beschädigt und sinkt.\""
+
+msgid "sp_bloodsacrifice_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gewinnt durch das Ritual $int($amount) Aura.\""
+
+msgid "sp_confusion_effect_0"
+msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
+
+msgid "pest"
+msgstr "\"Hier wütete die Pest, und $int($dead) Bauern starben.\""
+
+msgid "wormhole_exit"
+msgstr "\"$unit($unit) reist durch ein Wurmloch nach $region($region).\""
+
+msgid "spellfail_astralonly"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in der Geisterwelt.\""
+
+msgid "analyse_ship_noage"
+msgstr "\"$unit($mage) fand heraus, dass auf $ship($ship) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.\""
+
+msgid "destroy_road"
+msgstr "\"$unit($unit) reißt die Straße zwischen $region($from) und $region($to) ein.\""
+
+msgid "error13"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat sich bereits bewegt.\""
+
+msgid "aborted_battle"
+msgstr "\"Der Kampf wurde abgebrochen, da alle Verteidiger flohen.\""
+
+msgid "error24"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht Spionage unmöglich.\""
+
+msgid "usecatapult"
+msgstr "\"$int($amount) Krieger von $unit($unit) feuern ihre Katapulte ab.\""
+
+msgid "error76"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Gegenstand kann man nicht benutzen.\""
+
+msgid "error98"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Insekten können im Winter nur in Wüsten rekrutiert werden.\""
+
+msgid "spyreport"
+msgstr "\"$unit($spy) gelang es, Informationen über $unit($target) herauszubekommen: Kampfstatus ${status}.\""
+
+msgid "newbie_password"
+msgstr "\"Dein Passwort lautet ${password}.\""
+
+msgid "error65"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Lernkosten können nicht bezahlt werden.\""
+
+msgid "error87"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Für das Elixier benötigt man Drachenblut.\""
+
+msgid "spellfail_block"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Wege aus dieser Region sind blockiert.\""
+
+msgid "error278"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Name und Beschreibung des Gebäudes können nicht geändert werden.\""
+
+msgid "error168"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnten keine Luxusgüter verkauft werden.\""
+
+msgid "stormwinds_reduced"
+msgstr "\"$unit($unit) konnte nur $int($ships) von $int($maxships) Schiffen verzaubern.\""
+
+msgid "error283"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Passwort darf nur Buchstaben und Ziffern enthalten.\""
+
+msgid "rust_effect"
+msgstr "\"$unit($mage) legt einen Rosthauch auf $unit($target). $int($amount) Waffen wurden vom Rost zerfressen.\""
+
+msgid "nr_migrants"
+msgstr "\"Deine Partei hat $int($units) Migranten und kann maximal $int($maxunits) Migranten aufnehmen.\""
+
+msgid "error239"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Soll eine Einheit oder ein Schiff eine neue Nummer bekommen?\""
+
+msgid "aurapotion50_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier fühlt sich durch den Trank magische gestärkt.\""
+
+msgid "error129"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Leute kann die Partei nicht aufnehmen.\""
+
+msgid "spyreport_skills"
+msgstr "\"$unit($target) beherrscht ${skills}.\""
+
+msgid "sighting"
+msgstr "\"$if($isnull($region),\"Es\",\"In $region($region)\") wurde$if($eq($number,1),\"\",\"n\") $int($number) $race($race,$number) gesichtet.\""
+
+msgid "nr_stat_recruits"
+msgstr "\"Rekruten: max. $int($max) Bauern\""
+
+msgid "error235"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Für das Gebäude wurde noch kein Unterhalt bezahlt.\""
+
+msgid "error231"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit oder ihre Tiere würden dort nicht überleben.\""
+
+msgid "error121"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas gibt es hier nicht.\""
+
+msgid "error306"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei muß mindestens 9 Wochen alt sein, um einen Neustart zu versuchen.\""
+
+msgid "manacrystal_use"
+msgstr "\"$unit($unit) benutzt einen Astralkristall und gewinnt $int($aura) Aura hinzu.\""
+
+msgid "error302"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Bereits ein Synonym gesetzt.\""
+
+msgid "analyse_region_noage"
+msgstr "\"$unit($mage) fand heraus, dass auf $region($region) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.\""
+
+msgid "icastle_create"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier erschafft ein Traumgebäude.\""
+
+msgid "spyfail"
+msgstr "\"$unit($spy) gelang es nicht, etwas über $unit($target) herauszufinden.\""
+
+msgid "firewall_damage"
+msgstr "\"$unit($unit) erleidet beim Durchqueren der Feuerwand nach $region($region) schwere Verbrennungen.\""
+
+msgid "cast_speed_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden magisch beschleunigt.\""
+
+msgid "firewall_effect"
+msgstr "\"$unit($mage) erschafft in $region($region) eine Wand aus Feuer.\""
+
+msgid "phunger"
+msgstr "\"$if($eq($dead,1),\"Ein Bauer verhungert\",\"$int($dead) Bauern verhungern\").\""
+
+msgid "transport"
+msgstr "\"$unit($unit) transportiert $unit($target) von $region($start) nach $region($end).\""
+
+msgid "sp_holyground_effect"
+msgstr "\"$unit($mage) beschwört Naturgeister in den Boden von $region($region).\""
+
+msgid "curseinfo::maelstrom"
+msgstr "Der Mahlstrom in dieser Region wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))"
+
+msgid "leavefail"
+msgstr "\"$unit($unit) konnte aus $region($region) nicht ausreisen.\""
+
+msgid "reduced_production"
+msgstr "Die Region ist verwüstet, der Boden karg."
+
+msgid "feedback_no_astralregion"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es kann hier kein Kontakt zur Astralwelt aufgenommen werden.\""
+
+msgid "peace_active"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es ist so schön friedlich, man möchte hier niemanden angreifen.\""
+
+msgid "peasantluck_success"
+msgstr "\"$if($eq($births,1),\"Einen Bauern\",\"$int($births) Bauern\") besucht unverhofft der Storch.\""
+
+msgid "astralshield_activate"
+msgstr "\"$unit($unit) reaktiviert den astralen Schutzschild in $region($region).\""
+
+msgid "destroy_curse_effect"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier zerstört den Fluch ($id) auf ${target}.\""
+
+msgid "analyse_region_fail"
+msgstr "\"$unit($mage) meint, dass auf $region($region) ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.\""
+
+msgid "viewreality_effect"
+msgstr "\"$unit($unit) gelingt es, durch die Nebel auf die Realität zu blicken.\""
+
+msgid "use_speedsail"
+msgstr "\"$unit($unit) setzt ein Sonnensegel. Die Geschwindigkeit des Schiffes erhöht um $int($speed).\""
+
+msgid "error21"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu gibt es keine Informationen.\""
+
+msgid "error43"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat so etwas nicht.\""
+
+msgid "unknown_status"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannter Kampfstatus.\""
+
+msgid "error10"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das macht wenig Sinn.\""
+
+msgid "error32"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht an Bord unseres Schiffes.\""
+
+msgid "error54"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht handeln.\""
+
+msgid "manufacture_skills"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu produzieren.\""
+
+msgid "error177"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann der Vertraute nicht zaubern.\""
+
+msgid "curseinfo::godcurseocean"
+msgstr "\"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. Niemand kann hier lange überleben. ($int36($id))\""
+
+msgid "curseinfo::sparkle_4"
+msgstr "\"Ein schimmernder Lichterkranz umgibt $unit($unit). ($int36($id))\""
+
+msgid "error84"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Name angegeben.\""
+
+msgid "spellfail_noexpensives"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat unaufkündbare Bindungen an seine alte Partei.\""
+
+msgid "error287"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin können wir die Einheit nicht transportieren.\""
+
+msgid "error292"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht unterrichtet werden.\""
+
+msgid "error95"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Illusionen können eine Region nicht bewachen.\""
+
+msgid "nr_stat_header"
+msgstr "\"Statistik für $region($region):\""
+
+msgid "sp_strongwalls_effect"
+msgstr "\"$unit($mage) läßt die Mauern von $building($building) in einem unheimlichen magischen Licht erglühen.\""
+
+msgid "curseinfo::orcish"
+msgstr "\"$unit($unit) stürzt sich von einem amourösen Abenteuer ins nächste. ($int36($id))\""
+
+msgid "target_region_not_empty"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - In der Zielregion befinden sich noch Einheiten.\""
+
+msgid "error173"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Selbst in der Bibliothek von Xontormia konnte dieser Spruch nicht gefunden werden.\""
+
+msgid "error138"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Uns gehört nichts, was man abreißen oder versenken könnte.\""
+
+msgid "killsandhits"
+msgstr "\"$unit($unit) erzielte $int($hits) Treffer und tötete $int($kills) Gegner.\""
+
+msgid "shapeshift_effect"
+msgstr "\"$unit($mage) läßt $unit($target) als $race($race,$unit.size($target)) erscheinen.\""
+
+msgid "error248"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei muß mindestens 10 Runden alt sein.\""
+
+msgid "followfail"
+msgstr "\"$unit($follower) konnte $unit($unit) nicht folgen.\""
+
+msgid "followdetect"
+msgstr "\"$unit($follower) ist $unit($unit) gefolgt.\""
+
+msgid "unitnotfound_id"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit $id wurde nicht gefunden.\""
+
+msgid "error244"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat schon einen Namen.\""
+
+msgid "use_tacticcrystal"
+msgstr "\"$unit($unit) benutzt in $region($region) ein Traumauge.\""
+
+msgid "error134"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannte Meldungs-Option.\""
+
+msgid "error319"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann den Befehl in dieser Runde nicht ausführen, da sie an einem Kampf teilgenommen hat.\""
+
+msgid "analyse_building_noage"
+msgstr "\"$unit($mage) fand heraus, dass auf $building($building) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.\""
+
+msgid "sink_lost_msg"
+msgstr "\"$int($amount) Personen von $unit($unit) ertrinken.$if($isnull($region),\"\",\" Die Einheit rettet sich nach $region($region).\")\""
+
+msgid "error130"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax: MAGIEGEBIET [1-5].\""
+
+msgid "error240"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Soll eine Einheit oder ein Schiff verfolgt werden?\""
+
+msgid "travelthru_trail"
+msgstr "$trailto($region)"
+
+msgid "error315"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nicht alle Zutaten vorhanden.\""
+
+msgid "volcanooutbreak"
+msgstr "\"Der Vulkan in $region($regionv) bricht aus. Die Lavamassen verwüsten $region($regionn).\""
+
+msgid "seduce_effect_0"
+msgstr "\"$unit($unit) schenkt $unit($mage) $resources($items).\""
+
+msgid "error311"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann sich nicht verwandeln.\""
+
+msgid "error201"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Rasse und Zieleinheit wurden vergessen.\""
+
+msgid "newbieimmunity"
+msgstr "\"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe.\""
+
+msgid "curseinfo::auraboost_0"
+msgstr "\"$unit($unit) fühlt sich von starken magischen Energien durchströmt. ($int36($id))\""
+
+msgid "curseinfo::drought"
+msgstr "\"In dieser Gegend herrscht eine Dürre. ($int36($id))\""
+
+msgid "race_cantwork"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nicht arbeiten.\""
+
+msgid "stealdetect"
+msgstr "\"$unit($unit) fühlt sich beobachtet.\""
+
+msgid "stealaura_detect"
+msgstr "\"$unit($unit) fühlt seine magischen Kräfte schwinden und verliert $int($aura) Aura.\""
+
+msgid "missing_message"
+msgstr "\"Interner Fehler: Meldung '$name' nicht definiert.\""
+
+msgid "analyse_ship_fail"
+msgstr "\"$unit($mage) meint, dass auf $ship($ship) ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.\""
+
+msgid "income_magic"
+msgstr "\"$unit($unit) verdient in $region($region) $int($amount) Silber durch Zauberei.\""
+
+msgid "stealaura_success"
+msgstr "\"$unit($mage) entzieht $unit($target) $int($aura) Aura.\""
+
+msgid "error_flying_ship_too_big"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $ship($ship) ist zu groß, um fliegen zu können.\""
+
+msgid "familiar_describe"
+msgstr "\"$unit($mage) ruft einen Vertrauten. $race($race, 0) können $skills lernen.\""
+
+msgid "wind_effect"
+msgstr "\"$unit($mage) erfleht den Segen der Götter des Windes und des Wassers für $ship($ship).\""
+
+msgid "para_army_index"
+msgstr "\"Heer $int($index): $name\""
+
+msgid "wormhole_requirements"
+msgstr "\"$unit($unit) kann in $region($region) nicht durch das Wurmloch reisen, da die Einheit entweder zu gross ist oder teure Talente besitzt.\""
+
+msgid "cast_escape_effect"
+msgstr "\"$unit($mage) zaubert $spell($spell): Das Kampfgetümmel erstirbt und er kann unbehelligt seines Weges ziehen.\""
+
+msgid "volcanostartsmoke"
+msgstr "\"Aus dem Vulkankrater von $region($region) steigt plötzlich Rauch.\""
+
+msgid "nr_insectfall"
+msgstr "Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können."
+
+msgid "error296"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier werden niemals Bäume wachsen.\""
+
+msgid "error186"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nur auf Land gelegt werden.\""
+
+msgid "error51"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat nicht genug Silber.\""
+
+msgid "error73"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine hungernde Einheit kann niemanden weggeben.\""
+
+msgid "error40"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat keinen Kontakt mit uns aufgenommen.\""
+
+msgid "error182"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff kann in diese Richtung nicht ablegen.\""
+
+msgid "analyse_ship_nospell"
+msgstr "\"$unit($mage) meint, dass auf $ship($ship) kein Zauber liegt.\""
+
+msgid "error257"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ungültiges Locale.\""
+
+msgid "error147"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht Burgherr der größten Burg in der Region.\""
+
+msgid "unknowndirection"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Richtung '$dirname' wurde nicht erkannt.\""
+
+msgid "error143"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf einem Schiff.\""
+
+msgid "spellfail_onocean"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf hoher See gezaubert werden.\""
+
+msgid "error253"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier ist nicht stark genug, sich den Göttern zu opfern.\""
+
+msgid "battle_loot"
+msgstr "\"$unit($unit) erbeutet $int($amount) $resource($item,$amount).\""
+
+msgid "error209"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax Error.\""
+
+msgid "summonundead_effect_0"
+msgstr "\"$unit($mage) kann in $region($region) keine Untoten rufen.\""
+
+msgid "givedumb"
+msgstr "\"$unit($unit) gibt $int($amount) Dumpfbackenbrot an $unit($recipient).\""
+
+msgid "error205"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber gelingt nur in einer Ozeanregion.\""
+
+msgid "error210"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es ist zu gefährlich, ein sturmgepeitschtes Schiff fliegen zu lassen.\""
+
+msgid "eatpeasants"
+msgstr "\"$unit($unit) verspeiste $int($amount) Bauern.\""
+
+msgid "error320"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen.\""
+
+msgid "dissolve_units_2"
+msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"wurde zum Baum\", \"wurden zu Bäumen\").\""
+
+msgid "sp_eternizewall_effect"
+msgstr "\"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde von $region($region) in die Mauern von $building($building).\""
+

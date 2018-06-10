@@ -181,7 +181,7 @@ void spawn_braineaters(float chance)
         if (next-- == 0) {
             u = create_unit(r, f, 1 + rng_int() % 10 + rng_int() % 10,
                 rc_brain, 0, NULL, NULL);
-            equip_unit(u, get_equipment("seed_braineater"));
+            equip_unit(u, "seed_braineater");
 
             next = rng_int() % (int)(chance * 100);
         }

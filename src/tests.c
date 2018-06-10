@@ -3,7 +3,7 @@
 #include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
-#include "calendar.h"
+#include "kernel/calendar.h"
 #include "vortex.h"
 
 #include <kernel/config.h>
@@ -37,13 +37,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+int test_set_item(unit * u, const item_type *itype, int value)
+{
+    item *i;
+
+    assert(itype);
+    i = *i_find(&u->items, itype);
+    if (!i) {
+        i = i_add(&u->items, i_new(itype, value));
+    }
+    else {
+        i->number = value;
+        assert(i->number >= 0);
+    }
+    return value;
+}
+
 struct race *test_create_race(const char *name)
 {
     race *rc = rc_get_or_create(name ? name : "smurf");
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
-    rc->flags |= RCF_WALK;
+    rc->flags |= (RCF_WALK|RCF_PLAYABLE);
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
@@ -212,7 +228,6 @@ static void test_reset(void) {
     free_config();
     default_locale = 0;
     calendar_cleanup();
-    equipment_done();
     close_orders();
     free_special_directions();
     free_locales();
@@ -231,9 +246,12 @@ static void test_reset(void) {
     }
     random_source_reset();
 
-    mt_register(mt_new_va("changepasswd", "value:string", MT_NEW_END));
-    mt_register(mt_new_va("starvation", "unit:unit", "region:region", "dead:int", "live:int", MT_NEW_END));
-    mt_register(mt_new_va("malnourish", "unit:unit", "region:region", MT_NEW_END));
+    mt_create_va(mt_new("changepasswd", NULL),
+        "value:string", MT_NEW_END);
+    mt_create_va(mt_new("starvation", NULL),
+        "unit:unit", "region:region", "dead:int", "live:int", MT_NEW_END);
+    mt_create_va(mt_new("malnourish", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
 
     if (errno) {
         int error = errno;
@@ -257,6 +275,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
     else {
         log_debug("start test in %s:%d", file, line);
     }
+    errno = 0;
 }
 
 void test_teardown(void)
@@ -266,9 +285,14 @@ void test_teardown(void)
 }
 
 terrain_type *
-test_create_terrain(const char * name, unsigned int flags)
+test_create_terrain(const char * name, int flags)
 {
     terrain_type * t = get_or_create_terrain(name);
+
+    if (flags < 0) {
+        /* sensible defaults for most terrains */
+        flags = LAND_REGION | WALK_INTO | FLY_INTO;
+    }
     if (flags & LAND_REGION) {
         t->size = 1000;
     }
@@ -331,20 +355,26 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
+    construction *con;
     building_type *btype = bt_get_or_create(name);
-    btype->flags = BTF_NAMECHANGE;
-    if (!btype->construction) {
-        btype->construction = (construction *)calloc(sizeof(construction), 1);
-        btype->construction->skill = SK_BUILDING;
-        btype->construction->maxsize = -1;
-        btype->construction->minskill = 1;
-        btype->construction->reqsize = 1;
+    if (btype->stages) {
+        con = btype->stages->construction;
+    } else {
+        btype->stages = calloc(1, sizeof(building_stage));
+        con = (construction *)calloc(1, sizeof(construction));
+        if (con) {
+            con->skill = SK_BUILDING;
+            con->maxsize = -1;
+            con->minskill = 1;
+            con->reqsize = 1;
+            btype->stages->construction = con;
+        }
     }
-    if (!btype->construction->materials) {
-        btype->construction->materials = (requirement *)calloc(sizeof(requirement), 2);
-        btype->construction->materials[1].number = 0;
-        btype->construction->materials[0].number = 1;
-        btype->construction->materials[0].rtype = get_resourcetype(R_STONE);
+    if (con && !con->materials) {
+        con->materials = (requirement *)calloc(2, sizeof(requirement));
+        con->materials[1].number = 0;
+        con->materials[0].number = 1;
+        con->materials[0].rtype = get_resourcetype(R_STONE);
     }
     if (default_locale) {
         locale_setstring(default_locale, name, name);

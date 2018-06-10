@@ -36,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "morale.h"
 #include "reports.h"
-#include "calendar.h"
 
 #include <attributes/reduceproduction.h>
 #include <attributes/racename.h>
@@ -45,23 +44,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 
 /* kernel includes */
-#include <kernel/ally.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/ally.h"
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
 /* util includes */
 #include <util/attrib.h>
@@ -263,7 +263,7 @@ void add_recruits(unit * u, int number, int wanted)
 
         len = snprintf(equipment, sizeof(equipment), "new_%s", u_race(u)->_name);
         if (len > 0 && (size_t)len < sizeof(equipment)) {
-            equip_unit(unew, get_equipment(equipment));
+            equip_unit(unew, equipment);
         }
         if (unew != u) {
             transfermen(unew, u, unew->number);
@@ -833,7 +833,8 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
 
     for (mod = rtype->modifiers; mod && mod->type != RMT_END; ++mod) {
         if (mod->btype == NULL || mod->btype == btype) {
-            if (mod->race == NULL || mod->race == u_race(u)) {
+            const race * rc = u_race(u);
+            if (mod->race_mask == 0 || (mod->race_mask & rc->mask_item)) {
                 switch (mod->type) {
                 case RMT_PROD_SAVE:
                     if (savep) {
@@ -845,7 +846,7 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
                     mod_skill(mod, sk, &skill);
                     break;
                 case RMT_PROD_REQUIRE:
-                    if (mod->race) need_race |= 1;
+                    if (mod->race_mask) need_race |= 1;
                     if (mod->btype) {
                         need_bldg |= 1;
                     }
@@ -857,7 +858,7 @@ static struct message * get_modifiers(unit *u, skill_t sk, const resource_type *
             }
         }
         if (mod->type == RMT_PROD_REQUIRE) {
-            if (mod->race) need_race |= 2;
+            if (mod->race_mask) need_race |= 2;
             if (mod->btype) {
                 btype_needed = mod->btype;
                 need_bldg |= 2;
@@ -1079,8 +1080,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
         int need;
         bool first = true;
         do {
-            int avail = rm->amount;
-            int nreq = 0;
+            int avail = rm->amount, nreq = 0;
             allocation *al;
 
             if (avail <= 0) {
@@ -1092,7 +1092,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
 
             assert(avail > 0);
 
-            for (al = alist; al; al = al->next)
+            for (al = alist; al; al = al->next) {
                 if (!fval(al, AFL_DONE)) {
                     int req = required(al->want - al->get, al->save);
                     assert(al->get <= al->want && al->get >= 0);
@@ -1111,6 +1111,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                             fset(al, AFL_LOWSKILL);
                     }
                 }
+            }
             need = nreq;
 
             if (avail > nreq) avail = nreq;
@@ -1189,15 +1190,13 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     assert(avail == 0 || nreq == 0);
 }
 
-typedef void(*allocate_function) (const resource_type *, struct region *,
-    struct allocation *);
-
-static allocate_function get_allocator(const struct resource_type *rtype)
-{
+static void allocate(const resource_type *rtype, region *r, allocation *data) {
     if (rtype->raw) {
-        return leveled_allocation;
+        leveled_allocation(rtype, r, data);
     }
-    return attrib_allocation;
+    else {
+        attrib_allocation(rtype, r, data);
+    }
 }
 
 void split_allocations(region * r)
@@ -1206,11 +1205,10 @@ void split_allocations(region * r)
     while (*p_alist) {
         allocation_list *alist = *p_alist;
         const resource_type *rtype = alist->type;
-        allocate_function alloc = get_allocator(rtype);
         const item_type *itype = resource2item(rtype);
         allocation **p_al = &alist->data;
 
-        alloc(rtype, r, alist->data);
+        allocate(rtype, r, alist->data);
 
         while (*p_al) {
             allocation *al = *p_al;
@@ -1411,7 +1409,7 @@ int make_cmd(unit * u, struct order *ord)
         if (pl && fval(pl, PFL_NOBUILD)) {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else if (btype->construction) {
+        else if (btype->stages && btype->stages->construction) {
             int id = getid();
             build_building(u, btype, id, m, ord);
         }
@@ -1431,10 +1429,10 @@ int make_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
-static void free_luxuries(struct attrib *a)
+static void free_luxuries(variant *var)
 {
-    item *itm = (item *)a->data.v;
-    a->data.v = NULL;
+    item *itm = (item *)var->v;
+    var->v = NULL;
     i_freeall(&itm);
 }
 
@@ -1557,6 +1555,20 @@ attrib_type at_trades = {
     NO_READ
 };
 
+static bool trade_needs_castle(const region *r, const race *rc) {
+    static int rc_change, terrain_change;
+    static const race *rc_insect;
+    static const terrain_type *t_desert, *t_swamp;
+    if (rc_changed(&rc_change)) {
+        rc_insect = get_race(RC_INSECT);
+    }
+    if (terrain_changed(&terrain_change)) {
+        t_swamp = newterrain(T_SWAMP);
+        t_desert = newterrain(T_DESERT);
+    }
+    return rc != rc_insect && (r->terrain == t_swamp || r->terrain == t_desert);
+}
+
 static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
@@ -1595,7 +1607,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
-    if (u_race(u) != get_race(RC_INSECT) || (r->terrain == newterrain(T_SWAMP) || r->terrain == newterrain(T_DESERT))) {
+    if (trade_needs_castle(r, u_race(u))) {
         building *b = NULL;
         if (r->buildings) {
             static int cache;

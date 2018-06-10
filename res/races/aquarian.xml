@@ -10,7 +10,7 @@
     <skill name="roadwork" modifier="-1"/>
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
-    <familiar race="giantturtle" default="yes"/>
+    <familiar race="giantturtle"/>
     <familiar race="dolphin"/>
     <familiar race="giantturtle"/>
     <familiar race="dolphin"/>

@@ -22,10 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    extern struct region **path_find(struct region *start,
+    extern struct region **path_find(struct region *handle_start,
         const struct region *target, int maxlen,
         bool(*allowed) (const struct region *, const struct region *));
-    extern bool path_exists(struct region *start, const struct region *target,
+    extern bool path_exists(struct region *handle_start, const struct region *target,
         int maxlen, bool(*allowed) (const struct region *,
         const struct region *));
     extern bool allowed_swim(const struct region *src,

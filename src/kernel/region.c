@@ -17,12 +17,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "region.h"
 
 /* kernel includes */
 #include "alliance.h"
 #include "building.h"
+#include "calendar.h"
+#include "config.h"
 #include "connection.h"
 #include "curse.h"
 #include "equipment.h"
@@ -181,14 +182,14 @@ void deathcounts(region * r, int fallen)
 /********************/
 /*   at_moveblock   */
 /********************/
-void a_initmoveblock(attrib * a)
+void a_initmoveblock(variant *var)
 {
-    a->data.v = calloc(1, sizeof(moveblock));
+    var->v = calloc(1, sizeof(moveblock));
 }
 
-int a_readmoveblock(attrib * a, void *owner, gamedata *data)
+int a_readmoveblock(variant *var, void *owner, gamedata *data)
 {
-    moveblock *m = (moveblock *)(a->data.v);
+    moveblock *m = (moveblock *)var->v;
     int i;
 
     READ_INT(data->store, &i);
@@ -197,9 +198,9 @@ int a_readmoveblock(attrib * a, void *owner, gamedata *data)
 }
 
 void
-a_writemoveblock(const attrib * a, const void *owner, struct storage *store)
+a_writemoveblock(const variant *var, const void *owner, struct storage *store)
 {
-    moveblock *m = (moveblock *)(a->data.v);
+    moveblock *m = (moveblock *)var->v;
     WRITE_INT(store, (int)m->dir);
 }
 
@@ -970,16 +971,16 @@ static char *makename(void)
     size_t nk, ne, nv, ns;
     static char name[16];
     const char *kons = "bcdfghklmnprstvwz",
-        *start = "bcdgtskpvfr",
-        *end = "nlrdst",
+        *handle_start = "bcdgtskpvfr",
+        *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
     /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
 
     nk = strlen(kons);
-    ne = strlen(end);
+    ne = strlen(handle_end);
     nv = strlen(vowels);
-    ns = strlen(start);
+    ns = strlen(handle_start);
 
     for (s = rng_int() % 3 + 2; s > 0; s--) {
         int v;
@@ -990,7 +991,7 @@ static char *makename(void)
         }
         else {
             k = rng_int() % (int)ns;
-            name[p] = start[k];
+            name[p] = handle_start[k];
             p++;
         }
         v = rng_int() % (int)nv;
@@ -998,7 +999,7 @@ static char *makename(void)
         p++;
         if (rng_int() % 3 == 2 || s == 1) {
             e = rng_int() % (int)ne;
-            name[p] = end[e];
+            name[p] = handle_end[e];
             p++;
             x = 1;
         }
@@ -1090,7 +1091,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         rsethorses(r, 0);
         rsetpeasants(r, 0);
         rsetmoney(r, 0);
-        freset(r, RF_ENCOUNTER);
         freset(r, RF_MALLORN);
         return;
     }
@@ -1194,19 +1194,21 @@ void terraform_region(region * r, const terrain_type * terrain)
                 fset(r, RF_MALLORN);
             else
                 freset(r, RF_MALLORN);
-            if (rng_int() % 100 < ENCCHANCE) {
-                fset(r, RF_ENCOUNTER);
-            }
         }
     }
 
     if (oldterrain == NULL || terrain->size != oldterrain->size) {
+        static int changed;
+        static const terrain_type *t_plain;
         int horses = 0, trees = 0;
+        if (terrain_changed(&changed)) {
+            t_plain = get_terrain(terrainnames[T_PLAIN]);
+        }
         if (terrain->size>0) {
             horses = rng_int() % (terrain->size / 50);
             trees = terrain->size * (30 + rng_int() % 40) / 1000;
         }
-        if (terrain == newterrain(T_PLAIN)) {
+        if (t_plain && terrain == t_plain) {
             rsethorses(r, horses);
             if (chance(0.4)) {
                 rsettrees(r, 2, trees);

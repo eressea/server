@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="gray">
   <entry spell="acidrain" level="8" />
   <entry spell="airship" level="6" />
@@ -165,3 +166,4 @@
   <entry spell="wolfhowl" level="7" />
   <entry spell="wyrm_transformation" level="1" />
 </spellbook>
+</eressea>

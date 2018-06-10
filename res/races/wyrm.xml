@@ -1,10 +1,12 @@
+<?xml version="1.0" ?>
+<eressea>
+<races>
 <race name="wyrm" magres="90" maxaura="1.0" regaura="3.000000"
 weight="18000" capacity="1000000" speed="1.0" hp="2700" ac="8"
 damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10"
 defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes"
 teach="no" getitem="yes" resistbash="yes" dragon="yes" income="5000">
   <ai splitsize="1" killpeasants="yes" learn="yes" scare="1000"/>
-  <function name="name" value="namedragon"/>
   <skill name="magic" modifier="12"/>
   <skill name="tactics" modifier="12"/>
   <attack type="4" damage="3d20"/>
@@ -12,3 +14,5 @@ teach="no" getitem="yes" resistbash="yes" dragon="yes" income="5000">
   <attack type="4" damage="5d30"/>
   <attack type="6" spell="powerful_dragonbreath" level="12" />
 </race>
+</races>
+</eressea>

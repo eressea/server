@@ -37,8 +37,8 @@ int add_raceprefix(const char *prefix)
 }
 
 void free_prefixes(void) {
-    int i;
     if (race_prefixes) {
+        int i;
         for (i = 0; race_prefixes[i]; ++i) {
             free(race_prefixes[i]);
         }

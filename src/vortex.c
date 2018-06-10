@@ -65,14 +65,14 @@ void register_special_direction(struct locale *lang, const char *name)
 /********************/
 /*   at_direction   */
 /********************/
-static void a_initdirection(attrib * a)
+static void a_initdirection(variant * var)
 {
-    a->data.v = calloc(1, sizeof(spec_direction));
+    var->v = calloc(1, sizeof(spec_direction));
 }
 
-static void a_freedirection(attrib * a)
+static void a_freedirection(variant *var)
 {
-    spec_direction *d = (spec_direction *)(a->data.v);
+    spec_direction *d = (spec_direction *)(var->v);
     free(d->desc);
     free(d->keyword);
     free(d);
@@ -86,10 +86,10 @@ static int a_agedirection(attrib * a, void *owner)
     return (d->duration > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
-static int a_readdirection(attrib * a, void *owner, struct gamedata *data)
+static int a_readdirection(variant *var, void *owner, struct gamedata *data)
 {
     struct storage *store = data->store;
-    spec_direction *d = (spec_direction *)(a->data.v);
+    spec_direction *d = (spec_direction *)(var->v);
     char lbuf[32];
 
     (void)owner;
@@ -105,9 +105,9 @@ static int a_readdirection(attrib * a, void *owner, struct gamedata *data)
 }
 
 static void
-a_writedirection(const attrib * a, const void *owner, struct storage *store)
+a_writedirection(const variant *var, const void *owner, struct storage *store)
 {
-    spec_direction *d = (spec_direction *)(a->data.v);
+    spec_direction *d = (spec_direction *)(var->v);
 
     (void)owner;
     WRITE_INT(store, d->x);

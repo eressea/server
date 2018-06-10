@@ -183,6 +183,8 @@ if file_exists('execute.lock') then
     assert(false)
 end
 
+math.randomseed(rng.random())
+
 local path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path

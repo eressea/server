@@ -28,7 +28,6 @@ log.test.c
 umlaut.test.c
 unicode.test.c
 variant.test.c
-# xml.test.c
 )
 
 SET(_FILES
@@ -51,6 +50,7 @@ nrmessage.c
 parser.c
 password.c
 path.c
+pofile.c
 rand.c
 resolve.c
 strings.c
@@ -58,7 +58,6 @@ translation.c
 umlaut.c
 unicode.c
 variant.c
-xml.c
 )
 
 FOREACH(_FILE ${_FILES})

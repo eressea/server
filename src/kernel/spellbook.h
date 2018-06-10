@@ -19,17 +19,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_KRNL_SPELLBOOK_H
 #define H_KRNL_SPELLBOOK_H
 
+#include "spell.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    struct spell;
     struct storage;
     struct gamedata;
     struct selist;
 
     typedef struct spellbook_entry {
-        struct spell *sp;
+        spellref spref;
         int level;
     } spellbook_entry;
 
@@ -45,6 +46,7 @@ extern "C" {
     void write_spellbook(const struct spellbook *book, struct storage *store);
 
     void spellbook_add(spellbook *sbp, struct spell *sp, int level);
+    void spellbook_addref(spellbook *sb, const char *name, int level);
     int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data);
     void spellbook_clear(spellbook *sb);
     spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp);

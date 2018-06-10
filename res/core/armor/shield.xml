@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<eressea><resources>
 <resource name="shield">
   <item weight="100" score="30">
     <construction skill="armorer" minskill="2">
@@ -7,3 +8,4 @@
     <armor ac="1" penalty="-0.15" magres="0.0" shield="yes"/>
   </item>
 </resource>
+</resources></eressea>

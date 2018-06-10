@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "ally.h"
 #include "building.h"
+#include "calendar.h"
 #include "faction.h"
 #include "group.h"
 #include "connection.h"
@@ -37,6 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "ship.h"
 #include "skill.h"
 #include "terrain.h"
+#include "terrainid.h"
 
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
@@ -450,13 +452,13 @@ int ualias(const unit * u)
     return a->data.i;
 }
 
-int a_readprivate(attrib * a, void *owner, gamedata *data)
+int a_readprivate(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     char lbuf[DISPLAYSIZE];
     READ_STR(store, lbuf, sizeof(lbuf));
-    a->data.v = str_strdup(lbuf);
-    return (a->data.v) ? AT_READ_OK : AT_READ_FAIL;
+    var->v = str_strdup(lbuf);
+    return (var->v) ? AT_READ_OK : AT_READ_FAIL;
 }
 
 /*********************/
@@ -517,35 +519,6 @@ void usetprivate(unit * u, const char *str)
 }
 
 /*********************/
-/*   at_potionuser   */
-/*********************/
-/* Einheit BENUTZT einen Trank */
-attrib_type at_potionuser = {
-    "potionuser",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-void usetpotionuse(unit * u, const item_type * ptype)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        a = a_add(&u->attribs, a_new(&at_potionuser));
-    a->data.v = (void *)ptype;
-}
-
-const item_type *ugetpotionuse(const unit * u)
-{
-    attrib *a = a_find(u->attribs, &at_potionuser);
-    if (!a)
-        return NULL;
-    return (const item_type *)a->data.v;
-}
-
-/*********************/
 /*   at_target   */
 /*********************/
 attrib_type at_target = {
@@ -557,46 +530,19 @@ attrib_type at_target = {
     NO_READ
 };
 
-unit *utarget(const unit * u)
-{
-    attrib *a;
-    if (!fval(u, UFL_TARGET))
-        return NULL;
-    a = a_find(u->attribs, &at_target);
-    assert(a || !"flag set, but no target found");
-    return (unit *)a->data.v;
-}
-
-void usettarget(unit * u, const unit * t)
-{
-    attrib *a = a_find(u->attribs, &at_target);
-    if (!a && t)
-        a = a_add(&u->attribs, a_new(&at_target));
-    if (a) {
-        if (!t) {
-            a_remove(&u->attribs, a);
-            freset(u, UFL_TARGET);
-        }
-        else {
-            a->data.v = (void *)t;
-            fset(u, UFL_TARGET);
-        }
-    }
-}
-
 /*********************/
 /*   at_siege   */
 /*********************/
 
-void a_writesiege(const attrib * a, const void *owner, struct storage *store)
+void a_writesiege(const variant *var, const void *owner, struct storage *store)
 {
-    struct building *b = (struct building *)a->data.v;
+    struct building *b = (struct building *)var->v;
     write_building_reference(b, store);
 }
 
-int a_readsiege(attrib * a, void *owner, gamedata *data)
+int a_readsiege(variant *var, void *owner, gamedata *data)
 {
-    if (read_building_reference(data, (building **)&a->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&var->v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -669,7 +615,7 @@ bool ucontact(const unit * u, const unit * u2)
 
     /* Explizites KONTAKTIERE */
     for (ru = a_find(u->attribs, &at_contact); ru && ru->type == &at_contact;
-    ru = ru->next) {
+        ru = ru->next) {
         if (((unit *)ru->data.v) == u2) {
             return true;
         }
@@ -1160,8 +1106,8 @@ skill *add_skill(unit * u, skill_t sk)
     skill *sv;
     int i;
 
-    for (i=0; i != u->skill_size; ++i) {
-        sv = u->skills+i;
+    for (i = 0; i != u->skill_size; ++i) {
+        sv = u->skills + i;
         if (sv->id >= sk) break;
     }
     u->skills = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
@@ -1263,8 +1209,62 @@ static int att_modification(const unit * u, skill_t sk)
     return (int)result;
 }
 
+static int terrain_mod(const race * rc, skill_t sk, const region *r)
+{
+    static int rc_cache, t_cache;
+    static const race *rc_dwarf, *rc_insect, *rc_elf;
+    static const terrain_type *t_mountain, *t_desert, *t_swamp;
+    const struct terrain_type *terrain = r->terrain;
+
+    if (terrain_changed(&t_cache)) {
+        t_mountain = get_terrain(terrainnames[T_MOUNTAIN]);
+        t_desert = get_terrain(terrainnames[T_DESERT]);
+        t_swamp = get_terrain(terrainnames[T_SWAMP]);
+    }
+    if (rc_changed(&rc_cache)) {
+        rc_elf = get_race(RC_ELF);
+        rc_dwarf = get_race(RC_DWARF);
+        rc_insect = get_race(RC_INSECT);
+    }
+
+    if (rc == rc_dwarf) {
+        if (sk == SK_TACTICS) {
+            if (terrain == t_mountain || fval(terrain, ARCTIC_REGION))
+                return 1;
+        }
+    }
+    else if (rc == rc_insect) {
+        if (terrain == t_mountain || fval(terrain, ARCTIC_REGION)) {
+            return -1;
+        }
+        else if (terrain == t_desert || terrain == t_swamp) {
+            return 1;
+        }
+    }
+    else if (rc == rc_elf) {
+        if (r_isforest(r)) {
+            if (sk == SK_PERCEPTION || sk == SK_STEALTH) {
+                return 1;
+            }
+            else if (sk == SK_TACTICS) {
+                return 2;
+            }
+        }
+    }
+    return 0;
+}
+
+static int rc_skillmod(const struct race *rc, skill_t sk)
+{
+    if (!skill_enabled(sk)) {
+        return 0;
+    }
+    return rc->bonus[sk];
+}
+
 int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool noitem)
 {
+    const struct race *rc = u_race(u);
     int bskill = level;
     int skill = bskill;
 
@@ -1275,12 +1275,16 @@ int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool n
         }
     }
 
-    skill += rc_skillmod(u_race(u), r, sk);
-    skill += att_modification(u, sk);
-    if (u->attribs) {
-        skill = skillmod(u, r, sk, skill);
+    skill += rc_skillmod(rc, sk);
+    if (skill > 0) {
+        if (r) {
+            skill += terrain_mod(rc, sk, r);
+        }
+        skill += att_modification(u, sk);
+        if (u->attribs) {
+            skill = skillmod(u, r, sk, skill);
+        }
     }
-
     if (fval(u, UFL_HUNGER)) {
         if (sk == SK_SAILING && skill > 2) {
             skill = skill - 1;
@@ -1402,7 +1406,7 @@ void default_name(const unit *u, char name[], int len) {
         const char * prefix;
         prefix = LOC(lang, "unitdefault");
         if (!prefix) {
-            prefix= parameters[P_UNIT];
+            prefix = parameters[P_UNIT];
         }
         result = prefix;
     }
@@ -1474,7 +1478,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         attrib *a;
 
         /* erbt Kampfstatus */
-        setstatus(u, creator->status);
+        unit_setstatus(u, creator->status);
 
         /* erbt Gebaeude/Schiff */
         if (creator->region == r) {
@@ -1659,7 +1663,7 @@ int unit_max_hp(const unit * u)
     h = u_race(u)->hitpoints;
 
     if (config_changed(&config)) {
-        rule_stamina = config_get_int("rules.stamina", 1)!=0;
+        rule_stamina = config_get_int("rules.stamina", 1) != 0;
     }
     if (rule_stamina) {
         double p = pow(effskill(u, SK_STAMINA, u->region) / 2.0, 1.5) * 0.2;
@@ -1682,7 +1686,7 @@ void scale_number(unit * u, int n)
         return;
     }
     if (u->number > 0) {
-        if (n>0) {
+        if (n > 0) {
             const attrib *a = a_find(u->attribs, &at_effect);
 
             u->hp = (long long)u->hp * n / u->number;
@@ -1929,14 +1933,6 @@ bool has_horses(const unit * u)
     return false;
 }
 
-void setstatus(unit *u, int status)
-{
-    assert(status >= ST_AGGRO && status <= ST_FLEE);
-    if (u->status != status) {
-        u->status = (status_t)status;
-    }
-}
-
 #define MAINTENANCE 10
 int maintenance_cost(const struct unit *u)
 {
@@ -1964,7 +1960,7 @@ bool has_limited_skills(const struct unit * u)
 double u_heal_factor(const unit * u)
 {
     const race * rc = u_race(u);
-    if (rc->healing>0) {
+    if (rc->healing > 0) {
         return rc->healing / 100.0;
     }
     if (r_isforest(u->region)) {

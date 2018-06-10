@@ -26,6 +26,7 @@ typedef struct build_fixture {
     region *r;
     race *rc;
     construction cons;
+    building_type *btype;
 } build_fixture;
 
 static unit * setup_build(build_fixture *bf) {
@@ -34,7 +35,7 @@ static unit * setup_build(build_fixture *bf) {
     init_resources();
 
     test_create_itemtype("stone");
-    test_create_buildingtype("castle");
+    bf->btype = test_create_buildingtype("castle");
     bf->rc = test_create_race("human");
     bf->r = test_create_region(0, 0, NULL);
     bf->f = test_create_faction(bf->rc);
@@ -192,8 +193,7 @@ static void test_build_building_no_materials(CuTest *tc) {
     unit *u;
 
     u = setup_build(&bf);
-    btype = bt_find("castle");
-    assert(btype);
+    btype = bf.btype;
     set_level(u, SK_BUILDING, 1);
     u->orders = create_order(K_MAKE, u->faction->locale, 0);
     CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
@@ -209,9 +209,7 @@ static void test_build_building_with_golem(CuTest *tc) {
 
     u = setup_build(&bf);
     bf.rc->ec_flags |= ECF_STONEGOLEM;
-    btype = bt_find("castle");
-    assert(btype);
-    assert(btype->construction);
+    btype = bf.btype;
 
     set_level(bf.u, SK_BUILDING, 1);
     u->orders = create_order(K_MAKE, u->faction->locale, 0);
@@ -231,9 +229,8 @@ static void test_build_building_success(CuTest *tc) {
     u = setup_build(&bf);
 
     rtype = get_resourcetype(R_STONE);
-    btype = bt_find("castle");
+    btype = bf.btype;
     assert(btype && rtype && rtype->itype);
-    assert(btype->construction);
     assert(!u->region->buildings);
 
     i_change(&bf.u->items, rtype->itype, 1);
@@ -256,7 +253,7 @@ static void test_build_destroy_road(CuTest *tc)
     message *m;
 
     test_setup();
-    mt_register(mt_new_va("destroy_road", "unit:unit", "from:region", "to:region", MT_NEW_END));
+    mt_create_va(mt_new("destroy_road", NULL), "unit:unit", "from:region", "to:region", MT_NEW_END);
     r2 = test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);

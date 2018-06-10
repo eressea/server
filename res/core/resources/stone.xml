@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
+<eressea>
+<resources>
 <resource name="stone" limited="yes" material="yes">
     <item weight="6000" score="10" big="yes">
         <construction skill="quarrying" minskill="1"/>
     </item>
     <modifier building="quarry" type="skill" value="1"/>
     <modifier building="quarry" type="material" value="0.5"/>
-    <modifier race="troll" type="material" value="0.75"/>
+    <modifier races="troll" type="material" value="0.75"/>
 </resource>
+</resources>
+</eressea>

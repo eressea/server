@@ -16,7 +16,7 @@ void test_terraform(CuTest *tc) {
     item_type *itype;
 
     test_setup();
-    itype = test_create_itemtype("ointment");
+    itype = test_create_itemtype("oil");
     itype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
     new_luxurytype(itype, 0);
 

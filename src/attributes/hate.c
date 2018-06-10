@@ -39,14 +39,14 @@ static int verify_hate(attrib * a, void *owner)
 }
 
 static void
-write_hate(const attrib * a, const void *owner, struct storage *store)
+write_hate(const variant *var, const void *owner, struct storage *store)
 {
-    write_unit_reference((unit *)a->data.v, store);
+    write_unit_reference((unit *)var->v, store);
 }
 
-static int read_hate(attrib * a, void *owner, gamedata *data)
+static int read_hate(variant *var, void *owner, gamedata *data)
 {
-    if (read_unit_reference(data, (unit **)&a->data.v, NULL) <= 0) {
+    if (read_unit_reference(data, (unit **)&var->v, NULL) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

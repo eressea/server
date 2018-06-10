@@ -27,7 +27,7 @@ recruitethereal="yes" equipment="yes" healing="1.5">
     <skill name="unarmed" modifier="-99"/>
     <attack type="1" damage="1d5"/>
     <attack type="5"/>
-    <familiar race="imp" default="yes"/>
+    <familiar race="imp"/>
     <familiar race="imp"/>
     <familiar race="ghost"/>
     <familiar race="rat"/>

@@ -58,8 +58,9 @@ static void test_spellref(CuTest *tc)
     ref = spellref_create(NULL, "hodor");
     CuAssertPtrNotNull(tc, ref);
     CuAssertPtrEquals(tc, NULL, ref->sp);
-    CuAssertStrEquals(tc, "hodor", ref->name);
+    CuAssertStrEquals(tc, "hodor", ref->_name);
     CuAssertPtrEquals(tc, NULL, spellref_get(ref));
+    CuAssertStrEquals(tc, "hodor", spellref_name(ref));
     sp = create_spell("hodor");
     CuAssertPtrNotNull(tc, sp);
     CuAssertPtrEquals(tc, sp, spellref_get(ref));

@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0"?>
+<eressea>
 <resources>
   <!-- this file contains herbs that are part of the alchemy system -->
 
@@ -87,3 +88,4 @@
   </resource>
 
 </resources>
+</eressea>

@@ -1,5 +1,31 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
+<eressea>
 <resources>
+
+<resource name="stone" limited="yes" material="yes">
+    <item weight="6000" score="10" big="yes">
+        <construction skill="quarrying" minskill="1"/>
+    </item>
+    <modifier building="quarry" type="skill" value="1"/>
+    <modifier building="quarry" type="material" value="0.5"/>
+</resource>
+
+<resource name="iron" limited="yes" material="yes">
+    <item weight="500" score="10">
+        <construction skill="mining" minskill="1"/>
+    </item>
+    <modifier building="smithy" type="save" value="2"/>
+    <modifier building="mine" type="skill" value="1"/>
+    <modifier building="mine" type="material" value="0.5"/>
+</resource>
+
+<resource name="seed">
+  <item weight="10" score="50"/>
+</resource>
+
+<resource name="mallornseed">
+  <item weight="10" score="100"/>
+</resource>
 
   <resource name="rpg_item_1"><item weight="10"/></resource>
   <resource name="rpg_item_2"><item weight="1"/></resource>
@@ -26,7 +52,7 @@
     </item>
   </resource>
 
-  <resource name="p14" appearance="vial">
+  <resource name="healing" appearance="vial">
     <!-- Heiltrank -->
     <item weight="0" score="120" use="yes">
       <potion level="4"/>
@@ -40,7 +66,7 @@
     </item>
   </resource>
 
-  <resource name="p2" appearance="vial">
+  <resource name="lifepotion" appearance="vial">
     <!-- Wasser des Lebens -->
     <item weight="0" score="30" use="yes">
       <potion level="1"/>
@@ -76,3 +102,4 @@
   </resource>
 
 </resources>
+</eressea>

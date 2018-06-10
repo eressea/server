@@ -95,12 +95,12 @@ static void free_nodes(node * root)
     }
 }
 
-struct selist *regions_in_range(struct region *start, int maxdist,
+struct selist *regions_in_range(struct region *handle_start, int maxdist,
     bool(*allowed) (const struct region *, const struct region *))
 {
     selist * rlist = NULL;
-    node *root = new_node(start, 0, NULL);
-    node **end = &root->next;
+    node *root = new_node(handle_start, 0, NULL);
+    node **handle_end = &root->next;
     node *n = root;
 
     while (n != NULL) {
@@ -125,8 +125,8 @@ struct selist *regions_in_range(struct region *start, int maxdist,
             /* make sure we don't go here again, and put the region into the set for
                further BFS'ing */
             fset(rn, RF_MARK);
-            *end = new_node(rn, depth, n);
-            end = &(*end)->next;
+            *handle_end = new_node(rn, depth, n);
+            handle_end = &(*handle_end)->next;
         }
         n = n->next;
     }
@@ -135,17 +135,17 @@ struct selist *regions_in_range(struct region *start, int maxdist,
     return rlist;
 }
 
-static region **internal_path_find(region * start, const region * target,
+static region **internal_path_find(region * handle_start, const region * target,
     int maxlen, bool(*allowed) (const region *, const region *))
 {
     static region *path[MAXDEPTH + 2];    /* STATIC_RETURN: used for return, not across calls */
     direction_t d;
-    node *root = new_node(start, 0, NULL);
-    node **end = &root->next;
+    node *root = new_node(handle_start, 0, NULL);
+    node **handle_end = &root->next;
     node *n = root;
     bool found = false;
     assert(maxlen <= MAXDEPTH);
-    fset(start, RF_MARK);
+    fset(handle_start, RF_MARK);
 
     while (n != NULL) {
         region *r = n->r;
@@ -173,8 +173,8 @@ static region **internal_path_find(region * start, const region * target,
             }
             else {
                 fset(rn, RF_MARK);
-                *end = new_node(rn, depth, n);
-                end = &(*end)->next;
+                *handle_end = new_node(rn, depth, n);
+                handle_end = &(*handle_end)->next;
             }
         }
         if (found)
@@ -188,22 +188,22 @@ static region **internal_path_find(region * start, const region * target,
 }
 
 bool
-path_exists(region * start, const region * target, int maxlen,
+path_exists(region * handle_start, const region * target, int maxlen,
 bool(*allowed) (const region *, const region *))
 {
-    assert((!fval(start, RF_MARK) && !fval(target, RF_MARK))
+    assert((!fval(handle_start, RF_MARK) && !fval(target, RF_MARK))
         || !"Some Algorithm did not clear its RF_MARKs!");
-    if (start == target)
+    if (handle_start == target)
         return true;
-    if (internal_path_find(start, target, maxlen, allowed) != NULL)
+    if (internal_path_find(handle_start, target, maxlen, allowed) != NULL)
         return true;
     return false;
 }
 
-region **path_find(region * start, const region * target, int maxlen,
+region **path_find(region * handle_start, const region * target, int maxlen,
     bool(*allowed) (const region *, const region *))
 {
-    assert((!fval(start, RF_MARK) && !fval(target, RF_MARK))
+    assert((!fval(handle_start, RF_MARK) && !fval(target, RF_MARK))
         || !"Did you call path_init()?");
-    return internal_path_find(start, target, maxlen, allowed);
+    return internal_path_find(handle_start, target, maxlen, allowed);
 }

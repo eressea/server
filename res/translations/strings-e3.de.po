@@ -1,0 +1,315 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"X-Generator: Poedit 2.0.7\n"
+
+msgid "catamaran_a"
+msgstr "ein Katamaran"
+
+msgid "rpg_item_1"
+msgstr "Pandoras Urkunde für Halbling ehrenhalber, weiblich"
+
+msgid "rpg_item_2"
+msgstr "Heilige Nußhälfte"
+
+msgid "rpg_item_3"
+msgstr "Flaschengeist Zhardamon"
+
+msgctxt "spell"
+msgid "create_potion_p0"
+msgstr "Braue Siebenmeilentee"
+
+msgctxt "spell"
+msgid "create_potion_p2"
+msgstr "Braue Wasser des Lebens"
+
+msgctxt "spell"
+msgid "create_potion_p3"
+msgstr "Braue Schaffenstrunk"
+
+msgctxt "spellinfo"
+msgid "concealing_aura"
+msgstr "Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Zeit vor den Blicken anderer verschleiern. Der Zauber schützt nicht vor Dieben und Spionen."
+
+msgctxt "spell"
+msgid "create_potion_p9"
+msgstr "Braue Pferdeglück"
+
+msgctxt "morale"
+msgid "10"
+msgstr "unterwürfige"
+
+msgctxt "spellinfo"
+msgid "create_potion_peasantblood"
+msgstr "Zu dem gefährlichsten und geheimsten Wissen der Magier zählt das Wissen über die Macht des Todes. Auch wenn die meisten es nicht zugeben, so fasziniert dieses Thema jeden Magier. Früher oder später beschäftigen sich alle mit diesem teilweise verbotenen Gebiet. Sodann werden sie feststellen, dass es noch eine weitere Ebene der Existenz gibt, in der die Dämonen beheimatet sind. Nur Blut allein vermag den Hunger dieser Wesen zu befriedigen, wenn sie ihre Ebene verlassen und unsere betreten. Erfahrene Magier werden jedoch feststellen, dass man den Blutwein, den die Dämonen zu sich nehmen, strecken kann, so dass davon 100 anstatt nur 10 Dämonen satt werden. Da die Dämonen davon jedoch nichts wissen dürfen, muss der Magier selbst klammheimlich einen seiner urplötzlich verfügbar gewordenen Untergebenen opfern. "
+
+msgid "scaffolding"
+msgstr "Gerüst"
+
+msgctxt "spellinfo"
+msgid "raindance"
+msgstr "Durch dieses uralte Tanzritual ruft der Zauberkundige die Kräfte des Lebens und der Fruchtbarkeit an. Die darauf folgenden Regenfälle begünstigen das Wachstum und erhöhen die Ernteerträge einiger Bauern der Region bis der Regen wieder nachlässt."
+
+msgid "adamantium"
+msgstr "Adamantium"
+
+msgid "adamantiumplate"
+msgstr "Adamantiumrüstung"
+
+msgid "rpg_item_3_p"
+msgstr "Flaschengeister"
+
+msgid "barge_a"
+msgstr "eine Barke"
+
+msgctxt "spell"
+msgid "create_potion_ointment"
+msgstr "Braue Wundsalbe"
+
+msgctxt "spell"
+msgid "create_potion_healing"
+msgstr "Braue Heiltrank"
+
+msgid "frigate_a"
+msgstr "eine Fregatte"
+
+msgid "trireme"
+msgstr "Trireme"
+
+msgctxt "spellinfo"
+msgid "create_potion_healing"
+msgstr "Manche Magier erforschen den Tod, bis sie Verstorbene wieder ins Leben zurück bringen können. Diese sind jedoch meist bösartig und nur noch Schatten ihres früheren Selbst. Diejenigen jedoch, die sich intensiv mit dem Leben und seiner Kombination mit dem Tod beschäftigen, finden eine Möglichkeit, Verstorbene in ihrer wahren Gestalt zurück zu rufen. Dies ist allerdings nur wenige Minuten nach dem Tod möglich. Da selbst Magier nicht überall gleichzeitig sein können, musste ein Weg gefunden werden, diese Fähigkeit auf andere zu übertragen. Alle Versuche, dies Feldschern beizubringen, scheiterten jedoch, bis einer dieser Feldscher von einem Widersacher hinterrücks ermordet wurde. Im Moment seines Todes wandte er sein erworbenes Wissen an und konnte tags darauf den Übeltäter wegen Mordes hinrichten lassen. Der von ihm entwickelte magische Trank muss jedoch von einem der Magie des Lebens Kundigen gesegnet werden, um seine volle Wirkung zu entfalten. Ein solcher Trank gibt vier Männern (oder einem Mann viermal) im Kampf eine Chance von 50%, sonst tödliche Wunden zu überleben. Der Trank wird von ihnen automatisch bei Verletzung angewandt."
+
+msgid "frigate"
+msgstr "Fregatte"
+
+msgctxt "spellinfo"
+msgid "create_potion_p13"
+msgstr "Ebenso wie das Wissen über den Tod ist das Wissen über gewisse Monster bei der abergläubigen Bevölkerung nicht gerne gesehen. Einige wenige Krieger jedoch, die diesen Kreaturen schon mal im Kampf gegenüberstanden, haben entdeckt, dass deren Blut eine belebende Wirkung auf sie hatte. So soll es schon Krieger gegeben haben, die im Blut der erschlagenen Monster badeten, um deren Stärke in sich aufzunehmen. Diese Wirkung verfliegt jedoch rasch und wirkt nur bei frischen Blut. Da niemand vor dem Kampf gegen seinen Nachbarn die Zeit hat, schnell noch einen Wyrm zu erschlagen, musste ein Weg gefunden werden, die Wirkung haltbar zu machen. Manasouf dem Schwarzen gelang dies nach zahlreichen Experimenten, die das Leben vieler guter Männer kosteten, welche ständig neues Drachenblut für seine Versuche beschaffen mussten. Ursprünglich ein streng gehütetes Geheimnis ist das Rezept inzwischen im ganzen Land bekannt. Zunächst muss geronnenes Drachenblut in heißem Zinn verflüssigt werden. Anschließend wird der Geist des erschlagenen Drachen in der Geisterebene wieder an sein Blut gebunden und kann so lange nicht in Frieden ruhen, bis das letzte bisschen seines Blutes verbraucht wurde."
+
+msgctxt "spellinfo"
+msgid "earn_silver#gwyrrd"
+msgstr "Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei den Bauern sehr begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen besseren Preis zu verkaufen. Pro Stufe kann der Magier so 25 Silber verdienen."
+
+msgctxt "describe"
+msgid "lifepotion"
+msgstr "Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht um aus fünf Holzstämmen neue Bäume wachsen zu lassen."
+
+msgid "charger"
+msgstr "Streitross"
+
+msgid "cog"
+msgstr "Kogge"
+
+msgid "adamantiumplate_p"
+msgstr "Adamantiumrüstungen"
+
+msgid "cutter"
+msgstr "Kutter"
+
+msgid "caravel_a"
+msgstr "eine Karavelle"
+
+msgctxt "spellinfo"
+msgid "blessedharvest"
+msgstr "Für dieses Ernteritual sendet der Druide seine arkane Energie entlang der astralen Kraftlinien der gesamten Umgebung, um selbst weit entfernte Naturgeister zu erreichen. Die Beschwörung dieser Naturgeister ist eine hohe Kunst, die höchste Konzentration und vor allem viel Erfahrung erfordert. Die Bauern werden nach und nach von den besseren Ernten profitieren und ihre Ersparnisse steigern können."
+
+msgid "adamantiumaxe"
+msgstr "Adamantiumaxt"
+
+msgid "charger_p"
+msgstr "Streitrösser"
+
+msgid "raft"
+msgstr "Floß"
+
+msgid "guardhouse"
+msgstr "Wachstube"
+
+msgid "caravel"
+msgstr "Karavelle"
+
+msgid "canoe"
+msgstr "Einbaum"
+
+msgctxt "morale"
+msgid "0"
+msgstr "aufständische"
+
+msgctxt "morale"
+msgid "1"
+msgstr "wütende"
+
+msgctxt "morale"
+msgid "2"
+msgstr "zornige"
+
+msgctxt "morale"
+msgid "3"
+msgstr "unruhige"
+
+msgctxt "morale"
+msgid "4"
+msgstr "gleichgültige"
+
+msgctxt "morale"
+msgid "5"
+msgstr "entspannte"
+
+msgctxt "morale"
+msgid "6"
+msgstr "zufriedene"
+
+msgctxt "morale"
+msgid "7"
+msgstr "glückliche"
+
+msgctxt "morale"
+msgid "8"
+msgstr "treue"
+
+msgctxt "morale"
+msgid "9"
+msgstr "ergebene"
+
+msgid "rep_crossbow"
+msgstr "Repetierarmbrust"
+
+msgid "packice"
+msgstr "Packeis"
+
+msgctxt "spellinfo"
+msgid "commonfamiliar"
+msgstr "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem Magier anschließen wird."
+
+msgid "trireme_a"
+msgstr "eine Trireme"
+
+msgid "royalbarge_a"
+msgstr "eine Königsbarke"
+
+msgid "adamantiumaxe_p"
+msgstr "Adamantiumäxte"
+
+msgid "rpg_item_2_p"
+msgstr "Nußhälften"
+
+msgid "watch"
+msgstr "Wache"
+
+msgctxt "spellinfo"
+msgid "earn_silver#draig"
+msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll: niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 25 Silber pro Stufe ein."
+
+msgid "catamaran"
+msgstr "Katamaran"
+
+msgctxt "spell"
+msgid "create_potion_p13"
+msgstr "Braue Elixier der Macht"
+
+msgctxt "spellinfo"
+msgid "create_potion_ointment"
+msgstr "Nach einem harten Kampf sollte man sich heilen lassen. Diese Möglichkeit bietet der Magier ebenso wie der Heiler. Im Gegensatz zum Heiler ist der Magier jedoch in der Lage, seine Behandlung bereits vor dem Kampf durchzuführen, indem er seine Heilkräfte in eine magische Salbe bindet, welche gelagert werden kann und nach dem Kampf nur aufgetragen werden muss."
+
+msgid "packice_trail"
+msgstr "%s"
+
+msgid "cog_a"
+msgstr "eine Kogge"
+
+msgid "canoe_a"
+msgstr "ein Einbaum"
+
+msgid "galleon_a"
+msgstr "eine Galeone"
+
+msgid "towershield_p"
+msgstr "Turmschilde"
+
+msgid "cutter_a"
+msgstr "ein Kutter"
+
+msgid "royalbarge"
+msgstr "Königsbarke"
+
+msgctxt "spell"
+msgid "commonfamiliar"
+msgstr "Vertrauten binden"
+
+msgid "barge"
+msgstr "Barke"
+
+msgctxt "spell"
+msgid "create_potion_peasantblood"
+msgstr "Braue Bauernblut"
+
+msgctxt "spellinfo"
+msgid "earn_silver#cerddor"
+msgstr "Cerddormagier sind _die_ Gaukler unter den Magiern; sie lieben es, das Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen die kleinen Kunststücke und magischen Tricks, mit denen man das Volk locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und am Ende der Woche wird der Gaukler 25 Silber pro Stufe verdient haben."
+
+msgctxt "spellinfo"
+msgid "earn_silver#illaun"
+msgstr "Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch die Kunst der Wahrsagerei, des Kartenlegens und des Handlesens sind ihm geläufig. Dafür zahlen ihm die Bauern 25 Silber pro Stufe."
+
+msgid "rpg_item_1_p"
+msgstr "Urkunden"
+
+msgid "guardtower"
+msgstr "Wachturm"
+
+msgid "raft_a"
+msgstr "ein Floß"
+
+msgid "dragonship"
+msgstr "Drachenschiff"
+
+msgid "galleon"
+msgstr "Galeone"
+
+msgid "towershield"
+msgstr "Turmschild"
+
+msgid "rm_adamantium"
+msgstr "Adamantium"
+
+msgid "adamantium_p"
+msgstr "Adamantium"
+
+msgctxt "spellinfo"
+msgid "create_potion_p0"
+msgstr "Die Zeit ist eines der ersten Geheimnisse, die jeder Magier zu erkunden versucht. Gelingt ihm dies, kann er alle seine Energie auf das Studium der Magie verwenden; die Wege zwischen Dormitorium, Bibliothek und Magierturm schafft er nun viel schneller. Um sein Herz im Takt zu halten, verwendet er einen speziellen selbstgemachten Tee. Manche Magier teilen diesen Tee mit bis zu 10 Personen. "
+
+msgctxt "spellinfo"
+msgid "create_potion_p2"
+msgstr "In einem der seltsamsten Zauber kann der Magier seiner Umgebung ein klein wenig der Lebensenergie entziehen um das sogenannte Wasser des Lebens herstellen. Als Basis dient ihm hierbei der Saft aus einigen ausgesuchten Kräutern, welcher die Lebensenergie speichern kann. Da der Magier aufgrund seiner magischen Fähigkeiten immun ist, ist er der einzige, der den Saft berühren kann, ohne Schaden zu nehmen. Sodann muss er diesen eine Woche lang von Ort zu Ort tragen, damit er sich mit Lebensenergie vollsaugt, ohne einem einzelnen Ort soviel zu entfernen, dass er Schaden nimmt. "
+
+msgctxt "spellinfo"
+msgid "create_potion_p3"
+msgstr "Ein weiteres Anwendungsgebiet des Wissens über die Zeit, welches ein Magier ansammelt, stellt der Schaffenstrunk dar. Auch wenn körperliche Arbeiten eher selten von Magiern ausgeführt werden, so haben diese doch ein Interesse daran, die Effizienz ihrer Untergebenen bei solchen Arbeiten zu steigern. Mornac der Weise war der erste, der entdeckte, dass man einen Trunk herstellen kann, durch den 10 Untergebene die Arbeit von 20 erledigen, wodurch der Rest für andere Experimente eingesetzt werden kann. "
+
+msgid "dragonship_a"
+msgstr "ein Drachenschiff"
+
+msgctxt "spellinfo"
+msgid "create_potion_p9"
+msgstr "Obwohl für Magier das Gebiet der Liebe tabu ist und sie im strengen Zölibat leben, haben sie ein großes Wissen darüber, wie man gewisse Bedürfnisse weckt, weshalb sie immer wieder von Dorfbewohnerinnen und Dorfbewohnern nach entsprechenden Zaubern gefragt werden. Da die Verzauberung eines Bewohners jedoch streng verboten ist, bieten sie ihre Dienste nur für die Züchter an. In einem aufwendigen Ritual, welches jedoch nur dazu dient zu verschleiern, wie einfach dies eigentlich ist, vermischt der Magier vor den Augen des Züchters einige Pflanzensäfte. Dabei ruft er die Geister an, die dem Pferdezüchter das Glück bescheren sollen, um klarzumachen, das diese nur mit ihm sprechen und jeglicher Versuch des Züchters, selbst die Kräuter zu mischen, nur eine unbrauchbare Pampe produzieren würde. Anschließend überreicht der Magier dem Züchter eine Phiole, die dieser in die Tränke seiner Pferde entleeren muss."
+
+msgctxt "spellinfo"
+msgid "earn_silver#tybied"
+msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat -- nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 25 Silber pro Stufe lassen sich so in einer Woche verdienen."
+
+msgid "market"
+msgstr "Marktplatz"
+
+msgid "rep_crossbow_p"
+msgstr "Repetierarmbrüste"
+

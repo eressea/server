@@ -47,12 +47,24 @@ DEST=$(dirname $ROOT)/server
 git submodule update --init
 
 LUA_VERSION="5.2"
+LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
 if [ -d /usr/include/lua5.1 ]; then
    LUA_VERSION="5.1"
+   LUA_INCLUDE=/usr/include/lua5.1
+elif [ -d /usr/include/lua5.2 ]; then
+   export LUA_DIR=/usr
+   LUA_VERSION="5.2"
+   LUA_INCLUDE=/usr/include/lua5.2
 elif [ -d /usr/local/include/lua5.1 ]; then
    export LUA_DIR=/usr/local
    LUA_VERSION="5.1"
+   LUA_INCLUDE=/usr/local/include/lua5.1
+fi
+
+if [ ! -e ${LUA_INCLUDE}/lua.h ]; then
+  echo "no compatible version of lua is installed in $LUA_INCLUDE."
+  exit 1
 fi
 
 cat >| $BUILD/config.cmake <<HEREDOC
@@ -68,7 +80,7 @@ path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
  echo "tolua is not installed, building from source"
  cd $ROOT
- if [ ! -d tolua ]; then
+ if [ ! -d tolua/include ]; then
   echo "fetching tolua ${LUA_VERSION} from github..."
   git clone https://github.com/ennorehling/tolua-${LUA_VERSION}.git tolua
  fi

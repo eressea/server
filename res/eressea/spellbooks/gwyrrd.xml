@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="gwyrrd">
   <entry spell="hail" level="3" />
   <entry spell="rustweapon" level="3" />
@@ -39,3 +40,4 @@
   <entry spell="create_aots" level="6" />
   <entry spell="create_magicherbbag" level="5" />
 </spellbook>
+</eressea>

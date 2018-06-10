@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -223,7 +224,7 @@ static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
     leave_building(u3);
     CuAssertPtrEquals(tc, u2, building_owner(bld));
     leave_building(u2);
-    CuAssertPtrEquals(tc, 0, building_owner(bld));
+    CuAssertPtrEquals(tc, NULL, building_owner(bld));
     test_teardown();
 }
 
@@ -280,7 +281,7 @@ void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
     leave_building(u1);
     CuAssertPtrEquals(tc, u3, building_owner(bld));
     leave_building(u3);
-    CuAssertPtrEquals(tc, 0, building_owner(bld));
+    CuAssertPtrEquals(tc, NULL, building_owner(bld));
     u2->number = 1;
     CuAssertPtrEquals(tc, u2, building_owner(bld));
     test_teardown();
@@ -294,8 +295,8 @@ static void test_btype_defaults(CuTest *tc) {
     btype = bt_get_or_create("hodor");
     CuAssertPtrNotNull(tc, btype);
     CuAssertStrEquals(tc, "hodor", btype->_name);
-    CuAssertPtrEquals(tc, 0, btype->maintenance);
-    CuAssertPtrEquals(tc, 0, btype->construction);
+    CuAssertPtrEquals(tc, NULL, btype->maintenance);
+    CuAssertPtrEquals(tc, NULL, btype->stages);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, 0, btype->taxes);
     CuAssertIntEquals(tc, -1, btype->maxsize);
@@ -304,7 +305,7 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertIntEquals(tc, 0, btype->magres.sa[0]);
     CuAssertIntEquals(tc, 0, btype->magresbonus);
     CuAssertIntEquals(tc, 0, btype->fumblebonus);
-    CuAssertIntEquals(tc, 0, btype->flags);
+    CuAssertIntEquals(tc, BTF_DEFAULT, btype->flags);
     test_teardown();
 }
 
@@ -488,11 +489,11 @@ static void test_cmp_current_owner(CuTest *tc) {
     config_set("rules.region_owners", "1");
     r = test_create_region(0, 0, NULL);
     btype = test_create_buildingtype("watch");
-    btype->construction->maxsize = 1;
+    btype->stages->construction->maxsize = 1;
     btype->taxes = 200;
     b1 = test_create_building(r, btype);
     btype = test_create_buildingtype("castle");
-    btype->construction->maxsize = 1;
+    btype->stages->construction->maxsize = 1;
     btype->taxes = 100;
     b2 = test_create_building(r, btype);
     b1->size = 1;
@@ -514,16 +515,26 @@ static void test_cmp_current_owner(CuTest *tc) {
 static void test_building_effsize(CuTest *tc) {
     building *b;
     building_type *btype;
+    building_stage *stage;
     construction *cons;
 
     test_setup();
-    btype = bt_get_or_create("castle");
-    cons = btype->construction = calloc(1, sizeof(construction));
+    btype = test_create_buildingtype("castle");
+    stage = btype->stages;
+    assert(stage && stage->construction);
+    cons = stage->construction;
     cons->maxsize = 5;
-    cons = cons->improvement = calloc(1, sizeof(construction));
+
+    stage->next = calloc(1, sizeof(building_stage));
+    stage = stage->next;
+    cons = stage->construction = calloc(1, sizeof(construction));
     cons->maxsize = 5;
-    cons = cons->improvement = calloc(1, sizeof(construction));
+
+    stage->next = calloc(1, sizeof(building_stage));
+    stage = stage->next;
+    cons = stage->construction = calloc(1, sizeof(construction));
     cons->maxsize = -1;
+
     b = test_create_building(test_create_region(0,0,0), btype);
     b->size = 1;
     CuAssertIntEquals(tc, 0, buildingeffsize(b, false));
@@ -562,14 +573,20 @@ static void test_largestbuilding(CuTest *tc) {
 static void test_buildingtype(CuTest *tc) {
     building_type *btype;
     test_setup();
+
     btype = test_create_buildingtype("hodor");
-    CuAssertPtrNotNull(tc, btype->construction);
+    CuAssertPtrNotNull(tc, btype->stages);
+    CuAssertPtrEquals(tc, NULL, btype->stages->name);
+    CuAssertPtrNotNull(tc, btype->stages->construction);
     CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
-    btype->construction->name = str_strdup("castle");
+
+    btype->stages->name = str_strdup("castle");
     CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
+
     btype = bt_get_or_create("portal");
-    CuAssertPtrEquals(tc, NULL, btype->construction);
+    CuAssertPtrEquals(tc, NULL, btype->stages);
     CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
+
     test_teardown();
 }
 

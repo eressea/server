@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<spellbook name="illaun">
-    <entry spell="create_roi" level="6" />
-    <entry spell="earn_silver#illaun" level="1" />
-    <entry spell="create_aots" level="6" />
-    <entry spell="create_dreameye" level="14" />
-    <entry spell="create_invisibility_sphere" level="13" />
-</spellbook>

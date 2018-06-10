@@ -180,15 +180,15 @@ struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
     rawmaterial_type *rmtype;
 
-    assert(!rtype->raw);
-    assert(!rtype->itype || rtype->itype->construction);
-    rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
-    rmtype->rtype = rtype;
-    rmtype->terraform = terraform_default;
-    rmtype->update = NULL;
-    rmtype->use = use_default;
-    rmtype->visible = visible_default;
-    return rmtype;
+    if (!rtype->raw) {
+        rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        rmtype->rtype = rtype;
+        rmtype->terraform = terraform_default;
+        rmtype->update = NULL;
+        rmtype->use = use_default;
+        rmtype->visible = visible_default;
+    }
+    return rtype->raw;
 }
 
 int limit_resource(const struct region *r, const resource_type *rtype)

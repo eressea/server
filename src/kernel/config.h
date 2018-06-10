@@ -141,8 +141,6 @@ extern "C" {
     extern const char *parameters[];
     extern settings global;
 
-    extern int turn;
-
 #ifdef __cplusplus
 }
 #endif

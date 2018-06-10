@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<eressea>
 <spellbook name="cerddor">
   <entry spell="create_potion_p2" level="2" />
   <entry spell="create_potion_p0" level="3" />
@@ -6,7 +7,7 @@
   <entry spell="create_potion_peasantblood" level="5" />
   <entry spell="create_potion_ointment" level="6" />
   <entry spell="create_potion_p3" level="7" />
-  <entry spell="create_potion_p14" level="8" />
+  <entry spell="create_potion_healing" level="8" />
   <entry spell="create_potion_p13" level="9" />
   <entry spell="create_roi" level="7" />
   <entry spell="create_aots" level="6" />
@@ -35,3 +36,4 @@
     <entry spell="incite_riot" level="15" />
   <entry spell="summon_familiar" level="9" />
 </spellbook>
+</eressea>

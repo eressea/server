@@ -11,41 +11,42 @@ without prior permission by the authors of Eressea.
 */
 
 #include <platform.h>
-#include <kernel/config.h>
 #include "jsonconf.h"
 
 /* kernel includes */
-#include <kernel/building.h>
-#include <kernel/equipment.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/resources.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
+#include "kernel/building.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/equipment.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/resources.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/crmessage.h>
-#include <util/functions.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/message.h>
-#include <util/nrmessage.h>
-#include <util/path.h>
-#include <util/strings.h>
-#include <util/xml.h>
+#include "util/attrib.h"
+#include "util/crmessage.h"
+#include "util/functions.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/message.h"
+#include "util/nrmessage.h"
+#include "util/path.h"
+#include "util/pofile.h"
+#include "util/strings.h"
 
 /* game modules */
-#include "calendar.h"
 #include "direction.h"
 #include "keyword.h"
 #include "move.h"
 #include "prefix.h"
 #include "skill.h"
+#include "exparse.h"
 
 /* external libraries */
 #include <cJSON.h>
@@ -151,20 +152,6 @@ static void json_construction(cJSON *json, construction **consp) {
     cJSON *child;
     construction * cons;
     
-    if (json->type == cJSON_Array) {
-        int size = 0;
-        for (child = json->child; child; child = child->next) {
-            construction *cons = 0;
-            json_construction(child, &cons);
-            if (cons) {
-                cons->maxsize -= size;
-                size += cons->maxsize + size;
-                *consp = cons;
-                consp = &cons->improvement;
-            }
-        }
-        return;
-    }
     if (json->type != cJSON_Object) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
@@ -309,6 +296,57 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
     }
 }
 
+static void json_stage(cJSON *json, building_stage *stage) {
+    cJSON *child;
+
+    if (json->type != cJSON_Object) {
+        log_error("building stages is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_Object:
+            if (strcmp(child->string, "construction") == 0) {
+                json_construction(child, &stage->construction);
+            }
+            break;
+        case cJSON_String:
+            if (strcmp(child->string, "name") == 0) {
+                stage->name = str_strdup(child->valuestring);
+            }
+            break;
+        }
+    }
+}
+
+static void json_stages(cJSON *json, building_type *bt) {
+    cJSON *child;
+    building_stage *stage, **sp = &bt->stages;
+    int size = 0;
+
+    if (json->type != cJSON_Array) {
+        log_error("building stages is not a json array: %d", json->type);
+        return;
+    }
+
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_Object:
+            stage = calloc(sizeof(building_stage), 1);
+            json_stage(child, stage);
+            if (stage->construction->maxsize > 0) {
+                stage->construction->maxsize -= size;
+                size += stage->construction->maxsize;
+            }
+            *sp = stage;
+            sp = &stage->next;
+            break;
+        default:
+            log_error("building stage contains non-object type %d", child->type);
+        }
+    }
+}
+
 static void json_building(cJSON *json, building_type *bt) {
     cJSON *child;
     const char *flags[] = {
@@ -321,8 +359,10 @@ static void json_building(cJSON *json, building_type *bt) {
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Array:
-            if (strcmp(child->string, "construction") == 0) {
-                json_construction(child, &bt->construction);
+            if (strcmp(child->string, "stages") == 0) {
+                if (!bt->stages) {
+                    json_stages(child, bt);
+                }
             }
             else if (strcmp(child->string, "maintenance") == 0) {
                 json_maintenance(child, &bt->maintenance);
@@ -333,9 +373,14 @@ static void json_building(cJSON *json, building_type *bt) {
             break;
         case cJSON_Object:
             if (strcmp(child->string, "construction") == 0) {
-                json_construction(child, &bt->construction);
+                /* simple, single-stage building */
+                if (!bt->stages) {
+                    building_stage *stage = calloc(sizeof(building_stage), 1);
+                    json_construction(child, &stage->construction);
+                    bt->stages = stage;
+                }
             }
-            else if (strcmp(child->string, "maintenance") == 0) {
+            if (strcmp(child->string, "maintenance") == 0) {
                 json_maintenance(child, &bt->maintenance);
             }
             break;
@@ -433,17 +478,16 @@ static void json_ship(cJSON *json, ship_type *st) {
 static void json_race(cJSON *json, race *rc) {
     cJSON *child;
     const char *flags[] = {
-        "npc", "killpeasants", "scarepeasants",
+        "player", "killpeasants", "scarepeasants",
         "nosteal", "moverandom", "cannotmove",
         "learn", "fly", "swim", "walk", "nolearn",
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal",
         "noweapons", "shapeshift", "", "undead", "dragon",
-        "coastal", "", "cansail", 0
+        "coastal", "", "cansail", NULL
     };
     const char *ecflags[] = {
-        "", "keepitem", "giveperson",
-        "giveunit", "getitem", 0
+        "giveperson", "giveunit", "getitem", NULL
     };
     if (json->type != cJSON_Object) {
         log_error("race %s is not a json object: %d", json->string, json->type);
@@ -888,6 +932,131 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
+/* TODO: much more configurable authority-to-file lookup */
+static const char * authority_to_path(const char *authority, char *name, size_t size) {
+    /* source and destination cannot share the same buffer */
+    assert(authority < name || authority > name + size);
+
+    return join_path(json_relpath, authority, name, size);
+}
+
+static const char * uri_to_file(const char * uri, char *name, size_t size) {
+    const char *pos, *scheme, *path = uri;
+
+    /* source and destination cannot share the same buffer */
+    assert(uri < name || uri > name + size);
+
+    /* identify scheme */
+    scheme = uri;
+    pos = strstr(scheme, "://");
+    if (pos) {
+        size_t slen = pos - scheme;
+        if (strncmp(scheme, "config", slen) == 0) {
+            const char *authority = pos + 3;
+            /* authority */
+            pos = strstr(authority, "/");
+            if (pos) {
+                char buffer[16];
+                size_t alen = pos - authority;
+                assert(alen < sizeof(buffer));
+                memcpy(buffer, authority, alen);
+                buffer[alen] = 0;
+
+                path = authority_to_path(buffer, name, size);
+                path = path_join(path, pos + 1, name, size);
+            }
+        }
+        else {
+            log_fatal("unknown URI scheme: %s", uri);
+        }
+    }
+    return path;
+}
+
+static int include_json(const char *uri) {
+    FILE *F;
+    char name[PATH_MAX];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    int result = -1;
+
+    F = fopen(filename, "r");
+    if (F) {
+        long pos;
+        fseek(F, 0, SEEK_END);
+        pos = ftell(F);
+        rewind(F);
+        if (pos > 0) {
+            cJSON *config;
+            char *data;
+            size_t sz;
+
+            data = malloc(pos + 1);
+            sz = fread(data, 1, (size_t)pos, F);
+            data[sz] = 0;
+            config = cJSON_Parse(data);
+            free(data);
+            if (config) {
+                json_config(config);
+                cJSON_Delete(config);
+                result = 0;
+            }
+            else {
+                log_error("could not parse JSON from %s", uri);
+                result = -1;
+            }
+        }
+        fclose(F);
+    }
+    return result;
+}
+
+static int include_xml(const char *uri) {
+    char name[PATH_MAX];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    int err;
+    err = exparse_readfile(filename);
+    if (err != 0) {
+        log_error("could not parse XML from %s", uri);
+    }
+    return err;
+}
+
+static int add_po_string(const char *msgid, const char *msgstr, const char *msgctxt, void *data) {
+    struct locale * lang = (struct locale *)data;
+    const char * key = msgid;
+    if (msgctxt) {
+        key = mkname(msgctxt, msgid);
+    }
+    locale_setstring(lang, key, msgstr);
+    return 0;
+}
+
+static int include_po(const char *uri) {
+    char name[PATH_MAX], lname[8];
+    const char *filename = uri_to_file(uri, name, sizeof(name));
+    const char *pos = strstr(filename, ".po");
+    if (pos) {
+        size_t len;
+        const char *str = --pos;
+        while (str > filename && *str != '.') --str;
+        len = (size_t)(pos - str);
+        if (len < sizeof(lname)) {
+            struct locale * lang;
+            memcpy(lname, str+1, len);
+            lname[len] = 0;
+            lang = get_or_create_locale(lname);
+            if (lang) {
+                int err = pofile_read(filename, add_po_string, lang);
+                if (err < 0) {
+                    log_error("could not parse translations from %s", uri);
+                }
+                return err;
+            }
+        }
+    }
+    return -1;
+}
+
 static void json_include(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Array) {
@@ -895,39 +1064,20 @@ static void json_include(cJSON *json) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        FILE *F;
-        if (json_relpath) {
-            char name[PATH_MAX];
-            path_join(json_relpath, child->valuestring, name, sizeof(name));
-            F = fopen(name, "r");
+        const char *uri = child->valuestring;
+        int err;
+
+        if (strstr(uri, ".po") != NULL) {
+            err = include_po(uri);
+        }
+        else if (strstr(uri, ".xml") != NULL) {
+            err = include_xml(uri);
         }
         else {
-            F = fopen(child->valuestring, "r");
+            err = include_json(uri);
         }
-        if (F) {
-            long pos;
-            fseek(F, 0, SEEK_END);
-            pos = ftell(F);
-            rewind(F);
-            if (pos > 0) {
-                cJSON *config;
-                char *data;
-                size_t sz;
-
-                data = malloc(pos + 1);
-                sz = fread(data, 1, (size_t)pos, F);
-                data[sz] = 0;
-                config = cJSON_Parse(data);
-                free(data);
-                if (config) {
-                    json_config(config);
-                    cJSON_Delete(config);
-                }
-                else {
-                    log_error("invalid JSON, could not parse %s", child->valuestring);
-                }
-            }
-            fclose(F);
+        if (err != 0) {
+            log_error("no data found in %s", uri);
         }
     }
 }

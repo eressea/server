@@ -130,8 +130,10 @@ static void test_view_reality(CuTest *tc) {
 
     test_setup();
     setup_spells();
-    mt_register(mt_new_va("spell_astral_only", "unit:unit", "region:region", "command:order", MT_NEW_END));
-    mt_register(mt_new_va("viewreality_effect", "unit:unit", MT_NEW_END));
+    mt_create_va(mt_new("spell_astral_only", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("viewreality_effect", NULL),
+        "unit:unit", MT_NEW_END);
     r = test_create_region(0, 0, NULL);
     ra = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
     ra->_plane = get_astralplane();

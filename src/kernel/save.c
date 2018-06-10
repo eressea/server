@@ -25,8 +25,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alliance.h"
 #include "ally.h"
 #include "building.h"
+#include "calendar.h"
 #include "connection.h"
-#include "equipment.h"
 #include "faction.h"
 #include "group.h"
 #include "item.h"
@@ -495,7 +495,7 @@ unit *read_unit(gamedata *data)
     }
 
     READ_INT(data->store, &n);
-    setstatus(u, n);
+    unit_setstatus(u, (status_t)n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
     if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
@@ -1330,29 +1330,7 @@ static void fix_familiars(void) {
                 /* unit is potentially a familiar */
                 attrib * a = a_find(u->attribs, &at_mage);
                 attrib * am = a_find(u->attribs, &at_familiarmage);
-                if (am) {
-                    sc_mage *mage = a ? (sc_mage *)a->data.v : NULL;
-                    /* a familiar */
-                    if (!mage) {
-                        log_error("%s seems to be a familiar with no magic.",
-                            unitname(u));
-                        mage = create_mage(u, M_GRAY);
-                    }
-                    if (!mage->spellbook) {
-                        char eqname[32];
-                        equipment *eq;
-                        
-                        snprintf(eqname, sizeof(eqname), "fam_%s", u->_race->_name);
-                        eq = get_equipment(eqname);
-                        if (eq && eq->spells) {
-                            log_error("%s seems to be a familiar with no spells.",
-                                unitname(u));
-                            /* magical familiar, no spells */
-                            equip_unit_mask(u, eq, EQUIP_SPELLS);
-                        }
-                    }
-                }
-                else if (a) {
+                if (!am && a) {
                     /* not a familiar, but magical */
                     attrib * ae = a_find(u->attribs, &at_eventhandler);
                     if (ae) {
@@ -1417,7 +1395,7 @@ int read_game(gamedata *data)
     read_attribs(data, &global.attribs, NULL);
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
-    rng_init(turn);
+    rng_init(turn + config_get_int("game.seed", 0));
     READ_INT(store, NULL);          /* max_unique_id = ignore */
     READ_INT(store, &nextborder);
 

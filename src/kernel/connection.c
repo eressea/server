@@ -73,36 +73,6 @@ void free_borders(void)
     }
 }
 
-connection *find_border(int id)
-{
-    int key;
-    for (key = 0; key != BORDER_MAXHASH; key++) {
-        connection *bhash;
-        for (bhash = borders[key]; bhash != NULL; bhash = bhash->nexthash) {
-            connection *b;
-            for (b = bhash; b; b = b->next) {
-                if (b->id == id)
-                    return b;
-            }
-        }
-    }
-    return NULL;
-}
-
-int resolve_borderid(variant id, void *addr)
-{
-    int result = 0;
-    connection *b = NULL;
-    if (id.i != 0) {
-        b = find_border(id.i);
-        if (b == NULL) {
-            result = -1;
-        }
-    }
-    *(connection **)addr = b;
-    return result;
-}
-
 static void walk_i(region *r, connection *b, void(*cb)(connection *, void *), void *data) {
     for (; b; b = b->nexthash) {
         if (b->from == r || b->to == r) {
@@ -226,7 +196,7 @@ border_type *find_bordertype(const char *name)
 void b_read(connection * b, gamedata * data)
 {
     storage * store = data->store;
-    int n, result = 0;
+    int n;
     switch (b->type->datatype) {
     case VAR_NONE:
     case VAR_INT:
@@ -241,9 +211,7 @@ void b_read(connection * b, gamedata * data)
     case VAR_VOIDPTR:
     default:
         assert(!"invalid variant type in connection");
-        result = 0;
     }
-    assert(result >= 0 || !"EOF encountered?");
 }
 
 void b_write(const connection * b, storage * store)

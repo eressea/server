@@ -1,29 +1,29 @@
 #include <platform.h>
-#include "settings.h"
 #include "eressea.h"
 
-#include <kernel/config.h>
-#include <util/log.h>
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/curse.h"
+#include "kernel/faction.h"
+#include "kernel/building.h"
+#include "kernel/equipment.h"
+#include "kernel/item.h"
+#include "kernel/database.h"
 
-#include <modules/museum.h>
-#include <triggers/triggers.h>
-#include <util/language.h>
-#include <util/functions.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/item.h>
-#include <kernel/database.h>
-#include <modules/gmcmd.h>
-#include <modules/xmas.h>
-#include <items/xerewards.h>
-#include <items/weapons.h>
+#include "util/functions.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/message.h"
 
-#include <attributes/attributes.h>
-#include <util/message.h>
-#include <races/races.h>
+#include "modules/gmcmd.h"
+#include "modules/xmas.h"
+#include "modules/museum.h"
+#include "triggers/triggers.h"
+#include "items/xerewards.h"
+#include "items/weapons.h"
+#include "attributes/attributes.h"
+#include "races/races.h"
 
-#include "calendar.h"
 #include "chaos.h"
 #include "items.h"
 #include "creport.h"
@@ -33,30 +33,27 @@
 #include "spells.h"
 #include "vortex.h"
 #include "wormhole.h"
-#include "xmlreader.h"
 
 #include <errno.h>
 #include <stdlib.h>
 
+/* manually free() everything at exit? */
+#undef CLEANUP_CODE
+
 void game_done(void)
 {
-#undef CLEANUP_CODE
+    log_dead_factions();
+
 #ifdef CLEANUP_CODE
-    /* Diese Routine enfernt allen allokierten Speicher wieder. Das ist nur
-     * zum Debugging interessant, wenn man Leak Detection hat, und nach
-     * nicht freigegebenem Speicher sucht, der nicht bis zum Ende benoetigt
-     * wird (temporaere Hilsstrukturen) */
-
-    free_game();
-
+    free_gamedata();
     creport_cleanup();
     report_cleanup();
-#endif
     calendar_cleanup();
     free_functions();
     free_config();
     free_special_directions();
     free_locales();
+#endif
     kernel_done();
     dblib_close();
 }
@@ -82,7 +79,6 @@ void game_init(void)
 
     register_weapons();
     register_xerewards();
-    register_xmlreader();
     register_attributes();
     register_gmcmd();
 

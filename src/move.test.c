@@ -28,8 +28,10 @@
 #include <assert.h>
 
 static void setup_move(void) {
-    mt_register(mt_new_va("travel", "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END));
-    mt_register(mt_new_va("moveblocked", "unit:unit", "direction:int", MT_NEW_END));
+    mt_create_va(mt_new("travel", NULL),
+        "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END);
+    mt_create_va(mt_new("moveblocked", NULL),
+        "unit:unit", "direction:int", MT_NEW_END);
 }
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
@@ -285,9 +287,12 @@ void setup_drift (struct drift_fixture *fix) {
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->sh);
 
-    mt_register(mt_new_va("ship_drift", "ship:ship", "dir:int", MT_NEW_END));
-    mt_register(mt_new_va("shipsink", "ship:ship", MT_NEW_END));
-    mt_register(mt_new_va("massive_overload", "ship:ship", MT_NEW_END));
+    mt_create_va(mt_new("ship_drift", NULL),
+        "ship:ship", "dir:int", MT_NEW_END);
+    mt_create_va(mt_new("shipsink", NULL),
+        "ship:ship", MT_NEW_END);
+    mt_create_va(mt_new("massive_overload", NULL),
+        "ship:ship", MT_NEW_END);
 }
 
 static void test_ship_no_overload(CuTest *tc) {
@@ -482,7 +487,8 @@ static void test_follow_ship_msg(CuTest * tc) {
     td->dir = D_NORTHWEST;
     td->age = 2;
 
-    mt_register(mt_new_va("error18", "unit:unit", "region:region", "command:order", MT_NEW_END));
+    mt_create_va(mt_new("error18", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
 
     init_order_depr(ord);
     getstrtoken();
@@ -593,6 +599,30 @@ static void test_route_cycle(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cycle_route(CuTest *tc) {
+    struct locale *lang;
+    char buffer[32];
+    order *ord, *onew;
+
+    test_setup();
+    lang = test_create_locale();
+    CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
+
+    ord = create_order(K_ROUTE, lang, "WEST EAST PAUSE NW");
+    CuAssertStrEquals(tc, "route WEST EAST PAUSE NW", get_command(ord, lang, buffer, sizeof(buffer)));
+
+    onew = cycle_route(ord, lang, 1);
+    CuAssertStrEquals(tc, "route east PAUSE nw west", get_command(onew, lang, buffer, sizeof(buffer)));
+    free_order(onew);
+
+    onew = cycle_route(ord, lang, 2);
+    CuAssertStrEquals(tc, "route nw west east PAUSE", get_command(onew, lang, buffer, sizeof(buffer)));
+    free_order(onew);
+
+    free_order(ord);
+    test_teardown();
+}
+
 static void test_route_pause(CuTest *tc) {
     unit *u;
     region *r;
@@ -630,6 +660,26 @@ static void test_movement_speed_dragon(CuTest *tc) {
     test_teardown();
 }
 
+static void test_make_movement_order(CuTest *tc) {
+    order *ord;
+    char buffer[32];
+    struct locale *lang;
+    direction_t steps[] = { D_EAST, D_WEST, D_EAST, D_WEST };
+
+    test_setup();
+    lang = test_create_locale();
+
+    ord = make_movement_order(lang, steps, 2);
+    CuAssertStrEquals(tc, "move east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    ord = make_movement_order(lang, steps, 4);
+    CuAssertStrEquals(tc, "move east west east west", get_command(ord, lang, buffer, sizeof(buffer)));
+    free_order(ord);
+
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -658,6 +708,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
     SUITE_ADD_TEST(suite, test_route_cycle);
+    SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);
+    SUITE_ADD_TEST(suite, test_make_movement_order);
     return suite;
 }
