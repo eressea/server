@@ -5573,7 +5573,7 @@ msgid "swamp_trail"
 msgstr "der Sumpf von %s"
 
 msgid "nr_nb_final"
-msgstr "und im"
+msgstr "und im "
 
 msgid "aoc"
 msgstr "Katzenamulett"
