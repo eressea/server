@@ -1907,7 +1907,7 @@ msgid "castle"
 msgstr "Burg"
 
 msgid "nr_borderlist_infix"
-msgstr ", im"
+msgstr ", im "
 
 msgctxt "race"
 msgid "shadowbat_p"
@@ -3707,7 +3707,7 @@ msgid "analyse_object"
 msgstr "Lied des Ortes analysieren"
 
 msgid "nr_borderlist_lastfix"
-msgstr "und im"
+msgstr "und im "
 
 msgctxt "race"
 msgid "shadowknight_d"
