@@ -1906,9 +1906,6 @@ msgstr "Mallorn"
 msgid "castle"
 msgstr "Burg"
 
-msgid "nr_borderlist_infix"
-msgstr ", im"
-
 msgctxt "race"
 msgid "shadowbat_p"
 msgstr "Todesflattern"
@@ -3705,9 +3702,6 @@ msgstr "hilft"
 msgctxt "spell"
 msgid "analyse_object"
 msgstr "Lied des Ortes analysieren"
-
-msgid "nr_borderlist_lastfix"
-msgstr "und im"
 
 msgctxt "race"
 msgid "shadowknight_d"
@@ -5573,7 +5567,7 @@ msgid "swamp_trail"
 msgstr "der Sumpf von %s"
 
 msgid "nr_nb_final"
-msgstr "und im"
+msgstr "und im "
 
 msgid "aoc"
 msgstr "Katzenamulett"

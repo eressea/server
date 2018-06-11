@@ -698,10 +698,16 @@
       <arg name="faction" type="faction"/>
     </type>
   </message>
-  <message name="nr_borderlist_postfix" section="nr">
+  <message name="nr_border_transparent" section="nr">
     <type>
-      <arg name="transparent" type="int"/>
       <arg name="object" type="string"/>
+      <arg name="dir" type="direction"/>
+    </type>
+  </message>
+  <message name="nr_border_opaque" section="nr">
+    <type>
+      <arg name="object" type="string"/>
+      <arg name="dir" type="direction"/>
     </type>
   </message>
   <message name="nr_building_besieged" section="nr">
@@ -5494,12 +5500,12 @@
       <arg name="unit" type="unit"/>
     </type>
   </message>
-  <message name="tactics_lost" section="battle">
+  <message name="para_tactics_lost" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>
   </message>
-  <message name="tactics_won" section="battle">
+  <message name="para_tactics_won" section="battle">
     <type>
       <arg name="unit" type="unit"/>
     </type>

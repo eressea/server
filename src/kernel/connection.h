@@ -45,7 +45,7 @@ extern "C" {
     } connection;
 
     typedef struct border_type {
-        const char *__name;         /* internal use only */
+        const char *_name;         /* internal use only */
         variant_type datatype;
         bool(*transparent) (const connection *, const struct faction *);
         /* is it possible to see through this? */

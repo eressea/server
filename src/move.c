@@ -73,7 +73,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
 #include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -1047,15 +1046,17 @@ int movewhere(const unit * u, const char *token, region * r, region ** resultp)
 order * cycle_route(order * ord, const struct locale *lang, int gereist)
 {
     int cm = 0;
-    char tail[1024], *bufp = tail;
-    char neworder[2048], *obuf = neworder;
+    char tail[1024];
+    char neworder[2048];
     char token[128];
     direction_t d = NODIRECTION;
     bool paused = false;
-    bool pause;
     order *norder;
-    size_t size = sizeof(tail) - 1;
+    sbstring sbtail;
+    sbstring sborder;
 
+    sbs_init(&sbtail, tail, sizeof(tail));
+    sbs_init(&sborder, neworder, sizeof(neworder));
     assert(getkeyword(ord) == K_ROUTE);
     tail[0] = '\0';
     neworder[0] = '\0';
@@ -1063,14 +1064,10 @@ order * cycle_route(order * ord, const struct locale *lang, int gereist)
 
     for (cm = 0;; ++cm) {
         const char *s;
-        pause = false;
         s = gettoken(token, sizeof(token));
         if (s && *s) {
             d = get_direction(s, lang);
-            if (d == D_PAUSE) {
-                pause = true;
-            }
-            else if (d == NODIRECTION) {
+            if (d == NODIRECTION) {
                 break;
             }
         }
@@ -1079,38 +1076,37 @@ order * cycle_route(order * ord, const struct locale *lang, int gereist)
         }
         if (cm < gereist) {
             /* TODO: hier sollte keine PAUSE auftreten */
-            assert(!pause);
-            if (!pause) {
+            assert (d != D_PAUSE);
+            if (d != D_PAUSE) {
                 const char *loc = LOC(lang, shortdirections[d]);
                 assert(loc);
-                if (bufp != tail) {
-                    bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
+                if (sbs_length(&sbtail) > 0) {
+                    sbs_strcat(&sbtail, " ");
                 }
-                bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
+                sbs_strcat(&sbtail, loc);
             }
         }
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
-        else if (cm == gereist && !paused && pause) {
+        else if (cm == gereist && !paused && (d == D_PAUSE)) {
             const char *loc = LOC(lang, parameters[P_PAUSE]);
-            bufp = STRLCPY_EX(bufp, " ", &size, "cycle_route");
-            bufp = STRLCPY_EX(bufp, loc, &size, "cycle_route");
+            sbs_strcat(&sbtail, " ");
+            sbs_strcat(&sbtail, loc);
             paused = true;
         }
-        else if (pause) {
-            /* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
-             * hier keine normale direction), muss jede PAUSE einzeln
-             * herausgefiltert und explizit gesetzt werden */
-            if (neworder != obuf) {
-                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
-            }
-            obuf += str_strlcat(obuf, LOC(lang, parameters[P_PAUSE]), sizeof(neworder) - (obuf - neworder));
-        }
         else {
-            if (neworder != obuf) {
-                obuf += str_strlcat(obuf, " ", sizeof(neworder) - (obuf - neworder));
+            if (sbs_length(&sbtail) > 0) {
+                sbs_strcat(&sborder, " ");
             }
-            obuf += str_strlcat(obuf, LOC(lang, shortdirections[d]), sizeof(neworder) - (obuf - neworder));
+            if (d == D_PAUSE) {
+                /* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
+                 * hier keine normale direction), muss jede PAUSE einzeln
+                 * herausgefiltert und explizit gesetzt werden */
+                sbs_strcat(&sborder, LOC(lang, parameters[P_PAUSE]));
+            }
+            else {
+                sbs_strcat(&sborder, LOC(lang, shortdirections[d]));
+            }
         }
     }
 
@@ -2250,10 +2246,9 @@ static direction_t hunted_dir(attrib * at, int id)
 int follow_ship(unit * u, order * ord)
 {
     region *rc = u->region;
-    size_t bytes;
+    sbstring sbcmd;
     int  moves, id, speed;
-    char command[256], *bufp = command;
-    size_t size = sizeof(command);
+    char command[256];
     direction_t dir;
 
     if (fval(u, UFL_NOTMOVING)) {
@@ -2289,11 +2284,10 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    bufp = command;
-    bytes = slprintf(bufp, size, "%s %s", LOC(u->faction->locale, keyword(K_MOVE)), LOC(u->faction->locale, directions[dir]));
-    assert(bytes <= INT_MAX);
-    if (wrptr(&bufp, &size, (int)bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_init(&sbcmd, command, sizeof(command));
+    sbs_strcpy(&sbcmd, LOC(u->faction->locale, keyword(K_MOVE)));
+    sbs_strcat(&sbcmd, " ");
+    sbs_strcat(&sbcmd, LOC(u->faction->locale, directions[dir]));
 
     moves = 1;
 
@@ -2309,8 +2303,8 @@ int follow_ship(unit * u, order * ord)
     rc = rconnect(rc, dir);
     while (rc && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
-        bufp = STRLCPY_EX(bufp, " ", &size, "hunt");
-        bufp = STRLCPY_EX(bufp, loc, &size, "hunt");
+        sbs_strcat(&sbcmd, " ");
+        sbs_strcat(&sbcmd, loc);
         moves++;
         rc = rconnect(rc, dir);
     }
