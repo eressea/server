@@ -1355,8 +1355,11 @@ msgstr "\"Es herrscht eine fröhliche und ausgelassene Stimmung. ($int36($id))\"
 msgid "buildroad"
 msgstr "\"$unit($unit) erweitert in $region($region) das Straßennetz um $int($size).\""
 
-msgid "nr_borderlist_postfix"
-msgstr "\"$if($transparent,\" befindet sich\",\" versperrt\") ${object}$if($transparent,\"\",\" die Sicht\").\""
+msgid "nr_border_opaque"
+msgstr "Im $direction($dir) verperrt ${object} die Sicht."
+
+msgid "nr_border_transparent"
+msgstr "Im $direction($dir) befindet sich ${object}."
 
 msgid "effectstrength"
 msgstr "\"$unit($mage) erhöht die Körperkraft von $unit.dative($target) beträchtlich.\""

@@ -1642,9 +1642,6 @@ msgstr "mallorn"
 msgid "castle"
 msgstr "castle"
 
-msgid "nr_borderlist_infix"
-msgstr ", to the "
-
 msgctxt "race"
 msgid "shadowbat_p"
 msgstr "darkbats"
@@ -3260,9 +3257,6 @@ msgstr "is helping"
 msgctxt "spell"
 msgid "analyse_object"
 msgstr "Analysis"
-
-msgid "nr_borderlist_lastfix"
-msgstr ", and to the "
 
 msgctxt "race"
 msgid "shadowknight_d"

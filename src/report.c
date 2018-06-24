@@ -761,11 +761,11 @@ static void rp_battles(struct stream *out, faction * f)
         while (bm) {
             char buf[256];
             RENDER(f, buf, sizeof(buf), ("header_battle", "region", bm->r));
-            newline(out);
             centre(out, buf, true);
             newline(out);
             rp_messages(out, bm->msgs, f, 0, false);
             bm = bm->next;
+            newline(out);
         }
     }
 }
@@ -1229,39 +1229,17 @@ void report_region(struct stream *out, const region * r, faction * f)
     if (edges)
         newline(out);
     for (e = edges; e; e = e->next) {
-        bool first = true;
         message *msg;
 
-        bufp = buf;
-        size = sizeof(buf) - 1;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
-            if (!e->exist[d])
-                continue;
-            /* this localization might not work for every language but is fine for de and en */
-            if (first)
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_borderlist_prefix"), size);
-            else if (e->lastd == d)
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_borderlist_lastfix"), size);
-            else
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_borderlist_infix"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, directions[d]), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            first = false;
+            if (e->exist[d]) {
+                msg = msg_message(e->transparent ? "nr_border_transparent" : "nr_border_opaque",
+                    "object dir", e->name, d);
+                nr_render(msg, f->locale, buf, sizeof(buf), f);
+                msg_release(msg);
+                paragraph(out, buf, 0, 0, 0);
+            }
         }
-        /* TODO name is localized? Works for roads anyway... */
-        /* TODO: creating messages during reporting makes them not show up in CR? */
-        msg = msg_message("nr_borderlist_postfix", "transparent object",
-            e->transparent, e->name);
-        bytes = (int)nr_render(msg, f->locale, bufp, size, f);
-        msg_release(msg);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-
-        *bufp = 0;
-        paragraph(out, buf, 0, 0, 0);
     }
     if (edges) {
         while (edges) {
@@ -1291,7 +1269,6 @@ static void statistics(struct stream *out, const region * r, const faction * f)
         }
     }
     /* print */
-    newline(out);
     m = msg_message("nr_stat_header", "region", r);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
@@ -2284,8 +2261,10 @@ report_plaintext(const char *filename, report_context * ctx,
             report_travelthru(out, r, f);
         }
 
-        if (wants_stats && r->seen.mode >= seen_unit)
+        if (wants_stats && r->seen.mode >= seen_unit) {
             statistics(out, r, f);
+            newline(out);
+        }
 
         /* Nachrichten an REGION in der Region */
         if (r->seen.mode >= seen_travel) {

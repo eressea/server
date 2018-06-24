@@ -188,7 +188,7 @@ border_type *find_bordertype(const char *name)
 {
     border_type *bt = bordertypes;
 
-    while (bt && strcmp(bt->__name, name)!=0)
+    while (bt && strcmp(bt->_name, name)!=0)
         bt = bt->next;
     return bt;
 }
@@ -563,7 +563,7 @@ void write_borders(struct storage *store)
             for (b = bhash; b != NULL; b = b->next) {
                 if (b->type->valid && !b->type->valid(b))
                     continue;
-                WRITE_TOK(store, b->type->__name);
+                WRITE_TOK(store, b->type->_name);
                 WRITE_INT(store, b->id);
                 WRITE_INT(store, b->from->uid);
                 WRITE_INT(store, b->to->uid);
@@ -614,7 +614,7 @@ int read_borders(gamedata *data)
         if (to == from && from) {
             direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
             region *r = rconnect(from, dir);
-            log_error("[read_borders] invalid %s in %s\n", type->__name, regionname(from, NULL));
+            log_error("[read_borders] invalid %s in %s\n", type->_name, regionname(from, NULL));
             if (r != NULL)
                 to = r;
         }
@@ -633,5 +633,5 @@ int read_borders(gamedata *data)
 }
 
 const char * border_name(const connection *co, const struct region * r, const struct faction * f, int flags) {
-    return (co->type->name) ? co->type->name(co, r, f, flags) : co->type->__name;
+    return (co->type->name) ? co->type->name(co, r, f, flags) : co->type->_name;
 }

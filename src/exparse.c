@@ -818,7 +818,9 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
                 handle_requirement(pi, el, attr);
             }
             else if (xml_strcmp(el, "luxury") == 0) {
-                rtype->ltype = new_luxurytype(itype, 0);
+                int price = atoi(attr_get(attr, "price"));
+                assert(price > 0);
+                rtype->ltype = new_luxurytype(itype, price);
             }
             else if (xml_strcmp(el, "potion") == 0) {
                 int i, level = 0;
@@ -1090,9 +1092,13 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
 
         name = attr_get(attr, "name");
         if (name) {
+            int i;
+
             assert(!rc);
             pi->object = rc = rc_get_or_create(name);
-            int i;
+            while (AT_NONE != rc->attack[nattacks].type) {
+                ++nattacks;
+            }
 
             for (i = 0; attr[i]; i += 2) {
                 const XML_Char *key = attr[i], *val = attr[i + 1];
