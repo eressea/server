@@ -1,5 +1,6 @@
 require 'eressea.path'
 require 'eressea.resources'
+require 'eressea.equipment'
 require 'eressea.spells'
 
 local self = {}
