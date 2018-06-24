@@ -180,14 +180,21 @@ static void test_default_order(CuTest *tc) {
 
     test_setup();
     loc = test_create_locale();
-    ord = default_order(loc);
-    CuAssertPtrEquals(tc, 0, ord);
-    free_order(ord);
 
-    config_set("orders.default", "work");
     ord = default_order(loc);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_WORK, getkeyword(ord));
+    free_order(ord);
+
+    enable_keyword(K_WORK, false);
+    ord = default_order(loc);
+    CuAssertPtrEquals(tc, NULL, ord);
+    free_order(ord);
+
+    config_set("orders.default", "entertain");
+    ord = default_order(loc);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(ord));
     free_order(ord);
     test_teardown();
 }

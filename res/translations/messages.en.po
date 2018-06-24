@@ -1355,8 +1355,11 @@ msgstr "\"Everyone in this region seems to be having a very good time. ($int36($
 msgid "buildroad"
 msgstr "\"$unit($unit) extends the road network in $region($region) by $int($size).\""
 
-msgid "nr_borderlist_postfix"
-msgstr "\"$if($transparent,\" there is\",\" sight is blocked by \") ${object}.\""
+msgid "nr_border_opaque"
+msgstr "To the $direction($dir), ${object} is blocking the view."
+
+msgid "nr_border_transparent"
+msgstr "To the $direction($dir) is ${object}."
 
 msgid "effectstrength"
 msgstr "\"$unit($mage) increases the strength of $unit($target) dramatically.\""

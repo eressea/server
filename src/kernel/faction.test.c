@@ -3,8 +3,10 @@
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/calendar.h>
+#include <kernel/callbacks.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -298,9 +300,30 @@ static void test_save_special_items(CuTest *tc) {
     test_teardown();
 }
 
+static void test_addplayer(CuTest *tc) {
+    unit *u;
+    region *r;
+    faction *f;
+    item_type *itype;
+    test_setup();
+    callbacks.equip_unit = NULL;
+    itype = test_create_silver();
+    r = test_create_plain(0, 0);
+    f = test_create_faction(NULL);
+    u = addplayer(r, f);
+    CuAssertPtrNotNull(tc, u);
+    CuAssertPtrEquals(tc, r, u->region);
+    CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertIntEquals(tc, i_get(u->items, itype), 10);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
+    test_teardown();
+}
+
 CuSuite *get_faction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_addplayer);
     SUITE_ADD_TEST(suite, test_max_migrants);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
