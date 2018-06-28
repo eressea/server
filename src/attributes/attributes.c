@@ -209,6 +209,7 @@ void register_attributes(void)
 
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
     at_deprecate("hurting", a_readint); /* an old arena attribute */
+    at_deprecate("chaoscount", a_readint); /* used to increase the chance of monster spawns */
     at_deprecate("xontormiaexpress", a_readint);    /* required for old datafiles */
     at_deprecate("orcification", a_readint);    /* required for old datafiles */
     at_deprecate("lua", read_ext);    /* required for old datafiles */

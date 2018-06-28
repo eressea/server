@@ -24,14 +24,7 @@ extern "C" {
 
     struct region;
 
-    extern struct attrib_type at_chaoscount;
-
-    void chaos_register(void);
     void chaos_update(void);
-
-    void set_chaoscount(struct region *r, int deaths);
-    int get_chaoscount(const struct region * r);
-    void add_chaoscount(struct region * r, int deaths);
 
 #ifdef __cplusplus
 }

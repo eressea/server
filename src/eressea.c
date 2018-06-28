@@ -24,7 +24,6 @@
 #include "attributes/attributes.h"
 #include "races/races.h"
 
-#include "chaos.h"
 #include "items.h"
 #include "creport.h"
 #include "report.h"
@@ -82,5 +81,4 @@ void game_init(void)
     register_attributes();
     register_gmcmd();
 
-    chaos_register();
 }
