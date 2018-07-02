@@ -512,6 +512,7 @@ static void test_create_order_long(CuTest *tc) {
     stream_order(&out, ord, lang, true);
     out.api->rewind(out.handle);
     out.api->readln(out.handle, buffer, sizeof(buffer));
+    CuAssertIntEquals(tc, 1026, strlen(buffer));
     mstream_done(&out);
     free_order(ord);
     test_teardown();

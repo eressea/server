@@ -39,57 +39,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 
-/*********************/
-/*   at_chaoscount   */
-/*********************/
-attrib_type at_chaoscount = {
-    "chaoscount",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
-
-void set_chaoscount(struct region *r, int deaths)
-{
-    if (deaths==0) {
-        a_removeall(&r->attribs, &at_chaoscount);
-    } else {
-        attrib *a = a_find(r->attribs, &at_chaoscount);
-        if (!a) {
-            a = a_add(&r->attribs, a_new(&at_chaoscount));
-        }
-        a->data.i = deaths;
-    }
-}
-
-int get_chaoscount(const region * r)
-{
-    attrib *a = a_find(r->attribs, &at_chaoscount);
-    if (!a)
-        return 0;
-    return a->data.i;
-}
-
-void add_chaoscount(region * r, int fallen)
-{
-    attrib *a;
-
-    if (fallen == 0)
-        return;
-
-    a = a_find(r->attribs, &at_chaoscount);
-    if (!a)
-        a = a_add(&r->attribs, a_new(&at_chaoscount));
-    a->data.i += fallen;
-
-    if (a->data.i <= 0)
-        a_remove(&r->attribs, a);
-}
-
 static const terrain_type *chaosterrain(void)
 {
     static const terrain_type **types;
@@ -248,18 +197,8 @@ void chaos_update(void) {
     region *r;
     /* Chaos */
     for (r = regions; r; r = r->next) {
-        int i;
-
         if ((r->flags & RF_CHAOTIC)) {
             chaos(r);
         }
-        i = get_chaoscount(r);
-        if (i) {
-            add_chaoscount(r, -(int)(i * ((double)(rng_int() % 10)) / 100.0));
-        }
     }
-}
-
-void chaos_register(void) {
-    at_register(&at_chaoscount);
 }

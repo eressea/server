@@ -58,7 +58,7 @@
         "entertain.base": 0,
         "entertain.perlevel": 20,
         "nmr.timeout": 5,
-        "nmr.removenewbie": 0,
+        "nmr.removenewbie": false,
         "GiveRestriction": 3,
         "healing.forest": 2.0,
         "hunger.long": false,

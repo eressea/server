@@ -2179,10 +2179,10 @@ void report_battle_start(battle * b)
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        sbs_strcpy(&sbs, ", ");
+                        sbs_strcat(&sbs, ", ");
                     }
                     if (lastf) {
-                        sbs_strcpy(&sbs, lastf);
+                        sbs_strcat(&sbs, lastf);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2193,12 +2193,10 @@ void report_battle_start(battle * b)
                 }
             }
         }
-        if (first) {
+        if (first && lastf) {
             sbs_strcat(&sbs, " ");
             sbs_strcat(&sbs, LOC(f->locale, "and"));
             sbs_strcat(&sbs, " ");
-        }
-        if (lastf) {
             sbs_strcat(&sbs, lastf);
         }
 

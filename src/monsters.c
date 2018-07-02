@@ -24,7 +24,6 @@
 #include "monsters.h"
 
 #include "economy.h"
-#include "chaos.h"
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
@@ -843,18 +842,14 @@ void plan_monsters(faction * f)
     pathfinder_cleanup();
 }
 
-static double chaosfactor(region * r)
-{
-    return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
-}
-
 static int nrand(int handle_start, int sub)
 {
     int res = 0;
 
     do {
-        if (rng_int() % 100 < handle_start)
+        if (rng_int() % 100 < handle_start) {
             res++;
+        }
         handle_start -= sub;
     } while (handle_start > 0);
 
@@ -876,7 +871,7 @@ void spawn_dragons(void)
     region *r;
     faction *monsters = get_or_create_monsters();
     int minage = config_get_int("monsters.spawn.min_age", 100);
-    int spawn_chance = 100 * config_get_int("monsters.spawn.chance", 100);
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100);
 
     if (spawn_chance <= 0) {
         /* monster spawning disabled */
@@ -895,7 +890,8 @@ void spawn_dragons(void)
         else if ((r->terrain == newterrain(T_GLACIER)
             || r->terrain == newterrain(T_SWAMP)
             || r->terrain == newterrain(T_DESERT))
-            && rng_int() % spawn_chance < (5 + 100 * chaosfactor(r))) {
+            && rng_int() % spawn_chance < 6)
+        {
             if (chance(0.80)) {
                 u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
             }
@@ -907,7 +903,7 @@ void spawn_dragons(void)
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
-                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
 
             name_unit(u);
 
@@ -932,9 +928,9 @@ void spawn_undead(void)
                 continue;
             }
         }
-        /* Chance 0.1% * chaosfactor */
+
         if (r->land && unburied > rpeasants(r) / 20
-            && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
+            && rng_int() % 10000 < 200) {
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.

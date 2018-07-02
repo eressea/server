@@ -30,7 +30,7 @@ extern "C" {
     void report_travelthru(struct stream *out, struct region * r, const struct faction * f);
     void report_region(struct stream *out, const struct region * r, struct faction * f);
 
-    void nr_spell_syntax(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
+    void nr_spell_syntax(char *buf, size_t size, struct spellbook_entry * sbe, const struct locale *lang);
     void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
 
 #ifdef __cplusplus
