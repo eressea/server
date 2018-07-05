@@ -33,6 +33,7 @@ extern "C" {
     int study_cmd(struct unit *u, struct order *ord);
 
     magic_t getmagicskill(const struct locale *lang);
+    skill_t getskill(const struct locale *lang);
     bool is_migrant(struct unit *u);
     int study_cost(struct unit *u, skill_t talent);
 

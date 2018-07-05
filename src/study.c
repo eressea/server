@@ -69,7 +69,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define TEACH_ALL 1
 #define TEACH_FRIENDS
 
-static skill_t getskill(const struct locale *lang)
+skill_t getskill(const struct locale *lang)
 {
     char token[128];
     const char * s = gettoken(token, sizeof(token));
@@ -331,7 +331,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                         sk = teachskill[t];
                     }
                     if (sk != NOSKILL
-                        && effskill_study(teacher, sk, 0) - TEACHDIFFERENCE > effskill_study(student, sk, 0)) {
+                        && effskill_study(teacher, sk) - TEACHDIFFERENCE > effskill_study(student, sk)) {
                         teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
@@ -343,7 +343,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
-                        && effskill_study(teacher, sk, 0) - TEACHDIFFERENCE >= effskill(student, sk, 0)) {
+                        && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk)) {
                         teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
@@ -432,7 +432,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 continue;
             }
 
-            if (effskill_study(student, sk, 0) > effskill_study(teacher, sk, 0)
+            if (effskill_study(student, sk, NULL) > effskill_study(teacher, sk)
                 - TEACHDIFFERENCE) {
                 if (feedback) {
                     ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord, "teach_asgood",

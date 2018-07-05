@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <modules/gmcmd.h>
 
 #include "alchemy.h"
+#include "automate.h"
 #include "battle.h"
 #include "economy.h"
 #include "keyword.h"
@@ -4001,6 +4002,7 @@ void init_processor(void)
     }
 
     p += 10;
+    add_proc_region(p, do_autostudy, "study automation");
     add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;

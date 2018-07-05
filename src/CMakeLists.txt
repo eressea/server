@@ -86,6 +86,7 @@ ENDIF()
 
 set (ERESSEA_SRC
   vortex.c
+  automate.c
   move.c
   piracy.c
   spells.c
