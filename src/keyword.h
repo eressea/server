@@ -72,6 +72,7 @@ extern "C"
         K_PROMOTION,
         K_PAY,
         K_LOOT,
+        K_AUTOSTUDY,
         MAXKEYWORDS,
         NOKEYWORD
     } keyword_t;
