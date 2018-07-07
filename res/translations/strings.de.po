@@ -327,10 +327,6 @@ msgctxt "spell"
 msgid "clone"
 msgstr "Seelenkopie"
 
-msgctxt "spellinfo"
-msgid "concealing_aura"
-msgstr "Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Zeit vor den Blicken anderer verschleiern."
-
 msgctxt "shipinfo"
 msgid "balloon"
 msgstr "Der Sumpfgasballon besteht aus einem großen Weidenkorb, welcher Platz für maximal 5 Personen oder 500 Gewichtseinheiten bietet, und einer großen, mit Sumpfgas gefüllten Wyrmblase. Bei guten Winden kann sich der Ballon zwei Regionen pro Woche fortbewegen. Das Führen eines Ballons ist nicht einfach, und der Kapitän muss mindestens ein Segeltalent von 6 besitzen. Diese neue Entwicklung auf Eressea wird ausschließlich für den Xontormia-Expreß hergestellt und die Baupläne sind streng geheim. So ist es auch bisher noch niemandem gelungen, ein Exemplar nachzubauen."
@@ -908,10 +904,6 @@ msgctxt "spellinfo"
 msgid "disturbingdreams"
 msgstr "Dieser Zauber führt in der betroffenen Region für einige Wochen zu Schlaflosigkeit und Unruhe. Den Betroffenen fällt das Lernen deutlich schwerer."
 
-msgctxt "spellinfo"
-msgid "raindance"
-msgstr "Dieses uralte Tanzritual ruft die Kräfte des Lebens und der Fruchtbarkeit. Die Erträge der Bauern werden für einige Wochen deutlich besser ausfallen."
-
 msgid "wdw_pyramid"
 msgstr "Pyramide"
 
@@ -1459,10 +1451,6 @@ msgctxt "race"
 msgid "goblin_x"
 msgstr "Goblin"
 
-msgctxt "spellinfo"
-msgid "earn_silver#gwyrrd"
-msgstr "Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei den Bauern sehr begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen besseren Preis zu verkaufen. Pro Stufe kann der Magier so 50 Silber verdienen."
-
 msgctxt "spell"
 msgid "raindance"
 msgstr "Regentanz"
@@ -1493,10 +1481,6 @@ msgstr "Mallorn"
 
 msgid "mallorn_p"
 msgstr "Mallorn"
-
-msgctxt "describe"
-msgid "lifepotion"
-msgstr "Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme."
 
 msgctxt "spell"
 msgid "homestone"
@@ -1739,10 +1723,6 @@ msgstr "Beschwörung eines Wasserelementares"
 
 msgid "GEBAEUDE"
 msgstr "GEBÄUDE"
-
-msgctxt "spellinfo"
-msgid "blessedharvest"
-msgstr "Dieses Ernteritual verbessert die Erträge der arbeitenden Bauern in der Region um ein Silberstück. Je mehr Kraft der Druide investiert, desto länger wirkt der Zauber."
 
 msgid "KRAEUTER"
 msgstr "KRÄUTER"
@@ -3146,10 +3126,6 @@ msgstr "Magischer Sturm"
 msgctxt "spellinfo"
 msgid "create_focus"
 msgstr "Erzeugt einen Aurafokus."
-
-msgctxt "spellinfo"
-msgid "earn_silver#draig"
-msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll, niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 50 Silber pro Stufe ein."
 
 msgctxt "spell"
 msgid "song_of_slavery"
@@ -4910,10 +4886,6 @@ msgstr "Elixier der Macht"
 msgid "wand_p"
 msgstr "Zauberstäbe"
 
-msgctxt "spellinfo"
-msgid "earn_silver#cerddor"
-msgstr "Cerddormagier sind _die_ Gaukler unter den Magiern, sie lieben es das Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen die kleinen Kunststücke und magischen Tricks, mit denen man das Volk locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und am Ende der Woche wird der Gaukler 50 Silber pro Stufe verdient haben."
-
 msgctxt "spell"
 msgid "strength"
 msgstr "Unbekannter Effekt"
@@ -4995,10 +4967,6 @@ msgstr "Myrrhe"
 
 msgid "skeleton_prefix_9"
 msgstr "Dunkle"
-
-msgctxt "spellinfo"
-msgid "earn_silver#illaun"
-msgstr "Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch die Kunst der Wahrsagerei, des Kartenlegens und des Handlesens sind ihm geläufig. Dafür zahlen ihm die Bauern 50 Silber pro Stufe."
 
 msgctxt "spell"
 msgid "big_recruit"
@@ -5912,10 +5880,6 @@ msgstr "Feuerwand"
 msgctxt "spell"
 msgid "cerddorfumbleshield"
 msgstr "Bannlied"
-
-msgctxt "spellinfo"
-msgid "earn_silver#tybied"
-msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 50 Silber pro Stufe lassen sich so in einer Woche verdienen."
 
 msgid "ANZAHL"
 msgstr "ANZAHL"
