@@ -84,7 +84,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         sbs_strcat(&sbs, str);
         if (ord->id < 0) {
             skill_t sk = (skill_t)(100+ord->id);
-            assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+            assert((kwd == K_STUDY || kwd == K_AUTOSTUDY) && sk != SK_MAGIC && sk < MAXSKILLS);
             str = skillname(sk, lang);
             if (str) {
                 if (strchr(str, ' ') == NULL) {

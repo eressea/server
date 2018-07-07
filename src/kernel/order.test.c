@@ -113,6 +113,30 @@ static void test_parse_make(CuTest *tc) {
     test_teardown();
 }
 
+static void test_parse_autostudy(CuTest *tc) {
+    char cmd[32];
+    order *ord;
+    struct locale * lang;
+
+    test_setup();
+    lang = get_or_create_locale("en");
+    locale_setstring(lang, mkname("skill", skillnames[SK_ENTERTAINMENT]), "Entertainment");
+    locale_setstring(lang, keyword(K_STUDY), "STUDY");
+    locale_setstring(lang, keyword(K_AUTOSTUDY), "AUTOSTUDY");
+    locale_setstring(lang, parameters[P_AUTO], "AUTO");
+    init_locale(lang);
+
+    ord = parse_order("STUDY AUTO Entertainment", lang);
+    CuAssertPtrNotNull(tc, ord);
+    CuAssertIntEquals(tc, K_AUTOSTUDY, getkeyword(ord));
+    CuAssertStrEquals(tc, "AUTOSTUDY Entertainment", get_command(ord, lang, cmd, sizeof(cmd)));
+
+    CuAssertIntEquals(tc, K_AUTOSTUDY, init_order(ord, lang));
+    CuAssertStrEquals(tc, "Entertainment", getstrtoken());
+    free_order(ord);
+    test_teardown();
+}
+
 static void test_parse_make_temp(CuTest *tc) {
     char cmd[32];
     order *ord;
@@ -130,7 +154,7 @@ static void test_parse_make_temp(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord, lang));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
     test_teardown();
@@ -153,7 +177,7 @@ static void test_parse_maketemp(CuTest *tc) {
     CuAssertPtrNotNull(tc, ord);
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord, lang));
     CuAssertStrEquals(tc, "herp", getstrtoken());
     free_order(ord);
     test_teardown();
@@ -167,7 +191,7 @@ static void test_init_order(CuTest *tc) {
 
     lang = get_or_create_locale("en");
     ord = create_order(K_MAKETEMP, lang, "hurr durr");
-    CuAssertIntEquals(tc, K_MAKETEMP, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MAKETEMP, init_order(ord, lang));
     CuAssertStrEquals(tc, "hurr", getstrtoken());
     CuAssertStrEquals(tc, "durr", getstrtoken());
     free_order(ord);
@@ -548,6 +572,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_study_order_quoted);
     SUITE_ADD_TEST(suite, test_parse_order);
     SUITE_ADD_TEST(suite, test_parse_make);
+    SUITE_ADD_TEST(suite, test_parse_autostudy);
     SUITE_ADD_TEST(suite, test_parse_make_temp);
     SUITE_ADD_TEST(suite, test_parse_maketemp);
     SUITE_ADD_TEST(suite, test_init_order);
