@@ -343,7 +343,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
-                        && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk)) {
+                        && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk, NULL)) {
                         teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
@@ -432,7 +432,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 continue;
             }
 
-            if (effskill_study(student, sk, NULL) > effskill_study(teacher, sk)
+            if (effskill_study(student, sk) > effskill_study(teacher, sk)
                 - TEACHDIFFERENCE) {
                 if (feedback) {
                     ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord, "teach_asgood",

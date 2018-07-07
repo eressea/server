@@ -21,8 +21,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_GC_AUTOMATE
 #define H_GC_AUTOMATE
 
+#include "skill.h"
+
 struct region;
+struct unit;
+
+typedef struct student {
+    struct unit *u;
+    skill_t sk;
+    int level;
+    int learn;
+} student;
 
 void do_autostudy(struct region *r);
+
+int autostudy_init(student students[], int max_students, struct region *r);
 
 #endif

@@ -188,6 +188,7 @@ set(TESTS_SRC
   tests.c
   academy.test.c
   alchemy.test.c
+  automate.test.c
   battle.test.c
   creport.test.c
   direction.test.c

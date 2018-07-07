@@ -13,14 +13,6 @@
 
 #include <stdlib.h>
 
-typedef struct student {
-    unit *u;
-    skill_t sk;
-    int level;
-} student;
-
-#define MAXSTUDENTS 128
-
 int cmp_students(const void *lhs, const void *rhs) {
     const student *a = (const student *)lhs;
     const student *b = (const student *)rhs;
@@ -32,16 +24,16 @@ int cmp_students(const void *lhs, const void *rhs) {
     return (int)a->sk - (int)b->sk;
 }
 
-void do_autostudy(region *r) {
+int autostudy_init(student students[], int max_students, region *r)
+{
     unit *u;
     int nstudents = 0;
-    student students[MAXSTUDENTS];
 
     for (u = r->units; u; u = u->next) {
         keyword_t kwd = getkeyword(u->thisorder);
         if (kwd == K_AUTOSTUDY) {
             student * st = students + nstudents;
-            if (++nstudents == MAXSTUDENTS) {
+            if (++nstudents == max_students) {
                 log_fatal("you must increase MAXSTUDENTS");
             }
             st->u = u;
@@ -50,10 +42,18 @@ void do_autostudy(region *r) {
             st->level = effskill_study(u, st->sk);
         }
     }
+    return nstudents;
+}
+
+#define MAXSTUDENTS 128
+
+void do_autostudy(region *r) {
+    student students[MAXSTUDENTS];
+    int nstudents = autostudy_init(students, MAXSTUDENTS, r);
+
     if (nstudents > 0) {
-        int i, taught = 0;
+        int i;
         skill_t sk = NOSKILL;
-        student *teacher = NULL, *student = NULL;
 
         qsort(students, nstudents, sizeof(student), cmp_students);
         for (i = 0; i != nstudents; ++i) {
