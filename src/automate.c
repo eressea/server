@@ -40,7 +40,11 @@ int autostudy_init(student students[], int max_students, region *r)
             init_order(u->thisorder, u->faction->locale);
             st->sk = getskill(u->faction->locale);
             st->level = effskill_study(u, st->sk);
+            st->learn = 0;
         }
+    }
+    if (nstudents > 0) {
+        qsort(students, nstudents, sizeof(student), cmp_students);
     }
     return nstudents;
 }
@@ -55,7 +59,6 @@ void do_autostudy(region *r) {
         int i;
         skill_t sk = NOSKILL;
 
-        qsort(students, nstudents, sizeof(student), cmp_students);
         for (i = 0; i != nstudents; ++i) {
             if (students[i].u) {
                 if (sk == NOSKILL) {
