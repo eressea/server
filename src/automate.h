@@ -26,15 +26,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 struct region;
 struct unit;
 
-typedef struct student {
+typedef struct scholar {
     struct unit *u;
     skill_t sk;
     int level;
     int learn;
-} student;
+} scholar;
 
 void do_autostudy(struct region *r);
 
-int autostudy_init(student students[], int max_students, struct region *r);
+int autostudy_init(scholar scholars[], int max_scholars, struct region *r);
+void autostudy_run(scholar scholars[], int nscholars);
 
 #endif
