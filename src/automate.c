@@ -142,22 +142,10 @@ void autostudy_run(scholar scholars[], int nscholars)
 void do_autostudy(region *r)
 {
     scholar scholars[MAXSCHOLARS];
-    int nscholars = autostudy_init(scholars, MAXSCHOLARS, r);
-
-    if (nscholars > 0) {
-        int i;
-        skill_t sk = NOSKILL;
-
-        for (i = 0; i != nscholars; ++i) {
-            if (scholars[i].u) {
-                if (sk == NOSKILL) {
-                    sk = scholars[i].sk;
-                }
-                else if (sk != scholars[i].sk) {
-                    continue;
-                }
-                scholars[i].u = NULL;
-            }
-        }
+    int i, nscholars = autostudy_init(scholars, MAXSCHOLARS, r);
+    autostudy_run(scholars, nscholars);
+    for (i = 0; i != nscholars; ++i) {
+        int days = STUDYDAYS * scholars[i].learn;
+        learn_skill(scholars[i].u, scholars[i].sk, days);
     }
 }
