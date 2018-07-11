@@ -766,9 +766,6 @@ int study_cmd(unit * u, order * ord)
         days *= 2;
     }
 
-    if (fval(u, UFL_HUNGER))
-        days /= 2;
-
     learn_skill(u, sk, days);
     if (a != NULL) {
         if (teach->teachers) {
@@ -832,6 +829,9 @@ void learn_skill(unit *u, skill_t sk, int days) {
     int leveldays = STUDYDAYS * u->number;
     int weeks = 0;
 
+    if (fval(u, UFL_HUNGER)) {
+        days /= 2;
+    }
     assert(sk >= 0 && sk < MAXSKILLS);
     if (inject_learn_fun) {
         inject_learn_fun(u, sk, days);
