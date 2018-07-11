@@ -33,6 +33,8 @@ typedef struct scholar {
     int learn;
 } scholar;
 
+#define STUDENTS_PER_TEACHER 10
+
 void do_autostudy(struct region *r);
 
 int autostudy_init(scholar scholars[], int max_scholars, struct region *r);

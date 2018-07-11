@@ -12,6 +12,7 @@
 #include "study.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 int cmp_scholars(const void *lhs, const void *rhs)
 {
@@ -50,44 +51,89 @@ int autostudy_init(scholar scholars[], int max_scholars, region *r)
     return nscholars;
 }
 
+static void teaching(scholar *s, int n) {
+    assert(n <= s->u->number);
+    s->learn += n;
+}
+
+static void learning(scholar *s, int n) {
+    assert(n <= s->u->number);
+    s->learn += n;
+}
+
 void autostudy_run(scholar scholars[], int nscholars)
 {
-    int i, t, s, ti = 0, si = 0, ts = 0, tt = 0;
-    skill_t sk = scholars[0].sk;
-    for (i = ti; i != nscholars && scholars[i].sk == sk; ++i) {
-        int mint;
-        ts += scholars[i].u->number; /* count total scholars */
-        mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-        while (mint>tt) {
-            tt += scholars[si++].u->number;
-        }
-    }
-    /* now si splits the teachers and students 1:10 */
-    /* first student must be 2 levels below first teacher: */
-    while (scholars[ti].level - TEACHDIFFERENCE > scholars[si].level) {
-        tt += scholars[si++].u->number;
-    }
-    /* invariant: unit ti can still teach i students */
-    i = scholars[ti].u->number * 10;
-    for (t = ti, s = si; t != si && s != nscholars; ++t) {
-        /* TODO: is there no constant for students per teacher? */
-        while (s != nscholars) {
-            int n = scholars[s].u->number;
-            scholars[s].learn += n;
-            if (i >= n) {
-                i -= n;
-                scholars[s].learn += n;
-                /* next student */
+    int ti = 0;
+    while (ti != nscholars) {
+        skill_t sk = scholars[ti].sk;
+        int t, s, se, ts = 0, tt = 0, si = ti;
+        for (se = ti; se != nscholars && scholars[se].sk == sk; ++se) {
+            int mint;
+            ts += scholars[se].u->number; /* count total scholars */
+            mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
+            for (; mint > tt && si != nscholars; ++si) {
+                tt += scholars[si].u->number;
             }
-            else {
-                scholars[s].learn += i;
-                /* go to next suitable teacher */
-                do {
-                    ++t;
+        }
+        /* now si splits the teachers and students 1:10 */
+        /* first student must be 2 levels below first teacher: */
+        for (; si != se && scholars[ti].level - TEACHDIFFERENCE > scholars[si].level; ++si) {
+            tt += scholars[si].u->number;
+        }
+        if (si == se) {
+            /* there are no students, so standard learning only */
+            for (t = ti; t != se; ++t) {
+                learning(scholars + t, scholars[t].u->number);
+            }
+        }
+        else {
+            /* invariant: unit ti can still teach i students */
+            int i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
+            /* invariant: unit si has n students that can still be taught */
+            int n = scholars[si].u->number;
+            for (t = ti, s = si; t != si && s != se; ) {
+                if (i > n) {
+                    /* t has more than enough teaching capacity for s */
+                    i -= n;
+                    teaching(scholars + s, n);
+                    learning(scholars + s, scholars[s].u->number);
+                    /* next student, please: */
+                    if (++s == se) {
+                        continue;
+                    }
+                    n = scholars[s].u->number;
                 }
-                while (scholars[t].level - TEACHDIFFERENCE < scholars[s].level);
+                else {
+                    /* s gets partial credit and we need a new teacher */
+                    teaching(scholars + s, i);
+
+                    /* we are done with this teacher. any remaining people are regular learners: */
+                    if (scholars[t].u->number > 1) {
+                        /* remain = number - ceil(taught/10); */
+                        int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
+                        learning(scholars + t, remain);
+                    }
+
+                    /* we want a new teacher for s. if any exists, it's next in the sequence. */
+                    if (++t == si) {
+                        continue;
+                    }
+                    if (scholars[t].level - TEACHDIFFERENCE < scholars[s].level) {
+                        /* next teacher cannot teach, we must skip students. */
+                        do {
+                            learning(scholars + s, (n - i));
+                            i = 0;
+                            if (++s == se) {
+                                continue;
+                            }
+                            n = scholars[s].u->number;
+                        } while (scholars[t].level - TEACHDIFFERENCE < scholars[s].level);
+                    }
+                    i = scholars[t].u->number * STUDENTS_PER_TEACHER;
+                }
             }
         }
+        ti = se;
     }
 }
 
