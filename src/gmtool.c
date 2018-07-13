@@ -531,17 +531,32 @@ static void statusline(WINDOW * win, const char *str)
 }
 
 static void reset_region(region *r) {
+    unit **up = &r->units;
+    bool players = false;
+
     set_chaoscount(r, 0);
     r->flags = 0;
     a_removeall(&r->attribs, NULL);
-    while (r->units) {
-        remove_unit(&r->units, r->units);
+    while (*up) {
+        unit *u = *up;
+        if (is_monsters(u->faction)) {
+            remove_unit(up, u);
+        }
+        else {
+            players = true;
+            up = &u->next;
+        }
     }
-    while (r->ships) {
-        remove_ship(&r->ships, r->ships);
-    }
-    while (r->buildings) {
-        remove_building(&r->buildings, r->buildings);
+    if (!players) {
+        while (r->ships) {
+            remove_ship(&r->ships, r->ships);
+        }
+        while (r->buildings) {
+            remove_building(&r->buildings, r->buildings);
+        }
+        if (r->land) {
+            init_region(r);
+        }
     }
 }
 
