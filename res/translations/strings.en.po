@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: Poedit 2.0.7\n"
 
 msgid "rustychainmail"
-msgstr "rustychainmail"
+msgstr "rusty chainmail"
 
 msgctxt "spellinfo"
 msgid "destroy_magic"
@@ -40,10 +40,6 @@ msgstr "southwest coast"
 msgid "pegasus"
 msgstr "pegasus"
 
-msgctxt "race"
-msgid "sphinx_x"
-msgstr "sphinx"
-
 msgid "truthpotion_p"
 msgstr "potions of truth"
 
@@ -53,15 +49,13 @@ msgstr "aurafocus"
 msgid "firewall"
 msgstr "firewall"
 
-msgid "nut_p"
-msgstr "nuts"
-
 msgctxt "spell"
 msgid "gwyrrddestroymagic"
 msgstr "Banish Spirits"
 
-msgid "AGGRESSIV"
-msgstr "AGGRESSIVE"
+msgid "nut_p"
+msgstr "nuts"
+
 
 msgctxt "spell"
 msgid "transferauratraum"
@@ -71,11 +65,14 @@ msgctxt "race"
 msgid "shadowdemon_p"
 msgstr "shadowdemons"
 
-msgid "h10_p"
-msgstr "peyote"
+msgid "AGGRESSIV"
+msgstr "AGGRESSIVE"
 
 msgid "stat_tribe_p"
 msgstr " tribes"
+
+msgid "h10_p"
+msgstr "peyote"
 
 msgctxt "spell"
 msgid "speed"
@@ -88,22 +85,22 @@ msgstr "shadowdemon"
 msgid "jadee_dress"
 msgstr "wedding dress"
 
-msgid "halberd_p"
-msgstr "halberds"
-
 msgctxt "spell"
 msgid "fumblecurse"
 msgstr "Chaos Curse"
 
+msgid "halberd_p"
+msgstr "halberds"
+
 msgid "h13_p"
 msgstr "fjord fungi"
+
+msgid "laensword"
+msgstr "laen sword"
 
 msgctxt "keyword"
 msgid "entertain"
 msgstr "ENTERTAIN"
-
-msgid "laensword"
-msgstr "laen sword"
 
 msgid "greatbow_p"
 msgstr "elven bows"
@@ -111,12 +108,12 @@ msgstr "elven bows"
 msgid "person"
 msgstr "man"
 
-msgid "JEDEM"
-msgstr "EACH"
-
 msgctxt "spell"
 msgid "eternal_walls"
 msgstr "Eternal Walls"
+
+msgid "JEDEM"
+msgstr "EACH"
 
 msgctxt "skill"
 msgid "sailing"
@@ -125,39 +122,39 @@ msgstr "sailing"
 msgid "h16_p"
 msgstr "gapgrowths"
 
+msgctxt "race"
+msgid "undeadpharaoh_d"
+msgstr "undead Pharaoh"
+
 msgid "TRAENKE"
 msgstr "POTIONS"
 
 msgid "northwest"
 msgstr "northwest"
 
-msgctxt "race"
-msgid "undeadpharaoh_d"
-msgstr "undead Pharaoh"
-
-msgid "h19_p"
-msgstr "white hemlocks"
-
 msgctxt "spell"
 msgid "protective_runes"
 msgstr "Protective Runes"
 
+msgid "h19_p"
+msgstr "white hemlocks"
+
 msgid "birthdaycake_p"
 msgstr "birthday cakes"
+
+msgid "volcano"
+msgstr "volcano"
 
 msgctxt "keyword"
 msgid "default"
 msgstr "DEFAULT"
 
-msgid "volcano"
-msgstr "volcano"
+msgctxt "spellinfo"
+msgid "create_roqf"
+msgstr "The famous bard Miriam bhean'Meddafwas known for exceptionally limber play of the harp. Her spell, which is easy to infuse into a little silver ring, increases the wearer's dexterity by a factor of ten, which is said to be useful to both craftsmen and shady natures."
 
 msgid "magicbag"
 msgstr "magic bag"
-
-msgctxt "spellinfo"
-msgid "create_roqf"
-msgstr "The famous bard Mirim was known for exceptionally limber play of the harp. Her spell, which is easy to ban into a little silver ring, increases the wearer's dexterity by a factor of ten, which is siad to be useful to both craftsmen and shady natures."
 
 msgid "rustysword_p"
 msgstr "rusty swords"
@@ -168,11 +165,11 @@ msgstr "apophis"
 
 msgctxt "race"
 msgid "undeadpharaoh_p"
-msgstr "undead Pharaohs"
+msgstr "undead pharaohs"
 
 msgctxt "iteminfo"
 msgid "magicbag"
-msgstr "This bag encloses a dimensional fold, which can store up to 200 stones of weight without any extra burden on the bearer. Large items such as horses or carts cannot be placed inside."
+msgstr "This bag encloses a dimensional fold, which can store up to 200 stones of weight without any extra burden on the bearer. Large items such as horses, other living beings, or carts cannot be placed inside. It is also not possible to place such a bag inside another on. The bag itself weighs 1 stone."
 
 msgid "lighthouse"
 msgstr "lighthouse"
@@ -202,7 +199,7 @@ msgstr "the third age"
 
 msgctxt "race"
 msgid "undeadpharaoh_x"
-msgstr "undead Pharaoh"
+msgstr "undead pharaoh"
 
 msgctxt "race"
 msgid "youngdragon_d"
@@ -233,7 +230,7 @@ msgstr "Calm Monster"
 
 msgctxt "spellinfo"
 msgid "sound_out"
-msgstr "Should the unit succumb to the spell, they will tell the mage everything they know about the region is question. Is no unit of their faction in that region, they'll have nothing to report. Also, they can only report, what they themselves could see."
+msgstr "Should the unit succumb to the spell, they will tell the mage everything they know about the region in question. If no unit of their faction is in that region, they will have nothing to report. Also, they can only report what they themselves could see."
 
 msgctxt "spell"
 msgid "readmind"
@@ -243,15 +240,15 @@ msgctxt "race"
 msgid "apophis_x"
 msgstr "apophis"
 
+msgctxt "race"
+msgid "youngdragon_p"
+msgstr "young dragons"
+
 msgid "nr_options"
 msgstr "Options"
 
 msgid "GRUPPE"
 msgstr "GROUP"
-
-msgctxt "race"
-msgid "youngdragon_p"
-msgstr "young dragons"
 
 msgctxt "spellinfo"
 msgid "cerddorfumbleshield"
@@ -267,21 +264,53 @@ msgstr "young dragon"
 
 msgctxt "spellinfo"
 msgid "calm_monster"
-msgstr "This disarming chant can tame almost any intelligent monster. It will refrain from attacks on the mage and his companions. But one should not deceive oneself about the persisting unpredictable nature of the creature."
+msgstr "This disarming chant can tame almost any intelligent monster. It will refrain from attacks on the mage and her companions. But one should not deceive oneself about the persisting unpredictable nature of the creature."
 
 msgctxt "spell"
 msgid "clone"
 msgstr "Doppelganger"
 
+msgctxt "shipinfo"
+msgid "balloon"
+msgstr "The swamp gas ballon consists of a large wicker basket that can hold 5 peopleor 500 stone of weight and a large wyrm bladder filled with swamp gas. Good winds provided it may move up to two regions per week. Piloting a balloon is no easy feat. The captain must have a sailing skill of 6. This novel invention is exclusively produced for the Xontormia Express und the blue prints are strictly confidential. Nobody has managed to reverse engineer one yet."
+
+msgctxt "iteminfo"
+msgid "toad"
+msgstr "The toad is one of the rarest races of Eressea. It is said that it only comes to life by magic. In an ancient tome of magic from the library of the academy of Xontormia it is theorized that the toad is the manifestation of the energy of an imploded magical aura transformed into the morphic field of the mage. Maybe this is why toads are far more resistant to magic than other races of Eressea, but at the same time much less magical itself. From its size and lack of hands alone it is all but impossible for it to do magic. The only advantage of its size is that it is easier for it to hide."
+
 msgctxt "spell"
 msgid "bloodsacrifice"
 msgstr "Lesser Sacrifice"
 
-msgid "EINHEIT"
-msgstr "UNIT"
+msgid "undead_name_0"
+msgstr "ghosts"
 
-msgid "magictower"
-msgstr "mage tower"
+msgid "undead_name_1"
+msgstr "phantoms"
+
+msgid "undead_name_2"
+msgstr "vampires"
+
+msgid "undead_name_3"
+msgstr "zombies"
+
+msgid "undead_name_4"
+msgstr "spectres"
+
+msgid "undead_name_5"
+msgstr "creatures"
+
+msgid "undead_name_6"
+msgstr "forms"
+
+msgid "undead_name_7"
+msgstr "schemes"
+
+msgid "undead_name_8"
+msgstr "monsters"
+
+msgid "undead_name_9"
+msgstr "warriors"
 
 msgctxt "spellinfo"
 msgid "migration"
@@ -290,6 +319,12 @@ msgstr "This ritual facilitates the migration of an unit to the own faction. The
 msgctxt "race"
 msgid "illusion"
 msgstr "illusion"
+
+msgid "EINHEIT"
+msgstr "UNIT"
+
+msgid "magictower"
+msgstr "mage tower"
 
 msgid "stonecircle"
 msgstr "stonecircle"
@@ -319,11 +354,11 @@ msgctxt "iteminfo"
 msgid "firesword"
 msgstr "The flaming sword gives its bearer an attack of 3d6+10 plus an additional fireball causing 2d6 damage to 1-10 victims. Using a flaming sword requires a minimum skill of 7. It grants an additional +1 to your skill and your resistance to magic will be increased."
 
-msgid "p9"
-msgstr "horsepower potion"
-
 msgid "stat_hitpoints"
 msgstr "hitpoints"
+
+msgid "p9"
+msgstr "horsepower potion"
 
 msgctxt "damage"
 msgid "strong"
@@ -342,12 +377,16 @@ msgstr "demon blood"
 msgid "dwarfspoil_p"
 msgstr "dwarven beards"
 
-msgid "sword"
-msgstr "sword"
+msgctxt "iteminfo"
+msgid "jadee_ring"
+msgstr "This beautiful ring was crafted by dwarves from white gold and platinum. The surface is so smooth that it can be discerned only by looking very closely that it is made of two different metals. On the inside there is an engraving: \"Wild Duck, 3rd week of Ice Wind in the year 8\"."
 
 msgctxt "race"
 msgid "cat"
 msgstr "cat"
+
+msgid "sword"
+msgstr "sword"
 
 msgctxt "race"
 msgid "mummy"
@@ -363,12 +402,12 @@ msgstr "size"
 msgid "axe"
 msgstr "axe"
 
-msgid "blessedstonecircle"
-msgstr "blessed stonecircle"
-
 msgctxt "race"
 msgid "dragon_p"
 msgstr "dragons"
+
+msgid "blessedstonecircle"
+msgstr "blessed stonecircle"
 
 msgid "aots_p"
 msgstr "amulets of true seeing"
@@ -381,12 +420,12 @@ msgctxt "spellinfo"
 msgid "gwyrrdfumbleshield"
 msgstr "This ritual summons some Elemental Spirits of Magic and sends them into the ranks of the enemy mages. Casting spells will be much harder for them during the battle."
 
-msgid "antimagic_p"
-msgstr "antimagic crystals"
-
 msgctxt "race"
 msgid "shadowdemon"
 msgstr "shadowdemon"
+
+msgid "antimagic_p"
+msgstr "antimagic crystals"
 
 msgid "weight_per"
 msgstr "stone per"
@@ -406,7 +445,7 @@ msgstr "."
 
 msgctxt "spellinfo"
 msgid "firewall"
-msgstr "The spell creates an opaque wall of fire in the gives direction that will harm anyone passing through it."
+msgstr "The spell creates an opaque wall of fire in the given direction that will harm anyone passing through it."
 
 msgctxt "border"
 msgid "gate_open"
@@ -437,12 +476,12 @@ msgctxt "race"
 msgid "irongolem_x"
 msgstr "irongolem"
 
-msgid "balloon"
-msgstr "balloon"
-
 msgctxt "spellinfo"
 msgid "draigfumbleshield"
 msgstr "This ritual, performed before a battle, causes the astral energies on the battlefield to whirl and churn and thereby makes spellcasting more difficult for the enemy mages."
+
+msgid "balloon"
+msgstr "balloon"
 
 msgid "nr_schemes_postfix"
 msgstr "can be discerned."
@@ -493,13 +532,13 @@ msgstr "rusty halberd"
 msgid "h3_p"
 msgstr "spider ivies"
 
-msgctxt "skill"
-msgid "building"
-msgstr "masonry"
-
 msgctxt "spell"
 msgid "summonshadow"
 msgstr "Summon Shadowdemons"
+
+msgctxt "skill"
+msgid "building"
+msgstr "masonry"
 
 msgid "unknown_faction_dative"
 msgstr "an unknown faction"
@@ -513,20 +552,20 @@ msgstr "bugleweeds"
 msgid "firesword_p"
 msgstr "flaming swords"
 
+msgctxt "spellinfo"
+msgid "raise_mob"
+msgstr "Employing this magic chant the mage convinces the peasants of the region to join him. The peasants won't leave their home region and won't give up their possessions, though. Additionally, each week some peasants will shake off the spell and return to their crops. How many peasants join the mage depends on the power of his chant."
+
 msgctxt "keyword"
 msgid "origin"
 msgstr "ORIGIN"
-
-msgctxt "spellinfo"
-msgid "raise_mob"
-msgstr "Employing this magic chant the mage convinces the peasants of the region to join him. The peasants won't leave their home region and won't give up their possessions, though. Additionally each week some peasants will shake off the spell and return to their fields. How many peasants join the mage depends on the power of his chant."
 
 msgid "wand"
 msgstr "wand"
 
 msgctxt "spellinfo"
 msgid "summonshadow"
-msgstr "With the help of dark rituals the sorcerer summons demons from the Sphere of Shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadow demons are feared in combat for they are hard to hit and have the ability to drain strength from their victims."
+msgstr "With the help of dark rituals, the sorcerer summons demons from the Sphere of Shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadow demons are feared in combat for they are hard to hit and have the ability to drain strength from their victims."
 
 msgid "aurapotion50"
 msgstr "aura potion"
@@ -1072,7 +1111,7 @@ msgstr "ALLIANCE"
 
 msgctxt "spell"
 msgid "song_of_healing"
-msgstr "Blessed Harvest"
+msgstr "Song of Healing"
 
 msgid "sapling"
 msgstr "sapling"
@@ -4219,7 +4258,7 @@ msgid "healing"
 msgstr "healing potion"
 
 msgid "vortex_desc"
-msgstr "A vortex of pure chaos energy pulls over the region"
+msgstr "A vortex of pure chaos energy pulls over the region."
 
 msgctxt "race"
 msgid "ghast_d"

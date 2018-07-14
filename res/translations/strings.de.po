@@ -34,10 +34,6 @@ msgctxt "race"
 msgid "shadowdemon_d"
 msgstr "Schattendämonen"
 
-msgctxt "race"
-msgid "sphinx_x"
-msgstr "Spinx"
-
 msgctxt "coast"
 msgid "sw"
 msgstr "Südwestküste"
@@ -106,27 +102,15 @@ msgctxt "keyword"
 msgid "entertain"
 msgstr "UNTERHALTE"
 
-msgid "spinx00"
-msgstr "Das Schiff des Elfen hat ein rotes Segel"
-
 msgid "greatbow_p"
 msgstr "Elfenbögen"
-
-msgid "spinx01"
-msgstr "Der Zwerg hat eine Nuss dabei"
 
 msgid "person"
 msgstr "Person"
 
-msgid "spinx02"
-msgstr "Die Katze führt eine Hellebarde"
-
 msgctxt "spell"
 msgid "eternal_walls"
 msgstr "Mauern der Ewigkeit"
-
-msgid "spinx03"
-msgstr "Das Schiff mit dem grünen Segel liegt links neben dem mit einem weissen Segel"
 
 msgid "JEDEM"
 msgstr "JEDEM"
@@ -135,30 +119,12 @@ msgctxt "skill"
 msgid "sailing"
 msgstr "Segeln"
 
-msgid "spinx04"
-msgstr "Auf dem Schiff mit grünen Segeln kam der Speerkämpfer"
-
 msgid "h16_p"
 msgstr "Spaltwachse"
-
-msgid "spinx05"
-msgstr "Der Krieger mit dem Kreis im Wappen hat einen Keks"
-
-msgid "spinx06"
-msgstr "Der Krieger des mittleren Schiffs hat ein Schwert"
-
-msgid "fortress_generic"
-msgstr "Burg"
-
-msgid "spinx07"
-msgstr "Auf dem gelben Segel prankt ein Kreuz als Wappen"
 
 msgctxt "race"
 msgid "undeadpharaoh_d"
 msgstr "Untoten Pharao"
-
-msgid "spinx08"
-msgstr "Der Mensch kam mit dem ersten Schiff"
 
 msgid "TRAENKE"
 msgstr "TRÄNKE"
@@ -166,9 +132,6 @@ msgstr "TRÄNKE"
 msgid "northwest"
 msgstr "Nordwesten"
 
-msgctxt "iteminfo"
-msgid "cookie"
-msgstr "Kleines trockenes Dauergebäck, m od. s; - u. -es, - u. -e"
 
 msgctxt "spell"
 msgid "protective_runes"
@@ -189,7 +152,7 @@ msgstr "DEFAULT"
 
 msgctxt "spellinfo"
 msgid "create_roqf"
-msgstr "Die berühmte Bardin Miriam bhean'Meddaf war bekannt für ihr außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen sich so schnell über die Saiten bewegt haben, das sie nicht mehr erkennbar waren. Dieser Zauber, der recht einfach in einen Silberring zu bannen ist, bewirkt eine um das zehnfache verbesserte Geschicklichkeit und Gewandheit der Finger. (Das soll sie auch an anderer Stelle ausgenutzt haben, ihr Ruf als Falschspielerin war berüchtigt). Handwerker können somit das zehnfache produzieren, und bei einigen anderen Tätigkeiten könnte dies ebenfalls von Nutzen sein."
+msgstr "Die berühmte Bardin Miriam bhean'Meddaf war bekannt für ihr außergewöhnliches Geschick mit der Harfe. Ihre Finger sollen sich so schnell über die Saiten bewegt haben, das sie nicht mehr erkennbar waren. Dieser Zauber, der recht einfach in einen Silberring zu bannen ist, bewirkt eine um das zehnfache verbesserte Geschicklichkeit und Gewandheit der Finger. (Das soll sie auch an anderer Stelle ausgenutzt haben; ihr Ruf als Falschspielerin war berüchtigt). Handwerker können somit das zehnfache produzieren, und bei einigen anderen Tätigkeiten könnte dies ebenfalls von Nutzen sein."
 
 msgid "magicbag"
 msgstr "Zauberbeutel"
@@ -270,9 +233,6 @@ msgctxt "spell"
 msgid "calm_monster"
 msgstr "Monster friedlich stimmen"
 
-msgid "spinx10"
-msgstr "Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat"
-
 msgctxt "spellinfo"
 msgid "sound_out"
 msgstr "Erliegt die Einheit dem Zauber, so wird sie dem Magier alles erzählen, was sie über die gefragte Region weiß. Ist in der Region niemand ihrer Partei, so weiß sie nichts zu berichten. Auch kann sie nur das erzählen, was sie selber sehen könnte."
@@ -281,25 +241,13 @@ msgctxt "spell"
 msgid "readmind"
 msgstr "Traumdeuten"
 
-msgid "spinx11"
-msgstr "Der Krieger mit dem Turm im Wappen trägt eine Axt"
-
-msgid "spinx12"
-msgstr "Das Schiff des Menschen liegt neben dem blauen Schiff"
-
 msgctxt "race"
 msgid "apophis_x"
 msgstr "Apophis"
 
-msgid "spinx13"
-msgstr "Das Insekt trägt einen Baum als Wappen"
-
 msgctxt "race"
 msgid "youngdragon_p"
 msgstr "Jungdrachen"
-
-msgid "spinx14"
-msgstr "Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt"
 
 msgid "nr_options"
 msgstr "Optionen"
@@ -348,6 +296,27 @@ msgstr "Phantome"
 msgid "undead_name_2"
 msgstr "Vampire"
 
+msgid "undead_name_3"
+msgstr "Zombies"
+
+msgid "undead_name_4"
+msgstr "Gespenster"
+
+msgid "undead_name_5"
+msgstr "Kreaturen"
+
+msgid "undead_name_6"
+msgstr "Gestalten"
+
+msgid "undead_name_7"
+msgstr "Schemen"
+
+msgid "undead_name_8"
+msgstr "Monster"
+
+msgid "undead_name_9"
+msgstr "Krieger"
+
 msgctxt "spellinfo"
 msgid "migration"
 msgstr "Dieses Ritual ermöglicht es, eine Einheit, egal welcher Art, in die eigene Partei aufzunehmen. Der um Aufnahme Bittende muss dazu willig und bereit sein, seiner alten Partei abzuschwören. Dies bezeugt er durch KONTAKTIEREn des Magiers. Auch wird er die Woche über ausschliesslich mit Vorbereitungen auf das Ritual beschäftigt sein. Das Ritual wird fehlschlagen, wenn er zu stark an seine alte Partei gebunden ist, dieser etwa Dienst für seine teuere Ausbildung schuldet. Der das Ritual leitende Magier muss für die permanente Bindung des Aufnahmewilligen an seine Partei naturgemäß auch permanente Aura aufwenden. Pro Stufe und pro 1 permanente Aura kann er eine Person aufnehmen."
@@ -362,26 +331,11 @@ msgstr "EINHEIT"
 msgid "magictower"
 msgstr "Magierturm"
 
-msgid "undead_name_3"
-msgstr "Zombies"
-
 msgid "stonecircle"
 msgstr "Steinkreis"
 
-msgid "undead_name_4"
-msgstr "Gespenster"
-
 msgid "p0"
 msgstr "Siebenmeilentee"
-
-msgid "undead_name_5"
-msgstr "Kreaturen"
-
-msgid "undead_name_6"
-msgstr "Gestalten"
-
-msgid "undead_name_7"
-msgstr "Schemen"
 
 msgid "p3"
 msgstr "Schaffenstrunk"
@@ -389,14 +343,8 @@ msgstr "Schaffenstrunk"
 msgid "balloon_a"
 msgstr "ein Ballon"
 
-msgid "undead_name_8"
-msgstr "Monster"
-
 msgid "jadee_ring"
 msgstr "Jadees Hochzeitsring"
-
-msgid "undead_name_9"
-msgstr "Krieger"
 
 msgid "mallorntree"
 msgstr "Mallorn"
@@ -466,11 +414,29 @@ msgstr "Drachen"
 msgid "blessedstonecircle"
 msgstr "Gesegneter Steinkreis"
 
-msgid "dragon_postfix_0"
-msgstr "der Weise"
-
 msgid "aots_p"
 msgstr "Amulette des wahren Sehens"
+
+msgctxt "race"
+msgid "dragon_x"
+msgstr "Drachen"
+
+msgctxt "spellinfo"
+msgid "gwyrrdfumbleshield"
+msgstr "Dieses Ritual beschwört einige Elementargeister der Magie und schickt sie in die Reihen der feindlichen Magier. Diesen wird das Zaubern für die Dauer des Kampfes deutlich schwerer fallen."
+
+msgctxt "race"
+msgid "shadowdemon"
+msgstr "Schattendämon"
+
+msgid "antimagic_p"
+msgstr "Antimagiekristalle"
+
+msgid "weight_per"
+msgstr "GE je"
+
+msgid "dragon_postfix_0"
+msgstr "der Weise"
 
 msgid "dragon_postfix_1"
 msgstr "der Allwissende"
@@ -481,38 +447,20 @@ msgstr "der Mächtige"
 msgid "dragon_postfix_3"
 msgstr "die Ehrwürdige"
 
-msgctxt "race"
-msgid "dragon_x"
-msgstr "Drachen"
-
 msgid "dragon_postfix_4"
 msgstr "die Listige"
 
 msgid "dragon_postfix_5"
 msgstr "der Grüne"
 
-msgctxt "spellinfo"
-msgid "gwyrrdfumbleshield"
-msgstr "Dieses Ritual beschwört einige Elementargeister der Magie und schickt sie in die Reihen der feindlichen Magier. Diesen wird das Zaubern für die Dauer des Kampfes deutlich schwerer fallen."
-
 msgid "dragon_postfix_6"
 msgstr "die Strafende"
-
-msgctxt "race"
-msgid "shadowdemon"
-msgstr "Schattendämon"
-
-msgid "antimagic_p"
-msgstr "Antimagiekristalle"
 
 msgid "dragon_postfix_7"
 msgstr "der Sehende"
 
 msgid "dragon_postfix_8"
 msgstr "der Reisende"
-
-msgid "weight_per"
-msgstr "GE je"
 
 msgid "dragon_postfix_9"
 msgstr "die Wissende"
@@ -650,9 +598,6 @@ msgstr "URSPRUNG"
 msgid "zombie_prefix_0"
 msgstr "Faulende"
 
-msgid "wand"
-msgstr "Zauberstab"
-
 msgid "zombie_prefix_1"
 msgstr "Zerschlagene"
 
@@ -662,33 +607,39 @@ msgstr "Gefolterte"
 msgid "zombie_prefix_3"
 msgstr "Angsteinflößende"
 
-msgctxt "spellinfo"
-msgid "summonshadow"
-msgstr "Mit Hilfe dunkler Rituale beschwört der Zauberer Dämonen aus der Sphäre der Schatten. Diese gefürchteten Wesen können sich fast unsichtbar unter den Lebenden bewegen, ihre finstere Aura ist jedoch für jeden spürbar. Im Kampf sind Schattendämonen gefürchtete Gegner. Sie sind schwer zu treffen und entziehen ihrem Gegner Kraft."
-
 msgid "zombie_prefix_4"
 msgstr "Leise Schlurfende"
 
 msgid "zombie_prefix_5"
 msgstr "Kinderfressende"
 
-msgid "aurapotion50"
-msgstr "Auratrank"
-
 msgid "zombie_prefix_6"
 msgstr "Schwarze"
-
-msgid "h9_p"
-msgstr "Wasserfinder"
-
-msgid "tree"
-msgstr "Baum"
 
 msgid "zombie_prefix_7"
 msgstr "Dunkle"
 
 msgid "zombie_prefix_8"
 msgstr "Fürchterliche"
+
+msgid "zombie_prefix_9"
+msgstr "Grauenhafte"
+
+msgid "wand"
+msgstr "Zauberstab"
+
+msgctxt "spellinfo"
+msgid "summonshadow"
+msgstr "Mit Hilfe dunkler Rituale beschwört der Zauberer Dämonen aus der Sphäre der Schatten. Diese gefürchteten Wesen können sich fast unsichtbar unter den Lebenden bewegen, ihre finstere Aura ist jedoch für jeden spürbar. Im Kampf sind Schattendämonen gefürchtete Gegner. Sie sind schwer zu treffen und entziehen ihrem Gegner Kraft."
+
+msgid "aurapotion50"
+msgstr "Auratrank"
+
+msgid "h9_p"
+msgstr "Wasserfinder"
+
+msgid "tree"
+msgstr "Baum"
 
 msgctxt "race"
 msgid "redscarab"
@@ -697,9 +648,6 @@ msgstr "roter Scarabäus"
 msgctxt "race"
 msgid "wolf_d"
 msgstr "Wölfen"
-
-msgid "zombie_prefix_9"
-msgstr "Grauenhafte"
 
 msgctxt "race"
 msgid "museumghost_d"
@@ -4759,7 +4707,7 @@ msgid "healing"
 msgstr "Heiltrank"
 
 msgid "vortex_desc"
-msgstr "Ein Wirbel aus reinem Chaos zieht über die Region"
+msgstr "Ein Wirbel aus reinem Chaos zieht über die Region."
 
 msgctxt "race"
 msgid "ghast_d"
