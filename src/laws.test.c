@@ -1759,6 +1759,34 @@ static void test_nmr_timeout(CuTest *tc) {
     test_teardown();
 }
 
+static void test_long_orders(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    CuAssertTrue(tc, long_order_allowed(u));
+    u->flags |= UFL_LONGACTION;
+    CuAssertTrue(tc, !long_order_allowed(u));
+    test_teardown();
+}
+
+static void test_long_order_on_ocean(CuTest *tc) {
+    unit *u;
+    race * rc;
+
+    test_setup();
+    rc = test_create_race("pikachu");
+    u = test_create_unit(test_create_faction(rc), test_create_ocean(0, 0));
+    CuAssertTrue(tc, !long_order_allowed(u));
+    rc->flags |= RCF_SWIM;
+    CuAssertTrue(tc, long_order_allowed(u));
+
+    rc = test_create_race("aquarian");
+    u = test_create_unit(test_create_faction(rc), u->region);
+    CuAssertTrue(tc, long_order_allowed(u));
+    test_teardown();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1831,6 +1859,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
+    SUITE_ADD_TEST(suite, test_long_orders);
+    SUITE_ADD_TEST(suite, test_long_order_on_ocean);
 
     return suite;
 }

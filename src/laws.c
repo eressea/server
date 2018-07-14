@@ -3647,6 +3647,24 @@ void add_proc_unit(int priority, void(*process) (unit *), const char *name)
     }
 }
 
+bool long_order_allowed(const unit *u)
+{
+    const region *r = u->region;
+    if (fval(u, UFL_LONGACTION)) {
+        /* this message was already given in laws.update_long_order
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        */
+        return false;
+    }
+    else if (fval(r->terrain, SEA_REGION)
+        && u_race(u) != get_race(RC_AQUARIAN)
+        && !(u_race(u)->flags & RCF_SWIM)) {
+        /* error message disabled by popular demand */
+        return false;
+    }
+    return true;
+}
+
 /* per priority, execute processors in order from PR_GLOBAL down to PR_ORDER */
 void process(void)
 {
@@ -3716,16 +3734,7 @@ void process(void)
                                         cmistake(u, ord, 224, MSG_MAGIC);
                                         ord = NULL;
                                     }
-                                    else if (fval(u, UFL_LONGACTION)) {
-                                        /* this message was already given in laws.update_long_order
-                                           cmistake(u, ord, 52, MSG_PRODUCE);
-                                           */
-                                        ord = NULL;
-                                    }
-                                    else if (fval(r->terrain, SEA_REGION)
-                                        && u_race(u) != get_race(RC_AQUARIAN)
-                                        && !(u_race(u)->flags & RCF_SWIM)) {
-                                        /* error message disabled by popular demand */
+                                    else if (!long_order_allowed(u)) {
                                         ord = NULL;
                                     }
                                 }
@@ -4167,7 +4176,7 @@ void update_subscriptions(void)
 /** determine if unit can be seen by faction
  * @param f -- the observiong faction
  * @param u -- the unit that is observed
- * @param r -- the region that u is obesrved in (see below)
+ * @param r -- the region that u is obesrved from (see below)
  * @param m -- terrain modifier to stealth
  * 
  * r kann != u->region sein, wenn es um Durchreisen geht,
