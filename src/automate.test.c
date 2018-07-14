@@ -73,6 +73,7 @@ static void test_autostudy_run(CuTest *tc) {
     CuAssertIntEquals(tc, 0, scholars[0].learn);
     CuAssertIntEquals(tc, 20, scholars[1].learn);
     CuAssertIntEquals(tc, 15, scholars[2].learn);
+    test_teardown();
 }
 
 static void test_autostudy_run_noteachers(CuTest *tc) {
@@ -100,6 +101,7 @@ static void test_autostudy_run_noteachers(CuTest *tc) {
     CuAssertIntEquals(tc, 2, scholars[0].learn);
     CuAssertIntEquals(tc, 10, scholars[1].learn);
     CuAssertIntEquals(tc, 15, scholars[2].learn);
+    test_teardown();
 }
 
 CuSuite *get_automate_suite(void)
