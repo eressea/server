@@ -1,6 +1,8 @@
 #include <platform.h>
 
 #include "battle.h"
+
+#include "reports.h"
 #include "skill.h"
 
 #include <kernel/config.h>
@@ -16,6 +18,8 @@
 #include <spells/buildingcurse.h>
 
 #include <util/functions.h>
+#include <util/language.h>
+#include <util/message.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
@@ -552,6 +556,103 @@ static void test_battle_skilldiff(CuTest *tc)
     test_teardown();
 }
 
+static void test_battle_report_one(CuTest *tc)
+{
+    battle * b = NULL;
+    region *r;
+    unit *u1, *u2;
+    message *m;
+    const char *expect;
+    fighter *fig;
+
+    test_setup();
+    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    b = make_battle(r);
+    join_battle(b, u1, true, &fig);
+    join_battle(b, u2, false, &fig);
+    faction_setname(u1->faction, "Monster");
+    expect = factionname(u1->faction);
+
+    report_battle_start(b);
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(u1->faction->battles->msgs, "start_battle"));
+    CuAssertStrEquals(tc, expect, (const char *)m->parameters[0].v);
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_battle_report_two(CuTest *tc)
+{
+    battle * b = NULL;
+    region *r;
+    unit *u1, *u2;
+    message *m;
+    char expect[64];
+    fighter *fig;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "and", "and");
+    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1->faction->locale = lang;
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2->faction->locale = lang;
+
+    str_slprintf(expect, sizeof(expect), "%s and %s", factionname(u1->faction), factionname(u2->faction));
+    b = make_battle(r);
+    join_battle(b, u1, true, &fig);
+    join_battle(b, u2, true, &fig);
+    report_battle_start(b);
+
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(u1->faction->battles->msgs, "start_battle"));
+    CuAssertStrEquals(tc, expect, (const char *)m->parameters[0].v);
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_battle_report_three(CuTest *tc)
+{
+    battle * b = NULL;
+    region *r;
+    unit *u1, *u2, *u3;
+    message *m;
+    char expect[64];
+    fighter *fig;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "and", "and");
+    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1->faction->locale = lang;
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2->faction->locale = lang;
+    u3 = test_create_unit(test_create_faction(NULL), r);
+    u3->faction->locale = lang;
+
+    str_slprintf(expect, sizeof(expect), "%s, %s and %s", factionname(u1->faction), factionname(u2->faction), factionname(u3->faction));
+    b = make_battle(r);
+    join_battle(b, u1, true, &fig);
+    join_battle(b, u2, true, &fig);
+    join_battle(b, u3, true, &fig);
+    report_battle_start(b);
+
+    CuAssertPtrNotNull(tc, m = test_find_messagetype(u1->faction->battles->msgs, "start_battle"));
+    CuAssertStrEquals(tc, expect, (const char *)m->parameters[0].v);
+
+    free_battle(b);
+    test_teardown();
+}
+
 static void test_battle_skilldiff_building(CuTest *tc)
 {
     troop ta, td;
@@ -690,6 +791,9 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_select_armor);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
+    SUITE_ADD_TEST(suite, test_battle_report_one);
+    SUITE_ADD_TEST(suite, test_battle_report_two);
+    SUITE_ADD_TEST(suite, test_battle_report_three);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
