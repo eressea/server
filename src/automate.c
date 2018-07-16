@@ -62,13 +62,13 @@ int autostudy_init(scholar scholars[], int max_scholars, region *r)
 static void teaching(scholar *s, int n) {
     assert(n <= s->u->number);
     s->learn += n;
-    fset(s->u, UFL_LONGACTION);
+    s->u->flags |= UFL_LONGACTION;
 }
 
 static void learning(scholar *s, int n) {
     assert(n <= s->u->number);
     s->learn += n;
-    fset(s->u, UFL_LONGACTION);
+    s->u->flags |= UFL_LONGACTION;
 }
 
 void autostudy_run(scholar scholars[], int nscholars)
