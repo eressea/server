@@ -29,6 +29,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "group.h"
 #include "item.h"
 #include "messages.h"
+#include "order.h"
 #include "plane.h"
 #include "race.h"
 #include "region.h"
@@ -294,8 +295,13 @@ unit *addplayer(region * r, faction * f)
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
+    u->thisorder = default_order(f->locale);
+    unit_addorder(u, copy_order(u->thisorder));
     name = config_get("rules.equip_first");
-    equip_unit(u, name ? name : "first_unit");
+    if (!equip_unit(u, name ? name : "first_unit")) {
+        /* give every unit enough money to survive the first turn */
+        i_change(&u->items, get_resourcetype(R_SILVER)->itype, maintenance_cost(u));
+    }
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
@@ -486,36 +492,6 @@ void destroyfaction(faction ** fp)
     }
 
     handle_event(f->attribs, "destroy", f);
-#if 0
-    faction *ff;
-    for (ff = factions; ff; ff = ff->next) {
-        group *g;
-        ally *sf, **sfp;
-
-        for (sfp = &ff->allies; *sfp;) {
-            sf = *sfp;
-            if (sf->faction == f || sf->faction == NULL) {
-                *sfp = sf->next;
-                free(sf);
-            }
-            else
-                sfp = &(*sfp)->next;
-        }
-        for (g = ff->groups; g; g = g->next) {
-            for (sfp = &g->allies; *sfp; ) {
-                sf = *sfp;
-                if (sf->faction == f || sf->faction == NULL) {
-                    *sfp = sf->next;
-                    free(sf);
-                }
-                else {
-                    sfp = &(*sfp)->next;
-                }
-            }
-        }
-    }
-#endif
-
     if (f->alliance) {
         setalliance(f, 0);
     }

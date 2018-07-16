@@ -2193,10 +2193,12 @@ void report_battle_start(battle * b)
                 }
             }
         }
-        if (first && lastf) {
-            sbs_strcat(&sbs, " ");
-            sbs_strcat(&sbs, LOC(f->locale, "and"));
-            sbs_strcat(&sbs, " ");
+        if (lastf) {
+            if (first) {
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, LOC(f->locale, "and"));
+                sbs_strcat(&sbs, " ");
+            }
             sbs_strcat(&sbs, lastf);
         }
 
