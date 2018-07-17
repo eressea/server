@@ -25,10 +25,10 @@ bool is_lighthouse(const building_type *btype)
 }
 
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
-* it adds temporary markers to the surrounding regions.
-* The existence of markers says nothing about the quality of the observer in
-* the lighthouse, for this may change more frequently.
-*/
+ * it adds temporary markers to the surrounding regions.
+ * The existence of markers says nothing about the quality of the observer in
+ * the lighthouse, since this may change more frequently.
+ */
 void update_lighthouse(building * lh)
 {
     region *r = lh->region;

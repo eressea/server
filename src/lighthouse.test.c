@@ -122,6 +122,9 @@ static void test_lighthouse_guard(CuTest * tc) {
     CuAssertIntEquals(tc, true, lighthouse_guarded(r2));
     CuAssertIntEquals(tc, true, lighthouse_guarded(r3));
     CuAssertIntEquals(tc, false, lighthouse_guarded(r4));
+    b->size = 1; /* size can go down in destroy_cmd */
+    CuAssertIntEquals(tc, false, lighthouse_guarded(r2));
+    CuAssertIntEquals(tc, false, lighthouse_guarded(r3));
     test_teardown();
 }
 
