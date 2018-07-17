@@ -377,7 +377,9 @@ building *new_building(const struct building_type * btype, region * r,
         bptr = &(*bptr)->next;
     *bptr = b;
 
-    update_lighthouse(b);
+    if (is_lighthouse(b->type)) {
+        update_lighthouse(b);
+    }
     bname = LOC(lang, btype->_name);
     if (!bname) {
         bname = LOC(lang, parameters[P_GEBAEUDE]);
@@ -399,6 +401,7 @@ static building *deleted_buildings;
 void remove_building(building ** blist, building * b)
 {
     unit *u;
+    region *r = b->region;
     static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
     static int btypes;
 
@@ -410,18 +413,19 @@ void remove_building(building ** blist, building * b)
         bt_tunnel = bt_find("tunnel");
     }
     handle_event(b->attribs, "destroy", b);
-    for (u = b->region->units; u; u = u->next) {
+    for (u = r->units; u; u = u->next) {
         if (u->building == b) leave(u, true);
     }
 
+    if (is_lighthouse(b->type)) {
+        remove_lighthouse(b);
+    }
     b->size = 0;
-    update_lighthouse(b);
     bunhash(b);
 
     /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
      * gebaute Strasse zur Haelfte vernichtet */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
-        region *r = b->region;
         int d;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             direction_t dir = (direction_t)d;

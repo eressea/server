@@ -1353,6 +1353,13 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
     update_interval(f, last);
 }
 
+static void add_seen_lighthouse(region *r, faction *f)
+{
+    if (r->terrain->flags & SEA_REGION) {
+        add_seen_nb(f, r, seen_lighthouse);
+    }
+}
+
 /** mark all regions seen by the lighthouse.
  */
 static void prepare_lighthouse_ql(faction *f, selist *rlist) {
@@ -1361,9 +1368,7 @@ static void prepare_lighthouse_ql(faction *f, selist *rlist) {
 
     for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
         region *rl = (region *)selist_get(ql, qi);
-        if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-            add_seen_nb(f, rl, seen_lighthouse);
-        }
+        add_seen_lighthouse(rl, f);
     }
 }
 
@@ -1382,9 +1387,7 @@ static void prepare_lighthouse(faction *f, region *r, int range)
         assert(n > 0 && n <= 64);
         for (i = 0; i != n; ++i) {
             region *rl = result[i];
-            if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-                add_seen_nb(f, rl, seen_lighthouse);
-            }
+            add_seen_lighthouse(rl, f);
         }
     }
 }
@@ -1592,7 +1595,7 @@ void prepare_report(report_context *ctx, faction *f)
                 if (rule_region_owners && f == region_get_owner(r)) {
                     for (b = rbuildings(r); b; b = b->next) {
                         if (b && b->type == bt_lighthouse) {
-                            /* region owners get maximm range */
+                            /* region owners get maximum range */
                             int lhr = lighthouse_range(b, NULL, NULL);
                             if (lhr > range) range = lhr;
                         }
@@ -1630,7 +1633,7 @@ void prepare_report(report_context *ctx, faction *f)
                         /* unit is one of ours, and inside the current lighthouse */
                         if (br == 0) {
                             /* lazy-calculate the range */
-                            br = lighthouse_range(u->building, f, u);
+                            br = lighthouse_range(b, f, u);
                         }
                         if (br > range) {
                             range = br;

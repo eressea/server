@@ -19,6 +19,11 @@ attrib_type at_lighthouse = {
     /* Rest ist NULL; tempor�res, nicht alterndes Attribut */
 };
 
+bool is_lighthouse(const building_type *btype)
+{
+    return is_building_type(btype, "lighthouse");
+}
+
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
 * it adds temporary markers to the surrounding regions.
 * The existence of markers says nothing about the quality of the observer in
@@ -26,46 +31,57 @@ attrib_type at_lighthouse = {
 */
 void update_lighthouse(building * lh)
 {
-    if (is_building_type(lh->type, "lighthouse")) {
-        region *r = lh->region;
+    region *r = lh->region;
+    assert(is_lighthouse(lh->type));
 
-        r->flags |= RF_LIGHTHOUSE;
-        if (lh->size > 0) {
-            int d = (int)log10(lh->size) + 1;
-            int x;
-            for (x = -d; x <= d; ++x) {
-                int y;
-                for (y = -d; y <= d; ++y) {
-                    attrib *a;
-                    region *r2;
-                    int px = r->x + x, py = r->y + y;
+    r->flags |= RF_LIGHTHOUSE;
+    if (lh->size >= 10) {
+        int d = lighthouse_range(lh, NULL, NULL);
+        int x;
+        for (x = -d; x <= d; ++x) {
+            int y;
+            for (y = -d; y <= d; ++y) {
+                attrib *a;
+                region *r2;
+                int px = r->x + x, py = r->y + y;
 
-                    pnormalize(&px, &py, rplane(r));
-                    r2 = findregion(px, py);
-                    if (!r2 || !fval(r2->terrain, SEA_REGION))
-                        continue;
-                    if (distance(r, r2) > d)
-                        continue;
-                    a = a_find(r2->attribs, &at_lighthouse);
-                    while (a && a->type == &at_lighthouse) {
-                        building *b = (building *)a->data.v;
-                        if (b == lh)
-                            break;
-                        a = a->next;
-                    }
-                    if (!a) {
-                        a = a_add(&r2->attribs, a_new(&at_lighthouse));
-                        a->data.v = (void *)lh;
-                    }
+                pnormalize(&px, &py, rplane(r));
+                r2 = findregion(px, py);
+                if (!r2 || !fval(r2->terrain, SEA_REGION))
+                    continue;
+                if (distance(r, r2) > d)
+                    continue;
+                a = a_find(r2->attribs, &at_lighthouse);
+                while (a && a->type == &at_lighthouse) {
+                    building *b = (building *)a->data.v;
+                    if (b == lh)
+                        break;
+                    a = a->next;
+                }
+                if (!a) {
+                    a = a_add(&r2->attribs, a_new(&at_lighthouse));
+                    a->data.v = (void *)lh;
                 }
             }
         }
     }
 }
 
+void remove_lighthouse(const building *lh) {
+    building *b;
+    region * r = lh->region;
+
+    r->flags &= ~RF_LIGHTHOUSE;
+    for (b = r->buildings; b; b = b->next) {
+        if (b != lh && is_lighthouse(b->type)) {
+            update_lighthouse(b);
+        }
+    }
+}
+
 int lighthouse_range(const building * b, const faction * f, const unit *u)
 {
-    if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
+    if (b->size >= 10 && (b->flags & BLD_MAINTAINED)) {
         int maxd = (int)log10(b->size) + 1;
 
         if (u && skill_enabled(SK_PERCEPTION)) {
@@ -80,11 +96,11 @@ int lighthouse_range(const building * b, const faction * f, const unit *u)
     return 0;
 }
 
-bool check_leuchtturm(region * r, faction * f)
+bool lighthouse_guarded(const region * r)
 {
     attrib *a;
 
-    if (!fval(r->terrain, SEA_REGION)) {
+    if (!r->attribs || !(r->terrain->flags & SEA_REGION)) {
         return false;
     }
     for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
@@ -92,37 +108,11 @@ bool check_leuchtturm(region * r, faction * f)
         building *b = (building *)a->data.v;
 
         assert(is_building_type(b->type, "lighthouse"));
-        if (fval(b, BLD_MAINTAINED) && b->size >= 10) {
+        if ((b->flags & BLD_MAINTAINED) && b->size >= 10) {
             int maxd = (int)log10(b->size) + 1;
-
-            if (skill_enabled(SK_PERCEPTION) && f) {
-                region *r2 = b->region;
-                unit *u;
-                int c = 0;
-                int d = 0;
-
-                for (u = r2->units; u; u = u->next) {
-                    if (u->building == b) {
-                        c += u->number;
-                        if (c > buildingcapacity(b))
-                            break;
-                        if (u->faction == f) {
-                            if (!d)
-                                d = distance(r, r2);
-                            if (maxd < d)
-                                break;
-                            if (effskill(u, SK_PERCEPTION, 0) >= d * 3)
-                                return true;
-                        }
-                    }
-                    else if (c)
-                        break;              /* first unit that's no longer in the house ends the search */
-                }
-            }
-            else {
-                /* E3A rule: no perception req'd */
-                return true;
-            }
+            int d = distance(r, b->region);
+            assert(maxd >= d);
+            return true;
         }
     }
 

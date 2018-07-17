@@ -29,13 +29,16 @@ extern "C" {
     struct faction;
     struct region;
     struct building;
+    struct building_type;
     struct unit;
     struct attrib;
 
     extern struct attrib_type at_lighthouse;
     /* leuchtturm */
-    bool check_leuchtturm(struct region *r, struct faction *f);
+    bool is_lighthouse(const struct building_type *btype);
+    bool lighthouse_guarded(const struct region *r);
     void update_lighthouse(struct building *b);
+    void remove_lighthouse(const struct building *lh);
     int lighthouse_range(const struct building *b, const struct faction *f,
         const struct unit *u);
 

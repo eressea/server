@@ -530,7 +530,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
 static void test_prepare_lighthouse(CuTest *tc) {
     report_context ctx;
     faction *f;
-    region *r1, *r2, *r3;
+    region *r1, *r2, *r3, *r4;
     unit *u;
     building *b;
     building_type *btype;
@@ -543,6 +543,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
+    r4 = test_create_region(0, 1, t_plain);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
@@ -557,6 +558,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r4->seen.mode);
     finish_reports(&ctx);
     test_teardown();
 }
