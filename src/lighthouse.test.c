@@ -26,30 +26,33 @@ static void test_lighthouse_range(CuTest * tc)
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
     b = test_create_building(r, test_create_buildingtype("lighthouse"));
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL, NULL));
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, u1->faction, NULL));
+    CuAssertIntEquals(tc, 0, lighthouse_range(b));
+    b->size = 9;
+    CuAssertIntEquals(tc, 0, lighthouse_range(b));
     b->size = 10;
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL, NULL));
+    CuAssertIntEquals(tc, 0, lighthouse_range(b));
+    b->flags |= BLD_MAINTAINED;
+    CuAssertIntEquals(tc, 2, lighthouse_range(b));
     u1->building = b;
     u2->building = b;
     u1->number = 10;
     set_level(u1, SK_PERCEPTION, 3);
     set_level(u2, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 0, lighthouse_range(b, NULL, NULL));
 
-    b->flags |= BLD_MAINTAINED;
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction, u1));
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
     set_level(u1, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, u1->faction, u1));
-    /* lighthouse_range does not check inside_building */
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u2->faction, u2));
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u2));
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u1));
     b->size = 100;
     update_lighthouse(b);
-    CuAssertIntEquals(tc, 3, lighthouse_range(b, NULL, NULL));
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, u1->faction, u1));
+    CuAssertIntEquals(tc, 3, lighthouse_range(b));
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u1));
     set_level(u1, SK_PERCEPTION, 9);
-    CuAssertIntEquals(tc, 3, lighthouse_range(b, u1->faction, u1));
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u2->faction, u2));
+    CuAssertIntEquals(tc, 3, lighthouse_view_distance(b, u1));
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u2));
+    b->size = 99;
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u1));
+
     test_teardown();
 }
 
@@ -111,7 +114,7 @@ static void test_lighthouse_guard(CuTest * tc) {
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
+    CuAssertIntEquals(tc, 2, lighthouse_range(b));
     update_lighthouse(b);
     CuAssertIntEquals(tc, RF_LIGHTHOUSE, r1->flags&RF_LIGHTHOUSE);
     CuAssertPtrEquals(tc, NULL, r1->attribs);

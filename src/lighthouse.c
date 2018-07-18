@@ -36,7 +36,7 @@ void update_lighthouse(building * lh)
 
     r->flags |= RF_LIGHTHOUSE;
     if (lh->size >= 10) {
-        int d = lighthouse_range(lh, NULL, NULL);
+        int d = lighthouse_range(lh);
         int x;
         for (x = -d; x <= d; ++x) {
             int y;
@@ -79,18 +79,24 @@ void remove_lighthouse(const building *lh) {
     }
 }
 
-int lighthouse_range(const building * b, const faction * f, const unit *u)
+int lighthouse_range(const building * b)
 {
     if (b->size >= 10 && (b->flags & BLD_MAINTAINED)) {
-        int maxd = (int)log10(b->size) + 1;
+        return (int)log10(b->size) + 1;
+    }
+    return 0;
+}
 
-        if (u && skill_enabled(SK_PERCEPTION)) {
+int lighthouse_view_distance(const building * b, const unit *u)
+{
+    if (b->size >= 10 && (b->flags & BLD_MAINTAINED)) {
+        int maxd = lighthouse_range(b);
+
+        if (maxd > 0 && u && skill_enabled(SK_PERCEPTION)) {
             int sk = effskill(u, SK_PERCEPTION, 0) / 3;
             assert(u->building == b);
-            assert(u->faction == f);
             if (maxd > sk) maxd = sk;
         }
-        /* E3A rule: no perception req'd */
         return maxd;
     }
     return 0;

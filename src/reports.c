@@ -1596,7 +1596,7 @@ void prepare_report(report_context *ctx, faction *f)
                     for (b = rbuildings(r); b; b = b->next) {
                         if (b && b->type == bt_lighthouse) {
                             /* region owners get maximum range */
-                            int lhr = lighthouse_range(b, NULL, NULL);
+                            int lhr = lighthouse_view_distance(b, NULL);
                             if (lhr > range) range = lhr;
                         }
                     }
@@ -1613,7 +1613,7 @@ void prepare_report(report_context *ctx, faction *f)
                      */
                     if (!fval(r, RF_LIGHTHOUSE)) {
                         /* it's enough to add the region once, and if there are
-                        * no lighthouses, there is no need to look at more units */
+                         * no lighthouses here, there is no need to look at more units */
                         break;
                     }
                 }
@@ -1633,10 +1633,10 @@ void prepare_report(report_context *ctx, faction *f)
                         /* unit is one of ours, and inside the current lighthouse */
                         if (br == 0) {
                             /* lazy-calculate the range */
-                            br = lighthouse_range(b, f, u);
-                        }
-                        if (br > range) {
-                            range = br;
+                            br = lighthouse_view_distance(b, u);
+                            if (br > range) {
+                                range = br;
+                            }
                         }
                     }
                 }

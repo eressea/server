@@ -39,8 +39,8 @@ extern "C" {
     bool lighthouse_guarded(const struct region *r);
     void update_lighthouse(struct building *b);
     void remove_lighthouse(const struct building *lh);
-    int lighthouse_range(const struct building *b, const struct faction *f,
-        const struct unit *u);
+    int lighthouse_range(const struct building *b);
+    int lighthouse_view_distance(const struct building *b, const struct unit *u);
 
 
 #ifdef __cplusplus

@@ -495,7 +495,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     u1->number = 4;
     u1->building = b;
     set_level(u1, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction, u1));
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
     CuAssertPtrEquals(tc, b, inside_building(u1));
     u2 = test_create_unit(f, r1);
     u2->building = b;
@@ -597,7 +597,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
