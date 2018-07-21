@@ -895,7 +895,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     }
     fset(b, BLD_EXPANDED);
 
-    update_lighthouse(b);
+    if (is_lighthouse(btype)) {
+        update_lighthouse(b);
+    }
 
     return built;
 }
