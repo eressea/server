@@ -1779,7 +1779,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
 
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);
-                if (check_leuchtturm(next_point, NULL)) {
+                if (lighthouse_guarded(next_point)) {
                     if (lighthouse_div > 0) {
                         stormchance /= lighthouse_div;
                     }
@@ -1867,7 +1867,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
                 if (reason == SA_NO_INSECT) {
                     ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
                 }
-                else if (check_leuchtturm(current_point, NULL)) {
+                else if (lighthouse_guarded(current_point)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
                 }
                 else {

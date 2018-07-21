@@ -755,6 +755,11 @@ void plan_monsters(faction * f)
             if (u->faction!=f)
                 continue;
 
+            /* Parteitarnung von Monstern ist doof: */
+            if (fval(u, UFL_ANON_FACTION)) {
+                u->flags &= ~UFL_ANON_FACTION;
+            }
+
             /* Befehle m�ssen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {

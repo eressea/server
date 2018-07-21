@@ -3323,7 +3323,7 @@ fighter * get_fighter(battle * b, const struct unit * u)
     return 0;
 }
 
-static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
+int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     side *s;
     fighter *fc = NULL;
