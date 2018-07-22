@@ -1493,7 +1493,9 @@ int read_game(gamedata *data)
         if (r->flags & RF_LIGHTHOUSE) {
             building *b;
             for (b = r->buildings; b; b = b->next) {
-                update_lighthouse(b);
+                if (is_lighthouse(b->type)) {
+                    update_lighthouse(b);
+                }
             }
         }
     }
