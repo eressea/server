@@ -25,6 +25,6 @@ addr=$1
 subj=$2
 shift 2
 
-mutt -F "$ERESSEA/etc/muttrc" -s "$subj" -a "$@" -- "$addr" \
+mutt -s "$subj" -a "$@" -- "$addr" \
 	< "$ERESSEA/server/etc/$TEMPLATE"
 
