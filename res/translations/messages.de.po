@@ -2121,7 +2121,7 @@ msgid "missing_components"
 msgstr "\"$unit($unit) hat nicht genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern.\""
 
 msgid "seduce_effect_1"
-msgstr "\"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und gut verspielt.\""
+msgstr "\"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und Gut verspielt.\""
 
 msgid "xmastree_effect"
 msgstr "\"In der Region erstrahlen des Nachts bunte Lichter, Gloeckchen klingeln und frohes Kindergelaechter klingt durch den Wald.\""
