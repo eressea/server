@@ -2449,8 +2449,10 @@ bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mod
         return true;
     }
     else {
-        if (stealthmod > INT_MIN && (mode == seen_lighthouse || mode >= seen_unit)) {
-            return cansee(f, u->region, u, stealthmod);
+        if (stealthmod > INT_MIN && mode >= seen_lighthouse) {
+            if (mode != seen_travel || u->building || u->ship || is_guard(u)) {
+                return cansee(f, u->region, u, stealthmod);
+            }
         }
     }
     return false;

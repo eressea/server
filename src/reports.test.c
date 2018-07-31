@@ -1,7 +1,7 @@
 #include <platform.h>
 #include "reports.h"
 
-#include "kernel/calendar.h"
+#include "guard.h"
 #include "keyword.h"
 #include "lighthouse.h"
 #include "laws.h"
@@ -10,28 +10,29 @@
 #include "spy.h"
 #include "travelthru.h"
 
-#include <kernel/ally.h>
-#include <kernel/config.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
+#include "kernel/ally.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
 
-#include <util/attrib.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
+#include "util/attrib.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/message.h"
 
-#include <attributes/attributes.h>
-#include <attributes/key.h>
-#include <attributes/otherfaction.h>
+#include "attributes/attributes.h"
+#include "attributes/key.h"
+#include "attributes/otherfaction.h"
 
 #include <selist.h>
 #include <stream.h>
@@ -826,38 +827,61 @@ static void test_newbie_warning(CuTest *tc) {
 }
 
 static void test_visible_unit(CuTest *tc) {
-    unit *u2;
+    unit *u;
     faction *f;
     ship *sh;
+    building *b;
+    race *rc;
 
     test_setup();
     f = test_create_faction(NULL);
-    u2 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    sh = test_create_ship(u2->region, NULL);
+    rc = test_create_race("smurf");
+    rc->flags |= RCF_UNARMEDGUARD;
+    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
-    CuAssertTrue(tc, cansee(f, u2->region, u2, 0));
-    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_unit));
-    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_spell));
-    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_battle));
-    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_travel));
-    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_none));
-    CuAssertTrue(tc, !visible_unit(u2, f, 0, seen_neighbour));
+    CuAssertTrue(tc, cansee(f, u->region, u, 0));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_spell));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_battle));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
 
-    CuAssertTrue(tc, visible_unit(u2, f, 0, seen_lighthouse));
-    CuAssertTrue(tc, !visible_unit(u2, f, -2, seen_lighthouse));
-    u2->ship = sh;
-    CuAssertTrue(tc, visible_unit(u2, f, -2, seen_lighthouse));
-    u2->ship = NULL;
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u, f, -2, seen_lighthouse));
 
-    set_level(u2, SK_STEALTH, 1);
-    CuAssertTrue(tc, !cansee(f, u2->region, u2, 0));
-    CuAssertTrue(tc, cansee(f, u2->region, u2, 1));
+    u->ship = sh = test_create_ship(u->region, NULL);
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    u->ship = NULL;
 
-    u2->ship = sh;
-    CuAssertTrue(tc, visible_unit(u2, f, -2, seen_lighthouse));
-    u2->ship = NULL;
-    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_spell));
-    CuAssertTrue(tc, visible_unit(u2, f, 1, seen_battle));
+    setguard(u, true);
+    CuAssertTrue(tc, is_guard(u));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    setguard(u, false);
+
+    u->building = b = test_create_building(u->region, NULL);
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    u->building = NULL;
+
+    set_level(u, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u->region, u, 0));
+    CuAssertTrue(tc, cansee(f, u->region, u, 1));
+
+    u->ship = sh;
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
+    u->ship = NULL;
+
+    u->building = b;
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
+    u->building = NULL;
+
+    CuAssertTrue(tc, visible_unit(u, f, 1, seen_spell));
+    CuAssertTrue(tc, visible_unit(u, f, 1, seen_battle));
 
     test_teardown();
 }

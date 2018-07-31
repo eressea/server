@@ -625,6 +625,7 @@ static void handle_requirement(parseinfo *pi, const XML_Char *el, const XML_Char
 
     assert(nreqs < MAX_REQUIREMENTS);
     req = reqs + nreqs;
+    req->number = 1;
     for (i = 0; attr[i]; i += 2) {
         if (xml_strcmp(attr[i], "type") == 0) {
             req->rtype = rt_get_or_create(attr[i + 1]);
