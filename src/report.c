@@ -2212,6 +2212,7 @@ report_plaintext(const char *filename, report_context * ctx,
                     if (wrptr(&bufp, &size, bytes) != 0)
                         WARN_STATIC_BUFFER();
                 }
+                assert(!rm->rtype);
             }
             *bufp = 0;
             centre(out, buf, true);
