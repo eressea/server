@@ -1252,7 +1252,6 @@ static void create_potion(unit * u, const item_type * itype, int want)
         /* something missing from the list of materials */
         ADDMSG(&u->faction->msgs, msg_materials_required(u, u->thisorder,
             itype->construction, want));
-        return;
         break;
     default:
         i_change(&u->items, itype, built);
