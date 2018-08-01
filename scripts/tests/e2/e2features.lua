@@ -522,7 +522,7 @@ function test_seaserpent_attack()
     local r = region.create(0, 0, 'ocean')
     local sh = ship.create(r, 'boat')
     local us = unit.create(get_monsters(), r, 1, 'seaserpent')
-    local u = unit.create(faction.create('human'), r, 20, 'human')
+    local u = unit.create(faction.create('human', 'enno@example.com'), r, 20, 'human')
     u.ship = sh
     us:clear_orders()
     us:add_order('ATTACKIERE ' .. itoa36(u.id))
