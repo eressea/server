@@ -47,6 +47,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "laws.h"
 #include "reports.h"
 #include "study.h"
+#include "spy.h"
 #include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
@@ -541,6 +542,7 @@ static ship *do_maelstrom(region * r, unit * u)
     if (sh->damage >= sh->size * DAMAGE_SCALE) {
         ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
             "region ship damage sink", r, sh, damage, 1));
+        sink_ship(sh);
         remove_ship(&sh->region->ships, sh);
         return NULL;
     }
@@ -882,12 +884,14 @@ static void drifting_ships(region * r)
                 }
                 if (sh->damage >= sh->size * DAMAGE_SCALE) {
                     msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
-                    remove_ship(&sh->region->ships, sh);
+                    sink_ship(sh);
+                    remove_ship(shp, sh);
                 }
             }
 
-            if (*shp == sh)
+            if (*shp == sh) {
                 shp = &sh->next;
+            }
         }
     }
 }
@@ -1926,6 +1930,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
     if (sh->damage >= sh->size * DAMAGE_SCALE) {
         if (sh->region) {
             ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
+            sink_ship(sh);
             remove_ship(&sh->region->ships, sh);
         }
         sh = NULL;

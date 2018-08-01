@@ -2590,6 +2590,7 @@ void sinkships(struct region * r)
             }
         }
         if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            sink_ship(sh);
             remove_ship(shp, sh);
         }
         if (*shp == sh)

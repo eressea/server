@@ -392,19 +392,22 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     return 1;                     /* success */
 }
 
-static void sink_ship(region * r, ship * sh, unit * saboteur)
+#define OCEAN_SWIMMER_CHANCE 0.1
+#define COAST_SWIMMER_CHANCE 0.9
+
+void sink_ship(ship * sh)
 {
     unit **ui, *u;
-    region *safety = r;
+    region *r, *safety;
     int i;
     direction_t d;
     double probability = 0.0;
     message *sink_msg = NULL;
     faction *f;
 
-    assert(r);
-    assert(sh);
-    assert(saboteur);
+    assert(sh && sh->region);
+    r = sh->region;
+
     for (f = NULL, u = r->units; u; u = u->next) {
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
@@ -414,8 +417,9 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
     }
 
     /* figure out what a unit's chances of survival are: */
+    safety = r;
     if (!(r->terrain->flags & SEA_REGION)) {
-        probability = CANAL_SWIMMER_CHANCE;
+        probability = COAST_SWIMMER_CHANCE;
     }
     else {
         for (d = 0; d != MAXDIRECTIONS; ++d) {
@@ -479,10 +483,9 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         }
         ui = &u->next;
     }
-    if (sink_msg)
+    if (sink_msg) {
         msg_release(sink_msg);
-    /* finally, get rid of the ship */
-    remove_ship(&sh->region->ships, sh);
+    }
 }
 
 int sabotage_cmd(unit * u, struct order *ord)
@@ -514,7 +517,9 @@ int sabotage_cmd(unit * u, struct order *ord)
                 effskill(u, SK_SPY, 0) - top_skill(u->region, u2->faction, sh, SK_PERCEPTION);
         }
         if (try_destruction(u, u2, sh, skdiff)) {
-            sink_ship(u->region, sh, u);
+            sink_ship(sh);
+            /* finally, get rid of the ship */
+            remove_ship(&sh->region->ships, sh);
         }
         break;
     default:
