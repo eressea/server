@@ -1529,6 +1529,7 @@ static void report_itemtype(FILE *F, faction *f, const item_type *itype) {
             fprintf(F, "\"%s\"\n", translate(ch, LOC(f->locale, ch)));
             m++;
         }
+        assert(!m->rtype);
     }
 }
     
