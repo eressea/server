@@ -785,23 +785,48 @@ static void test_stealth_modifier(CuTest *tc) {
     test_teardown();
 }
 
+static void setup_calendar(void) {
+    months_per_year = 9;
+    month_season = malloc(sizeof(int) * months_per_year);
+    month_season[0] = SEASON_SUMMER;
+    month_season[1] = SEASON_AUTUMN;
+    month_season[2] = SEASON_AUTUMN;
+    month_season[3] = SEASON_WINTER;
+    month_season[4] = SEASON_WINTER;
+    month_season[5] = SEASON_WINTER;
+    month_season[6] = SEASON_SPRING;
+    month_season[7] = SEASON_SPRING;
+    month_season[8] = SEASON_SUMMER;
+}
+
 static void test_insect_warnings(CuTest *tc) {
     faction *f;
     gamedate gd;
 
-    /* OBS: in unit tests, get_gamedate always returns season = 0 */
     test_setup();
+    setup_calendar();
+    config_set_int("game.start", 184);
     test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
-    gd.turn = 0;
-    gd.season = 3;
-    report_warnings(f, &gd);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
-
-    gd.season = 0;
-    report_warnings(f, &gd);
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1082, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
+    CuAssertIntEquals(tc, SEASON_WINTER, get_gamedate(1084, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
     test_teardown();
 }
 
@@ -810,16 +835,16 @@ static void test_newbie_warning(CuTest *tc) {
 
     test_setup();
     test_inject_messagetypes();
-    f = test_create_faction(test_create_race("insect"));
+    f = test_create_faction(NULL);
     config_set_int("NewbieImmunity", 3);
 
     f->age = 2;
-    report_warnings(f, NULL);
+    report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunity"));
     test_clear_messages(f);
 
     f->age = 3;
-    report_warnings(f, NULL);
+    report_warnings(f, 0);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunity"));
     test_clear_messages(f);
 

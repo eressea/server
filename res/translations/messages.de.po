@@ -1773,7 +1773,7 @@ msgid "storm"
 msgstr "\"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$if($sink,\" und sinkt\",\"\").\""
 
 msgid "nr_insectwinter"
-msgstr "Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."
+msgstr "Insekten können wegen des Winterwetters in der kommenden Woche nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."
 
 msgid "spellfail_nomonsters"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Monster gezaubert werden.\""
@@ -2727,7 +2727,7 @@ msgid "volcanostartsmoke"
 msgstr "\"Aus dem Vulkankrater von $region($region) steigt plötzlich Rauch.\""
 
 msgid "nr_insectfall"
-msgstr "Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können."
+msgstr "Es ist Spätherbst, und die kommende Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können."
 
 msgid "error296"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier werden niemals Bäume wachsen.\""

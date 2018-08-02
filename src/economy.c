@@ -477,7 +477,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     if (rc == get_race(RC_INSECT)) {
         gamedate date;
         get_gamedate(turn, &date);
-        if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
+        if (date.season == SEASON_WINTER && r->terrain != newterrain(T_DESERT)) {
             bool usepotion = false;
             unit *u2;
 
