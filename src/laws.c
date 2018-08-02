@@ -2058,17 +2058,6 @@ int mail_cmd(unit * u, struct order *ord)
                 break;
             }
             else {
-                attrib *a = a_find(u2->attribs, &at_eventhandler);
-                if (a != NULL) {
-                    event_arg args[3];
-                    args[0].data.v = (void *)s;
-                    args[0].type = "string";
-                    args[1].data.v = (void *)u;
-                    args[1].type = "unit";
-                    args[2].type = NULL;
-                    handle_event(a, "message", args);
-                }
-
                 mailunit(r, u, n, ord, s);
             }
             return 0;
