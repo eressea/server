@@ -455,19 +455,6 @@ int fctr_handle(struct trigger *tp, void *data)
     return 0;
 }
 
-static void fctr_init(trigger * t)
-{
-    t->data.v = calloc(sizeof(fctr_data), 1);
-}
-
-static void fctr_done(trigger * t)
-{
-    fctr_data *fd = (fctr_data *)t->data.v;
-    lua_State *L = (lua_State *)global.vm_state;
-    luaL_unref(L, LUA_REGISTRYINDEX, fd->fhandle);
-    free(fd);
-}
-
 static int tolua_unit_addnotice(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
