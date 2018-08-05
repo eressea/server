@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "economy.h"
 #include "monsters.h"
 #include "move.h"
+#include "spy.h"
 #include "study.h"
 #include "volcano.h"
 
@@ -295,6 +296,7 @@ static void move_iceberg(region * r)
                             ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des",
                                 "ship", sh));
                         }
+                        sink_ship(sh);
                         remove_ship(&sh->region->ships, sh);
                     }
                     else if (u != NULL) {
@@ -421,6 +423,7 @@ static void godcurse(void)
                             ADDMSG(&uo->faction->msgs,
                                 msg_message("godcurse_destroy_ship", "ship", sh));
                         }
+                        sink_ship(sh);
                         remove_ship(&sh->region->ships, sh);
                     }
                     sh = shn;

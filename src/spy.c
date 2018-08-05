@@ -392,19 +392,16 @@ static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
     return 1;                     /* success */
 }
 
-static void sink_ship(region * r, ship * sh, unit * saboteur)
+void sink_ship(ship * sh)
 {
-    unit **ui, *u;
-    region *safety = r;
-    int i;
-    direction_t d;
-    double probability = 0.0;
+    unit *u;
+    region *r;
     message *sink_msg = NULL;
     faction *f;
 
-    assert(r);
-    assert(sh);
-    assert(saboteur);
+    assert(sh && sh->region);
+    r = sh->region;
+
     for (f = NULL, u = r->units; u; u = u->next) {
         /* slight optimization to avoid dereferencing u->faction each time */
         if (f != u->faction) {
@@ -413,76 +410,27 @@ static void sink_ship(region * r, ship * sh, unit * saboteur)
         }
     }
 
-    /* figure out what a unit's chances of survival are: */
-    if (!(r->terrain->flags & SEA_REGION)) {
-        probability = CANAL_SWIMMER_CHANCE;
-    }
-    else {
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *rn = rconnect(r, d);
-            if (rn && !(rn->terrain->flags & SEA_REGION) && !move_blocked(NULL, r, rn)) {
-                safety = rn;
-                probability = OCEAN_SWIMMER_CHANCE;
-                break;
-            }
-        }
-    }
-    for (ui = &r->units; *ui;) {
+    for (f = NULL, u = r->units; u; u = u->next) {
         /* inform this faction about the sinking ship: */
-        u = *ui;
-        if (!(u->faction->flags & FFL_SELECT)) {
-            fset(u->faction, FFL_SELECT);
-            if (sink_msg == NULL) {
-                sink_msg = msg_message("sink_msg", "ship region", sh, r);
-            }
-            add_message(&f->msgs, sink_msg);
-        }
-
         if (u->ship == sh) {
-            int dead = 0;
-            message *msg;
-
-            /* if this fails, I misunderstood something: */
-            for (i = 0; i != u->number; ++i)
-                if (chance(probability))
-                    ++dead;
-
-            if (dead != u->number) {
-                /* she will live. but her items get stripped */
-                if (dead > 0) {
-                    msg =
-                        msg_message("sink_lost_msg", "dead region unit", dead, safety, u);
-                }
-                else {
-                    msg = msg_message("sink_saved_msg", "region unit", safety, u);
-                }
-                leave_ship(u);
-                if (r != safety) {
-                    setguard(u, false);
-                }
-                while (u->items) {
-                    i_remove(&u->items, u->items);
-                }
-                move_unit(u, safety, NULL);
-            }
-            else {
-                msg = msg_message("sink_lost_msg", "dead region unit", dead, (region *)NULL, u);
-            }
-            add_message(&u->faction->msgs, msg);
-            msg_release(msg);
-            if (dead == u->number) {
-                if (remove_unit(ui, u) == 0) {
-                    /* ui is already pointing at u->next */
-                    continue;
+            if (f != u->faction) {
+                f = u->faction;
+                if (!(f->flags & FFL_SELECT)) {
+                    f->flags |= FFL_SELECT;
+                    if (sink_msg == NULL) {
+                        sink_msg = msg_message("sink_msg", "ship region", sh, r);
+                    }
+                    add_message(&f->msgs, sink_msg);
                 }
             }
         }
-        ui = &u->next;
+        else if (f != NULL) {
+            break;
+        }
     }
-    if (sink_msg)
+    if (sink_msg) {
         msg_release(sink_msg);
-    /* finally, get rid of the ship */
-    remove_ship(&sh->region->ships, sh);
+    }
 }
 
 int sabotage_cmd(unit * u, struct order *ord)
@@ -514,7 +462,9 @@ int sabotage_cmd(unit * u, struct order *ord)
                 effskill(u, SK_SPY, 0) - top_skill(u->region, u2->faction, sh, SK_PERCEPTION);
         }
         if (try_destruction(u, u2, sh, skdiff)) {
-            sink_ship(u->region, sh, u);
+            sink_ship(sh);
+            /* finally, get rid of the ship */
+            remove_ship(&sh->region->ships, sh);
         }
         break;
     default:

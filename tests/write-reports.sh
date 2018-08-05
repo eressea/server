@@ -19,7 +19,7 @@ done
 #set -e
 cd $ROOT/tests
 setup
-#cleanup
+cleanup
 VALGRIND=`which valgrind`
 TESTS=../Debug/eressea/test_eressea
 SERVER=../Debug/eressea/eressea

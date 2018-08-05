@@ -868,21 +868,6 @@
     </type>
   </message>
 
-  <message name="sink_lost_msg" section="events">
-    <type>
-      <arg name="dead" type="int"/>
-      <arg name="region" type="region"/>
-      <arg name="unit" type="unit"/>
-    </type>
-  </message>
-
-  <message name="sink_saved_msg" section="events">
-    <type>
-      <arg name="region" type="region"/>
-      <arg name="unit" type="unit"/>
-    </type>
-  </message>
-
   <message name="sink_msg" section="events">
     <type>
       <arg name="ship" type="ship"/>

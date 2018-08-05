@@ -27,6 +27,7 @@ extern "C" {
     struct strlist;
     struct order;
     struct faction;
+    struct ship;
 
     int setstealth_cmd(struct unit *u, struct order *ord);
     int spy_cmd(struct unit *u, struct order *ord);
@@ -34,10 +35,7 @@ extern "C" {
     void spy_message(int spy, const struct unit *u,
         const struct unit *target);
     void set_factionstealth(struct unit * u, struct faction * f);
-    
-
-#define OCEAN_SWIMMER_CHANCE 0.1
-#define CANAL_SWIMMER_CHANCE 0.9
+    void sink_ship(struct ship * sh);
 
 #ifdef __cplusplus
 }

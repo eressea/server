@@ -2303,9 +2303,6 @@ msgstr "\"$unit($mage) receives a shock when his familiar dies.\""
 msgid "error269"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot cast spells here.\""
 
-msgid "sink_saved_msg"
-msgstr "\"$unit($unit) survives unscathed and makes it to $region($region).\""
-
 msgid "race_noregroup"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) cannot be regrouped.\""
 
@@ -2653,9 +2650,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot
 
 msgid "analyse_building_noage"
 msgstr "\"$unit($mage) discovers that $building($building) is charmed with '$curse($curse)', which will last for centuries.\""
-
-msgid "sink_lost_msg"
-msgstr "\"$int($amount) people of $unit($unit) drown.$if($isnull($region),\"\",\" The unit makes it to $region($region).\")\""
 
 msgid "error130"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax: MAGIC SPHERE [1-5].\""
