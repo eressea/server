@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int cmp_scholars(const void *lhs, const void *rhs)
+static int cmp_scholars(const void *lhs, const void *rhs)
 {
     const scholar *a = (const scholar *)lhs;
     const scholar *b = (const scholar *)rhs;
