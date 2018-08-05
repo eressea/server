@@ -1517,24 +1517,23 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     }
 }
 
-void report_warnings(faction *f, const gamedate *date)
+void report_warnings(faction *f, int now)
 {
     if (f->age < NewbieImmunity()) {
         ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
             NewbieImmunity() - f->age));
     }
 
-    if (date) {
-        if (f->race == get_race(RC_INSECT)) {
-            if (date->season == 0) {
-                ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
-            }
-            else {
-                gamedate next;
-                get_gamedate(date->turn + 1, &next);
-                if (next.season == 0) {
-                    ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
-                }
+    if (f->race == get_race(RC_INSECT)) {
+        gamedate date;
+        get_gamedate(now + 1, &date);
+
+        if (date.season == SEASON_WINTER) {
+            ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
+        }
+        else if (date.season == SEASON_AUTUMN) {
+            if (get_gamedate(now + 2 + 2, &date)->season == SEASON_WINTER) {
+                ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
             }
         }
     }
@@ -1552,11 +1551,9 @@ void prepare_report(report_context *ctx, faction *f)
     static bool rule_region_owners;
     static bool rule_lighthouse_units;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    gamedate now;
 
     /* Insekten-Winter-Warnung */
-    get_gamedate(turn, &now);
-    report_warnings(f, &now);
+    report_warnings(f, turn);
 
     if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);

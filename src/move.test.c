@@ -287,6 +287,9 @@ void setup_drift (struct drift_fixture *fix) {
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
     assert(fix->sh);
 
+    mt_create_va(mt_new("sink_msg", NULL),
+        "ship:ship", "region:region", MT_NEW_END);
+
     mt_create_va(mt_new("ship_drift", NULL),
         "ship:ship", "dir:int", MT_NEW_END);
     mt_create_va(mt_new("shipsink", NULL),

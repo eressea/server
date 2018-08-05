@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "move.h"
 #include "skill.h"
 #include "study.h"
+#include "spy.h"
 
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
@@ -2787,10 +2788,12 @@ static void aftermath(battle * b)
             ship *sh = *sp;
             freset(sh, SF_DAMAGED);
             if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                sink_ship(sh);
                 remove_ship(sp, sh);
             }
-            if (*sp == sh)
+            else {
                 sp = &sh->next;
+            }
         }
     }
 

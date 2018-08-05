@@ -426,6 +426,59 @@ static int recruit_cost(const faction * f, const race * rc)
     return -1;
 }
 
+message *can_recruit(unit *u, const race *rc, order *ord, int now)
+{
+    region *r = u->region;
+
+    /* this is a very special case because the recruiting unit may be empty
+    * at this point and we have to look at the creating unit instead. This
+    * is done in cansee, which is called indirectly by is_guarded(). */
+    if (is_guarded(r, u)) {
+        return msg_error(u, ord, 70);
+    }
+
+    if (rc == get_race(RC_INSECT)) {
+        gamedate date;
+        get_gamedate(now, &date);
+        if (date.season == SEASON_WINTER && r->terrain != newterrain(T_DESERT)) {
+            bool usepotion = false;
+            unit *u2;
+
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (fval(u2, UFL_WARMTH)) {
+                    usepotion = true;
+                    break;
+                }
+            }
+            if (!usepotion) {
+                return msg_error(u, ord, 98);
+            }
+        }
+        /* in Gletschern, Eisbergen gar nicht rekrutieren */
+        if (r_insectstalled(r)) {
+            return msg_error(u, ord, 97);
+        }
+    }
+    if (is_cursed(r->attribs, &ct_riotzone)) {
+        /* Die Region befindet sich in Aufruhr */
+        return msg_error(u, ord, 237);
+    }
+
+    if (rc && !playerrace(rc)) {
+        return msg_error(u, ord, 139);
+    }
+
+    if (fval(u, UFL_HERO)) {
+        return msg_feedback(u, ord, "error_herorecruit", "");
+    }
+    if (has_skill(u, SK_MAGIC)) {
+        /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
+        * grunds�tzlich nur alleine! */
+        return msg_error(u, ord, 158);
+    }
+    return NULL;
+}
+
 static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
 {
     region *r = u->region;
@@ -434,6 +487,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     const faction *f = u->faction;
     const struct race *rc = u_race(u);
     int n;
+    message *msg;
 
     init_order_depr(ord);
     n = getint();
@@ -456,6 +510,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
             }
         }
     }
+
     if (recruitcost < 0) {
         rc = u_race(u);
         recruitcost = recruit_cost(f, rc);
@@ -463,95 +518,46 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
             recruitcost = INT_MAX;
         }
     }
-    assert(rc);
-    u_setrace(u, rc);
 
-    /* this is a very special case because the recruiting unit may be empty
-     * at this point and we have to look at the creating unit instead. This
-     * is done in cansee, which is called indirectly by is_guarded(). */
-    if (is_guarded(r, u)) {
-        cmistake(u, ord, 70, MSG_EVENT);
-        return;
-    }
-
-    if (rc == get_race(RC_INSECT)) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        if (date.season == 0 && r->terrain != newterrain(T_DESERT)) {
-            bool usepotion = false;
-            unit *u2;
-
-            for (u2 = r->units; u2; u2 = u2->next)
-                if (fval(u2, UFL_WARMTH)) {
-                    usepotion = true;
-                    break;
-                }
-            if (!usepotion)
-            {
-                cmistake(u, ord, 98, MSG_EVENT);
-                return;
-            }
-        }
-        /* in Gletschern, Eisbergen gar nicht rekrutieren */
-        if (r_insectstalled(r)) {
-            cmistake(u, ord, 97, MSG_EVENT);
-            return;
-        }
-    }
-    if (is_cursed(r->attribs, &ct_riotzone)) {
-        /* Die Region befindet sich in Aufruhr */
-        cmistake(u, ord, 237, MSG_EVENT);
-        return;
-    }
-
-    if (recruitcost) {
+    if (recruitcost > 0) {
+        int pool;
         plane *pl = getplane(r);
-        if (pl && fval(pl, PFL_NORECRUITS)) {
+
+        if (pl && (pl->flags & PFL_NORECRUITS)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_pflnorecruit", ""));
             return;
         }
 
-        if (get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
-            recruitcost) < recruitcost) {
+        pool = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
+        if (pool < recruitcost) {
             cmistake(u, ord, 142, MSG_EVENT);
             return;
         }
+        pool /= recruitcost;
+        if (n > pool) n = pool;
     }
-    if (!playerrace(rc)) {
-        cmistake(u, ord, 139, MSG_EVENT);
-        return;
-    }
-
-    if (fval(u, UFL_HERO)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_herorecruit", ""));
-        return;
-    }
-    if (has_skill(u, SK_MAGIC)) {
-        /* error158;de;{unit} in {region}: '{command}' - Magier arbeiten
-         * grunds�tzlich nur alleine! */
-        cmistake(u, ord, 158, MSG_EVENT);
-        return;
-    }
-    if (has_skill(u, SK_ALCHEMY)
-        && count_skill(u->faction, SK_ALCHEMY) + n >
-        skill_limit(u->faction, SK_ALCHEMY)) {
-        cmistake(u, ord, 156, MSG_EVENT);
-        return;
-    }
-    if (recruitcost > 0) {
-        int pooled =
-            get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
-        int pr = pooled / recruitcost;
-        if (n > pr) n = pr;
-    }
-
-    u->wants = n;
 
     if (!n) {
         cmistake(u, ord, 142, MSG_EVENT);
         return;
     }
+    if (has_skill(u, SK_ALCHEMY)) {
+        if (count_skill(u->faction, SK_ALCHEMY) + n > skill_limit(u->faction, SK_ALCHEMY)) {
+            cmistake(u, ord, 156, MSG_EVENT);
+            return;
+        }
+    }
 
+    assert(rc);
+    msg = can_recruit(u, rc, ord, turn);
+    if (msg) {
+        add_message(&u->faction->msgs, msg);
+        msg_release(msg);
+        return;
+    }
+
+    u_setrace(u, rc);
+    u->wants = n;
     o = (econ_request *)calloc(1, sizeof(econ_request));
     o->qty = n;
     o->unit = u;

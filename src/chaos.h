@@ -22,8 +22,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    struct region;
-
     void chaos_update(void);
 
 #ifdef __cplusplus

@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "chaos.h"
 #include "monsters.h"
 #include "move.h"
+#include "spy.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -144,19 +145,20 @@ static void chaos(region * r)
                             break;
                     }
                     if (dir != MAXDIRECTIONS) {
-                        ship *sh = r->ships;
+                        ship **slist = &r->ships;
                         unit **up;
 
-                        while (sh) {
-                            ship *nsh = sh->next;
-                            double dmg =
-                                config_get_flt("rules.ship.damage.atlantis",
-                                0.50);
-                            damage_ship(sh, dmg);
+                        while (*slist) {
+                            ship *sh = *slist;
+
+                            damage_ship(sh, 0.5);
                             if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                                remove_ship(&sh->region->ships, sh);
+                                sink_ship(sh);
+                                remove_ship(slist, sh);
                             }
-                            sh = nsh;
+                            else {
+                                slist = &sh->next;
+                            }
                         }
 
                         for (up = &r->units; *up;) {
