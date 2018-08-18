@@ -135,7 +135,8 @@ const char *parameters[MAXPARAMS] = {
     "GRUPPE",
     "PARTEITARNUNG",
     "BAEUME",
-    "ALLIANZ"
+    "ALLIANZ",
+    "AUTO"
 };
 
 int findoption(const char *s, const struct locale *lang)
