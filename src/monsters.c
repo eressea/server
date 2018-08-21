@@ -1016,37 +1016,42 @@ static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
     double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
-    int n = 0;
-    int horse = -1;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
-    int scare;
+    int p = rpeasants(u->region);
 
-    scare = rc_scare(rc);
-    if (scare>0) {
-        n = rng_int() % scare * u->number;
-    } else {
-        n = rng_int() % (u->number / 20 + 1);
-        horse = 0;
-    }
-    horse = horse ? i_get(u->items, rhorse->itype) : 0;
+    if (p > 0) {
+        int horse = -1;
+        int scare = rc_scare(rc);
+        int n = 0;
 
-    n = (int)(n * multi);
-    if (n > 0) {
-
-        n = lovar(n);
-
-        if (n > 0) {
-            int p = rpeasants(u->region);
-            if (p < n) n = p;
-            deathcounts(u->region, n);
-            rsetpeasants(u->region, rpeasants(u->region) - n);
-            ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+        if (scare > 0) {
+            n = rng_int() % scare * u->number;
         }
-    }
-    if (horse > 0) {
-        i_change(&u->items, rhorse->itype, -horse);
-        ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+        else {
+            n = rng_int() % (u->number / 20 + 1);
+            horse = 0;
+        }
+
+        horse = horse ? i_get(u->items, rhorse->itype) : 0;
+        if (horse > 0) {
+            i_change(&u->items, rhorse->itype, -horse);
+            ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+        }
+
+        n = (int)(n * multi);
+        if (n > 0) {
+            n = lovar(n);
+
+            if (p < n) n = p;
+            if (n > 0) {
+                if (n > 0) {
+                    deathcounts(u->region, n);
+                    rsetpeasants(u->region, rpeasants(u->region) - n);
+                    ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+                }
+            }
+        }
     }
 }
 
@@ -1059,10 +1064,12 @@ static void absorbed_by_monster(unit * u)
         if (n > 0) {
             int p = rpeasants(u->region);
             if (p < n) n = p;
-            rsetpeasants(u->region, rpeasants(u->region) - n);
-            scale_number(u, u->number + n);
-            ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
-                "unit race amount", u, u_race(u), n));
+            if (n > 0) {
+                rsetpeasants(u->region, rpeasants(u->region) - n);
+                scale_number(u, u->number + n);
+                ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
+                    "unit race amount", u, u_race(u), n));
+            }
         }
     }
 }
