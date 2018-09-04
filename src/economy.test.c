@@ -480,6 +480,35 @@ static void test_recruit(CuTest *tc) {
     test_teardown();
 }
 
+static void test_recruit_insect(CuTest *tc) {
+    unit *u;
+    faction *f;
+    message * msg;
+
+    test_setup();
+    test_create_calendar();
+    f = test_create_faction(test_create_race("insect"));
+    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
+
+    msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
+    CuAssertPtrEquals(tc, NULL, msg);
+
+    msg = can_recruit(u, f->race, u->thisorder, 1084); /* Insects, Winter */
+    CuAssertPtrNotNull(tc, msg);
+    msg_release(msg);
+
+    u->flags |= UFL_WARMTH;
+    msg = can_recruit(u, f->race, u->thisorder, 1084); /* Insects, potion, Winter */
+    CuAssertPtrEquals(tc, NULL, msg);
+
+    u->flags = 0;
+    msg = can_recruit(u, NULL, u->thisorder, 1084); /* Other races, Winter */
+    CuAssertPtrEquals(tc, NULL, msg);
+
+    test_teardown();
+}
+
 static void test_income(CuTest *tc)
 {
     race *rc;
@@ -764,6 +793,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);
+    SUITE_ADD_TEST(suite, test_recruit_insect);
     SUITE_ADD_TEST(suite, test_loot);
     SUITE_ADD_TEST(suite, test_expand_production);
     return suite;

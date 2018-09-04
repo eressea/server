@@ -50,7 +50,6 @@
 #include <util/unicode.h>
 
 #include "gmtool_structs.h"
-#include "chaos.h"
 #include "console.h"
 #include "listbox.h"
 #include "wormhole.h"
@@ -534,7 +533,6 @@ static void reset_region(region *r) {
     unit **up = &r->units;
     bool players = false;
 
-    set_chaoscount(r, 0);
     r->flags = 0;
     a_removeall(&r->attribs, NULL);
     while (*up) {

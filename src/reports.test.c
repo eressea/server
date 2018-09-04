@@ -496,7 +496,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     u1->number = 4;
     u1->building = b;
     set_level(u1, SK_PERCEPTION, 3);
-    CuAssertIntEquals(tc, 1, lighthouse_range(b, u1->faction, u1));
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
     CuAssertPtrEquals(tc, b, inside_building(u1));
     u2 = test_create_unit(f, r1);
     u2->building = b;
@@ -531,7 +531,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
 static void test_prepare_lighthouse(CuTest *tc) {
     report_context ctx;
     faction *f;
-    region *r1, *r2, *r3;
+    region *r1, *r2, *r3, *r4;
     unit *u;
     building *b;
     building_type *btype;
@@ -544,6 +544,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     r3 = test_create_region(2, 0, t_ocean);
+    r4 = test_create_region(0, 1, t_plain);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
@@ -558,6 +559,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
+    CuAssertIntEquals(tc, seen_neighbour, r4->seen.mode);
     finish_reports(&ctx);
     test_teardown();
 }
@@ -596,7 +598,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
-    CuAssertIntEquals(tc, 2, lighthouse_range(b, NULL, NULL));
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
@@ -787,19 +789,29 @@ static void test_insect_warnings(CuTest *tc) {
     faction *f;
     gamedate gd;
 
-    /* OBS: in unit tests, get_gamedate always returns season = 0 */
     test_setup();
+    test_create_calendar();
     test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
-    gd.turn = 0;
-    gd.season = 3;
-    report_warnings(f, &gd);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
-
-    gd.season = 0;
-    report_warnings(f, &gd);
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1082, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
+    CuAssertIntEquals(tc, SEASON_WINTER, get_gamedate(1084, &gd)->season);
+    report_warnings(f, gd.turn);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
+    test_clear_messages(f);
+
     test_teardown();
 }
 
@@ -808,16 +820,16 @@ static void test_newbie_warning(CuTest *tc) {
 
     test_setup();
     test_inject_messagetypes();
-    f = test_create_faction(test_create_race("insect"));
+    f = test_create_faction(NULL);
     config_set_int("NewbieImmunity", 3);
 
     f->age = 2;
-    report_warnings(f, NULL);
+    report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunity"));
     test_clear_messages(f);
 
     f->age = 3;
-    report_warnings(f, NULL);
+    report_warnings(f, 0);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunity"));
     test_clear_messages(f);
 

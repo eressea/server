@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <modules/gmcmd.h>
 
 #include "alchemy.h"
+#include "automate.h"
 #include "battle.h"
 #include "economy.h"
 #include "keyword.h"
@@ -2058,17 +2059,6 @@ int mail_cmd(unit * u, struct order *ord)
                 break;
             }
             else {
-                attrib *a = a_find(u2->attribs, &at_eventhandler);
-                if (a != NULL) {
-                    event_arg args[3];
-                    args[0].data.v = (void *)s;
-                    args[0].type = "string";
-                    args[1].data.v = (void *)u;
-                    args[1].type = "unit";
-                    args[2].type = NULL;
-                    handle_event(a, "message", args);
-                }
-
                 mailunit(r, u, n, ord, s);
             }
             return 0;
@@ -2590,6 +2580,7 @@ void sinkships(struct region * r)
             }
         }
         if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            sink_ship(sh);
             remove_ship(shp, sh);
         }
         if (*shp == sh)
@@ -3646,6 +3637,24 @@ void add_proc_unit(int priority, void(*process) (unit *), const char *name)
     }
 }
 
+bool long_order_allowed(const unit *u)
+{
+    const region *r = u->region;
+    if (fval(u, UFL_LONGACTION)) {
+        /* this message was already given in laws.update_long_order
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        */
+        return false;
+    }
+    else if (fval(r->terrain, SEA_REGION)
+        && u_race(u) != get_race(RC_AQUARIAN)
+        && !(u_race(u)->flags & RCF_SWIM)) {
+        /* error message disabled by popular demand */
+        return false;
+    }
+    return true;
+}
+
 /* per priority, execute processors in order from PR_GLOBAL down to PR_ORDER */
 void process(void)
 {
@@ -3715,16 +3724,7 @@ void process(void)
                                         cmistake(u, ord, 224, MSG_MAGIC);
                                         ord = NULL;
                                     }
-                                    else if (fval(u, UFL_LONGACTION)) {
-                                        /* this message was already given in laws.update_long_order
-                                           cmistake(u, ord, 52, MSG_PRODUCE);
-                                           */
-                                        ord = NULL;
-                                    }
-                                    else if (fval(r->terrain, SEA_REGION)
-                                        && u_race(u) != get_race(RC_AQUARIAN)
-                                        && !(u_race(u)->flags & RCF_SWIM)) {
-                                        /* error message disabled by popular demand */
+                                    else if (!long_order_allowed(u)) {
                                         ord = NULL;
                                     }
                                 }
@@ -4011,6 +4011,7 @@ void init_processor(void)
     }
 
     p += 10;
+    add_proc_region(p, do_autostudy, "study automation");
     add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
@@ -4165,7 +4166,7 @@ void update_subscriptions(void)
 /** determine if unit can be seen by faction
  * @param f -- the observiong faction
  * @param u -- the unit that is observed
- * @param r -- the region that u is obesrved in (see below)
+ * @param r -- the region that u is obesrved from (see below)
  * @param m -- terrain modifier to stealth
  * 
  * r kann != u->region sein, wenn es um Durchreisen geht,

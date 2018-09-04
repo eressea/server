@@ -228,32 +228,11 @@ static void set_parameter(spell_fixture spell, char *value) {
 }
 
 static void check_spell_syntax(CuTest *tc, char *msg, spell_fixture *spell, char *syntax) {
-    stream strm;
     char buf[1024];
-    char *linestart, *newline;
-    size_t len;
 
-    mstream_init(&strm);
-    nr_spell_syntax(&strm, spell->sbe, spell->lang);
-    strm.api->rewind(strm.handle);
-    len = strm.api->read(strm.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    nr_spell_syntax(buf, sizeof(buf), spell->sbe, spell->lang);
 
-    linestart = strtok(buf, "\n");
-    while (linestart && !strstr(linestart, "ZAUBERE"))
-        linestart = strtok(NULL, "\n");
-
-    CuAssertPtrNotNull(tc, linestart);
-
-    newline = strtok(NULL, "\n");
-    while (newline) {
-        *(newline - 1) = '\n';
-        newline = strtok(NULL, "\n");
-    }
-
-    CuAssertStrEquals_Msg(tc, msg, syntax, linestart);
-
-    mstream_done(&strm);
+    CuAssertStrEquals_Msg(tc, msg, syntax, buf);
 }
 
 static void test_write_spell_syntax(CuTest *tc) {
@@ -262,54 +241,54 @@ static void test_write_spell_syntax(CuTest *tc) {
     test_setup();
     setup_spell_fixture(&spell);
 
-    check_spell_syntax(tc, "vanilla", &spell, "  ZAUBERE \"Testzauber\"");
+    check_spell_syntax(tc, "vanilla", &spell, "ZAUBERE Testzauber");
 
     spell.sp->sptyp |= FARCASTING;
-    check_spell_syntax(tc, "far", &spell, "  ZAUBERE [REGION x y] \"Testzauber\"");
+    check_spell_syntax(tc, "far", &spell, "ZAUBERE [REGION x y] Testzauber");
 
     spell.sp->sptyp |= SPELLLEVEL;
-    check_spell_syntax(tc, "farlevel", &spell, "  ZAUBERE [REGION x y] [STUFE n] \"Testzauber\"");
+    check_spell_syntax(tc, "farlevel", &spell, "ZAUBERE [REGION x y] [STUFE n] Testzauber");
     spell.sp->sptyp = 0;
 
     set_parameter(spell, "kc");
-    check_spell_syntax(tc, "kc", &spell, "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
+    check_spell_syntax(tc, "kc", &spell, "ZAUBERE Testzauber ( REGION | EINHEIT <enr> | SCHIFF <snr> | BURG <bnr> )");
 
     spell.sp->sptyp |= BUILDINGSPELL;
-    check_spell_syntax(tc, "kc typed", &spell, "  ZAUBERE \"Testzauber\" BURG <bnr>");
+    check_spell_syntax(tc, "kc typed", &spell, "ZAUBERE Testzauber BURG <bnr>");
     spell.sp->sptyp = 0;
 
     set_parameter(spell, "b");
-    check_spell_syntax(tc, "b", &spell, "  ZAUBERE \"Testzauber\" <bnr>");
+    check_spell_syntax(tc, "b", &spell, "ZAUBERE Testzauber <bnr>");
 
     set_parameter(spell, "s");
-    check_spell_syntax(tc, "s", &spell, "  ZAUBERE \"Testzauber\" <snr>");
+    check_spell_syntax(tc, "s", &spell, "ZAUBERE Testzauber <snr>");
 
     set_parameter(spell, "s+");
-    check_spell_syntax(tc, "s+", &spell, "  ZAUBERE \"Testzauber\" <snr> [<snr> ...]");
+    check_spell_syntax(tc, "s+", &spell, "ZAUBERE Testzauber <snr> [<snr> ...]");
 
     set_parameter(spell, "u");
-    check_spell_syntax(tc, "u", &spell, "  ZAUBERE \"Testzauber\" <enr>");
+    check_spell_syntax(tc, "u", &spell, "ZAUBERE Testzauber <enr>");
 
     set_parameter(spell, "r");
-    check_spell_syntax(tc, "r", &spell, "  ZAUBERE \"Testzauber\" <x> <y>");
+    check_spell_syntax(tc, "r", &spell, "ZAUBERE Testzauber <x> <y>");
 
     set_parameter(spell, "bc");
     free(spell.sp->syntax);
     spell.sp->syntax = str_strdup("hodor");
-    check_spell_syntax(tc, "bc hodor", &spell, "  ZAUBERE \"Testzauber\" <bnr> <Hodor>");
+    check_spell_syntax(tc, "bc hodor", &spell, "ZAUBERE Testzauber <bnr> <Hodor>");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
     set_parameter(spell, "c?");
     free(spell.sp->syntax);
     spell.sp->syntax = str_strdup("hodor");
-    check_spell_syntax(tc, "c?", &spell, "  ZAUBERE \"Testzauber\" [<Hodor>]");
+    check_spell_syntax(tc, "c?", &spell, "ZAUBERE Testzauber [<Hodor>]");
     free(spell.sp->syntax);
     spell.sp->syntax = 0;
 
     set_parameter(spell, "kc+");
     check_spell_syntax(tc, "kc+", &spell,
-        "  ZAUBERE \"Testzauber\" ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr>\n  [<snr> ...] | BURG <bnr> [<bnr> ...] )");
+        "ZAUBERE Testzauber ( REGION | EINHEIT <enr> [<enr> ...] | SCHIFF <snr> [<snr> ...] | BURG <bnr> [<bnr> ...] )");
 
     cleanup_spell_fixture(&spell);
     test_teardown();

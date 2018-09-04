@@ -84,7 +84,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         sbs_strcat(&sbs, str);
         if (ord->id < 0) {
             skill_t sk = (skill_t)(100+ord->id);
-            assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+            assert((kwd == K_STUDY || kwd == K_AUTOSTUDY) && sk != SK_MAGIC && sk < MAXSKILLS);
             str = skillname(sk, lang);
             if (str) {
                 if (strchr(str, ' ') == NULL) {
@@ -214,12 +214,12 @@ static int create_data(keyword_t kwd, const char *s,
     order_data *data;
     int id;
 
-    assert(kwd!=NOKEYWORD);
+    assert(kwd != NOKEYWORD);
 
     if (!s || *s == 0) {
         return 0;
     }
-    if (kwd==K_STUDY) {
+    if (kwd == K_STUDY || kwd == K_AUTOSTUDY) {
         const char * sptr = s;
         skill_t sk = get_skill(parse_token_depr(&sptr), lang);
         if (sk != SK_MAGIC && sk != NOSKILL) {
@@ -332,6 +332,14 @@ order *parse_order(const char *s, const struct locale * lang)
                 sptr = sp;
             }
         }
+        else if (kwd == K_STUDY) {
+            const char *sp = sptr;
+            p = parse_token_depr(&sp);
+            if (p && isparam(p, lang, P_AUTO)) {
+                kwd = K_AUTOSTUDY;
+                sptr = sp;
+            }
+        }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
             create_order_i(ord, kwd, sptr, persistent, noerror, lang);
@@ -366,6 +374,7 @@ bool is_repeated(keyword_t kwd)
     case K_STEAL:
     case K_SABOTAGE:
     case K_STUDY:
+    case K_AUTOSTUDY:
     case K_TEACH:
     case K_GROW:
     case K_PLANT:
@@ -406,6 +415,7 @@ bool is_exclusive(const order * ord)
     case K_STEAL:
     case K_SABOTAGE:
     case K_STUDY:
+    case K_AUTOSTUDY:
     case K_TEACH:
     case K_GROW:
     case K_PLANT:
@@ -447,6 +457,7 @@ bool is_long(keyword_t kwd)
     case K_STEAL:
     case K_SABOTAGE:
     case K_STUDY:
+    case K_AUTOSTUDY:
     case K_TEACH:
     case K_GROW:
     case K_PLANT:
@@ -541,7 +552,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
 
             assert(sk < MAXSKILLS);
             assert(lang);
-            assert(kwd == K_STUDY);
+            assert(kwd == K_STUDY || kwd == K_AUTOSTUDY);
             str = skillname(sk, lang);
             if (strchr(str, ' ') == NULL) {
                 init_tokens_str(str);
@@ -575,7 +586,7 @@ keyword_t init_order_depr(const struct order *ord)
 {
     if (ord) {
         keyword_t kwd = ORD_KEYWORD(ord);
-        assert(kwd != K_STUDY);
+        assert(kwd != K_STUDY && kwd != K_AUTOSTUDY);
     }
     return init_order(ord, NULL);
 }

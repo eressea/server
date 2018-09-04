@@ -89,15 +89,15 @@ static void setup_teacher(study_fixture *fix, skill_t sk) {
     setup_locale(lang);
     fix->u = test_create_unit(f, r);
     assert(fix->u);
-    fix->u->thisorder = create_order(K_STUDY, f->locale, "%s", skillnames[sk]);
+    fix->u->thisorder = create_order(K_STUDY, f->locale, skillnames[sk]);
 
     fix->teachers[0] = test_create_unit(f, r);
     assert(fix->teachers[0]);
-    fix->teachers[0]->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(fix->u->no));
+    fix->teachers[0]->thisorder = create_order(K_TEACH, f->locale, itoa36(fix->u->no));
 
     fix->teachers[1] = test_create_unit(f, r);
     assert(fix->teachers[1]);
-    fix->teachers[1]->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(fix->u->no));
+    fix->teachers[1]->thisorder = create_order(K_TEACH, f->locale, itoa36(fix->u->no));
     test_clear_messages(f);
 }
 
@@ -110,7 +110,7 @@ static void test_study_no_teacher(CuTest *tc) {
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
+    CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
     test_teardown();
 }
 
@@ -121,7 +121,7 @@ static void test_study_with_teacher(CuTest *tc) {
     setup_teacher(&fix, SK_CROSSBOW);
     set_level(fix.teachers[0], SK_CROSSBOW, TEACHDIFFERENCE);
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
-    CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
+    CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
@@ -288,7 +288,7 @@ static void test_academy_bonus(CuTest *tc) {
     u1 = test_create_unit(u->faction, u->region);
     u3 = test_create_unit(u->faction, u->region);
     u0->thisorder = create_order(K_TEACH, loc, "%s %s", itoa36(u3->no), itoa36(u1->no));
-    u->thisorder = create_order(K_TEACH, loc, "%s", itoa36(u1->no));
+    u->thisorder = create_order(K_TEACH, loc, itoa36(u1->no));
     u1->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
     u3->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
     
@@ -405,7 +405,7 @@ static void test_study_magic(CuTest *tc) {
     f = test_create_faction(NULL);
     lang = f->locale;
     u = test_create_unit(f, test_create_region(0, 0, NULL));
-    u->thisorder = create_order(K_STUDY, lang, "%s", skillnames[SK_MAGIC]);
+    u->thisorder = create_order(K_STUDY, lang, skillnames[SK_MAGIC]);
     itype = test_create_silver();
 
     CuAssertIntEquals(tc, -1, study_cmd(u, u->thisorder));
@@ -423,7 +423,7 @@ static void test_study_magic(CuTest *tc) {
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertPtrNotNull(tc, get_mage_depr(u));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error65"));
     CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
 
     test_teardown();
@@ -491,12 +491,12 @@ static void test_teach_magic(CuTest *tc) {
     f = test_create_faction(NULL);
     f->magiegebiet = M_GWYRRD;
     u = test_create_unit(f, test_create_region(0, 0, NULL));
-    u->thisorder = create_order(K_STUDY, f->locale, "%s", skillnames[SK_MAGIC]);
+    u->thisorder = create_order(K_STUDY, f->locale, skillnames[SK_MAGIC]);
     i_change(&u->items, itype, study_cost(u, SK_MAGIC));
     ut = test_create_unit(f, u->region);
     set_level(ut, SK_MAGIC, TEACHDIFFERENCE);
     create_mage(ut, M_GWYRRD);
-    ut->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(u->no));
+    ut->thisorder = create_order(K_TEACH, f->locale, itoa36(u->no));
     learn_inject();
     teach_cmd(ut, ut->thisorder);
     study_cmd(u, u->thisorder);

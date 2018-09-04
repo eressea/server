@@ -1773,7 +1773,7 @@ msgid "storm"
 msgstr "\"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$if($sink,\" und sinkt\",\"\").\""
 
 msgid "nr_insectwinter"
-msgstr "Es ist Winter, und Insekten können nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."
+msgstr "Insekten können wegen des Winterwetters in der kommenden Woche nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."
 
 msgid "spellfail_nomonsters"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Monster gezaubert werden.\""
@@ -2121,7 +2121,7 @@ msgid "missing_components"
 msgstr "\"$unit($unit) hat nicht genügend Komponenten um $spell($spell) auf Stufe $int($level) zu zaubern.\""
 
 msgid "seduce_effect_1"
-msgstr "\"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und gut verspielt.\""
+msgstr "\"$unit($unit) verfiel dem Glücksspiel und hat fast sein ganzes Hab und Gut verspielt.\""
 
 msgid "xmastree_effect"
 msgstr "\"In der Region erstrahlen des Nachts bunte Lichter, Gloeckchen klingeln und frohes Kindergelaechter klingt durch den Wald.\""
@@ -2302,9 +2302,6 @@ msgstr "\"$unit($mage) erleidet durch den Tod seines Vertrauten einen Schock.\""
 
 msgid "error269"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man nicht zaubern.\""
-
-msgid "sink_saved_msg"
-msgstr "\"$unit($unit) überlebt unbeschadet und rettet sich nach $region($region).\""
 
 msgid "race_noregroup"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können nicht neu gruppiert werden.\""
@@ -2654,9 +2651,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kan
 msgid "analyse_building_noage"
 msgstr "\"$unit($mage) fand heraus, dass auf $building($building) der Zauber '$curse($curse)' liegt, dessen Kraft ausreicht, um noch Jahrhunderte bestehen zu bleiben.\""
 
-msgid "sink_lost_msg"
-msgstr "\"$int($amount) Personen von $unit($unit) ertrinken.$if($isnull($region),\"\",\" Die Einheit rettet sich nach $region($region).\")\""
-
 msgid "error130"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax: MAGIEGEBIET [1-5].\""
 
@@ -2733,7 +2727,7 @@ msgid "volcanostartsmoke"
 msgstr "\"Aus dem Vulkankrater von $region($region) steigt plötzlich Rauch.\""
 
 msgid "nr_insectfall"
-msgstr "Es ist Spätherbst, und diese Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können."
+msgstr "Es ist Spätherbst, und die kommende Woche ist die letzte vor dem Winter, in der Insekten rekrutieren können."
 
 msgid "error296"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier werden niemals Bäume wachsen.\""

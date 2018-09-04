@@ -50,6 +50,7 @@ extern "C" {
     void sbs_strcat(struct sbstring *sbs, const char *str);
     void sbs_strncat(struct sbstring *sbs, const char *str, size_t size);
     void sbs_strcpy(struct sbstring *sbs, const char *str);
+    size_t sbs_length(const struct sbstring *sbs);
 
     /* benchmark for units:
      * JENKINS_HASH: 5.25 misses/hit (with good cache behavior)

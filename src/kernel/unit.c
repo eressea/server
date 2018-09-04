@@ -1310,13 +1310,12 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
     return 0;
 }
 
-int effskill_study(const unit * u, skill_t sk, const region * r)
+int effskill_study(const unit * u, skill_t sk)
 {
     skill *sv = unit_skill(u, sk);
     if (sv && sv->level > 0) {
         int mlevel = sv->level;
-        if (!r) r = u->region;
-        mlevel += get_modifier(u, sv->id, sv->level, r, true);
+        mlevel += get_modifier(u, sv->id, sv->level, u->region, true);
         if (mlevel > 0)
             return mlevel;
     }

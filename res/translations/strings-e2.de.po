@@ -1,0 +1,49 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"X-Generator: Poedit 2.0.7\n"
+
+msgctxt "spellinfo"
+msgid "concealing_aura"
+msgstr "Dieser Zauber wird die gesamte Ausrüstung der Zieleinheit für einige Zeit vor den Blicken anderer verschleiern."
+
+msgctxt "spellinfo"
+msgid "raindance"
+msgstr "Dieses uralte Tanzritual ruft die Kräfte des Lebens und der Fruchtbarkeit. Die Erträge der Bauern werden für einige Wochen deutlich besser ausfallen."
+
+msgctxt "spellinfo"
+msgid "earn_silver#gwyrrd"
+msgstr "Die Fähigkeiten der Gwyrrd-Magier in der Viehzucht und Heilung sind bei den Bauern sehr begehrt. Gerade auf Märkten sind ihre Dienste häufig sehr gefragt. Manch einer mag auch sein Talent dazu nutzen, ein Tier für einen besseren Preis zu verkaufen. Pro Stufe kann der Magier so 50 Silber verdienen."
+
+msgctxt "spellinfo"
+msgid "earn_silver#draig"
+msgstr "In den dunkleren Gassen gibt es sie, die Flüche und Verhexungen auf Bestellung. Aber auch Gegenzauber hat der Jünger des Draigs natürlich im Angebot. Ob nun der Sohn des Nachbarn in einen Liebesbann gezogen werden soll oder die Nebenbuhlerin Pickel und Warzen bekommen soll, niemand gibt gerne zu, zu solchen Mitteln gegriffen zu haben. Für diese Dienstleistung streicht der Magier 50 Silber pro Stufe ein."
+
+msgctxt "spellinfo"
+msgid "earn_silver#cerddor"
+msgstr "Cerddormagier sind die führenden Gaukler unter den Magiern, sie lieben es das Volk zu unterhalten und im Mittelpunkt zu stehen. Schon Anfänger lernen die kleinen Kunststücke und magischen Tricks, mit denen man das Volk locken und verführen kann, den Geldbeutel ganz weit zu öffnen, und am Ende der Woche wird der Gaukler 50 Silber pro Stufe verdient haben."
+
+msgctxt "spellinfo"
+msgid "earn_silver#tybied"
+msgstr "Wenn einem der Alchemist nicht weiterhelfen kann, geht man zu dem gelehrten Tybiedmagier. Seine Tränke und Tinkturen helfen gegen alles, was man sonst nicht bekommen kann. Ob nun die kryptische Formel unter dem Holzschuh des untreuen Ehemannes wirklich geholfen hat - nun, der des Lesens nicht mächtige Bauer wird es nie wissen. Dem Magier hilft es auf jeden Fall... beim Füllen seines Geldbeutels. 50 Silber pro Stufe lassen sich so in einer Woche verdienen."
+
+msgctxt "spellinfo"
+msgid "earn_silver#illaun"
+msgstr "Niemand kann so gut die Träume deuten wie ein Magier des Illaun. Auch die Kunst der Wahrsagerei, des Kartenlegens und des Handlesens sind ihm geläufig. Dafür zahlen ihm die Bauern 50 Silber pro Stufe."
+
+msgctxt "describe"
+msgid "lifepotion"
+msgstr "Das 'Wasser des Lebens' ist in der Lage, aus gefällten Baumstämmen wieder lebende Bäume zu machen. Dazu wird ein knotiger Saugwurz zusammen mit einem Elfenlieb erwärmt, so dass man gerade noch den Finger reinhalten kann. Dies gieße man in ein Gefäß und lasse es langsam abkühlen. Der Extrakt reicht für 10 Holzstämme."
+
+msgctxt "spellinfo"
+msgid "blessedharvest"
+msgstr "Dieses Ernteritual verbessert die Erträge der arbeitenden Bauern in der Region um ein Silberstück. Je mehr Kraft der Druide investiert, desto länger wirkt der Zauber."
+
