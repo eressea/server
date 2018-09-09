@@ -29,26 +29,9 @@ extern "C" {
     struct unit;
     struct selist;
 
-    int teach_cmd(struct unit *u, struct order *ord);
-    int study_cmd(struct unit *u, struct order *ord);
-
-    magic_t getmagicskill(const struct locale *lang);
-    skill_t getskill(const struct locale *lang);
-    bool is_migrant(struct unit *u);
-    int study_cost(struct unit *u, skill_t talent);
-
-    typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
-
 #define STUDYDAYS 30
-    void learn_skill(struct unit *u, skill_t sk, int days);
-    void reduce_skill_days(struct unit *u, skill_t sk, int days);
-
-    void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn);
-
-    void demon_skillchange(struct unit *u);
-
 #define TEACHNUMBER 10
+
     typedef struct teaching_info {
         struct selist *teachers;
         int students;
@@ -56,6 +39,24 @@ extern "C" {
     } teaching_info;
 
     extern const struct attrib_type at_learning;
+
+    int teach_cmd(struct unit *u, struct order *ord);
+    int study_cmd(struct unit *u, struct order *ord);
+
+    magic_t getmagicskill(const struct locale *lang);
+    skill_t getskill(const struct locale *lang);
+    bool is_migrant(struct unit *u);
+    int study_cost(struct unit *u, skill_t sk);
+
+    typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
+
+    void learn_skill(struct unit *u, skill_t sk, int days);
+    void reduce_skill_days(struct unit *u, skill_t sk, int days);
+
+    void produceexp(struct unit *u, skill_t sk, int n);
+    void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn);
+
+    void demon_skillchange(struct unit *u);
 
     void inject_learn(learn_fun fun);
 
