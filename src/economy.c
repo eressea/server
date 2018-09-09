@@ -1660,7 +1660,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
             return;
         }
     }
-    if (r_demand(r, ltype)) {
+    if (!r->land || r_demand(r, ltype)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", ""));
         return;
     }
@@ -1702,6 +1702,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     static int bt_cache;
     static const struct building_type *castle_bt, *harbour_bt, *caravan_bt;
 
+    assert(r->land);
     if (bt_changed(&bt_cache)) {
         castle_bt = bt_find("castle");
         harbour_bt = bt_find("harbour");
@@ -1971,7 +1972,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         econ_request *o;
         int k, available;
 
-        if (!r_demand(r, ltype)) {
+        if (!r->land || !r_demand(r, ltype)) {
             cmistake(u, ord, 263, MSG_COMMERCE);
             return false;
         }
