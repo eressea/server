@@ -49,5 +49,7 @@ void init_skills(const struct locale *lang);
 void init_skill(const struct locale *lang, skill_t kwd, const char *str);
 void enable_skill(skill_t sk, bool enabled);
 bool skill_enabled(skill_t sk);
+int skill_cost(skill_t sk);
+bool expensive_skill(skill_t sk);
 
 #endif
