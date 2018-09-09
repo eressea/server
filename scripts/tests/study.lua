@@ -24,7 +24,7 @@ end
 
 function test_study()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:add_order("LERNEN Armbrust")
     process_orders()
@@ -33,7 +33,7 @@ end
 
 function test_study_expensive()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     eressea.settings.set("skills.cost.alchemy", "50")
     u:add_order("LERNEN Alchemie")
@@ -45,7 +45,7 @@ end
 
 function test_unit_spells()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u.magic = "gray"
     u:set_skill("magic", 1)
@@ -75,7 +75,7 @@ end
 
 function test_study_no_teacher()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = make_student(f, r, 1)
     u1:set_skill("crossbow", 1)
     process_orders()
@@ -84,7 +84,7 @@ end
 
 function test_study_with_teacher()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = make_student(f, r, 1)
 
     make_teacher(u1)
@@ -95,7 +95,7 @@ end
 
 function test_study_too_many_students()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = make_student(f, r, 20, "Taktik")
     u1.name = "Student"
     u1:add_item("money", 201*u1.number)
@@ -106,7 +106,7 @@ end
 
 function test_study_multiple_teachers()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = make_student(f, r, 20, "Taktik")
     u1.name = "Student"
     u1:add_item("money", 201*u1.number)
