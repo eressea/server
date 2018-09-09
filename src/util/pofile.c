@@ -66,6 +66,7 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
 
     if (!F) {
         log_error("could not open %s", filename);
+        return -1;
     }
 
     msgctxt[0] = 0;
@@ -106,10 +107,10 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
             line = read_line(F);
         }
     }
-    if (ferror(F)) {
-        log_error("read error in %s:%d.", filename, po_lineno);
-        return -1;
-    }
+    err = ferror(F);
     fclose(F);
+    if (err) {
+        log_error("read error %d in %s:%d.", err, filename, po_lineno);
+    }
     return err;
 }

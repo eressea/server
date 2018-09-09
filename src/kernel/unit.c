@@ -1310,13 +1310,12 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
     return 0;
 }
 
-int effskill_study(const unit * u, skill_t sk, const region * r)
+int effskill_study(const unit * u, skill_t sk)
 {
     skill *sv = unit_skill(u, sk);
     if (sv && sv->level > 0) {
         int mlevel = sv->level;
-        if (!r) r = u->region;
-        mlevel += get_modifier(u, sv->id, sv->level, r, true);
+        mlevel += get_modifier(u, sv->id, sv->level, u->region, true);
         if (mlevel > 0)
             return mlevel;
     }
@@ -1918,9 +1917,11 @@ int getunit(const region * r, const faction * f, unit **uresult)
 int besieged(const unit * u)
 {
     /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
+    if (u && !keyword_disabled(K_BESIEGE) && u->building) {
+        building * b = u->building;
+        return building_get_siege(b) >= b->size * SIEGEFACTOR;
+    }
+    return false;
 }
 
 bool has_horses(const unit * u)

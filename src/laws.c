@@ -26,6 +26,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <modules/gmcmd.h>
 
 #include "alchemy.h"
+#include "automate.h"
 #include "battle.h"
 #include "economy.h"
 #include "keyword.h"
@@ -305,6 +306,11 @@ static void calculate_emigration(region * r)
     }
 }
 
+/* Vermehrungsrate Bauern in 1/10000.
+* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen hoeher. */
+#define PEASANTGROWTH 10
+#define PEASANTLUCK 10
+#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 
 static double peasant_growth_factor(void)
 {
@@ -907,7 +913,7 @@ static int slipthru(const region * r, const unit * u, const building * b)
     int n, o;
 
     /* b ist die burg, in die man hinein oder aus der man heraus will. */
-    if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
+    if (b == NULL || building_get_siege(b) < b->size * SIEGEFACTOR) {
         return 1;
     }
 
@@ -3636,6 +3642,24 @@ void add_proc_unit(int priority, void(*process) (unit *), const char *name)
     }
 }
 
+bool long_order_allowed(const unit *u)
+{
+    const region *r = u->region;
+    if (fval(u, UFL_LONGACTION)) {
+        /* this message was already given in laws.update_long_order
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        */
+        return false;
+    }
+    else if (fval(r->terrain, SEA_REGION)
+        && u_race(u) != get_race(RC_AQUARIAN)
+        && !(u_race(u)->flags & RCF_SWIM)) {
+        /* error message disabled by popular demand */
+        return false;
+    }
+    return true;
+}
+
 /* per priority, execute processors in order from PR_GLOBAL down to PR_ORDER */
 void process(void)
 {
@@ -3705,16 +3729,7 @@ void process(void)
                                         cmistake(u, ord, 224, MSG_MAGIC);
                                         ord = NULL;
                                     }
-                                    else if (fval(u, UFL_LONGACTION)) {
-                                        /* this message was already given in laws.update_long_order
-                                           cmistake(u, ord, 52, MSG_PRODUCE);
-                                           */
-                                        ord = NULL;
-                                    }
-                                    else if (fval(r->terrain, SEA_REGION)
-                                        && u_race(u) != get_race(RC_AQUARIAN)
-                                        && !(u_race(u)->flags & RCF_SWIM)) {
-                                        /* error message disabled by popular demand */
+                                    else if (!long_order_allowed(u)) {
                                         ord = NULL;
                                     }
                                 }
@@ -3847,7 +3862,7 @@ int siege_cmd(unit * u, order * ord)
 
     usetsiege(u, b);
     if (katapultiere < bewaffnete) katapultiere = bewaffnete;
-    b->besieged += katapultiere;
+    building_add_siege(b, katapultiere);
 
     /* definitiver schaden eingeschraenkt */
     if (d > b->size - 1) d = b->size - 1;
@@ -4001,6 +4016,7 @@ void init_processor(void)
     }
 
     p += 10;
+    add_proc_region(p, do_autostudy, "study automation");
     add_proc_order(p, K_TEACH, teach_cmd, PROC_THISORDER | PROC_LONGORDER,
         "Lehren");
     p += 10;
@@ -4155,7 +4171,7 @@ void update_subscriptions(void)
 /** determine if unit can be seen by faction
  * @param f -- the observiong faction
  * @param u -- the unit that is observed
- * @param r -- the region that u is obesrved in (see below)
+ * @param r -- the region that u is obesrved from (see below)
  * @param m -- terrain modifier to stealth
  * 
  * r kann != u->region sein, wenn es um Durchreisen geht,
