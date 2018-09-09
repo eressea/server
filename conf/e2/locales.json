@@ -1,7 +1,9 @@
 {
     "include": [
       "config://res/translations/strings.de.po",
+      "config://res/translations/strings-e2.de.po",
       "config://res/translations/strings.en.po",
+      "config://res/translations/strings-e2.en.po",
       "config://res/translations/messages.de.po",
       "config://res/translations/messages.en.po",
       "config://res/core/messages.xml"

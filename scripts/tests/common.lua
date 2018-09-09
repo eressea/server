@@ -338,45 +338,6 @@ function test_message()
   return msg
 end
 
-function test_events()
-  local fail = 1
-  local function msg_handler(u, evt)
-    str = evt:get(0)
-    u2 = evt:get(1)
-    assert(u2~=nil)
-    assert(str=="Du Elf stinken")
-    message_unit(u, u2, "thanks unit, i got your message: " .. str)
-    message_faction(u, u2.faction, "thanks faction, i got your message: " .. str)
-    message_region(u, "thanks region, i got your message: " .. str)
-    fail = 0
-  end
-
-  plain = region.create(0, 0, "plain")
-  skill = 8
-
-  f = create_faction('elf')
-  f.age = 20
-
-  u = unit.create(f, plain)
-  u.number = 1
-  u:add_item("money", u.number*100)
-  u:clear_orders()
-  u:add_order("NUMMER PARTEI test")
-  u:add_handler("message", msg_handler)
-  msg = "BOTSCHAFT EINHEIT " .. itoa36(u.id) .. " Du~Elf~stinken"
-  f = create_faction('elf')
-  f.age = 20
-
-  u = unit.create(f, plain)
-  u.number = 1
-  u:add_item("money", u.number*100)
-  u:clear_orders()
-  u:add_order("NUMMER PARTEI eviL")
-  u:add_order(msg)
-  process_orders()
-  assert(fail==0)
-end
-
 function test_renumber_ship()
     local r = region.create(0, 0, "plain")
     local f = create_faction('human')

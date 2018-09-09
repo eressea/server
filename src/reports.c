@@ -1353,6 +1353,13 @@ static void add_seen_nb(faction *f, region *r, seen_mode mode) {
     update_interval(f, last);
 }
 
+static void add_seen_lighthouse(region *r, faction *f)
+{
+    if (r->terrain->flags & SEA_REGION) {
+        add_seen_nb(f, r, seen_lighthouse);
+    }
+}
+
 /** mark all regions seen by the lighthouse.
  */
 static void prepare_lighthouse_ql(faction *f, selist *rlist) {
@@ -1361,9 +1368,7 @@ static void prepare_lighthouse_ql(faction *f, selist *rlist) {
 
     for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
         region *rl = (region *)selist_get(ql, qi);
-        if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-            add_seen_nb(f, rl, seen_lighthouse);
-        }
+        add_seen_lighthouse(rl, f);
     }
 }
 
@@ -1382,9 +1387,7 @@ static void prepare_lighthouse(faction *f, region *r, int range)
         assert(n > 0 && n <= 64);
         for (i = 0; i != n; ++i) {
             region *rl = result[i];
-            if (!fval(rl->terrain, FORBIDDEN_REGION)) {
-                add_seen_nb(f, rl, seen_lighthouse);
-            }
+            add_seen_lighthouse(rl, f);
         }
     }
 }
@@ -1514,24 +1517,23 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
     }
 }
 
-void report_warnings(faction *f, const gamedate *date)
+void report_warnings(faction *f, int now)
 {
     if (f->age < NewbieImmunity()) {
         ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
             NewbieImmunity() - f->age));
     }
 
-    if (date) {
-        if (f->race == get_race(RC_INSECT)) {
-            if (date->season == 0) {
-                ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
-            }
-            else {
-                gamedate next;
-                get_gamedate(date->turn + 1, &next);
-                if (next.season == 0) {
-                    ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
-                }
+    if (f->race == get_race(RC_INSECT)) {
+        gamedate date;
+        get_gamedate(now + 1, &date);
+
+        if (date.season == SEASON_WINTER) {
+            ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
+        }
+        else if (date.season == SEASON_AUTUMN) {
+            if (get_gamedate(now + 2 + 2, &date)->season == SEASON_WINTER) {
+                ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
             }
         }
     }
@@ -1549,11 +1551,9 @@ void prepare_report(report_context *ctx, faction *f)
     static bool rule_region_owners;
     static bool rule_lighthouse_units;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
-    gamedate now;
 
     /* Insekten-Winter-Warnung */
-    get_gamedate(turn, &now);
-    report_warnings(f, &now);
+    report_warnings(f, turn);
 
     if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
@@ -1592,8 +1592,8 @@ void prepare_report(report_context *ctx, faction *f)
                 if (rule_region_owners && f == region_get_owner(r)) {
                     for (b = rbuildings(r); b; b = b->next) {
                         if (b && b->type == bt_lighthouse) {
-                            /* region owners get maximm range */
-                            int lhr = lighthouse_range(b, NULL, NULL);
+                            /* region owners get maximum range */
+                            int lhr = lighthouse_view_distance(b, NULL);
                             if (lhr > range) range = lhr;
                         }
                     }
@@ -1610,7 +1610,7 @@ void prepare_report(report_context *ctx, faction *f)
                      */
                     if (!fval(r, RF_LIGHTHOUSE)) {
                         /* it's enough to add the region once, and if there are
-                        * no lighthouses, there is no need to look at more units */
+                         * no lighthouses here, there is no need to look at more units */
                         break;
                     }
                 }
@@ -1630,10 +1630,10 @@ void prepare_report(report_context *ctx, faction *f)
                         /* unit is one of ours, and inside the current lighthouse */
                         if (br == 0) {
                             /* lazy-calculate the range */
-                            br = lighthouse_range(u->building, f, u);
-                        }
-                        if (br > range) {
-                            range = br;
+                            br = lighthouse_view_distance(b, u);
+                            if (br > range) {
+                                range = br;
+                            }
                         }
                     }
                 }
@@ -2179,10 +2179,10 @@ void report_battle_start(battle * b)
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        sbs_strcpy(&sbs, ", ");
+                        sbs_strcat(&sbs, ", ");
                     }
                     if (lastf) {
-                        sbs_strcpy(&sbs, lastf);
+                        sbs_strcat(&sbs, lastf);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2193,12 +2193,12 @@ void report_battle_start(battle * b)
                 }
             }
         }
-        if (first) {
-            sbs_strcat(&sbs, " ");
-            sbs_strcat(&sbs, LOC(f->locale, "and"));
-            sbs_strcat(&sbs, " ");
-        }
         if (lastf) {
+            if (first) {
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, LOC(f->locale, "and"));
+                sbs_strcat(&sbs, " ");
+            }
             sbs_strcat(&sbs, lastf);
         }
 

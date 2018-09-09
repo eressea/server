@@ -20,13 +20,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
-#include "chaos.h"
 #include "guard.h"
 #include "laws.h"
 #include "monsters.h"
 #include "move.h"
 #include "skill.h"
 #include "study.h"
+#include "spy.h"
 
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
@@ -2531,7 +2531,6 @@ static void battle_effects(battle * b, int dead_players)
         }
         if (dead_peasants) {
             deathcounts(r, dead_peasants + dead_players);
-            add_chaoscount(r, dead_peasants / 2);
             rsetpeasants(r, rp - dead_peasants);
         }
     }
@@ -2789,10 +2788,12 @@ static void aftermath(battle * b)
             ship *sh = *sp;
             freset(sh, SF_DAMAGED);
             if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                sink_ship(sh);
                 remove_ship(sp, sh);
             }
-            if (*sp == sh)
+            else {
                 sp = &sh->next;
+            }
         }
     }
 
@@ -3325,7 +3326,7 @@ fighter * get_fighter(battle * b, const struct unit * u)
     return 0;
 }
 
-static int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
+int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     side *s;
     fighter *fc = NULL;

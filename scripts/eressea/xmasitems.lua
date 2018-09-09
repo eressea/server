@@ -99,8 +99,6 @@ function self.update()
                     r:set_resource("tree", trees * 1.1)
                     msg:send_region(r)
                 end
-                if clear then
-                end
             end
         end
     else

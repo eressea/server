@@ -115,7 +115,7 @@ extern "C" {
         int size, const struct faction *viewer, bool see_unit);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
-    void report_warnings(struct faction *f, const struct gamedate *date);
+    void report_warnings(struct faction *f, int now);
     void report_raceinfo(const struct race *rc, const struct locale *lang, char *buf, size_t length);
     void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,

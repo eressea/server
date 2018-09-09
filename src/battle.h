@@ -261,6 +261,7 @@ extern "C" {
     void free_battle(struct battle * b);
     struct fighter *make_fighter(struct battle *b, struct unit *u,
     struct side * s, bool attack);
+    int join_battle(struct battle * b, struct unit * u, bool attack, struct fighter ** cp);
     struct side *make_side(struct battle * b, const struct faction * f,
         const struct group * g, unsigned int flags,
         const struct faction * stealthfaction);

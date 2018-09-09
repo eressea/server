@@ -79,7 +79,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <util/attrib.h>
 #include <util/base36.h>
-#include <util/bsdstring.h>
+#include "util/bsdstring.h"
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -243,39 +243,44 @@ static size_t write_spell_modifier(const spell * sp, int flag, const char * str,
     return 0;
 }
 
-void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
+void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct locale *lang)
 {
-    int bytes;
-    char buf[4096];
-    char *bufp = buf;
-    size_t size = sizeof(buf) - 1;
     const spell *sp = spellref_get(&sbe->spref);
     const char *params = sp->parameter;
+    const char *spname;
+    sbstring sbs;
 
+    sbs_init(&sbs, buf, size);
     if (sp->sptyp & ISCOMBATSPELL) {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, keyword(K_COMBATSPELL)), size);
+        sbs_strcpy(&sbs, LOC(lang, keyword(K_COMBATSPELL)));
     }
     else {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, keyword(K_CAST)), size);
+        sbs_strcpy(&sbs, LOC(lang, keyword(K_CAST)));
     }
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
 
     /* Reihenfolge beachten: Erst REGION, dann STUFE! */
     if (sp->sptyp & FARCASTING) {
-        bytes = snprintf(bufp, size, " [%s x y]", LOC(lang, parameters[P_REGION]));
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " [");
+        sbs_strcat(&sbs, LOC(lang, parameters[P_REGION]));
+        sbs_strcat(&sbs, " x y]");
     }
     if (sp->sptyp & SPELLLEVEL) {
-        bytes = snprintf(bufp, size, " [%s n]", LOC(lang, parameters[P_LEVEL]));
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " [");
+        sbs_strcat(&sbs, LOC(lang, parameters[P_LEVEL]));
+        sbs_strcat(&sbs, " n]");
     }
 
-    bytes = (int)snprintf(bufp, size, " \"%s\"", spell_name(sp, lang));
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    spname = spell_name(sp, lang);
+    if (strchr(spname, ' ') != NULL) {
+        /* contains spaces, needs quotes */
+        sbs_strcat(&sbs, " '");
+        sbs_strcat(&sbs, spname);
+        sbs_strcat(&sbs, "'");
+    }
+    else {
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, spname);
+    }
 
     while (params && *params) {
         typedef struct starget {
@@ -298,52 +303,48 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
         if (cp == 'u') {
             targetp = targets + 1;
             locp = LOC(lang, targetp->vars);
-            bytes = (int)snprintf(bufp, size, " <%s>", locp);
+            sbs_strcat(&sbs, " <");
+            sbs_strcat(&sbs, locp);
+            sbs_strcat(&sbs, ">");
             if (*params == '+') {
                 ++params;
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+                sbs_strcat(&sbs, " [<");
+                sbs_strcat(&sbs, locp);
+                sbs_strcat(&sbs, "> ...]");
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
         else if (cp == 's') {
             targetp = targets + 2;
             locp = LOC(lang, targetp->vars);
-            bytes = (int)snprintf(bufp, size, " <%s>", locp);
+            sbs_strcat(&sbs, " <");
+            sbs_strcat(&sbs, locp);
+            sbs_strcat(&sbs, ">");
             if (*params == '+') {
                 ++params;
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+                sbs_strcat(&sbs, " [<");
+                sbs_strcat(&sbs, locp);
+                sbs_strcat(&sbs, "> ...]");
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
         else if (cp == 'r') {
-            bytes = (int)str_strlcpy(bufp, " <x> <y>", size);
+            sbs_strcat(&sbs, " <x> <y>");
             if (*params == '+') {
                 ++params;
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)str_strlcpy(bufp, " [<x> <y> ...]", size);
+                sbs_strcat(&sbs, " [<x> <y> ...]");
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
         else if (cp == 'b') {
             targetp = targets + 3;
             locp = LOC(lang, targetp->vars);
-            bytes = (int)snprintf(bufp, size, " <%s>", locp);
+            sbs_strcat(&sbs, " <");
+            sbs_strcat(&sbs, locp);
+            sbs_strcat(&sbs, ">");
             if (*params == '+') {
                 ++params;
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-                bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+                sbs_strcat(&sbs, " [<");
+                sbs_strcat(&sbs, locp);
+                sbs_strcat(&sbs, "> ...]");
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
         else if (cp == 'k') {
             int i, maxparam = 0;
@@ -361,41 +362,35 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
                     ++maxparam;
             }
             if (!maxparam || maxparam > 1) {
-                bytes = (int)str_strlcpy(bufp, " (", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                sbs_strcat(&sbs, " (");
             }
             i = 0;
             for (targetp = targets; targetp->flag; ++targetp) {
                 if (!maxparam || sp->sptyp & targetp->flag) {
                     if (i++ != 0) {
-                        bytes = (int)str_strlcpy(bufp, " |", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
+                        sbs_strcat(&sbs, " |");
                     }
                     if (targetp->param && targetp->vars) {
                         locp = LOC(lang, targetp->vars);
-                        bytes =
-                            (int)snprintf(bufp, size, " %s <%s>", parameters[targetp->param],
-                                locp);
+                        sbs_strcat(&sbs, " ");
+                        sbs_strcat(&sbs, parameters[targetp->param]);
+                        sbs_strcat(&sbs, " <");
+                        sbs_strcat(&sbs, locp);
+                        sbs_strcat(&sbs, ">");
                         if (multi) {
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
-                            bytes = (int)snprintf(bufp, size, " [<%s> ...]", locp);
+                            sbs_strcat(&sbs, " [<");
+                            sbs_strcat(&sbs, locp);
+                            sbs_strcat(&sbs, "> ...]");
                         }
                     }
                     else {
-                        bytes =
-                            (int)snprintf(bufp, size, " %s", parameters[targetp->param]);
+                        sbs_strcat(&sbs, " ");
+                        sbs_strcat(&sbs, parameters[targetp->param]);
                     }
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
                 }
             }
             if (!maxparam || maxparam > 1) {
-                bytes = (int)str_strlcpy(bufp, " )", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                sbs_strcat(&sbs, " )");
             }
         }
         else if (cp == 'i' || cp == 'c') {
@@ -416,21 +411,20 @@ void nr_spell_syntax(struct stream *out, spellbook_entry * sbe, const struct loc
             }
             if (*params == '?') {
                 ++params;
-                bytes = (int)snprintf(bufp, size, " [<%s>]", locp);
+                sbs_strcat(&sbs, " [<");
+                sbs_strcat(&sbs, locp);
+                sbs_strcat(&sbs, ">]");
             }
             else {
-                bytes = (int)snprintf(bufp, size, " <%s>", locp);
+                sbs_strcat(&sbs, " <");
+                sbs_strcat(&sbs, locp);
+                sbs_strcat(&sbs, ">");
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
         else {
             log_error("unknown spell parameter %c for spell %s", cp, sp->sname);
         }
     }
-    *bufp = 0;
-    paragraph(out, buf, 2, 0, 0);
-
 }
 
 void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
@@ -542,10 +536,8 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     paragraph(out, buf, 0, 0, 0);
     paragraph(out, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
 
-    bufp = buf;
-    size = sizeof(buf) - 1;
-
-    nr_spell_syntax(out, sbe, lang);
+    nr_spell_syntax(buf, sizeof(buf), sbe, lang);
+    paragraph(out, buf, 2, 0, 0);
 
     newline(out);
 }
@@ -1825,72 +1817,61 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
 static void
 nr_building(struct stream *out, const region *r, const building *b, const faction *f)
 {
-    int i, bytes;
+    int i;
     const char *name, *bname, *billusion = NULL;
     const struct locale *lang;
-    char buffer[8192], *bufp = buffer;
+    char buffer[8192];
     message *msg;
-    size_t size = sizeof(buffer) - 1;
+    size_t size;
+    sbstring sbs;
 
     assert(f);
     lang = f->locale;
     newline(out);
-    bytes =
-        snprintf(bufp, size, "%s, %s %d, ", buildingname(b), LOC(lang,
-            "nr_size"), b->size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_init(&sbs, buffer, sizeof(buffer));
 
     report_building(b, &bname, &billusion);
+
+    size = str_slprintf(buffer, sizeof(buffer), "%s, %s %d, ", buildingname(b),
+        LOC(lang, "nr_size"), b->size);
+    sbs.end += size;
     name = LOC(lang, billusion ? billusion : bname);
-    bytes = (int)str_strlcpy(bufp, name, size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_strcat(&sbs, name);
+
     if (billusion) {
         unit *owner = building_owner(b);
         if (owner && owner->faction == f) {
             /* illusion. report real type */
-            name = LOC(lang, bname);
-            bytes = snprintf(bufp, size, " (%s)", name);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, " (");
+            sbs_strcat(&sbs, LOC(lang, bname));
+            sbs_strcat(&sbs, ")");
         }
     }
 
     if (!building_finished(b)) {
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, LOC(lang, "nr_building_inprogress"), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, LOC(lang, "nr_building_inprogress"));
     }
 
     if (b->besieged > 0 && r->seen.mode >= seen_lighthouse) {
         msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
             b->besieged - b->size * SIEGEFACTOR);
-        bytes = (int)nr_render(msg, lang, bufp, size, f);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+
+        size = nr_render(msg, lang, sbs.end, sbs.size - (sbs.end - sbs.begin), f);
+        sbs.end += size;
+
         msg_release(msg);
     }
     i = 0;
     if (b->display && b->display[0]) {
-        bytes = (int)str_strlcpy(bufp, "; ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, b->display, size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, "; ");
+        sbs_strcat(&sbs, b->display);
         i = b->display[strlen(b->display) - 1];
     }
 
     if (i != '!' && i != '?' && i != '.') {
-        bytes = (int)str_strlcpy(bufp, ".", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, ".");
     }
-    *bufp = 0;
     paragraph(out, buffer, 2, 0, 0);
 
     if (r->seen.mode >= seen_lighthouse) {
@@ -1900,14 +1881,10 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
 
 static void nr_paragraph(struct stream *out, message * m, faction * f)
 {
-    int bytes;
-    char buf[4096], *bufp = buf;
-    size_t size = sizeof(buf) - 1;
+    char buf[4096];
 
     assert(f);
-    bytes = (int)nr_render(m, f->locale, bufp, size, f);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
 
     paragraph(out, buf, 0, 0, 0);
@@ -2010,6 +1987,8 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
         return;
     }
 }
+
+#include "util/bsdstring.h"
 
 int
 report_plaintext(const char *filename, report_context * ctx,

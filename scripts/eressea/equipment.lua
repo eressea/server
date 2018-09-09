@@ -2,7 +2,6 @@
 local self = {}
 
 local function equip_first(u)
-    equip_newunits(u)
     name = 'seed_' .. u.race
     equip_unit(u, name, 255)
 end
