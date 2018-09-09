@@ -130,47 +130,23 @@ bool magic_lowskill(unit * u)
     return u_race(u) == toad_rc;
 }
 
-/* ------------------------------------------------------------- */
-
 int study_cost(struct unit *u, skill_t sk)
 {
-    static int config;
-    static int costs[MAXSKILLS];
-    int cost = -1;
-
     if (sk == SK_MAGIC) {
-        int next_level = 1 + (u ? get_level(u, sk) : 0);
+        static int config;
+        static int cost;
         /* Die Magiekosten betragen 50+Summe(50*Stufe) */
         /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
-        cost = config_get_int("skills.cost.magic", 50);
-        return cost * (1 + ((next_level + next_level * next_level) / 2));
+        if (config_changed(&config)) {
+            cost = config_get_int("skills.cost.magic", 50);
+        }
+        if (cost > 0) {
+            int next_level = 1 + (u ? get_level(u, sk) : 0);
+            return cost * (1 + ((next_level + next_level * next_level) / 2));
+        }
+        return cost;
     }
-    else switch (sk) {
-    case SK_SPY:
-        cost = 100;
-        break;
-    case SK_TACTICS:
-    case SK_HERBALISM:
-    case SK_ALCHEMY:
-        cost = 200;
-        break;
-    default:
-        cost = -1;
-    }
-
-    if (config_changed(&config)) {
-        memset(costs, 0, sizeof(costs));
-    }
-
-    if (costs[sk] == 0) {
-        char buffer[256];
-        sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        costs[sk] = config_get_int(buffer, cost);
-    }
-    if (costs[sk] >= 0) {
-        return costs[sk];
-    }
-    return (cost > 0) ? cost : 0;
+    return skill_cost(sk);
 }
 
 /* ------------------------------------------------------------- */

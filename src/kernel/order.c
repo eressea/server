@@ -141,7 +141,8 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
     if (ord->id < 0) {
         skill_t sk = (skill_t)(100 + ord->id);
 
-        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+        assert(kwd == K_AUTOSTUDY || kwd == K_STUDY);
+        assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
             swrite(" '", 1, 2, out);
@@ -310,12 +311,13 @@ order *parse_order(const char *s, const struct locale * lang)
     assert(lang);
     assert(s);
     if (*s != 0) {
+        char token[32];
         keyword_t kwd = NOKEYWORD;
         const char *sptr = s;
         bool persistent = false, noerror = false;
-        const char * p;
+        char * p;
 
-        p = *sptr ? parse_token_depr(&sptr) : 0;
+        p = parse_token(&sptr, token, sizeof(token));
         if (p) {
             while (*p == '!' || *p == '@') {
                 if (*p == '!') noerror = true;
@@ -326,7 +328,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd == K_MAKE) {
             const char *sp = sptr;
-            p = parse_token_depr(&sp);
+            p = parse_token(&sp, token, sizeof(token));
             if (p && isparam(p, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
@@ -334,10 +336,15 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         else if (kwd == K_STUDY) {
             const char *sp = sptr;
-            p = parse_token_depr(&sp);
+            p = parse_token(&sp, token, sizeof(token));
             if (p && isparam(p, lang, P_AUTO)) {
-                kwd = K_AUTOSTUDY;
+                skill_t sk;
                 sptr = sp;
+                p = parse_token(&sp, token, sizeof(token));
+                sk = get_skill(p, lang);
+                if (!expensive_skill(sk)) {
+                    kwd = K_AUTOSTUDY;
+                }
             }
         }
         if (kwd != NOKEYWORD) {

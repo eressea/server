@@ -2864,6 +2864,9 @@ msgstr "der Schatten"
 msgid "ALLES"
 msgstr "ALLES"
 
+msgid "AUTO"
+msgstr "AUTO"
+
 msgid "undead_postfix_2"
 msgstr "der Finsternis"
 
@@ -5957,6 +5960,10 @@ msgstr "Berserkerblut"
 msgctxt "keyword"
 msgid "maketemp"
 msgstr "MACHE TEMP"
+
+msgctxt "keyword"
+msgid "autostudy"
+msgstr "LERNE AUTO"
 
 msgctxt "spell"
 msgid "reanimate"
