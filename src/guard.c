@@ -105,8 +105,6 @@ static bool is_guardian_r(const unit * guard)
 {
     if (guard->number == 0)
         return false;
-    if (besieged(guard))
-        return false;
 
     /* if region_owners exist then they may be guardians: */
     if (guard->building && rule_region_owners() && guard == building_owner(guard->building)) {

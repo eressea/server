@@ -94,7 +94,7 @@ const char *keywords[MAXKEYWORDS] = {
     "work",
     "attack",
     "steal",
-    "besiege",
+    "deprecated_besiege",
     "name",
     "use",
     "describe",

@@ -870,14 +870,3 @@ int cmp_current_owner(const building * b, const building * a)
     }
     return 0;
 }
-
-int building_get_siege(const struct building *b)
-{
-    return b->_besieged;
-}
-
-int building_add_siege(struct building *b, int delta)
-{
-    b->_besieged += delta;
-    return b->_besieged;
-}

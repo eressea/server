@@ -373,7 +373,6 @@ bool is_repeated(keyword_t kwd)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:
@@ -414,7 +413,6 @@ bool is_exclusive(const order * ord)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:
@@ -456,7 +454,6 @@ bool is_long(keyword_t kwd)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:

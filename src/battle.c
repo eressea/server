@@ -3577,17 +3577,6 @@ static void join_allies(battle * b)
                 }
                 if (se == s_end)
                     continue;
-                /* Wenn die Einheit belagert ist, mu� auch einer der Alliierten belagert sein: */
-                if (besieged(u)) {
-                    fighter *ally;
-                    for (ally = s->fighters; ally; ally = ally->next) {
-                        if (besieged(ally->unit)) {
-                            break;
-                        }
-                    }
-                    if (ally == NULL)
-                        continue;
-                }
                 /* keine Einw�nde, also soll er mitmachen: */
                 if (c == NULL) {
                     if (!join_battle(b, u, false, &c)) {

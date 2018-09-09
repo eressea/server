@@ -2772,10 +2772,6 @@ msgstr "Dieser wunderschoen geschmueckte Baum entfaltet in den Wintermonaten ein
 msgid "h10"
 msgstr "Kakteenschwitz"
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BELAGERE"
-
 msgid "h11"
 msgstr "Sandfäule"
 

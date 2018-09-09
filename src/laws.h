@@ -48,7 +48,6 @@ extern "C" {
     bool renamed_building(const struct building * b);
     int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
     void get_food(struct region * r);
-    int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
     int enter_ship(struct unit *u, struct order *ord, int id, bool report);
@@ -82,7 +81,6 @@ extern "C" {
     int quit_cmd(struct unit *u, struct order *ord);
     int name_cmd(struct unit *u, struct order *ord);
     int use_cmd(struct unit *u, struct order *ord);
-    int siege_cmd(struct unit *u, struct order *ord);
     int leave_cmd(struct unit *u, struct order *ord);
     int pay_cmd(struct unit *u, struct order *ord);
     int promotion_cmd(struct unit *u, struct order *ord);

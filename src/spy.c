@@ -137,10 +137,6 @@ int spy_cmd(unit * u, struct order *ord)
             msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
         return 0;
     }
-    if (!can_contact(r, u, target)) {
-        cmistake(u, u->thisorder, 24, MSG_EVENT);
-        return 0;
-    }
     if (effskill(u, SK_SPY, 0) < 1) {
         cmistake(u, u->thisorder, 39, MSG_EVENT);
         return 0;

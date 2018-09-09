@@ -2421,10 +2421,6 @@ msgctxt "iteminfo"
 msgid "xmastree"
 msgstr "In the winter months, this beautifully decorated tree has a magical effect on the entire forest."
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BESIEGE"
-
 msgid "h10"
 msgstr "peyote"
 
