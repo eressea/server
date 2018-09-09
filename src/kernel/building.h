@@ -118,7 +118,7 @@ extern "C" {
         int no;
         int size;
         int sizeleft;               /* is only used during battle. should be a temporary attribute */
-        int besieged;               /* should be an attribute */
+        int _besieged;               /* should be an attribute */
         int flags;
     } building;
 
@@ -133,6 +133,9 @@ extern "C" {
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
+
+    int building_get_siege(const struct building *b);
+    int building_add_siege(struct building *b, int delta);
 
     int wage(const struct region *r, const struct faction *f,
         const struct race *rc, int in_turn);

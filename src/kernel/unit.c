@@ -1917,9 +1917,11 @@ int getunit(const region * r, const faction * f, unit **uresult)
 int besieged(const unit * u)
 {
     /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
+    if (u && !keyword_disabled(K_BESIEGE) && u->building) {
+        building * b = u->building;
+        return building_get_siege(b) >= b->size * SIEGEFACTOR;
+    }
+    return false;
 }
 
 bool has_horses(const unit * u)

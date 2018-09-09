@@ -103,6 +103,8 @@ static void recruit_init(void)
     }
 }
 
+#define ENTERTAINFRACTION 20
+
 int entertainmoney(const region * r)
 {
     double n;

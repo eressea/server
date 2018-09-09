@@ -306,6 +306,11 @@ static void calculate_emigration(region * r)
     }
 }
 
+/* Vermehrungsrate Bauern in 1/10000.
+* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen hoeher. */
+#define PEASANTGROWTH 10
+#define PEASANTLUCK 10
+#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 
 static double peasant_growth_factor(void)
 {
@@ -908,7 +913,7 @@ static int slipthru(const region * r, const unit * u, const building * b)
     int n, o;
 
     /* b ist die burg, in die man hinein oder aus der man heraus will. */
-    if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
+    if (b == NULL || building_get_siege(b) < b->size * SIEGEFACTOR) {
         return 1;
     }
 
@@ -3857,7 +3862,7 @@ int siege_cmd(unit * u, order * ord)
 
     usetsiege(u, b);
     if (katapultiere < bewaffnete) katapultiere = bewaffnete;
-    b->besieged += katapultiere;
+    building_add_siege(b, katapultiere);
 
     /* definitiver schaden eingeschraenkt */
     if (d > b->size - 1) d = b->size - 1;

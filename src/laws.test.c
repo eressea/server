@@ -113,7 +113,8 @@ static void test_contact(CuTest * tc)
     u3 = test_create_unit(test_create_faction(NULL), r);
     set_level(u3, SK_PERCEPTION, 2);
     usetsiege(u3, b);
-    b->besieged = 1;
+    building_add_siege(b, 1);
+    CuAssertIntEquals(tc, 1, building_get_siege(b));
     CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
 
     u_set_building(u1, b);

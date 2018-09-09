@@ -645,6 +645,7 @@ static void cr_output_building(struct stream *out, building *b,
     const unit *owner, int fno, faction *f)
 {
     const char *bname, *billusion;
+    int i;
 
     stream_printf(out, "BURG %d\n", b->no);
 
@@ -673,9 +674,12 @@ static void cr_output_building(struct stream *out, building *b,
     if (fno >= 0) {
         stream_printf(out, "%d;Partei\n", fno);
     }
-    if (b->besieged) {
-        stream_printf(out, "%d;Belagerer\n", b->besieged);
+
+    i = building_get_siege(b);
+    if (i) {
+        stream_printf(out, "%d;Belagerer\n", i);
     }
+
     cr_output_curses(out, f, b, TYP_BUILDING);
 }
 
