@@ -30,7 +30,7 @@
     </type>
   </message>
 
-  <message name="target_region_invalid">
+  <message name="target_region_invalid" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -38,7 +38,7 @@
     </type>
   </message>
   
-  <message name="missing_direction">
+  <message name="missing_direction" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -46,7 +46,7 @@
     </type>
   </message>
   
-  <message name="target_region_not_empty">
+  <message name="target_region_not_empty" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
