@@ -86,13 +86,7 @@ static void mt_register(message_type * mtype) {
 
 message_type *mt_create(message_type * mtype, const char *args[], int nparameters)
 {
-    if (args != NULL && args[nparameters]) {
-        /* count the number of parameters */
-        do {
-            ++nparameters;
-        } while (args[nparameters]);
-    }
-    if (nparameters > 0) {
+    if (args && nparameters > 0) {
         int i;
         mtype->nparameters = nparameters;
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
