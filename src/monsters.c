@@ -876,7 +876,7 @@ void spawn_dragons(void)
     region *r;
     faction *monsters = get_or_create_monsters();
     int minage = config_get_int("monsters.spawn.min_age", 100);
-    int spawn_chance = config_get_int("monsters.spawn.chance", 100);
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 100;
 
     if (spawn_chance <= 0) {
         /* monster spawning disabled */
