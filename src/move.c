@@ -2633,9 +2633,9 @@ void follow_unit(unit * u)
             }
         }
         if (follow) {
-            fset(u, UFL_FOLLOWING);
             fset(u2, UFL_FOLLOWED);
             /* FOLLOW unit on a (potentially) moving unit prevents long orders */
+            fset(u, UFL_FOLLOWING | UFL_LONGACTION);
             set_order(&u->thisorder, NULL);
         }
     }
