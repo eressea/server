@@ -139,7 +139,7 @@ end
 
 function test_bug_2480()
   local r = region.create(0, 0, "plain")
-  local f = faction.create("human", "hodor@eressea.de", "de")
+  local f = faction.create("human", "2480@eressea.de", "de")
   local u1 = unit.create(f, r, 1)
   local monster = unit.create(get_monsters(), r, 1, "wyrm")
   u1.number = 30
@@ -147,5 +147,4 @@ function test_bug_2480()
   monster:add_order("ATTACK " .. itoa36(u1.id))
   process_orders()
   assert_equal(0, u1.number);
-  write_reports()
 end

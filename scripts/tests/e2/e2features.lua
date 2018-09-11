@@ -519,6 +519,7 @@ function test_buy_sell()
 end
 
 function test_seaserpent_attack()
+    -- FIXME what does this test do?
     local r = region.create(0, 0, 'ocean')
     local sh = ship.create(r, 'boat')
     local us = unit.create(get_monsters(), r, 1, 'seaserpent')

@@ -555,8 +555,7 @@ static weapon *preferred_weapon(const troop t, bool attacking)
     return melee;
 }
 
-static weapon *select_weapon(const troop t, bool attacking,
-    bool ismissile)
+weapon *select_weapon(const troop t, bool attacking, bool ismissile)
     /* select the primary weapon for this trooper */
 {
     if (attacking) {
@@ -770,7 +769,7 @@ bool missile)
     return skill;
 }
 
-static const armor_type *select_armor(troop t, bool shield)
+const armor_type *select_armor(troop t, bool shield)
 {
     unsigned int type = shield ? ATF_SHIELD : 0;
     unit *u = t.fighter->unit;
@@ -1012,85 +1011,87 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
     return modifier;
 }
 
-int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype, variant *magres) {
+int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype,
+    const armor_type *armor, const armor_type *shield, bool magic) {
     fighter *df = dt.fighter;
     unit *du = df->unit;
-    int ar = 0, an, am;
-    const armor_type *armor = select_armor(dt, false);
-    const armor_type *shield = select_armor(dt, true);
+    int total_armor = 0, nat_armor, magic_armor;
     bool missile = awtype && (awtype->flags&WTF_MISSILE);
 
     if (armor) {
-        ar += armor->prot;
+        total_armor += armor->prot;
         if (missile && armor->projectile > 0 && chance(armor->projectile)) {
             return -1;
         }
     }
     if (shield) {
-        ar += shield->prot;
+        total_armor += shield->prot;
         if (missile && shield->projectile > 0 && chance(shield->projectile)) {
             return -1;
         }
     }
 
+    if (magic) {
+      /* gegen Magie wirkt nur natuerliche und magische Ruestung */
+      total_armor = 0;
+    }
+
     /* nat�rliche R�stung */
-    an = natural_armor(du);
+    nat_armor = natural_armor(du);
 
     /* magische R�stung durch Artefakte oder Spr�che */
     /* Momentan nur Trollg�rtel und Werwolf-Eigenschaft */
-    am = select_magicarmor(dt);
+    magic_armor = select_magicarmor(dt);
 
     if (rule_nat_armor == 0) {
         /* nat�rliche R�stung ist halbkumulativ */
-        if (ar > 0) {
-            ar += an / 2;
+        if (total_armor > 0) {
+            total_armor += nat_armor / 2;
         }
         else {
-            ar = an;
+            total_armor = nat_armor;
         }
     }
     else {
         /* use the higher value, add half the other value */
-        ar = (ar > an) ? (ar + an / 2) : (an + ar / 2);
+        total_armor = (total_armor > nat_armor) ? (total_armor + nat_armor / 2) : (nat_armor + total_armor / 2);
     }
 
     if (awtype && fval(awtype, WTF_ARMORPIERCING)) {
         /* crossbows */
-        ar /= 2;
+        total_armor /= 2;
     }
 
-    ar += am;
+    total_armor += magic_armor;
 
-    if (magres) {
-        /* calculate damage multiplier for magical damage */
-        variant res;
+    return total_armor;
+}
+
+variant calculate_resistance(troop dt, const weapon_type *dwtype, const armor_type *armor, const armor_type *shield) {
+  fighter *df = dt.fighter;
+  unit *du = df->unit;
+  /* calculate damage multiplier for magical damage */
+  variant res;
         
-        res = frac_sub(frac_one, magic_resistance(du));
+  res = frac_sub(frac_one, magic_resistance(du));
 
-        if (u_race(du)->battle_flags & BF_EQUIPMENT) {
-            /* der Effekt von Laen steigt nicht linear */
-            if (armor && fval(armor, ATF_LAEN)) {
-                res = frac_mul(res, frac_sub(frac_one, armor->magres));
-            }
-            if (shield && fval(shield, ATF_LAEN)) {
-                res = frac_mul(res, frac_sub(frac_one, shield->magres));
-            }
-            if (dwtype) {
-                res = frac_mul(res, frac_sub(frac_one, dwtype->magres));
-            }
-        }
-
-        /* gegen Magie wirkt nur natuerliche und magische Ruestung */
-        ar = an + am;
-        if (res.sa[0] >= 0) {
-            *magres = res;
-        }
-        else {
-            *magres = frac_make(0, 1);
-        }
+  if (u_race(du)->battle_flags & BF_EQUIPMENT) {
+    /* der Effekt von Laen steigt nicht linear */
+    if (armor && fval(armor, ATF_LAEN)) {
+      res = frac_mul(res, frac_sub(frac_one, armor->magres));
     }
-
-    return ar;
+    if (shield && fval(shield, ATF_LAEN)) {
+      res = frac_mul(res, frac_sub(frac_one, shield->magres));
+    }
+    if (dwtype) {
+      res = frac_mul(res, frac_sub(frac_one, dwtype->magres));
+    }
+  }
+  if (res.sa[0] >= 0) {
+    return res;
+  } else {
+    return frac_zero;
+  }
 }
 
 static bool resurrect_troop(troop dt)
@@ -1109,7 +1110,7 @@ static bool resurrect_troop(troop dt)
 }
 
 bool
-terminate(troop dt, troop at, int type, const char *damage, bool missile)
+terminate(troop dt, troop at, int type, const char *damage_formula, bool missile)
 {
     item **pitm;
     fighter *df = dt.fighter;
@@ -1120,16 +1121,19 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
 
     /* Schild */
     side *ds = df->side;
-    int ar;
+    int armor_value;
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const weapon *weapon;
-    variant res = frac_one;
+    const armor_type *armor = NULL;
+    const armor_type *shield = NULL;
 
-    int rda, sk = 0, sd;
+    variant resistance_factor = frac_one;
+
+    int reduced_damage, attskill = 0, defskill;
     bool magic = false;
-    int da = dice_rand(damage);
+    int damage = dice_rand(damage_formula);
 
     assert(du->number > 0);
     ++at.fighter->hits;
@@ -1137,14 +1141,14 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     switch (type) {
     case AT_STANDARD:
         weapon = select_weapon(at, true, missile);
-        sk = weapon_effskill(at, dt, weapon, true, missile);
+        attskill = weapon_effskill(at, dt, weapon, true, missile);
         if (weapon)
             awtype = weapon->type;
         if (awtype && fval(awtype, WTF_MAGICAL))
             magic = true;
         break;
     case AT_NATURAL:
-        sk = weapon_effskill(at, dt, NULL, true, missile);
+        attskill = weapon_effskill(at, dt, NULL, true, missile);
         break;
     case AT_SPELL:
     case AT_COMBATSPELL:
@@ -1154,63 +1158,69 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
         break;
     }
     weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
-    sd = weapon_effskill(dt, at, weapon, false, false);
+    defskill = weapon_effskill(dt, at, weapon, false, false);
     if (weapon != NULL)
         dwtype = weapon->type;
 
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
-        da += CavalryBonus(au, dt, BONUS_DAMAGE);
+        damage += CavalryBonus(au, dt, BONUS_DAMAGE);
     }
 
-    ar = calculate_armor(dt, dwtype, awtype, magic ? &res : 0);
-    if (ar < 0) {
+    armor = select_armor(dt, false);
+    shield = select_armor(dt, true);
+
+    armor_value = calculate_armor(dt, dwtype, awtype, armor, shield, magic);
+    if (magic) {
+      resistance_factor = calculate_resistance(dt, dwtype, armor, shield);
+    }
+    if (armor_value < 0) {
         return false;
     }
 
     if (magic) {
-        res = frac_mul(frac_make(da, 1), res);
-        da = res.sa[0] / res.sa[1];
+        variant reduced_damage = frac_mul(frac_make(damage, 1), resistance_factor);
+        damage = reduced_damage.sa[0] / reduced_damage.sa[1];
     }
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (rule_damage & DAMAGE_CRITICAL) {
-            double kritchance = (sk * 3 - sd) / 200.0;
+            double kritchance = (attskill * 3 - defskill) / 200.0;
             int maxk = 4;
 
             kritchance = fmax(kritchance, 0.005);
             kritchance = fmin(0.9, kritchance);
 
             while (maxk-- && chance(kritchance)) {
-                da += dice_rand(damage);
+                damage += dice_rand(damage_formula);
             }
         }
 
-        da += rc_specialdamage(au, du, awtype);
+        damage += rc_specialdamage(au, du, awtype);
 
         if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
             /* missile weapon bonus */
             if (rule_damage & DAMAGE_MISSILE_BONUS) {
-                da += af->person[at.index].damage_rear;
+                damage += af->person[at.index].damage_rear;
             }
         }
         else {
             /* melee bonus */
             if (rule_damage & DAMAGE_MELEE_BONUS) {
-                da += af->person[at.index].damage;
+                damage += af->person[at.index].damage;
             }
         }
 
         /* Skilldifferenzbonus */
         if (rule_damage & DAMAGE_SKILL_BONUS) {
-            da += MAX(0, (sk - sd) / DAMAGE_QUOTIENT);
+            damage += MAX(0, (attskill - defskill) / DAMAGE_QUOTIENT);
         }
     }
 
-    rda = MAX(da - ar, 0);
+    reduced_damage = MAX(damage - armor_value, 0);
 
     if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
-        rda = 0;
+        reduced_damage = 0;
     else {
         int qi;
         selist *ql;
@@ -1224,23 +1234,23 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
             i |= WTF_BLUNT;
 
         if (i && awtype && fval(awtype, i))
-            rda /= 2;
+            reduced_damage /= 2;
 
         /* Schilde */
         for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
             meffect *me = (meffect *)selist_get(ql, qi);
             if (meffect_protection(b, me, ds) != 0) {
-                assert(0 <= rda);       /* rda sollte hier immer mindestens 0 sein */
+                assert(0 <= reduced_damage);       /* rda sollte hier immer mindestens 0 sein */
                 /* jeder Schaden wird um effect% reduziert bis der Schild duration
                  * Trefferpunkte aufgefangen hat */
                 if (me->typ == SHIELD_REDUCE) {
-                    int hp = rda * (me->effect / 100);
-                    rda -= hp;
+                    int hp = reduced_damage * (me->effect / 100);
+                    reduced_damage -= hp;
                     me->duration -= hp;
                 }
                 /* gibt R�stung +effect f�r duration Treffer */
                 if (me->typ == SHIELD_ARMOR) {
-                    rda = MAX(rda - me->effect, 0);
+                    reduced_damage = MAX(reduced_damage - me->effect, 0);
                     me->duration--;
                 }
             }
@@ -1248,10 +1258,10 @@ terminate(troop dt, troop at, int type, const char *damage, bool missile)
     }
 
     assert(dt.index >= 0 && dt.index < du->number);
-    if (rda>0) {
-        df->person[dt.index].hp -= rda;
+    if (reduced_damage>0) {
+        df->person[dt.index].hp -= reduced_damage;
         if (u_race(au) == get_race(RC_DAEMON)) {
-            vampirism(at, rda);
+            vampirism(at, reduced_damage);
         }
         if (b->turn>1) {
             /* someone on the ship got damaged, damage the ship */
