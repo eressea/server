@@ -1174,8 +1174,8 @@ static void destroy_items(troop dt) {
   for (pitm = &du->items; *pitm;) {
       item *itm = *pitm;
       const item_type *itype = itm->type;
-      if (!(itype->flags & ITF_CURSED) && dt.index < itm->number) {
-          /* 25% Grundchance, das ein Item kaputtgeht. */
+      if (!(itype->flags & (ITF_CURSED | ITF_NOTLOST)) && dt.index < itm->number) {
+          /* 25% Grundchance, dass ein Item kaputtgeht. */
           if (rng_int() % 4 < 1) {
               i_change(pitm, itype, -1);
           }
