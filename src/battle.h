@@ -236,7 +236,7 @@ extern "C" {
     const struct armor_type *select_armor(struct troop t, bool shield);
     struct weapon *select_weapon(const struct troop t, bool attacking, bool ismissile);
     int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
-    union variant calculate_resistance(struct troop dt, const struct weapon_type *dwtype, const struct armor_type *armor, const struct armor_type *shield);
+    int apply_resistance(int damage, struct troop dt, const struct weapon_type *dwtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
     void message_all(battle * b, struct message *m);

@@ -1012,8 +1012,9 @@ static int rc_specialdamage(const unit *au, const unit *du, const struct weapon_
 }
 
 int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awtype,
-    const armor_type *armor, const armor_type *shield, bool magic) {
-    fighter *df = dt.fighter;
+        const armor_type *armor, const armor_type *shield, bool magic) {
+
+    const fighter *df = dt.fighter;
     unit *du = df->unit;
     int total_armor = 0, nat_armor, magic_armor;
     bool missile = awtype && (awtype->flags&WTF_MISSILE);
@@ -1067,31 +1068,35 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
     return total_armor;
 }
 
-variant calculate_resistance(troop dt, const weapon_type *dwtype, const armor_type *armor, const armor_type *shield) {
-  fighter *df = dt.fighter;
+int apply_resistance(int damage, troop dt, const weapon_type *dwtype, const armor_type *armor, const armor_type *shield, bool magic) {
+  const fighter *df = dt.fighter;
   unit *du = df->unit;
+
+  if (!magic)
+    return damage;
+
   /* calculate damage multiplier for magical damage */
-  variant res;
-        
-  res = frac_sub(frac_one, magic_resistance(du));
+  variant resistance_factor = frac_sub(frac_one, magic_resistance(du));
 
   if (u_race(du)->battle_flags & BF_EQUIPMENT) {
     /* der Effekt von Laen steigt nicht linear */
     if (armor && fval(armor, ATF_LAEN)) {
-      res = frac_mul(res, frac_sub(frac_one, armor->magres));
+      resistance_factor = frac_mul(resistance_factor, frac_sub(frac_one, armor->magres));
     }
     if (shield && fval(shield, ATF_LAEN)) {
-      res = frac_mul(res, frac_sub(frac_one, shield->magres));
+      resistance_factor = frac_mul(resistance_factor, frac_sub(frac_one, shield->magres));
     }
     if (dwtype) {
-      res = frac_mul(res, frac_sub(frac_one, dwtype->magres));
+      resistance_factor = frac_mul(resistance_factor, frac_sub(frac_one, dwtype->magres));
     }
   }
-  if (res.sa[0] >= 0) {
-    return res;
-  } else {
-    return frac_zero;
+  if (resistance_factor.sa[0] <= 0) {
+    return 0;
   }
+
+  variant reduced_damage = frac_mul(frac_make(damage, 1), resistance_factor);
+  return reduced_damage.sa[0] / reduced_damage.sa[1];
+
 }
 
 static bool resurrect_troop(troop dt)
@@ -1129,10 +1134,9 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     const armor_type *armor = NULL;
     const armor_type *shield = NULL;
 
-    variant resistance_factor = frac_one;
-
-    int reduced_damage, attskill = 0, defskill;
+    int reduced_damage, attskill = 0, defskill = 0;
     bool magic = false;
+
     int damage = dice_rand(damage_formula);
 
     assert(du->number > 0);
@@ -1171,17 +1175,11 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     shield = select_armor(dt, true);
 
     armor_value = calculate_armor(dt, dwtype, awtype, armor, shield, magic);
-    if (magic) {
-      resistance_factor = calculate_resistance(dt, dwtype, armor, shield);
-    }
     if (armor_value < 0) {
         return false;
     }
 
-    if (magic) {
-        variant reduced_damage = frac_mul(frac_make(damage, 1), resistance_factor);
-        damage = reduced_damage.sa[0] / reduced_damage.sa[1];
-    }
+    damage = apply_resistance(damage, dt, dwtype, armor, shield, magic);
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         if (rule_damage & DAMAGE_CRITICAL) {
