@@ -565,6 +565,38 @@ static void test_battle_skilldiff(CuTest *tc)
     test_teardown();
 }
 
+static void test_terminate(CuTest * tc)
+{
+    troop at, dt;
+    battle *b = NULL;
+    region *r;
+    unit *au, *du;
+    race *rc;
+
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+
+    rc = test_create_race("human");
+    au = test_create_unit(test_create_faction(rc), r);
+    du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
+    at.index = 0;
+
+    at.fighter = setup_fighter(&b, au);
+    dt.fighter = setup_fighter(&b, du);
+
+    CuAssertIntEquals_Msg(tc, "not killed", 0, terminate(dt, at, AT_STANDARD, "1d1", false));
+    b = NULL;
+    at.fighter = setup_fighter(&b, au);
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "killed", 1, terminate(dt, at, AT_STANDARD, "100d1", false));
+    CuAssertIntEquals_Msg(tc, "number", 0, dt.fighter->person[0].hp);
+
+    free_battle(b);
+    test_teardown();
+}
+
+
 static void test_battle_report_one(CuTest *tc)
 {
     battle * b = NULL;
@@ -812,6 +844,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
     SUITE_ADD_TEST(suite, test_tactics_chance);
+    SUITE_ADD_TEST(suite, test_terminate);
     DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

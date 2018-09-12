@@ -122,7 +122,7 @@ const troop no_troop = { 0, 0 };
 
 #define DAMAGE_CRITICAL      (1<<0)
 #define DAMAGE_MELEE_BONUS   (1<<1)
-#define DAMAGE_MISSILE_BONUS (1<<2)
+#define DAMAGE_MISSILE_BONUS (1<<2)   /* deprecated */
 #define DAMAGE_SKILL_BONUS   (1<<4)
 
 static int max_turns;
@@ -169,7 +169,7 @@ static void init_rules(void)
     if (config_get_int("rules.combat.melee_bonus", 1)) {
         rule_damage |= DAMAGE_MELEE_BONUS;
     }
-    if (config_get_int("rules.combat.missile_bonus", 1)) {
+    if (config_get_int("rules.combat.missile_bonus", 1)) { /* deprecated */
         rule_damage |= DAMAGE_MISSILE_BONUS;
     }
     if (config_get_int("rules.combat.skill_bonus", 1)) {
@@ -949,6 +949,9 @@ void drain_exp(struct unit *u, int n)
 
 static void vampirism(troop at, int damage)
 {
+  const unit *au = at.fighter->unit;
+
+  if (u_race(au) == get_race(RC_DAEMON)) {
     if (rule_vampire > 0) {
         int gain = damage / rule_vampire;
         int chance = damage - rule_vampire * gain;
@@ -962,6 +965,16 @@ static void vampirism(troop at, int damage)
             at.fighter->person[at.index].hp = maxhp;
         }
     }
+  }
+}
+
+static void ship_damage(int turn, unit *du) {
+  if (turn>1) {
+      /* someone on the ship got damaged, damage the ship */
+      ship *sh = du->ship ? du->ship : leftship(du);
+      if (sh)
+          fset(sh, SF_DAMAGED);
+  }
 }
 
 #define MAXRACES 128
@@ -1114,23 +1127,181 @@ static bool resurrect_troop(troop dt)
     return false;
 }
 
+static void demon_dazzle(fighter *af, troop dt) {
+    const fighter *df = dt.fighter;
+    if (u_race(af->unit) == get_race(RC_DAEMON)) {
+        if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
+            df->person[dt.index].flags |= FL_DAZZLED;
+            df->person[dt.index].defence--;
+        }
+    }
+}
+
+static bool survives(fighter *af, troop dt, battle *b) {
+    const unit *du = af->unit;
+    const fighter *df = dt.fighter;
+
+    if (df->person[dt.index].hp > 0) {    /* Hat �berlebt */
+        demon_dazzle(af, dt);
+
+        return true;
+    }
+
+    /* Sieben Leben */
+    if (u_race(du) == get_race(RC_CAT) && (chance(1.0 / 7))) {
+        df->person[dt.index].hp = unit_max_hp(du);
+        return true;
+    }
+
+    /* healing potions can avert a killing blow */
+    if (resurrect_troop(dt)) {
+        message *m = msg_message("potionsave", "unit", du);
+        battle_message_faction(b, du->faction, m);
+        msg_release(m);
+        return true;
+    }
+
+    return false;
+}
+
+static void destroy_items(troop dt) {
+  unit *du = dt.fighter->unit;
+
+  item **pitm;
+
+  for (pitm = &du->items; *pitm;) {
+      item *itm = *pitm;
+      const item_type *itype = itm->type;
+      if (!(itype->flags & ITF_CURSED) && dt.index < itm->number) {
+          /* 25% Grundchance, das ein Item kaputtgeht. */
+          if (rng_int() % 4 < 1) {
+              i_change(pitm, itype, -1);
+          }
+      }
+      if (*pitm == itm) {
+          pitm = &itm->next;
+      }
+  }
+
+}
+
+static void calculate_defence_type(troop dt, troop at, int type, bool missile,
+    const weapon_type **dwtype, int *defskill) {
+  const weapon *weapon;
+  weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
+  *defskill = weapon_effskill(dt, at, weapon, false, false);
+  if (weapon != NULL)
+    *dwtype = weapon->type;
+}
+
+static void calculate_attack_type(troop dt, troop at, int type, bool missile,
+    const weapon_type **awtype, int *attskill, bool *magic) {
+  const weapon *weapon;
+
+  switch (type) {
+  case AT_STANDARD:
+      weapon = select_weapon(at, true, missile);
+      *attskill = weapon_effskill(at, dt, weapon, true, missile);
+      if (weapon)
+          *awtype = weapon->type;
+      if (*awtype && fval(*awtype, WTF_MAGICAL))
+          *magic = true;
+      break;
+  case AT_NATURAL:
+      *attskill = weapon_effskill(at, dt, NULL, true, missile);
+      break;
+  case AT_SPELL:
+  case AT_COMBATSPELL:
+      *magic = true;
+      break;
+  default:
+      break;
+  }
+}
+
+static int crit_damage(int attskill, int defskill, const char *damage_formula) {
+  int damage = 0;
+  if (rule_damage & DAMAGE_CRITICAL) {
+      double kritchance = (attskill * 3 - defskill) / 200.0;
+      int maxk = 4;
+
+      kritchance = fmax(kritchance, 0.005);
+      kritchance = fmin(0.9, kritchance);
+
+      while (maxk-- && chance(kritchance)) {
+          damage += dice_rand(damage_formula);
+      }
+  }
+  return damage;
+}
+
+static int apply_race_resistance(int reduced_damage, fighter *df,
+    const weapon_type *awtype, bool magic) {
+  unit *du = df->unit;
+
+  if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
+    reduced_damage = 0;
+  else {
+    unsigned int i = 0;
+
+    if (u_race(du)->battle_flags & BF_RES_PIERCE)
+      i |= WTF_PIERCE;
+    if (u_race(du)->battle_flags & BF_RES_CUT)
+      i |= WTF_CUT;
+    if (u_race(du)->battle_flags & BF_RES_BASH)
+      i |= WTF_BLUNT;
+
+    if (i && awtype && fval(awtype, i))
+      reduced_damage /= 2;
+  }
+  return reduced_damage;
+}
+
+static int apply_magicshield(int reduced_damage, fighter *df,
+    const weapon_type *awtype, battle *b, bool magic) {
+  side *ds = df->side;
+  selist *ql;
+  int qi;
+
+  if (reduced_damage <= 0)
+    return 0;
+
+  /* Schilde */
+  for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
+    meffect *me = (meffect *) selist_get(ql, qi);
+    if (meffect_protection(b, me, ds) != 0) {
+      assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
+      /* jeder Schaden wird um effect% reduziert bis der Schild duration
+       * Trefferpunkte aufgefangen hat */
+      if (me->typ == SHIELD_REDUCE) {
+        int hp = reduced_damage * (me->effect / 100);
+        reduced_damage -= hp;
+        me->duration -= hp;
+      }
+      /* gibt R�stung +effect f�r duration Treffer */
+      if (me->typ == SHIELD_ARMOR) {
+        reduced_damage = MAX(reduced_damage - me->effect, 0);
+        me->duration--;
+      }
+    }
+  }
+
+  return reduced_damage;
+}
+
 bool
 terminate(troop dt, troop at, int type, const char *damage_formula, bool missile)
 {
-    item **pitm;
     fighter *df = dt.fighter;
     fighter *af = at.fighter;
     unit *au = af->unit;
     unit *du = df->unit;
     battle *b = df->side->battle;
 
-    /* Schild */
-    side *ds = df->side;
     int armor_value;
 
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
-    const weapon *weapon;
     const armor_type *armor = NULL;
     const armor_type *shield = NULL;
 
@@ -1142,29 +1313,8 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     assert(du->number > 0);
     ++at.fighter->hits;
 
-    switch (type) {
-    case AT_STANDARD:
-        weapon = select_weapon(at, true, missile);
-        attskill = weapon_effskill(at, dt, weapon, true, missile);
-        if (weapon)
-            awtype = weapon->type;
-        if (awtype && fval(awtype, WTF_MAGICAL))
-            magic = true;
-        break;
-    case AT_NATURAL:
-        attskill = weapon_effskill(at, dt, NULL, true, missile);
-        break;
-    case AT_SPELL:
-    case AT_COMBATSPELL:
-        magic = true;
-        break;
-    default:
-        break;
-    }
-    weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
-    defskill = weapon_effskill(dt, at, weapon, false, false);
-    if (weapon != NULL)
-        dwtype = weapon->type;
+    calculate_attack_type(at, dt, type, missile, &awtype, &attskill, &magic);
+    calculate_defence_type(at, dt, type, missile, &awtype, &attskill);
 
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
@@ -1182,27 +1332,11 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     damage = apply_resistance(damage, dt, dwtype, armor, shield, magic);
 
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
-        if (rule_damage & DAMAGE_CRITICAL) {
-            double kritchance = (attskill * 3 - defskill) / 200.0;
-            int maxk = 4;
-
-            kritchance = fmax(kritchance, 0.005);
-            kritchance = fmin(0.9, kritchance);
-
-            while (maxk-- && chance(kritchance)) {
-                damage += dice_rand(damage_formula);
-            }
-        }
+        damage += crit_damage(attskill, defskill, damage_formula);
 
         damage += rc_specialdamage(au, du, awtype);
 
-        if (awtype != NULL && fval(awtype, WTF_MISSILE)) {
-            /* missile weapon bonus */
-            if (rule_damage & DAMAGE_MISSILE_BONUS) {
-                damage += af->person[at.index].damage_rear;
-            }
-        }
-        else {
+        if (awtype == NULL || !fval(awtype, WTF_MISSILE)) {
             /* melee bonus */
             if (rule_damage & DAMAGE_MELEE_BONUS) {
                 damage += af->person[at.index].damage;
@@ -1217,96 +1351,25 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
 
     reduced_damage = MAX(damage - armor_value, 0);
 
-    if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
-        reduced_damage = 0;
-    else {
-        int qi;
-        selist *ql;
-        unsigned int i = 0;
-
-        if (u_race(du)->battle_flags & BF_RES_PIERCE)
-            i |= WTF_PIERCE;
-        if (u_race(du)->battle_flags & BF_RES_CUT)
-            i |= WTF_CUT;
-        if (u_race(du)->battle_flags & BF_RES_BASH)
-            i |= WTF_BLUNT;
-
-        if (i && awtype && fval(awtype, i))
-            reduced_damage /= 2;
-
-        /* Schilde */
-        for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
-            meffect *me = (meffect *)selist_get(ql, qi);
-            if (meffect_protection(b, me, ds) != 0) {
-                assert(0 <= reduced_damage);       /* rda sollte hier immer mindestens 0 sein */
-                /* jeder Schaden wird um effect% reduziert bis der Schild duration
-                 * Trefferpunkte aufgefangen hat */
-                if (me->typ == SHIELD_REDUCE) {
-                    int hp = reduced_damage * (me->effect / 100);
-                    reduced_damage -= hp;
-                    me->duration -= hp;
-                }
-                /* gibt R�stung +effect f�r duration Treffer */
-                if (me->typ == SHIELD_ARMOR) {
-                    reduced_damage = MAX(reduced_damage - me->effect, 0);
-                    me->duration--;
-                }
-            }
-        }
-    }
+    reduced_damage = apply_race_resistance(reduced_damage, df, awtype, magic);
+    reduced_damage = apply_magicshield(reduced_damage, df, awtype, b, magic);
 
     assert(dt.index >= 0 && dt.index < du->number);
-    if (reduced_damage>0) {
+    if (reduced_damage > 0) {
         df->person[dt.index].hp -= reduced_damage;
-        if (u_race(au) == get_race(RC_DAEMON)) {
-            vampirism(at, reduced_damage);
-        }
-        if (b->turn>1) {
-            /* someone on the ship got damaged, damage the ship */
-            ship *sh = du->ship ? du->ship : leftship(du);
-            if (sh)
-                fset(sh, SF_DAMAGED);
-        }
 
-    }
-    if (df->person[dt.index].hp > 0) {    /* Hat �berlebt */
-        if (u_race(au) == get_race(RC_DAEMON)) {
-            if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
-                df->person[dt.index].flags |= FL_DAZZLED;
-                df->person[dt.index].defence--;
-            }
-        }
-        return false;
+        vampirism(at, reduced_damage);
+
+        ship_damage(b->turn, du);
     }
 
-    /* Sieben Leben */
-    if (u_race(du) == get_race(RC_CAT) && (chance(1.0 / 7))) {
-        df->person[dt.index].hp = unit_max_hp(du);
-        return false;
-    }
+    if (survives(af, dt, b))
+      return false;
 
-    /* healing potions can avert a killing blow */
-    if (resurrect_troop(dt)) {
-        message *m = msg_message("potionsave", "unit", du);
-        battle_message_faction(b, du->faction, m);
-        msg_release(m);
-        return false;
-    }
     ++at.fighter->kills;
 
-    for (pitm = &du->items; *pitm;) {
-        item *itm = *pitm;
-        const item_type *itype = itm->type;
-        if (!(itype->flags & ITF_CURSED) && dt.index < itm->number) {
-            /* 25% Grundchance, das ein Item kaputtgeht. */
-            if (rng_int() % 4 < 1) {
-                i_change(pitm, itype, -1);
-            }
-        }
-        if (*pitm == itm) {
-            pitm = &itm->next;
-        }
-    }
+    destroy_items(dt);
+
     kill_troop(dt);
 
     return true;

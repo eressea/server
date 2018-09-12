@@ -175,7 +175,6 @@ extern "C" {
             int attack;
             int defence;
             int damage;
-            int damage_rear;
             int flags;
             int speed;
             int reload;
