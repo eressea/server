@@ -2368,7 +2368,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
+                        if (!LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }

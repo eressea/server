@@ -9,7 +9,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
- function test_piracy()
+function test_piracy()
     local r = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
     local r3 = region.create(-1, 0, "ocean")
@@ -96,6 +96,7 @@ function test_follow_ship()
     local f = faction.create("human", "test@example.com", "de")
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f, r1, 1)
+    u2.name = 'Xolgrim'
     u1:add_item("money", 100)
     u2:add_item("money", 100)
     u1.ship = ship.create(r1, "boat")
