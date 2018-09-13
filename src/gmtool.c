@@ -932,20 +932,10 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            const char *at = strchr(player->email, '@');
             faction *f;
             addplayer(r, f = addfaction(player->email, player->password,
                                         player->race, player->lang,
                                         player->subscription));
-            if (at) {
-                char fname[64];
-                size_t len = at - player->email;
-                if (len>4 && len<sizeof(fname)) {
-                    memcpy(fname, player->email, len);
-                    fname[len]=0;
-                    faction_setname(f, fname);
-                }
-            }
         }
     }
 }
