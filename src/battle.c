@@ -1078,6 +1078,8 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
 
     total_armor += magic_armor;
 
+    assert(total_armor >= 0 || !"armor < 0 means hit denied");
+
     return total_armor;
 }
 
