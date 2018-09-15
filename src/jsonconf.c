@@ -846,7 +846,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
     }
     for (child = json->child; child; child = child->next) {
         keyword_t kwd = findkeyword(child->string);
-        if (kwd != NOKEYWORD) {
+        if (kwd != NOKEYWORD && keywords[kwd]) {
             if (child->type == cJSON_String) {
                 init_keyword(lang, kwd, child->valuestring);
                 locale_setstring(lang, mkname("keyword", keywords[kwd]), child->valuestring);

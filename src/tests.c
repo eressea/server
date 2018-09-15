@@ -147,7 +147,9 @@ struct locale * test_create_locale(void) {
             locale_setstring(loc, combatstatus[i], combatstatus[i] + 7);
         }
         for (i = 0; i != MAXKEYWORDS; ++i) {
-            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            if (keywords[i]) {
+                locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            }
         }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);

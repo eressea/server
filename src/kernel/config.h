@@ -109,7 +109,6 @@ extern "C" {
 
     /* globale settings des Spieles */
     typedef struct settings {
-        struct attrib *attribs;
         void *vm_state;
     } settings;
 
