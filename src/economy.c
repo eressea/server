@@ -103,6 +103,8 @@ static void recruit_init(void)
     }
 }
 
+#define ENTERTAINFRACTION 20
+
 int entertainmoney(const region * r)
 {
     double n;
@@ -978,11 +980,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         }
     }
 
-    if (besieged(u)) {
-        cmistake(u, u->thisorder, 60, MSG_PRODUCE);
-        return;
-    }
-
     if (rtype->modifiers) {
         message *msg = get_modifiers(u, sk, rtype, &save_mod, &skill_mod);
         if (msg) {
@@ -1604,11 +1601,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         cmistake(u, ord, 26, MSG_COMMERCE);
         return;
     }
-    if (besieged(u)) {
-        /* Belagerte Einheiten k�nnen nichts kaufen. */
-        cmistake(u, ord, 60, MSG_COMMERCE);
-        return;
-    }
 
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
@@ -1927,12 +1919,6 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             cmistake(u, ord, 27, MSG_COMMERCE);
             return false;
         }
-    }
-    /* Belagerte Einheiten k�nnen nichts verkaufen. */
-
-    if (besieged(u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
-        return false;
     }
     /* In der Region mu� es eine Burg geben. */
 
@@ -2407,10 +2393,6 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 58, MSG_INCOME);
         return;
     }
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_INCOME);
-        return;
-    }
     if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
@@ -2497,11 +2479,6 @@ static int do_work(unit * u, order * ord, econ_request * o)
         if (fval(u, UFL_WERE)) {
             if (ord)
                 cmistake(u, ord, 313, MSG_INCOME);
-            return -1;
-        }
-        if (besieged(u)) {
-            if (ord)
-                cmistake(u, ord, 60, MSG_INCOME);
             return -1;
         }
         if (u->ship && is_guarded(r, u)) {
@@ -2612,10 +2589,6 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
         return;
     }
 
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_INCOME);
-        return;
-    }
     n = armedmen(u, false);
 
     if (!n) {
@@ -2686,10 +2659,6 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
         return;
     }
 
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_INCOME);
-        return;
-    }
     n = armedmen(u, false);
 
     if (!n) {

@@ -257,9 +257,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Buildings canno
 msgid "error165"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The potion does not agree with the unit.\""
 
-msgid "siege_catapults"
-msgstr "\"$building($building) is under siege by $unit($unit). During siege, catapults caused $int($destruction) points destruction.\""
-
 msgid "curseinfo::magicstreet"
 msgstr "\"The roads are extremely dry and well-kept. ($int36($id))\""
 
@@ -638,9 +635,6 @@ msgstr "\"$unit($unit) appears.\""
 msgid "magicresistance_effect"
 msgstr "\"$unit($unit) is briefly surrounded by a magical light.\""
 
-msgid "siege"
-msgstr "\"$building($building) is under siege by $unit($unit).\""
-
 msgid "missing_force"
 msgstr "\"$unit($unit) cannot muster enough energy to cast $spell($spell) on level $int($level).\""
 
@@ -977,9 +971,6 @@ msgstr "\"$unit($mage) sees after the wounded and heals $int($amount). A $resour
 msgid "error276"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ships cannot be built here.\""
 
-msgid "error166"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - This race cannot besiege a castle.\""
-
 msgid "chaosgate_effect_2"
 msgstr "\"A vortex of blinding light appears.\""
 
@@ -997,9 +988,6 @@ msgstr "\"'$order($command)' - $unit($unit) marched into $region($region) during
 
 msgid "error82"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is no agreement with this number.\""
-
-msgid "error60"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is under siege.\""
 
 msgid "error162"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - This healing potion will be automatically used when needed.\""
@@ -1457,9 +1445,6 @@ msgstr "\"$unit($unit) unlocks one of the locks in $region($region) with $if($eq
 msgid "error255"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot sacrifice this.\""
 
-msgid "entrance_besieged"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) is under siege.\""
-
 msgid "error260"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The owner of a ship or a building cannot be sorted.\""
 
@@ -1549,9 +1534,6 @@ msgstr "\"There is a battle in $region($region).\""
 
 msgid "wormhole_dissolve"
 msgstr "\"The wormhole in $region($region) disappears.\""
-
-msgid "error23"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Contact was not possible due to siege.\""
 
 msgid "error12"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is not ours.\""
@@ -2135,9 +2117,6 @@ msgstr "\"Member of '$name ($int36($id))' for $int($age) weeks, led by $faction(
 msgid "deathcloud_effect"
 msgstr "\"$unit($mage) summons a poison elemental in $region($region).\""
 
-msgid "nr_building_besieged"
-msgstr "\", besieged by $int($soldiers) soldiers$if($lt($diff,0),\"\",\" (cut off)\")\""
-
 msgid "nr_population"
 msgstr "\"Your faction has $int($population) people in $int($units) of $int($limit) possible units.\""
 
@@ -2413,9 +2392,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship has mo
 
 msgid "aborted_battle"
 msgstr "\"The battle was aborted because all enemies escaped.\""
-
-msgid "error24"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Espionage was not possible due to siege.\""
 
 msgid "usecatapult"
 msgstr "\"$int($amount) fighters of $unit($unit) launch their catapults.\""

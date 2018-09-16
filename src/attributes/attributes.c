@@ -182,13 +182,13 @@ void register_attributes(void)
     at_register(&at_seenspell);
     at_register(&at_seenspells);
 
-    /* neue REGION-Attribute */
+    /* REGION Attribute */
     at_register(&at_moveblock);
     at_register(&at_deathcount);
     at_register(&at_woodcount);
+    at_register(&at_germs);
 
-    /* neue UNIT-Attribute */
-    at_register(&at_siege);
+    /* UNIT Attribute */
     at_register(&at_effect);
     at_register(&at_private);
 
@@ -205,8 +205,7 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
-    at_register(&at_germs);
-
+    at_deprecate("siege", a_readint);
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
     at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("chaoscount", a_readint); /* used to increase the chance of monster spawns */

@@ -153,15 +153,6 @@ int tolua_itemlist_next(lua_State * L)
     return 0;
 }
 
-static int tolua_getkey(lua_State * L)
-{
-    const char *name = tolua_tostring(L, 1, 0);
-    int flag = atoi36(name);
-
-    lua_pushboolean(L, key_get(global.attribs, flag));
-    return 1;
-}
-
 static int tolua_translate(lua_State * L)
 {
     const char *str = tolua_tostring(L, 1, 0);
@@ -171,20 +162,6 @@ static int tolua_translate(lua_State * L)
         str = LOC(loc, str);
         tolua_pushstring(L, str);
         return 1;
-    }
-    return 0;
-}
-
-static int tolua_setkey(lua_State * L)
-{
-    const char *name = tolua_tostring(L, 1, 0);
-    int value = (int)tolua_tonumber(L, 3, 0);
-    int flag = atoi36(name);
-    if (value) {
-        key_set(&global.attribs, flag, value);
-    }
-    else {
-        key_unset(&global.attribs, flag);
     }
     return 0;
 }
@@ -1003,8 +980,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
         tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
-        tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
-        tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);

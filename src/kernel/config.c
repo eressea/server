@@ -767,10 +767,6 @@ void free_gamedata(void)
     free_borders();
     free_alliances();
 
-    while (global.attribs) {
-        a_remove(&global.attribs, global.attribs);
-    }
-
     while (planes) {
         plane *pl = planes;
         planes = planes->next;

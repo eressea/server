@@ -30,7 +30,6 @@
 
 void age_firedragon(struct unit *u);
 void age_dragon(struct unit *u);
-void age_undead(struct unit *u);
 void age_skeleton(struct unit *u);
 void age_zombie(struct unit *u);
 void age_ghoul(struct unit *u);
@@ -81,7 +80,6 @@ void equip_newunits(struct unit *u)
 void register_races(void)
 {
     /* function age for race->age() */
-    register_function((pf_generic)age_undead, "age_undead");
     register_function((pf_generic)age_skeleton, "age_skeleton");
     register_function((pf_generic)age_zombie, "age_zombie");
     register_function((pf_generic)age_ghoul, "age_ghoul");

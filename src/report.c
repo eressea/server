@@ -1821,7 +1821,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     const char *name, *bname, *billusion = NULL;
     const struct locale *lang;
     char buffer[8192];
-    message *msg;
     size_t size;
     sbstring sbs;
 
@@ -1853,15 +1852,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
         sbs_strcat(&sbs, LOC(lang, "nr_building_inprogress"));
     }
 
-    if (b->besieged > 0 && r->seen.mode >= seen_lighthouse) {
-        msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
-            b->besieged - b->size * SIEGEFACTOR);
-
-        size = nr_render(msg, lang, sbs.end, sbs.size - (sbs.end - sbs.begin), f);
-        sbs.end += size;
-
-        msg_release(msg);
-    }
     i = 0;
     if (b->display && b->display[0]) {
         sbs_strcat(&sbs, "; ");

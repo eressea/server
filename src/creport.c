@@ -673,9 +673,7 @@ static void cr_output_building(struct stream *out, building *b,
     if (fno >= 0) {
         stream_printf(out, "%d;Partei\n", fno);
     }
-    if (b->besieged) {
-        stream_printf(out, "%d;Belagerer\n", b->besieged);
-    }
+
     cr_output_curses(out, f, b, TYP_BUILDING);
 }
 
@@ -780,7 +778,6 @@ void cr_output_unit(stream *out, const faction * f,
     const item_type *lasttype;
     int pr;
     item *itm, *show = NULL;
-    building *b;
     const char *pzTmp;
     skill *sv;
     item result[MAX_INVENTORY];
@@ -878,9 +875,6 @@ void cr_output_unit(stream *out, const faction * f,
     }
     if (is_guard(u)) {
         stream_printf(out, "%d;bewacht\n", 1);
-    }
-    if ((b = usiege(u)) != NULL) {
-        stream_printf(out, "%d;belagert\n", b->no);
     }
     /* additional information for own units */
     if (u->faction == f || omniscient(f)) {

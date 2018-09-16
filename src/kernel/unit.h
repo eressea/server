@@ -47,7 +47,6 @@ extern "C" {
 #define UFL_NOTMOVING     (1<<9)        /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
 #define UFL_DEFENDER      (1<<10)
 #define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
-#define UFL_SIEGE         (1<<12)       /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13)       /* speedup: hat ein target, siehe attribut */
 #define UFL_WERE          (1<<14)
 #define UFL_ENTER         (1<<15)       /* unit has entered a ship/building and will not leave it */
@@ -121,7 +120,6 @@ extern "C" {
 
     extern struct attrib_type at_creator;
     extern struct attrib_type at_alias;
-    extern struct attrib_type at_siege;
     extern struct attrib_type at_target;
     extern struct attrib_type at_potionuser;
     extern struct attrib_type at_contact;
@@ -138,8 +136,6 @@ extern "C" {
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);
     void u_setrace(struct unit *u, const struct race *);
-    struct building *usiege(const struct unit *u);
-    void usetsiege(struct unit *u, const struct building *b);
 
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
@@ -257,7 +253,6 @@ extern "C" {
     int read_unitid(const struct faction *f, const struct region *r);
 
     /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     bool has_horses(const struct unit *u);
     int maintenance_cost(const struct unit *u);
     bool has_limited_skills(const struct unit *u);

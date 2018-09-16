@@ -76,10 +76,6 @@ void process_battle(void) {
     do_battles();
 }
 
-void process_siege(void) {
-    process_cmd(K_BESIEGE, siege_cmd, PROC_LAND_REGION);
-}
-
 void process_update_long_order(void) {
     region * r;
     for (r = regions; r; r = r->next) {

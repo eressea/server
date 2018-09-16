@@ -118,7 +118,6 @@ extern "C" {
         int no;
         int size;
         int sizeleft;               /* is only used during battle. should be a temporary attribute */
-        int besieged;               /* should be an attribute */
         int flags;
     } building;
 

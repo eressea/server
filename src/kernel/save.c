@@ -1392,7 +1392,13 @@ int read_game(gamedata *data)
     else {
         READ_STR(store, NULL, 0);
     }
-    read_attribs(data, &global.attribs, NULL);
+
+    if (data->version < FIXATKEYS_VERSION) {
+        attrib *a = NULL;
+        read_attribs(data, &a, NULL);
+        a_removeall(&a, NULL);
+    }
+
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
     rng_init(turn + config_get_int("game.seed", 0));
@@ -1612,9 +1618,6 @@ int write_game(gamedata *data) {
     assert(data->version <= MAX_VERSION && data->version >= MIN_VERSION);
 
     WRITE_INT(store, game_id());
-    WRITE_SECTION(store);
-
-    write_attribs(store, global.attribs, NULL);
     WRITE_SECTION(store);
 
     WRITE_INT(store, turn);

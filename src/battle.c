@@ -100,9 +100,7 @@ typedef enum combatmagic {
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
-#ifndef ROW_FACTOR
-# define ROW_FACTOR 10
-#endif
+#define ROW_FACTOR 3            /* factor for combat row advancement rule */
 #define EFFECT_PANIC_SPELL 0.25
 #define TROLL_REGENERATION 0.10
 
@@ -161,7 +159,7 @@ static void init_rules(void)
     skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
     /* maximum number of combat turns */
-    max_turns = config_get_int("rules.combat.turns", COMBAT_TURNS);
+    max_turns = config_get_int("rules.combat.turns", 5);
     /* damage calculation */
     if (config_get_int("rules.combat.critical", 1)) {
         rule_damage |= DAMAGE_CRITICAL;
@@ -3579,17 +3577,6 @@ static void join_allies(battle * b)
                 }
                 if (se == s_end)
                     continue;
-                /* Wenn die Einheit belagert ist, mu� auch einer der Alliierten belagert sein: */
-                if (besieged(u)) {
-                    fighter *ally;
-                    for (ally = s->fighters; ally; ally = ally->next) {
-                        if (besieged(ally->unit)) {
-                            break;
-                        }
-                    }
-                    if (ally == NULL)
-                        continue;
-                }
                 /* keine Einw�nde, also soll er mitmachen: */
                 if (c == NULL) {
                     if (!join_battle(b, u, false, &c)) {

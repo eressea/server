@@ -435,30 +435,6 @@ static int tolua_process_eressea_process_battle00(lua_State* tolua_S)
 #endif
 }
 
-/* function: process_siege */
-static int tolua_process_eressea_process_siege00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
- !tolua_isnoobj(tolua_S,1,&tolua_err)
- )
- goto tolua_lerror;
- else
-#endif
- {
- {
-  process_siege();
- }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'siege'.",&tolua_err);
- return 0;
-#endif
-}
-
 /* function: process_leave */
 static int tolua_process_eressea_process_leave00(lua_State* tolua_S)
 {
@@ -993,7 +969,6 @@ LUALIB_API int luaopen_process (lua_State* tolua_S)
  tolua_function(tolua_S,"movement",tolua_process_eressea_process_movement00);
  tolua_function(tolua_S,"use",tolua_process_eressea_process_use00);
  tolua_function(tolua_S,"battle",tolua_process_eressea_process_battle00);
- tolua_function(tolua_S,"siege",tolua_process_eressea_process_siege00);
  tolua_function(tolua_S,"leave",tolua_process_eressea_process_leave00);
  tolua_function(tolua_S,"maintenance",tolua_process_eressea_process_maintenance00);
  tolua_function(tolua_S,"promote",tolua_process_eressea_process_promote00);

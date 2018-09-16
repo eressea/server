@@ -710,12 +710,6 @@
       <arg name="dir" type="direction"/>
     </type>
   </message>
-  <message name="nr_building_besieged" section="nr">
-    <type>
-      <arg name="soldiers" type="int"/>
-      <arg name="diff" type="int"/>
-    </type>
-  </message>
 
   <message name="newbie_password" section="events">
     <type>
@@ -2684,19 +2678,6 @@
       <arg name="want" type="int"/>
     </type>
   </message>
-  <message name="siege_catapults" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="building" type="building"/>
-      <arg name="destruction" type="int"/>
-    </type>
-  </message>
-  <message name="siege" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="building" type="building"/>
-    </type>
-  </message>
   <message name="drown_on_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -3351,14 +3332,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="entrance_besieged" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="building" type="building"/>
-    </type>
-  </message>
   <message name="entrance_denied" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -3890,13 +3863,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error166" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error165" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -3996,13 +3962,6 @@
     </type>
   </message>
   <message name="error135" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error60" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4987,20 +4946,6 @@
     </type>
   </message>
   <message name="error25" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error24" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error23" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>

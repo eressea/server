@@ -120,7 +120,7 @@ static void test_disable(CuTest * tc)
     const char * data = "{\"disabled\": [ "
         "\"alchemy\","
         "\"pay\","
-        "\"besiege\","
+        "\"attack\","
         "\"module\""
         "]}";
     cJSON *json = cJSON_Parse(data);
@@ -129,13 +129,13 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
-    CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
+    CuAssertTrue(tc, !keyword_disabled(K_ATTACK));
     CuAssertIntEquals(tc, 1, config_get_int("module.enabled", 1));
     json_config(json);
     CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, keyword_disabled(K_PAY));
-    CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
+    CuAssertTrue(tc, keyword_disabled(K_ATTACK));
     CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
     cJSON_Delete(json);
     test_teardown();

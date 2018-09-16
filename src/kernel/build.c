@@ -279,10 +279,6 @@ void build_road(unit * u, int size, direction_t d)
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
         return;
     }
-    if (besieged(u)) {
-        cmistake(u, u->thisorder, 60, MSG_PRODUCE);
-        return;
-    }
 
     if (rn == NULL || rn->terrain->max_road < 0) {
         cmistake(u, u->thisorder, 94, MSG_PRODUCE);
@@ -780,11 +776,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         cmistake(u, ord, 93, MSG_PRODUCE);
         return 0;
     }
-    if (besieged(u)) {
-        /* units under siege can not build */
-        cmistake(u, ord, 60, MSG_PRODUCE);
-        return 0;
-    }
     if (btype->flags & BTF_NOBUILD) {
         /* special building, cannot be built */
         cmistake(u, ord, 221, MSG_PRODUCE);
@@ -947,10 +938,6 @@ create_ship(unit * u, const struct ship_type *newtype, int want,
 
     if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
-        return;
-    }
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_PRODUCE);
         return;
     }
 
