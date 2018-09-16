@@ -77,7 +77,7 @@ extern "C" {
     bool canfly(struct unit *u);
     void leave_trail(struct ship *sh, struct region *from,
                             struct region_list *route);
-    struct ship *move_ship(struct ship *sh, struct region *from,
+    void move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
     int movement_speed(const struct unit * u);
