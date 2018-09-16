@@ -855,7 +855,7 @@ static void drifting_ships(region * r)
                 }
             }
 
-            if (firstu != NULL) {
+            if (rnext && firstu) {
                 message *msg = msg_message("ship_drift", "ship dir", sh, dir);
                 msg_to_ship_inmates(sh, &firstu, &lastu, msg);
             }
@@ -873,7 +873,7 @@ static void drifting_ships(region * r)
                 sink_ship(sh);
                 remove_ship(shp, sh);
             }
-            else if (rnext != NULL) {
+            else if (rnext) {
                 /* Das Schiff und alle Einheiten darin werden nun von r
                     * nach rnext verschoben. Danach eine Meldung. */
                 add_regionlist(&route, rnext);
