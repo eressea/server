@@ -299,7 +299,7 @@ int sp_combatrosthauch(struct castorder * co)
         for (w = 0; df->weapons[w].type != NULL; ++w) {
             weapon *wp = df->weapons;
             int n = force;
-            if (n < wp->used) n = wp->used;
+            if (n > wp->used) n = wp->used;
             if (n) {
                 requirement *mat = wp->type->itype->construction->materials;
                 bool iron = false;
