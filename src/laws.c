@@ -741,11 +741,13 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
      * Kräuter))% sich zu vermehren. */
     UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
-        int i;
-        for (i = rherbs(r); i > 0; i--) {
-            if (rng_int() % 100 < (100 - rherbs(r)))
-                rsetherbs(r, (short)(rherbs(r) + 1));
+        int i, herbs = rherbs(r);
+        for (i = herbs; i > 0; --i) {
+            if (rng_int() % 100 < (100 - herbs)) {
+                ++herbs;
+            }
         }
+        rsetherbs(r, herbs);
     }
 }
 
