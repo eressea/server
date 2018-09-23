@@ -22,7 +22,6 @@
 
 #include "kernel/building.h"
 #include "kernel/faction.h"
-#include "kernel/item.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
 #include "kernel/terrainid.h"
@@ -45,7 +44,6 @@
 #include "teleport.h"
 
 #include <assert.h>
-#include <locale.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdarg.h>

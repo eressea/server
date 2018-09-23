@@ -4,30 +4,38 @@
 
 #include "bindings.h"
 
+#include "magic.h"
+#include "skill.h"
+#include "helpers.h"
+#include "console.h"
+#include "reports.h"
+#include "study.h"
+#include "summary.h"
+#include "teleport.h"
+#include "laws.h"
+
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/alliance.h"
 #include "kernel/building.h"
+#include "kernel/build.h"
 #include "kernel/curse.h"
 #include "kernel/unit.h"
 #include "kernel/terrain.h"
 #include "kernel/messages.h"
-#include "kernel/region.h"
-#include "kernel/building.h"
 #include "kernel/plane.h"
-#include "kernel/race.h"
-#include "kernel/item.h"
-#include "kernel/order.h"
-#include "kernel/ship.h"
-#include "kernel/faction.h"
+#include "kernel/region.h"
 #include "kernel/save.h"
+#include "kernel/ship.h"
 #include "kernel/spell.h"
+#include "kernel/types.h"
+#include "kernel/item.h"
+#include "kernel/faction.h"
 #include "kernel/spellbook.h"
 #include "races/races.h"
 
 #include "bind_unit.h"
 #include "bind_storage.h"
-#include "bind_building.h"
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
@@ -36,42 +44,31 @@
 #include "bind_gmtool.h"
 #include "bind_region.h"
 
-#include "helpers.h"
-#include "console.h"
-#include "reports.h"
-#include "study.h"
-#include "economy.h"
-#include "summary.h"
-#include "teleport.h"
-#include "laws.h"
-#include "monsters.h"
-#include "market.h"
-
 #include <modules/score.h>
-#include <attributes/key.h>
 
 #include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
-#include <util/nrmessage.h>
+#include <util/message.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
 #include <selist.h>
-#include <storage.h>
 
-#include <iniparser.h>
+#include <dictionary.h>
 #include <tolua.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include <time.h>
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define TOLUA_PKG(NAME) void tolua_##NAME##_open(lua_State * L)
 

@@ -18,6 +18,7 @@ without prior permission by the authors of Eressea.
 #include "bind_unit.h"
 #include "bindings.h"
 #include "helpers.h"
+#include "magic.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
@@ -29,14 +30,19 @@ without prior permission by the authors of Eressea.
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spellbook.h>
-#include <attributes/key.h>
+#include "kernel/types.h"
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/password.h>
 
+#include "attributes/key.h"
+
+#include <lua.h>
+#include <lauxlib.h>
 #include <tolua.h>
 #include <string.h>
 #include <stdlib.h>
