@@ -169,9 +169,18 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
+find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+if(NOT IWYU_PATH)
+	message(STATUS "Could not find the program include-what-you-use")
+endif()
+
+
 add_library(version STATIC ${VERSION_SRC})
 add_library(game ${ERESSEA_SRC})
 add_executable(eressea ${SERVER_SRC})
+if (IWYU_PATH)
+set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+endif(IWYU_PATH)
 target_link_libraries(game version)
 target_link_libraries(eressea
   game
