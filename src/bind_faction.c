@@ -17,19 +17,16 @@ without prior permission by the authors of Eressea.
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
-#include "helpers.h"
 #include "magic.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
-#include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/spellbook.h>
 #include "kernel/types.h"
 
 #include <util/base36.h>
@@ -46,7 +43,6 @@ without prior permission by the authors of Eressea.
 #include <tolua.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 typedef struct helpmode {
     const char *name;

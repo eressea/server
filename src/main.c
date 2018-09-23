@@ -22,15 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <kernel/calendar.h>
 #include <kernel/config.h>
-#include <kernel/database.h>
 #include <kernel/messages.h>
-#include <kernel/save.h>
 #include <kernel/version.h>
 
-#include <util/filereader.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <util/macros.h>
 #include <util/path.h>
 
 #include "eressea.h"
@@ -39,14 +35,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 #include "bindings.h"
-#include "races/races.h"
-#include "spells.h"
+
+#include <iniparser.h>
+#include <dictionary.h>
 
 #include <lua.h>
-#include <assert.h>
+
+#include <limits.h>
 #include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <wctype.h>
-#include <iniparser.h>
 
 static const char *logfile = "eressea.log";
 static const char *luafile = 0;
@@ -302,7 +302,7 @@ void locale_init(void)
     }
 }
 
-extern void bind_monsters(struct lua_State *L);
+extern void bind_monsters(lua_State *L);
 
 int main(int argc, char **argv)
 {
