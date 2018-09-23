@@ -3865,7 +3865,6 @@ static void battle_flee(battle * b)
             for (fig = s->fighters; fig; fig = fig->next) {
                 unit *u = fig->unit;
                 troop dt;
-                int runners = 0;
                 /* Flucht nicht bei mehr als 600 HP. Damit Wyrme t�tbar bleiben. */
                 int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
                 if (runhp > 600) runhp = 600;
@@ -3912,7 +3911,6 @@ static void battle_flee(battle * b)
                         ispaniced = EFFECT_PANIC_SPELL;
                     }
                     if (chance(fmin(fleechance(u) + ispaniced, 0.90))) {
-                        ++runners;
                         flee(dt);
                     }
                 }
