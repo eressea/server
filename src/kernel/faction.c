@@ -230,7 +230,7 @@ static int unused_faction_id(void)
 }
 
 faction *addfaction(const char *email, const char *password,
-    const struct race * frace, const struct locale * loc, int subscription)
+    const struct race * frace, const struct locale * loc)
 {
     faction *f = calloc(sizeof(faction), 1);
     char buf[128];
@@ -249,7 +249,7 @@ faction *addfaction(const char *email, const char *password,
     f->race = frace;
     f->magiegebiet = 0;
     f->locale = loc;
-    f->subscription = subscription;
+    f->uid = 0;
     f->flags = FFL_ISNEW|FFL_PWMSG;
 
     if (!password) password = itoa36(rng_int());
@@ -393,7 +393,7 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
         const char *email = config_get("monster.email");
-        f = addfaction(email, NULL, rc, default_locale, 0);
+        f = addfaction(email, NULL, rc, default_locale);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
@@ -839,7 +839,7 @@ int writepasswd(void)
 
         for (f = factions; f; f = f->next) {
             fprintf(F, "%s:%s:%s:%d\n",
-                itoa36(f->no), faction_getemail(f), f->_password, f->subscription);
+                itoa36(f->no), faction_getemail(f), f->_password, f->uid);
         }
         fclose(F);
         return 0;

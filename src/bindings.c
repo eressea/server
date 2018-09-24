@@ -339,13 +339,6 @@ static int tolua_update_owners(lua_State * L)
     return 0;
 }
 
-static int tolua_update_subscriptions(lua_State * L)
-{
-    UNUSED_ARG(L);
-    update_subscriptions();
-    return 0;
-}
-
 static int tolua_remove_empty_units(lua_State * L)
 {
     UNUSED_ARG(L);
@@ -972,7 +965,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
         tolua_function(L, TOLUA_CAST "get_nmrs", tolua_get_nmrs);
         tolua_function(L, TOLUA_CAST "remove_empty_units", tolua_remove_empty_units);
-        tolua_function(L, TOLUA_CAST "update_subscriptions", tolua_update_subscriptions);
         tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
         tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);

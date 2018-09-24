@@ -969,7 +969,10 @@ faction *read_faction(gamedata * data)
             a_remove(&f->attribs, f->attribs);
         }
     }
-    READ_INT(data->store, &f->subscription);
+    READ_INT(data->store, &f->uid);
+    if (data->version < FACTION_UID_VERSION) {
+        f->uid = 0;
+    }
 
     if (data->version >= SPELL_LEVEL_VERSION) {
         READ_INT(data->store, &f->max_spelllevel);
@@ -1100,7 +1103,7 @@ void write_faction(gamedata *data, const faction * f)
     assert(f->_alive);
     assert(f->no > 0 && f->no <= MAX_UNIT_NR);
     WRITE_INT(data->store, f->no);
-    WRITE_INT(data->store, f->subscription);
+    WRITE_INT(data->store, f->uid);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
     WRITE_INT(data->store, f->max_spelllevel);
 #endif
@@ -1681,6 +1684,5 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
     write_borders(store);
     WRITE_SECTION(store);
-
     return 0;
 }

@@ -4192,7 +4192,7 @@ static int sp_calm_monster(castorder * co)
         return 0;
     }
 
-    effect = mage->faction->subscription;
+    effect = mage->faction->uid;
     c = create_curse(mage, &target->attribs, &ct_calmmonster, force,
         (int)force, effect, 0);
     if (c == NULL) {

@@ -166,7 +166,7 @@ struct locale * test_create_locale(void) {
 struct faction *test_create_faction(const struct race *rc)
 {
     struct locale * loc = test_create_locale();
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc);
     test_clear_messages(f);
     return f;
 }

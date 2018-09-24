@@ -44,6 +44,11 @@ int db_driver_order_save(order_data *od)
     return ent.id;
 }
 
+int db_driver_faction_save(int id, int no, int turn, const char *email, const char *password)
+{
+    return -1;
+}
+
 static int free_data_cb(const void *match, const void *key, size_t keylen,
     void *udata)
 {

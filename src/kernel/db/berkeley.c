@@ -53,6 +53,11 @@ int db_driver_order_save(struct order_data *od)
     return (int)recno;
 }
 
+int db_driver_faction_save(int id, int no, int turn, const char *email, const char *password)
+{
+    return -1;
+}
+
 struct order_data *db_driver_order_load(int id)
 {
     int ret;

@@ -24,7 +24,7 @@ extern "C" {
         char *password;
         const struct locale *lang;
         const struct race *race;
-        int subscription;
+        int uid;
         bool oldregions;
         struct alliance *allies;
     } newfaction;

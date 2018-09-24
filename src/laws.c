@@ -3974,33 +3974,6 @@ void turn_end(void)
     update_spells();
 }
 
-void update_subscriptions(void)
-{
-    FILE *F;
-    char zText[4096];
-
-    path_join(basepath(), "subscriptions", zText, sizeof(zText));
-    F = fopen(zText, "r");
-    if (F == NULL) {
-        log_warning(0, "could not open %s.\n", zText);
-        return;
-    }
-    for (;;) {
-        char zFaction[5];
-        int subscription, fno;
-        faction *f;
-
-        if (fscanf(F, "%4d %4s", &subscription, zFaction) <= 0)
-            break;
-        fno = atoi36(zFaction);
-        f = findfaction(fno);
-        if (f != NULL) {
-            f->subscription = subscription;
-        }
-    }
-    fclose(F);
-}
-
 /** determine if unit can be seen by faction
  * @param f -- the observiong faction
  * @param u -- the unit that is observed

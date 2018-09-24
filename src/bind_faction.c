@@ -432,7 +432,7 @@ static int tolua_faction_create(lua_State * L)
     faction *f = NULL;
     const struct race *frace = rc_find(racename ? racename : "human");
     if (frace != NULL) {
-        f = addfaction(email, NULL, frace, loc, 0);
+        f = addfaction(email, NULL, frace, loc);
     }
     if (!f) {
         log_error("cannot create %s faction for %s, unknown race.", racename, email);
@@ -528,14 +528,14 @@ static int tolua_faction_set_name(lua_State * L)
 static int tolua_faction_get_uid(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, f->subscription);
+    lua_pushinteger(L, f->uid);
     return 1;
 }
 
 static int tolua_faction_set_uid(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    f->subscription = (int)tolua_tonumber(L, 2, 0);
+    f->uid = (int)tolua_tonumber(L, 2, 0);
     return 0;
 }
 

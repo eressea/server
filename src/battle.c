@@ -3659,7 +3659,7 @@ static bool is_calmed(const unit *u, const faction *f) {
 
     while (a && a->type == &at_curse) {
         curse *c = (curse *)a->data.v;
-        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->subscription) {
+        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->uid) {
             if (curse_active(c)) {
                 return true;
             }

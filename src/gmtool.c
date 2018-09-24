@@ -920,8 +920,7 @@ static void seed_player(state *st, const newfaction *player) {
         if (r) {
             faction *f;
             addplayer(r, f = addfaction(player->email, player->password,
-                                        player->race, player->lang,
-                                        player->subscription));
+                                        player->race, player->lang));
         }
     }
 }

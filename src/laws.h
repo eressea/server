@@ -41,7 +41,6 @@ extern "C" {
     void demographics(void);
     void immigration(void);
     void update_guards(void);
-    void update_subscriptions(void);
     void deliverMail(struct faction *f, struct region *r, struct unit *u,
         const char *s, struct unit *receiver);
 

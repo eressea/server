@@ -95,7 +95,7 @@ newfaction *read_newfactions(const char *filename)
         faction *f;
         char race[20], email[64], lang[8], password[16];
         newfaction *nf, **nfi;
-        int alliance = 0, subscription = 0;
+        int alliance = 0, uid = 0;
 
         if (fgets(buf, sizeof(buf), F) == NULL)
             break;
@@ -104,7 +104,7 @@ newfaction *read_newfactions(const char *filename)
         password[0] = '\0';
 
         if (sscanf(buf, "%54s %19s %7s %15s %4d %4d", email, race, lang, 
-            password, &subscription, &alliance) < 3) {
+            password, &uid, &alliance) < 3) {
             break;
         }
         if (email[0] == '#') {
@@ -137,13 +137,13 @@ newfaction *read_newfactions(const char *filename)
         if (check_email(email) == 0) {
           nf->email = str_strdup(email);
         } else {
-            log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
+            log_error("Invalid email address for subscription %s: %s\n", itoa36(uid), email);
             free(nf);
             continue;
         }
         nf->password = str_strdup(password);
         nf->race = rc_find(race);
-        nf->subscription = subscription;
+        nf->uid = uid;
         if (alliances != NULL) {
             struct alliance *al = findalliance(alliance);
             if (al == NULL) {
@@ -557,7 +557,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             ++tsize;
             assert(r->land && r->units == 0);
             u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
-                nextf->lang, nextf->subscription));
+                nextf->lang));
             f = u->faction;
             fset(f, FFL_ISNEW);
             f->alliance = nextf->allies;
@@ -857,7 +857,7 @@ static void starting_region(newfaction ** players, region * r, region * rn[])
         const struct race *rc = nf->race ? nf->race : races;
         const struct locale *lang = nf->lang ? nf->lang : default_locale;
         const char * passwd = nf->password ? nf->password : itoa36(rng_int());
-        addplayer(r, addfaction(nf->email, passwd, rc, lang, 0));
+        addplayer(r, addfaction(nf->email, passwd, rc, lang));
         *players = nf->next;
         free_newfaction(nf);
     }

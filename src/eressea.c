@@ -39,6 +39,18 @@
 /* manually free() everything at exit? */
 #undef CLEANUP_CODE
 
+void game_write_dbstate(void)
+{
+    faction *f;
+
+    for (f = factions; f; f = f->next) {
+        int uid = dblib_save_faction(f, turn);
+        if (uid > 0) {
+            f->uid = uid;
+        }
+    }
+}
+
 void game_done(void)
 {
     log_dead_factions();
