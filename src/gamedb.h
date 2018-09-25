@@ -1,3 +1,3 @@
 #pragma once
 
-void gamedb_update(void);
+int gamedb_update(void);

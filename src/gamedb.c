@@ -4,9 +4,11 @@
 
 #include "gamedb.h"
 
-#include "kernel/db/driver.h"
+#include "kernel/config.h"
+#include "kernel/calendar.h"
 #include "kernel/database.h"
 #include "kernel/faction.h"
+#include "kernel/db/driver.h"
 
 int gamedb_update(void)
 {

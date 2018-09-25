@@ -95,8 +95,9 @@ local function write_htpasswd()
 end
 
 local function write_files(locales)
+    write_database()
     write_passwords()
-    write_htpasswd()
+    -- write_htpasswd()
     write_reports()
     write_summary()
 end

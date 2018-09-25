@@ -4,15 +4,16 @@
 
 #include "bindings.h"
 
-#include "magic.h"
-#include "skill.h"
-#include "helpers.h"
 #include "console.h"
+#include "gamedb.h"
+#include "helpers.h"
+#include "laws.h"
+#include "magic.h"
 #include "reports.h"
+#include "skill.h"
 #include "study.h"
 #include "summary.h"
 #include "teleport.h"
-#include "laws.h"
 
 #include "kernel/calendar.h"
 #include "kernel/config.h"
@@ -437,7 +438,14 @@ static int tolua_write_passwords(lua_State * L)
 {
     int result = writepasswd();
     lua_pushinteger(L, result);
-    return 0;
+    return 1;
+}
+
+static int tolua_write_database(lua_State * L)
+{
+    int result = gamedb_update();
+    lua_pushinteger(L, result);
+    return 1;
 }
 
 static int tolua_write_summary(lua_State * L)
@@ -949,6 +957,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "write_report", tolua_write_report);
         tolua_function(L, TOLUA_CAST "write_summary", tolua_write_summary);
         tolua_function(L, TOLUA_CAST "write_passwords", tolua_write_passwords);
+        tolua_function(L, TOLUA_CAST "write_database", tolua_write_database);
         tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);
         tolua_function(L, TOLUA_CAST "message_faction", tolua_message_faction);
         tolua_function(L, TOLUA_CAST "message_region", tolua_message_region);

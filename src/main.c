@@ -96,7 +96,7 @@ static const char * valid_keys[] = {
     "game.era",
     "game.sender",
     "game.dbname",
-    "game.db.",
+    "game.dbswap",
     "game.dbbatch",
     "editor.color",
     "editor.codepage",
