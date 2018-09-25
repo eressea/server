@@ -144,15 +144,9 @@ int db_driver_faction_save(int id, int no, int turn, const char *email, const ch
     return (int)row_id;
 }
 
-void db_driver_open(void)
-{
+static int db_open_game(const char *dbname) {
     int err;
-    const char *dbname, *dbtemp;
 
-    ERRNO_CHECK();
-
-    dbname = config_get("game.dbname");
-    if (!dbname) dbname = "";
     err = sqlite3_open(dbname, &g_game_db);
     assert(err == SQLITE_OK);
     err = sqlite3_exec(g_game_db, "CREATE TABLE IF NOT EXISTS factions (id INTEGER PRIMARY KEY, no INTEGER NOT NULL, email VARCHAR(128), password VARCHAR(128), turn INTEGER NOT NULL)", NULL, NULL, NULL);
@@ -162,9 +156,16 @@ void db_driver_open(void)
     err = sqlite3_prepare_v2(g_game_db, "INSERT INTO factions (no, turn, email, password) VALUES (?,?,?,?)", -1, &g_stmt_insert_faction, NULL);
     assert(err == SQLITE_OK);
 
+    ERRNO_CHECK();
+    return 0;
+}
+
+static int db_open_swap(const char *dbname) {
+    int err;
+
     g_order_batchsize = config_get_int("game.dbbatch", 100);
-    dbtemp = config_get("game.db.temp");
-    err = sqlite3_open(dbtemp ? dbtemp : dbname, &g_temp_db);
+
+    err = sqlite3_open(dbname, &g_temp_db);
     assert(err == SQLITE_OK);
     err = sqlite3_exec(g_temp_db, "PRAGMA journal_mode=OFF", NULL, NULL, NULL);
     assert(err == SQLITE_OK);
@@ -176,16 +177,30 @@ void db_driver_open(void)
     assert(err == SQLITE_OK);
     err = sqlite3_prepare_v2(g_temp_db, "SELECT data FROM orders WHERE id=?", -1, &g_stmt_select_order, NULL);
     assert(err == SQLITE_OK);
-
     ERRNO_CHECK();
+    return 0;
 }
 
-void db_driver_close(void)
+int db_driver_open(database_t db, const char *dbname)
+{
+    ERRNO_CHECK();
+
+    if (db == DB_SWAP) {
+        return db_open_swap(dbname);
+    }
+    else if (db == DB_GAME) {
+        return db_open_game(dbname);
+    }
+    return -1;
+}
+
+void db_driver_close(database_t db)
 {
     int err;
 
     ERRNO_CHECK();
-    if (g_temp_db) {
+    if (db == DB_SWAP) {
+        assert(g_temp_db);
         err = sqlite3_finalize(g_stmt_select_order);
         assert(err == SQLITE_OK);
         err = sqlite3_finalize(g_stmt_insert_order);
@@ -193,7 +208,8 @@ void db_driver_close(void)
         err = sqlite3_close(g_temp_db);
         assert(err == SQLITE_OK);
     }
-    if (g_game_db) {
+    else if (db == DB_GAME) {
+        assert(g_game_db);
         err = sqlite3_finalize(g_stmt_update_faction);
         assert(err == SQLITE_OK);
         err = sqlite3_finalize(g_stmt_insert_faction);
