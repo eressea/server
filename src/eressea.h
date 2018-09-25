@@ -6,7 +6,6 @@ extern "C" {
 
     void game_init(void);
     void game_done(void);
-    void game_write_dbstate(void);
 
 #ifdef __cplusplus
 }

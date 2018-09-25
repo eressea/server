@@ -97,6 +97,7 @@ set (ERESSEA_SRC
   economy.c
   eressea.c
   exparse.c
+  gamedb.c
   give.c
   guard.c
   items.c
