@@ -86,48 +86,48 @@ ENDIF()
 
 set (ERESSEA_SRC
   vortex.c
-  automate.c
-  move.c
-  piracy.c
-  spells.c
-  battle.c
-  alchemy.c
   academy.c
+  alchemy.c
+  automate.c
+  battle.c
   chaos.c
-  upkeep.c
-  names.c
-  lighthouse.c
-  reports.c
-  teleport.c
-  guard.c
-  jsonconf.c
-  prefix.c
-  donations.c
-  eressea.c
-  direction.c
-  keyword.c
-  skill.c
-  json.c
   creport.c
-  report.c
-  steal.c
+  direction.c
+  donations.c
   economy.c
+  eressea.c
   exparse.c
   give.c
+  guard.c
   items.c
+  json.c
+  jsonconf.c
+  keyword.c
   laws.c
+  lighthouse.c
   magic.c
   market.c
+  monsters.c
   morale.c
+  move.c
+  names.c
   orderfile.c
+  piracy.c
+  prefix.c
   randenc.c
   renumber.c
-  volcano.c
+  report.c
+  reports.c
+  skill.c
+  spells.c
   spy.c
+  steal.c
   study.c
   summary.c
   travelthru.c
-  monsters.c
+  teleport.c
+  upkeep.c
+  volcano.c
   wormhole.c
   ${SPELLS_SRC}
   ${RACES_SRC}
@@ -141,31 +141,31 @@ set (ERESSEA_SRC
 )
 
 set(SERVER_SRC
-  main.c
-  console.c
-  helpers.c
-  bind_tolua.c
   bind_building.c
   bind_config.c
-  bind_locale.c
   bind_eressea.c
   bind_faction.c
-  bind_order.c
-  bindings.c
+  bind_locale.c
   bind_message.c
   bind_monsters.c
+  bind_order.c
   bind_process.c
   bind_region.c
   bind_ship.c
   bind_storage.c
+  bind_tolua.c
   bind_unit.c
+  bindings.c
+  console.c
+  helpers.c
+  main.c
 )
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
+  bind_gmtool.c
   gmtool.c
   listbox.c
-  bind_gmtool.c
 )
 endif(CURSES_FOUND)
 
@@ -193,8 +193,6 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
-  test_eressea.c
-  tests.c
   academy.test.c
   alchemy.test.c
   automate.test.c
@@ -219,13 +217,15 @@ set(TESTS_SRC
   piracy.test.c
   prefix.test.c
   renumber.test.c
-  reports.test.c
   report.test.c
-  summary.test.c
+  reports.test.c
   skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
+  summary.test.c
+  test_eressea.c
+  tests.c
   tests.test.c
   travelthru.test.c
   upkeep.test.c
