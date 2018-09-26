@@ -15,14 +15,21 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
+
+#ifdef WIN32
+#include <windows.h>
+#include <bcrypt.h>
+#else
+#include <unistd.h>
+#endif
 
 #include "bcrypt.h"
 #include "crypt_blowfish/ow-crypt.h"
 
 #define RANDBYTES (16)
 
+#ifndef WIN32
 static int try_close(int fd)
 {
 	int ret;
@@ -60,7 +67,7 @@ static int try_read(int fd, char *out, size_t count)
 
 	return 0;
 }
-
+#endif
 /*
  * This is a best effort implementation. Nothing prevents a compiler from
  * optimizing this function and making it vulnerable to timing attacks, but
@@ -96,12 +103,15 @@ static int timing_safe_strcmp(const char *str1, const char *str2)
 
 int bcrypt_gensalt(int factor, char salt[BCRYPT_HASHSIZE])
 {
-	int fd;
 	char input[RANDBYTES];
 	int workf;
 	char *aux;
 
-	fd = open("/dev/urandom", O_RDONLY);
+#ifdef WIN32
+    BCryptGenRandom(NULL, input, RANDBYTES, BCRYPT_USE_SYSTEM_PREFERRED_RNG);    
+#else
+    int fd;
+    fd = open("/dev/urandom", O_RDONLY);
 	if (fd == -1)
 		return 1;
 
@@ -113,7 +123,7 @@ int bcrypt_gensalt(int factor, char salt[BCRYPT_HASHSIZE])
 
 	if (try_close(fd) != 0)
 		return 3;
-
+#endif
 	/* Generate salt. */
 	workf = (factor < 4 || factor > 31)?12:factor;
 	aux = crypt_gensalt_rn("$2a$", workf, input, RANDBYTES,
