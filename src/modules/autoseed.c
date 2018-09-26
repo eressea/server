@@ -95,7 +95,7 @@ newfaction *read_newfactions(const char *filename)
         faction *f;
         char race[20], email[64], lang[8], password[16];
         newfaction *nf, **nfi;
-        int alliance = 0, uid = 0;
+        int alliance = 0;
 
         if (fgets(buf, sizeof(buf), F) == NULL)
             break;
@@ -103,8 +103,8 @@ newfaction *read_newfactions(const char *filename)
         email[0] = '\0';
         password[0] = '\0';
 
-        if (sscanf(buf, "%54s %19s %7s %15s %4d %4d", email, race, lang, 
-            password, &uid, &alliance) < 3) {
+        if (sscanf(buf, "%54s %19s %7s %15s %4d", email, race, lang, 
+            password, &alliance) < 3) {
             break;
         }
         if (email[0] == '#') {
@@ -137,13 +137,12 @@ newfaction *read_newfactions(const char *filename)
         if (check_email(email) == 0) {
             nf->email = str_strdup(email);
         } else {
-            log_error("Invalid email address for subscription %s: %s\n", itoa36(uid), email);
+            log_error("Invalid email address for new faction: %s\n", email);
             free(nf);
             continue;
         }
         nf->password = str_strdup(password);
         nf->race = rc_find(race);
-        nf->uid = uid;
         if (alliances != NULL) {
             struct alliance *al = findalliance(alliance);
             if (al == NULL) {
@@ -559,7 +558,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             assert(r->land && r->units == 0);
             password = nextf->password ? nextf->password : itoa36(rng_int());
             u = addplayer(r, addfaction(nextf->email, password, nextf->race,
-                nextf->lang, nextf));
+                nextf->lang));
             f = u->faction;
             fset(f, FFL_ISNEW);
             f->alliance = nextf->allies;
