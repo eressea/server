@@ -16,7 +16,7 @@ bool password_is_implemented(cryptalgo_t algo) {
     return algo == PASSWORD_PLAINTEXT;
 }
 
-const char * password_encode(const char * passwd, cryptalgo_t algo) {
+const char * password_hash(const char * passwd, cryptalgo_t algo) {
     if (algo == PASSWORD_BCRYPT) {
         char salt[BCRYPT_HASHSIZE];
         static char hash[BCRYPT_HASHSIZE];

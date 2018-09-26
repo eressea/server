@@ -924,7 +924,7 @@ static void read_password(gamedata *data, faction *f) {
     if (name[0] == '$' && data->version == BADCRYPT_VERSION) {
         char * pass = getpasswd(f->no);
         if (pass) {
-            faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
+            faction_setpassword(f, password_hash(pass, PASSWORD_DEFAULT));
             free(pass); /* TODO: remove this allocation! */
         }
         else {
@@ -932,7 +932,7 @@ static void read_password(gamedata *data, faction *f) {
         }
     }
     else {
-        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
+        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, PASSWORD_DEFAULT));
     }
     (void)_test_read_password;
 }

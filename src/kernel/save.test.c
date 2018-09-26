@@ -407,7 +407,7 @@ static void test_read_password(CuTest *tc) {
 
     test_setup();
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     _test_write_password(&data, f);
@@ -431,7 +431,7 @@ static void test_read_password_external(CuTest *tc) {
         errno = 0;
     }
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);

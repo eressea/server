@@ -254,7 +254,7 @@ faction *addfaction(const char *email, const char *password,
     f->flags = FFL_ISNEW|FFL_PWMSG;
 
     if (password) {
-        faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
+        faction_setpassword(f, password_hash(password, PASSWORD_DEFAULT));
         ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
     }
 

@@ -13,5 +13,5 @@ extern int bcrypt_workfactor;
 #define VERIFY_FAIL 1
 #define VERIFY_UNKNOWN 2
 int password_verify(const char *hash, const char *passwd);
-const char * password_encode(const char *passwd, cryptalgo_t algo);
+const char * password_hash(const char *passwd, cryptalgo_t algo);
 bool password_is_implemented(cryptalgo_t algo);

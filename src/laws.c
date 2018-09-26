@@ -2135,7 +2135,7 @@ int password_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 283, MSG_EVENT);
         str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
+    faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
         "value", pwbuf));
     u->faction->flags |= FFL_PWMSG;
