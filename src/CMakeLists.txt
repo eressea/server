@@ -3,6 +3,7 @@ project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
+include_directories (${BCRYPT_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
@@ -179,6 +180,7 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CLIBS_LIBRARIES}
+  ${BCRYPT_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
@@ -239,6 +241,7 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
+  ${BCRYPT_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )

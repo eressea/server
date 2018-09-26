@@ -62,6 +62,7 @@ endif(TOLUA_FOUND)
 
 enable_testing()
 
+add_subdirectory (crypt_blowfish)
 add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (iniparser)
