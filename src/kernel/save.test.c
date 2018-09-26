@@ -441,16 +441,15 @@ static void test_read_password_external(CuTest *tc) {
     data.strm.api->rewind(data.strm.handle);
     data.version = NOCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "newpassword", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "newpassword"));
     data.version = BADCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "secret", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "secret"));
     F = fopen(pwfile, "wt");
     fprintf(F, "%s:pwfile\n", itoa36(f->no));
     fclose(F);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "pwfile", f->_password);
     CuAssertTrue(tc, checkpasswd(f, "pwfile"));
     mstream_done(&data.strm);
     gamedata_done(&data);

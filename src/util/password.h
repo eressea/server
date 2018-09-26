@@ -5,7 +5,7 @@ typedef enum cryptalgo_t {
     PASSWORD_PLAINTEXT,
     PASSWORD_BCRYPT
 } cryptalgo_t;
-#define PASSWORD_DEFAULT PASSWORD_PLAINTEXT
+#define PASSWORD_DEFAULT PASSWORD_BCRYPT
 
 extern int bcrypt_workfactor;
 

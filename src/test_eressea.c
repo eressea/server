@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/password.h>
 #include <util/strings.h>
 #include <util/variant.h>
 
@@ -159,6 +160,7 @@ int RunAllTests(int argc, char *argv[])
         CuSuite *summary = CuSuiteNew();
         int fail_count;
         game_init();
+        bcrypt_workfactor = 4;
         while (suites) {
             suite *s = suites->next;
             RunTests(suites->csuite, suites->name);

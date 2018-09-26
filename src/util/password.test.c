@@ -7,6 +7,7 @@ static void test_passwords(CuTest *tc) {
     const char *hash;
     
     if (password_is_implemented(PASSWORD_BCRYPT)) {
+        int wf = bcrypt_workfactor;
         bcrypt_workfactor = 4;
         hash = password_encode("password", PASSWORD_BCRYPT);
         CuAssertPtrNotNull(tc, hash);
@@ -18,6 +19,7 @@ static void test_passwords(CuTest *tc) {
         CuAssertIntEquals(tc, '$', hash[6]);
         CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
         CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(hash, "arseword"));
+        bcrypt_workfactor = wf;
     }
     if (password_is_implemented(PASSWORD_PLAINTEXT)) {
         hash = password_encode("password", PASSWORD_PLAINTEXT);

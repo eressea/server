@@ -36,10 +36,9 @@
 #define FAMILIAR_FIX_VERSION 359 /* familiar links are fixed */
 #define SKILLSORT_VERSION 360 /* u->skills is sorted */
 #define LANDDISPLAY_VERSION 360 /* r.display is now in r.land.display */
-/* unfinished: */
-#define CRYPT_VERSION 400 /* passwords are encrypted */
+#define CRYPT_VERSION 361 /* passwords are encrypted */
 
-#define RELEASE_VERSION LANDDISPLAY_VERSION /* current datafile */
+#define RELEASE_VERSION CRYPT_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
