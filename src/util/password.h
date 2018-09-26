@@ -7,6 +7,8 @@ typedef enum cryptalgo_t {
 } cryptalgo_t;
 #define PASSWORD_DEFAULT PASSWORD_PLAINTEXT
 
+extern int bcrypt_workfactor;
+
 #define VERIFY_OK 0
 #define VERIFY_FAIL 1
 #define VERIFY_UNKNOWN 2

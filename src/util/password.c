@@ -3,11 +3,13 @@
 #endif
 #include "password.h"
 
-#include "crypto/bcrypt.h"
+#include "crypto/crypto.h"
 
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+
+int bcrypt_workfactor = 8;
 
 bool password_is_implemented(cryptalgo_t algo) {
     if (algo == PASSWORD_BCRYPT) return true;
@@ -19,7 +21,7 @@ const char * password_encode(const char * passwd, cryptalgo_t algo) {
         char salt[BCRYPT_HASHSIZE];
         static char hash[BCRYPT_HASHSIZE];
         int ret;
-        bcrypt_gensalt(12, salt);
+        bcrypt_gensalt(bcrypt_workfactor, salt);
         ret = bcrypt_hashpw(passwd, salt, hash);
         assert(ret == 0);
         return hash;

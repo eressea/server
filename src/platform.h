@@ -14,6 +14,7 @@
 #pragma warning(disable: 4457) // declaration hides function parameter
 #pragma warning(disable: 4459) // declaration hides global
 #pragma warning(disable: 4224) // formal parameter was previously defined as a type
+#pragma warning(disable: 4214) // bit field types other than int
 #endif
 
 /* @see https://insanecoding.blogspot.no/2007/11/pathmax-simply-isnt.html */

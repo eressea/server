@@ -24,7 +24,7 @@
 #include <unistd.h>
 #endif
 
-#include "bcrypt.h"
+#include "crypto.h"
 #include "crypt_blowfish/ow-crypt.h"
 
 #define RANDBYTES (16)

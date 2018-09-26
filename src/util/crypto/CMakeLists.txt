@@ -7,7 +7,7 @@ IF (MSVC)
 ENDIF (MSVC)
 
 SET (LIB_SRC
-  bcrypt.c
+  crypto.c
   crypt_blowfish/wrapper.c
   crypt_blowfish/crypt_blowfish.c
   crypt_blowfish/crypt_gensalt.c
@@ -18,8 +18,7 @@ set (CRYPTO_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "cJSON header
 set (CRYPTO_LIBRARIES crypto CACHE INTERNAL "crypto libraries")
 
 IF(WIN32)
-  FIND_LIBRARY(WIN32_CNG_LIBRARY bcrypt)
-  SET(CRYPTO_LIBRARIES ${CRYPTO_LIBRARIES} ${WIN32_CNG_LIBRARY} CACHE
+  SET(CRYPTO_LIBRARIES ${CRYPTO_LIBRARIES} bcrypt CACHE
     INTERNAL "crypto libraries")
 ENDIF()
             

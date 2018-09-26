@@ -243,13 +243,15 @@ char *__crypt_gensalt_ra(const char *prefix, unsigned long count,
 		input, size, output, sizeof(output));
 
 	if (retval) {
-		retval = strdup(retval);
+        size_t len = 1 + strlen(retval);
+        char * dst = malloc(len);
 #ifndef __GLIBC__
-		/* strdup(3) on glibc sets errno, so we don't need to bother */
-		if (!retval)
+		/* malloc(3) on glibc sets errno, so we don't need to bother */
+		if (!dst)
 			__set_errno(ENOMEM);
 #endif
-	}
+        retval = memcpy(dst, retval, len);
+    }
 
 	return retval;
 }
