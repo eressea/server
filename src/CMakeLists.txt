@@ -3,6 +3,7 @@ project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
+include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
@@ -27,7 +28,7 @@ IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /Za /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
@@ -189,6 +190,7 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CLIBS_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
@@ -249,6 +251,7 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )

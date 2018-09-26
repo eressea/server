@@ -112,7 +112,7 @@ static void test_addfaction(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     lang = test_create_locale();
-    f = addfaction("test@eressea.de", "hurrdurr", rc, lang);
+    f = addfaction("test@eressea.de", NULL, rc, lang);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);

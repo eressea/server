@@ -38,10 +38,9 @@
 #define LANDDISPLAY_VERSION 360 /* r.display is now in r.land.display */
 #define FIXATKEYS_VERSION 361 /* remove global.attribs, fix at_keys */
 #define FACTION_UID_VERSION 362 /* f->uid contains a database id */
-/* unfinished: */
-#define CRYPT_VERSION 400 /* passwords are encrypted */
+#define CRYPT_VERSION 363 /* passwords are encrypted */
 
-#define RELEASE_VERSION FACTION_UID_VERSION /* current datafile */
+#define RELEASE_VERSION CRYPT_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

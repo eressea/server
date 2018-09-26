@@ -245,6 +245,7 @@ faction *addfaction(const char *email, const char *password,
     f->alliance_joindate = turn;
     f->lastorders = turn;
     f->_alive = true;
+    f->_password = NULL;
     f->age = 0;
     f->race = frace;
     f->magiegebiet = 0;
@@ -252,9 +253,10 @@ faction *addfaction(const char *email, const char *password,
     f->uid = 0;
     f->flags = FFL_ISNEW|FFL_PWMSG;
 
-    if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
-    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+    if (password) {
+        faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
+        ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+    }
 
     f->options =
         WANT_OPTION(O_REPORT) | WANT_OPTION(O_ZUGVORLAGE) |

@@ -135,7 +135,7 @@ newfaction *read_newfactions(const char *filename)
         }
         nf = calloc(sizeof(newfaction), 1);
         if (check_email(email) == 0) {
-          nf->email = str_strdup(email);
+            nf->email = str_strdup(email);
         } else {
             log_error("Invalid email address for subscription %s: %s\n", itoa36(uid), email);
             free(nf);
@@ -550,14 +550,16 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             newfaction **nfp, *nextf = *players;
             faction *f;
             unit *u;
+            const char * password;
 
             isize += REGIONS_PER_FACTION;
             terraform_region(r, preferred_terrain(nextf->race));
             prepare_starting_region(r);
             ++tsize;
             assert(r->land && r->units == 0);
-            u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
-                nextf->lang));
+            password = nextf->password ? nextf->password : itoa36(rng_int());
+            u = addplayer(r, addfaction(nextf->email, password, nextf->race,
+                nextf->lang, nextf));
             f = u->faction;
             fset(f, FFL_ISNEW);
             f->alliance = nextf->allies;
