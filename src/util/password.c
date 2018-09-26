@@ -3,7 +3,7 @@
 #endif
 #include "password.h"
 
-#include <bcrypt.h>
+#include "crypto/bcrypt.h"
 
 #include <assert.h>
 #include <string.h>

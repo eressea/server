@@ -19,7 +19,7 @@
 #include <errno.h>
 
 #include "bcrypt.h"
-#include "ow-crypt.h"
+#include "crypt_blowfish/ow-crypt.h"
 
 #define RANDBYTES (16)
 
