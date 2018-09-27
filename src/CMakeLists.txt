@@ -140,7 +140,11 @@ set (ERESSEA_SRC
   ${KERNEL_SRC}
   ${DB_SRC}
   ${UTIL_SRC}
-)
+  )
+
+set(CHECK_SRC
+  checker.c
+  )
 
 set(SERVER_SRC
   bind_building.c
@@ -161,7 +165,7 @@ set(SERVER_SRC
   console.c
   helpers.c
   main.c
-)
+  )
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
@@ -176,10 +180,10 @@ if(NOT IWYU_PATH)
 	message(STATUS "Could not find the program include-what-you-use")
 endif()
 
-
 add_library(version STATIC ${VERSION_SRC})
 add_library(game ${ERESSEA_SRC})
 add_executable(eressea ${SERVER_SRC})
+add_executable(checker ${CHECK_SRC})
 if (IWYU_PATH)
 set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif(IWYU_PATH)
