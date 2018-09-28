@@ -1,7 +1,7 @@
 #ifndef H_ORDERFILE
 #define H_ORDERFILE
 
-#include <skill.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
     } input;
 
     int read_orders(struct input *in);
-    int readorders(const char *filename);
+    int readorders(FILE *F);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,6 @@
 #include <platform.h>
 #include <eressea.h>
 #include <kernel/config.h>
-#include <kernel/database.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>

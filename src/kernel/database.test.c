@@ -2,7 +2,7 @@
 #include <kernel/config.h>
 #include <kernel/faction.h>
 
-#include "database.h"
+#include "db/driver.h"
 #include "orderdb.h"
 
 #include <CuTest.h>
@@ -39,9 +39,9 @@ static void test_update_faction(CuTest *tc) {
 
     test_setup();
     f = test_create_faction(NULL);
-    uid = dblib_save_faction(f, 0);
+    uid = db_driver_faction_save(f->uid, f->no, 0, f->email, f->_password);
     f->uid = uid;
-    uid = dblib_save_faction(f, 0);
+    uid = db_driver_faction_save(f->uid, f->no, 0, f->email, f->_password);
     CuAssertIntEquals(tc, f->uid, uid);
     test_teardown();
 }

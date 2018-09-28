@@ -226,20 +226,13 @@ static const char * file_getbuf(void *data)
     return getbuf(F, ENCODING_UTF8);
 }
 
-int readorders(const char *filename)
+int readorders(FILE *F)
 {
     input in;
     int result;
-    FILE *F = fopen(filename, "r");
 
-    if (!F) {
-        perror(filename);
-        return -1;
-    }
-    log_info("reading orders from %s", filename);
     in.getbuf = file_getbuf;
     in.data = F;
     result = read_orders(&in);
-    fclose(F);
     return result;
 }

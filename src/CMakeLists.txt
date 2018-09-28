@@ -144,6 +144,7 @@ set (ERESSEA_SRC
 
 set(CHECK_SRC
   checker.c
+  orderfile.c
   )
 
 set(SERVER_SRC

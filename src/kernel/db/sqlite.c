@@ -1,8 +1,6 @@
 #include <platform.h>
 
 #include <kernel/config.h>
-#include <kernel/database.h>
-#include <kernel/orderdb.h>
 
 #include <util/log.h>
 
@@ -25,9 +23,9 @@ static sqlite3_stmt * g_stmt_insert_faction;
 static int g_order_batchsize;
 static int g_order_tx_size;
 
-order_data *db_driver_order_load(int id)
+struct order_data *db_driver_order_load(int id)
 {
-    order_data * od = NULL;
+    struct order_data * od = NULL;
     int err;
 
     ERRNO_CHECK();
@@ -58,12 +56,12 @@ order_data *db_driver_order_load(int id)
     return NULL;
 }
 
-int db_driver_order_save(order_data *od)
+int db_driver_order_save(const char *str)
 {
     int err;
     sqlite3_int64 id;
     
-    assert(od && od->_str);
+    assert(str);
    
     ERRNO_CHECK();
 
@@ -76,7 +74,7 @@ int db_driver_order_save(order_data *od)
     
     err = sqlite3_reset(g_stmt_insert_order);
     assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_order, 1, od->_str, -1, SQLITE_STATIC);
+    err = sqlite3_bind_text(g_stmt_insert_order, 1, str, -1, SQLITE_STATIC);
     assert(err == SQLITE_OK);
     err = sqlite3_step(g_stmt_insert_order);
     assert(err == SQLITE_DONE);

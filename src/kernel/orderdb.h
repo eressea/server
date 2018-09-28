@@ -19,6 +19,9 @@ extern "C" {
     order_data *odata_load(int id);
     int odata_save(order_data *od);
 
+    void orderdb_open(void);
+    void orderdb_close(void);
+
 #ifdef __cplusplus
 }
 #endif
