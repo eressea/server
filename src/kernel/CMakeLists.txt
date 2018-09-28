@@ -27,7 +27,6 @@ group.test.c
 item.test.c
 messages.test.c
 order.test.c
-orderdb.test.c
 # pathfinder.test.c
 plane.test.c
 pool.test.c
@@ -61,7 +60,6 @@ group.c
 item.c
 messages.c
 order.c
-orderdb.c
 pathfinder.c
 plane.c
 pool.c

@@ -37,6 +37,18 @@ extern "C" {
 #define CMD_PERSIST 0x020000
 #define CMD_DEFAULT 0x040000
 
+    typedef struct order_data {
+        const char *_str;
+        int _refcount;
+    } order_data;
+
+    extern order_data *odata_load(int id);
+    extern int odata_save(order_data *od);
+
+    void odata_create(order_data **pdata, size_t len, const char *str);
+    void odata_release(order_data * od);
+    void odata_addref(order_data *od);
+
     typedef struct order {
         struct order *next;
         /* do not access this data: */

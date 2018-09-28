@@ -8,7 +8,6 @@
 #include "kernel/equipment.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
-#include "kernel/orderdb.h"
 
 #include "util/functions.h"
 #include "util/language.h"
@@ -28,6 +27,7 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
+#include "orderdb.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"

@@ -1,6 +1,7 @@
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/order.h>
 
 #include "db/driver.h"
 #include "orderdb.h"

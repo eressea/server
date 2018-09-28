@@ -113,6 +113,7 @@ set (ERESSEA_SRC
   morale.c
   move.c
   names.c
+  orderdb.c
   orderfile.c
   piracy.c
   prefix.c
@@ -221,6 +222,7 @@ set(TESTS_SRC
   monsters.test.c
   move.test.c
   names.test.c
+  orderdb.test.c
   orderfile.test.c
   piracy.test.c
   prefix.test.c
