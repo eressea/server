@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(kernel C)
 
-SET(_DBFILES db/critbit.c)
+SET(_DBFILES db/memory.c)
 
 IF(SQLITE3_FOUND)
 SET(_DBFILES db/sqlite.c)
