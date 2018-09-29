@@ -18,9 +18,27 @@ struct OrderParserStruct {
     int m_lineNumber;
 };
 
+void OP_SetUnitHandler(OP_Parser op, OP_UnitHandler handler)
+{
+    op->m_unitHandler = handler;
+}
+
+void OP_SetFactionHandler(OP_Parser op, OP_FactionHandler handler) {
+    op->m_factionHandler = handler;
+}
+
+void OP_SetOrderHandler(OP_Parser op, OP_OrderHandler handler) {
+    op->m_orderHandler = handler;
+}
+
+void OP_SetUserData(OP_Parser op, void *userData) {
+    op->m_userData = userData;
+}
+
 OP_Parser OP_ParserCreate(void)
 {
-    return NULL;
+    OP_Parser parser = calloc(1, sizeof(struct OrderParserStruct));
+    return parser;
 }
 
 void OP_ParserFree(OP_Parser op) {
