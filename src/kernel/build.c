@@ -33,10 +33,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
-#include <kernel/connection.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
+#include <kernel/connection.h>
 #include <kernel/curse.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -52,12 +54,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* from libutil */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 

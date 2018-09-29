@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
+
 #include "economy.h"
 
 #include "alchemy.h"
@@ -45,10 +45,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "kernel/ally.h"
+#include "kernel/attrib.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
+#include "kernel/event.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
@@ -64,13 +67,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include "util/param.h"
 #include <util/parser.h>
 #include <util/rng.h>
 

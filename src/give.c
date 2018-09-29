@@ -25,6 +25,8 @@
 #include <attributes/racename.h>
 
  /* kernel includes */
+#include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <kernel/ally.h>
 #include <kernel/build.h>
 #include <kernel/curse.h>
@@ -41,11 +43,10 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 
 /* libc includes */

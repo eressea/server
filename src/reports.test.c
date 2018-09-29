@@ -2,7 +2,7 @@
 #include "reports.h"
 
 #include "guard.h"
-#include "keyword.h"
+#include "util/keyword.h"
 #include "lighthouse.h"
 #include "laws.h"
 #include "move.h"

@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <kernel/config.h>
 #include "orderfile.h"
 
 #include "kernel/calendar.h"
@@ -8,12 +7,14 @@
 #include "kernel/order.h"
 #include "kernel/unit.h"
 
-#include <util/base36.h>
-#include <util/message.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/filereader.h>
-#include <util/parser.h>
+#include "util/base36.h"
+#include "util/message.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/filereader.h"
+#include "util/param.h"
+#include "util/parser.h"
+#include "util/order_parser.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -33,9 +34,9 @@ static unit *unitorders(input *in, faction *f)
     if (u && u->faction == f) {
         order **ordp;
 
-        if (!fval(u, UFL_ORDERS)) {
+        if (u->flags & UFL_ORDERS) {
             /* alle wiederholbaren, langen befehle werden gesichert: */
-            fset(u, UFL_ORDERS);
+            u->flags |= UFL_ORDERS;
             u->old_orders = u->orders;
             ordp = &u->old_orders;
             while (*ordp) {
@@ -125,7 +126,7 @@ static faction *factionorders(void)
     int fid = getid();
     faction *f = findfaction(fid);
 
-    if (f != NULL && !fval(f, FFL_NPC)) {
+    if (f != NULL && (f->flags & FFL_NPC) == 0) {
         char token[128];
         const char *pass = gettoken(token, sizeof(token));
 
@@ -151,6 +152,10 @@ int read_orders(input *in)
     int nfactions = 0;
     struct faction *f = NULL;
     const struct locale *lang = default_locale;
+    OP_Parser parser;
+
+    parser = OP_ParserCreate();
+    OP_ParserFree(parser);
 
     /* TODO: recognize UTF8 BOM */
     b = in->getbuf(in->data);

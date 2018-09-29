@@ -19,13 +19,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_GC_LAWS
 #define H_GC_LAWS
 
-#include <kernel/types.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    enum param_t;
 
+    struct locale;
     struct unit;
     struct region;
     struct building;
@@ -114,6 +115,8 @@ extern "C" {
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
     bool help_enter(struct unit *uo, struct unit *u);
+
+    enum param_t findparam_ex(const char *s, const struct locale * lang);
 
 #ifdef __cplusplus
 }

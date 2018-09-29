@@ -17,6 +17,7 @@ language.test.c
 message.test.c
 # nrmessage.test.c
 # order_parser.test.c
+# param.test.c
 parser.test.c
 password.test.c
 # rand.test.c
@@ -47,6 +48,7 @@ message.c
 mt19937ar.c
 nrmessage.c
 order_parser.c
+param.c
 parser.c
 password.c
 path.c

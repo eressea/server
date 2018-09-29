@@ -45,6 +45,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/umlaut.h>

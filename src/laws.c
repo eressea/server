@@ -80,6 +80,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
@@ -127,7 +128,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define DMRISE         0.1F     /* weekly chance that demand goes up */
 #define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
-/* - exported global symbols ----------------------------------- */
+param_t findparam_ex(const char *s, const struct locale * lang)
+{
+    param_t result = findparam(s, lang);
+
+    if (result == NOPARAM) {
+        const building_type *btype = findbuildingtype(s, lang);
+        if (btype != NULL)
+            return P_GEBAEUDE;
+    }
+    return (result == P_BUILDING) ? P_GEBAEUDE : result;
+}
 
 int NewbieImmunity(void)
 {

@@ -20,6 +20,7 @@
 #include "util/keyword.h"
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/strings.h>
 
