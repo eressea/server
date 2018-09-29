@@ -85,6 +85,11 @@ TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
+set (PARSER_SRC
+  ${DB_SRC}
+  ${UTIL_SRC}
+  )
+
 set (ERESSEA_SRC
   vortex.c
   academy.c
@@ -139,13 +144,10 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
-  ${DB_SRC}
-  ${UTIL_SRC}
   )
 
 set(CHECK_SRC
   checker.c
-  orderfile.c
   )
 
 set(SERVER_SRC
@@ -183,22 +185,28 @@ if(NOT IWYU_PATH)
 endif()
 
 add_library(version STATIC ${VERSION_SRC})
-add_library(game ${ERESSEA_SRC})
+add_library(parser ${PARSER_SRC})
+target_link_libraries(parser
+  ${CRYPTO_LIBRARIES}
+  )
+
 
 #add_executable(checker ${CHECK_SRC})
+#target_link_libraries(checker parser)
+
+add_library(game ${ERESSEA_SRC})
+target_link_libraries(game parser version)
 
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
 set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif(IWYU_PATH)
-target_link_libraries(game version)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CLIBS_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
@@ -260,7 +268,6 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )
