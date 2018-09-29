@@ -392,6 +392,27 @@ static void test_unit_limit(CuTest * tc)
     test_teardown();
 }
 
+static void test_findparam_ex(CuTest *tc)
+{
+    struct locale *lang;
+    struct building_type *btype;
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "temple", "TEMPEL");
+    btype = test_create_buildingtype("temple");
+
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex("TEMPEL", lang));
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex(
+        locale_string(lang, parameters[P_BUILDING], false), lang));
+    CuAssertIntEquals(tc, P_SHIP, findparam_ex(
+        locale_string(lang, parameters[P_SHIP], false), lang));
+    CuAssertIntEquals(tc, P_FACTION, findparam_ex(
+        locale_string(lang, parameters[P_FACTION], false), lang));
+    CuAssertIntEquals(tc, P_UNIT, findparam_ex(
+        locale_string(lang, parameters[P_UNIT], false), lang));
+    test_teardown();
+}
+
 static void test_maketemp(CuTest * tc)
 {
     faction *f;
@@ -1762,6 +1783,7 @@ CuSuite *get_laws_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
+    SUITE_ADD_TEST(suite, test_findparam_ex);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
