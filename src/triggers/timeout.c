@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <kernel/attrib.h>
 #include <kernel/event.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 

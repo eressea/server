@@ -9,7 +9,6 @@ base36.test.c
 # dice.test.c
 # filereader.test.c
 functions.test.c
-gamedata.test.c
 # goodies.test.c
 language.test.c
 # lists.test.c
@@ -37,7 +36,6 @@ crmessage.c
 dice.c
 filereader.c
 functions.c
-gamedata.c
 goodies.c
 language.c
 lists.c

@@ -12,7 +12,7 @@
 
 #include <kernel/attrib.h>
 #include <util/strings.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 
 #include <storage.h>
 

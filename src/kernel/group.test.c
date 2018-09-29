@@ -8,7 +8,7 @@
 #include "region.h"
 #include "save.h"
 
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <kernel/attrib.h>
 #include <attributes/key.h>
 

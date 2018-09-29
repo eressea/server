@@ -41,7 +41,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/functions.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/macros.h>

@@ -25,6 +25,7 @@ database.test.c
 equipment.test.c
 # event.test.c
 faction.test.c
+gamedata.test.c
 group.test.c
 item.test.c
 messages.test.c
@@ -60,6 +61,7 @@ curse.c
 equipment.c
 event.c
 faction.c
+gamedata.c
 group.c
 item.c
 messages.c

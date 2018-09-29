@@ -28,7 +28,7 @@
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <kernel/event.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
 

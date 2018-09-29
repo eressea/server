@@ -32,7 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/unicode.h>

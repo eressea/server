@@ -14,7 +14,7 @@
 #include <kernel/unit.h>
 
 #include <kernel/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/rand.h>

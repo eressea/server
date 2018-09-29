@@ -61,9 +61,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <kernel/event.h>
 #include <util/filereader.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>

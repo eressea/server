@@ -33,7 +33,7 @@
 
 /* util includes */
 #include <kernel/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/macros.h>
 
 #include <storage.h>

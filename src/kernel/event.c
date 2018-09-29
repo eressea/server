@@ -21,7 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "attrib.h"
 
 /* util includes */
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/strings.h>
 

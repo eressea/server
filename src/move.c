@@ -74,7 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/assert.h>
 #include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>

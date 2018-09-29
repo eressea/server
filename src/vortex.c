@@ -5,7 +5,7 @@
 #include <kernel/region.h>
 
 #include <kernel/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/strings.h>
