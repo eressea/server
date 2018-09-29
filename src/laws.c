@@ -1952,7 +1952,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-            n = getfactionid();
+            n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {

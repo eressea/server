@@ -191,8 +191,8 @@ target_link_libraries(parser
   )
 
 
-#add_executable(checker ${CHECK_SRC})
-#target_link_libraries(checker parser)
+add_executable(checker ${CHECK_SRC})
+target_link_libraries(checker parser)
 
 add_library(game ${ERESSEA_SRC})
 target_link_libraries(game parser version)

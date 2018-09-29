@@ -79,7 +79,7 @@ struct building *getbuilding(const struct region *r)
 
 ship *getship(const struct region * r)
 {
-    ship *sh, *sx = findship(getshipid());
+    ship *sh, *sx = findship(getid());
     for (sh = r->ships; sh; sh = sh->next) {
         if (sh == sx)
             return sh;
