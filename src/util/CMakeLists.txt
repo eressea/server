@@ -1,5 +1,7 @@
 project(util C)
 
+add_subdirectory (crypto)
+
 SET(_TEST_FILES
 attrib.test.c
 base36.test.c

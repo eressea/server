@@ -3,8 +3,6 @@
 #endif
 #include "bind_eressea.h"
 
-#include <platform.h>
-
 #include "json.h"
 #include "orderfile.h"
 
@@ -16,6 +14,7 @@
 #include <util/language.h>
 
 #include <stream.h>
+#include <stdio.h>
 #include <filestream.h>
 
 

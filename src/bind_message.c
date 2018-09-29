@@ -16,13 +16,17 @@
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include <util/variant.h>
 
 /* lua includes */
+#include <lua.h>
 #include <tolua.h>
 
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+struct order;
 
 #define E_OK 0
 #define E_INVALID_MESSAGE 1

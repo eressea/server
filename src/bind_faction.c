@@ -17,30 +17,32 @@ without prior permission by the authors of Eressea.
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
-#include "helpers.h"
+#include "magic.h"
 
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
-#include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/spellbook.h>
-#include <attributes/key.h>
+#include "kernel/types.h"
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/password.h>
 
+#include "attributes/key.h"
+
+#include <lua.h>
+#include <lauxlib.h>
 #include <tolua.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 typedef struct helpmode {
     const char *name;
@@ -430,7 +432,7 @@ static int tolua_faction_create(lua_State * L)
     faction *f = NULL;
     const struct race *frace = rc_find(racename ? racename : "human");
     if (frace != NULL) {
-        f = addfaction(email, NULL, frace, loc, 0);
+        f = addfaction(email, NULL, frace, loc);
     }
     if (!f) {
         log_error("cannot create %s faction for %s, unknown race.", racename, email);
@@ -450,7 +452,7 @@ static int tolua_faction_set_password(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
     const char * passw = tolua_tostring(L, 2, 0);
-    faction_setpassword(self, password_encode(passw, PASSWORD_DEFAULT));
+    faction_setpassword(self, password_hash(passw, PASSWORD_DEFAULT));
     return 0;
 }
 
@@ -526,14 +528,14 @@ static int tolua_faction_set_name(lua_State * L)
 static int tolua_faction_get_uid(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, f->subscription);
+    lua_pushinteger(L, f->uid);
     return 1;
 }
 
 static int tolua_faction_set_uid(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    f->subscription = (int)tolua_tonumber(L, 2, 0);
+    f->uid = (int)tolua_tonumber(L, 2, 0);
     return 0;
 }
 

@@ -128,7 +128,11 @@ def echeck(filename, locale, rules):
     return mail
 
 #print "reading password file..."
-pw_data = EPasswd(os.path.join(game_dir,"passwd"))
+pw_data = EPasswd()
+try:
+    pw_data.load_database(os.path.join(game_dir,"eressea.db"))
+except:
+    pw_data.load_file(os.path.join(game_dir,"passwd"))
 
 #print "reading orders.queue..."
 # move the queue file to a save space while locking it:

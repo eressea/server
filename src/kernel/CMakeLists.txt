@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.6)
 project(kernel C)
 
+SET(_DBFILES db/critbit.c)
+
+IF(SQLITE3_FOUND)
+SET(_DBFILES db/sqlite.c)
+ELSEIF(DB_FOUND)
+SET(_DBFILES db/berkeley.c)
+ENDIF(SQLITE3_FOUND)
+
 SET(_TEST_FILES
 alliance.test.c
 ally.test.c
@@ -34,14 +42,6 @@ spell.test.c
 # terrain.test.c
 unit.test.c
 )
-
-SET(_DBFILES db/critbit.c)
-
-IF(SQLITE3_FOUND)
-SET(_DBFILES db/sqlite.c)
-ELSEIF(DB_FOUND)
-SET(_DBFILES db/berkeley.c)
-ENDIF(SQLITE3_FOUND)
 
 SET(_FILES
 ${_DBFILES}

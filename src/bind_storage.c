@@ -11,16 +11,13 @@
 #include <util/macros.h>
 
 #include <storage.h>
-#include <stream.h>
-#include <filestream.h>
-#include <binarystore.h>
 
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <errno.h>
 
+#include <lua.h>
 #include <tolua.h>
 
 static int tolua_storage_create(lua_State * L)

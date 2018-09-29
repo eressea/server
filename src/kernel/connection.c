@@ -440,7 +440,7 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
         return (f && fno == f->no) ? "illusionwall" : "wall";
     if (gflags & GF_ARTICLE) {
         return LOC(f->locale, mkname("border", (f
-            && fno == f->subscription) ? "an_illusionwall" : "a_wall"));
+            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
     }
     return LOC(f->locale, mkname("border", (f
         && fno == f->no) ? "illusionwall" : "wall"));

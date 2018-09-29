@@ -12,6 +12,8 @@
 #include "settings.pkg.c"
 #pragma warning(pop)
 
+#include <lua.h>
+
 void tolua_bind_open(lua_State * L) {
     tolua_eressea_open(L);
     tolua_process_open(L);

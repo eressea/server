@@ -741,11 +741,13 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
      * Kräuter))% sich zu vermehren. */
     UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
-        int i;
-        for (i = rherbs(r); i > 0; i--) {
-            if (rng_int() % 100 < (100 - rherbs(r)))
-                rsetherbs(r, (short)(rherbs(r) + 1));
+        int i, herbs = rherbs(r);
+        for (i = herbs; i > 0; --i) {
+            if (rng_int() % 100 < (100 - herbs)) {
+                ++herbs;
+            }
         }
+        rsetherbs(r, herbs);
     }
 }
 
@@ -2133,7 +2135,7 @@ int password_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 283, MSG_EVENT);
         str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
+    faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
         "value", pwbuf));
     u->faction->flags |= FFL_PWMSG;
@@ -3970,33 +3972,6 @@ void turn_end(void)
     /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
      * Beschreibungen geändert haben */
     update_spells();
-}
-
-void update_subscriptions(void)
-{
-    FILE *F;
-    char zText[4096];
-
-    path_join(basepath(), "subscriptions", zText, sizeof(zText));
-    F = fopen(zText, "r");
-    if (F == NULL) {
-        log_warning(0, "could not open %s.\n", zText);
-        return;
-    }
-    for (;;) {
-        char zFaction[5];
-        int subscription, fno;
-        faction *f;
-
-        if (fscanf(F, "%4d %4s", &subscription, zFaction) <= 0)
-            break;
-        fno = atoi36(zFaction);
-        f = findfaction(fno);
-        if (f != NULL) {
-            f->subscription = subscription;
-        }
-    }
-    fclose(F);
 }
 
 /** determine if unit can be seen by faction

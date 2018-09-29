@@ -4,6 +4,7 @@
 #include <platform.h>
 
 #include <kernel/config.h>
+#include <kernel/faction.h>
 #include <kernel/database.h>
 #include <kernel/orderdb.h>
 
@@ -27,12 +28,19 @@ int dblib_save_order(order_data *od)
     return 0;
 }
 
+int dblib_save_faction(const faction *f, int turn) {
+    return db_driver_faction_save(f->uid, f->no, turn, f->email, f->_password);
+}
+
 void dblib_open(void)
 {
-    db_driver_open();
+    const char *dbname;
+
+    dbname = config_get("game.dbswap");
+    db_driver_open(DB_SWAP, dbname);
 }
 
 void dblib_close(void)
 {
-    db_driver_close();
+    db_driver_close(DB_SWAP);
 }
