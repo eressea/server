@@ -33,7 +33,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "keyword.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -51,9 +50,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <kernel/attrib.h>
+#include <kernel/event.h>
+
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <kernel/event.h>
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>

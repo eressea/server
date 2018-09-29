@@ -10,11 +10,13 @@ base36.test.c
 # filereader.test.c
 functions.test.c
 # goodies.test.c
+keyword.test.c
 language.test.c
 # lists.test.c
 # log.test.c
 message.test.c
 # nrmessage.test.c
+# order_parser.test.c
 parser.test.c
 password.test.c
 # rand.test.c
@@ -37,12 +39,14 @@ dice.c
 filereader.c
 functions.c
 goodies.c
+keyword.c
 language.c
 lists.c
 log.c
 message.c
 mt19937ar.c
 nrmessage.c
+order_parser.c
 parser.c
 password.c
 path.c

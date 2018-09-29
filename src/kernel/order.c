@@ -15,9 +15,9 @@
 #include "order.h"
 
 #include "skill.h"
-#include "keyword.h"
 
 #include <util/base36.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/log.h>
 #include <util/parser.h>

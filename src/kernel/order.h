@@ -13,7 +13,8 @@
 #ifndef KRNL_ORDER_H
 #define KRNL_ORDER_H
 
-#include "keyword.h"
+#include <util/keyword.h>
+
 #include <stddef.h>
 #include <stdbool.h>
 

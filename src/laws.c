@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "automate.h"
 #include "battle.h"
 #include "economy.h"
-#include "keyword.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -75,6 +74,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/base36.h>
 #include <kernel/event.h>
 #include <util/goodies.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>

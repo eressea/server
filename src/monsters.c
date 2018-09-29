@@ -27,17 +27,18 @@
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
-#include "keyword.h"
 #include "study.h"
 #include "move.h"
 
 /* kernel includes */
+#include "kernel/attrib.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
+#include "kernel/event.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
@@ -52,10 +53,9 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
-#include <util/language.h>
+#include "util/keyword.h"
+#include "util/language.h"
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/rand.h>

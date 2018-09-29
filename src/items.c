@@ -5,7 +5,6 @@
 
 #include "alchemy.h"
 #include "skill.h"
-#include "keyword.h"
 #include "direction.h"
 #include "study.h"
 #include "economy.h"
@@ -35,6 +34,7 @@
 
 #include <kernel/attrib.h>
 #include <kernel/event.h>
+#include <util/keyword.h>
 #include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>

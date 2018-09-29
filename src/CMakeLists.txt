@@ -109,7 +109,6 @@ set (ERESSEA_SRC
   items.c
   json.c
   jsonconf.c
-  keyword.c
   laws.c
   lighthouse.c
   magic.c
@@ -224,7 +223,6 @@ set(TESTS_SRC
   guard.test.c
   json.test.c
   jsonconf.test.c
-  keyword.test.c
   laws.test.c
   lighthouse.test.c
   magic.test.c
