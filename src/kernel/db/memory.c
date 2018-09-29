@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "driver.h"
 
 #include <util/log.h>
@@ -40,11 +42,10 @@ int db_driver_faction_save(int id, int no, int turn, const char *email, const ch
     return -1;
 }
 
-static int free_data_cb(const void *match)
+static void free_data_cb(void *match)
 {
     char *str = (char *)match;
     free(str);
-    return 0;
 }
 
 int db_driver_open(database_t db, const char *dbname)
