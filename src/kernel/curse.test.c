@@ -4,7 +4,7 @@
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/unit.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/rng.h>
 #include <util/gamedata.h>
 #include <util/message.h>

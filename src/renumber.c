@@ -9,7 +9,7 @@
 #include <kernel/order.h>
 #include <kernel/messages.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/parser.h>
 

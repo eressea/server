@@ -27,7 +27,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/key.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/parser.h>

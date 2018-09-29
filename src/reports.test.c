@@ -25,7 +25,7 @@
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"
 
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"

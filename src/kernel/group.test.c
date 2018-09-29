@@ -9,7 +9,7 @@
 #include "save.h"
 
 #include <util/gamedata.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <attributes/key.h>
 
 #include <stream.h>

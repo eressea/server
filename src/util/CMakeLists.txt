@@ -3,12 +3,10 @@ project(util C)
 add_subdirectory (crypto)
 
 SET(_TEST_FILES
-attrib.test.c
 base36.test.c
 # bsdstring.test.c
 # crmessage.test.c
 # dice.test.c
-# event.test.c
 # filereader.test.c
 functions.test.c
 gamedata.test.c
@@ -33,12 +31,10 @@ variant.test.c
 )
 
 SET(_FILES
-attrib.c
 base36.c
 bsdstring.c
 crmessage.c
 dice.c
-event.c
 filereader.c
 functions.c
 gamedata.c

@@ -7,7 +7,7 @@
 #include <kernel/order.h>
 #include <util/language.h>
 #include <util/base36.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 #include <iniparser.h>
 

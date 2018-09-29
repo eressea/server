@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/region.h>
 #include <kernel/messages.h>
 #include <util/message.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <assert.h>
 
 static int age_reduceproduction(attrib * a, void *owner)

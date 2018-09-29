@@ -33,8 +33,8 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
-#include <util/attrib.h>
-#include <util/event.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>

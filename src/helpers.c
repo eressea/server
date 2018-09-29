@@ -19,8 +19,8 @@ without prior permission by the authors of Eressea.
 #include "alchemy.h"
 #include "magic.h"
 
-#include <util/attrib.h>
-#include <util/event.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <util/functions.h>
 #include <util/gamedata.h>
 #include <util/log.h>

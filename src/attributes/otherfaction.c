@@ -23,7 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ally.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/gamedata.h>
 
 #include <storage.h>

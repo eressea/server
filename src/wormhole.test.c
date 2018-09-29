@@ -8,7 +8,7 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/message.h>
 
 #include <selist.h>

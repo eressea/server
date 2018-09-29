@@ -32,7 +32,7 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/gamedata.h>
 #include <util/macros.h>
 

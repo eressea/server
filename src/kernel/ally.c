@@ -10,7 +10,7 @@
 #include "objtypes.h"
 #include "plane.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/strings.h>
 #include <util/gamedata.h>
 

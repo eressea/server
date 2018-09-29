@@ -18,12 +18,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <platform.h>
 #include "event.h"
+#include "attrib.h"
 
 /* util includes */
-#include "attrib.h"
-#include "gamedata.h"
-#include "log.h"
-#include "strings.h"
+#include <util/gamedata.h>
+#include <util/log.h>
+#include <util/strings.h>
 
 #include <storage.h>
 

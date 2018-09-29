@@ -12,6 +12,7 @@ ENDIF(SQLITE3_FOUND)
 SET(_TEST_FILES
 alliance.test.c
 ally.test.c
+attrib.test.c
 build.test.c
 building.test.c
 # callbacks.test.c
@@ -22,6 +23,7 @@ config.test.c
 curse.test.c
 database.test.c
 equipment.test.c
+# event.test.c
 faction.test.c
 group.test.c
 item.test.c
@@ -46,6 +48,7 @@ SET(_FILES
 ${_DBFILES}
 alliance.c
 ally.c
+attrib.c
 build.c
 building.c
 callbacks.c
@@ -55,6 +58,7 @@ config.c
 connection.c
 curse.c
 equipment.c
+event.c
 faction.c
 group.c
 item.c

@@ -41,9 +41,9 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/parser.h>

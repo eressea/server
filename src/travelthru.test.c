@@ -3,7 +3,7 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/macros.h>
 
 #include "travelthru.h"
