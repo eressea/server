@@ -81,6 +81,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);
+    ADD_SUITE(order_parser);
     ADD_SUITE(parser);
     ADD_SUITE(password);
     ADD_SUITE(umlaut);

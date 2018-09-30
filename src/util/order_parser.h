@@ -34,11 +34,12 @@ typedef void(*OP_UnitHandler) (void *userData, int no);
 typedef void(*OP_OrderHandler) (void *userData, const char *str);
 
 OP_Parser OP_ParserCreate(void);
-void OP_ParserFree(OP_Parser op);
-enum OP_Status OP_Parse(OP_Parser op, const char *s, int len, int isFinal);
-void OP_SetUnitHandler(OP_Parser op, OP_UnitHandler handler);
-void OP_SetFactionHandler(OP_Parser op, OP_FactionHandler handler);
-void OP_SetOrderHandler(OP_Parser op, OP_OrderHandler handler);
-void OP_SetUserData(OP_Parser op, void *userData);
+void OP_ParserFree(OP_Parser parser);
+void OP_ParserReset(OP_Parser parser);
+enum OP_Status OP_Parse(OP_Parser parser, const char *s, int len, int isFinal);
+void OP_SetUnitHandler(OP_Parser parser, OP_UnitHandler handler);
+void OP_SetFactionHandler(OP_Parser parser, OP_FactionHandler handler);
+void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler);
+void OP_SetUserData(OP_Parser parser, void *userData);
 
 #endif

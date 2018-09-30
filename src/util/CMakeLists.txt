@@ -16,7 +16,7 @@ language.test.c
 # log.test.c
 message.test.c
 # nrmessage.test.c
-# order_parser.test.c
+order_parser.test.c
 # param.test.c
 parser.test.c
 password.test.c
