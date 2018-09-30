@@ -186,6 +186,7 @@ endif()
 add_library(version STATIC ${VERSION_SRC})
 add_library(parser ${PARSER_SRC})
 target_link_libraries(parser
+  bsd
   ${CRYPTO_LIBRARIES}
   )
 
@@ -297,8 +298,7 @@ if (HAVE_STRDUP)
 endif(HAVE_STRDUP)
 
 if (HAVE_LIBBSD)
-target_link_libraries(test_eressea bsd)
-target_link_libraries(eressea bsd)
+target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
 if (SQLITE3_FOUND)
