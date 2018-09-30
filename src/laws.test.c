@@ -395,11 +395,11 @@ static void test_unit_limit(CuTest * tc)
 static void test_findparam_ex(CuTest *tc)
 {
     struct locale *lang;
-    struct building_type *btype;
+
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "temple", "TEMPEL");
-    btype = test_create_buildingtype("temple");
+    test_create_buildingtype("temple");
 
     CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex("TEMPEL", lang));
     CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex(

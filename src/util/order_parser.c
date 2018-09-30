@@ -14,7 +14,7 @@ struct OrderParserStruct {
     OP_FactionHandler m_factionHandler;
     OP_UnitHandler m_unitHandler;
     OP_OrderHandler m_orderHandler;
-    enum CR_Error m_errorCode;
+    enum OP_Error m_errorCode;
     int m_lineNumber;
 };
 

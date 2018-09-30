@@ -23,6 +23,12 @@ enum OP_Status {
     OP_STATUS_OK = 1
 };
 
+enum OP_Error {
+    OP_ERROR_NONE,
+    OP_ERROR_NO_MEMORY,
+    OP_ERROR_SYNTAX
+};
+
 typedef void(*OP_FactionHandler) (void *userData, int no, const char *password);
 typedef void(*OP_UnitHandler) (void *userData, int no);
 typedef void(*OP_OrderHandler) (void *userData, const char *str);

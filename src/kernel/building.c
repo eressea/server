@@ -257,7 +257,7 @@ building *findbuilding(int i)
 
 static local_names *bnames;
 
-static void free_bnames() {
+static void free_bnames(void) {
     while (bnames) {
         local_names *bn = bnames;
         bnames = bnames->next;
