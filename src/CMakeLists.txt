@@ -186,7 +186,6 @@ endif()
 add_library(version STATIC ${VERSION_SRC})
 add_library(parser ${PARSER_SRC})
 target_link_libraries(parser
-  bsd
   ${CRYPTO_LIBRARIES}
   )
 
