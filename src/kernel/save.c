@@ -101,9 +101,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
 
-/* TODO: is this still important? */
-int enc_gamedata = ENCODING_UTF8;
-
 static void read_alliances(gamedata *data)
 {
     storage *store = data->store;

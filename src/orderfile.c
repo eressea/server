@@ -229,7 +229,7 @@ int read_orders(input *in)
 static const char * file_getbuf(void *data)
 {
     FILE *F = (FILE *)data;
-    return getbuf(F, ENCODING_UTF8);
+    return getbuf(F);
 }
 
 typedef struct parser_state {
