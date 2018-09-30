@@ -1,13 +1,46 @@
 #!/bin/sh
 
-ERESSEA_DB=db
+ERESSEA_DB=memory
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
+
+GETOPT=getopt
+GETOPT_LONG=1
+
+if [ "Darwin" = "$(uname)" ] ; then
+  if [ -x "/usr/local/opt/gnu-getopt/bin/getopt" ] ; then
+    GETOPT="/usr/local/opt/gnu-getopt/bin/getopt"
+  else
+    GETOPT_LONG=0
+  fi
+fi
+
+if [ $GETOPT_LONG -eq 1 ]; then
+  options=$(${GETOPT} -o d: -l db: -- "$@")
+else # assume GNU getopt (long arguments)
+  options=$(${GETOPT} d: "$@")
+fi
+
 # Parse command line arguments
+eval set -- "$options"
+until [ -z "$1" ] ; do
+  case $1 in
+    -d|--db)
+      ERESSEA_DB=$2
+      shift
+    ;;
+    --) shift; break;;
+    (-*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
+    (*) break;;
+  esac
+  shift
+done
 while [ ! -z "$1" ] ; do
 if [ "$1" = "--with-db" ] ; then
 ERESSEA_DB=db
 elif [ "$1" = "--with-sqlite" ] ; then
 ERESSEA_DB=sqlite
+elif [ "$1" = "--with-memory" ] ; then
+ERESSEA_DB=memory
 fi
 shift 1
 done
