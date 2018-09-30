@@ -179,6 +179,9 @@ endif()
 
 add_library(version STATIC ${VERSION_SRC})
 add_library(game ${ERESSEA_SRC})
+
+#add_executable(checker ${CHECK_SRC})
+
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
 set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
