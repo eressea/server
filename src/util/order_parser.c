@@ -144,7 +144,21 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
             }
             else {
                 /* this is not multi-line input yet, so do nothing */
-                pos = strpbrk(pos + 1, "\\;\n");
+                if (pos[1] == '\0') {
+                    /* end of available input */
+                    if (isFinal) {
+                        /* input ends on a pointless backslash, kill it */
+                        pos[0] = '\0';
+                        pos = NULL;
+                    }
+                    else {
+                        /* backslash is followed by data that we do not know */
+                        pos = NULL;
+                    }
+                }
+                else {
+                    pos = strpbrk(pos + 1, "\\;\n");
+                }
             }
             break;
         case ';':
