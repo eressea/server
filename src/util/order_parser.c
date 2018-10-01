@@ -14,21 +14,10 @@ struct OrderParserStruct {
     char *m_buffer;
     char *m_bufferPtr;
     const char *m_bufferEnd;
-    OP_FactionHandler m_factionHandler;
-    OP_UnitHandler m_unitHandler;
     OP_OrderHandler m_orderHandler;
     enum OP_Error m_errorCode;
     int m_lineNumber;
 };
-
-void OP_SetUnitHandler(OP_Parser parser, OP_UnitHandler handler)
-{
-    parser->m_unitHandler = handler;
-}
-
-void OP_SetFactionHandler(OP_Parser parser, OP_FactionHandler handler) {
-    parser->m_factionHandler = handler;
-}
 
 void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler) {
     parser->m_orderHandler = handler;
@@ -95,13 +84,6 @@ static enum OP_Error buffer_append(OP_Parser parser, const char *s, int len)
     return OP_ERROR_NONE;
 }
 
-static enum OP_Error handle_line(OP_Parser parser) {
-    if (parser->m_orderHandler) {
-        parser->m_orderHandler(parser->m_userData, parser->m_bufferPtr);
-    }
-    return OP_ERROR_NONE;
-}
-
 static char *skip_spaces(char *pos) {
     char *next;
     for (next = pos; *next && *next != '\n'; ++next) {
@@ -109,6 +91,16 @@ static char *skip_spaces(char *pos) {
         if (!isspace(*next)) break;
     }
     return next;
+}
+
+static enum OP_Error handle_line(OP_Parser parser) {
+    if (parser->m_orderHandler) {
+        char * str = skip_spaces(parser->m_bufferPtr);
+        if (*str) {
+            parser->m_orderHandler(parser->m_userData, str);
+        }
+    }
+    return OP_ERROR_NONE;
 }
 
 static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
