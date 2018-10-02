@@ -301,6 +301,15 @@ static void handle_order(void *userData, const char *str) {
             handle_unit(userData, no);
         }
     }
+    else if (p == P_NEXT) {
+        state->f = NULL;
+        state->u = NULL;
+        state->next_order = NULL;
+    }
+    else if (p == P_REGION) {
+        state->u = NULL;
+        state->next_order = NULL;
+    }
     else if (state->u) {
         unit * u = state->u;
         order * ord = parse_order(str, lang);
