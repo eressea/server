@@ -348,7 +348,7 @@ int parseorders(FILE *F)
         done = feof(F);
         if (OP_Parse(parser, buf, len, done) == OP_STATUS_ERROR) {
             /* TODO: error message */
-            err = -1;
+            err = (int)OP_GetErrorCode(parser);
             break;
         }
     }

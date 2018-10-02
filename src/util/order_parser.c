@@ -5,7 +5,7 @@
 #include "order_parser.h"
 
 #include <assert.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,6 +18,10 @@ struct OrderParserStruct {
     enum OP_Error m_errorCode;
     int m_lineNumber;
 };
+
+enum OP_Error OP_GetErrorCode(OP_Parser parser) {
+    return parser->m_errorCode;
+}
 
 void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler) {
     parser->m_orderHandler = handler;
@@ -87,8 +91,9 @@ static enum OP_Error buffer_append(OP_Parser parser, const char *s, int len)
 static char *skip_spaces(char *pos) {
     char *next;
     for (next = pos; *next && *next != '\n'; ++next) {
+        wint_t wch = *(unsigned char *)next;
         /* TODO: handle unicode whitespace */
-        if (!isspace(*next)) break;
+        if (!iswspace(wch)) break;
     }
     return next;
 }
@@ -110,6 +115,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
         enum OP_Error code;
         size_t len = pos - parser->m_bufferPtr;
         char *next;
+        int continue_comment = 0;
 
         switch (*pos) {
         case '\n':
@@ -164,9 +170,8 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 if (next) {
                     if (*next == '\n') {
                         /* no more lines in this comment, we're done: */
-                        pos = next + 1;
                         ++parser->m_lineNumber;
-                        break;
+                        break; /* exit loop */
                     }
                     else {
                         /* is this backslash the final character? */
@@ -184,25 +189,42 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 }
             } while (next && *next);
 
-            if (next && pos < parser->m_bufferEnd) {
-                /* we skip the comment, and there is more data in the buffer */
-                parser->m_bufferPtr = pos;
-            }
-            else {
-                /* we exhausted the buffer before we got to the end of the comment */
+            if (!next) {
+                /* we exhausted the buffer before we finished the line */
                 if (isFinal) {
-                    /* the input ended on this comment line, which is fine */
+                    /* this comment was at the end of the file, it just has no newline. done! */
                     return OP_STATUS_OK;
                 }
                 else {
-                    /* skip what we have of the comment, keep the semicolon, keep going */
-                    ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
-                    if (skip > 1) {
-                        parser->m_bufferPtr += (skip - 1);
-                        parser->m_bufferPtr[0] = ';';
-                    }
+                    /* there is more of this line in the next buffer, save the semicolon */
+                    continue_comment = 1;
                 }
             }
+            else { 
+                if (*next) {
+                    /* end comment parsing, begin parsing a new line */
+                    pos = next + 1;
+                    continue_comment = 0;
+                }
+                else {
+                    /* reached end of input naturally, need more data to finish */
+                    continue_comment = 1;
+                }
+            }
+
+            if (continue_comment) {
+                ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
+                continue_comment = 0;
+                if (skip > 0) {
+                    /* should always be true */
+                    parser->m_bufferPtr += (skip - 1);
+                    parser->m_bufferPtr[0] = ';';
+                }
+                return OP_STATUS_OK;
+            }
+            /* continue the outer loop */
+            parser->m_bufferPtr = pos;
+            pos = strpbrk(pos, "\\;\n");
             break;
         default:
             parser->m_errorCode = OP_ERROR_SYNTAX;
