@@ -41,7 +41,7 @@ int eressea_read_orders(const char * filename) {
         return -1;
     }
     log_info("reading orders from %s", filename);
-    return readorders(F);
+    return parseorders(F);
 }
 
 int eressea_export_json(const char * filename, int flags) {

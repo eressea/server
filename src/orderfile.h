@@ -14,6 +14,7 @@ extern "C" {
 
     int read_orders(struct input *in);
     int readorders(FILE *F);
+    int parseorders(FILE *F);
 
 #ifdef __cplusplus
 }
