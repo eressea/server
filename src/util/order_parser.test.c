@@ -39,7 +39,24 @@ static void test_parse_orders(CuTest *tc) {
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\nError", 18, 1));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Error;\nHello World", 18, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\\nError", 19, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\", 13, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nError", 6, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello \\", 7, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nWorld", 6, 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 

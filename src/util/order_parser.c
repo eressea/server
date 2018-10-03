@@ -175,11 +175,15 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                     }
                     else {
                         /* is this backslash the final character? */
-                        next = skip_spaces(pos + 1);
+                        next = skip_spaces(next + 1);
                         if (*next == '\n') {
                             /* we have a multi-line comment! */
                             pos = next + 1;
                             ++parser->m_lineNumber;
+                        }
+                        else if (*next == '\0') {
+                            /* cannot find the EOL char yet, stream is dry. keep ; and \ */
+                            continue_comment = 2;
                         }
                         else {
                             /* keep looking for a backslash */
@@ -206,7 +210,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                     pos = next + 1;
                     continue_comment = 0;
                 }
-                else {
+                else if (!continue_comment) {
                     /* reached end of input naturally, need more data to finish */
                     continue_comment = 1;
                 }
@@ -214,12 +218,16 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
 
             if (continue_comment) {
                 ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
-                continue_comment = 0;
-                if (skip > 0) {
+                assert(skip >= continue_comment);
+                if (skip >= continue_comment) {
                     /* should always be true */
-                    parser->m_bufferPtr += (skip - 1);
+                    parser->m_bufferPtr += (skip - continue_comment);
                     parser->m_bufferPtr[0] = ';';
                 }
+                if (continue_comment == 2) {
+                    parser->m_bufferPtr[1] = '\\';
+                }
+                continue_comment = 0;
                 return OP_STATUS_OK;
             }
             /* continue the outer loop */

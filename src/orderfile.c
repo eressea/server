@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 
+static FILE *dlog;
+static int orders_parsed, units_parsed, factions_parsed;
+
 static void begin_orders(unit *u) {
     if (u->flags & UFL_ORDERS) {
         order **ordp;
@@ -52,6 +55,7 @@ static unit *unitorders(input *in, faction *f)
     int i;
     unit *u;
 
+    ++units_parsed;
     if (!f)
         return NULL;
 
@@ -109,6 +113,11 @@ static unit *unitorders(input *in, faction *f)
                     }
                 }
                 /* Nun wird der Befehl erzeut und eingeh�ngt */
+                ++orders_parsed;
+                if (dlog) {
+                    fputs(s, dlog);
+                    fputc('\n', dlog);
+                }
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -131,6 +140,7 @@ static faction *factionorders(void)
     int fid = getid();
     faction *f = findfaction(fid);
 
+    ++factions_parsed;
     if (f != NULL && (f->flags & FFL_NPC) == 0) {
         char token[128];
         const char *pass = gettoken(token, sizeof(token));
@@ -241,6 +251,7 @@ typedef struct parser_state {
 static void handle_faction(void *userData, int no, const char *password) {
     parser_state *state = (parser_state *)userData;
     faction * f = state->f = findfaction(no);
+    ++factions_parsed;
     if (!f) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
@@ -258,6 +269,7 @@ static void handle_unit(void *userData, int no) {
     parser_state *state = (parser_state *)userData;
     unit * u = findunit(no);
 
+    ++units_parsed;
     state->u = NULL;
     if (!u) {
         /* TODO: error message */
@@ -313,6 +325,11 @@ static void handle_order(void *userData, const char *str) {
     else if (state->u) {
         unit * u = state->u;
         order * ord = parse_order(str, lang);
+        ++orders_parsed;
+        if (dlog) {
+            fputs(str, dlog);
+            fputc('\n', dlog);
+        }
         if (ord) {
             *state->next_order = ord;
             state->next_order = &ord->next;
@@ -325,7 +342,7 @@ static void handle_order(void *userData, const char *str) {
 
 int parseorders(FILE *F)
 {
-    char buf[2048];
+    char buf[4096];
     int done = 0, err = 0;
     OP_Parser parser;
     parser_state state = { NULL, NULL };
@@ -356,18 +373,28 @@ int parseorders(FILE *F)
     return err;
 }
 
+#define NEW_PARSER
 int readorders(FILE *F)
 {
-#define NEW_PARSER
-#ifdef NEW_PARSER
-    return parseorders(F);
-#else
-    input in;
     int result;
 
-    in.getbuf = file_getbuf;
-    in.data = F;
-    result = read_orders(&in);
-    return result;
+    orders_parsed = 0;
+    units_parsed = 0;
+    factions_parsed = 0;
+
+#ifdef NEW_PARSER
+    dlog = fopen("orders.new.log", "w+");
+    result = parseorders(F);
+#else
+    dlog = fopen("orders.old.log", "w+");
+    {
+        input in;
+        in.getbuf = file_getbuf;
+        in.data = F;
+        result = read_orders(&in);
+    }
 #endif
+    fclose(dlog);
+    log_debug("%d orders read.", orders_parsed);
+    return result;
 }
