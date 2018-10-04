@@ -245,7 +245,10 @@ static void handle_faction(void *userData, int no, const char *password) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
     else {
-        if (!checkpasswd(f, password)) {
+        if (checkpasswd(f, password)) {
+            f->lastorders = turn;
+        }
+        else {
             log_debug("invalid password for faction %s", itoa36(no));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
         }
