@@ -5,7 +5,7 @@
 #include "order_parser.h"
 
 #include <assert.h>
-#include <ctype.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,21 +13,15 @@ struct OrderParserStruct {
     void *m_userData;
     char *m_buffer;
     char *m_bufferPtr;
+    size_t m_bufferSize;
     const char *m_bufferEnd;
-    OP_FactionHandler m_factionHandler;
-    OP_UnitHandler m_unitHandler;
     OP_OrderHandler m_orderHandler;
     enum OP_Error m_errorCode;
     int m_lineNumber;
 };
 
-void OP_SetUnitHandler(OP_Parser parser, OP_UnitHandler handler)
-{
-    parser->m_unitHandler = handler;
-}
-
-void OP_SetFactionHandler(OP_Parser parser, OP_FactionHandler handler) {
-    parser->m_factionHandler = handler;
+enum OP_Error OP_GetErrorCode(OP_Parser parser) {
+    return parser->m_errorCode;
 }
 
 void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler) {
@@ -42,6 +36,7 @@ static void buffer_free(OP_Parser parser)
 {
     /* TODO: recycle buffers, reduce mallocs. */
     free(parser->m_buffer);
+    parser->m_bufferSize = 0;
     parser->m_bufferEnd = parser->m_bufferPtr = parser->m_buffer = NULL;
 }
 
@@ -65,8 +60,28 @@ void OP_ParserFree(OP_Parser parser) {
 
 static enum OP_Error buffer_append(OP_Parser parser, const char *s, int len)
 {
+    size_t total = len + 1;
+    size_t remain = parser->m_bufferEnd - parser->m_bufferPtr;
+    total += remain;
+    if (remain > 0) {
+        /* there is remaining data in the buffer, should we move it to the front? */
+        if (total <= parser->m_bufferSize) {
+            /* reuse existing buffer */
+            memmove(parser->m_buffer, parser->m_bufferPtr, remain);
+            memcpy(parser->m_buffer + remain, s, len);
+            parser->m_buffer[total - 1] = '\0';
+            parser->m_bufferPtr = parser->m_buffer;
+            parser->m_bufferEnd = parser->m_bufferPtr + total - 1;
+            return OP_ERROR_NONE;
+        }
+    }
+    else if (parser->m_bufferPtr >= parser->m_bufferEnd) {
+        buffer_free(parser);
+    }
+
     if (parser->m_buffer == NULL) {
-        parser->m_buffer = malloc(len + 1);
+        parser->m_bufferSize = len + 1;
+        parser->m_buffer = malloc(parser->m_bufferSize);
         if (!parser->m_buffer) {
             return OP_ERROR_NO_MEMORY;
         }
@@ -76,28 +91,26 @@ static enum OP_Error buffer_append(OP_Parser parser, const char *s, int len)
         parser->m_bufferEnd = parser->m_buffer + len;
     }
     else {
-        size_t total = len;
         char * buffer;
-        total += (parser->m_bufferEnd - parser->m_bufferPtr);
         /* TODO: recycle buffers, reduce mallocs. */
-        buffer = malloc(total + 1);
-        memcpy(buffer, parser->m_bufferPtr, total - len);
-        memcpy(buffer + total - len, s, len);
-        buffer[total] = '\0';
-        free(parser->m_buffer);
-        parser->m_buffer = buffer;
-        if (!parser->m_buffer) {
-            return OP_ERROR_NO_MEMORY;
+        if (parser->m_bufferSize < total) {
+            parser->m_bufferSize = total;
+            buffer = malloc(parser->m_bufferSize);
+            if (!buffer) {
+                return OP_ERROR_NO_MEMORY;
+            }
+            memcpy(buffer, parser->m_bufferPtr, total - len - 1);
+            memcpy(buffer + total - len - 1, s, len);
+            free(parser->m_buffer);
+            parser->m_buffer = buffer;
         }
+        else {
+            memcpy(parser->m_buffer, parser->m_bufferPtr, total - len);
+            memcpy(parser->m_buffer + total - len, s, len);
+        }
+        parser->m_buffer[total - 1] = '\0';
         parser->m_bufferPtr = parser->m_buffer;
-        parser->m_bufferEnd = parser->m_buffer + total;
-    }
-    return OP_ERROR_NONE;
-}
-
-static enum OP_Error handle_line(OP_Parser parser) {
-    if (parser->m_orderHandler) {
-        parser->m_orderHandler(parser->m_userData, parser->m_bufferPtr);
+        parser->m_bufferEnd = parser->m_buffer + total - 1;
     }
     return OP_ERROR_NONE;
 }
@@ -105,10 +118,21 @@ static enum OP_Error handle_line(OP_Parser parser) {
 static char *skip_spaces(char *pos) {
     char *next;
     for (next = pos; *next && *next != '\n'; ++next) {
+        wint_t wch = *(unsigned char *)next;
         /* TODO: handle unicode whitespace */
-        if (!isspace(*next)) break;
+        if (!iswspace(wch)) break;
     }
     return next;
+}
+
+static enum OP_Error handle_line(OP_Parser parser) {
+    if (parser->m_orderHandler) {
+        char * str = skip_spaces(parser->m_bufferPtr);
+        if (*str) {
+            parser->m_orderHandler(parser->m_userData, str);
+        }
+    }
+    return OP_ERROR_NONE;
 }
 
 static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
@@ -118,6 +142,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
         enum OP_Error code;
         size_t len = pos - parser->m_bufferPtr;
         char *next;
+        int continue_comment = 0;
 
         switch (*pos) {
         case '\n':
@@ -172,17 +197,20 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 if (next) {
                     if (*next == '\n') {
                         /* no more lines in this comment, we're done: */
-                        pos = next + 1;
                         ++parser->m_lineNumber;
-                        break;
+                        break; /* exit loop */
                     }
                     else {
                         /* is this backslash the final character? */
-                        next = skip_spaces(pos + 1);
+                        next = skip_spaces(next + 1);
                         if (*next == '\n') {
                             /* we have a multi-line comment! */
                             pos = next + 1;
                             ++parser->m_lineNumber;
+                        }
+                        else if (*next == '\0') {
+                            /* cannot find the EOL char yet, stream is dry. keep ; and \ */
+                            continue_comment = 2;
                         }
                         else {
                             /* keep looking for a backslash */
@@ -192,25 +220,46 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 }
             } while (next && *next);
 
-            if (next && pos < parser->m_bufferEnd) {
-                /* we skip the comment, and there is more data in the buffer */
-                parser->m_bufferPtr = pos;
-            }
-            else {
-                /* we exhausted the buffer before we got to the end of the comment */
+            if (!next) {
+                /* we exhausted the buffer before we finished the line */
                 if (isFinal) {
-                    /* the input ended on this comment line, which is fine */
+                    /* this comment was at the end of the file, it just has no newline. done! */
                     return OP_STATUS_OK;
                 }
                 else {
-                    /* skip what we have of the comment, keep the semicolon, keep going */
-                    ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
-                    if (skip > 1) {
-                        parser->m_bufferPtr += (skip - 1);
-                        parser->m_bufferPtr[0] = ';';
-                    }
+                    /* there is more of this line in the next buffer, save the semicolon */
+                    continue_comment = 1;
                 }
             }
+            else { 
+                if (*next) {
+                    /* end comment parsing, begin parsing a new line */
+                    pos = next + 1;
+                    continue_comment = 0;
+                }
+                else if (!continue_comment) {
+                    /* reached end of input naturally, need more data to finish */
+                    continue_comment = 1;
+                }
+            }
+
+            if (continue_comment) {
+                ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
+                assert(skip >= continue_comment);
+                if (skip >= continue_comment) {
+                    /* should always be true */
+                    parser->m_bufferPtr += (skip - continue_comment);
+                    parser->m_bufferPtr[0] = ';';
+                }
+                if (continue_comment == 2) {
+                    parser->m_bufferPtr[1] = '\\';
+                }
+                continue_comment = 0;
+                return OP_STATUS_OK;
+            }
+            /* continue the outer loop */
+            parser->m_bufferPtr = pos;
+            pos = strpbrk(pos, "\\;\n");
             break;
         default:
             parser->m_errorCode = OP_ERROR_SYNTAX;
@@ -227,10 +276,6 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
 enum OP_Status OP_Parse(OP_Parser parser, const char *s, int len, int isFinal)
 {
     enum OP_Error code;
-
-    if (parser->m_bufferPtr >= parser->m_bufferEnd) {
-        buffer_free(parser);
-    }
 
     code = buffer_append(parser, s, len);
     if (code != OP_ERROR_NONE) {

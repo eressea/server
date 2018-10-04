@@ -32,34 +32,89 @@ static void test_parse_orders(CuTest *tc) {
     OP_SetUserData(parser, lastline);
     OP_SetOrderHandler(parser, copy_line);
     CuAssertPtrNotNull(tc, parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World", 11, 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Error;\nHello World", 18, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\\nError", 19, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\", 13, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nError", 6, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello \\", 7, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nWorld", 6, 1));
+    CuAssertStrEquals(tc, "Hello World", lastline);
+    OP_ParserReset(parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World\n", 12, 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello\\\n World", 13, 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello;World", 11, 1));
     CuAssertStrEquals(tc, "Hello", lastline);
     OP_ParserReset(parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello\\World", 11, 1));
     CuAssertStrEquals(tc, "Hello\\World", lastline);
     OP_ParserReset(parser);
+
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello ", 6, 0));
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "World", 5, 1));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, ";\n", 2, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World", 11, 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, ";Hello \\", 8, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nWorld\n", 7, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Enno", 4, 1));
+    CuAssertStrEquals(tc, "Enno", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, ";Hello", 6, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "World\n", 6, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Enno", 4, 1));
+    CuAssertStrEquals(tc, "Enno", lastline);
+    OP_ParserReset(parser);
+
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello\\World  \\", 14, 1));
     CuAssertStrEquals(tc, "Hello\\World  ", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello\n", 6, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "World\n", 6, 1));
+    CuAssertStrEquals(tc, "World", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello\n", 6, 0));
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "World\n", 6, 1));
+    CuAssertStrEquals(tc, "World", lastline);
     OP_ParserReset(parser);
     lastline[0] = 0;
     CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello \\", 7, 0));

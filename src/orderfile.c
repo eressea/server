@@ -245,10 +245,15 @@ static void handle_faction(void *userData, int no, const char *password) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
     else {
-        if (!checkpasswd(f, password)) {
+        if (checkpasswd(f, password)) {
+            f->lastorders = turn;
+        }
+        else {
             log_debug("invalid password for faction %s", itoa36(no));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
         }
+        state->u = NULL;
+        state->next_order = NULL;
     }
 }
 
@@ -272,23 +277,58 @@ static void handle_unit(void *userData, int no) {
 
 static void handle_order(void *userData, const char *str) {
     parser_state *state = (parser_state *)userData;
-    unit * u = state->u;
-    order *ord;
+    const char * tok, *input = str;
+    char buffer[16];
+    const struct locale *lang;
+    param_t p;
+    faction * f = state->f;
 
-    ord = parse_order(str, u->faction->locale);
-    if (ord) {
-        *state->next_order = ord;
-        state->next_order = &ord->next;
+    lang = f ? f->locale : default_locale;
+    tok = parse_token(&input, buffer, sizeof(buffer));
+    p = findparam(tok, lang);
+    if (p == P_FACTION || p == P_GAMENAME) {
+        tok = parse_token(&input, buffer, sizeof(buffer));
+        if (tok) {
+            int no = atoi36(tok);
+            tok = parse_token(&input, buffer, sizeof(buffer));
+            handle_faction(userData, no, tok);
+        }
+        else {
+            /* TODO: log_error() */
+        }
     }
-    else {
-        ADDMSG(&u->faction->msgs, msg_message("parse_error", "unit command", u, str));
+    else if (p == P_UNIT) {
+        tok = parse_token(&input, buffer, sizeof(buffer));
+        if (tok) {
+            int no = atoi36(tok);
+            handle_unit(userData, no);
+        }
+    }
+    else if (p == P_NEXT) {
+        state->f = NULL;
+        state->u = NULL;
+        state->next_order = NULL;
+    }
+    else if (p == P_REGION) {
+        state->u = NULL;
+        state->next_order = NULL;
+    }
+    else if (state->u) {
+        unit * u = state->u;
+        order * ord = parse_order(str, lang);
+        if (ord) {
+            *state->next_order = ord;
+            state->next_order = &ord->next;
+        }
+        else {
+            ADDMSG(&u->faction->msgs, msg_message("parse_error", "unit command", u, str));
+        }
     }
 }
 
-
 int parseorders(FILE *F)
 {
-    char buf[2048];
+    char buf[4096];
     int done = 0, err = 0;
     OP_Parser parser;
     parser_state state = { NULL, NULL };
@@ -298,8 +338,6 @@ int parseorders(FILE *F)
         /* TODO: error message */
         return errno;
     }
-    OP_SetUnitHandler(parser, handle_unit);
-    OP_SetFactionHandler(parser, handle_faction);
     OP_SetOrderHandler(parser, handle_order);
     OP_SetUserData(parser, &state);
 
@@ -313,7 +351,7 @@ int parseorders(FILE *F)
         done = feof(F);
         if (OP_Parse(parser, buf, len, done) == OP_STATUS_ERROR) {
             /* TODO: error message */
-            err = -1;
+            err = (int)OP_GetErrorCode(parser);
             break;
         }
     }
@@ -323,16 +361,11 @@ int parseorders(FILE *F)
 
 int readorders(FILE *F)
 {
-#undef NEW_PARSER
-#ifdef NEW_PARSER
-    return parseorders(F);
-#else
-    input in;
     int result;
 
+    input in;
     in.getbuf = file_getbuf;
     in.data = F;
     result = read_orders(&in);
     return result;
-#endif
 }
