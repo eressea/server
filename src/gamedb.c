@@ -6,7 +6,6 @@
 
 #include "kernel/config.h"
 #include "kernel/calendar.h"
-#include "kernel/database.h"
 #include "kernel/faction.h"
 #include "kernel/db/driver.h"
 
@@ -21,7 +20,7 @@ int gamedb_update(void)
     err = db_driver_open(DB_GAME, dbname);
     if (err == 0) {
         for (f = factions; f; f = f->next) {
-            int uid = dblib_save_faction(f, turn);
+            int uid = db_driver_faction_save(f->uid, f->no, turn, f->email, f->_password);
             if (uid > 0) {
                 f->uid = uid;
             }

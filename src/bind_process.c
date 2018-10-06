@@ -4,20 +4,22 @@
 
 #include "bind_process.h"
 
+#include "battle.h"
+#include "economy.h"
+#include "laws.h"
+#include "magic.h"
+#include "market.h"
+#include "move.h"
+#include "study.h"
+
 #include <kernel/alliance.h>
 #include <kernel/config.h>
 #include <kernel/order.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include "battle.h"
-#include "economy.h"
-#include "keyword.h"
-#include "laws.h"
-#include "magic.h"
-#include "market.h"
-#include "move.h"
-#include "study.h"
+
+#include "util/keyword.h"
 
 #define PROC_LAND_REGION 0x0001
 #define PROC_LONG_ORDER 0x0002

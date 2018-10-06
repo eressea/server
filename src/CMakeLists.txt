@@ -85,6 +85,11 @@ TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
+set (PARSER_SRC
+  ${DB_SRC}
+  ${UTIL_SRC}
+  )
+
 set (ERESSEA_SRC
   vortex.c
   academy.c
@@ -104,7 +109,6 @@ set (ERESSEA_SRC
   items.c
   json.c
   jsonconf.c
-  keyword.c
   laws.c
   lighthouse.c
   magic.c
@@ -113,6 +117,7 @@ set (ERESSEA_SRC
   morale.c
   move.c
   names.c
+  orderdb.c
   orderfile.c
   piracy.c
   prefix.c
@@ -138,9 +143,11 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
-  ${DB_SRC}
-  ${UTIL_SRC}
-)
+  )
+
+set(CHECK_SRC
+  checker.c
+  )
 
 set(SERVER_SRC
   bind_building.c
@@ -161,7 +168,7 @@ set(SERVER_SRC
   console.c
   helpers.c
   main.c
-)
+  )
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
@@ -176,24 +183,29 @@ if(NOT IWYU_PATH)
 	message(STATUS "Could not find the program include-what-you-use")
 endif()
 
-
 add_library(version STATIC ${VERSION_SRC})
-add_library(game ${ERESSEA_SRC})
+add_library(parser ${PARSER_SRC})
+target_link_libraries(parser
+  ${CLIBS_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
+  )
 
-#add_executable(checker ${CHECK_SRC})
+
+add_executable(checker ${CHECK_SRC})
+target_link_libraries(checker parser)
+
+add_library(game ${ERESSEA_SRC})
+target_link_libraries(game parser version)
 
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
 set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif(IWYU_PATH)
-target_link_libraries(game version)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CLIBS_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
@@ -211,7 +223,6 @@ set(TESTS_SRC
   guard.test.c
   json.test.c
   jsonconf.test.c
-  keyword.test.c
   laws.test.c
   lighthouse.test.c
   magic.test.c
@@ -219,6 +230,7 @@ set(TESTS_SRC
   monsters.test.c
   move.test.c
   names.test.c
+  orderdb.test.c
   orderfile.test.c
   piracy.test.c
   prefix.test.c
@@ -254,7 +266,6 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
   )
@@ -286,8 +297,7 @@ if (HAVE_STRDUP)
 endif(HAVE_STRDUP)
 
 if (HAVE_LIBBSD)
-target_link_libraries(test_eressea bsd)
-target_link_libraries(eressea bsd)
+target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
 if (SQLITE3_FOUND)

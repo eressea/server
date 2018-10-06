@@ -14,13 +14,13 @@
 #include <kernel/config.h>
 #include "order.h"
 
-#include "orderdb.h"
 #include "skill.h"
-#include "keyword.h"
 
 #include <util/base36.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/strings.h>
 
@@ -35,6 +35,36 @@
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
+
+void odata_create(order_data **pdata, size_t len, const char *str)
+{
+    order_data *data;
+    char *result;
+
+    assert(pdata);
+    data = malloc(sizeof(order_data) + len + 1);
+    data->_refcount = 1;
+    result = (char *)(data + 1);
+    data->_str = (len > 0) ? result : NULL;
+    if (str) {
+        strcpy(result, str);
+    }
+    *pdata = data;
+}
+
+void odata_release(order_data * od)
+{
+    if (od) {
+        if (--od->_refcount == 0) {
+            free(od);
+        }
+    }
+}
+
+void odata_addref(order_data *od)
+{
+    ++od->_refcount;
+}
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {

@@ -7,7 +7,7 @@
 #include <kernel/unit.h>
 #include <kernel/curse.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 #include <spells/shipcurse.h>
 #include <attributes/movement.h>

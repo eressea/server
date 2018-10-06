@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <attributes/stealth.h>
 
 #include <stdlib.h>

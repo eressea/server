@@ -6,7 +6,7 @@
 
 #include <kernel/save.h>
 
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 

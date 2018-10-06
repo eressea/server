@@ -56,7 +56,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/log.h"

@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include "move.h"
 
-#include "keyword.h"
 #include "lighthouse.h"
 
-#include <kernel/config.h>
+#include <kernel/attrib.h>
 #include <kernel/ally.h>
 #include <kernel/building.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -17,7 +17,7 @@
 #include <kernel/race.h>
 #include <kernel/order.h>
 
-#include <util/attrib.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/base36.h>

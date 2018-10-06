@@ -17,10 +17,10 @@
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/password.h>
 #include <util/path.h>
 #include <util/strings.h>

@@ -3,7 +3,6 @@
 #include "move.h"
 #include "spy.h"
 #include "travelthru.h"
-#include "keyword.h"
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -17,6 +16,7 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>

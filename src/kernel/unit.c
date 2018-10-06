@@ -21,12 +21,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 #include "ally.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
-#include "faction.h"
-#include "group.h"
 #include "connection.h"
 #include "curse.h"
+#include "event.h"
+#include "faction.h"
+#include "gamedata.h"
+#include "group.h"
+#include "guard.h"
 #include "item.h"
 #include "move.h"
 #include "order.h"
@@ -47,18 +51,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
-#include "guard.h"
-
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
-#include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/resolve.h>

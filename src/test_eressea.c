@@ -1,7 +1,6 @@
 #include <platform.h>
 #include <eressea.h>
 #include <kernel/config.h>
-#include <kernel/database.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>
@@ -82,6 +81,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);
+    ADD_SUITE(order_parser);
     ADD_SUITE(parser);
     ADD_SUITE(password);
     ADD_SUITE(umlaut);

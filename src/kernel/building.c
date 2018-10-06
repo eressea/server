@@ -38,13 +38,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/functions.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
@@ -126,14 +127,6 @@ static void free_buildingtype(void *ptr) {
     free(btype->maintenance);
     free(btype->_name);
     free(btype);
-}
-
-void free_buildingtypes(void) {
-    cb_clear(&cb_bldgtypes);
-    selist_foreach(buildingtypes, free_buildingtype);
-    selist_free(buildingtypes);
-    buildingtypes = 0;
-    ++bt_changes;
 }
 
 building_type *bt_get_or_create(const char *name)
@@ -264,17 +257,28 @@ building *findbuilding(int i)
 
 static local_names *bnames;
 
-/* Find the building type for a given localized name (as seen by the user). Useful for parsing
- * orders. The inverse of locale_string(lang, btype->_name), sort of. */
-const building_type *findbuildingtype(const char *name,
-    const struct locale *lang)
-{
-    variant type;
-    local_names *bn = bnames;
+static void free_bnames(void) {
+    while (bnames) {
+        local_names *bn = bnames;
+        bnames = bnames->next;
+        freetokens(bn->names);
+        free(bn);
+    }
+}
 
+static local_names *get_bnames(const struct locale *lang)
+{
+    static int config;
+    local_names *bn;
+
+    if (bt_changed(&config)) {
+        free_bnames();
+    }
+    bn = bnames;
     while (bn) {
-        if (bn->lang == lang)
+        if (bn->lang == lang) {
             break;
+        }
         bn = bn->next;
     }
     if (!bn) {
@@ -291,14 +295,26 @@ const building_type *findbuildingtype(const char *name,
             const char *n = LOC(lang, btype->_name);
             if (!n) {
                 log_error("building type %s has no translation in %s",
-                          btype->_name, locale_name(lang));
-            } else {
+                    btype->_name, locale_name(lang));
+            }
+            else {
+                variant type;
                 type.v = (void *)btype;
                 addtoken((struct tnode **)&bn->names, n, type);
             }
         }
         bnames = bn;
     }
+    return bn;
+}
+
+/* Find the building type for a given localized name (as seen by the user). Useful for parsing
+ * orders. The inverse of locale_string(lang, btype->_name), sort of. */
+const building_type *findbuildingtype(const char *name,
+    const struct locale *lang)
+{
+    variant type;
+    local_names *bn = get_bnames(lang);
     if (findtoken(bn->names, name, &type) == E_TOK_NOMATCH)
         return NULL;
     return (const building_type *)type.v;
@@ -869,4 +885,13 @@ int cmp_current_owner(const building * b, const building * a)
         }
     }
     return 0;
+}
+
+void free_buildingtypes(void) {
+    free_bnames();
+    cb_clear(&cb_bldgtypes);
+    selist_foreach(buildingtypes, free_buildingtype);
+    selist_free(buildingtypes);
+    buildingtypes = 0;
+    ++bt_changes;
 }

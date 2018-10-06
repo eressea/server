@@ -16,7 +16,7 @@ without prior permission by the authors of Eressea.
 
 #include <assert.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <selist.h>
 #include <util/rng.h>
 

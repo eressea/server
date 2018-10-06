@@ -12,8 +12,9 @@ without prior permission by the authors of Eressea.
 #include <platform.h>
 #include "log.h"
 
-#include "unicode.h"
+#include "path.h"
 #include "strings.h"
+#include "unicode.h"
 
 #include <assert.h>
 #include <errno.h>

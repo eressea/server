@@ -20,10 +20,11 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/rand.h>
 
 #include <CuTest.h>
@@ -388,6 +389,27 @@ static void test_unit_limit(CuTest * tc)
 
     config_set("rules.limit.alliance", "250");
     CuAssertIntEquals(tc, 250, rule_alliance_limit());
+    test_teardown();
+}
+
+static void test_findparam_ex(CuTest *tc)
+{
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "temple", "TEMPEL");
+    test_create_buildingtype("temple");
+
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex("TEMPEL", lang));
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex(
+        locale_string(lang, parameters[P_BUILDING], false), lang));
+    CuAssertIntEquals(tc, P_SHIP, findparam_ex(
+        locale_string(lang, parameters[P_SHIP], false), lang));
+    CuAssertIntEquals(tc, P_FACTION, findparam_ex(
+        locale_string(lang, parameters[P_FACTION], false), lang));
+    CuAssertIntEquals(tc, P_UNIT, findparam_ex(
+        locale_string(lang, parameters[P_UNIT], false), lang));
     test_teardown();
 }
 
@@ -1761,6 +1783,7 @@ CuSuite *get_laws_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
+    SUITE_ADD_TEST(suite, test_findparam_ex);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);

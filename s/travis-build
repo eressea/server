@@ -31,8 +31,8 @@ cppcheck_tests() {
 
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
-s/cmake-init
 # cppcheck_tests
+s/cmake-init --db=sqlite
 s/build
 cd process
 make

@@ -15,11 +15,11 @@
 #include "kernel/order.h"
 #include "kernel/terrain.h"
 
+#include "util/keyword.h"
 #include "util/language.h"
 
 #include "kernel/calendar.h"
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 #include "prefix.h"
 
