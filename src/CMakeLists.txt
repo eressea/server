@@ -186,6 +186,7 @@ endif()
 add_library(version STATIC ${VERSION_SRC})
 add_library(parser ${PARSER_SRC})
 target_link_libraries(parser
+  ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   )
 
@@ -205,7 +206,6 @@ target_link_libraries(eressea
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CLIBS_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )

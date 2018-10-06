@@ -239,6 +239,7 @@ static void init_magic(struct locale *lang)
         free(sstr);
     }
 }
+
 void init_locale(struct locale *lang)
 {
     init_magic(lang);

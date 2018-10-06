@@ -22,7 +22,7 @@
 void eressea_free_game(void) {
     free_gamedata();
     init_resources();
-    init_locales();
+    init_locales(init_locale);
 }
 
 int eressea_read_game(const char * filename) {
