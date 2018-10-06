@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(kernel C)
 
-SET(_DBFILES db/critbit.c)
+SET(_DBFILES db/memory.c)
 
 IF(SQLITE3_FOUND)
 SET(_DBFILES db/sqlite.c)
@@ -12,6 +12,7 @@ ENDIF(SQLITE3_FOUND)
 SET(_TEST_FILES
 alliance.test.c
 ally.test.c
+attrib.test.c
 build.test.c
 building.test.c
 # callbacks.test.c
@@ -22,12 +23,13 @@ config.test.c
 curse.test.c
 database.test.c
 equipment.test.c
+# event.test.c
 faction.test.c
+gamedata.test.c
 group.test.c
 item.test.c
 messages.test.c
 order.test.c
-orderdb.test.c
 # pathfinder.test.c
 plane.test.c
 pool.test.c
@@ -47,6 +49,7 @@ SET(_FILES
 ${_DBFILES}
 alliance.c
 ally.c
+attrib.c
 build.c
 building.c
 callbacks.c
@@ -55,14 +58,14 @@ command.c
 config.c
 connection.c
 curse.c
-database.c
 equipment.c
+event.c
 faction.c
+gamedata.c
 group.c
 item.c
 messages.c
 order.c
-orderdb.c
 pathfinder.c
 plane.c
 pool.c

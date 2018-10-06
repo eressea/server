@@ -5,9 +5,12 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
-#include <util/language.h>
+
 #include <util/base36.h>
-#include <util/attrib.h>
+#include <util/language.h>
+#include <util/param.h>
+
+#include <kernel/attrib.h>
 
 #include <iniparser.h>
 

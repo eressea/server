@@ -21,7 +21,7 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/functions.h>
 #include <util/rng.h>
 

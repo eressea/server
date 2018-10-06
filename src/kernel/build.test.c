@@ -1,19 +1,24 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 
-#include <kernel/messages.h>
 #include "alchemy.h"
-#include "types.h"
 #include "build.h"
-#include "guard.h"
-#include "order.h"
-#include "unit.h"
 #include "building.h"
+#include "config.h"
 #include "faction.h"
-#include "region.h"
-#include "race.h"
+#include "guard.h"
 #include "item.h"
-#include <util/language.h>
+#include "messages.h"
+#include "order.h"
+#include "race.h"
+#include "region.h"
+#include "types.h"
+#include "unit.h"
+
+#include "util/language.h"
+#include "util/param.h"
+
 #include <CuTest.h>
 #include <tests.h>
 

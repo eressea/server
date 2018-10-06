@@ -3,7 +3,6 @@
 #include "battle.h"
 
 #include "guard.h"
-#include "keyword.h"
 #include "reports.h"
 #include "skill.h"
 
@@ -22,6 +21,7 @@
 
 #include <util/base36.h>
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/rand.h>

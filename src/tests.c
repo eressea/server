@@ -1,11 +1,10 @@
 #include <platform.h>
 #include "tests.h"
-#include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
-#include "kernel/calendar.h"
 #include "vortex.h"
 
+#include "kernel/calendar.h"
 #include <kernel/config.h>
 #include <kernel/alliance.h>
 #include <kernel/equipment.h>
@@ -24,11 +23,14 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
+
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
+#include "util/param.h"
 #include <util/rand.h>
 #include <util/assert.h>
 
@@ -418,7 +420,9 @@ building_type * test_create_buildingtype(const char * name)
         con->materials[0].rtype = get_resourcetype(R_STONE);
     }
     if (default_locale) {
-        locale_setstring(default_locale, name, name);
+        if (locale_getstring(default_locale, name) == NULL) {
+            locale_setstring(default_locale, name, name);
+        }
     }
     return btype;
 }

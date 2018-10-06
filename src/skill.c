@@ -5,6 +5,8 @@
 #include <util/umlaut.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
+
 #include <critbit.h>
 
 #include <string.h>

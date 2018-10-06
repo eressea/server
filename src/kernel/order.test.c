@@ -5,6 +5,7 @@
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 
+#include "util/param.h"
 #include <util/parser.h>
 #include <util/language.h>
 

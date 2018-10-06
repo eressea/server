@@ -57,13 +57,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/filereader.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -100,9 +100,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
-
-/* TODO: is this still important? */
-int enc_gamedata = ENCODING_UTF8;
 
 static void read_alliances(gamedata *data)
 {

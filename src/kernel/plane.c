@@ -25,7 +25,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/lists.h>

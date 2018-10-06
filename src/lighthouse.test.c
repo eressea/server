@@ -2,7 +2,7 @@
 
 #include "lighthouse.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>

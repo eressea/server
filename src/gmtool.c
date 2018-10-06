@@ -30,7 +30,7 @@
 #include "kernel/ship.h"
 #include "kernel/terrain.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/lists.h>
 #include <util/macros.h>

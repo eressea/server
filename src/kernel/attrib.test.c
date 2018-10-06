@@ -1,7 +1,7 @@
 #include <platform.h>
 #include "attrib.h"
 
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/strings.h>
 
 #include <storage.h>

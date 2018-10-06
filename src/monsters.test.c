@@ -18,7 +18,7 @@
 #include "skill.h"
 #include "study.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/nrmessage.h>

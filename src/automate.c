@@ -6,10 +6,10 @@
 #include "kernel/region.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"
 #include "util/log.h"
 
 #include "automate.h"
-#include "keyword.h"
 #include "laws.h"
 #include "study.h"
 
