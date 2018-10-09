@@ -16,6 +16,7 @@ else
   mv orders.dir "orders.dir.$TURN"
   mkdir -p orders.dir
 fi
+rm -f "orders.$TURN"
 find "orders.dir.$TURN" -maxdepth 1 -type f -printf "%T+\t%p\n" | sort | cut -f2 | while read -r
 do
   cat "$REPLY" >> "orders.$TURN"
@@ -23,7 +24,7 @@ done
 
 lockfile -r3 -l120 orders.queue.lock
 if [ -e orders.queue ] ; then
-  mv orders.queue "orders.dir.$TURN/orders.queue"
+  mv orders.queue "orders.queue.bak.$TURN"
 fi
 rm -f orders.queue.lock
 
