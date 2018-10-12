@@ -30,9 +30,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/raceprefix.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/unicode.h>

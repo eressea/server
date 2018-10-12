@@ -11,9 +11,11 @@
 #include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
+
 #include <util/language.h>
 #include <util/message.h>
+#include "util/param.h"
 #include <util/crmessage.h>
 #include <tests.h>
 

@@ -27,6 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 
 /* kernel includes */
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/item.h>
 #include <kernel/faction.h>
@@ -44,8 +45,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/stealth.h>
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>

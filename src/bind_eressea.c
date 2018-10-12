@@ -12,6 +12,7 @@
 #include <kernel/save.h>
 
 #include <util/language.h>
+#include <util/log.h>
 
 #include <stream.h>
 #include <stdio.h>
@@ -21,7 +22,7 @@
 void eressea_free_game(void) {
     free_gamedata();
     init_resources();
-    init_locales();
+    init_locales(init_locale);
 }
 
 int eressea_read_game(const char * filename) {
@@ -34,7 +35,13 @@ int eressea_write_game(const char * filename) {
 }
 
 int eressea_read_orders(const char * filename) {
-    return readorders(filename);
+    FILE * F = fopen(filename, "r");
+    if (!F) {
+        perror(filename);
+        return -1;
+    }
+    log_info("reading orders from %s", filename);
+    return parseorders(F);
 }
 
 int eressea_export_json(const char * filename, int flags) {

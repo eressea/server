@@ -31,7 +31,7 @@
 #include <attributes/key.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>

@@ -13,8 +13,8 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/rand.h>

@@ -2,7 +2,7 @@
 #include "key.h"
 #include "dict.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <CuTest.h>
 #include <stdlib.h>

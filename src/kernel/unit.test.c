@@ -9,7 +9,7 @@
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/macros.h>

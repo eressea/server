@@ -23,7 +23,7 @@
 #include <kernel/objtypes.h>
 
 /* util includes */
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/nrmessage.h>
 #include <util/macros.h>

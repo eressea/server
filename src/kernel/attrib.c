@@ -19,12 +19,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include "attrib.h"
 
-#include "gamedata.h"
-#include "log.h"
-#include "variant.h"
-#include "storage.h"
-#include "strings.h"
+#include <util/log.h>
+#include <util/strings.h>
+#include <util/variant.h>
+#include <kernel/gamedata.h>
 
+#include <storage.h>
 #include <critbit.h>
 
 #include <assert.h>
