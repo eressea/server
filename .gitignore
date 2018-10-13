@@ -25,6 +25,7 @@ ipch/
 *.user
 
 *~
+*.pyc
 *.bak
 bin/
 build*/
