@@ -3,6 +3,7 @@ project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 include_directories (${CJSON_INCLUDE_DIR})
+include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
@@ -27,7 +28,7 @@ IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
 #    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
 ELSEIF(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /Za /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
@@ -84,50 +85,56 @@ TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kenel/config.h)
 ENDIF()
 
+set (PARSER_SRC
+  ${DB_SRC}
+  ${UTIL_SRC}
+  )
+
 set (ERESSEA_SRC
   vortex.c
-  automate.c
-  move.c
-  piracy.c
-  spells.c
-  battle.c
-  alchemy.c
   academy.c
+  alchemy.c
+  automate.c
+  battle.c
   chaos.c
-  upkeep.c
-  names.c
-  lighthouse.c
-  reports.c
-  teleport.c
-  guard.c
-  jsonconf.c
-  prefix.c
-  donations.c
-  eressea.c
-  direction.c
-  keyword.c
-  skill.c
-  json.c
   creport.c
-  report.c
-  steal.c
+  direction.c
+  donations.c
   economy.c
+  eressea.c
   exparse.c
+  gamedb.c
   give.c
+  guard.c
   items.c
+  json.c
+  jsonconf.c
   laws.c
+  lighthouse.c
   magic.c
   market.c
+  monsters.c
   morale.c
+  move.c
+  names.c
+  orderdb.c
   orderfile.c
+  piracy.c
+  prefix.c
   randenc.c
   renumber.c
-  volcano.c
+  report.c
+  reports.c
+  skill.c
+  spells.c
   spy.c
+  steal.c
   study.c
   summary.c
   travelthru.c
-  monsters.c
+  teleport.c
+  upkeep.c
+  volcano.c
   wormhole.c
   ${SPELLS_SRC}
   ${RACES_SRC}
@@ -136,56 +143,74 @@ set (ERESSEA_SRC
   ${TRIGGERS_SRC}
   ${ATTRIBUTES_SRC}
   ${KERNEL_SRC}
-  ${DB_SRC}
-  ${UTIL_SRC}
-)
+  )
+
+set(CHECK_SRC
+  checker.c
+  )
 
 set(SERVER_SRC
-  main.c
-  console.c
-  helpers.c
-  bind_tolua.c
   bind_building.c
   bind_config.c
-  bind_locale.c
   bind_eressea.c
   bind_faction.c
-  bind_order.c
-  bindings.c
+  bind_locale.c
   bind_message.c
   bind_monsters.c
+  bind_order.c
   bind_process.c
   bind_region.c
   bind_ship.c
   bind_storage.c
+  bind_tolua.c
   bind_unit.c
-)
+  bindings.c
+  console.c
+  helpers.c
+  main.c
+  )
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
+  bind_gmtool.c
   gmtool.c
   listbox.c
-  bind_gmtool.c
 )
 endif(CURSES_FOUND)
 
+find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+if(NOT IWYU_PATH)
+	message(STATUS "Could not find the program include-what-you-use")
+endif()
+
 add_library(version STATIC ${VERSION_SRC})
+add_library(parser ${PARSER_SRC})
+target_link_libraries(parser
+  ${CLIBS_LIBRARIES}
+  ${CRYPTO_LIBRARIES}
+  )
+
+
+add_executable(checker ${CHECK_SRC})
+target_link_libraries(checker parser)
+
 add_library(game ${ERESSEA_SRC})
+target_link_libraries(game parser version)
+
 add_executable(eressea ${SERVER_SRC})
-target_link_libraries(game version)
+if (IWYU_PATH)
+set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+endif(IWYU_PATH)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CLIBS_LIBRARIES}
   ${CJSON_LIBRARIES}
   ${INIPARSER_LIBRARIES}
 )
 
 set(TESTS_SRC
-  test_eressea.c
-  tests.c
   academy.test.c
   alchemy.test.c
   automate.test.c
@@ -198,7 +223,6 @@ set(TESTS_SRC
   guard.test.c
   json.test.c
   jsonconf.test.c
-  keyword.test.c
   laws.test.c
   lighthouse.test.c
   magic.test.c
@@ -206,17 +230,20 @@ set(TESTS_SRC
   monsters.test.c
   move.test.c
   names.test.c
+  orderdb.test.c
   orderfile.test.c
   piracy.test.c
   prefix.test.c
   renumber.test.c
-  reports.test.c
   report.test.c
-  summary.test.c
+  reports.test.c
   skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
+  summary.test.c
+  test_eressea.c
+  tests.c
   tests.test.c
   travelthru.test.c
   upkeep.test.c
@@ -270,8 +297,7 @@ if (HAVE_STRDUP)
 endif(HAVE_STRDUP)
 
 if (HAVE_LIBBSD)
-target_link_libraries(test_eressea bsd)
-target_link_libraries(eressea bsd)
+target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
 if (SQLITE3_FOUND)

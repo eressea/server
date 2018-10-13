@@ -33,9 +33,6 @@ extern "C" {
     int getid(void);
     unsigned int atoip(const char *s);
 
-#define getshipid() getid()
-#define getfactionid() getid()
-
 #ifdef __cplusplus
 }
 #endif

@@ -112,7 +112,7 @@ static void test_addfaction(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     lang = test_create_locale();
-    f = addfaction("test@eressea.de", "hurrdurr", rc, lang, 1234);
+    f = addfaction("test@eressea.de", NULL, rc, lang);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);
@@ -124,7 +124,6 @@ static void test_addfaction(CuTest *tc) {
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
-    CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, FFL_ISNEW|FFL_PWMSG, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
     CuAssertTrue(tc, faction_alive(f));
@@ -138,7 +137,7 @@ static void test_check_passwd(CuTest *tc) {
     faction *f;
     
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("password", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     CuAssertTrue(tc, checkpasswd(f, "password"));
     CuAssertTrue(tc, !checkpasswd(f, "assword"));
     CuAssertTrue(tc, !checkpasswd(f, "PASSWORD"));

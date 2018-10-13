@@ -19,7 +19,7 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
 
@@ -487,6 +487,7 @@ static void test_recruit_insect(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
+    test_create_terrain("desert", -1);
     f = test_create_faction(test_create_race("insect"));
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);

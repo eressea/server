@@ -33,10 +33,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
-#include <kernel/connection.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
+#include <kernel/connection.h>
 #include <kernel/curse.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -52,12 +54,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* from libutil */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/resolve.h>
 
@@ -79,7 +80,7 @@ struct building *getbuilding(const struct region *r)
 
 ship *getship(const struct region * r)
 {
-    ship *sh, *sx = findship(getshipid());
+    ship *sh, *sx = findship(getid());
     for (sh = r->ships; sh; sh = sh->next) {
         if (sh == sx)
             return sh;
@@ -277,10 +278,6 @@ void build_road(unit * u, int size, direction_t d)
     effsk = effskill(u, SK_ROAD_BUILDING, 0);
     if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
-        return;
-    }
-    if (besieged(u)) {
-        cmistake(u, u->thisorder, 60, MSG_PRODUCE);
         return;
     }
 
@@ -780,11 +777,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         cmistake(u, ord, 93, MSG_PRODUCE);
         return 0;
     }
-    if (besieged(u)) {
-        /* units under siege can not build */
-        cmistake(u, ord, 60, MSG_PRODUCE);
-        return 0;
-    }
     if (btype->flags & BTF_NOBUILD) {
         /* special building, cannot be built */
         cmistake(u, ord, 221, MSG_PRODUCE);
@@ -947,10 +939,6 @@ create_ship(unit * u, const struct ship_type *newtype, int want,
 
     if (!effskill(u, SK_SHIPBUILDING, 0)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
-        return;
-    }
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_PRODUCE);
         return;
     }
 

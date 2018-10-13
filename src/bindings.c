@@ -4,30 +4,39 @@
 
 #include "bindings.h"
 
+#include "console.h"
+#include "gamedb.h"
+#include "helpers.h"
+#include "laws.h"
+#include "magic.h"
+#include "reports.h"
+#include "skill.h"
+#include "study.h"
+#include "summary.h"
+#include "teleport.h"
+
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/alliance.h"
 #include "kernel/building.h"
+#include "kernel/build.h"
 #include "kernel/curse.h"
 #include "kernel/unit.h"
 #include "kernel/terrain.h"
 #include "kernel/messages.h"
-#include "kernel/region.h"
-#include "kernel/building.h"
 #include "kernel/plane.h"
-#include "kernel/race.h"
-#include "kernel/item.h"
-#include "kernel/order.h"
-#include "kernel/ship.h"
-#include "kernel/faction.h"
+#include "kernel/region.h"
 #include "kernel/save.h"
+#include "kernel/ship.h"
 #include "kernel/spell.h"
+#include "kernel/types.h"
+#include "kernel/item.h"
+#include "kernel/faction.h"
 #include "kernel/spellbook.h"
 #include "races/races.h"
 
 #include "bind_unit.h"
 #include "bind_storage.h"
-#include "bind_building.h"
 #include "bind_message.h"
 #include "bind_building.h"
 #include "bind_faction.h"
@@ -36,42 +45,31 @@
 #include "bind_gmtool.h"
 #include "bind_region.h"
 
-#include "helpers.h"
-#include "console.h"
-#include "reports.h"
-#include "study.h"
-#include "economy.h"
-#include "summary.h"
-#include "teleport.h"
-#include "laws.h"
-#include "monsters.h"
-#include "market.h"
-
 #include <modules/score.h>
-#include <attributes/key.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
-#include <util/nrmessage.h>
+#include <util/message.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
 #include <selist.h>
-#include <storage.h>
 
-#include <iniparser.h>
+#include <dictionary.h>
 #include <tolua.h>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include <time.h>
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define TOLUA_PKG(NAME) void tolua_##NAME##_open(lua_State * L)
 
@@ -153,15 +151,6 @@ int tolua_itemlist_next(lua_State * L)
     return 0;
 }
 
-static int tolua_getkey(lua_State * L)
-{
-    const char *name = tolua_tostring(L, 1, 0);
-    int flag = atoi36(name);
-
-    lua_pushboolean(L, key_get(global.attribs, flag));
-    return 1;
-}
-
 static int tolua_translate(lua_State * L)
 {
     const char *str = tolua_tostring(L, 1, 0);
@@ -171,20 +160,6 @@ static int tolua_translate(lua_State * L)
         str = LOC(loc, str);
         tolua_pushstring(L, str);
         return 1;
-    }
-    return 0;
-}
-
-static int tolua_setkey(lua_State * L)
-{
-    const char *name = tolua_tostring(L, 1, 0);
-    int value = (int)tolua_tonumber(L, 3, 0);
-    int flag = atoi36(name);
-    if (value) {
-        key_set(&global.attribs, flag, value);
-    }
-    else {
-        key_unset(&global.attribs, flag);
     }
     return 0;
 }
@@ -365,13 +340,6 @@ static int tolua_update_owners(lua_State * L)
     return 0;
 }
 
-static int tolua_update_subscriptions(lua_State * L)
-{
-    UNUSED_ARG(L);
-    update_subscriptions();
-    return 0;
-}
-
 static int tolua_remove_empty_units(lua_State * L)
 {
     UNUSED_ARG(L);
@@ -470,7 +438,14 @@ static int tolua_write_passwords(lua_State * L)
 {
     int result = writepasswd();
     lua_pushinteger(L, result);
-    return 0;
+    return 1;
+}
+
+static int tolua_write_database(lua_State * L)
+{
+    int result = gamedb_update();
+    lua_pushinteger(L, result);
+    return 1;
 }
 
 static int tolua_write_summary(lua_State * L)
@@ -982,6 +957,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "write_report", tolua_write_report);
         tolua_function(L, TOLUA_CAST "write_summary", tolua_write_summary);
         tolua_function(L, TOLUA_CAST "write_passwords", tolua_write_passwords);
+        tolua_function(L, TOLUA_CAST "write_database", tolua_write_database);
         tolua_function(L, TOLUA_CAST "message_unit", tolua_message_unit);
         tolua_function(L, TOLUA_CAST "message_faction", tolua_message_faction);
         tolua_function(L, TOLUA_CAST "message_region", tolua_message_region);
@@ -998,13 +974,10 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "dice_roll", tolua_dice_rand);
         tolua_function(L, TOLUA_CAST "get_nmrs", tolua_get_nmrs);
         tolua_function(L, TOLUA_CAST "remove_empty_units", tolua_remove_empty_units);
-        tolua_function(L, TOLUA_CAST "update_subscriptions", tolua_update_subscriptions);
         tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
         tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
-        tolua_function(L, TOLUA_CAST "get_key", tolua_getkey);
-        tolua_function(L, TOLUA_CAST "set_key", tolua_setkey);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);
         tolua_function(L, TOLUA_CAST "equip_newunits", tolua_equip_newunits);

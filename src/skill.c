@@ -5,6 +5,8 @@
 #include <util/umlaut.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
+
 #include <critbit.h>
 
 #include <string.h>
@@ -113,3 +115,38 @@ skill_t get_skill(const char *s, const struct locale * lang)
     return result;
 }
 
+int skill_cost(skill_t sk) {
+    static int config;
+    static int costs[MAXSKILLS];
+    int cost;
+    switch (sk) {
+    case SK_SPY:
+        cost = 100;
+        break;
+    case SK_TACTICS:
+    case SK_HERBALISM:
+    case SK_ALCHEMY:
+        cost = 200;
+        break;
+    default:
+        cost = -1;
+    }
+
+    if (config_changed(&config)) {
+        memset(costs, 0, sizeof(costs));
+    }
+
+    if (costs[sk] == 0) {
+        char buffer[256];
+        sprintf(buffer, "skills.cost.%s", skillnames[sk]);
+        costs[sk] = config_get_int(buffer, cost);
+    }
+    if (costs[sk] >= 0) {
+        return costs[sk];
+    }
+    return (cost > 0) ? cost : 0;
+}
+
+bool expensive_skill(skill_t sk) {
+    return (sk == SK_MAGIC) || skill_cost(sk) > 0;
+}

@@ -6,10 +6,10 @@
 #include "kernel/region.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"
 #include "util/log.h"
 
 #include "automate.h"
-#include "keyword.h"
 #include "laws.h"
 #include "study.h"
 
@@ -38,14 +38,14 @@ int autostudy_init(scholar scholars[], int max_scholars, region *r)
         if (kwd == K_AUTOSTUDY) {
             if (long_order_allowed(u) && unit_can_study(u)) {
                 scholar * st = scholars + nscholars;
-                if (++nscholars == max_scholars) {
-                    log_fatal("you must increase MAXSCHOLARS");
-                }
-                st->u = u;
                 init_order(u->thisorder, u->faction->locale);
                 st->sk = getskill(u->faction->locale);
                 st->level = effskill_study(u, st->sk);
                 st->learn = 0;
+                st->u = u;
+                if (++nscholars == max_scholars) {
+                    log_fatal("you must increase MAXSCHOLARS");
+                }
             }
             else {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_race_nolearn", "race",
@@ -81,13 +81,13 @@ void autostudy_run(scholar scholars[], int nscholars)
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-            for (; mint > tt && si != nscholars; ++si) {
+            for (; mint > tt && si != nscholars && scholars[si].sk == sk; ++si) {
                 tt += scholars[si].u->number;
             }
         }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se && scholars[ti].level - TEACHDIFFERENCE > scholars[si].level; ++si) {
+        for (; si != se && scholars[ti].level - TEACHDIFFERENCE > scholars[si].level && scholars[si].sk == sk; ++si) {
             tt += scholars[si].u->number;
         }
         if (si == se) {
@@ -134,7 +134,7 @@ void autostudy_run(scholar scholars[], int nscholars)
                             learning(scholars + s, (n - i));
                             i = 0;
                             if (++s == se) {
-                                continue;
+                                break;
                             }
                             n = scholars[s].u->number;
                         } while (scholars[t].level - TEACHDIFFERENCE < scholars[s].level);

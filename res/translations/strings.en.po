@@ -2421,10 +2421,6 @@ msgctxt "iteminfo"
 msgid "xmastree"
 msgstr "In the winter months, this beautifully decorated tree has a magical effect on the entire forest."
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BESIEGE"
-
 msgid "h10"
 msgstr "peyote"
 
@@ -2509,6 +2505,9 @@ msgstr "halfling foot"
 
 msgid "ALLES"
 msgstr "ALL"
+
+msgid "AUTO"
+msgstr "AUTO"
 
 msgctxt "race"
 msgid "songdragon_d"
@@ -5268,7 +5267,11 @@ msgstr "berserkers blood potions"
 
 msgctxt "keyword"
 msgid "maketemp"
-msgstr "MAKETEMP"
+msgstr "MAKE TEMP"
+
+msgctxt "keyword"
+msgid "autostudy"
+msgstr "LEARN AUTO"
 
 msgctxt "spell"
 msgid "reanimate"

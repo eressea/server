@@ -14,13 +14,13 @@
 #include <kernel/config.h>
 #include "order.h"
 
-#include "orderdb.h"
 #include "skill.h"
-#include "keyword.h"
 
 #include <util/base36.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/strings.h>
 
@@ -35,6 +35,36 @@
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
+
+void odata_create(order_data **pdata, size_t len, const char *str)
+{
+    order_data *data;
+    char *result;
+
+    assert(pdata);
+    data = malloc(sizeof(order_data) + len + 1);
+    data->_refcount = 1;
+    result = (char *)(data + 1);
+    data->_str = (len > 0) ? result : NULL;
+    if (str) {
+        strcpy(result, str);
+    }
+    *pdata = data;
+}
+
+void odata_release(order_data * od)
+{
+    if (od) {
+        if (--od->_refcount == 0) {
+            free(od);
+        }
+    }
+}
+
+void odata_addref(order_data *od)
+{
+    ++od->_refcount;
+}
 
 void replace_order(order ** dlist, order * orig, const order * src)
 {
@@ -141,7 +171,8 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
     if (ord->id < 0) {
         skill_t sk = (skill_t)(100 + ord->id);
 
-        assert(kwd == K_STUDY && sk != SK_MAGIC && sk < MAXSKILLS);
+        assert(kwd == K_AUTOSTUDY || kwd == K_STUDY);
+        assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
             swrite(" '", 1, 2, out);
@@ -310,12 +341,13 @@ order *parse_order(const char *s, const struct locale * lang)
     assert(lang);
     assert(s);
     if (*s != 0) {
+        char token[32];
         keyword_t kwd = NOKEYWORD;
         const char *sptr = s;
         bool persistent = false, noerror = false;
-        const char * p;
+        char * p;
 
-        p = *sptr ? parse_token_depr(&sptr) : 0;
+        p = parse_token(&sptr, token, sizeof(token));
         if (p) {
             while (*p == '!' || *p == '@') {
                 if (*p == '!') noerror = true;
@@ -326,7 +358,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd == K_MAKE) {
             const char *sp = sptr;
-            p = parse_token_depr(&sp);
+            p = parse_token(&sp, token, sizeof(token));
             if (p && isparam(p, lang, P_TEMP)) {
                 kwd = K_MAKETEMP;
                 sptr = sp;
@@ -334,10 +366,15 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         else if (kwd == K_STUDY) {
             const char *sp = sptr;
-            p = parse_token_depr(&sp);
+            p = parse_token(&sp, token, sizeof(token));
             if (p && isparam(p, lang, P_AUTO)) {
-                kwd = K_AUTOSTUDY;
+                skill_t sk;
                 sptr = sp;
+                p = parse_token(&sp, token, sizeof(token));
+                sk = get_skill(p, lang);
+                if (!expensive_skill(sk)) {
+                    kwd = K_AUTOSTUDY;
+                }
             }
         }
         if (kwd != NOKEYWORD) {
@@ -366,7 +403,6 @@ bool is_repeated(keyword_t kwd)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:
@@ -407,7 +443,6 @@ bool is_exclusive(const order * ord)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:
@@ -449,7 +484,6 @@ bool is_long(keyword_t kwd)
     case K_ROUTE:
     case K_DRIVE:
     case K_WORK:
-    case K_BESIEGE:
     case K_ENTERTAIN:
     case K_TAX:
     case K_RESEARCH:

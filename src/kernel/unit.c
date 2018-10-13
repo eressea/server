@@ -21,12 +21,16 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 #include "ally.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
-#include "faction.h"
-#include "group.h"
 #include "connection.h"
 #include "curse.h"
+#include "event.h"
+#include "faction.h"
+#include "gamedata.h"
+#include "group.h"
+#include "guard.h"
 #include "item.h"
 #include "move.h"
 #include "order.h"
@@ -47,18 +51,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
-#include "guard.h"
-
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
-#include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/resolve.h>
@@ -529,60 +528,6 @@ attrib_type at_target = {
     NO_WRITE,
     NO_READ
 };
-
-/*********************/
-/*   at_siege   */
-/*********************/
-
-void a_writesiege(const variant *var, const void *owner, struct storage *store)
-{
-    struct building *b = (struct building *)var->v;
-    write_building_reference(b, store);
-}
-
-int a_readsiege(variant *var, void *owner, gamedata *data)
-{
-    if (read_building_reference(data, (building **)&var->v, NULL) <= 0) {
-        return AT_READ_FAIL;
-    }
-    return AT_READ_OK;
-}
-
-attrib_type at_siege = {
-    "siege",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writesiege,
-    a_readsiege
-};
-
-struct building *usiege(const unit * u)
-{
-    attrib *a;
-    if (!fval(u, UFL_SIEGE))
-        return NULL;
-    a = a_find(u->attribs, &at_siege);
-    assert(a || !"flag set, but no siege found");
-    return (struct building *)a->data.v;
-}
-
-void usetsiege(unit * u, const struct building *t)
-{
-    attrib *a = a_find(u->attribs, &at_siege);
-    if (!a && t)
-        a = a_add(&u->attribs, a_new(&at_siege));
-    if (a) {
-        if (!t) {
-            a_remove(&u->attribs, a);
-            freset(u, UFL_SIEGE);
-        }
-        else {
-            a->data.v = (void *)t;
-            fset(u, UFL_SIEGE);
-        }
-    }
-}
 
 /*********************/
 /*   at_contact   */
@@ -1912,14 +1857,6 @@ int getunit(const region * r, const faction * f, unit **uresult)
         *uresult = u2;
     }
     return result;
-}
-
-int besieged(const unit * u)
-{
-    /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
 }
 
 bool has_horses(const unit * u)

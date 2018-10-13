@@ -36,7 +36,7 @@
 #include <move.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -299,7 +299,7 @@ int sp_combatrosthauch(struct castorder * co)
         for (w = 0; df->weapons[w].type != NULL; ++w) {
             weapon *wp = df->weapons;
             int n = force;
-            if (n < wp->used) n = wp->used;
+            if (n > wp->used) n = wp->used;
             if (n) {
                 requirement *mat = wp->type->itype->construction->materials;
                 bool iron = false;

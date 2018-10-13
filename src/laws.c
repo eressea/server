@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "automate.h"
 #include "battle.h"
 #include "economy.h"
-#include "keyword.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -71,15 +70,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/goodies.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
@@ -127,7 +128,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define DMRISE         0.1F     /* weekly chance that demand goes up */
 #define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
-/* - exported global symbols ----------------------------------- */
+param_t findparam_ex(const char *s, const struct locale * lang)
+{
+    param_t result = findparam(s, lang);
+
+    if (result == NOPARAM) {
+        const building_type *btype = findbuildingtype(s, lang);
+        if (btype != NULL)
+            return P_GEBAEUDE;
+    }
+    return (result == P_BUILDING) ? P_GEBAEUDE : result;
+}
 
 int NewbieImmunity(void)
 {
@@ -306,6 +317,11 @@ static void calculate_emigration(region * r)
     }
 }
 
+/* Vermehrungsrate Bauern in 1/10000.
+* TODO: Evt. Berechnungsfehler, reale Vermehrungsraten scheinen hoeher. */
+#define PEASANTGROWTH 10
+#define PEASANTLUCK 10
+#define PEASANTFORCE 0.75       /* Chance einer Vermehrung trotz 90% Auslastung */
 
 static double peasant_growth_factor(void)
 {
@@ -736,11 +752,13 @@ growing_herbs(region * r, const int current_season, const int last_weeks_season)
      * Kräuter))% sich zu vermehren. */
     UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
-        int i;
-        for (i = rherbs(r); i > 0; i--) {
-            if (rng_int() % 100 < (100 - rherbs(r)))
-                rsetherbs(r, (short)(rherbs(r) + 1));
+        int i, herbs = rherbs(r);
+        for (i = herbs; i > 0; --i) {
+            if (rng_int() % 100 < (100 - herbs)) {
+                ++herbs;
+            }
         }
+        rsetherbs(r, herbs);
     }
 }
 
@@ -896,61 +914,6 @@ void demographics(void)
     immigration();
 }
 
-/* ------------------------------------------------------------- */
-
-/* test if the unit can slip through a siege undetected.
- * returns 0 if siege is successful, or 1 if the building is either
- * not besieged or the unit can slip through the siege due to better stealth.
- */
-static int slipthru(const region * r, const unit * u, const building * b)
-{
-    unit *u2;
-    int n, o;
-
-    /* b ist die burg, in die man hinein oder aus der man heraus will. */
-    if (b == NULL || b->besieged < b->size * SIEGEFACTOR) {
-        return 1;
-    }
-
-    /* u wird am hinein- oder herausschluepfen gehindert, wenn STEALTH <=
-     * OBSERVATION +2 der belagerer u2 ist */
-    n = effskill(u, SK_STEALTH, r);
-
-    for (u2 = r->units; u2; u2 = u2->next) {
-        if (usiege(u2) == b) {
-
-            if (invisible(u, u2) >= u->number)
-                continue;
-
-            o = effskill(u2, SK_PERCEPTION, r);
-
-            if (o + 2 >= n) {
-                return 0;               /* entdeckt! */
-            }
-        }
-    }
-    return 1;
-}
-
-int can_contact(const region * r, const unit * u, const unit * u2) {
-
-    /* hier geht es nur um die belagerung von burgen */
-    UNUSED_ARG(r);
-    if (u->building == u2->building) {
-        return 1;
-    }
-
-    /* unit u is trying to contact u2 - unasked for contact. wenn u oder u2
-     * nicht in einer burg ist, oder die burg nicht belagert ist, ist
-     * slipthru () == 1. ansonsten ist es nur 1, wenn man die belagerer */
-
-    if (slipthru(u->region, u, u->building) && slipthru(u->region, u2, u2->building)) {
-        return 1;
-    }
-
-    return (alliedunit(u, u2->faction, HELP_GIVE));
-}
-
 int contact_cmd(unit * u, order * ord)
 {
     unit *u2;
@@ -961,10 +924,6 @@ int contact_cmd(unit * u, order * ord)
     u2 = findunit(n);
 
     if (u2 != NULL) {
-        if (!can_contact(u->region, u, u2)) {
-            cmistake(u, u->thisorder, 23, MSG_EVENT);
-            return -1;
-        }
         usetcontact(u, u2);
     }
     return 0;
@@ -989,13 +948,7 @@ int leave_cmd(unit * u, struct order *ord)
             return 0;
         }
     }
-    if (!slipthru(r, u, u->building)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "entrance_besieged",
-            "building", u->building));
-    }
-    else {
-        leave(u, true);
-    }
+    leave(u, true);
     return 0;
 }
 
@@ -1139,13 +1092,6 @@ int enter_building(unit * u, order * ord, int id, bool report)
     if (!mayenter(r, u, b)) {
         if (report) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_denied",
-                "building", b));
-        }
-        return 0;
-    }
-    if (!slipthru(r, u, b)) {
-        if (report) {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "entrance_besieged",
                 "building", b));
         }
         return 0;
@@ -2017,7 +1963,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-            n = getfactionid();
+            n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
@@ -2200,7 +2146,7 @@ int password_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 283, MSG_EVENT);
         str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
     }
-    faction_setpassword(u->faction, password_encode(pwbuf, PASSWORD_DEFAULT));
+    faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd",
         "value", pwbuf));
     u->faction->flags |= FFL_PWMSG;
@@ -3799,98 +3745,6 @@ int armedmen(const unit * u, bool siege_weapons)
     return n;
 }
 
-int siege_cmd(unit * u, order * ord)
-{
-    region *r = u->region;
-    building *b;
-    int d, pooled;
-    int bewaffnete, katapultiere = 0;
-    resource_type *rt_catapultammo = NULL;
-    resource_type *rt_catapult = NULL;
-
-    init_order_depr(ord);
-    b = getbuilding(r);
-
-    if (!b) {
-        cmistake(u, ord, 31, MSG_BATTLE);
-        return 31;
-    }
-
-    if (!playerrace(u_race(u))) {
-        /* keine Drachen, Illusionen, Untote etc */
-        cmistake(u, ord, 166, MSG_BATTLE);
-        return 166;
-    }
-    /* schaden durch katapulte */
-
-    rt_catapultammo = rt_find("catapultammo");
-    rt_catapult = rt_find("catapult");
-
-    d = i_get(u->items, rt_catapult->itype);
-    if (d > u->number) d = u->number;
-    pooled = get_pooled(u, rt_catapultammo, GET_DEFAULT, d);
-    if (d > pooled) d = pooled;
-    if (effskill(u, SK_CATAPULT, 0) >= 1) {
-        katapultiere = d;
-        d *= effskill(u, SK_CATAPULT, 0);
-    }
-    else {
-        d = 0;
-    }
-
-    bewaffnete = armedmen(u, true);
-    if (d == 0 && bewaffnete == 0) {
-        /* abbruch, falls unbewaffnet oder unfaehig, katapulte zu benutzen */
-        cmistake(u, ord, 80, MSG_EVENT);
-        return 80;
-    }
-
-    if (!is_guard(u)) {
-        /* abbruch, wenn die einheit nicht vorher die region bewacht - als
-         * warnung fuer alle anderen! */
-        cmistake(u, ord, 81, MSG_EVENT);
-        return 81;
-    }
-    /* einheit und burg markieren - spart zeit beim behandeln der einheiten
-     * in der burg, falls die burg auch markiert ist und nicht alle
-     * einheiten wieder abgesucht werden muessen! */
-
-    usetsiege(u, b);
-    if (katapultiere < bewaffnete) katapultiere = bewaffnete;
-    b->besieged += katapultiere;
-
-    /* definitiver schaden eingeschraenkt */
-    if (d > b->size - 1) d = b->size - 1;
-
-    /* meldung, schaden anrichten */
-    if (d && !curse_active(get_curse(b->attribs, &ct_magicwalls))) {
-        b->size -= d;
-        use_pooled(u, rt_catapultammo,
-            GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, d);
-        /* send message to the entire region */
-        ADDMSG(&r->msgs, msg_message("siege_catapults",
-            "unit building destruction", u, b, d));
-    }
-    else {
-        /* send message to the entire region */
-        ADDMSG(&r->msgs, msg_message("siege", "unit building", u, b));
-    }
-    return 0;
-}
-
-void do_siege(region * r)
-{
-    if (fval(r->terrain, LAND_REGION)) {
-        unit *u;
-
-        for (u = r->units; u; u = u->next) {
-            if (getkeyword(u->thisorder) == K_BESIEGE) {
-                siege_cmd(u, u->thisorder);
-            }
-        }
-    }
-}
-
 static void enter_1(region * r)
 {
     do_enter(r, 0);
@@ -3973,11 +3827,6 @@ void init_processor(void)
 
     p += 10;
     add_proc_global(p, do_battles, "Attackieren");
-
-    if (!keyword_disabled(K_BESIEGE)) {
-        p += 10;
-        add_proc_region(p, do_siege, "Belagern");
-    }
 
     p += 10;                      /* can't allow reserve before siege (weapons) */
     add_proc_region(p, enter_1, "Betreten (3. Versuch)");  /* to claim a castle after a victory and to be able to DESTROY it in the same turn */
@@ -4136,33 +3985,6 @@ void turn_end(void)
     update_spells();
 }
 
-void update_subscriptions(void)
-{
-    FILE *F;
-    char zText[4096];
-
-    path_join(basepath(), "subscriptions", zText, sizeof(zText));
-    F = fopen(zText, "r");
-    if (F == NULL) {
-        log_warning(0, "could not open %s.\n", zText);
-        return;
-    }
-    for (;;) {
-        char zFaction[5];
-        int subscription, fno;
-        faction *f;
-
-        if (fscanf(F, "%4d %4s", &subscription, zFaction) <= 0)
-            break;
-        fno = atoi36(zFaction);
-        f = findfaction(fno);
-        if (f != NULL) {
-            f->subscription = subscription;
-        }
-    }
-    fclose(F);
-}
-
 /** determine if unit can be seen by faction
  * @param f -- the observiong faction
  * @param u -- the unit that is observed
@@ -4196,7 +4018,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
     }
 
     /* simple visibility, just gotta have a viewer in the region to see 'em */
-    if (leftship(u) || is_guard(u) || usiege(u) || u->building || u->ship) {
+    if (leftship(u) || is_guard(u) || u->building || u->ship) {
         return true;
     }
 
@@ -4234,7 +4056,7 @@ bool cansee_unit(const unit * u, const unit * target, int modifier)
     else {
         int n, rings;
 
-        if (is_guard(target) || usiege(target) || target->building
+        if (is_guard(target) || target->building
             || target->ship) {
             return true;
         }
@@ -4277,7 +4099,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
     else {
         int rings, n;
 
-        if (is_guard(u) || usiege(u) || u->building || u->ship) {
+        if (is_guard(u) || u->building || u->ship) {
             return true;
         }
 

@@ -2772,10 +2772,6 @@ msgstr "Dieser wunderschoen geschmueckte Baum entfaltet in den Wintermonaten ein
 msgid "h10"
 msgstr "Kakteenschwitz"
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BELAGERE"
-
 msgid "h11"
 msgstr "Sandfäule"
 
@@ -2863,6 +2859,9 @@ msgstr "der Schatten"
 
 msgid "ALLES"
 msgstr "ALLES"
+
+msgid "AUTO"
+msgstr "AUTO"
 
 msgid "undead_postfix_2"
 msgstr "der Finsternis"
@@ -5957,6 +5956,10 @@ msgstr "Berserkerblut"
 msgctxt "keyword"
 msgid "maketemp"
 msgstr "MACHE TEMP"
+
+msgctxt "keyword"
+msgid "autostudy"
+msgstr "LERNE AUTO"
 
 msgctxt "spell"
 msgid "reanimate"

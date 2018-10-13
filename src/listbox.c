@@ -13,14 +13,13 @@
 #endif
 
 #include <curses.h>
-#include <kernel/config.h>
 
 #include "listbox.h"
 #include "gmtool_structs.h"
 
-#include <util/log.h>
 #include <util/strings.h>
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>

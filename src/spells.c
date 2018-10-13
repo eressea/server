@@ -70,10 +70,10 @@
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/message.h>
@@ -4192,7 +4192,7 @@ static int sp_calm_monster(castorder * co)
         return 0;
     }
 
-    effect = mage->faction->subscription;
+    effect = mage->faction->uid;
     c = create_curse(mage, &target->attribs, &ct_calmmonster, force,
         (int)force, effect, 0);
     if (c == NULL) {

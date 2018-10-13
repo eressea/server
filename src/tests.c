@@ -1,11 +1,10 @@
 #include <platform.h>
 #include "tests.h"
-#include "keyword.h"
 #include "prefix.h"
 #include "reports.h"
-#include "kernel/calendar.h"
 #include "vortex.h"
 
+#include "kernel/calendar.h"
 #include <kernel/config.h>
 #include <kernel/alliance.h>
 #include <kernel/equipment.h>
@@ -13,6 +12,7 @@
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
@@ -23,11 +23,14 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
+
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
+#include "util/param.h"
 #include <util/rand.h>
 #include <util/assert.h>
 
@@ -146,7 +149,9 @@ struct locale * test_create_locale(void) {
             locale_setstring(loc, combatstatus[i], combatstatus[i] + 7);
         }
         for (i = 0; i != MAXKEYWORDS; ++i) {
-            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            if (keywords[i]) {
+                locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            }
         }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);
@@ -163,7 +168,7 @@ struct locale * test_create_locale(void) {
 struct faction *test_create_faction(const struct race *rc)
 {
     struct locale * loc = test_create_locale();
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc);
     test_clear_messages(f);
     return f;
 }
@@ -238,6 +243,29 @@ static void test_reset(void) {
     free_spellbooks();
     free_prefixes();
     mt_clear();
+/*
+    for (i = 0; i != MAXTERRAINS; ++i) {
+        int flags = 0;
+        if (i == T_FIREWALL) {
+            flags |= FORBIDDEN_REGION;
+        } else {
+            flags = FLY_INTO | WALK_INTO;
+            if (i == T_OCEAN) {
+                flags |= SEA_REGION | SWIM_INTO;
+            }
+            else {
+                flags |= LAND_REGION;
+                if (i == T_PLAIN) {
+                    flags |= CAVALRY_REGION | FOREST_REGION;
+                }
+                else if (i == T_GLACIER || i == T_ICEBERG || i == T_ICEBERG_SLEEP) {
+                    flags |= ARCTIC_REGION;
+                }
+            }
+        }
+        test_create_terrain(terrainnames[i], flags);
+    }
+*/
     for (i = 0; i != MAXSKILLS; ++i) {
         enable_skill(i, true);
     }
@@ -392,7 +420,9 @@ building_type * test_create_buildingtype(const char * name)
         con->materials[0].rtype = get_resourcetype(R_STONE);
     }
     if (default_locale) {
-        locale_setstring(default_locale, name, name);
+        if (locale_getstring(default_locale, name) == NULL) {
+            locale_setstring(default_locale, name, name);
+        }
     }
     return btype;
 }

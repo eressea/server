@@ -24,3 +24,8 @@ indent_style = tab
 [.travis.yml]
 indent_style = space
 indent_size = 2
+
+# Matches exact files
+[CMakeLists.txt]
+indent_style = space
+indent_size = 2

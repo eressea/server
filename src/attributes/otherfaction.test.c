@@ -7,7 +7,7 @@
 #include <kernel/region.h>
 #include <kernel/faction.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 #include <CuTest.h>
 #include <tests.h>

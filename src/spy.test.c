@@ -11,9 +11,11 @@
 #include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
+
 #include <util/language.h>
 #include <util/message.h>
+#include "util/param.h"
 #include <util/crmessage.h>
 #include <tests.h>
 
@@ -198,17 +200,17 @@ static void test_setstealth_cmd(CuTest *tc) {
     test_setup();
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     lang = u->faction->locale;
-    u->flags = UFL_ANON_FACTION | UFL_SIEGE;
+    u->flags = UFL_ANON_FACTION | UFL_DEFENDER;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
         LOC(lang, parameters[P_FACTION]),
         LOC(lang, parameters[P_NOT]));
     setstealth_cmd(u, u->thisorder);
-    CuAssertIntEquals(tc, UFL_SIEGE, u->flags);
+    CuAssertIntEquals(tc, UFL_DEFENDER, u->flags);
     free_order(u->thisorder);
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s",
         LOC(lang, parameters[P_FACTION]));
     setstealth_cmd(u, u->thisorder);
-    CuAssertIntEquals(tc, UFL_SIEGE | UFL_ANON_FACTION, u->flags);
+    CuAssertIntEquals(tc, UFL_DEFENDER | UFL_ANON_FACTION, u->flags);
     test_teardown();
 }
 

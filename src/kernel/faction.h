@@ -61,7 +61,7 @@ extern "C" {
         struct region *first;
         struct region *last;
         int no;
-        int subscription;
+        int uid;
         int flags;
         char *name;
         char *banner;
@@ -112,7 +112,7 @@ extern "C" {
     const char *factionname(const struct faction *f);
     struct unit *addplayer(struct region *r, faction * f);
     struct faction *addfaction(const char *email, const char *password,
-        const struct race *frace, const struct locale *loc, int subscription);
+        const struct race *frace, const struct locale *loc);
     bool checkpasswd(const faction * f, const char *passwd);
     int writepasswd(void);
     void destroyfaction(faction ** f);

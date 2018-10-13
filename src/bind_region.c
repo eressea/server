@@ -8,38 +8,37 @@
 #include "bind_building.h"
 
 #include "teleport.h"
+#include "direction.h"
 
+#include <kernel/building.h>
 #include <kernel/calendar.h>
-#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/unit.h>
-#include <kernel/region.h>
 #include <kernel/item.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
 #include <kernel/ship.h>
 #include <kernel/plane.h>
 #include <kernel/terrain.h>
 #include <kernel/messages.h>
-#include <modules/autoseed.h>
+
+#include <kernel/attrib.h>
+#include <util/base36.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include <util/message.h>
+#include <util/strings.h>
+
 #include <attributes/key.h>
 #include <attributes/racename.h>
 
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/macros.h>
-#include <util/strings.h>
-
-#include <critbit.h>
-
+#include <lua.h>
+#include <lauxlib.h>
 #include <tolua.h>
 
 #include <assert.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 static int tolua_region_count_msg_type(lua_State *L) {

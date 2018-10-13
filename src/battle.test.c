@@ -2,6 +2,7 @@
 
 #include "battle.h"
 
+#include "guard.h"
 #include "reports.h"
 #include "skill.h"
 
@@ -10,6 +11,7 @@
 #include <kernel/faction.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -17,7 +19,9 @@
 
 #include <spells/buildingcurse.h>
 
+#include <util/base36.h>
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/rand.h>
@@ -30,6 +34,21 @@
 #include <stdio.h>
 
 #include "tests.h"
+
+static void setup_messages(void) {
+    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    mt_create_va(mt_new("para_army_index", NULL), "index:int", "name:string", MT_NEW_END);
+    mt_create_va(mt_new("battle_msg", NULL), "string:string", MT_NEW_END);
+    mt_create_va(mt_new("battle_row", NULL), "row:int", MT_NEW_END);
+    mt_create_va(mt_new("para_lineup_battle", NULL), "turn:int", MT_NEW_END);
+    mt_create_va(mt_new("para_after_battle", NULL), MT_NEW_END);
+    mt_create_va(mt_new("army_report", NULL), 
+        "index:int",  "abbrev:string", "dead:int", "fled:int", "survived:int",
+        MT_NEW_END);
+    mt_create_va(mt_new("casualties", NULL), 
+        "unit:unit", "runto:region", "run:int", "alive:int", "fallen:int",
+        MT_NEW_END);
+}
 
 static void test_make_fighter(CuTest * tc)
 {
@@ -607,7 +626,7 @@ static void test_battle_report_one(CuTest *tc)
     fighter *fig;
 
     test_setup();
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -638,7 +657,7 @@ static void test_battle_report_two(CuTest *tc)
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "and", "and");
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u1->faction->locale = lang;
@@ -671,7 +690,7 @@ static void test_battle_report_three(CuTest *tc)
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "and", "and");
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u1->faction->locale = lang;
@@ -824,12 +843,43 @@ static void test_tactics_chance(CuTest *tc) {
     test_teardown();
 }
 
+static void test_battle_fleeing(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    test_setup();
+    setup_messages();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1->status = ST_FLEE;
+    u2->status = ST_AGGRO;
+#if 0
+    setguard(u1, true);
+    CuAssertIntEquals(tc, UFL_GUARD, (u1->flags & UFL_GUARD));
+    CuAssertIntEquals(tc, RF_GUARDED, (r->flags & RF_GUARDED));
+#endif
+    config_set_int("rules.combat.flee_chance_base", 100);
+    config_set_int("rules.combat.flee_chance_limit", 100);
+    unit_addorder(u2, create_order(K_ATTACK, u2->faction->locale, itoa36(u1->no)));
+    do_battles();
+    CuAssertIntEquals(tc, 1, u1->number);
+    CuAssertIntEquals(tc, 1, u2->number);
+#if 0
+    CuAssertIntEquals(tc, 0, (u1->flags & UFL_GUARD));
+    CuAssertIntEquals(tc, 0, (r->flags & RF_GUARDED));
+#endif
+    CuAssertIntEquals(tc, UFL_LONGACTION, (u1->flags & UFL_LONGACTION));
+    CuAssertIntEquals(tc, UFL_LONGACTION | UFL_NOTMOVING, (u2->flags & (UFL_LONGACTION | UFL_NOTMOVING)));
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
     SUITE_ADD_TEST(suite, test_select_weapon_restricted);
     SUITE_ADD_TEST(suite, test_select_armor);
+    SUITE_ADD_TEST(suite, test_battle_fleeing);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_battle_report_one);

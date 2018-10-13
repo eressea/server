@@ -17,7 +17,7 @@
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/strings.h>
 

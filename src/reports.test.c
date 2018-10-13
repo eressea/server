@@ -2,7 +2,7 @@
 #include "reports.h"
 
 #include "guard.h"
-#include "keyword.h"
+#include "util/keyword.h"
 #include "lighthouse.h"
 #include "laws.h"
 #include "move.h"
@@ -25,7 +25,7 @@
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"
 
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"

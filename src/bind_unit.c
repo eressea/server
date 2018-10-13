@@ -5,15 +5,22 @@
 #include "bind_unit.h"
 #include "alchemy.h"
 #include "bindings.h"
-#include "move.h"
 #include "reports.h"
 #include "guard.h"
+#include "magic.h"
+#include "skill.h"
 
-/*  attributes includes */
-#include <attributes/racename.h>
-#include <attributes/key.h>
+/*  util includes */
+#include <kernel/attrib.h>
+#include <util/base36.h>
+#include <kernel/event.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include "util/variant.h"
 
 /*  kernel includes */
+#include "kernel/skills.h"
+#include "kernel/types.h"
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
@@ -31,21 +38,20 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-/*  util includes */
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/event.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/macros.h>
+/*  attributes includes */
+#include <attributes/racename.h>
+#include <attributes/key.h>
 
 #include <selist.h>
 
+#include <lauxlib.h>
+#include <lua.h>
 #include <tolua.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <limits.h>
 

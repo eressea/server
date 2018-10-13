@@ -60,7 +60,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -100,10 +100,8 @@ typedef enum combatmagic {
 #define MINSPELLRANGE 1
 #define MAXSPELLRANGE 7
 
-#ifndef ROW_FACTOR
-# define ROW_FACTOR 10
-#endif
-#define EFFECT_PANIC_SPELL 0.25
+#define ROW_FACTOR 3            /* factor for combat row advancement rule */
+#define EFFECT_PANIC_SPELL 25
 #define TROLL_REGENERATION 0.10
 
 /* Nach dem alten System: */
@@ -128,6 +126,9 @@ const troop no_troop = { 0, 0 };
 static int max_turns;
 static int rule_damage;
 static int rule_loot;
+static int flee_chance_max_percent;
+static int flee_chance_base;
+static int flee_chance_skill_bonus;
 static int skill_formula;
 static int rule_cavalry_skill;
 static int rule_population_damage;
@@ -146,6 +147,9 @@ static void init_rules(void)
 {
     it_mistletoe = it_find("mistletoe");
 
+    flee_chance_skill_bonus = config_get_int("rules.combat.flee_chance_bonus", 5);
+    flee_chance_base = config_get_int("rules.combat.flee_chance_base", 20);
+    flee_chance_max_percent = config_get_int("rules.combat.flee_chance_limit", 90);
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
@@ -161,7 +165,7 @@ static void init_rules(void)
     skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
     /* maximum number of combat turns */
-    max_turns = config_get_int("rules.combat.turns", COMBAT_TURNS);
+    max_turns = config_get_int("rules.combat.turns", 5);
     /* damage calculation */
     if (config_get_int("rules.combat.critical", 1)) {
         rule_damage |= DAMAGE_CRITICAL;
@@ -2350,7 +2354,7 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
     ta->value = value;
 }
 
-static double horse_fleeing_bonus(const unit * u)
+static int horse_fleeing_bonus(const unit * u)
 {
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
@@ -2373,26 +2377,26 @@ static double horse_fleeing_bonus(const unit * u)
         }
     }
     if (skl >= 5 && n3 >= u->number)
-        return 0.30;
+        return 30;
     if (skl >= 2 && n2 + n3 >= u->number)
-        return 0.20;
+        return 20;
     if (n1 + n2 + n3 >= u->number)
-        return 0.10;
-    return 0.0F;
+        return 10;
+    return 0;
 }
 
-double fleechance(unit * u)
+static int fleechance(unit * u)
 {
-    double p = 0.20;              /* Fluchtwahrscheinlichkeit in % */
+    int p = flee_chance_base;              /* Fluchtwahrscheinlichkeit in % */
     /* Einheit u versucht, dem Get�mmel zu entkommen */
 
-    p += (effskill(u, SK_STEALTH, 0) * 0.05);
+    p += (effskill(u, SK_STEALTH, 0) * flee_chance_skill_bonus);
     p += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
-        p += 0.20;
-        if (p > 0.9) {
-            p = 0.9;
+        p += flee_chance_base;
+        if (p > flee_chance_max_percent) {
+            p = flee_chance_max_percent;
         }
     }
     return p;
@@ -2691,7 +2695,7 @@ static void aftermath(battle * b)
                 }
             }
             snumber += du->number;
-            if (df->alive == 0) {
+            if (dead == df->unit->number) {
                 flags = UFL_DEAD;
             }
             else if (relevant) {
@@ -3651,17 +3655,6 @@ static void join_allies(battle * b)
                 }
                 if (se == s_end)
                     continue;
-                /* Wenn die Einheit belagert ist, mu� auch einer der Alliierten belagert sein: */
-                if (besieged(u)) {
-                    fighter *ally;
-                    for (ally = s->fighters; ally; ally = ally->next) {
-                        if (besieged(ally->unit)) {
-                            break;
-                        }
-                    }
-                    if (ally == NULL)
-                        continue;
-                }
                 /* keine Einw�nde, also soll er mitmachen: */
                 if (c == NULL) {
                     if (!join_battle(b, u, false, &c)) {
@@ -3716,13 +3709,21 @@ static void flee(const troop dt)
 {
     fighter *fig = dt.fighter;
     unit *u = fig->unit;
+    int fchance = fleechance(u);
 
-    fig->run.hp += fig->person[dt.index].hp;
-    ++fig->run.number;
+    if (fig->person[dt.index].flags & FL_PANICED) {
+        fchance += EFFECT_PANIC_SPELL;
+    }
+    if (fchance > flee_chance_max_percent) {
+        fchance = flee_chance_max_percent;
+    }
+    if (rng_int() % 100 < fchance) {
+        fig->run.hp += fig->person[dt.index].hp;
+        ++fig->run.number;
 
-    setguard(u, false);
-
-    kill_troop(dt);
+        setguard(u, false);
+        kill_troop(dt);
+    }
 }
 
 static bool is_calmed(const unit *u, const faction *f) {
@@ -3730,7 +3731,7 @@ static bool is_calmed(const unit *u, const faction *f) {
 
     while (a && a->type == &at_curse) {
         curse *c = (curse *)a->data.v;
-        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->subscription) {
+        if (c->type == &ct_calmmonster && curse_geteffect_int(c) == f->uid) {
             if (curse_active(c)) {
                 return true;
             }
@@ -3950,7 +3951,6 @@ static void battle_flee(battle * b)
             for (fig = s->fighters; fig; fig = fig->next) {
                 unit *u = fig->unit;
                 troop dt;
-                int runners = 0;
                 /* Flucht nicht bei mehr als 600 HP. Damit Wyrme t�tbar bleiben. */
                 int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
                 if (runhp > 600) runhp = 600;
@@ -3967,7 +3967,6 @@ static void battle_flee(battle * b)
                 dt.fighter = fig;
                 dt.index = fig->alive - fig->removed;
                 while (s->size[SUM_ROW] && dt.index != 0) {
-                    double ispaniced = 0.0;
                     --dt.index;
                     assert(dt.index >= 0 && dt.index < fig->unit->number);
                     assert(fig->person[dt.index].hp > 0);
@@ -3992,14 +3991,7 @@ static void battle_flee(battle * b)
                         }
                         continue;
                     }
-
-                    if (fig->person[dt.index].flags & FL_PANICED) {
-                        ispaniced = EFFECT_PANIC_SPELL;
-                    }
-                    if (chance(fmin(fleechance(u) + ispaniced, 0.90))) {
-                        ++runners;
-                        flee(dt);
-                    }
+                    flee(dt);
                 }
             }
         }
@@ -4053,8 +4045,7 @@ void force_leave(region *r, battle *b) {
 }
 
 
-void do_battle(region * r)
-{
+static void do_battle(region * r) {
     battle *b = NULL;
     bool fighting;
     ship *sh;

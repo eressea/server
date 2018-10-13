@@ -11,7 +11,7 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 
 #include <magic.h>
 

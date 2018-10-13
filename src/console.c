@@ -5,13 +5,12 @@
 
 /* lua includes */
 #include <lua.h>
+#include <luaconf.h>
 #include <lauxlib.h>
-#include <lualib.h>
 
 /* libc includes */
 #include <assert.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 

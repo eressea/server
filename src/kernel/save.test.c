@@ -17,10 +17,10 @@
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/password.h>
 #include <util/path.h>
 #include <util/strings.h>
@@ -407,7 +407,7 @@ static void test_read_password(CuTest *tc) {
 
     test_setup();
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     _test_write_password(&data, f);
@@ -431,7 +431,7 @@ static void test_read_password_external(CuTest *tc) {
         errno = 0;
     }
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, f->_password);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -441,16 +441,15 @@ static void test_read_password_external(CuTest *tc) {
     data.strm.api->rewind(data.strm.handle);
     data.version = NOCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "newpassword", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "newpassword"));
     data.version = BADCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "secret", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "secret"));
     F = fopen(pwfile, "wt");
     fprintf(F, "%s:pwfile\n", itoa36(f->no));
     fclose(F);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "pwfile", f->_password);
     CuAssertTrue(tc, checkpasswd(f, "pwfile"));
     mstream_done(&data.strm);
     gamedata_done(&data);

@@ -26,9 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -440,7 +440,7 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
         return (f && fno == f->no) ? "illusionwall" : "wall";
     if (gflags & GF_ARTICLE) {
         return LOC(f->locale, mkname("border", (f
-            && fno == f->subscription) ? "an_illusionwall" : "a_wall"));
+            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
     }
     return LOC(f->locale, mkname("border", (f
         && fno == f->no) ? "illusionwall" : "wall"));

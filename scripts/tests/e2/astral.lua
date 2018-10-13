@@ -13,12 +13,6 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
-local function dump_messages(f)
-    for k, v in ipairs(f.messages) do
-        print(v)
-    end
-end
-
 function test_fetch_astral()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")

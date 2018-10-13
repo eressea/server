@@ -5,6 +5,7 @@
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 
+#include "util/param.h"
 #include <util/parser.h>
 #include <util/language.h>
 
@@ -121,6 +122,8 @@ static void test_parse_autostudy(CuTest *tc) {
     test_setup();
     lang = get_or_create_locale("en");
     locale_setstring(lang, mkname("skill", skillnames[SK_ENTERTAINMENT]), "Entertainment");
+    locale_setstring(lang, mkname("skill", skillnames[SK_MAGIC]), "Magic");
+    locale_setstring(lang, mkname("skill", skillnames[SK_TACTICS]), "Tactics");
     locale_setstring(lang, keyword(K_STUDY), "STUDY");
     locale_setstring(lang, keyword(K_AUTOSTUDY), "AUTOSTUDY");
     locale_setstring(lang, parameters[P_AUTO], "AUTO");
@@ -134,6 +137,17 @@ static void test_parse_autostudy(CuTest *tc) {
     CuAssertIntEquals(tc, K_AUTOSTUDY, init_order(ord, lang));
     CuAssertStrEquals(tc, "Entertainment", getstrtoken());
     free_order(ord);
+
+    ord = parse_order("STUDY AUTO Magic", lang);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertStrEquals(tc, "STUDY Magic", get_command(ord, lang, cmd, sizeof(cmd)));
+    free_order(ord);
+
+    ord = parse_order("STUDY AUTO Tactics", lang);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertStrEquals(tc, "STUDY Tactics", get_command(ord, lang, cmd, sizeof(cmd)));
+    free_order(ord);
+
     test_teardown();
 }
 

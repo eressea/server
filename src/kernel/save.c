@@ -57,13 +57,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/filereader.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -100,9 +100,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* exported symbols symbols */
 int firstx = 0, firsty = 0;
-
-/* TODO: is this still important? */
-int enc_gamedata = ENCODING_UTF8;
 
 static void read_alliances(gamedata *data)
 {
@@ -924,7 +921,7 @@ static void read_password(gamedata *data, faction *f) {
     if (name[0] == '$' && data->version == BADCRYPT_VERSION) {
         char * pass = getpasswd(f->no);
         if (pass) {
-            faction_setpassword(f, password_encode(pass, PASSWORD_DEFAULT));
+            faction_setpassword(f, password_hash(pass, PASSWORD_DEFAULT));
             free(pass); /* TODO: remove this allocation! */
         }
         else {
@@ -932,7 +929,7 @@ static void read_password(gamedata *data, faction *f) {
         }
     }
     else {
-        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_encode(name, PASSWORD_DEFAULT));
+        faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, PASSWORD_DEFAULT));
     }
     (void)_test_read_password;
 }
@@ -969,7 +966,10 @@ faction *read_faction(gamedata * data)
             a_remove(&f->attribs, f->attribs);
         }
     }
-    READ_INT(data->store, &f->subscription);
+    READ_INT(data->store, &f->uid);
+    if (data->version < FACTION_UID_VERSION) {
+        f->uid = 0;
+    }
 
     if (data->version >= SPELL_LEVEL_VERSION) {
         READ_INT(data->store, &f->max_spelllevel);
@@ -1100,7 +1100,7 @@ void write_faction(gamedata *data, const faction * f)
     assert(f->_alive);
     assert(f->no > 0 && f->no <= MAX_UNIT_NR);
     WRITE_INT(data->store, f->no);
-    WRITE_INT(data->store, f->subscription);
+    WRITE_INT(data->store, f->uid);
 #if RELEASE_VERSION >= SPELL_LEVEL_VERSION
     WRITE_INT(data->store, f->max_spelllevel);
 #endif
@@ -1392,7 +1392,13 @@ int read_game(gamedata *data)
     else {
         READ_STR(store, NULL, 0);
     }
-    read_attribs(data, &global.attribs, NULL);
+
+    if (data->version < FIXATKEYS_VERSION) {
+        attrib *a = NULL;
+        read_attribs(data, &a, NULL);
+        a_removeall(&a, NULL);
+    }
+
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
     rng_init(turn + config_get_int("game.seed", 0));
@@ -1614,9 +1620,6 @@ int write_game(gamedata *data) {
     WRITE_INT(store, game_id());
     WRITE_SECTION(store);
 
-    write_attribs(store, global.attribs, NULL);
-    WRITE_SECTION(store);
-
     WRITE_INT(store, turn);
     WRITE_INT(store, 0 /* max_unique_id */);
     WRITE_INT(store, nextborder);
@@ -1678,6 +1681,5 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
     write_borders(store);
     WRITE_SECTION(store);
-
     return 0;
 }

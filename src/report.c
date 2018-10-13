@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
 
 #include "report.h"
 #include "reports.h"
@@ -50,8 +49,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
+#include "kernel/alliance.h"
 #include "kernel/ally.h"
+#include "kernel/attrib.h"
 #include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/connection.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
@@ -74,10 +76,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/terrain.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
-#include "kernel/alliance.h"
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
 #include "util/bsdstring.h"
 #include <util/goodies.h>
@@ -86,6 +86,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include "util/param.h"
 #include <util/rng.h>
 #include <util/strings.h>
 
@@ -1821,7 +1822,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     const char *name, *bname, *billusion = NULL;
     const struct locale *lang;
     char buffer[8192];
-    message *msg;
     size_t size;
     sbstring sbs;
 
@@ -1853,15 +1853,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
         sbs_strcat(&sbs, LOC(lang, "nr_building_inprogress"));
     }
 
-    if (b->besieged > 0 && r->seen.mode >= seen_lighthouse) {
-        msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
-            b->besieged - b->size * SIEGEFACTOR);
-
-        size = nr_render(msg, lang, sbs.end, sbs.size - (sbs.end - sbs.begin), f);
-        sbs.end += size;
-
-        msg_release(msg);
-    }
     i = 0;
     if (b->display && b->display[0]) {
         sbs_strcat(&sbs, "; ");

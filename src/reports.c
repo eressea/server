@@ -62,7 +62,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/base36.h"
 #include "util/bsdstring.h"
 #include "util/functions.h"
@@ -683,7 +683,6 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     int i, dh;
     int getarnt = fval(u, UFL_ANON_FACTION);
     const char *pzTmp, *str;
-    building *b;
     bool isbattle = (bool)(mode == seen_battle);
     item *itm, *show = NULL;
     faction *fv;
@@ -805,11 +804,6 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     if (is_guard(u)) {
         bufp = STRLCPY(bufp, ", ", size);
         bufp = STRLCPY(bufp, LOC(lang, "unit_guards"), size);
-    }
-
-    if ((b = usiege(u)) != NULL) {
-        bufp = STRLCPY(bufp, ", belagert ", size);
-        bufp = STRLCPY(bufp, buildingname(b), size);
     }
 
     dh = 0;

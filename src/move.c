@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "kernel/ally.h"
+#include "kernel/attrib.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
@@ -30,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/connection.h"
 #include "kernel/curse.h"
 #include "kernel/faction.h"
+#include "kernel/gamedata.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/order.h"
@@ -72,13 +74,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -630,7 +631,7 @@ mark_travelthru(unit * u, region * r, const region_list * route,
     }
 }
 
-ship *move_ship(ship * sh, region * from, region * to, region_list * route)
+void move_ship(ship * sh, region * from, region * to, region_list * route)
 {
     unit **iunit = &from->units;
     unit **ulist = &to->units;
@@ -663,8 +664,6 @@ ship *move_ship(ship * sh, region * from, region * to, region_list * route)
         if (*iunit == u)
             iunit = &u->next;
     }
-
-    return sh;
 }
 
 static bool is_freezing(const unit * u)
@@ -857,39 +856,34 @@ static void drifting_ships(region * r)
                 }
             }
 
-            if (rnext != NULL) {
+            if (rnext && firstu) {
+                message *msg = msg_message("ship_drift", "ship dir", sh, dir);
+                msg_to_ship_inmates(sh, &firstu, &lastu, msg);
+            }
 
+            fset(sh, SF_DRIFTED);
+            if (ovl >= overload_start()) {
+                damage_ship(sh, damage_overload(ovl));
+                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+            }
+            else {
+                damage_ship(sh, damage_drift);
+            }
+            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
+                sink_ship(sh);
+                remove_ship(shp, sh);
+            }
+            else if (rnext) {
                 /* Das Schiff und alle Einheiten darin werden nun von r
-                 * nach rnext verschoben. Danach eine Meldung. */
+                    * nach rnext verschoben. Danach eine Meldung. */
                 add_regionlist(&route, rnext);
 
                 set_coast(sh, r, rnext);
-                sh = move_ship(sh, r, rnext, route);
+                move_ship(sh, r, rnext, route);
                 free_regionlist(route);
-
-                if (firstu != NULL) {
-                    message *msg = msg_message("ship_drift", "ship dir", sh, dir);
-                    msg_to_ship_inmates(sh, &firstu, &lastu, msg);
-                }
             }
-
-            if (sh != NULL) {
-                fset(sh, SF_DRIFTED);
-                if (ovl >= overload_start()) {
-                    damage_ship(sh, damage_overload(ovl));
-                    msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
-                }
-                else {
-                    damage_ship(sh, damage_drift);
-                }
-                if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                    msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
-                    sink_ship(sh);
-                    remove_ship(shp, sh);
-                }
-            }
-
-            if (*shp == sh) {
+            else {
                 shp = &sh->next;
             }
         }
@@ -1970,7 +1964,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         if (fval(u, UFL_FOLLOWING))
             caught_target(current_point, u);
 
-        sh = move_ship(sh, starting_point, current_point, *routep);
+        move_ship(sh, starting_point, current_point, *routep);
 
         /* Hafengebühren ? */
 
@@ -2272,7 +2266,7 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    id = getshipid();
+    id = getid();
 
     if (id <= 0) {
         cmistake(u, ord, 20, MSG_MOVE);
@@ -2368,7 +2362,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
+                        if (!LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }
@@ -2556,7 +2550,7 @@ void follow_unit(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                id = getshipid();
+                id = getid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */
                 }
@@ -2633,9 +2627,9 @@ void follow_unit(unit * u)
             }
         }
         if (follow) {
-            fset(u, UFL_FOLLOWING);
             fset(u2, UFL_FOLLOWED);
             /* FOLLOW unit on a (potentially) moving unit prevents long orders */
+            fset(u, UFL_FOLLOWING | UFL_LONGACTION);
             set_order(&u->thisorder, NULL);
         }
     }

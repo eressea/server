@@ -42,8 +42,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -716,7 +716,10 @@ const item_type *r_luxury(const region * r)
 
 int r_demand(const region * r, const luxury_type * ltype)
 {
-    struct demand *d = r->land->demands;
+    struct demand *d;
+
+    assert(r && r->land);
+    d = r->land->demands;
     while (d && d->type != ltype)
         d = d->next;
     if (!d)
