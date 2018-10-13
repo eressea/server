@@ -173,7 +173,7 @@ extern "C" {
         struct person {
             int hp;                   /* Trefferpunkte der Personen */
             int attack;
-            int defence;
+            int defense;
             int damage;
             int flags;
             int speed;

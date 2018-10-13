@@ -303,7 +303,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     test_teardown();
 }
 
-static void test_building_defence_bonus(CuTest * tc)
+static void test_building_defense_bonus(CuTest * tc)
 {
     building_type * btype;
 
@@ -570,7 +570,7 @@ static void test_battle_skilldiff(CuTest *tc)
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ta.fighter->person[0].attack = 2;
-    td.fighter->person[0].defence = 1;
+    td.fighter->person[0].defense = 1;
     CuAssertIntEquals(tc, 1, skilldiff(ta, td, 0));
 
     td.fighter->person[0].flags |= FL_SLEEPING;
@@ -888,7 +888,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
-    SUITE_ADD_TEST(suite, test_building_defence_bonus);
+    SUITE_ADD_TEST(suite, test_building_defense_bonus);
     SUITE_ADD_TEST(suite, test_calculate_armor);
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
