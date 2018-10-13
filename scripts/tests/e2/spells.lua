@@ -136,3 +136,15 @@ function test_familiar_lynx()
     assert_equal(1, u:get_skill('magic'))
     assert_equal(1, u:get_skill('perception'))
 end
+
+function test_bug_2480()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("human", "2480@eressea.de", "de")
+  local u1 = unit.create(f, r, 1)
+  local monster = unit.create(get_monsters(), r, 1, "wyrm")
+  u1.number = 30
+  u1.hp = u1.hp_max * u1.number
+  monster:add_order("ATTACK " .. itoa36(u1.id))
+  process_orders()
+  assert_equal(0, u1.number);
+end
