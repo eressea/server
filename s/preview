@@ -55,7 +55,8 @@ cd $TESTROOT
 
 cat >| eressea.ini <<HEREDOC
 [lua]
-dbname = preview.db
+dbname = eressea.db
+dbswap = :memory:
 install = $SOURCE
 paths = $SOURCE/lunit:$SOURCE/git/scripts
 rules = e$game
@@ -70,7 +71,6 @@ cd $TESTROOT
 [ -d data ] || mkdir data
 assert_dir data
 assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
-cp $LIVE/eressea.db preview.db
 ln -f $LIVE/orders.$turn
 ln -f $LIVE/data/$turn.dat data/
 rm -rf reports
