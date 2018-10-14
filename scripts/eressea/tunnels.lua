@@ -1,3 +1,4 @@
+-- Weltentor portal module
 local tunnels = {}
 
 local buildings = {}
@@ -24,25 +25,15 @@ local function get_target(param)
 end
 
 local function tunnel_action(b, param)
-  local r = nil
-  if tonumber(param)~=nil then
-    r = get_region_by_id(tonumber(param))
-  end
   local units = tunnel_travelers(b)
-  if units~=nil then
+  local rto = get_target(param)
+  if rto and units then
     eressea.log.debug("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
     for key, u in pairs(units) do
-      local rto = r
-      if r==nil then
-        rto = get_target(param)
-      end
-      if rto~=nil then
         u.region = rto
         eressea.log.debug("teleported " .. tostring(u) .. " to " .. tostring(rto))
-      end
     end
   end
-  return 1 -- return 0 to destroy
 end
 
 function tunnels.init()
