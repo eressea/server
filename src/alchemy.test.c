@@ -45,16 +45,16 @@ static void test_herbsearch(CuTest * tc)
     CuAssertPtrEquals(tc, u2, is_guarded(r, u));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
     setguard(u2, false);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u));
-    CuAssertPtrEquals(tc, 0, (void *)rherbtype(r));
+    CuAssertPtrEquals(tc, NULL, is_guarded(r, u));
+    CuAssertPtrEquals(tc, NULL, (void *)rherbtype(r));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error108"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error70"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
     rsetherbtype(r, itype);
@@ -62,9 +62,9 @@ static void test_herbsearch(CuTest * tc)
     CuAssertIntEquals(tc, 0, rherbs(r));
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "researchherb_none"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error108"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error108"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error70"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
     rsetherbs(r, 100);
@@ -73,10 +73,10 @@ static void test_herbsearch(CuTest * tc)
     CuAssertIntEquals(tc, 99, rherbs(r));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "herbfound"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "researchherb_none"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error108"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error59"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "researchherb_none"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error108"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error70"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error59"));
     test_clear_messages(f);
 
     test_teardown();

@@ -45,7 +45,7 @@ void test_updatespells(CuTest * tc)
     CuAssertPtrNotNull(tc, book);
     spellbook_add(book, sp, 1);
 
-    CuAssertPtrEquals(tc, 0, f->spellbook);
+    CuAssertPtrEquals(tc, NULL, f->spellbook);
     pick_random_spells(f, 1, book, 1);
     CuAssertPtrNotNull(tc, f->spellbook);
     CuAssertIntEquals(tc, 1, selist_length(f->spellbook->spells));
@@ -191,7 +191,7 @@ void test_getspell_unit(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
     unit_add_spell(u, 0, sp, 1);
     CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
@@ -220,7 +220,7 @@ void test_getspell_faction(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
     f->spellbook = create_spellbook(0);
     spellbook_add(f->spellbook, sp, 1);
@@ -250,7 +250,7 @@ void test_getspell_school(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
     book = faction_get_spellbook(f);
     CuAssertPtrNotNull(tc, book);
@@ -287,7 +287,7 @@ void test_set_pre_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 
@@ -319,7 +319,7 @@ void test_set_main_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 
@@ -351,7 +351,7 @@ void test_set_post_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 

@@ -78,7 +78,7 @@ static void test_make_fighter(CuTest * tc)
     af = make_fighter(b, au, as, false);
 
     CuAssertIntEquals(tc, 1, b->nfighters);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     CuAssertPtrEquals(tc, as, af->side);
     CuAssertIntEquals(tc, 0, af->run.hp);
     CuAssertIntEquals(tc, ST_BEHIND, af->status);
@@ -216,7 +216,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     af = make_fighter(b, au, as, true);
 
     CuAssertPtrEquals(tc, bld, df->building);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
 
     dt.fighter = df;
     dt.index = 0;
@@ -261,7 +261,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, true);
 
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     free_battle(b);
     test_teardown();
 }
@@ -298,7 +298,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     df = make_fighter(b, du, as, false);
 
     CuAssertPtrEquals(tc, bld, af->building);
-    CuAssertPtrEquals(tc, 0, df->building);
+    CuAssertPtrEquals(tc, NULL, df->building);
     free_battle(b);
     test_teardown();
 }

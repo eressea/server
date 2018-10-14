@@ -106,7 +106,7 @@ static void test_piracy_cmd(CuTest * tc) {
     u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(u2->faction->no));
 
     piracy_cmd(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertTrue(tc, u->region != r);
     CuAssertPtrEquals(tc, u2->region, u->region);
     CuAssertPtrEquals(tc, u2->region, u->ship->region);
@@ -211,7 +211,7 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
     u->thisorder = create_order(K_PIRACY, f->locale, "%s", itoa36(target));
 
     piracy_cmd(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrEquals(tc, r, u->region);
 
     test_teardown();
@@ -226,7 +226,7 @@ static void test_piracy_cmd_swimmer(CuTest * tc) {
     r = pirate->region;
 
     piracy_cmd(pirate);
-    CuAssertPtrEquals(tc, 0, pirate->thisorder);
+    CuAssertPtrEquals(tc, NULL, pirate->thisorder);
     CuAssertTrue(tc, pirate->region != r);
     CuAssertPtrEquals(tc, victim->region, pirate->region);
     CuAssertPtrNotNullMsg(tc, "successful PIRACY message", test_find_messagetype(pirate->faction->msgs, "piratesawvictim"));

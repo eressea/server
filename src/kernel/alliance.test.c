@@ -34,14 +34,14 @@ static void test_alliance_make(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", al->name);
     CuAssertIntEquals(tc, 1, al->id);
     CuAssertIntEquals(tc, 0, al->flags);
-    CuAssertPtrEquals(tc, 0, al->members);
-    CuAssertPtrEquals(tc, 0, al->_leader);
-    CuAssertPtrEquals(tc, 0, al->allies);
+    CuAssertPtrEquals(tc, NULL, al->members);
+    CuAssertPtrEquals(tc, NULL, al->_leader);
+    CuAssertPtrEquals(tc, NULL, al->allies);
     CuAssertPtrEquals(tc, al, findalliance(1));
     CuAssertPtrEquals(tc, al, alliances);
     free_alliances();
-    CuAssertPtrEquals(tc, 0, findalliance(1));
-    CuAssertPtrEquals(tc, 0, alliances);
+    CuAssertPtrEquals(tc, NULL, findalliance(1));
+    CuAssertPtrEquals(tc, NULL, alliances);
     test_teardown();
 }
 
@@ -50,8 +50,8 @@ static void test_alliance_join(CuTest *tc) {
     alliance * al;
 
     setup_alliance(&fix);
-    CuAssertPtrEquals(tc, 0, fix.f1->alliance);
-    CuAssertPtrEquals(tc, 0, fix.f2->alliance);
+    CuAssertPtrEquals(tc, NULL, fix.f1->alliance);
+    CuAssertPtrEquals(tc, NULL, fix.f2->alliance);
     al = makealliance(1, "Hodor");
     setalliance(fix.f1, al);
     CuAssertPtrEquals(tc, fix.f1, alliance_get_leader(al));
@@ -99,7 +99,7 @@ static void test_alliance_cmd(CuTest *tc) {
     unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
     CuAssertTrue(tc, is_allied(u1->faction, u1->faction));
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u1->faction));
     alliance_cmd();
     al = f_get_alliance(u1->faction);
     CuAssertPtrNotNull(tc, al);
@@ -126,10 +126,10 @@ static void test_alliance_limits(CuTest *tc) {
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_INVITE], itoa36(u2->faction->no)));
     unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u1->faction));
     alliance_cmd();
     CuAssertPtrNotNull(tc, f_get_alliance(u1->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u2->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u2->faction));
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "too_many_units_in_alliance"));
     test_teardown();
@@ -152,7 +152,7 @@ static void test_alliance_cmd_kick(CuTest *tc) {
     CuAssertTrue(tc, is_allied(u1->faction, u2->faction));
     alliance_cmd();
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u2->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u2->faction));
     test_teardown();
 }
 
@@ -168,10 +168,10 @@ static void test_alliance_cmd_no_invite(CuTest *tc) {
     unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
     CuAssertTrue(tc, is_allied(u1->faction, u1->faction));
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u1->faction));
     alliance_cmd();
     CuAssertPtrNotNull(tc, f_get_alliance(u1->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u2->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u2->faction));
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
     test_teardown();
 }
@@ -193,7 +193,7 @@ static void test_alliance_cmd_leave(CuTest *tc) {
     CuAssertTrue(tc, is_allied(u1->faction, u2->faction));
     alliance_cmd();
     CuAssertTrue(tc, !is_allied(u1->faction, u2->faction));
-    CuAssertPtrEquals(tc, 0, f_get_alliance(u1->faction));
+    CuAssertPtrEquals(tc, NULL, f_get_alliance(u1->faction));
     test_teardown();
 }
 

@@ -239,11 +239,11 @@ static void test_replace_order(CuTest *tc) {
     orig = create_order(K_MAKE, lang, NULL);
     repl = create_order(K_ALLY, lang, NULL);
     replace_order(&orders, orig, repl);
-    CuAssertPtrEquals(tc, 0, orders);
+    CuAssertPtrEquals(tc, NULL, orders);
     orders = orig;
     replace_order(&orders, orig, repl);
     CuAssertPtrNotNull(tc, orders);
-    CuAssertPtrEquals(tc, 0, orders->next);
+    CuAssertPtrEquals(tc, NULL, orders->next);
     CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
     free_order(orders);
     free_order(repl);

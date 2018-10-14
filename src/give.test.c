@@ -92,7 +92,7 @@ static void test_give_unit(CuTest * tc) {
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
-    CuAssertPtrEquals(tc, 0, env.f1->units);
+    CuAssertPtrEquals(tc, NULL, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
     test_teardown();
@@ -304,7 +304,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     ord = create_order(K_GIVE, env.f1->locale, "%s ALLES PERSONEN", itoa36(env.dst->no));
     test_clear_messages(env.f1);
     give_cmd(env.src, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
 
     msg_release(msg);
@@ -408,7 +408,7 @@ static void test_give_okay(CuTest * tc) {
     setup_give(&env);
 
     config_set("rules.give.flags", "0");
-    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, check_give(env.src, env.dst, NULL));
     test_teardown();
 }
 
@@ -451,7 +451,7 @@ static void test_give_new_unit(CuTest * tc) {
     setup_give(&env);
     env.dst->number = 0;
     fset(env.dst, UFL_ISNEW);
-    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, check_give(env.src, env.dst, NULL));
     test_teardown();
 }
 

@@ -15,11 +15,11 @@ static void test_attrib_new(CuTest * tc)
     attrib_type at_test = { "test" };
     attrib * a;
     CuAssertPtrNotNull(tc, (a = a_new(&at_test)));
-    CuAssertPtrEquals(tc, 0, a->next);
-    CuAssertPtrEquals(tc, 0, a->nexttype);
+    CuAssertPtrEquals(tc, NULL, a->next);
+    CuAssertPtrEquals(tc, NULL, a->nexttype);
     CuAssertPtrEquals(tc, (void *)a->type, (void *)&at_test);
     a_remove(&a, a);
-    CuAssertPtrEquals(tc, 0, a);
+    CuAssertPtrEquals(tc, NULL, a);
 }
 
 static void test_attrib_add(CuTest * tc)
@@ -51,7 +51,7 @@ static void test_attrib_remove_self(CuTest * tc) {
     CuAssertPtrNotNull(tc, a_add(&alist, a_new(&at_foo)));
     CuAssertPtrNotNull(tc, a = a_add(&alist, a_new(&at_foo)));
     CuAssertPtrEquals(tc, a, alist->next);
-    CuAssertPtrEquals(tc, 0, alist->nexttype);
+    CuAssertPtrEquals(tc, NULL, alist->nexttype);
     CuAssertIntEquals(tc, 1, a_remove(&alist, alist));
     CuAssertPtrEquals(tc, a, alist);
     a_removeall(&alist, NULL);
@@ -66,11 +66,11 @@ static void test_attrib_removeall(CuTest * tc) {
     a_add(&alist, a_new(&at_foo));
     a_removeall(&alist, &at_foo);
     CuAssertPtrEquals(tc, a, alist);
-    CuAssertPtrEquals(tc, 0, alist->next);
+    CuAssertPtrEquals(tc, NULL, alist->next);
     a_add(&alist, a_new(&at_bar));
     a_add(&alist, a_new(&at_foo));
     a_removeall(&alist, NULL);
-    CuAssertPtrEquals(tc, 0, alist);
+    CuAssertPtrEquals(tc, NULL, alist);
 }
 
 static void test_attrib_remove(CuTest * tc)
@@ -83,7 +83,7 @@ static void test_attrib_remove(CuTest * tc)
     CuAssertIntEquals(tc, 1, a_remove(&alist, a));
     CuAssertPtrNotNull(tc, alist);
     CuAssertIntEquals(tc, 1, a_remove(&alist, alist));
-    CuAssertPtrEquals(tc, 0, alist);
+    CuAssertPtrEquals(tc, NULL, alist);
 }
 
 static void test_attrib_nexttype(CuTest * tc)
@@ -92,16 +92,16 @@ static void test_attrib_nexttype(CuTest * tc)
     attrib_type at_bar = { "bar" };
     attrib *a, *alist = 0;
     CuAssertPtrNotNull(tc, (a = a_new(&at_foo)));
-    CuAssertPtrEquals(tc, 0, a->nexttype);
+    CuAssertPtrEquals(tc, NULL, a->nexttype);
     CuAssertPtrEquals(tc, a, a_add(&alist, a));
-    CuAssertPtrEquals(tc, 0, alist->nexttype);
+    CuAssertPtrEquals(tc, NULL, alist->nexttype);
 
     CuAssertPtrNotNull(tc, a_add(&alist, a_new(&at_foo)));
-    CuAssertPtrEquals(tc, 0, alist->nexttype);
+    CuAssertPtrEquals(tc, NULL, alist->nexttype);
 
     CuAssertPtrNotNull(tc, (a = a_add(&alist, a_new(&at_bar))));
     CuAssertPtrEquals(tc, a, alist->nexttype);
-    CuAssertPtrEquals(tc, 0, a->nexttype);
+    CuAssertPtrEquals(tc, NULL, a->nexttype);
 
     a_remove(&alist, alist);
     CuAssertPtrEquals(tc, a, alist->nexttype);

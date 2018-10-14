@@ -25,7 +25,7 @@ void test_named_spellbooks(CuTest * tc)
 
     sb = create_spellbook(0);
     CuAssertPtrNotNull(tc, sb);
-    CuAssertPtrEquals(tc, 0, sb->name);
+    CuAssertPtrEquals(tc, NULL, sb->name);
     spellbook_clear(sb);
     free(sb);
 

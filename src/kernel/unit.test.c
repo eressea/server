@@ -42,7 +42,7 @@ static void test_remove_empty_units(CuTest *tc) {
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units();
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     test_teardown();
 }
 
@@ -61,9 +61,9 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
-    CuAssertPtrEquals(tc, 0, u->nextF);
-    CuAssertPtrEquals(tc, 0, u->region);
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, u->nextF);
+    CuAssertPtrEquals(tc, NULL, u->region);
     test_teardown();
 }
 
@@ -78,7 +78,7 @@ static void test_remove_units_without_faction(CuTest *tc) {
     uid = u->no;
     u_setfaction(u, 0);
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
     test_teardown();
 }
@@ -94,7 +94,7 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
     uid = u->no;
     u->faction->_alive = false;
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
     test_teardown();
 }
@@ -308,16 +308,16 @@ static void test_inside_building(CuTest *tc) {
 
     b->size = 1;
     scale_number(u, 1);
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     u->building = b;
     CuAssertPtrEquals(tc, b, inside_building(u));
     scale_number(u, 2);
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     b->size = 2;
     CuAssertPtrEquals(tc, b, inside_building(u));
     u = test_create_unit(u->faction, u->region);
     u->building = b;
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     b->size = 3;
     CuAssertPtrEquals(tc, b, inside_building(u));
     test_teardown();
@@ -397,7 +397,7 @@ static void test_unit_description(CuTest *tc) {
     rc = test_create_race("hodor");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
-    CuAssertPtrEquals(tc, 0, u->display);
+    CuAssertPtrEquals(tc, NULL, u->display);
     CuAssertStrEquals(tc, 0, u_description(u, lang));
     u->display = str_strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
@@ -428,37 +428,37 @@ static void test_remove_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, u1, f->units);
     CuAssertPtrEquals(tc, u2, u1->nextF);
     CuAssertPtrEquals(tc, u1, u2->prevF);
-    CuAssertPtrEquals(tc, 0, u2->nextF);
+    CuAssertPtrEquals(tc, NULL, u2->nextF);
     uno = u1->no;
     region_setresource(r, rtype, 0);
     i_change(&u1->items, rtype->itype, 100);
     remove_unit(&r->units, u1);
     CuAssertIntEquals(tc, 0, u1->number);
-    CuAssertPtrEquals(tc, 0, u1->region);
+    CuAssertPtrEquals(tc, NULL, u1->region);
     /* money is given to a survivor: */
-    CuAssertPtrEquals(tc, 0, u1->items);
+    CuAssertPtrEquals(tc, NULL, u1->items);
     CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
 
     /* unit is removed from f->units: */
-    CuAssertPtrEquals(tc, 0, u1->nextF);
+    CuAssertPtrEquals(tc, NULL, u1->nextF);
     CuAssertPtrEquals(tc, u2, f->units);
-    CuAssertPtrEquals(tc, 0, u2->nextF);
-    CuAssertPtrEquals(tc, 0, u2->prevF);
+    CuAssertPtrEquals(tc, NULL, u2->nextF);
+    CuAssertPtrEquals(tc, NULL, u2->prevF);
     /* unit is no longer in r->units: */
     CuAssertPtrEquals(tc, u2, r->units);
-    CuAssertPtrEquals(tc, 0, u2->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
 
     /* unit is in deleted_units: */
-    CuAssertPtrEquals(tc, 0, findunit(uno));
+    CuAssertPtrEquals(tc, NULL, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
 
     remove_unit(&r->units, u2);
     /* no survivor, give money to peasants: */
     CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
     /* there are now no more units: */
-    CuAssertPtrEquals(tc, 0, r->units);
-    CuAssertPtrEquals(tc, 0, f->units);
+    CuAssertPtrEquals(tc, NULL, r->units);
+    CuAssertPtrEquals(tc, NULL, f->units);
     test_teardown();
 }
 
