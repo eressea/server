@@ -123,7 +123,7 @@ static void test_monsters_waiting(CuTest * tc)
     setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false);
-    CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 1", m));
     test_teardown();
 }
 
@@ -173,7 +173,7 @@ static void test_monsters_attack_not(CuTest * tc)
 
     plan_monsters(m->faction);
 
-    CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 1", m));
     test_teardown();
 }
 
