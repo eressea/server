@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 static sqlite3 *g_game_db;
@@ -179,11 +180,14 @@ static int db_open_swap(const char *dbname) {
     return 0;
 }
 
+static const char *g_swapname;
+
 int db_driver_open(database_t db, const char *dbname)
 {
     ERRNO_CHECK();
 
     if (db == DB_SWAP) {
+        g_swapname = dbname;
         return db_open_swap(dbname);
     }
     else if (db == DB_GAME) {
@@ -205,6 +209,13 @@ void db_driver_close(database_t db)
         assert(err == SQLITE_OK);
         err = sqlite3_close(g_temp_db);
         assert(err == SQLITE_OK);
+        if (g_swapname) {
+            FILE * F = fopen(g_swapname, "r");
+            if (F) {
+                fclose(F);
+                remove(g_swapname);
+            }
+        }
     }
     else if (db == DB_GAME) {
         assert(g_game_db);

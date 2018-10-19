@@ -873,6 +873,8 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
+#define MAX_EDGES 16
+
 void report_region(struct stream *out, const region * r, faction * f)
 {
     int n;
@@ -883,13 +885,13 @@ void report_region(struct stream *out, const region * r, faction * f)
     attrib *a;
     const char *tname;
     struct edge {
-        struct edge *next;
         char *name;
         bool transparent;
         bool block;
         bool exist[MAXDIRECTIONS];
         direction_t lastd;
-    } *edges = NULL, *e;
+    } edges[MAX_EDGES];
+    int ne = 0;
     bool see[MAXDIRECTIONS];
     char buf[8192];
     char *bufp = buf;
@@ -908,7 +910,8 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (!r2)
             continue;
         for (b = get_borders(r, r2); b;) {
-            struct edge *edg = edges;
+            int e;
+            struct edge *match = NULL;
             bool transparent = b->type->transparent(b, f);
             const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
@@ -919,18 +922,22 @@ void report_region(struct stream *out, const region * r, faction * f)
                 b = b->next;
                 continue;
             }
-            while (edg && (edg->transparent != transparent || strcmp(name, edg->name)!=0)) {
-                edg = edg->next;
+            for (e = 0; e!=ne; ++e) {
+                struct edge *edg = edges + e;
+                if (edg->transparent == transparent && 0 == strcmp(name, edg->name)) {
+                    match = edg;
+                    break;
+                }
             }
-            if (!edg) {
-                edg = calloc(sizeof(struct edge), 1);
-                edg->name = str_strdup(name);
-                edg->transparent = transparent;
-                edg->next = edges;
-                edges = edg;
+            if (match == NULL) {
+                match = edges + ne;
+                match->name = str_strdup(name);
+                match->transparent = transparent;
+                ++ne;
+                assert(ne < MAX_EDGES);
             }
-            edg->lastd = d;
-            edg->exist[d] = true;
+            match->lastd = d;
+            match->exist[d] = true;
             b = b->next;
         }
     }
@@ -1227,27 +1234,22 @@ void report_region(struct stream *out, const region * r, faction * f)
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
-    if (edges)
+    if (ne > 0) {
+        int e;
         newline(out);
-    for (e = edges; e; e = e->next) {
-        message *msg;
+        for (e = 0; e != ne; ++e) {
+            message *msg;
 
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            if (e->exist[d]) {
-                msg = msg_message(e->transparent ? "nr_border_transparent" : "nr_border_opaque",
-                    "object dir", e->name, d);
-                nr_render(msg, f->locale, buf, sizeof(buf), f);
-                msg_release(msg);
-                paragraph(out, buf, 0, 0, 0);
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                if (edges[e].exist[d]) {
+                    msg = msg_message(edges[e].transparent ? "nr_border_transparent" : "nr_border_opaque",
+                        "object dir", edges[e].name, d);
+                    nr_render(msg, f->locale, buf, sizeof(buf), f);
+                    msg_release(msg);
+                    paragraph(out, buf, 0, 0, 0);
+                }
             }
-        }
-    }
-    if (edges) {
-        while (edges) {
-            e = edges->next;
-            free(edges->name);
-            free(edges);
-            edges = e;
+            free(edges[e].name);
         }
     }
 }
