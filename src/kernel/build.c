@@ -179,7 +179,8 @@ int destroy_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s && *s) {
-        n = atoi((const char *)s);
+        n = atoi10((const char *)s);
+
         if (n <= 0) {
             n = INT_MAX;
         }
