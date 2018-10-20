@@ -180,8 +180,9 @@ int destroy_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s && *s) {
-        n = str_atoi(s);
-
+        ERRNO_CHECK();
+        n = atoi(s);
+        errno = 0;
         if (n <= 0) {
             n = INT_MAX;
         }
