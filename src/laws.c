@@ -29,7 +29,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "automate.h"
 #include "battle.h"
 #include "economy.h"
-#include "keyword.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -71,15 +70,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/goodies.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
@@ -127,7 +128,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define DMRISE         0.1F     /* weekly chance that demand goes up */
 #define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
-/* - exported global symbols ----------------------------------- */
+param_t findparam_ex(const char *s, const struct locale * lang)
+{
+    param_t result = findparam(s, lang);
+
+    if (result == NOPARAM) {
+        const building_type *btype = findbuildingtype(s, lang);
+        if (btype != NULL)
+            return P_GEBAEUDE;
+    }
+    return (result == P_BUILDING) ? P_GEBAEUDE : result;
+}
 
 int NewbieImmunity(void)
 {
@@ -1952,7 +1963,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
         case P_FACTION:
-            n = getfactionid();
+            n = getid();
 
             for (u2 = r->units; u2; u2 = u2->next) {
                 if (u2->faction->no == n && seefaction(u->faction, r, u2, 0)) {
@@ -2900,7 +2911,7 @@ void maketemp_cmd(unit *u, order **olist)
             order *deford = default_order(u2->faction->locale);
             if (deford) {
                 set_order(&u2->thisorder, NULL);
-                addlist(&u2->orders, deford);
+                unit_addorder(u2, deford);
             }
         }
     }

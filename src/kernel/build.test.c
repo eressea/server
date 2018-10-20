@@ -1,19 +1,24 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 
-#include <kernel/messages.h>
 #include "alchemy.h"
-#include "types.h"
 #include "build.h"
-#include "guard.h"
-#include "order.h"
-#include "unit.h"
 #include "building.h"
+#include "config.h"
 #include "faction.h"
-#include "region.h"
-#include "race.h"
+#include "guard.h"
 #include "item.h"
-#include <util/language.h>
+#include "messages.h"
+#include "order.h"
+#include "race.h"
+#include "region.h"
+#include "types.h"
+#include "unit.h"
+
+#include "util/language.h"
+#include "util/param.h"
+
 #include <CuTest.h>
 #include <tests.h>
 
@@ -197,8 +202,8 @@ static void test_build_building_no_materials(CuTest *tc) {
     set_level(u, SK_BUILDING, 1);
     u->orders = create_order(K_MAKE, u->faction->locale, 0);
     CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
-    CuAssertPtrEquals(tc, 0, u->region->buildings);
-    CuAssertPtrEquals(tc, 0, u->building);
+    CuAssertPtrEquals(tc, NULL, u->region->buildings);
+    CuAssertPtrEquals(tc, NULL, u->building);
     teardown_build(&bf);
 }
 
@@ -262,7 +267,7 @@ static void test_build_destroy_road(CuTest *tc)
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "destroy_road"));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
@@ -319,7 +324,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "destroy_road"));
 
     test_clear_messages(f);
     setguard(ug, false);

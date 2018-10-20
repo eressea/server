@@ -59,7 +59,7 @@ static void test_merge_split(CuTest *tc) {
     add_message(&append, msg = msg_message(mtype->name, ""));
     msg_release(msg);
 
-    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
     CuAssertPtrEquals(tc, &mlist->begin->next, mlist->end);
     split = merge_messages(mlist, append);
     CuAssertPtrNotNull(tc, split);
@@ -68,7 +68,7 @@ static void test_merge_split(CuTest *tc) {
     CuAssertPtrNotNull(tc, mlist->begin->next);
     CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
     split_messages(mlist, split);
-    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
     free_messagelist(*split);
     free_messagelist(mlist->begin);
     free(mlist);

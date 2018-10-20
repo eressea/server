@@ -22,11 +22,12 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
-rm -rf crypto tolua
+rm -rf tolua
 git fetch || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
 git pull -q
 git submodule update
+s/cmake-init
 s/build > /dev/null || abort "build failed."
 }
 

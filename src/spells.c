@@ -70,10 +70,10 @@
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/message.h>
@@ -2348,7 +2348,7 @@ void patzer_peasantmob(const castorder * co)
             create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
                 NULL);
         fset(u, UFL_ISNEW);
-        addlist(&u->orders, create_order(K_GUARD, lang, NULL));
+        unit_addorder(u, create_order(K_GUARD, lang, NULL));
         set_order(&u->thisorder, default_order(lang));
         a = a_new(&at_unitdissolve);
         a->data.ca[0] = 1;          /* An rpeasants(r). */

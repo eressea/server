@@ -27,17 +27,18 @@
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
-#include "keyword.h"
 #include "study.h"
 #include "move.h"
 
 /* kernel includes */
+#include "kernel/attrib.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
+#include "kernel/event.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
@@ -52,11 +53,9 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/language.h>
-#include <util/lists.h>
+#include "util/keyword.h"
+#include "util/language.h"
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -203,6 +202,7 @@ void monsters_desert(struct faction *monsters)
 int monster_attacks(unit * monster, bool rich_only)
 {
     const race *rc_serpent = get_race(RC_SEASERPENT);
+    int result = -1;
     if (monster->status < ST_AVOID) {
         region *r = monster->region;
         unit *u2;
@@ -220,15 +220,16 @@ int monster_attacks(unit * monster, bool rich_only)
                 if (!rich_only || m > 0) {
                     order *ord = monster_attack(monster, u2);
                     if (ord) {
-                        addlist(&monster->orders, ord);
+                        result = 0;
+                        unit_addorder(monster, ord);
                         money += m;
                     }
                 }
             }
         }
-        return money;
+        return money > 0 ? money : result;
     }
-    return 0;
+    return result;
 }
 
 static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
@@ -249,7 +250,8 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
     if (attacks && is_guard(udragon)) {
-        money += monster_attacks(udragon, true);
+        int m = monster_attacks(udragon, true);
+        if (m > 0) money += m;
     }
 
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
@@ -737,19 +739,12 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool attacking = false;
-        /* Tiny optimization: Monsters on land only attack randomly when
-        * they are guarding. If nobody is guarding this region (RF_GUARDED),
-        * there can't be any random attacks.
-        */
-        if (!r->land || r->flags & RF_GUARDED) {
-            attacking = chance(attack_chance);
-        }
 
         for (u = r->units; u; u = u->next) {
             const race *rc = u_race(u);
             attrib *ta;
             order *long_order = NULL;
+            bool can_move = true;
 
             /* Ab hier nur noch Befehle f�r NPC-Einheiten. */
             if (u->faction!=f)
@@ -760,16 +755,19 @@ void plan_monsters(faction * f)
                 u->flags &= ~UFL_ANON_FACTION;
             }
 
-            /* Befehle m�ssen jede Runde neu gegeben werden: */
-            free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (attacking && (!r->land || is_guard(u))) {
-                monster_attacks(u, false);
+            /* Befehle m�ssen jede Runde neu gegeben werden: */
+            free_orders(&u->orders);
+
+            /* All monsters guard the region: */
+            if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
+                unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
             }
+
             /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
@@ -777,7 +775,8 @@ void plan_monsters(faction * f)
                 if (tu && tu->region == r) {
                     order * ord = monster_attack(u, tu);
                     if (ord) {
-                        addlist(&u->orders, ord);
+                        unit_addorder(u, ord);
+                        can_move = false;
                     }
                 }
                 else if (tu) {
@@ -786,17 +785,22 @@ void plan_monsters(faction * f)
                         allowed = allowed_fly;
                     }
                     long_order = plan_move_to_target(u, tu->region, 2, allowed);
+                    can_move = false;
                 }
                 else
                     a_remove(&u->attribs, ta);
             }
-            /* All monsters guard the region: */
-            if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
-                addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
+            else if (!r->land || is_guard(u)) {
+                if (chance(attack_chance)) {
+                    int m = monster_attacks(u, false);
+                    if (m >= 0) {
+                        can_move = false;
+                    }
+                }
             }
 
             /* Einheiten mit Bewegungsplan kriegen ein NACH: */
-            if (long_order == NULL) {
+            if (can_move && long_order == NULL) {
                 ta = a_find(u->attribs, &at_targetregion);
                 if (ta) {
                     if (u->region == (region *)ta->data.v) {
@@ -817,7 +821,7 @@ void plan_monsters(faction * f)
                     long_order = plan_dragon(u);
                 }
                 else {
-                    if (rc == get_race(RC_SEASERPENT)) {
+                    if (can_move && rc == get_race(RC_SEASERPENT)) {
                         long_order = create_order(K_PIRACY, f->locale, NULL);
                     }
                     else {
@@ -827,6 +831,7 @@ void plan_monsters(faction * f)
                     }
                 }
             }
+
             if (long_order == NULL && unit_can_study(u)) {
                 /* Einheiten, die Waffenlosen Kampf lernen k�nnten, lernen es um
                 * zu bewachen: */
@@ -840,7 +845,7 @@ void plan_monsters(faction * f)
             }
 
             if (long_order) {
-                addlist(&u->orders, long_order);
+                unit_addorder(u, long_order);
             }
         }
     }

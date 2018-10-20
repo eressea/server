@@ -33,7 +33,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "keyword.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -50,15 +49,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/event.h>
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/path.h>
 #include <util/rand.h>
@@ -91,54 +93,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 struct settings global;
 
-const char *parameters[MAXPARAMS] = {
-    "LOCALE",
-    "ALLES",
-    "JEDEM",
-    "BAUERN",
-    "BURG",
-    "EINHEIT",
-    "PRIVAT",
-    "HINTEN",
-    "KOMMANDO",
-    "KRAEUTER",
-    "NICHT",
-    "NAECHSTER",
-    "PARTEI",
-    "ERESSEA",
-    "PERSONEN",
-    "REGION",
-    "SCHIFF",
-    "SILBER",
-    "STRASSEN",
-    "TEMP",
-    "FLIEHE",
-    "GEBAEUDE",
-    "GIB",                        /* HELFE GIB */
-    "KAEMPFE",
-    "DURCHREISE",
-    "BEWACHE",
-    "ZAUBER",
-    "PAUSE",
-    "VORNE",
-    "AGGRESSIV",
-    "DEFENSIV",
-    "STUFE",
-    "HELFE",
-    "FREMDES",
-    "AURA",
-    "HINTER",
-    "VOR",
-    "ANZAHL",
-    "GEGENSTAENDE",
-    "TRAENKE",
-    "GRUPPE",
-    "PARTEITARNUNG",
-    "BAEUME",
-    "ALLIANZ",
-    "AUTO"
-};
-
 int findoption(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_OPTIONS);
@@ -148,78 +102,6 @@ int findoption(const char *s, const struct locale *lang)
         return (direction_t)token.i;
     }
     return NODIRECTION;
-}
-
-param_t findparam(const char *s, const struct locale * lang)
-{
-    param_t result = NOPARAM;
-    char buffer[64];
-    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
-
-    if (str && *str) {
-        int i;
-        void * match;
-        void **tokens = get_translations(lang, UT_PARAMS);
-        critbit_tree *cb = (critbit_tree *)*tokens;
-        if (!cb) {
-            log_warning("no parameters defined in locale %s", locale_name(lang));
-        }
-        else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-            cb_get_kv(match, &i, sizeof(int));
-            result = (param_t)i;
-        }
-    }
-    return result;
-}
-
-param_t findparam_block(const char *s, const struct locale *lang, bool any_locale)
-{
-    param_t p;
-    if (!s || s[0] == '@') {
-        return NOPARAM;
-    }
-    p = findparam(s, lang);
-    if (any_locale && p==NOPARAM) {
-        const struct locale *loc;
-        for (loc=locales;loc;loc=nextlocale(loc)) {
-            if (loc!=lang) {
-                p = findparam(s, loc);
-                if (p==P_FACTION || p==P_GAMENAME) {
-                    break;
-                }
-            }
-        }
-    }
-    return p;
-}
-
-param_t findparam_ex(const char *s, const struct locale * lang)
-{
-    param_t result = findparam(s, lang);
-
-    if (result == NOPARAM) {
-        const building_type *btype = findbuildingtype(s, lang);
-        if (btype != NULL)
-            return P_GEBAEUDE;
-    }
-    return (result == P_BUILDING) ? P_GEBAEUDE : result;
-}
-
-bool isparam(const char *s, const struct locale * lang, param_t param)
-{
-    assert(s);
-    if (s[0] > '@') {
-        param_t p = (param == P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
-        return p == param;
-    }
-    return false;
-}
-
-param_t getparam(const struct locale * lang)
-{
-    char token[64];
-    const char *s = gettoken(token, sizeof(token));
-    return s ? findparam(s, lang) : NOPARAM;
 }
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
@@ -266,17 +148,6 @@ int newcontainerid(void)
     }
     return random_no;
 }
-
-static const char * parameter_key(int i)
-{
-    assert(i < MAXPARAMS && i >= 0);
-    return parameters[i];
-}
-
-void init_parameters(struct locale *lang) {
-    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-}
-
 
 void init_terrains_translation(const struct locale *lang) {
     void **tokens;
@@ -368,6 +239,7 @@ static void init_magic(struct locale *lang)
         free(sstr);
     }
 }
+
 void init_locale(struct locale *lang)
 {
     init_magic(lang);

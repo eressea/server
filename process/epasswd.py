@@ -35,7 +35,7 @@ class EPasswd:
     def __init__(self):
         self.data = {}
 
-    def set_data(no, email, passwd):
+    def set_data(self, no, email, passwd):
         lc_id = lower(no)
         self.data[lc_id] = {}
         self.data[lc_id]["id"] = no

@@ -44,12 +44,6 @@ extern "C" {
 
     int findoption(const char *s, const struct locale *lang);
 
-    param_t findparam(const char *s, const struct locale *lang);
-    param_t findparam_block(const char *s, const struct locale *lang, bool any_locale);
-    param_t findparam_ex(const char *s, const struct locale * lang);
-    bool isparam(const char *s, const struct locale * lang, param_t param);
-    param_t getparam(const struct locale *lang);
-
     const char * game_name(void);
     const char * game_mailcmd(void);
     int game_id(void);
@@ -132,12 +126,9 @@ extern "C" {
 
     struct order *default_order(const struct locale *lang);
 
-    void init_parameters(struct locale *lang);
-
     void free_gamedata(void);
     void free_config(void);
 
-    extern const char *parameters[];
     extern settings global;
 
 #ifdef __cplusplus

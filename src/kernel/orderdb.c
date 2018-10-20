@@ -1,5 +1,8 @@
 #include <platform.h>
-#include "database.h"
+
+#include "kernel/config.h"
+#include "kernel/db/driver.h"
+
 #include "orderdb.h"
 
 #include <util/log.h>
@@ -10,42 +13,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-void odata_create(order_data **pdata, size_t len, const char *str)
+void orderdb_open(void)
 {
-    order_data *data;
-    char *result;
+    const char *dbname;
 
-    assert(pdata);
-    data = malloc(sizeof(order_data) + len + 1);
-    data->_refcount = 1;
-    result = (char *)(data + 1);
-    data->_str = (len > 0) ? result : NULL;
-    if (str) {
-        strcpy(result, str);
-    }
-    *pdata = data;
+    dbname = config_get("game.dbswap");
+    db_driver_open(DB_SWAP, dbname);
 }
 
-void odata_release(order_data * od)
+void orderdb_close(void)
 {
-    if (od) {
-        if (--od->_refcount == 0) {
-            free(od);
-        }
-    }
-}
-
-void odata_addref(order_data *od)
-{
-    ++od->_refcount;
+    db_driver_close(DB_SWAP);
 }
 
 order_data *odata_load(int id)
 {
-    return dblib_load_order(id);
+    if (id > 0) {
+        return db_driver_order_load(id);
+    }
+    return NULL;
 }
 
 int odata_save(order_data *od)
 {
-    return dblib_save_order(od);
+    if (od->_str) {
+        return db_driver_order_save(od->_str);
+    }
+    return 0;
 }

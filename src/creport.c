@@ -64,7 +64,7 @@ without prior permission by the authors of Eressea.
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
 #include <util/strings.h>

@@ -8,8 +8,8 @@
 #include "region.h"
 #include "save.h"
 
-#include <util/gamedata.h>
-#include <util/attrib.h>
+#include <kernel/gamedata.h>
+#include <kernel/attrib.h>
 #include <attributes/key.h>
 
 #include <stream.h>
@@ -35,7 +35,7 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     f = test_create_faction(NULL);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
-    CuAssertPtrEquals(tc, 0, f->next);
+    CuAssertPtrEquals(tc, NULL, f->next);
     f2 = test_create_faction(NULL);
     CuAssertPtrEquals(tc, f2, factions->next);
     u = test_create_unit(f2, test_create_region(0, 0, NULL));
@@ -58,14 +58,14 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     read_game(&data);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     f2 = factions;
     CuAssertPtrNotNull(tc, f2);
     u = f2->units;
     CuAssertPtrNotNull(tc, u);
     g = get_group(u);
     CuAssertPtrNotNull(tc, g);
-    CuAssertPtrEquals(tc, 0, g->allies);
+    CuAssertPtrEquals(tc, NULL, g->allies);
     test_teardown();
 }
 
@@ -106,11 +106,11 @@ static void test_group_readwrite(CuTest * tc)
     CuAssertPtrNotNull(tc, f->groups->next);
     CuAssertIntEquals(tc, 43, f->groups->next->gid);
     CuAssertStrEquals(tc, "Egoisten", f->groups->next->name);
-    CuAssertPtrEquals(tc, 0, f->groups->allies);
+    CuAssertPtrEquals(tc, NULL, f->groups->allies);
     g = f->groups->next;
     CuAssertIntEquals(tc, 44, key_get(g->attribs, 44));
     CuAssertPtrNotNull(tc, g->allies);
-    CuAssertPtrEquals(tc, 0, g->allies->next);
+    CuAssertPtrEquals(tc, NULL, g->allies->next);
     CuAssertPtrEquals(tc, f, g->allies->faction);
     CuAssertIntEquals(tc, HELP_GIVE, g->allies->status);
     test_teardown();
@@ -135,7 +135,7 @@ static void test_group(CuTest * tc)
     CuAssertIntEquals(tc, 1, g->members);
     set_group(u, 0);
     CuAssertIntEquals(tc, 0, g->members);
-    CuAssertPtrEquals(tc, 0, get_group(u));
+    CuAssertPtrEquals(tc, NULL, get_group(u));
     set_group(u, g);
     CuAssertIntEquals(tc, 1, g->members);
     CuAssertPtrEquals(tc, g, get_group(u));

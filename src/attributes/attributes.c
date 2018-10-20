@@ -53,9 +53,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/macros.h>
 #include <util/resolve.h>
 

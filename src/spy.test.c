@@ -11,9 +11,11 @@
 #include <kernel/order.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
+
 #include <util/language.h>
 #include <util/message.h>
+#include "util/param.h"
 #include <util/crmessage.h>
 #include <tests.h>
 
@@ -270,7 +272,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     assert(ord);
     set_level(u2, SK_SPY, 1);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u2, ord));
-    CuAssertPtrEquals(tc, 0, r->ships);
+    CuAssertPtrEquals(tc, NULL, r->ships);
     free_order(ord);
     test_teardown();
 }

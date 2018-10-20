@@ -11,7 +11,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/rand.h>
 #include <util/message.h>
 #include <util/language.h>

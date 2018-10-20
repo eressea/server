@@ -1,8 +1,6 @@
 #include <platform.h>
 
 #include <kernel/config.h>
-#include <kernel/database.h>
-#include <kernel/orderdb.h>
 
 #include <util/log.h>
 
@@ -13,6 +11,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 static sqlite3 *g_game_db;
@@ -25,9 +24,9 @@ static sqlite3_stmt * g_stmt_insert_faction;
 static int g_order_batchsize;
 static int g_order_tx_size;
 
-order_data *db_driver_order_load(int id)
+struct order_data *db_driver_order_load(int id)
 {
-    order_data * od = NULL;
+    struct order_data * od = NULL;
     int err;
 
     ERRNO_CHECK();
@@ -58,12 +57,12 @@ order_data *db_driver_order_load(int id)
     return NULL;
 }
 
-int db_driver_order_save(order_data *od)
+int db_driver_order_save(const char *str)
 {
     int err;
     sqlite3_int64 id;
     
-    assert(od && od->_str);
+    assert(str);
    
     ERRNO_CHECK();
 
@@ -76,7 +75,7 @@ int db_driver_order_save(order_data *od)
     
     err = sqlite3_reset(g_stmt_insert_order);
     assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_order, 1, od->_str, -1, SQLITE_STATIC);
+    err = sqlite3_bind_text(g_stmt_insert_order, 1, str, -1, SQLITE_STATIC);
     assert(err == SQLITE_OK);
     err = sqlite3_step(g_stmt_insert_order);
     assert(err == SQLITE_DONE);
@@ -181,11 +180,14 @@ static int db_open_swap(const char *dbname) {
     return 0;
 }
 
+static const char *g_swapname;
+
 int db_driver_open(database_t db, const char *dbname)
 {
     ERRNO_CHECK();
 
     if (db == DB_SWAP) {
+        g_swapname = dbname;
         return db_open_swap(dbname);
     }
     else if (db == DB_GAME) {
@@ -207,6 +209,13 @@ void db_driver_close(database_t db)
         assert(err == SQLITE_OK);
         err = sqlite3_close(g_temp_db);
         assert(err == SQLITE_OK);
+        if (g_swapname) {
+            FILE * F = fopen(g_swapname, "r");
+            if (F) {
+                fclose(F);
+                remove(g_swapname);
+            }
+        }
     }
     else if (db == DB_GAME) {
         assert(g_game_db);

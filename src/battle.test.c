@@ -3,7 +3,6 @@
 #include "battle.h"
 
 #include "guard.h"
-#include "keyword.h"
 #include "reports.h"
 #include "skill.h"
 
@@ -22,6 +21,7 @@
 
 #include <util/base36.h>
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/rand.h>
@@ -78,7 +78,7 @@ static void test_make_fighter(CuTest * tc)
     af = make_fighter(b, au, as, false);
 
     CuAssertIntEquals(tc, 1, b->nfighters);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     CuAssertPtrEquals(tc, as, af->side);
     CuAssertIntEquals(tc, 0, af->run.hp);
     CuAssertIntEquals(tc, ST_BEHIND, af->status);
@@ -216,7 +216,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     af = make_fighter(b, au, as, true);
 
     CuAssertPtrEquals(tc, bld, df->building);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
 
     dt.fighter = df;
     dt.index = 0;
@@ -261,7 +261,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, true);
 
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     free_battle(b);
     test_teardown();
 }
@@ -298,12 +298,12 @@ static void test_building_bonus_respects_size(CuTest * tc)
     df = make_fighter(b, du, as, false);
 
     CuAssertPtrEquals(tc, bld, af->building);
-    CuAssertPtrEquals(tc, 0, df->building);
+    CuAssertPtrEquals(tc, NULL, df->building);
     free_battle(b);
     test_teardown();
 }
 
-static void test_building_defence_bonus(CuTest * tc)
+static void test_building_defense_bonus(CuTest * tc)
 {
     building_type * btype;
 
@@ -358,6 +358,16 @@ static void test_natural_armor(CuTest * tc)
     test_teardown();
 }
 
+static int test_armor(troop dt, weapon_type *awtype, bool magic) {
+  return calculate_armor(dt, 0, awtype, select_armor(dt, false), select_armor(dt, true), magic);
+}
+
+static int test_resistance(troop dt) {
+  return apply_resistance(1000, dt,
+                  select_weapon(dt, false, true) ? select_weapon(dt, false, true)->type : 0,
+                  select_armor(dt, false), select_armor(dt, true), true);
+}
+
 static void test_calculate_armor(CuTest * tc)
 {
     troop dt;
@@ -368,7 +378,6 @@ static void test_calculate_armor(CuTest * tc)
     armor_type *ashield, *achain;
     item_type *ibelt, *ishield, *ichain;
     race *rc;
-    variant magres = frac_zero;
     variant v50p = frac_make(1, 2);
 
     test_setup();
@@ -384,18 +393,19 @@ static void test_calculate_armor(CuTest * tc)
     dt.index = 0;
 
     dt.fighter = setup_fighter(&b, du);
-    CuAssertIntEquals_Msg(tc, "default ac", 0, calculate_armor(dt, 0, 0, &magres));
-    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[0], magres.sa[1]);
+    CuAssertIntEquals_Msg(tc, "default ac", 0, test_armor(dt, 0, false));
+
+    CuAssertIntEquals_Msg(tc, "magres unmodified", 1000, test_resistance(dt));
     free_battle(b);
 
     b = NULL;
     i_change(&du->items, ibelt, 1);
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "without natural armor", 0, natural_armor(du));
-    CuAssertIntEquals_Msg(tc, "magical armor", 1, calculate_armor(dt, 0, 0, 0));
+    CuAssertIntEquals_Msg(tc, "magical armor", 1, test_armor(dt, 0, false));
     rc->armor = 2;
     CuAssertIntEquals_Msg(tc, "with natural armor", 2, natural_armor(du));
-    CuAssertIntEquals_Msg(tc, "natural armor", 3, calculate_armor(dt, 0, 0, 0));
+    CuAssertIntEquals_Msg(tc, "natural armor", 3, test_armor(dt, 0, false));
     rc->armor = 0;
     free_battle(b);
 
@@ -404,29 +414,30 @@ static void test_calculate_armor(CuTest * tc)
     i_change(&du->items, ichain, 1);
     dt.fighter = setup_fighter(&b, du);
     rc->battle_flags &= ~BF_EQUIPMENT;
-    CuAssertIntEquals_Msg(tc, "require BF_EQUIPMENT", 1, calculate_armor(dt, 0, 0, 0));
+    CuAssertIntEquals_Msg(tc, "require BF_EQUIPMENT", 1, test_armor(dt, 0, false));
     free_battle(b);
 
     b = NULL;
     rc->battle_flags |= BF_EQUIPMENT;
     dt.fighter = setup_fighter(&b, du);
-    CuAssertIntEquals_Msg(tc, "stack equipment rc", 5, calculate_armor(dt, 0, 0, 0));
+    CuAssertIntEquals_Msg(tc, "stack equipment rc", 5, test_armor(dt, 0, false));
     rc->armor = 2;
-    CuAssertIntEquals_Msg(tc, "natural armor adds 50%", 6, calculate_armor(dt, 0, 0, 0));
+    CuAssertIntEquals_Msg(tc, "natural armor adds 50%", 6, test_armor(dt, 0, false));
     wtype->flags = WTF_NONE;
-    CuAssertIntEquals_Msg(tc, "regular weapon has no effect", 6, calculate_armor(dt, 0, wtype, 0));
+    CuAssertIntEquals_Msg(tc, "regular weapon has no effect", 6, test_armor(dt, wtype, false));
     wtype->flags = WTF_ARMORPIERCING;
-    CuAssertIntEquals_Msg(tc, "armor piercing weapon", 3, calculate_armor(dt, 0, wtype, 0));
+    CuAssertIntEquals_Msg(tc, "armor piercing weapon", 3, test_armor(dt, wtype, false));
     wtype->flags = WTF_NONE;
 
-    CuAssertIntEquals_Msg(tc, "magical attack", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertIntEquals_Msg(tc, "magres unmodified", magres.sa[1], magres.sa[0]);
+    CuAssertIntEquals_Msg(tc, "magical attack", 3, test_armor(dt, wtype, true));
+    CuAssertIntEquals_Msg(tc, "magres unmodified", 1000,
+        test_resistance(dt));
 
     ashield->flags |= ATF_LAEN;
     achain->flags |= ATF_LAEN;
-    magres = frac_one;
-    CuAssertIntEquals_Msg(tc, "laen armor", 3, calculate_armor(dt, 0, 0, &magres));
-    CuAssertIntEquals_Msg(tc, "laen magres bonus", 4, magres.sa[1]);
+
+    CuAssertIntEquals_Msg(tc, "laen armor", 3, test_armor(dt, wtype, true));
+    CuAssertIntEquals_Msg(tc, "laen magres bonus", 250, test_resistance(dt));
     free_battle(b);
     test_teardown();
 }
@@ -456,15 +467,17 @@ static void test_magic_resistance(CuTest *tc)
 
     i_change(&du->items, ishield, 1);
     dt.fighter = setup_fighter(&b, du);
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssertIntEquals_Msg(tc, "no magres reduction", magres.sa[1], magres.sa[0]);
+    CuAssertIntEquals_Msg(tc, "no magres reduction", 1000, test_resistance(dt));
     magres = magic_resistance(du);
     CuAssertIntEquals_Msg(tc, "no magres reduction", 0, magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
     ashield->magres = v10p;
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssert(tc, "laen reduction => 10%%", frac_equal(frac_make(9, 10), magres));
+    CuAssertIntEquals_Msg(tc, "laen reduction => 10%%", 900, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "no magic, no resistance", 1000,
+        apply_resistance(1000, dt,
+            select_weapon(dt, false, true) ? select_weapon(dt, false, true)->type : 0,
+            select_armor(dt, false), select_armor(dt, true), false));
     free_battle(b);
 
     b = NULL;
@@ -474,8 +487,7 @@ static void test_magic_resistance(CuTest *tc)
     ashield->flags |= ATF_LAEN;
     ashield->magres = v10p;
     dt.fighter = setup_fighter(&b, du);
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssert(tc, "2x laen reduction => 81%%", frac_equal(frac_make(81, 100), magres));
+    CuAssertIntEquals_Msg(tc, "2x laen reduction => 81%%", 810, test_resistance(dt));
     free_battle(b);
 
     b = NULL;
@@ -483,21 +495,18 @@ static void test_magic_resistance(CuTest *tc)
     i_change(&du->items, ichain, -1);
     set_level(du, SK_MAGIC, 2);
     dt.fighter = setup_fighter(&b, du);
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssert(tc, "skill reduction => 90%%", frac_equal(magres, frac_make(9, 10)));
+    CuAssertIntEquals_Msg(tc, "skill reduction => 90%%", 900, test_resistance(dt));
     magres = magic_resistance(du);
     CuAssert(tc, "skill reduction", frac_equal(magres, v10p));
     rc->magres = v50p; /* percentage, gets added to skill bonus */
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssert(tc, "race reduction => 40%%", frac_equal(magres, frac_make(4, 10)));
+    CuAssertIntEquals_Msg(tc, "race reduction => 40%%", 400, test_resistance(dt));
     magres = magic_resistance(du);
     CuAssert(tc, "race bonus => 60%%", frac_equal(magres, frac_make(60, 100)));
 
     rc->magres = frac_make(15, 10); /* 150% resistance should not cause negative damage multiplier */
     magres = magic_resistance(du);
     CuAssert(tc, "magic resistance is never > 0.9", frac_equal(magres, frac_make(9, 10)));
-    calculate_armor(dt, 0, 0, &magres);
-    CuAssert(tc, "damage reduction is never < 0.1", frac_equal(magres, frac_make(1, 10)));
+    CuAssertIntEquals_Msg(tc, "damage reduction is never < 0.1", 100, test_resistance(dt));
 
     free_battle(b);
     test_teardown();
@@ -532,12 +541,12 @@ static void test_projectile_armor(CuTest * tc)
     dt.fighter = setup_fighter(&b, du);
     wtype->flags = WTF_MISSILE;
     achain->projectile = 1.0;
-    CuAssertIntEquals_Msg(tc, "projectile armor", -1, calculate_armor(dt, 0, wtype, 0));
+    CuAssertIntEquals_Msg(tc, "projectile armor", -1, test_armor(dt, wtype, false));
     achain->projectile = 0.0;
     ashield->projectile = 1.0;
-    CuAssertIntEquals_Msg(tc, "projectile shield", -1, calculate_armor(dt, 0, wtype, 0));
+    CuAssertIntEquals_Msg(tc, "projectile shield", -1, test_armor(dt, wtype, false));
     wtype->flags = WTF_NONE;
-    CuAssertIntEquals_Msg(tc, "no projectiles", 4, calculate_armor(dt, 0, wtype, 0));
+    CuAssertIntEquals_Msg(tc, "no projectiles", 4, test_armor(dt, wtype, false));
     free_battle(b);
     test_teardown();
 }
@@ -561,7 +570,7 @@ static void test_battle_skilldiff(CuTest *tc)
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ta.fighter->person[0].attack = 2;
-    td.fighter->person[0].defence = 1;
+    td.fighter->person[0].defense = 1;
     CuAssertIntEquals(tc, 1, skilldiff(ta, td, 0));
 
     td.fighter->person[0].flags |= FL_SLEEPING;
@@ -574,6 +583,38 @@ static void test_battle_skilldiff(CuTest *tc)
     free_battle(b);
     test_teardown();
 }
+
+static void test_terminate(CuTest * tc)
+{
+    troop at, dt;
+    battle *b = NULL;
+    region *r;
+    unit *au, *du;
+    race *rc;
+
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+
+    rc = test_create_race("human");
+    au = test_create_unit(test_create_faction(rc), r);
+    du = test_create_unit(test_create_faction(rc), r);
+    dt.index = 0;
+    at.index = 0;
+
+    at.fighter = setup_fighter(&b, au);
+    dt.fighter = setup_fighter(&b, du);
+
+    CuAssertIntEquals_Msg(tc, "not killed", 0, terminate(dt, at, AT_STANDARD, "1d1", false));
+    b = NULL;
+    at.fighter = setup_fighter(&b, au);
+    dt.fighter = setup_fighter(&b, du);
+    CuAssertIntEquals_Msg(tc, "killed", 1, terminate(dt, at, AT_STANDARD, "100d1", false));
+    CuAssertIntEquals_Msg(tc, "number", 0, dt.fighter->person[0].hp);
+
+    free_battle(b);
+    test_teardown();
+}
+
 
 static void test_battle_report_one(CuTest *tc)
 {
@@ -847,12 +888,13 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
-    SUITE_ADD_TEST(suite, test_building_defence_bonus);
+    SUITE_ADD_TEST(suite, test_building_defense_bonus);
     SUITE_ADD_TEST(suite, test_calculate_armor);
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_projectile_armor);
     SUITE_ADD_TEST(suite, test_tactics_chance);
+    SUITE_ADD_TEST(suite, test_terminate);
     DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

@@ -23,13 +23,13 @@ static void test_resources(CuTest *tc) {
     CuAssertPtrNotNull(tc, rt_find("permaura"));
     CuAssertPtrEquals(tc, rt_find("permaura"), (void *)get_resourcetype(R_PERMAURA));
 
-    CuAssertPtrEquals(tc, 0, rt_find("stone"));
+    CuAssertPtrEquals(tc, NULL, rt_find("stone"));
     rtype = rt_get_or_create("stone");
     CuAssertPtrEquals(tc, (void *)rtype, (void *)rt_find("stone"));
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
     free_resources();
-    CuAssertPtrEquals(tc, 0, rt_find("stone"));
-    CuAssertPtrEquals(tc, 0, rt_find("peasant"));
+    CuAssertPtrEquals(tc, NULL, rt_find("stone"));
+    CuAssertPtrEquals(tc, NULL, rt_find("peasant"));
     rtype = rt_get_or_create("stone");
     CuAssertPtrEquals(tc, (void *)rtype, (void *)get_resourcetype(R_STONE));
     test_teardown();

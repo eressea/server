@@ -36,7 +36,7 @@
 #include <move.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -956,7 +956,7 @@ int sp_hero(struct castorder * co)
 
         if (df) {
             if (!(df->person[dt.index].flags & FL_COURAGE)) {
-                df->person[dt.index].defence += df_bonus;
+                df->person[dt.index].defense += df_bonus;
                 df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
                 targets++;
                 --force;
@@ -1005,7 +1005,7 @@ int sp_berserk(struct castorder * co)
         if (df) {
             if (!(df->person[dt.index].flags & FL_COURAGE)) {
                 df->person[dt.index].attack += at_bonus;
-                df->person[dt.index].defence -= df_malus;
+                df->person[dt.index].defense -= df_malus;
                 df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
                 targets++;
                 --force;
@@ -1064,7 +1064,7 @@ int sp_frighten(struct castorder * co)
         }
         if (!is_magic_resistant(mage, df->unit, 0)) {
             df->person[dt.index].attack -= at_malus;
-            df->person[dt.index].defence -= df_malus;
+            df->person[dt.index].defense -= df_malus;
             targets++;
         }
         --force;
@@ -1109,7 +1109,7 @@ int sp_tiredsoldiers(struct castorder * co)
         if (!(df->person[t.index].flags & FL_TIRED)) {
             if (!is_magic_resistant(mage, df->unit, 0)) {
                 df->person[t.index].flags = df->person[t.index].flags | FL_TIRED;
-                df->person[t.index].defence -= 2;
+                df->person[t.index].defense -= 2;
                 ++n;
             }
         }

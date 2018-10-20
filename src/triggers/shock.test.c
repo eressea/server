@@ -5,7 +5,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/message.h>
 
 #include <tests.h>

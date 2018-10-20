@@ -57,7 +57,7 @@ static void test_remove_empty_factions_alliance(CuTest *tc) {
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
     CuAssertIntEquals(tc, 1, selist_length(al->members));
     remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, al->_leader);
+    CuAssertPtrEquals(tc, NULL, al->_leader);
     CuAssertIntEquals(tc, 0, selist_length(al->members));
     test_teardown();
 }
@@ -75,7 +75,7 @@ static void test_remove_empty_factions(CuTest *tc) {
     CuAssertIntEquals(tc, false, f->_alive);
     CuAssertPtrEquals(tc, fm, factions);
     CuAssertPtrEquals(tc, NULL, fm->next);
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     CuAssertPtrEquals(tc, fm, get_monsters());
     test_teardown();
 }
@@ -99,7 +99,7 @@ static void test_remove_dead_factions(CuTest *tc) {
     f->_alive = false;
     fno = f->no;
     remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     CuAssertPtrEquals(tc, fm, get_monsters());
     test_teardown();
 }
@@ -162,7 +162,7 @@ static void test_set_origin(CuTest *tc) {
     test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(NULL);
-    CuAssertPtrEquals(tc, 0, f->ursprung);
+    CuAssertPtrEquals(tc, NULL, f->ursprung);
     faction_setorigin(f, 0, 1, 1);
     CuAssertIntEquals(tc, 0, f->ursprung->id);
     CuAssertIntEquals(tc, 1, f->ursprung->x);
@@ -250,7 +250,7 @@ static void test_set_email(CuTest *tc) {
     faction_setemail(f, "bugs@eressea.de");
     CuAssertStrEquals(tc, "bugs@eressea.de", f->email);
     faction_setemail(f, NULL);
-    CuAssertPtrEquals(tc, 0, f->email);
+    CuAssertPtrEquals(tc, NULL, f->email);
     CuAssertStrEquals(tc, "", faction_getemail(f));
     test_teardown();
 }

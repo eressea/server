@@ -7,7 +7,7 @@
 #include <kernel/unit.h>
 #include <kernel/curse.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 #include <spells/shipcurse.h>
 #include <attributes/movement.h>
@@ -278,7 +278,7 @@ static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
     leave_ship(u3);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     leave_ship(u2);
-    CuAssertPtrEquals(tc, 0, ship_owner(sh));
+    CuAssertPtrEquals(tc, NULL, ship_owner(sh));
     test_teardown();
 }
 
@@ -311,7 +311,7 @@ static void test_shipowner_resets_when_empty(CuTest * tc)
     u_set_ship(u, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     u->number = 0;
-    CuAssertPtrEquals(tc, 0, ship_owner(sh));
+    CuAssertPtrEquals(tc, NULL, ship_owner(sh));
     u->number = 1;
     CuAssertPtrEquals(tc, u, ship_owner(sh));
     test_teardown();
@@ -353,7 +353,7 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     leave_ship(u1);
     CuAssertPtrEquals(tc, u3, ship_owner(sh));
     leave_ship(u3);
-    CuAssertPtrEquals(tc, 0, ship_owner(sh));
+    CuAssertPtrEquals(tc, NULL, ship_owner(sh));
     u2->number = 1;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
@@ -365,8 +365,8 @@ static void test_stype_defaults(CuTest *tc) {
     stype = st_get_or_create("hodor");
     CuAssertPtrNotNull(tc, stype);
     CuAssertStrEquals(tc, "hodor", stype->_name);
-    CuAssertPtrEquals(tc, 0, stype->construction);
-    CuAssertPtrEquals(tc, 0, stype->coasts);
+    CuAssertPtrEquals(tc, NULL, stype->construction);
+    CuAssertPtrEquals(tc, NULL, stype->coasts);
     CuAssertDblEquals(tc, 0.0, stype->damage, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->storm, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->tac_bonus, 0.01);
