@@ -22,10 +22,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "strings.h"
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 
 #ifdef HAVE_LIBBSD
@@ -33,6 +34,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #else
 #include <string.h>
 #endif
+
+int str_atoi(const char *str)
+{
+    int e = errno;
+    int i = atoi(str);
+    errno = e;
+    return i;
+}
 
 size_t str_strlcpy(char *dst, const char *src, size_t len)
 {

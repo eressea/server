@@ -54,13 +54,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* from libutil */
-#include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 
 /* from libc */
 #include <assert.h>
@@ -180,7 +180,7 @@ int destroy_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s && *s) {
-        n = atoi10((const char *)s);
+        n = str_atoi(s);
 
         if (n <= 0) {
             n = INT_MAX;

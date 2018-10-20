@@ -23,14 +23,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
-
-int atoi10(const char *str)
-{
-    int i = atoi(str);
-    errno = 0;
-    return i;
-}
 
 int atoi36(const char *str)
 {

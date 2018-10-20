@@ -71,6 +71,27 @@ static void test_str_hash(CuTest * tc)
     CuAssertIntEquals(tc, 140703196, str_hash("Hodor"));
 }
 
+static void test_str_atoi(CuTest * tc)
+{
+    errno = 0;
+    CuAssertIntEquals(tc, 0, str_atoi("0"));
+    CuAssertIntEquals(tc, 4, str_atoi("4"));
+    CuAssertIntEquals(tc, 42, str_atoi("42"));
+    CuAssertIntEquals(tc, -4, str_atoi("-4"));
+    CuAssertIntEquals(tc, 0, errno);
+    CuAssertIntEquals(tc, 4, str_atoi("4a"));
+    CuAssertIntEquals(tc, 8, str_atoi("08"));
+    CuAssertIntEquals(tc, 0, str_atoi("0x8"));
+    CuAssertIntEquals(tc, 0, str_atoi("a"));
+    CuAssertIntEquals(tc, 0, errno);
+    errno = ERANGE;
+    CuAssertIntEquals(tc, 0, str_atoi("a"));
+    CuAssertIntEquals(tc, ERANGE, errno);
+    errno = EINVAL;
+    CuAssertIntEquals(tc, 0, str_atoi("a"));
+    CuAssertIntEquals(tc, EINVAL, errno);
+}
+
 static void test_str_slprintf(CuTest * tc)
 {
     char buffer[32];
@@ -157,6 +178,7 @@ static void test_sbstring(CuTest * tc)
 CuSuite *get_strings_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_str_atoi);
     SUITE_ADD_TEST(suite, test_str_hash);
     SUITE_ADD_TEST(suite, test_str_escape);
     SUITE_ADD_TEST(suite, test_str_escape_ex);
