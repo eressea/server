@@ -229,6 +229,8 @@ static void test_reset(void) {
     default_locale = 0;
     calendar_cleanup();
     close_orders();
+    log_close();
+    stats_close();
     free_special_directions();
     free_locales();
     free_spells();

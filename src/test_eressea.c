@@ -173,6 +173,8 @@ int RunAllTests(int argc, char *argv[])
         fail_count = summary->failCount;
         CuSuiteDelete(summary);
         game_done();
+        log_close();
+        stats_close();
         return fail_count;
     }
     return 0;
