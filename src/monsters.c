@@ -608,6 +608,7 @@ static void recruit_dracoids(unit * dragon, int size)
     region *r = dragon->region;
     const struct item *weapon = NULL;
     unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
+    stats_count("monsters.create.dracoid", 1);
 
     fset(un, UFL_ISNEW | UFL_MOVED);
 
@@ -868,6 +869,7 @@ static int nrand(int handle_start, int sub)
 
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
+    stats_count("monsters.create.seaserpent", 1);
     fset(u, UFL_ISNEW | UFL_MOVED);
     equip_unit(u, "seed_seaserpent");
     return u;
@@ -908,6 +910,7 @@ void spawn_dragons(void)
             else {
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
+            stats_count("monsters.create.dragon", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             equip_unit(u, "seed_dragon");
 
@@ -968,6 +971,7 @@ void spawn_undead(void)
             }
 
             u = create_unit(r, monsters, undead, rc, 0, NULL, NULL);
+            stats_count("monsters.create.undead", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
                 && rng_int() % 10 < 4) {
