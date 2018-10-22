@@ -382,20 +382,8 @@ static int tolua_faction_set_origin(lua_State * L)
 static int tolua_faction_get_origin(lua_State * L)
 {
     faction *self = (faction *)tolua_tousertype(L, 1, 0);
-
-    ursprung *origin = self->ursprung;
-    int x, y;
-    while (origin != NULL && origin->id != 0) {
-        origin = origin->next;
-    }
-    if (origin) {
-        x = origin->x;
-        y = origin->y;
-    }
-    else {
-        x = 0;
-        y = 0;
-    }
+    int x = 0, y = 0;
+    faction_getorigin(self, 0, &x, &y);
 
     lua_pushinteger(L, x);
     lua_pushinteger(L, y);

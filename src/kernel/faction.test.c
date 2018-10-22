@@ -119,7 +119,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->next);
     CuAssertPtrEquals(tc, NULL, (void *)f->banner);
     CuAssertPtrEquals(tc, NULL, (void *)f->spellbook);
-    CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
+    CuAssertPtrEquals(tc, NULL, (void *)f->origin);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
     CuAssertStrEquals(tc, "test@eressea.de", f->email);
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
@@ -162,11 +162,11 @@ static void test_set_origin(CuTest *tc) {
     test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(NULL);
-    CuAssertPtrEquals(tc, NULL, f->ursprung);
+    CuAssertPtrEquals(tc, NULL, f->origin);
     faction_setorigin(f, 0, 1, 1);
-    CuAssertIntEquals(tc, 0, f->ursprung->id);
-    CuAssertIntEquals(tc, 1, f->ursprung->x);
-    CuAssertIntEquals(tc, 1, f->ursprung->y);
+    CuAssertIntEquals(tc, 0, f->origin->id);
+    CuAssertIntEquals(tc, 1, f->origin->x);
+    CuAssertIntEquals(tc, 1, f->origin->y);
     faction_getorigin(f, 0, &x, &y);
     CuAssertIntEquals(tc, 1, x);
     CuAssertIntEquals(tc, 1, y);
@@ -190,7 +190,7 @@ static void test_set_origin_bug(CuTest *tc) {
     faction_setorigin(f, 0, -10, 3);
     faction_setorigin(f, 0, -13, -4);
     adjust_coordinates(f, &x, &y, pl);
-    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, 0, f->origin->id);
     CuAssertIntEquals(tc, -9, x);
     CuAssertIntEquals(tc, 2, y);
     test_teardown();

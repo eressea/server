@@ -357,14 +357,14 @@ static void read_skills(gamedata *data, unit *u)
             size_t sz = u->skill_size * sizeof(skill);
 
             qsort(skills, u->skill_size, sizeof(skill), skill_cmp);
-            u->skills = malloc(sz);
+            u->skills = (skill *)malloc(sz);
             memcpy(u->skills, skills, sz);
         }
     }
     else {
         int i;
         READ_INT(data->store, &u->skill_size);
-        u->skills = malloc(sizeof(skill)*u->skill_size);
+        u->skills = (skill *)malloc(sizeof(skill)*u->skill_size);
         for (i = 0; i != u->skill_size; ++i) {
             skill *sv = u->skills + i;
             read_skill(data, sv);
@@ -420,7 +420,7 @@ unit *read_unit(gamedata *data)
         u_setfaction(u, NULL);
     }
     else {
-        u = calloc(sizeof(unit), 1);
+        u = (unit *)calloc(1, sizeof(unit));
         assert_alloc(u);
         u->no = n;
         uhash(u);
@@ -1095,7 +1095,7 @@ faction *read_faction(gamedata * data)
 void write_faction(gamedata *data, const faction * f)
 {
     ally *sf;
-    ursprung *ur;
+    origin *ur;
 
     assert(f->_alive);
     assert(f->no > 0 && f->no <= MAX_UNIT_NR);
@@ -1134,8 +1134,8 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
     WRITE_TOK(data->store, "end");
     WRITE_SECTION(data->store);
-    WRITE_INT(data->store, listlen(f->ursprung));
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    WRITE_INT(data->store, listlen(f->origin));
+    for (ur = f->origin; ur; ur = ur->next) {
         WRITE_INT(data->store, ur->id);
         WRITE_INT(data->store, ur->x);
         WRITE_INT(data->store, ur->y);
