@@ -938,7 +938,7 @@ void spawn_undead(void)
         }
 
         if (r->land && unburied > rpeasants(r) / 20
-            && rng_int() % 10000 < 200) {
+            && rng_int() % 10000 < 100) {
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
