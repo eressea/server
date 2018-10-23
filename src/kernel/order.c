@@ -14,6 +14,8 @@
 #include <kernel/config.h>
 #include "order.h"
 
+#include "db/driver.h"
+
 #include "skill.h"
 
 #include <util/base36.h>
@@ -35,6 +37,22 @@
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
+
+order_data *odata_load(int id)
+{
+    if (id > 0) {
+        return db_driver_order_load(id);
+    }
+    return NULL;
+}
+
+int odata_save(order_data *od)
+{
+    if (od->_str) {
+        return db_driver_order_save(od->_str);
+    }
+    return 0;
+}
 
 void odata_create(order_data **pdata, size_t len, const char *str)
 {

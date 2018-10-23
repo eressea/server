@@ -16,3 +16,5 @@ void db_driver_close(database_t db);
 int db_driver_order_save(const char *str);
 struct order_data *db_driver_order_load(int id);
 int db_driver_faction_save(int id, int no, int turn, const char *email, const char *password);
+unsigned int db_driver_string_save(const char *s);
+const char *db_driver_string_load(unsigned int id, size_t *size);

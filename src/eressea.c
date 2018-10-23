@@ -3,6 +3,7 @@
 
 #include "kernel/building.h"
 #include "kernel/calendar.h"
+#include "kernel/database.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
@@ -54,12 +55,12 @@ void game_done(void)
     free_locales();
 #endif
     kernel_done();
-    orderdb_close();
+    swapdb_close();
 }
 
 void game_init(void)
 {
-    orderdb_open();
+    swapdb_open();
     errno = 0;
     kernel_init();
     register_triggers();
