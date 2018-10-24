@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "types.h"
+#include "db/driver.h"
 
 #include <util/resolve.h>
 #include <modules/score.h>
@@ -72,7 +73,7 @@ extern "C" {
         char *name;
         char *banner;
         char *email;
-        char *_password;
+        dbrow_id password_id;
         int max_spelllevel;
         struct spellbook *spellbook;
         const struct locale *locale;
@@ -154,6 +155,7 @@ extern "C" {
     void faction_setemail(struct faction *self, const char *email);
 
     void faction_setpassword(struct faction *self, const char *pwhash);
+    const char *faction_getpassword(const struct faction *f);
     bool valid_race(const struct faction *f, const struct race *rc);
 
     void faction_getorigin(const struct faction * f, int id, int *x, int *y);

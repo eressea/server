@@ -22,6 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "calendar.h"
 #include "config.h"
+#include "database.h"
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -106,7 +107,6 @@ static void free_faction(faction * f)
 
     free(f->email);
     free(f->banner);
-    free(f->_password);
     free(f->name);
     if (f->seen_factions) {
         selist_free(f->seen_factions);
@@ -245,7 +245,7 @@ faction *addfaction(const char *email, const char *password,
     f->alliance_joindate = turn;
     f->lastorders = turn;
     f->_alive = true;
-    f->_password = NULL;
+    f->password_id = 0;
     f->age = 0;
     f->race = frace;
     f->magiegebiet = 0;
@@ -321,9 +321,11 @@ unit *addplayer(region * r, faction * f)
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
+    const char *pwhash;
     if (!passwd) return false;
 
-    if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
+    pwhash = faction_getpassword(f);
+    if (pwhash && password_verify(pwhash, passwd) == VERIFY_FAIL) {
         log_info("password check failed: %s", factionname(f));
         return false;
     }
@@ -603,11 +605,17 @@ void faction_setbanner(faction * self, const char *banner)
         self->banner = str_strdup(banner);
 }
 
+const char *faction_getpassword(const faction *f) {
+    if (f->password_id > 0) {
+        return dbstring_load(f->password_id, NULL);
+    }
+    return NULL;
+}
+
 void faction_setpassword(faction * f, const char *pwhash)
 {
     assert(pwhash);
-    free(f->_password);
-    f->_password = str_strdup(pwhash);
+    f->password_id = dbstring_save(pwhash);
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -844,7 +852,8 @@ int writepasswd(void)
 
         for (f = factions; f; f = f->next) {
             fprintf(F, "%s:%s:%s:%d\n",
-                itoa36(f->no), faction_getemail(f), f->_password, f->uid);
+                itoa36(f->no), faction_getemail(f),
+               faction_getpassword(f), f->uid);
         }
         fclose(F);
         return 0;
