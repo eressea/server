@@ -100,9 +100,7 @@ dbrow_id db_driver_faction_save(dbrow_id id, int no, int turn, const char *email
     sqlite3_int64 row_id;
     int err;
 
-    if (!g_game_db) {
-        return -1;
-    }
+    assert(g_game_db);
     if (id != 0) {
         int rows;
 
@@ -192,7 +190,11 @@ static const char *g_swapname;
 int db_driver_open(database_t db, const char *dbname)
 {
     ERRNO_CHECK();
-
+    
+    if (!dbname) {
+        /* by default, use an in-memory database */
+        dbname = ":memory:";
+    }
     if (db == DB_SWAP) {
         g_swapname = dbname;
         return db_open_swap(dbname);

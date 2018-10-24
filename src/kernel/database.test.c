@@ -50,6 +50,7 @@ static void test_update_faction(CuTest *tc) {
     int uid;
 
     test_setup();
+    db_driver_open(DB_GAME, NULL);
     f = test_create_faction(NULL);
     uid = db_driver_faction_save(f->uid, f->no, 0,
         faction_getemail(f),
@@ -59,6 +60,7 @@ static void test_update_faction(CuTest *tc) {
         faction_getemail(f),
         faction_getpassword(f));
     CuAssertIntEquals(tc, f->uid, uid);
+    db_driver_close(DB_GAME);
     test_teardown();
 }
 
