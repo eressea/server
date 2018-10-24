@@ -35,7 +35,7 @@ static void end_transaction(void) {
     }
 }
 
-struct order_data *db_driver_order_load(int id)
+struct order_data *db_driver_order_load(dbrow_id id)
 {
     struct order_data * od = NULL;
     int err;
@@ -61,7 +61,7 @@ struct order_data *db_driver_order_load(int id)
     return NULL;
 }
 
-int db_driver_order_save(const char *str) {
+dbrow_id db_driver_order_save(const char *str) {
     int err;
     sqlite3_int64 id;
     
@@ -83,7 +83,7 @@ int db_driver_order_save(const char *str) {
     err = sqlite3_step(g_stmt_insert_order);
     assert(err == SQLITE_DONE);
     id = sqlite3_last_insert_rowid(g_swap_db);
-    assert(id <= INT_MAX);
+    assert(id > 0 && id <= UINT_MAX);
     
     if (g_insert_batchsize > 0) {
         if (++g_insert_tx_size >= g_insert_batchsize) {
@@ -91,11 +91,11 @@ int db_driver_order_save(const char *str) {
         }
     }
     ERRNO_CHECK(); 
-    return (int)id;
+    return (dbrow_id)id;
 }
 
 
-int db_driver_faction_save(int id, int no, int turn, const char *email, const char *password)
+dbrow_id db_driver_faction_save(dbrow_id id, int no, int turn, const char *email, const char *password)
 {
     sqlite3_int64 row_id;
     int err;
@@ -140,8 +140,8 @@ int db_driver_faction_save(int id, int no, int turn, const char *email, const ch
     ERRNO_CHECK();
 
     row_id = sqlite3_last_insert_rowid(g_game_db);
-    assert(row_id <= INT_MAX);
-    return (int)row_id;
+    assert(row_id>0 && row_id <= UINT_MAX);
+    return (dbrow_id)row_id;
 }
 
 static int db_open_game(const char *dbname) {
@@ -240,7 +240,7 @@ void db_driver_close(database_t db)
     ERRNO_CHECK();
 }
 
-unsigned int db_driver_string_save(const char *str) {
+dbrow_id db_driver_string_save(const char *str) {
     int err;
     sqlite3_int64 id;
 
@@ -262,7 +262,7 @@ unsigned int db_driver_string_save(const char *str) {
     err = sqlite3_step(g_stmt_insert_string);
     assert(err == SQLITE_DONE);
     id = sqlite3_last_insert_rowid(g_swap_db);
-    assert(id <= INT_MAX);
+    assert(id > 0 && id <= UINT_MAX);
 
     if (g_insert_batchsize > 0) {
         if (++g_insert_tx_size >= g_insert_batchsize) {
@@ -270,10 +270,10 @@ unsigned int db_driver_string_save(const char *str) {
         }
     }
     ERRNO_CHECK();
-    return (int)id;
+    return (dbrow_id)id;
 }
 
-const char *db_driver_string_load(unsigned int id, size_t *size) {
+const char *db_driver_string_load(dbrow_id id, size_t *size) {
     int err;
 
     end_transaction();

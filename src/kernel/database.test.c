@@ -3,14 +3,25 @@
 #include <kernel/faction.h>
 #include <kernel/order.h>
 
+#include "database.h"
 #include "db/driver.h"
-#include "orderdb.h"
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <stdio.h>
 #include <string.h>
+
+static void test_orderdb(CuTest *tc) {
+    order_data *od = NULL;
+    const char * s = "GIB enno 1 Hodor";
+
+    odata_create(&od, strlen(s) + 1, s);
+    CuAssertPtrNotNull(tc, od);
+    CuAssertStrEquals(tc, s, od->_str);
+    CuAssertTrue(tc, od->_refcount >= 1);
+    odata_release(od);
+}
 
 static void test_save_load_order(CuTest *tc) {
     order_data *od;
@@ -52,6 +63,7 @@ CuSuite *get_db_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_save_load_order);
     SUITE_ADD_TEST(suite, test_update_faction);
+    SUITE_ADD_TEST(suite, test_orderdb);
 
     return suite;
 }

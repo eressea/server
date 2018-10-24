@@ -1,11 +1,11 @@
 #pragma once
 
-#include <stddef.h>
+#include "db/driver.h"
 
-typedef unsigned int dbstring_id;
+#include <stddef.h>
 
 void swapdb_open(void);
 void swapdb_close(void);
 
-dbstring_id dbstring_save(const char *s);
-const char *dbstring_load(dbstring_id id, size_t *size);
+dbrow_id dbstring_save(const char *s);
+const char *dbstring_load(dbrow_id id, size_t *size);

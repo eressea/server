@@ -28,7 +28,6 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
-#include "orderdb.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"
