@@ -37,7 +37,7 @@ extern "C" {
     struct attrib_type;
     struct gamedata;
     struct selist;
-    
+
     /* faction flags */
 #define FFL_NOAID         (1<<0)  /* Hilfsflag Kampf */
 #define FFL_ISNEW         (1<<1)
@@ -53,6 +53,12 @@ extern "C" {
 #define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
+
+    typedef struct origin {
+        struct origin *next;
+        int id;
+        int x, y;
+    } origin;
 
     typedef struct faction {
         struct faction *next;
@@ -72,7 +78,7 @@ extern "C" {
         const struct locale *locale;
         int lastorders;
         int age;
-        struct ursprung *ursprung;
+        struct origin *origin;
         const struct race *race;
         magic_t magiegebiet;
         int newbies;

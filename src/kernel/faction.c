@@ -119,7 +119,7 @@ static void free_faction(faction * f)
 
     i_freeall(&f->items);
 
-    freelist(f->ursprung);
+    freelist(f->origin);
 }
 
 #define FMAXHASH 2039
@@ -727,10 +727,10 @@ bool faction_alive(const faction *f) {
 
 void faction_getorigin(const faction * f, int id, int *x, int *y)
 {
-    ursprung *ur;
+    origin *ur;
 
     assert(f && x && y);
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id) {
             *x = ur->x;
             *y = ur->y;
@@ -739,24 +739,27 @@ void faction_getorigin(const faction * f, int id, int *x, int *y)
     }
 }
 
-void faction_setorigin(faction * f, int id, int x, int y)
-{
-    ursprung *ur;
-    assert(f != NULL);
-    for (ur = f->ursprung; ur; ur = ur->next) {
-        if (ur->id == id) {
-            ur->x = ur->x + x;
-            ur->y = ur->y + y;
-            return;
-        }
-    }
-
-    ur = calloc(1, sizeof(ursprung));
+static origin *new_origin(int id, int x, int y) {
+    origin *ur = (origin *)calloc(1, sizeof(origin));
     ur->id = id;
     ur->x = x;
     ur->y = y;
+    return ur;
+}
 
-    addlist(&f->ursprung, ur);
+void faction_setorigin(faction * f, int id, int x, int y)
+{
+    origin **urp;
+    assert(f != NULL);
+    for (urp = &f->origin; *urp; urp = &(*urp)->next) {
+        origin *ur = *urp;
+        if (ur->id == id) {
+            ur->x += x;
+            ur->y += y;
+            return;
+        }
+    }
+    *urp = new_origin(id, x, y);
 }
 
 

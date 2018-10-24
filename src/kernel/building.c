@@ -135,7 +135,7 @@ building_type *bt_get_or_create(const char *name)
     if (name != NULL) {
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
-            btype = calloc(sizeof(building_type), 1);
+            btype = (building_type *)calloc(1, sizeof(building_type));
             btype->_name = str_strdup(name);
             btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;

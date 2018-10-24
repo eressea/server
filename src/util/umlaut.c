@@ -117,7 +117,7 @@ char * transliterate(char * out, size_t size, const char * in)
 }
 
 tnode * mknode(void) {
-    tnode * node = calloc(1, sizeof(tnode));
+    tnode * node = (tnode *)calloc(1, sizeof(tnode));
     node->refcount = 1;
     return node;
 }

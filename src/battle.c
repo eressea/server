@@ -3226,7 +3226,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             assert(w != WMAX);
         }
         assert(w >= 0);
-        fig->weapons = (weapon *)calloc(sizeof(weapon), (size_t)(w + 1));
+        fig->weapons = (weapon *)calloc((size_t)(w + 1), sizeof(weapon));
         memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
 
         for (i = 0; i != w; ++i) {
@@ -3452,7 +3452,7 @@ battle *make_battle(region * r)
                         break;
                 }
                 if (!bf) {
-                    bf = (bfaction *)calloc(sizeof(bfaction), 1);
+                    bf = (bfaction *)calloc(1, sizeof(bfaction));
                     ++b->nfactions;
                     bf->faction = u->faction;
                     bf->next = b->factions;

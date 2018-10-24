@@ -56,10 +56,8 @@ ally * ally_add(ally **al_p, struct faction *f) {
         if (f && al->faction == f) return al;
         al_p = &al->next;
     }
-    al = (ally *)malloc(sizeof(ally));
+    al = (ally *)calloc(1, sizeof(ally));
     al->faction = f;
-    al->status = 0;
-    al->next = 0;
     *al_p = al;
     return al;
 }

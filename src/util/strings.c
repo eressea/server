@@ -22,10 +22,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "strings.h"
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 
 #ifdef HAVE_LIBBSD

@@ -133,7 +133,7 @@ newfaction *read_newfactions(const char *filename)
         if (nf) {
             continue;
         }
-        nf = calloc(sizeof(newfaction), 1);
+        nf = (newfaction *)calloc(1, sizeof(newfaction));
         if (check_email(email) == 0) {
             nf->email = str_strdup(email);
         } else {

@@ -55,12 +55,6 @@ struct terrain_type;
 struct unit;
 struct weapon_type;
 
-typedef struct ursprung {
-  struct ursprung *next;
-  int id;
-  int x, y;
-} ursprung;
-
 /* seen_mode: visibility in the report */
 typedef enum {
     seen_none,

@@ -2950,7 +2950,7 @@ void free_spellbook(spellbook *sb) {
     free(sb);
 }
 
-static int free_spellbook_cb(const void *match, const void *key, size_t keylen, void *data) {
+static int free_spellbook_cb(void *match, const void *key, size_t keylen, void *data) {
     const sb_entry *ent = (const sb_entry *)match;
     UNUSED_ARG(data);
     UNUSED_ARG(keylen);

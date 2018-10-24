@@ -122,7 +122,7 @@ int getplaneid(const region * r)
 static int
 ursprung_x(const faction * f, const plane * pl, const region * rdefault)
 {
-    ursprung *ur;
+    origin *ur;
     int id = 0;
 
     if (!f)
@@ -131,7 +131,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
     if (pl)
         id = pl->id;
 
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id)
             return ur->x;
     }
@@ -145,7 +145,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
 static int
 ursprung_y(const faction * f, const plane * pl, const region * rdefault)
 {
-    ursprung *ur;
+    origin *ur;
     int id = 0;
 
     if (!f)
@@ -154,7 +154,7 @@ ursprung_y(const faction * f, const plane * pl, const region * rdefault)
     if (pl)
         id = pl->id;
 
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id)
             return ur->y;
     }
