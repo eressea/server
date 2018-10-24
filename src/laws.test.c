@@ -188,12 +188,12 @@ static void test_display_cmd(CuTest *tc) {
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertStrEquals(tc, "Hodor", u->display);
+    CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertPtrEquals(tc, NULL, u->display);
+    CuAssertPtrEquals(tc, NULL, (void *)unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));

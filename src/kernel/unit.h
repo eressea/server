@@ -89,7 +89,7 @@ extern "C" {
         int no;                     /* id */
         int hp;
         char *_name;
-        char *display;
+        char *_display;
         struct faction *faction;
         struct building *building;
         struct ship *ship;

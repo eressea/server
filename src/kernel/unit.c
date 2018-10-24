@@ -474,8 +474,8 @@ attrib_type at_private = {
 
 const char *u_description(const unit * u, const struct locale *lang)
 {
-    if (u->display && u->display[0]) {
-        return u->display;
+    if (u->_display && u->_display[0]) {
+        return u->_display;
     }
     else {
         char zText[64];
@@ -1293,7 +1293,7 @@ void free_unit(unit * u)
 {
     assert(!u->region);
     free(u->_name);
-    free(u->display);
+    free(u->_display);
     free_order(u->thisorder);
     free_orders(&u->orders);
     if (u->skills)
@@ -1522,16 +1522,16 @@ void unit_setname(unit * u, const char *name)
 
 const char *unit_getinfo(const unit * u)
 {
-    return (const char *)u->display;
+    return (const char *)u->_display;
 }
 
 void unit_setinfo(unit * u, const char *info)
 {
-    free(u->display);
+    free(u->_display);
     if (info)
-        u->display = str_strdup(info);
+        u->_display = str_strdup(info);
     else
-        u->display = NULL;
+        u->_display = NULL;
 }
 
 int unit_getid(const unit * u)

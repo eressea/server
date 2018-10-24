@@ -1542,7 +1542,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        s = &u->display;
+        unit_setinfo(u, getstrtoken());
         break;
 
     case P_PRIVAT:

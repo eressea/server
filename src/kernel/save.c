@@ -440,12 +440,12 @@ unit *read_unit(gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? str_strdup(obuf) : 0;
+    unit_setname(u, obuf[0] ? obuf : NULL);
     READ_STR(data->store, obuf, sizeof(obuf));
     if (unicode_utf8_trim(obuf)!=0) {
         log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
     }
-    u->display = obuf[0] ? str_strdup(obuf) : 0;
+    unit_setinfo(u, obuf[0] ? obuf : NULL);
     READ_INT(data->store, &number);
     set_number(u, number);
 
@@ -544,6 +544,7 @@ unit *read_unit(gamedata *data)
 
 void write_unit(gamedata *data, const unit * u)
 {
+    const char *str;
     order *ord;
     int p = 0;
     unsigned int flags = u->flags & UFL_SAVEMASK;
@@ -553,7 +554,8 @@ void write_unit(gamedata *data, const unit * u)
     assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
-    WRITE_STR(data->store, u->display ? u->display : "");
+    str = unit_getinfo(u);
+    WRITE_STR(data->store, str ? str : "");
     WRITE_INT(data->store, u->number);
     WRITE_INT(data->store, u->age);
     WRITE_TOK(data->store, u_race(u)->_name);
