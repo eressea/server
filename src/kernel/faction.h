@@ -71,7 +71,7 @@ extern "C" {
         int uid;
         int flags;
         char *name;
-        char *banner;
+        dbrow_id banner_id;
         char *email;
         dbrow_id password_id;
         int max_spelllevel;

@@ -1007,7 +1007,7 @@ faction *read_faction(gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = str_strdup(name);
+    faction_setbanner(f, name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
@@ -1115,7 +1115,7 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_INT(data->store, f->alliance_joindate);
 
     WRITE_STR(data->store, f->name);
-    WRITE_STR(data->store, f->banner);
+    WRITE_STR(data->store, faction_getbanner(f));
     WRITE_STR(data->store, f->email?f->email:"");
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));

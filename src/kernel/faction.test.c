@@ -117,7 +117,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);
     CuAssertPtrEquals(tc, NULL, (void *)f->next);
-    CuAssertPtrEquals(tc, NULL, (void *)f->banner);
+    CuAssertPtrEquals(tc, NULL, (void *)faction_getbanner(f));
     CuAssertPtrEquals(tc, NULL, (void *)f->spellbook);
     CuAssertPtrEquals(tc, NULL, (void *)f->origin);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
@@ -229,6 +229,18 @@ static void test_valid_race(CuTest *tc) {
     test_teardown();
 }
 
+static void test_dbstrings(CuTest *tc) {
+    const char *lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    faction *f;
+    test_setup();
+    f = test_create_faction(NULL);
+    faction_setbanner(f, lipsum);
+    faction_setpassword(f, lipsum + 12);
+    CuAssertStrEquals(tc, lipsum, faction_getbanner(f));
+    CuAssertStrEquals(tc, lipsum + 12, faction_getpassword(f));
+    test_teardown();
+}
+
 static void test_set_email(CuTest *tc) {
     faction *f;
     char email[10];
@@ -335,6 +347,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
+    SUITE_ADD_TEST(suite, test_dbstrings);
     SUITE_ADD_TEST(suite, test_save_special_items);
     return suite;
 }

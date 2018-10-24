@@ -106,7 +106,6 @@ static void free_faction(faction * f)
     freelist(f->allies);
 
     free(f->email);
-    free(f->banner);
     free(f->name);
     if (f->seen_factions) {
         selist_free(f->seen_factions);
@@ -593,16 +592,17 @@ void faction_setemail(faction * self, const char *email)
         self->email = NULL;
 }
 
-const char *faction_getbanner(const faction * self)
+const char *faction_getbanner(const faction * f)
 {
-    return self->banner ? self->banner : "";
+    if (f->banner_id > 0) {
+        return dbstring_load(f->banner_id, NULL);
+    }
+    return NULL;
 }
 
-void faction_setbanner(faction * self, const char *banner)
+void faction_setbanner(faction * f, const char *banner)
 {
-    free(self->banner);
-    if (banner)
-        self->banner = str_strdup(banner);
+    f->banner_id = dbstring_save(banner);
 }
 
 const char *faction_getpassword(const faction *f) {
