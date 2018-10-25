@@ -397,14 +397,13 @@ static void test_unit_description(CuTest *tc) {
     rc = test_create_race("hodor");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
-    CuAssertPtrEquals(tc, NULL, u->display);
-    CuAssertStrEquals(tc, 0, u_description(u, lang));
-    u->display = str_strdup("Hodor");
+    CuAssertStrEquals(tc, NULL, unit_getinfo(u));
+    CuAssertStrEquals(tc, NULL, u_description(u, lang));
+    unit_setinfo(u, "Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
     CuAssertStrEquals(tc, "Hodor", u_description(u, lang));
 
-    free(u->display);
-    u->display = NULL;
+    unit_setinfo(u, NULL);
     locale_setstring(lang, "describe_hodor", "HODOR");
     CuAssertStrEquals(tc, "HODOR", u_description(u, lang));
 

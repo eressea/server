@@ -1726,11 +1726,13 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     while (flist != NULL) {
         const faction *f = (const faction *)selist_get(flist, qi);
         if (!is_monsters(f)) {
+            const char *str;
             char buf[8192];
             char label = '-';
 
+            str = faction_getbanner(f);
             sprintf(buf, "%s: %s; %s", factionname(f), faction_getemail(f),
-                f->banner ? f->banner : "");
+                str ? str : "");
             if (uf == f)
                 label = '*';
             else if (is_allied(uf, f))

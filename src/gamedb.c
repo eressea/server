@@ -20,7 +20,9 @@ int gamedb_update(void)
     err = db_driver_open(DB_GAME, dbname);
     if (err == 0) {
         for (f = factions; f; f = f->next) {
-            int uid = db_driver_faction_save(f->uid, f->no, turn, f->email, f->_password);
+            int uid = db_driver_faction_save(f->uid, f->no, turn,
+                faction_getemail(f),
+                faction_getpassword(f));
             if (uid > 0) {
                 f->uid = uid;
             }

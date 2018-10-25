@@ -1057,12 +1057,15 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
     while (flist) {
         const faction *f = (const faction *)selist_get(flist, i);
         if (uf != f) {
+            const char *str;
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
             if (strcmp(faction_getemail(f), "") != 0)
                 fprintf(F, "\"%s\";email\n", faction_getemail(f));
-            if (f->banner)
-                fprintf(F, "\"%s\";banner\n", f->banner);
+            str = faction_getbanner(f);
+            if (str) {
+                fprintf(F, "\"%s\";banner\n", str);
+            }
             fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
             if (f->alliance && f->alliance == uf->alliance) {
                 fprintf(F, "%d;alliance\n", f->alliance->id);
@@ -1534,7 +1537,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     static int era = -1;
     int i;
     faction *f = ctx->f;
-    const char *prefix;
+    const char *prefix, *str;
     region *r;
     const char *mailto = config_get("game.email");
     const attrib *a;
@@ -1628,8 +1631,10 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);
     fprintf(F, "\"%s\";email\n", faction_getemail(f));
-    if (f->banner)
-        fprintf(F, "\"%s\";banner\n", f->banner);
+    str = faction_getbanner(f);
+    if (str) {
+        fprintf(F, "\"%s\";banner\n", str);
+    }
     print_items(F, f->items, f->locale);
     fputs("OPTIONEN\n", F);
     for (i = 0; i != MAXOPTIONS; ++i) {

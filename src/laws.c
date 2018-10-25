@@ -1542,7 +1542,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        s = &u->display;
+        unit_setinfo(u, getstrtoken());
         break;
 
     case P_PRIVAT:
@@ -2086,12 +2086,10 @@ int banner_cmd(unit * u, struct order *ord)
 {
     const char * s;
 
-    free(u->faction->banner);
     init_order_depr(ord);
     s = getstrtoken();
-    u->faction->banner = s ? str_strdup(s) : 0;
-    add_message(&u->faction->msgs, msg_message("changebanner", "value",
-        u->faction->banner));
+    faction_setbanner(u->faction, s);
+    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }

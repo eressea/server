@@ -1554,14 +1554,6 @@ void prepare_report(report_context *ctx, faction *f)
         rule_lighthouse_units = config_get_int("rules.lighthouse.unit_capacity", 0) != 0;
     }
 
-    if (f->age <= 2) {
-        if ((f->flags&FFL_PWMSG) == 0) {
-            /* TODO: this assumes unencrypted passwords */
-            f->flags |= FFL_PWMSG;
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
-        }
-    }
-
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
