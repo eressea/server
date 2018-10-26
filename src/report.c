@@ -1511,7 +1511,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
 }
 
 static void
-show_allies(const faction * f, const ally * allies, char *buf, size_t size)
+show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
 {
     int allierte = 0;
     int i = 0, h, hh = 0;
