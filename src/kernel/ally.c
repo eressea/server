@@ -8,7 +8,6 @@
 #include "group.h"
 #include "faction.h"
 #include "objtypes.h"
-#include "plane.h"
 
 #include <kernel/attrib.h>
 #include <util/strings.h>
@@ -26,17 +25,20 @@ typedef struct ally {
     int status;
 } ally;
 
-void allies_walk(struct ally *allies, cb_allies_walk callback, void *udata);
+int allies_walk(struct ally *allies, cb_allies_walk callback, void *udata)
 {
     ally *al;
     for (al = allies; al; al = al->next) {
-        callback(allies, al->faction, al->status, udata);
+        int err = callback(allies, al->faction, al->status, udata);
+        if (err != 0) {
+            return err;
+        }
     }
+    return 0;
 }
 
-void read_allies(gamedata * data, faction *f)
+void read_allies(gamedata * data, ally **sfp)
 {
-    ally **sfp = &f->allies;
     for (;;) {
         int aid;
         READ_INT(data->store, &aid);
@@ -74,19 +76,6 @@ ally * ally_add(ally **al_p, struct faction *f) {
     al->faction = f;
     *al_p = al;
     return al;
-}
-
-void ally_remove(ally **al_p, struct faction *f) {
-    ally * al;
-    while (*al_p) {
-        al = *al_p;
-        if (al->faction == f) {
-            *al_p = al->next;
-            free(al);
-            break;
-        }
-        al_p = &al->next;
-    }
 }
 
 static int ally_flag(const char *s, int help_mask)
@@ -128,16 +117,11 @@ int AllianceAuto(void)
 }
 
 static int
-autoalliance(const plane * pl, const faction * sf, const faction * f2)
+autoalliance(const faction * sf, const faction * f2)
 {
-    if (pl && (pl->flags & PFL_FRIENDLY))
-        return HELP_ALL;
-
-    if (f_get_alliance(sf) != NULL && AllianceAuto()) {
-        if (sf->alliance == f2->alliance)
-            return AllianceAuto();
+    if (sf->alliance == f2->alliance) {
+        return AllianceAuto();
     }
-
     return 0;
 }
 
@@ -172,12 +156,13 @@ attrib_type at_npcfaction = {
 */
 int HelpMask(void)
 {
-    static int config, rule = 0;
+    static int config, rule;
     if (config_changed(&config)) {
         const char *str = config_get("rules.help.mask");
         if (str != NULL) {
             char *sstr = str_strdup(str);
             char *tok = strtok(sstr, " ");
+            rule = 0;
             while (tok) {
                 rule |= ally_flag(tok, -1);
                 tok = strtok(NULL, " ");
@@ -193,71 +178,77 @@ int HelpMask(void)
 
 static int AllianceRestricted(void)
 {
-    const char *str = config_get("alliance.restricted");
-    int rule = 0;
-    if (str != NULL) {
-        char *sstr = str_strdup(str);
-        char *tok = strtok(sstr, " ");
-        while (tok) {
-            rule |= ally_flag(tok, -1);
-            tok = strtok(NULL, " ");
+    static int config, rule;
+    if (config_changed(&config)) {
+        const char *str = config_get("alliance.restricted");
+        rule = 0;
+        if (str != NULL) {
+            char *sstr = str_strdup(str);
+            char *tok = strtok(sstr, " ");
+            while (tok) {
+                rule |= ally_flag(tok, -1);
+                tok = strtok(NULL, " ");
+            }
+            free(sstr);
         }
-        free(sstr);
+        rule &= HelpMask();
     }
-    rule &= HelpMask();
     return rule;
 }
 
-int
-alliedgroup(const struct plane *pl, const struct faction *f,
-            const struct faction *f2,
-            const struct ally *sf, int mode)
-{
-    if (!(faction_alive(f) && faction_alive(f2))) {
-        return 0;
-    }
-    while (sf && sf->faction != f2) {
-        sf = sf->next;
-    }
-    if (sf == NULL) {
-        mode = mode & autoalliance(pl, f, f2);
-    }
-    mode = ally_mode(sf, mode) | (mode & autoalliance(pl, f, f2));
-    if (AllianceRestricted()) {
-        if (a_find(f->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (a_find(f2->attribs, &at_npcfaction)) {
-            return mode;
-        }
-        if (f->alliance != f2->alliance) {
-            mode &= ~AllianceRestricted();
+
+int alliance_status(faction *f, faction *f2, int status) {
+    status |= autoalliance(f, f2);
+    if (status > 0) {
+        int mask = AllianceRestricted();
+        if (mask) {
+            if (a_find(f->attribs, &at_npcfaction)) {
+                return status;
+            }
+            if (a_find(f2->attribs, &at_npcfaction)) {
+                return status;
+            }
+            if (f->alliance != f2->alliance) {
+                status &= ~mask;
+            }
         }
     }
-    return mode;
+    return status;
 }
 
 int
-alliedfaction(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, int mode)
+alliedgroup(const struct faction *f,
+    const struct faction *f2, const struct group *g, int mask)
 {
-    return alliedgroup(pl, f, f2, f->allies, mode);
+    ally *all = g ? g->allies : f->allies;
+    int status;
+
+    if (!(faction_alive(f) && faction_alive(f2))) {
+        return 0;
+    }
+    status = ally_get(all, f2);
+    return alliance_status(f, f2, status);
+}
+
+int
+alliedfaction(const struct faction *f, const struct faction *f2, int mask)
+{
+    return alliedgroup(f, f2, NULL, mask);
 }
 
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
 int alliedunit(const unit * u, const faction * f2, int mode)
 {
-    int automode;
-
     assert(u);
     assert(f2);
     assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
-    if (u->faction == f2)
+    if (u->faction == f2) {
         return mode;
+    }
+    if (!faction_alive(f2)) {
+        return 0;
+    }
     if (u->faction != NULL && f2 != NULL) {
-        ally *sf;
-        plane *pl;
-
         if (mode & HELP_FIGHT) {
             if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
                 faction *owner = region_get_owner(u->region);
@@ -268,20 +259,44 @@ int alliedunit(const unit * u, const faction * f2, int mode)
             }
         }
 
-        pl = rplane(u->region);
-        automode = mode & autoalliance(pl, u->faction, f2);
-
-        if (pl != NULL && (pl->flags & PFL_NOALLIANCES))
-            mode = (mode & automode) | (mode & HELP_GIVE);
-
-        sf = u->faction->allies;
         if (fval(u, UFL_GROUP)) {
             const attrib *a = a_find(u->attribs, &at_group);
-            if (a != NULL)
-                sf = ((group *)a->data.v)->allies;
+            if (a != NULL) {
+                group *g = (group *)a->data.v;
+                return alliedgroup(u->faction, f2, g, mode);
+            }
         }
-        return alliedgroup(pl, u->faction, f2, sf, mode);
+        return alliedfaction(u->faction, f2, mode);
     }
     return 0;
 }
 
+void ally_set(ally **allies, struct faction *f, int status) {
+    ally *al;
+    while (*allies) {
+        al = *allies;
+        if (al->faction == f) {
+            if (status != 0) {
+                al->status = status;
+            }
+            else {
+                *allies = al->next;
+                free(al);
+            }
+            return;
+        }
+        allies = &al->next;
+    }
+    al = ally_add(allies, f);
+    al->status = status;
+}
+
+int ally_get(ally *allies, const struct faction *f) {
+    ally *al;
+    for (al = allies; al; al = al->next) {
+        if (al->faction == f) {
+            return al->status;
+        }
+    }
+    return 0;
+}

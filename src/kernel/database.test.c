@@ -3,14 +3,25 @@
 #include <kernel/faction.h>
 #include <kernel/order.h>
 
+#include "database.h"
 #include "db/driver.h"
-#include "orderdb.h"
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <stdio.h>
 #include <string.h>
+
+static void test_orderdb(CuTest *tc) {
+    order_data *od = NULL;
+    const char * s = "GIB enno 1 Hodor";
+
+    odata_create(&od, strlen(s) + 1, s);
+    CuAssertPtrNotNull(tc, od);
+    CuAssertStrEquals(tc, s, od->_str);
+    CuAssertTrue(tc, od->_refcount >= 1);
+    odata_release(od);
+}
 
 static void test_save_load_order(CuTest *tc) {
     order_data *od;
@@ -39,11 +50,17 @@ static void test_update_faction(CuTest *tc) {
     int uid;
 
     test_setup();
+    db_driver_open(DB_GAME, NULL);
     f = test_create_faction(NULL);
-    uid = db_driver_faction_save(f->uid, f->no, 0, f->email, f->_password);
+    uid = db_driver_faction_save(f->uid, f->no, 0,
+        faction_getemail(f),
+        faction_getpassword(f));
     f->uid = uid;
-    uid = db_driver_faction_save(f->uid, f->no, 0, f->email, f->_password);
+    uid = db_driver_faction_save(f->uid, f->no, 0,
+        faction_getemail(f),
+        faction_getpassword(f));
     CuAssertIntEquals(tc, f->uid, uid);
+    db_driver_close(DB_GAME);
     test_teardown();
 }
 
@@ -52,6 +69,7 @@ CuSuite *get_db_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_save_load_order);
     SUITE_ADD_TEST(suite, test_update_faction);
+    SUITE_ADD_TEST(suite, test_orderdb);
 
     return suite;
 }

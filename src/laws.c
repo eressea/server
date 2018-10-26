@@ -800,7 +800,7 @@ void immigration(void)
 void nmr_warnings(void)
 {
     faction *f, *fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
+#define HELP_NMR (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
@@ -816,14 +816,12 @@ void nmr_warnings(void)
                             warn = 1;
                         }
                     }
-                    else if (alliedfaction(NULL, f, fa, FRIEND)
-                        && alliedfaction(NULL, fa, f, FRIEND)) {
+                    else if (alliedfaction(f, fa, HELP_NMR) && alliedfaction(fa, f, HELP_NMR)) {
                         warn = 1;
                     }
                     if (warn) {
                         if (msg == NULL) {
-                            msg =
-                                msg_message("warn_dropout", "faction turns", f,
+                            msg = msg_message("warn_dropout", "faction turns", f,
                                     turn - f->lastorders);
                         }
                         add_message(&fa->msgs, msg);
@@ -1529,7 +1527,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        s = &u->display;
+        unit_setinfo(u, getstrtoken());
         break;
 
     case P_PRIVAT:
@@ -2073,12 +2071,10 @@ int banner_cmd(unit * u, struct order *ord)
 {
     const char * s;
 
-    free(u->faction->banner);
     init_order_depr(ord);
     s = getstrtoken();
-    u->faction->banner = s ? str_strdup(s) : 0;
-    add_message(&u->faction->msgs, msg_message("changebanner", "value",
-        u->faction->banner));
+    faction_setbanner(u->faction, s);
+    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }

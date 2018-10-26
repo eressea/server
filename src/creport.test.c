@@ -227,7 +227,6 @@ static void test_cr_factionstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
 
     test_setup();
     f1 = test_create_faction(NULL);
@@ -298,8 +297,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     mstream_done(&strm);
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
     mstream_init(&strm);
     cr_output_unit(&strm, f2, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));

@@ -44,8 +44,7 @@ static void setup_give(struct give *env) {
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
     if (env->f2) {
-        ally * al = ally_add(&env->f2->allies, env->f1);
-        al->status = HELP_GIVE;
+        ally_set(&env->f2->allies, env->f1, HELP_GIVE);
         env->dst = test_create_unit(env->f2, env->r);
     }
     else {

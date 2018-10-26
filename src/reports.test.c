@@ -177,7 +177,6 @@ static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
     char buf[256];
     struct locale *lang;
 
@@ -232,8 +231,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
     bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
 
@@ -902,7 +900,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_region_distance);
     SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
-    SUITE_ADD_TEST(suite, test_newbie_password_message);
+    DISABLE_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

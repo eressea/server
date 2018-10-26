@@ -188,12 +188,12 @@ static void test_display_cmd(CuTest *tc) {
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertStrEquals(tc, "Hodor", u->display);
+    CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertPtrEquals(tc, NULL, u->display);
+    CuAssertPtrEquals(tc, NULL, (void *)unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
@@ -222,7 +222,6 @@ static void test_rule_force_leave(CuTest *tc) {
 }
 
 static void test_force_leave_buildings(CuTest *tc) {
-    ally *al;
     region *r;
     unit *u1, *u2, *u3;
     building * b;
@@ -245,8 +244,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u3->faction->msgs, "force_leave_building"));
 
     u_set_building(u3, b);
-    al = ally_add(&u1->faction->allies, u3->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u1->faction->allies, u3->faction, HELP_GUARD);
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
     test_teardown();
@@ -1265,25 +1263,25 @@ static void test_ally_cmd(CuTest *tc) {
     ord = create_order(K_ALLY, f->locale, "%s", itoa36(f->no));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_ALL, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_ALL, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_GUARD, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     test_teardown();

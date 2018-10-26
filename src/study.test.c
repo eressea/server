@@ -636,7 +636,6 @@ static void test_teach_many_to_one(CuTest *tc) {
 static void test_teach_message(CuTest *tc) {
     unit *u, *u1, *u2;
     attrib *a;
-    ally *al;
     teaching_info *teach;
 
     test_setup();
@@ -652,8 +651,7 @@ static void test_teach_message(CuTest *tc) {
     set_level(u1, SK_CROSSBOW, TEACHDIFFERENCE);
     u1->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
     u2 = test_create_unit(test_create_faction(NULL), u->region);
-    al = ally_add(&u->faction->allies, u2->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u->faction->allies, u2->faction, HELP_GUARD);
     set_level(u2, SK_CROSSBOW, TEACHDIFFERENCE);
     u2->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
     CuAssertTrue(tc, !alliedunit(u, u1->faction, HELP_GUARD));

@@ -1518,7 +1518,7 @@ show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
     const ally *sf;
    
     for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+        int mode = alliedfaction(f, sf->faction, HELP_ALL);
         if (mode > 0) {
             ++allierte;
         }
@@ -1529,7 +1529,7 @@ show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
         sbs_init(&sbs, buf, size);
 
         for (sf = allies; sf; sf = sf->next) {
-            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+            int mode = alliedfaction(f, sf->faction, HELP_ALL);
             if (mode <= 0)
                 continue;
             i++;
@@ -1711,16 +1711,19 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     while (flist != NULL) {
         const faction *f = (const faction *)selist_get(flist, qi);
         if (!is_monsters(f)) {
+            const char *str;
             char buf[8192];
             char label = '-';
 
+            str = faction_getbanner(f);
             sprintf(buf, "%s: %s; %s", factionname(f), faction_getemail(f),
-                f->banner ? f->banner : "");
+                str ? str : "");
             if (uf == f)
                 label = '*';
-            else if (is_allied(uf, f))
+            else if (is_allied(uf, f)) {
                 label = 'o';
-            else if (alliedfaction(NULL, uf, f, HELP_ALL))
+            }
+            else if (alliedfaction(uf, f, HELP_ALL))
                 label = '+';
             paragraph(out, buf, 4, 0, label);
         }

@@ -58,6 +58,7 @@ command.c
 config.c
 connection.c
 curse.c
+database.c
 equipment.c
 event.c
 faction.c

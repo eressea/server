@@ -1539,12 +1539,7 @@ int sp_undeadhero(struct castorder * co)
 
             /* new units gets some stats from old unit */
 
-            if (du->display) {
-                unit_setinfo(u, du->display);
-            }
-            else {
-                unit_setinfo(u, NULL);
-            }
+            unit_setinfo(u, unit_getinfo(du));
             unit_setstatus(u, du->status);
             setguard(u, false);
             for (ilist = &du->items; *ilist;) {
