@@ -25,6 +25,19 @@ typedef struct ally {
     int status;
 } ally;
 
+static ally * ally_add(ally **al_p, struct faction *f) {
+    ally * al;
+    while (*al_p) {
+        al = *al_p;
+        if (f && al->faction == f) return al;
+        al_p = &al->next;
+    }
+    al = (ally *)calloc(1, sizeof(ally));
+    al->faction = f;
+    *al_p = al;
+    return al;
+}
+
 void allies_free(ally *al)
 {
     while (al) {
@@ -97,19 +110,6 @@ ally * ally_find(ally *al, const struct faction *f) {
         if (al->faction == f) return al;
     }
     return 0;
-}
-
-ally * ally_add(ally **al_p, struct faction *f) {
-    ally * al;
-    while (*al_p) {
-        al = *al_p;
-        if (f && al->faction == f) return al;
-        al_p = &al->next;
-    }
-    al = (ally *)calloc(1, sizeof(ally));
-    al->faction = f;
-    *al_p = al;
-    return al;
 }
 
 static int ally_flag(const char *s, int help_mask)

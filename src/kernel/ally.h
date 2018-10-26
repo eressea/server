@@ -42,7 +42,6 @@ extern "C" {
     struct ally* ally_find(struct ally*al, const struct faction *f);
     void ally_set(struct ally**al_p, struct faction *f, int status);
     int ally_get(struct ally *al, const struct faction *f);
-    struct ally* ally_add(struct ally**al_p, struct faction *f);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */
