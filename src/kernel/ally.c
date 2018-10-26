@@ -159,13 +159,6 @@ autoalliance(const faction * sf, const faction * f2)
     return 0;
 }
 
-static int ally_mode(const ally * sf, int mode)
-{
-    if (sf == NULL)
-        return 0;
-    return sf->status & mode;
-}
-
 static void init_npcfaction(variant *var)
 {
     var->i = 1;
