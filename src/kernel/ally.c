@@ -20,6 +20,20 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef struct ally {
+    struct ally *next;
+    struct faction *faction;
+    int status;
+} ally;
+
+void allies_walk(struct ally *allies, cb_allies_walk callback, void *udata);
+{
+    ally *al;
+    for (al = allies; al; al = al->next) {
+        callback(allies, al->faction, al->status, udata);
+    }
+}
+
 void read_allies(gamedata * data, faction *f)
 {
     ally **sfp = &f->allies;
@@ -196,7 +210,8 @@ static int AllianceRestricted(void)
 
 int
 alliedgroup(const struct plane *pl, const struct faction *f,
-    const struct faction *f2, const struct ally *sf, int mode)
+            const struct faction *f2,
+            const struct ally *sf, int mode)
 {
     if (!(faction_alive(f) && faction_alive(f2))) {
         return 0;

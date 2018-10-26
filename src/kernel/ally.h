@@ -28,19 +28,18 @@ extern "C" {
     struct faction;
     struct gamedata;
     struct unit;
+    struct ally;
 
     extern struct attrib_type at_npcfaction;
 
-    typedef struct ally {
-        struct ally *next;
-        struct faction *faction;
-        int status;
-    } ally;
-
     void read_allies(struct gamedata * data, struct faction *f);
-    ally * ally_find(ally *al, const struct faction *f);
-    ally * ally_add(ally **al_p, struct faction *f);
-    void ally_remove(ally **al_p, struct faction *f);
+    typedef void (*cb_allies_walk)(struct ally *, struct faction *, int, void *);
+    void allies_walk(struct ally *allies, cb_allies_walk callback, void *udata);
+    struct ally* ally_find(struct ally*al, const struct faction *f);
+    void ally_set(struct ally**al_p, struct faction *f, int status);
+    int ally_get(struct ally *al, struct faction *f);
+    struct ally* ally_add(struct ally**al_p, struct faction *f);
+    void ally_remove(struct ally**al_p, struct faction *f);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */
@@ -49,7 +48,7 @@ extern "C" {
     int alliedfaction(const struct plane *pl, const struct faction *f,
         const struct faction *f2, int mode);
     int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
+        const struct faction *f2, const struct ally*sf, int mode);
 
 #ifdef __cplusplus
 }
