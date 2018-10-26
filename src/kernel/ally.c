@@ -282,6 +282,8 @@ int alliedunit(const unit * u, const faction * f2, int mask)
         return 0;
     }
     if (u->faction != NULL && f2 != NULL) {
+        group *g;
+
         if (mask & HELP_FIGHT) {
             if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
                 faction *owner = region_get_owner(u->region);
@@ -292,12 +294,9 @@ int alliedunit(const unit * u, const faction * f2, int mask)
             }
         }
 
-        if (fval(u, UFL_GROUP)) {
-            const attrib *a = a_find(u->attribs, &at_group);
-            if (a != NULL) {
-                group *g = (group *)a->data.v;
-                return alliedgroup(u->faction, f2, g, mask);
-            }
+        g = get_group(u);
+        if (g) {
+            return alliedgroup(u->faction, f2, g, mask);
         }
         return alliedfaction(u->faction, f2, mask);
     }

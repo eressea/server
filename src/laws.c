@@ -1317,9 +1317,9 @@ int ally_cmd(unit * u, struct order *ord)
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
-        attrib *a = a_find(u->attribs, &at_group);
-        if (a) {
-            sfp = &((group *)a->data.v)->allies;
+        group *g = get_group(u);
+        if (g) {
+            sfp = &g->allies;
         }
     }
 
@@ -1453,12 +1453,8 @@ int prefix_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (!s || !*s) {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP)) {
-            a = a_find(u->attribs, &at_group);
-        }
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             a_removeall(&g->attribs, &at_raceprefix);
         }
         else {
@@ -1473,13 +1469,12 @@ int prefix_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 299, MSG_EVENT);
     }
     else {
-        ap = &u->faction->attribs;
-        if (fval(u, UFL_GROUP)) {
-            attrib *a = a_find(u->attribs, &at_group);
-            if (a) {
-                group *g = (group *)a->data.v;
-                ap = &g->attribs;
-            }
+        group *g = get_group(u);
+        if (g) {
+            ap = &g->attribs;
+        } 
+        else {
+            ap = &u->faction->attribs;
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1839,11 +1834,8 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_GROUP:
     {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             s = &g->name;
             break;
         }

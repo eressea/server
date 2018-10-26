@@ -799,13 +799,11 @@ void cr_output_unit(stream *out, const faction * f,
     }
 
     if (u->faction == f) {
-        const attrib *a = NULL;
         unit *mage;
+        group * g;
 
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a != NULL) {
-            const group *g = (const group *)a->data.v;
+        g = get_group(u);
+        if (g) {
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
         mage = get_familiar_mage(u);

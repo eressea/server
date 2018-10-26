@@ -531,14 +531,9 @@ const char *rc_name_s(const race * rc, name_t n)
 
 const char *raceprefix(const unit * u)
 {
-    attrib *asource = u->faction->attribs;
-
-    if (fval(u, UFL_GROUP)) {
-        attrib *agroup = a_find(u->attribs, &at_group);
-        if (agroup != NULL)
-            asource = ((const group *)(agroup->data.v))->attribs;
-    }
-    return get_prefix(asource);
+    group *g = get_group(u);
+    attrib *attr = g ? g->attribs : u->faction->attribs;
+    return get_prefix(attr);
 }
 
 const char *racename(const struct locale *loc, const unit * u, const race * rc)
