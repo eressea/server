@@ -800,7 +800,7 @@ void immigration(void)
 void nmr_warnings(void)
 {
     faction *f, *fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
+#define HELP_NMR (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
@@ -816,14 +816,12 @@ void nmr_warnings(void)
                             warn = 1;
                         }
                     }
-                    else if (alliedfaction(NULL, f, fa, FRIEND)
-                        && alliedfaction(NULL, fa, f, FRIEND)) {
+                    else if (alliedfaction(f, fa, HELP_NMR) && alliedfaction(fa, f, HELP_NMR)) {
                         warn = 1;
                     }
                     if (warn) {
                         if (msg == NULL) {
-                            msg =
-                                msg_message("warn_dropout", "faction turns", f,
+                            msg = msg_message("warn_dropout", "faction turns", f,
                                     turn - f->lastorders);
                         }
                         add_message(&fa->msgs, msg);

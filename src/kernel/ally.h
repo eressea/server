@@ -24,8 +24,8 @@ extern "C" {
 #endif
 
     struct attrib_type;
-    struct plane;
     struct faction;
+    struct group;
     struct gamedata;
     struct unit;
 
@@ -37,19 +37,21 @@ extern "C" {
         int status;
     } ally;
 
-    void read_allies(struct gamedata * data, struct faction *f);
+    int ally_get(struct ally *allies, const struct faction *f);
+    void ally_set(struct ally **allies, struct faction *f, int status);
+
+    void read_allies(struct gamedata * data, struct ally **allies);
     ally * ally_find(ally *al, const struct faction *f);
     ally * ally_add(ally **al_p, struct faction *f);
-    void ally_remove(ally **al_p, struct faction *f);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */
     int alliedunit(const struct unit *u, const struct faction *f2,
         int mode);
-    int alliedfaction(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, int mode);
-    int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
+    int alliedfaction(const struct faction *f, const struct faction *f2,
+        int mode);
+    int alliedgroup(const struct faction *f, const struct faction *f2,
+        const struct group *g, int mode);
 
 #ifdef __cplusplus
 }

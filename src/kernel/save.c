@@ -1082,7 +1082,7 @@ faction *read_faction(gamedata * data)
         /* mistakes were made in the past*/
         f->options &= ~WANT_OPTION(O_JSON);
     }
-    read_allies(data, f);
+    read_allies(data, &f->allies);
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {
@@ -1145,17 +1145,13 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no;
-        int status;
-
         assert(sf->faction);
 
-        no = sf->faction->no;
-        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
-
-        if (status != 0) {
-            WRITE_INT(data->store, no);
-            WRITE_INT(data->store, sf->status);
+        if (faction_alive(sf->faction)) {
+            if (sf->status != 0) {
+                WRITE_INT(data->store, sf->faction->no);
+                WRITE_INT(data->store, sf->status);
+            }
         }
     }
     WRITE_INT(data->store, 0);

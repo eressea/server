@@ -29,20 +29,18 @@
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
     region *r;
-    ally *al;
 
     test_setup();
     r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(NULL);
     test_create_unit(f1, r);
     f2 = test_create_faction(NULL);
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FIGHT;
-    CuAssertIntEquals(tc, HELP_FIGHT, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_FIGHT);
+    CuAssertIntEquals(tc, HELP_FIGHT, alliedfaction(f1, f2, HELP_ALL));
     CuAssertPtrEquals(tc, f2, f1->next);
     destroyfaction(&f1->next);
     CuAssertIntEquals(tc, false, faction_alive(f2));
-    CuAssertIntEquals(tc, 0, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    CuAssertIntEquals(tc, 0, alliedfaction(f1, f2, HELP_ALL));
     test_teardown();
 }
 

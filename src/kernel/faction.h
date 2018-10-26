@@ -111,6 +111,8 @@ extern "C" {
     void fhash(struct faction *f);
     void funhash(struct faction *f);
 
+    int faction_ally_status(const faction *f, const faction *f2);
+
     struct faction *findfaction(int n);
     int max_magicians(const faction * f);
     void set_show_item(faction * f, const struct item_type *itype);

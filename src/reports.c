@@ -969,7 +969,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
 
     dh = 0;
     if (!getarnt) {
-        if (alliedfaction(rplane(u->region), f, fv, HELP_ALL)) {
+        if (alliedfaction(f, fv, HELP_ALL)) {
             dh = 1;
         }
     }

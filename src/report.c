@@ -1518,7 +1518,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
     const ally *sf;
    
     for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+        int mode = alliedfaction(f, sf->faction, HELP_ALL);
         if (mode > 0) {
             ++allierte;
         }
@@ -1529,7 +1529,7 @@ show_allies(const faction * f, const ally * allies, char *buf, size_t size)
         sbs_init(&sbs, buf, size);
 
         for (sf = allies; sf; sf = sf->next) {
-            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+            int mode = alliedfaction(f, sf->faction, HELP_ALL);
             if (mode <= 0)
                 continue;
             i++;
@@ -1720,9 +1720,10 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
                 str ? str : "");
             if (uf == f)
                 label = '*';
-            else if (is_allied(uf, f))
+            else if (is_allied(uf, f)) {
                 label = 'o';
-            else if (alliedfaction(NULL, uf, f, HELP_ALL))
+            }
+            else if (alliedfaction(uf, f, HELP_ALL))
                 label = '+';
             paragraph(out, buf, 4, 0, label);
         }

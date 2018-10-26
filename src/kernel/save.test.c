@@ -250,7 +250,6 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     faction *f, *f2;
     unit * u;
     group *g;
-    ally *al;
     int fno;
     gamedata data;
     storage store;
@@ -269,8 +268,8 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
-    al = ally_add(&g->allies, f);
-    CuAssertPtrNotNull(tc, al);
+    ally_set(&g->allies, f, HELP_GIVE);
+    CuAssertPtrNotNull(tc, g->allies);
 
     CuAssertPtrEquals(tc, f, factions);
     destroyfaction(&factions);

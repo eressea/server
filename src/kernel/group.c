@@ -72,12 +72,11 @@ static void init_group(faction * f, group * g)
     ally *a, **an;
 
     an = &g->allies;
-    for (a = f->allies; a; a = a->next)
+    for (a = f->allies; a; a = a->next) {
         if (a->faction) {
-            ally *ga = ally_add(an, a->faction);
-            ga->status = a->status;
-            an = &ga->next;
+            ally_set(an, a->faction, a->status);
         }
+    }
 }
 
 static group *find_groupbyname(group * g, const char *name)
@@ -228,7 +227,6 @@ void read_groups(gamedata *data, faction * f)
 {
     struct storage *store = data->store;
     for (;;) {
-        ally **pa;
         group *g;
         int gid;
         char buf[1024];
@@ -238,19 +236,7 @@ void read_groups(gamedata *data, faction * f)
             break;
         READ_STR(store, buf, sizeof(buf));
         g = new_group(f, buf, gid);
-        pa = &g->allies;
-        for (;;) {
-            ally *al;
-            int id;
-            READ_INT(store, &id);
-            if (id == 0) break;
-            al = ally_add(pa, NULL);
-            al->faction = findfaction(id);
-            if (!al->faction) {
-                ur_add(RESOLVE_FACTION | id, (void **)&al->faction, NULL);
-            }
-            READ_INT(store, &al->status);
-        }
+        read_allies(data, &g->allies);
         read_attribs(data, &g->attribs, g);
     }
 }

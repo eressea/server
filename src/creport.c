@@ -1021,15 +1021,16 @@ static void cr_output_unit_compat(FILE * F, const faction * f,
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
 
 /* prints allies */
-static void show_allies_cr(FILE * F, const faction * f, const ally * sf)
+static void show_allies_cr(FILE * F, const faction * f, const group *g)
 {
+    ally * sf = g ? g->allies : f->allies;
     for (; sf; sf = sf->next)
-        if (sf->faction) {
-            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
+        if (sf->faction && faction_alive(sf->faction)) {
+            int mode = alliedgroup(f, sf->faction, g, HELP_ALL);
             if (mode != 0 && sf->status > 0) {
                 fprintf(F, "ALLIANZ %d\n", sf->faction->no);
                 fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-                fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
+                fprintf(F, "%d;Status\n", sf->status);
             }
         }
 }
@@ -1646,7 +1647,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             f->options &= (~flag);
         }
     }
-    show_allies_cr(F, f, f->allies);
+    show_allies_cr(F, f, NULL);
     {
         group *g;
         for (g = f->groups; g; g = g->next) {
@@ -1659,7 +1660,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
                 fprintf(F, "\"%s\";typprefix\n",
                     translate(prefix, LOC(f->locale, prefix)));
             }
-            show_allies_cr(F, f, g->allies);
+            show_allies_cr(F, f, g);
         }
     }
 
