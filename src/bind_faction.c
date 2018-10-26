@@ -44,23 +44,6 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct helpmode {
-    const char *name;
-    int status;
-} helpmode;
-
-static helpmode helpmodes[] = {
-    { "all", HELP_ALL },
-    { "money", HELP_MONEY },
-    { "fight", HELP_FIGHT },
-    { "observe", HELP_OBSERVE },
-    { "give", HELP_GIVE },
-    { "guard", HELP_GUARD },
-    { "stealth", HELP_FSTEALTH },
-    { "travel", HELP_TRAVEL },
-    { NULL, 0 }
-};
-
 int tolua_factionlist_next(lua_State * L)
 {
     faction **faction_ptr = (faction **)lua_touserdata(L, lua_upvalueindex(1));
