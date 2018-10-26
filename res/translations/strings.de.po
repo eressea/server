@@ -1437,7 +1437,7 @@ msgstr "Goblins"
 
 msgctxt "spellinfo"
 msgid "song_of_slavery"
-msgstr "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig fühlen."
+msgstr "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft es den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig fühlen."
 
 msgctxt "spell"
 msgid "healingzone"

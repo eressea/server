@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "upkeep.h"
 
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
@@ -117,7 +118,7 @@ void test_upkeep_from_friend(CuTest * tc)
     f1 = test_create_faction(test_create_race("human"));
     f2 = test_create_faction(test_create_race("human"));
     assert(f1 && f2);
-    set_alliance(f1, f2, HELP_MONEY);
+    ally_set(&f1->allies, f2, HELP_MONEY);
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
     assert(r && u1 && u2);

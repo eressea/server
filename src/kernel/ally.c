@@ -25,7 +25,29 @@ typedef struct ally {
     int status;
 } ally;
 
-int allies_walk(struct ally *allies, cb_allies_walk callback, void *udata)
+void allies_free(ally *al)
+{
+    while (al) {
+        ally * an = al->next;
+        free(al);
+        al = an;
+    }
+}
+
+ally *allies_clone(const ally *al) {
+    ally *al_clone = NULL, **al_end = &al_clone;
+
+    for (; al; al = al->next) {
+        if (al->faction) {
+            ally * al_new = ally_add(al_end, al->faction);
+            al_new->status = al->status;
+            al_end = &al_new->next;
+        }
+    }
+    return al_clone;
+}
+
+int allies_walk(ally *allies, cb_allies_walk callback, void *udata)
 {
     ally *al;
     for (al = allies; al; al = al->next) {
@@ -35,6 +57,18 @@ int allies_walk(struct ally *allies, cb_allies_walk callback, void *udata)
         }
     }
     return 0;
+}
+
+void write_allies(gamedata * data, const ally *alist)
+{
+    const ally *a;
+    for (a = alist; a; a = a->next) {
+        if (a->faction && a->faction->_alive) {
+            write_faction_reference(a->faction, data->store);
+            WRITE_INT(data->store, a->status);
+        }
+    }
+    write_faction_reference(NULL, data->store);
 }
 
 void read_allies(gamedata * data, ally **sfp)
@@ -196,8 +230,7 @@ static int AllianceRestricted(void)
     return rule;
 }
 
-
-int alliance_status(faction *f, faction *f2, int status) {
+int alliance_status(const faction *f, const faction *f2, int status) {
     status |= autoalliance(f, f2);
     if (status > 0) {
         int mask = AllianceRestricted();
@@ -226,7 +259,7 @@ alliedgroup(const struct faction *f,
     if (!(faction_alive(f) && faction_alive(f2))) {
         return 0;
     }
-    status = ally_get(all, f2);
+    status = ally_get(all, f2) & mask;
     return alliance_status(f, f2, status);
 }
 
@@ -237,19 +270,19 @@ alliedfaction(const struct faction *f, const struct faction *f2, int mask)
 }
 
 /* Die Gruppe von Einheit u hat helfe zu f2 gesetzt. */
-int alliedunit(const unit * u, const faction * f2, int mode)
+int alliedunit(const unit * u, const faction * f2, int mask)
 {
     assert(u);
     assert(f2);
     assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
     if (u->faction == f2) {
-        return mode;
+        return mask;
     }
     if (!faction_alive(f2)) {
         return 0;
     }
     if (u->faction != NULL && f2 != NULL) {
-        if (mode & HELP_FIGHT) {
+        if (mask & HELP_FIGHT) {
             if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
                 faction *owner = region_get_owner(u->region);
                 /* helps the owner of the region */
@@ -263,10 +296,10 @@ int alliedunit(const unit * u, const faction * f2, int mode)
             const attrib *a = a_find(u->attribs, &at_group);
             if (a != NULL) {
                 group *g = (group *)a->data.v;
-                return alliedgroup(u->faction, f2, g, mode);
+                return alliedgroup(u->faction, f2, g, mask);
             }
         }
-        return alliedfaction(u->faction, f2, mode);
+        return alliedfaction(u->faction, f2, mask);
     }
     return 0;
 }

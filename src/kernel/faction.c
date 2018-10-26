@@ -518,24 +518,6 @@ void destroyfaction(faction ** fp)
     }
 }
 
-int get_alliance(const faction * a, const faction * b)
-{
-    const ally *sf = a->allies;
-    for (; sf != NULL; sf = sf->next) {
-        if (sf->faction == b) {
-            return sf->status;
-        }
-    }
-    return 0;
-}
-
-void set_alliance(faction * a, faction * b, int status)
-{
-    /* TODO: optimization (use allies_walk?) */
-    int original = ally_get(a->allies, b);
-    ally_set(&a->allies, b, status | original);
-}
-
 void renumber_faction(faction * f, int no)
 {
     funhash(f);

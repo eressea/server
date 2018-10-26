@@ -128,9 +128,6 @@ extern "C" {
 
     bool faction_alive(const struct faction *f);
 
-    void set_alliance(struct faction *a, struct faction *b, int status);
-    int get_alliance(const struct faction *a, const struct faction *b);
-
     struct alliance *f_get_alliance(const struct faction *f);
 
     void write_faction_reference(const struct faction *f,
