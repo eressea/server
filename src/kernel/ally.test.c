@@ -15,8 +15,8 @@ static void test_ally(CuTest * tc)
     CuAssertPtrEquals(tc, f1, ally_find(al, f1)->faction);
 
     ally_remove(&al, f1);
-    CuAssertPtrEquals(tc, 0, al);
-    CuAssertPtrEquals(tc, 0, ally_find(al, f1));
+    CuAssertPtrEquals(tc, NULL, al);
+    CuAssertPtrEquals(tc, NULL, ally_find(al, f1));
 }
 
 static void test_ally_null(CuTest * tc)
@@ -28,7 +28,7 @@ static void test_ally_null(CuTest * tc)
     CuAssertPtrNotNull(tc, a1);
     CuAssertPtrNotNull(tc, a2);
     CuAssertPtrEquals(tc, a2, a1->next);
-    CuAssertPtrEquals(tc, 0, a2->next);
+    CuAssertPtrEquals(tc, NULL, a2->next);
     free(a1);
     free(a2);
 }

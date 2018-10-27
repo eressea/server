@@ -17,8 +17,8 @@ static void test_create_a_spell(CuTest * tc)
     spell * sp;
 
     test_setup();
-    CuAssertPtrEquals(tc, 0, spells);
-    CuAssertPtrEquals(tc, 0, find_spell("testspell"));
+    CuAssertPtrEquals(tc, NULL, spells);
+    CuAssertPtrEquals(tc, NULL, find_spell("testspell"));
 
     sp = create_spell("testspell");
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
@@ -37,13 +37,13 @@ static void test_create_duplicate_spell(CuTest * tc)
     test_log_stderr(0); /* suppress the "duplicate spell" error message */
     log = test_log_start(LOG_CPERROR, &sl);
 
-    CuAssertPtrEquals(tc, 0, find_spell("testspell"));
+    CuAssertPtrEquals(tc, NULL, find_spell("testspell"));
 
     sp = create_spell("testspell");
-    CuAssertPtrEquals(tc, 0, create_spell("testspell"));
+    CuAssertPtrEquals(tc, NULL, create_spell("testspell"));
     CuAssertPtrNotNull(tc, sl);
     CuAssertStrEquals(tc, "create_spell: duplicate name '%s'", sl->s);
-    CuAssertPtrEquals(tc, 0, sl->next);
+    CuAssertPtrEquals(tc, NULL, sl->next);
     CuAssertPtrEquals(tc, sp, find_spell("testspell"));
     test_log_stop(log, sl);
     test_log_stderr(1); /* or teardown complains that stderr logging is off */

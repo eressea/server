@@ -23,14 +23,14 @@ void test_terraform(CuTest *tc) {
     t_plain = test_create_terrain("plain", LAND_REGION);
     t_ocean = test_create_terrain("ocean", SEA_REGION);
     r = test_create_region(0, 0, t_ocean);
-    CuAssertPtrEquals(tc, 0, r->land);
+    CuAssertPtrEquals(tc, NULL, r->land);
     terraform_region(r, t_plain);
     CuAssertPtrNotNull(tc, r->land);
     CuAssertPtrNotNull(tc, r->land->demands);
     CuAssertPtrEquals(tc, itype, (void *)r->land->demands->type->itype);
     CuAssertIntEquals(tc, 0, r->land->demands->type->price);
     terraform_region(r, t_ocean);
-    CuAssertPtrEquals(tc, 0, r->land);
+    CuAssertPtrEquals(tc, NULL, r->land);
     test_teardown();
 }
 

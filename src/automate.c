@@ -36,20 +36,22 @@ int autostudy_init(scholar scholars[], int max_scholars, region *r)
     for (u = r->units; u; u = u->next) {
         keyword_t kwd = getkeyword(u->thisorder);
         if (kwd == K_AUTOSTUDY) {
-            if (long_order_allowed(u) && unit_can_study(u)) {
-                scholar * st = scholars + nscholars;
-                init_order(u->thisorder, u->faction->locale);
-                st->sk = getskill(u->faction->locale);
-                st->level = effskill_study(u, st->sk);
-                st->learn = 0;
-                st->u = u;
-                if (++nscholars == max_scholars) {
-                    log_fatal("you must increase MAXSCHOLARS");
+            if (long_order_allowed(u)) {
+                if (unit_can_study(u)) {
+                    scholar * st = scholars + nscholars;
+                    init_order(u->thisorder, u->faction->locale);
+                    st->sk = getskill(u->faction->locale);
+                    st->level = effskill_study(u, st->sk);
+                    st->learn = 0;
+                    st->u = u;
+                    if (++nscholars == max_scholars) {
+                        log_fatal("you must increase MAXSCHOLARS");
+                    }
                 }
-            }
-            else {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_race_nolearn", "race",
-                    u_race(u)));
+                else {
+                    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_race_nolearn", "race",
+                        u_race(u)));
+                }
             }
         }
     }

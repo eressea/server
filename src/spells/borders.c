@@ -79,7 +79,7 @@ const curse_type ct_firewall = {
 
 static void wall_init(connection * b)
 {
-    wall_data *fd = (wall_data *)calloc(sizeof(wall_data), 1);
+    wall_data *fd = (wall_data *)calloc(1, sizeof(wall_data));
     fd->countdown = -1;           /* infinite */
     b->data.v = fd;
 }

@@ -1138,7 +1138,7 @@ static void demon_dazzle(fighter *af, troop dt) {
     if (u_race(af->unit) == get_race(RC_DAEMON)) {
         if (!(df->person[dt.index].flags & (FL_COURAGE | FL_DAZZLED))) {
             df->person[dt.index].flags |= FL_DAZZLED;
-            df->person[dt.index].defence--;
+            df->person[dt.index].defense--;
         }
     }
 }
@@ -1191,7 +1191,7 @@ static void destroy_items(troop dt) {
 
 }
 
-static void calculate_defence_type(troop dt, troop at, int type, bool missile,
+static void calculate_defense_type(troop dt, troop at, int type, bool missile,
     const weapon_type **dwtype, int *defskill) {
   const weapon *weapon;
   weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
@@ -1320,7 +1320,7 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     ++at.fighter->hits;
 
     calculate_attack_type(at, dt, type, missile, &awtype, &attskill, &magic);
-    calculate_defence_type(at, dt, type, missile, &awtype, &attskill);
+    calculate_defense_type(at, dt, type, missile, &awtype, &attskill);
 
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
@@ -1946,7 +1946,7 @@ int skilldiff(troop at, troop dt, int dist)
         rc_goblin = get_race(RC_GOBLIN);
     }
     skdiff += af->person[at.index].attack;
-    skdiff -= df->person[dt.index].defence;
+    skdiff -= df->person[dt.index].defense;
 
     if (df->person[dt.index].flags & FL_SLEEPING)
         skdiff += 2;
@@ -2075,7 +2075,7 @@ void dazzle(battle * b, troop * td)
     }
 
     td->fighter->person[td->index].flags |= FL_DAZZLED;
-    td->fighter->person[td->index].defence--;
+    td->fighter->person[td->index].defense--;
 }
 
 void damage_building(battle * b, building * bldg, int damage_abs)
@@ -2241,7 +2241,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                     td.fighter->person[td.index].attack -= 1;
                 }
                 else {
-                    td.fighter->person[td.index].defence -= 1;
+                    td.fighter->person[td.index].defense -= 1;
                 }
                 c--;
             }
@@ -3184,7 +3184,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     strongmen = trollbelts(u);
     if (strongmen > fig->unit->number) strongmen = fig->unit->number;
 
-    /* Hitpoints, Attack- und Defence-Boni f�r alle Personen */
+    /* Hitpoints, Attack- und Defense-Boni fuer alle Personen */
     for (i = 0; i < fig->alive; i++) {
         assert(i < fig->unit->number);
         fig->person[i].hp = h;
@@ -3226,7 +3226,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             assert(w != WMAX);
         }
         assert(w >= 0);
-        fig->weapons = (weapon *)calloc(sizeof(weapon), (size_t)(w + 1));
+        fig->weapons = (weapon *)calloc((size_t)(w + 1), sizeof(weapon));
         memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
 
         for (i = 0; i != w; ++i) {
@@ -3452,7 +3452,7 @@ battle *make_battle(region * r)
                         break;
                 }
                 if (!bf) {
-                    bf = (bfaction *)calloc(sizeof(bfaction), 1);
+                    bf = (bfaction *)calloc(1, sizeof(bfaction));
                     ++b->nfactions;
                     bf->faction = u->faction;
                     bf->next = b->factions;

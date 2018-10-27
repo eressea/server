@@ -66,7 +66,7 @@ void new_potiontype(item_type * itype, int level)
 {
     potion_type *ptype;
 
-    ptype = (potion_type *)calloc(sizeof(potion_type), 1);
+    ptype = (potion_type *)calloc(1, sizeof(potion_type));
     itype->flags |= ITF_POTION;
     ptype->itype = itype;
     ptype->level = level;
@@ -181,7 +181,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 static void a_initeffect(variant *var)
 {
-    var->v = calloc(sizeof(effect_data), 1);
+    var->v = calloc(1, sizeof(effect_data));
 }
 
 static void

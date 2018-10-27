@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define STRINGS_H
 
 #include <stddef.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {

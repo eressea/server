@@ -16,7 +16,6 @@
 void orderdb_open(void)
 {
     const char *dbname;
-
     dbname = config_get("game.dbswap");
     db_driver_open(DB_SWAP, dbname);
 }

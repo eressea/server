@@ -1361,7 +1361,7 @@ static void update_view(view * vi)
 
 state *state_open(void)
 {
-    state *st = calloc(sizeof(state), 1);
+    state *st = (state *)calloc(1, sizeof(state));
     st->display.pl = get_homeplane();
     st->cursor.pl = get_homeplane();
     st->cursor.x = 0;

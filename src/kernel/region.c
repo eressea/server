@@ -774,7 +774,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
             log_error("duplicate region contains units\n");
         return r;
     }
-    r = calloc(1, sizeof(region));
+    r = (region *)calloc(sizeof(region), 1);
     assert_alloc(r);
     r->x = x;
     r->y = y;
