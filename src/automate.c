@@ -34,17 +34,19 @@ int autostudy_init(scholar scholars[], int max_scholars, region *r)
     int nscholars = 0;
 
     for (u = r->units; u; u = u->next) {
-        keyword_t kwd = getkeyword(u->thisorder);
+        keyword_t kwd = init_order(u->thisorder, u->faction->locale);
         if (kwd == K_AUTOSTUDY) {
-            if (long_order_allowed(u) && unit_can_study(u)) {
+            if (long_order_allowed(u)) {
                 scholar * st = scholars + nscholars;
-                init_order(u->thisorder, u->faction->locale);
-                st->sk = getskill(u->faction->locale);
-                st->level = effskill_study(u, st->sk);
-                st->learn = 0;
-                st->u = u;
-                if (++nscholars == max_scholars) {
-                    log_fatal("you must increase MAXSCHOLARS");
+                skill_t sk = getskill(u->faction->locale);
+                if (check_student(u, u->thisorder, sk)) {
+                    st->sk = sk;
+                    st->level = effskill_study(u, st->sk);
+                    st->learn = 0;
+                    st->u = u;
+                    if (++nscholars == max_scholars) {
+                        log_fatal("you must increase MAXSCHOLARS");
+                    }
                 }
             }
             else {

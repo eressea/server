@@ -116,7 +116,9 @@ skill_t get_skill(const char *s, const struct locale * lang)
 int skill_cost(skill_t sk) {
     static int config;
     static int costs[MAXSKILLS];
-    int cost;
+    int cost = -1;
+
+    assert(sk >= 0 && sk < MAXSKILLS);
     switch (sk) {
     case SK_SPY:
         cost = 100;
@@ -146,5 +148,6 @@ int skill_cost(skill_t sk) {
 }
 
 bool expensive_skill(skill_t sk) {
+    assert(sk >= 0 && sk < MAXSKILLS);
     return (sk == SK_MAGIC) || skill_cost(sk) > 0;
 }
