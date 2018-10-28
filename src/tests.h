@@ -75,7 +75,6 @@ extern "C" {
     void assert_string_parameter(struct CuTest * tc, struct message *msg, int index, const char *arg);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
-    void test_inject_messagetypes(void);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
 

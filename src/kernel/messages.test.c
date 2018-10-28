@@ -18,6 +18,23 @@ void test_missing_message(CuTest *tc) {
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
     CuAssertStrEquals(tc, msg->type->name, "missing_message");
+    CuAssertStrEquals(tc, "unknown", (const char *)msg->parameters[0].v);
+    msg_release(msg);
+    test_teardown();
+}
+
+void test_missing_feedback(CuTest *tc) {
+    message *msg;
+    struct locale *lang;
+
+    test_setup();
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
+    lang = test_create_locale();
+    msg = msg_error(NULL, NULL, 77);
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertPtrNotNull(tc, msg->type);
+    CuAssertStrEquals(tc, msg->type->name, "missing_feedback");
+    CuAssertStrEquals(tc, "error77", (const char *)msg->parameters[3].v);
     msg_release(msg);
     test_teardown();
 }

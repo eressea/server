@@ -277,15 +277,10 @@ void test_create_calendar(void) {
     month_season[8] = SEASON_SUMMER;
 }
 
-void test_inject_messagetypes(void)
-{
-    message_handle_missing(MESSAGE_MISSING_REPLACE);
-}
-
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
-    message_handle_missing(MESSAGE_MISSING_ERROR);
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     if (tc) {
         log_debug("start test: %s", tc->name);
     }
@@ -297,6 +292,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
 
 void test_teardown(void)
 {
+    message_handle_missing(MESSAGE_MISSING_IGNORE);
     test_reset();
     test_log_stderr(0);
 }

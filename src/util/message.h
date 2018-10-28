@@ -64,6 +64,8 @@ extern "C" {
     struct message_type *mt_new(const char *name, const char *section);
     /** message_type registry (optional): **/
     struct message_type *mt_create(struct message_type *, const char *args[], int nargs);
+    struct message_type *mt_create_feedback(const char *name);
+    struct message_type *mt_create_error(int error);
     struct message_type *mt_create_va(struct message_type *, ...);
     const struct message_type *mt_find(const char *);
 
