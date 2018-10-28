@@ -25,11 +25,9 @@ void test_missing_message(CuTest *tc) {
 
 void test_missing_feedback(CuTest *tc) {
     message *msg;
-    struct locale *lang;
 
     test_setup();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
-    lang = test_create_locale();
     msg = msg_error(NULL, NULL, 77);
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
