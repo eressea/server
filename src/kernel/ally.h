@@ -29,14 +29,20 @@ extern "C" {
     struct gamedata;
     struct unit;
     struct ally;
+    struct allies;
 
     extern struct attrib_type at_npcfaction;
 
+    int allies_get(struct allies *al, const struct faction *f);
+    void allies_set(struct allies **p_al, const struct faction *f, int status);
+    void allies_write(struct gamedata * data, const struct allies *alist);
+    void allies_read(struct gamedata * data, struct allies **sfp);
+
     void read_allies(struct gamedata * data, struct ally **alist);
     void write_allies(struct gamedata * data, const struct ally *alist);
-    typedef int (*cb_allies_walk)(struct ally *, struct faction *, int, void *);
-    int allies_walk(struct ally *allies, cb_allies_walk callback, void *udata);
-    struct ally *allies_clone(const struct ally *al);
+    typedef int (*cb_ally_walk)(struct ally *, struct faction *, int, void *);
+    int ally_walk(struct ally *allies, cb_ally_walk callback, void *udata);
+    struct ally *ally_clone(const struct ally *al);
     void allies_free(struct ally *al);
 
     struct ally* ally_find(struct ally*al, const struct faction *f);

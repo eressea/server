@@ -1587,7 +1587,7 @@ static void
 show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
 {
     int num_allies = 0;
-    allies_walk(allies, count_allies_cb, &num_allies);
+    ally_walk(allies, count_allies_cb, &num_allies);
 
     if (num_allies > 0) {
         struct show_s show;
@@ -1595,7 +1595,7 @@ show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
         show.num_allies = num_allies;
         sbs_init(&show.sbs, buf, size);
 
-        allies_walk(allies, show_allies_cb, &show);
+        ally_walk(allies, show_allies_cb, &show);
         sbs_strcat(&show.sbs, ".");
     }
 }

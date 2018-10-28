@@ -1047,7 +1047,7 @@ static void show_allies_cr(FILE * F, const faction * f, const group *g)
     data.F = F;
     data.f = f;
     struct ally *sf = g ? g->allies : f->allies;
-    allies_walk(sf, print_ally_cb, &data);
+    ally_walk(sf, print_ally_cb, &data);
 }
 
 /* prints allies */
