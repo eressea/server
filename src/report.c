@@ -902,6 +902,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     assert(f);
     assert(r);
 
+    memset(edges, 0, sizeof(edges));
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
