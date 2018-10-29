@@ -52,6 +52,53 @@ static unit * setup_build(build_fixture *bf) {
     return bf->u;
 }
 
+static building_type *setup_castle(item_type *it_stone) {
+    building_type *btype;
+    building_stage *stage;
+    construction * cons;
+
+    btype = test_create_buildingtype("castle");
+    stage = btype->stages = calloc(1, sizeof(building_stage));
+    cons = stage->construction = calloc(1, sizeof(construction));
+    cons->materials = calloc(2, sizeof(requirement));
+    cons->materials[0].number = 1;
+    cons->materials[0].rtype = it_stone->rtype;
+    cons->minskill = 1;
+    cons->maxsize = 2;
+    cons->reqsize = 1;
+    cons->skill = SK_BUILDING;
+    stage = stage->next = calloc(1, sizeof(building_stage));
+    cons = stage->construction = calloc(1, sizeof(construction));
+    cons->materials = calloc(2, sizeof(requirement));
+    cons->materials[0].number = 1;
+    cons->materials[0].rtype = it_stone->rtype;
+    cons->minskill = 1;
+    cons->maxsize = 8;
+    cons->reqsize = 1;
+    cons->skill = SK_BUILDING;
+    return btype;
+}
+
+static void test_build_building_stages(CuTest *tc) {
+    building_type *btype;
+    item_type *it_stone;
+    unit *u;
+
+    test_setup();
+    init_resources();
+    it_stone = test_create_itemtype("stone");
+    btype = setup_castle(it_stone);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    set_level(u, SK_BUILDING, 2);
+    i_change(&u->items, it_stone, 4);
+    build_building(u, btype, -1, INT_MAX, NULL);
+    CuAssertPtrNotNull(tc, u->building);
+    CuAssertIntEquals(tc, 2, u->building->size);
+    CuAssertIntEquals(tc, 2, i_get(u->items, it_stone));
+
+    test_teardown();
+}
+
 static void teardown_build(build_fixture *bf) {
     free(bf->cons.materials);
     test_teardown();
@@ -390,6 +437,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_with_ring);
     SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_building_success);
+    SUITE_ADD_TEST(suite, test_build_building_stages);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     SUITE_ADD_TEST(suite, test_build_destroy_cmd);
