@@ -500,6 +500,28 @@ static int count_materials(unit *u, const construction *type, int n, int complet
     return n;
 }
 
+int build_skill(unit *u, int basesk, int skill_mod) {
+    int effsk, skills;
+    int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+
+    effsk = basesk + skill_mod;
+    assert(effsk >= 0);
+
+    skills = effsk * u->number;
+
+    /* technically, nimblefinge and domore should be in a global set of
+     * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+     * them in here. */
+
+    if (dm != 0) {
+        /* Auswirkung Schaffenstrunk */
+        if (dm > u->number) dm = u->number;
+        change_effect(u, oldpotiontype[P_DOMORE], -dm);
+        skills += dm * effsk;
+    }
+    return skills;
+}
+
 /** Use up resources for building an object.
 * Build up to 'size' points of 'type', where 'completed'
 * of the first object have already been finished. return the
@@ -521,28 +543,11 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         return ECOMPLETE;
     }
     if (con->skill != NOSKILL) {
-        int effsk;
-        int dm = get_effect(u, oldpotiontype[P_DOMORE]);
-
         basesk = effskill(u, con->skill, 0);
         if (basesk == 0)
             return ENEEDSKILL;
 
-        effsk = basesk + skill_mod;
-        assert(effsk >= 0);
-
-        skills = effsk * u->number;
-
-        /* technically, nimblefinge and domore should be in a global set of
-         * "game"-attributes, (as at_skillmod) but for a while, we're leaving
-         * them in here. */
-
-        if (dm != 0) {
-            /* Auswirkung Schaffenstrunk */
-            if (dm > u->number) dm = u->number;
-            change_effect(u, oldpotiontype[P_DOMORE], -dm);
-            skills += dm * effsk;
-        }
+        skills = build_skill(u, basesk, skill_mod);
     }
     for (; want > 0 && skills > 0;) {
         int err, n;

@@ -145,6 +145,7 @@ static struct unit *create_recruiter(void) {
 
 static void setup_production(void) {
     init_resources();
+    mt_create_feedback("error_cannotmake");
     mt_create_va(mt_new("produce", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END);
     mt_create_va(mt_new("income", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END);
     mt_create_va(mt_new("buy", NULL), "unit:unit", "money:int", MT_NEW_END);
@@ -738,6 +739,7 @@ static void test_loot(CuTest *tc) {
 
     test_setup();
     setup_production();
+    mt_create_error(48); /* unit is unarmed */
     it_silver = test_create_silver();
     config_set("rules.enable_loot", "1");
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
@@ -747,7 +749,7 @@ static void test_loot(CuTest *tc) {
     test_clear_messages(f);
     arm_unit(u);
     produce(u->region);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "income")); /* unit is unarmed */
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "income"));
     CuAssertIntEquals(tc, 2 * TAXFRACTION, i_get(u->items, it_silver));
     CuAssertIntEquals(tc, UFL_LONGACTION | UFL_NOTMOVING, fval(u, UFL_LONGACTION | UFL_NOTMOVING));
     test_teardown();
