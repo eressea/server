@@ -55,6 +55,7 @@
 #include "wormhole.h"
 #include "teleport.h"
 
+#include <selist.h>
 #include <storage.h>
 #include <lua.h>
 
@@ -708,7 +709,7 @@ void highlight_region(region * r, int toggle)
     }
 }
 
-void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
+void select_coordinate(struct selection *selected, int nx, int ny, bool toggle)
 {
     if (toggle)
         tag_region(selected, nx, ny);
@@ -716,7 +717,50 @@ void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
         untag_region(selected, nx, ny);
 }
 
-enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+enum select_t { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+
+static void select_island(state *st, int selectmode)
+{
+    region *r;
+    int nx = st->cursor.x;
+    int ny = st->cursor.y;
+
+    pnormalize(&nx, &ny, st->cursor.pl);
+    r = findregion(nx, ny);
+    if (r && r->land) {
+        selist *ql, *stack = NULL;
+        int qi = 0;
+
+        selist_push(&stack, r);
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            region *rnext[MAXDIRECTIONS];
+            int i;
+
+            fset(r, RF_MARK);
+            if (selectmode & MODE_SELECT) {
+                select_coordinate(st->selected, r->x, r->y,
+                    selectmode == MODE_SELECT);
+            }
+            else {
+                highlight_region(r, selectmode == MODE_MARK);
+            }
+            get_neighbours(r, rnext);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = rnext[i];
+                if (rn && rn->land && !fval(rn, RF_MARK)) {
+                    selist_push(&stack, rn);
+                }
+            }
+        }
+
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            freset(r, RF_MARK);
+        }
+        selist_free(stack);
+    }
+}
 
 static void select_regions(state * st, int selectmode)
 {
@@ -869,6 +913,11 @@ static void select_regions(state * st, int selectmode)
                 return;
             }
         }
+    }
+    else if (findmode == 'i') {
+        sprintf(sbuffer, "%swand: ", status);
+        statusline(st->wnd_status->handle, sbuffer);
+        select_island(st, selectmode);
     }
     else if (findmode == 't') {
         const struct terrain_type *terrain;
