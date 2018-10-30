@@ -827,7 +827,7 @@ void free_land(land_region * lr)
     free(lr);
 }
 
-void region_setresource(region * r, const resource_type * rtype, int value)
+void region_setresource(region * r, const struct resource_type *rtype, int value)
 {
     rawmaterial *rm = r->resources;
     while (rm) {
@@ -870,7 +870,18 @@ void region_setresource(region * r, const resource_type * rtype, int value)
     }
 }
 
-int region_getresource(const region * r, const resource_type * rtype)
+int region_getresource_level(const region * r, const struct resource_type * rtype)
+{
+    const rawmaterial *rm;
+    for (rm = r->resources; rm; rm = rm->next) {
+        if (rm->rtype == rtype) {
+            return rm->level;
+        }
+    }
+    return -1;
+}
+
+int region_getresource(const region * r, const struct resource_type *rtype)
 {
     const rawmaterial *rm;
     for (rm = r->resources; rm; rm = rm->next) {
