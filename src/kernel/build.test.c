@@ -17,8 +17,9 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <limits.h>
 
 typedef struct build_fixture {
     faction *f;
