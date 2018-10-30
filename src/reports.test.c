@@ -789,7 +789,6 @@ static void test_insect_warnings(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
-    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
     CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
@@ -817,7 +816,6 @@ static void test_newbie_warning(CuTest *tc) {
     faction *f;
 
     test_setup();
-    test_inject_messagetypes();
     f = test_create_faction(NULL);
     config_set_int("NewbieImmunity", 3);
 

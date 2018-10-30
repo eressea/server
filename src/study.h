@@ -48,6 +48,7 @@ extern "C" {
     skill_t getskill(const struct locale *lang);
     bool is_migrant(struct unit *u);
     int study_cost(struct unit *u, skill_t sk);
+    bool check_student(const struct unit *u, struct order *ord, skill_t sk);
 
     typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
 

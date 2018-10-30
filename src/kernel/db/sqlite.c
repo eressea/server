@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -226,7 +227,11 @@ void db_driver_close(database_t db)
             FILE * F = fopen(g_swapname, "r");
             if (F) {
                 fclose(F);
-                remove(g_swapname);
+                if (0 != remove(g_swapname)) {
+                    log_error("could not remove %s: %s", g_swapname,
+                            strerror(errno));
+                    errno = 0;
+                }
             }
         }
     }

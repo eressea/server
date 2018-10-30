@@ -192,7 +192,7 @@ void read_allies(gamedata * data, ally **sfp)
             ally * al = ally_add(sfp, NULL);
             int state;
             if ((al->faction = findfaction(aid)) == NULL) {
-                ur_add(RESOLVE_FACTION | aid, (void **)&al->faction, NULL);
+                al->faction = faction_create(aid);
             }
             READ_INT(data->store, &state);
             al->status = state & HELP_ALL;
