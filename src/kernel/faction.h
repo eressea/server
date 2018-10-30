@@ -127,6 +127,7 @@ extern "C" {
     void destroyfaction(faction ** f);
 
     bool faction_alive(const struct faction *f);
+    struct faction *faction_create(int no);
 
     void set_alliance(struct faction *a, struct faction *b, int status);
     int get_alliance(const struct faction *a, const struct faction *b);

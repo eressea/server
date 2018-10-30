@@ -957,8 +957,7 @@ faction *read_faction(gamedata * data)
     assert(n > 0);
     f = findfaction(n);
     if (f == NULL) {
-        f = (faction *)calloc(1, sizeof(faction));
-        f->no = n;
+        f = faction_create(n);
     }
     else {
         f->allies = NULL;           /* FIXME: mem leak */
@@ -1415,7 +1414,6 @@ int read_game(gamedata *data)
 
         *fp = f;
         fp = &f->next;
-        fhash(f);
     }
     *fp = 0;
 
@@ -1515,6 +1513,7 @@ int read_game(gamedata *data)
             }
         }
         else {
+            assert(f->units);
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
                     sc_mage *mage = get_mage_depr(u);

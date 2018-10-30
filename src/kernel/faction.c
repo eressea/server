@@ -875,3 +875,11 @@ void free_factions(void) {
     free_flist(&factions);
     free_flist(&dead_factions);
 }
+
+faction *faction_create(int no)
+{
+    faction *f = (faction *)calloc(1, sizeof(faction));
+    f->no = no;
+    fhash(f);
+    return f;
+}
