@@ -23,7 +23,7 @@ static void test_ally(CuTest * tc)
     test_teardown();
 }
 
-static void test_allies_clone(CuTest * tc)
+static void test_ally_clone(CuTest * tc)
 {
     struct ally * al = NULL, *ac;
     struct faction * f;
@@ -63,8 +63,8 @@ CuSuite *get_ally_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_ally);
+    SUITE_ADD_TEST(suite, test_ally_clone);
     SUITE_ADD_TEST(suite, test_allies);
-    SUITE_ADD_TEST(suite, test_allies_clone);
     return suite;
 }
 

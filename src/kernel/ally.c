@@ -105,16 +105,20 @@ void allies_write(gamedata * data, const allies *alist)
     write_faction_reference(NULL, data->store);
 }
 
-void allies_read(gamedata * data, allies **sfp)
+void allies_read(gamedata * data, allies **p_al)
 {
     for (;;) {
-        int aid, state;
+        faction *f;
+        int aid, status;
         READ_INT(data->store, &aid);
         /* TODO: deal with unresolved factions, somehow */
-        if (aid >=0) {
+        if (aid <= 0) {
             break;
         }
-        READ_INT(data->store, &state);
+        f = findfaction(aid);
+        if (!f) f = faction_create(aid);
+        READ_INT(data->store, &status);
+        allies_set(p_al, f, status);
     }
 }
 
