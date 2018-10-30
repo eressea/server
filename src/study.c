@@ -524,6 +524,48 @@ static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
     selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
 }
 
+bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
+    int err = 0;
+
+    if (sk < 0) {
+        err = 77;
+    }
+    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
+    else if (u_race(u)->bonus[sk] == -99) {
+        err = 771;
+    }
+    else {
+        static int config;
+        static bool learn_newskills;
+
+        if (config_changed(&config)) {
+            learn_newskills = config_get_int("study.newskills", 1) != 0;
+        }
+        if (!learn_newskills) {
+            skill *sv = unit_skill(u, sk);
+            if (sv == NULL) {
+                /* we can only learn skills we already have */
+                err = 771;
+            }
+        }
+    }
+    if (err) {
+        if (ord) {
+            cmistake(u, ord, err, MSG_EVENT);
+        }
+        return false;
+    }
+
+    if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+        if (ord) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "error_race_nolearn", "race", u_race(u)));
+        }
+        return false;
+    }
+    return true;
+}
+
 int study_cmd(unit * u, order * ord)
 {
     region *r = u->region;
@@ -537,7 +579,6 @@ int study_cmd(unit * u, order * ord)
     skill_t sk;
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
-    bool learn_newskills = config_get_int("study.newskills", 1) != 0;
     static const race *rc_snotling;
     static int rc_cache;
 
@@ -545,31 +586,11 @@ int study_cmd(unit * u, order * ord)
         rc_snotling = get_race(RC_SNOTLING);
     }
 
-    if (!unit_can_study(u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
-            u_race(u)));
-        return -1;
-    }
-
     (void)init_order(ord, u->faction->locale);
     sk = getskill(u->faction->locale);
 
-    if (sk < 0) {
-        cmistake(u, ord, 77, MSG_EVENT);
+    if (!check_student(u, ord, sk)) {
         return -1;
-    }
-    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
-    if (u_race(u)->bonus[sk] == -99) {
-        cmistake(u, ord, 771, MSG_EVENT);
-        return -1;
-    }
-    if (!learn_newskills) {
-        skill *sv = unit_skill(u, sk);
-        if (sv == NULL) {
-            /* we can only learn skills we already have */
-            cmistake(u, ord, 771, MSG_EVENT);
-            return -1;
-        }
     }
 
     /* snotlings koennen Talente nur bis T8 lernen */
