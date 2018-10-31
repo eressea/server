@@ -30,7 +30,7 @@ extern "C" {
         struct faction *f;
         struct attrib *attribs;
         char *name;
-        struct ally *allies;
+        struct allies *allies;
         int gid;
         int members;
     } group;

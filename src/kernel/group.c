@@ -69,7 +69,7 @@ group *new_group(faction * f, const char *name, int gid)
 
 static void init_group(faction * f, group * g)
 {
-    g->allies = ally_clone(f->allies);
+    g->allies = allies_clone(f->allies);
 }
 
 static group *find_groupbyname(group * g, const char *name)

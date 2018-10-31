@@ -23,31 +23,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    struct attrib_type;
-    struct faction;
-    struct group;
-    struct gamedata;
-    struct unit;
-    struct ally;
-    struct allies;
+struct attrib_type;
+struct faction;
+struct group;
+struct gamedata;
+struct unit;
+struct allies;
 
-    extern struct attrib_type at_npcfaction;
+extern struct attrib_type at_npcfaction;
 
-    int allies_get(struct allies *al, const struct faction *f);
-    void allies_set(struct allies **p_al, const struct faction *f, int status);
-    void allies_write(struct gamedata * data, const struct allies *alist);
-    void allies_read(struct gamedata * data, struct allies **sfp);
+int ally_get(struct allies *al, const struct faction *f);
+void ally_set(struct allies **p_al, struct faction *f, int status);
+void write_allies(struct gamedata * data, const struct allies *alist);
+void read_allies(struct gamedata * data, struct allies **sfp);
+typedef int (*cb_allies_walk)(struct allies *, struct faction *, int, void *);
+int allies_walk(struct allies *allies, cb_allies_walk callback, void *udata);
+struct allies *allies_clone(const struct allies *al);
 
-    void read_allies(struct gamedata * data, struct ally **alist);
-    void write_allies(struct gamedata * data, const struct ally *alist);
-    typedef int (*cb_ally_walk)(struct ally *, struct faction *, int, void *);
-    int ally_walk(struct ally *allies, cb_ally_walk callback, void *udata);
-    struct ally *ally_clone(const struct ally *al);
-    void allies_free(struct ally *al);
-
-    struct ally* ally_find(struct ally*al, const struct faction *f);
-    void ally_set(struct ally**al_p, struct faction *f, int status);
-    int ally_get(struct ally *al, const struct faction *f);
+void allies_free(struct allies *al);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */

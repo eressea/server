@@ -1511,7 +1511,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     return 0;
 }
 
-static int count_allies_cb(struct ally *all, faction *af, int status, void *udata) {
+static int count_allies_cb(struct allies *all, faction *af, int status, void *udata) {
     int *num = (int *)udata;
     if (status > 0) {
         ++*num;
@@ -1525,7 +1525,7 @@ struct show_s {
     int num_allies;
 };
 
-static int show_allies_cb(struct ally *all, faction *af, int status, void *udata) {
+static int show_allies_cb(struct allies *all, faction *af, int status, void *udata) {
     struct show_s * show = (struct show_s *)udata;
     const faction * f = show->f;
 
@@ -1585,10 +1585,10 @@ static int show_allies_cb(struct ally *all, faction *af, int status, void *udata
 }
 
 static void
-show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
+show_allies(const faction * f, struct allies * allies, char *buf, size_t size)
 {
     int num_allies = 0;
-    ally_walk(allies, count_allies_cb, &num_allies);
+    allies_walk(allies, count_allies_cb, &num_allies);
 
     if (num_allies > 0) {
         struct show_s show;
@@ -1596,7 +1596,7 @@ show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
         show.num_allies = num_allies;
         sbs_init(&show.sbs, buf, size);
 
-        ally_walk(allies, show_allies_cb, &show);
+        allies_walk(allies, show_allies_cb, &show);
         sbs_strcat(&show.sbs, ".");
     }
 }

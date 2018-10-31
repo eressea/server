@@ -5,35 +5,17 @@
 #include <CuTest.h>
 #include <tests.h>
 
-static void test_ally(CuTest * tc)
+static void test_allies_clone(CuTest * tc)
 {
-    struct ally * al = NULL;
+    struct allies * al = NULL, *ac;
     struct faction * f;
 
     test_setup();
     f = test_create_faction(NULL);
-    ally_set(&al, f, HELP_GUARD);
-    CuAssertPtrNotNull(tc, al);
-    CuAssertIntEquals(tc, HELP_GUARD, ally_get(al, f));
-
-    ally_set(&al, f, 0);
-    CuAssertPtrEquals(tc, NULL, al);
-    CuAssertIntEquals(tc, 0, ally_get(al, f));
-    allies_free(al);
-    test_teardown();
-}
-
-static void test_ally_clone(CuTest * tc)
-{
-    struct ally * al = NULL, *ac;
-    struct faction * f;
-
-    test_setup();
-    f = test_create_faction(NULL);
-    CuAssertPtrEquals(tc, NULL, ally_clone(NULL));
+    CuAssertPtrEquals(tc, NULL, allies_clone(NULL));
     
     ally_set(&al, f, HELP_GUARD);
-    ac = ally_clone(al);
+    ac = allies_clone(al);
     CuAssertPtrNotNull(tc, ac);
     CuAssertTrue(tc, al != ac);
     CuAssertIntEquals(tc, HELP_GUARD, ally_get(ac, f));
@@ -50,11 +32,11 @@ static void test_allies(CuTest *tc) {
     test_setup();
     f = test_create_faction(NULL);
 
-    CuAssertIntEquals(tc, 0, allies_get(al, f));
-    allies_set(&al, f, 42);
-    CuAssertIntEquals(tc, 42, allies_get(al, f));
-    allies_set(&al, f, 0);
-    CuAssertIntEquals(tc, 0, allies_get(al, f));
+    CuAssertIntEquals(tc, 0, ally_get(al, f));
+    ally_set(&al, f, 42);
+    CuAssertIntEquals(tc, 42, ally_get(al, f));
+    ally_set(&al, f, 0);
+    CuAssertIntEquals(tc, 0, ally_get(al, f));
     CuAssertPtrEquals(tc, NULL, al);
     test_teardown();
 }
@@ -62,9 +44,8 @@ static void test_allies(CuTest *tc) {
 CuSuite *get_ally_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_ally);
-    SUITE_ADD_TEST(suite, test_ally_clone);
     SUITE_ADD_TEST(suite, test_allies);
+    SUITE_ADD_TEST(suite, test_allies_clone);
     return suite;
 }
 
