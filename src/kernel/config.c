@@ -135,7 +135,8 @@ const char *parameters[MAXPARAMS] = {
     "GRUPPE",
     "PARTEITARNUNG",
     "BAEUME",
-    "ALLIANZ"
+    "ALLIANZ",
+    "AUTO"
 };
 
 int findoption(const char *s, const struct locale *lang)
@@ -631,28 +632,24 @@ void kernel_init(void)
     translation_init();
 }
 
-static order * defaults[MAXLOCALES];
-
 order *default_order(const struct locale *lang)
 {
     int i = locale_index(lang);
+    keyword_t kwd;
+    const char * str;
     order *result = 0;
-    assert(i < MAXLOCALES);
 
-    result = defaults[i];
-    if (!result) {
-        const char * str;
-        keyword_t kwd = NOKEYWORD;
-        str = config_get("orders.default");
-        if (str) {
-            kwd = findkeyword(str);
-        }
-        if (kwd != NOKEYWORD) {
-            result = create_order(kwd, lang, NULL);
-            defaults[i] = result;
-        }
+    assert(i < MAXLOCALES);
+    kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
+    str = config_get("orders.default");
+    if (str) {
+        kwd = findkeyword(str);
     }
-    return result ? copy_order(result) : 0;
+    if (kwd != NOKEYWORD) {
+        result = create_order(kwd, lang, NULL);
+        return copy_order(result);
+    }
+    return NULL;
 }
 
 int rule_give(void)
@@ -760,14 +757,6 @@ void free_config(void) {
  */
 void free_gamedata(void)
 {
-    int i;
-
-    for (i = 0; i != MAXLOCALES; ++i) {
-        if (defaults[i]) {
-            free_order(defaults[i]);
-            defaults[i] = 0;
-        }
-    }
     free(forbidden_ids);
     forbidden_ids = NULL;
 

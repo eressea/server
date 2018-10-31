@@ -28,7 +28,10 @@ if [ -e orders.$TURN ]; then
 files="$files orders.$TURN"
 fi
 echo "backup turn $TURN, game $GAME, files: $files"
+if [ -d reports ] ; then
+  tar cjf backup/$TURN-reports.tar.bz2 reports
+fi
 tar cjf backup/$TURN.tar.bz2 $files
 echo "uploading game-$GAME/$TURN.tar.bz2"
 curl -s -n -T backup/$TURN.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN.tar.bz2
-curl -s -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db
+#curl -s -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db

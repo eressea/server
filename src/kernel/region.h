@@ -228,6 +228,7 @@ extern "C" {
     struct region *new_region(int x, int y, struct plane *pl, int uid);
     void remove_region(region ** rlist, region * r);
     void terraform_region(struct region *r, const struct terrain_type *terrain);
+    void init_region(struct region *r);
     bool pnormalize(int *x, int *y, const struct plane *pl);
 
     extern const int delta_x[MAXDIRECTIONS];
@@ -260,6 +261,8 @@ extern "C" {
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
     void region_setinfo(struct region *self, const char *name);
+    int region_getresource_level(const struct region * r,
+        const struct resource_type * rtype);
     int region_getresource(const struct region *r,
         const struct resource_type *rtype);
     void region_setresource(struct region *r, const struct resource_type *rtype,

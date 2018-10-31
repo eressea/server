@@ -334,6 +334,8 @@ int main(int argc, char **argv)
     game_done();
     lua_done(L);
     log_close();
+    stats_write(stdout, "");
+    stats_close();
     if (d) {
         iniparser_freedict(d);
     }

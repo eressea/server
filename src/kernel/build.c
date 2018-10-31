@@ -500,49 +500,45 @@ static int count_materials(unit *u, const construction *type, int n, int complet
     return n;
 }
 
+int build_skill(unit *u, int basesk, int skill_mod) {
+    int effsk, skills;
+    int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+
+    effsk = basesk + skill_mod;
+    assert(effsk >= 0);
+
+    skills = effsk * u->number;
+
+    /* technically, nimblefinge and domore should be in a global set of
+     * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+     * them in here. */
+
+    if (dm != 0) {
+        /* Auswirkung Schaffenstrunk */
+        if (dm > u->number) dm = u->number;
+        change_effect(u, oldpotiontype[P_DOMORE], -dm);
+        skills += dm * effsk;
+    }
+    return skills;
+}
+
 /** Use up resources for building an object.
 * Build up to 'size' points of 'type', where 'completed'
 * of the first object have already been finished. return the
 * actual size that could be built.
 */
-int build(unit * u, const construction * ctype, int completed, int want, int skill_mod)
-{
-    const construction *con = ctype;
-    int skills = INT_MAX;         /* number of skill points remainig */
-    int basesk = 0;
+static int build_limited(unit * u, const construction * con, int completed, int want, int basesk, int *skill_total) {
+    int skills = *skill_total;
     int made = 0;
 
-    if (want <= 0)
+    if (want <= 0) {
         return 0;
+    }
     if (con == NULL) {
         return ENOMATERIALS;
     }
     if (completed == con->maxsize) {
         return ECOMPLETE;
-    }
-    if (con->skill != NOSKILL) {
-        int effsk;
-        int dm = get_effect(u, oldpotiontype[P_DOMORE]);
-
-        basesk = effskill(u, con->skill, 0);
-        if (basesk == 0)
-            return ENEEDSKILL;
-
-        effsk = basesk + skill_mod;
-        assert(effsk >= 0);
-
-        skills = effsk * u->number;
-
-        /* technically, nimblefinge and domore should be in a global set of
-         * "game"-attributes, (as at_skillmod) but for a while, we're leaving
-         * them in here. */
-
-        if (dm != 0) {
-            /* Auswirkung Schaffenstrunk */
-            if (dm > u->number) dm = u->number;
-            change_effect(u, oldpotiontype[P_DOMORE], -dm);
-            skills += dm * effsk;
-        }
     }
     for (; want > 0 && skills > 0;) {
         int err, n;
@@ -610,9 +606,27 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         want -= n;
         completed = completed + n;
     }
-    /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, ctype->skill, (made < u->number) ? made : u->number);
+    *skill_total = skills;
+    return made;
+}
 
+int build(unit * u, const construction * con, int completed, int want, int skill_mod)
+{
+    int skills = INT_MAX;         /* number of skill points remainig */
+    int made, basesk = 0;
+
+    assert(con->skill != NOSKILL);
+    basesk = effskill(u, con->skill, 0);
+    if (basesk == 0) {
+        return ENEEDSKILL;
+    }
+
+    skills = build_skill(u, basesk, skill_mod);
+    made = build_limited(u, con, completed, want, basesk, &skills);
+    /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
+    if (made > 0) {
+        produceexp(u, con->skill, (made < u->number) ? made : u->number);
+    }
     return made;
 }
 
@@ -681,7 +695,7 @@ static int build_failure(unit *u, order *ord, const building_type *btype, int wa
     return err;
 }
 
-static int build_stages(unit *u, const building_type *btype, int built, int n) {
+static int build_stages(unit *u, const building_type *btype, int built, int n, int basesk, int *skill_total) {
     
     const building_stage *stage;
     int made = 0;
@@ -701,7 +715,7 @@ static int build_stages(unit *u, const building_type *btype, int built, int n) {
                     want = todo;
                 }
             }
-            err = build(u, con, built, want, 0);
+            err = build_limited(u, con, built, want, basesk, skill_total);
             if (err < 0) {
                 if (made == 0) {
                     /* could not make any part at all */
@@ -739,10 +753,14 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     const char *btname;
     order *new_order = NULL;
     const struct locale *lang = u->faction->locale;
+    int skills, basesk;         /* number of skill points remainig */
 
     assert(u->number);
     assert(btype->stages && btype->stages->construction);
-    if (effskill(u, SK_BUILDING, 0) == 0) {
+
+    basesk = effskill(u, SK_BUILDING, 0);
+    skills = build_skill(u, basesk, 0);
+    if (skills == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
         return 0;
     }
@@ -832,7 +850,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
 
-    built = build_stages(u, btype, built, n);
+    built = build_stages(u, btype, built, n, basesk, &skills);
 
     if (built < 0) {
         return build_failure(u, ord, btype, want, built);
@@ -895,7 +913,9 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     }
     fset(b, BLD_EXPANDED);
 
-    update_lighthouse(b);
+    if (is_lighthouse(btype)) {
+        update_lighthouse(b);
+    }
 
     return built;
 }

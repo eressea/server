@@ -12,6 +12,30 @@ function setup()
     eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
+function test_study_auto()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("LERN AUT Waffenbau")
+    assert_equal("LERNE AUTO Waffenbau", u:get_order(0))
+    process_orders()
+    assert_equal(1, u:get_skill("weaponsmithing"))
+end
+
+function test_study_auto_expensive()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("LERNE AUTO Magie")
+    assert_equal("LERNE Magie", u:get_order(0))
+    u:clear_orders()
+    u:add_order("LERN AUT Taktik")
+    assert_equal("LERNE Taktik", u:get_order(0))
+    u:clear_orders()
+    u:add_order("LERN AUT Waffenbau")
+    assert_equal("LERNE AUTO Waffenbau", u:get_order(0))
+end
+
 function test_calendar()
     assert_equal("winter", get_season(1011))
     assert_equal("spring", get_season(1012))
@@ -516,4 +540,17 @@ function test_buy_sell()
     process_orders()
     assert_equal(4, u:get_item(item))
     assert_not_equal(0, u:get_item('money'))
+end
+
+function test_seaserpent_attack()
+    local r = region.create(0, 0, 'ocean')
+    local sh = ship.create(r, 'boat')
+    local us = unit.create(get_monsters(), r, 1, 'seaserpent')
+    local u = unit.create(faction.create('human', 'enno@example.com'), r, 20, 'human')
+    u.ship = sh
+    us:clear_orders()
+    us:add_order('ATTACKIERE ' .. itoa36(u.id))
+    us:set_skill('unarmed', 10)
+    process_orders()
+    write_reports()
 end

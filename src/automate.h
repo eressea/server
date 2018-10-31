@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2018, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -16,28 +16,28 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef H_KRNL_SPY
-#define H_KRNL_SPY
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
-    struct unit;
-    struct region;
-    struct strlist;
-    struct order;
-    struct faction;
-    struct ship;
+#ifndef H_GC_AUTOMATE
+#define H_GC_AUTOMATE
 
-    int setstealth_cmd(struct unit *u, struct order *ord);
-    int spy_cmd(struct unit *u, struct order *ord);
-    int sabotage_cmd(struct unit *u, struct order *ord);
-    void spy_message(int spy, const struct unit *u,
-        const struct unit *target);
-    void set_factionstealth(struct unit * u, struct faction * f);
-    void sink_ship(struct ship * sh);
+#include "skill.h"
 
-#ifdef __cplusplus
-}
-#endif
+struct region;
+struct unit;
+
+typedef struct scholar {
+    struct unit *u;
+    skill_t sk;
+    int level;
+    int learn;
+} scholar;
+
+#define STUDENTS_PER_TEACHER 10
+
+void do_autostudy(struct region *r);
+
+int autostudy_init(scholar scholars[], int max_scholars, struct region *r);
+void autostudy_run(scholar scholars[], int nscholars);
+
 #endif

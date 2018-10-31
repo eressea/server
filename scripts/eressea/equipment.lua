@@ -1,13 +1,19 @@
--- forward declaration required:
-
+-- forward declarations required:
 local self = {}
+
+local function equip_first(u)
+    name = 'seed_' .. u.race
+    equip_unit(u, name, 255)
+end
+
 local mysets = {
     ['first_unit'] = {
         ['items'] = {
             ['money'] = 2500,
             ['log'] = 10,
             ['stone'] = 4
-        }
+        },
+        ['callback'] = equip_first
     },
     ['seed_unit'] = {
         ['items'] = {
@@ -75,7 +81,7 @@ local mysets = {
     },
     ['seed_insect'] = {
         ['items'] = {
-            ['nestwarmth'] =9
+            ['nestwarmth'] = 9
         }
     },
     ['seed_halfling'] = {

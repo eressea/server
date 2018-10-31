@@ -455,48 +455,6 @@ int fctr_handle(struct trigger *tp, void *data)
     return 0;
 }
 
-static void fctr_init(trigger * t)
-{
-    t->data.v = calloc(sizeof(fctr_data), 1);
-}
-
-static void fctr_done(trigger * t)
-{
-    fctr_data *fd = (fctr_data *)t->data.v;
-    lua_State *L = (lua_State *)global.vm_state;
-    luaL_unref(L, LUA_REGISTRYINDEX, fd->fhandle);
-    free(fd);
-}
-
-static struct trigger_type tt_lua = {
-    "lua_event",
-    fctr_init,
-    fctr_done,
-    fctr_handle
-};
-
-static trigger *trigger_lua(struct unit *u, int handle)
-{
-    trigger *t = t_new(&tt_lua);
-    fctr_data *td = (fctr_data *)t->data.v;
-    td->target = u;
-    td->fhandle = handle;
-    return t;
-}
-
-static int tolua_unit_addhandler(lua_State * L)
-{
-    unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    const char *ename = tolua_tostring(L, 2, 0);
-    int handle;
-
-    lua_pushvalue(L, 3);
-    handle = luaL_ref(L, LUA_REGISTRYINDEX);
-    add_trigger(&self->attribs, ename, trigger_lua(self, handle));
-
-    return 0;
-}
-
 static int tolua_unit_addnotice(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
@@ -909,8 +867,8 @@ static int tolua_unit_create(lua_State * L)
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     region *r = (region *)tolua_tousertype(L, 2, 0);
     unit *u;
-    const char *rcname = tolua_tostring(L, 4, NULL);
     int num = (int)tolua_tonumber(L, 3, 1);
+    const char *rcname = tolua_tostring(L, 4, NULL);
     const race *rc;
 
     assert(f && r);
@@ -1045,9 +1003,6 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "set_skill", tolua_unit_setskill);
 
             tolua_function(L, TOLUA_CAST "add_notice", tolua_unit_addnotice);
-
-            /*  npc logic: */
-            tolua_function(L, TOLUA_CAST "add_handler", tolua_unit_addhandler);
 
             tolua_variable(L, TOLUA_CAST "race_name", tolua_unit_get_racename,
                 tolua_unit_set_racename);

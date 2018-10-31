@@ -7,7 +7,6 @@
 #include "bind_ship.h"
 #include "bind_building.h"
 
-#include "chaos.h"
 #include "teleport.h"
 
 #include <kernel/calendar.h>
@@ -356,7 +355,7 @@ static int tolua_region_get_resourcelevel(lua_State * L)
 #define LUA_ASSERT(c, s) if (!(c)) { log_error("%s(%d): %s\n", __FILE__, __LINE__, (s)); return 0; }
 
 static int special_resource(const char *type) {
-    const char * special[] = { "seed", "sapling", "tree", "grave", "chaos", 0 };
+    const char * special[] = { "seed", "sapling", "tree", "grave", NULL };
     int i;
 
     for (i = 0; special[i]; ++i) {
@@ -389,9 +388,6 @@ static int tolua_region_get_resource(lua_State * L)
     case 3:
         result = deathcount(r);
         break;
-    case 4:
-        result = get_chaoscount(r);
-        break;
     default:
         rtype = rt_find(type);
         if (rtype) {
@@ -422,9 +418,6 @@ static int tolua_region_set_resource(lua_State * L)
         break;
     case 3:
         deathcounts(r, value - deathcount(r));
-        break;
-    case 4:
-        add_chaoscount(r, value - get_chaoscount(r));
         break;
     default:
         rtype = rt_find(type);

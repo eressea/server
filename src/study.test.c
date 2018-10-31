@@ -58,6 +58,11 @@ typedef struct {
 } study_fixture;
 
 static void setup_study(void) {
+    test_setup();
+    mt_create_error(178);
+    mt_create_error(65);
+    mt_create_va(mt_new("teach_asgood", NULL),
+        "unit:unit", "region:region", "command:order", "student:unit", MT_NEW_END);
     mt_create_va(mt_new("studycost", NULL),
         "unit:unit", "region:region", "cost:int", "skill:int", MT_NEW_END);
     mt_create_va(mt_new("teach_teacher", NULL),
@@ -81,7 +86,7 @@ static void setup_teacher(study_fixture *fix, skill_t sk) {
     struct locale *lang;
 
     assert(fix);
-    test_setup();
+    setup_study();
     config_set("study.random_progress", "0");
     r = test_create_region(0, 0, NULL);
     f = test_create_faction(NULL);
@@ -89,15 +94,15 @@ static void setup_teacher(study_fixture *fix, skill_t sk) {
     setup_locale(lang);
     fix->u = test_create_unit(f, r);
     assert(fix->u);
-    fix->u->thisorder = create_order(K_STUDY, f->locale, "%s", skillnames[sk]);
+    fix->u->thisorder = create_order(K_STUDY, f->locale, skillnames[sk]);
 
     fix->teachers[0] = test_create_unit(f, r);
     assert(fix->teachers[0]);
-    fix->teachers[0]->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(fix->u->no));
+    fix->teachers[0]->thisorder = create_order(K_TEACH, f->locale, itoa36(fix->u->no));
 
     fix->teachers[1] = test_create_unit(f, r);
     assert(fix->teachers[1]);
-    fix->teachers[1]->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(fix->u->no));
+    fix->teachers[1]->thisorder = create_order(K_TEACH, f->locale, itoa36(fix->u->no));
     test_clear_messages(f);
 }
 
@@ -110,7 +115,7 @@ static void test_study_no_teacher(CuTest *tc) {
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
+    CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
     test_teardown();
 }
 
@@ -121,7 +126,7 @@ static void test_study_with_teacher(CuTest *tc) {
     setup_teacher(&fix, SK_CROSSBOW);
     set_level(fix.teachers[0], SK_CROSSBOW, TEACHDIFFERENCE);
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
-    CuAssertPtrEquals(tc, 0, test_get_last_message(fix.u->faction->msgs));
+    CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
@@ -148,7 +153,7 @@ static void test_study_bug_2194(CuTest *tc) {
     struct locale * loc;
     building * b;
 
-    test_setup();
+    setup_study();
     random_source_inject_constant(0.0);
     init_resources();
     loc = test_create_locale();
@@ -205,7 +210,7 @@ static void test_produceexp(CuTest *tc) {
     unit *u;
 
     g_tc = tc;
-    test_setup();
+    setup_study();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 2);
     config_set("study.produceexp", "20");
@@ -220,7 +225,7 @@ static void test_academy_building(CuTest *tc) {
     building * b;
     message * msg;
 
-    test_setup();
+    setup_study();
     mt_create_va(mt_new("teach_asgood", NULL),
         "unit:unit", "region:region", "command:order", "student:unit", MT_NEW_END);
 
@@ -271,7 +276,6 @@ static void test_academy_bonus(CuTest *tc) {
     struct locale * loc;
     building * b;
 
-    test_setup();
     setup_study();
 
     random_source_inject_constant(0.0);
@@ -288,7 +292,7 @@ static void test_academy_bonus(CuTest *tc) {
     u1 = test_create_unit(u->faction, u->region);
     u3 = test_create_unit(u->faction, u->region);
     u0->thisorder = create_order(K_TEACH, loc, "%s %s", itoa36(u3->no), itoa36(u1->no));
-    u->thisorder = create_order(K_TEACH, loc, "%s", itoa36(u1->no));
+    u->thisorder = create_order(K_TEACH, loc, itoa36(u1->no));
     u1->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
     u3->thisorder = create_order(K_STUDY, loc, skillnames[SK_CROSSBOW]);
     
@@ -328,7 +332,8 @@ static void test_academy_bonus(CuTest *tc) {
 void test_learn_skill_single(CuTest *tc) {
     unit *u;
     skill *sv;
-    test_setup();
+
+    setup_study();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     learn_skill(u, SK_ALCHEMY, STUDYDAYS);
@@ -347,7 +352,8 @@ void test_learn_skill_single(CuTest *tc) {
 void test_learn_skill_multi(CuTest *tc) {
     unit *u;
     skill *sv;
-    test_setup();
+
+    setup_study();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 10);
@@ -367,7 +373,8 @@ void test_learn_skill_multi(CuTest *tc) {
 static void test_demon_skillchanges(CuTest *tc) {
     unit * u;
     const race * rc;
-    test_setup();
+
+    setup_study();
     rc = test_create_race("demon");
     CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_DAEMON));
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
@@ -380,7 +387,8 @@ static void test_demon_skillchanges(CuTest *tc) {
 
 static void test_study_cmd(CuTest *tc) {
     unit *u;
-    test_setup();
+
+    setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
@@ -399,13 +407,12 @@ static void test_study_magic(CuTest *tc) {
     const struct locale *lang;
     const struct item_type *itype;
 
-    test_setup();
     setup_study();
     init_resources();
     f = test_create_faction(NULL);
     lang = f->locale;
     u = test_create_unit(f, test_create_region(0, 0, NULL));
-    u->thisorder = create_order(K_STUDY, lang, "%s", skillnames[SK_MAGIC]);
+    u->thisorder = create_order(K_STUDY, lang, skillnames[SK_MAGIC]);
     itype = test_create_silver();
 
     CuAssertIntEquals(tc, -1, study_cmd(u, u->thisorder));
@@ -423,7 +430,7 @@ static void test_study_magic(CuTest *tc) {
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertPtrNotNull(tc, get_mage_depr(u));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error65"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error65"));
     CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
 
     test_teardown();
@@ -432,7 +439,6 @@ static void test_study_magic(CuTest *tc) {
 static void test_study_cost_magic(CuTest *tc) {
     unit * u;
 
-    test_setup();
     setup_study();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
 
@@ -456,7 +462,6 @@ static void test_study_cost(CuTest *tc) {
     unit *u;
     const struct item_type *itype;
 
-    test_setup();
     setup_study();
 
     itype = test_create_silver();
@@ -484,19 +489,18 @@ static void test_teach_magic(CuTest *tc) {
     faction *f;
     const struct item_type *itype;
 
-    test_setup();
     setup_study();
     init_resources();
     itype = get_resourcetype(R_SILVER)->itype;
     f = test_create_faction(NULL);
     f->magiegebiet = M_GWYRRD;
     u = test_create_unit(f, test_create_region(0, 0, NULL));
-    u->thisorder = create_order(K_STUDY, f->locale, "%s", skillnames[SK_MAGIC]);
+    u->thisorder = create_order(K_STUDY, f->locale, skillnames[SK_MAGIC]);
     i_change(&u->items, itype, study_cost(u, SK_MAGIC));
     ut = test_create_unit(f, u->region);
     set_level(ut, SK_MAGIC, TEACHDIFFERENCE);
     create_mage(ut, M_GWYRRD);
-    ut->thisorder = create_order(K_TEACH, f->locale, "%s", itoa36(u->no));
+    ut->thisorder = create_order(K_TEACH, f->locale, itoa36(u->no));
     learn_inject();
     teach_cmd(ut, ut->thisorder);
     study_cmd(u, u->thisorder);
@@ -510,7 +514,8 @@ static void test_teach_magic(CuTest *tc) {
 
 static void test_teach_cmd(CuTest *tc) {
     unit *u, *ut;
-    test_setup();
+    
+    setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 10);
@@ -530,7 +535,8 @@ static void test_teach_cmd(CuTest *tc) {
 
 static void test_teach_two(CuTest *tc) {
     unit *u1, *u2, *ut;
-    test_setup();
+    
+    setup_study();
     init_resources();
     u1 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u1, 5);
@@ -560,7 +566,7 @@ static void test_teach_two_skills(CuTest *tc) {
     faction *f;
     region *r;
 
-    test_setup();
+    setup_study();
     init_resources();
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);
@@ -590,7 +596,8 @@ static void test_teach_two_skills(CuTest *tc) {
 
 static void test_teach_one_to_many(CuTest *tc) {
     unit *u, *ut;
-    test_setup();
+
+    setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 20);
@@ -611,7 +618,7 @@ static void test_teach_one_to_many(CuTest *tc) {
 static void test_teach_many_to_one(CuTest *tc) {
     unit *u, *u1, *u2;
 
-    test_setup();
+    setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 20);
@@ -639,11 +646,7 @@ static void test_teach_message(CuTest *tc) {
     ally *al;
     teaching_info *teach;
 
-    test_setup();
-    mt_create_va(mt_new("teach_teacher", NULL),
-        "teacher:unit", "student:unit", "skill:int", "level:int", MT_NEW_END);
-    mt_create_va(mt_new("teach_student", NULL),
-        "teacher:unit", "student:unit", "skill:int", MT_NEW_END);
+    setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     scale_number(u, 20);
@@ -683,7 +686,7 @@ static void test_teach_many_to_many(CuTest *tc) {
     region *r;
     faction *f;
 
-    test_setup();
+    setup_study();
     init_resources();
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);

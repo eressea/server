@@ -22,16 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    struct region;
-
-    extern struct attrib_type at_chaoscount;
-
-    void chaos_register(void);
     void chaos_update(void);
-
-    void set_chaoscount(struct region *r, int deaths);
-    int get_chaoscount(const struct region * r);
-    void add_chaoscount(struct region * r, int deaths);
 
 #ifdef __cplusplus
 }

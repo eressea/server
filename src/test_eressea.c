@@ -93,7 +93,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(xerewards);
     /* kernel */
     ADD_SUITE(academy);
-    ADD_SUITE(alchemy);
     ADD_SUITE(alliance);
     ADD_SUITE(ally);
     ADD_SUITE(building);
@@ -121,6 +120,8 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(spells);
     ADD_SUITE(unit);
     /* gamecode */
+    ADD_SUITE(alchemy);
+    ADD_SUITE(automate);
     ADD_SUITE(battle);
     ADD_SUITE(calendar);
     ADD_SUITE(creport);
@@ -172,6 +173,8 @@ int RunAllTests(int argc, char *argv[])
         fail_count = summary->failCount;
         CuSuiteDelete(summary);
         game_done();
+        log_close();
+        stats_close();
         return fail_count;
     }
     return 0;

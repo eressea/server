@@ -4,6 +4,7 @@ eressea.log.debug('rules for game E2')
 math.randomseed(rng.random())
 
 local equipment = require('eressea.equipment')
+
 local sets = {
     ['seed_faction'] = {
         ['items'] = {

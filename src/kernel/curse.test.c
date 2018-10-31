@@ -51,7 +51,6 @@ typedef struct {
 
 static void setup_curse(curse_fixture *fix, const char *name) {
     test_setup();
-    test_inject_messagetypes();
     fix->r = test_create_region(0, 0, NULL);
     fix->u = test_create_unit(test_create_faction(NULL), fix->r);
     fix->c = create_curse(fix->u, &fix->r->attribs, ct_find(name), 1.0, 1, 1.0, 0);

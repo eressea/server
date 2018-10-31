@@ -55,10 +55,6 @@ static void setup_spy(spy_fixture *fix) {
         "ship:ship", MT_NEW_END);
     mt_create_va(mt_new("sink_msg", NULL), 
         "ship:ship", "region:region", MT_NEW_END);
-    mt_create_va(mt_new("sink_lost_msg", NULL), 
-        "unit:unit", "region:region", "dead:int", MT_NEW_END);
-    mt_create_va(mt_new("sink_saved_msg", NULL),
-        "unit:unit", "region:region", MT_NEW_END);
 
     if (fix) {
         fix->r = test_create_region(0, 0, NULL);
@@ -112,6 +108,7 @@ static void test_sabotage_self(CuTest *tc) {
     unit *u;
     region *r;
     order *ord;
+    message *msg;
 
     test_setup();
     setup_spy(NULL);
@@ -119,17 +116,49 @@ static void test_sabotage_self(CuTest *tc) {
     assert(r);
     u = test_create_unit(test_create_faction(NULL), r);
     assert(u && u->faction && u->region == r);
-    u->ship = test_create_ship(r, test_create_shiptype("boat"));
+    u->ship = test_create_ship(r, NULL);
     assert(u->ship);
     ord = create_order(K_SABOTAGE, u->faction->locale, "SCHIFF");
     assert(ord);
     CuAssertIntEquals(tc, 0, sabotage_cmd(u, ord));
-    CuAssertPtrEquals(tc, 0, r->ships);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "sink_msg"));
+    CuAssertPtrEquals(tc, NULL, r->ships);
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "sink_msg"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype_ex(u->faction->msgs, "sink_msg", msg));
     free_order(ord);
     test_teardown();
 }
 
+static void test_sink_ship(CuTest *tc) {
+    ship *sh;
+    unit *u1, *u2, *u3;
+    region *r;
+    message *msg;
+
+    test_setup();
+    setup_spy(NULL);
+    r = test_create_ocean(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(u1->faction, r);
+    u3 = test_create_unit(test_create_faction(NULL), r);
+    u1->ship = u2->ship = u3->ship = sh = test_create_ship(r, NULL);
+
+    sink_ship(sh);
+    CuAssertPtrEquals(tc, r, sh->region);
+    CuAssertPtrEquals(tc, sh, r->ships);
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u1->faction->msgs, "sink_msg"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype_ex(u1->faction->msgs, "sink_msg", msg));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u3->faction->msgs, "sink_msg"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype_ex(u3->faction->msgs, "sink_msg", msg));
+
+    remove_ship(&r->ships, sh);
+    CuAssertPtrEquals(tc, NULL, sh->region);
+    CuAssertPtrEquals(tc, NULL, r->ships);
+    CuAssertPtrEquals(tc, NULL, u1->ship);
+    CuAssertPtrEquals(tc, NULL, u2->ship);
+    CuAssertPtrEquals(tc, NULL, u3->ship);
+
+    test_teardown();
+}
 
 static void test_sabotage_other_fail(CuTest *tc) {
     unit *u, *u2;
@@ -145,7 +174,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
     assert(u && u2);
-    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    u2->ship = test_create_ship(r, NULL);
     assert(u2->ship);
     u->ship = u2->ship;
     ship_update_owner(u->ship);
@@ -167,7 +196,7 @@ static void test_setstealth_cmd(CuTest *tc) {
     const struct locale *lang;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     lang = u->faction->locale;
     u->flags = UFL_ANON_FACTION | UFL_SIEGE;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
@@ -191,7 +220,7 @@ static void test_setstealth_demon(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("demon");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
     rc = test_create_race("dwarf");
     init_races(lang);
     u->thisorder = create_order(K_SETSTEALTH, lang, racename(lang, u, rc));
@@ -208,7 +237,7 @@ static void test_setstealth_demon_bad(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("demon");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
 
     rc = test_create_race("smurf");
     rc->flags &= ~RCF_PLAYABLE;
@@ -232,7 +261,7 @@ static void test_sabotage_other_success(CuTest *tc) {
     u = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
     assert(u && u2);
-    u2->ship = test_create_ship(r, test_create_shiptype("boat"));
+    u2->ship = test_create_ship(r, NULL);
     assert(u2->ship);
     u->ship = u2->ship;
     ship_update_owner(u->ship);
@@ -251,6 +280,7 @@ CuSuite *get_spy_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_simple_spy_message);
     SUITE_ADD_TEST(suite, test_all_spy_message);
+    SUITE_ADD_TEST(suite, test_sink_ship);
     SUITE_ADD_TEST(suite, test_sabotage_self);
     SUITE_ADD_TEST(suite, test_setstealth_cmd);
     SUITE_ADD_TEST(suite, test_setstealth_demon);

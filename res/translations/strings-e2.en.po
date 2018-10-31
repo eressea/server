@@ -1,0 +1,49 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"X-Generator: Poedit 2.0.7\n"
+
+msgctxt "spellinfo"
+msgid "earn_silver#gwyrrd"
+msgstr "The abilities of the mages of Gwyrrd concerning the breeding and healing of cattle are highly appreciated among the peasants. Especially at the markets, their services are demanded frequently. Some of them also use their talents to sell an animal at a higher price. A magician can earn 50 silver pieces per level in this way."
+
+msgctxt "spellinfo"
+msgid "earn_silver#draig"
+msgstr "In the dark alleys you can find those who sell curses and hexes on demand - but you can buy the apropriate counterspells from the followers of Draig as well. May it be a love spell for the son of a neighbour or a wart in the face of a rival. For offering these services, the sorcerer charges 50 silver pieces per level."
+
+msgctxt "spellinfo"
+msgid "earn_silver#cerddor"
+msgstr "The mages of Cerddor truly are the bards of the wizards; they love to use their sorcery to entertain the crowds and to be the center of attention. Even the apprentices study those little magic tricks, which attract and fascinate the people and thus ensnare them into leaving a few coins or more for the artist. By the end of the week, the bard will have earned 50 silver per level."
+
+msgctxt "spellinfo"
+msgid "earn_silver#illaun"
+msgstr "No one can read dreams as well as the mages of Illaun. Furthermore, they are also familiar with all other common means of foretelling the future like crystal balls, tarot cards or palms. A mentalist can earn 50 silver pieces per level and week for offering these services to peasants."
+
+msgctxt "spellinfo"
+msgid "earn_silver#tybied"
+msgstr "If the local alchemist could not help you, you should visit a scholar of Tybied. His potions and tinctures may help when nothing else does. If the cryptic formula under the wooden shoes of the unfaithful husband really helped? - well, the peasant, who isn't capable of reading, will never know. At least it helped the magician... to fill his purse. In one week he can earn 50 silver per level that way."
+
+msgctxt "spellinfo"
+msgid "blessedharvest"
+msgstr "This ritual increases the output of the local farms. Peasants in the region produce an extra silverpiece. The stronger the druid's spell is, the longer the effect will last."
+
+msgctxt "spellinfo"
+msgid "raindance"
+msgstr "This ancient rite calls upon the forces of life and fertility. For the next few weeks, the peasant's harvest will be extraordinary good."
+
+msgctxt "spellinfo"
+msgid "concealing_aura"
+msgstr "This spell will hide the whole equipment of a target unit from the looks of others."
+
+msgctxt "describe"
+msgid "lifepotion"
+msgstr "The \"Water of Life\" allows living trees to be created from logs. A Knotroot and Elvendear are heated until one can just still keep one's finger in. This is then poured into a jar and allowed to cool slowly. The extract is sufficient for 10 pieces of wood."
+

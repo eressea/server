@@ -42,7 +42,8 @@ function test_build_watch()
     process_orders()
     assert_not_nil(u.building)
     if 5 ~= u.building.size then
-        for k,v in f.messages do
+    -- debug logging to find intermittent errors
+        for k,v in ipairs(f.messages) do
             print(v)
         end
     end

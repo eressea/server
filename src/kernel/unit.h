@@ -163,7 +163,7 @@ extern "C" {
     void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
 
     int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
-    int effskill_study(const struct unit *u, skill_t sk, const struct region *r);
+    int effskill_study(const struct unit *u, skill_t sk);
 
     int get_modifier(const struct unit *u, skill_t sk, int level,
         const struct region *r, bool noitem);
@@ -246,7 +246,6 @@ extern "C" {
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
-    bool unit_can_study(const struct unit *u);
 
     /* getunit results: */
 #define GET_UNIT 0

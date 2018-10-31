@@ -1,5 +1,5 @@
 #!/bin/bash
-
+(
 [ "$PREVIEW" != "yes" ] && exit
 [ -z ${ERESSEA} ] && ERESSEA=$HOME/eressea
 
@@ -13,3 +13,5 @@ for game in 2 3 4 ; do
 	${SRC}/s/preview -g ${game} run && \
 	${SRC}/s/preview -g ${game} send
 done
+) | tee -a $HOME/log/preview.cron.log
+

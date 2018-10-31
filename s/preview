@@ -93,7 +93,7 @@ email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
 echo "sending reports to $1 / $email"
 info=/dev/null
 [ -e ../email.txt ] && info=../email.txt
-cat $info | mutt -F $ERESSEA/etc/muttrc -s "Testauswertung Spiel $game Partei $1" -a $zip -- $email
+cat $info | mutt -s "Testauswertung Spiel $game Partei $1" -a $zip -- $email
 }
 
 game=0

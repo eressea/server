@@ -30,7 +30,7 @@
     </type>
   </message>
 
-  <message name="target_region_invalid">
+  <message name="target_region_invalid" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -38,7 +38,7 @@
     </type>
   </message>
   
-  <message name="missing_direction">
+  <message name="missing_direction" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -46,7 +46,7 @@
     </type>
   </message>
   
-  <message name="target_region_not_empty">
+  <message name="target_region_not_empty" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -865,21 +865,6 @@
   <message name="destroy_ship_4" section="events">
     <type>
       <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
-  <message name="sink_lost_msg" section="events">
-    <type>
-      <arg name="dead" type="int"/>
-      <arg name="region" type="region"/>
-      <arg name="unit" type="unit"/>
-    </type>
-  </message>
-
-  <message name="sink_saved_msg" section="events">
-    <type>
-      <arg name="region" type="region"/>
-      <arg name="unit" type="unit"/>
     </type>
   </message>
 

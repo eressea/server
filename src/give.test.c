@@ -65,11 +65,14 @@ static void setup_give(struct give *env) {
     mt_create_va(mt_new("give", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
     mt_create_va(mt_new("give_peasants", NULL), "unit:unit", "resource:resource", "amount:int", MT_NEW_END);
     /* error messages: */
+    mt_create_error(129);
+    mt_create_error(96);
+    mt_create_error(10);
+    mt_create_feedback("feedback_give_forbidden");
+    mt_create_feedback("peasants_give_invalid");
     mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("feedback_no_contact", NULL), "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END);
-    mt_create_va(mt_new("feedback_give_forbidden", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
-    mt_create_va(mt_new("peasants_give_invalid", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("giverestriction", NULL), "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END);
     mt_create_va(mt_new("error_unit_size", NULL), "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END);
     mt_create_va(mt_new("nogive_reserved", NULL), "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END);
@@ -91,7 +94,7 @@ static void test_give_unit(CuTest * tc) {
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
-    CuAssertPtrEquals(tc, 0, env.f1->units);
+    CuAssertPtrEquals(tc, NULL, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
     test_teardown();
@@ -159,11 +162,12 @@ static void test_give_men_magicians(CuTest * tc) {
     message * msg;
 
     test_setup_ex(tc);
+    mt_create_error(158);
     env.f2 = env.f1 = test_create_faction(NULL);
     setup_give(&env);
     set_level(env.src, SK_MAGIC, 1);
     CuAssertPtrNotNull(tc, msg = give_men(1, env.src, env.dst, NULL));
-    CuAssertStrEquals(tc, "error158", (const char *)msg->parameters[3].v);
+    CuAssertStrEquals(tc, "error158", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.dst->number);
     CuAssertIntEquals(tc, 1, env.src->number);
     msg_release(msg);
@@ -303,7 +307,7 @@ static void test_give_men_requires_contact(CuTest * tc) {
     ord = create_order(K_GIVE, env.f1->locale, "%s ALLES PERSONEN", itoa36(env.dst->no));
     test_clear_messages(env.f1);
     give_cmd(env.src, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(env.f1->msgs, "give_person"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_no_contact"));
 
     msg_release(msg);
@@ -407,7 +411,7 @@ static void test_give_okay(CuTest * tc) {
     setup_give(&env);
 
     config_set("rules.give.flags", "0");
-    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, check_give(env.src, env.dst, NULL));
     test_teardown();
 }
 
@@ -450,7 +454,7 @@ static void test_give_new_unit(CuTest * tc) {
     setup_give(&env);
     env.dst->number = 0;
     fset(env.dst, UFL_ISNEW);
-    CuAssertPtrEquals(tc, 0, check_give(env.src, env.dst, NULL));
+    CuAssertPtrEquals(tc, NULL, check_give(env.src, env.dst, NULL));
     test_teardown();
 }
 

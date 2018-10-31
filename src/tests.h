@@ -40,6 +40,7 @@ extern "C" {
     struct log_t * test_log_start(int flags, struct strlist **slist);
     void test_log_stop(struct log_t *log, struct strlist *slist);
 
+    void test_create_calendar(void);
     struct locale * test_create_locale(void);
     struct terrain_type * test_create_terrain(const char * name, int flags);
     struct race *test_create_race(const char *name);
@@ -74,7 +75,6 @@ extern "C" {
     void assert_string_parameter(struct CuTest * tc, struct message *msg, int index, const char *arg);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
-    void test_inject_messagetypes(void);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
 

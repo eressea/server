@@ -24,7 +24,6 @@
 #include "monsters.h"
 
 #include "economy.h"
-#include "chaos.h"
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
@@ -556,7 +555,7 @@ static order *monster_learn(unit * u)
     const struct locale *lang = u->faction->locale;
 
     /* can these monsters even study? */
-    if (!unit_can_study(u)) {
+    if (!check_student(u, NULL, SK_PERCEPTION)) {
         return NULL;
     }
 
@@ -607,6 +606,7 @@ static void recruit_dracoids(unit * dragon, int size)
     region *r = dragon->region;
     const struct item *weapon = NULL;
     unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
+    stats_count("monsters.create.dracoid", 1);
 
     fset(un, UFL_ISNEW | UFL_MOVED);
 
@@ -756,6 +756,11 @@ void plan_monsters(faction * f)
             if (u->faction!=f)
                 continue;
 
+            /* Parteitarnung von Monstern ist doof: */
+            if (fval(u, UFL_ANON_FACTION)) {
+                u->flags &= ~UFL_ANON_FACTION;
+            }
+
             /* Befehle m�ssen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
             if (skill_enabled(SK_PERCEPTION)) {
@@ -823,7 +828,7 @@ void plan_monsters(faction * f)
                     }
                 }
             }
-            if (long_order == NULL && unit_can_study(u)) {
+            if (long_order == NULL && check_student(u, NULL, SK_WEAPONLESS)) {
                 /* Einheiten, die Waffenlosen Kampf lernen k�nnten, lernen es um
                 * zu bewachen: */
                 if (rc->bonus[SK_WEAPONLESS] != -99) {
@@ -843,18 +848,14 @@ void plan_monsters(faction * f)
     pathfinder_cleanup();
 }
 
-static double chaosfactor(region * r)
-{
-    return fval(r, RF_CHAOTIC) ? ((double)(1 + get_chaoscount(r)) / 1000.0) : 0.0;
-}
-
 static int nrand(int handle_start, int sub)
 {
     int res = 0;
 
     do {
-        if (rng_int() % 100 < handle_start)
+        if (rng_int() % 100 < handle_start) {
             res++;
+        }
         handle_start -= sub;
     } while (handle_start > 0);
 
@@ -863,6 +864,7 @@ static int nrand(int handle_start, int sub)
 
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
+    stats_count("monsters.create.seaserpent", 1);
     fset(u, UFL_ISNEW | UFL_MOVED);
     equip_unit(u, "seed_seaserpent");
     return u;
@@ -876,7 +878,7 @@ void spawn_dragons(void)
     region *r;
     faction *monsters = get_or_create_monsters();
     int minage = config_get_int("monsters.spawn.min_age", 100);
-    int spawn_chance = 100 * config_get_int("monsters.spawn.chance", 100);
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 100;
 
     if (spawn_chance <= 0) {
         /* monster spawning disabled */
@@ -895,19 +897,21 @@ void spawn_dragons(void)
         else if ((r->terrain == newterrain(T_GLACIER)
             || r->terrain == newterrain(T_SWAMP)
             || r->terrain == newterrain(T_DESERT))
-            && rng_int() % spawn_chance < (5 + 100 * chaosfactor(r))) {
+            && rng_int() % spawn_chance < 6)
+        {
             if (chance(0.80)) {
                 u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
             }
             else {
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
+            stats_count("monsters.create.dragon", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             equip_unit(u, "seed_dragon");
 
             log_debug("spawning %d %s in %s.\n", u->number,
                 LOC(default_locale,
-                rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
+                    rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
 
             name_unit(u);
 
@@ -932,9 +936,9 @@ void spawn_undead(void)
                 continue;
             }
         }
-        /* Chance 0.1% * chaosfactor */
+
         if (r->land && unburied > rpeasants(r) / 20
-            && rng_int() % 10000 < (100 + 100 * chaosfactor(r))) {
+            && rng_int() % 10000 < 100) {
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
@@ -962,6 +966,7 @@ void spawn_undead(void)
             }
 
             u = create_unit(r, monsters, undead, rc, 0, NULL, NULL);
+            stats_count("monsters.create.undead", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
                 && rng_int() % 10 < 4) {
@@ -1015,37 +1020,42 @@ static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
     double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
-    int n = 0;
-    int horse = -1;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
-    int scare;
+    int p = rpeasants(u->region);
 
-    scare = rc_scare(rc);
-    if (scare>0) {
-        n = rng_int() % scare * u->number;
-    } else {
-        n = rng_int() % (u->number / 20 + 1);
-        horse = 0;
-    }
-    horse = horse ? i_get(u->items, rhorse->itype) : 0;
+    if (p > 0) {
+        int horse = -1;
+        int scare = rc_scare(rc);
+        int n = 0;
 
-    n = (int)(n * multi);
-    if (n > 0) {
-
-        n = lovar(n);
-
-        if (n > 0) {
-            int p = rpeasants(u->region);
-            if (p < n) n = p;
-            deathcounts(u->region, n);
-            rsetpeasants(u->region, rpeasants(u->region) - n);
-            ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+        if (scare > 0) {
+            n = rng_int() % scare * u->number;
         }
-    }
-    if (horse > 0) {
-        i_change(&u->items, rhorse->itype, -horse);
-        ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+        else {
+            n = rng_int() % (u->number / 20 + 1);
+            horse = 0;
+        }
+
+        horse = horse ? i_get(u->items, rhorse->itype) : 0;
+        if (horse > 0) {
+            i_change(&u->items, rhorse->itype, -horse);
+            ADDMSG(&u->region->msgs, msg_message("eathorse", "unit amount", u, horse));
+        }
+
+        n = (int)(n * multi);
+        if (n > 0) {
+            n = lovar(n);
+
+            if (p < n) n = p;
+            if (n > 0) {
+                if (n > 0) {
+                    deathcounts(u->region, n);
+                    rsetpeasants(u->region, rpeasants(u->region) - n);
+                    ADDMSG(&u->region->msgs, msg_message("eatpeasants", "unit amount", u, n));
+                }
+            }
+        }
     }
 }
 
@@ -1058,10 +1068,12 @@ static void absorbed_by_monster(unit * u)
         if (n > 0) {
             int p = rpeasants(u->region);
             if (p < n) n = p;
-            rsetpeasants(u->region, rpeasants(u->region) - n);
-            scale_number(u, u->number + n);
-            ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
-                "unit race amount", u, u_race(u), n));
+            if (n > 0) {
+                rsetpeasants(u->region, rpeasants(u->region) - n);
+                scale_number(u, u->number + n);
+                ADDMSG(&u->region->msgs, msg_message("absorbpeasants",
+                    "unit race amount", u, u_race(u), n));
+            }
         }
     }
 }

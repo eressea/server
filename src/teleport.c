@@ -182,6 +182,7 @@ void spawn_braineaters(float chance)
             u = create_unit(r, f, 1 + rng_int() % 10 + rng_int() % 10,
                 rc_brain, 0, NULL, NULL);
             equip_unit(u, "seed_braineater");
+            stats_count("monsters.create.braineater", 1);
 
             next = rng_int() % (int)(chance * 100);
         }

@@ -4072,7 +4072,7 @@ static int sp_pump(castorder * co)
  *  Betoert eine Einheit, so das sie ihm den groe�ten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
  *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
- *  MIN(Stufe*1000$, u->money - maintenace)
+ *  MIN(Stufe*1000$, u->money - maintenance)
  *  Von jedem Item wird 50% abgerundet ermittelt und uebergeben. Dazu
  *  kommt Itemzahl%2 mit 50% chance
  *
@@ -4083,15 +4083,16 @@ static int sp_seduce(castorder * co)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     unit *target;
-    item **itmp, *items = 0;
-    unit *mage = co->magician.u;
+    item **itmp, *items = NULL;
+    unit *u, *mage = co->magician.u;
     spellparameter *pa = co->par;
     int cast_level = co->level;
     double force = co->force;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag == TARGET_NOTFOUND) {
         return 0;
+    }
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
@@ -4099,6 +4100,15 @@ static int sp_seduce(castorder * co)
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_noundead", ""));
         return 0;
+    }
+
+    u = mage;
+    if (mage->region != target->region) {
+        for (u = target->region->units; u; u = u->next) {
+            if (u->faction == mage->faction) {
+                break;
+            }
+        }
     }
 
     /* Erfolgsmeldung */
@@ -4113,28 +4123,30 @@ static int sp_seduce(castorder * co)
             if (loot < 0) loot = 0;
         }
         else {
-            loot = itm->number / 2;
-            if (itm->number % 2) {
-                loot += rng_int() % 2;
-            }
+            loot = (itm->number + 1) / 2;
             if (loot > 0) {
                 int floot = (int)(5 * force);
                 if (loot > floot) loot = floot;
             }
         }
         if (loot > 0) {
-            i_change(&mage->items, itm->type, loot);
-            i_change(&items, itm->type, loot);
+            if (u) {
+                i_change(&u->items, itm->type, loot);
+                i_change(&items, itm->type, loot);
+            }
             i_change(itmp, itm->type, -loot);
         }
-        if (*itmp == itm)
+        if (*itmp == itm) {
             itmp = &itm->next;
+        }
     }
 
     if (items) {
-        ADDMSG(&mage->faction->msgs, msg_message("seduce_effect_0", "mage unit items",
-            mage, target, items));
-        i_freeall(&items);
+        if (u) {
+            ADDMSG(&mage->faction->msgs, msg_message("seduce_effect_0", "mage unit items",
+                u, target, items));
+            i_freeall(&items);
+        }
         ADDMSG(&target->faction->msgs, msg_message("seduce_effect_1", "unit",
             target));
     }

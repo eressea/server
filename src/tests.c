@@ -229,6 +229,8 @@ static void test_reset(void) {
     default_locale = 0;
     calendar_cleanup();
     close_orders();
+    log_close();
+    stats_close();
     free_special_directions();
     free_locales();
     free_spells();
@@ -260,15 +262,25 @@ static void test_reset(void) {
     }
 }
 
-void test_inject_messagetypes(void)
-{
-    message_handle_missing(MESSAGE_MISSING_REPLACE);
+void test_create_calendar(void) {
+    config_set_int("game.start", 184);
+    months_per_year = 9;
+    month_season = malloc(sizeof(int) * months_per_year);
+    month_season[0] = SEASON_SUMMER;
+    month_season[1] = SEASON_AUTUMN;
+    month_season[2] = SEASON_AUTUMN;
+    month_season[3] = SEASON_WINTER;
+    month_season[4] = SEASON_WINTER;
+    month_season[5] = SEASON_WINTER;
+    month_season[6] = SEASON_SPRING;
+    month_season[7] = SEASON_SPRING;
+    month_season[8] = SEASON_SUMMER;
 }
 
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
-    message_handle_missing(MESSAGE_MISSING_ERROR);
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     if (tc) {
         log_debug("start test: %s", tc->name);
     }
@@ -280,6 +292,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
 
 void test_teardown(void)
 {
+    message_handle_missing(MESSAGE_MISSING_IGNORE);
     test_reset();
     test_log_stderr(0);
 }

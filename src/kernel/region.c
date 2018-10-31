@@ -716,7 +716,10 @@ const item_type *r_luxury(const region * r)
 
 int r_demand(const region * r, const luxury_type * ltype)
 {
-    struct demand *d = r->land->demands;
+    struct demand *d;
+
+    assert(r && r->land);
+    d = r->land->demands;
     while (d && d->type != ltype)
         d = d->next;
     if (!d)
@@ -824,7 +827,7 @@ void free_land(land_region * lr)
     free(lr);
 }
 
-void region_setresource(region * r, const resource_type * rtype, int value)
+void region_setresource(region * r, const struct resource_type *rtype, int value)
 {
     rawmaterial *rm = r->resources;
     while (rm) {
@@ -867,7 +870,18 @@ void region_setresource(region * r, const resource_type * rtype, int value)
     }
 }
 
-int region_getresource(const region * r, const resource_type * rtype)
+int region_getresource_level(const region * r, const struct resource_type * rtype)
+{
+    const rawmaterial *rm;
+    for (rm = r->resources; rm; rm = rm->next) {
+        if (rm->rtype == rtype) {
+            return rm->level;
+        }
+    }
+    return -1;
+}
+
+int region_getresource(const region * r, const struct resource_type *rtype)
 {
     const rawmaterial *rm;
     for (rm = r->resources; rm; rm = rm->next) {
@@ -1048,6 +1062,43 @@ int fix_demand(region * rd) {
     return -1;
 }
 
+void init_region(region *r)
+{
+    static int changed;
+    static const terrain_type *t_plain;
+    const terrain_type * terrain = r->terrain;
+    int horses = 0, trees = 0;
+    if (terrain_changed(&changed)) {
+        t_plain = get_terrain(terrainnames[T_PLAIN]);
+    }
+    if (terrain->size>0) {
+        horses = rng_int() % (terrain->size / 50);
+        trees = terrain->size * (30 + rng_int() % 40) / 1000;
+    }
+    if (t_plain && terrain == t_plain) {
+        rsethorses(r, horses);
+        if (chance(0.4)) {
+            rsettrees(r, 2, trees);
+        }
+    }
+    else if (trees>0 && chance(0.2)) {
+        rsettrees(r, 2, trees);
+    }
+    else {
+        rsettrees(r, 2, 0);
+    }
+    rsettrees(r, 1, rtrees(r, 2) / 4);
+    rsettrees(r, 0, rtrees(r, 2) / 8);
+
+    if (!fval(r, RF_CHAOTIC)) {
+        int peasants;
+        peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
+        rsetpeasants(r, MAX(100, peasants));
+        rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
+            INT_MAX) + 1) + rng_int() % 5));
+    }
+}
+
 void terraform_region(region * r, const terrain_type * terrain)
 {
     /* Resourcen, die nicht mehr vorkommen können, löschen */
@@ -1195,40 +1246,8 @@ void terraform_region(region * r, const terrain_type * terrain)
             else
                 freset(r, RF_MALLORN);
         }
-    }
-
-    if (oldterrain == NULL || terrain->size != oldterrain->size) {
-        static int changed;
-        static const terrain_type *t_plain;
-        int horses = 0, trees = 0;
-        if (terrain_changed(&changed)) {
-            t_plain = get_terrain(terrainnames[T_PLAIN]);
-        }
-        if (terrain->size>0) {
-            horses = rng_int() % (terrain->size / 50);
-            trees = terrain->size * (30 + rng_int() % 40) / 1000;
-        }
-        if (t_plain && terrain == t_plain) {
-            rsethorses(r, horses);
-            if (chance(0.4)) {
-                rsettrees(r, 2, trees);
-            }
-        }
-        else if (trees>0 && chance(0.2)) {
-            rsettrees(r, 2, trees);
-        }
-        else {
-            rsettrees(r, 2, 0);
-        }
-        rsettrees(r, 1, rtrees(r, 2) / 4);
-        rsettrees(r, 0, rtrees(r, 2) / 8);
-
-        if (!fval(r, RF_CHAOTIC)) {
-            int peasants;
-            peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
-            rsetpeasants(r, MAX(100, peasants));
-            rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
-                INT_MAX) + 1) + rng_int() % 5));
+        if (oldterrain == NULL || terrain->size != oldterrain->size) {
+            init_region(r);
         }
     }
 }

@@ -723,7 +723,7 @@ int change_money(unit * u, int v)
     return 0;
 }
 
-static int add_resourcename_cb(const void * match, const void * key,
+static int add_resourcename_cb(void * match, const void * key,
     size_t keylen, void *data)
 {
     struct locale * lang = (struct locale *)data;
@@ -773,7 +773,7 @@ attrib_type at_showitem = {
     "showitem"
 };
 
-static int add_itemname_cb(const void * match, const void * key,
+static int add_itemname_cb(void * match, const void * key,
     size_t keylen, void *data)
 {
     struct locale * lang = (struct locale *)data;
@@ -919,7 +919,7 @@ void free_rtype(resource_type *rtype) {
     free(rtype);
 }
 
-static int free_rtype_cb(const void * match, const void * key,
+static int free_rtype_cb(void * match, const void * key,
     size_t keylen, void *cbdata)
 {
     resource_type *rtype = ((rt_entry *)match)->value;;

@@ -198,6 +198,16 @@ message_type *mt_create_va(message_type *mtype, ...)
     return mt_create(mtype, args, i - 1);
 }
 
+message_type *mt_create_feedback(const char *name) {
+    return mt_create_va(mt_new(name, NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
+}
+
+message_type *mt_create_error(int error) {
+    char name[16];
+    snprintf(name, sizeof(name), "error%d", error);
+    return mt_create_feedback(name);
+}
+
 static variant copy_arg(const arg_type * atype, variant data)
 {
     assert(atype != NULL);

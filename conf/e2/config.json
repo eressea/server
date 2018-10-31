@@ -39,7 +39,7 @@
         "entertain.perlevel": 20,
         "taxing.perlevel": 20,
         "nmr.timeout": 5,
-        "nmr.removenewbie": 0,
+        "nmr.removenewbie": false,
         "GiveRestriction": 3,
         "hunger.long": true,
         "init_spells": 0,

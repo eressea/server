@@ -124,9 +124,9 @@ extern "C" {
     extern void write_ship_reference(const struct ship *sh,
     struct storage *store);
 
-    extern void remove_ship(struct ship **slist, struct ship *s);
-    extern void free_ship(struct ship *s);
-    extern void free_ships(void);
+    void remove_ship(struct ship **slist, struct ship *s);
+    void free_ship(struct ship *s);
+    void free_ships(void);
 
     const char *ship_getname(const struct ship *sh);
     void ship_setname(struct ship *self, const char *name);

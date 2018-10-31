@@ -66,6 +66,7 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
 
     if (!F) {
         log_error("could not open %s", filename);
+        return -1;
     }
 
     msgctxt[0] = 0;
@@ -76,7 +77,7 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
         int err = sscanf(line, "%8s", token);
         if (err == 1) {
             char *text = NULL;
-            size_t size, len = strlen(token);
+            size_t size = 0, len = strlen(token);
 
             line = line + len + 1;
             if (len == 7 && memcmp(token, "msgctxt", 7) == 0) {
@@ -98,7 +99,7 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
                     msgid[0] = 0;
                 }
             }
-            if (text) {
+            if (size > 0) {
                 line = read_multiline(F, line, text, size);
             }
         }
@@ -106,10 +107,10 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
             line = read_line(F);
         }
     }
-    if (ferror(F)) {
-        log_error("read error in %s:%d.", filename, po_lineno);
-        return -1;
-    }
+    err = ferror(F);
     fclose(F);
+    if (err) {
+        log_error("read error %d in %s:%d.", err, filename, po_lineno);
+    }
     return err;
 }

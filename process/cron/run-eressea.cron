@@ -1,6 +1,6 @@
 #!/bin/bash
 GAME=$1
-
+(
 [ "$ENABLED" != "yes" ] && exit
 [ -z ${ERESSEA} ] && ERESSEA=$HOME/eressea
 
@@ -58,3 +58,5 @@ $BIN/compress.sh $GAME $TURN
 $BIN/sendreports.sh $GAME
 $BIN/backup-eressea $GAME $TURN
 rm -f test/execute.lock
+) | tee -a $HOME/log/eressea.cron.log
+

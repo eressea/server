@@ -14,6 +14,42 @@ function test_read_race()
     assert_not_nil(f)
 end
 
+function test_first_insect()
+    local f = faction.create('insect')
+    local r = region.create(0, 0, "plain")
+    local u = unit.create(f, r, 1)
+    u:equip('first_unit')
+    assert_equal(9, u:get_item('nestwarmth'))
+end
+
+function test_first_troll()
+    local f = faction.create('troll')
+    local r = region.create(0, 0, "plain")
+    local u = unit.create(f, r, 1)
+    u:equip('first_unit')
+    assert_equal(2, u:eff_skill('perception'))
+end
+
+function test_first_human()
+    local f = faction.create('human')
+    local r = region.create(0, 0, "plain")
+    local u = unit.create(f, r, 1)
+    u:equip('first_unit')
+    assert_not_nil(u.building)
+    assert_equal('castle', u.building.type)
+    assert_equal(10, u.building.size)
+end
+
+function test_first_aquarian()
+    local f = faction.create('aquarian')
+    local r = region.create(0, 0, "plain")
+    local u = unit.create(f, r, 1)
+    u:equip('first_unit')
+    assert_not_nil(u.ship)
+    assert_equal('boat', u.ship.type)
+    assert_equal(1, u:get_skill('sailing'))
+end
+
 function test_seed_unit()
     local r = region.create(0, 0, "plain")
     local f = faction.create('human')
@@ -37,3 +73,4 @@ function test_seed_elf()
     assert_equal('castle', u.building.type)
     assert_equal(10, u.building.size)
 end
+
