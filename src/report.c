@@ -902,6 +902,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     assert(f);
     assert(r);
 
+    memset(edges, 0, sizeof(edges));
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
@@ -1510,97 +1511,94 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     return 0;
 }
 
-static void
-show_allies(const faction * f, const ally * allies, char *buf, size_t size)
-{
-    int allierte = 0;
-    int i = 0, h, hh = 0;
-    int bytes, dh = 0;
-    const ally *sf;
-    char *bufp = buf;             /* buf already contains data */
-
-    --size;                       /* leave room for a null-terminator */
-
-    for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-        if (mode > 0)
-            ++allierte;
+static int count_allies_cb(struct ally *all, faction *af, int status, void *udata) {
+    int *num = (int *)udata;
+    if (status > 0) {
+        ++*num;
     }
+    return 0;
+}
 
-    for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-        if (mode <= 0)
-            continue;
-        i++;
-        if (dh) {
-            if (i == allierte) {
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "list_and"), size);
-            }
-            else {
-                bytes = (int)str_strlcpy(bufp, ", ", size);
-            }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-        }
-        dh = 1;
-        hh = 0;
-        bytes = (int)str_strlcpy(bufp, factionname(sf->faction), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, " (", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        if ((mode & HELP_ALL) == HELP_ALL) {
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, parameters[P_ANY]), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+struct show_s {
+    sbstring sbs;
+    const faction *f;
+    int num_allies;
+};
+
+static int show_allies_cb(struct ally *all, faction *af, int status, void *udata) {
+    struct show_s * show = (struct show_s *)udata;
+    const faction * f = show->f;
+
+    int mode = alliance_status(f, af, status);
+    --show->num_allies;
+    if (sbs_length(&show->sbs) > 0) {
+        /* not the first entry */
+        if (0 == show->num_allies) {
+            sbs_strcat(&show->sbs, LOC(f->locale, "list_and"));
         }
         else {
-            for (h = 1; h <= HELP_TRAVEL; h *= 2) {
-                int p = MAXPARAMS;
-                if ((mode & h) == h) {
-                    switch (h) {
-                    case HELP_TRAVEL:
-                        p = P_TRAVEL;
-                        break;
-                    case HELP_MONEY:
-                        p = P_MONEY;
-                        break;
-                    case HELP_FIGHT:
-                        p = P_FIGHT;
-                        break;
-                    case HELP_GIVE:
-                        p = P_GIVE;
-                        break;
-                    case HELP_GUARD:
-                        p = P_GUARD;
-                        break;
-                    case HELP_FSTEALTH:
-                        p = P_FACTIONSTEALTH;
-                        break;
-                    }
-                }
-                if (p != MAXPARAMS) {
-                    if (hh) {
-                        bytes = (int)str_strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
-                    }
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, parameters[p]), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    hh = 1;
+            sbs_strcat(&show->sbs, ", ");
+        }
+    }
+    sbs_strcat(&show->sbs, factionname(af));
+    sbs_strcat(&show->sbs, " (");
+    if ((mode & HELP_ALL) == HELP_ALL) {
+        sbs_strcat(&show->sbs, LOC(f->locale, parameters[P_ANY]));
+    }
+    else {
+        int h, hh = 0;
+        for (h = 1; h <= HELP_TRAVEL; h *= 2) {
+            int p = MAXPARAMS;
+            if ((mode & h) == h) {
+                switch (h) {
+                case HELP_TRAVEL:
+                    p = P_TRAVEL;
+                    break;
+                case HELP_MONEY:
+                    p = P_MONEY;
+                    break;
+                case HELP_FIGHT:
+                    p = P_FIGHT;
+                    break;
+                case HELP_GIVE:
+                    p = P_GIVE;
+                    break;
+                case HELP_GUARD:
+                    p = P_GUARD;
+                    break;
+                case HELP_FSTEALTH:
+                    p = P_FACTIONSTEALTH;
+                    break;
                 }
             }
+            if (p != MAXPARAMS) {
+                if (hh) {
+                    sbs_strcat(&show->sbs, ", ");
+                }
+                sbs_strcat(&show->sbs, LOC(f->locale, parameters[p]));
+                hh = 1;
+            }
         }
-        bytes = (int)str_strlcpy(bufp, ")", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
     }
-    bytes = (int)str_strlcpy(bufp, ".", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    *bufp = 0;
+    sbs_strcat(&show->sbs, ")");
+    return 0;
+}
+
+static void
+show_allies(const faction * f, struct ally * allies, char *buf, size_t size)
+{
+    int num_allies = 0;
+    ally_walk(allies, count_allies_cb, &num_allies);
+
+    if (num_allies > 0) {
+        struct show_s show;
+        show.f = f;
+        show.num_allies = num_allies;
+        sbs_init(&show.sbs, buf, size);
+
+        ally_walk(allies, show_allies_cb, &show);
+        sbs_strcat(&show.sbs, ".");
+    }
 }
 
 static void allies(struct stream *out, const faction * f)
@@ -1726,16 +1724,19 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     while (flist != NULL) {
         const faction *f = (const faction *)selist_get(flist, qi);
         if (!is_monsters(f)) {
+            const char *str;
             char buf[8192];
             char label = '-';
 
+            str = faction_getbanner(f);
             sprintf(buf, "%s: %s; %s", factionname(f), faction_getemail(f),
-                f->banner ? f->banner : "");
+                str ? str : "");
             if (uf == f)
                 label = '*';
-            else if (is_allied(uf, f))
+            else if (is_allied(uf, f)) {
                 label = 'o';
-            else if (alliedfaction(NULL, uf, f, HELP_ALL))
+            }
+            else if (alliedfaction(uf, f, HELP_ALL))
                 label = '+';
             paragraph(out, buf, 4, 0, label);
         }

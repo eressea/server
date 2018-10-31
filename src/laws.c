@@ -800,7 +800,7 @@ void immigration(void)
 void nmr_warnings(void)
 {
     faction *f, *fa;
-#define FRIEND (HELP_GUARD|HELP_MONEY)
+#define HELP_NMR (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
         if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
@@ -816,14 +816,12 @@ void nmr_warnings(void)
                             warn = 1;
                         }
                     }
-                    else if (alliedfaction(NULL, f, fa, FRIEND)
-                        && alliedfaction(NULL, fa, f, FRIEND)) {
+                    else if (alliedfaction(f, fa, HELP_NMR) && alliedfaction(fa, f, HELP_NMR)) {
                         warn = 1;
                     }
                     if (warn) {
                         if (msg == NULL) {
-                            msg =
-                                msg_message("warn_dropout", "faction turns", f,
+                            msg = msg_message("warn_dropout", "faction turns", f,
                                     turn - f->lastorders);
                         }
                         add_message(&fa->msgs, msg);
@@ -1319,9 +1317,9 @@ int ally_cmd(unit * u, struct order *ord)
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
-        attrib *a = a_find(u->attribs, &at_group);
-        if (a) {
-            sfp = &((group *)a->data.v)->allies;
+        group *g = get_group(u);
+        if (g) {
+            sfp = &g->allies;
         }
     }
 
@@ -1455,12 +1453,8 @@ int prefix_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (!s || !*s) {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP)) {
-            a = a_find(u->attribs, &at_group);
-        }
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             a_removeall(&g->attribs, &at_raceprefix);
         }
         else {
@@ -1475,13 +1469,12 @@ int prefix_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 299, MSG_EVENT);
     }
     else {
-        ap = &u->faction->attribs;
-        if (fval(u, UFL_GROUP)) {
-            attrib *a = a_find(u->attribs, &at_group);
-            if (a) {
-                group *g = (group *)a->data.v;
-                ap = &g->attribs;
-            }
+        group *g = get_group(u);
+        if (g) {
+            ap = &g->attribs;
+        } 
+        else {
+            ap = &u->faction->attribs;
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1529,7 +1522,7 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        s = &u->display;
+        unit_setinfo(u, getstrtoken());
         break;
 
     case P_PRIVAT:
@@ -1841,11 +1834,8 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_GROUP:
     {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             s = &g->name;
             break;
         }
@@ -2073,12 +2063,10 @@ int banner_cmd(unit * u, struct order *ord)
 {
     const char * s;
 
-    free(u->faction->banner);
     init_order_depr(ord);
     s = getstrtoken();
-    u->faction->banner = s ? str_strdup(s) : 0;
-    add_message(&u->faction->msgs, msg_message("changebanner", "value",
-        u->faction->banner));
+    faction_setbanner(u->faction, s);
+    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }
