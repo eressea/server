@@ -342,7 +342,7 @@ order *parse_order(const char *s, const struct locale * lang)
                 sptr = sp;
                 p = parse_token(&sp, token, sizeof(token));
                 sk = get_skill(p, lang);
-                if (!expensive_skill(sk)) {
+                if (sk == NOSKILL || !expensive_skill(sk)) {
                     kwd = K_AUTOSTUDY;
                 }
             }

@@ -1853,10 +1853,6 @@ bool unit_name_equals_race(const unit *u) {
     return false;
 }
 
-bool unit_can_study(const unit *u) {
-    return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
-}
-
 static int read_newunitid(const faction * f, const region * r)
 {
     int n;

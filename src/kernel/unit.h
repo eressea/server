@@ -246,7 +246,6 @@ extern "C" {
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
-    bool unit_can_study(const struct unit *u);
 
     /* getunit results: */
 #define GET_UNIT 0

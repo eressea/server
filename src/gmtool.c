@@ -46,6 +46,7 @@
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/path.h>
+#include <util/rand.h>
 #include <util/rng.h>
 #include <util/unicode.h>
 
@@ -55,6 +56,7 @@
 #include "wormhole.h"
 #include "teleport.h"
 
+#include <selist.h>
 #include <storage.h>
 #include <lua.h>
 
@@ -451,7 +453,10 @@ static void paint_info_region(window * wnd, const state * st)
         line++;
         umvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
         if (r->land) {
+            int iron = region_getresource_level(r, get_resourcetype(R_IRON));
+            int stone = region_getresource_level(r, get_resourcetype(R_STONE));
             mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "S:%6d  I:%5d", stone, iron);
             mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
@@ -529,6 +534,33 @@ static void statusline(WINDOW * win, const char *str)
     wnoutrefresh(win);
 }
 
+static void reset_resources(region *r, const struct terrain_type *terrain)
+{
+    int i;
+
+    for (i = 0; terrain->production[i].type; ++i) {
+        rawmaterial *rm;
+        const terrain_production *production = terrain->production + i;
+        const resource_type *rtype = production->type;
+
+        for (rm = r->resources; rm; rm = rm->next) {
+            if (rm->rtype == rtype)
+                break;
+        }
+        if (rm) {
+            struct rawmaterial_type *rmt;
+            set_resource(rm,
+                dice_rand(production->startlevel),
+                dice_rand(production->base),
+                dice_rand(production->divisor));
+            rmt = rmt_get(rtype);
+            if (rmt && rmt->terraform) {
+                rmt->terraform(rm, r);
+            }
+        }
+    }
+}
+
 static void reset_region(region *r) {
     unit **up = &r->units;
     bool players = false;
@@ -554,6 +586,7 @@ static void reset_region(region *r) {
         }
         if (r->land) {
             init_region(r);
+            reset_resources(r, r->terrain);
         }
     }
 }
@@ -595,6 +628,69 @@ static void terraform_at(coordinate * c, const terrain_type * terrain)
         }
         if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
             terraform_region(r, terrain);
+        }
+    }
+}
+
+static void selection_walk(selection * selected, void(*callback)(region *, void *), void *udata) {
+    int i;
+
+    for (i = 0; i != MAXTHASH; ++i) {
+        tag **tp = &selected->tags[i];
+        while (*tp) {
+            region *r;
+            tag *t = *tp;
+            int nx = t->coord.x, ny = t->coord.y;
+            plane *pl = t->coord.pl;
+
+            pnormalize(&nx, &ny, pl);
+            r = findregion(nx, ny);
+            if (r != NULL) {
+                callback(r, udata);
+            }
+            tp = &t->nexthash;
+        }
+    }
+}
+
+static void reset_levels_cb(region *r, void *udata) {
+    struct rawmaterial *res;
+    UNUSED_ARG(udata);
+    for (res = r->resources; res; res = res->next) {
+        if (res->level > 3) {
+            res->level = 1;
+        }
+    }
+}
+
+/**
+ * BUG 2506: reset drained mountains to level 1
+ */
+static void
+fix_selection(selection * selected)
+{
+    selection_walk(selected, reset_levels_cb, NULL);
+}
+
+static void
+reset_selection(selection * selected)
+{
+    int i;
+
+    for (i = 0; i != MAXTHASH; ++i) {
+        tag **tp = &selected->tags[i];
+        while (*tp) {
+            region *r;
+            tag *t = *tp;
+            int nx = t->coord.x, ny = t->coord.y;
+            plane *pl = t->coord.pl;
+
+            pnormalize(&nx, &ny, pl);
+            r = findregion(nx, ny);
+            if (r != NULL) {
+                reset_region(r);
+            }
+            tp = &t->nexthash;
         }
     }
 }
@@ -708,7 +804,7 @@ void highlight_region(region * r, int toggle)
     }
 }
 
-void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
+void select_coordinate(struct selection *selected, int nx, int ny, bool toggle)
 {
     if (toggle)
         tag_region(selected, nx, ny);
@@ -716,7 +812,50 @@ void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
         untag_region(selected, nx, ny);
 }
 
-enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+enum select_t { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+
+static void select_island(state *st, int selectmode)
+{
+    region *r;
+    int nx = st->cursor.x;
+    int ny = st->cursor.y;
+
+    pnormalize(&nx, &ny, st->cursor.pl);
+    r = findregion(nx, ny);
+    if (r && r->land) {
+        selist *ql, *stack = NULL;
+        int qi = 0;
+
+        selist_push(&stack, r);
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            region *rnext[MAXDIRECTIONS];
+            int i;
+
+            fset(r, RF_MARK);
+            if (selectmode & MODE_SELECT) {
+                select_coordinate(st->selected, r->x, r->y,
+                    selectmode == MODE_SELECT);
+            }
+            else {
+                highlight_region(r, selectmode == MODE_MARK);
+            }
+            get_neighbours(r, rnext);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = rnext[i];
+                if (rn && rn->land && !fval(rn, RF_MARK)) {
+                    selist_push(&stack, rn);
+                }
+            }
+        }
+
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            freset(r, RF_MARK);
+        }
+        selist_free(stack);
+    }
+}
 
 static void select_regions(state * st, int selectmode)
 {
@@ -869,6 +1008,11 @@ static void select_regions(state * st, int selectmode)
                 return;
             }
         }
+    }
+    else if (findmode == 'i') {
+        sprintf(sbuffer, "%swand: ", status);
+        statusline(st->wnd_status->handle, sbuffer);
+        select_island(st, selectmode);
     }
     else if (findmode == 't') {
         const struct terrain_type *terrain;
@@ -1210,7 +1354,12 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'r':
+            reset_selection(st->selected);
+            break;
         case 'f':
+            fix_selection(st->selected);
+            break;
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;

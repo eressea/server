@@ -9,17 +9,22 @@
 #include "kernel/region.h"
 #include "kernel/unit.h"
 
+#include "util/message.h"
+
 #include "tests.h"
 
 #include <CuTest.h>
 
 static void test_autostudy_init(CuTest *tc) {
     scholar scholars[4];
-    unit *u1, *u2, *u3;
+    unit *u1, *u2, *u3, *u4;
     faction *f;
     region *r;
 
     test_setup();
+    mt_create_error(77);
+    mt_create_error(771);
+
     r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     u1 = test_create_unit(f, r);
@@ -30,8 +35,11 @@ static void test_autostudy_init(CuTest *tc) {
     set_level(u2, SK_ENTERTAINMENT, 2);
     u3 = test_create_unit(f, r);
     u3->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
+    u4 = test_create_unit(test_create_faction(NULL), r);
+    u4->thisorder = create_order(K_AUTOSTUDY, f->locale, "Dudelidu");
     scholars[3].u = NULL;
     CuAssertIntEquals(tc, 3, autostudy_init(scholars, 4, r));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u4->faction->msgs, "error77"));
     CuAssertPtrEquals(tc, u2, scholars[0].u);
     CuAssertIntEquals(tc, 2, scholars[0].level);
     CuAssertIntEquals(tc, 0, scholars[0].learn);
