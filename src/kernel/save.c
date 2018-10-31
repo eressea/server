@@ -1093,7 +1093,6 @@ faction *read_faction(gamedata * data)
 
 void write_faction(gamedata *data, const faction * f)
 {
-    ally *sf;
     origin *ur;
 
     assert(f->_alive);
@@ -1143,19 +1142,9 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_INT(data->store, f->options & ~WANT_OPTION(O_DEBUG));
     WRITE_SECTION(data->store);
 
-    for (sf = f->allies; sf; sf = sf->next) {
-        assert(sf->faction);
-
-        if (faction_alive(sf->faction)) {
-            if (sf->status != 0) {
-                WRITE_INT(data->store, sf->faction->no);
-                WRITE_INT(data->store, sf->status);
-            }
-        }
-    }
-    WRITE_INT(data->store, 0);
+    write_allies(data, f->allies);
     WRITE_SECTION(data->store);
-    write_groups(data->store, f);
+    write_groups(data, f);
     write_spellbook(f->spellbook, data->store);
 }
 

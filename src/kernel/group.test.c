@@ -84,7 +84,7 @@ static void test_group_readwrite(CuTest * tc)
     g = new_group(f, "Egoisten", 43);
     key_set(&g->attribs, 44, 44);
     ally_set(&g->allies, f, HELP_GIVE);
-    write_groups(&store, f);
+    write_groups(&data, f);
     WRITE_INT(&store, 47);
 
     free_group(f->groups);
@@ -107,9 +107,7 @@ static void test_group_readwrite(CuTest * tc)
     g = f->groups->next;
     CuAssertIntEquals(tc, 44, key_get(g->attribs, 44));
     CuAssertPtrNotNull(tc, g->allies);
-    CuAssertPtrEquals(tc, NULL, g->allies->next);
-    CuAssertPtrEquals(tc, f, g->allies->faction);
-    CuAssertIntEquals(tc, HELP_GIVE, g->allies->status);
+    CuAssertIntEquals(tc, HELP_GIVE, ally_get(g->allies, f));
     test_teardown();
 }
 

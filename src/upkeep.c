@@ -167,7 +167,7 @@ void get_food(region * r)
             struct faction *owner = region_get_owner(r);
             /* if the region is owned, and the owner is nice, then we'll get
             * food from the peasants - should not be used with WORK */
-            if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
+            if (owner != NULL && alliedfaction(owner, u->faction, HELP_MONEY)) {
                 int rm = rmoney(r);
                 int use = (rm < need) ? rm : need;
                 rsetmoney(r, rm - use);

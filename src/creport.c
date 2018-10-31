@@ -799,13 +799,11 @@ void cr_output_unit(stream *out, const faction * f,
     }
 
     if (u->faction == f) {
-        const attrib *a = NULL;
         unit *mage;
+        group * g;
 
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a != NULL) {
-            const group *g = (const group *)a->data.v;
+        g = get_group(u);
+        if (g) {
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
         mage = get_familiar_mage(u);
@@ -1018,21 +1016,38 @@ static void cr_output_unit_compat(FILE * F, const faction * f,
     cr_output_unit(&strm, f, u, mode);
 }
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
+static void print_ally(const faction *f, faction *af, int status, FILE *F) {
+    if (af && status > 0) {
+        fprintf(F, "ALLIANZ %d\n", af->no);
+        fprintf(F, "\"%s\";Parteiname\n", af->name);
+        fprintf(F, "%d;Status\n", status & HELP_ALL);
+    }
+}
+
+struct print_ally_s {
+    const faction *f;
+    FILE *F;
+};
+
+static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
+    struct print_ally_s *data = (struct print_ally_s *)udata;
+
+    UNUSED_ARG(al);
+    if (af && faction_alive(af)) {
+        int mode = alliance_status(data->f, af, status);
+        print_ally(data->f, af, mode, data->F);
+    }
+    return 0;
+}
 
 /* prints allies */
 static void show_allies_cr(FILE * F, const faction * f, const group *g)
 {
-    ally * sf = g ? g->allies : f->allies;
-    for (; sf; sf = sf->next)
-        if (sf->faction && faction_alive(sf->faction)) {
-            int mode = alliedgroup(f, sf->faction, g, HELP_ALL);
-            if (mode != 0 && sf->status > 0) {
-                fprintf(F, "ALLIANZ %d\n", sf->faction->no);
-                fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-                fprintf(F, "%d;Status\n", sf->status);
-            }
-        }
+    struct print_ally_s data;
+    data.F = F;
+    data.f = f;
+    struct allies *sf = g ? g->allies : f->allies;
+    allies_walk(sf, print_ally_cb, &data);
 }
 
 /* prints allies */
