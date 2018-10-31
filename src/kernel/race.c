@@ -79,10 +79,10 @@ const char *racenames[MAXRACES] = {
     "clone"
 };
 
-#define MAXOPTIONS 4
+#define MAX_OPTIONS 4
 typedef struct rcoption {
-    unsigned char key[MAXOPTIONS];
-    variant value[MAXOPTIONS];
+    unsigned char key[MAX_OPTIONS];
+    variant value[MAX_OPTIONS];
 } rcoption;
 
 enum {
@@ -106,7 +106,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
         v = rc->options->value;
     } else {
         int i;
-        for (i=0;!v && i < MAXOPTIONS;++i) {
+        for (i=0;!v && i < MAX_OPTIONS;++i) {
             if (rc->options->key[i]==key) {
                 v = rc->options->value+i;
                 break;
@@ -114,7 +114,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
             if (rc->options->key[i]==RCO_NONE) {
                 v = rc->options->value+i;
                 rc->options->key[i] = key;
-                if (i+1 < MAXOPTIONS) {
+                if (i+1 < MAX_OPTIONS) {
                     rc->options->key[i+1]=RCO_NONE;
                 }
                 break;
@@ -145,7 +145,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
 static variant *rc_getoption(const race *rc, int key) {
     if (rc->options) {
         int i;
-        for (i=0;i!=MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+        for (i=0;i!=MAX_OPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
             if (rc->options->key[i]==key) {
                 return rc->options->value+i;
             }
@@ -269,7 +269,7 @@ void free_races(void) {
         rcoption * opt = races->options;
         
         if (opt) {
-            for (i=0;i!=MAXOPTIONS && opt->key[i]!=RCO_NONE;++i) {
+            for (i=0;i!=MAX_OPTIONS && opt->key[i]!=RCO_NONE;++i) {
                 if (opt->key[i]==RCO_HUNGER) {
                     free(opt->value[i].v);
                 }

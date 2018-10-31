@@ -29,20 +29,18 @@
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
     region *r;
-    ally *al;
 
     test_setup();
     r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(NULL);
     test_create_unit(f1, r);
     f2 = test_create_faction(NULL);
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FIGHT;
-    CuAssertIntEquals(tc, HELP_FIGHT, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_FIGHT);
+    CuAssertIntEquals(tc, HELP_FIGHT, alliedfaction(f1, f2, HELP_ALL));
     CuAssertPtrEquals(tc, f2, f1->next);
     destroyfaction(&f1->next);
     CuAssertIntEquals(tc, false, faction_alive(f2));
-    CuAssertIntEquals(tc, 0, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    CuAssertIntEquals(tc, 0, alliedfaction(f1, f2, HELP_ALL));
     test_teardown();
 }
 
@@ -117,7 +115,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);
     CuAssertPtrEquals(tc, NULL, (void *)f->next);
-    CuAssertPtrEquals(tc, NULL, (void *)f->banner);
+    CuAssertPtrEquals(tc, NULL, (void *)faction_getbanner(f));
     CuAssertPtrEquals(tc, NULL, (void *)f->spellbook);
     CuAssertPtrEquals(tc, NULL, (void *)f->origin);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
@@ -229,6 +227,18 @@ static void test_valid_race(CuTest *tc) {
     test_teardown();
 }
 
+static void test_dbstrings(CuTest *tc) {
+    const char *lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    faction *f;
+    test_setup();
+    f = test_create_faction(NULL);
+    faction_setbanner(f, lipsum);
+    faction_setpassword(f, lipsum + 12);
+    CuAssertStrEquals(tc, lipsum, faction_getbanner(f));
+    CuAssertStrEquals(tc, lipsum + 12, faction_getpassword(f));
+    test_teardown();
+}
+
 static void test_set_email(CuTest *tc) {
     faction *f;
     char email[10];
@@ -335,6 +345,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
+    SUITE_ADD_TEST(suite, test_dbstrings);
     SUITE_ADD_TEST(suite, test_save_special_items);
     return suite;
 }

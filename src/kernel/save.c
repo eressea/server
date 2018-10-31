@@ -440,12 +440,12 @@ unit *read_unit(gamedata *data)
     if (unicode_utf8_trim(obuf)!=0) {
 		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
 	}
-    u->_name = obuf[0] ? str_strdup(obuf) : 0;
+    unit_setname(u, obuf[0] ? obuf : NULL);
     READ_STR(data->store, obuf, sizeof(obuf));
     if (unicode_utf8_trim(obuf)!=0) {
         log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
     }
-    u->display = obuf[0] ? str_strdup(obuf) : 0;
+    unit_setinfo(u, obuf[0] ? obuf : NULL);
     READ_INT(data->store, &number);
     set_number(u, number);
 
@@ -544,6 +544,7 @@ unit *read_unit(gamedata *data)
 
 void write_unit(gamedata *data, const unit * u)
 {
+    const char *str;
     order *ord;
     int p = 0;
     unsigned int flags = u->flags & UFL_SAVEMASK;
@@ -553,7 +554,8 @@ void write_unit(gamedata *data, const unit * u)
     assert(u->faction->_alive);
     write_faction_reference(u->faction, data->store);
     WRITE_STR(data->store, u->_name);
-    WRITE_STR(data->store, u->display ? u->display : "");
+    str = unit_getinfo(u);
+    WRITE_STR(data->store, str ? str : "");
     WRITE_INT(data->store, u->number);
     WRITE_INT(data->store, u->age);
     WRITE_TOK(data->store, u_race(u)->_name);
@@ -931,7 +933,6 @@ static void read_password(gamedata *data, faction *f) {
     else {
         faction_setpassword(f, (data->version >= CRYPT_VERSION) ? name : password_hash(name, PASSWORD_DEFAULT));
     }
-    (void)_test_read_password;
 }
 
 void _test_read_password(gamedata *data, faction *f) {
@@ -939,8 +940,7 @@ void _test_read_password(gamedata *data, faction *f) {
 }
 
 static void write_password(gamedata *data, const faction *f) {
-    WRITE_TOK(data->store, (const char *)f->_password);
-    (void)_test_write_password;
+    WRITE_TOK(data->store, faction_getpassword(f));
 }
 
 void _test_write_password(gamedata *data, const faction *f) {
@@ -957,8 +957,7 @@ faction *read_faction(gamedata * data)
     assert(n > 0);
     f = findfaction(n);
     if (f == NULL) {
-        f = (faction *)calloc(1, sizeof(faction));
-        f->no = n;
+        f = faction_create(n);
     }
     else {
         f->allies = NULL;           /* FIXME: mem leak */
@@ -1009,7 +1008,7 @@ faction *read_faction(gamedata * data)
 	if (unicode_utf8_trim(name)!=0) {
 		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
 	};
-    f->banner = str_strdup(name);
+    faction_setbanner(f, name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
 
@@ -1082,7 +1081,7 @@ faction *read_faction(gamedata * data)
         /* mistakes were made in the past*/
         f->options &= ~WANT_OPTION(O_JSON);
     }
-    read_allies(data, f);
+    read_allies(data, &f->allies);
     read_groups(data, f);
     f->spellbook = 0;
     if (data->version >= REGIONOWNER_VERSION) {
@@ -1117,7 +1116,7 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_INT(data->store, f->alliance_joindate);
 
     WRITE_STR(data->store, f->name);
-    WRITE_STR(data->store, f->banner);
+    WRITE_STR(data->store, faction_getbanner(f));
     WRITE_STR(data->store, f->email?f->email:"");
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
@@ -1145,17 +1144,13 @@ void write_faction(gamedata *data, const faction * f)
     WRITE_SECTION(data->store);
 
     for (sf = f->allies; sf; sf = sf->next) {
-        int no;
-        int status;
-
         assert(sf->faction);
 
-        no = sf->faction->no;
-        status = alliedfaction(NULL, f, sf->faction, HELP_ALL);
-
-        if (status != 0) {
-            WRITE_INT(data->store, no);
-            WRITE_INT(data->store, sf->status);
+        if (faction_alive(sf->faction)) {
+            if (sf->status != 0) {
+                WRITE_INT(data->store, sf->faction->no);
+                WRITE_INT(data->store, sf->status);
+            }
         }
     }
     WRITE_INT(data->store, 0);
@@ -1419,7 +1414,6 @@ int read_game(gamedata *data)
 
         *fp = f;
         fp = &f->next;
-        fhash(f);
     }
     *fp = 0;
 
@@ -1519,6 +1513,7 @@ int read_game(gamedata *data)
             }
         }
         else {
+            assert(f->units);
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
                     sc_mage *mage = get_mage_depr(u);

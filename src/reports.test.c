@@ -177,7 +177,6 @@ static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
     char buf[256];
     struct locale *lang;
 
@@ -232,8 +231,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
     bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
 
@@ -791,7 +789,6 @@ static void test_insect_warnings(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
-    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
     CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
@@ -819,7 +816,6 @@ static void test_newbie_warning(CuTest *tc) {
     faction *f;
 
     test_setup();
-    test_inject_messagetypes();
     f = test_create_faction(NULL);
     config_set_int("NewbieImmunity", 3);
 
@@ -902,7 +898,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_region_distance);
     SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
-    SUITE_ADD_TEST(suite, test_newbie_password_message);
+    DISABLE_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

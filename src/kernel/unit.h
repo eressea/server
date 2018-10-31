@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/resolve.h>
 #include "types.h"
+#include "database.h"
 #include "skills.h"
 #include <stddef.h>
 
@@ -89,7 +90,7 @@ extern "C" {
         int no;                     /* id */
         int hp;
         char *_name;
-        char *display;
+        dbrow_id display_id;
         struct faction *faction;
         struct building *building;
         struct ship *ship;
@@ -242,7 +243,6 @@ extern "C" {
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
-    bool unit_can_study(const struct unit *u);
 
     /* getunit results: */
 #define GET_UNIT 0

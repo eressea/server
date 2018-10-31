@@ -153,7 +153,6 @@ static void test_ship_has_harbormaster_same_faction(CuTest * tc) {
 static void test_ship_has_harbormaster_ally(CuTest * tc) {
     unit *u;
     move_fixture mf;
-    ally *al;
 
     test_setup();
     setup_harbor(&mf);
@@ -161,8 +160,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
-    al = ally_add(&u->faction->allies, mf.u->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u->faction->allies, mf.u->faction, HELP_GUARD);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();

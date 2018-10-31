@@ -969,7 +969,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
 
     dh = 0;
     if (!getarnt) {
-        if (alliedfaction(rplane(u->region), f, fv, HELP_ALL)) {
+        if (alliedfaction(f, fv, HELP_ALL)) {
             dh = 1;
         }
     }
@@ -1552,14 +1552,6 @@ void prepare_report(report_context *ctx, faction *f)
     if (bt_lighthouse && config_changed(&config)) {
         rule_region_owners = config_token("rules.region_owner_pay_building", bt_lighthouse->_name);
         rule_lighthouse_units = config_get_int("rules.lighthouse.unit_capacity", 0) != 0;
-    }
-
-    if (f->age <= 2) {
-        if ((f->flags&FFL_PWMSG) == 0) {
-            /* TODO: this assumes unencrypted passwords */
-            f->flags |= FFL_PWMSG;
-            ADDMSG(&f->msgs, msg_message("changepasswd", "value", f->_password));
-        }
     }
 
     ctx->f = f;
