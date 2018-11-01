@@ -99,7 +99,7 @@ static int createunit_read(trigger * t, gamedata *data)
         result = AT_READ_FAIL;
     }
 
-    read_region_reference(data, &td->r, NULL);
+    read_region_reference(data, &td->r);
     td->race = read_race_reference(data->store);
     if (!td->race) {
         result = AT_READ_FAIL;
