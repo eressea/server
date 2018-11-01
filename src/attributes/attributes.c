@@ -98,7 +98,7 @@ static int obs_read(variant *var, void *owner, struct gamedata *data)
     obs_data *od = (obs_data *)var->v;
 
     UNUSED_ARG(owner);
-    read_faction_reference(data, &od->f, NULL);
+    read_faction_reference(data, &od->f);
     READ_INT(data->store, &od->skill);
     READ_INT(data->store, &od->timer);
     return AT_READ_OK;

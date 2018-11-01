@@ -133,10 +133,7 @@ extern "C" {
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    int read_faction_reference(struct gamedata *data, struct faction **fp, resolve_fun fun);
-
-#define RESOLVE_FACTION (TYP_FACTION << 24)
-    void resolve_faction(struct faction *f);
+    int read_faction_reference(struct gamedata *data, struct faction **fp);
 
     void renumber_faction(faction * f, int no);
     void free_factions(void);

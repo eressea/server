@@ -94,7 +94,7 @@ static int createunit_read(trigger * t, gamedata *data)
     int id;
     int result = AT_READ_OK;
 
-    id = read_faction_reference(data, &td->f, NULL);
+    id = read_faction_reference(data, &td->f);
     if (id <= 0) {
         result = AT_READ_FAIL;
     }
