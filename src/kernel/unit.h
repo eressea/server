@@ -206,10 +206,11 @@ extern "C" {
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);
 
-    extern void name_unit(struct unit *u);
-    extern struct unit *create_unit(struct region *r1, struct faction *f,
+    void name_unit(struct unit *u);
+    struct unit *unit_create(int id);
+    struct unit *create_unit(struct region *r1, struct faction *f,
         int number, const struct race *rc, int id, const char *dname,
-    struct unit *creator);
+        struct unit *creator);
 
     void uhash(struct unit *u);
     void uunhash(struct unit *u);

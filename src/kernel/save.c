@@ -420,10 +420,7 @@ unit *read_unit(gamedata *data)
         u_setfaction(u, NULL);
     }
     else {
-        u = (unit *)calloc(1, sizeof(unit));
-        assert_alloc(u);
-        u->no = n;
-        uhash(u);
+        u = unit_create(n);
     }
 
     READ_INT(data->store, &n);
