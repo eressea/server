@@ -44,23 +44,6 @@ without prior permission by the authors of Eressea.
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct helpmode {
-    const char *name;
-    int status;
-} helpmode;
-
-static helpmode helpmodes[] = {
-    { "all", HELP_ALL },
-    { "money", HELP_MONEY },
-    { "fight", HELP_FIGHT },
-    { "observe", HELP_OBSERVE },
-    { "give", HELP_GIVE },
-    { "guard", HELP_GUARD },
-    { "stealth", HELP_FSTEALTH },
-    { "travel", HELP_TRAVEL },
-    { NULL, 0 }
-};
-
 int tolua_factionlist_next(lua_State * L)
 {
     faction **faction_ptr = (faction **)lua_touserdata(L, lua_upvalueindex(1));
@@ -307,49 +290,6 @@ static int tolua_faction_count_msg_type(lua_State *L) {
     }
     lua_pushinteger(L, n);
     return 1;
-}
-
-static int tolua_faction_get_policy(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction *other = (faction *)tolua_tousertype(L, 2, 0);
-    const char *policy = tolua_tostring(L, 3, 0);
-
-    int result = 0, mode;
-    for (mode = 0; helpmodes[mode].name != NULL; ++mode) {
-        if (strcmp(policy, helpmodes[mode].name) == 0) {
-            result = get_alliance(self, other) & mode;
-            break;
-        }
-    }
-
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-static int tolua_faction_set_policy(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction *other = (faction *)tolua_tousertype(L, 2, 0);
-    const char *policy = tolua_tostring(L, 3, 0);
-    int value = tolua_toboolean(L, 4, 0);
-
-    int mode;
-    for (mode = 0; helpmodes[mode].name != NULL; ++mode) {
-        if (strcmp(policy, helpmodes[mode].name) == 0) {
-            if (value) {
-                set_alliance(self, other, get_alliance(self,
-                    other) | helpmodes[mode].status);
-            }
-            else {
-                set_alliance(self, other, get_alliance(self,
-                    other) & ~helpmodes[mode].status);
-            }
-            break;
-        }
-    }
-
-    return 0;
 }
 
 static int tolua_faction_normalize(lua_State * L)
@@ -632,8 +572,6 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn,
                 tolua_faction_set_lastturn);
 
-            tolua_function(L, TOLUA_CAST "set_policy", tolua_faction_set_policy);
-            tolua_function(L, TOLUA_CAST "get_policy", tolua_faction_get_policy);
             tolua_function(L, TOLUA_CAST "get_origin", tolua_faction_get_origin);
             tolua_function(L, TOLUA_CAST "set_origin", tolua_faction_set_origin);
             tolua_function(L, TOLUA_CAST "normalize", tolua_faction_normalize);

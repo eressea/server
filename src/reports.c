@@ -697,9 +697,8 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     if (!isbattle) {
         if (u->faction == f) {
             if (fval(u, UFL_GROUP)) {
-                attrib *a = a_find(u->attribs, &at_group);
-                if (a) {
-                    group *g = (group *)a->data.v;
+                group *g = get_group(u);
+                if (g) {
                     bufp = STRLCPY(bufp, ", ", size);
                     bufp = STRLCPY(bufp, groupid(g, f), size);
                 }

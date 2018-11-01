@@ -3108,9 +3108,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     if (fval(u, UFL_ANON_FACTION) != 0)
         flags |= SIDE_STEALTH;
     if (!(AllianceAuto() & HELP_FIGHT) && fval(u, UFL_GROUP)) {
-        const attrib *agroup = a_find(u->attribs, &at_group);
-        if (agroup != NULL)
-            g = (const group *)agroup->data.v;
+        g = get_group(u);
     }
 
     /* Illusionen und Zauber kaempfen nicht */

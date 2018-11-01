@@ -1290,11 +1290,12 @@ void quit(void)
 int ally_cmd(unit * u, struct order *ord)
 {
     char token[128];
-    ally *sf, **sfp;
+    struct allies **sfp;
     faction *f;
     int keyword, not_kw;
     const char *s;
-
+    int sf_status;
+   
     init_order_depr(ord);
     f = getfaction();
 
@@ -1316,29 +1317,18 @@ int ally_cmd(unit * u, struct order *ord)
 
     sfp = &u->faction->allies;
     if (fval(u, UFL_GROUP)) {
-        attrib *a = a_find(u->attribs, &at_group);
-        if (a)
-            sfp = &((group *)a->data.v)->allies;
+        group *g = get_group(u);
+        if (g) {
+            sfp = &g->allies;
+        }
     }
-    for (sf = *sfp; sf; sf = sf->next)
-        if (sf->faction == f)
-            break;                    /* Gleich die passende raussuchen, wenn vorhanden */
 
     not_kw = getparam(u->faction->locale);        /* HELFE partei [modus] NICHT */
 
-    if (!sf) {
-        if (keyword == P_NOT || not_kw == P_NOT) {
-            /* Wir helfen der Partei gar nicht... */
-            return 0;
-        }
-        else {
-            sf = ally_add(sfp, f);
-            sf->status = 0;
-        }
-    }
+    sf_status = ally_get(*sfp, f);
     switch (keyword) {
     case P_NOT:
-        sf->status = 0;
+        sf_status = 0;
         break;
 
     case NOPARAM:
@@ -1346,60 +1336,57 @@ int ally_cmd(unit * u, struct order *ord)
         return 0;
 
     case P_ANY:
-        if (not_kw == P_NOT)
-            sf->status = 0;
-        else
-            sf->status = HELP_ALL;
+        sf_status = (not_kw == P_NOT) ? 0 : HELP_ALL;
         break;
 
     case P_TRAVEL:
-        if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_TRAVEL);
-        else
-            sf->status = sf->status | HELP_TRAVEL;
+        if (not_kw == P_NOT) {
+            sf_status = sf_status & (HELP_ALL - HELP_TRAVEL);
+        }
+        else {
+            sf_status |= HELP_TRAVEL;
+        }
         break;
 
     case P_GIVE:
         if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_GIVE);
+            sf_status &= (HELP_ALL - HELP_GIVE);
         else
-            sf->status = sf->status | HELP_GIVE;
+            sf_status |= HELP_GIVE;
         break;
 
     case P_MONEY:
         if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_MONEY);
+            sf_status &= (HELP_ALL - HELP_MONEY);
         else
-            sf->status = sf->status | HELP_MONEY;
+            sf_status |= HELP_MONEY;
         break;
 
     case P_FIGHT:
         if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_FIGHT);
+            sf_status &= (HELP_ALL - HELP_FIGHT);
         else
-            sf->status = sf->status | HELP_FIGHT;
+            sf_status |= HELP_FIGHT;
         break;
 
     case P_FACTIONSTEALTH:
         if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_FSTEALTH);
+            sf_status &= (HELP_ALL - HELP_FSTEALTH);
         else
-            sf->status = sf->status | HELP_FSTEALTH;
+            sf_status |= HELP_FSTEALTH;
         break;
 
     case P_GUARD:
         if (not_kw == P_NOT)
-            sf->status = sf->status & (HELP_ALL - HELP_GUARD);
+            sf_status &= (HELP_ALL - HELP_GUARD);
         else
-            sf->status = sf->status | HELP_GUARD;
+            sf_status |= HELP_GUARD;
         break;
     }
 
-    sf->status &= HelpMask();
+    sf_status &= HelpMask();
+    ally_set(sfp, f, sf_status);
 
-    if (sf->status == 0) {        /* Alle HELPs geloescht */
-        removelist(sfp, sf);
-    }
     return 0;
 }
 
@@ -1466,12 +1453,8 @@ int prefix_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (!s || !*s) {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP)) {
-            a = a_find(u->attribs, &at_group);
-        }
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             a_removeall(&g->attribs, &at_raceprefix);
         }
         else {
@@ -1486,13 +1469,12 @@ int prefix_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 299, MSG_EVENT);
     }
     else {
-        ap = &u->faction->attribs;
-        if (fval(u, UFL_GROUP)) {
-            attrib *a = a_find(u->attribs, &at_group);
-            if (a) {
-                group *g = (group *)a->data.v;
-                ap = &g->attribs;
-            }
+        group *g = get_group(u);
+        if (g) {
+            ap = &g->attribs;
+        } 
+        else {
+            ap = &u->faction->attribs;
         }
         set_prefix(ap, race_prefixes[var.i]);
     }
@@ -1852,11 +1834,8 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_GROUP:
     {
-        attrib *a = NULL;
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a) {
-            group *g = (group *)a->data.v;
+        group *g = get_group(u);
+        if (g) {
             s = &g->name;
             break;
         }
