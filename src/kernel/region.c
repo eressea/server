@@ -1274,7 +1274,7 @@ int read_region_reference(gamedata * data, region **rp)
     READ_INT(store, &id);
     *rp = findregionbyid(id);
     if (*rp == NULL) {
-        ur_add(RESOLVE_REGION | id, (void **)rp, NULL);
+        *rp = region_create(id);
     }
     return id;
 }
