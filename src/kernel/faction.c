@@ -54,7 +54,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
-#include <util/resolve.h>
 #include <util/rng.h>
 #include <util/strings.h>
 #include <util/variant.h>
@@ -331,20 +330,14 @@ bool checkpasswd(const faction * f, const char *passwd)
     return true;
 }
 
-void resolve_faction(faction *f)
-{
-    resolve(RESOLVE_FACTION | f->no, f);
-}
-
-int read_faction_reference(gamedata * data, faction **fp, resolve_fun fun)
+int read_faction_reference(gamedata * data, faction **fp)
 {
     int id;
     READ_INT(data->store, &id);
     if (id > 0) {
         *fp = findfaction(id);
         if (*fp == NULL) {
-            *fp = NULL;
-            ur_add(RESOLVE_FACTION | id, (void **)fp, fun);
+            *fp = faction_create(id);
         }
     }
     else {

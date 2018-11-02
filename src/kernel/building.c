@@ -359,15 +359,14 @@ void resolve_building(building *b)
     resolve(RESOLVE_BUILDING | b->no, b);
 }
 
-int read_building_reference(gamedata * data, building **bp, resolve_fun fun)
+int read_building_reference(gamedata * data, building **bp)
 {
     int id;
     READ_INT(data->store, &id);
     if (id > 0) {
         *bp = findbuilding(id);
         if (*bp == NULL) {
-            *bp = NULL;
-            ur_add(RESOLVE_BUILDING | id, (void**)bp, fun);
+            *bp = building_create(id);
         }
     }
     else {
@@ -376,16 +375,22 @@ int read_building_reference(gamedata * data, building **bp, resolve_fun fun)
     return id;
 }
 
+building *building_create(int id)
+{
+    building *b = (building *)calloc(1, sizeof(building));
+    b->no = id;
+    bhash(b);
+    return b;
+}
+
 building *new_building(const struct building_type * btype, region * r,
     const struct locale * lang)
 {
     building **bptr = &r->buildings;
-    building *b = (building *)calloc(1, sizeof(building));
+    int id = newcontainerid();
+    building *b = building_create(id);
     const char *bname;
     char buffer[32];
-
-    b->no = newcontainerid();
-    bhash(b);
 
     b->type = btype;
     b->region = r;

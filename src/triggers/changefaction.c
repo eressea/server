@@ -87,7 +87,7 @@ static int changefaction_read(trigger * t, gamedata *data)
     changefaction_data *td = (changefaction_data *)t->data.v;
 
     read_unit_reference(data, &td->unit, NULL);
-    return read_faction_reference(data, &td->faction, NULL) > 0 ? AT_READ_OK : AT_READ_FAIL;
+    return read_faction_reference(data, &td->faction) > 0 ? AT_READ_OK : AT_READ_FAIL;
 }
 
 trigger_type tt_changefaction = {

@@ -1375,6 +1375,12 @@ void name_unit(unit * u)
     }
 }
 
+unit *unit_create(int id)
+{
+    unit *u = (unit *)calloc(1, sizeof(unit));
+    createunitid(u, id);
+    return u;
+}
 /** creates a new unit.
 *
 * @param dname: name, set to NULL to get a default.
@@ -1383,7 +1389,7 @@ void name_unit(unit * u)
 unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     int id, const char *dname, unit * creator)
 {
-    unit *u = (unit *)calloc(1, sizeof(unit));
+    unit *u = unit_create(id);
 
     assert(urace);
     u_setrace(u, urace);
@@ -1394,10 +1400,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
 
     set_number(u, number);
-
-    /* die nummer der neuen einheit muss vor name_unit generiert werden,
-     * da der default name immer noch 'Nummer u->no' ist */
-    createunitid(u, id);
 
     /* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
      * enthalten */

@@ -127,8 +127,9 @@ extern "C" {
     const char *write_buildingname(const building * b, char *ibuf,
         size_t size);
     int buildingcapacity(const struct building *b);
+    struct building *building_create(int id);
     struct building *new_building(const struct building_type *typ,
-    struct region *r, const struct locale *lang);
+        struct region *r, const struct locale *lang);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
@@ -166,7 +167,7 @@ extern "C" {
     void resolve_building(building *b);
     void write_building_reference(const struct building *b,
     struct storage *store);
-    int read_building_reference(struct gamedata * data, struct building **bp, resolve_fun fun);
+    int read_building_reference(struct gamedata * data, struct building **bp);
 
     struct building *findbuilding(int n);
 

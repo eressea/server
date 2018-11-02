@@ -123,7 +123,7 @@ static void read_alliances(gamedata *data)
             READ_INT(store, &al->flags);
         }
         if (data->version >= ALLIANCELEADER_VERSION) {
-            read_faction_reference(data, &al->_leader, NULL);
+            read_faction_reference(data, &al->_leader);
             READ_INT(store, &id);
         }
         else {
@@ -248,7 +248,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
             owner->flags = 0;
         }
         if (data->version >= OWNER_3_VERSION) {
-            read_faction_reference(data, &owner->last_owner, NULL);
+            read_faction_reference(data, &owner->last_owner);
         }
         else if (data->version >= OWNER_2_VERSION) {
             int id;
@@ -261,7 +261,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
         else {
             owner->last_owner = NULL;
         }
-        read_faction_reference(data, &owner->owner, NULL);
+        read_faction_reference(data, &owner->owner);
         *powner = owner;
     }
     else {
@@ -420,10 +420,7 @@ unit *read_unit(gamedata *data)
         u_setfaction(u, NULL);
     }
     else {
-        u = (unit *)calloc(1, sizeof(unit));
-        assert_alloc(u);
-        u->no = n;
-        uhash(u);
+        u = unit_create(n);
     }
 
     READ_INT(data->store, &n);
@@ -1087,7 +1084,6 @@ faction *read_faction(gamedata * data)
     if (data->version >= REGIONOWNER_VERSION) {
         read_spellbook(FactionSpells() ? &f->spellbook : 0, data, get_spell_level_faction, (void *)f);
     }
-    resolve_faction(f);
     return f;
 }
 

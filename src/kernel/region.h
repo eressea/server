@@ -225,6 +225,7 @@ extern "C" {
     const char *write_regionname(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 
+    struct region *region_create(int uid);
     struct region *new_region(int x, int y, struct plane *pl, int uid);
     void remove_region(region ** rlist, region * r);
     void terraform_region(struct region *r, const struct terrain_type *terrain);
@@ -252,7 +253,7 @@ extern "C" {
 #define RESOLVE_REGION (TYP_REGION << 24)
     void resolve_region(region *r);
     void write_region_reference(const struct region *r, struct storage *store);
-    int read_region_reference(struct gamedata *data, region **rp, resolve_fun fun);
+    int read_region_reference(struct gamedata *data, region **rp);
 
     const char *regionname(const struct region *r, const struct faction *f);
 
