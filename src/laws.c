@@ -3379,7 +3379,7 @@ int pay_cmd(unit * u, struct order *ord)
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
     char token[128];
-    if (u->number > 0 && (u_race(u)->ec_flags & ECF_GETITEM)) {
+    if (u->number > 0) {
         int use, count, para;
         const item_type *itype;
         const char *s;
@@ -3413,7 +3413,10 @@ static int reserve_i(unit * u, struct order *ord, int flags)
 }
 
 int reserve_cmd(unit * u, struct order *ord) {
-    return reserve_i(u, ord, GET_DEFAULT);
+    if ((u_race(u)->ec_flags & ECF_GETITEM)) {
+        return reserve_i(u, ord, GET_DEFAULT);
+    }
+    return 0;
 }
 
 int reserve_self(unit * u, struct order *ord) {
