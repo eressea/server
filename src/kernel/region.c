@@ -242,7 +242,7 @@ static void unhash_uid(region * r)
     uidhash[key].r = NULL;
 }
 
-static void hash_uid(region * r)
+static void rhash_uid(region * r)
 {
     int uid = r->uid;
     for (;;) {
@@ -268,7 +268,7 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
-bool pnormalize(int *x, int *y, const plane * pl)
+void pnormalize(int *x, int *y, const plane * pl)
 {
     if (pl) {
         if (x) {
@@ -284,7 +284,6 @@ bool pnormalize(int *x, int *y, const plane * pl)
             *y = ny % height + pl->miny;
         }
     }
-    return false;                 /* TBD */
 }
 
 static region *rfindhash(int x, int y)
@@ -343,8 +342,9 @@ region *r_connect(const region * r, direction_t dir)
     int x, y;
     region *rmodify = (region *)r;
     assert(dir >= 0 && dir < MAXDIRECTIONS);
-    if (r->connect[dir])
+    if (r->connect[dir]) {
         return r->connect[dir];
+    }
     assert(dir < MAXDIRECTIONS);
     x = r->x + delta_x[dir];
     y = r->y + delta_y[dir];
@@ -757,39 +757,41 @@ int rsettrees(const region * r, int ageclass, int value)
     return 0;
 }
 
-static region *last;
+region *region_create(int uid)
+{
+    region *r = (region *)calloc(1, sizeof(region));
+    assert_alloc(r);
+    r->uid = uid;
+    rhash_uid(r);
+    return r;
+}
 
-static unsigned int max_index = 0;
+static region *last;
+static unsigned int max_index;
+
+void add_region(region *r, int x, int y) {
+    r->x = x;
+    r->y = y;
+    r->_plane = findplane(x, y);
+    rhash(r);
+    if (last) {
+        addlist(&last, r);
+    }
+    else {
+        addlist(&regions, r);
+    }
+    last = r;
+    assert(r->next == NULL);
+    r->index = ++max_index;
+}
 
 region *new_region(int x, int y, struct plane *pl, int uid)
 {
     region *r;
-
-    pnormalize(&x, &y, pl);
-    r = rfindhash(x, y);
-
-    if (r) {
-        log_error("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL), x, y);
-        if (r->units)
-            log_error("duplicate region contains units\n");
-        return r;
-    }
-    r = (region *)calloc(sizeof(region), 1);
-    assert_alloc(r);
-    r->x = x;
-    r->y = y;
-    r->uid = uid;
+    r = region_create(uid);
     r->age = 1;
-    r->_plane = pl;
-    rhash(r);
-    hash_uid(r);
-    if (last)
-        addlist(&last, r);
-    else
-        addlist(&regions, r);
-    last = r;
-    assert(r->next == NULL);
-    r->index = ++max_index;
+    add_region(r, x, y);
+    assert(pl == r->_plane);
     return r;
 }
 
@@ -1263,7 +1265,7 @@ void resolve_region(region *r)
     resolve(RESOLVE_REGION | r->uid, r);
 }
 
-int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
+int read_region_reference(gamedata * data, region **rp)
 {
     struct storage * store = data->store;
     int id = 0;
@@ -1271,7 +1273,7 @@ int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
     READ_INT(store, &id);
     *rp = findregionbyid(id);
     if (*rp == NULL) {
-        ur_add(RESOLVE_REGION | id, (void **)rp, fun);
+        *rp = region_create(id);
     }
     return id;
 }

@@ -53,7 +53,7 @@ group *new_group(faction * f, const char *name, int gid)
 {
     group **gp = &f->groups;
     int index = gid % GMAXHASH;
-    group *g = calloc(sizeof(group), 1);
+    group *g = calloc(1, sizeof(group));
 
     while (*gp)
         gp = &(*gp)->next;
@@ -69,15 +69,7 @@ group *new_group(faction * f, const char *name, int gid)
 
 static void init_group(faction * f, group * g)
 {
-    ally *a, **an;
-
-    an = &g->allies;
-    for (a = f->allies; a; a = a->next)
-        if (a->faction) {
-            ally *ga = ally_add(an, a->faction);
-            ga->status = a->status;
-            an = &ga->next;
-        }
+    g->allies = allies_clone(f->allies);
 }
 
 static group *find_groupbyname(group * g, const char *name)
@@ -139,11 +131,7 @@ void free_group(group * g)
     if (g->attribs) {
         a_removeall(&g->attribs, NULL);
     }
-    while (g->allies) {
-        ally *a = g->allies;
-        g->allies = a->next;
-        free(a);
-    }
+    allies_free(g->allies);
     free(g->name);
     free(g);
 }
@@ -204,20 +192,14 @@ group *join_group(unit * u, const char *name)
     return g;
 }
 
-void write_groups(struct storage *store, const faction * f)
+void write_groups(struct gamedata *data, const faction * f)
 {
     group *g;
+    storage *store = data->store;
     for (g = f->groups; g; g = g->next) {
-        ally *a;
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);
-        for (a = g->allies; a; a = a->next) {
-            if (a->faction && a->faction->_alive) {
-                write_faction_reference(a->faction, store);
-                WRITE_INT(store, a->status);
-            }
-        }
-        write_faction_reference(NULL, store);
+        write_allies(data, g->allies);
         a_write(store, g->attribs, g);
         WRITE_SECTION(store);
     }
@@ -228,7 +210,6 @@ void read_groups(gamedata *data, faction * f)
 {
     struct storage *store = data->store;
     for (;;) {
-        ally **pa;
         group *g;
         int gid;
         char buf[1024];
@@ -238,19 +219,7 @@ void read_groups(gamedata *data, faction * f)
             break;
         READ_STR(store, buf, sizeof(buf));
         g = new_group(f, buf, gid);
-        pa = &g->allies;
-        for (;;) {
-            ally *al;
-            int id;
-            READ_INT(store, &id);
-            if (id == 0) break;
-            al = ally_add(pa, NULL);
-            al->faction = findfaction(id);
-            if (!al->faction) {
-                ur_add(RESOLVE_FACTION | id, (void **)&al->faction, NULL);
-            }
-            READ_INT(store, &al->status);
-        }
+        read_allies(data, &g->allies);
         read_attribs(data, &g->attribs, g);
     }
 }

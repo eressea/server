@@ -263,7 +263,7 @@ bool b_blocknone(const connection * b, const unit * u, const region * r)
 
 bool b_rvisible(const connection * b, const region * r)
 {
-    return (bool)(b->to == r || b->from == r);
+    return (b->to == r || b->from == r);
 }
 
 bool b_fvisible(const connection * b, const struct faction * f,
@@ -412,7 +412,7 @@ b_blockfogwall(const connection * b, const unit * u, const region * r)
     UNUSED_ARG(b);
     if (!u)
         return true;
-    return (bool)(effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
+    return (effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
 }
 
 /** Legacy type used in old Eressea games, no longer in use. */

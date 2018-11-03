@@ -799,13 +799,11 @@ void cr_output_unit(stream *out, const faction * f,
     }
 
     if (u->faction == f) {
-        const attrib *a = NULL;
         unit *mage;
+        group * g;
 
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a != NULL) {
-            const group *g = (const group *)a->data.v;
+        g = get_group(u);
+        if (g) {
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
         mage = get_familiar_mage(u);
@@ -1018,20 +1016,38 @@ static void cr_output_unit_compat(FILE * F, const faction * f,
     cr_output_unit(&strm, f, u, mode);
 }
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
+static void print_ally(const faction *f, faction *af, int status, FILE *F) {
+    if (af && status > 0) {
+        fprintf(F, "ALLIANZ %d\n", af->no);
+        fprintf(F, "\"%s\";Parteiname\n", af->name);
+        fprintf(F, "%d;Status\n", status & HELP_ALL);
+    }
+}
+
+struct print_ally_s {
+    const faction *f;
+    FILE *F;
+};
+
+static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
+    struct print_ally_s *data = (struct print_ally_s *)udata;
+
+    UNUSED_ARG(al);
+    if (af && faction_alive(af)) {
+        int mode = alliance_status(data->f, af, status);
+        print_ally(data->f, af, mode, data->F);
+    }
+    return 0;
+}
 
 /* prints allies */
-static void show_allies_cr(FILE * F, const faction * f, const ally * sf)
+static void show_allies_cr(FILE * F, const faction * f, const group *g)
 {
-    for (; sf; sf = sf->next)
-        if (sf->faction) {
-            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-            if (mode != 0 && sf->status > 0) {
-                fprintf(F, "ALLIANZ %d\n", sf->faction->no);
-                fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-                fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
-            }
-        }
+    struct print_ally_s data;
+    data.F = F;
+    data.f = f;
+    struct allies *sf = g ? g->allies : f->allies;
+    allies_walk(sf, print_ally_cb, &data);
 }
 
 /* prints allies */
@@ -1057,12 +1073,15 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
     while (flist) {
         const faction *f = (const faction *)selist_get(flist, i);
         if (uf != f) {
+            const char *str;
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
             if (strcmp(faction_getemail(f), "") != 0)
                 fprintf(F, "\"%s\";email\n", faction_getemail(f));
-            if (f->banner)
-                fprintf(F, "\"%s\";banner\n", f->banner);
+            str = faction_getbanner(f);
+            if (str) {
+                fprintf(F, "\"%s\";banner\n", str);
+            }
             fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
             if (f->alliance && f->alliance == uf->alliance) {
                 fprintf(F, "%d;alliance\n", f->alliance->id);
@@ -1534,7 +1553,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     static int era = -1;
     int i;
     faction *f = ctx->f;
-    const char *prefix;
+    const char *prefix, *str;
     region *r;
     const char *mailto = config_get("game.email");
     const attrib *a;
@@ -1628,8 +1647,10 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);
     fprintf(F, "\"%s\";email\n", faction_getemail(f));
-    if (f->banner)
-        fprintf(F, "\"%s\";banner\n", f->banner);
+    str = faction_getbanner(f);
+    if (str) {
+        fprintf(F, "\"%s\";banner\n", str);
+    }
     print_items(F, f->items, f->locale);
     fputs("OPTIONEN\n", F);
     for (i = 0; i != MAXOPTIONS; ++i) {
@@ -1641,7 +1662,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             f->options &= (~flag);
         }
     }
-    show_allies_cr(F, f, f->allies);
+    show_allies_cr(F, f, NULL);
     {
         group *g;
         for (g = f->groups; g; g = g->next) {
@@ -1654,7 +1675,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
                 fprintf(F, "\"%s\";typprefix\n",
                     translate(prefix, LOC(f->locale, prefix)));
             }
-            show_allies_cr(F, f, g->allies);
+            show_allies_cr(F, f, g);
         }
     }
 

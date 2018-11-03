@@ -30,6 +30,8 @@ static void setup_piracy(void) {
     st_boat = test_create_shiptype("boat");
     st_boat->cargo = 1000;
 
+    mt_create_error(144);
+    mt_create_error(146);
     mt_create_va(mt_new("piratenovictim", NULL),
         "ship:ship", "unit:unit", "region:region", MT_NEW_END);
     mt_create_va(mt_new("piratesawvictim", NULL),

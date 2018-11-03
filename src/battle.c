@@ -281,19 +281,15 @@ static void set_friendly(side * as, side * ds)
     as->relations[ds->index] |= E_FRIEND;
 }
 
-static int allysfm(const side * s, const faction * f, int mode)
+static bool alliedside(const side * s, const faction * f, int mode)
 {
-    if (s->faction == f)
-        return mode;
-    if (s->group) {
-        return alliedgroup(s->battle->plane, s->faction, f, s->group->allies, mode);
+    if (s->faction == f) {
+        return true;
     }
-    return alliedfaction(s->battle->plane, s->faction, f, mode);
-}
-
-static int allysf(const side * s, const faction * f)
-{
-    return allysfm(s, f, HELP_FIGHT);
+    if (s->group) {
+        return alliedgroup(s->faction, f, s->group, mode) != 0;
+    }
+    return alliedfaction(s->faction, f, mode) != 0;
 }
 
 static int dead_fighters(const fighter * df)
@@ -313,7 +309,7 @@ fighter *select_corpse(battle * b, fighter * af)
 
     for (si = 0; si != b->nsides; ++si) {
         side *s = b->sides + si;
-        if (af == NULL || (!enemy_i(af->side, si) && allysf(af->side, s->faction))) {
+        if (af == NULL || (!enemy_i(af->side, si) && alliedside(af->side, s->faction, HELP_FIGHT))) {
             maxcasualties += s->casualties;
         }
     }
@@ -344,7 +340,7 @@ bool helping(const side * as, const side * ds)
 {
     if (as->faction == ds->faction)
         return true;
-    return (bool)(!enemy(as, ds) && allysf(as, ds->faction));
+    return (!enemy(as, ds) && alliedside(as, ds->faction, HELP_FIGHT));
 }
 
 int statusrow(int status)
@@ -832,7 +828,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
         return false;
     if (enemy(s->magician->side, ds))
         return false;
-    if (allysf(s->magician->side, ds->faction))
+    if (alliedside(s->magician->side, ds->faction, HELP_FIGHT))
         return true;
     return false;
 }
@@ -1654,7 +1650,7 @@ selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, vo
                 continue;
         }
         else if (mask == FS_HELP) {
-            if (enemy(s, vs) || !allysf(s, vs->faction)) {
+            if (enemy(s, vs) || !alliedside(s, vs->faction, HELP_FIGHT)) {
                 continue;
             }
         }
@@ -2644,7 +2640,7 @@ static void aftermath(battle * b)
     side *s;
     int dead_players = 0;
     bfaction *bf;
-    bool ships_damaged = (bool)(b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
+    bool ships_damaged = (b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *df;
@@ -3112,9 +3108,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     if (fval(u, UFL_ANON_FACTION) != 0)
         flags |= SIDE_STEALTH;
     if (!(AllianceAuto() & HELP_FIGHT) && fval(u, UFL_GROUP)) {
-        const attrib *agroup = a_find(u->attribs, &at_group);
-        if (agroup != NULL)
-            g = (const group *)agroup->data.v;
+        g = get_group(u);
     }
 
     /* Illusionen und Zauber kaempfen nicht */
@@ -3636,7 +3630,7 @@ static void join_allies(battle * b)
                      * vorgespiegelt wird, und er sich uns gegen�ber nicht zu
                      * erkennen gibt, helfen wir ihm nicht */
                     if (s->stealthfaction) {
-                        if (!allysfm(s, u->faction, HELP_FSTEALTH)) {
+                        if (!alliedside(s, u->faction, HELP_FSTEALTH)) {
                             continue;
                         }
                     }
@@ -3690,17 +3684,13 @@ static void join_allies(battle * b)
         }
 
         for (sa = s + 1; sa != b->sides + b->nsides; ++sa) {
-            plane *pl = rplane(r);
-            if (enemy(s, sa))
-                continue;
-            if (friendly(s, sa))
-                continue;
-            if (!alliedgroup(pl, f, sa->faction, f->allies, HELP_FIGHT))
-                continue;
-            if (!alliedgroup(pl, sa->faction, f, sa->faction->allies, HELP_FIGHT))
-                continue;
-
-            set_friendly(s, sa);
+            if (!enemy(s, sa) && !friendly(s, sa)) {
+                if (alliedfaction(f, sa->faction, HELP_FIGHT)) {
+                    if (alliedfaction(sa->faction, f, HELP_FIGHT)) {
+                        set_friendly(s, sa);
+                    }
+                }
+            }
         }
     }
 }

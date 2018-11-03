@@ -23,33 +23,35 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    struct attrib_type;
-    struct plane;
-    struct faction;
-    struct gamedata;
-    struct unit;
+struct attrib_type;
+struct faction;
+struct group;
+struct gamedata;
+struct unit;
+struct allies;
 
-    extern struct attrib_type at_npcfaction;
+extern struct attrib_type at_npcfaction;
 
-    typedef struct ally {
-        struct ally *next;
-        struct faction *faction;
-        int status;
-    } ally;
+int ally_get(struct allies *al, const struct faction *f);
+void ally_set(struct allies **p_al, struct faction *f, int status);
+void write_allies(struct gamedata * data, const struct allies *alist);
+void read_allies(struct gamedata * data, struct allies **sfp);
+typedef int (*cb_allies_walk)(struct allies *, struct faction *, int, void *);
+int allies_walk(struct allies *allies, cb_allies_walk callback, void *udata);
+struct allies *allies_clone(const struct allies *al);
 
-    void read_allies(struct gamedata * data, struct faction *f);
-    ally * ally_find(ally *al, const struct faction *f);
-    ally * ally_add(ally **al_p, struct faction *f);
-    void ally_remove(ally **al_p, struct faction *f);
+void allies_free(struct allies *al);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */
     int alliedunit(const struct unit *u, const struct faction *f2,
-        int mode);
-    int alliedfaction(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, int mode);
-    int alliedgroup(const struct plane *pl, const struct faction *f,
-        const struct faction *f2, const struct ally *sf, int mode);
+        int mask);
+
+    int alliedfaction(const struct faction *f, const struct faction *f2,
+        int mask);
+    int alliedgroup(const struct faction *f, const struct faction *f2,
+        const struct group *g, int mask);
+    int alliance_status(const struct faction *f, const struct faction *f2, int status);
 
 #ifdef __cplusplus
 }

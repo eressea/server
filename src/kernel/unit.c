@@ -474,8 +474,8 @@ attrib_type at_private = {
 
 const char *u_description(const unit * u, const struct locale *lang)
 {
-    if (u->display && u->display[0]) {
-        return u->display;
+    if (u->display_id > 0) {
+        return unit_getinfo(u);
     }
     else {
         char zText[64];
@@ -1293,7 +1293,6 @@ void free_unit(unit * u)
 {
     assert(!u->region);
     free(u->_name);
-    free(u->display);
     free_order(u->thisorder);
     free_orders(&u->orders);
     if (u->skills)
@@ -1376,6 +1375,12 @@ void name_unit(unit * u)
     }
 }
 
+unit *unit_create(int id)
+{
+    unit *u = (unit *)calloc(1, sizeof(unit));
+    createunitid(u, id);
+    return u;
+}
 /** creates a new unit.
 *
 * @param dname: name, set to NULL to get a default.
@@ -1384,7 +1389,7 @@ void name_unit(unit * u)
 unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     int id, const char *dname, unit * creator)
 {
-    unit *u = (unit *)calloc(1, sizeof(unit));
+    unit *u = unit_create(id);
 
     assert(urace);
     u_setrace(u, urace);
@@ -1395,10 +1400,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
 
     set_number(u, number);
-
-    /* die nummer der neuen einheit muss vor name_unit generiert werden,
-     * da der default name immer noch 'Nummer u->no' ist */
-    createunitid(u, id);
 
     /* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
      * enthalten */
@@ -1455,10 +1456,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         }
 
         /* Gruppen */
-        if (creator->faction == f && fval(creator, UFL_GROUP)) {
-            a = a_find(creator->attribs, &at_group);
-            if (a) {
-                group *g = (group *)a->data.v;
+        if (creator->faction == f) {
+            group *g = get_group(creator);
+            if (g) {
                 set_group(u, g);
             }
         }
@@ -1522,16 +1522,20 @@ void unit_setname(unit * u, const char *name)
 
 const char *unit_getinfo(const unit * u)
 {
-    return (const char *)u->display;
+    if (u->display_id > 0) {
+        return dbstring_load(u->display_id, NULL);
+    }
+    return NULL;
 }
 
 void unit_setinfo(unit * u, const char *info)
 {
-    free(u->display);
-    if (info)
-        u->display = str_strdup(info);
-    else
-        u->display = NULL;
+    if (info) {
+        u->display_id = dbstring_save(info);
+    }
+    else {
+        u->display_id = 0;
+    }
 }
 
 int unit_getid(const unit * u)
@@ -1796,10 +1800,6 @@ bool unit_name_equals_race(const unit *u) {
         }
     }
     return false;
-}
-
-bool unit_can_study(const unit *u) {
-    return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
 }
 
 static int read_newunitid(const faction * f, const region * r)

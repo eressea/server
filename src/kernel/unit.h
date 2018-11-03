@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/resolve.h>
 #include "types.h"
+#include "database.h"
 #include "skills.h"
 #include <stddef.h>
 
@@ -89,7 +90,7 @@ extern "C" {
         int no;                     /* id */
         int hp;
         char *_name;
-        char *display;
+        dbrow_id display_id;
         struct faction *faction;
         struct building *building;
         struct ship *ship;
@@ -205,10 +206,11 @@ extern "C" {
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);
 
-    extern void name_unit(struct unit *u);
-    extern struct unit *create_unit(struct region *r1, struct faction *f,
+    void name_unit(struct unit *u);
+    struct unit *unit_create(int id);
+    struct unit *create_unit(struct region *r1, struct faction *f,
         int number, const struct race *rc, int id, const char *dname,
-    struct unit *creator);
+        struct unit *creator);
 
     void uhash(struct unit *u);
     void uunhash(struct unit *u);
@@ -242,7 +244,6 @@ extern "C" {
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
-    bool unit_can_study(const struct unit *u);
 
     /* getunit results: */
 #define GET_UNIT 0

@@ -177,7 +177,6 @@ static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
     char buf[256];
     struct locale *lang;
 
@@ -232,8 +231,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
     bufunit(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
 
@@ -442,21 +440,33 @@ static void test_get_addresses_fstealth(CuTest *tc) {
 
 static void test_get_addresses_travelthru(CuTest *tc) {
     report_context ctx;
-    faction *f, *f2, *f1;
+    faction *f, *f4, *f3, *f2, *f1;
     region *r1, *r2;
     unit *u;
+    race *rc;
 
     test_setup();
     f = test_create_faction(NULL);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
     r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     u = test_create_unit(f, r2);
     travelthru_add(r1, u);
+
+    f1 = test_create_faction(NULL);
     u = test_create_unit(f1, r1);
+    f2 = test_create_faction(NULL);
     set_factionstealth(u, f2);
     u->building = test_create_building(u->region, test_create_buildingtype("tower"));
+
+    rc = rc_get_or_create("dragon");
+    rc->flags |= RCF_UNARMEDGUARD;
+    f3 = test_create_faction(rc);
+    u = test_create_unit(f3, r1);
+    setguard(u, true);
+
+    f4 = test_create_faction(NULL);
+    u = test_create_unit(f4, r1);
+    set_level(u, SK_STEALTH, 1);
 
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
@@ -466,7 +476,9 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     CuAssertTrue(tc, selist_contains(ctx.addresses, f, NULL));
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
-    CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f3, NULL));
+    CuAssertTrue(tc, !selist_contains(ctx.addresses, f4, NULL));
+    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     finish_reports(&ctx);
     test_teardown();
 }
@@ -791,7 +803,6 @@ static void test_insect_warnings(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
-    test_inject_messagetypes();
     f = test_create_faction(test_create_race("insect"));
 
     CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
@@ -819,7 +830,6 @@ static void test_newbie_warning(CuTest *tc) {
     faction *f;
 
     test_setup();
-    test_inject_messagetypes();
     f = test_create_faction(NULL);
     config_set_int("NewbieImmunity", 3);
 
@@ -902,7 +912,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_region_distance);
     SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
-    SUITE_ADD_TEST(suite, test_newbie_password_message);
+    DISABLE_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

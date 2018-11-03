@@ -36,12 +36,16 @@ int eressea_write_game(const char * filename) {
 
 int eressea_read_orders(const char * filename) {
     FILE * F = fopen(filename, "r");
+    int result;
+
     if (!F) {
         perror(filename);
         return -1;
     }
     log_info("reading orders from %s", filename);
-    return parseorders(F);
+    result = parseorders(F);
+    fclose(F);
+    return result;
 }
 
 int eressea_export_json(const char * filename, int flags) {
