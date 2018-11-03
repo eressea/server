@@ -614,7 +614,7 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
 
 static region *readregion(gamedata *data, int x, int y)
 {
-    region *r = findregion(x, y);
+    region *r;
     const terrain_type *terrain;
     char name[NAMESIZE];
     char info[DISPLAYSIZE];
@@ -622,7 +622,7 @@ static region *readregion(gamedata *data, int x, int y)
     int n;
 
     READ_INT(data->store, &uid);
-
+    r = findregionbyid(uid);
     if (r == NULL) {
         plane *pl = findplane(x, y);
         r = new_region(x, y, pl, uid);
