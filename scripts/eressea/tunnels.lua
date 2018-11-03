@@ -27,6 +27,7 @@ end
 local function tunnel_action(b, param)
   local units = tunnel_travelers(b)
   local rto = get_target(param)
+  print("tunnel from " .. tostring(b.region) .. " to " .. tostring(rto))
   if rto and units then
     eressea.log.debug("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
     for key, u in pairs(units) do

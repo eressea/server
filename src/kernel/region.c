@@ -775,10 +775,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
     region *r;
 
     pnormalize(&x, &y, pl);
-    r = rfindhash(x, y);
-    if (!r) {
-        r = region_create(uid);
-    }
+    r = region_create(uid);
     r->x = x;
     r->y = y;
     r->age = 1;
