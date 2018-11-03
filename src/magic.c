@@ -1213,7 +1213,7 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 
 bool is_magic_resistant(unit * magician, unit * target, int resist_bonus)
 {
-    return (bool)target_resists_magic(magician, target, TYP_UNIT,
+    return target_resists_magic(magician, target, TYP_UNIT,
         resist_bonus);
 }
 

@@ -58,8 +58,8 @@ static const char *getbuf_utf8(FILE * F)
         eatwhite(bp, &white);       /* decoding errors will get caught later on, don't have to check */
         bp += white;
 
-        comment = (bool)(comment && cont);
-        quote = (bool)(quote && cont);
+        comment = (comment && cont);
+        quote = (quote && cont);
 
         if (tail[1] == 0) {
             /* we read the maximum number of bytes! */

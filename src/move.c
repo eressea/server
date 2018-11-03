@@ -892,7 +892,7 @@ static void drifting_ships(region * r)
 
 static bool present(region * r, unit * u)
 {
-    return (bool)(u && u->region == r);
+    return (u && u->region == r);
 }
 
 static void caught_target(region * r, unit * u)

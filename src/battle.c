@@ -340,7 +340,7 @@ bool helping(const side * as, const side * ds)
 {
     if (as->faction == ds->faction)
         return true;
-    return (bool)(!enemy(as, ds) && alliedside(as, ds->faction, HELP_FIGHT));
+    return (!enemy(as, ds) && alliedside(as, ds->faction, HELP_FIGHT));
 }
 
 int statusrow(int status)
@@ -2640,7 +2640,7 @@ static void aftermath(battle * b)
     side *s;
     int dead_players = 0;
     bfaction *bf;
-    bool ships_damaged = (bool)(b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
+    bool ships_damaged = (b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *df;

@@ -683,7 +683,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     int i, dh;
     int getarnt = fval(u, UFL_ANON_FACTION);
     const char *pzTmp, *str;
-    bool isbattle = (bool)(mode == seen_battle);
+    bool isbattle = (mode == seen_battle);
     item *itm, *show = NULL;
     faction *fv;
     char *bufp = buf;
