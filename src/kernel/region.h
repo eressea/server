@@ -226,11 +226,12 @@ extern "C" {
         char *buffer, size_t size);
 
     struct region *region_create(int uid);
+    void add_region(region *r, int x, int y);
     struct region *new_region(int x, int y, struct plane *pl, int uid);
     void remove_region(region ** rlist, region * r);
     void terraform_region(struct region *r, const struct terrain_type *terrain);
     void init_region(struct region *r);
-    bool pnormalize(int *x, int *y, const struct plane *pl);
+    void pnormalize(int *x, int *y, const struct plane *pl);
 
     extern const int delta_x[MAXDIRECTIONS];
     extern const int delta_y[MAXDIRECTIONS];

@@ -448,7 +448,7 @@ static int tolua_region_create(lua_State * L)
             return 0;
         }
 
-        assert(!pnormalize(&x, &y, pl));
+        pnormalize(&x, &y, pl);
         r = result = findregion(x, y);
 
         if (r != NULL && r->units != NULL) {

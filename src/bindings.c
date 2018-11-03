@@ -481,7 +481,7 @@ static int tolua_get_region(lua_State * L)
     int x = (int)tolua_tonumber(L, 1, 0);
     int y = (int)tolua_tonumber(L, 2, 0);
     region *r;
-    assert(!pnormalize(&x, &y, findplane(x, y)));
+    pnormalize(&x, &y, findplane(x, y));
     r = findregion(x, y);
     tolua_pushusertype(L, r, TOLUA_CAST "region");
     return 1;

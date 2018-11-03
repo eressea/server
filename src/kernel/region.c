@@ -268,7 +268,7 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
-bool pnormalize(int *x, int *y, const plane * pl)
+void pnormalize(int *x, int *y, const plane * pl)
 {
     if (pl) {
         if (x) {
@@ -284,7 +284,6 @@ bool pnormalize(int *x, int *y, const plane * pl)
             *y = ny % height + pl->miny;
         }
     }
-    return false;                 /* TBD */
 }
 
 static region *rfindhash(int x, int y)
@@ -343,8 +342,9 @@ region *r_connect(const region * r, direction_t dir)
     int x, y;
     region *rmodify = (region *)r;
     assert(dir >= 0 && dir < MAXDIRECTIONS);
-    if (r->connect[dir])
+    if (r->connect[dir]) {
         return r->connect[dir];
+    }
     assert(dir < MAXDIRECTIONS);
     x = r->x + delta_x[dir];
     y = r->y + delta_y[dir];
@@ -757,10 +757,6 @@ int rsettrees(const region * r, int ageclass, int value)
     return 0;
 }
 
-static region *last;
-
-static unsigned int max_index = 0;
-
 region *region_create(int uid)
 {
     region *r = (region *)calloc(1, sizeof(region));
@@ -770,16 +766,13 @@ region *region_create(int uid)
     return r;
 }
 
-region *new_region(int x, int y, struct plane *pl, int uid)
-{
-    region *r;
+static region *last;
+static unsigned int max_index;
 
-    pnormalize(&x, &y, pl);
-    r = region_create(uid);
+void add_region(region *r, int x, int y) {
     r->x = x;
     r->y = y;
-    r->age = 1;
-    r->_plane = pl;
+    r->_plane = findplane(x, y);
     rhash(r);
     if (last) {
         addlist(&last, r);
@@ -790,6 +783,15 @@ region *new_region(int x, int y, struct plane *pl, int uid)
     last = r;
     assert(r->next == NULL);
     r->index = ++max_index;
+}
+
+region *new_region(int x, int y, struct plane *pl, int uid)
+{
+    region *r;
+    r = region_create(uid);
+    r->age = 1;
+    add_region(r, x, y);
+    assert(pl == r->_plane);
     return r;
 }
 
