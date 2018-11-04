@@ -29,7 +29,7 @@ extern "C" {
     const char *prompt);
 
   void highlight_region(struct region *r, int on);
-  void select_coordinate(struct selection *selected, int x, int y, int on);
+  void select_coordinate(struct selection *selected, int x, int y, bool on);
   void run_mapper(void);
 
   extern int force_color;

@@ -37,7 +37,7 @@ typedef struct scholar {
 
 void do_autostudy(struct region *r);
 
-int autostudy_init(scholar scholars[], int max_scholars, struct region *r);
+int autostudy_init(scholar scholars[], int max_scholars, struct unit **units);
 void autostudy_run(scholar scholars[], int nscholars);
 
 #endif
