@@ -14,16 +14,18 @@
 
 #include <curses.h>
 
-#include <kernel/config.h>
-
 #include "gmtool.h"
+#include "direction.h"
 
 #include <modules/autoseed.h>
 
 #include "kernel/building.h"
+#include "kernel/config.h"
 #include "kernel/faction.h"
+#include "kernel/item.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
+#include "kernel/resources.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
 #include "kernel/save.h"
@@ -45,8 +47,6 @@
 #include "teleport.h"
 
 #include <selist.h>
-#include <storage.h>
-#include <lua.h>
 
 #include <assert.h>
 #include <limits.h>
