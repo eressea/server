@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
     typedef struct skill {
-        skill_t id : 8;
+        int id : 8;
         int level : 8;
         int weeks : 8;
         int old : 8;
