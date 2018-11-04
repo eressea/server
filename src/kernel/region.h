@@ -263,6 +263,8 @@ extern "C" {
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
     void region_setinfo(struct region *self, const char *name);
+    int region_getresource_level(const struct region * r,
+        const struct resource_type * rtype);
     int region_getresource(const struct region *r,
         const struct resource_type *rtype);
     void region_setresource(struct region *r, const struct resource_type *rtype,
