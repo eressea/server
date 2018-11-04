@@ -97,6 +97,7 @@ set (ERESSEA_SRC
   automate.c
   battle.c
   chaos.c
+  contact.c
   creport.c
   direction.c
   donations.c
@@ -214,6 +215,7 @@ set(TESTS_SRC
   alchemy.test.c
   automate.test.c
   battle.test.c
+  contact.test.c
   creport.test.c
   direction.test.c
   donations.test.c

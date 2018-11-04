@@ -125,6 +125,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(automate);
     ADD_SUITE(battle);
     ADD_SUITE(calendar);
+    ADD_SUITE(contact);
     ADD_SUITE(creport);
     ADD_SUITE(donations);
     ADD_SUITE(economy);

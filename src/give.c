@@ -16,6 +16,7 @@
 #include <kernel/config.h>
 #include "give.h"
 
+#include "contact.h"
 #include "economy.h"
 #include "laws.h"
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "move.h"
 
+#include "contact.h"
 #include "lighthouse.h"
 
 #include <kernel/attrib.h>

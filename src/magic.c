@@ -22,11 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 #include "magic.h"
 
-#include "skill.h"
-#include "study.h"
+#include "contact.h"
 #include "helpers.h"
 #include "laws.h"
+#include "skill.h"
 #include "spells.h"
+#include "study.h"
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>

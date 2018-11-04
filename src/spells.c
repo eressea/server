@@ -17,6 +17,7 @@
 
 #include "spells.h"
 
+#include "contact.h"
 #include "guard.h"
 #include "reports.h"
 #include "spy.h"

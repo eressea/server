@@ -430,7 +430,7 @@ unit *findnewunit(const region * r, const faction * f, int n)
 /*********************/
 /*   at_alias   */
 /*********************/
-attrib_type at_alias = {
+static attrib_type at_alias = {
     "alias",
     DEFAULT_INIT,
     DEFAULT_FINALIZE,
@@ -449,6 +449,11 @@ int ualias(const unit * u)
     if (!a)
         return 0;
     return a->data.i;
+}
+
+void usetalias(unit *u, int alias)
+{
+    a_add(&u->attribs, a_new(&at_alias))->data.i = alias;
 }
 
 int a_readprivate(variant *var, void *owner, gamedata *data)
@@ -515,58 +520,6 @@ void usetprivate(unit * u, const char *str)
         free(a->data.v);
     }
     a->data.v = str_strdup(str);
-}
-
-/*********************/
-/*   at_target   */
-/*********************/
-attrib_type at_target = {
-    "target",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-/*********************/
-/*   at_contact   */
-/*********************/
-attrib_type at_contact = {
-    "contact",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-void usetcontact(unit * u, const unit * u2)
-{
-    attrib *a = a_find(u->attribs, &at_contact);
-    while (a && a->type == &at_contact && a->data.v != u2)
-        a = a->next;
-    if (a && a->type == &at_contact)
-        return;
-    a_add(&u->attribs, a_new(&at_contact))->data.v = (void *)u2;
-}
-
-bool ucontact(const unit * u, const unit * u2)
-/* Prueft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
-{
-    attrib *ru;
-    if (u->faction == u2->faction)
-        return true;
-
-    /* Explizites KONTAKTIERE */
-    for (ru = a_find(u->attribs, &at_contact); ru && ru->type == &at_contact;
-        ru = ru->next) {
-        if (((unit *)ru->data.v) == u2) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /***

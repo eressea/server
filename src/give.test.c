@@ -1,6 +1,8 @@
 #include <platform.h>
 
 #include "give.h"
+
+#include "contact.h"
 #include "economy.h"
 
 #include <kernel/ally.h>
