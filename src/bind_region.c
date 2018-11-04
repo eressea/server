@@ -36,7 +36,6 @@
 #include <lauxlib.h>
 #include <tolua.h>
 
-#include <assert.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
