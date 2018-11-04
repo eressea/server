@@ -195,7 +195,7 @@ static void test_give_men_limit(CuTest * tc) {
     config_set("rules.give.max_men", "1");
 
     /* below the limit, give men, increase newbies counter */
-    usetcontact(env.dst, env.src);
+    contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
@@ -204,7 +204,7 @@ static void test_give_men_limit(CuTest * tc) {
     msg_release(msg);
 
     /* beyond the limit, do nothing */
-    usetcontact(env.src, env.dst);
+    contact_unit(env.src, env.dst);
     msg = give_men(2, env.dst, env.src, NULL);
     CuAssertStrEquals(tc, "error129", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
@@ -283,7 +283,7 @@ static void test_give_men_other_faction(CuTest * tc) {
     env.f1 = test_create_faction(NULL);
     env.f2 = test_create_faction(NULL);
     setup_give(&env);
-    usetcontact(env.dst, env.src);
+    contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);

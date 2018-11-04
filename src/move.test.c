@@ -130,7 +130,7 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
-    usetcontact(mf.b->_owner, mf.sh->_owner);
+    contact_unit(mf.b->_owner, mf.sh->_owner);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
