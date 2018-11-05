@@ -1171,3 +1171,14 @@ function test_faction_keys()
     assert_equal(1, f:get_key('more'))
 end
 
+function test_cartmaking()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:set_skill('cartmaking', 1)
+    u:add_item('log', 10)
+    u:add_order('MACHE Wagen')
+    process_orders()
+    assert_equal(1, u:get_item('cart'))
+    assert_equal(5, u:get_item('log'))
+end
