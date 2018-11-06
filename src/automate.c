@@ -94,11 +94,15 @@ void autostudy_run(scholar scholars[], int nscholars)
         }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se && scholars[ti].level - TEACHDIFFERENCE > scholars[si].level && scholars[si].sk == sk; ++si) {
+        for (; si != se && scholars[si].sk == sk; ++si) {
+            if (scholars[si].level + TEACHDIFFERENCE <= scholars[ti].level) {
+                break;
+            }
             tt += scholars[si].u->number;
         }
-        if (si == se) {
-            /* there are no students, so standard learning only */
+        /* now si is the first unit we can teach, if we can teach any */
+        if (si == se || scholars[si].sk != sk) {
+            /* there are no students, so standard learning for everyone */
             for (t = ti; t != se; ++t) {
                 learning(scholars + t, scholars[t].u->number);
             }
@@ -109,7 +113,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit si has n students that can still be taught */
             int n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
-                if (i > n) {
+                if (i >= n) {
                     /* t has more than enough teaching capacity for s */
                     i -= n;
                     teaching(scholars + s, n);
@@ -148,6 +152,15 @@ void autostudy_run(scholar scholars[], int nscholars)
                     }
                     i = scholars[t].u->number * STUDENTS_PER_TEACHER;
                 }
+            }
+            if (i > 0) {
+                int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
+                /* teacher has remaining time */
+                learning(scholars + t, remain);
+            }
+            ++t;
+            for (; t < si; ++t) {
+                learning(scholars + t, scholars[t].u->number);
             }
         }
         ti = se;
