@@ -29,6 +29,21 @@ function test_castle_names()
     assert_equal("citadel", b:get_typename(6250))
 end
 
+function test_build_castle_one_stage()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r, 2)
+
+    u:add_item('stone', 4)
+
+    u:set_skill('building', 1)
+    u:add_order('MACHE BURG')
+
+    process_orders()
+    assert_equal(2, u.building.size)
+    assert_equal(2, u:get_item('stone'))
+end
+
 function test_build_castle_stages()
     local r = region.create(0,0, "plain")
     local f = faction.create("human")

@@ -5,6 +5,7 @@
 #include "bind_process.h"
 
 #include "battle.h"
+#include "contact.h"
 #include "economy.h"
 #include "laws.h"
 #include "magic.h"

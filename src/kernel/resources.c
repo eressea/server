@@ -46,8 +46,6 @@ void update_resources(region * r)
     }
 }
 
-extern int dice_rand(const char *s);
-
 static void update_resource(struct rawmaterial *res, double modifier)
 {
     double amount = (res->level - res->startlevel) / 100.0 * res->divisor + 1;
@@ -59,6 +57,15 @@ static void update_resource(struct rawmaterial *res, double modifier)
     assert(res->amount > 0);
 }
 
+void set_resource(struct rawmaterial *rm, int level, int base, int divisor)
+{
+    rm->level = level;
+    rm->startlevel = level;
+    rm->base = base;
+    rm->amount = base;
+    rm->divisor = divisor;
+}
+
 struct rawmaterial *
 add_resource(region * r, int level, int base, int divisor,
 const resource_type * rtype)
@@ -67,13 +74,9 @@ const resource_type * rtype)
 
     rm->next = r->resources;
     r->resources = rm;
-    rm->level = level;
-    rm->startlevel = level;
-    rm->base = base;
-    rm->amount = base;
-    rm->divisor = divisor;
     rm->flags = 0;
     rm->rtype = rtype;
+    set_resource(rm, level, base, divisor);
     return rm;
 }
 

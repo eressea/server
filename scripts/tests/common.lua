@@ -1058,6 +1058,21 @@ function test_give_silver()
     assert_equal(10, u:get_item("money"))
 end
 
+function test_build_castle_one_stage()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r, 2)
+
+    u:add_item('stone', 4)
+
+    u:set_skill('building', 1)
+    u:add_order('MACHE BURG')
+
+    process_orders()
+    assert_equal(2, u.building.size)
+    assert_equal(2, u:get_item('stone'))
+end
+
 function test_build_castle()
     local r = region.create(0, 0, "plain")
     local f = create_faction('human')
@@ -1134,4 +1149,36 @@ function test_immunity_stops_guard()
     process_orders()
     assert_equal(f.age, 2)
     assert_true(u.guard)
+end
+
+function test_region_keys()
+    local r = region.create(0, 0, 'plain')
+    assert_nil(r:get_key('test'))
+    assert_nil(r:get_key('more'))
+    r:set_key('test', 42)
+    r:set_key('more') -- default is 1
+    assert_equal(42, r:get_key('test'))
+    assert_equal(1, r:get_key('more'))
+end
+
+function test_faction_keys()
+    local f = faction.create('human')
+    assert_nil(f:get_key('test'))
+    assert_nil(f:get_key('more'))
+    f:set_key('test', 42)
+    f:set_key('more') -- default is 1
+    assert_equal(42, f:get_key('test'))
+    assert_equal(1, f:get_key('more'))
+end
+
+function test_cartmaking()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:set_skill('cartmaking', 1)
+    u:add_item('log', 10)
+    u:add_order('MACHE Wagen')
+    process_orders()
+    assert_equal(1, u:get_item('cart'))
+    assert_equal(5, u:get_item('log'))
 end

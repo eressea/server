@@ -22,11 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 #include "magic.h"
 
-#include "skill.h"
-#include "study.h"
+#include "contact.h"
 #include "helpers.h"
 #include "laws.h"
+#include "skill.h"
 #include "spells.h"
+#include "study.h"
 
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
@@ -1213,7 +1214,7 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 
 bool is_magic_resistant(unit * magician, unit * target, int resist_bonus)
 {
-    return (bool)target_resists_magic(magician, target, TYP_UNIT,
+    return target_resists_magic(magician, target, TYP_UNIT,
         resist_bonus);
 }
 

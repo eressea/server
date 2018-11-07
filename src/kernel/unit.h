@@ -120,15 +120,14 @@ extern "C" {
     } unit;
 
     extern struct attrib_type at_creator;
-    extern struct attrib_type at_alias;
-    extern struct attrib_type at_target;
     extern struct attrib_type at_potionuser;
-    extern struct attrib_type at_contact;
     extern struct attrib_type at_effect;
     extern struct attrib_type at_private;
     extern struct attrib_type at_showskchange;
 
     int ualias(const struct unit *u);
+    void usetalias(unit *u, int alias);
+
     int weight(const struct unit *u);
 
     void renumber_unit(struct unit *u, int no);
@@ -140,9 +139,6 @@ extern "C" {
 
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
-
-    bool ucontact(const struct unit *u, const struct unit *u2);
-    void usetcontact(struct unit *u, const struct unit *c);
 
     struct unit *findnewunit(const struct region *r, const struct faction *f,
         int alias);

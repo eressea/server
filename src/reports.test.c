@@ -440,21 +440,33 @@ static void test_get_addresses_fstealth(CuTest *tc) {
 
 static void test_get_addresses_travelthru(CuTest *tc) {
     report_context ctx;
-    faction *f, *f2, *f1;
+    faction *f, *f4, *f3, *f2, *f1;
     region *r1, *r2;
     unit *u;
+    race *rc;
 
     test_setup();
     f = test_create_faction(NULL);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
     r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     u = test_create_unit(f, r2);
     travelthru_add(r1, u);
+
+    f1 = test_create_faction(NULL);
     u = test_create_unit(f1, r1);
+    f2 = test_create_faction(NULL);
     set_factionstealth(u, f2);
     u->building = test_create_building(u->region, test_create_buildingtype("tower"));
+
+    rc = rc_get_or_create("dragon");
+    rc->flags |= RCF_UNARMEDGUARD;
+    f3 = test_create_faction(rc);
+    u = test_create_unit(f3, r1);
+    setguard(u, true);
+
+    f4 = test_create_faction(NULL);
+    u = test_create_unit(f4, r1);
+    set_level(u, SK_STEALTH, 1);
 
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
@@ -464,7 +476,9 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     CuAssertTrue(tc, selist_contains(ctx.addresses, f, NULL));
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
-    CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f3, NULL));
+    CuAssertTrue(tc, !selist_contains(ctx.addresses, f4, NULL));
+    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     finish_reports(&ctx);
     test_teardown();
 }

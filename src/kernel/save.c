@@ -614,7 +614,7 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
 
 static region *readregion(gamedata *data, int x, int y)
 {
-    region *r = findregion(x, y);
+    region *r;
     const terrain_type *terrain;
     char name[NAMESIZE];
     char info[DISPLAYSIZE];
@@ -622,26 +622,19 @@ static region *readregion(gamedata *data, int x, int y)
     int n;
 
     READ_INT(data->store, &uid);
-
+    r = findregionbyid(uid);
     if (r == NULL) {
-        plane *pl = findplane(x, y);
-        r = new_region(x, y, pl, uid);
+        r = region_create(uid);
     }
     else {
-        assert(uid == 0 || r->uid == uid);
-        while (r->attribs)
-            a_remove(&r->attribs, r->attribs);
-        if (r->land) {
-            free_land(r->land);
-            r->land = 0;
-        }
-        while (r->resources) {
-            rawmaterial *rm = r->resources;
-            r->resources = rm->next;
-            free(rm);
-        }
-        r->land = 0;
+        /* make sure this was not read earlier */
+        assert(r->next == NULL);
+        assert(r->attribs == NULL);
+        assert(r->land == NULL);
+        assert(r->resources == NULL);
     }
+    /* add region to the global list: */
+    add_region(r, x, y);
     if (data->version < LANDDISPLAY_VERSION) {
         read_regioninfo(data, r, info, sizeof(info));
     }

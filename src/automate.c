@@ -28,29 +28,38 @@ static int cmp_scholars(const void *lhs, const void *rhs)
     return (int)a->sk - (int)b->sk;
 }
 
-int autostudy_init(scholar scholars[], int max_scholars, region *r)
+int autostudy_init(scholar scholars[], int max_scholars, unit **units)
 {
-    unit *u;
+    unit *unext = NULL, *u = *units;
+    faction *f = u->faction;
     int nscholars = 0;
 
-    for (u = r->units; u; u = u->next) {
+    while (u) {
         keyword_t kwd = init_order(u->thisorder, u->faction->locale);
         if (kwd == K_AUTOSTUDY) {
             if (long_order_allowed(u)) {
-                scholar * st = scholars + nscholars;
-                skill_t sk = getskill(u->faction->locale);
-                if (check_student(u, u->thisorder, sk)) {
-                    st->sk = sk;
-                    st->level = effskill_study(u, st->sk);
-                    st->learn = 0;
-                    st->u = u;
-                    if (++nscholars == max_scholars) {
-                        log_fatal("you must increase MAXSCHOLARS");
+                if (f == u->faction) {
+                    scholar * st = scholars + nscholars;
+                    skill_t sk = getskill(u->faction->locale);
+                    if (check_student(u, u->thisorder, sk)) {
+                        st->sk = sk;
+                        st->level = effskill_study(u, st->sk);
+                        st->learn = 0;
+                        st->u = u;
+                        if (++nscholars == max_scholars) {
+                            log_fatal("you must increase MAXSCHOLARS");
+                        }
                     }
+                }
+                else if (!unext) {
+                    unext = u;
                 }
             }
         }
+        u = u->next;
     }
+    *units = unext;
+    scholars[nscholars].u = NULL;
     if (nscholars > 0) {
         qsort(scholars, nscholars, sizeof(scholar), cmp_scholars);
     }
@@ -85,11 +94,15 @@ void autostudy_run(scholar scholars[], int nscholars)
         }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se && scholars[ti].level - TEACHDIFFERENCE > scholars[si].level && scholars[si].sk == sk; ++si) {
+        for (; si != se && scholars[si].sk == sk; ++si) {
+            if (scholars[si].level + TEACHDIFFERENCE <= scholars[ti].level) {
+                break;
+            }
             tt += scholars[si].u->number;
         }
-        if (si == se) {
-            /* there are no students, so standard learning only */
+        /* now si is the first unit we can teach, if we can teach any */
+        if (si == se || scholars[si].sk != sk) {
+            /* there are no students, so standard learning for everyone */
             for (t = ti; t != se; ++t) {
                 learning(scholars + t, scholars[t].u->number);
             }
@@ -100,7 +113,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit si has n students that can still be taught */
             int n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
-                if (i > n) {
+                if (i >= n) {
                     /* t has more than enough teaching capacity for s */
                     i -= n;
                     teaching(scholars + s, n);
@@ -140,20 +153,37 @@ void autostudy_run(scholar scholars[], int nscholars)
                     i = scholars[t].u->number * STUDENTS_PER_TEACHER;
                 }
             }
+            if (i > 0) {
+                int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
+                /* teacher has remaining time */
+                learning(scholars + t, remain);
+            }
+            ++t;
+            for (; t < si; ++t) {
+                learning(scholars + t, scholars[t].u->number);
+            }
         }
         ti = se;
     }
 }
 
-#define MAXSCHOLARS 128
+#define MAXSCHOLARS 512
 
 void do_autostudy(region *r)
 {
+    static int max_scholars;
+    unit *units = r->units;
     scholar scholars[MAXSCHOLARS];
-    int i, nscholars = autostudy_init(scholars, MAXSCHOLARS, r);
-    autostudy_run(scholars, nscholars);
-    for (i = 0; i != nscholars; ++i) {
-        int days = STUDYDAYS * scholars[i].learn;
-        learn_skill(scholars[i].u, scholars[i].sk, days);
+    while (units) {
+        int i, nscholars = autostudy_init(scholars, MAXSCHOLARS, &units);
+        if (nscholars > max_scholars) {
+            stats_count("automate.max_scholars", nscholars - max_scholars);
+            max_scholars = nscholars;
+        }
+        autostudy_run(scholars, nscholars);
+        for (i = 0; i != nscholars; ++i) {
+            int days = STUDYDAYS * scholars[i].learn;
+            learn_skill(scholars[i].u, scholars[i].sk, days);
+        }
     }
 }

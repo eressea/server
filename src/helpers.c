@@ -178,7 +178,7 @@ static bool lua_equipunit(unit *u, const char *eqname, int mask) {
             lua_pop(L, 1);
         }
         else {
-            result = (bool)lua_toboolean(L, -1);
+            result = lua_toboolean(L, -1) != 0;
             lua_pop(L, 1);
         }
     }

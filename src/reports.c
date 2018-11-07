@@ -683,7 +683,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
     int i, dh;
     int getarnt = fval(u, UFL_ANON_FACTION);
     const char *pzTmp, *str;
-    bool isbattle = (bool)(mode == seen_battle);
+    bool isbattle = (mode == seen_battle);
     item *itm, *show = NULL;
     faction *fv;
     char *bufp = buf;
@@ -916,7 +916,7 @@ bufunit(const faction * f, const unit * u, seen_mode mode, char *buf,
         }
         if (!isbattle) {
             int printed = 0;
-            order *ord;;
+            order *ord;
             for (ord = u->old_orders; ord; ord = ord->next) {
                 keyword_t kwd = getkeyword(ord);
                 if (is_repeated(kwd)) {
@@ -1133,7 +1133,6 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
             if (data->lastf != sf && cansee_unit(ut, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
                 data->lastf = sf;
-                break;
             }
         }
     }

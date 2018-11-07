@@ -22,7 +22,6 @@ struct critbit_tree;
 static void test_read_unitid(CuTest *tc) {
     unit *u;
     order *ord;
-    attrib *a;
     struct locale *lang;
     struct terrain_type *t_plain;
 
@@ -31,8 +30,7 @@ static void test_read_unitid(CuTest *tc) {
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, t_plain));
-    a = a_add(&u->attribs, a_new(&at_alias));
-    a->data.i = atoi36("42"); /* this unit is also TEMP 42 */
+    usetalias(u, atoi36("42"));
 
     ord = create_order(K_GIVE, lang, "TEMP 42");
     init_order_depr(ord);
@@ -66,7 +64,6 @@ static void test_read_unitid(CuTest *tc) {
 static void test_getunit(CuTest *tc) {
     unit *u, *u2;
     order *ord;
-    attrib *a;
     struct region *r;
     struct locale *lang;
     struct terrain_type *t_plain;
@@ -76,8 +73,9 @@ static void test_getunit(CuTest *tc) {
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, t_plain));
-    a = a_add(&u->attribs, a_new(&at_alias));
-    a->data.i = atoi36("42"); /* this unit is also TEMP 42 */
+    /* This unit is also TEMP 42: */
+    usetalias(u, atoi36("42"));
+
     r = test_create_region(1, 0, t_plain);
 
     ord = create_order(K_GIVE, lang, itoa36(u->no));
