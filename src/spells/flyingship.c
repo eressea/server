@@ -47,7 +47,7 @@ int sp_flying_ship(castorder * co)
 
     assert(co);
     r = co_get_region(co);
-    mage = co->magician.u;
+    mage = co_get_magician(co);
     cast_level = co->level;
     power = co->force;
     pa = co->par;

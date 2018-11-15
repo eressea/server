@@ -10,6 +10,7 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth.factor", "0")
     eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("magic.regeneration.enable", "0")
 end
 
 function test_shapeshift()
@@ -102,6 +103,56 @@ function test_earn_silver()
     process_orders() -- not enough
     assert_equal(350, u:get_item("money"))
     assert_equal(0, r:get_resource("money"))
+end
+
+function test_familiar_cast()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u.magic = "gwyrrd"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    u:add_spell("earn_silver#gwyrrd")
+    u:add_order('ARBEITE')
+    local uf = unit.create(f, r)
+    uf.magic = "gwyrrd"
+    uf.race = "lynx"
+    uf:set_skill("magic", 5)
+    uf:add_order('ZAUBER STUFE 1 Viehheilung')
+    u.familiar = uf
+    process_orders()
+    assert_equal(198, u.aura) -- Fremdzauber, Kosten verdoppelt
+    assert_equal(10, u:get_item('money')) -- von ARBEITE
+    assert_equal(50, uf:get_item('money')) -- von Zauber
+    assert_equal(300, uf.region:get_resource("money"))
+end
+
+function test_familiar_mage_actions()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u.magic = "gwyrrd"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    u:add_spell("earn_silver#gwyrrd")
+    u:add_order('ZAUBER STUFE 1 Viehheilung')
+    local uf = unit.create(f, r)
+    uf.magic = "gwyrrd"
+    uf.race = "lynx"
+    uf:set_skill("magic", 5)
+    uf:add_order('ZAUBER STUFE 1 Viehheilung')
+    u.familiar = uf
+    u.name = 'Xolgrim'
+    uf.name = 'Zonk'
+    process_orders()
+    assert_equal(50, u:get_item('money'))
+    assert_equal(50, uf:get_item('money'))
+    assert_equal(250, uf.region:get_resource("money"))
+    assert_equal(197, u.aura)
 end
 
 function test_familiar()

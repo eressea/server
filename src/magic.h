@@ -140,6 +140,7 @@ extern "C" {
     } castorder;
 
     struct unit * co_get_caster(const struct castorder * co);
+    struct unit * co_get_magician(const struct castorder * co);
     struct region * co_get_region(const struct castorder * co);
 
     typedef struct spell_component {
@@ -288,9 +289,11 @@ extern "C" {
 
     /* Prüfroutinen für Zaubern */
     int countspells(struct unit *u, int step);
+    int spellcount(const struct unit *u);
     /*      erhöht den Counter für Zaubersprüche um 'step' und gibt die neue
      *      Anzahl der gezauberten Sprüche zurück. */
-    int spellcost(struct unit *u, const struct spell * sp);
+    int auracost(const struct unit *caster, const struct spell *sp);
+    int spellcost(const struct unit *caster, const struct spell_component *spc);
     /*      gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
      *      geringstmöglichen Stufe zurück, schon um den Faktor der bereits
      *      zuvor gezauberten Sprüche erhöht */
@@ -298,12 +301,12 @@ extern "C" {
         int distance, struct order *ord);
     /*      true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
      *      geringstmögliche Stufe hat und den Spruch beherrscht */
-    void pay_spell(struct unit *u, const struct spell * sp, int eff_stufe, int distance);
+    void pay_spell(struct unit *mage, const struct unit *caster, const struct spell * sp, int eff_stufe, int distance);
     /*      zieht die Komponenten des Zaubers aus dem Inventory der Einheit
      *      ab. Die effektive Stufe des gezauberten Spruchs ist wichtig für
      *      die korrekte Bestimmung der Magiepunktkosten */
-    int eff_spelllevel(struct unit *u, const struct spell * sp, int cast_level,
-        int distance);
+    int eff_spelllevel(struct unit *mage, struct unit *caster,
+        const struct spell * sp, int cast_level, int distance);
     /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
      *      die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
      *      bei Farcasting Stufe*2^Entfernung) */

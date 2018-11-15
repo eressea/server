@@ -123,9 +123,9 @@ void test_pay_spell(CuTest * tc)
     change_resource(u, get_resourcetype(R_AURA), 3);
     change_resource(u, get_resourcetype(R_HORSE), 3);
 
-    level = eff_spelllevel(u, sp, 3, 1);
+    level = eff_spelllevel(u, u, sp, 3, 1);
     CuAssertIntEquals(tc, 3, level);
-    pay_spell(u, sp, level, 1);
+    pay_spell(u, NULL, sp, level, 1);
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
@@ -157,16 +157,16 @@ void test_pay_spell_failure(CuTest * tc)
     CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_AURA), 2));
     CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_HORSE), 3));
 
-    level = eff_spelllevel(u, sp, 3, 1);
+    level = eff_spelllevel(u, u, sp, 3, 1);
     CuAssertIntEquals(tc, 2, level);
-    pay_spell(u, sp, level, 1);
+    pay_spell(u, NULL, sp, level, 1);
     CuAssertIntEquals(tc, 1, change_resource(u, get_resourcetype(R_SILVER), 1));
     CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_AURA), 3));
     CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_HORSE), 1));
 
-    CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
+    CuAssertIntEquals(tc, 0, eff_spelllevel(u, u, sp, 3, 1));
     CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
-    CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
+    CuAssertIntEquals(tc, 0, eff_spelllevel(u, u, sp, 2, 1));
     test_teardown();
 }
 
