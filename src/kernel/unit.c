@@ -1258,10 +1258,9 @@ void free_unit(unit * u)
 
     while (*pres) {
         struct reservation *res = *pres;
-        pres = &res->next;
+        *pres = res->next;
         free(res);
     }
-    u->reservations = NULL;
     if (u->skills) {
         free(u->skills);
         u->skills = NULL;

@@ -3479,10 +3479,9 @@ static void free_fighter(fighter * fig)
     armor **ap = &fig->armors;
     while (*ap) {
         armor *a = *ap;
-        ap = &a->next;
+        *ap = a->next;
         free(a);
     }
-    fig->armors = NULL;
     while (fig->loot) {
         i_free(i_remove(&fig->loot, fig->loot));
     }
@@ -3500,7 +3499,7 @@ static void battle_free(battle * b) {
         fighter **fp = &s->fighters;
         while (*fp) {
             fighter *fig = *fp;
-            fp = &fig->next;
+            *fp = fig->next;
             free_fighter(fig);
             free(fig);
         }
