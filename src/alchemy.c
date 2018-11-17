@@ -67,6 +67,7 @@ void new_potiontype(item_type * itype, int level)
     potion_type *ptype;
 
     ptype = (potion_type *)calloc(1, sizeof(potion_type));
+    assert(ptype);
     itype->flags |= ITF_POTION;
     ptype->itype = itype;
     ptype->level = level;

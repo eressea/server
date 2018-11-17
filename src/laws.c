@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "alchemy.h"
 #include "automate.h"
 #include "battle.h"
+#include "contact.h"
 #include "economy.h"
 #include "market.h"
 #include "morale.h"
@@ -910,21 +911,6 @@ void demographics(void)
 
     remove_empty_units();
     immigration();
-}
-
-int contact_cmd(unit * u, order * ord)
-{
-    unit *u2;
-    int n;
-
-    init_order_depr(ord);
-    n = read_unitid(u->faction, u->region);
-    u2 = findunit(n);
-
-    if (u2 != NULL) {
-        usetcontact(u, u2);
-    }
-    return 0;
 }
 
 int leave_cmd(unit * u, struct order *ord)
@@ -2855,7 +2841,7 @@ void maketemp_cmd(unit *u, order **olist)
         }
         u2 = create_unit(u->region, u->faction, 0, u->faction->race, alias, s, u);
         fset(u2, UFL_ISNEW);
-        a_add(&u2->attribs, a_new(&at_alias))->data.i = alias;
+        usetalias(u2, alias);
         sh = leftship(u);
         if (sh) {
             set_leftship(u2, sh);

@@ -26,7 +26,6 @@ extern "C" {
 #include <util/message.h>
 
     struct faction;
-    struct msglevel;
 
     typedef struct mlist {
         struct mlist *next;
@@ -38,13 +37,6 @@ extern "C" {
     } message_list;
 
     void free_messagelist(struct mlist *msgs);
-
-    typedef struct msglevel {
-        /* used to set specialized msg-levels */
-        struct msglevel *next;
-        const struct message_type *type;
-        int level;
-    } msglevel;
 
 #define MESSAGE_MISSING_IGNORE  0
 #define MESSAGE_MISSING_ERROR   1
@@ -63,7 +55,7 @@ extern "C" {
     struct mlist ** merge_messages(message_list *ml, message_list *append);
     void split_messages(message_list *ml, struct mlist **split);
 
-#define ADDMSG(msgs, mcreate) { message * mx = mcreate; if (mx) { assert(mx->refcount>=1); add_message(msgs, mx); msg_release(mx); } }
+#define ADDMSG(msgs, mcreate) { message * mx = mcreate; if (mx) { add_message(msgs, mx); msg_release(mx); } }
 
     void syntax_error(const struct unit *u, struct order *ord);
     void cmistake(const struct unit *u, struct order *ord, int mno, int mtype);

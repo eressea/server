@@ -51,6 +51,7 @@ void register_special_direction(struct locale *lang, const char *name)
 
         if (lang == locales) {
             dir_lookup *dl = malloc(sizeof(dir_lookup));
+            assert(dl);
             dl->name = str;
             dl->oldname = token;
             dl->next = dir_name_lookup;

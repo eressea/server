@@ -44,18 +44,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
 
-#include "move.h"
+#include "alchemy.h"
+#include "contact.h"
 #include "guard.h"
 #include "laws.h"
+#include "lighthouse.h"
+#include "monsters.h"
+#include "move.h"
+#include "piracy.h"
 #include "reports.h"
 #include "study.h"
 #include "spy.h"
-#include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
-#include "monsters.h"
-#include "lighthouse.h"
-#include "piracy.h"
 
 #include <spells/flyingship.h>
 #include <spells/unitcurse.h>

@@ -10,6 +10,7 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth.factor", "0")
     eressea.settings.set("magic.fumble.enable", "0")
+    eressea.settings.set("magic.regeneration.enable", "0")
 end
 
 function test_shapeshift()
@@ -104,6 +105,52 @@ function test_earn_silver()
     assert_equal(0, r:get_resource("money"))
 end
 
+function test_familiar_cast()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u.magic = "gwyrrd"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    u:add_spell("earn_silver#gwyrrd")
+    u:add_order('ARBEITE')
+    local uf = unit.create(f, r)
+    uf.race = "lynx"
+    uf:set_skill("magic", 5)
+    uf:add_order('ZAUBER STUFE 1 Viehheilung')
+    u.familiar = uf
+    process_orders()
+    assert_equal(198, u.aura) -- Fremdzauber, Kosten verdoppelt
+    assert_equal(10, u:get_item('money')) -- von ARBEITE
+    assert_equal(50, uf:get_item('money')) -- von Zauber
+    assert_equal(300, uf.region:get_resource("money"))
+end
+
+function test_familiar_mage_actions()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u.magic = "gwyrrd"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    u:add_spell("earn_silver#gwyrrd")
+    u:add_order('ZAUBER STUFE 1 Viehheilung')
+    local uf = unit.create(f, r)
+    uf.race = "lynx"
+    uf:set_skill("magic", 5)
+    uf:add_order('ZAUBER STUFE 1 Viehheilung')
+    u.familiar = uf
+    process_orders()
+    assert_equal(50, u:get_item('money'))
+    assert_equal(50, uf:get_item('money'))
+    assert_equal(250, uf.region:get_resource("money"))
+    assert_equal(197, u.aura)
+end
+
 function test_familiar()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("human")
@@ -147,4 +194,56 @@ function test_bug_2480()
   monster:add_order("ATTACK " .. itoa36(u1.id))
   process_orders()
   assert_equal(0, u1.number);
+end
+
+function test_bug_2517()
+  local r = region.create(0, 0, "plain")
+  local f = faction.create("elf")
+  local um = unit.create(f, r, 1)
+  local uf = nil
+  eressea.settings.set("magic.familiar.race", "lynx")
+  f.magic = 'gwyrrd'
+  um.name = 'Xolgrim'
+  um.magic = 'gwyrrd'
+  um.race = 'elf'
+  um:set_skill('magic', 10)
+  um:add_spell('summon_familiar')
+  um:add_spell('earn_silver#gwyrrd')
+  um:add_order('ZAUBERE Vertrauten~rufen')
+  um.aura = 200
+  process_orders()
+  uf = um.familiar
+  assert_not_nil(uf)
+  assert_equal('lynx', uf.race)
+  assert_nil(uf.magic)
+  uf:add_order('LERNE Magie')
+  um:clear_orders()
+  um:add_order('ARBEITEN')
+  process_orders()
+  assert_nil(uf.magic)
+  uf:add_order('ZAUBERE STUFE 1 Viehheilung')
+  process_orders()
+  assert_equal(50, uf:get_item('money'))
+end
+
+function test_familiar_school()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("money", 350)
+    r:set_resource("peasant", 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u.magic = "draig"
+    u:set_skill("magic", 10)
+    u.aura = 200
+    u:add_spell("fireball")
+    local uf = unit.create(f, r)
+    uf.race = "lynx"
+    u.familiar = uf
+
+    assert_nil(uf.magic)
+    uf:set_skill("magic", 5)
+    assert_nil(uf.magic)
+    uf.aura = 10
+    assert_equal(0, uf.aura)
+    assert_nil(uf.magic)
 end
