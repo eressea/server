@@ -488,7 +488,7 @@ contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
         mod *= (1 + ar->penalty);
     if (sh != NULL)
         mod *= (1 + sh->penalty);
-    vw = (int)(100 - ((100 - vw) * mod));
+    vw = (int)(100.0 - ((100.0 - (double)vw) * mod));
 
     do {
         p = (int)(rng_int() % 100);
@@ -1226,7 +1226,7 @@ static void calculate_attack_type(troop dt, troop at, int type, bool missile,
 static int crit_damage(int attskill, int defskill, const char *damage_formula) {
   int damage = 0;
   if (rule_damage & DAMAGE_CRITICAL) {
-      double kritchance = (attskill * 3 - defskill) / 200.0;
+      double kritchance = ((double)attskill * 3.0 - (double)defskill) / 200.0;
       int maxk = 4;
 
       kritchance = fmax(kritchance, 0.005);
@@ -2079,6 +2079,7 @@ void dazzle(battle * b, troop * td)
 
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
+    assert(bldg);
     bldg->size = MAX(1, bldg->size - damage_abs);
 
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
@@ -3428,11 +3429,12 @@ int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 
 battle *make_battle(region * r)
 {
-    battle *b = (battle *)calloc(1, sizeof(battle));
     unit *u;
     bfaction *bf;
     building * bld;
+    battle *b = (battle *)calloc(1, sizeof(battle));
 
+    assert(b);
     /* Alle Mann raus aus der Burg! */
     for (bld = r->buildings; bld != NULL; bld = bld->next)
         bld->sizeleft = bld->size;
@@ -3450,6 +3452,7 @@ battle *make_battle(region * r)
                 }
                 if (!bf) {
                     bf = (bfaction *)calloc(1, sizeof(bfaction));
+                    assert(bf);
                     ++b->nfactions;
                     bf->faction = u->faction;
                     bf->next = b->factions;
@@ -3473,13 +3476,15 @@ static void free_side(side * si)
 
 static void free_fighter(fighter * fig)
 {
+    armor **ap = &fig->armors;
+    while (*ap) {
+        armor *a = *ap;
+        ap = &a->next;
+        free(a);
+    }
+    fig->armors = NULL;
     while (fig->loot) {
         i_free(i_remove(&fig->loot, fig->loot));
-    }
-    while (fig->armors) {
-        armor *a = fig->armors;
-        fig->armors = a->next;
-        free(a);
     }
     free(fig->person);
     free(fig->weapons);
@@ -3492,13 +3497,14 @@ static void battle_free(battle * b) {
     assert(b);
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fnext = s->fighters;
-        while (fnext) {
-            fighter *fig = fnext;
-            fnext = fig->next;
+        fighter **fp = &s->fighters;
+        while (*fp) {
+            fighter *fig = *fp;
+            fp = &fig->next;
             free_fighter(fig);
             free(fig);
         }
+        s->fighters = NULL;
         free_side(s);
     }
     free(b);

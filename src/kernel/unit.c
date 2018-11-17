@@ -208,6 +208,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
                     nf = *fr;
                     if (nf == NULL || nf->faction != u2->faction) {
                         nf = malloc(sizeof(buddy));
+                        assert(nf);
                         nf->next = *fr;
                         nf->faction = u2->faction;
                         nf->unit = u2;
@@ -1004,11 +1005,15 @@ skill *add_skill(unit * u, skill_t sk)
     skill *sv;
     int i;
 
+    assert(u);
     for (i = 0; i != u->skill_size; ++i) {
         sv = u->skills + i;
         if (sv->id >= sk) break;
     }
-    u->skills = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    sv = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    assert(sv);
+    u->skills = sv;
+
     sv = u->skills + i;
     if (i < u->skill_size) {
         assert(sv->id != sk);
@@ -1244,24 +1249,31 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
+    struct reservation **pres = &u->reservations;
+
     assert(!u->region);
     free(u->_name);
     free_order(u->thisorder);
     free_orders(&u->orders);
-    if (u->skills)
+
+    while (*pres) {
+        struct reservation *res = *pres;
+        pres = &res->next;
+        free(res);
+    }
+    u->reservations = NULL;
+    if (u->skills) {
         free(u->skills);
+        u->skills = NULL;
+    }
     while (u->items) {
         item *it = u->items->next;
         u->items->next = NULL;
         i_free(u->items);
         u->items = it;
     }
-    while (u->attribs)
+    while (u->attribs) {
         a_remove(&u->attribs, u->attribs);
-    while (u->reservations) {
-        struct reservation *res = u->reservations;
-        u->reservations = res->next;
-        free(res);
     }
 }
 
