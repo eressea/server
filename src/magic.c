@@ -1262,8 +1262,8 @@ bool fumble(region * r, unit * u, const spell * sp, int cast_grade)
     }
 
     /* CHAOSPATZERCHANCE 10 : +10% Chance zu Patzern */
-    mage = get_mage_depr(u);
-    if (mage->magietyp == M_DRAIG) {
+    mage = get_mage(u);
+    if (mage && mage->magietyp == M_DRAIG) {
         fumble_chance += CHAOSPATZERCHANCE;
     }
     if (is_cursed(u->attribs, &ct_magicboost)) {

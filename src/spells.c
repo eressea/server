@@ -706,11 +706,13 @@ static int sp_transferaura(castorder * co)
 {
     int aura, gain, multi = 2;
     unit *caster = co_get_caster(co);
+    unit *mage = co_get_magician(co);
     int cast_level = co->level;
     spellparameter *pa = co->par;
     unit *u;
-    sc_mage *scm_dst, *scm_src = get_mage(caster);
+    sc_mage *scm_dst, *scm_src = get_mage(mage);
 
+    assert(scm_src);
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
@@ -5384,6 +5386,7 @@ int sp_fetchastral(castorder * co)
             ro = u->region;
         }
 
+        assert(ro);
         cast_level = co->level; /* at least one unit could have been teleported */
         if (is_cursed(ro->attribs, &ct_astralblock)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
@@ -5658,8 +5661,9 @@ int sp_disruptastral(castorder * co)
                 int c = rng_int() % inhab_regions;
 
                 /* Zufaellige Zielregion suchen */
-                while (c-- != 0)
+                while (c-- != 0) {
                     trl2 = trl2->next;
+                }
                 tr = trl2->data;
 
                 if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
@@ -5766,7 +5770,8 @@ int sp_permtransfer(castorder * co)
 {
     int aura, i;
     unit *tu;
-    unit *mage = co_get_caster(co);
+    unit *caster = co_get_caster(co);
+    unit *mage = co_get_magician(co);
     int cast_level = co->level;
     spellparameter *pa = co->par;
     const spell *sp = co->sp;
@@ -5787,7 +5792,7 @@ int sp_permtransfer(castorder * co)
     if (!is_mage(tu)) {
         /*    sprintf(buf, "%s in %s: 'ZAUBER %s': Einheit ist kein Magier."
               , unitname(mage), regionname(mage->region, mage->faction),sa->strings[0]); */
-        cmistake(mage, co->order, 214, MSG_MAGIC);
+        cmistake(caster, co->order, 214, MSG_MAGIC);
         return 0;
     }
 
@@ -5804,10 +5809,9 @@ int sp_permtransfer(castorder * co)
         change_maxspellpoints(tu, aura / 3);
     }
 
-    msg =
-        msg_message("sp_permtransfer_effect", "mage target amount", mage, tu, aura);
-    add_message(&mage->faction->msgs, msg);
-    if (tu->faction != mage->faction) {
+    msg = msg_message("sp_permtransfer_effect", "mage target amount", mage, tu, aura);
+    add_message(&caster->faction->msgs, msg);
+    if (tu->faction != caster->faction) {
         add_message(&tu->faction->msgs, msg);
     }
     msg_release(msg);
@@ -5908,7 +5912,8 @@ int sp_stealaura(castorder * co)
 {
     int taura;
     unit *u;
-    unit *mage = co_get_caster(co);
+    unit *mage = co_get_magician(co);
+    unit *caster = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
     spellparameter *pa = co->par;
@@ -5921,8 +5926,8 @@ int sp_stealaura(castorder * co)
     u = pa->param[0]->data.u;
 
     if (!get_mage_depr(u)) {
-        ADDMSG(&mage->faction->msgs, msg_message("stealaura_fail", "unit target",
-            mage, u));
+        ADDMSG(&caster->faction->msgs, msg_message("stealaura_fail", "unit target",
+            caster, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
         return 0;
     }
@@ -5934,16 +5939,16 @@ int sp_stealaura(castorder * co)
         get_mage_depr(mage)->spellpoints += taura;
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */
-        ADDMSG(&mage->faction->msgs, msg_message("stealaura_success",
-            "mage target aura", mage, u, taura));
+        ADDMSG(&caster->faction->msgs, msg_message("stealaura_success",
+            "mage target aura", caster, u, taura));
         /*    sprintf(buf, "%s fuehlt seine magischen Kraefte schwinden und verliert %d "
               "Aura.", unitname(u), taura); */
         ADDMSG(&u->faction->msgs, msg_message("stealaura_detect", "unit aura", u,
             taura));
     }
     else {
-        ADDMSG(&mage->faction->msgs, msg_message("stealaura_fail", "unit target",
-            mage, u));
+        ADDMSG(&caster->faction->msgs, msg_message("stealaura_fail", "unit target",
+            caster, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
     }
     return cast_level;
