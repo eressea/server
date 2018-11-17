@@ -784,13 +784,7 @@ int study_cmd(unit * u, order * ord)
             show_potions(f, skill);
         }
     }
-    else if (sk == SK_MAGIC) {
-        sc_mage *mage = get_mage_depr(u);
-        if (!mage) {
-            mage = create_mage(u, u->faction->magiegebiet);
-        }
-    }
-    init_order_depr(NULL);
+    init_order(NULL, NULL);
     return 0;
 }
 

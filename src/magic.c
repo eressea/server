@@ -904,6 +904,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
             itemhave = get_pooled(u, rtype, GET_DEFAULT, itemanz);
             if (itemhave < itemanz) {
                 resource *res = malloc(sizeof(resource));
+                assert(res);
                 res->number = itemanz - itemhave;
                 res->type = rtype;
                 res->next = reslist;
@@ -2874,7 +2875,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
 
     sb = unit_get_spellbook(u);
     if (sb) {
-        void * tokens = 0;
+        void * tokens = NULL;
         select_spellbook(&tokens, sb, lang);
         if (tokens) {
             variant token;
@@ -2885,7 +2886,7 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
             freetokens(tokens);
         }
     }
-    return 0;
+    return NULL;
 }
 
 int cast_spell(struct castorder *co)

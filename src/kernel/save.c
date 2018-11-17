@@ -1293,50 +1293,63 @@ ship *read_ship(gamedata *data)
     return sh;
 }
 
+static void fix_fam_mage(unit *u) {
+    sc_mage *m = get_mage(u);
+    if (m && m->magietyp != M_GRAY) {
+        /* unit should be a familiar that has aura and a spell-list */
+        if (!m->spellbook) {
+            m->magietyp = M_GRAY;
+        }
+    }
+}
 
-static void fix_familiars(void) {
+static void fix_fam_triggers(unit *u) {
+    attrib * a = a_find(u->attribs, &at_mage);
+    attrib * am = a_find(u->attribs, &at_familiarmage);
+    if (!am && a) {
+        /* not a familiar, but magical */
+        attrib * ae = a_find(u->attribs, &at_eventhandler);
+        if (ae) {
+            trigger **tlist;
+            tlist = get_triggers(ae, "destroy");
+            if (tlist) {
+                trigger *t;
+                unit *um = NULL;
+                for (t = *tlist; t; t = t->next) {
+                    if (t->type == &tt_shock) {
+                        um = (unit *)t->data.v;
+                        break;
+                    }
+                }
+                if (um) {
+                    attrib *af = a_find(um->attribs, &at_familiar);
+                    log_error("%s seems to be a broken familiar of %s.",
+                        unitname(u), unitname(um));
+                    if (af) {
+                        unit * uf = (unit *)af->data.v;
+                        log_error("%s already has a familiar: %s.",
+                            unitname(um), unitname(uf));
+                    }
+                    else {
+                        set_familiar(um, u);
+                    }
+                }
+                else {
+                    log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
+                }
+            }
+        }
+    }
+}
+
+static void fix_familiars(void (*callback)(unit *)) {
     region *r;
     for (r = regions; r; r = r->next) {
         unit * u;
         for (u = r->units; u; u = u->next) {
             if (u->_race != u->faction->race && (u->_race->flags & RCF_FAMILIAR)) {
                 /* unit is potentially a familiar */
-                attrib * a = a_find(u->attribs, &at_mage);
-                attrib * am = a_find(u->attribs, &at_familiarmage);
-                if (!am && a) {
-                    /* not a familiar, but magical */
-                    attrib * ae = a_find(u->attribs, &at_eventhandler);
-                    if (ae) {
-                        trigger **tlist;
-                        tlist = get_triggers(ae, "destroy");
-                        if (tlist) {
-                            trigger *t;
-                            unit *um = NULL;
-                            for (t = *tlist; t; t = t->next) {
-                                if (t->type == &tt_shock) {
-                                    um = (unit *)t->data.v;
-                                    break;
-                                }
-                            }
-                            if (um) {
-                                attrib *af = a_find(um->attribs, &at_familiar);
-                                log_error("%s seems to be a broken familiar of %s.",
-                                    unitname(u), unitname(um));
-                                if (af) {
-                                    unit * uf = (unit *)af->data.v;
-                                    log_error("%s already has a familiar: %s.",
-                                        unitname(um), unitname(uf));
-                                }
-                                else {
-                                    set_familiar(um, u);
-                                }
-                            }
-                            else {
-                                log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
-                            }
-                        }
-                    }
-                }
+                callback(u);
             }
         }
     }
@@ -1524,7 +1537,10 @@ int read_game(gamedata *data)
     }
 
     if (data->version < FAMILIAR_FIX_VERSION) {
-        fix_familiars();
+        fix_familiars(fix_fam_triggers);
+    }
+    if (data->version < FAMILIAR_FIXMAGE_VERSION) {
+        fix_familiars(fix_fam_mage);
     }
 
     log_debug("Done loading turn %d.", turn);

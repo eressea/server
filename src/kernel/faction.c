@@ -607,7 +607,7 @@ struct spellbook * faction_get_spellbook(struct faction *f)
     if (f->magiegebiet != M_GRAY) {
         return get_spellbook(magic_school[f->magiegebiet]);
     }
-    return 0;
+    return NULL;
 }
 
 static int allied_skillcount(const faction * f, skill_t sk)

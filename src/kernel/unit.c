@@ -1671,7 +1671,7 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
             return faction_get_spellbook(u->faction);
         }
     }
-    return 0;
+    return NULL;
 }
 
 int effskill(const unit * u, skill_t sk, const region *r)
