@@ -5748,6 +5748,26 @@ static int sp_eternizewall(castorder * co)
     return cast_level;
 }
 
+static bool change_spellpoints(struct unit *u, int delta) {
+    sc_mage *mage = get_mage(u);
+    if (mage) {
+        if (mage->spellpoints + delta >= 0) {
+            mage->spellpoints += delta;
+            return true;
+        }
+        mage->spellpoints = 0;
+    }
+    return false;
+}
+
+static enum magic_t get_magic_type(const struct unit *u) {
+    sc_mage *mage = get_mage(u);
+    if (mage) {
+        return mage->magietyp;
+    }
+    return M_GRAY;
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Opfere Kraft
  * Stufe:      15
@@ -5802,7 +5822,7 @@ int sp_permtransfer(castorder * co)
     change_maxspellpoints(mage, -aura);
     change_spellpoints(mage, -aura);
 
-    if (get_mage_depr(tu)->magietyp == get_mage_depr(mage)->magietyp) {
+    if (get_magic_type(tu) == get_magic_type(mage)) {
         change_maxspellpoints(tu, aura / 2);
     }
     else {
@@ -5935,8 +5955,8 @@ int sp_stealaura(castorder * co)
     taura = (get_mage_depr(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
 
     if (taura > 0) {
-        get_mage_depr(u)->spellpoints -= taura;
-        get_mage_depr(mage)->spellpoints += taura;
+        change_spellpoints(u, -taura);
+        change_spellpoints(mage, taura);
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */
         ADDMSG(&caster->faction->msgs, msg_message("stealaura_success",
