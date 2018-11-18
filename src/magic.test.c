@@ -182,7 +182,7 @@ void test_getspell_unit(CuTest * tc)
     r = test_create_region(0, 0, NULL);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    create_mage(u, M_GRAY);
+    create_mage(u, M_GWYRRD);
     enable_skill(SK_MAGIC, true);
 
     set_level(u, SK_MAGIC, 1);
@@ -451,7 +451,7 @@ static void test_max_spellpoints(CuTest *tc) {
     CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
     rc->maxaura = 200;
     CuAssertIntEquals(tc, 2, max_spellpoints(u->region, u));
-    create_mage(u, M_GRAY);
+    create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 1);
     CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
     set_level(u, SK_MAGIC, 2);

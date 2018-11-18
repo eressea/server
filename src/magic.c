@@ -126,7 +126,7 @@ int mage_change_spellpoints(sc_mage *m, int delta)
 {
     if (m) {
         int val = m->spellpoints + delta;
-        return m->spellpoints = (val > 0) ? val : m->spellpoints;
+        return m->spellpoints = (val >= 0) ? val : m->spellpoints;
     }
     return 0;
 }
