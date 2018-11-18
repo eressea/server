@@ -5748,19 +5748,7 @@ static int sp_eternizewall(castorder * co)
     return cast_level;
 }
 
-static bool change_spellpoints(struct unit *u, int delta) {
-    sc_mage *mage = get_mage(u);
-    if (mage) {
-        if (mage->spellpoints + delta >= 0) {
-            mage->spellpoints += delta;
-            return true;
-        }
-        mage->spellpoints = 0;
-    }
-    return false;
-}
-
-static enum magic_t get_magic_type(const struct unit *u) {
+static magic_t get_magic_type(const struct unit *u) {
     sc_mage *mage = get_mage(u);
     if (mage) {
         return mage->magietyp;
