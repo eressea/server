@@ -117,7 +117,7 @@ enum {
   MAXOPTIONS
 };
 
-typedef enum {
+typedef enum magic_t {
   M_GRAY = 0,                 /* Gray */
   M_ILLAUN = 1,               /* Illaun */
   M_TYBIED = 2,               /* Tybied */

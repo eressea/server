@@ -1294,11 +1294,19 @@ ship *read_ship(gamedata *data)
 }
 
 static void fix_fam_mage(unit *u) {
-    sc_mage *m = get_mage(u);
-    if (m && m->magietyp != M_GRAY) {
+    struct sc_mage *mage = get_mage(u);
+    magic_t mtype = mage_get_type(mage);
+    if (mtype != M_GRAY) {
+        int skill = get_level(u, SK_MAGIC);
         /* unit should be a familiar that has aura and a spell-list */
-        if (!m->spellbook) {
-            m->magietyp = M_GRAY;
+        if (skill > 0) {
+            struct spellbook * sb = mage_get_spellbook(mage);
+            if (!sb) {
+                unit_set_magic(u, M_GRAY);
+            }
+        }
+        else {
+            a_removeall(&u->attribs, &at_mage);
         }
     }
 }
@@ -1507,19 +1515,17 @@ int read_game(gamedata *data)
             assert(f->units);
             for (u = f->units; u; u = u->nextF) {
                 if (data->version < SPELL_LEVEL_VERSION) {
-                    sc_mage *mage = get_mage_depr(u);
+                    struct sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
                         int skl = effskill(u, SK_MAGIC, 0);
                         if (f->magiegebiet == M_GRAY) {
-                            log_error("faction %s had magic=gray, fixing (%s)", factionname(f), magic_school[mage->magietyp]);
-                            f->magiegebiet = mage->magietyp;
+                            f->magiegebiet = mage_get_type(mage);
+                            log_error("faction %s had magic=gray, fixing (%s)",
+                                factionname(f), magic_school[f->magiegebiet]);
                         }
                         if (f->max_spelllevel < skl) {
                             f->max_spelllevel = skl;
-                        }
-                        if (mage->spellcount < 0) {
-                            mage->spellcount = 0;
                         }
                     }
                 }

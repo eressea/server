@@ -637,10 +637,10 @@ static size_t spskill(char *buffer, size_t size, const struct locale * lang,
     bufp = STRLCPY(bufp, " ", size);
 
     if (sv->id == SK_MAGIC) {
-        sc_mage *mage = get_mage(u);
-        if (mage && mage->magietyp != M_GRAY) {
-            bufp = STRLCPY(bufp, LOC(lang, mkname("school",
-                magic_school[mage->magietyp])), size);
+        magic_t mtype = unit_get_magic(u);
+        if (mtype != M_GRAY) {
+            bufp = STRLCPY(bufp,
+                LOC(lang, mkname("school", magic_school[mtype])), size);
             bufp = STRLCPY(bufp, " ", size);
         }
     }

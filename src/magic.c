@@ -103,6 +103,78 @@ const char *magic_school[MAXMAGIETYP] = {
     "common"
 };
 
+struct combatspell {
+    int level;
+    const struct spell *sp;
+};
+
+typedef struct sc_mage {
+    magic_t magietyp;
+    int spellpoints;
+    int spchange;
+    int spellcount;
+    struct combatspell combatspells[MAXCOMBATSPELLS];
+    struct spellbook *spellbook;
+} sc_mage;
+
+int mage_get_spellpoints(const sc_mage *m)
+{
+    return m ? m->spellpoints : 0;
+}
+
+int mage_change_spellpoints(sc_mage *m, int delta)
+{
+    if (m) {
+        int val = m->spellpoints + delta;
+        return m->spellpoints = (val > 0) ? val : m->spellpoints;
+    }
+    return 0;
+}
+
+magic_t mage_get_type(const sc_mage *m)
+{
+    return m ? m->magietyp : M_GRAY;
+}
+
+const spell *mage_get_combatspell(const sc_mage *mage, int nr, int *level)
+{
+    assert(nr < MAXCOMBATSPELLS);
+    if (mage) {
+        if (level) {
+            *level = mage->combatspells[nr].level;
+        }
+        return mage->combatspells[nr].sp;
+    }
+    return NULL;
+}
+
+void unit_set_magic(struct unit *u, enum magic_t mtype)
+{
+    sc_mage *mage = get_mage(u);
+    if (mage) {
+        mage->magietyp = mtype;
+    }
+}
+
+magic_t unit_get_magic(const unit *u)
+{
+    return mage_get_type(get_mage(u));
+}
+
+void unit_add_spell(unit * u, struct spell * sp, int level)
+{
+    sc_mage *mage = get_mage(u);
+
+    if (!mage) {
+        log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
+        mage = create_mage(u, u->faction ? u->faction->magiegebiet : M_GRAY);
+    }
+    if (!mage->spellbook) {
+        mage->spellbook = create_spellbook(0);
+    }
+    spellbook_add(mage->spellbook, sp, level);
+}
+
 /**
  ** at_icastle
  ** TODO: separate castle-appearance from illusion-effects
@@ -199,6 +271,23 @@ const building_type *icastle_type(const struct attrib *a) {
 
 extern int dice(int count, int value);
 
+bool FactionSpells(void)
+{
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("rules.magic.factionlist", 0);
+    }
+    return rule != 0;
+}
+
+int get_spell_level_mage(const spell * sp, void * cbdata)
+{
+    sc_mage *mage = (sc_mage *)cbdata;
+    spellbook *book = get_spellbook(magic_school[mage->magietyp]);
+    spellbook_entry *sbe = spellbook_get(book, sp);
+    return sbe ? sbe->level : 0;
+}
+
 /* ------------------------------------------------------------- */
 /* aus dem alten System übriggebliegene Funktionen, die bei der
  * Umwandlung von alt nach neu gebraucht werden */
@@ -217,23 +306,6 @@ static void free_mage(variant *var)
         free(mage->spellbook);
     }
     free(mage);
-}
-
-bool FactionSpells(void)
-{
-    static int config, rule;
-    if (config_changed(&config)) {
-        rule = config_get_int("rules.magic.factionlist", 0);
-    }
-    return rule != 0;
-}
-
-int get_spell_level_mage(const spell * sp, void * cbdata)
-{
-    sc_mage *mage = (sc_mage *)cbdata;
-    spellbook *book = get_spellbook(magic_school[mage->magietyp]);
-    spellbook_entry *sbe = spellbook_get(book, sp);
-    return sbe ? sbe->level : 0;
 }
 
 static int read_mage(variant *var, void *owner, struct gamedata *data)
@@ -312,9 +384,10 @@ attrib_type at_mage = {
     ATF_UNIQUE
 };
 
-bool is_mage(const unit * u)
+bool is_mage(const struct unit * u)
 {
-    return get_mage_depr(u) != NULL;
+    sc_mage *m = get_mage(u);
+    return (m && m->magietyp != M_GRAY);
 }
 
 sc_mage *get_mage(const unit * u)
@@ -326,12 +399,22 @@ sc_mage *get_mage(const unit * u)
     return NULL;
 }
 
-sc_mage *get_mage_depr(const unit * u)
+struct spellbook * mage_get_spellbook(const struct sc_mage * mage) {
+    if (mage) {
+        return mage->spellbook;
+    }
+    return NULL;
+}
+
+struct spellbook * unit_get_spellbook(const struct unit * u)
 {
-    if (has_skill(u, SK_MAGIC)) {
-        attrib *a = a_find(u->attribs, &at_mage);
-        if (a) {
-            return (sc_mage *)a->data.v;
+    sc_mage * mage = get_mage(u);
+    if (mage) {
+        if (mage->spellbook) {
+            return mage->spellbook;
+        }
+        if (mage->magietyp != M_GRAY) {
+            return faction_get_spellbook(u->faction);
         }
     }
     return NULL;
@@ -436,17 +519,15 @@ int u_hasspell(const unit *u, const struct spell *sp)
 
 int get_combatspelllevel(const unit * u, int nr)
 {
-    sc_mage *m = get_mage_depr(u);
-
-    assert(nr < MAXCOMBATSPELLS);
-    if (m) {
-        int level = effskill(u, SK_MAGIC, 0);
-        if (level < m->combatspells[nr].level) {
-            return level;
+    int level;
+    if (mage_get_combatspell(get_mage(u), nr, &level) != NULL) {
+        int maxlevel = effskill(u, SK_MAGIC, 0);
+        if (level > maxlevel) {
+            return maxlevel;
         }
-        return m->combatspells[nr].level;
+        return level;
     }
-    return -1;
+    return 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -454,40 +535,15 @@ int get_combatspelllevel(const unit * u, int nr)
 
 const spell *get_combatspell(const unit * u, int nr)
 {
-    sc_mage *m;
-
-    assert(nr < MAXCOMBATSPELLS);
-    m = get_mage_depr(u);
-    if (m) {
-        return m->combatspells[nr].sp;
-    }
-    return NULL;
+    return mage_get_combatspell(get_mage(u), nr, NULL);
 }
 
 void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 {
-    sc_mage *mage = get_mage_depr(u);
+    sc_mage *mage = get_mage(u);
     int i = -1;
 
     assert(mage || !"trying to set a combat spell for non-mage");
-
-    /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
-    if (!knowsspell(u->region, u, sp)) {
-        /* Fehler 'Spell not found' */
-        cmistake(u, ord, 173, MSG_MAGIC);
-        return;
-    }
-    if (!u_hasspell(u, sp)) {
-        /* Diesen Zauber kennt die Einheit nicht */
-        cmistake(u, ord, 169, MSG_MAGIC);
-        return;
-    }
-    if (!(sp->sptyp & ISCOMBATSPELL)) {
-        /* Diesen Kampfzauber gibt es nicht */
-        cmistake(u, ord, 171, MSG_MAGIC);
-        return;
-    }
-
     if (sp->sptyp & PRECOMBATSPELL)
         i = 0;
     else if (sp->sptyp & COMBATSPELL)
@@ -502,13 +558,12 @@ void set_combatspell(unit * u, spell * sp, struct order *ord, int level)
 
 void unset_combatspell(unit * u, spell * sp)
 {
-    sc_mage *m;
     int nr = 0;
+    sc_mage *m = get_mage(u);
 
-    m = get_mage_depr(u);
-    if (!m)
+    if (!m) {
         return;
-
+    }
     if (!sp) {
         int i;
         for (i = 0; i < MAXCOMBATSPELLS; i++) {
@@ -540,26 +595,15 @@ void unset_combatspell(unit * u, spell * sp)
 /* Gibt die aktuelle Anzahl der Magiepunkte der Einheit zurück */
 int get_spellpoints(const unit * u)
 {
-    sc_mage *m;
-
-    m = get_mage_depr(u);
-    if (!m)
-        return 0;
-
-    return m->spellpoints;
+    return mage_get_spellpoints(get_mage(u));
 }
 
 void set_spellpoints(unit * u, int sp)
 {
-    sc_mage *m;
-
-    m = get_mage_depr(u);
-    if (!m)
-        return;
-
-    m->spellpoints = sp;
-
-    return;
+    sc_mage *m = get_mage(u);
+    if (m) {
+        m->spellpoints = sp;
+    }
 }
 
 /*
@@ -567,23 +611,7 @@ void set_spellpoints(unit * u, int sp)
  */
 int change_spellpoints(unit * u, int mp)
 {
-    sc_mage *m;
-    int sp;
-
-    m = get_mage_depr(u);
-    if (!m) {
-        return 0;
-    }
-
-    /* verhindere negative Magiepunkte */
-    sp = m->spellpoints + mp;
-    if (sp > 0) {
-        m->spellpoints = sp;
-    }
-    else {
-        m->spellpoints = 0;
-    }
-    return sp;
+    return mage_change_spellpoints(get_mage(u), mp);
 }
 
 /* bietet die Möglichkeit, die maximale Anzahl der Magiepunkte mit
@@ -593,11 +621,8 @@ static int get_spchange(const unit * u)
 {
     sc_mage *m;
 
-    m = get_mage_depr(u);
-    if (!m)
-        return 0;
-
-    return m->spchange;
+    m = get_mage(u);
+    return m ? m->spchange : 0;
 }
 
 /* ein Magier kann normalerweise maximal Stufe^2.1/1.2+1 Magiepunkte
@@ -645,9 +670,7 @@ int max_spellpoints(const region * r, const unit * u)
 
 int change_maxspellpoints(unit * u, int csp)
 {
-    sc_mage *m;
-
-    m = get_mage_depr(u);
+    sc_mage *m = get_mage(u);
     if (!m) {
         return 0;
     }
@@ -660,28 +683,22 @@ int change_maxspellpoints(unit * u, int csp)
  */
 int countspells(unit * u, int step)
 {
-    sc_mage *m;
-    int count;
-
-    m = get_mage_depr(u);
-    if (!m) {
-        return 0;
-    }
-    if (step == 0) {
-        return m->spellcount;
-    }
-    count = m->spellcount + step;
-
-    m->spellcount = (count > 0) ? count : 0;
-    return m->spellcount;
-}
-
-int spellcount(const unit *u) {
-    sc_mage *m = get_mage_depr(u);
+    sc_mage * m = get_mage(u);
     if (m) {
+        int count;
+        if (step == 0) {
+            return m->spellcount;
+        }
+        count = m->spellcount + step;
+        m->spellcount = (count > 0) ? count : 0;
         return m->spellcount;
     }
     return 0;
+}
+
+int spellcount(const unit *u) {
+    sc_mage *m = get_mage(u);
+    return m ? m->spellcount : 0;
 }
 
 /**

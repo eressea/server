@@ -420,15 +420,16 @@ int teach_cmd(unit * teacher, struct order *ord)
             if (sk == SK_MAGIC) {
                 /* ist der Magier schon spezialisiert, so versteht er nur noch
                  * Lehrer seines Gebietes */
-                sc_mage *mage1 = get_mage_depr(teacher);
-                sc_mage *mage2 = get_mage_depr(scholar);
-                if (mage2 && mage1 && mage2->magietyp != M_GRAY
-                    && mage1->magietyp != mage2->magietyp) {
-                    if (feedback) {
-                        ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
-                            "error_different_magic", "target", scholar));
+                magic_t mage2 = unit_get_magic(scholar);
+                if (mage2 != M_GRAY) {
+                    magic_t mage1 = unit_get_magic(teacher);
+                    if (mage1 != mage2) {
+                        if (feedback) {
+                            ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
+                                "error_different_magic", "target", scholar));
+                        }
+                        continue;
                     }
-                    continue;
                 }
             }
             sk_academy = sk;
