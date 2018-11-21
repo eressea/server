@@ -26,7 +26,6 @@ extern "C" {
 #include <util/message.h>
 
     struct faction;
-    struct msglevel;
 
     typedef struct mlist {
         struct mlist *next;
@@ -38,13 +37,6 @@ extern "C" {
     } message_list;
 
     void free_messagelist(struct mlist *msgs);
-
-    typedef struct msglevel {
-        /* used to set specialized msg-levels */
-        struct msglevel *next;
-        const struct message_type *type;
-        int level;
-    } msglevel;
 
 #define MESSAGE_MISSING_IGNORE  0
 #define MESSAGE_MISSING_ERROR   1
