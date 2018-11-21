@@ -166,7 +166,7 @@ void unit_add_spell(unit * u, struct spell * sp, int level)
     sc_mage *mage = get_mage(u);
 
     if (!mage) {
-        log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
+        log_error("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
         mage = create_mage(u, u->faction ? u->faction->magiegebiet : M_GRAY);
     }
     if (!mage->spellbook) {
