@@ -1293,24 +1293,6 @@ ship *read_ship(gamedata *data)
     return sh;
 }
 
-static void fix_fam_mage(unit *u) {
-    struct sc_mage *mage = get_mage(u);
-    magic_t mtype = mage_get_type(mage);
-    if (mtype != M_GRAY) {
-        int skill = get_level(u, SK_MAGIC);
-        /* unit should be a familiar that has aura and a spell-list */
-        if (skill > 0) {
-            struct spellbook * sb = mage_get_spellbook(mage);
-            if (!sb) {
-                unit_set_magic(u, M_GRAY);
-            }
-        }
-        else {
-            a_removeall(&u->attribs, &at_mage);
-        }
-    }
-}
-
 static void fix_fam_triggers(unit *u) {
     attrib * a = a_find(u->attribs, &at_mage);
     attrib * am = a_find(u->attribs, &at_familiarmage);

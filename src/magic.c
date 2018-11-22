@@ -166,8 +166,8 @@ void unit_add_spell(unit * u, struct spell * sp, int level)
     sc_mage *mage = get_mage(u);
 
     if (!mage) {
-        log_error("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
-        mage = create_mage(u, u->faction ? u->faction->magiegebiet : M_GRAY);
+        log_error("adding new spell %s to a previously non-magical unit %s\n", sp->sname, unitname(u));
+        mage = create_mage(u, M_GRAY);
     }
     if (!mage->spellbook) {
         mage->spellbook = create_spellbook(0);
@@ -350,7 +350,7 @@ static int read_mage(variant *var, void *owner, struct gamedata *data)
         read_spellbook(&mage->spellbook, data, get_spell_level_mage, mage);
     }
     else {
-        read_spellbook(0, data, 0, mage);
+        read_spellbook(NULL, data, NULL, mage);
     }
     return AT_READ_OK;
 }
@@ -2210,18 +2210,67 @@ void remove_familiar(unit * mage)
     }
 }
 
-void create_newfamiliar(unit * mage, unit * fam)
-{
-    /* skills and spells: */
+static void equip_familiar(unit *fam) {
+    /* items, skills and spells: */
     char eqname[64];
     const race *rc = u_race(fam);
-
-    set_familiar(mage, fam);
 
     snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
     if (!equip_unit(fam, eqname)) {
         log_info("could not perform initialization for familiar %s.\n", rc->_name);
     }
+}
+
+static int copy_spell_cb(spellbook_entry *sbe, void *udata) {
+    spellbook *sb = (spellbook *)udata;
+    spell * sp = spellref_get(&sbe->spref);
+    if (!spellbook_get(sb, sp)) {
+        spellbook_add(sb, sp, sbe->level);
+    }
+    return 0;
+}
+
+/**
+ * Einmalige Reparatur von Vertrauten (Bugs 2451, 2517).
+ */
+void fix_fam_mage(unit *u) {
+    sc_mage *dmage;
+    unit *du = unit_create(0);
+
+    u_setrace(du, u_race(u));
+    dmage = create_mage(du, M_GRAY);
+    equip_familiar(du);
+    if (dmage) {
+        sc_mage *mage = get_mage(u);
+        if (!mage) {
+            mage = create_mage(u, dmage->magietyp);
+        }
+        else if (dmage->magietyp != mage->magietyp) {
+            mage->magietyp = dmage->magietyp;
+        }
+        if (dmage->spellbook) {
+            if (!mage->spellbook) {
+                mage->spellbook = create_spellbook(NULL);
+                spellbook_foreach(dmage->spellbook, copy_spell_cb, mage->spellbook);
+            }
+        }
+        else {
+            if (mage->spellbook) {
+                spellbook_clear(mage->spellbook);
+                mage->spellbook = NULL;
+            }
+        }
+    }
+    free_unit(du);
+}
+
+void create_newfamiliar(unit * mage, unit * fam)
+{
+
+    create_mage(fam, M_GRAY);
+    set_familiar(mage, fam);
+    equip_familiar(fam);
+
     /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
     /* Wenn der Magier stirbt, dann auch der Vertraute */
     add_trigger(&mage->attribs, "destroy", trigger_killunit(fam));

@@ -326,7 +326,8 @@ extern "C" {
     void remove_familiar(struct unit *mage);
     void create_newfamiliar(struct unit *mage, struct unit *familiar);
     void create_newclone(struct unit *mage, struct unit *familiar);
-    struct unit *has_clone(struct unit *mage);
+
+    void fix_fam_mage(struct unit *u);
 
     const char *spell_info(const struct spell *sp,
         const struct locale *lang);

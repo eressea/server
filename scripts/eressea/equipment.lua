@@ -132,7 +132,7 @@ function equip_unit(u, name, flags)
         end
         local spells = set['spells']
         if spells then
-            for name, level in ipairs(spells) do
+            for name, level in pairs(spells) do
                 u:add_spell(name, level)
             end
         end
