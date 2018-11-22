@@ -429,9 +429,9 @@ static void test_study_magic(CuTest *tc) {
     CuAssertIntEquals(tc, 0, study_cmd(u, u->thisorder));
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrNotNull(tc, get_mage_depr(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error65"));
-    CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
+    CuAssertIntEquals(tc, M_GWYRRD, unit_get_magic(u));
 
     test_teardown();
 }

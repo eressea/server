@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2014,
+Copyright (c) 1998-2018,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -1430,9 +1430,10 @@ int movement_speed(const unit * u)
             /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
                 * Nicht kumulativ mit anderen Beschleunigungen! */
             if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
-                sc_mage *mage = get_mage(u);
-                if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
-                    if (has_skill(u, SK_MAGIC)) {
+                struct sc_mage *mage = get_mage(u);
+                if (mage) {
+                    magic_t mtype = mage_get_type(mage);
+                    if (mtype == M_TYBIED || mtype == M_ILLAUN) {
                         mp *= 2;
                     }
                 }

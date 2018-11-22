@@ -880,7 +880,7 @@ void cr_output_unit(stream *out, const faction * f,
         const char *xc;
         const char *c;
         int i;
-        sc_mage *mage;
+        struct sc_mage *mage;
 
         i = ualias(u);
         if (i > 0)
@@ -957,19 +957,23 @@ void cr_output_unit(stream *out, const faction * f,
         }
 
         /* spells that this unit can cast */
-        mage = get_mage_depr(u);
+        mage = get_mage(u);
         if (mage) {
             int maxlevel = effskill(u, SK_MAGIC, 0);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-                const spell *sp = mage->combatspells[i].sp;
+                int level;
+                const spell *sp = mage_get_combatspell(mage, i, &level);
                 if (sp) {
-                    const char *name =
-                        translate(mkname("spell", sp->sname), spell_name(sp, lang));
+                    const char *name;
+                    if (level > maxlevel) {
+                        level = maxlevel;
+                    }
                     stream_printf(out, "KAMPFZAUBER %d\n", i);
+                    name = translate(mkname("spell", sp->sname), spell_name(sp, lang));
                     stream_printf(out, "\"%s\";name\n", name);
-                    stream_printf(out, "%d;level\n", mage->combatspells[i].level);
+                    stream_printf(out, "%d;level\n", level);
                 }
             }
         }

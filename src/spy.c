@@ -72,11 +72,11 @@ void spy_message(int spy, const unit * u, const unit * target)
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
         target, status));
     if (spy > 20) {
-        sc_mage *mage = get_mage_depr(target);
+        magic_t mtype = unit_get_magic(target);
         /* for mages, spells and magic school */
-        if (mage) {
+        if (mtype != M_GRAY) {
             ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target type", u,
-                target, magic_school[mage->magietyp]));
+                target, magic_school[mtype]));
         }
     }
     if (spy > 6) {

@@ -587,14 +587,12 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_MAGIC)) {
-        sc_mage *mage;
         if (count_skill(u2->faction, SK_MAGIC) + u->number >
             skill_limit(u2->faction, SK_MAGIC)) {
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
-        mage = get_mage_depr(u);
-        if (!mage || u2->faction->magiegebiet != mage->magietyp) {
+        if (u2->faction->magiegebiet != unit_get_magic(u)) {
             cmistake(u, ord, 157, MSG_COMMERCE);
             return;
         }
