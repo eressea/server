@@ -704,13 +704,13 @@ static int sp_destroy_magic(castorder * co)
 
 static int sp_transferaura(castorder * co)
 {
-    int aura, gain, multi = 2;
+    int aura, used, multi = 2;
     unit *caster = co_get_caster(co);
     unit *mage = co_get_magician(co);
     int cast_level = co->level;
     spellparameter *pa = co->par;
     unit *u;
-    sc_mage *scm_dst, *scm_src = get_mage(mage);
+    struct sc_mage *scm_dst, *scm_src = get_mage(mage);
 
     assert(scm_src);
     /* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -725,25 +725,29 @@ static int sp_transferaura(castorder * co)
     /* Wieviel Transferieren? */
     aura = pa->param[1]->data.i;
     u = pa->param[0]->data.u;
-    scm_dst = get_mage_depr(u);
+    scm_dst = get_mage(u);
 
     if (scm_dst == NULL) {
         /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
         cmistake(caster, co->order, 207, MSG_MAGIC);
         return 0;
     }
-    else if (scm_src->magietyp == M_TYBIED) {
-        if (scm_src->magietyp != scm_dst->magietyp)
-            multi = 3;
-    }
-    else if (scm_src->magietyp == M_GRAY) {
-        if (scm_src->magietyp != scm_dst->magietyp)
-            multi = 4;
-    }
-    else if (scm_dst->magietyp != scm_src->magietyp) {
-        /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
-        cmistake(caster, co->order, 207, MSG_MAGIC);
-        return 0;
+    else {
+        magic_t src = mage_get_type(scm_src);
+        magic_t dst = mage_get_type(scm_dst);
+        if (src != dst) {
+            if (src == M_TYBIED) {
+                multi = 3;
+            }
+            else if (src == M_GRAY) {
+                multi = 4;
+            }
+            else {
+                /* "Zu dieser Einheit kann ich keine Aura uebertragen." */
+                cmistake(caster, co->order, 207, MSG_MAGIC);
+                return 0;
+            }
+        }
     }
 
     if (aura < multi) {
@@ -752,16 +756,15 @@ static int sp_transferaura(castorder * co)
         return 0;
     }
 
-    gain = scm_src->spellpoints;
-    if (gain > aura) gain = aura;
-    gain = gain / multi;
-    scm_src->spellpoints -= gain * multi;
-    scm_dst->spellpoints += gain;
+    used = mage_get_spellpoints(scm_src);
+    if (used > aura) used = aura;
+    mage_change_spellpoints(scm_src, -used);
+    mage_change_spellpoints(scm_dst, used / multi);
 
     /*  sprintf(buf, "%s transferiert %d Aura auf %s", unitname(mage),
           gain, unitname(u)); */
     ADDMSG(&caster->faction->msgs, msg_message("auratransfer_success",
-        "unit target aura", caster, u, gain));
+        "unit target aura", caster, u, used));
     return cast_level;
 }
 
@@ -5748,14 +5751,6 @@ static int sp_eternizewall(castorder * co)
     return cast_level;
 }
 
-static magic_t get_magic_type(const struct unit *u) {
-    sc_mage *mage = get_mage(u);
-    if (mage) {
-        return mage->magietyp;
-    }
-    return M_GRAY;
-}
-
 /* ------------------------------------------------------------- */
 /* Name:       Opfere Kraft
  * Stufe:      15
@@ -5810,7 +5805,7 @@ int sp_permtransfer(castorder * co)
     change_maxspellpoints(mage, -aura);
     change_spellpoints(mage, -aura);
 
-    if (get_magic_type(tu) == get_magic_type(mage)) {
+    if (unit_get_magic(tu) == unit_get_magic(mage)) {
         change_maxspellpoints(tu, aura / 2);
     }
     else {
@@ -5925,6 +5920,7 @@ int sp_stealaura(castorder * co)
     int cast_level = co->level;
     double power = co->force;
     spellparameter *pa = co->par;
+    struct sc_mage *scm;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag == TARGET_NOTFOUND)
@@ -5933,17 +5929,18 @@ int sp_stealaura(castorder * co)
     /* Zieleinheit */
     u = pa->param[0]->data.u;
 
-    if (!get_mage_depr(u)) {
+    scm = get_mage(u);
+    if (!scm) {
         ADDMSG(&caster->faction->msgs, msg_message("stealaura_fail", "unit target",
             caster, u));
         ADDMSG(&u->faction->msgs, msg_message("stealaura_fail_detect", "unit", u));
         return 0;
     }
 
-    taura = (get_mage_depr(u)->spellpoints * (rng_int() % (int)(3 * power) + 1)) / 100;
+    taura = (mage_get_spellpoints(scm) * (rng_int() % (int)(3 * power) + 1)) / 100;
 
     if (taura > 0) {
-        change_spellpoints(u, -taura);
+        mage_change_spellpoints(scm, -taura);
         change_spellpoints(mage, taura);
         /*    sprintf(buf, "%s entzieht %s %d Aura.", unitname(mage), unitname(u),
               taura); */

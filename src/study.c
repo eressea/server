@@ -420,15 +420,16 @@ int teach_cmd(unit * teacher, struct order *ord)
             if (sk == SK_MAGIC) {
                 /* ist der Magier schon spezialisiert, so versteht er nur noch
                  * Lehrer seines Gebietes */
-                sc_mage *mage1 = get_mage_depr(teacher);
-                sc_mage *mage2 = get_mage_depr(scholar);
-                if (mage2 && mage1 && mage2->magietyp != M_GRAY
-                    && mage1->magietyp != mage2->magietyp) {
-                    if (feedback) {
-                        ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
-                            "error_different_magic", "target", scholar));
+                magic_t mage2 = unit_get_magic(scholar);
+                if (mage2 != M_GRAY) {
+                    magic_t mage1 = unit_get_magic(teacher);
+                    if (mage1 != mage2) {
+                        if (feedback) {
+                            ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
+                                "error_different_magic", "target", scholar));
+                        }
+                        continue;
                     }
-                    continue;
                 }
             }
             sk_academy = sk;
@@ -622,7 +623,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (sk == SK_MAGIC) {
-        magic_t mtyp;
+        magic_t mtype;
         if (u->number > 1) {
             cmistake(u, ord, 106, MSG_MAGIC);
             return -1;
@@ -630,7 +631,7 @@ int study_cmd(unit * u, order * ord)
         if (is_familiar(u)) {
             /* Vertraute zaehlen nicht zu den Magiern einer Partei,
              * koennen aber nur Graue Magie lernen */
-            mtyp = M_GRAY;
+            mtype = M_GRAY;
         }
         else if (!has_skill(u, SK_MAGIC)) {
             int mmax = skill_limit(u->faction, SK_MAGIC);
@@ -640,24 +641,24 @@ int study_cmd(unit * u, order * ord)
                     "amount", mmax));
                 return -1;
             }
-            mtyp = getmagicskill(u->faction->locale);
-            if (mtyp == M_NONE || mtyp == M_GRAY) {
+            mtype = getmagicskill(u->faction->locale);
+            if (mtype == M_NONE || mtype == M_GRAY) {
                 /* wurde kein Magiegebiet angegeben, wird davon
                  * ausgegangen, dass das normal gelernt werden soll */
                 if (u->faction->magiegebiet != 0) {
-                    mtyp = u->faction->magiegebiet;
+                    mtype = u->faction->magiegebiet;
                 }
                 else {
                     /* Es wurde kein Magiegebiet angegeben und die Partei
                      * hat noch keins gewaehlt. */
-                    mtyp = getmagicskill(u->faction->locale);
-                    if (mtyp == M_NONE) {
+                    mtype = getmagicskill(u->faction->locale);
+                    if (mtype == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
                         return -1;
                     }
                 }
             }
-            if (mtyp != u->faction->magiegebiet) {
+            if (mtype != u->faction->magiegebiet) {
                 /* Es wurde versucht, ein anderes Magiegebiet zu lernen
                  * als das der Partei */
                 if (u->faction->magiegebiet != 0) {
@@ -667,25 +668,25 @@ int study_cmd(unit * u, order * ord)
                 else {
                     /* Lernt zum ersten mal Magie und legt damit das
                      * Magiegebiet der Partei fest */
-                    u->faction->magiegebiet = mtyp;
+                    u->faction->magiegebiet = mtype;
                 }
             }
-            create_mage(u, mtyp);
+            create_mage(u, mtype);
         }
         else {
             /* ist schon ein Magier und kein Vertrauter */
             if (u->faction->magiegebiet == 0) {
                 /* die Partei hat noch kein Magiegebiet gewaehlt. */
-                mtyp = getmagicskill(u->faction->locale);
-                if (mtyp == M_NONE) {
-                    mtyp = getmagicskill(u->faction->locale);
-                    if (mtyp == M_NONE) {
+                mtype = getmagicskill(u->faction->locale);
+                if (mtype == M_NONE) {
+                    mtype = getmagicskill(u->faction->locale);
+                    if (mtype == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
                         return -1;
                     }
                 }
                 /* Legt damit das Magiegebiet der Partei fest */
-                u->faction->magiegebiet = mtyp;
+                u->faction->magiegebiet = mtype;
             }
         }
     }

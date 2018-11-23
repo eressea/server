@@ -1657,34 +1657,6 @@ void u_setrace(struct unit *u, const struct race *rc)
     }
 }
 
-void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
-{
-    sc_mage *mage = m ? m : get_mage_depr(u);
-
-    if (!mage) {
-        log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
-        mage = create_mage(u, u->faction ? u->faction->magiegebiet : M_GRAY);
-    }
-    if (!mage->spellbook) {
-        mage->spellbook = create_spellbook(0);
-    }
-    spellbook_add(mage->spellbook, sp, level);
-}
-
-struct spellbook * unit_get_spellbook(const struct unit * u)
-{
-    sc_mage * mage = get_mage_depr(u);
-    if (mage) {
-        if (mage->spellbook) {
-            return mage->spellbook;
-        }
-        if (mage->magietyp != M_GRAY) {
-            return faction_get_spellbook(u->faction);
-        }
-    }
-    return NULL;
-}
-
 int effskill(const unit * u, skill_t sk, const region *r)
 {
     assert(u);

@@ -2419,7 +2419,22 @@ int combatspell_cmd(unit * u, struct order *ord)
     }
     else {
         /* KAMPFZAUBER "<Spruchname>"  setzt diesen Kampfzauber */
-        set_combatspell(u, sp, ord, level);
+        /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
+        if (!knowsspell(u->region, u, sp)) {
+            /* Fehler 'Spell not found' */
+            cmistake(u, ord, 173, MSG_MAGIC);
+        }
+        else if (!u_hasspell(u, sp)) {
+            /* Diesen Zauber kennt die Einheit nicht */
+            cmistake(u, ord, 169, MSG_MAGIC);
+        }
+        else if (!(sp->sptyp & ISCOMBATSPELL)) {
+            /* Diesen Kampfzauber gibt es nicht */
+            cmistake(u, ord, 171, MSG_MAGIC);
+        }
+        else {
+            set_combatspell(u, sp, ord, level);
+        }
     }
 
     return 0;
@@ -3169,8 +3184,8 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
 
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
-            sc_mage *mage = get_mage_depr(u);
-            if (mage) {
+            struct sc_mage * mage = get_mage(u);
+            if (mage && mage_get_spellbook(mage)) {
                 int level = effskill(u, SK_MAGIC, 0);
                 if (level > maxlevel) {
                     maxlevel = level;
@@ -3229,11 +3244,12 @@ static void update_spells(void)
             unit *mages[MAXMAGES];
             int i;
             int maxlevel = faction_getmages(f, mages, MAXMAGES);
+            struct spellbook *fsb;
 
             if (maxlevel && FactionSpells()) {
                 spellbook * book = get_spellbook(magic_school[f->magiegebiet]);
                 if (!f->spellbook) {
-                    f->spellbook = create_spellbook(0);
+                    f->spellbook = create_spellbook(NULL);
                 }
                 copy_spells(book, f->spellbook, maxlevel);
                 if (maxlevel > f->max_spelllevel) {
@@ -3241,13 +3257,14 @@ static void update_spells(void)
                     pick_random_spells(f, maxlevel, common_spells, COMMONSPELLS);
                 }
             }
-            show_new_spells(f, maxlevel, faction_get_spellbook(f));
+            fsb = faction_get_spellbook(f);
+            show_new_spells(f, maxlevel, fsb);
             for (i = 0; i != MAXMAGES && mages[i]; ++i) {
                 unit * u = mages[i];
-                sc_mage *mage = get_mage_depr(u);
-                if (mage && mage->spellbook) {
-                    int level = effskill(u, SK_MAGIC, 0);
-                    show_new_spells(f, level, mage->spellbook);
+                spellbook *sb = unit_get_spellbook(u);
+                if (sb != fsb) {
+                    int level = effskill(u, SK_MAGIC, NULL);
+                    show_new_spells(f, level, sb);
                 }
             }
         }

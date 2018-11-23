@@ -27,17 +27,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    /* ------------------------------------------------------------- */
-
 #define MAXCOMBATSPELLS 3       /* PRECOMBAT COMBAT POSTCOMBAT */
 #define MAX_SPELLRANK 9         /* Standard-Rank 5 */
 #define MAXINGREDIENT	5       /* bis zu 5 Komponenten pro Zauber */
 #define CHAOSPATZERCHANCE 10    /* +10% Chance zu Patzern */
-
-    /* ------------------------------------------------------------- */
-
 #define IRONGOLEM_CRUMBLE   15  /* monatlich Chance zu zerfallen */
 #define STONEGOLEM_CRUMBLE  10  /* monatlich Chance zu zerfallen */
+
+    struct sc_mage;
+    struct unit;
 
     extern const char *magic_school[MAXMAGIETYP];
     extern struct attrib_type at_familiar;
@@ -99,25 +97,11 @@ extern "C" {
      * - Spruchliste
      */
 
-    typedef struct combatspell {
-        int level;
-        const struct spell *sp;
-    } combatspell;
-
     typedef struct spell_names {
         struct spell_names *next;
         const struct locale *lang;
         void * tokens;
     } spell_names;
-
-    typedef struct sc_mage {
-        magic_t magietyp;
-        int spellpoints;
-        int spchange;
-        int spellcount;
-        combatspell combatspells[MAXCOMBATSPELLS];
-        struct spellbook *spellbook;
-    } sc_mage;
 
     /* ------------------------------------------------------------- */
     /* Zauberliste */
@@ -217,12 +201,22 @@ extern "C" {
      */
 
     /* Magier */
-    sc_mage *create_mage(struct unit *u, magic_t mtyp);
+    struct sc_mage *create_mage(struct unit *u, magic_t mtyp);
     /*      macht die struct unit zu einem neuen Magier: legt die struct u->mage an
      *      und     initialisiert den Magiertypus mit mtyp.  */
-    sc_mage *get_mage(const struct unit *u);
-    sc_mage *get_mage_depr(const struct unit *u);
-    /*      gibt u->mage zurück, bei nicht-Magiern *NULL */
+    struct sc_mage *get_mage(const struct unit *u);
+
+    enum magic_t mage_get_type(const struct sc_mage *mage);
+    const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
+    struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
+    int mage_get_spellpoints(const struct sc_mage *m);
+    int mage_change_spellpoints(struct sc_mage *m, int delta);
+
+    enum magic_t unit_get_magic(const struct unit *u);
+    void unit_set_magic(struct unit *u, enum magic_t mtype);
+    struct spellbook * unit_get_spellbook(const struct unit * u);
+    void unit_add_spell(struct unit * u, struct spell * sp, int level);
+
     bool is_mage(const struct unit *u);
     /*      gibt true, wenn u->mage gesetzt.  */
     bool is_familiar(const struct unit *u);
@@ -332,7 +326,8 @@ extern "C" {
     void remove_familiar(struct unit *mage);
     void create_newfamiliar(struct unit *mage, struct unit *familiar);
     void create_newclone(struct unit *mage, struct unit *familiar);
-    struct unit *has_clone(struct unit *mage);
+
+    void fix_fam_mage(struct unit *u);
 
     const char *spell_info(const struct spell *sp,
         const struct locale *lang);
