@@ -2173,8 +2173,10 @@ static void display_item(unit * u, const item_type * itype)
 static void display_race(faction * f, const race * rc)
 {
     char buf[2048];
+    sbstring sbs;
 
-    report_raceinfo(rc, f->locale, buf, sizeof(buf));
+    sbs_init(&sbs, buf, sizeof(buf));
+    report_raceinfo(rc, f->locale, &sbs);
     addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
 }
 
