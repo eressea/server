@@ -2198,28 +2198,23 @@ static void eval_resources(struct opstack **stack, const void *userdata)
     const struct locale *lang = f ? f->locale : default_locale;
     const struct resource *res = (const struct resource *)opop(stack).v;
     char buf[1024];        /* but we only use about half of this */
-    size_t size = sizeof(buf) - 1;
     variant var;
-
-    char *bufp = buf;
-    while (res != NULL && size > 4) {
+    sbstring sbs;
+    
+    sbs_init(&sbs, buf, sizeof(buf));
+    while (res != NULL) {
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
-        int result = snprintf(bufp, size, "%d %s", res->number, LOC(lang, rname));
-        if (wrptr(&bufp, &size, result) != 0 || size < sizeof(buf) / 2) {
-            WARN_STATIC_BUFFER();
-            break;
-        }
+        sbs_strcat(&sbs, str_itoa(res->number));
+        sbs_strcat(&sbs, "");
+        sbs_strcat(&sbs, LOC(lang, rname));
 
         res = res->next;
-        if (res != NULL && size > 2) {
-            strcat(bufp, ", ");
-            bufp += 2;
-            size -= 2;
+        if (res != NULL) {
+            sbs_strcat(&sbs, ", ");
         }
     }
-    *bufp = 0;
-    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
+    var.v = strcpy(balloc(sbs_length(&sbs)), buf);
     opush(stack, var);
 }
 

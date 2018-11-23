@@ -34,6 +34,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #endif
 
+const char *str_itoa(int n) {
+    static char buf[12];
+    snprintf(buf, sizeof(buf), "%d", n);
+    return buf;
+}
+
 size_t str_strlcpy(char *dst, const char *src, size_t len)
 {
 #ifdef HAVE_BSDSTRING
