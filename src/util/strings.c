@@ -18,6 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifdef _MSC_VER
 #include <platform.h>
+#define HAVE__ITOA
 #endif
 #include "strings.h"
 
@@ -34,10 +35,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #endif
 
-const char *str_itoa(int n) {
-    static char buf[12];
-    snprintf(buf, sizeof(buf), "%d", n);
-    return buf;
+const char* str_itoab(int val, int base)
+{
+    static char buf[32] = { 0 };
+#ifdef HAVE__ITOAB
+    return _itoa(val, buf, base);
+#else
+    int i = 30;
+    for (; val && i; --i, val /= base) {
+        buf[i] = "0123456789abcdefghijklmnopqrstuvwxyz"[val % base];
+    }
+    return &buf[i + 1];
+#endif
+}
+
+const char *str_itoa(int n)
+{
+#ifdef HAVE__ITOA
+    static char buf[32] = { 0 };
+    return _itoa(n, buf, 10);
+#else
+    return str_itoab(n, 10);
+#endif
 }
 
 size_t str_strlcpy(char *dst, const char *src, size_t len)
