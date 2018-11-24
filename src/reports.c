@@ -645,15 +645,6 @@ static void spskill(sbstring *sbp, const struct locale * lang,
     }
 }
 
-static size_t spskill_depr(char *buffer, size_t size, const struct locale * lang,
-    const struct unit * u, struct skill * sv, int *dh)
-{
-    sbstring sbs;
-    sbs_init(&sbs, buffer, size);
-    spskill(&sbs, lang, u, sv, dh);
-    return sbs_length(&sbs);
-}
-
 void bufunit(const faction * f, const unit * u, const faction *fv,
     seen_mode mode, int getarnt, struct sbstring *sbp)
 {
