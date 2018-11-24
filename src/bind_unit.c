@@ -62,7 +62,7 @@ static int tolua_bufunit(lua_State * L) {
         if (f) {
             char buf[8192];
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
-            bufunit(f, u, mode, buf, sizeof(buf));
+            bufunit_depr(f, u, mode, buf, sizeof(buf));
             tolua_pushstring(L, buf);
             return 1;
         }
@@ -199,7 +199,7 @@ static int tolua_unit_set_id(lua_State * L)
 static int tolua_unit_get_auramax(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, max_spellpoints(self->region, self));
+    lua_pushinteger(L, max_spellpoints_depr(self->region, self));
     return 1;
 }
 

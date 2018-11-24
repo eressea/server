@@ -646,13 +646,16 @@ static int use_item_aura(const region * r, const unit * u)
     return n;
 }
 
-int max_spellpoints(const region * r, const unit * u)
+int max_spellpoints(const struct unit *u, const region * r)
 {
     int sk;
     double n, msp = 0;
     double potenz = 2.1;
     double divisor = 1.2;
     const struct resource_type *rtype;
+
+    assert(u);
+    if (!r) r = u->region;
 
     sk = effskill(u, SK_MAGIC, r);
     msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
@@ -668,6 +671,11 @@ int max_spellpoints(const region * r, const unit * u)
     return (msp > 0) ? (int)msp : 0;
 }
 
+int max_spellpoints_depr(const struct region *r, const struct unit *u)
+{
+    return max_spellpoints(u, r);
+}
+
 int change_maxspellpoints(unit * u, int csp)
 {
     sc_mage *m = get_mage(u);
@@ -675,7 +683,7 @@ int change_maxspellpoints(unit * u, int csp)
         return 0;
     }
     m->spchange += csp;
-    return max_spellpoints(u->region, u);
+    return max_spellpoints_depr(u->region, u);
 }
 
 /* ------------------------------------------------------------- */
@@ -1456,7 +1464,7 @@ void regenerate_aura(void)
         for (u = r->units; u; u = u->next) {
             if (u->number && is_mage(u)) {
                 aura = get_spellpoints(u);
-                auramax = max_spellpoints(r, u);
+                auramax = max_spellpoints_depr(r, u);
                 if (aura < auramax) {
                     struct building *b = inside_building(u);
                     const struct building_type *btype = building_is_active(b) ? b->type : NULL;
@@ -2977,6 +2985,11 @@ int cast_spell(struct castorder *co)
         return callbacks.cast_spell(co, fname);
     }
     return fun(co);
+}
+
+const char *magic_name(magic_t mtype, const struct locale *lang)
+{
+    return LOC(lang, mkname("school", magic_school[mtype]));
 }
 
 static critbit_tree cb_spellbooks;

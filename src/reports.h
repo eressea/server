@@ -88,12 +88,15 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit(const struct faction *f, const struct unit *u, seen_mode mode,
+    int bufunit_depr(const struct faction *f, const struct unit *u, seen_mode mode,
         char *buf, size_t size);
+    void bufunit(const struct faction * f, const struct unit * u,
+        const struct faction *fv, seen_mode mode, int getarnt, 
+        struct sbstring *sbp);
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);
-    size_t report_status(const struct unit *u,
+    size_t report_status_depr(const struct unit *u,
         const struct locale *lang, char *buf, size_t siz);
     void report_battle_start(struct battle * b);
 
