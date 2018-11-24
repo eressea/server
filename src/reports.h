@@ -121,7 +121,7 @@ extern "C" {
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, int now);
     void report_raceinfo(const struct race *rc, const struct locale *lang, struct sbstring *sbp);
-    void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
+    void report_race_skills_depr(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);
