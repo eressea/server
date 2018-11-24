@@ -2192,31 +2192,29 @@ static void eval_regions(struct opstack **stack, const void *userdata)
     int handle_end, begin = opop(stack).i;
     const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[256];
-    size_t size = sizeof(buf) - 1;
     variant var;
-    char *bufp = buf;
+    sbstring sbs;
 
+    sbs_init(&sbs, buf, sizeof(buf));
     if (aregs == NULL) {
         handle_end = begin;
     }
-    else {
-        if (i >= 0)
-            handle_end = begin + i;
-        else
-            handle_end = aregs->nregions + i;
+    else if (i >= 0) {
+        handle_end = begin + i;
     }
+    else {
+        handle_end = aregs->nregions + i;
+    }
+
     for (i = begin; i < handle_end; ++i) {
         const char *rname = (const char *)regionname(aregs->regions[i], report);
-        bufp = STRLCPY(bufp, rname, size);
+        sbs_strcat(&sbs, rname);
 
-        if (i + 1 < handle_end && size > 2) {
-            strcat(bufp, ", ");
-            bufp += 2;
-            size -= 2;
+        if (i + 1 < handle_end) {
+            sbs_strcat(&sbs, ", ");
         }
     }
-    *bufp = 0;
-    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
+    var.v = strcpy(balloc(sbs_length(&sbs)), buf);
     opush(stack, var);
 }
 
