@@ -1483,6 +1483,34 @@ static void test_show_without_item(CuTest *tc)
     test_teardown();
 }
 
+static struct locale *setup_locale(void) {
+    struct locale *loc;
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "iteminfo::elvenhorse", "Elfenpferd Informationen");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    locale_setstring(loc, "race::human_p", "Menschen");
+    locale_setstring(loc, "race::human", "Mensch");
+    locale_setstring(loc, "stat_hitpoints", "Trefferpunkte");
+    locale_setstring(loc, "stat_attack", "Angriff");
+    locale_setstring(loc, "stat_attacks", "Angriffe");
+    locale_setstring(loc, "stat_defense", "Verteidigung");
+    locale_setstring(loc, "stat_armor", "Ruestung");
+    locale_setstring(loc, "stat_equipment", "Gegenstaende");
+    locale_setstring(loc, "stat_pierce", "Pieks");
+    locale_setstring(loc, "stat_cut", "Schnipp");
+    locale_setstring(loc, "stat_bash", "Boink");
+    locale_setstring(loc, "attack_magical", "magisch");
+    locale_setstring(loc, "attack_standard", "normal");
+    locale_setstring(loc, "attack_natural", "natuerlich");
+    locale_setstring(loc, "attack_structural", "strukturell");
+    init_locale(loc);
+    return loc;
+}
+
 static void test_show_race(CuTest *tc) {
     order *ord;
     race * rc;
@@ -1495,12 +1523,7 @@ static void test_show_race(CuTest *tc) {
     test_create_race("human");
     rc = test_create_race("elf");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    locale_setstring(loc, "race::human_p", "Menschen");
-    locale_setstring(loc, "race::human", "Mensch");
-    init_locale(loc);
+    loc = setup_locale();
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     u->faction->locale = loc;
 
@@ -1536,13 +1559,7 @@ static void test_show_both(CuTest *tc) {
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "elvenhorse", "Elfenpferd");
-    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
-    locale_setstring(loc, "iteminfo::elvenhorse", "Hiyaa!");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    init_locale(loc);
+    loc = setup_locale();
 
     CuAssertPtrNotNull(tc, finditemtype("elf", loc));
     CuAssertPtrNotNull(tc, findrace("elf", loc));
@@ -1558,7 +1575,7 @@ static void test_show_both(CuTest *tc) {
     CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
     msg = test_find_messagetype(u->faction->msgs, "displayitem");
     CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Hiyaa!", msg->parameters[2].v, 4) == 0);
+    CuAssertTrue(tc, memcmp("Elfenpferd Informationen", msg->parameters[2].v, 4) == 0);
     test_clear_messages(u->faction);
     free_order(ord);
     test_teardown();

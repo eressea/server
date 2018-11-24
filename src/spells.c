@@ -3790,7 +3790,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     /* maximal Stufe Personen */
-    if (target->number > cast_level || target->number > max_spellpoints(r, mage)) {
+    if (target->number > cast_level || target->number > max_spellpoints_depr(r, mage)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_toomanytargets", ""));
         return 0;

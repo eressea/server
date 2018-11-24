@@ -326,7 +326,7 @@ static void calculate_emigration(region * r)
 
 static double peasant_growth_factor(void)
 {
-    return config_get_flt("rules.peasants.growth.factor", 0.0001F * PEASANTGROWTH);
+    return config_get_flt("rules.peasants.growth.factor", 0.0001 * (double)PEASANTGROWTH);
 }
 
 static double peasant_luck_factor(void)
@@ -424,8 +424,10 @@ static migration *get_migrants(region * r)
         /* Es gibt noch keine Migration. Also eine erzeugen
          */
         m = free_migrants;
-        if (!m)
+        if (!m) {
             m = calloc(1, sizeof(migration));
+            if (!m) abort();
+        }
         else {
             free_migrants = free_migrants->next;
             m->horses = 0;
@@ -476,8 +478,8 @@ static void horses(region * r)
         }
         else if (maxhorses > 0) {
             double growth =
-                (RESOURCE_QUANTITY * HORSEGROWTH * 200 * (maxhorses -
-                    horses)) / maxhorses;
+                (RESOURCE_QUANTITY * (HORSEGROWTH * 200.0 * ((double)maxhorses -
+                    horses))) / (double)maxhorses;
 
             if (growth > 0) {
                 int i;
@@ -1233,6 +1235,7 @@ static void remove_idle_players(void)
     i = turn + 1;
     if (i < 4) i = 4;
     age = calloc(i, sizeof(int));
+    if (!age) abort();
     for (fp = &factions; *fp;) {
         faction *f = *fp;
         if (!is_monsters(f)) {
@@ -1393,8 +1396,10 @@ static void init_prefixnames(void)
             }
             in = in->next;
         }
-        if (in == NULL)
+        if (in == NULL) {
             in = calloc(sizeof(local_names), 1);
+            if (!in) abort();
+        }
         in->next = pnames;
         in->lang = lang;
 
@@ -1432,7 +1437,8 @@ int prefix_cmd(unit * u, struct order *ord)
     }
     if (in == NULL) {
         init_prefixnames();
-        for (in = pnames; in->lang != lang; in = in->next);
+        for (in = pnames; in && in->lang != lang; in = in->next);
+        if (!in) return 0;
     }
 
     init_order_depr(ord);
@@ -2173,8 +2179,10 @@ static void display_item(unit * u, const item_type * itype)
 static void display_race(faction * f, const race * rc)
 {
     char buf[2048];
+    sbstring sbs;
 
-    report_raceinfo(rc, f->locale, buf, sizeof(buf));
+    sbs_init(&sbs, buf, sizeof(buf));
+    report_raceinfo(rc, f->locale, &sbs);
     addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
 }
 
@@ -3070,9 +3078,11 @@ void monthly_healing(void)
             /* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
              * oder verändertes Ausdauertalent verursacht */
             if (u->hp > umhp) {
-                u->hp -= (int)ceil((u->hp - umhp) / 2.0);
-                if (u->hp < umhp)
+                int diff = u->hp - umhp;
+                u->hp -= (int)ceil(diff / 2.0);
+                if (u->hp < umhp) {
                     u->hp = umhp;
+                }
                 continue;
             }
 
@@ -3509,6 +3519,7 @@ static processor *add_proc(int priority, const char *name, processor_t type)
     }
 
     proc = (processor *)malloc(sizeof(processor));
+    if (!proc) abort();
     proc->priority = priority;
     proc->type = type;
     proc->name = name;
