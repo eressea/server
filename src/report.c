@@ -1982,8 +1982,6 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
     }
 }
 
-#include "util/bsdstring.h"
-
 int
 report_plaintext(const char *filename, report_context * ctx,
     const char *bom)
