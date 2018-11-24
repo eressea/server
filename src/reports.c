@@ -297,13 +297,6 @@ static void buforder(sbstring *sbp, const order * ord, const struct locale *lang
     sbs_strcat(sbp, "\"");
 }
 
-static size_t buforder_depr(char *buffer, size_t size, const order * ord, const struct locale *lang, int mode) {
-    sbstring sbs;
-    sbs_init(&sbs, buffer, size);
-    buforder(&sbs, ord, lang, mode);
-    return sbs_length(&sbs);
-}
-
 /** create a report of a list of items to a non-owner.
  * \param result: an array of size items.
  * \param size: maximum number of items to return
