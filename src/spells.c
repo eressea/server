@@ -592,7 +592,7 @@ static int sp_summon_familiar(castorder * co)
     msg_release(msg);
     make_familiar(caster, r, rc, zText);
 
-    report_race_skills(rc, zText, sizeof(zText), caster->faction->locale);
+    report_race_skills_depr(rc, zText, sizeof(zText), caster->faction->locale);
     ADDMSG(&caster->faction->msgs, msg_message("familiar_describe",
         "mage race skills", caster, rc, zText));
     return cast_level;
@@ -3790,7 +3790,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     /* maximal Stufe Personen */
-    if (target->number > cast_level || target->number > max_spellpoints(r, mage)) {
+    if (target->number > cast_level || target->number > max_spellpoints_depr(r, mage)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_toomanytargets", ""));
         return 0;

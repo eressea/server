@@ -917,7 +917,7 @@ void cr_output_unit(stream *out, const faction * f,
         }
         if (is_mage(u)) {
             stream_printf(out, "%d;Aura\n", get_spellpoints(u));
-            stream_printf(out, "%d;Auramax\n", max_spellpoints(u->region, u));
+            stream_printf(out, "%d;Auramax\n", max_spellpoints_depr(u->region, u));
         }
         /* default commands */
         stream_printf(out, "COMMANDS\n");

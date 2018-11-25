@@ -676,7 +676,7 @@ nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_
         return;
 
     newline(out);
-    dh = bufunit(f, u, mode, buf, sizeof(buf));
+    dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
 
     if (u->faction == f) {
         marker = '*';
@@ -1982,8 +1982,6 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
     }
 }
 
-#include "util/bsdstring.h"
-
 int
 report_plaintext(const char *filename, report_context * ctx,
     const char *bom)
@@ -2026,7 +2024,7 @@ report_plaintext(const char *filename, report_context * ctx,
     newline(out);
     sprintf(buf, "%s, %s/%s (%s)", factionname(f),
         LOC(f->locale, rc_name_s(f->race, NAME_PLURAL)),
-        LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), faction_getemail(f));
+        magic_name(f->magiegebiet, f->locale), faction_getemail(f));
     centre(out, buf, true);
     if (f_get_alliance(f)) {
         centre(out, alliancename(f->alliance), true);

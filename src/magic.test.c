@@ -446,19 +446,19 @@ static void test_max_spellpoints(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
-    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 1, max_spellpoints_depr(u->region, u));
     rc->maxaura = 100;
-    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 1, max_spellpoints_depr(u->region, u));
     rc->maxaura = 200;
-    CuAssertIntEquals(tc, 2, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 2, max_spellpoints_depr(u->region, u));
     create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 1);
-    CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 3, max_spellpoints_depr(u->region, u));
     set_level(u, SK_MAGIC, 2);
-    CuAssertIntEquals(tc, 9, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 9, max_spellpoints_depr(u->region, u));
     /* permanent aura loss: */
     CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
-    CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 7, max_spellpoints_depr(u->region, u));
     test_teardown();
 }
 
