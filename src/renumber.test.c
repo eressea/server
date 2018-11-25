@@ -101,7 +101,12 @@ static void test_renumber_building(CuTest *tc) {
     no = u->building->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, LOC(lang, parameters[P_BUILDING]));
+    renumber_cmd(u, u->thisorder);
+    CuAssertTrue(tc, no != u->building->no);
+    free_order(u->thisorder);
+
+    u->thisorder = create_order(K_NUMBER, lang, "%s %i", LOC(lang, parameters[P_BUILDING]), uno);
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->building->no);
     test_teardown();
@@ -120,7 +125,7 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_BUILDING]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %i", LOC(lang, parameters[P_BUILDING]), uno);
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->building->no);
