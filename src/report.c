@@ -1185,12 +1185,12 @@ void report_region(struct stream *out, const region * r, faction * f)
             bytes = (int)str_strlcpy(bufp, "\")", size);
             if (wrptr(&bufp, &size, bytes) != 0)
                 WARN_STATIC_BUFFER();
+            bytes = (int)str_strlcpy(bufp, ".", size);
+            if (wrptr(&bufp, &size, bytes) != 0)
+                WARN_STATIC_BUFFER();
             dh = 1;
         }
     }
-    bytes = (int)str_strlcpy(bufp, ".", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
     *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 
