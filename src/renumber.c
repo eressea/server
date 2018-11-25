@@ -164,7 +164,7 @@ int renumber_cmd(unit * u, order * ord)
             break;
         }
         s = gettoken(token, sizeof(token));
-        if (*s == 0) {
+        if (s == NULL || *s == 0) {
             i = newcontainerid();
         }
         else {
