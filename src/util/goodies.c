@@ -32,8 +32,11 @@ int *intlist_init(void)
 
 int *intlist_add(int *i_p, int i)
 {
+    void *tmp;
     i_p[0]++;
-    i_p = realloc(i_p, (i_p[0] + 1) * sizeof(int));
+    tmp = realloc(i_p, (i_p[0] + 1) * sizeof(int));
+    if (!tmp) abort();
+    i_p = (int *)tmp;
 
     i_p[i_p[0]] = i;
     return (i_p);

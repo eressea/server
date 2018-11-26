@@ -54,6 +54,7 @@ static const terrain_type *chaosterrain(void)
         }
         if (numtypes > 0) {
             types = malloc(sizeof(terrain_type *) * numtypes);
+            if (!types) abort();
             numtypes = 0;
             for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
                 if ((terrain->flags & LAND_REGION) && terrain->herbs) {
