@@ -132,6 +132,7 @@ void random_source_inject_array(double inject[], int size) {
     if (values)
         free(values);
     values = malloc(sizeof(double) * size);
+    if (!values) abort();
     for (i=0; i < size; ++i) {
         values[i] = inject[i];
     }

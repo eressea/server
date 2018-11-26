@@ -296,6 +296,19 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
     sbs->end = sbs->begin + len;
 }
 
+void sbs_cut(sbstring *sbp, int bytes)
+{
+    if (bytes > 0) {
+        size_t len = sbs_length(sbp) - bytes;
+        memmove(sbp->begin, sbp->begin + bytes, len + 1);
+        sbp->end = sbp->begin + len;
+    }
+    else if (bytes < 0) {
+        size_t len = sbs_length(sbp) + bytes;
+        sbp->end = sbp->begin + len;
+    }
+}
+
 size_t sbs_length(const struct sbstring *sbs)
 {
     return sbs->end - sbs->begin;

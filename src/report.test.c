@@ -3,6 +3,7 @@
 #include "move.h"
 #include "travelthru.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -140,6 +141,58 @@ static void test_report_region(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
 
     mstream_done(&out);
+    test_teardown();
+}
+
+static void test_report_allies(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    char exp[1024];
+    size_t len, linebreak = 72;
+    struct locale *lang;
+    faction *f, *f1, *f2, *f3;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "list_and", " und ");
+    mstream_init(&out);
+    f = test_create_faction(NULL);
+    f->locale = lang;
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    f3 = test_create_faction(NULL);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]));
+    ally_set(&f->allies, f1, HELP_GUARD);
+    report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = 0;
+    CuAssertStrEquals(tc, exp, buf);
+
+    out.api->rewind(out.handle);
+    ally_set(&f->allies, f2, HELP_GIVE);
+    ally_set(&f->allies, f3, HELP_ALL);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]),
+        factionname(f2),
+        LOC(lang, parameters[P_GIVE]));
+    linebreak = strlen(exp);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)\nund %s (%s).\n",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]),
+        factionname(f2),
+        LOC(lang, parameters[P_GIVE]),
+        factionname(f3),
+        LOC(lang, parameters[P_ANY]));
+    report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = 0;
+    CuAssertStrEquals(tc, exp, buf);
+
     test_teardown();
 }
 
@@ -302,6 +355,7 @@ CuSuite *get_report_suite(void)
     SUITE_ADD_TEST(suite, test_write_many_spaces);
     SUITE_ADD_TEST(suite, test_report_travelthru);
     SUITE_ADD_TEST(suite, test_report_region);
+    SUITE_ADD_TEST(suite, test_report_allies);
     SUITE_ADD_TEST(suite, test_write_spell_syntax);
     return suite;
 }

@@ -52,6 +52,7 @@ extern "C" {
     void sbs_strcat(struct sbstring *sbs, const char *str);
     void sbs_strncat(struct sbstring *sbs, const char *str, size_t size);
     void sbs_strcpy(struct sbstring *sbs, const char *str);
+    void sbs_cut(struct sbstring *sbp, int bytes);
     size_t sbs_length(const struct sbstring *sbs);
 
     /* benchmark for units:
