@@ -173,9 +173,8 @@ extern "C" {
         struct person {
             int hp;                   /* Trefferpunkte der Personen */
             int attack;
-            int defence;
+            int defense;
             int damage;
-            int damage_rear;
             int flags;
             int speed;
             int reload;
@@ -233,7 +232,10 @@ extern "C" {
     int count_enemies(struct battle *b, const struct fighter *af,
         int minrow, int maxrow, int select);
     int natural_armor(struct unit * u);
-    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, union variant *magres);
+    const struct armor_type *select_armor(struct troop t, bool shield);
+    struct weapon *select_weapon(const struct troop t, bool attacking, bool ismissile);
+    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
+    int apply_resistance(int damage, struct troop dt, const struct weapon_type *dwtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
     bool terminate(troop dt, troop at, int type, const char *damage,
         bool missile);
     void message_all(battle * b, struct message *m);

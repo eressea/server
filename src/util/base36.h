@@ -31,6 +31,7 @@ extern "C" {
     const char *itoa36(int i);
     const char *itoa10(int i);
     extern int atoi36(const char *s);
+    extern int atoi10(const char *s);
     int i10toi36(int i);
 
 #ifdef __cplusplus

@@ -1,6 +1,9 @@
 #include <platform.h>
 #include "renumber.h"
 
+#include "laws.h"
+
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
@@ -9,8 +12,8 @@
 #include <kernel/order.h>
 #include <kernel/messages.h>
 
-#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/param.h>
 #include <util/parser.h>
 
 #include <assert.h>

@@ -19,13 +19,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef H_GC_LAWS
 #define H_GC_LAWS
 
-#include <kernel/types.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    enum param_t;
 
+    struct locale;
     struct unit;
     struct region;
     struct building;
@@ -41,14 +42,12 @@ extern "C" {
     void demographics(void);
     void immigration(void);
     void update_guards(void);
-    void update_subscriptions(void);
     void deliverMail(struct faction *f, struct region *r, struct unit *u,
         const char *s, struct unit *receiver);
 
     bool renamed_building(const struct building * b);
     int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
     void get_food(struct region * r);
-    int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
     int enter_ship(struct unit *u, struct order *ord, int id, bool report);
@@ -82,7 +81,6 @@ extern "C" {
     int quit_cmd(struct unit *u, struct order *ord);
     int name_cmd(struct unit *u, struct order *ord);
     int use_cmd(struct unit *u, struct order *ord);
-    int siege_cmd(struct unit *u, struct order *ord);
     int leave_cmd(struct unit *u, struct order *ord);
     int pay_cmd(struct unit *u, struct order *ord);
     int promotion_cmd(struct unit *u, struct order *ord);
@@ -117,6 +115,8 @@ extern "C" {
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
     bool help_enter(struct unit *uo, struct unit *u);
+
+    enum param_t findparam_ex(const char *s, const struct locale * lang);
 
 #ifdef __cplusplus
 }

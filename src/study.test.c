@@ -11,7 +11,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/rand.h>
 #include <util/message.h>
 #include <util/language.h>
@@ -429,9 +429,9 @@ static void test_study_magic(CuTest *tc) {
     CuAssertIntEquals(tc, 0, study_cmd(u, u->thisorder));
     CuAssertIntEquals(tc, M_GWYRRD, f->magiegebiet);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrNotNull(tc, get_mage_depr(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error65"));
-    CuAssertIntEquals(tc, M_GWYRRD, get_mage_depr(u)->magietyp);
+    CuAssertIntEquals(tc, M_GWYRRD, unit_get_magic(u));
 
     test_teardown();
 }
@@ -643,7 +643,6 @@ static void test_teach_many_to_one(CuTest *tc) {
 static void test_teach_message(CuTest *tc) {
     unit *u, *u1, *u2;
     attrib *a;
-    ally *al;
     teaching_info *teach;
 
     setup_study();
@@ -655,8 +654,7 @@ static void test_teach_message(CuTest *tc) {
     set_level(u1, SK_CROSSBOW, TEACHDIFFERENCE);
     u1->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
     u2 = test_create_unit(test_create_faction(NULL), u->region);
-    al = ally_add(&u->faction->allies, u2->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u->faction->allies, u2->faction, HELP_GUARD);
     set_level(u2, SK_CROSSBOW, TEACHDIFFERENCE);
     u2->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
     CuAssertTrue(tc, !alliedunit(u, u1->faction, HELP_GUARD));

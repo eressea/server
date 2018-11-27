@@ -30,7 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"
 
 #include <util/log.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/strings.h>
 
 /* libc includes */

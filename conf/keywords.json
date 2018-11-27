@@ -12,7 +12,6 @@
             "work": [ "ARBEITE", "ARBEITEN" ],
             "attack": ["ATTACKIERE", "ATTACKIEREN"],
             "steal": [ "BEKLAUE", "BEKLAUEN" ],
-            "besiege": ["BELAGERE", "BELAGERN" ],
             "name": [ "BENENNE", "BENENNEN" ],
             "use": [ "BENUTZE", "BENUTZEN" ],
             "describe": [ "BESCHREIBE", "BESCHREIBEN" ],

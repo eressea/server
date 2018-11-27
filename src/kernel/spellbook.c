@@ -4,7 +4,7 @@
 #include <kernel/spell.h>
 
 #include <util/log.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/strings.h>
 
 #include "spellbook.h"

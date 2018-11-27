@@ -353,29 +353,20 @@ void *get_translation(const struct locale *lang, const char *str, int index) {
     return NULL;
 }
 
-void locale_foreach(void(*callback)(const struct locale *, const char *)) {
-    const locale * lang;
-    for (lang = locales; lang; lang = lang->next) {
-        callback(lang, lang->name);
-    }
-}
-
 const char *localenames[] = {
     "de", "en",
     NULL
 };
 
-extern void init_locale(struct locale *lang);
-
 static int locale_init = 0;
 
-void init_locales(void)
+void init_locales(locale_handler init)
 {
     locale * lang;
     if (locale_init) return;
     assert(locales);
-    for (lang = locales; lang; lang = lang->next) {
-        init_locale(lang);
+    for (lang = locales; lang; lang = nextlocale(lang)) {
+        init(lang);
     }
     locale_init = 1;
 }

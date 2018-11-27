@@ -21,7 +21,6 @@ module eressea {
         void process_movement @ movement(void); /* MOVE/FOLLOW/ROUTE */
         void process_use @ use(void); /* USE */
         void process_battle @ battle(void); /* ATTACK */
-        void process_siege @ siege(void); /* SIEGE */
         void process_leave @ leave(void); /* LEAVE */
         void process_maintenance @ maintenance(void); /* PAY */
         void process_promote @ promote(void); /* PROMOTE */

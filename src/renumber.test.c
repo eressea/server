@@ -10,6 +10,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/param.h>
 
 #include <stddef.h>
 #include <CuTest.h>

@@ -40,29 +40,6 @@ void make_undead_unit(unit * u)
     u->flags |= UFL_ISNEW;
 }
 
-void age_undead(unit * u)
-{
-    region *r = u->region;
-
-    /* untote, die einer partei angehoeren, koennen sich
-     * absplitten, anstatt sich zu vermehren. monster
-     * untote vermehren sich nur noch */
-
-    if (u->number > UNDEAD_MIN && !is_monsters(u->faction)
-        && rng_int() % 100 < UNDEAD_BREAKUP) {
-        int m, n = 0;
-        unit *u2;
-
-        for (m = u->number; m; m--) {
-            if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
-                ++n;
-        }
-        u2 = create_unit(r, get_monsters(), 0, get_race(RC_UNDEAD), 0, NULL, u);
-        make_undead_unit(u2);
-        transfermen(u, u2, u->number - n);
-    }
-}
-
 void age_skeleton(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {

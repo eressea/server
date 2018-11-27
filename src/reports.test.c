@@ -2,7 +2,7 @@
 #include "reports.h"
 
 #include "guard.h"
-#include "keyword.h"
+#include "util/keyword.h"
 #include "lighthouse.h"
 #include "laws.h"
 #include "move.h"
@@ -25,7 +25,7 @@
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"
 
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
@@ -76,7 +76,7 @@ static void test_reorder_units(CuTest * tc)
     CuAssertPtrEquals(tc, u2, u3->next);
     CuAssertPtrEquals(tc, u1, u2->next);
     CuAssertPtrEquals(tc, u0, u1->next);
-    CuAssertPtrEquals(tc, 0, u0->next);
+    CuAssertPtrEquals(tc, NULL, u0->next);
     test_teardown();
 }
 
@@ -130,19 +130,19 @@ static void test_sparagraph(CuTest *tc) {
     split_paragraph(&sp, "Hello World", 0, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "Hello World", sp->s);
-    CuAssertPtrEquals(tc, 0, sp->next);
+    CuAssertPtrEquals(tc, NULL, sp->next);
     freestrlist(sp);
 
     split_paragraph(&sp, "Hello World", 4, 16, 0);
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "    Hello World", sp->s);
-    CuAssertPtrEquals(tc, 0, sp->next);
+    CuAssertPtrEquals(tc, NULL, sp->next);
     freestrlist(sp);
 
     split_paragraph(&sp, "Hello World", 4, 16, '*');
     CuAssertPtrNotNull(tc, sp);
     CuAssertStrEquals(tc, "  * Hello World", sp->s);
-    CuAssertPtrEquals(tc, 0, sp->next);
+    CuAssertPtrEquals(tc, NULL, sp->next);
     freestrlist(sp);
 
     split_paragraph(&sp, "12345678 90 12345678", 0, 8, '*');
@@ -152,7 +152,7 @@ static void test_sparagraph(CuTest *tc) {
     CuAssertStrEquals(tc, "90", sp->next->s);
     CuAssertPtrNotNull(tc, sp->next->next);
     CuAssertStrEquals(tc, "12345678", sp->next->next->s);
-    CuAssertPtrEquals(tc, 0, sp->next->next->next);
+    CuAssertPtrEquals(tc, NULL, sp->next->next->next);
     freestrlist(sp);
 }
 
@@ -177,7 +177,6 @@ static void test_bufunit_fstealth(CuTest *tc) {
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
     char buf[256];
     struct locale *lang;
 
@@ -200,56 +199,55 @@ static void test_bufunit_fstealth(CuTest *tc) {
     key_set(&u->attribs, 42, 42);
 
     /* report to ourselves */
-    bufunit(f1, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressive.", buf);
 
     /* ... also when we are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f1, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human, aggressive.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see that our unit is cloaked */
     set_factionstealth(u, f2);
     CuAssertPtrNotNull(tc, u->attribs);
-    bufunit(f1, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human, aggressive.", buf);
 
     /* ... also when we are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f1, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human, aggressive.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we can see that someone is presenting as us */
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human.", buf);
 
     /* ... but not if they are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
 
     /* ... also when they are anonymous */
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* fstealth has no influence when we are allies, same results again */
     set_factionstealth(u, NULL);
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buf);
 
     u->flags |= UFL_ANON_FACTION;
-    bufunit(f2, u, seen_unit, buf, sizeof(buf));
+    bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
@@ -279,20 +277,20 @@ static void test_bufunit(CuTest *tc) {
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
-    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv.", buffer);
 
     set_level(u, SK_ALCHEMY, 1);
-    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2.", buffer);
 
     set_level(u, SK_SAILING, 1);
-    bufunit(u->faction, u, 0, buffer, sizeof(buffer));
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), 1 human, aggressiv, Talente: Alchemie 2, Segeln 1.", buffer);
 
     f = test_create_faction(NULL);
     f->locale = get_or_create_locale("de");
-    bufunit(f, u, 0, buffer, sizeof(buffer));
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "Hodor (1), UFO (1), 1 human.", buffer);
 
     test_teardown();
@@ -326,7 +324,7 @@ static void test_arg_resources(CuTest *tc) {
     CuAssertPtrNotNull(tc, res = res->next);
     CuAssertPtrEquals(tc, itype->rtype, (void *)res->type);
     CuAssertIntEquals(tc, 5, res->number);
-    CuAssertPtrEquals(tc, 0, res->next);
+    CuAssertPtrEquals(tc, NULL, res->next);
     atype->release(v2);
     test_teardown();
 }
@@ -340,7 +338,7 @@ static void test_newbie_password_message(CuTest *tc) {
     f->flags = 0;
     prepare_report(&ctx, f);
     CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
     f->age=2;
     prepare_report(&ctx, f);
     CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
@@ -442,21 +440,33 @@ static void test_get_addresses_fstealth(CuTest *tc) {
 
 static void test_get_addresses_travelthru(CuTest *tc) {
     report_context ctx;
-    faction *f, *f2, *f1;
+    faction *f, *f4, *f3, *f2, *f1;
     region *r1, *r2;
     unit *u;
+    race *rc;
 
     test_setup();
     f = test_create_faction(NULL);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
     r1 = test_create_region(0, 0, NULL);
     r2 = test_create_region(1, 0, 0);
     u = test_create_unit(f, r2);
     travelthru_add(r1, u);
+
+    f1 = test_create_faction(NULL);
     u = test_create_unit(f1, r1);
+    f2 = test_create_faction(NULL);
     set_factionstealth(u, f2);
     u->building = test_create_building(u->region, test_create_buildingtype("tower"));
+
+    rc = rc_get_or_create("dragon");
+    rc->flags |= RCF_UNARMEDGUARD;
+    f3 = test_create_faction(rc);
+    u = test_create_unit(f3, r1);
+    setguard(u, true);
+
+    f4 = test_create_faction(NULL);
+    u = test_create_unit(f4, r1);
+    set_level(u, SK_STEALTH, 1);
 
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
@@ -466,7 +476,9 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     CuAssertTrue(tc, selist_contains(ctx.addresses, f, NULL));
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f1, NULL));
     CuAssertTrue(tc, selist_contains(ctx.addresses, f2, NULL));
-    CuAssertIntEquals(tc, 2, selist_length(ctx.addresses));
+    CuAssertTrue(tc, selist_contains(ctx.addresses, f3, NULL));
+    CuAssertTrue(tc, !selist_contains(ctx.addresses, f4, NULL));
+    CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     finish_reports(&ctx);
     test_teardown();
 }
@@ -511,7 +523,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
 
     prepare_report(&ctx, u2->faction);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
     finish_reports(&ctx);
@@ -520,7 +532,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     config_set_int("rules.lighthouse.unit_capacity", 1);
     prepare_report(&ctx, u2->faction);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     finish_reports(&ctx);
@@ -619,15 +631,15 @@ static void test_prepare_report(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
 
     prepare_report(&ctx, f);
-    CuAssertPtrEquals(tc, 0, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
     finish_reports(&ctx);
 
     test_create_unit(f, r);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r->seen.mode);
     finish_reports(&ctx);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
@@ -655,7 +667,7 @@ static void test_seen_neighbours(CuTest *tc) {
     test_create_unit(f, r1);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
     finish_reports(&ctx);
@@ -682,7 +694,7 @@ static void test_seen_travelthru(CuTest *tc) {
     CuAssertPtrEquals(tc, r3, f->last);
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_travel, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
@@ -760,7 +772,7 @@ static void test_report_far_vision(CuTest *tc) {
     report_context ctx;
     prepare_report(&ctx, f);
     CuAssertPtrEquals(tc, r1, ctx.first);
-    CuAssertPtrEquals(tc, 0, ctx.last);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_spell, r2->seen.mode);
     finish_reports(&ctx);
@@ -900,7 +912,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_region_distance);
     SUITE_ADD_TEST(suite, test_region_distance_max);
     SUITE_ADD_TEST(suite, test_region_distance_ql);
-    SUITE_ADD_TEST(suite, test_newbie_password_message);
+    DISABLE_TEST(suite, test_newbie_password_message);
     SUITE_ADD_TEST(suite, test_prepare_report);
     SUITE_ADD_TEST(suite, test_seen_neighbours);
     SUITE_ADD_TEST(suite, test_seen_travelthru);

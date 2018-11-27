@@ -39,7 +39,8 @@ extern "C" {
     /** managing multiple locales: **/
     struct locale *get_locale(const char *name);
     struct locale *get_or_create_locale(const char *key);
-    void init_locales(void);
+    typedef void(*locale_handler)(struct locale *lang);
+    void init_locales(locale_handler callback);
     void free_locales(void);
     void reset_locales(void);
 
@@ -57,7 +58,6 @@ extern "C" {
 
     void make_locales(const char *str);
 
-    void locale_foreach(void(*callback)(const struct locale *lang, const char *name));
     void po_write_msg(FILE *F, const char *id, const char *str, const char *ctxt);
 
 #define LOC(lang, s) (lang?locale_string(lang, s, true):s)

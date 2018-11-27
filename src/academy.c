@@ -16,8 +16,8 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-#include <kernel/config.h>
+#include "platform.h"
+#include "kernel/config.h"
 #include <kernel/unit.h>
 #include <kernel/building.h>
 #include <kernel/item.h>

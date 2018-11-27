@@ -6,10 +6,10 @@
 #include "kernel/region.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"
 #include "util/log.h"
 
 #include "automate.h"
-#include "keyword.h"
 #include "laws.h"
 #include "study.h"
 
@@ -54,10 +54,6 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
                 else if (!unext) {
                     unext = u;
                 }
-            }
-            else {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "error_race_nolearn", "race",
-                    u_race(u)));
             }
         }
         u = u->next;

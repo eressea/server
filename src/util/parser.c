@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "parser.h"
 #include "unicode.h"
 #include "base36.h"

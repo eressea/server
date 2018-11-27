@@ -8,7 +8,7 @@
 #include <kernel/unit.h>
 #include <util/message.h>
 #include <util/language.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <spells/regioncurse.h>
 #include "spells.h"
 

@@ -20,11 +20,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "key.h"
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <storage.h>
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -76,25 +77,83 @@ static int keys_size(int n) {
     return 4096;
 }
 
+static int read_flags(gamedata *data, int *keys, int n) {
+    int i;
+    for (i = 0; i != n; ++i) {
+        int key;
+        READ_INT(data->store, &key);
+        keys[i * 2] = key;
+        keys[i * 2 + 1] = 1;
+    }
+    return n;
+}
+
+#ifdef KEYVAL_VERSION
+static int read_keyval(gamedata *data, int *keys, int n) {
+    int i;
+    for (i = 0; i != n; ++i) {
+        int key, val;
+        READ_INT(data->store, &key);
+        READ_INT(data->store, &val);
+        keys[i * 2] = key;
+        keys[i * 2 + 1] = val;
+    }
+    return n;
+}
+#endif
+
+#ifdef FIXATKEYS_VERSION
+static int read_keyval_orig(gamedata *data, int *keys, int n) {
+    int i, j = 0, dk = -1;
+    for (i = 0; i != n; ++i) {
+        int key, val;
+        READ_INT(data->store, &key);
+        READ_INT(data->store, &val);
+        if (key > dk) {
+            keys[j * 2] = key;
+            keys[j * 2 + 1] = val;
+            dk = key;
+            ++j;
+        }
+    }
+    return j;
+}
+#endif
+
 static int a_readkeys(variant *var, void *owner, gamedata *data) {
-    int i, n, *keys;
+    int i, n, ksn, *keys;
 
     READ_INT(data->store, &n);
     assert(n < 4096 && n >= 0);
     if (n == 0) {
         return AT_READ_FAIL;
     }
-    keys = malloc(sizeof(int)*(keys_size(n) * 2 + 1));
-    *keys = n;
-    for (i = 0; i != n; ++i) {
-        READ_INT(data->store, keys + i * 2 + 1);
-        if (data->version >= KEYVAL_VERSION) {
-            READ_INT(data->store, keys + i * 2 + 2);
-        }
-        else {
-            keys[i * 2 + 2] = 1;
+    ksn = keys_size(n);
+    keys = malloc((ksn * 2 + 1) * sizeof(int));
+    if (data->version >= FIXATKEYS_VERSION) {
+        n = read_keyval(data, keys + 1, n);
+    }
+    else if (data->version >= KEYVAL_VERSION) {
+        int m = read_keyval_orig(data, keys + 1, n);
+        if (n != m) {
+            int ksm = keys_size(m);
+            if (ksm != ksn) {
+                int *nkeys = (int *)realloc(keys, (ksm * 2 + 1) * sizeof(int));
+                if (nkeys != NULL) {
+                    keys = nkeys;
+                }
+                else {
+                    log_error("a_readkeys allocation failed: %s", strerror(errno));
+                    return AT_READ_FAIL;
+                }
+            }
+            n = m;
         }
     }
+    else {
+        n = read_flags(data, keys + 1, n);
+    }
+    keys[0] = n;
     if (data->version < SORTKEYS_VERSION) {
         int e = 1;
         for (i = 1; i != n; ++i) {

@@ -4,17 +4,29 @@
 #include <string.h>
 
 static void test_passwords(CuTest *tc) {
-    const char *hash, *expect;
+    const char *hash;
     
-    expect = "password";
-    if (password_is_implemented(PASSWORD_PLAINTEXT)) {
-        hash = password_encode("password", PASSWORD_PLAINTEXT);
+    if (password_is_implemented(PASSWORD_BCRYPT)) {
+        int wf = bcrypt_workfactor;
+        bcrypt_workfactor = 4;
+        hash = password_hash("password", PASSWORD_BCRYPT);
         CuAssertPtrNotNull(tc, hash);
-        CuAssertStrEquals(tc, hash, expect);
-        CuAssertIntEquals(tc, VERIFY_OK, password_verify(expect, "password"));
-        CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(expect, "arseword"));
-    } else {
-        CuAssertIntEquals(tc, VERIFY_UNKNOWN, password_verify(expect, "password"));
+        CuAssertIntEquals(tc, '$', hash[0]);
+        CuAssertIntEquals(tc, '2', hash[1]);
+        CuAssertIntEquals(tc, '$', hash[3]);
+        CuAssertIntEquals(tc, '0', hash[4]);
+        CuAssertIntEquals(tc, '4', hash[5]);
+        CuAssertIntEquals(tc, '$', hash[6]);
+        CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
+        CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(hash, "arseword"));
+        bcrypt_workfactor = wf;
+    }
+    if (password_is_implemented(PASSWORD_PLAINTEXT)) {
+        hash = password_hash("password", PASSWORD_PLAINTEXT);
+        CuAssertPtrNotNull(tc, hash);
+        CuAssertStrEquals(tc, hash, "password");
+        CuAssertIntEquals(tc, VERIFY_OK, password_verify(hash, "password"));
+        CuAssertIntEquals(tc, VERIFY_FAIL, password_verify(hash, "arseword"));
     }
 }
 

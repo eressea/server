@@ -27,17 +27,15 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-    /* ------------------------------------------------------------- */
-
 #define MAXCOMBATSPELLS 3       /* PRECOMBAT COMBAT POSTCOMBAT */
 #define MAX_SPELLRANK 9         /* Standard-Rank 5 */
 #define MAXINGREDIENT	5       /* bis zu 5 Komponenten pro Zauber */
 #define CHAOSPATZERCHANCE 10    /* +10% Chance zu Patzern */
-
-    /* ------------------------------------------------------------- */
-
 #define IRONGOLEM_CRUMBLE   15  /* monatlich Chance zu zerfallen */
 #define STONEGOLEM_CRUMBLE  10  /* monatlich Chance zu zerfallen */
+
+    struct sc_mage;
+    struct unit;
 
     extern const char *magic_school[MAXMAGIETYP];
     extern struct attrib_type at_familiar;
@@ -99,25 +97,11 @@ extern "C" {
      * - Spruchliste
      */
 
-    typedef struct combatspell {
-        int level;
-        const struct spell *sp;
-    } combatspell;
-
     typedef struct spell_names {
         struct spell_names *next;
         const struct locale *lang;
         void * tokens;
     } spell_names;
-
-    typedef struct sc_mage {
-        magic_t magietyp;
-        int spellpoints;
-        int spchange;
-        int spellcount;
-        combatspell combatspells[MAXCOMBATSPELLS];
-        struct spellbook *spellbook;
-    } sc_mage;
 
     /* ------------------------------------------------------------- */
     /* Zauberliste */
@@ -140,6 +124,7 @@ extern "C" {
     } castorder;
 
     struct unit * co_get_caster(const struct castorder * co);
+    struct unit * co_get_magician(const struct castorder * co);
     struct region * co_get_region(const struct castorder * co);
 
     typedef struct spell_component {
@@ -216,12 +201,22 @@ extern "C" {
      */
 
     /* Magier */
-    sc_mage *create_mage(struct unit *u, magic_t mtyp);
+    struct sc_mage *create_mage(struct unit *u, magic_t mtyp);
     /*      macht die struct unit zu einem neuen Magier: legt die struct u->mage an
      *      und     initialisiert den Magiertypus mit mtyp.  */
-    sc_mage *get_mage(const struct unit *u);
-    sc_mage *get_mage_depr(const struct unit *u);
-    /*      gibt u->mage zurück, bei nicht-Magiern *NULL */
+    struct sc_mage *get_mage(const struct unit *u);
+
+    enum magic_t mage_get_type(const struct sc_mage *mage);
+    const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
+    struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
+    int mage_get_spellpoints(const struct sc_mage *m);
+    int mage_change_spellpoints(struct sc_mage *m, int delta);
+
+    enum magic_t unit_get_magic(const struct unit *u);
+    void unit_set_magic(struct unit *u, enum magic_t mtype);
+    struct spellbook * unit_get_spellbook(const struct unit * u);
+    void unit_add_spell(struct unit * u, struct spell * sp, int level);
+
     bool is_mage(const struct unit *u);
     /*      gibt true, wenn u->mage gesetzt.  */
     bool is_familiar(const struct unit *u);
@@ -257,7 +252,8 @@ extern "C" {
     /* setzt die Magiepunkte auf sp */
     int change_spellpoints(struct unit *u, int mp);
     /*      verändert die Anzahl der Magiepunkte der Einheit um +mp */
-    int max_spellpoints(const struct region *r, const struct unit *u);
+    int max_spellpoints_depr(const struct region *r, const struct unit *u);
+    int max_spellpoints(const struct unit *u, const struct region *r);
     /*      gibt die aktuell maximal möglichen Magiepunkte der Einheit zurück */
     int change_maxspellpoints(struct unit *u, int csp);
     /* verändert die maximalen Magiepunkte einer Einheit */
@@ -288,9 +284,11 @@ extern "C" {
 
     /* Prüfroutinen für Zaubern */
     int countspells(struct unit *u, int step);
+    int spellcount(const struct unit *u);
     /*      erhöht den Counter für Zaubersprüche um 'step' und gibt die neue
      *      Anzahl der gezauberten Sprüche zurück. */
-    int spellcost(struct unit *u, const struct spell * sp);
+    int auracost(const struct unit *caster, const struct spell *sp);
+    int spellcost(const struct unit *caster, const struct spell_component *spc);
     /*      gibt die für diesen Spruch derzeit notwendigen Magiepunkte auf der
      *      geringstmöglichen Stufe zurück, schon um den Faktor der bereits
      *      zuvor gezauberten Sprüche erhöht */
@@ -298,12 +296,12 @@ extern "C" {
         int distance, struct order *ord);
     /*      true, wenn Einheit alle Komponenten des Zaubers (incl. MP) für die
      *      geringstmögliche Stufe hat und den Spruch beherrscht */
-    void pay_spell(struct unit *u, const struct spell * sp, int eff_stufe, int distance);
+    void pay_spell(struct unit *mage, const struct unit *caster, const struct spell * sp, int eff_stufe, int distance);
     /*      zieht die Komponenten des Zaubers aus dem Inventory der Einheit
      *      ab. Die effektive Stufe des gezauberten Spruchs ist wichtig für
      *      die korrekte Bestimmung der Magiepunktkosten */
-    int eff_spelllevel(struct unit *u, const struct spell * sp, int cast_level,
-        int distance);
+    int eff_spelllevel(struct unit *mage, struct unit *caster,
+        const struct spell * sp, int cast_level, int distance);
     /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
      *      die gewünschte maximale Stufe (im Normalfall Stufe des Magiers,
      *      bei Farcasting Stufe*2^Entfernung) */
@@ -319,6 +317,7 @@ extern "C" {
      *      widersteht */
     extern struct spell * unit_getspell(struct unit *u, const char *s,
         const struct locale *lang);
+    const char *magic_name(magic_t mtype, const struct locale *lang);
 
     /* Sprüche in der struct region */
     /* (sind in curse) */
@@ -329,7 +328,8 @@ extern "C" {
     void remove_familiar(struct unit *mage);
     void create_newfamiliar(struct unit *mage, struct unit *familiar);
     void create_newclone(struct unit *mage, struct unit *familiar);
-    struct unit *has_clone(struct unit *mage);
+
+    void fix_fam_mage(struct unit *u);
 
     const char *spell_info(const struct spell *sp,
         const struct locale *lang);

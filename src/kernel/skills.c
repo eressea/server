@@ -24,7 +24,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "region.h"
 #include "unit.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>

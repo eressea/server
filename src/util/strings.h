@@ -20,6 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define STRINGS_H
 
 #include <stddef.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +28,8 @@ extern "C" {
 
     void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value);
     int str_hash(const char *s);
+    const char *str_itoa(int i);
+    const char *str_itoab(int i, int base);
     size_t str_slprintf(char * dst, size_t size, const char * format, ...);
     size_t str_strlcpy(char *dst, const char *src, size_t len);
     size_t str_strlcat(char *dst, const char *src, size_t len);

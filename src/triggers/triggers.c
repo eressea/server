@@ -31,7 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <triggers/clonedied.h>
 
 /* util includes */
-#include <util/event.h>
+#include <kernel/event.h>
 
 /* libc includes */
 #include <stdio.h>

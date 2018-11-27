@@ -2,20 +2,19 @@
 #include <platform.h>
 #endif
 
-#include "spells/shipcurse.h"
 #include "monsters.h"
 
 #include <spells/flyingship.h>
 
 #include <kernel/faction.h>
-#include <kernel/race.h>
 #include <kernel/ship.h>
-#include <kernel/spellbook.h>
 #include <kernel/unit.h>
 
 #include <util/macros.h>
 
+#include <lua.h>
 #include <tolua.h>
+
 #include <stdlib.h>
 
 static int tolua_levitate_ship(lua_State * L)
@@ -62,7 +61,7 @@ static int tolua_spawn_undead(lua_State * L)
     return 0;
 }
 
-void bind_monsters(struct lua_State *L)
+void bind_monsters(lua_State *L)
 {
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);

@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include "move.h"
 
-#include "keyword.h"
+#include "contact.h"
 #include "lighthouse.h"
 
-#include <kernel/config.h>
+#include <kernel/attrib.h>
 #include <kernel/ally.h>
 #include <kernel/building.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -17,7 +18,7 @@
 #include <kernel/race.h>
 #include <kernel/order.h>
 
-#include <util/attrib.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/base36.h>
@@ -129,7 +130,7 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
-    usetcontact(mf.b->_owner, mf.sh->_owner);
+    contact_unit(mf.b->_owner, mf.sh->_owner);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
@@ -153,7 +154,6 @@ static void test_ship_has_harbormaster_same_faction(CuTest * tc) {
 static void test_ship_has_harbormaster_ally(CuTest * tc) {
     unit *u;
     move_fixture mf;
-    ally *al;
 
     test_setup();
     setup_harbor(&mf);
@@ -161,8 +161,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     u = test_create_unit(test_create_faction(NULL), mf.r);
     u->building = mf.b;
     building_set_owner(u);
-    al = ally_add(&u->faction->allies, mf.u->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u->faction->allies, mf.u->faction, HELP_GUARD);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
@@ -225,16 +224,16 @@ static void test_ship_trails(CuTest *tc) {
     move_ship(sh, r1, r3, NULL);
     CuAssertPtrEquals(tc, r3, sh->region);
     CuAssertPtrEquals(tc, sh, r3->ships);
-    CuAssertPtrEquals(tc, 0, r1->ships);
-    CuAssertPtrEquals(tc, 0, a_find(r1->attribs, &at_shiptrail));
-    CuAssertPtrEquals(tc, 0, a_find(r3->attribs, &at_shiptrail));
+    CuAssertPtrEquals(tc, NULL, r1->ships);
+    CuAssertPtrEquals(tc, NULL, a_find(r1->attribs, &at_shiptrail));
+    CuAssertPtrEquals(tc, NULL, a_find(r3->attribs, &at_shiptrail));
     add_regionlist(&route, r3);
     add_regionlist(&route, r2);
     move_ship(sh, r3, r1, route);
     CuAssertPtrEquals(tc, r1, sh->region);
     CuAssertPtrEquals(tc, sh, r1->ships);
-    CuAssertPtrEquals(tc, 0, r3->ships);
-    CuAssertPtrEquals(tc, 0, a_find(r1->attribs, &at_shiptrail));
+    CuAssertPtrEquals(tc, NULL, r3->ships);
+    CuAssertPtrEquals(tc, NULL, a_find(r1->attribs, &at_shiptrail));
     CuAssertPtrNotNull(tc, a_find(r2->attribs, &at_shiptrail));
     CuAssertPtrNotNull(tc, a_find(r3->attribs, &at_shiptrail));
     free_regionlist(route);
@@ -258,7 +257,7 @@ static void test_age_trails(CuTest *tc) {
     a_age(&r1->attribs, r1);
     CuAssertPtrNotNull(tc, r1->attribs);
     a_age(&r1->attribs, r1);
-    CuAssertPtrEquals(tc, 0, r1->attribs);
+    CuAssertPtrEquals(tc, NULL, r1->attribs);
     free_regionlist(route);
     test_teardown();
 }
@@ -323,7 +322,7 @@ static void test_ship_empty(CuTest *tc) {
     movement();
     CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "ship_drift"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
 
     test_teardown();
 }
@@ -340,7 +339,7 @@ static void test_no_drift_damage(CuTest *tc) {
     movement();
     CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
     CuAssertIntEquals(tc, 0, ship_damage_percent(fix.sh));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "ship_drift"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
 
     test_teardown();
 }
@@ -386,7 +385,7 @@ static void test_ship_no_real_overload(CuTest *tc) {
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
     CuAssertIntEquals(tc, 82, ship_damage_percent(fix.sh));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(fix.f->msgs, "massive_overload"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
     test_teardown();
 }
@@ -431,7 +430,7 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     movement();
     CuAssertTrue(tc, ship_damage_percent(fix.sh) > 99);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
-    CuAssertPtrEquals(tc, 0, fix.sh->region);
+    CuAssertPtrEquals(tc, NULL, fix.sh->region);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "shipsink"));
     test_teardown();
 }

@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include "skill.h"
 #include "types.h"
+#include "db/driver.h"
 
 #include <util/resolve.h>
 #include <modules/score.h>
@@ -37,7 +38,7 @@ extern "C" {
     struct attrib_type;
     struct gamedata;
     struct selist;
-    
+
     /* faction flags */
 #define FFL_NOAID         (1<<0)  /* Hilfsflag Kampf */
 #define FFL_ISNEW         (1<<1)
@@ -54,6 +55,12 @@ extern "C" {
 #define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_DEFENDER|FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
 
+    typedef struct origin {
+        struct origin *next;
+        int id;
+        int x, y;
+    } origin;
+
     typedef struct faction {
         struct faction *next;
         struct faction *nexthash;
@@ -61,25 +68,25 @@ extern "C" {
         struct region *first;
         struct region *last;
         int no;
-        int subscription;
+        int uid;
         int flags;
         char *name;
-        char *banner;
+        dbrow_id banner_id;
         char *email;
-        char *_password;
+        dbrow_id password_id;
         int max_spelllevel;
         struct spellbook *spellbook;
         const struct locale *locale;
         int lastorders;
         int age;
-        struct ursprung *ursprung;
+        struct origin *origin;
         const struct race *race;
         magic_t magiegebiet;
         int newbies;
         int num_people;             /* Anzahl Personen ohne Monster */
         int num_units;
         int options;
-        struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
+        struct allies *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
         struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
         score_t score;
         struct alliance *alliance;
@@ -104,6 +111,8 @@ extern "C" {
     void fhash(struct faction *f);
     void funhash(struct faction *f);
 
+    int faction_ally_status(const faction *f, const faction *f2);
+
     struct faction *findfaction(int n);
     int max_magicians(const faction * f);
     void set_show_item(faction * f, const struct item_type *itype);
@@ -112,24 +121,19 @@ extern "C" {
     const char *factionname(const struct faction *f);
     struct unit *addplayer(struct region *r, faction * f);
     struct faction *addfaction(const char *email, const char *password,
-        const struct race *frace, const struct locale *loc, int subscription);
+        const struct race *frace, const struct locale *loc);
     bool checkpasswd(const faction * f, const char *passwd);
     int writepasswd(void);
     void destroyfaction(faction ** f);
 
     bool faction_alive(const struct faction *f);
-
-    void set_alliance(struct faction *a, struct faction *b, int status);
-    int get_alliance(const struct faction *a, const struct faction *b);
+    struct faction *faction_create(int no);
 
     struct alliance *f_get_alliance(const struct faction *f);
 
     void write_faction_reference(const struct faction *f,
         struct storage *store);
-    int read_faction_reference(struct gamedata *data, struct faction **fp, resolve_fun fun);
-
-#define RESOLVE_FACTION (TYP_FACTION << 24)
-    void resolve_faction(struct faction *f);
+    int read_faction_reference(struct gamedata *data, struct faction **fp);
 
     void renumber_faction(faction * f, int no);
     void free_factions(void);
@@ -148,6 +152,7 @@ extern "C" {
     void faction_setemail(struct faction *self, const char *email);
 
     void faction_setpassword(struct faction *self, const char *pwhash);
+    const char *faction_getpassword(const struct faction *f);
     bool valid_race(const struct faction *f, const struct race *rc);
 
     void faction_getorigin(const struct faction * f, int id, int *x, int *y);

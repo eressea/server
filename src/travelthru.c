@@ -27,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/ship.h>
 #include <kernel/region.h>
 #include <kernel/faction.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/log.h>
 #include <util/language.h>
 

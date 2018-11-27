@@ -1,7 +1,8 @@
 ﻿#include <platform.h>
 
 #include "gamedata.h"
-#include "log.h"
+
+#include <util/log.h>
 
 #include <storage.h>
 #include <filestream.h>

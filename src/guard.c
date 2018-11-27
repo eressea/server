@@ -20,6 +20,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <platform.h>
 #include <kernel/config.h>
 #include "guard.h"
+
+#include "contact.h"
 #include "laws.h"
 #include "monsters.h"
 
@@ -104,8 +106,6 @@ static bool is_guardian_u(const unit * guard, unit * u)
 static bool is_guardian_r(const unit * guard)
 {
     if (guard->number == 0)
-        return false;
-    if (besieged(guard))
         return false;
 
     /* if region_owners exist then they may be guardians: */

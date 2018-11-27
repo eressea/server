@@ -33,8 +33,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -66,7 +66,8 @@ void new_potiontype(item_type * itype, int level)
 {
     potion_type *ptype;
 
-    ptype = (potion_type *)calloc(sizeof(potion_type), 1);
+    ptype = (potion_type *)calloc(1, sizeof(potion_type));
+    assert(ptype);
     itype->flags |= ITF_POTION;
     ptype->itype = itype;
     ptype->level = level;
@@ -181,7 +182,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 static void a_initeffect(variant *var)
 {
-    var->v = calloc(sizeof(effect_data), 1);
+    var->v = calloc(1, sizeof(effect_data));
 }
 
 static void

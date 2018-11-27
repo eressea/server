@@ -28,10 +28,10 @@ extern "C" {
     struct plane;
     struct storage;
 
-#define PFL_NOCOORDS        1   /* not in use */
-#define PFL_NORECRUITS      2
-#define PFL_NOALLIANCES     4
-#define PFL_LOWSTEALING     8
+#define PFL_NOCOORDS        1   /* not implemented */
+#define PFL_NORECRUITS      2   /* cannot recruit */
+#define PFL_NOALLIANCES     4   /* not implemented */
+#define PFL_LOWSTEALING     8   /* not implemented */
 #define PFL_NOGIVE         16   /* Übergaben sind unmöglich */
 #define PFL_NOATTACK       32   /* Angriffe und Diebstähle sind unmöglich */
 #define PFL_NOTERRAIN      64   /* Terraintyp wird nicht angezeigt TODO? */
@@ -40,7 +40,7 @@ extern "C" {
 #define PFL_NOTEACH       512   /* Lehre außer Betrieb */
 #define PFL_NOBUILD      1024   /* Bauen außer Betrieb */
 #define PFL_NOFEED       2048   /* Kein Unterhalt nötig */
-#define PFL_FRIENDLY     4096   /* everyone is your ally */
+#define PFL_FRIENDLY     4096   /* not implemented */
 #define PFL_NOORCGROWTH  8192   /* orcs don't grow */
 #define PFL_NOMONSTERS  16384   /* no monster randenc */
 

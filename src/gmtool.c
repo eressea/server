@@ -14,55 +14,44 @@
 
 #include <curses.h>
 
-#include <kernel/config.h>
-
 #include "gmtool.h"
+#include "direction.h"
 
-#include <modules/xmas.h>
-#include <modules/gmcmd.h>
-#include <modules/museum.h>
 #include <modules/autoseed.h>
 
 #include "kernel/building.h"
-#include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/plane.h"
-#include "kernel/race.h"
 #include "kernel/region.h"
+#include "kernel/resources.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
-#include "kernel/resources.h"
 #include "kernel/save.h"
 #include "kernel/ship.h"
 #include "kernel/terrain.h"
 
-#include <attributes/attributes.h>
-#include <triggers/triggers.h>
-
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/lists.h>
-#include <util/log.h>
 #include <util/macros.h>
-#include <util/path.h>
-#include <util/rand.h>
-#include <util/rng.h>
-#include <util/unicode.h>
+#include "util/path.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/unicode.h"
 
 #include "gmtool_structs.h"
 #include "console.h"
 #include "listbox.h"
-#include "wormhole.h"
 #include "teleport.h"
 
 #include <selist.h>
-#include <storage.h>
-#include <lua.h>
 
 #include <assert.h>
-#include <locale.h>
+#include <limits.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -1076,20 +1065,10 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            const char *at = strchr(player->email, '@');
             faction *f;
-            addplayer(r, f = addfaction(player->email, player->password,
-                                        player->race, player->lang,
-                                        player->subscription));
-            if (at) {
-                char fname[64];
-                size_t len = at - player->email;
-                if (len>4 && len<sizeof(fname)) {
-                    memcpy(fname, player->email, len);
-                    fname[len]=0;
-                    faction_setname(f, fname);
-                }
-            }
+            const char *password = player->password ? player->password : itoa36(rng_int());
+            addplayer(r, f = addfaction(player->email, password,
+                                        player->race, player->lang));
         }
     }
 }
@@ -1534,7 +1513,7 @@ static void update_view(view * vi)
 
 state *state_open(void)
 {
-    state *st = calloc(sizeof(state), 1);
+    state *st = (state *)calloc(1, sizeof(state));
     st->display.pl = get_homeplane();
     st->cursor.pl = get_homeplane();
     st->cursor.x = 0;

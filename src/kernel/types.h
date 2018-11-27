@@ -55,12 +55,6 @@ struct terrain_type;
 struct unit;
 struct weapon_type;
 
-typedef struct ursprung {
-  struct ursprung *next;
-  int id;
-  int x, y;
-} ursprung;
-
 /* seen_mode: visibility in the report */
 typedef enum {
     seen_none,
@@ -83,58 +77,6 @@ typedef enum {
   ST_FLEE
 } status_t;
 
-/* ----------------- Parameter --------------------------------- */
-
-typedef enum {
-  P_LOCALE,
-  P_ANY,
-  P_EACH,
-  P_PEASANT,
-  P_BUILDING,
-  P_UNIT,
-  P_PRIVAT,
-  P_BEHIND,
-  P_CONTROL,
-  P_HERBS,
-  P_NOT,
-  P_NEXT,
-  P_FACTION,
-  P_GAMENAME,
-  P_PERSON,
-  P_REGION,
-  P_SHIP,
-  P_MONEY,
-  P_ROAD,
-  P_TEMP,
-  P_FLEE,
-  P_GEBAEUDE,
-  P_GIVE,
-  P_FIGHT,
-  P_TRAVEL,
-  P_GUARD,
-  P_ZAUBER,
-  P_PAUSE,
-  P_VORNE,
-  P_AGGRO,
-  P_CHICKEN,
-  P_LEVEL,
-  P_HELP,
-  P_FOREIGN,
-  P_AURA,
-  P_AFTER,
-  P_BEFORE,
-  P_NUMBER,
-  P_ITEMS,
-  P_POTIONS,
-  P_GROUP,
-  P_FACTIONSTEALTH,
-  P_TREES,
-  P_ALLIANCE,
-  P_AUTO,
-  MAXPARAMS,
-  NOPARAM 
-} param_t;
-
 typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_BATTLE,
   MSG_EVENT,
@@ -156,8 +98,6 @@ enum {                          /* Message-Level */
   ML_MAX
 };
 
-extern const char *parameters[MAXPARAMS];
-
 /* --------------- Reports Typen ------------------------------- */
 
 enum {
@@ -177,7 +117,7 @@ enum {
   MAXOPTIONS
 };
 
-typedef enum {
+typedef enum magic_t {
   M_GRAY = 0,                 /* Gray */
   M_ILLAUN = 1,               /* Illaun */
   M_TYBIED = 2,               /* Tybied */

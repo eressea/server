@@ -4,8 +4,8 @@
 #include <kernel/config.h>
 #include <kernel/region.h>
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/strings.h>
@@ -51,6 +51,7 @@ void register_special_direction(struct locale *lang, const char *name)
 
         if (lang == locales) {
             dir_lookup *dl = malloc(sizeof(dir_lookup));
+            assert(dl);
             dl->name = str;
             dl->oldname = token;
             dl->next = dir_name_lookup;

@@ -15,7 +15,7 @@
 const char * keyword(keyword_t kwd)
 {
     static char result[32]; /* FIXME: static return value */
-    if (kwd==NOKEYWORD) {
+    if (kwd==NOKEYWORD || keywords[kwd] == NULL) {
         return NULL;
     }
     if (!result[0]) {
@@ -43,7 +43,7 @@ void init_keywords(const struct locale *lang) {
 keyword_t findkeyword(const char *s) {
     int i;
     for (i = 0; i != MAXKEYWORDS; ++i) {
-        if (strcmp(s, keywords[i]) == 0) {
+        if (keywords[i] && (strcmp(s, keywords[i]) == 0)) {
             return (keyword_t)i;
         }
     }
@@ -94,7 +94,7 @@ const char *keywords[MAXKEYWORDS] = {
     "work",
     "attack",
     "steal",
-    "besiege",
+    NULL,
     "name",
     "use",
     "describe",

@@ -8,7 +8,7 @@
 #include <kernel/unit.h>
 #include <kernel/messages.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 #include <attributes/reduceproduction.h>
 

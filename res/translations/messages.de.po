@@ -257,9 +257,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man k
 msgid "error165"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Trank bekommt der Einheit nicht.\""
 
-msgid "siege_catapults"
-msgstr "\"$unit($unit) belagert $building($building). Dabei richten die Katapulte Zerstörungen von $int($destruction) Größenpunkten an.\""
-
 msgid "curseinfo::magicstreet"
 msgstr "\"Die Straßen sind erstaunlich trocken und gut begehbar. ($int36($id))\""
 
@@ -638,9 +635,6 @@ msgstr "\"$unit($unit) erscheint plötzlich.\""
 msgid "magicresistance_effect"
 msgstr "\"$unit($unit) wird kurz von einem magischen Licht umhüllt.\""
 
-msgid "siege"
-msgstr "\"$unit($unit) belagert $building($building).\""
-
 msgid "missing_force"
 msgstr "\"$unit($unit) schafft es nicht, genug Kraft aufzubringen, um $spell($spell) auf Stufe $int($level) zu zaubern.\""
 
@@ -977,9 +971,6 @@ msgstr "\"$unit($mage) kümmert sich um die Verletzten und benutzt ein $resource
 msgid "error276"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man keine Schiffe bauen.\""
 
-msgid "error166"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann eine Burg nicht belagern.\""
-
 msgid "chaosgate_effect_2"
 msgstr "\"Ein Wirbel aus blendendem Licht erscheint.\""
 
@@ -997,9 +988,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist
 
 msgid "error82"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es gibt keine Abstimmung mit dieser Nummer.\""
-
-msgid "error60"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wird belagert.\""
 
 msgid "error162"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Heiltrank wird automatisch bei Bedarf benutzt.\""
@@ -1457,9 +1445,6 @@ msgstr "\"$unit($unit) öffnet eines der Schlösser in $region($region) mit $if(
 msgid "error255"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht opfern.\""
 
-msgid "entrance_besieged"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) wird belagert.\""
-
 msgid "error260"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Besitzer eines Schiffes oder Gebäudes kann nicht neu sortiert werden.\""
 
@@ -1549,9 +1534,6 @@ msgstr "\"In $region($region) findet ein Kampf statt.\""
 
 msgid "wormhole_dissolve"
 msgstr "\"Das Wurmloch in $region($region) schließt sich.\""
-
-msgid "error23"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht die Kontaktaufnahme unmöglich.\""
 
 msgid "error12"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht.\""
@@ -2135,9 +2117,6 @@ msgstr "\"Seit $int($age) Wochen Mitglied der Allianz '$name ($int36($id))', ang
 msgid "deathcloud_effect"
 msgstr "\"$unit($mage) beschwört einen Giftelementar in $region($region).\""
 
-msgid "nr_building_besieged"
-msgstr "\", belagert von $int($soldiers) Personen$if($lt($diff,0),\"\",\" (abgeschnitten)\")\""
-
 msgid "nr_population"
 msgstr "\"Deine Partei hat $int($population) Personen in $int($units) von maximal $int($limit) Einheiten.\""
 
@@ -2413,9 +2392,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat 
 
 msgid "aborted_battle"
 msgstr "\"Der Kampf wurde abgebrochen, da alle Verteidiger flohen.\""
-
-msgid "error24"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Belagerungszustand macht Spionage unmöglich.\""
 
 msgid "usecatapult"
 msgstr "\"$int($amount) Krieger von $unit($unit) feuern ihre Katapulte ab.\""

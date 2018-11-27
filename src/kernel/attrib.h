@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define ATTRIB_H
 
 #include <stdbool.h>
-#include "variant.h"
+#include <util/variant.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

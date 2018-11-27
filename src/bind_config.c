@@ -5,17 +5,15 @@
 #include "bind_config.h"
 
 #include "jsonconf.h"
+#include "magic.h"
 
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/race.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
 
 #include <util/log.h>
-#include <util/language.h>
 #include <util/nrmessage.h>
 #include <util/path.h>
 #include <util/strings.h>

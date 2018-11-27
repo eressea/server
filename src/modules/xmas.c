@@ -25,10 +25,10 @@
 #include <move.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
 
@@ -50,7 +50,7 @@ static void xmasgate_write(const trigger * t, struct storage *store)
 
 static int xmasgate_read(trigger * t, struct gamedata *data)
 {
-    if (read_building_reference(data, (building **)&t->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&t->data.v) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

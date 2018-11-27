@@ -1,12 +1,12 @@
 #include <platform.h>
 #include <eressea.h>
 #include <kernel/config.h>
-#include <kernel/database.h>
 #include <CuTest.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <util/log.h>
+#include <util/password.h>
 #include <util/strings.h>
 #include <util/variant.h>
 
@@ -81,6 +81,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(functions);
     ADD_SUITE(gamedata);
     ADD_SUITE(language);
+    ADD_SUITE(order_parser);
     ADD_SUITE(parser);
     ADD_SUITE(password);
     ADD_SUITE(umlaut);
@@ -124,6 +125,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(automate);
     ADD_SUITE(battle);
     ADD_SUITE(calendar);
+    ADD_SUITE(contact);
     ADD_SUITE(creport);
     ADD_SUITE(donations);
     ADD_SUITE(economy);
@@ -137,7 +139,6 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(monsters);
     ADD_SUITE(move);
     ADD_SUITE(names);
-    ADD_SUITE(orderdb);
     ADD_SUITE(orderfile);
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
@@ -159,6 +160,7 @@ int RunAllTests(int argc, char *argv[])
         CuSuite *summary = CuSuiteNew();
         int fail_count;
         game_init();
+        bcrypt_workfactor = 4;
         while (suites) {
             suite *s = suites->next;
             RunTests(suites->csuite, suites->name);

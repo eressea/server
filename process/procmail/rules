@@ -3,26 +3,6 @@
 ##
 
 :0:server.lock
-* ^Subject:.*ERE.*2.*PASSWOR.*
-| sendpassword.py $HOME/eressea/game-2/passwd
-
-:0:server.lock
-* ^Subject:.*ERE.*3.*PASSWOR.*
-| sendpassword.py $HOME/eressea/game-3/passwd
-
-:0:server.lock
-* ^Subject:.*ERE.*4.*PASSWOR.*
-| sendpassword.py $HOME/eressea/game-4/passwd
-
-:0:server.lock
-* ^Subject:.*ERE.*PASSWOR.*
-| sendpassword.py $HOME/eressea/game-2/passwd
-
-:0:server.lock
-* ^Subject:.*E3.*PASSWOR.*
-| sendpassword.py $HOME/eressea/game-3/passwd
-
-:0:server.lock
 * ^Subject:.*ERE.*2.*REPORT \/.*
 * !From: .*eressea.*@eressea.de
 | tr -d '' | ERESSEA=$HOME/eressea sendreport.sh 2 $FROM $MATCH
