@@ -105,6 +105,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
+/* pre-C99 compatibility */
+#ifndef SIZE_MAX
+#define SIZE_MAX ((size_t)(-1))
+#endif
+
 #define ECHECK_VERSION "4.01"
 
 extern int *storms;
