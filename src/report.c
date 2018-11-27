@@ -1563,7 +1563,6 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                     ++pos;
                     ++len;
                 }
-                assert(len <= SIZE_MAX);
                 sbs_substr(sbp, len, SIZE_MAX);
                 break;
             }
