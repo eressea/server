@@ -1687,7 +1687,7 @@ int reports(void)
     faction *f;
     FILE *mailit;
     int retval = 0;
-    char path[4096];
+    char path[PATH_MAX];
     const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);

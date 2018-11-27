@@ -1528,11 +1528,14 @@ struct show_s {
     size_t maxlen;
 };
 
+/* TODO: does not test for non-ascii unicode spaces. */
+#define IS_UTF8_SPACE(pos) (*pos > 0 && *pos <= CHAR_MAX && isspace(*pos))
+
 void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
 {
     while (sbs_length(sbp) > maxlen) {
         char *pos, *begin = sbp->begin;
-        while (*begin && isspace(*begin)) {
+        while (*begin && IS_UTF8_SPACE(begin)) {
             /* eat whitespace */
             ++begin;
         }
@@ -1551,7 +1554,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 swrite(begin, 1, len, out);
                 newline(out);
 
-                while (*pos && isspace(*pos)) {
+                while (*pos && IS_UTF8_SPACE(pos)) {
                     ++pos;
                     ++len;
                 }
@@ -1564,7 +1567,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
     }
     if (isfinal) {
         char *pos = sbp->begin;
-        while (*pos && isspace(*pos)) {
+        while (*pos && IS_UTF8_SPACE(pos)) {
             /* eat whitespace */
             ++pos;
         }
@@ -1590,6 +1593,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
         }
     }
     sbs_strcat(sbp, factionname(af));
+    pump_paragraph(sbp, show->out, show->maxlen, false);
     sbs_strcat(sbp, " (");
     if ((mode & HELP_ALL) == HELP_ALL) {
         sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
