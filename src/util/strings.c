@@ -80,9 +80,10 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
 
     /* Not enough room in dst, add NUL and traverse rest of src */
     if (n == 0) {
-        if (len != 0)
-            *d = '\0';                /* NUL-terminate dst */
-        return (d - dst);         /* count does not include NUL */
+        if (len != 0) {
+            *d = '\0'; /* NUL-terminate dst */
+        }
+        return (s - src) + strlen(s); /* count does not include NUL */
     }
 
     return (s - src - 1);         /* count does not include NUL */
@@ -287,8 +288,8 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     size_t len;
     assert(sbs);
     len = sbs->size - (sbs->end - sbs->begin);
-    len = str_strlcpy(sbs->end, str, len);
-    sbs->end += len;
+    str_strlcpy(sbs->end, str, len);
+    sbs->end += strlen(sbs->end);
     assert(sbs->begin + sbs->size >= sbs->end);
 }
 
