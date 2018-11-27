@@ -302,19 +302,24 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
     assert(sbs->begin + sbs->size >= sbs->end);
 }
 
-void sbs_cut(sbstring *sbs, int bytes)
+void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
 {
-    if (bytes > 0) {
-        size_t len = sbs_length(sbs) - bytes;
-        memmove(sbs->begin, sbs->begin + bytes, len + 1);
-        sbs->end = sbs->begin + len;
+    if (pos > sbs->end - sbs->begin) {
+        /* starting past end of string, do nothing */
+        sbs->end = sbs->begin;
     }
-    else if (bytes < 0) {
-        size_t len = sbs_length(sbs) + bytes;
+    if (pos >= 0) {
+        size_t sz = sbs->end - (sbs->begin + pos);
+        if (len > sz) len = sz;
+        if (len - pos > 0) {
+            memmove(sbs->begin, sbs->begin + pos, len);
+        }
+        else {
+            memcpy(sbs->begin, sbs->begin + pos, len);
+        }
         sbs->end = sbs->begin + len;
+        sbs->end[0] = '\0';
     }
-    assert(sbs->begin + sbs->size >= sbs->end);
-    assert(sbs->end[0] == '\0');
 }
 
 size_t sbs_length(const struct sbstring *sbs)

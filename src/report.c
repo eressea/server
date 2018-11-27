@@ -1550,7 +1550,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 return;
             }
             else if (next > begin + maxlen) {
-                size_t len = pos - begin;
+                ptrdiff_t len = pos - begin;
                 swrite(begin, 1, len, out);
                 newline(out);
 
@@ -1558,8 +1558,8 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                     ++pos;
                     ++len;
                 }
-                assert(len <= INT_MAX);
-                sbs_cut(sbp, (int)len);
+                assert(len <= SIZE_MAX);
+                sbs_substr(sbp, len, SIZE_MAX);
                 break;
             }
             pos = next;
