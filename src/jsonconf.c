@@ -29,9 +29,10 @@ without prior permission by the authors of Eressea.
 #include "kernel/spellbook.h"
 
 /* util includes */
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/crmessage.h"
 #include "util/functions.h"
+#include "util/keyword.h"
 #include "util/language.h"
 #include "util/log.h"
 #include "util/message.h"
@@ -42,7 +43,6 @@ without prior permission by the authors of Eressea.
 
 /* game modules */
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 #include "prefix.h"
 #include "skill.h"
@@ -846,7 +846,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
     }
     for (child = json->child; child; child = child->next) {
         keyword_t kwd = findkeyword(child->string);
-        if (kwd != NOKEYWORD) {
+        if (kwd != NOKEYWORD && keywords[kwd]) {
             if (child->type == cJSON_String) {
                 init_keyword(lang, kwd, child->valuestring);
                 locale_setstring(lang, mkname("keyword", keywords[kwd]), child->valuestring);

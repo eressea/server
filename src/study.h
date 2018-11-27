@@ -31,6 +31,7 @@ extern "C" {
 
 #define STUDYDAYS 30
 #define TEACHNUMBER 10
+#define TEACHDIFFERENCE 2
 
     typedef struct teaching_info {
         struct selist *teachers;

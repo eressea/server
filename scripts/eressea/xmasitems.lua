@@ -74,7 +74,7 @@ function use_xmastree(u, amount)
     if u.region.herb~=nil then
         -- TODO: else?
         local trees = u.region:get_resource("tree")
-        u.region:set_key("xm06", true)
+        u.region:set_key("xm06", get_turn())
         u.region:set_resource("tree", 10+trees)
         local msg = usepotion_message(u, "xmastree")
         msg:send_region(u.region)
@@ -107,7 +107,7 @@ function self.update()
             -- we celebrate knut and kick out the trees.
             for r in regions() do
                 if r:get_key("xm06") then
-                    r:set_key("xm06", false)
+                    r:set_key("xm06", 0)
                 end
             end
         end

@@ -20,10 +20,11 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/rand.h>
 
 #include <CuTest.h>
@@ -92,37 +93,6 @@ static void test_rename_building_twice(CuTest * tc)
 
     rename_building(u, NULL, b, "Villa Kunterbunt");
     CuAssertStrEquals(tc, "Villa Kunterbunt", b->name);
-    test_teardown();
-}
-
-static void test_contact(CuTest * tc)
-{
-    region *r;
-    unit *u1, *u2, *u3;
-    building *b;
-    building_type *btype;
-    ally *al;
-
-    test_setup();
-    test_create_locale();
-    btype = test_create_buildingtype("castle");
-    r = test_create_region(0, 0, NULL);
-    b = new_building(btype, r, default_locale);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
-    u3 = test_create_unit(test_create_faction(NULL), r);
-    set_level(u3, SK_PERCEPTION, 2);
-    usetsiege(u3, b);
-    b->besieged = 1;
-    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
-
-    u_set_building(u1, b);
-    CuAssertIntEquals(tc, 0, can_contact(r, u1, u2));
-    al = ally_add(&u1->faction->allies, u2->faction);
-    al->status = HELP_ALL;
-    CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
-    u_set_building(u2, b);
-    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
     test_teardown();
 }
 
@@ -217,12 +187,12 @@ static void test_display_cmd(CuTest *tc) {
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertStrEquals(tc, "Hodor", u->display);
+    CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertPtrEquals(tc, NULL, u->display);
+    CuAssertPtrEquals(tc, NULL, (void *)unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
@@ -251,7 +221,6 @@ static void test_rule_force_leave(CuTest *tc) {
 }
 
 static void test_force_leave_buildings(CuTest *tc) {
-    ally *al;
     region *r;
     unit *u1, *u2, *u3;
     building * b;
@@ -274,8 +243,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u3->faction->msgs, "force_leave_building"));
 
     u_set_building(u3, b);
-    al = ally_add(&u1->faction->allies, u3->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u1->faction->allies, u3->faction, HELP_GUARD);
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
     test_teardown();
@@ -418,6 +386,27 @@ static void test_unit_limit(CuTest * tc)
 
     config_set("rules.limit.alliance", "250");
     CuAssertIntEquals(tc, 250, rule_alliance_limit());
+    test_teardown();
+}
+
+static void test_findparam_ex(CuTest *tc)
+{
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "temple", "TEMPEL");
+    test_create_buildingtype("temple");
+
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex("TEMPEL", lang));
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex(
+        locale_string(lang, parameters[P_BUILDING], false), lang));
+    CuAssertIntEquals(tc, P_SHIP, findparam_ex(
+        locale_string(lang, parameters[P_SHIP], false), lang));
+    CuAssertIntEquals(tc, P_FACTION, findparam_ex(
+        locale_string(lang, parameters[P_FACTION], false), lang));
+    CuAssertIntEquals(tc, P_UNIT, findparam_ex(
+        locale_string(lang, parameters[P_UNIT], false), lang));
     test_teardown();
 }
 
@@ -1284,25 +1273,25 @@ static void test_ally_cmd(CuTest *tc) {
     ord = create_order(K_ALLY, f->locale, "%s", itoa36(f->no));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_ALL, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_ALL, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_GUARD, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     test_teardown();
@@ -1494,6 +1483,34 @@ static void test_show_without_item(CuTest *tc)
     test_teardown();
 }
 
+static struct locale *setup_locale(void) {
+    struct locale *loc;
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "iteminfo::elvenhorse", "Elfenpferd Informationen");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    locale_setstring(loc, "race::human_p", "Menschen");
+    locale_setstring(loc, "race::human", "Mensch");
+    locale_setstring(loc, "stat_hitpoints", "Trefferpunkte");
+    locale_setstring(loc, "stat_attack", "Angriff");
+    locale_setstring(loc, "stat_attacks", "Angriffe");
+    locale_setstring(loc, "stat_defense", "Verteidigung");
+    locale_setstring(loc, "stat_armor", "Ruestung");
+    locale_setstring(loc, "stat_equipment", "Gegenstaende");
+    locale_setstring(loc, "stat_pierce", "Pieks");
+    locale_setstring(loc, "stat_cut", "Schnipp");
+    locale_setstring(loc, "stat_bash", "Boink");
+    locale_setstring(loc, "attack_magical", "magisch");
+    locale_setstring(loc, "attack_standard", "normal");
+    locale_setstring(loc, "attack_natural", "natuerlich");
+    locale_setstring(loc, "attack_structural", "strukturell");
+    init_locale(loc);
+    return loc;
+}
+
 static void test_show_race(CuTest *tc) {
     order *ord;
     race * rc;
@@ -1506,12 +1523,7 @@ static void test_show_race(CuTest *tc) {
     test_create_race("human");
     rc = test_create_race("elf");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    locale_setstring(loc, "race::human_p", "Menschen");
-    locale_setstring(loc, "race::human", "Mensch");
-    init_locale(loc);
+    loc = setup_locale();
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     u->faction->locale = loc;
 
@@ -1547,13 +1559,7 @@ static void test_show_both(CuTest *tc) {
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "elvenhorse", "Elfenpferd");
-    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
-    locale_setstring(loc, "iteminfo::elvenhorse", "Hiyaa!");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    init_locale(loc);
+    loc = setup_locale();
 
     CuAssertPtrNotNull(tc, finditemtype("elf", loc));
     CuAssertPtrNotNull(tc, findrace("elf", loc));
@@ -1569,7 +1575,7 @@ static void test_show_both(CuTest *tc) {
     CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
     msg = test_find_messagetype(u->faction->msgs, "displayitem");
     CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Hiyaa!", msg->parameters[2].v, 4) == 0);
+    CuAssertTrue(tc, memcmp("Elfenpferd Informationen", msg->parameters[2].v, 4) == 0);
     test_clear_messages(u->faction);
     free_order(ord);
     test_teardown();
@@ -1805,6 +1811,7 @@ CuSuite *get_laws_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
+    SUITE_ADD_TEST(suite, test_findparam_ex);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
@@ -1845,7 +1852,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
     SUITE_ADD_TEST(suite, test_new_units);
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
-    SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
     SUITE_ADD_TEST(suite, test_display_cmd);

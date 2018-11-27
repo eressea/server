@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2014,
+Copyright (c) 1998-2018,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -23,6 +23,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* kernel includes */
 #include "kernel/ally.h"
+#include "kernel/attrib.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
@@ -30,6 +31,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/connection.h"
 #include "kernel/curse.h"
 #include "kernel/faction.h"
+#include "kernel/gamedata.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/order.h"
@@ -42,18 +44,19 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
 
-#include "move.h"
+#include "alchemy.h"
+#include "contact.h"
 #include "guard.h"
 #include "laws.h"
+#include "lighthouse.h"
+#include "monsters.h"
+#include "move.h"
+#include "piracy.h"
 #include "reports.h"
 #include "study.h"
 #include "spy.h"
-#include "alchemy.h"
 #include "travelthru.h"
 #include "vortex.h"
-#include "monsters.h"
-#include "lighthouse.h"
-#include "piracy.h"
 
 #include <spells/flyingship.h>
 #include <spells/unitcurse.h>
@@ -72,13 +75,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -891,7 +893,7 @@ static void drifting_ships(region * r)
 
 static bool present(region * r, unit * u)
 {
-    return (bool)(u && u->region == r);
+    return (u && u->region == r);
 }
 
 static void caught_target(region * r, unit * u)
@@ -1428,9 +1430,10 @@ int movement_speed(const unit * u)
             /* Im Astralraum sind Tyb und Ill-Magier doppelt so schnell.
                 * Nicht kumulativ mit anderen Beschleunigungen! */
             if (mp * dk <= BP_WALKING * u_race(u)->speed && is_astral(u->region)) {
-                sc_mage *mage = get_mage(u);
-                if (mage && (mage->magietyp == M_TYBIED || mage->magietyp == M_ILLAUN)) {
-                    if (has_skill(u, SK_MAGIC)) {
+                struct sc_mage *mage = get_mage(u);
+                if (mage) {
+                    magic_t mtype = mage_get_type(mage);
+                    if (mtype == M_TYBIED || mtype == M_ILLAUN) {
                         mp *= 2;
                     }
                 }
@@ -2265,7 +2268,7 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
-    id = getshipid();
+    id = getid();
 
     if (id <= 0) {
         cmistake(u, ord, 20, MSG_MOVE);
@@ -2361,7 +2364,7 @@ static void move_hunters(void)
                             break;
                         }
 
-                        if (!fval(u, UFL_LONGACTION) && !LongHunger(u) && follow_ship(u, ord)) {
+                        if (!LongHunger(u) && follow_ship(u, ord)) {
                             up = &r->units;
                             break;
                         }
@@ -2549,7 +2552,7 @@ void follow_unit(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                id = getshipid();
+                id = getid();
                 if (id <= 0) {
                     /*	cmistake(u, ord, 20, MSG_MOVE); */
                 }
@@ -2626,9 +2629,9 @@ void follow_unit(unit * u)
             }
         }
         if (follow) {
-            fset(u, UFL_FOLLOWING);
             fset(u2, UFL_FOLLOWED);
             /* FOLLOW unit on a (potentially) moving unit prevents long orders */
+            fset(u, UFL_FOLLOWING | UFL_LONGACTION);
             set_order(&u->thisorder, NULL);
         }
     }

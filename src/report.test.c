@@ -2,7 +2,6 @@
 #include "report.h"
 #include "move.h"
 #include "travelthru.h"
-#include "keyword.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -15,6 +14,8 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
+#include "util/keyword.h"
+#include "util/param.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>

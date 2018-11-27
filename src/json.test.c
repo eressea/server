@@ -71,8 +71,8 @@ static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, r
     json = cJSON_Parse(buf);
     CuAssertPtrNotNull(tc, json);
     CuAssertIntEquals(tc, cJSON_Object, json->type);
-    CuAssertPtrEquals(tc, 0, cJSON_GetObjectItem(json, "factions"));
-    CuAssertPtrEquals(tc, 0, cJSON_GetObjectItem(json, "units"));
+    CuAssertPtrEquals(tc, NULL, cJSON_GetObjectItem(json, "factions"));
+    CuAssertPtrEquals(tc, NULL, cJSON_GetObjectItem(json, "units"));
     CuAssertPtrNotNull(tc, regs = cJSON_GetObjectItem(json, "regions"));
     CuAssertIntEquals(tc, cJSON_Object, regs->type);
     result = regs->child;
@@ -111,7 +111,7 @@ static void test_export_ocean_region(CuTest * tc) {
     test_setup();
     terrain = test_create_terrain("ocean", SEA_REGION);
     json = export_a_region(tc, terrain, 0);
-    CuAssertPtrEquals(tc, 0, cJSON_GetObjectItem(json, "name"));
+    CuAssertPtrEquals(tc, NULL, cJSON_GetObjectItem(json, "name"));
     cJSON_Delete(json);
     test_teardown();
 }

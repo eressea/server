@@ -26,9 +26,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -263,7 +263,7 @@ bool b_blocknone(const connection * b, const unit * u, const region * r)
 
 bool b_rvisible(const connection * b, const region * r)
 {
-    return (bool)(b->to == r || b->from == r);
+    return (b->to == r || b->from == r);
 }
 
 bool b_fvisible(const connection * b, const struct faction * f,
@@ -412,7 +412,7 @@ b_blockfogwall(const connection * b, const unit * u, const region * r)
     UNUSED_ARG(b);
     if (!u)
         return true;
-    return (bool)(effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
+    return (effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
 }
 
 /** Legacy type used in old Eressea games, no longer in use. */
@@ -440,7 +440,7 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
         return (f && fno == f->no) ? "illusionwall" : "wall";
     if (gflags & GF_ARTICLE) {
         return LOC(f->locale, mkname("border", (f
-            && fno == f->subscription) ? "an_illusionwall" : "a_wall"));
+            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
     }
     return LOC(f->locale, mkname("border", (f
         && fno == f->no) ? "illusionwall" : "wall"));

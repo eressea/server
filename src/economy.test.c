@@ -19,7 +19,7 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
 
@@ -358,7 +358,7 @@ static void test_tax_cmd(CuTest *tc) {
 
     set_level(u, SK_TAXING, 1);
     tax_cmd(u, ord, &taxorders);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
     CuAssertPtrNotNull(tc, taxorders);
 
     rsetmoney(r, 11);
@@ -416,8 +416,8 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, f->msgs);
-    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrEquals(tc, NULL, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
@@ -439,8 +439,8 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrEquals(tc, 0, r->msgs);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
@@ -449,7 +449,7 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
     test_clear_messagelist(&r->msgs);
 
@@ -488,6 +488,7 @@ static void test_recruit_insect(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
+    test_create_terrain("desert", -1);
     f = test_create_faction(test_create_race("insect"));
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);

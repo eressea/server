@@ -64,7 +64,7 @@ without prior permission by the authors of Eressea.
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
 #include <util/strings.h>
@@ -673,9 +673,7 @@ static void cr_output_building(struct stream *out, building *b,
     if (fno >= 0) {
         stream_printf(out, "%d;Partei\n", fno);
     }
-    if (b->besieged) {
-        stream_printf(out, "%d;Belagerer\n", b->besieged);
-    }
+
     cr_output_curses(out, f, b, TYP_BUILDING);
 }
 
@@ -780,7 +778,6 @@ void cr_output_unit(stream *out, const faction * f,
     const item_type *lasttype;
     int pr;
     item *itm, *show = NULL;
-    building *b;
     const char *pzTmp;
     skill *sv;
     item result[MAX_INVENTORY];
@@ -802,13 +799,11 @@ void cr_output_unit(stream *out, const faction * f,
     }
 
     if (u->faction == f) {
-        const attrib *a = NULL;
         unit *mage;
+        group * g;
 
-        if (fval(u, UFL_GROUP))
-            a = a_find(u->attribs, &at_group);
-        if (a != NULL) {
-            const group *g = (const group *)a->data.v;
+        g = get_group(u);
+        if (g) {
             stream_printf(out, "%d;gruppe\n", g->gid);
         }
         mage = get_familiar_mage(u);
@@ -879,16 +874,13 @@ void cr_output_unit(stream *out, const faction * f,
     if (is_guard(u)) {
         stream_printf(out, "%d;bewacht\n", 1);
     }
-    if ((b = usiege(u)) != NULL) {
-        stream_printf(out, "%d;belagert\n", b->no);
-    }
     /* additional information for own units */
     if (u->faction == f || omniscient(f)) {
         order *ord;
         const char *xc;
         const char *c;
         int i;
-        sc_mage *mage;
+        struct sc_mage *mage;
 
         i = ualias(u);
         if (i > 0)
@@ -925,7 +917,7 @@ void cr_output_unit(stream *out, const faction * f,
         }
         if (is_mage(u)) {
             stream_printf(out, "%d;Aura\n", get_spellpoints(u));
-            stream_printf(out, "%d;Auramax\n", max_spellpoints(u->region, u));
+            stream_printf(out, "%d;Auramax\n", max_spellpoints_depr(u->region, u));
         }
         /* default commands */
         stream_printf(out, "COMMANDS\n");
@@ -965,19 +957,23 @@ void cr_output_unit(stream *out, const faction * f,
         }
 
         /* spells that this unit can cast */
-        mage = get_mage_depr(u);
+        mage = get_mage(u);
         if (mage) {
             int maxlevel = effskill(u, SK_MAGIC, 0);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-                const spell *sp = mage->combatspells[i].sp;
+                int level;
+                const spell *sp = mage_get_combatspell(mage, i, &level);
                 if (sp) {
-                    const char *name =
-                        translate(mkname("spell", sp->sname), spell_name(sp, lang));
+                    const char *name;
+                    if (level > maxlevel) {
+                        level = maxlevel;
+                    }
                     stream_printf(out, "KAMPFZAUBER %d\n", i);
+                    name = translate(mkname("spell", sp->sname), spell_name(sp, lang));
                     stream_printf(out, "\"%s\";name\n", name);
-                    stream_printf(out, "%d;level\n", mage->combatspells[i].level);
+                    stream_printf(out, "%d;level\n", level);
                 }
             }
         }
@@ -1024,20 +1020,38 @@ static void cr_output_unit_compat(FILE * F, const faction * f,
     cr_output_unit(&strm, f, u, mode);
 }
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
+static void print_ally(const faction *f, faction *af, int status, FILE *F) {
+    if (af && status > 0) {
+        fprintf(F, "ALLIANZ %d\n", af->no);
+        fprintf(F, "\"%s\";Parteiname\n", af->name);
+        fprintf(F, "%d;Status\n", status & HELP_ALL);
+    }
+}
+
+struct print_ally_s {
+    const faction *f;
+    FILE *F;
+};
+
+static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
+    struct print_ally_s *data = (struct print_ally_s *)udata;
+
+    UNUSED_ARG(al);
+    if (af && faction_alive(af)) {
+        int mode = alliance_status(data->f, af, status);
+        print_ally(data->f, af, mode, data->F);
+    }
+    return 0;
+}
 
 /* prints allies */
-static void show_allies_cr(FILE * F, const faction * f, const ally * sf)
+static void show_allies_cr(FILE * F, const faction * f, const group *g)
 {
-    for (; sf; sf = sf->next)
-        if (sf->faction) {
-            int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-            if (mode != 0 && sf->status > 0) {
-                fprintf(F, "ALLIANZ %d\n", sf->faction->no);
-                fprintf(F, "\"%s\";Parteiname\n", sf->faction->name);
-                fprintf(F, "%d;Status\n", sf->status & HELP_ALL);
-            }
-        }
+    struct print_ally_s data;
+    data.F = F;
+    data.f = f;
+    struct allies *sf = g ? g->allies : f->allies;
+    allies_walk(sf, print_ally_cb, &data);
 }
 
 /* prints allies */
@@ -1063,12 +1077,15 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
     while (flist) {
         const faction *f = (const faction *)selist_get(flist, i);
         if (uf != f) {
+            const char *str;
             fprintf(F, "PARTEI %d\n", f->no);
             fprintf(F, "\"%s\";Parteiname\n", f->name);
             if (strcmp(faction_getemail(f), "") != 0)
                 fprintf(F, "\"%s\";email\n", faction_getemail(f));
-            if (f->banner)
-                fprintf(F, "\"%s\";banner\n", f->banner);
+            str = faction_getbanner(f);
+            if (str) {
+                fprintf(F, "\"%s\";banner\n", str);
+            }
             fprintf(F, "\"%s\";locale\n", locale_name(f->locale));
             if (f->alliance && f->alliance == uf->alliance) {
                 fprintf(F, "%d;alliance\n", f->alliance->id);
@@ -1540,7 +1557,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     static int era = -1;
     int i;
     faction *f = ctx->f;
-    const char *prefix;
+    const char *prefix, *str;
     region *r;
     const char *mailto = config_get("game.email");
     const attrib *a;
@@ -1634,8 +1651,10 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);
     fprintf(F, "\"%s\";email\n", faction_getemail(f));
-    if (f->banner)
-        fprintf(F, "\"%s\";banner\n", f->banner);
+    str = faction_getbanner(f);
+    if (str) {
+        fprintf(F, "\"%s\";banner\n", str);
+    }
     print_items(F, f->items, f->locale);
     fputs("OPTIONEN\n", F);
     for (i = 0; i != MAXOPTIONS; ++i) {
@@ -1647,7 +1666,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             f->options &= (~flag);
         }
     }
-    show_allies_cr(F, f, f->allies);
+    show_allies_cr(F, f, NULL);
     {
         group *g;
         for (g = f->groups; g; g = g->next) {
@@ -1660,7 +1679,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
                 fprintf(F, "\"%s\";typprefix\n",
                     translate(prefix, LOC(f->locale, prefix)));
             }
-            show_allies_cr(F, f, g->allies);
+            show_allies_cr(F, f, g);
         }
     }
 

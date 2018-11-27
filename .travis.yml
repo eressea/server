@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
       - libbsd-dev
+      - libdb-dev
       - liblua5.1-dev
       - libtolua-dev
       - libncurses5-dev

@@ -1150,3 +1150,35 @@ function test_immunity_stops_guard()
     assert_equal(f.age, 2)
     assert_true(u.guard)
 end
+
+function test_region_keys()
+    local r = region.create(0, 0, 'plain')
+    assert_nil(r:get_key('test'))
+    assert_nil(r:get_key('more'))
+    r:set_key('test', 42)
+    r:set_key('more') -- default is 1
+    assert_equal(42, r:get_key('test'))
+    assert_equal(1, r:get_key('more'))
+end
+
+function test_faction_keys()
+    local f = faction.create('human')
+    assert_nil(f:get_key('test'))
+    assert_nil(f:get_key('more'))
+    f:set_key('test', 42)
+    f:set_key('more') -- default is 1
+    assert_equal(42, f:get_key('test'))
+    assert_equal(1, f:get_key('more'))
+end
+
+function test_cartmaking()
+    local f = faction.create('human')
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(f, r)
+    u:set_skill('cartmaking', 1)
+    u:add_item('log', 10)
+    u:add_order('MACHE Wagen')
+    process_orders()
+    assert_equal(1, u:get_item('cart'))
+    assert_equal(5, u:get_item('log'))
+end

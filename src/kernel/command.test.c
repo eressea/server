@@ -37,8 +37,8 @@ static void test_command(CuTest * tc) {
     st = stree_create();
     CuAssertPtrNotNull(tc, st);
     CuAssertPtrEquals(tc, loc, (struct locale *)st->lang);
-    CuAssertPtrEquals(tc, 0, st->root);
-    CuAssertPtrEquals(tc, 0, st->next);
+    CuAssertPtrEquals(tc, NULL, st->root);
+    CuAssertPtrEquals(tc, NULL, st->next);
     stree_add(st, "two", parser_two);
     stree_add(st, "six", parser_six);
     CuAssertPtrNotNull(tc, st->root);

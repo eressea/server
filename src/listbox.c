@@ -13,14 +13,13 @@
 #endif
 
 #include <curses.h>
-#include <kernel/config.h>
 
 #include "listbox.h"
 #include "gmtool_structs.h"
 
-#include <util/log.h>
 #include <util/strings.h>
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -29,7 +28,7 @@ void
 insert_selection(list_selection ** p_sel, list_selection * prev,
 const char *str, void *payload)
 {
-    list_selection *sel = calloc(sizeof(list_selection), 1);
+    list_selection *sel = (list_selection *)calloc(1, sizeof(list_selection));
     sel->str = str_strdup(str);
     sel->data = payload;
     if (*p_sel) {
@@ -57,7 +56,7 @@ const char *str, void *payload)
 list_selection **push_selection(list_selection ** p_sel, char *str,
     void *payload)
 {
-    list_selection *sel = calloc(sizeof(list_selection), 1);
+    list_selection *sel = (list_selection *)calloc(1, sizeof(list_selection));
     list_selection *prev = NULL;
     sel->str = str;
     sel->data = payload;

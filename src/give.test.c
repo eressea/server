@@ -1,6 +1,8 @@
 #include <platform.h>
 
 #include "give.h"
+
+#include "contact.h"
 #include "economy.h"
 
 #include <kernel/ally.h>
@@ -16,6 +18,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/param.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -43,8 +46,7 @@ static void setup_give(struct give *env) {
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
     if (env->f2) {
-        ally * al = ally_add(&env->f2->allies, env->f1);
-        al->status = HELP_GIVE;
+        ally_set(&env->f2->allies, env->f1, HELP_GIVE);
         env->dst = test_create_unit(env->f2, env->r);
     }
     else {
@@ -193,7 +195,7 @@ static void test_give_men_limit(CuTest * tc) {
     config_set("rules.give.max_men", "1");
 
     /* below the limit, give men, increase newbies counter */
-    usetcontact(env.dst, env.src);
+    contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
@@ -202,7 +204,7 @@ static void test_give_men_limit(CuTest * tc) {
     msg_release(msg);
 
     /* beyond the limit, do nothing */
-    usetcontact(env.src, env.dst);
+    contact_unit(env.src, env.dst);
     msg = give_men(2, env.dst, env.src, NULL);
     CuAssertStrEquals(tc, "error129", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);
@@ -281,7 +283,7 @@ static void test_give_men_other_faction(CuTest * tc) {
     env.f1 = test_create_faction(NULL);
     env.f2 = test_create_faction(NULL);
     setup_give(&env);
-    usetcontact(env.dst, env.src);
+    contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 2, env.dst->number);

@@ -2,10 +2,10 @@
 #include "piracy.h"
 
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 
 #include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
@@ -15,9 +15,9 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>

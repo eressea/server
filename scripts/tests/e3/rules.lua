@@ -953,12 +953,11 @@ function test_bug2083()
     -- this is a bit weird, but the bug was caused by market code
     -- being called in two places. We want to make sure this doesn't happen
     for k, v in pairs(rules) do
-        set_key("xm09", true)
-    	if 'table' == type(v) then
+        if 'table' == type(v) then
            cb = v['update']
-	   if 'function' == type(cb) then
+            if 'function' == type(cb) then
               cb()
-	   end
+            end
         end
      end
 

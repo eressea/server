@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "racename.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/strings.h>
 
 /* libc includes */

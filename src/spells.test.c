@@ -12,7 +12,7 @@
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/unit.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <spells/regioncurse.h>

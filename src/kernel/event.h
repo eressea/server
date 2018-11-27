@@ -22,7 +22,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-#include "variant.h"
+#include <util/variant.h>
 
     struct attrib;
     struct trigger;

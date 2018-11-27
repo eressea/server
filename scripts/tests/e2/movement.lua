@@ -9,7 +9,7 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
 end
 
- function test_piracy()
+function test_piracy()
     local r = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
     local r3 = region.create(-1, 0, "ocean")

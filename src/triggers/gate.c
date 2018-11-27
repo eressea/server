@@ -18,9 +18,9 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/resolve.h>
@@ -75,8 +75,8 @@ static void gate_write(const trigger * t, struct storage *store)
 static int gate_read(trigger * t, gamedata *data)
 {
     gate_data *gd = (gate_data *)t->data.v;
-    int bc = read_building_reference(data, &gd->gate, NULL);
-    int rc = read_region_reference(data, &gd->target, NULL);
+    int bc = read_building_reference(data, &gd->gate);
+    int rc = read_region_reference(data, &gd->target);
 
     if (bc <= 0 && rc <= 0) {
         return AT_READ_FAIL;

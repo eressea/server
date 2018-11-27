@@ -21,6 +21,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <util/resolve.h>
 #include "types.h"
+#include "database.h"
 #include "skills.h"
 #include <stddef.h>
 
@@ -47,7 +48,6 @@ extern "C" {
 #define UFL_NOTMOVING     (1<<9)        /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
 #define UFL_DEFENDER      (1<<10)
 #define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
-#define UFL_SIEGE         (1<<12)       /* speedup: belagert eine burg, siehe attribut */
 #define UFL_TARGET        (1<<13)       /* speedup: hat ein target, siehe attribut */
 #define UFL_WERE          (1<<14)
 #define UFL_ENTER         (1<<15)       /* unit has entered a ship/building and will not leave it */
@@ -90,7 +90,7 @@ extern "C" {
         int no;                     /* id */
         int hp;
         char *_name;
-        char *display;
+        dbrow_id display_id;
         struct faction *faction;
         struct building *building;
         struct ship *ship;
@@ -120,16 +120,14 @@ extern "C" {
     } unit;
 
     extern struct attrib_type at_creator;
-    extern struct attrib_type at_alias;
-    extern struct attrib_type at_siege;
-    extern struct attrib_type at_target;
     extern struct attrib_type at_potionuser;
-    extern struct attrib_type at_contact;
     extern struct attrib_type at_effect;
     extern struct attrib_type at_private;
     extern struct attrib_type at_showskchange;
 
     int ualias(const struct unit *u);
+    void usetalias(unit *u, int alias);
+
     int weight(const struct unit *u);
 
     void renumber_unit(struct unit *u, int no);
@@ -138,14 +136,9 @@ extern "C" {
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);
     void u_setrace(struct unit *u, const struct race *);
-    struct building *usiege(const struct unit *u);
-    void usetsiege(struct unit *u, const struct building *b);
 
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
-
-    bool ucontact(const struct unit *u, const struct unit *u2);
-    void usetcontact(struct unit *u, const struct unit *c);
 
     struct unit *findnewunit(const struct region *r, const struct faction *f,
         int alias);
@@ -209,10 +202,11 @@ extern "C" {
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);
 
-    extern void name_unit(struct unit *u);
-    extern struct unit *create_unit(struct region *r1, struct faction *f,
+    void name_unit(struct unit *u);
+    struct unit *unit_create(int id);
+    struct unit *create_unit(struct region *r1, struct faction *f,
         int number, const struct race *rc, int id, const char *dname,
-    struct unit *creator);
+        struct unit *creator);
 
     void uhash(struct unit *u);
     void uunhash(struct unit *u);
@@ -234,8 +228,6 @@ extern "C" {
     int unit_max_hp(const struct unit *u);
     void scale_number(struct unit *u, int n);
 
-    struct spellbook * unit_get_spellbook(const struct unit * u);
-    void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp, int level);
     void remove_empty_units_in_region(struct region * r);
     void remove_empty_units(void);
 
@@ -256,7 +248,6 @@ extern "C" {
     int read_unitid(const struct faction *f, const struct region *r);
 
     /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     bool has_horses(const struct unit *u);
     int maintenance_cost(const struct unit *u);
     bool has_limited_skills(const struct unit *u);

@@ -8,8 +8,8 @@
 #include "region.h"
 #include "save.h"
 
-#include <util/gamedata.h>
-#include <util/attrib.h>
+#include <kernel/gamedata.h>
+#include <kernel/attrib.h>
 #include <attributes/key.h>
 
 #include <stream.h>
@@ -28,22 +28,21 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     faction *f, *f2;
     unit * u;
     group *g;
-    ally *al;
     int fno;
 
     test_setup();
     f = test_create_faction(NULL);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
-    CuAssertPtrEquals(tc, 0, f->next);
+    CuAssertPtrEquals(tc, NULL, f->next);
     f2 = test_create_faction(NULL);
     CuAssertPtrEquals(tc, f2, factions->next);
     u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
-    al = ally_add(&g->allies, f);
-    CuAssertPtrNotNull(tc, al);
+    ally_set(&g->allies, f, HELP_GIVE);
+    CuAssertPtrNotNull(tc, g->allies);
 
     CuAssertPtrEquals(tc, f, factions);
     destroyfaction(&factions);
@@ -58,14 +57,14 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     read_game(&data);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     f2 = factions;
     CuAssertPtrNotNull(tc, f2);
     u = f2->units;
     CuAssertPtrNotNull(tc, u);
     g = get_group(u);
     CuAssertPtrNotNull(tc, g);
-    CuAssertPtrEquals(tc, 0, g->allies);
+    CuAssertPtrEquals(tc, NULL, g->allies);
     test_teardown();
 }
 
@@ -73,7 +72,6 @@ static void test_group_readwrite(CuTest * tc)
 {
     faction * f;
     group *g;
-    ally *al;
     int i;
     gamedata data;
     storage store;
@@ -85,9 +83,8 @@ static void test_group_readwrite(CuTest * tc)
     new_group(f, "NW", 42);
     g = new_group(f, "Egoisten", 43);
     key_set(&g->attribs, 44, 44);
-    al = ally_add(&g->allies, f);
-    al->status = HELP_GIVE;
-    write_groups(&store, f);
+    ally_set(&g->allies, f, HELP_GIVE);
+    write_groups(&data, f);
     WRITE_INT(&store, 47);
 
     free_group(f->groups);
@@ -106,13 +103,11 @@ static void test_group_readwrite(CuTest * tc)
     CuAssertPtrNotNull(tc, f->groups->next);
     CuAssertIntEquals(tc, 43, f->groups->next->gid);
     CuAssertStrEquals(tc, "Egoisten", f->groups->next->name);
-    CuAssertPtrEquals(tc, 0, f->groups->allies);
+    CuAssertPtrEquals(tc, NULL, f->groups->allies);
     g = f->groups->next;
     CuAssertIntEquals(tc, 44, key_get(g->attribs, 44));
     CuAssertPtrNotNull(tc, g->allies);
-    CuAssertPtrEquals(tc, 0, g->allies->next);
-    CuAssertPtrEquals(tc, f, g->allies->faction);
-    CuAssertIntEquals(tc, HELP_GIVE, g->allies->status);
+    CuAssertIntEquals(tc, HELP_GIVE, ally_get(g->allies, f));
     test_teardown();
 }
 
@@ -135,7 +130,7 @@ static void test_group(CuTest * tc)
     CuAssertIntEquals(tc, 1, g->members);
     set_group(u, 0);
     CuAssertIntEquals(tc, 0, g->members);
-    CuAssertPtrEquals(tc, 0, get_group(u));
+    CuAssertPtrEquals(tc, NULL, get_group(u));
     set_group(u, g);
     CuAssertIntEquals(tc, 1, g->members);
     CuAssertPtrEquals(tc, g, get_group(u));

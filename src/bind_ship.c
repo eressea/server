@@ -14,7 +14,7 @@
 #include <kernel/ship.h>
 #include <kernel/build.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>

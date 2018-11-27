@@ -19,7 +19,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
-#include <kernel/config.h>
 
 #include "report.h"
 #include "reports.h"
@@ -50,8 +49,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "teleport.h"
 
 /* kernel includes */
+#include "kernel/alliance.h"
 #include "kernel/ally.h"
+#include "kernel/attrib.h"
 #include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/connection.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
@@ -74,10 +76,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/terrain.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
-#include "kernel/alliance.h"
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
 #include "util/bsdstring.h"
 #include <util/goodies.h>
@@ -86,6 +86,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+#include "util/param.h"
 #include <util/rng.h>
 #include <util/strings.h>
 
@@ -675,7 +676,7 @@ nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_
         return;
 
     newline(out);
-    dh = bufunit(f, u, mode, buf, sizeof(buf));
+    dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
 
     if (u->faction == f) {
         marker = '*';
@@ -872,6 +873,8 @@ bool see_border(const connection * b, const faction * f, const region * r)
     return cs;
 }
 
+#define MAX_EDGES 16
+
 void report_region(struct stream *out, const region * r, faction * f)
 {
     int n;
@@ -882,13 +885,13 @@ void report_region(struct stream *out, const region * r, faction * f)
     attrib *a;
     const char *tname;
     struct edge {
-        struct edge *next;
         char *name;
         bool transparent;
         bool block;
         bool exist[MAXDIRECTIONS];
         direction_t lastd;
-    } *edges = NULL, *e;
+    } edges[MAX_EDGES];
+    int ne = 0;
     bool see[MAXDIRECTIONS];
     char buf[8192];
     char *bufp = buf;
@@ -899,6 +902,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     assert(f);
     assert(r);
 
+    memset(edges, 0, sizeof(edges));
     for (d = 0; d != MAXDIRECTIONS; d++) {
         /* Nachbarregionen, die gesehen werden, ermitteln */
         region *r2 = rconnect(r, d);
@@ -907,7 +911,8 @@ void report_region(struct stream *out, const region * r, faction * f)
         if (!r2)
             continue;
         for (b = get_borders(r, r2); b;) {
-            struct edge *edg = edges;
+            int e;
+            struct edge *match = NULL;
             bool transparent = b->type->transparent(b, f);
             const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
 
@@ -918,18 +923,22 @@ void report_region(struct stream *out, const region * r, faction * f)
                 b = b->next;
                 continue;
             }
-            while (edg && (edg->transparent != transparent || strcmp(name, edg->name)!=0)) {
-                edg = edg->next;
+            for (e = 0; e!=ne; ++e) {
+                struct edge *edg = edges + e;
+                if (edg->transparent == transparent && 0 == strcmp(name, edg->name)) {
+                    match = edg;
+                    break;
+                }
             }
-            if (!edg) {
-                edg = calloc(sizeof(struct edge), 1);
-                edg->name = str_strdup(name);
-                edg->transparent = transparent;
-                edg->next = edges;
-                edges = edg;
+            if (match == NULL) {
+                match = edges + ne;
+                match->name = str_strdup(name);
+                match->transparent = transparent;
+                ++ne;
+                assert(ne < MAX_EDGES);
             }
-            edg->lastd = d;
-            edg->exist[d] = true;
+            match->lastd = d;
+            match->exist[d] = true;
             b = b->next;
         }
     }
@@ -1226,27 +1235,22 @@ void report_region(struct stream *out, const region * r, faction * f)
     nr_curses(out, 0, f, TYP_REGION, r);
     n = 0;
 
-    if (edges)
+    if (ne > 0) {
+        int e;
         newline(out);
-    for (e = edges; e; e = e->next) {
-        message *msg;
+        for (e = 0; e != ne; ++e) {
+            message *msg;
 
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            if (e->exist[d]) {
-                msg = msg_message(e->transparent ? "nr_border_transparent" : "nr_border_opaque",
-                    "object dir", e->name, d);
-                nr_render(msg, f->locale, buf, sizeof(buf), f);
-                msg_release(msg);
-                paragraph(out, buf, 0, 0, 0);
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                if (edges[e].exist[d]) {
+                    msg = msg_message(edges[e].transparent ? "nr_border_transparent" : "nr_border_opaque",
+                        "object dir", edges[e].name, d);
+                    nr_render(msg, f->locale, buf, sizeof(buf), f);
+                    msg_release(msg);
+                    paragraph(out, buf, 0, 0, 0);
+                }
             }
-        }
-    }
-    if (edges) {
-        while (edges) {
-            e = edges->next;
-            free(edges->name);
-            free(edges);
-            edges = e;
+            free(edges[e].name);
         }
     }
 }
@@ -1507,97 +1511,94 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     return 0;
 }
 
-static void
-show_allies(const faction * f, const ally * allies, char *buf, size_t size)
-{
-    int allierte = 0;
-    int i = 0, h, hh = 0;
-    int bytes, dh = 0;
-    const ally *sf;
-    char *bufp = buf;             /* buf already contains data */
-
-    --size;                       /* leave room for a null-terminator */
-
-    for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-        if (mode > 0)
-            ++allierte;
+static int count_allies_cb(struct allies *all, faction *af, int status, void *udata) {
+    int *num = (int *)udata;
+    if (status > 0) {
+        ++*num;
     }
+    return 0;
+}
 
-    for (sf = allies; sf; sf = sf->next) {
-        int mode = alliedgroup(NULL, f, sf->faction, sf, HELP_ALL);
-        if (mode <= 0)
-            continue;
-        i++;
-        if (dh) {
-            if (i == allierte) {
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "list_and"), size);
-            }
-            else {
-                bytes = (int)str_strlcpy(bufp, ", ", size);
-            }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-        }
-        dh = 1;
-        hh = 0;
-        bytes = (int)str_strlcpy(bufp, factionname(sf->faction), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, " (", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        if ((mode & HELP_ALL) == HELP_ALL) {
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, parameters[P_ANY]), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+struct show_s {
+    sbstring sbs;
+    const faction *f;
+    int num_allies;
+};
+
+static int show_allies_cb(struct allies *all, faction *af, int status, void *udata) {
+    struct show_s * show = (struct show_s *)udata;
+    const faction * f = show->f;
+
+    int mode = alliance_status(f, af, status);
+    --show->num_allies;
+    if (sbs_length(&show->sbs) > 0) {
+        /* not the first entry */
+        if (0 == show->num_allies) {
+            sbs_strcat(&show->sbs, LOC(f->locale, "list_and"));
         }
         else {
-            for (h = 1; h <= HELP_TRAVEL; h *= 2) {
-                int p = MAXPARAMS;
-                if ((mode & h) == h) {
-                    switch (h) {
-                    case HELP_TRAVEL:
-                        p = P_TRAVEL;
-                        break;
-                    case HELP_MONEY:
-                        p = P_MONEY;
-                        break;
-                    case HELP_FIGHT:
-                        p = P_FIGHT;
-                        break;
-                    case HELP_GIVE:
-                        p = P_GIVE;
-                        break;
-                    case HELP_GUARD:
-                        p = P_GUARD;
-                        break;
-                    case HELP_FSTEALTH:
-                        p = P_FACTIONSTEALTH;
-                        break;
-                    }
-                }
-                if (p != MAXPARAMS) {
-                    if (hh) {
-                        bytes = (int)str_strlcpy(bufp, ", ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
-                    }
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, parameters[p]), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    hh = 1;
+            sbs_strcat(&show->sbs, ", ");
+        }
+    }
+    sbs_strcat(&show->sbs, factionname(af));
+    sbs_strcat(&show->sbs, " (");
+    if ((mode & HELP_ALL) == HELP_ALL) {
+        sbs_strcat(&show->sbs, LOC(f->locale, parameters[P_ANY]));
+    }
+    else {
+        int h, hh = 0;
+        for (h = 1; h <= HELP_TRAVEL; h *= 2) {
+            int p = MAXPARAMS;
+            if ((mode & h) == h) {
+                switch (h) {
+                case HELP_TRAVEL:
+                    p = P_TRAVEL;
+                    break;
+                case HELP_MONEY:
+                    p = P_MONEY;
+                    break;
+                case HELP_FIGHT:
+                    p = P_FIGHT;
+                    break;
+                case HELP_GIVE:
+                    p = P_GIVE;
+                    break;
+                case HELP_GUARD:
+                    p = P_GUARD;
+                    break;
+                case HELP_FSTEALTH:
+                    p = P_FACTIONSTEALTH;
+                    break;
                 }
             }
+            if (p != MAXPARAMS) {
+                if (hh) {
+                    sbs_strcat(&show->sbs, ", ");
+                }
+                sbs_strcat(&show->sbs, LOC(f->locale, parameters[p]));
+                hh = 1;
+            }
         }
-        bytes = (int)str_strlcpy(bufp, ")", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
     }
-    bytes = (int)str_strlcpy(bufp, ".", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    *bufp = 0;
+    sbs_strcat(&show->sbs, ")");
+    return 0;
+}
+
+static void
+show_allies(const faction * f, struct allies * allies, char *buf, size_t size)
+{
+    int num_allies = 0;
+    allies_walk(allies, count_allies_cb, &num_allies);
+
+    if (num_allies > 0) {
+        struct show_s show;
+        show.f = f;
+        show.num_allies = num_allies;
+        sbs_init(&show.sbs, buf, size);
+
+        allies_walk(allies, show_allies_cb, &show);
+        sbs_strcat(&show.sbs, ".");
+    }
 }
 
 static void allies(struct stream *out, const faction * f)
@@ -1723,16 +1724,19 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     while (flist != NULL) {
         const faction *f = (const faction *)selist_get(flist, qi);
         if (!is_monsters(f)) {
+            const char *str;
             char buf[8192];
             char label = '-';
 
+            str = faction_getbanner(f);
             sprintf(buf, "%s: %s; %s", factionname(f), faction_getemail(f),
-                f->banner ? f->banner : "");
+                str ? str : "");
             if (uf == f)
                 label = '*';
-            else if (is_allied(uf, f))
+            else if (is_allied(uf, f)) {
                 label = 'o';
-            else if (alliedfaction(NULL, uf, f, HELP_ALL))
+            }
+            else if (alliedfaction(uf, f, HELP_ALL))
                 label = '+';
             paragraph(out, buf, 4, 0, label);
         }
@@ -1821,7 +1825,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     const char *name, *bname, *billusion = NULL;
     const struct locale *lang;
     char buffer[8192];
-    message *msg;
     size_t size;
     sbstring sbs;
 
@@ -1853,15 +1856,6 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
         sbs_strcat(&sbs, LOC(lang, "nr_building_inprogress"));
     }
 
-    if (b->besieged > 0 && r->seen.mode >= seen_lighthouse) {
-        msg = msg_message("nr_building_besieged", "soldiers diff", b->besieged,
-            b->besieged - b->size * SIEGEFACTOR);
-
-        size = nr_render(msg, lang, sbs.end, sbs.size - (sbs.end - sbs.begin), f);
-        sbs.end += size;
-
-        msg_release(msg);
-    }
     i = 0;
     if (b->display && b->display[0]) {
         sbs_strcat(&sbs, "; ");
@@ -1988,8 +1982,6 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
     }
 }
 
-#include "util/bsdstring.h"
-
 int
 report_plaintext(const char *filename, report_context * ctx,
     const char *bom)
@@ -2032,7 +2024,7 @@ report_plaintext(const char *filename, report_context * ctx,
     newline(out);
     sprintf(buf, "%s, %s/%s (%s)", factionname(f),
         LOC(f->locale, rc_name_s(f->race, NAME_PLURAL)),
-        LOC(f->locale, mkname("school", magic_school[f->magiegebiet])), faction_getemail(f));
+        magic_name(f->magiegebiet, f->locale), faction_getemail(f));
     centre(out, buf, true);
     if (f_get_alliance(f)) {
         centre(out, alliancename(f->alliance), true);

@@ -188,10 +188,6 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     }
 
     assert(u->region == u2->region);
-    if (!can_contact(r, u, u2)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
-        return;
-    }
 
     effsk = effskill(u, SK_STEALTH, 0);
     n = effsk - max_skill(r, f, SK_PERCEPTION);

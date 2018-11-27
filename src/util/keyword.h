@@ -1,7 +1,6 @@
 #ifndef H_KEYWORD_H
 #define H_KEYWORD_H
 
-#include "kernel/types.h"
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -17,7 +16,7 @@ extern "C"
         K_WORK,
         K_ATTACK,
         K_STEAL,
-        K_BESIEGE,
+        K_BESIEGE_UNUSED,
         K_NAME,
         K_USE,
         K_DISPLAY,

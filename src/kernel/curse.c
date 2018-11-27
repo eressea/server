@@ -34,9 +34,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -229,7 +229,7 @@ int curse_read(variant *var, void *owner, gamedata *data)
         READ_INT(store, &c->data.i);
     }
     if (c->type->typ == CURSETYP_REGION) {
-        int rr = read_region_reference(data, (region **)&c->data.v, NULL);
+        int rr = read_region_reference(data, (region **)&c->data.v);
         if (ur == 0 && rr == 0 && !c->data.v) {
             return AT_READ_FAIL;
         }

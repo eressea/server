@@ -1,21 +1,11 @@
-#ifndef H_DATABASE
-#define H_DATABASE
+#pragma once
+
+#include "db/driver.h"
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void swapdb_open(void);
+void swapdb_close(void);
 
-    struct order_data;
-
-    void dblib_open(void);
-    void dblib_close(void);
-
-    struct order_data *dblib_load_order(int id);
-    int dblib_save_order(struct order_data *od);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
+dbrow_id dbstring_save(const char *s);
+const char *dbstring_load(dbrow_id id, size_t *size);

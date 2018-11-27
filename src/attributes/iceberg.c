@@ -20,7 +20,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include "iceberg.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 
 attrib_type at_iceberg = {
     "iceberg_drift",

@@ -1,3 +1,10 @@
+function dump_messages(f)
+    for k, v in ipairs(f.messages) do
+        print(v)
+    end
+end
+
+require 'tests.e2.movement'
 require 'tests.e2.astral'
 require 'tests.e2.spells'
 require 'tests.e2.e2features'
@@ -7,7 +14,6 @@ require 'tests.e2.production'
 require 'tests.e2.adamantium'
 require 'tests.e2.undead'
 require 'tests.e2.shiplanding'
-require 'tests.e2.movement'
 require 'tests.e2.destroy'
 require 'tests.e2.guard'
 require 'tests.e2.stealth'

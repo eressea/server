@@ -22,8 +22,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/config.h>
 #include <kernel/region.h>
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/resolve.h>
 
 #include <storage.h>
@@ -36,7 +36,7 @@ write_targetregion(const variant *var, const void *owner, struct storage *store)
 
 static int read_targetregion(variant *var, void *owner, gamedata *data)
 {
-    if (read_region_reference(data, (region **)&var->v, NULL) <= 0) {
+    if (read_region_reference(data, (region **)&var->v) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;

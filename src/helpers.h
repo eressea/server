@@ -14,8 +14,6 @@ without prior permission by the authors of Eressea.
 extern "C" {
 #endif
 
-    struct lua_State;
-
     void register_tolua_helpers(void);
 
 #ifdef __cplusplus

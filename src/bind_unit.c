@@ -5,15 +5,22 @@
 #include "bind_unit.h"
 #include "alchemy.h"
 #include "bindings.h"
-#include "move.h"
 #include "reports.h"
 #include "guard.h"
+#include "magic.h"
+#include "skill.h"
 
-/*  attributes includes */
-#include <attributes/racename.h>
-#include <attributes/key.h>
+/*  util includes */
+#include <kernel/attrib.h>
+#include <util/base36.h>
+#include <kernel/event.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include "util/variant.h"
 
 /*  kernel includes */
+#include "kernel/skills.h"
+#include "kernel/types.h"
 #include <kernel/building.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
@@ -31,21 +38,20 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-/*  util includes */
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/event.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/macros.h>
+/*  attributes includes */
+#include <attributes/racename.h>
+#include <attributes/key.h>
 
 #include <selist.h>
 
+#include <lauxlib.h>
+#include <lua.h>
 #include <tolua.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <limits.h>
 
@@ -56,7 +62,7 @@ static int tolua_bufunit(lua_State * L) {
         if (f) {
             char buf[8192];
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
-            bufunit(f, u, mode, buf, sizeof(buf));
+            bufunit_depr(f, u, mode, buf, sizeof(buf));
             tolua_pushstring(L, buf);
             return 1;
         }
@@ -193,7 +199,7 @@ static int tolua_unit_set_id(lua_State * L)
 static int tolua_unit_get_auramax(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, max_spellpoints(self->region, self));
+    lua_pushinteger(L, max_spellpoints_depr(self->region, self));
     return 1;
 }
 
@@ -270,8 +276,12 @@ static int tolua_unit_set_guard(lua_State * L)
 
 static const char *unit_getmagic(const unit * u)
 {
-    sc_mage *mage = get_mage_depr(u);
-    return mage ? magic_school[mage->magietyp] : NULL;
+    struct sc_mage *mage = get_mage(u);
+    if (mage) {
+        magic_t mtype = mage_get_type(mage);
+        return magic_school[mtype];
+    }
+    return NULL;
 }
 
 static int tolua_unit_get_magic(lua_State * L)
@@ -283,16 +293,15 @@ static int tolua_unit_get_magic(lua_State * L)
 
 static void unit_setmagic(unit * u, const char *type)
 {
-    sc_mage *mage = get_mage(u);
-    int mtype;
-    for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
-        if (strcmp(magic_school[mtype], type) == 0)
-            break;
-    }
-    if (mtype == MAXMAGIETYP)
-        return;
+    struct sc_mage *mage = get_mage(u);
     if (mage == NULL) {
-        mage = create_mage(u, (magic_t)mtype);
+        int mtype;
+        for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
+            if (strcmp(magic_school[mtype], type) == 0) {
+                create_mage(u, (magic_t)mtype);
+                return;
+            }
+        }
     }
 }
 
@@ -515,7 +524,7 @@ static int tolua_unit_addspell(lua_State * L)
         return EINVAL;
     }
     else {
-        unit_add_spell(u, 0, sp, level);
+        unit_add_spell(u, sp, level);
     }
 
     lua_pushinteger(L, err);
@@ -742,8 +751,8 @@ static int tolua_unit_get_items(lua_State * L)
 static int tolua_unit_get_spells(lua_State * L)
 {
     unit *self = (unit *) tolua_tousertype(L, 1, 0);
-    sc_mage *mage = self ? get_mage_depr(self) : 0;
-    spellbook *sb = mage ? mage->spellbook : 0;
+    struct sc_mage *mage = self ? get_mage(self) : NULL;
+    spellbook *sb = mage_get_spellbook(mage);
     selist *slist = 0;
     if (sb) {
         selist **slist_ptr = &sb->spells;
