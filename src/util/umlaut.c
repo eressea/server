@@ -118,6 +118,7 @@ char * transliterate(char * out, size_t size, const char * in)
 
 tnode * mknode(void) {
     tnode * node = (tnode *)calloc(1, sizeof(tnode));
+    if (!node) abort();
     node->refcount = 1;
     return node;
 }
@@ -179,6 +180,7 @@ void addtoken(tnode ** root, const char *str, variant id)
             }
 
             ref = (tref *)malloc(sizeof(tref));
+            if (!ref) abort();
             ref->ucs = ucs;
             ref->node = node;
             ref->nexthash = tk->next[index];
@@ -221,11 +223,10 @@ void addtoken(tnode ** root, const char *str, variant id)
     }
 }
 
-void freetokens(tnode * root)
+void freetokens(tnode * node)
 {
-    tnode * node = root;
     int i;
-    for (i = 0; node && i != NODEHASHSIZE; ++i) {
+    for (i = 0; i != NODEHASHSIZE; ++i) {
         if (node->next[i]) {
             tref * ref = node->next[i];
             while (ref) {
@@ -237,6 +238,7 @@ void freetokens(tnode * root)
             node->next[i] = 0;
         }
     }
+    /* TODO: warning C6011: Dereferencing NULL pointer 'node'. */
     if (--node->refcount == 0) {
         free(node);
     }

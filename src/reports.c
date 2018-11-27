@@ -1687,7 +1687,7 @@ int reports(void)
     faction *f;
     FILE *mailit;
     int retval = 0;
-    char path[4096];
+    char path[PATH_MAX];
     const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
@@ -2156,7 +2156,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
         sbs_strcat(&sbs, str_itoa(res->number));
-        sbs_strcat(&sbs, "");
+        sbs_strcat(&sbs, " ");
         sbs_strcat(&sbs, LOC(lang, rname));
 
         res = res->next;

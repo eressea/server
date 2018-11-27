@@ -80,9 +80,10 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
 
     /* Not enough room in dst, add NUL and traverse rest of src */
     if (n == 0) {
-        if (len != 0)
-            *d = '\0';                /* NUL-terminate dst */
-        while (*s++);
+        if (len != 0) {
+            *d = '\0'; /* NUL-terminate dst */
+        }
+        return (s - src) + strlen(s); /* count does not include NUL */
     }
 
     return (s - src - 1);         /* count does not include NUL */
@@ -287,8 +288,9 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     size_t len;
     assert(sbs);
     len = sbs->size - (sbs->end - sbs->begin);
-    len = str_strlcpy(sbs->end, str, len);
-    sbs->end += len;
+    str_strlcpy(sbs->end, str, len);
+    sbs->end += strlen(sbs->end);
+    assert(sbs->begin + sbs->size >= sbs->end);
 }
 
 void sbs_strcpy(struct sbstring *sbs, const char *str)
@@ -298,10 +300,32 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
         len = sbs->size - 1;
     }
     sbs->end = sbs->begin + len;
+    assert(sbs->begin + sbs->size >= sbs->end);
+}
+
+void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
+{
+    if (pos > sbs->end - sbs->begin) {
+        /* starting past end of string, do nothing */
+        sbs->end = sbs->begin;
+    }
+    if (pos >= 0) {
+        size_t sz = sbs->end - (sbs->begin + pos);
+        if (len > sz) len = sz;
+        if (len - pos > 0) {
+            memmove(sbs->begin, sbs->begin + pos, len);
+        }
+        else {
+            memcpy(sbs->begin, sbs->begin + pos, len);
+        }
+        sbs->end = sbs->begin + len;
+        sbs->end[0] = '\0';
+    }
 }
 
 size_t sbs_length(const struct sbstring *sbs)
 {
+    assert(sbs->begin + sbs->size >= sbs->end);
     return sbs->end - sbs->begin;
 }
 

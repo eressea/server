@@ -105,6 +105,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <limits.h>
 #include <stdlib.h>
 
+/* pre-C99 compatibility */
+#ifndef SIZE_MAX
+#define SIZE_MAX ((size_t)(-1))
+#endif
+
 #define ECHECK_VERSION "4.01"
 
 extern int *storms;
@@ -1521,29 +1526,81 @@ static int count_allies_cb(struct allies *all, faction *af, int status, void *ud
 
 struct show_s {
     sbstring sbs;
+    stream *out;
     const faction *f;
     int num_allies;
+    int num_listed;
+    size_t maxlen;
 };
+
+/* TODO: does not test for non-ascii unicode spaces. */
+#define IS_UTF8_SPACE(pos) (*pos > 0 && *pos <= CHAR_MAX && isspace(*pos))
+
+void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
+{
+    while (sbs_length(sbp) > maxlen) {
+        char *pos, *begin = sbp->begin;
+        while (*begin && IS_UTF8_SPACE(begin)) {
+            /* eat whitespace */
+            ++begin;
+        }
+        pos = begin;
+        while (pos) {
+            char *next = strchr(pos+1, ' ');
+            if (next == NULL) {
+                if (isfinal) {
+                    swrite(begin, 1, sbp->end - begin, out);
+                    newline(out);
+                }
+                return;
+            }
+            else if (next > begin + maxlen) {
+                ptrdiff_t len = pos - begin;
+                swrite(begin, 1, len, out);
+                newline(out);
+
+                while (*pos && IS_UTF8_SPACE(pos)) {
+                    ++pos;
+                    ++len;
+                }
+                sbs_substr(sbp, len, SIZE_MAX);
+                break;
+            }
+            pos = next;
+        }
+    }
+    if (isfinal) {
+        char *pos = sbp->begin;
+        while (*pos && IS_UTF8_SPACE(pos)) {
+            /* eat whitespace */
+            ++pos;
+        }
+        swrite(pos, 1, sbp->end - pos, out);
+        newline(out);
+    }
+}
 
 static int show_allies_cb(struct allies *all, faction *af, int status, void *udata) {
     struct show_s * show = (struct show_s *)udata;
     const faction * f = show->f;
-
+    sbstring *sbp = &show->sbs;
     int mode = alliance_status(f, af, status);
-    --show->num_allies;
-    if (sbs_length(&show->sbs) > 0) {
-        /* not the first entry */
-        if (0 == show->num_allies) {
-            sbs_strcat(&show->sbs, LOC(f->locale, "list_and"));
+
+    if (show->num_listed++ != 0) {
+        if (show->num_listed == show->num_allies) {
+            /* last entry */
+            sbs_strcat(sbp, LOC(f->locale, "list_and"));
         }
         else {
-            sbs_strcat(&show->sbs, ", ");
+            /* neither first entry nor last*/
+            sbs_strcat(sbp, ", ");
         }
     }
-    sbs_strcat(&show->sbs, factionname(af));
-    sbs_strcat(&show->sbs, " (");
+    sbs_strcat(sbp, factionname(af));
+    pump_paragraph(sbp, show->out, show->maxlen, false);
+    sbs_strcat(sbp, " (");
     if ((mode & HELP_ALL) == HELP_ALL) {
-        sbs_strcat(&show->sbs, LOC(f->locale, parameters[P_ANY]));
+        sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
     }
     else {
         int h, hh = 0;
@@ -1573,58 +1630,60 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
             }
             if (p != MAXPARAMS) {
                 if (hh) {
-                    sbs_strcat(&show->sbs, ", ");
+                    sbs_strcat(sbp, ", ");
                 }
-                sbs_strcat(&show->sbs, LOC(f->locale, parameters[p]));
+                sbs_strcat(sbp, LOC(f->locale, parameters[p]));
                 hh = 1;
             }
         }
     }
-    sbs_strcat(&show->sbs, ")");
+    if (show->num_allies == show->num_listed) {
+        sbs_strcat(sbp, ").");
+        pump_paragraph(sbp, show->out, show->maxlen, true);
+    }
+    else {
+        sbs_strcat(sbp, ")");
+        pump_paragraph(sbp, show->out, show->maxlen, false);
+    }
     return 0;
 }
 
-static void
-show_allies(const faction * f, struct allies * allies, char *buf, size_t size)
+void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct allies * allies, const char *prefix)
 {
     int num_allies = 0;
+
+    assert(maxlen <= REPORTWIDTH);
     allies_walk(allies, count_allies_cb, &num_allies);
 
     if (num_allies > 0) {
         struct show_s show;
+        char buf[REPORTWIDTH * 2];
         show.f = f;
+        show.out = out;
         show.num_allies = num_allies;
-        sbs_init(&show.sbs, buf, size);
+        show.num_listed = 0;
+        show.maxlen = maxlen;
+        sbs_init(&show.sbs, buf, sizeof(buf));
+        sbs_strcpy(&show.sbs, prefix);
 
         allies_walk(allies, show_allies_cb, &show);
-        sbs_strcat(&show.sbs, ".");
     }
 }
 
 static void allies(struct stream *out, const faction * f)
 {
     const group *g = f->groups;
-    char buf[16384];
+    char prefix[64];
 
     if (f->allies) {
-        int bytes;
-        size_t size = sizeof(buf);
-        bytes = snprintf(buf, size, "%s ", LOC(f->locale, "faction_help"));
-        size -= bytes;
-        show_allies(f, f->allies, buf + bytes, size);
-        paragraph(out, buf, 0, 0, 0);
-        newline(out);
+        snprintf(prefix, sizeof(prefix), "%s ", LOC(f->locale, "faction_help"));
+        report_allies(out, REPORTWIDTH, f, f->allies, prefix);
     }
 
     while (g) {
         if (g->allies) {
-            int bytes;
-            size_t size = sizeof(buf);
-            bytes = snprintf(buf, size, "%s %s ", g->name, LOC(f->locale, "group_help"));
-            size -= bytes;
-            show_allies(f, g->allies, buf + bytes, size);
-            paragraph(out, buf, 0, 0, 0);
-            newline(out);
+            snprintf(prefix, sizeof(prefix), "%s %s ", g->name, LOC(f->locale, "group_help"));
+            report_allies(out, REPORTWIDTH, f, g->allies, prefix);
         }
         g = g->next;
     }

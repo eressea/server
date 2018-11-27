@@ -271,8 +271,11 @@ static int *keys_update(int *base, int key, int val)
     else {
         int sz = keys_size(n);
         if (n + 1 > sz) {
+            void * tmp;
             sz = keys_size(n + 1);
-            base = realloc(base, (sz * 2 + 1) * sizeof(int));
+            tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
+            if (!tmp) abort();
+            base = (int *)tmp;
         }
         base[0] = n + 1;
         kv = keys_get(base, l);

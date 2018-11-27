@@ -63,6 +63,7 @@ void tsf_register(const char *name, tostring_f fun)
     }
     if (tsf == NULL) {
         tsf = malloc(sizeof(tsf_list));
+        if (!tsf) abort();
         tsf->fun = fun;
         tsf->name = name;
         tsf->next = tostringfs;
@@ -102,12 +103,14 @@ void crt_register(const struct message_type *mtype)
     }
     if (!crt) {
         crt = malloc(sizeof(crmessage_type));
+        if (!crt) abort();
         crt->mtype = mtype;
         crt->next = crtypes[hash];
         crtypes[hash] = crt;
         if (mtype->nparameters > 0) {
             int i;
             crt->renderers = malloc(sizeof(tostring_f) * mtype->nparameters);
+            if (!crt->renderers) abort();
             /* can be scrapped for memory vs. speed */
             for (i = 0; i != mtype->nparameters; ++i) {
                 crt->renderers[i] = tsf_find(mtype->types[i]->name);
