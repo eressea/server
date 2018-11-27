@@ -17,7 +17,7 @@ bool password_is_implemented(cryptalgo_t algo) {
 }
 
 const char * password_hash(const char * passwd, cryptalgo_t algo) {
-    if (algo == PASSWORD_BCRYPT) {
+    if (algo == PASSWORD_BCRYPT && bcrypt_workfactor != 0) {
         char salt[BCRYPT_HASHSIZE];
         static char hash[BCRYPT_HASHSIZE];
         int ret;
@@ -32,9 +32,12 @@ const char * password_hash(const char * passwd, cryptalgo_t algo) {
 int password_verify(const char * pwhash, const char * passwd) {
     if (pwhash[0] == '$') {
         if (pwhash[1] == '2') {
-            int ret = bcrypt_checkpw(passwd, pwhash);
-            assert(ret != -1);
-            return (ret == 0) ? VERIFY_OK : VERIFY_FAIL;
+            if (bcrypt_workfactor > 0) {
+                int ret = bcrypt_checkpw(passwd, pwhash);
+                assert(ret != -1);
+                return (ret == 0) ? VERIFY_OK : VERIFY_FAIL;
+            }
+            return VERIFY_OK;
         }
     }
     return (strcmp(passwd, pwhash) == 0) ? VERIFY_OK : VERIFY_FAIL;
