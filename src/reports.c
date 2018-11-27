@@ -2156,7 +2156,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
         sbs_strcat(&sbs, str_itoa(res->number));
-        sbs_strcat(&sbs, "");
+        sbs_strcat(&sbs, " ");
         sbs_strcat(&sbs, LOC(lang, rname));
 
         res = res->next;
