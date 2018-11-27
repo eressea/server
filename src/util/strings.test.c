@@ -119,10 +119,10 @@ static void test_str_strlcpy(CuTest * tc)
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
 
-    CuAssertIntEquals(tc, 3, (int)str_strlcpy(buffer, "herp", 4));
+    CuAssertIntEquals(tc, 4, (int)str_strlcpy(buffer, "herp", 4));
     CuAssertStrEquals(tc, "her", buffer);
 
-    CuAssertIntEquals(tc, 7, (int)str_strlcpy(buffer, "herpderp", 8));
+    CuAssertIntEquals(tc, 8, (int)str_strlcpy(buffer, "herpderp", 8));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
 
