@@ -28,6 +28,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/language.h>
 #include <util/log.h>
 #include <util/path.h>
+#include <util/password.h>
 
 #include "eressea.h"
 #ifdef USE_CURSES
@@ -230,6 +231,10 @@ static int parse_args(int argc, char **argv)
             case 't':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 turn = atoi(arg);
+                break;
+            case 'w':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                bcrypt_workfactor = arg ? atoi(arg) : 0xff;
                 break;
             case 'q':
                 verbosity = 0;
