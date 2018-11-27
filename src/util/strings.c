@@ -82,7 +82,7 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
     if (n == 0) {
         if (len != 0)
             *d = '\0';                /* NUL-terminate dst */
-        while (*s++);
+        return (d - dst);         /* count does not include NUL */
     }
 
     return (s - src - 1);         /* count does not include NUL */
@@ -289,6 +289,7 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     len = sbs->size - (sbs->end - sbs->begin);
     len = str_strlcpy(sbs->end, str, len);
     sbs->end += len;
+    assert(sbs->begin + sbs->size >= sbs->end);
 }
 
 void sbs_strcpy(struct sbstring *sbs, const char *str)
@@ -298,23 +299,27 @@ void sbs_strcpy(struct sbstring *sbs, const char *str)
         len = sbs->size - 1;
     }
     sbs->end = sbs->begin + len;
+    assert(sbs->begin + sbs->size >= sbs->end);
 }
 
-void sbs_cut(sbstring *sbp, int bytes)
+void sbs_cut(sbstring *sbs, int bytes)
 {
     if (bytes > 0) {
-        size_t len = sbs_length(sbp) - bytes;
-        memmove(sbp->begin, sbp->begin + bytes, len + 1);
-        sbp->end = sbp->begin + len;
+        size_t len = sbs_length(sbs) - bytes;
+        memmove(sbs->begin, sbs->begin + bytes, len + 1);
+        sbs->end = sbs->begin + len;
     }
     else if (bytes < 0) {
-        size_t len = sbs_length(sbp) + bytes;
-        sbp->end = sbp->begin + len;
+        size_t len = sbs_length(sbs) + bytes;
+        sbs->end = sbs->begin + len;
     }
+    assert(sbs->begin + sbs->size >= sbs->end);
+    assert(sbs->end[0] == '\0');
 }
 
 size_t sbs_length(const struct sbstring *sbs)
 {
+    assert(sbs->begin + sbs->size >= sbs->end);
     return sbs->end - sbs->begin;
 }
 
