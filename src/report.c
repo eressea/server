@@ -778,9 +778,9 @@ static void prices(struct stream *out, const region * r, const faction * f)
     sbs_adopt(&sbs, buf, sizeof(buf));
 
     if (n > 0) {
-        sbs_strcpy(&sbs, " ");
-        sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_intro"));
-        sbs_strcpy(&sbs, " ");
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, LOC(f->locale, "nr_trade_intro"));
+        sbs_strcat(&sbs, " ");
 
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value > 0) {
@@ -790,16 +790,16 @@ static void prices(struct stream *out, const region * r, const faction * f)
                 msg_release(m);
                 n--;
                 if (n == 0) {
-                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_end"));
+                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_end"));
                 }
                 else if (n == 1) {
-                    sbs_strcpy(&sbs, " ");
-                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_final"));
-                    sbs_strcpy(&sbs, " ");
+                    sbs_strcat(&sbs, " ");
+                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_final"));
+                    sbs_strcat(&sbs, " ");
                 }
                 else {
-                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_next"));
-                    sbs_strcpy(&sbs, " ");
+                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_next"));
+                    sbs_strcat(&sbs, " ");
                 }
             }
         }
@@ -984,6 +984,7 @@ static void report_region_description(struct stream *out, const region * r, fact
     if (a) {
         sbs_strcat(&sbs, " ");
         sbs_strcat(&sbs, (const char *)a->data.v);
+        sbs_strcat(&sbs, ".");
     }
     else {
         int d, nrd = 0;
@@ -1026,6 +1027,7 @@ static void report_region_description(struct stream *out, const region * r, fact
                 }
             }
         }
+        sbs_strcat(&sbs, ".");
         /* Spezielle Richtungen */
         for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
             a = a->next) {
@@ -1042,9 +1044,9 @@ static void report_region_description(struct stream *out, const region * r, fact
 }
 
 /**
- * Zeige Wirkungen permanenter Sprüche.
+ * Show roads and certain magic effects.
  */
-static void report_region_curses(struct stream *out, const region * r, faction * f, struct edge edges[], int nedges) {
+static void report_region_edges(struct stream *out, const region * r, faction * f, struct edge edges[], int nedges) {
     nr_curses(out, 0, f, TYP_REGION, r);
 
     if (nedges > 0) {
@@ -1166,7 +1168,7 @@ void report_region(struct stream *out, const region * r, faction * f)
 
     report_region_description(out, r, f, see);
     report_region_schemes(out, r, f);
-    report_region_curses(out, r, f, edges, ne);
+    report_region_edges(out, r, f, edges, ne);
 }
 
 static void statistics(struct stream *out, const region * r, const faction * f)
@@ -1577,7 +1579,7 @@ void report_allies(struct stream *out, size_t maxlen, const struct faction * f, 
         show.num_listed = 0;
         show.maxlen = maxlen;
         sbs_init(&show.sbs, buf, sizeof(buf));
-        sbs_strcpy(&show.sbs, prefix);
+        sbs_strcat(&show.sbs, prefix);
 
         allies_walk(allies, show_allies_cb, &show);
     }
