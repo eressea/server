@@ -50,6 +50,7 @@ extern "C" {
     } sbstring;
 
     void sbs_init(struct sbstring *sbs, char *buffer, size_t size);
+    void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size);
     void sbs_strcat(struct sbstring *sbs, const char *str);
     void sbs_strncat(struct sbstring *sbs, const char *str, size_t size);
     void sbs_strcpy(struct sbstring *sbs, const char *str);
