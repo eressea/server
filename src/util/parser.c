@@ -58,6 +58,7 @@ void init_tokens_ex(const char *initstr, void *data, void (*dtor)(void *))
 {
     if (states == NULL) {
         states = calloc(1, sizeof(parser_state));
+        if (!states) abort();
     }
     else if (states->dtor) {
         states->dtor(states->data);
@@ -74,6 +75,7 @@ void init_tokens_str(const char *initstr) {
 void parser_pushstate(void)
 {
     parser_state *new_state = calloc(1, sizeof(parser_state));
+    if (!new_state) abort();
     new_state->current_token = NULL;
     new_state->next = states;
     states = new_state;

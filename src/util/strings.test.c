@@ -115,16 +115,21 @@ static void test_str_strlcpy(CuTest * tc)
 
     memset(buffer, 0x7f, sizeof(buffer));
 
-    CuAssertIntEquals(tc, 4, (int)str_strlcpy(buffer, "herp", 4));
-    CuAssertStrEquals(tc, "her", buffer);
-
-    CuAssertIntEquals(tc, 4, (int)str_strlcpy(buffer, "herp", 8)); /*-V666 */
+    CuAssertIntEquals(tc, 4, (int)str_strlcpy(buffer, "herp", 8));
     CuAssertStrEquals(tc, "herp", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[5]);
+
+    CuAssertIntEquals(tc, 4, (int)str_strlcpy(buffer, "herp", 4));
+    CuAssertStrEquals(tc, "her", buffer);
 
     CuAssertIntEquals(tc, 8, (int)str_strlcpy(buffer, "herpderp", 8));
     CuAssertStrEquals(tc, "herpder", buffer);
     CuAssertIntEquals(tc, 0x7f, buffer[8]);
+
+    CuAssertIntEquals(tc, 8, (int)str_strlcpy(buffer, "herpderp", 16));
+    CuAssertStrEquals(tc, "herpderp", buffer);
+    CuAssertIntEquals(tc, 0x7f, buffer[9]);
+
     errno = 0;
 }
 
@@ -154,6 +159,69 @@ static void test_sbstring(CuTest * tc)
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
 }
 
+static void test_sbs_strcat(CuTest * tc)
+{
+    char buffer[8];
+    sbstring sbs;
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "AB");
+    CuAssertStrEquals(tc, "AB", sbs.begin);
+    sbs_strcat(&sbs, "CD");
+    CuAssertStrEquals(tc, "ABCD", sbs.begin);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678901234567890");
+    CuAssertStrEquals(tc, "1234567", sbs.begin);
+    sbs_strcat(&sbs, "12345678901234567890");
+    CuAssertStrEquals(tc, "1234567", sbs.begin);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strncat(&sbs, "12345678901234567890", 4);
+    CuAssertStrEquals(tc, "1234", sbs.begin);
+    sbs_strncat(&sbs, "12345678901234567890", 4);
+    CuAssertStrEquals(tc, "1234123", sbs.begin);
+}
+
+static void test_sbs_substr(CuTest * tc)
+{
+    char buffer[10];
+    sbstring sbs;
+
+    buffer[9] = 'A';
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcpy(&sbs, "12345678");
+    CuAssertStrEquals(tc, "12345678", buffer);
+    sbs_substr(&sbs, 0, 4);
+    CuAssertStrEquals(tc, "1234", buffer);
+    CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
+
+    sbs_strcpy(&sbs, "12345678");
+    CuAssertStrEquals(tc, "12345678", buffer);
+    sbs_substr(&sbs, 4, 4);
+    CuAssertStrEquals(tc, "5678", buffer);
+    CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
+
+    sbs_strcpy(&sbs, "12345678");
+    CuAssertStrEquals(tc, "12345678", buffer);
+    sbs_substr(&sbs, 2, 4);
+    CuAssertStrEquals(tc, "3456", buffer);
+    CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
+
+    sbs_strcpy(&sbs, "12345678");
+    CuAssertStrEquals(tc, "12345678", buffer);
+    sbs_substr(&sbs, 4, 4);
+    CuAssertStrEquals(tc, "5678", buffer);
+    CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
+
+    sbs_strcpy(&sbs, "12345678");
+    CuAssertStrEquals(tc, "12345678", buffer);
+    sbs_substr(&sbs, 4, 8);
+    CuAssertStrEquals(tc, "5678", buffer);
+    CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
+    CuAssertIntEquals(tc, 'A', buffer[9]);
+}
+
 CuSuite *get_strings_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -166,5 +234,7 @@ CuSuite *get_strings_suite(void)
     SUITE_ADD_TEST(suite, test_str_strlcat);
     SUITE_ADD_TEST(suite, test_str_strlcpy);
     SUITE_ADD_TEST(suite, test_sbstring);
+    SUITE_ADD_TEST(suite, test_sbs_strcat);
+    SUITE_ADD_TEST(suite, test_sbs_substr);
     return suite;
 }

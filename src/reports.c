@@ -64,7 +64,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* util includes */
 #include "kernel/attrib.h"
 #include "util/base36.h"
-#include "util/bsdstring.h"
 #include "util/functions.h"
 #include "util/goodies.h"
 #include "util/language.h"
@@ -1688,7 +1687,7 @@ int reports(void)
     faction *f;
     FILE *mailit;
     int retval = 0;
-    char path[4096];
+    char path[PATH_MAX];
     const char * rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
@@ -2157,7 +2156,7 @@ static void eval_resources(struct opstack **stack, const void *userdata)
         const char *rname =
             resourcename(res->type, (res->number != 1) ? NMF_PLURAL : 0);
         sbs_strcat(&sbs, str_itoa(res->number));
-        sbs_strcat(&sbs, "");
+        sbs_strcat(&sbs, " ");
         sbs_strcat(&sbs, LOC(lang, rname));
 
         res = res->next;
@@ -2209,41 +2208,49 @@ const char *get_mailcmd(const struct locale *loc)
     return result;
 }
 
+static void print_trail(const faction *f, const region *r,
+    const struct locale *lang, struct sbstring *sbp)
+{
+    char buf[64];
+    const char *trail = trailinto(r, lang);
+    const char *rn = f_regionid_s(r, f);
+    if (snprintf(buf, sizeof(buf), trail, rn) != 0) {
+        sbs_strcat(sbp, buf);
+    }
+}
+
 static void eval_trail(struct opstack **stack, const void *userdata)
 {                               /* order -> string */
     const faction *report = (const faction *)userdata;
     const struct locale *lang = report ? report->locale : default_locale;
     const arg_regions *aregs = (const arg_regions *)opop(stack).v;
     char buf[512];
-    size_t size = sizeof(buf) - 1;
     variant var;
-    char *bufp = buf;
+    sbstring sbs;
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
-    /* stupid MS broke snprintf */
+    /* MSVC touches errno in snprintf */
     int eold = errno;
 #endif
 
+    sbs_init(&sbs, buf, sizeof(buf));
     if (aregs != NULL) {
         int i, handle_end = 0, begin = 0;
         handle_end = aregs->nregions;
         for (i = begin; i < handle_end; ++i) {
             region *r = aregs->regions[i];
-            const char *trail = trailinto(r, lang);
-            const char *rn = f_regionid_s(r, report);
+            sbs_strcat(&sbs, ", ");
 
-            if (wrptr(&bufp, &size, snprintf(bufp, size, trail, rn)) != 0)
-                WARN_STATIC_BUFFER();
+            print_trail(report, r, lang, &sbs);
 
             if (i + 2 < handle_end) {
-                bufp = STRLCPY(bufp, ", ", size);
+                sbs_strcat(&sbs, ", ");
             }
             else if (i + 1 < handle_end) {
-                bufp = STRLCPY(bufp, LOC(lang, "list_and"), size);
+                sbs_strcat(&sbs, LOC(lang, "list_and"));
             }
         }
     }
-    *bufp = 0;
-    var.v = strcpy(balloc((size_t)(bufp - buf + 1)), buf);
+    var.v = strcpy(balloc(sbs_length(&sbs)), buf);
     opush(stack, var);
 #ifdef _SECURECRT_ERRCODE_VALUES_DEFINED
     if (errno == ERANGE) {
@@ -2252,11 +2259,9 @@ static void eval_trail(struct opstack **stack, const void *userdata)
 #endif
 }
 
-void report_race_skills(const race *rc, char *zText, size_t length, const struct locale *lang)
+void report_race_skills(const race *rc, const struct locale *lang, sbstring *sbp)
 {
-    size_t size = length - 1;
     int dh = 0, dh1 = 0, sk;
-    char *bufp = zText;
 
     for (sk = 0; sk < MAXSKILLS; ++sk) {
         if (skill_enabled(sk) && rc->bonus[sk] > -5)
@@ -2265,27 +2270,28 @@ void report_race_skills(const race *rc, char *zText, size_t length, const struct
 
     for (sk = 0; sk < MAXSKILLS; sk++) {
         if (skill_enabled(sk) && rc->bonus[sk] > -5) {
-            size_t bytes;
             dh--;
             if (dh1 == 0) {
                 dh1 = 1;
             }
             else {
                 if (dh == 0) {
-                    bytes = str_strlcpy(bufp, LOC(lang, "list_and"), size);
+                    sbs_strcat(sbp, LOC(lang, "list_and"));
                 }
                 else {
-                    bytes = str_strlcpy(bufp, ", ", size);
+                    sbs_strcat(sbp, ", ");
                 }
-                assert(bytes <= INT_MAX);
-                BUFFER_STRCAT(bufp, size, bytes);
             }
-            bytes = str_strlcpy(bufp, skillname((skill_t)sk, lang),
-                size);
-            assert(bytes <= INT_MAX);
-            BUFFER_STRCAT(bufp, size, (int)bytes);
+            sbs_strcat(sbp, skillname((skill_t)sk, lang));
         }
     }
+}
+
+void report_race_skills_depr(const race *rc, char *zText, size_t length, const struct locale *lang)
+{
+    sbstring sbs;
+    sbs_init(&sbs, zText, length);
+    report_race_skills(rc, lang, &sbs);
 }
 
 static void eval_direction(struct opstack **stack, const void *userdata)

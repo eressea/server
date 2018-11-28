@@ -31,8 +31,8 @@ extern "C" {
     struct param;
     struct _dictionary_;
 
-#define DISPLAYSIZE         8192        /* max. L�nge einer Beschreibung, incl trailing 0 */
-#define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
+#define DISPLAYSIZE         4096 /* max. L�nge einer Beschreibung, incl trailing 0 */
+#define ORDERSIZE           4096 /* max. length of an order */
 #define NAMESIZE            128 /* max. L�nge eines Namens, incl trailing 0 */
 #define IDSIZE              16  /* max. L�nge einer no (als String), incl trailing 0 */
 #define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. L�nge der Strings, die

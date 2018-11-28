@@ -83,7 +83,7 @@ locale *get_or_create_locale(const char *name)
             return *lp;
         }
     }
-    *lp = l = (locale *)calloc(sizeof(locale), 1);
+    *lp = l = (locale *)calloc(1, sizeof(locale));
     assert_alloc(l);
     l->hashkey = hkey;
     l->name = str_strdup(name);
@@ -206,6 +206,7 @@ void locale_setstring(locale * lang, const char *key, const char *value)
     }
     if (!find) {
         find = calloc(1, sizeof(struct locale_str));
+        if (!find) abort();
         find->nexthash = lang->strings[id];
         lang->strings[id] = find;
         find->hashkey = hkey;

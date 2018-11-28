@@ -120,6 +120,7 @@ unsigned int listlen(void *l)
 void addstrlist(strlist ** SP, const char *s)
 {
     strlist *slist = malloc(sizeof(strlist));
+    if (!slist) abort();
     slist->next = NULL;
     slist->s = str_strdup(s);
     addlist(SP, slist);

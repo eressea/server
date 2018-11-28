@@ -52,6 +52,7 @@ static log_t *loggers;
 
 log_t *log_create(int flags, void *data, log_fun call) {
     log_t *lgr = malloc(sizeof(log_t));
+    if (!lgr) abort();
     lgr->log = call;
     lgr->flags = flags;
     lgr->data = data;
@@ -147,7 +148,7 @@ static const char *log_prefix(int level) {
 static int check_dupe(const char *format, int level)
 {
     static int last_type; /* STATIC_XCALL: used across calls */
-    static char last_message[32]; /* STATIC_XCALL: used across calls */
+    static char last_message[32] = { 0 }; /* STATIC_XCALL: used across calls */
     static int dupes = 0;         /* STATIC_XCALL: used across calls */
     if (strncmp(last_message, format, sizeof(last_message)) == 0) {
         /* TODO: C6054: String 'last_message' might not be zero - terminated. */
