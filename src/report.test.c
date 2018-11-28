@@ -106,12 +106,30 @@ static void test_report_region(CuTest *tc) {
     rsettrees(r, 0, 1);
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
-    region_setname(r, "Hodor");
     f = test_create_faction(NULL);
     f->locale = lang;
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
 
+    region_setname(r, "1234567890123456789012345678901234567890");
+    r->seen.mode = seen_travel;
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "1234567890123456789012345678901234567890 (0,0) (durchgereist), Ebene, 3/2\nBlumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
+    out.api->rewind(out.handle);
+    region_setname(r, "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    r->seen.mode = seen_travel;
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "12345678901234567890123456789012345678901234567890123456789012345678901234567890\n(0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
+    out.api->rewind(out.handle);
+    region_setname(r, "Hodor");
     r->seen.mode = seen_travel;
     report_region(&out, r, f);
     out.api->rewind(out.handle);
@@ -119,26 +137,39 @@ static void test_report_region(CuTest *tc) {
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
-    r->seen.mode = seen_unit;
     out.api->rewind(out.handle);
+    r->seen.mode = seen_unit;
     report_region(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 135 Steine/1, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
+    out.api->rewind(out.handle);
     r->resources->amount = 1;
     r->land->peasants = 1;
     r->land->horses = 1;
     r->land->money = 1;
-
     r->seen.mode = seen_unit;
-    out.api->rewind(out.handle);
     report_region(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
+
+    r->land->peasants = 0;
+    r->land->horses = 0;
+    r->land->money = 0;
+    rsettrees(r, 0, 0);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 2, 0);
+
+    out.api->rewind(out.handle);
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 1 Stein/1.\n", buf);
 
     mstream_done(&out);
     test_teardown();
