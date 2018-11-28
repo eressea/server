@@ -750,9 +750,9 @@ static void prices(struct stream *out, const region * r, const faction * f)
     const luxury_type *sale = NULL;
     struct demand *dmd;
     message *m;
-    int bytes, n = 0;
-    char buf[4096], *bufp = buf;
-    size_t size = sizeof(buf) - 1;
+    int n = 0;
+    char buf[4096];
+    sbstring sbs;
 
     if (r->land == NULL || r->land->demands == NULL)
         return;
@@ -766,64 +766,40 @@ static void prices(struct stream *out, const region * r, const faction * f)
 
     m = msg_message("nr_market_sale", "product price",
         sale->itype->rtype, sale->price);
-
-    bytes = (int)nr_render(m, f->locale, bufp, size, f);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
+    sbs_adopt(&sbs, buf, sizeof(buf));
 
     if (n > 0) {
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_trade_intro"), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcpy(&sbs, " ");
+        sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_intro"));
+        sbs_strcpy(&sbs, " ");
 
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value > 0) {
+                size_t size = sizeof(buf) - sbs_length(&sbs);
+                /* FIXME: this is a bad hack, cause by how msg_message works. */
                 m = msg_message("nr_market_price", "product price",
                     dmd->type->itype->rtype, dmd->value * dmd->type->price);
-                bytes = (int)nr_render(m, f->locale, bufp, size, f);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                size = nr_render(m, f->locale, sbs.end, size, f);
+                sbs.end += size;
                 msg_release(m);
                 n--;
                 if (n == 0) {
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_trade_end"),
-                        size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_end"));
                 }
                 else if (n == 1) {
-                    bytes = (int)str_strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_trade_final"),
-                        size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcpy(&sbs, " ");
+                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_final"));
+                    sbs_strcpy(&sbs, " ");
                 }
                 else {
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_trade_next"),
-                        size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcpy(&sbs, LOC(f->locale, "nr_trade_next"));
+                    sbs_strcpy(&sbs, " ");
                 }
             }
         }
     }
-    /* Schreibe Paragraphen */
-    *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 }
 
@@ -849,73 +825,26 @@ bool see_border(const connection * b, const faction * f, const region * r)
 
 #define MAX_EDGES 16
 
-void report_region(struct stream *out, const region * r, faction * f)
+struct edge {
+    char *name;
+    bool transparent;
+    bool block;
+    bool exist[MAXDIRECTIONS];
+    direction_t lastd;
+};
+
+static void report_region_description(struct stream *out, const region * r, faction * f, const bool see[])
 {
     int n;
     bool dh;
-    direction_t d;
     int trees;
     int saplings;
     attrib *a;
     const char *tname;
-    struct edge {
-        char *name;
-        bool transparent;
-        bool block;
-        bool exist[MAXDIRECTIONS];
-        direction_t lastd;
-    } edges[MAX_EDGES];
-    int ne = 0;
-    bool see[MAXDIRECTIONS];
-    char buf[8192];
+    char buf[4096];
     char *bufp = buf;
     size_t size = sizeof(buf);
     int bytes;
-
-    assert(out);
-    assert(f);
-    assert(r);
-
-    memset(edges, 0, sizeof(edges));
-    for (d = 0; d != MAXDIRECTIONS; d++) {
-        /* Nachbarregionen, die gesehen werden, ermitteln */
-        region *r2 = rconnect(r, d);
-        connection *b;
-        see[d] = true;
-        if (!r2)
-            continue;
-        for (b = get_borders(r, r2); b;) {
-            int e;
-            struct edge *match = NULL;
-            bool transparent = b->type->transparent(b, f);
-            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
-
-            if (!transparent) {
-                see[d] = false;
-            }
-            if (!see_border(b, f, r)) {
-                b = b->next;
-                continue;
-            }
-            for (e = 0; e!=ne; ++e) {
-                struct edge *edg = edges + e;
-                if (edg->transparent == transparent && 0 == strcmp(name, edg->name)) {
-                    match = edg;
-                    break;
-                }
-            }
-            if (match == NULL) {
-                match = edges + ne;
-                match->name = str_strdup(name);
-                match->transparent = transparent;
-                ++ne;
-                assert(ne < MAX_EDGES);
-            }
-            match->lastd = d;
-            match->exist[d] = true;
-            b = b->next;
-        }
-    }
 
     bytes = (int)f_regionid(r, f, bufp, size);
     if (wrptr(&bufp, &size, bytes) != 0)
@@ -981,7 +910,7 @@ void report_region(struct stream *out, const region * r, faction * f)
 
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
-                const char * name = resourcename(result[n].rtype, result[n].number!=1);
+                const char * name = resourcename(result[n].rtype, result[n].number != 1);
                 bytes = snprintf(bufp, size, ", %d %s/%d", result[n].number,
                     LOC(f->locale, name), result[n].level);
                 if (wrptr(&bufp, &size, bytes) != 0)
@@ -1089,7 +1018,7 @@ void report_region(struct stream *out, const region * r, faction * f)
             WARN_STATIC_BUFFER();
     }
     else {
-        int nrd = 0;
+        int d, nrd = 0;
 
         /* Nachbarregionen, die gesehen werden, ermitteln */
         for (d = 0; d != MAXDIRECTIONS; d++) {
@@ -1167,6 +1096,41 @@ void report_region(struct stream *out, const region * r, faction * f)
     }
     *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
+}
+
+/**
+ * Zeige Wirkungen permanenter Sprüche.
+ */
+static void report_region_curses(struct stream *out, const region * r, faction * f, struct edge edges[], int nedges) {
+    nr_curses(out, 0, f, TYP_REGION, r);
+
+    if (nedges > 0) {
+        int e;
+        newline(out);
+        for (e = 0; e != nedges; ++e) {
+            message *msg;
+            int d;
+
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                if (edges[e].exist[d]) {
+                    char buf[512];
+                    msg = msg_message(edges[e].transparent ? "nr_border_transparent" : "nr_border_opaque",
+                        "object dir", edges[e].name, d);
+                    nr_render(msg, f->locale, buf, sizeof(buf), f);
+                    msg_release(msg);
+                    paragraph(out, buf, 0, 0, 0);
+                }
+            }
+            free(edges[e].name);
+        }
+    }
+}
+
+static void report_region_schemes(struct stream *out, const region * r, faction * f) {
+    char buf[4096];
+    char *bufp = buf;
+    size_t size = sizeof(buf);
+    int bytes;
 
     if (r->seen.mode >= seen_unit && is_astral(r) &&
         !is_cursed(r->attribs, &ct_astralblock)) {
@@ -1204,29 +1168,62 @@ void report_region(struct stream *out, const region * r, faction * f)
             paragraph(out, buf, 0, 0, 0);
         }
     }
+}
 
-    /* Wirkungen permanenter Sprüche */
-    nr_curses(out, 0, f, TYP_REGION, r);
-    n = 0;
+void report_region(struct stream *out, const region * r, faction * f)
+{
+    int d, ne = 0;
+    bool see[MAXDIRECTIONS];
+    struct edge edges[MAX_EDGES];
 
-    if (ne > 0) {
-        int e;
-        newline(out);
-        for (e = 0; e != ne; ++e) {
-            message *msg;
+    assert(out);
+    assert(f);
+    assert(r);
 
-            for (d = 0; d != MAXDIRECTIONS; ++d) {
-                if (edges[e].exist[d]) {
-                    msg = msg_message(edges[e].transparent ? "nr_border_transparent" : "nr_border_opaque",
-                        "object dir", edges[e].name, d);
-                    nr_render(msg, f->locale, buf, sizeof(buf), f);
-                    msg_release(msg);
-                    paragraph(out, buf, 0, 0, 0);
+    memset(edges, 0, sizeof(edges));
+    for (d = 0; d != MAXDIRECTIONS; d++) {
+        /* Nachbarregionen, die gesehen werden, ermitteln */
+        region *r2 = rconnect(r, d);
+        connection *b;
+        see[d] = true;
+        if (!r2)
+            continue;
+        for (b = get_borders(r, r2); b;) {
+            int e;
+            struct edge *match = NULL;
+            bool transparent = b->type->transparent(b, f);
+            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
+
+            if (!transparent) {
+                see[d] = false;
+            }
+            if (!see_border(b, f, r)) {
+                b = b->next;
+                continue;
+            }
+            for (e = 0; e != ne; ++e) {
+                struct edge *edg = edges + e;
+                if (edg->transparent == transparent && 0 == strcmp(name, edg->name)) {
+                    match = edg;
+                    break;
                 }
             }
-            free(edges[e].name);
+            if (match == NULL) {
+                match = edges + ne;
+                match->name = str_strdup(name);
+                match->transparent = transparent;
+                ++ne;
+                assert(ne < MAX_EDGES);
+            }
+            match->lastd = d;
+            match->exist[d] = true;
+            b = b->next;
         }
     }
+
+    report_region_description(out, r, f, see);
+    report_region_schemes(out, r, f);
+    report_region_curses(out, r, f, edges, ne);
 }
 
 static void statistics(struct stream *out, const region * r, const faction * f)
@@ -2024,13 +2021,12 @@ report_plaintext(const char *filename, report_context * ctx,
     attrib *a;
     message *m;
     unsigned char op;
-    int maxh, bytes, ix = WANT_OPTION(O_STATISTICS);
+    int maxh, ix = WANT_OPTION(O_STATISTICS);
     int wants_stats = (f->options & ix);
     FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
-    char buf[8192];
-    char *bufp;
-    size_t size;
+    char buf[1024];
+    sbstring sbs;
 
     if (F == NULL) {
         perror(filename);
@@ -2134,26 +2130,19 @@ report_plaintext(const char *filename, report_context * ctx,
         centre(out, buf, true);
     }
 
-    bufp = buf;
-    size = sizeof(buf) - 1;
-    bytes = snprintf(buf, size, "%s:", LOC(f->locale, "nr_options"));
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_init(&sbs, buf, sizeof(buf));
+    sbs_strcat(&sbs, LOC(f->locale, "nr_options"));
+    sbs_strcat(&sbs, ":");
     for (op = 0; op != MAXOPTIONS; op++) {
         if (f->options & WANT_OPTION(op) && options[op]) {
-            bytes = (int)str_strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, options[op]), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, " ");
+            sbs_strcat(&sbs, LOC(f->locale, options[op]));
 
-            flag++;
+            ++flag;
         }
     }
     if (flag > 0) {
         newline(out);
-        *bufp = 0;
         centre(out, buf, true);
     }
 
@@ -2192,28 +2181,21 @@ report_plaintext(const char *filename, report_context * ctx,
             centre(out, buf, true);
             newline(out);
 
-            bufp = buf;
-            size = sizeof(buf) - 1;
-            bytes = snprintf(bufp, size, "%s: ", LOC(f->locale, "nr_herbsrequired"));
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_init(&sbs, buf, sizeof(buf));
+            sbs_strcat(&sbs, LOC(f->locale, "nr_herbsrequired"));
+            sbs_strcat(&sbs, ":");
 
             if (itype->construction) {
                 requirement *rm = itype->construction->materials;
                 while (rm->number) {
-                    bytes =
-                        (int)str_strlcpy(bufp, LOC(f->locale, resourcename(rm->rtype, 0)), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, LOC(f->locale, resourcename(rm->rtype, 0)));
                     ++rm;
-                    if (rm->number)
-                        bytes = (int)str_strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    if (rm->number) {
+                        sbs_strcat(&sbs, ", ");
+                    }
                 }
                 assert(!rm->rtype);
             }
-            *bufp = 0;
             centre(out, buf, true);
             newline(out);
             description = mkname("describe", pname);
