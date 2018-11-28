@@ -745,6 +745,13 @@ static void rp_battles(struct stream *out, faction * f)
     }
 }
 
+static void append_message(sbstring *sbp, message *m, const faction * f) {
+    /* FIXME: this is a bad hack, cause by how msg_message works. */
+    size_t size = sbp->size - sbs_length(sbp);
+    size = nr_render(m, f->locale, sbp->end, size, f);
+    sbp->end += size;
+}
+
 static void prices(struct stream *out, const region * r, const faction * f)
 {
     const luxury_type *sale = NULL;
@@ -777,12 +784,9 @@ static void prices(struct stream *out, const region * r, const faction * f)
 
         for (dmd = r->land->demands; dmd; dmd = dmd->next) {
             if (dmd->value > 0) {
-                size_t size = sizeof(buf) - sbs_length(&sbs);
-                /* FIXME: this is a bad hack, cause by how msg_message works. */
                 m = msg_message("nr_market_price", "product price",
                     dmd->type->itype->rtype, dmd->value * dmd->type->price);
-                size = nr_render(m, f->locale, sbs.end, size, f);
-                sbs.end += size;
+                append_message(&sbs, m, f);
                 msg_release(m);
                 n--;
                 if (n == 0) {
@@ -833,6 +837,15 @@ struct edge {
     direction_t lastd;
 };
 
+static void report_region_resource(sbstring *sbp, const struct locale *lang, const struct resource_type *rtype, int n) {
+    if (n != 0) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, str_itoa(n));
+        sbs_strcat(sbp, " ");
+        sbs_strcat(sbp, LOC(lang, resourcename(rtype, (n != 1) ? GR_PLURAL : 0)));
+    }
+}
+
 static void report_region_description(struct stream *out, const region * r, faction * f, const bool see[])
 {
     int n;
@@ -842,66 +855,61 @@ static void report_region_description(struct stream *out, const region * r, fact
     attrib *a;
     const char *tname;
     char buf[4096];
-    char *bufp = buf;
-    size_t size = sizeof(buf);
-    int bytes;
+    sbstring sbs;
 
-    bytes = (int)f_regionid(r, f, bufp, size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    f_regionid(r, f, buf, sizeof(buf));
+    sbs_adopt(&sbs, buf, sizeof(buf));
 
     if (r->seen.mode == seen_travel) {
-        bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_travel"));
+        sbs_strcat(&sbs, " (");
+        sbs_strcat(&sbs, LOC(f->locale, "see_travel"));
+        sbs_strcat(&sbs, ")");
     }
     else if (r->seen.mode == seen_neighbour) {
-        bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_neighbour"));
+        sbs_strcat(&sbs, " (");
+        sbs_strcat(&sbs, LOC(f->locale, "see_neighbour"));
+        sbs_strcat(&sbs, ")");
     }
     else if (r->seen.mode == seen_lighthouse) {
-        bytes = snprintf(bufp, size, " (%s)", LOC(f->locale, "see_lighthouse"));
+        sbs_strcat(&sbs, " (");
+        sbs_strcat(&sbs, LOC(f->locale, "see_lighthouse"));
+        sbs_strcat(&sbs, ")");
     }
-    else {
-        bytes = 0;
-    }
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
 
     /* Terrain */
-    bytes = (int)str_strlcpy(bufp, ", ", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-
     tname = terrain_name(r);
-    bytes = (int)str_strlcpy(bufp, LOC(f->locale, tname), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_strcat(&sbs, ", ");
+    sbs_strcat(&sbs, LOC(f->locale, tname));
+    pump_paragraph(&sbs, out, REPORTWIDTH, false);
 
     /* Trees */
     trees = rtrees(r, 2);
     saplings = rtrees(r, 1);
     if (max_production(r)) {
         if (trees > 0 || saplings > 0) {
-            bytes = snprintf(bufp, size, ", %d/%d ", trees, saplings);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, ", ");
+            sbs_strcat(&sbs, str_itoa(trees));
+            sbs_strcat(&sbs, "/");
+            sbs_strcat(&sbs, str_itoa(saplings));
+            sbs_strcat(&sbs, " ");
 
             if (fval(r, RF_MALLORN)) {
                 if (trees == 1) {
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mallorntree"), size);
+                    sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree"));
                 }
                 else {
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mallorntree_p"), size);
+                    sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree_p"));
                 }
             }
             else if (trees == 1) {
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "tree"), size);
+                sbs_strcat(&sbs, LOC(f->locale, "tree"));
             }
             else {
-                bytes = (int)str_strlcpy(bufp, LOC(f->locale, "tree_p"), size);
+                sbs_strcat(&sbs, LOC(f->locale, "tree_p"));
             }
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
     }
+    pump_paragraph(&sbs, out, REPORTWIDTH, false);
 
     /* iron & stone */
     if (r->seen.mode >= seen_unit) {
@@ -911,111 +919,71 @@ static void report_region_description(struct stream *out, const region * r, fact
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
                 const char * name = resourcename(result[n].rtype, result[n].number != 1);
-                bytes = snprintf(bufp, size, ", %d %s/%d", result[n].number,
-                    LOC(f->locale, name), result[n].level);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                sbs_strcat(&sbs, ", ");
+                sbs_strcat(&sbs, str_itoa(result[n].number));
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, LOC(f->locale, name));
+                sbs_strcat(&sbs, "/");
+                sbs_strcat(&sbs, str_itoa(result[n].level));
             }
         }
     }
 
     /* peasants & silver */
-    if (rpeasants(r)) {
-        int p = rpeasants(r);
-        bytes = snprintf(bufp, size, ", %d", p);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+    n = rpeasants(r);
+    if (n) {
+        sbs_strcat(&sbs, ", ");
+        sbs_strcat(&sbs, str_itoa(n));
 
         if (r->land->ownership) {
             const char *str =
                 LOC(f->locale, mkname("morale", itoa10(region_get_morale(r))));
-            bytes = snprintf(bufp, size, " %s", str);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, " ");
+            sbs_strcat(&sbs, str);
         }
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes =
-            (int)str_strlcpy(bufp, LOC(f->locale, p == 1 ? "peasant" : "peasant_p"),
-                size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, LOC(f->locale, n != 1 ? "peasant_p" : "peasant"));
+
         if (is_mourning(r, turn + 1)) {
-            bytes = (int)str_strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_mourning"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, " ");
+            sbs_strcat(&sbs, LOC(f->locale, "nr_mourning"));
         }
     }
-    if (rmoney(r) && r->seen.mode >= seen_travel) {
-        bytes = snprintf(bufp, size, ", %d ", rmoney(r));
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes =
-            (int)str_strlcpy(bufp, LOC(f->locale, resourcename(get_resourcetype(R_SILVER),
-                rmoney(r) != 1)), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+    if (r->seen.mode >= seen_travel) {
+        report_region_resource(&sbs, f->locale, get_resourcetype(R_SILVER), rmoney(r));
     }
     /* Pferde */
-
-    if (rhorses(r)) {
-        bytes = snprintf(bufp, size, ", %d ", rhorses(r));
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes =
-            (int)str_strlcpy(bufp, LOC(f->locale, resourcename(get_resourcetype(R_HORSE),
-            (rhorses(r) > 1) ? GR_PLURAL : 0)), size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-    }
-    bytes = (int)str_strlcpy(bufp, ".", size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    report_region_resource(&sbs, f->locale, get_resourcetype(R_HORSE), rhorses(r));
+    sbs_strcat(&sbs, ".");
 
     if (r->land && r->land->display && r->land->display[0]) {
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, r->land->display, size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, r->land->display);
 
         n = r->land->display[strlen(r->land->display) - 1];
         if (n != '!' && n != '?' && n != '.') {
-            bytes = (int)str_strlcpy(bufp, ".", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, ".");
         }
     }
 
     if (rule_region_owners()) {
         const faction *owner = region_get_owner(r);
-        message *msg;
 
         if (owner != NULL) {
-            bytes = (int)str_strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            message *msg;
+
+            sbs_strcat(&sbs, " ");
             msg = msg_message("nr_region_owner", "faction", owner);
-            bytes = (int)nr_render(msg, f->locale, bufp, size, f);
+            append_message(&sbs, msg, f);
             msg_release(msg);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
         }
     }
-    a = a_find(r->attribs, &at_overrideroads);
 
+    pump_paragraph(&sbs, out, REPORTWIDTH, false);
+    a = a_find(r->attribs, &at_overrideroads);
     if (a) {
-        bytes = (int)str_strlcpy(bufp, " ", size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
-        bytes = (int)str_strlcpy(bufp, (char *)a->data.v, size);
-        if (wrptr(&bufp, &size, bytes) != 0)
-            WARN_STATIC_BUFFER();
+        sbs_strcat(&sbs, " ");
+        sbs_strcat(&sbs, (const char *)a->data.v);
     }
     else {
         int d, nrd = 0;
@@ -1025,8 +993,8 @@ static void report_region_description(struct stream *out, const region * r, fact
             if (see[d] && rconnect(r, d))
                 nrd++;
         }
-        /* list directions */
 
+        /* list directions */
         dh = false;
         for (d = 0; d != MAXDIRECTIONS; d++) {
             if (see[d]) {
@@ -1035,36 +1003,25 @@ static void report_region_description(struct stream *out, const region * r, fact
                     continue;
                 nrd--;
                 if (dh) {
-                    char regname[4096];
+                    char regname[128], trail[256];
                     if (nrd == 0) {
-                        bytes = (int)str_strlcpy(bufp, " ", size);
-                        if (wrptr(&bufp, &size, bytes) != 0)
-                            WARN_STATIC_BUFFER();
-                        bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_nb_final"), size);
+                        sbs_strcat(&sbs, " ");
+                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_final"));
                     }
                     else {
-                        bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_nb_next"), size);
+                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_next"));
                     }
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, LOC(f->locale, directions[d]), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, LOC(f->locale, directions[d]));
+                    sbs_strcat(&sbs, " ");
                     f_regionid(r2, f, regname, sizeof(regname));
-                    bytes = snprintf(bufp, size, trailinto(r2, f->locale), regname);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
+                    sbs_strcat(&sbs, trail);
                 }
                 else {
-                    bytes = (int)str_strlcpy(bufp, " ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    MSG(("nr_vicinitystart", "dir region", d, r2), bufp, size, f->locale,
-                        f);
-                    bufp += strlen(bufp);
+                    message * msg = msg_message("nr_vicinitystart", "dir region", d, r2);
+                    sbs_strcat(&sbs, " ");
+                    append_message(&sbs, msg, f);
+                    msg_release(msg);
                     dh = true;
                 }
             }
@@ -1073,29 +1030,15 @@ static void report_region_description(struct stream *out, const region * r, fact
         for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
             a = a->next) {
             spec_direction *spd = (spec_direction *)(a->data.v);
-            bytes = (int)str_strlcpy(bufp, " ", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, spd->desc), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, " (\"", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, spd->keyword), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, "\")", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
-            bytes = (int)str_strlcpy(bufp, ".", size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, " ");
+            sbs_strcat(&sbs, LOC(f->locale, spd->desc));
+            sbs_strcat(&sbs, " (\"");
+            sbs_strcat(&sbs, LOC(f->locale, spd->keyword));
+            sbs_strcat(&sbs, "\").");
             dh = 1;
         }
     }
-    *bufp = 0;
-    paragraph(out, buf, 0, 0, 0);
+    pump_paragraph(&sbs, out, REPORTWIDTH, true);
 }
 
 /**
@@ -1521,15 +1464,19 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 return;
             }
             else if (next > begin + maxlen) {
-                ptrdiff_t len = pos - begin;
+                ptrdiff_t len;
+                if (pos == begin) {
+                    /* there was no space before the break, line will be too long */
+                    pos = next;
+                }
+                len = pos - begin;
                 swrite(begin, 1, len, out);
                 newline(out);
 
                 while (*pos && IS_UTF8_SPACE(pos)) {
                     ++pos;
-                    ++len;
                 }
-                sbs_substr(sbp, len, SIZE_MAX);
+                sbs_substr(sbp, pos - begin, SIZE_MAX);
                 break;
             }
             pos = next;
