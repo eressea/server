@@ -234,19 +234,18 @@ paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_ind
     } while (*begin);
 }
 
-static size_t write_spell_modifier(const spell * sp, int flag, const char * str, bool cont, char * bufp, size_t size) {
+static bool write_spell_modifier(const spell * sp, int flag, const char * str, bool cont, sbstring *sbp) {
     if (sp->sptyp & flag) {
-        size_t bytes = 0;
         if (cont) {
-            bytes = str_strlcpy(bufp, ", ", size);
+            sbs_strcat(sbp, ", ");
         }
         else {
-            bytes = str_strlcpy(bufp, " ", size);
+            sbs_strcat(sbp, " ");
         }
-        bytes += str_strlcpy(bufp + bytes, str, size - bytes);
-        return bytes;
+        sbs_strcat(sbp, str);
+        return true;
     }
-    return 0;
+    return cont;
 }
 
 void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct locale *lang)
@@ -435,11 +434,11 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
 
 void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
-    int bytes, k, itemanz, costtyp;
+    int k, itemanz, costtyp;
+    bool cont;
     char buf[4096];
-    char *startp, *bufp = buf;
-    size_t size = sizeof(buf) - 1;
     const spell *sp = spellref_get(&sbe->spref);
+    sbstring sbs;
 
     newline(out);
     centre(out, spell_name(sp, lang), true);
@@ -447,29 +446,22 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     paragraph(out, LOC(lang, "nr_spell_description"), 0, 0, 0);
     paragraph(out, spell_info(sp, lang), 2, 0, 0);
 
-    bytes = (int)str_strlcpy(bufp, LOC(lang, "nr_spell_type"), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_init(&sbs, buf, sizeof(buf));
+    sbs_strcat(&sbs, LOC(lang, "nr_spell_type"));
+    sbs_strcat(&sbs, " ");
 
-    if (size) {
-        *bufp++ = ' ';
-        --size;
-    }
     if (sp->sptyp & PRECOMBATSPELL) {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, "sptype_precombat"), size);
+        sbs_strcat(&sbs, LOC(lang, "sptype_precombat"));
     }
     else if (sp->sptyp & COMBATSPELL) {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, "sptype_combat"), size);
+        sbs_strcat(&sbs, LOC(lang, "sptype_combat"));
     }
     else if (sp->sptyp & POSTCOMBATSPELL) {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, "sptype_postcombat"), size);
+        sbs_strcat(&sbs, LOC(lang, "sptype_postcombat"));
     }
     else {
-        bytes = (int)str_strlcpy(bufp, LOC(lang, "sptype_normal"), size);
+        sbs_strcat(&sbs, LOC(lang, "sptype_normal"));
     }
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
-    *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
 
     sprintf(buf, "%s %d", LOC(lang, "nr_spell_level"), sbe->level);
@@ -484,61 +476,38 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
         itemanz = sp->components[k].amount;
         costtyp = sp->components[k].cost;
         if (itemanz > 0) {
-            size = sizeof(buf) - 1;
-            bufp = buf;
+            sbs_init(&sbs, buf, sizeof(buf));
             if (sp->sptyp & SPELLLEVEL) {
-                bytes =
-                    snprintf(bufp, size, "  %d %s", itemanz, LOC(lang, resourcename(rtype,
-                        itemanz != 1)));
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                sbs_strcat(&sbs, "  ");
+                sbs_strcat(&sbs, str_itoa(itemanz));
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, LOC(lang, resourcename(rtype, itemanz != 1)));
+
                 if (costtyp == SPC_LEVEL || costtyp == SPC_LINEAR) {
-                    bytes = snprintf(bufp, size, " * %s", LOC(lang, "nr_level"));
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, "  * ");
+                    sbs_strcat(&sbs, LOC(lang, "nr_level"));
                 }
             }
             else {
-                bytes = snprintf(bufp, size, "%d %s", itemanz, LOC(lang, resourcename(rtype, itemanz != 1)));
-                if (wrptr(&bufp, &size, bytes) != 0) {
-                    WARN_STATIC_BUFFER();
-                }
+                sbs_strcat(&sbs, str_itoa(itemanz));
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, LOC(lang, resourcename(rtype, itemanz != 1)));
             }
-            *bufp = 0;
             paragraph(out, buf, 2, 2, '-');
         }
     }
 
-    size = sizeof(buf) - 1;
-    bufp = buf;
-    bytes = (int)str_strlcpy(buf, LOC(lang, "nr_spell_modifiers"), size);
-    if (wrptr(&bufp, &size, bytes) != 0)
-        WARN_STATIC_BUFFER();
+    sbs_substr(&sbs, 0, 0);
+    sbs_strcat(&sbs, LOC(lang, "nr_spell_modifiers"));
 
-    startp = bufp;
-    bytes = (int)write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
+    cont = false;
+    cont = write_spell_modifier(sp, FARCASTING, LOC(lang, "smod_far"), cont, &sbs);
+    cont = write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), cont, &sbs);
+    cont = write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), cont, &sbs);
+    cont = write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), cont, &sbs);
+    if (!cont) {
+        write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), cont, &sbs);
     }
-    bytes = (int)write_spell_modifier(sp, OCEANCASTABLE, LOC(lang, "smod_sea"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)write_spell_modifier(sp, ONSHIPCAST, LOC(lang, "smod_ship"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_nofamiliar"), startp != bufp, bufp, size);
-    if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-        WARN_STATIC_BUFFER();
-    }
-    if (startp == bufp) {
-        bytes = (int)write_spell_modifier(sp, NOTFAMILIARCAST, LOC(lang, "smod_none"), startp != bufp, bufp, size);
-        if (bytes && wrptr(&bufp, &size, bytes) != 0) {
-            WARN_STATIC_BUFFER();
-        }
-    }
-    *bufp = 0;
     paragraph(out, buf, 0, 0, 0);
     paragraph(out, LOC(lang, "nr_spell_syntax"), 0, 0, 0);
 
