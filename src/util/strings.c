@@ -263,11 +263,21 @@ char *str_strdup(const char *s) {
 void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
 {
     assert(sbs);
-    assert(size>0);
+    assert(size > 0);
     sbs->begin = buffer;
     sbs->size = size;
     sbs->end = buffer;
     buffer[0] = '\0';
+}
+
+void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size)
+{
+    size_t len = strlen(buffer);
+    assert(sbs);
+    assert(size > len);
+    sbs->begin = buffer;
+    sbs->size = size;
+    sbs->end = buffer + len;
 }
 
 void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
