@@ -1027,7 +1027,9 @@ static void report_region_description(struct stream *out, const region * r, fact
                 }
             }
         }
-        sbs_strcat(&sbs, ".");
+        if (dh) {
+            sbs_strcat(&sbs, ".");
+        }
         /* Spezielle Richtungen */
         for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
             a = a->next) {
