@@ -1075,9 +1075,8 @@ static void report_region_edges(struct stream *out, const region * r, faction * 
 
 static void report_region_schemes(struct stream *out, const region * r, faction * f) {
     char buf[4096];
-    char *bufp = buf;
-    size_t size = sizeof(buf);
-    int bytes;
+    sbstring sbs;
+    sbs_init(&sbs, buf, sizeof(buf));
 
     if (r->seen.mode >= seen_unit && is_astral(r) &&
         !is_cursed(r->attribs, &ct_astralblock)) {
@@ -1086,32 +1085,22 @@ static void report_region_schemes(struct stream *out, const region * r, faction 
         region_list *rl2;
 
         if (rl) {
-            bufp = buf;
-            size = sizeof(buf) - 1;
-
             /* this localization might not work for every language but is fine for de and en */
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_schemes_prefix"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs, LOC(f->locale, "nr_schemes_prefix"));
             rl2 = rl;
             while (rl2) {
-                bytes = (int)f_regionid(rl2->data, f, bufp, size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                char rbuf[REPORTWIDTH];
+                f_regionid(rl2->data, f, rbuf, sizeof(rbuf));
+                sbs_strcat(&sbs, rbuf);
                 rl2 = rl2->next;
                 if (rl2) {
-                    bytes = (int)str_strlcpy(bufp, ", ", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, ", ");
                 }
             }
-            bytes = (int)str_strlcpy(bufp, LOC(f->locale, "nr_schemes_postfix"), size);
-            if (wrptr(&bufp, &size, bytes) != 0)
-                WARN_STATIC_BUFFER();
+            sbs_strcat(&sbs,LOC(f->locale, "nr_schemes_postfix"));
             free_regionlist(rl);
             /* Schreibe Paragraphen */
             newline(out);
-            *bufp = 0;
             paragraph(out, buf, 0, 0, 0);
         }
     }
