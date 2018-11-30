@@ -1277,9 +1277,8 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     region *r;
     FILE *F = fopen(filename, "w");
     stream strm = { 0 }, *out = &strm;
-    char buf[8192], *bufp;
-    size_t size;
-    int bytes;
+    char buf[4096];
+    sbstring sbs;
 
     if (F == NULL) {
         perror(filename);
@@ -1339,50 +1338,40 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                 }
                 dh = 1;
 
-                bufp = buf;
-                size = sizeof(buf) - 1;
-                bytes = snprintf(bufp, size, "%s %s;    %s [%d,%d$",
-                    LOC(u->faction->locale, parameters[P_UNIT]),
-                    itoa36(u->no), unit_getname(u), u->number, get_money(u));
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
+                sbs_init(&sbs, buf, sizeof(buf));
+                sbs_strcat(&sbs, LOC(u->faction->locale, parameters[P_UNIT]));
+                sbs_strcat(&sbs, " ");
+                sbs_strcat(&sbs, itoa36(u->no)),
+                sbs_strcat(&sbs, ";    ");
+                sbs_strcat(&sbs, unit_getname(u));
+                sbs_strcat(&sbs, " [");
+                sbs_strcat(&sbs, str_itoa(u->number));
+                sbs_strcat(&sbs, ",");
+                sbs_strcat(&sbs, str_itoa(get_money(u)));
+                sbs_strcat(&sbs, "$");
                 if (u->building && building_owner(u->building) == u) {
                     building *b = u->building;
                     if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
                         int cost = buildingmaintenance(b, rsilver);
                         if (cost > 0) {
-                            bytes = (int)str_strlcpy(bufp, ",U", size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
-                            bytes = (int)str_strlcpy(bufp, itoa10(cost), size);
-                            if (wrptr(&bufp, &size, bytes) != 0)
-                                WARN_STATIC_BUFFER();
+                            sbs_strcat(&sbs, ",U");
+                            sbs_strcat(&sbs, str_itoa(cost));
                         }
                     }
                 }
                 else if (u->ship) {
                     if (ship_owner(u->ship) == u) {
-                        bytes = (int)str_strlcpy(bufp, ",S", size);
+                        sbs_strcat(&sbs, ",S");
                     }
                     else {
-                        bytes = (int)str_strlcpy(bufp, ",s", size);
+                        sbs_strcat(&sbs, ",s");
                     }
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
-                    bytes = (int)str_strlcpy(bufp, itoa36(u->ship->no), size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs,itoa36(u->ship->no));
                 }
                 if (lifestyle(u) == 0) {
-                    bytes = (int)str_strlcpy(bufp, ",I", size);
-                    if (wrptr(&bufp, &size, bytes) != 0)
-                        WARN_STATIC_BUFFER();
+                    sbs_strcat(&sbs, ",I");
                 }
-                bytes = (int)str_strlcpy(bufp, "]", size);
-                if (wrptr(&bufp, &size, bytes) != 0)
-                    WARN_STATIC_BUFFER();
-
-                *bufp = 0;
+                sbs_strcat(&sbs, "]");
                 rps_nowrap(out, buf);
                 newline(out);
 
