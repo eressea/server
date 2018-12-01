@@ -151,14 +151,22 @@ static void test_sbstring(CuTest * tc)
     CuAssertStrEquals(tc, "Hodor", sbs.begin);
     sbs_strcat(&sbs, "Hodor");
     CuAssertStrEquals(tc, "HodorHodor", sbs.begin);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "Hodor");
     CuAssertStrEquals(tc, "Hodor", sbs.begin);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
     CuAssertPtrEquals(tc, sbs.begin + sbs.size - 1, sbs.end);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
     CuAssertPtrEquals(tc, buffer, sbs.begin);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "1234567890");
     CuAssertStrEquals(tc, "1234567890", sbs.begin);
     sbs_strncat(&sbs, "1234567890", 4);
@@ -208,24 +216,28 @@ static void test_sbs_substr(CuTest * tc)
     CuAssertStrEquals(tc, "1234", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 4);
     CuAssertStrEquals(tc, "5678", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 2, 4);
     CuAssertStrEquals(tc, "3456", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 4);
     CuAssertStrEquals(tc, "5678", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 8);
