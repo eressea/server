@@ -323,16 +323,6 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     assert(sbs->begin + sbs->size >= sbs->end);
 }
 
-void sbs_strcpy(struct sbstring *sbs, const char *str)
-{
-    size_t len = str_strlcpy(sbs->begin, str, sbs->size);
-    if (len >= sbs->size) {
-        len = sbs->size - 1;
-    }
-    sbs->end = sbs->begin + len;
-    assert(sbs->begin + sbs->size >= sbs->end);
-}
-
 void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
 {
     if (pos > sbs->end - sbs->begin) {

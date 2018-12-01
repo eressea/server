@@ -4,7 +4,6 @@ add_subdirectory (crypto)
 
 SET(_TEST_FILES
 base36.test.c
-# bsdstring.test.c
 # crmessage.test.c
 # dice.test.c
 # filereader.test.c
@@ -34,7 +33,6 @@ variant.test.c
 
 SET(_FILES
 base36.c
-bsdstring.c
 crmessage.c
 dice.c
 filereader.c

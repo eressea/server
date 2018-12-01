@@ -120,7 +120,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
 
     sbs_init(&sbs, sbuffer, size);
     if (ord->command & CMD_QUIET) {
-        sbs_strcpy(&sbs, "!");
+        sbs_strcat(&sbs, "!");
     }
     if (ord->command & CMD_PERSIST) {
         sbs_strcat(&sbs, "@");
