@@ -2286,7 +2286,7 @@ int follow_ship(unit * u, order * ord)
     }
 
     sbs_init(&sbcmd, command, sizeof(command));
-    sbs_strcpy(&sbcmd, LOC(u->faction->locale, keyword(K_MOVE)));
+    sbs_strcat(&sbcmd, LOC(u->faction->locale, keyword(K_MOVE)));
     sbs_strcat(&sbcmd, " ");
     sbs_strcat(&sbcmd, LOC(u->faction->locale, directions[dir]));
 
