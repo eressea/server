@@ -169,9 +169,8 @@ static void centre(struct stream *out, const char *s, bool breaking)
     }
 }
 
-static void
-paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_indent,
-    char marker)
+void paragraph(struct stream *out, const char *str, ptrdiff_t indent,
+    int hanging_indent, char marker)
 {
     size_t length = REPORTWIDTH;
     const char *handle_end, *begin, *mark = 0;
