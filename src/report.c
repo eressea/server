@@ -1440,7 +1440,12 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
             char *next = strchr(pos+1, ' ');
             if (next == NULL) {
                 if (isfinal) {
-                    swrite(begin, 1, sbp->end - begin, out);
+                    swrite(begin, 1, pos - begin, out);
+                    while (*pos && IS_UTF8_SPACE(pos)) {
+                        ++pos;
+                    }
+                    newline(out);
+                    swrite(pos, 1, sbp->end - pos, out);
                     newline(out);
                 }
                 return;
