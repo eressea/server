@@ -260,6 +260,26 @@ char *str_strdup(const char *s) {
 #endif
 }
 
+void sbs_printf(struct sbstring *sbs, const char *format, ...)
+{
+    size_t size = sbs->size - (sbs->end - sbs->begin);
+
+    if (size > 0) {
+        va_list argp;
+        va_start(argp, format);
+        int bytes = vsnprintf(sbs->end, size, format, argp);
+        if (bytes > 0) {
+            if ((size_t)bytes >= size) {
+                bytes = size - 1;
+                /* terminate truncated output */
+                sbs->end[bytes] = '\0';
+            }
+            sbs->end += bytes;
+        }
+        va_end(argp);
+    }
+}
+
 void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
 {
     assert(sbs);

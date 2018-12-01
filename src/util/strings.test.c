@@ -226,6 +226,31 @@ static void test_sbs_substr(CuTest * tc)
     CuAssertIntEquals(tc, 'A', buffer[9]);
 }
 
+static void test_sbs_printf(CuTest * tc)
+{
+    char buffer[10];
+    sbstring sbs;
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s %d", "1234", 5678);
+    CuAssertStrEquals(tc, "1234 5678", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s", "12345");
+    sbs_printf(&sbs, "%d", 6789);
+    CuAssertStrEquals(tc, "123456789", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s", "1234567890");
+    CuAssertStrEquals(tc, "123456789", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%d", 123456789);
+    CuAssertStrEquals(tc, "123456789", buffer);
+    sbs_printf(&sbs, "%s", "Hodor");
+    CuAssertStrEquals(tc, "123456789", buffer);
+}
+
 CuSuite *get_strings_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -240,5 +265,6 @@ CuSuite *get_strings_suite(void)
     SUITE_ADD_TEST(suite, test_sbstring);
     SUITE_ADD_TEST(suite, test_sbs_strcat);
     SUITE_ADD_TEST(suite, test_sbs_substr);
+    SUITE_ADD_TEST(suite, test_sbs_printf);
     return suite;
 }
