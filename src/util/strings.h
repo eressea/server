@@ -48,6 +48,7 @@ extern "C" {
         char *end;
     } sbstring;
 
+    void sbs_printf(struct sbstring *sbs, const char *format, ...);
     void sbs_init(struct sbstring *sbs, char *buffer, size_t size);
     void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size);
     void sbs_strcat(struct sbstring *sbs, const char *str);
