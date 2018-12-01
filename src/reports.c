@@ -2239,7 +2239,6 @@ static void eval_trail(struct opstack **stack, const void *userdata)
         handle_end = aregs->nregions;
         for (i = begin; i < handle_end; ++i) {
             region *r = aregs->regions[i];
-            sbs_strcat(&sbs, ", ");
 
             print_trail(report, r, lang, &sbs);
 
