@@ -46,7 +46,7 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
                         st->level = effskill_study(u, st->sk);
                         st->learn = 0;
                         st->u = u;
-                        if (++nscholars == max_scholars) {
+                        if (++nscholars > max_scholars) {
                             log_fatal("you must increase MAXSCHOLARS");
                         }
                     }
@@ -59,7 +59,6 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
         u = u->next;
     }
     *units = unext;
-    scholars[nscholars].u = NULL;
     if (nscholars > 0) {
         qsort(scholars, nscholars, sizeof(scholar), cmp_scholars);
     }
@@ -125,25 +124,20 @@ void autostudy_run(scholar scholars[], int nscholars)
                     n = scholars[s].u->number;
                 }
                 else {
-                    /* s gets partial credit and we need a new teacher */
+                    /* a part of s gets credited and we need a new teacher: */
                     teaching(scholars + s, i);
-
-                    /* we are done with this teacher. any remaining people are regular learners: */
-                    if (scholars[t].u->number > 1) {
-                        /* remain = number - ceil(taught/10); */
-                        int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
-                        learning(scholars + t, remain);
-                    }
-
+                    /* we still need to teach n students in this unit: */
+                    n -= i;
+                    i = 0;
                     /* we want a new teacher for s. if any exists, it's next in the sequence. */
                     if (++t == si) {
                         continue;
                     }
                     if (scholars[t].level - TEACHDIFFERENCE < scholars[s].level) {
-                        /* next teacher cannot teach, we must skip students. */
+                        /* no remaining teacher can teach this student, so we skip ahead */
                         do {
-                            learning(scholars + s, (n - i));
-                            i = 0;
+                            /* remaining students learn without a teacher: */
+                            learning(scholars + s, n);
                             if (++s == se) {
                                 break;
                             }
