@@ -213,7 +213,6 @@ extern "C" {
     /* BEGIN battle interface */
     side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);
     side * get_side(battle * b, const struct unit * u);
-    fighter * get_fighter(battle * b, const struct unit * u);
     /* END battle interface */
 
     void do_battles(void);

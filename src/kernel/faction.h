@@ -117,7 +117,6 @@ extern "C" {
     int max_magicians(const faction * f);
     void set_show_item(faction * f, const struct item_type *itype);
 
-    const struct unit *random_unit_in_faction(const struct faction *f);
     const char *factionname(const struct faction *f);
     struct unit *addplayer(struct region *r, faction * f);
     struct faction *addfaction(const char *email, const char *password,

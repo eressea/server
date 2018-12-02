@@ -3383,23 +3383,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     return fig;
 }
 
-fighter * get_fighter(battle * b, const struct unit * u)
-{
-    side * s;
-
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fig;
-        if (s->faction == u->faction) {
-            for (fig = s->fighters; fig; fig = fig->next) {
-                if (fig->unit == u) {
-                    return fig;
-                }
-            }
-        }
-    }
-    return 0;
-}
-
 int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     side *s;

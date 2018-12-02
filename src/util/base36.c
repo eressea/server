@@ -125,13 +125,3 @@ const char *itoa10(int i)
 {
     return itoab(i, 10);
 }
-
-int i10toi36(int i)
-{
-    int r = 0;
-    while (i) {
-        r = r * 36 + i % 10;
-        i = i / 10;
-    }
-    return r;
-}
