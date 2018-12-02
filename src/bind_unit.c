@@ -432,11 +432,6 @@ static int tolua_unit_effskill(lua_State * L)
     return 1;
 }
 
-typedef struct fctr_data {
-    unit *target;
-    int fhandle;
-} fctr_data;
-
 typedef struct event {
     struct event_arg *args;
     char *msg;
