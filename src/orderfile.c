@@ -22,7 +22,7 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if (u->flags & UFL_ORDERS) {
+    if ((u->flags & UFL_ORDERS) == 0) {
         order **ordp;
         /* alle wiederholbaren, langen befehle werden gesichert: */
         u->flags |= UFL_ORDERS;

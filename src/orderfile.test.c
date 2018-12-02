@@ -50,7 +50,7 @@ static void test_unit_orders(CuTest *tc) {
     input in;
     unit *u;
     faction *f;
-    strlist *orders = NULL;
+    strlist *orders = NULL, *backup;
     char buf[64];
 
     test_setup();
@@ -66,15 +66,18 @@ static void test_unit_orders(CuTest *tc) {
     addstrlist(&orders, buf);
     snprintf(buf, sizeof(buf), "%s %s", keyword_name(K_MOVE, f->locale),
         LOC(f->locale, shortdirections[D_WEST]));
+    backup = orders;
     addstrlist(&orders, buf);
     in.data = &orders;
     in.getbuf = getbuf_strings;
     CuAssertIntEquals(tc, 0, read_orders(&in));
     CuAssertPtrNotNull(tc, u->old_orders);
     CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, NULL, orders);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(u->orders));
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->old_orders));
     CuAssertIntEquals(tc, UFL_ORDERS, u->flags & UFL_ORDERS);
+    freestrlist(backup);
     test_teardown();
 }
 
