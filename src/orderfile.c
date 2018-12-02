@@ -47,13 +47,12 @@ static void begin_orders(unit *u) {
     u->orders = NULL;
 }
 
-static unit *unitorders(input *in, faction *f)
+static void unitorders(input *in, faction *f)
 {
     int i;
     unit *u;
 
-    if (!f)
-        return NULL;
+    assert(f);
 
     i = getid();
     u = findunit(i);
@@ -120,10 +119,6 @@ static unit *unitorders(input *in, faction *f)
         }
 
     }
-    else {
-        return NULL;
-    }
-    return u;
 }
 
 static faction *factionorders(void)
@@ -189,7 +184,8 @@ int read_orders(input *in)
             * vermerkt. */
 
         case P_UNIT:
-            if (!f || !unitorders(in, f)) {
+            if (f) {
+                unitorders(in, f);
                 do {
                     b = in->getbuf(in->data);
                     if (!b) {

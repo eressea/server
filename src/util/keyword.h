@@ -83,6 +83,7 @@ extern "C"
     void init_keywords(const struct locale *lang);
     void init_keyword(const struct locale *lang, keyword_t kwd, const char *str);
     bool keyword_disabled(keyword_t kwd);
+    const char *keyword_name(keyword_t kwd, const struct locale *lang);
     void enable_keyword(keyword_t kwd, bool enabled);
     const char *keyword(keyword_t kwd);
 
