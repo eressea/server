@@ -3339,7 +3339,6 @@ int pay_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 6, MSG_EVENT);
     }
     else {
-        building *b = NULL;
         param_t p;
         int id;
 
@@ -3355,13 +3354,12 @@ int pay_cmd(unit * u, struct order *ord)
             }
             else {
                 /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
-                if (id == 0 || id == u->building->no)
-                {
+                if (id == 0 || id == u->building->no) {
                     u->building->flags |= BLD_DONTPAY;
                 }
                 else {
                     /* Find the building that matches to the given id*/
-                    b = findbuilding(id);
+                    building *b = findbuilding(id);
                     /* If there is a building and it is in the same region as the unit continue, else: error */
                     if (b && b->region == u->region)
                     {
