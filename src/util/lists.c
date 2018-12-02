@@ -80,15 +80,6 @@ void translist(void *l1, void *l2, void *p)
     addlist(l2, p);
 }
 
-void removelist(void *l, void *p)
-{
-
-    /* remove entry p from list l; free p */
-
-    choplist(l, p);
-    free(p);
-}
-
 void freelist(void *p1)
 {
 

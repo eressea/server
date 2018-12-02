@@ -240,15 +240,6 @@ race_list *get_familiarraces(void)
     return familiarraces;
 }
 
-void racelist_clear(struct race_list **rl)
-{
-    while (*rl) {
-        race_list *rl2 = (*rl)->next;
-        free(*rl);
-        *rl = rl2;
-    }
-}
-
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
     race_list *rl2 = (race_list *)malloc(sizeof(race_list));

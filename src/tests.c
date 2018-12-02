@@ -1,6 +1,8 @@
 #include <platform.h>
 #include "tests.h"
 #include "prefix.h"
+#include "creport.h"
+#include "report.h"
 #include "reports.h"
 #include "vortex.h"
 
@@ -230,9 +232,12 @@ static void test_reset(void) {
     free_gamedata();
     free_terrains();
     free_resources();
+    free_functions();
     free_config();
     default_locale = 0;
     calendar_cleanup();
+    creport_cleanup();
+    report_cleanup();
     close_orders();
     log_close();
     stats_close();
@@ -245,29 +250,7 @@ static void test_reset(void) {
     free_spellbooks();
     free_prefixes();
     mt_clear();
-/*
-    for (i = 0; i != MAXTERRAINS; ++i) {
-        int flags = 0;
-        if (i == T_FIREWALL) {
-            flags |= FORBIDDEN_REGION;
-        } else {
-            flags = FLY_INTO | WALK_INTO;
-            if (i == T_OCEAN) {
-                flags |= SEA_REGION | SWIM_INTO;
-            }
-            else {
-                flags |= LAND_REGION;
-                if (i == T_PLAIN) {
-                    flags |= CAVALRY_REGION | FOREST_REGION;
-                }
-                else if (i == T_GLACIER || i == T_ICEBERG || i == T_ICEBERG_SLEEP) {
-                    flags |= ARCTIC_REGION;
-                }
-            }
-        }
-        test_create_terrain(terrainnames[i], flags);
-    }
-*/
+
     for (i = 0; i != MAXSKILLS; ++i) {
         enable_skill(i, true);
     }

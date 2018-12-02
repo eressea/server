@@ -177,49 +177,6 @@ int str_hash(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *str_escape_wrong(const char *str, char *buffer, size_t len)
-{
-    const char *handle_start = strchr(str, '\"');
-    if (!handle_start) handle_start = strchr(str, '\\');
-    assert(buffer);
-    if (handle_start) {
-        const char *p = str;
-        char *o = buffer;
-        size_t skip = handle_start - str;
-
-        if (skip > len) {
-            skip = len;
-        }
-        if (skip > 0) {
-            memcpy(buffer, str, skip);
-            o += skip;
-            p += skip;
-            len -= skip;
-        }
-        do {
-            if (*p == '\"' || *p == '\\') {
-                if (len < 2) {
-                    break;
-                }
-                (*o++) = '\\';
-                len -= 2;
-            }
-            else {
-                if (len < 1) {
-                    break;
-                }
-                --len;
-            }
-            if (len > 0) {
-                (*o++) = (*p);
-            }
-        } while (len > 0 && *p++);
-        *o = '\0';
-        return buffer;
-    }
-    return str;
-}
-
 unsigned int jenkins_hash(unsigned int a)
 {
     a = (a + 0x7ed55d16) + (a << 12);
