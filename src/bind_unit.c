@@ -22,7 +22,6 @@
 #include "kernel/skills.h"
 #include "kernel/types.h"
 #include <kernel/building.h>
-#include <kernel/config.h>
 #include <kernel/curse.h>
 #include "kernel/equipment.h"
 #include <kernel/faction.h>
