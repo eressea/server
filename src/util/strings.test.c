@@ -128,6 +128,14 @@ static void test_str_strlcpy(CuTest * tc)
     errno = 0;
 }
 
+static void test_str_itoa(CuTest * tc)
+{
+    CuAssertStrEquals(tc, "1234", str_itoa(1234));
+    CuAssertStrEquals(tc, "0", str_itoa(0));
+    CuAssertStrEquals(tc, "1234567890", str_itoa(1234567890));
+    CuAssertStrEquals(tc, "-1234567890", str_itoa(-1234567890));
+}
+
 static void test_sbstring(CuTest * tc)
 {
     char buffer[16];
@@ -165,6 +173,7 @@ CuSuite *get_strings_suite(void)
     SUITE_ADD_TEST(suite, test_str_slprintf);
     SUITE_ADD_TEST(suite, test_str_strlcat);
     SUITE_ADD_TEST(suite, test_str_strlcpy);
+    SUITE_ADD_TEST(suite, test_str_itoa);
     SUITE_ADD_TEST(suite, test_sbstring);
     return suite;
 }
