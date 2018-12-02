@@ -88,6 +88,11 @@ bool keyword_disabled(keyword_t kwd) {
     return disabled_kwd[kwd];
 }
 
+const char *keyword_name(keyword_t kwd, const struct locale *lang)
+{
+    return LOC(lang, mkname("keyword", keywords[kwd]));
+}
+
 const char *keywords[MAXKEYWORDS] = {
     "//",
     "banner",
