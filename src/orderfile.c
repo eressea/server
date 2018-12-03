@@ -274,7 +274,7 @@ static void handle_unit(void *userData, int no) {
 static void handle_order(void *userData, const char *str) {
     parser_state *state = (parser_state *)userData;
     const char * tok, *input = str;
-    char buffer[16];
+    char buffer[64];
     const struct locale *lang;
     param_t p;
     faction * f = state->f;
