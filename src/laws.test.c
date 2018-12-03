@@ -48,6 +48,37 @@ static void test_new_building_can_be_renamed(CuTest * tc)
     test_teardown();
 }
 
+static void test_password_cmd(CuTest * tc)
+{
+    unit *u;
+    faction * f;
+    test_setup();
+    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "abcdefgh");
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, faction_getpassword(f));
+    CuAssertTrue(tc, checkpasswd(f, "abcdefgh"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "abc*de*");
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, !checkpasswd(f, "abc*de*"));
+    CuAssertTrue(tc, checkpasswd(f, "abcXdeX"));
+    free_order(u->thisorder);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "1234567890123456789012345678901234567890");
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error321"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, checkpasswd(f, "1234567890123456789012345678901"));
+
+    test_teardown();
+}
+
 static void test_rename_building(CuTest * tc)
 {
     region *r;
@@ -1831,6 +1862,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_buy_cast);
     SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
+    SUITE_ADD_TEST(suite, test_password_cmd);
     SUITE_ADD_TEST(suite, test_rename_building);
     SUITE_ADD_TEST(suite, test_rename_building_twice);
     SUITE_ADD_TEST(suite, test_fishing_feeds_2_people);
