@@ -2429,6 +2429,9 @@ msgstr "\"$unit($unit) konnte nur $int($ships) von $int($maxships) Schiffen verz
 msgid "error283"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Passwort darf nur Buchstaben und Ziffern enthalten.\""
 
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das gewählte Passwort war zu lang.\""
+
 msgid "rust_effect"
 msgstr "\"$unit($mage) legt einen Rosthauch auf $unit($target). $int($amount) Waffen wurden vom Rost zerfressen.\""
 
