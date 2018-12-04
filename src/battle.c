@@ -1318,7 +1318,7 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     ++at.fighter->hits;
 
     calculate_attack_type(at, dt, type, missile, &awtype, &attskill, &magic);
-    calculate_defense_type(at, dt, type, missile, &awtype, &attskill);
+    calculate_defense_type(at, dt, type, missile, &dwtype, &defskill);
 
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
