@@ -52,7 +52,7 @@ extern "C" {
     void init_locale(struct locale *lang);
     void init_races(struct locale *lang);
 
-    int forbiddenid(int id);
+    bool forbiddenid(int id);
     int newcontainerid(void);
 
     bool rule_region_owners(void);
