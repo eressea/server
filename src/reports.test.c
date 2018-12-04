@@ -16,6 +16,7 @@
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
+#include "kernel/messages.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
@@ -29,6 +30,7 @@
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
+#include "util/nrmessage.h"
 
 #include "attributes/attributes.h"
 #include "attributes/key.h"
@@ -906,6 +908,46 @@ static void test_visible_unit(CuTest *tc) {
     test_teardown();
 }
 
+static void test_eval_functions(CuTest *tc)
+{
+    message *msg;
+    message_type *mtype;
+    item *items = NULL;
+    char buf[1024];
+    struct locale * lang;
+
+    test_setup();
+    init_resources();
+    test_create_itemtype("stone");
+    test_create_itemtype("iron");
+
+    lang = test_create_locale();
+    locale_setstring(lang, "nr_claims", "$resources($items)");
+    register_reports();
+    mtype = mt_create_va(mt_new("nr_claims", NULL), "items:items", MT_NEW_END);
+    nrt_register(mtype);
+
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "", buf);
+    msg_release(msg);
+
+    i_change(&items, get_resourcetype(R_IRON)->itype, 1);
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "1 Eisen", buf);
+    msg_release(msg);
+
+    i_change(&items, get_resourcetype(R_STONE)->itype, 2);
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "1 Eisen, 2 Steine", buf);
+    msg_release(msg);
+    i_freeall(&items);
+
+    test_teardown();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -936,5 +978,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_insect_warnings);
     SUITE_ADD_TEST(suite, test_newbie_warning);
     SUITE_ADD_TEST(suite, test_visible_unit);
+    SUITE_ADD_TEST(suite, test_eval_functions);
     return suite;
 }
