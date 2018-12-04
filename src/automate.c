@@ -108,7 +108,7 @@ void autostudy_run(scholar scholars[], int nscholars)
         }
         else {
             /* invariant: unit ti can still teach i students */
-            int s, i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
+            int i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
             /* invariant: unit si has n students that can still be taught */
             int s, n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
