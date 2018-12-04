@@ -2426,6 +2426,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - No luxury items
 msgid "stormwinds_reduced"
 msgstr "\"$unit($unit) could only enchant $int($ships) of $int($maxships) ships.\""
 
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The chosen password was too long.\""
+
 msgid "error283"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Your password may only contain alphanumeric symbols.\""
 

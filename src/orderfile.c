@@ -14,6 +14,7 @@
 #include "util/filereader.h"
 #include "util/param.h"
 #include "util/parser.h"
+#include "util/password.h"
 #include "util/order_parser.h"
 
 #include <assert.h>
@@ -127,7 +128,7 @@ static faction *factionorders(void)
     faction *f = findfaction(fid);
 
     if (f != NULL && (f->flags & FFL_NPC) == 0) {
-        char token[128];
+        char token[PASSWORD_MAXSIZE];
         const char *pass = gettoken(token, sizeof(token));
 
         if (!checkpasswd(f, (const char *)pass)) {
@@ -274,7 +275,7 @@ static void handle_unit(void *userData, int no) {
 static void handle_order(void *userData, const char *str) {
     parser_state *state = (parser_state *)userData;
     const char * tok, *input = str;
-    char buffer[16];
+    char buffer[64];
     const struct locale *lang;
     param_t p;
     faction * f = state->f;
