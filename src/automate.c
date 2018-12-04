@@ -110,7 +110,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit ti can still teach i students */
             int s, i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
             /* invariant: unit si has n students that can still be taught */
-            int n = scholars[si].u->number;
+            int s, n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
                 if (i >= n) {
                     /* t has more than enough teaching capacity for s */

@@ -697,23 +697,20 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     return 0;
 }
 
+/**
+ * Effektiver Waffenskill waehrend des Kampfes.
+ */
 static int
-weapon_effskill(troop t, troop enemy, const weapon * w, bool attacking,
-bool missile)
-/* effektiver Waffenskill w�hrend des Kampfes */
+weapon_effskill(troop t, troop enemy, const weapon * w,
+    bool attacking, bool missile)
 {
-    /* In dieser Runde alle die Modifier berechnen, die fig durch die
-     * Waffen bekommt. */
     fighter *tf = t.fighter;
     unit *tu = t.fighter->unit;
-    int skill;
-    const weapon_type *wtype = w ? w->type : NULL;
+    /* Alle Modifier berechnen, die fig durch die Waffen bekommt. */
+    if (w) {
+        int skill = 0;
+        const weapon_type *wtype = w->type;
 
-    if (wtype == NULL) {
-        /* Ohne Waffe: Waffenlose Angriffe */
-        skill = weapon_skill(NULL, tu, attacking);
-    }
-    else {
         if (attacking) {
             skill = w->attackskill;
         }
@@ -745,30 +742,31 @@ bool missile)
                 }
             }
         }
-    }
+        /* Burgenbonus, Pferdebonus */
+        if (is_riding(t) && (wtype == NULL || (fval(wtype, WTF_HORSEBONUS)
+            && !fval(wtype, WTF_MISSILE)))) {
+            skill += CavalryBonus(tu, enemy, BONUS_SKILL);
+        }
 
-    /* Burgenbonus, Pferdebonus */
-    if (is_riding(t) && (wtype == NULL || (fval(wtype, WTF_HORSEBONUS)
-        && !fval(wtype, WTF_MISSILE)))) {
-        skill += CavalryBonus(tu, enemy, BONUS_SKILL);
-    }
+        if (t.index < tf->elvenhorses) {
+            /* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
+             * eleganter, und vor allem einfacher, sonst mu� man noch ein
+             * WMF_ELVENHORSE einbauen. */
+            skill += 2;
+        }
 
-    if (t.index < tf->elvenhorses) {
-        /* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
-         * eleganter, und vor allem einfacher, sonst mu� man noch ein
-         * WMF_ELVENHORSE einbauen. */
-        skill += 2;
+        if (skill > 0 && !attacking && missile) {
+            /*
+             * Wenn ich verteidige, und nicht direkt meinem Feind gegen�berstehe,
+             * halbiert sich mein Skill: (z.B. gegen Fernk�mpfer. Nahk�mpfer
+             * k�nnen mich eh nicht treffen)
+             */
+            skill /= 2;
+        }
+        return skill;
     }
-
-    if (skill > 0 && !attacking && missile) {
-        /*
-         * Wenn ich verteidige, und nicht direkt meinem Feind gegen�berstehe,
-         * halbiert sich mein Skill: (z.B. gegen Fernk�mpfer. Nahk�mpfer
-         * k�nnen mich eh nicht treffen)
-         */
-        skill /= 2;
-    }
-    return skill;
+    /* no weapon: fight weaponless */
+    return weapon_skill(NULL, tu, attacking);
 }
 
 const armor_type *select_armor(troop t, bool shield)
@@ -1318,7 +1316,7 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     ++at.fighter->hits;
 
     calculate_attack_type(at, dt, type, missile, &awtype, &attskill, &magic);
-    calculate_defense_type(at, dt, type, missile, &awtype, &attskill);
+    calculate_defense_type(at, dt, type, missile, &dwtype, &defskill);
 
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
