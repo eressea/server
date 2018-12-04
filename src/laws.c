@@ -2088,34 +2088,33 @@ int email_cmd(unit * u, struct order *ord)
 
 int password_cmd(unit * u, struct order *ord)
 {
-    char pwbuf[32];
+    char pwbuf[PASSWORD_MAXSIZE + 1];
     const char *s;
-    bool pwok = true;
 
     init_order_depr(ord);
+    pwbuf[PASSWORD_MAXSIZE] = '\n';
     s = gettoken(pwbuf, sizeof(pwbuf));
-
-    if (!s || !*s) {
-        int i;
-        for (i = 0; i < 6; i++)
-            pwbuf[i] = (char)(97 + rng_int() % 26);
-        pwbuf[6] = 0;
+    if (pwbuf[PASSWORD_MAXSIZE] == '\0') {
+        cmistake(u, ord, 321, MSG_EVENT);
+        pwbuf[PASSWORD_MAXSIZE - 1] = '\0';
     }
-    else {
-        char *c;
-        for (c = pwbuf; *c && pwok; ++c) {
-            if (!isalnum(*(unsigned char *)c)) {
-                pwok = false;
+
+    if (s && *s) {
+        unsigned char *c = (unsigned char *)pwbuf;
+        int i, r = 0;
+
+        for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
+            if (!isalnum(c[i])) {
+                c[i] = 'X';
+                ++r;
             }
         }
-    }
-    if (!pwok) {
-        cmistake(u, ord, 283, MSG_EVENT);
-        str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
+        if (r != 0) {
+            cmistake(u, ord, 283, MSG_EVENT);
+        }
     }
     faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
-    ADDMSG(&u->faction->msgs, msg_message("changepasswd",
-        "value", pwbuf));
+    ADDMSG(&u->faction->msgs, msg_message("changepasswd", "value", pwbuf));
     u->faction->flags |= FFL_PWMSG;
     return 0;
 }
