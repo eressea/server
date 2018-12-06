@@ -52,6 +52,9 @@ messages = {
 "validate-en": "Validating",
 "validate-de": "Verarbeite",
 
+"noorders-en": "The email contained no recognizable orders.",
+"noorders-de": "Es konnten keine Befehle gefunden werden.",
+
 "faction-en": "Faction",
 "faction-de": "Partei",
 
@@ -183,6 +186,8 @@ for line in lines:
     logfile = open(os.path.join(game_dir, "zug.log"), "a")
     dirname, filename = split_filename(infile)
     msg = messages["validate-"+locale] + " " + infile + "\n\n"
+    if len(results)==0:
+        msg = msg + messages["noorders-"+locale]
     for faction, game_email, success, pwd in results:
         msg = msg + messages["faction-"+locale] + " " + faction + "\n"
         if success: failed = False
