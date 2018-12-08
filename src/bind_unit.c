@@ -22,7 +22,6 @@
 #include "kernel/skills.h"
 #include "kernel/types.h"
 #include <kernel/building.h>
-#include <kernel/config.h>
 #include <kernel/curse.h>
 #include "kernel/equipment.h"
 #include <kernel/faction.h>
@@ -432,37 +431,10 @@ static int tolua_unit_effskill(lua_State * L)
     return 1;
 }
 
-typedef struct fctr_data {
-    unit *target;
-    int fhandle;
-} fctr_data;
-
 typedef struct event {
     struct event_arg *args;
     char *msg;
 } event;
-
-int fctr_handle(struct trigger *tp, void *data)
-{
-    trigger *t = tp;
-    event evt = { 0 };
-    fctr_data *fd = (fctr_data *)t->data.v;
-    lua_State *L = (lua_State *)global.vm_state;
-    unit *u = fd->target;
-
-    evt.args = (event_arg *)data;
-    lua_rawgeti(L, LUA_REGISTRYINDEX, fd->fhandle);
-    tolua_pushusertype(L, u, TOLUA_CAST "unit");
-    tolua_pushusertype(L, &evt, TOLUA_CAST "event");
-    if (lua_pcall(L, 2, 0, 0) != 0) {
-        const char *error = lua_tostring(L, -1);
-        log_error("event (%s): %s\n", unitname(u), error);
-        lua_pop(L, 1);
-        tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
-    }
-
-    return 0;
-}
 
 static int tolua_unit_addnotice(lua_State * L)
 {

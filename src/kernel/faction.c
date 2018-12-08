@@ -168,28 +168,6 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-const unit *random_unit_in_faction(const faction * f)
-{
-    unit *u;
-    int c = 0, u_nr;
-
-    if (!f->units) {
-        return NULL;
-    }
-    for (u = f->units; u; u = u->next)
-        c++;
-
-    u_nr = rng_int() % c;
-    c = 0;
-
-    for (u = f->units; u; u = u->next)
-        if (u_nr == c)
-            return u;
-
-    /* Hier sollte er nie ankommen */
-    return NULL;
-}
-
 const char *factionname(const faction * f)
 {
     typedef char name[OBJECTIDSIZE + 1];

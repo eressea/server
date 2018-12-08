@@ -325,10 +325,10 @@ int log_level(log_t * log, int flags)
 static critbit_tree stats = CRITBIT_TREE();
 
 int stats_count(const char *stat, int delta) {
-    size_t len;
-    char data[128];
     void * match;
     if (cb_find_prefix_str(&stats, stat, &match, 1, 0) == 0) {
+        size_t len;
+        char data[128];
         len = cb_new_kv(stat, strlen(stat), &delta, sizeof(delta), data);
         cb_insert(&stats, data, len);
         return delta;

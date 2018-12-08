@@ -67,7 +67,6 @@ bool terrain_changed(int *cache) {
     return false;
 }
 
-
 void free_terrains(void)
 {
     while (registered_terrains) {

@@ -48,13 +48,12 @@ static int read_seenspells(variant *var, void *owner, struct gamedata *data)
 {
     selist *ql = NULL;
     storage *store = data->store;
-    spell *sp = 0;
     char token[32];
 
     UNUSED_ARG(owner);
     READ_TOK(store, token, sizeof(token));
     while (token[0]) {
-        sp = find_spell(token);
+        spell *sp = find_spell(token);
         if (!sp) {
             log_info("read_seenspells: could not find spell '%s'\n", token);
             return AT_READ_FAIL;
