@@ -1527,7 +1527,7 @@ int read_game(gamedata *data)
     if (data->version < FAMILIAR_FIX_VERSION) {
         fix_familiars(fix_fam_triggers);
     }
-    if (data->version < FAMILIAR_FIXMAGE_VERSION) {
+    if (data->version < FAMILIAR_FIXSPELLBOOK_VERSION) {
         fix_familiars(fix_fam_mage);
     }
 

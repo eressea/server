@@ -40,8 +40,9 @@
 #define FACTION_UID_VERSION 362 /* f->uid contains a database id */
 #define CRYPT_VERSION 363 /* passwords are encrypted */
 #define FAMILIAR_FIXMAGE_VERSION 364 /* familiar links are fixed */
+#define FAMILIAR_FIXSPELLBOOK_VERSION 365 /* familiar links are fixed */
 
-#define RELEASE_VERSION FAMILIAR_FIXMAGE_VERSION /* current datafile */
+#define RELEASE_VERSION FAMILIAR_FIXSPELLBOOK_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
