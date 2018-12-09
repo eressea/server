@@ -2239,7 +2239,6 @@ static void breed_cmd(unit * u, struct order *ord)
     const char *s;
     param_t p;
     region *r = u->region;
-    const resource_type *rtype = NULL;
 
     if (r->land == NULL) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
@@ -2275,7 +2274,7 @@ static void breed_cmd(unit * u, struct order *ord)
         break;
     default:
         if (p != P_ANY) {
-            rtype = findresourcetype(s, u->faction->locale);
+            const resource_type *rtype = findresourcetype(s, u->faction->locale);
             if (rtype == get_resourcetype(R_SEED) || rtype == get_resourcetype(R_MALLORN_SEED)) {
                 breedtrees(u, m);
                 break;

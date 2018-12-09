@@ -272,12 +272,11 @@ static void read_owner(gamedata *data, region_owner ** powner)
 static void write_owner(gamedata *data, region_owner * owner)
 {
     if (owner) {
-        faction *f;
         WRITE_INT(data->store, owner->since_turn);
         if (owner->since_turn >= 0) {
+            faction *f = owner->last_owner;
             WRITE_INT(data->store, owner->morale_turn);
             WRITE_INT(data->store, owner->flags);
-            f = owner->last_owner;
             write_faction_reference((f && f->_alive) ? f : NULL, data->store);
             f = owner->owner;
             write_faction_reference((f && f->_alive) ? f : NULL, data->store);
@@ -887,12 +886,12 @@ int get_spell_level_faction(const spell * sp, void * cbdata)
 }
 
 static char * getpasswd(int fno) {
-    const char *prefix = itoa36(fno);
-    size_t len = strlen(prefix);
     FILE * F = fopen("passwords.txt", "r");
-    char line[80];
     if (F) {
+        const char *prefix = itoa36(fno);
+        size_t len = strlen(prefix);
         while (!feof(F)) {
+            char line[80];
             fgets(line, sizeof(line), F);
             if (line[len] == ':' && strncmp(prefix, line, len) == 0) {
                 size_t slen = strlen(line) - 1;
@@ -1147,7 +1146,7 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
 
 int readgame(const char *filename)
 {
-    int n, stream_version;
+    int n = -2, stream_version;
     char path[PATH_MAX];
     gamedata gdata = { 0 };
     storage store;
@@ -1164,23 +1163,25 @@ int readgame(const char *filename)
         return -1;
     }
     sz = fread(&gdata.version, sizeof(int), 1, F);
-    sz = fread(&stream_version, sizeof(int), 1, F);
-    assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
-    assert(gdata.version >= MIN_VERSION || !"unsupported data format");
-    assert(gdata.version <= MAX_VERSION || !"unsupported data format");
+    if (sz == 1) {
+        sz = fread(&stream_version, sizeof(int), 1, F);
+        assert((sz == 1 && stream_version == STREAM_VERSION) || !"unsupported data format");
+        assert(gdata.version >= MIN_VERSION || !"unsupported data format");
+        assert(gdata.version <= MAX_VERSION || !"unsupported data format");
 
-    fstream_init(&strm, F);
-    binstore_init(&store, &strm);
-    gdata.store = &store;
+        fstream_init(&strm, F);
+        binstore_init(&store, &strm);
+        gdata.store = &store;
 
-    if (gdata.version >= BUILDNO_VERSION) {
-        int build;
-        READ_INT(&store, &build);
-        log_debug("data in %s created with build %d.", filename, build);
+        if (gdata.version >= BUILDNO_VERSION) {
+            int build;
+            READ_INT(&store, &build);
+            log_debug("data in %s created with build %d.", filename, build);
+        }
+        n = read_game(&gdata);
+        binstore_done(&store);
+        fstream_done(&strm);
     }
-    n = read_game(&gdata);
-    binstore_done(&store);
-    fstream_done(&strm);
     return n;
 }
 
@@ -1350,8 +1351,6 @@ int read_game(gamedata *data)
     int p, nread;
     faction *f, **fp;
     region *r;
-    building **bp;
-    ship **shp;
     unit *u;
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
@@ -1407,6 +1406,8 @@ int read_game(gamedata *data)
 
     while (--nread >= 0) {
         unit **up;
+        building **bp;
+        ship **shp;
 
         r = read_region(data);
 

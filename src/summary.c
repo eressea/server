@@ -77,11 +77,12 @@ int *nmrs = NULL;
 
 int update_nmrs(void)
 {
-    int i, newplayers = 0;
+    int newplayers = 0;
     faction *f;
     int timeout = NMRTimeout();
 
     if (timeout>0) {
+        int i;
         if (nmrs == NULL) {
             nmrs = malloc(sizeof(int) * (timeout + 1));
         }

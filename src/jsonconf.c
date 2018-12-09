@@ -1032,12 +1032,14 @@ static int add_po_string(const char *msgid, const char *msgstr, const char *msgc
 }
 
 static int include_po(const char *uri) {
-    char name[PATH_MAX], lname[8];
+    char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
     const char *pos = strstr(filename, ".po");
     if (pos) {
         size_t len;
         const char *str = --pos;
+        char lname[8];
+
         while (str > filename && *str != '.') --str;
         len = (size_t)(pos - str);
         if (len < sizeof(lname)) {
