@@ -1187,7 +1187,7 @@ static void destroy_items(troop dt) {
 
 }
 
-static void calculate_defense_type(troop dt, troop at, int type, bool missile,
+static void calculate_defense_type(troop at, troop dt, int type, bool missile,
     const weapon_type **dwtype, int *defskill) {
   const weapon *weapon;
   weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
@@ -1196,7 +1196,7 @@ static void calculate_defense_type(troop dt, troop at, int type, bool missile,
     *dwtype = weapon->type;
 }
 
-static void calculate_attack_type(troop dt, troop at, int type, bool missile,
+static void calculate_attack_type(troop at, troop dt, int type, bool missile,
     const weapon_type **awtype, int *attskill, bool *magic) {
   const weapon *weapon;
 
