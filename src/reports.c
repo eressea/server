@@ -812,19 +812,14 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
         if (book) {
             selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
-            sbs_strcat(sbp, ". Aura ");
-            sbs_strcat(sbp, str_itoa(get_spellpoints(u)));
-            sbs_strcat(sbp, "/");
-            sbs_strcat(sbp, str_itoa(max_spellpoints(u, NULL)));
+            sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 const spell *sp = spellref_get(&sbe->spref);
                 if (sbe->level <= maxlevel) {
                     if (!header) {
-                        sbs_strcat(sbp, ", ");
-                        sbs_strcat(sbp, LOC(lang, "nr_spells"));
-                        sbs_strcat(sbp, ": ");
+                        sbs_printf(sbp, ", %s: ", LOC(lang, "nr_spells"));
                         header = 1;
                     }
                     else {
@@ -840,9 +835,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, LOC(lang, "nr_combatspells"));
-                sbs_strcat(sbp, ": ");
+                sbs_printf(sbp, ", %s: ", LOC(lang, "nr_combatspells"));
                 dh = 0;
                 for (i = 0; i < MAXCOMBATSPELLS; i++) {
                     const spell *sp;
@@ -857,9 +850,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                         int sl = get_combatspelllevel(u, i);
                         sbs_strcat(sbp, spell_name(sp, lang));
                         if (sl > 0) {
-                            sbs_strcat(sbp, "( ");
-                            sbs_strcat(sbp, str_itoa(sl));
-                            sbs_strcat(sbp, ")");
+                            sbs_printf(sbp, "(%d)", sl);
                         }
                     }
                     else {
