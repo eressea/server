@@ -1607,6 +1607,9 @@ int write_reports(faction * f)
     if (noreports) {
         return false;
     }
+    if (f->lastorders == 0) {
+        faction_genpassword(f);
+    }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));

@@ -776,7 +776,6 @@ void clone_men(const unit * u, unit * dst, int n)
     /* "hat attackiert"-status wird uebergeben */
 
     if (dst) {
-        skill *sv, *sn;
         skill_t sk;
         ship *sh;
 
@@ -784,9 +783,8 @@ void clone_men(const unit * u, unit * dst, int n)
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
             int weeks, level = 0;
-
-            sv = unit_skill(u, sk);
-            sn = unit_skill(dst, sk);
+            skill *sv = unit_skill(u, sk);
+            skill *sn = unit_skill(dst, sk);
 
             if (sv == NULL && sn == NULL)
                 continue;

@@ -874,7 +874,6 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
 }
 
 static void start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
-    const char *flag_names[] = { "opensea", "fly", "nocoast", "speedy", NULL };
     if (xml_strequal(el, "ship")) {
         const XML_Char *name;
 
@@ -917,10 +916,13 @@ static void start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr
                 else if (xml_strequal(attr[i], "storm")) {
                     stype->storm = xml_float(attr[i + 1]);
                 }
-                else if (!handle_flag(&flags, attr + i, flag_names)) {
-                    /* we already handled the name earlier */
-                    if (!xml_strequal(attr[i], "name")) {
-                        handle_bad_input(pi, el, attr[i]);
+                else {
+                    const char *flag_names[] = { "opensea", "fly", "nocoast", "speedy", NULL };
+                    if (!handle_flag(&flags, attr + i, flag_names)) {
+                        /* we already handled the name earlier */
+                        if (!xml_strequal(attr[i], "name")) {
+                            handle_bad_input(pi, el, attr[i]);
+                        }
                     }
                 }
             }
@@ -1209,7 +1211,6 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
 }
 
 static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
-    const char *flag_names[] = { "nodestroy", "nobuild", "unique", "decay", "magic", "namechange", "fort", "oneperturn", NULL };
     if (xml_strequal(el, "building")) {
         const XML_Char *name;
 
@@ -1245,10 +1246,13 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
                     /* magres is specified in percent! */
                     btype->magres = frac_make(xml_int(attr[i + 1]), 100);
                 }
-                else if (!handle_flag(&flags, attr + i, flag_names)) {
-                    /* we already handled the name earlier */
-                    if (!xml_strequal(attr[i], "name")) {
-                        handle_bad_input(pi, el, attr[i]);
+                else {
+                    const char *flag_names[] = { "nodestroy", "nobuild", "unique", "decay", "magic", "namechange", "fort", "oneperturn", NULL };
+                    if (!handle_flag(&flags, attr + i, flag_names)) {
+                        /* we already handled the name earlier */
+                        if (!xml_strequal(attr[i], "name")) {
+                            handle_bad_input(pi, el, attr[i]);
+                        }
                     }
                 }
             }

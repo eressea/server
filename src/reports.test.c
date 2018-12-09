@@ -948,6 +948,28 @@ static void test_eval_functions(CuTest *tc)
     test_teardown();
 }
 
+static void test_reports_genpassword(CuTest *tc) {
+    faction *f;
+    int pwid;
+
+    test_setup();
+    mt_create_va(mt_new("changepasswd", NULL), "value:string", MT_NEW_END);
+    f = test_create_faction(NULL);
+    CuAssertIntEquals(tc, 0, f->lastorders);
+    CuAssertIntEquals(tc, 0, f->password_id);
+    f->options = 0;
+    write_reports(f);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, f->password_id != 0);
+    test_clear_messagelist(&f->msgs);
+    f->lastorders = 1;
+    pwid = f->password_id;
+    write_reports(f);
+    CuAssertIntEquals(tc, pwid, f->password_id);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
+    test_teardown();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -979,5 +1001,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_newbie_warning);
     SUITE_ADD_TEST(suite, test_visible_unit);
     SUITE_ADD_TEST(suite, test_eval_functions);
+    SUITE_ADD_TEST(suite, test_reports_genpassword);
     return suite;
 }
