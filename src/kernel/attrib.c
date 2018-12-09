@@ -185,15 +185,15 @@ void at_register(attrib_type * at)
 
 static attrib_type *at_find_key(unsigned int hk)
 {
-    const char *translate[3][2] = {
-        { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-        { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
-        { NULL, NULL }
-    };
     attrib_type *find = at_hash[hk % MAXATHASH];
     while (find && hk != find->hashkey)
         find = find->nexthash;
     if (!find) {
+        const char *translate[3][2] = {
+            { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
+            { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
+            { NULL, NULL }
+        };
         int i = 0;
         while (translate[i][0]) {
             if (__at_hashkey(translate[i][0]) == hk)

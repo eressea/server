@@ -108,11 +108,11 @@ static const char * valid_keys[] = {
 
 static dictionary *parse_config(const char *filename)
 {
-    char path[PATH_MAX];
     dictionary *d;
     const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
+        char path[PATH_MAX];
         path_join(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
         d = iniparser_load(path);

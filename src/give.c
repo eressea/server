@@ -169,7 +169,6 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
         if (config_changed(&config)) {
             divisor = config_get_int("rules.items.give_divisor", divisor);
         }
-        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
             return n / divisor;

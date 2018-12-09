@@ -3388,8 +3388,8 @@ int pay_cmd(unit * u, struct order *ord)
 
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
-    char token[128];
     if (u->number > 0) {
+        char token[128];
         int use, count, para;
         const item_type *itype;
         const char *s;
