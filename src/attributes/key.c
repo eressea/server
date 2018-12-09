@@ -260,6 +260,7 @@ static int *keys_update(int *base, int key, int val)
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
                 base = realloc(base, (sz * 2 + 1) * sizeof(int));
+                if (!base) abort();
                 kv = base + diff;
             }
             base[0] = n + 1;
