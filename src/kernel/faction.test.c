@@ -110,7 +110,7 @@ static void test_addfaction(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     lang = test_create_locale();
-    f = addfaction("test@eressea.de", NULL, rc, lang);
+    f = addfaction("test@example.com", NULL, rc, lang);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);
@@ -119,14 +119,14 @@ static void test_addfaction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)f->spellbook);
     CuAssertPtrEquals(tc, NULL, (void *)f->origin);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
-    CuAssertStrEquals(tc, "test@eressea.de", f->email);
+    CuAssertStrEquals(tc, "test@example.com", f->email);
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, FFL_ISNEW|FFL_PWMSG, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
     CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
-    CuAssertIntEquals(tc, turn, f->lastorders);
+    CuAssertIntEquals(tc, 0, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     test_teardown();
 }
