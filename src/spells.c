@@ -2346,7 +2346,6 @@ static int sp_earthquake(castorder * co)
 static void patzer_peasantmob(const castorder * co)
 {
     unit *u;
-    attrib *a;
     region *r;
     unit *mage = co_get_magician(co);
     r = mage->region->land ? mage->region : co_get_region(co);
@@ -2355,6 +2354,7 @@ static void patzer_peasantmob(const castorder * co)
         faction *f = get_monsters();
         const struct locale *lang = f->locale;
         message *msg;
+        attrib *a;
         int anteil, n;
 
         anteil = 6 + rng_int() % 4;
@@ -2410,7 +2410,6 @@ static void patzer_peasantmob(const castorder * co)
 static int sp_forest_fire(castorder * co)
 {
     unit *u;
-    region *nr;
     direction_t i;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -2442,7 +2441,7 @@ static int sp_forest_fire(castorder * co)
     msg_release(msg);
 
     for (i = 0; i < MAXDIRECTIONS; i++) {
-        nr = rconnect(r, i);
+        region *nr = rconnect(r, i);
         assert(nr);
         destroyed = 0;
         vernichtet_schoesslinge = 0;
@@ -5629,7 +5628,6 @@ int sp_disruptastral(castorder * co)
         attrib *a;
         double effect;
         region *r2 = rl2->data;
-        spec_direction *sd;
         int inhab_regions = 0;
         region_list *trl = NULL;
 
@@ -5649,7 +5647,7 @@ int sp_disruptastral(castorder * co)
 
         while (a != NULL && a->type == &at_direction) {
             attrib *a2 = a->next;
-            sd = (spec_direction *)(a->data.v);
+            spec_direction *sd = (spec_direction *)(a->data.v);
             if (sd->duration != -1)
                 a_remove(&r->attribs, a);
             a = a2;
@@ -6161,7 +6159,6 @@ int sp_speed2(castorder * co)
  */
 int sp_break_curse(castorder * co)
 {
-    attrib **ap;
     int obj;
     curse *c;
     region *r = co_get_region(co);
@@ -6169,7 +6166,6 @@ int sp_break_curse(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
-    const char *ts = NULL;
 
     if (pa->length < 2) {
         /* Das Zielobjekt wurde vergessen */
@@ -6186,6 +6182,8 @@ int sp_break_curse(castorder * co)
             "unit region command", mage, mage->region, co->order));
     }
     else {
+        const char *ts = NULL;
+        attrib **ap;
         switch (obj) {
         case SPP_REGION:
             ap = &r->attribs;
