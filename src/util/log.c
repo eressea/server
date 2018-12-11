@@ -205,15 +205,17 @@ log_t *log_to_file(int flags, FILE *out) {
     return log_create(flags, out, log_stdio);
 }
 
-#ifdef _MSC_VER
-/* https://social.msdn.microsoft.com/Forums/vstudio/en-US/53a4fd75-9f97-48b2-aa63-2e2e5a15efa3/stdcversion-problem?forum=vclanguage */
-#define VA_COPY(c, a) va_copy(c, a)
-#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-/* GNU only: https://www.gnu.org/software/libc/manual/html_node/Argument-Macros.html */
-#define VA_COPY(c, a) __va_copy(c, a)
-#else
-#define VA_COPY(c, a) va_copy(c, a)
-#endif
+/*
+ * Notes for va_copy compatibility:
+ * MSVC: https://social.msdn.microsoft.com/Forums/vstudio/en-US/53a4fd75-9f97-48b2-aa63-2e2e5a15efa3/stdcversion-problem?forum=vclanguage
+ * GNU: https://www.gnu.org/software/libc/manual/html_node/Argument-Macros.html
+ */
+static void vlog(log_t *lg, int level, const char *format, va_list args) {
+    va_list copy;
+    va_copy(copy, args);
+    lg->log(lg->data, level, NULL, format, copy);
+    va_end(copy);
+}
 
 static void log_write(int flags, const char *module, const char *format, va_list args) {
     log_t *lg;
@@ -225,10 +227,7 @@ static void log_write(int flags, const char *module, const char *format, va_list
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
-                va_list copy;
-                VA_COPY(copy, args);
-                lg->log(lg->data, level, NULL, format, copy);
-                va_end(copy);
+                vlog(lg, level, format, args);
             }
         }
     }
