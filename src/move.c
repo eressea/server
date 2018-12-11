@@ -637,6 +637,7 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
     unit **iunit = &from->units;
     unit **ulist = &to->units;
 
+    assert(sh);
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
         sh->region = to;
@@ -1676,10 +1677,9 @@ static bool ship_ready(const region * r, unit * u, order * ord)
 unit *owner_buildingtyp(const region * r, const building_type * bt)
 {
     building *b;
-    unit *owner;
 
     for (b = rbuildings(r); b; b = b->next) {
-        owner = building_owner(b);
+        unit *owner = building_owner(b);
         if (b->type == bt && owner != NULL) {
             if (building_finished(b)) {
                 return owner;
@@ -1971,7 +1971,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         /* Hafengebühren ? */
 
         harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
-        if (sh && harbourmaster != NULL) {
+        if (harbourmaster != NULL) {
             item *itm;
             unit *u2;
             item *trans = NULL;

@@ -2090,7 +2090,7 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->sp = sp;
     co->level = lev;
     co->force = MagicPower(force);
-    co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : 0));
+    co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : NULL));
     co->distance = range;
     co->order = copy_order(ord);
     co->par = p;
