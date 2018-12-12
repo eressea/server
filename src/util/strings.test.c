@@ -133,25 +133,41 @@ static void test_str_strlcpy(CuTest * tc)
     errno = 0;
 }
 
+static void test_str_itoa(CuTest * tc)
+{
+    CuAssertStrEquals(tc, "1234", str_itoa(1234));
+    CuAssertStrEquals(tc, "0", str_itoa(0));
+    CuAssertStrEquals(tc, "1234567890", str_itoa(1234567890));
+    CuAssertStrEquals(tc, "-1234567890", str_itoa(-1234567890));
+}
+
 static void test_sbstring(CuTest * tc)
 {
     char buffer[16];
     sbstring sbs;
     sbs_init(&sbs, buffer, sizeof(buffer));
     CuAssertStrEquals(tc, "", sbs.begin);
-    sbs_strcpy(&sbs, "Hodor");
+    sbs_strcat(&sbs, "Hodor");
     CuAssertStrEquals(tc, "Hodor", sbs.begin);
     sbs_strcat(&sbs, "Hodor");
     CuAssertStrEquals(tc, "HodorHodor", sbs.begin);
-    sbs_strcpy(&sbs, "Hodor");
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "Hodor");
     CuAssertStrEquals(tc, "Hodor", sbs.begin);
-    sbs_strcpy(&sbs, "12345678901234567890");
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
     CuAssertPtrEquals(tc, sbs.begin + sbs.size - 1, sbs.end);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
     sbs_strcat(&sbs, "12345678901234567890");
     CuAssertStrEquals(tc, "123456789012345", sbs.begin);
     CuAssertPtrEquals(tc, buffer, sbs.begin);
-    sbs_strcpy(&sbs, "1234567890");
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "1234567890");
     CuAssertStrEquals(tc, "1234567890", sbs.begin);
     sbs_strncat(&sbs, "1234567890", 4);
     CuAssertStrEquals(tc, "12345678901234", sbs.begin);
@@ -194,36 +210,65 @@ static void test_sbs_substr(CuTest * tc)
 
     buffer[9] = 'A';
     sbs_init(&sbs, buffer, sizeof(buffer));
-    sbs_strcpy(&sbs, "12345678");
+    sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 0, 4);
     CuAssertStrEquals(tc, "1234", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
-    sbs_strcpy(&sbs, "12345678");
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 4);
     CuAssertStrEquals(tc, "5678", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
-    sbs_strcpy(&sbs, "12345678");
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 2, 4);
     CuAssertStrEquals(tc, "3456", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
-    sbs_strcpy(&sbs, "12345678");
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 4);
     CuAssertStrEquals(tc, "5678", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
 
-    sbs_strcpy(&sbs, "12345678");
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_strcat(&sbs, "12345678");
     CuAssertStrEquals(tc, "12345678", buffer);
     sbs_substr(&sbs, 4, 8);
     CuAssertStrEquals(tc, "5678", buffer);
     CuAssertIntEquals(tc, 4, (int)sbs_length(&sbs));
     CuAssertIntEquals(tc, 'A', buffer[9]);
+}
+
+static void test_sbs_printf(CuTest * tc)
+{
+    char buffer[10];
+    sbstring sbs;
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s %d", "1234", 5678);
+    CuAssertStrEquals(tc, "1234 5678", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s", "12345");
+    sbs_printf(&sbs, "%d", 6789);
+    CuAssertStrEquals(tc, "123456789", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%s", "1234567890");
+    CuAssertStrEquals(tc, "123456789", buffer);
+
+    sbs_init(&sbs, buffer, sizeof(buffer));
+    sbs_printf(&sbs, "%d", 123456789);
+    CuAssertStrEquals(tc, "123456789", buffer);
+    sbs_printf(&sbs, "%s", "Hodor");
+    CuAssertStrEquals(tc, "123456789", buffer);
 }
 
 CuSuite *get_strings_suite(void)
@@ -237,8 +282,10 @@ CuSuite *get_strings_suite(void)
     SUITE_ADD_TEST(suite, test_str_slprintf);
     SUITE_ADD_TEST(suite, test_str_strlcat);
     SUITE_ADD_TEST(suite, test_str_strlcpy);
+    SUITE_ADD_TEST(suite, test_str_itoa);
     SUITE_ADD_TEST(suite, test_sbstring);
     SUITE_ADD_TEST(suite, test_sbs_strcat);
     SUITE_ADD_TEST(suite, test_sbs_substr);
+    SUITE_ADD_TEST(suite, test_sbs_printf);
     return suite;
 }

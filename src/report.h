@@ -35,6 +35,7 @@ extern "C" {
     void report_region(struct stream *out, const struct region * r, struct faction * f);
     void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct allies * allies, const char *prefix);
     void pump_paragraph(struct sbstring *sbp, struct stream *out, size_t maxlen, bool isfinal);
+    void paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_indent, char marker);
 
     void nr_spell_syntax(char *buf, size_t size, struct spellbook_entry * sbe, const struct locale *lang);
     void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);

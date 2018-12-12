@@ -28,6 +28,7 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
+#include "prefix.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"
@@ -50,9 +51,10 @@ void game_done(void)
     calendar_cleanup();
     free_functions();
     free_config();
-    free_special_directions();
     free_locales();
 #endif
+    free_prefixes();
+    free_special_directions();
     kernel_done();
     swapdb_close();
 }

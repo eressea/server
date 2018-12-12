@@ -2,6 +2,7 @@
 #include "messages.h"
 
 #include "unit.h"
+#include "faction.h"
 #include "order.h"
 
 #include <CuTest.h>
@@ -25,10 +26,13 @@ void test_missing_message(CuTest *tc) {
 
 void test_missing_feedback(CuTest *tc) {
     message *msg;
+    unit *u;
 
     test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->thisorder = create_order(K_ENTERTAIN, u->faction->locale, NULL);
     message_handle_missing(MESSAGE_MISSING_REPLACE);
-    msg = msg_error(NULL, NULL, 77);
+    msg = msg_error(u, NULL, 77);
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
     CuAssertStrEquals(tc, msg->type->name, "missing_feedback");
@@ -113,6 +117,7 @@ static void test_noerror(CuTest *tc) {
 CuSuite *get_messages_suite(void) {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_missing_message);
+    SUITE_ADD_TEST(suite, test_missing_feedback);
     SUITE_ADD_TEST(suite, test_merge_split);
     SUITE_ADD_TEST(suite, test_message);
     SUITE_ADD_TEST(suite, test_noerror);

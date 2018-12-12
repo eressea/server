@@ -148,6 +148,9 @@ const char *section_add(const char *name) {
         }
     }
     assert(i < MAXSECTIONS);
+    if (i == MAXSECTIONS) {
+        return NULL;
+    }
     assert(sections[i] == NULL);
     if (i + 1 < MAXSECTIONS) {
         sections[i + 1] = NULL;

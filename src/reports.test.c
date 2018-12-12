@@ -16,6 +16,7 @@
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
+#include "kernel/messages.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
@@ -29,6 +30,7 @@
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
+#include "util/nrmessage.h"
 
 #include "attributes/attributes.h"
 #include "attributes/key.h"
@@ -599,14 +601,14 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     f = test_create_faction(NULL);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
-    r3 = test_create_region(2, 0, t_ocean);
+    test_create_region(2, 0, t_ocean);
     r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
-    u = test_create_unit(f, r1);
+    test_create_unit(f, r1);
     u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
@@ -906,6 +908,68 @@ static void test_visible_unit(CuTest *tc) {
     test_teardown();
 }
 
+static void test_eval_functions(CuTest *tc)
+{
+    message *msg;
+    message_type *mtype;
+    item *items = NULL;
+    char buf[1024];
+    struct locale * lang;
+
+    test_setup();
+    init_resources();
+    test_create_itemtype("stone");
+    test_create_itemtype("iron");
+
+    lang = test_create_locale();
+    locale_setstring(lang, "nr_claims", "$resources($items)");
+    register_reports();
+    mtype = mt_create_va(mt_new("nr_claims", NULL), "items:items", MT_NEW_END);
+    nrt_register(mtype);
+
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "", buf);
+    msg_release(msg);
+
+    i_change(&items, get_resourcetype(R_IRON)->itype, 1);
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "1 Eisen", buf);
+    msg_release(msg);
+
+    i_change(&items, get_resourcetype(R_STONE)->itype, 2);
+    msg = msg_message("nr_claims", "items", items);
+    nr_render(msg, lang, buf, sizeof(buf), NULL);
+    CuAssertStrEquals(tc, "1 Eisen, 2 Steine", buf);
+    msg_release(msg);
+    i_freeall(&items);
+
+    test_teardown();
+}
+
+static void test_reports_genpassword(CuTest *tc) {
+    faction *f;
+    int pwid;
+
+    test_setup();
+    mt_create_va(mt_new("changepasswd", NULL), "value:string", MT_NEW_END);
+    f = test_create_faction(NULL);
+    CuAssertIntEquals(tc, 0, f->lastorders);
+    CuAssertIntEquals(tc, 0, f->password_id);
+    f->options = 0;
+    write_reports(f);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, f->password_id != 0);
+    test_clear_messagelist(&f->msgs);
+    f->lastorders = 1;
+    pwid = f->password_id;
+    write_reports(f);
+    CuAssertIntEquals(tc, pwid, f->password_id);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
+    test_teardown();
+}
+
 CuSuite *get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -936,5 +1000,7 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_insect_warnings);
     SUITE_ADD_TEST(suite, test_newbie_warning);
     SUITE_ADD_TEST(suite, test_visible_unit);
+    SUITE_ADD_TEST(suite, test_eval_functions);
+    SUITE_ADD_TEST(suite, test_reports_genpassword);
     return suite;
 }

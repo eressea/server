@@ -379,11 +379,66 @@ static void test_write_spell_syntax(CuTest *tc) {
     test_teardown();
 }
 
+static void test_paragraph(CuTest *tc) {
+    const char *toolong = "im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "im Westen das Hochland von Geraldin (93,-303).\n";
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    paragraph(&out, toolong, 0, 0, 0);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
+static void test_paragraph_break(CuTest *tc) {
+    const char *toolong = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin\n(93,-303).\n";
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    paragraph(&out, toolong, 0, 0, 0);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
+static void test_pump_paragraph_toolong(CuTest *tc) {
+    const char *toolong = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin\n(93,-303).\n";
+    sbstring sbs;
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    sbs_init(&sbs, buf, sizeof(buf));
+    sbs_strcat(&sbs, toolong);
+
+    pump_paragraph(&sbs, &out, 78, true);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
 CuSuite *get_report_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_write_spaces);
     SUITE_ADD_TEST(suite, test_write_many_spaces);
+    SUITE_ADD_TEST(suite, test_paragraph);
+    SUITE_ADD_TEST(suite, test_paragraph_break);
+    SUITE_ADD_TEST(suite, test_pump_paragraph_toolong);
     SUITE_ADD_TEST(suite, test_report_travelthru);
     SUITE_ADD_TEST(suite, test_report_region);
     SUITE_ADD_TEST(suite, test_report_allies);

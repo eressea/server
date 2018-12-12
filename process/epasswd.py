@@ -69,7 +69,7 @@ class EPasswd:
     def check(self, id, passwd):
         pw = self.get_passwd(id)
         if pw[0:4]=='$2a$' or pw[0:4]=='$2y$':
-            return bcrypt.checkpw(passwd, pw)
+            return bcrypt.checkpw(passwd.encode('utf8'), pw.encode('utf8'))
         return pw == passwd
 
     def get_passwd(self, id):

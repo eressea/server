@@ -18,7 +18,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #ifdef _MSC_VER
 #include <platform.h>
-#define HAVE__ITOA
+#undef HAVE__ITOA
 #endif
 #include "strings.h"
 
@@ -35,27 +35,23 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <string.h>
 #endif
 
-const char* str_itoab(int val, int base)
+const char* str_itoa_r(int val, char *buf)
 {
-    static char buf[32] = { 0 };
-#ifdef HAVE__ITOAB
-    return _itoa(val, buf, base);
+#ifdef HAVE__ITOA
+    return _itoa(val, buf, 10);
 #else
-    int i = 30;
-    for (; val && i; --i, val /= base) {
-        buf[i] = "0123456789abcdefghijklmnopqrstuvwxyz"[val % base];
-    }
-    return &buf[i + 1];
+    snprintf(buf, 12, "%d", val);
+    return buf;
 #endif
 }
 
 const char *str_itoa(int n)
 {
+    static char buf[12];
 #ifdef HAVE__ITOA
-    static char buf[32] = { 0 };
     return _itoa(n, buf, 10);
 #else
-    return str_itoab(n, 10);
+    return str_itoa_r(n, buf);
 #endif
 }
 
@@ -181,49 +177,6 @@ int str_hash(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *str_escape_wrong(const char *str, char *buffer, size_t len)
-{
-    const char *handle_start = strchr(str, '\"');
-    if (!handle_start) handle_start = strchr(str, '\\');
-    assert(buffer);
-    if (handle_start) {
-        const char *p = str;
-        char *o = buffer;
-        size_t skip = handle_start - str;
-
-        if (skip > len) {
-            skip = len;
-        }
-        if (skip > 0) {
-            memcpy(buffer, str, skip);
-            o += skip;
-            p += skip;
-            len -= skip;
-        }
-        do {
-            if (*p == '\"' || *p == '\\') {
-                if (len < 2) {
-                    break;
-                }
-                (*o++) = '\\';
-                len -= 2;
-            }
-            else {
-                if (len < 1) {
-                    break;
-                }
-                --len;
-            }
-            if (len > 0) {
-                (*o++) = (*p);
-            }
-        } while (len > 0 && *p++);
-        *o = '\0';
-        return buffer;
-    }
-    return str;
-}
-
 unsigned int jenkins_hash(unsigned int a)
 {
     a = (a + 0x7ed55d16) + (a << 12);
@@ -258,6 +211,26 @@ char *str_strdup(const char *s) {
     memcpy(dup, s, len+1);
     return dup;
 #endif
+}
+
+void sbs_printf(struct sbstring *sbs, const char *format, ...)
+{
+    size_t size = sbs->size - (sbs->end - sbs->begin);
+
+    if (size > 0) {
+        va_list argp;
+        va_start(argp, format);
+        int bytes = vsnprintf(sbs->end, size, format, argp);
+        if (bytes > 0) {
+            if ((size_t)bytes >= size) {
+                bytes = size - 1;
+                /* terminate truncated output */
+                sbs->end[bytes] = '\0';
+            }
+            sbs->end += bytes;
+        }
+        va_end(argp);
+    }
 }
 
 void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
@@ -300,16 +273,6 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     len = sbs->size - (sbs->end - sbs->begin);
     str_strlcpy(sbs->end, str, len);
     sbs->end += strlen(sbs->end);
-    assert(sbs->begin + sbs->size >= sbs->end);
-}
-
-void sbs_strcpy(struct sbstring *sbs, const char *str)
-{
-    size_t len = str_strlcpy(sbs->begin, str, sbs->size);
-    if (len >= sbs->size) {
-        len = sbs->size - 1;
-    }
-    sbs->end = sbs->begin + len;
     assert(sbs->begin + sbs->size >= sbs->end);
 }
 

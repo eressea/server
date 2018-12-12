@@ -52,13 +52,13 @@ keyword_t findkeyword(const char *s) {
 
 keyword_t get_keyword(const char *s, const struct locale *lang) {
     keyword_t result = NOKEYWORD;
-    char buffer[64];
 
     assert(lang);
     assert(s);
     while (*s == '@') ++s;
 
     if (*s) {
+        char buffer[64];
         char *str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
 
         if (str) {
@@ -86,6 +86,11 @@ void enable_keyword(keyword_t kwd, bool enabled) {
 bool keyword_disabled(keyword_t kwd) {
     assert(kwd < MAXKEYWORDS);
     return disabled_kwd[kwd];
+}
+
+const char *keyword_name(keyword_t kwd, const struct locale *lang)
+{
+    return LOC(lang, mkname("keyword", keywords[kwd]));
 }
 
 const char *keywords[MAXKEYWORDS] = {

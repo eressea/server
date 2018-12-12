@@ -154,8 +154,11 @@ bool IsImmune(const faction * f)
 
 int NMRTimeout(void)
 {
-    int nmr_timeout = config_get_int("nmr.timeout", 0);
-    int ini_timeout = config_get_int("game.maxnmr", 0);
+    static int config, nmr_timeout, ini_timeout;
+    if (config_changed(&config)) {
+        nmr_timeout = config_get_int("nmr.timeout", 0);
+        ini_timeout = config_get_int("game.maxnmr", 0);
+    }
     if (nmr_timeout > 0) {
         if (ini_timeout > nmr_timeout) {
             return nmr_timeout;
@@ -1192,17 +1195,26 @@ void do_enter(struct region *r, bool is_final_attempt)
 int dropouts[2];
 int *age = NULL;
 
-static void nmr_death(faction * f)
+bool nmr_death(const faction * f, int turn, int timeout)
 {
-    int rule = config_get_int("rules.nmr.destroy", 0) != 0;
-    if (rule) {
-        unit *u;
-        for (u = f->units; u; u = u->nextF) {
-            if (u->building && building_owner(u->building) == u) {
-                remove_building(&u->region->buildings, u->building);
+    if (f->age >= timeout && turn - f->lastorders >= timeout) {
+        static bool rule_destroy;
+        static int config;
+        
+        if (config_changed(&config)) {
+            rule_destroy = config_get_int("rules.nmr.destroy", 0) != 0;
+        }
+        if (rule_destroy) {
+            unit *u;
+            for (u = f->units; u; u = u->nextF) {
+                if (u->building && building_owner(u->building) == u) {
+                    remove_building(&u->region->buildings, u->building);
+                }
             }
         }
+        return true;
     }
+    return false;
 }
 
 static void remove_idle_players(void)
@@ -1215,8 +1227,7 @@ static void remove_idle_players(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
 
-        if (timeout > 0 && turn - f->lastorders >= timeout) {
-            nmr_death(f);
+        if (timeout > 0 && nmr_death(f, turn, timeout)) {
             destroyfaction(fp);
         } else {
             if (fval(f, FFL_NOIDLEOUT)) {
@@ -2088,34 +2099,33 @@ int email_cmd(unit * u, struct order *ord)
 
 int password_cmd(unit * u, struct order *ord)
 {
-    char pwbuf[32];
+    char pwbuf[PASSWORD_MAXSIZE + 1];
     const char *s;
-    bool pwok = true;
 
     init_order_depr(ord);
+    pwbuf[PASSWORD_MAXSIZE] = '\n';
     s = gettoken(pwbuf, sizeof(pwbuf));
-
-    if (!s || !*s) {
-        int i;
-        for (i = 0; i < 6; i++)
-            pwbuf[i] = (char)(97 + rng_int() % 26);
-        pwbuf[6] = 0;
+    if (pwbuf[PASSWORD_MAXSIZE] == '\0') {
+        cmistake(u, ord, 321, MSG_EVENT);
+        pwbuf[PASSWORD_MAXSIZE - 1] = '\0';
     }
-    else {
-        char *c;
-        for (c = pwbuf; *c && pwok; ++c) {
-            if (!isalnum(*(unsigned char *)c)) {
-                pwok = false;
+
+    if (s && *s) {
+        unsigned char *c = (unsigned char *)pwbuf;
+        int i, r = 0;
+
+        for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
+            if (!isalnum(c[i])) {
+                c[i] = 'X';
+                ++r;
             }
         }
-    }
-    if (!pwok) {
-        cmistake(u, ord, 283, MSG_EVENT);
-        str_strlcpy(pwbuf, itoa36(rng_int()), sizeof(pwbuf));
+        if (r != 0) {
+            cmistake(u, ord, 283, MSG_EVENT);
+        }
     }
     faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
-    ADDMSG(&u->faction->msgs, msg_message("changepasswd",
-        "value", pwbuf));
+    ADDMSG(&u->faction->msgs, msg_message("changepasswd", "value", pwbuf));
     u->faction->flags |= FFL_PWMSG;
     return 0;
 }
@@ -3339,7 +3349,6 @@ int pay_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 6, MSG_EVENT);
     }
     else {
-        building *b = NULL;
         param_t p;
         int id;
 
@@ -3355,13 +3364,12 @@ int pay_cmd(unit * u, struct order *ord)
             }
             else {
                 /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
-                if (id == 0 || id == u->building->no)
-                {
+                if (id == 0 || id == u->building->no) {
                     u->building->flags |= BLD_DONTPAY;
                 }
                 else {
                     /* Find the building that matches to the given id*/
-                    b = findbuilding(id);
+                    building *b = findbuilding(id);
                     /* If there is a building and it is in the same region as the unit continue, else: error */
                     if (b && b->region == u->region)
                     {
@@ -3391,8 +3399,8 @@ int pay_cmd(unit * u, struct order *ord)
 
 static int reserve_i(unit * u, struct order *ord, int flags)
 {
-    char token[128];
     if (u->number > 0) {
+        char token[128];
         int use, count, para;
         const item_type *itype;
         const char *s;
@@ -3426,10 +3434,7 @@ static int reserve_i(unit * u, struct order *ord, int flags)
 }
 
 int reserve_cmd(unit * u, struct order *ord) {
-    if ((u_race(u)->ec_flags & ECF_GETITEM)) {
-        return reserve_i(u, ord, GET_DEFAULT);
-    }
-    return 0;
+    return reserve_i(u, ord, GET_DEFAULT);
 }
 
 int reserve_self(unit * u, struct order *ord) {

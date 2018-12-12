@@ -1065,10 +1065,9 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            faction *f;
-            const char *password = player->password ? player->password : itoa36(rng_int());
-            addplayer(r, f = addfaction(player->email, password,
-                                        player->race, player->lang));
+            faction *f = addfaction(player->email, player->password,
+                player->race, player->lang);
+            addplayer(r, f);
         }
     }
 }

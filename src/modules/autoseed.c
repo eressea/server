@@ -549,15 +549,13 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             newfaction **nfp, *nextf = *players;
             faction *f;
             unit *u;
-            const char * password;
 
             isize += REGIONS_PER_FACTION;
             terraform_region(r, preferred_terrain(nextf->race));
             prepare_starting_region(r);
             ++tsize;
             assert(r->land && r->units == 0);
-            password = nextf->password ? nextf->password : itoa36(rng_int());
-            u = addplayer(r, addfaction(nextf->email, password, nextf->race,
+            u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
                 nextf->lang));
             f = u->faction;
             fset(f, FFL_ISNEW);
@@ -857,8 +855,7 @@ static void starting_region(newfaction ** players, region * r, region * rn[])
         newfaction *nf = *players;
         const struct race *rc = nf->race ? nf->race : races;
         const struct locale *lang = nf->lang ? nf->lang : default_locale;
-        const char * passwd = nf->password ? nf->password : itoa36(rng_int());
-        addplayer(r, addfaction(nf->email, passwd, rc, lang));
+        addplayer(r, addfaction(nf->email, nf->password, rc, lang));
         *players = nf->next;
         free_newfaction(nf);
     }

@@ -14,6 +14,7 @@
 #include "util/filereader.h"
 #include "util/param.h"
 #include "util/parser.h"
+#include "util/password.h"
 #include "util/order_parser.h"
 
 #include <assert.h>
@@ -22,7 +23,7 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if (u->flags & UFL_ORDERS) {
+    if ((u->flags & UFL_ORDERS) == 0) {
         order **ordp;
         /* alle wiederholbaren, langen befehle werden gesichert: */
         u->flags |= UFL_ORDERS;
@@ -47,13 +48,12 @@ static void begin_orders(unit *u) {
     u->orders = NULL;
 }
 
-static unit *unitorders(input *in, faction *f)
+static void unitorders(input *in, faction *f)
 {
     int i;
     unit *u;
 
-    if (!f)
-        return NULL;
+    assert(f);
 
     i = getid();
     u = findunit(i);
@@ -120,10 +120,6 @@ static unit *unitorders(input *in, faction *f)
         }
 
     }
-    else {
-        return NULL;
-    }
-    return u;
 }
 
 static faction *factionorders(void)
@@ -132,7 +128,7 @@ static faction *factionorders(void)
     faction *f = findfaction(fid);
 
     if (f != NULL && (f->flags & FFL_NPC) == 0) {
-        char token[128];
+        char token[PASSWORD_MAXSIZE];
         const char *pass = gettoken(token, sizeof(token));
 
         if (!checkpasswd(f, (const char *)pass)) {
@@ -189,7 +185,8 @@ int read_orders(input *in)
             * vermerkt. */
 
         case P_UNIT:
-            if (!f || !unitorders(in, f)) {
+            if (f) {
+                unitorders(in, f);
                 do {
                     b = in->getbuf(in->data);
                     if (!b) {
@@ -278,7 +275,7 @@ static void handle_unit(void *userData, int no) {
 static void handle_order(void *userData, const char *str) {
     parser_state *state = (parser_state *)userData;
     const char * tok, *input = str;
-    char buffer[16];
+    char buffer[64];
     const struct locale *lang;
     param_t p;
     faction * f = state->f;

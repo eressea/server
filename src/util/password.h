@@ -6,6 +6,7 @@ typedef enum cryptalgo_t {
     PASSWORD_BCRYPT
 } cryptalgo_t;
 #define PASSWORD_DEFAULT PASSWORD_BCRYPT
+#define PASSWORD_MAXSIZE 32
 
 extern int bcrypt_workfactor;
 

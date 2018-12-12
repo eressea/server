@@ -240,15 +240,6 @@ race_list *get_familiarraces(void)
     return familiarraces;
 }
 
-void racelist_clear(struct race_list **rl)
-{
-    while (*rl) {
-        race_list *rl2 = (*rl)->next;
-        free(*rl);
-        *rl = rl2;
-    }
-}
-
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
     race_list *rl2 = (race_list *)malloc(sizeof(race_list));
@@ -546,7 +537,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
         char ch[2];
 
         sbs_init(&sbs, lbuf, sizeof(lbuf));
-        sbs_strcpy(&sbs, LOC(loc, mkname("prefix", prefix)));
+        sbs_strcat(&sbs, LOC(loc, mkname("prefix", prefix)));
 
         str = LOC(loc, rc_name_s(rc, u->number != 1));
         assert(~str[0] & 0x80 || !"unicode/not implemented");

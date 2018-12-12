@@ -121,7 +121,7 @@ static int read_keyval_orig(gamedata *data, int *keys, int n) {
 #endif
 
 static int a_readkeys(variant *var, void *owner, gamedata *data) {
-    int i, n, ksn, *keys;
+    int n, ksn, *keys;
 
     READ_INT(data->store, &n);
     assert(n < 4096 && n >= 0);
@@ -155,7 +155,7 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
     }
     keys[0] = n;
     if (data->version < SORTKEYS_VERSION) {
-        int e = 1;
+        int i, e = 1;
         for (i = 1; i != n; ++i) {
             int k = keys[i * 2 + 1];
             int v = keys[i * 2 + 2];
@@ -260,6 +260,7 @@ static int *keys_update(int *base, int key, int val)
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
                 base = realloc(base, (sz * 2 + 1) * sizeof(int));
+                if (!base) abort();
                 kv = base + diff;
             }
             base[0] = n + 1;

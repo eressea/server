@@ -357,8 +357,6 @@ int sp_sleep(struct castorder * co)
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    unit *du;
-    troop dt;
     int force, enemies;
     int k = 0;
     message *m;
@@ -374,7 +372,8 @@ int sp_sleep(struct castorder * co)
         return 0;
     }
     while (force && enemies) {
-        dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+        unit *du;
+        troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
         assert(dt.fighter);
         du = dt.fighter->unit;
         if (!is_magic_resistant(mage, du, 0)) {

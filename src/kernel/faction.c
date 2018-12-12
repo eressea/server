@@ -168,28 +168,6 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-const unit *random_unit_in_faction(const faction * f)
-{
-    unit *u;
-    int c = 0, u_nr;
-
-    if (!f->units) {
-        return NULL;
-    }
-    for (u = f->units; u; u = u->next)
-        c++;
-
-    u_nr = rng_int() % c;
-    c = 0;
-
-    for (u = f->units; u; u = u->next)
-        if (u_nr == c)
-            return u;
-
-    /* Hier sollte er nie ankommen */
-    return NULL;
-}
-
 const char *factionname(const faction * f)
 {
     typedef char name[OBJECTIDSIZE + 1];
@@ -227,6 +205,12 @@ static int unused_faction_id(void)
     return id;
 }
 
+void faction_genpassword(faction *f) {
+    const char * password = itoa36(rng_int());
+    faction_setpassword(f, password_hash(password, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+}
+
 faction *addfaction(const char *email, const char *password,
     const struct race * frace, const struct locale * loc)
 {
@@ -241,7 +225,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     f->alliance_joindate = turn;
-    f->lastorders = turn;
+    f->lastorders = 0;
     f->_alive = true;
     f->password_id = 0;
     f->age = 0;

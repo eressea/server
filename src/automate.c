@@ -46,7 +46,7 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
                         st->level = effskill_study(u, st->sk);
                         st->learn = 0;
                         st->u = u;
-                        if (++nscholars == max_scholars) {
+                        if (++nscholars > max_scholars) {
                             log_fatal("you must increase MAXSCHOLARS");
                         }
                     }
@@ -59,7 +59,6 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
         u = u->next;
     }
     *units = unext;
-    scholars[nscholars].u = NULL;
     if (nscholars > 0) {
         qsort(scholars, nscholars, sizeof(scholar), cmp_scholars);
     }
@@ -83,7 +82,7 @@ void autostudy_run(scholar scholars[], int nscholars)
     int ti = 0;
     while (ti != nscholars) {
         skill_t sk = scholars[ti].sk;
-        int t, s, se, ts = 0, tt = 0, si = ti;
+        int t, se, ts = 0, tt = 0, si = ti;
         for (se = ti; se != nscholars && scholars[se].sk == sk; ++se) {
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
@@ -111,7 +110,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit ti can still teach i students */
             int i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
             /* invariant: unit si has n students that can still be taught */
-            int n = scholars[si].u->number;
+            int s, n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
                 if (i >= n) {
                     /* t has more than enough teaching capacity for s */
@@ -125,25 +124,20 @@ void autostudy_run(scholar scholars[], int nscholars)
                     n = scholars[s].u->number;
                 }
                 else {
-                    /* s gets partial credit and we need a new teacher */
+                    /* a part of s gets credited and we need a new teacher: */
                     teaching(scholars + s, i);
-
-                    /* we are done with this teacher. any remaining people are regular learners: */
-                    if (scholars[t].u->number > 1) {
-                        /* remain = number - ceil(taught/10); */
-                        int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
-                        learning(scholars + t, remain);
-                    }
-
+                    /* we still need to teach n students in this unit: */
+                    n -= i;
+                    i = 0;
                     /* we want a new teacher for s. if any exists, it's next in the sequence. */
                     if (++t == si) {
                         continue;
                     }
                     if (scholars[t].level - TEACHDIFFERENCE < scholars[s].level) {
-                        /* next teacher cannot teach, we must skip students. */
+                        /* no remaining teacher can teach this student, so we skip ahead */
                         do {
-                            learning(scholars + s, (n - i));
-                            i = 0;
+                            /* remaining students learn without a teacher: */
+                            learning(scholars + s, n);
                             if (++s == se) {
                                 break;
                             }

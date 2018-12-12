@@ -319,11 +319,11 @@ report_items(const unit *u, item * result, int size, const unit * owner,
         }
     }
     for (itm = items; itm; itm = itm->next) {
-        item *ishow;
         const char *ic;
 
         report_item(owner, itm, viewer, NULL, &ic, NULL, false);
         if (ic && *ic) {
+            item *ishow;
             for (ishow = result; ishow != result + n; ++ishow) {
                 const char *sc;
 
@@ -714,7 +714,8 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        sbs_strcat(sbp, pzTmp);
+        const char *name = LOC(lang, mkname("race", pzTmp));
+        sbs_strcat(sbp, name ? name : pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             sbs_strcat(sbp, " (");
             sbs_strcat(sbp, racename(lang, u, u_race(u)));
@@ -811,19 +812,14 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
         if (book) {
             selist *ql = book->spells;
             int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
-            sbs_strcat(sbp, ". Aura ");
-            sbs_strcat(sbp, str_itoa(get_spellpoints(u)));
-            sbs_strcat(sbp, "/");
-            sbs_strcat(sbp, str_itoa(max_spellpoints(u, NULL)));
+            sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
                 spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
                 const spell *sp = spellref_get(&sbe->spref);
                 if (sbe->level <= maxlevel) {
                     if (!header) {
-                        sbs_strcat(sbp, ", ");
-                        sbs_strcat(sbp, LOC(lang, "nr_spells"));
-                        sbs_strcat(sbp, ": ");
+                        sbs_printf(sbp, ", %s: ", LOC(lang, "nr_spells"));
                         header = 1;
                     }
                     else {
@@ -839,9 +835,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                     break;
             }
             if (i != MAXCOMBATSPELLS) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, LOC(lang, "nr_combatspells"));
-                sbs_strcat(sbp, ": ");
+                sbs_printf(sbp, ", %s: ", LOC(lang, "nr_combatspells"));
                 dh = 0;
                 for (i = 0; i < MAXCOMBATSPELLS; i++) {
                     const spell *sp;
@@ -856,9 +850,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                         int sl = get_combatspelllevel(u, i);
                         sbs_strcat(sbp, spell_name(sp, lang));
                         if (sl > 0) {
-                            sbs_strcat(sbp, "( ");
-                            sbs_strcat(sbp, str_itoa(sl));
-                            sbs_strcat(sbp, ")");
+                            sbs_printf(sbp, "(%d)", sl);
                         }
                     }
                     else {
@@ -1606,6 +1598,9 @@ int write_reports(faction * f)
     if (noreports) {
         return false;
     }
+    if (f->lastorders == 0) {
+        faction_genpassword(f);
+    }
     prepare_report(&ctx, f);
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));
@@ -1788,9 +1783,9 @@ static void var_free_regions(variant x) /*-V524 */
 
 const char *trailinto(const region * r, const struct locale *lang)
 {
-    static char ref[32];
-    const char *s;
     if (r) {
+        static char ref[32];
+        const char *s;
         const char *tname = terrain_name(r);
         size_t sz;
 
@@ -2238,7 +2233,6 @@ static void eval_trail(struct opstack **stack, const void *userdata)
         handle_end = aregs->nregions;
         for (i = begin; i < handle_end; ++i) {
             region *r = aregs->regions[i];
-            sbs_strcat(&sbs, ", ");
 
             print_trail(report, r, lang, &sbs);
 

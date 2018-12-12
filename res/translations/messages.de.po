@@ -2331,7 +2331,7 @@ msgid "curseinfo::magicboost"
 msgstr "Der Magier besitzt die Gabe des Chaos. ($int36($id))"
 
 msgid "illegal_password"
-msgstr "\"Dein Passwort enthält Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passwortenur aus Buchstaben von A bis Z und Zahlen bestehen dürfen. Dein neues Passwort ist '${newpass}'.\""
+msgstr "\"Das Passwort enthielt Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passworte nur aus Ziffern und Buchstaben von A bis Z bestehen dürfen. Dein neues Passwort ist '${newpass}'.\""
 
 msgid "curseinfo::sparkle_12"
 msgstr "\"Leuchtende Blumen erblühen rund um das Lager von $unit($unit). ($int36($id))\""
@@ -2428,6 +2428,9 @@ msgstr "\"$unit($unit) konnte nur $int($ships) von $int($maxships) Schiffen verz
 
 msgid "error283"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Passwort darf nur Buchstaben und Ziffern enthalten.\""
+
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das gewählte Passwort war zu lang.\""
 
 msgid "rust_effect"
 msgstr "\"$unit($mage) legt einen Rosthauch auf $unit($target). $int($amount) Waffen wurden vom Rost zerfressen.\""

@@ -120,7 +120,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
 
     sbs_init(&sbs, sbuffer, size);
     if (ord->command & CMD_QUIET) {
-        sbs_strcpy(&sbs, "!");
+        sbs_strcat(&sbs, "!");
     }
     if (ord->command & CMD_PERSIST) {
         sbs_strcat(&sbs, "@");
@@ -170,7 +170,6 @@ const char *crescape(const char *str, char *buffer, size_t size) {
 int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape)
 {
     const char *text;
-    order_data *od = NULL;
     keyword_t kwd = ORD_KEYWORD(ord);
 
     if (ord->command & CMD_QUIET) {
@@ -203,7 +202,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         }
     }
     else {
-        od = odata_load(ord->id);
+        order_data *od = odata_load(ord->id);
         text = OD_STRING(od);
         if (text) {
             char obuf[1024];

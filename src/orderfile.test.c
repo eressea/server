@@ -3,9 +3,20 @@
 
 #include "orderfile.h"
 
+#include "direction.h"
+
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/order.h>
+#include <kernel/unit.h>
+
+#include <util/base36.h>
+#include <util/keyword.h>
+#include <util/language.h>
+#include <util/lists.h>
 #include <util/message.h>
+#include <util/param.h>
+#include <util/password.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -21,6 +32,52 @@ static void test_read_orders(CuTest *tc) {
     in.getbuf = getbuf_null;
     in.data = NULL;
     CuAssertIntEquals(tc, 0, read_orders(&in));
+    test_teardown();
+}
+
+static const char *getbuf_strings(void *data)
+{
+    strlist **listp = (strlist **)data;
+    if (listp && *listp) {
+        strlist *list = *listp;
+        *listp = list->next;
+        return list->s;
+    }
+    return NULL;
+}
+
+static void test_unit_orders(CuTest *tc) {
+    input in;
+    unit *u;
+    faction *f;
+    strlist *orders = NULL, *backup;
+    char buf[64];
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
+    f->locale = test_create_locale();
+    u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
+    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
+    snprintf(buf, sizeof(buf), "%s %s %s",
+        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password");
+    addstrlist(&orders, buf);
+    snprintf(buf, sizeof(buf), "%s %s",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
+    addstrlist(&orders, buf);
+    snprintf(buf, sizeof(buf), "%s %s", keyword_name(K_MOVE, f->locale),
+        LOC(f->locale, shortdirections[D_WEST]));
+    backup = orders;
+    addstrlist(&orders, buf);
+    in.data = &orders;
+    in.getbuf = getbuf_strings;
+    CuAssertIntEquals(tc, 0, read_orders(&in));
+    CuAssertPtrNotNull(tc, u->old_orders);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, NULL, orders);
+    CuAssertIntEquals(tc, K_MOVE, getkeyword(u->orders));
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->old_orders));
+    CuAssertIntEquals(tc, UFL_ORDERS, u->flags & UFL_ORDERS);
+    freestrlist(backup);
     test_teardown();
 }
 
@@ -85,6 +142,7 @@ CuSuite *get_orderfile_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_read_orders);
+    SUITE_ADD_TEST(suite, test_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);
 

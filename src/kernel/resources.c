@@ -181,10 +181,8 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
-    rawmaterial_type *rmtype;
-
     if (!rtype->raw) {
-        rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
         rmtype->rtype = rtype;
         rmtype->terraform = terraform_default;
         rmtype->update = NULL;

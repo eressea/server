@@ -1334,7 +1334,6 @@ static void do_fumble(castorder * co)
     int level = co->level;
     int duration;
     double effect;
-    static const race *rc_toad;
     static int rc_cache;
     fumble_f fun;
 
@@ -1359,6 +1358,7 @@ static void do_fumble(castorder * co)
          * The list of things to happen are attached to a timeout
          * trigger and that's added to the triggerlit of the mage gone toad.
          */
+        static const race *rc_toad;
         trigger *trestore = trigger_changerace(mage, u_race(mage), mage->irace);
         if (chance(0.7)) {
             const resource_type *rtype = rt_find("toadslime");
@@ -2090,7 +2090,7 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->sp = sp;
     co->level = lev;
     co->force = MagicPower(force);
-    co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : 0));
+    co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : NULL));
     co->distance = range;
     co->order = copy_order(ord);
     co->par = p;
@@ -2119,10 +2119,9 @@ void add_castorder(spellrank * cll, castorder * co)
 
 void free_castorders(castorder * co)
 {
-    castorder *co2;
 
     while (co) {
-        co2 = co;
+        castorder *co2 = co;
         co = co->next;
         free_castorder(co2);
         free(co2);
@@ -2202,15 +2201,14 @@ void remove_familiar(unit * mage)
 {
     attrib *a = a_find(mage->attribs, &at_familiar);
     attrib *an;
-    skillmod_data *smd;
 
     if (a != NULL) {
         a_remove(&mage->attribs, a);
     }
     a = a_find(mage->attribs, &at_skillmod);
     while (a && a->type == &at_skillmod) {
+        skillmod_data *smd = (skillmod_data *)a->data.v;
         an = a->next;
-        smd = (skillmod_data *)a->data.v;
         if (smd->special == sm_familiar) {
             a_remove(&mage->attribs, a);
         }

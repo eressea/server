@@ -19,7 +19,7 @@ fi
 rm -f "orders.$TURN"
 find "orders.dir.$TURN" -maxdepth 1 -type f -printf "%T+\t%p\n" | sort | cut -f2 | while read -r
 do
-  cat "$REPLY" >> "orders.$TURN"
+  tr -d '\r' < "$REPLY" >> "orders.$TURN"
 done
 
 lockfile -r3 -l120 orders.queue.lock

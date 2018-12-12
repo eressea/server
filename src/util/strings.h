@@ -29,7 +29,6 @@ extern "C" {
     void str_replace(char *buffer, size_t size, const char *tmpl, const char *var, const char *value);
     int str_hash(const char *s);
     const char *str_itoa(int i);
-    const char *str_itoab(int i, int base);
     size_t str_slprintf(char * dst, size_t size, const char * format, ...);
     size_t str_strlcpy(char *dst, const char *src, size_t len);
     size_t str_strlcat(char *dst, const char *src, size_t len);
@@ -49,11 +48,11 @@ extern "C" {
         char *end;
     } sbstring;
 
+    void sbs_printf(struct sbstring *sbs, const char *format, ...);
     void sbs_init(struct sbstring *sbs, char *buffer, size_t size);
     void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size);
     void sbs_strcat(struct sbstring *sbs, const char *str);
     void sbs_strncat(struct sbstring *sbs, const char *str, size_t size);
-    void sbs_strcpy(struct sbstring *sbs, const char *str);
     void sbs_substr(struct sbstring *sbp, ptrdiff_t pos, size_t len);
     size_t sbs_length(const struct sbstring *sbs);
 

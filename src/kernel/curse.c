@@ -672,16 +672,6 @@ bool curse_active(const curse * c)
     return true;
 }
 
-bool is_cursed_internal(attrib * ap, const curse_type * ct)
-{
-    curse *c = get_curse(ap, ct);
-
-    if (!c)
-        return false;
-
-    return true;
-}
-
 bool is_cursed_with(const attrib * ap, const curse * c)
 {
     const attrib *a = ap;
