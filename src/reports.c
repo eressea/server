@@ -975,6 +975,7 @@ void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
      * Vgl. spunit (). */
 
     char *buflocal = calloc(strlen(s) + indent + 1, sizeof(char));
+    if (!buflocal) abort();
 
     if (indent) {
         memset(buflocal, ' ', indent);
@@ -1174,6 +1175,7 @@ static report_type *report_types;
 void register_reporttype(const char *extension, report_fun write, int flag)
 {
     report_type *type = (report_type *)malloc(sizeof(report_type));
+    if (!type) abort();
     type->extension = extension;
     type->write = write;
     type->flag = flag;
@@ -1738,6 +1740,7 @@ static variant var_copy_items(variant x)
 
     for (isrc = (item *)x.v; isrc != NULL; isrc = isrc->next) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = isrc->number;
         res->type = isrc->type->rtype;
         *rptr = res;
@@ -1755,6 +1758,7 @@ static variant var_copy_resources(variant x)
 
     for (rsrc = (resource *)x.v; rsrc != NULL; rsrc = rsrc->next) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = rsrc->number;
         res->type = rsrc->type;
         *rptr = res;

@@ -230,6 +230,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
      * guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
 
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->unit = u;
     o->qty = 1;                   /* Betrag steht in u->wants */
     o->type.steal.no = u2->no;

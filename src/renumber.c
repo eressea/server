@@ -57,6 +57,7 @@ void renumber_factions(void)
         }
         else {
             struct renum *r = calloc(1, sizeof(struct renum));
+            if (!r) abort();
             r->next = *rn;
             r->attrib = a;
             r->faction = f;

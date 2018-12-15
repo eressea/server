@@ -85,6 +85,7 @@ int update_nmrs(void)
         int i;
         if (nmrs == NULL) {
             nmrs = malloc(sizeof(int) * (timeout + 1));
+            if (!nmrs) abort();
         }
         for (i = 0; i <= timeout; ++i) {
             nmrs[i] = 0;

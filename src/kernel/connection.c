@@ -134,6 +134,7 @@ connection *new_border(border_type * type, region * from, region * to)
         bp = &(*bp)->next;
     }
     *bp = b = calloc(1, sizeof(connection));
+    if (!b) abort();
     b->type = type;
     b->from = from;
     b->to = to;

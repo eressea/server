@@ -257,10 +257,12 @@ static int *keys_update(int *base, int key, int val)
             int sz = keys_size(n);
             assert(kv[0] > key);
             if (n + 1 > sz) {
+                int *tmp;
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
-                base = realloc(base, (sz * 2 + 1) * sizeof(int));
-                if (!base) abort();
+                tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
+                if (!tmp) abort();
+                base = tmp;
                 kv = base + diff;
             }
             base[0] = n + 1;
@@ -299,6 +301,7 @@ void key_set(attrib ** alist, int key, int val)
     if (!keys) {
         int sz = keys_size(1);
         a->data.v = keys = malloc((2 * sz + 1) * sizeof(int));
+        if (!keys) abort();
         keys[0] = 1;
         keys[1] = key;
         keys[2] = val;
