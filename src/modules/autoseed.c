@@ -676,6 +676,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
 region_list *regionqueue_push(region_list ** rlist, region * r)
 {
     region_list *rnew = malloc(sizeof(region_list));
+    if (!rnew) abort();
     rnew->data = r;
     rnew->next = 0;
     while (*rlist) {
@@ -722,7 +723,9 @@ const terrain_type *random_terrain_e3(direction_t dir)
         int n = 0;
 
         terrainarr = malloc(GEOMAX * sizeof(const terrain_type *));
+        if (!terrainarr) abort();
         distribution = malloc(GEOMAX * sizeof(int));
+        if (!distribution) abort();
         for (n = 0; n != GEOMAX; ++n) {
             terrainarr[n] = newterrain(geography_e3[n].type);
             distribution[n] = geography_e3[n].distribution;

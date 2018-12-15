@@ -642,6 +642,7 @@ message *msg_materials_required(unit * u, order * ord,
         multi = 1;
     for (c = 0; ctype && ctype->materials[c].number; ++c) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = multi * ctype->materials[c].number / ctype->reqsize;
         res->type = ctype->materials[c].rtype;
         res->next = reslist;

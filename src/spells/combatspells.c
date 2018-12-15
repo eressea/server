@@ -1220,6 +1220,7 @@ static void do_meffect(fighter * af, int typ, int effect, int duration)
 {
     battle *b = af->side->battle;
     meffect *me = (meffect *)malloc(sizeof(struct meffect));
+    if (!me) abort();
     selist_push(&b->meffects, me);
     me->magician = af;
     me->typ = typ;

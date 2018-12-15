@@ -83,6 +83,7 @@ alliance *new_alliance(int id, const char *name) {
     assert(id>0);
 
     al = calloc(1, sizeof(alliance));
+    if (!al) abort();
     al->id = id;
     if (name) {
         al->name = str_strdup(name);
@@ -129,6 +130,7 @@ static void create_transaction(int type, unit * u, order * ord)
 {
     alliance_transaction *tr =
         (alliance_transaction *)calloc(1, sizeof(alliance_transaction));
+    if (!tr) abort();
     tr->ord = ord;
     tr->u = u;
     tr->next = transactions[type];

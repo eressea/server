@@ -1058,6 +1058,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
         alist = alist->next;
     if (!alist) {
         alist = calloc(1, sizeof(struct allocation_list));
+        if (!alist) abort();
         alist->next = allocations;
         alist->type = rtype;
         allocations = alist;

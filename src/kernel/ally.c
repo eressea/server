@@ -150,6 +150,7 @@ allies *allies_clone(const allies *al) {
 
     for (; al; al = al->next) {
         allies *al_new = calloc(1, sizeof(allies));
+        if (!al_new) abort();
         memcpy(al_new, al, sizeof(allies));
         *al_end = al_new;
         al_end = &al_new->next;

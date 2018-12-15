@@ -437,7 +437,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
 
     for (qi = 0, ql = book->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
-        if (sbe->level <= level) {
+        if (sbe && sbe->level <= level) {
             commonspells[numspells++] = sbe;
         }
     }
@@ -1753,11 +1753,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
         if ((sp->sptyp & REGIONSPELL)) {
             /* Zielobjekt Region anlegen */
             spllprm *spobj = (spllprm *)malloc(sizeof(spllprm));
+            if (!spobj) abort();
             spobj->flag = 0;
             spobj->typ = SPP_REGION;
             spobj->data.r = target_r;
 
             sa = calloc(1, sizeof(spellparameter));
+            if (!sa) abort();
             sa->length = 1;
             sa->param = calloc(sa->length, sizeof(spllprm *));
             sa->param[0] = spobj;
@@ -1815,6 +1817,7 @@ static int addparam_string(const char *const param[], spllprm ** spobjp)
     spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     assert(param[0]);
 
+    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_STRING;
     spobj->data.xs = str_strdup(param[0]);
@@ -1826,6 +1829,7 @@ static int addparam_int(const char *const param[], spllprm ** spobjp)
     spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     assert(param[0]);
 
+    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_INT;
     spobj->data.i = atoi((char *)param[0]);
@@ -1837,6 +1841,7 @@ static int addparam_ship(const char *const param[], spllprm ** spobjp)
     spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     int id = atoi36((const char *)param[0]);
 
+    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_SHIP;
     spobj->data.i = id;
@@ -1848,6 +1853,7 @@ static int addparam_building(const char *const param[], spllprm ** spobjp)
     spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     int id = atoi36((const char *)param[0]);
 
+    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_BUILDING;
     spobj->data.i = id;
@@ -1877,6 +1883,7 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
         if (rt != NULL) {
             spllprm *spobj = *spobjp = (spllprm *)malloc(sizeof(spllprm));
 
+            if (!spobj) abort();
             spobj->flag = 0;
             spobj->typ = SPP_REGION;
             spobj->data.r = rt;
@@ -1910,6 +1917,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
     }
 
     spobj = *spobjp = malloc(sizeof(spllprm));
+    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = otype;
     spobj->data.i = atoi36((const char *)param[i]);
@@ -1949,12 +1957,14 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
     }
 
     par = malloc(sizeof(spellparameter));
+    if (!par) abort();
     par->length = size;
     if (!size) {
         par->param = NULL;
         return par;
     }
     par->param = malloc(size * sizeof(spllprm *));
+    if (!par->param) abort();
 
     while (!err && *c && i < size && param[i] != NULL) {
         spllprm *spobj = NULL;
@@ -2008,6 +2018,7 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             switch (findparam_ex(param[i++], u->faction->locale)) {
             case P_REGION:
                 spobj = (spllprm *)malloc(sizeof(spllprm));
+                if (!spobj) abort();
                 spobj->flag = 0;
                 spobj->typ = SPP_REGION;
                 spobj->data.r = target_r;
@@ -2084,6 +2095,7 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     int lev, double force, int range, struct order * ord, spellparameter * p)
 {
     if (!co) co = (castorder*)calloc(1, sizeof(castorder));
+    if (!co) abort();
 
     co->magician.u = caster;
     co->_familiar = familiar;

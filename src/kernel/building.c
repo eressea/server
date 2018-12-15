@@ -136,6 +136,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = (building_type *)calloc(1, sizeof(building_type));
+            if (!btype) abort();
             btype->_name = str_strdup(name);
             btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;
@@ -286,6 +287,7 @@ static local_names *get_bnames(const struct locale *lang)
         int qi;
 
         bn = (local_names *)calloc(1, sizeof(local_names));
+        if (!bn) abort();
         bn->next = bnames;
         bn->lang = lang;
 
@@ -378,6 +380,7 @@ int read_building_reference(gamedata * data, building **bp)
 building *building_create(int id)
 {
     building *b = (building *)calloc(1, sizeof(building));
+    if (!b) abort();
     b->no = id;
     bhash(b);
     return b;
