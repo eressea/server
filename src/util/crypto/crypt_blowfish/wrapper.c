@@ -250,7 +250,9 @@ char *__crypt_gensalt_ra(const char *prefix, unsigned long count,
 		if (!dst)
 			__set_errno(ENOMEM);
 #endif
-        retval = memcpy(dst, retval, len);
+        if (dst) {
+            retval = memcpy(dst, retval, len);
+        }
     }
 
 	return retval;
