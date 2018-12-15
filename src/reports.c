@@ -319,11 +319,11 @@ report_items(const unit *u, item * result, int size, const unit * owner,
         }
     }
     for (itm = items; itm; itm = itm->next) {
-        item *ishow;
         const char *ic;
 
         report_item(owner, itm, viewer, NULL, &ic, NULL, false);
         if (ic && *ic) {
+            item *ishow;
             for (ishow = result; ishow != result + n; ++ishow) {
                 const char *sc;
 
@@ -1783,9 +1783,9 @@ static void var_free_regions(variant x) /*-V524 */
 
 const char *trailinto(const region * r, const struct locale *lang)
 {
-    static char ref[32];
-    const char *s;
     if (r) {
+        static char ref[32];
+        const char *s;
         const char *tname = terrain_name(r);
         size_t sz;
 

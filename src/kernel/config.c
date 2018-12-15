@@ -107,10 +107,10 @@ int findoption(const char *s, const struct locale *lang)
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static int *forbidden_ids;
+static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 
 bool forbiddenid(int id)
 {
-    static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
     static size_t len;
     size_t i;
     if (id <= 0) {

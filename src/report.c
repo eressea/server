@@ -432,7 +432,7 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
 
 void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *lang)
 {
-    int k, itemanz, costtyp;
+    int k;
     bool cont;
     char buf[4096];
     const spell *sp = spellref_get(&sbe->spref);
@@ -471,8 +471,8 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     paragraph(out, LOC(lang, "nr_spell_components"), 0, 0, 0);
     for (k = 0; sp->components[k].type; ++k) {
         const resource_type *rtype = sp->components[k].type;
-        itemanz = sp->components[k].amount;
-        costtyp = sp->components[k].cost;
+        int itemanz = sp->components[k].amount;
+        int costtyp = sp->components[k].cost;
         if (itemanz > 0) {
             sbs_init(&sbs, buf, sizeof(buf));
             if (sp->sptyp & SPELLLEVEL) {
@@ -519,7 +519,6 @@ static void
 nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
     for (; a; a = a->next) {
-        char buf[4096];
         message *msg = 0;
 
         if (a->type == &at_curse) {
@@ -536,6 +535,7 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
             }
         }
         if (msg) {
+            char buf[4096];
             newline(out);
             nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
             paragraph(out, buf, indent, 2, 0);
@@ -847,7 +847,6 @@ static void report_region_resource(sbstring *sbp, const struct locale *lang, con
 static void report_region_description(struct stream *out, const region * r, faction * f, const bool see[])
 {
     int n;
-    bool dh;
     int trees;
     int saplings;
     attrib *a;
@@ -986,6 +985,7 @@ static void report_region_description(struct stream *out, const region * r, fact
     }
     else {
         int d, nrd = 0;
+        bool dh = false;
 
         /* Nachbarregionen, die gesehen werden, ermitteln */
         for (d = 0; d != MAXDIRECTIONS; d++) {
@@ -994,7 +994,6 @@ static void report_region_description(struct stream *out, const region * r, fact
         }
 
         /* list directions */
-        dh = false;
         for (d = 0; d != MAXDIRECTIONS; d++) {
             if (see[d]) {
                 region *r2 = rconnect(r, d);
@@ -1037,7 +1036,6 @@ static void report_region_description(struct stream *out, const region * r, fact
             sbs_strcat(&sbs, " (\"");
             sbs_strcat(&sbs, LOC(f->locale, spd->keyword));
             sbs_strcat(&sbs, "\").");
-            dh = 1;
         }
     }
     pump_paragraph(&sbs, out, REPORTWIDTH, true);
@@ -1889,7 +1887,6 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
 void report_travelthru(struct stream *out, region *r, const faction *f)
 {
     int maxtravel;
-    char buf[8192];
 
     assert(r);
     assert(f);
@@ -1901,6 +1898,7 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
     maxtravel = count_travelthru(r, f);
     if (maxtravel > 0) {
         cb_data cbdata;
+        char buf[8192];
 
         init_cb(&cbdata, out, buf, sizeof(buf), f);
         cbdata.maxtravel = maxtravel;
@@ -1960,12 +1958,11 @@ report_plaintext(const char *filename, report_context * ctx,
 
     if (f->age <= 2) {
         const char *email;
-        const char *subject;
         email = config_get("game.email");
         if (!email)
           log_error("game.email not set");
         else {
-            subject = get_mailcmd(f->locale);
+            const char *subject = get_mailcmd(f->locale);
 
             m = msg_message("newbie_info_game", "email subject", email, subject);
             if (m) {
@@ -2068,9 +2065,9 @@ report_plaintext(const char *filename, report_context * ctx,
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
-        const char *description = NULL;
         if (itype) {
             const char *pname = resourcename(itype->rtype, 0);
+            const char *description;
 
             if (ch == 0) {
                 newline(out);
@@ -2102,8 +2099,7 @@ report_plaintext(const char *filename, report_context * ctx,
             }
             centre(out, buf, true);
             newline(out);
-            description = mkname("describe", pname);
-            description = LOC(f->locale, description);
+            description = LOC(f->locale, mkname("describe", pname));
             centre(out, description, true);
         }
     }

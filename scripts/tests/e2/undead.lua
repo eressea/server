@@ -19,7 +19,7 @@ function test_undead_reserve_self()
     assert_equal(1, u1:get_item("log"))
 end
 
-function skip_undead_reserve_other()
+function test_undead_reserve_other()
     local r1 = region.create(0, 0, "plain")
     local f1 = faction.create("human")
     local u1 = unit.create(f1, r1, 1)
@@ -28,9 +28,10 @@ function skip_undead_reserve_other()
     u1.race = "undead"
     u1:clear_orders()
     u1:add_order("RESERVIERE 1 Holz")
+    u1.name = 'Xolgrim'
     process_orders()
 
-    -- Intermittent Failure (clang): expected 0 but was 2
+    -- Intermittent Failure: expected 0 but was 2
     assert_equal(0, u1:get_item("log"))
 
     assert_equal(2, u2:get_item("log"))

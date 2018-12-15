@@ -601,14 +601,14 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     f = test_create_faction(NULL);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
-    r3 = test_create_region(2, 0, t_ocean);
+    test_create_region(2, 0, t_ocean);
     r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
-    u = test_create_unit(f, r1);
+    test_create_unit(f, r1);
     u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);

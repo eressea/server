@@ -982,9 +982,8 @@ void set_number(unit * u, int count)
 void remove_skill(unit * u, skill_t sk)
 {
     int i;
-    skill *sv;
     for (i = 0; i != u->skill_size; ++i) {
-        sv = u->skills + i;
+        skill *sv = u->skills + i;
         if (sv->id == sk) {
             if (u->skill_size - i - 1 > 0) {
                 memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
