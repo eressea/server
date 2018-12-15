@@ -227,6 +227,12 @@ static int unused_faction_id(void)
     return id;
 }
 
+void faction_genpassword(faction *f) {
+    const char * password = itoa36(rng_int());
+    faction_setpassword(f, password_hash(password, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+}
+
 faction *addfaction(const char *email, const char *password,
     const struct race * frace, const struct locale * loc)
 {
@@ -241,7 +247,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     f->alliance_joindate = turn;
-    f->lastorders = turn;
+    f->lastorders = 0;
     f->_alive = true;
     f->password_id = 0;
     f->age = 0;

@@ -154,8 +154,11 @@ bool IsImmune(const faction * f)
 
 int NMRTimeout(void)
 {
-    int nmr_timeout = config_get_int("nmr.timeout", 0);
-    int ini_timeout = config_get_int("game.maxnmr", 0);
+    static int config, nmr_timeout, ini_timeout;
+    if (config_changed(&config)) {
+        nmr_timeout = config_get_int("nmr.timeout", 0);
+        ini_timeout = config_get_int("game.maxnmr", 0);
+    }
     if (nmr_timeout > 0) {
         if (ini_timeout > nmr_timeout) {
             return nmr_timeout;
@@ -1192,17 +1195,26 @@ void do_enter(struct region *r, bool is_final_attempt)
 int dropouts[2];
 int *age = NULL;
 
-static void nmr_death(faction * f)
+bool nmr_death(const faction * f, int turn, int timeout)
 {
-    int rule = config_get_int("rules.nmr.destroy", 0) != 0;
-    if (rule) {
-        unit *u;
-        for (u = f->units; u; u = u->nextF) {
-            if (u->building && building_owner(u->building) == u) {
-                remove_building(&u->region->buildings, u->building);
+    if (f->age >= timeout && turn - f->lastorders >= timeout) {
+        static bool rule_destroy;
+        static int config;
+        
+        if (config_changed(&config)) {
+            rule_destroy = config_get_int("rules.nmr.destroy", 0) != 0;
+        }
+        if (rule_destroy) {
+            unit *u;
+            for (u = f->units; u; u = u->nextF) {
+                if (u->building && building_owner(u->building) == u) {
+                    remove_building(&u->region->buildings, u->building);
+                }
             }
         }
+        return true;
     }
+    return false;
 }
 
 static void remove_idle_players(void)
@@ -1215,8 +1227,7 @@ static void remove_idle_players(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
 
-        if (timeout > 0 && turn - f->lastorders >= timeout) {
-            nmr_death(f);
+        if (timeout > 0 && nmr_death(f, turn, timeout)) {
             destroyfaction(fp);
         } else {
             if (fval(f, FFL_NOIDLEOUT)) {

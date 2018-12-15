@@ -95,6 +95,7 @@ extern "C" {
     int claim_cmd(struct unit *u, struct order *ord);
 
     void nmr_warnings(void);
+    bool nmr_death(const struct faction * f, int turn, int timeout);
 
     bool cansee(const struct faction * f, const struct region * r,
         const struct unit *u, int modifier);

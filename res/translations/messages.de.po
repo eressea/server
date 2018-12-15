@@ -2331,7 +2331,7 @@ msgid "curseinfo::magicboost"
 msgstr "Der Magier besitzt die Gabe des Chaos. ($int36($id))"
 
 msgid "illegal_password"
-msgstr "\"Dein Passwort enthält Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passwortenur aus Buchstaben von A bis Z und Zahlen bestehen dürfen. Dein neues Passwort ist '${newpass}'.\""
+msgstr "\"Das Passwort enthielt Zeichen, die bei der Nachsendung von Reports Probleme bereiten können. Bitte beachte, dass Passworte nur aus Ziffern und Buchstaben von A bis Z bestehen dürfen. Dein neues Passwort ist '${newpass}'.\""
 
 msgid "curseinfo::sparkle_12"
 msgstr "\"Leuchtende Blumen erblühen rund um das Lager von $unit($unit). ($int36($id))\""
