@@ -312,8 +312,10 @@ message *add_message(message_list ** pm, message * m)
     assert(m && m->type);
     if (m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
+        if (!mnew) abort();
         if (*pm == NULL) {
             *pm = malloc(sizeof(message_list));
+            if (*pm == NULL) abort();
             (*pm)->end = &(*pm)->begin;
         }
         mnew->msg = msg_addref(m);

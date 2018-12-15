@@ -71,7 +71,8 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
         selist *ql;
         int qi;
 
-        sn = (local_names *)calloc(sizeof(local_names), 1);
+        sn = (local_names *)calloc(1, sizeof(local_names));
+        if (!sn) abort();
         sn->next = snames;
         sn->lang = lang;
 
@@ -124,7 +125,8 @@ ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     assert(!snames);
     if (!st) {
-        st = (ship_type *)calloc(sizeof(ship_type), 1);
+        st = (ship_type *)calloc(1, sizeof(ship_type));
+        if (!st) abort();
         st->_name = str_strdup(name);
         st->storm = 1.0;
         st->tac_bonus = 1.0;
@@ -189,6 +191,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     ship *sh = (ship *)calloc(1, sizeof(ship));
     const char *sname = 0;
 
+    if (!sh) abort();
     assert(stype);
     sh->no = newcontainerid();
     sh->coast = NODIRECTION;

@@ -113,7 +113,8 @@ int change_reservation(unit * u, const item_type * itype, int value)
         rp = &(*rp)->next;
     res = *rp;
     if (!res) {
-        *rp = res = calloc(sizeof(reservation), 1);
+        *rp = res = calloc(1, sizeof(reservation));
+        if (!res) abort();
         res->type = itype;
         res->value = value;
     }
@@ -138,7 +139,8 @@ int set_resvalue(unit * u, const item_type * itype, int value)
     if (!res) {
         if (!value)
             return 0;
-        *rp = res = calloc(sizeof(reservation), 1);
+        *rp = res = calloc(1, sizeof(reservation));
+        if (!res) abort();
         res->type = itype;
         res->value = value;
     }

@@ -244,7 +244,7 @@ static int a_ageicastle(struct attrib *a, void *owner)
 
 static void a_initicastle(variant *var)
 {
-    var->v = calloc(sizeof(icastle_data), 1);
+    var->v = calloc(1, sizeof(icastle_data));
 }
 
 attrib_type at_icastle = {
@@ -295,7 +295,7 @@ int get_spell_level_mage(const spell * sp, void * cbdata)
 
 static void init_mage(variant *var)
 {
-    var->v = calloc(sizeof(sc_mage), 1);
+    var->v = calloc(1, sizeof(sc_mage));
 }
 
 static void free_mage(variant *var)

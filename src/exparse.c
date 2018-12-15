@@ -753,8 +753,9 @@ static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **
 }
 
 static construction *parse_construction(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
-    construction *con = calloc(sizeof(construction), 1);
     int i;
+    construction *con = (construction *)calloc(1, sizeof(construction));
+    if (!con) abort();
     con->maxsize = -1;
     con->minskill = -1;
     con->reqsize = 1;
@@ -1273,7 +1274,8 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
         }
         else if (xml_strequal(el, "construction")) {
             assert(stage == NULL);
-            stage = calloc(1, sizeof(building_stage));
+            stage = (building_stage *)calloc(1, sizeof(building_stage));
+            if (!stage) abort();
             stage->construction = parse_construction(pi, el, attr);
         }
         else if (xml_strequal(el, "maintenance")) {
@@ -1366,7 +1368,8 @@ static void end_spells(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "spell")) {
         spell *sp = (spell *)pi->object;
         if (ncomponents > 0) {
-            sp->components = calloc(sizeof(spell_component), ncomponents + 1);
+            sp->components = (spell_component *)calloc(ncomponents + 1, sizeof(spell_component));
+            if (!sp->components) abort();
             memcpy(sp->components, components, sizeof(spell_component) * ncomponents);
             ncomponents = 0;
         }
@@ -1384,7 +1387,8 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "modifier")) {
         if (nwmods > 0) {
             weapon_type *wtype = rtype->wtype;
-            wtype->modifiers = calloc(sizeof(weapon_mod), nwmods + 1);
+            wtype->modifiers = (weapon_mod *)calloc(nwmods + 1, sizeof(weapon_mod));
+            if (!wtype->modifiers) abort();
             memcpy(wtype->modifiers, wmods, sizeof(weapon_mod) * nwmods);
             nwmods = 0;
         }
@@ -1395,7 +1399,8 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
     resource_type *rtype = (resource_type *)pi->object;
     if (xml_strequal(el, "resource")) {
         if (nrmods > 0) {
-            rtype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
+            rtype->modifiers = (resource_mod *)calloc(nrmods + 1, sizeof(resource_mod));
+            if (!rtype->modifiers) abort();
             memcpy(rtype->modifiers, rmods, sizeof(resource_mod) * nrmods);
             nrmods = 0;
         }
@@ -1403,7 +1408,8 @@ static void end_resources(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "construction")) {
         if (nreqs > 0) {
             construction *con = rtype->itype->construction;
-            con->materials = calloc(sizeof(requirement), nreqs + 1);
+            con->materials = (requirement *)calloc(nreqs + 1, sizeof(requirement));
+            if (!con->materials) abort();
             memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
             nreqs = 0;
         }
@@ -1440,15 +1446,17 @@ static void end_ships(parseinfo *pi, const XML_Char *el) {
         assert(stype->construction);
         if (nreqs > 0) {
             construction *con = stype->construction;
-            con->materials = calloc(sizeof(requirement), nreqs + 1);
+            con->materials = (requirement *) calloc(nreqs + 1, sizeof(requirement));
+            if (!con->materials) abort();
             memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
             nreqs = 0;
         }
     }
     else if (xml_strequal(el, "ship")) {
         if (ncoasts > 0) {
-            stype->coasts = calloc(sizeof(const terrain_type *), ncoasts + 1);
-            memcpy(stype->coasts, coasts, sizeof(const terrain_type *) * ncoasts);
+            stype->coasts = (terrain_type **) calloc(ncoasts + 1, sizeof(terrain_type *));
+            if (!stype->coasts) abort();
+            memcpy(stype->coasts, coasts, sizeof(terrain_type *) * ncoasts);
             ncoasts = 0;
         }
         pi->object = NULL;
@@ -1468,7 +1476,8 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
         if (stage) {
             if (nreqs > 0) {
                 construction *con = stage->construction;
-                con->materials = calloc(sizeof(requirement), nreqs + 1);
+                con->materials = (requirement *)calloc(nreqs + 1, sizeof(requirement));
+                if (!con->materials) abort();
                 memcpy(con->materials, reqs, sizeof(requirement) * nreqs);
                 nreqs = 0;
             }
@@ -1485,12 +1494,14 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "building")) {
         stage_ptr = NULL;
         if (nupkeep > 0) {
-            btype->maintenance = calloc(sizeof(maintenance), nupkeep + 1);
+            btype->maintenance = (maintenance *)calloc(nupkeep + 1, sizeof(maintenance));
+            if (!btype->maintenance) abort();
             memcpy(btype->maintenance, upkeep, sizeof(maintenance) * nupkeep);
             nupkeep = 0;
         }
         if (nrmods > 0) {
-            btype->modifiers = calloc(sizeof(resource_mod), nrmods + 1);
+            btype->modifiers = calloc(nrmods + 1, sizeof(resource_mod));
+            if (!btype->modifiers) abort();
             memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
             nrmods = 0;
         }

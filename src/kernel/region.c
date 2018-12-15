@@ -471,6 +471,7 @@ void add_regionlist(region_list ** rl, region * r)
 {
     region_list *rl2 = (region_list *)malloc(sizeof(region_list));
 
+    if (!rl2) abort();
     rl2->data = r;
     rl2->next = *rl;
 
@@ -799,7 +800,7 @@ static region *deleted_regions;
 
 void remove_region(region ** rlist, region * r)
 {
-
+    assert(r);
     while (r->units) {
         unit *u = r->units;
         i_freeall(&u->items);
@@ -1040,6 +1041,7 @@ void setluxuries(region * r, const luxury_type * sale)
 
     for (ltype = luxurytypes; ltype; ltype = ltype->next) {
         struct demand *dmd = malloc(sizeof(struct demand));
+        if (!dmd) abort();
         dmd->type = ltype;
         if (ltype != sale)
             dmd->value = 1 + rng_int() % 5;
@@ -1165,6 +1167,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         int mnr = 0;
 
         r->land = calloc(1, sizeof(land_region));
+        if (!r->land) abort();
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
@@ -1186,6 +1189,7 @@ void terraform_region(region * r, const terrain_type * terrain)
                         }
                         else {
                             sr = calloc(1, sizeof(struct surround));
+                            if (!sr) abort();
                         }
                         sr->next = nb;
                         sr->type = sale->type;
@@ -1321,6 +1325,7 @@ struct message *msg)
             imsg = imsg->next;
         if (imsg == NULL) {
             imsg = malloc(sizeof(struct individual_message));
+            if (!imsg) abort();
             imsg->next = r->individual_messages;
             imsg->msgs = NULL;
             r->individual_messages = imsg;
@@ -1372,11 +1377,13 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
     assert(rule_region_owners());
     if (r->land) {
         if (!r->land->ownership) {
-            r->land->ownership = malloc(sizeof(region_owner));
+            region_owner *ro = malloc(sizeof(region_owner));
+            if (!ro) abort();
             assert(region_get_morale(r) == MORALE_DEFAULT);
-            r->land->ownership->owner = NULL;
-            r->land->ownership->last_owner = NULL;
-            r->land->ownership->flags = 0;
+            ro->owner = NULL;
+            ro->last_owner = NULL;
+            ro->flags = 0;
+            r->land->ownership = ro;
         }
         r->land->ownership->since_turn = turn;
         r->land->ownership->morale_turn = turn;

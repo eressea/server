@@ -166,7 +166,8 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
     if (norders > 0) {
         int i = 0;
         econ_request **split;
-        split = calloc(norders, sizeof(econ_request *));
+        split = (econ_request **)calloc(norders, sizeof(econ_request *));
+        if (!split) abort();
         for (o = requests; o; o = o->next) {
             if (o->qty > 0) {
                 unsigned int j;
@@ -230,7 +231,8 @@ static recruitment *select_recruitment(econ_request ** rop,
             while (rec && rec->f != u->faction)
                 rec = rec->next;
             if (rec == NULL) {
-                rec = malloc(sizeof(recruitment));
+                rec = (recruitment *)malloc(sizeof(recruitment));
+                if (!rec) abort();
                 rec->f = u->faction;
                 rec->total = 0;
                 rec->assigned = 0;
@@ -563,6 +565,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
     u_setrace(u, rc);
     u->wants = n;
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->qty = n;
     o->unit = u;
     o->type.recruit.ord = ord;
@@ -940,7 +943,7 @@ typedef struct allocation {
     unsigned int flags;
     unit *unit;
 } allocation;
-#define new_allocation() calloc(sizeof(allocation), 1)
+#define new_allocation() (allocation *)calloc(1, sizeof(allocation))
 #define free_allocation(a) free(a)
 
 typedef struct allocation_list {
@@ -1054,12 +1057,13 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     while (alist && alist->type != rtype)
         alist = alist->next;
     if (!alist) {
-        alist = calloc(sizeof(struct allocation_list), 1);
+        alist = calloc(1, sizeof(struct allocation_list));
         alist->next = allocations;
         alist->type = rtype;
         allocations = alist;
     }
     al = new_allocation();
+    if (!al) abort();
     al->want = amount;
     al->save = save_mod;
     al->next = alist->data;
@@ -1665,6 +1669,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         return;
     }
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->type.trade.ltype = ltype;        /* sollte immer gleich sein */
 
     o->unit = u;
@@ -2013,6 +2018,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         /* die Menge der verkauften G�ter merken */
         a->data.i += n;
         o = (econ_request *)calloc(1, sizeof(econ_request));
+        if (!o) abort();
         o->unit = u;
         o->qty = n;
         o->type.trade.ltype = ltype;
@@ -2628,6 +2634,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
      * einheiten aufgeteilt. */
 
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->qty = u->wants / TAXFRACTION;
     o->unit = u;
     addlist(taxorders, o);
@@ -2693,6 +2700,7 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     }
 
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->qty = u->wants / TAXFRACTION;
     o->unit = u;
     addlist(lootorders, o);
@@ -2700,7 +2708,7 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     return;
 }
 
-#define MAX_WORKERS 2048
+#define MAX_WORKERS 512
 void auto_work(region * r)
 {
     econ_request workers[MAX_WORKERS];

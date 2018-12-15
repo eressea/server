@@ -214,9 +214,10 @@ void faction_genpassword(faction *f) {
 faction *addfaction(const char *email, const char *password,
     const struct race * frace, const struct locale * loc)
 {
-    faction *f = calloc(sizeof(faction), 1);
+    faction *f = calloc(1, sizeof(faction));
     char buf[128];
 
+    if (!f) abort();
     if (check_email(email) == 0) {
         faction_setemail(f, email);
     } else {
@@ -697,6 +698,7 @@ void faction_getorigin(const faction * f, int id, int *x, int *y)
 
 static origin *new_origin(int id, int x, int y) {
     origin *ur = (origin *)calloc(1, sizeof(origin));
+    if (!ur) abort();
     ur->id = id;
     ur->x = x;
     ur->y = y;
@@ -838,6 +840,7 @@ void free_factions(void) {
 faction *faction_create(int no)
 {
     faction *f = (faction *)calloc(1, sizeof(faction));
+    if (!f) abort();
     f->no = no;
     fhash(f);
     return f;
