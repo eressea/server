@@ -355,14 +355,3 @@ int parseorders(FILE *F)
     OP_ParserFree(parser);
     return err;
 }
-
-int readorders(FILE *F)
-{
-    int result;
-
-    input in;
-    in.getbuf = file_getbuf;
-    in.data = F;
-    result = read_orders(&in);
-    return result;
-}
