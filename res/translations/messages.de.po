@@ -714,7 +714,7 @@ msgid "magicboost_effect"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Sphären des Chaos geben dem Magier einen Teil ihrer Kraft.\""
 
 msgid "error254"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auraangabe fehlerhaft oder zuwenig Aura.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auraangabe fehlerhaft oder zu wenig Aura.\""
 
 msgid "error250"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nicht genug Karma.\""
@@ -1029,7 +1029,7 @@ msgid "chaos_disease"
 msgstr "\"$unit($unit) scheint von einer seltsamen Krankheit befallen.\""
 
 msgid "error1"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff befinden sich zuwenig erfahrene Seeleute.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff befinden sich zu wenige erfahrene Seeleute.\""
 
 msgid "sp_icastle_effect"
 msgstr "\"Verwundert blicken die Bauern von $region($region) auf ein neues Gebäude.\""
@@ -1974,7 +1974,7 @@ msgid "error80"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit ist nicht bewaffnet und kampffähig.\""
 
 msgid "error142"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat zuwenig Silber, um zu rekrutieren.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat zu wenig Silber, um zu rekrutieren.\""
 
 msgid "rust_fail"
 msgstr "\"$unit($mage) legt einen Rosthauch auf $unit($target), doch der Rosthauch fand keine Nahrung.\""

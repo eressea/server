@@ -37,12 +37,12 @@ int atoi36(const char *str)
         ++s;
     }
     while (isalnum(*(unsigned char *)s)) {
-        if (isupper(*(unsigned char *)s))
-            i = i * 36 + (*s) - 'A' + 10;
-        else if (islower(*s))
+        if (islower(*s))
             i = i * 36 + (*s) - 'a' + 10;
         else if (isdigit(*s))
             i = i * 36 + (*s) - '0';
+        else if (isupper(*(unsigned char *)s))
+            i = i * 36 + (*s) - 'A' + 10;
         else
             break;
         ++s;
