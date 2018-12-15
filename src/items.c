@@ -142,7 +142,7 @@ struct order *ord)
         /* H�lt Spr�che bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
-        force = effect * 20;     /* Stufe 5 =~ 100 */
+        force = effect * 20.0;     /* Stufe 5 =~ 100 */
 
         /* Regionszauber aufl�sen */
         while (*ap && force > 0) {

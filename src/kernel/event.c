@@ -79,7 +79,8 @@ int read_triggers(struct gamedata *data, trigger ** tp)
 
 trigger *t_new(trigger_type * ttype)
 {
-    trigger *t = calloc(sizeof(trigger), 1);
+    trigger *t = calloc(1, sizeof(trigger));
+    if (!t) abort();
     t->type = ttype;
     if (ttype->initialize)
         ttype->initialize(t);
@@ -129,7 +130,7 @@ typedef struct handler_info {
 
 static void init_handler(variant *var)
 {
-    var->v = calloc(sizeof(handler_info), 1);
+    var->v = calloc(1, sizeof(handler_info));
 }
 
 static void free_handler(variant *var)
@@ -204,6 +205,7 @@ void add_trigger(struct attrib **ap, const char *eventname, struct trigger *t)
         td = (handler_info *)a->data.v;
         td->event = str_strdup(eventname);
     }
+    assert(td);
     tp = &td->triggers;
     while (*tp)
         tp = &(*tp)->next;

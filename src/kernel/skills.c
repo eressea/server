@@ -39,7 +39,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /** skillmod attribut **/
 static void init_skillmod(variant *var)
 {
-    var->v = calloc(sizeof(skillmod_data), 1);
+    var->v = calloc(1, sizeof(skillmod_data));
 }
 
 /** temporary skill modification (NOT SAVED!). */

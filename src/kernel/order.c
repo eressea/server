@@ -61,6 +61,7 @@ void odata_create(order_data **pdata, size_t len, const char *str)
 
     assert(pdata);
     data = malloc(sizeof(order_data) + len + 1);
+    if (!data) abort();
     data->_refcount = 1;
     result = (char *)(data + 1);
     data->_str = (len > 0) ? result : NULL;
@@ -230,6 +231,7 @@ order *copy_order(const order * src)
 {
     if (src != NULL) {
         order *ord = (order *)malloc(sizeof(order));
+        if (!ord) abort();
         ord->next = NULL;
         ord->command = src->command;
         ord->id = src->id;

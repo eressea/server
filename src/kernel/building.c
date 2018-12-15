@@ -285,7 +285,7 @@ static local_names *get_bnames(const struct locale *lang)
         selist *ql = buildingtypes;
         int qi;
 
-        bn = (local_names *)calloc(sizeof(local_names), 1);
+        bn = (local_names *)calloc(1, sizeof(local_names));
         bn->next = bnames;
         bn->lang = lang;
 

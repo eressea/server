@@ -1408,7 +1408,7 @@ static void init_prefixnames(void)
             in = in->next;
         }
         if (in == NULL) {
-            in = calloc(sizeof(local_names), 1);
+            in = calloc(1, sizeof(local_names));
             if (!in) abort();
         }
         in->next = pnames;

@@ -150,6 +150,7 @@ void read_planes(gamedata *data) {
 
         if (pl == NULL) {
             pl = calloc(1, sizeof(plane));
+            if (!pl) abort();
         }
         else {
             log_warning("the plane with id=%d already exists.", id);
@@ -239,6 +240,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
     READ_INT(data->store, &since_turn);
     if (since_turn >= 0) {
         region_owner *owner = malloc(sizeof(region_owner));
+        if (!owner) abort();
         owner->since_turn = since_turn;
         READ_INT(data->store, &owner->morale_turn);
         if (data->version >= MOURNING_VERSION) {
@@ -696,6 +698,7 @@ static region *readregion(gamedata *data, int x, int y)
             if (strcmp(name, "end") == 0)
                 break;
             res = malloc(sizeof(rawmaterial));
+            if (!res) abort();
             res->rtype = rt_find(name);
             if (!res->rtype && strncmp("rm_", name, 3) == 0) {
                 res->rtype = rt_find(name + 3);
@@ -1203,6 +1206,7 @@ struct building *read_building(gamedata *data) {
     storage * store = data->store;
 
     b = (building *)calloc(1, sizeof(building));
+    if (!b) abort();
     READ_INT(store, &b->no);
     bhash(b);
     READ_STR(store, name, sizeof(name));
@@ -1257,6 +1261,7 @@ ship *read_ship(gamedata *data)
     storage *store = data->store;
 
     sh = (ship *)calloc(1, sizeof(ship));
+    if (!sh) abort();
     READ_INT(store, &sh->no);
     shash(sh);
     READ_STR(store, name, sizeof(name));

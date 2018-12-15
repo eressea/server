@@ -69,8 +69,10 @@ static node *new_node(region * r, int distance, node * prev)
         n = node_garbage;
         node_garbage = n->next;
     }
-    else
+    else {
         n = malloc(sizeof(node));
+        if (!n) abort();
+    }
     n->next = NULL;
     n->prev = prev;
     n->r = r;

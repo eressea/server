@@ -79,7 +79,7 @@ static int json_flags(cJSON *json, const char *flags[]) {
 static void json_requirements(cJSON *json, requirement **matp) {
     cJSON *child;
     int i;
-    requirement *mat = calloc(sizeof(requirement), 1 + cJSON_GetArraySize(json));
+    requirement *mat = calloc(1 + cJSON_GetArraySize(json), sizeof(requirement));
     for (i = 0, child = json->child; child; child = child->next, ++i) {
         mat[i].number = child->valueint;
         mat[i].rtype = rt_get_or_create(child->string);
@@ -134,7 +134,7 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
         log_error("maintenance is not a json object or array (%d)", json->type);
         return;
     }
-    *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
+    *mtp = mt = (struct maintenance *) calloc(size + 1, sizeof(struct maintenance));
     if (json->type == cJSON_Array) {
         int i;
         for (i = 0, child = json->child; child; child = child->next, ++i) {
@@ -156,7 +156,7 @@ static void json_construction(cJSON *json, construction **consp) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
-    cons = (construction *)calloc(sizeof(construction), 1);
+    cons = (construction *)calloc(1, sizeof(construction));
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
@@ -332,7 +332,7 @@ static void json_stages(cJSON *json, building_type *bt) {
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
-            stage = calloc(sizeof(building_stage), 1);
+            stage = calloc(1, sizeof(building_stage));
             json_stage(child, stage);
             if (stage->construction->maxsize > 0) {
                 stage->construction->maxsize -= size;
@@ -375,7 +375,7 @@ static void json_building(cJSON *json, building_type *bt) {
             if (strcmp(child->string, "construction") == 0) {
                 /* simple, single-stage building */
                 if (!bt->stages) {
-                    building_stage *stage = calloc(sizeof(building_stage), 1);
+                    building_stage *stage = calloc(1, sizeof(building_stage));
                     json_construction(child, &stage->construction);
                     bt->stages = stage;
                 }

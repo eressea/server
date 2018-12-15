@@ -51,7 +51,7 @@ typedef struct changefaction_data {
 
 static void changefaction_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(changefaction_data), 1);
+    t->data.v = calloc(1, sizeof(changefaction_data));
 }
 
 static void changefaction_free(trigger * t)

@@ -231,7 +231,7 @@ plane *create_new_plane(int id, const char *name, int minx, int maxx, int miny,
     if (pl)
         return pl;
     pl = calloc(1, sizeof(plane));
-
+    if (!pl) abort();
     pl->next = NULL;
     pl->id = id;
     if (name)

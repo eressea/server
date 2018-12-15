@@ -154,7 +154,7 @@ int study_cost(struct unit *u, skill_t sk)
 
 static void init_learning(variant *var)
 {
-    var->v = calloc(sizeof(teaching_info), 1);
+    var->v = calloc(1, sizeof(teaching_info));
 }
 
 static void done_learning(variant *var)

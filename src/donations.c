@@ -48,7 +48,8 @@ void add_donation(faction * f1, faction * f2, int amount, region * r)
         tf->amount += amount;
     }
     else {
-        tf = malloc(sizeof(transfer));
+        tf = (transfer *)malloc(sizeof(transfer));
+        if (!tf) abort();
         memcpy(tf, &tr, sizeof(transfer));
     }
     selist_set_insert(&transfers, tf, cmp_transfer);

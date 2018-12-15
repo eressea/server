@@ -42,7 +42,7 @@ typedef struct timeout_data {
 
 static void timeout_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(timeout_data), 1);
+    t->data.v = calloc(1, sizeof(timeout_data));
 }
 
 static void timeout_free(trigger * t)
