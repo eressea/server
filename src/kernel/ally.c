@@ -1,6 +1,5 @@
 #include "platform.h"
 #include "config.h"
-#include "types.h"
 #include "ally.h"
 
 #include "unit.h"
