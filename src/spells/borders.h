@@ -9,8 +9,8 @@ extern "C" {
 
     extern void register_borders(void);
 
-    /* für Feuerwände: in movement muß das noch explizit getestet werden.
-     ** besser wäre eine blcok_type::move() routine, die den effekt
+    /* fuer Feuerwaende: in movement muss das noch explizit getestet werden.
+     ** besser waere eine blcok_type::move() routine, die den effekt
      ** der Bewegung auf eine struct unit anwendet.
      **/
     extern struct border_type bt_chaosgate;

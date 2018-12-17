@@ -175,7 +175,7 @@ void deathcounts(region * r, int fallen)
     }
 }
 
-/* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
+/* Moveblock wird zur Zeit nicht ueber Attribute, sondern ein Bitfeld
    r->moveblock gemacht. Sollte umgestellt werden, wenn kompliziertere
    Dinge gefragt werden. */
 
@@ -992,7 +992,7 @@ static char *makename(void)
         *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
-    /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
+    /* const char * vowels_latin1 = "aaaaaaaaaÃ Ã¢eeeeeeeeeÃ©Ã¨ÃªiiiiiiiiiÃ­Ã®oooooooooÃ³Ã²Ã´uuuuuuuuuÃºyy"; */
 
     nk = strlen(kons);
     ne = strlen(handle_end);
@@ -1105,7 +1105,7 @@ void init_region(region *r)
 
 void terraform_region(region * r, const terrain_type * terrain)
 {
-    /* Resourcen, die nicht mehr vorkommen können, löschen */
+    /* Resourcen, die nicht mehr vorkommen koennen, lÃ¶schen */
     const terrain_type *oldterrain = r->terrain;
     rawmaterial **lrm = &r->resources;
 
@@ -1266,7 +1266,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 #include "curse.h"
 int max_production(const region * r)
 {
-    /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
+    /* muss rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
     if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;

@@ -47,7 +47,7 @@ extern "C" {
 #define UFL_MOVED         (1<<8)
 #define UFL_NOTMOVING     (1<<9)        /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
 #define UFL_DEFENDER      (1<<10)
-#define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
+#define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl ausser ARBEITE ausfuehren */
 #define UFL_TARGET        (1<<13)       /* speedup: hat ein target, siehe attribut */
 #define UFL_WERE          (1<<14)
 #define UFL_ENTER         (1<<15)       /* unit has entered a ship/building and will not leave it */
@@ -55,14 +55,14 @@ extern "C" {
     /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16)       /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
 #define UFL_FLEEING       (1<<17)       /* unit was in a battle, fleeing. */
-#define UFL_STORM         (1<<19)       /* Kapitän war in einem Sturm */
+#define UFL_STORM         (1<<19)       /* Kapitaen war in einem Sturm */
 #define UFL_FOLLOWING     (1<<20)
 #define UFL_FOLLOWED      (1<<21)
 
 #define UFL_NOAID         (1<<22)       /* Einheit hat Noaid-Status */
 #define UFL_MARK          (1<<23)       /* same as FL_MARK */
 #define UFL_ORDERS        (1<<24)       /* Einheit hat Befehle erhalten */
-#define UFL_TAKEALL       (1<<25)       /* Einheit nimmt alle Gegenstände an */
+#define UFL_TAKEALL       (1<<25)       /* Einheit nimmt alle Gegenstaende an */
 
     /* flags that speed up attribute access: */
 #define UFL_STEALTH       (1<<26)
@@ -84,7 +84,7 @@ extern "C" {
 
     typedef struct unit {
         struct unit *next;          /* needs to be first entry, for region's unitlist */
-        struct unit *nextF;         /* nächste Einheit der Partei */
+        struct unit *nextF;         /* naechste Einheit der Partei */
         struct unit *prevF;         /* vorherige Einheit der Partei */
         struct region *region;
         int no;                     /* id */

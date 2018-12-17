@@ -25,8 +25,8 @@ void init_direction(const struct locale *lang, direction_t dir, const char *str)
 }
 
 void init_directions(struct locale *lang) {
-    /* mit dieser routine kann man mehrere namen für eine direction geben,
-     * das ist für die hexes ideal. */
+    /* mit dieser routine kann man mehrere namen fuer eine direction geben,
+     * das ist fuer die hexes ideal. */
     const struct {
         const char *name;
         direction_t direction;
