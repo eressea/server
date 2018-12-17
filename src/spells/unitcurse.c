@@ -42,7 +42,7 @@
 /*
  * C_AURA
  */
-/* erhöht/senkt regeneration und maxaura um effect% */
+/* erhoeht/senkt regeneration und maxaura um effect% */
 static message *cinfo_auraboost(const void *obj, objtype_t typ, const curse * c,
     int self)
 {

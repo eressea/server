@@ -409,7 +409,7 @@ void report_raceinfo(const struct race *rc, const struct locale *lang, struct sb
     sbs_strcat(sbp, ": ");
     sbs_strcat(sbp, str_itoa(rc->df_default + rc->df_bonus));
 
-    /* b_armor : Rüstung */
+    /* b_armor : Ruestung */
     if (rc->armor > 0) {
         sbs_strcat(sbp, ", ");
         sbs_strcat(sbp, LOC(lang, "stat_armor"));

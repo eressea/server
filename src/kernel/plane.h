@@ -32,14 +32,14 @@ extern "C" {
 #define PFL_NORECRUITS      2   /* cannot recruit */
 #define PFL_NOALLIANCES     4   /* not implemented */
 #define PFL_LOWSTEALING     8   /* not implemented */
-#define PFL_NOGIVE         16   /* Übergaben sind unmöglich */
-#define PFL_NOATTACK       32   /* Angriffe und Diebstähle sind unmöglich */
+#define PFL_NOGIVE         16   /* Ãœbergaben sind unmoeglich */
+#define PFL_NOATTACK       32   /* Angriffe und Diebstaehle sind unmoeglich */
 #define PFL_NOTERRAIN      64   /* Terraintyp wird nicht angezeigt TODO? */
-#define PFL_NOMAGIC       128   /* Zaubern ist unmöglich */
-#define PFL_NOSTEALTH     256   /* Tarnung außer Betrieb */
-#define PFL_NOTEACH       512   /* Lehre außer Betrieb */
-#define PFL_NOBUILD      1024   /* Bauen außer Betrieb */
-#define PFL_NOFEED       2048   /* Kein Unterhalt nötig */
+#define PFL_NOMAGIC       128   /* Zaubern ist unmoeglich */
+#define PFL_NOSTEALTH     256   /* Tarnung ausser Betrieb */
+#define PFL_NOTEACH       512   /* Lehre ausser Betrieb */
+#define PFL_NOBUILD      1024   /* Bauen ausser Betrieb */
+#define PFL_NOFEED       2048   /* Kein Unterhalt noetig */
 #define PFL_FRIENDLY     4096   /* not implemented */
 #define PFL_NOORCGROWTH  8192   /* orcs don't grow */
 #define PFL_NOMONSTERS  16384   /* no monster randenc */

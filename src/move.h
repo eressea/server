@@ -46,11 +46,11 @@ extern "C" {
 #define BP_NORMAL 3
 #define BP_ROAD   2
 
-    /* die Zahlen sind genau äquivalent zu den race Flags */
+    /* die Zahlen sind genau aequivalent zu den race Flags */
 #define MV_CANNOTMOVE     (1<<5)
 #define MV_FLY            (1<<7)        /* kann fliegen */
 #define MV_SWIM           (1<<8)        /* kann schwimmen */
-#define MV_WALK           (1<<9)        /* kann über Land gehen */
+#define MV_WALK           (1<<9)        /* kann ueber Land gehen */
 
 #define HORSES_PER_CART    2 /* number of horses for a cart */
 #define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */

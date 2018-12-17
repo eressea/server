@@ -80,7 +80,7 @@ const struct curse_type ct_magicwalls = { "magicwalls",
 CURSETYP_NORM, CURSE_ONLYONE|CURSE_NOAGE, NO_MERGE, cinfo_building
 };
 
-/* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
+/* Feste Mauer - Praekampfzauber, wirkt nur 1 Runde */
 const struct curse_type ct_strongwall = { "strongwall",
 CURSETYP_NORM, 0, NO_MERGE, NULL
 };
