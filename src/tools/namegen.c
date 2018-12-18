@@ -125,7 +125,7 @@ static char *entish_syllable2[] = {
 };
 
 static char *entish_syllable3[] = {
-  "Hüter", "Pflanzer", "Hirte", "Wächter", "Wachser", "Beschützer",
+  "Hueter", "Pflanzer", "Hirte", "Waechter", "Wachser", "BeschÃ¼tzer",
 };
 
 static char *cthuloid_syllable1[] = {

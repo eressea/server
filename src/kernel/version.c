@@ -3,6 +3,7 @@
 #endif
 #include "version.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #ifndef ERESSEA_VERSION
