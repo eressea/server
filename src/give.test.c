@@ -58,6 +58,7 @@ static void setup_give(struct give *env) {
         env->f1->locale = env->lang;
     }
 
+    config_set("rules.give.max_men", "-1");
     /* success messages: */
     mt_create_va(mt_new("receive_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
     mt_create_va(mt_new("give_person", NULL), "unit:unit", "target:unit", "amount:int", MT_NEW_END);
@@ -67,6 +68,8 @@ static void setup_give(struct give *env) {
     mt_create_va(mt_new("give", NULL), "unit:unit", "target:unit", "resource:resource", "amount:int", MT_NEW_END);
     mt_create_va(mt_new("give_peasants", NULL), "unit:unit", "resource:resource", "amount:int", MT_NEW_END);
     /* error messages: */
+    mt_create_error(120);
+    mt_create_error(128);
     mt_create_error(129);
     mt_create_error(96);
     mt_create_error(10);
@@ -88,10 +91,14 @@ static void test_give_unit(CuTest * tc) {
     env.f1 = test_create_faction(NULL);
     env.f2 = test_create_faction(NULL);
     setup_give(&env);
+    CuAssertIntEquals(tc, 1, env.f1->num_units);
+    CuAssertIntEquals(tc, 1, env.f2->num_units);
+
     config_set("rules.give.max_men", "0");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
+
     config_set("rules.give.max_men", "-1");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
@@ -99,6 +106,42 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrEquals(tc, NULL, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
+
+    test_teardown();
+}
+
+static void test_give_unit_humans(CuTest * tc) {
+    struct give env = { 0 };
+    race *rc;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction(test_create_race("elf"));
+    env.f2 = test_create_faction(rc = test_create_race("human"));
+    rc->flags |= RCF_MIGRANTS;
+    setup_give(&env);
+
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error128"));
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+
+    scale_number(env.dst, 57);
+    CuAssertIntEquals(tc, 1, count_maxmigrants(env.f2));
+    give_unit(env.src, env.dst, NULL);
+    CuAssertIntEquals(tc, 1, env.f2->newbies);
+    test_teardown();
+}
+
+static void test_give_unit_other_race(CuTest * tc) {
+    struct give env = { 0 };
+    test_setup_ex(tc);
+    env.f1 = test_create_faction(test_create_race("elf"));
+    env.f2 = test_create_faction(test_create_race("orc"));
+    setup_give(&env);
+    scale_number(env.dst, 57);
+    CuAssertIntEquals(tc, 0, count_maxmigrants(env.f2));
+    give_unit(env.src, env.dst, NULL);
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error120"));
     test_teardown();
 }
 
@@ -108,9 +151,8 @@ static void test_give_unit_limits(CuTest * tc) {
     env.f1 = test_create_faction(NULL);
     env.f2 = test_create_faction(NULL);
     setup_give(&env);
-    CuAssertIntEquals(tc, 1, env.f1->num_units);
-    CuAssertIntEquals(tc, 1, env.f2->num_units);
     config_set("rules.limit.faction", "1");
+
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
@@ -497,6 +539,8 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
     SUITE_ADD_TEST(suite, test_give_unit);
+    SUITE_ADD_TEST(suite, test_give_unit_humans);
+    SUITE_ADD_TEST(suite, test_give_unit_other_race);
     SUITE_ADD_TEST(suite, test_give_unit_limits);
     SUITE_ADD_TEST(suite, test_give_unit_to_ocean);
     SUITE_ADD_TEST(suite, test_give_unit_to_peasants);
