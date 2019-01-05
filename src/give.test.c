@@ -8,6 +8,7 @@
 #include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -87,12 +88,15 @@ static void setup_give(struct give *env) {
 
 static void test_give_unit(CuTest * tc) {
     struct give env = { 0 };
+
     test_setup_ex(tc);
     env.f1 = test_create_faction(NULL);
     env.f2 = test_create_faction(NULL);
     setup_give(&env);
+
     CuAssertIntEquals(tc, 1, env.f1->num_units);
     CuAssertIntEquals(tc, 1, env.f2->num_units);
+    join_group(env.src, "group");
 
     config_set("rules.give.max_men", "0");
     give_unit(env.src, env.dst, NULL);
@@ -102,6 +106,7 @@ static void test_give_unit(CuTest * tc) {
     config_set("rules.give.max_men", "-1");
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
+    CuAssertPtrEquals(tc, NULL, get_group(env.src));
     CuAssertIntEquals(tc, 1, env.f2->newbies);
     CuAssertPtrEquals(tc, NULL, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
