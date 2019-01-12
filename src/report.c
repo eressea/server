@@ -1276,6 +1276,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     stream strm = { 0 }, *out = &strm;
     char buf[4096];
     sbstring sbs;
+    const char *password = "password";
 
     if (F == NULL) {
         perror(filename);
@@ -1287,12 +1288,17 @@ report_template(const char *filename, report_context * ctx, const char *bom)
         swrite(bom, 1, strlen(bom), out);
     }
 
-    newline(out);
-    rps_nowrap(out, LOC(lang, "nr_template"));
-    newline(out);
-    newline(out);
+    sprintf(buf, "; %s\n", LOC(lang, "nr_template"));
+    rps_nowrap(out, buf);
 
-    sprintf(buf, "%s %s \"password\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no));
+    if (ctx->password) {
+        password = ctx->password;
+    }
+    else {
+        sprintf(buf, "; %s\n", LOC(lang, "template_password_notice"));
+        rps_nowrap(out, buf);
+    }
+    sprintf(buf, "%s %s \"%s\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no), password);
     rps_nowrap(out, buf);
     newline(out);
     newline(out);

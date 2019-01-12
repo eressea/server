@@ -71,6 +71,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
+#include "util/password.h"
 #include "util/strings.h"
 #include "util/translation.h"
 #include <stream.h>
@@ -1480,7 +1481,7 @@ void report_warnings(faction *f, int now)
  * this function may also update ctx->last and ctx->first for potential
  * lighthouses and travelthru reports
  */
-void prepare_report(report_context *ctx, faction *f)
+void prepare_report(report_context *ctx, faction *f, const char *password)
 {
     region *r;
     static int config;
@@ -1496,6 +1497,7 @@ void prepare_report(report_context *ctx, faction *f)
         rule_lighthouse_units = config_get_int("rules.lighthouse.unit_capacity", 0) != 0;
     }
 
+    ctx->password = password;
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
@@ -1597,15 +1599,16 @@ int write_reports(faction * f)
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
+    char buffer[PASSWORD_MAXSIZE], *password = NULL;
     if (noreports) {
         return false;
     }
     if (f->lastorders == 0 || f->age <= 1) {
         /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
          * kriegen ein neues Passwort: */
-        faction_genpassword(f);
+        password = faction_genpassword(f);
     }
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, password);
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {

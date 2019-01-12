@@ -205,10 +205,11 @@ static int unused_faction_id(void)
     return id;
 }
 
-void faction_genpassword(faction *f) {
-    const char * password = itoa36(rng_int());
-    faction_setpassword(f, password_hash(password, PASSWORD_DEFAULT));
-    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+char *faction_genpassword(faction *f, char *buffer) {
+    password_generate(buffer, 8);
+    faction_setpassword(f, password_hash(buffer, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", buffer));
+    return buffer;
 }
 
 faction *addfaction(const char *email, const char *password,
