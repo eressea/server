@@ -6015,6 +6015,9 @@ msgstr "Eigentümer"
 msgid "nr_template"
 msgstr "Vorlage für den nächsten Zug:"
 
+msgid "template_password_notice"
+msgstr "Achtung: Hier muss das Passwort Deiner Partei eingefügt werden."
+
 msgctxt "skill"
 msgid "espionage"
 msgstr "Spionage"

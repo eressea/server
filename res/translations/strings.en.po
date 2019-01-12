@@ -5323,6 +5323,9 @@ msgstr "Owner"
 msgid "nr_template"
 msgstr "Template for the next turn:"
 
+msgid "template_password_notice"
+msgstr "Attention: Enter your faction's password here."
+
 msgctxt "skill"
 msgid "espionage"
 msgstr "espionage"
