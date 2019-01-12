@@ -1179,6 +1179,7 @@ static void statistics(struct stream *out, const region * r, const faction * f)
     m = msg_message("nr_stat_header", "region", r);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
+    newline(out);
     paragraph(out, buf, 0, 0, 0);
     newline(out);
 
