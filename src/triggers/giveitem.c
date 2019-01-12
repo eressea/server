@@ -51,7 +51,7 @@ typedef struct giveitem_data {
 
 static void giveitem_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(giveitem_data), 1);
+    t->data.v = calloc(1, sizeof(giveitem_data));
 }
 
 static void giveitem_free(trigger * t)

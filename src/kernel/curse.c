@@ -333,8 +333,8 @@ void ct_checknames(void) {
 }
 
 /* ------------------------------------------------------------- */
-/* get_curse identifiziert eine Verzauberung über die ID und gibt
- * einen pointer auf die struct zurück.
+/* get_curse identifiziert eine Verzauberung ueber die ID und gibt
+ * einen pointer auf die struct zurueck.
  */
 
 static bool cmp_curse(const attrib * a, const void *data)
@@ -387,7 +387,7 @@ bool remove_curse(attrib ** ap, const curse * c)
     return a && a_remove(ap, a) == 1;
 }
 
-/* gibt die allgemeine Stärke der Verzauberung zurück. id2 wird wie
+/* gibt die allgemeine Staerke der Verzauberung zurueck. id2 wird wie
  * oben benutzt. Dies ist nicht die Wirkung, sondern die Kraft und
  * damit der gegen Antimagie wirkende Widerstand einer Verzauberung */
 static double get_cursevigour(const curse * c)
@@ -395,15 +395,15 @@ static double get_cursevigour(const curse * c)
     return c ? c->vigour : 0;
 }
 
-/* setzt die Stärke der Verzauberung auf i */
+/* setzt die Staerke der Verzauberung auf i */
 static void set_cursevigour(curse * c, double vigour)
 {
     assert(c && vigour > 0);
     c->vigour = vigour;
 }
 
-/* verändert die Stärke der Verzauberung um +i und gibt die neue
- * Stärke zurück. Sollte die Zauberstärke unter Null sinken, löst er
+/* veraendert die StÃ¤rke der Verzauberung um +i und gibt die neue
+ * Staerke zurueck. Sollte die ZauberstÃ¤rke unter Null sinken, loest er
  * sich auf.
  */
 double curse_changevigour(attrib ** ap, curse * c, double vigour)
@@ -453,8 +453,8 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target,
 }
 
 /* ------------------------------------------------------------- */
-/* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
- * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
+/* gibt bei Personenbeschraenkten Verzauberungen die Anzahl der
+ * betroffenen Personen zurueck. Ansonsten wird 0 zurÃ¼ckgegeben. */
 int get_cursedmen(const unit * u, const curse * c)
 {
     int cursedmen = u->number;
@@ -502,7 +502,7 @@ static int newcurseid(void) {
 
 /* ------------------------------------------------------------- */
 /* Legt eine neue Verzauberung an. Sollte es schon einen Zauber
- * dieses Typs geben, gibt es den bestehenden zurück.
+ * dieses Typs geben, gibt es den bestehenden zurueck.
  */
 static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
     double vigour, int duration, double effect, int men)
@@ -535,7 +535,7 @@ static curse *make_curse(unit * mage, attrib ** ap, const curse_type * ct,
     return c;
 }
 
-/* Mapperfunktion für das Anlegen neuer curse. Automatisch wird zum
+/* Mapperfunktion fuer das Anlegen neuer curse. Automatisch wird zum
  * passenden Typ verzweigt und die relevanten Variablen weitergegeben.
  */
 curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
@@ -585,8 +585,8 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
 }
 
 /* ------------------------------------------------------------- */
-/* hier müssen alle c-typen, die auf Einheiten gezaubert werden können,
- * berücksichtigt werden */
+/* hier muessen alle c-typen, die auf Einheiten gezaubert werden koennen,
+ * beruecksichtigt werden */
 
 static void do_transfer_curse(curse * c, const unit * u, unit * u2, int n)
 {
@@ -705,15 +705,15 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 }
 
 /* ------------------------------------------------------------- */
-/* Antimagie - curse auflösen */
+/* Antimagie - curse aufloesen */
 /* ------------------------------------------------------------- */
 
-/* Wenn der Curse schwächer ist als der cast_level, dann wird er
-* aufgelöst, bzw seine Kraft (vigour) auf 0 gesetzt.
+/* Wenn der Curse schwaecher ist als der cast_level, dann wird er
+* aufgeloest, bzw seine Kraft (vigour) auf 0 gesetzt.
 * Ist der cast_level zu gering, hat die Antimagie nur mit einer Chance
 * von 100-20*Stufenunterschied % eine Wirkung auf den Curse. Dann wird
-* die Kraft des Curse um die halbe Stärke der Antimagie reduziert.
-* Zurückgegeben wird der noch unverbrauchte Rest von force.
+* die Kraft des Curse um die halbe Staerke der Antimagie reduziert.
+* Zurueckgegeben wird der noch unverbrauchte Rest von force.
 */
 double destr_curse(curse * c, int cast_level, double force)
 {
@@ -730,7 +730,7 @@ double destr_curse(curse * c, int cast_level, double force)
             }
         }
     }
-    else {                      /* Zauber ist stärker als curse */
+    else {                      /* Zauber ist staerker als curse */
         if (force >= c->vigour) {   /* reicht die Kraft noch aus? */
             force -= c->vigour;
             if (c->type->change_vigour) {

@@ -56,7 +56,8 @@ void renumber_factions(void)
             ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
         }
         else {
-            struct renum *r = calloc(sizeof(struct renum), 1);
+            struct renum *r = calloc(1, sizeof(struct renum));
+            if (!r) abort();
             r->next = *rn;
             r->attrib = a;
             r->faction = f;

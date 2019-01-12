@@ -24,10 +24,10 @@ extern "C" {
 #endif
 
     /* diverse Flags */
-    /* Strassen und Gebäude können gebaut werden, wenn max_road > 0 */
+    /* Strassen und Gebaeude koennen gebaut werden, wenn max_road > 0 */
 #define LAND_REGION      (1<<0) /* Standard-Land-struct region */
 #define SEA_REGION       (1<<1) /* hier braucht man ein Boot */
-#define FOREST_REGION    (1<<2) /* Elfen- und Kampfvorteil durch Bäume */
+#define FOREST_REGION    (1<<2) /* Elfen- und Kampfvorteil durch Baeume */
 #define ARCTIC_REGION    (1<<3) /* Gletscher & co = Keine Insekten! */
 #define CAVALRY_REGION   (1<<4) /* riding in combat is possible */
     /* Achtung: SEA_REGION ist nicht das Gegenteil von LAND_REGION. Die zwei schliessen sich nichtmal aus! */

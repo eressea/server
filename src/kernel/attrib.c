@@ -377,6 +377,7 @@ attrib *a_new(const attrib_type * at)
 {
     attrib *a = (attrib *)calloc(1, sizeof(attrib));
     assert(at != NULL);
+    if (!a) abort();
     a->type = at;
     if (at->initialize)
         at->initialize(&a->data);

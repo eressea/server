@@ -223,12 +223,6 @@ int read_orders(input *in)
     return 0;
 }
 
-static const char * file_getbuf(void *data)
-{
-    FILE *F = (FILE *)data;
-    return getbuf(F);
-}
-
 typedef struct parser_state {
     unit *u;
     faction *f;
@@ -354,15 +348,4 @@ int parseorders(FILE *F)
     }
     OP_ParserFree(parser);
     return err;
-}
-
-int readorders(FILE *F)
-{
-    int result;
-
-    input in;
-    in.getbuf = file_getbuf;
-    in.data = F;
-    result = read_orders(&in);
-    return result;
 }

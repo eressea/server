@@ -85,6 +85,7 @@ int update_nmrs(void)
         int i;
         if (nmrs == NULL) {
             nmrs = malloc(sizeof(int) * (timeout + 1));
+            if (!nmrs) abort();
         }
         for (i = 0; i <= timeout; ++i) {
             nmrs[i] = 0;
@@ -404,7 +405,7 @@ summary *make_summary(void)
         while (plang && plang->locale != lang)
             plang = plang->next;
         if (!plang) {
-            plang = calloc(sizeof(struct language), 1);
+            plang = calloc(1, sizeof(struct language));
             plang->next = s->languages;
             s->languages = plang;
             plang->locale = lang;

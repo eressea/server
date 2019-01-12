@@ -779,9 +779,9 @@ static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *
     }
     if (shipfirst) {
         *firstu = shipfirst;
-    }
-    for (u = *firstu; u != *lastu; u = u->next) {
-        freset(u->faction, FFL_MARK);
+        for (u = *firstu; u != *lastu; u = u->next) {
+            freset(u->faction, FFL_MARK);
+        }
     }
     msg_release(msg);
 }
@@ -1724,8 +1724,9 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
 
-    if (routep)
+    if (routep) {
         *routep = NULL;
+    }
 
     error = movewhere(u, token, starting_point, &next_point);
     if (error) {
@@ -1966,7 +1967,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         if (fval(u, UFL_FOLLOWING))
             caught_target(current_point, u);
 
-        move_ship(sh, starting_point, current_point, *routep);
+        move_ship(sh, starting_point, current_point, routep ? *routep : NULL);
 
         /* Hafengebühren ? */
 

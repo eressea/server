@@ -42,3 +42,12 @@ int password_verify(const char * pwhash, const char * passwd) {
     }
     return (strcmp(passwd, pwhash) == 0) ? VERIFY_OK : VERIFY_FAIL;
 }
+
+void password_generate(char *password, size_t length) {
+    char salt[BCRYPT_HASHSIZE];
+
+    assert(BCRYPT_HASHSIZE - 7 > length);
+    bcrypt_gensalt(4, salt);
+    memcpy(password, salt + 7, length);
+    password[length] = 0;
+}

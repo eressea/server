@@ -3,6 +3,7 @@
 #endif
 #include "version.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 #ifndef ERESSEA_VERSION
@@ -19,7 +20,8 @@ const char *eressea_version(void) {
 }
 
 int version_no(const char *str) {
-    int maj = 0, min = 0, pat = 0;
-    sscanf(str, "%4d.%4d.%4d", &maj, &min, &pat);
+    int c, maj = 0, min = 0, pat = 0;
+    c = sscanf(str, "%4d.%4d.%4d", &maj, &min, &pat);
+    assert(c == 3);
     return (maj << 16) | (min << 8) | pat;
 }

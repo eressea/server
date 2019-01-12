@@ -55,6 +55,7 @@ group *new_group(faction * f, const char *name, int gid)
     int index = gid % GMAXHASH;
     group *g = calloc(1, sizeof(group));
 
+    if (!g) abort();
     while (*gp)
         gp = &(*gp)->next;
     *gp = g;

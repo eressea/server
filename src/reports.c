@@ -71,6 +71,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "util/log.h"
 #include "util/macros.h"
 #include "util/path.h"
+#include "util/password.h"
 #include "util/strings.h"
 #include "util/translation.h"
 #include <stream.h>
@@ -409,7 +410,7 @@ void report_raceinfo(const struct race *rc, const struct locale *lang, struct sb
     sbs_strcat(sbp, ": ");
     sbs_strcat(sbp, str_itoa(rc->df_default + rc->df_bonus));
 
-    /* b_armor : Rüstung */
+    /* b_armor : Ruestung */
     if (rc->armor > 0) {
         sbs_strcat(sbp, ", ");
         sbs_strcat(sbp, LOC(lang, "stat_armor"));
@@ -975,6 +976,7 @@ void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
      * Vgl. spunit (). */
 
     char *buflocal = calloc(strlen(s) + indent + 1, sizeof(char));
+    if (!buflocal) abort();
 
     if (indent) {
         memset(buflocal, ' ', indent);
@@ -1174,6 +1176,7 @@ static report_type *report_types;
 void register_reporttype(const char *extension, report_fun write, int flag)
 {
     report_type *type = (report_type *)malloc(sizeof(report_type));
+    if (!type) abort();
     type->extension = extension;
     type->write = write;
     type->flag = flag;
@@ -1478,7 +1481,7 @@ void report_warnings(faction *f, int now)
  * this function may also update ctx->last and ctx->first for potential
  * lighthouses and travelthru reports
  */
-void prepare_report(report_context *ctx, faction *f)
+void prepare_report(report_context *ctx, faction *f, const char *password)
 {
     region *r;
     static int config;
@@ -1494,6 +1497,7 @@ void prepare_report(report_context *ctx, faction *f)
         rule_lighthouse_units = config_get_int("rules.lighthouse.unit_capacity", 0) != 0;
     }
 
+    ctx->password = password;
     ctx->f = f;
     ctx->report_time = time(NULL);
     ctx->addresses = NULL;
@@ -1595,13 +1599,14 @@ int write_reports(faction * f)
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
+    char buffer[PASSWORD_MAXSIZE], *password = NULL;
     if (noreports) {
         return false;
     }
     if (f->lastorders == 0) {
-        faction_genpassword(f);
+        password = faction_genpassword(f, buffer);
     }
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, password);
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
@@ -1738,6 +1743,7 @@ static variant var_copy_items(variant x)
 
     for (isrc = (item *)x.v; isrc != NULL; isrc = isrc->next) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = isrc->number;
         res->type = isrc->type->rtype;
         *rptr = res;
@@ -1755,6 +1761,7 @@ static variant var_copy_resources(variant x)
 
     for (rsrc = (resource *)x.v; rsrc != NULL; rsrc = rsrc->next) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = rsrc->number;
         res->type = rsrc->type;
         *rptr = res;

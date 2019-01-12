@@ -125,7 +125,7 @@ terrain_type * get_or_create_terrain(const char *name) {
     terrain_type *terrain = terrain_find_i(name);
     if (!terrain) {
         ++terrain_changes;
-        terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
+        terrain = (terrain_type *)calloc(1, sizeof(terrain_type));
         if (terrain) {
             terrain->_name = str_strdup(name);
             terrain->next = registered_terrains;

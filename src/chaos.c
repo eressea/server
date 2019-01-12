@@ -53,12 +53,12 @@ static const terrain_type *chaosterrain(void)
             }
         }
         if (numtypes > 0) {
+            int n = 0;
             types = malloc(sizeof(terrain_type *) * numtypes);
             if (!types) abort();
-            numtypes = 0;
-            for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+            for (terrain = terrains(); n != numtypes && terrain != NULL; terrain = terrain->next) {
                 if ((terrain->flags & LAND_REGION) && terrain->herbs) {
-                    types[numtypes++] = terrain;
+                    types[n++] = terrain;
                 }
             }
         }
