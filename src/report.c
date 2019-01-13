@@ -2170,6 +2170,7 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
+        newline(out);
 
         if (wants_stats && r->seen.mode >= seen_unit) {
             statistics(out, r, f);
