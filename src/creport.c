@@ -1399,7 +1399,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
             fprintf(F, "%d;Bauern\n", rpeasants(r));
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
-            if (r->seen.mode >= seen_unit) {
+            if (r->seen.mode >= seen_travel) {
                 if (rule_region_owners()) {
                     faction *owner = region_get_owner(r);
                     if (owner) {
