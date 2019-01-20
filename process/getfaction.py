@@ -3,7 +3,7 @@
 import sys, re
 from epasswd import EPasswd
 
-if len(sys.argv)<4:
+if len(sys.argv)<3:
     sys.exit(-2)
 
 filename=sys.argv[1]
@@ -23,8 +23,8 @@ except:
     log("loaded from file " + filename)
 
 if pw_data.fac_exists(myfaction):
-    log("faction found: " + myfaction)
     print(pw_data.get_email(myfaction))
+    log("faction found: " + myfaction)
     sys.exit(0)
 else:
     log("faction missing: " + myfaction)
