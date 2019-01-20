@@ -35,7 +35,7 @@ PWFILE="game-$GAME/eressea.db"
 if [ ! -e "$PWFILE" ]; then
   PWFILE="game-$GAME/passwd"
 fi
-$BIN/checkpasswd.py "$PWFILE" "$FACTION" "$PASSWD" || reply "Das Passwort fuer die Partei $FACTION ist ungueltig"
+"$BIN/checkpasswd.py" "$PWFILE" "$FACTION" "$PASSWD" || reply "Das Passwort fuer die Partei $FACTION ist ungueltig"
 
 cd "$ERESSEA/game-$GAME/reports" || exit
 if [ ! -e "${FACTION}.sh" ]; then
@@ -46,7 +46,7 @@ fi
 
 bash "${FACTION}.sh" "$EMAIL" || reply "Unbekannte Partei $FACTION"
 
-OWNER=$($BIN/getfaction.py "$PWFILE" "$FACTION")
+OWNER=$("$BIN/getfaction.py" "$PWFILE" "$FACTION")
 if [ ! -z "$OWNER" ]; then
   echo "Der Report Deiner Partei wurde an ${EMAIL} gesandt." \
   | mutt -s "Reportnachforderung Partei ${FACTION}" "$OWNER"
