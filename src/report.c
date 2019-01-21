@@ -1160,21 +1160,10 @@ void report_region(struct stream *out, const region * r, faction * f)
 
 static void statistics(struct stream *out, const region * r, const faction * f)
 {
-    const unit *u;
-    int number = 0, p = rpeasants(r);
+    int p = rpeasants(r);
     message *m;
-    item *itm, *items = NULL;
     char buf[4096];
 
-    /* count */
-    for (u = r->units; u; u = u->next) {
-        if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
-            for (itm = u->items; itm; itm = itm->next) {
-                i_change(&items, itm->type, itm->number);
-            }
-            number += u->number;
-        }
-    }
     /* print */
     m = msg_message("nr_stat_header", "region", r);
     nr_render(m, f->locale, buf, sizeof(buf), f);
@@ -1210,6 +1199,21 @@ static void statistics(struct stream *out, const region * r, const faction * f)
         paragraph(out, buf, 2, 2, 0);
         msg_release(m);
 
+        if (r->land->ownership) {
+            m = msg_message("nr_stat_morale", "morale", region_get_morale(r));
+            nr_render(m, f->locale, buf, sizeof(buf), f);
+            paragraph(out, buf, 2, 2, 0);
+            msg_release(m);
+        }
+
+    }
+
+    /* info about units */
+    if (r->seen.mode >= seen_unit) {
+        int number;
+        item *itm, *items = NULL;
+        unit *u;
+
         if (!markets_module()) {
             if (buildingtype_exists(r, bt_find("caravan"), true)) {
                 m = msg_message("nr_stat_luxuries", "max", (p * 2) / TRADE_FRACTION);
@@ -1222,28 +1226,28 @@ static void statistics(struct stream *out, const region * r, const faction * f)
             msg_release(m);
         }
 
-        if (r->land->ownership) {
-            m = msg_message("nr_stat_morale", "morale", region_get_morale(r));
-            nr_render(m, f->locale, buf, sizeof(buf), f);
-            paragraph(out, buf, 2, 2, 0);
-            msg_release(m);
+        /* count */
+        for (number = 0, u = r->units; u; u = u->next) {
+            if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
+                for (itm = u->items; itm; itm = itm->next) {
+                    i_change(&items, itm->type, itm->number);
+                }
+                number += u->number;
+            }
         }
-
-    }
-    /* info about units */
-
-    m = msg_message("nr_stat_people", "max", number);
-    nr_render(m, f->locale, buf, sizeof(buf), f);
-    paragraph(out, buf, 2, 2, 0);
-    msg_release(m);
-
-    for (itm = items; itm; itm = itm->next) {
-        sprintf(buf, "%s: %d",
-            LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
+        m = msg_message("nr_stat_people", "max", number);
+        nr_render(m, f->locale, buf, sizeof(buf), f);
         paragraph(out, buf, 2, 2, 0);
+        msg_release(m);
+
+        for (itm = items; itm; itm = itm->next) {
+            sprintf(buf, "%s: %d",
+                LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
+            paragraph(out, buf, 2, 2, 0);
+        }
+        while (items)
+            i_free(i_remove(&items, items));
     }
-    while (items)
-        i_free(i_remove(&items, items));
 }
 
 
@@ -1275,6 +1279,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     stream strm = { 0 }, *out = &strm;
     char buf[4096];
     sbstring sbs;
+    const char *password = "password";
 
     if (F == NULL) {
         perror(filename);
@@ -1286,12 +1291,17 @@ report_template(const char *filename, report_context * ctx, const char *bom)
         swrite(bom, 1, strlen(bom), out);
     }
 
-    newline(out);
-    rps_nowrap(out, LOC(lang, "nr_template"));
-    newline(out);
-    newline(out);
+    sprintf(buf, "; %s\n", LOC(lang, "nr_template"));
+    rps_nowrap(out, buf);
 
-    sprintf(buf, "%s %s \"password\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no));
+    if (ctx->password) {
+        password = ctx->password;
+    }
+    else {
+        sprintf(buf, "; %s\n", LOC(lang, "template_password_notice"));
+        rps_nowrap(out, buf);
+    }
+    sprintf(buf, "%s %s \"%s\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no), password);
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -2163,10 +2173,13 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
+        newline(out);
 
-        if (wants_stats && r->seen.mode >= seen_unit) {
-            statistics(out, r, f);
-            newline(out);
+        if (wants_stats && r->seen.mode >= seen_travel) {
+            if (r->land || r->seen.mode >= seen_unit) {
+                newline(out);
+                statistics(out, r, f);
+            }
         }
 
         /* Nachrichten an REGION in der Region */
