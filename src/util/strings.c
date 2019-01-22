@@ -64,8 +64,8 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
     register const char *s = src;
     register size_t n = len;
 
-    assert(src);
-    assert(dst);
+    assert(src != NULL);
+    assert(dst != NULL);
     /* Copy as many bytes as will fit */
     if (n != 0 && --n != 0) {
         do {
@@ -82,7 +82,7 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
         return (s - src) + strlen(s); /* count does not include NUL */
     }
 
-    return (s - src - 1);         /* count does not include NUL */
+    return (size_t)(s - src - 1);         /* count does not include NUL */
 #endif
 }
 
@@ -99,7 +99,7 @@ size_t str_strlcat(char *dst, const char *src, size_t len)
     /* Find the end of dst and adjust bytes left but don't go past end */
     while (*d != '\0' && n-- != 0)
         d++;
-    dlen = d - dst;
+    dlen = (size_t)(d - dst);
     n = len - dlen;
 
     if (n == 0)
@@ -143,7 +143,7 @@ void str_replace(char *buffer, size_t size, const char *tmpl, const char *var,
         char *p = strstr(tmpl, var);
         size_t len;
         if (p) {
-            len = p - tmpl;
+            len = (size_t)(p - tmpl);
         }
         else {
             len = strlen(tmpl);
@@ -170,7 +170,7 @@ void str_replace(char *buffer, size_t size, const char *tmpl, const char *var,
 int str_hash(const char *s)
 {
     int key = 0;
-    assert(s);
+    assert(s != NULL);
     while (*s) {
         key = key * 37 + *s++;
     }
@@ -200,17 +200,19 @@ unsigned int wang_hash(unsigned int a)
 }
 
 char *str_strdup(const char *s) {
-    if (s == NULL) return NULL;
+    if (s != NULL) {
 #ifdef HAVE_STRDUP
-    return strdup(s);
+        return strdup(s);
 #elif defined(_MSC_VER)
-    return _strdup(s);
+        return _strdup(s);
 #else
-    size_t len = strlen(s);
-    char *dup = malloc(len+1);
-    memcpy(dup, s, len+1);
-    return dup;
+        size_t len = strlen(s);
+        char *dup = malloc(len+1);
+        memcpy(dup, s, len+1);
+        return dup;
 #endif
+    }
+    return NULL;
 }
 
 void sbs_printf(struct sbstring *sbs, const char *format, ...)
@@ -218,16 +220,18 @@ void sbs_printf(struct sbstring *sbs, const char *format, ...)
     size_t size = sbs->size - (sbs->end - sbs->begin);
 
     if (size > 0) {
+        int bytes;
         va_list argp;
         va_start(argp, format);
-        int bytes = vsnprintf(sbs->end, size, format, argp);
+        bytes = vsnprintf(sbs->end, size, format, argp);
         if (bytes > 0) {
-            if ((size_t)bytes >= size) {
-                bytes = size - 1;
+            size_t len = (size_t)bytes;
+            if (len >= size) {
+                len = size - 1;
                 /* terminate truncated output */
-                sbs->end[bytes] = '\0';
+                sbs->end[len] = '\0';
             }
-            sbs->end += bytes;
+            sbs->end += len;
         }
         va_end(argp);
     }
@@ -235,7 +239,7 @@ void sbs_printf(struct sbstring *sbs, const char *format, ...)
 
 void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
 {
-    assert(sbs);
+    assert(sbs != NULL);
     assert(size > 0);
     sbs->begin = buffer;
     sbs->size = size;
@@ -246,7 +250,7 @@ void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
 void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size)
 {
     size_t len = strlen(buffer);
-    assert(sbs);
+    assert(sbs != NULL);
     assert(size > len);
     sbs->begin = buffer;
     sbs->size = size;
@@ -256,7 +260,7 @@ void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size)
 void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
 {
     size_t len;
-    assert(sbs);
+    assert(sbs != NULL);
     len = sbs->size - (sbs->end - sbs->begin) - 1;
     if (len < size) {
         size = len;
@@ -269,21 +273,21 @@ void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
 void sbs_strcat(struct sbstring *sbs, const char *str)
 {
     size_t len;
-    assert(sbs);
+    assert(sbs != NULL);
     len = sbs->size - (sbs->end - sbs->begin);
-    str_strlcpy(sbs->end, str, len);
+    (void)str_strlcpy(sbs->end, str, len);
     sbs->end += strlen(sbs->end);
     assert(sbs->begin + sbs->size >= sbs->end);
 }
 
 void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
 {
-    if (pos > sbs->end - sbs->begin) {
+    if (sbs->begin + pos > sbs->end) {
         /* starting past end of string, do nothing */
         sbs->end = sbs->begin;
     }
     if (pos >= 0) {
-        size_t sz = sbs->end - (sbs->begin + pos);
+        size_t sz = sbs->end - sbs->begin - pos;
         if (len > sz) len = sz;
         if (len - pos > 0) {
             memmove(sbs->begin, sbs->begin + pos, len);
@@ -299,15 +303,15 @@ void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
 size_t sbs_length(const struct sbstring *sbs)
 {
     assert(sbs->begin + sbs->size >= sbs->end);
-    return sbs->end - sbs->begin;
+    return (size_t)(sbs->end - sbs->begin);
 }
 
 char *str_unescape(char *str) {
     char *read = str, *write = str;
     while (*read) {
         char * pos = strchr(read, '\\');
-        if (pos) {
-            size_t len = pos - read;
+        if (pos > read) {
+            size_t len = (size_t)(pos - read);
             memmove(write, read, len);
             write += len;
             read += (len + 1);
@@ -341,15 +345,15 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
 {
     size_t slen = strlen(str);
     const char *read = str;
-    char *write = buffer;
+    unsigned char *write = (unsigned char *)buffer;
     if (size < 1) {
         return NULL;
     }
     while (slen > 0 && size > 1 && *read) {
         const char *pos = strpbrk(read, chars);
         size_t len = size;
-        if (pos) {
-            len = pos - read;
+        if (pos > read) {
+            len = (size_t)(pos - read);
         }
         if (len < size) {
             unsigned char ch = *(const unsigned char *)pos;
@@ -399,7 +403,7 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
                 break;
             default:
                 if (size > 5) {
-                    int n = sprintf(write, "\\%03o", ch);
+                    int n = snprintf((char *)write, size, "\\%03o", ch);
                     if (n > 0) {
                         assert(n == 5);
                         write += n;

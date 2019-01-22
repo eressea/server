@@ -67,7 +67,7 @@ void new_potiontype(item_type * itype, int level)
     potion_type *ptype;
 
     ptype = (potion_type *)calloc(1, sizeof(potion_type));
-    assert(ptype);
+    assert(ptype != NULL);
     itype->flags |= ITF_POTION;
     ptype->itype = itype;
     ptype->level = level;
@@ -120,7 +120,7 @@ void herbsearch(unit * u, int max_take)
 
     if (herbsfound) {
         produceexp(u, SK_HERBALISM, u->number);
-        i_change(&u->items, whichherb, herbsfound);
+        (void)i_change(&u->items, whichherb, herbsfound);
         ADDMSG(&u->faction->msgs, msg_message("herbfound",
             "unit region amount herb", u, r, herbsfound, whichherb->rtype));
     }
