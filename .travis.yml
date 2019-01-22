@@ -16,7 +16,6 @@ addons:
       - libxml2-dev
       - valgrind
       - cppcheck
-      - clang-tools
       - shellcheck
 os:
   - linux
