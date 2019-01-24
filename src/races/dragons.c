@@ -22,7 +22,10 @@
 /* util includes */
 #include <util/rng.h>
 
-#define age_chance(a,b,p) (MAX(0,a-b)*p)
+static int age_chance(int a, int b, int p) {
+    int r = (a - b) * p;
+    return (r < 0) ? 0 : r;
+}
 
 #define DRAGONAGE                   27
 #define WYRMAGE                     68

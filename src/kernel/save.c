@@ -448,7 +448,7 @@ unit *read_unit(gamedata *data)
     set_number(u, number);
 
     READ_INT(data->store, &n);
-    u->age = (short)n;
+    u->age = n;
 
     READ_TOK(data->store, rname, sizeof(rname));
     rc = rc_find(rname);
@@ -775,7 +775,8 @@ static region *readregion(gamedata *data, int x, int y)
         }
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            region_set_morale(r, MAX(0, (short)n), -1);
+            if (n < 0) n = 0;
+            region_set_morale(r, n, -1);
             read_owner(data, &r->land->ownership);
         }
     }
