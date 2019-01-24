@@ -4089,7 +4089,7 @@ static int sp_pump(castorder * co)
  *  Betoert eine Einheit, so das sie ihm den groe�ten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
  *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
- *  MIN(Stufe*1000$, u->money - maintenance)
+ *  min(Stufe*1000$, u->money - maintenance)
  *  Von jedem Item wird 50% abgerundet ermittelt und uebergeben. Dazu
  *  kommt Itemzahl%2 mit 50% chance
  *

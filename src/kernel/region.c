@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
+
 #include "region.h"
 
 /* kernel includes */
@@ -141,8 +144,11 @@ const char *regionname(const region * r, const faction * f)
 int region_maxworkers(const region *r)
 {
     int size = max_production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return MAX(size - treespace, MIN(size / 10, 200));
+    int treespace = size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    size /=10;
+    if (size > 200) size = 200;
+    if (treespace < size) treespace = size;
+    return treespace;
 }
 
 int deathcount(const region * r)
@@ -400,7 +406,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     int dx = x1 - x2;
     int dy = y1 - y2;
     int result, dist;
-    int mindist = MIN(width, height) >> 1;
+    int mindist = ((width > height) ? height : width) / 2;
 
     /* Bei negativem dy am Ursprung spiegeln, das veraendert
      * den Abstand nicht
@@ -423,13 +429,15 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
         if (result <= mindist)
             return result;
     }
-    dist = MAX(dx, height - dy);
+    dist = height - dy;
+    if (dist < dx) dist = dx;
     if (dist >= 0 && dist < result) {
         result = dist;
         if (result <= mindist)
             return result;
     }
-    dist = MAX(width - dx, dy);
+    dist = width - dx;
+    if (dist < dy) dist = dy;
     if (dist >= 0 && dist < result)
         result = dist;
     return result;
@@ -1097,7 +1105,8 @@ void init_region(region *r)
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
         peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
-        rsetpeasants(r, MAX(100, peasants));
+        if (peasants < 100) peasants = 100;
+        rsetpeasants(r, peasants);
         rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
             INT_MAX) + 1) + rng_int() % 5));
     }
@@ -1419,7 +1428,8 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = MAX(0, region_get_morale(r) - MORALE_TRANSFER);
+                            int morale = region_get_morale(r) - MORALE_TRANSFER;
+                            if (morale < 0) morale = 0;
                             region_set_morale(r, morale, turn);
                         }
                         else {

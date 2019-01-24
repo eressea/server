@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "ship.h"
 
@@ -359,8 +361,9 @@ int shipspeed(const ship * sh, const unit * u)
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
-            bonus = MIN(bonus, crew_bonus);
-            bonus = MIN(bonus, sh->type->range_max - sh->type->range);
+            int sbonus = sh->type->range_max - sh->type->range;
+            if (bonus > sbonus) bonus = sbonus;
+            if (bonus > crew_bonus) bonus = crew_bonus;
         }
         else {
             bonus = 0;

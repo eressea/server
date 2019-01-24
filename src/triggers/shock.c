@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
+
 #include "shock.h"
 
 #include <magic.h>
@@ -61,8 +64,8 @@ static void do_shock(unit * u, const char *reason)
     if (u->number > 0) {
         /* HP - Verlust */
         int hp = (unit_max_hp(u) * u->number) / 10;
-        hp = MIN(u->hp, hp);
-        u->hp = MAX(1, hp);
+        if (hp > u->hp) hp = u->hp;
+        u->hp = (hp > 1) ? hp : 1;
     }
 
     /* Aura - Verlust */
