@@ -27,7 +27,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/regioncurse.h>
 
 /* kernel includes */
-
 #include "curse.h"
 #include "item.h"
 #include "unit.h"
@@ -96,7 +95,7 @@ static int bt_changes = 1;
 
 bool bt_changed(int *cache)
 {
-    assert(cache != NULL);
+    assert(cache);
     if (*cache != bt_changes) {
         *cache = bt_changes;
         return true;
@@ -109,7 +108,7 @@ static void bt_register(building_type * btype)
     size_t len;
     char data[64];
 
-    (void)selist_push(&buildingtypes, (void *)btype);
+    selist_push(&buildingtypes, (void *)btype);
     len = cb_new_kv(btype->_name, strlen(btype->_name), &btype, sizeof(btype), data);
     assert(len <= sizeof(data));
     cb_insert(&cb_bldgtypes, data, len);
@@ -130,25 +129,20 @@ static void free_buildingtype(void *ptr) {
     free(btype);
 }
 
-static building_type *bt_create(const char *name) {
-    building_type *btype = (building_type *)calloc(1, sizeof(building_type));
-    if (!btype) abort();
-    btype->_name = str_strdup(name);
-    btype->flags = BTF_DEFAULT;
-    btype->auraregen = 1.0;
-    btype->maxsize = -1;
-    btype->capacity = 1;
-    btype->maxcapacity = -1;
-    return btype;
-}
-
 building_type *bt_get_or_create(const char *name)
 {
     assert(name && name[0]);
     if (name != NULL) {
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
-            btype = bt_create(name);
+            btype = (building_type *)calloc(1, sizeof(building_type));
+            if (!btype) abort();
+            btype->_name = str_strdup(name);
+            btype->flags = BTF_DEFAULT;
+            btype->auraregen = 1.0;
+            btype->maxsize = -1;
+            btype->capacity = 1;
+            btype->maxcapacity = -1;
             bt_register(btype);
         }
         return btype;
@@ -180,7 +174,7 @@ attrib_type at_building_generic_type = {
 
 /* TECH DEBT: simplest thing that works for E3 dwarf/halfling faction rules */
 static int adjust_size(const building *b, int bsize) {
-    assert(b != NULL);
+    assert(b);
     if (config_get_int("rules.dwarf_castles", 0)
         && strcmp(b->type->_name, "castle") == 0) {
         unit *u = building_owner(b);
@@ -196,7 +190,7 @@ static int adjust_size(const building *b, int bsize) {
  */
 const char *buildingtype(const building_type * btype, const building * b, int bsize)
 {
-    assert(btype != NULL);
+    assert(btype);
 
     if (b && b->attribs) {
         if (is_building_type(btype, "generic")) {
@@ -417,7 +411,7 @@ building *new_building(const struct building_type * btype, region * r,
             bname = parameters[P_GEBAEUDE];
         }
     }
-    assert(bname != NULL);
+    assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
     b->name = str_strdup(bname);
     return b;
@@ -435,7 +429,7 @@ void remove_building(building ** blist, building * b)
     static const struct building_type *bt_caravan, *bt_dam, *bt_tunnel;
     static int btypes;
 
-    assert(bfindhash(b->no) != NULL);
+    assert(bfindhash(b->no));
 
     if (bt_changed(&btypes)) {
         bt_caravan = bt_find("caravan");
@@ -696,7 +690,7 @@ bool in_safe_building(unit *u1, unit *u2) {
 }
 
 bool is_building_type(const struct building_type *btype, const char *name) {
-    assert(btype != NULL);
+    assert(btype);
     return name && strcmp(btype->_name, name)==0;
 }
 
@@ -832,7 +826,7 @@ int cmp_wage(const struct building *b, const building * a)
 }
 
 int building_taxes(const building *b) {
-    assert(b != NULL);
+    assert(b);
     return b->type->taxes;
 }
 
