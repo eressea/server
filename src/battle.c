@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
@@ -436,7 +439,8 @@ static int get_row(const side * s, int row, const side * vs)
     /* every entry in the size[] array means someone trying to defend us.
      * 'retreat' is the number of rows falling.
      */
-    result = MAX(FIRST_ROW, row - retreat);
+    result = row - retreat;
+    if (result < FIRST_ROW) result = FIRST_ROW;
 
     return result;
 }
@@ -587,50 +591,27 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
  * are taken into account, e.g. no horses, magic, etc. */
 {
     int skill;
+    const race * rc = u_race(u);
 
     if (wtype == NULL) {
         skill = effskill(u, SK_WEAPONLESS, 0);
+        int def = attacking ? rc->at_default : rc->df_default;
         if (skill <= 0) {
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
-            if (u_race(u) == get_race(RC_ORC)) {
+            if (rc == get_race(RC_ORC)) {
                 int sword = effskill(u, SK_MELEE, 0);
                 int spear = effskill(u, SK_SPEAR, 0);
-                skill = MAX(sword, spear) - 3;
-                if (attacking) {
-                    skill = MAX(skill, u_race(u)->at_default);
-                }
-                else {
-                    skill = MAX(skill, u_race(u)->df_default);
-                }
-            }
-            else {
-                if (attacking) {
-                    skill = u_race(u)->at_default;
-                }
-                else {
-                    skill = u_race(u)->df_default;
-                }
+                skill = ((sword > spear) ? sword : spear) - 3;
             }
         }
-        else {
-            /* der rassen-defaultwert kann h�her sein als der Talentwert von
-             * waffenloser kampf */
-            if (attacking) {
-                if (skill < u_race(u)->at_default)
-                    skill = u_race(u)->at_default;
-            }
-            else {
-                if (skill < u_race(u)->df_default)
-                    skill = u_race(u)->df_default;
-            }
-        }
+        if (def > skill) skill = def;
         if (attacking) {
-            skill += u_race(u)->at_bonus;
+            skill += rc->at_bonus;
             if (fval(u->region->terrain, SEA_REGION) && u->ship)
                 skill += u->ship->type->at_bonus;
         }
         else {
-            skill += u_race(u)->df_bonus;
+            skill += rc->df_bonus;
             if (fval(u->region->terrain, SEA_REGION) && u->ship)
                 skill += u->ship->type->df_bonus;
         }
@@ -642,10 +623,10 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         skill = effskill(u, wtype->skill, 0);
         if (skill > 0) {
             if (attacking) {
-                skill += u_race(u)->at_bonus;
+                skill += rc->at_bonus;
             }
             else {
-                skill += u_race(u)->df_bonus;
+                skill += rc->df_bonus;
             }
         }
         if (attacking) {
@@ -1261,32 +1242,33 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
 
 static int apply_magicshield(int reduced_damage, fighter *df,
     const weapon_type *awtype, battle *b, bool magic) {
-  side *ds = df->side;
-  selist *ql;
-  int qi;
+    side *ds = df->side;
+    selist *ql;
+    int qi;
 
-  if (reduced_damage <= 0)
-    return 0;
+    if (reduced_damage <= 0)
+        return 0;
 
-  /* Schilde */
-  for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
-    meffect *me = (meffect *) selist_get(ql, qi);
-    if (meffect_protection(b, me, ds) != 0) {
-      assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
-      /* jeder Schaden wird um effect% reduziert bis der Schild duration
-       * Trefferpunkte aufgefangen hat */
-      if (me->typ == SHIELD_REDUCE) {
-        int hp = reduced_damage * (me->effect / 100);
-        reduced_damage -= hp;
-        me->duration -= hp;
-      }
-      /* gibt R�stung +effect f�r duration Treffer */
-      if (me->typ == SHIELD_ARMOR) {
-        reduced_damage = MAX(reduced_damage - me->effect, 0);
-        me->duration--;
-      }
+    /* Schilde */
+    for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
+        meffect *me = (meffect *)selist_get(ql, qi);
+        if (meffect_protection(b, me, ds) != 0) {
+            assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
+            /* jeder Schaden wird um effect% reduziert bis der Schild duration
+             * Trefferpunkte aufgefangen hat */
+            if (me->typ == SHIELD_REDUCE) {
+                int hp = reduced_damage * (me->effect / 100);
+                reduced_damage -= hp;
+                me->duration -= hp;
+            }
+            /* gibt R�stung +effect f�r duration Treffer */
+            if (me->typ == SHIELD_ARMOR) {
+                reduced_damage -= me->effect;
+                if (reduced_damage < 0) reduced_damage = 0;
+                me->duration--;
+            }
+        }
     }
-  }
 
   return reduced_damage;
 }
@@ -1347,11 +1329,13 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
 
         /* Skilldifferenzbonus */
         if (rule_damage & DAMAGE_SKILL_BONUS) {
-            damage += MAX(0, (attskill - defskill) / DAMAGE_QUOTIENT);
+            int b = (attskill - defskill) / DAMAGE_QUOTIENT;
+            if (b > 0) damage += b;
         }
     }
 
-    reduced_damage = MAX(damage - armor_value, 0);
+    reduced_damage = damage - armor_value;
+    if (reduced_damage < 0) reduced_damage = 0;
 
     reduced_damage = apply_race_resistance(reduced_damage, df, awtype, magic);
     reduced_damage = apply_magicshield(reduced_damage, df, awtype, b, magic);
@@ -1500,7 +1484,8 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         minrow = FIGHT_ROW;
         maxrow = BEHIND_ROW;
     }
-    minrow = MAX(minrow, FIGHT_ROW);
+
+    if (minrow < FIGHT_ROW) minrow = FIGHT_ROW;
 
     enemies = count_enemies(b, af, minrow, maxrow, select);
 
@@ -1611,7 +1596,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
         dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     }
     else {
-        mindist = MAX(mindist, FIGHT_ROW);
+        if (mindist < FIGHT_ROW) mindist = FIGHT_ROW;
         dt = select_enemy(at.fighter, mindist, maxdist, SELECT_ADVANCE);
     }
 
@@ -2078,7 +2063,8 @@ void dazzle(battle * b, troop * td)
 void damage_building(battle * b, building * bldg, int damage_abs)
 {
     assert(bldg);
-    bldg->size = MAX(1, bldg->size - damage_abs);
+    bldg->size -= damage_abs;
+    if (bldg->size < 1) bldg->size = 1;
 
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
 
@@ -3020,7 +3006,9 @@ static void print_stats(battle * b)
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         if (!selist_empty(s->leader.fighters)) {
-            b->max_tactics = MAX(b->max_tactics, s->leader.value);
+            if (s->leader.value > b->max_tactics) {
+                b->max_tactics = s->leader.value;
+            }
         }
     }
 
@@ -3371,7 +3359,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
                 else
                     p_bonus += 3;
             } while (rnd >= 97);
-            bonus = MAX(p_bonus, bonus);
+            if (p_bonus > bonus) p_bonus = bonus;
         }
         tactics += bonus;
     }

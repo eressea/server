@@ -10,7 +10,10 @@
  without prior permission by the authors of Eressea.
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <kernel/config.h>
 #include "order.h"
 
@@ -398,6 +401,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
+            if (ord == NULL) abort();
             create_order_i(ord, kwd, sptr, persistent, noerror, lang);
             return ord;
         }
