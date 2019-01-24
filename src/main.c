@@ -268,10 +268,10 @@ static int parse_args(int argc, char **argv)
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #include <signal.h>
+static void *btrace[50];
 
 static void report_segfault(int signo, siginfo_t * sinf, void *arg)
 {
-    void *btrace[50];
     size_t size;
     int fd = fileno(stderr);
 
