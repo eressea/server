@@ -915,7 +915,8 @@ void cr_output_unit(stream *out, const faction * f,
         if (fval(u, UFL_HUNGER) && (u->faction == f)) {
             stream_printf(out, "1;hunger\n");
         }
-        if (is_mage(u)) {
+        mage = get_mage(u);
+        if (mage) {
             stream_printf(out, "%d;Aura\n", get_spellpoints(u));
             stream_printf(out, "%d;Auramax\n", max_spellpoints_depr(u->region, u));
         }
@@ -957,7 +958,6 @@ void cr_output_unit(stream *out, const faction * f,
         }
 
         /* spells that this unit can cast */
-        mage = get_mage(u);
         if (mage) {
             int maxlevel = effskill(u, SK_MAGIC, NULL);
             cr_output_spells(out, u, maxlevel);
