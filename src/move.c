@@ -271,7 +271,7 @@ static int ridingcapacity(const unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zählt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    horses = effskill(u, SK_RIDING, 0) * u->number * 2;
+    horses = effskill(u, SK_RIDING, NULL) * u->number * 2;
     if (animals > horses) animals = horses;
 
     if (fval(u_race(u), RCF_HORSE))
@@ -298,7 +298,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    horses = effskill(u, SK_RIDING, 0) * u->number * 4;
+    horses = effskill(u, SK_RIDING, NULL) * u->number * 4;
     pferde_fuer_wagen = (animals < horses) ? animals : horses;
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
@@ -376,7 +376,7 @@ static int canwalk(unit * u)
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-    effsk = effskill(u, SK_RIDING, 0);
+    effsk = effskill(u, SK_RIDING, NULL);
     maxwagen = effsk * u->number * 2;
     if (u_race(u) == get_race(RC_TROLL)) {
         int trolls = u->number / 4;
@@ -406,7 +406,7 @@ static int canwalk(unit * u)
 
 bool canfly(unit * u)
 {
-    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
+    if (i_get(u->items, it_find("pegasus")) >= u->number && effskill(u, SK_RIDING, NULL) >= 4)
         return true;
 
     if (fval(u_race(u), RCF_FLY))
@@ -420,7 +420,7 @@ bool canfly(unit * u)
 
 bool canswim(unit * u)
 {
-    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING, 0) >= 4)
+    if (i_get(u->items, it_find("dolphin")) >= u->number && effskill(u, SK_RIDING, NULL) >= 4)
         return true;
 
     if (u_race(u)->flags & RCF_FLY)
@@ -441,7 +441,7 @@ bool canswim(unit * u)
 static int walk_mode(const unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-    int skill = effskill(u, SK_RIDING, 0);
+    int skill = effskill(u, SK_RIDING, NULL);
     item *itm;
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
@@ -1979,11 +1979,11 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
             for (u2 = current_point->units; u2; u2 = u2->next) {
                 if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
 
-                    if (effskill(harbourmaster, SK_PERCEPTION, 0) > effskill(u2, SK_STEALTH, 0)) {
+                    if (effskill(harbourmaster, SK_PERCEPTION, NULL) > effskill(u2, SK_STEALTH, NULL)) {
                         for (itm = u2->items; itm; itm = itm->next) {
                             const luxury_type *ltype = resource2luxury(itm->type->rtype);
                             if (ltype != NULL && itm->number > 0) {
-                                int st = itm->number * effskill(harbourmaster, SK_TRADE, 0) / 50;
+                                int st = itm->number * effskill(harbourmaster, SK_TRADE, NULL) / 50;
 
                                 if (st > itm->number) st = itm->number;
                                 if (st > 0) {

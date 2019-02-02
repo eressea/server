@@ -562,7 +562,7 @@ report_resources(const region * r, resource_report * result, int size,
                 int maxskill = 0;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
-                        int s = effskill(u, skill, 0);
+                        int s = effskill(u, skill, NULL);
                         if (s > maxskill) {
                             maxskill = s;
                             visible = raw->visible(res, maxskill);
@@ -621,7 +621,7 @@ static void spskill(sbstring *sbp, const struct locale * lang,
         }
     }
 
-    effsk = eff_skill(u, sv, 0);
+    effsk = eff_skill(u, sv, NULL);
     sbs_strcat(sbp, str_itoa(effsk));
 
     if (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) {
@@ -810,7 +810,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 
         if (book) {
             selist *ql = book->spells;
-            int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
+            int qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
             sbs_strcat(sbp, ". Aura ");
             sbs_strcat(sbp, str_itoa(get_spellpoints(u)));
             sbs_strcat(sbp, "/");

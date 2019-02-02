@@ -33,8 +33,9 @@ set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 # cppcheck_tests
 s/cmake-init --db=sqlite
-s/build
-cd process
+cd Debug
+scan-build make
+cd ../process
 make
 cd $ROOT
 inifile

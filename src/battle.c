@@ -86,8 +86,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
 
-#define BASE_CHANCE    70       /* 70% Basis-�berlebenschance */
-#define TDIFF_CHANGE    5       /* 5% h�her pro Stufe */
+#define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
+#define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
 
 #define DEBUG_SELECT            /* should be disabled if select_enemy works */
@@ -589,12 +589,12 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     int skill;
 
     if (wtype == NULL) {
-        skill = effskill(u, SK_WEAPONLESS, 0);
+        skill = effskill(u, SK_WEAPONLESS, NULL);
         if (skill <= 0) {
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
             if (u_race(u) == get_race(RC_ORC)) {
-                int sword = effskill(u, SK_MELEE, 0);
-                int spear = effskill(u, SK_SPEAR, 0);
+                int sword = effskill(u, SK_MELEE, NULL);
+                int spear = effskill(u, SK_SPEAR, NULL);
                 skill = MAX(sword, spear) - 3;
                 if (attacking) {
                     skill = MAX(skill, u_race(u)->at_default);
@@ -639,7 +639,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         /* changed: if we own a weapon, we have at least a skill of 0 */
         if (!i_canuse(u, wtype->itype))
             return -1;
-        skill = effskill(u, wtype->skill, 0);
+        skill = effskill(u, wtype->skill, NULL);
         if (skill > 0) {
             if (attacking) {
                 skill += u_race(u)->at_bonus;
@@ -674,7 +674,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     }
     else {
         /* new rule, chargers in Eressea 1.1 */
-        int skl = effskill(u, SK_RIDING, 0);
+        int skl = effskill(u, SK_RIDING, NULL);
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_SKILL) {
@@ -989,7 +989,7 @@ int natural_armor(unit * du)
     assert(rc);
     an = rc_armor_bonus(rc);
     if (an > 0) {
-        int sk = effskill(du, SK_STAMINA, 0);
+        int sk = effskill(du, SK_STAMINA, NULL);
         return rc->armor + sk / an;
     }
     return rc->armor;
@@ -2359,7 +2359,7 @@ static int horse_fleeing_bonus(const unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
-    int skl = effskill(u, SK_RIDING, 0);
+    int skl = effskill(u, SK_RIDING, NULL);
     const resource_type *rtype;
 
     it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
@@ -2390,7 +2390,7 @@ static int fleechance(unit * u)
     int p = flee_chance_base;              /* Fluchtwahrscheinlichkeit in % */
     /* Einheit u versucht, dem Get�mmel zu entkommen */
 
-    p += (effskill(u, SK_STEALTH, 0) * flee_chance_skill_bonus);
+    p += (effskill(u, SK_STEALTH, NULL) * flee_chance_skill_bonus);
     p += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
@@ -3099,7 +3099,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
-    int h, i, tactics = effskill(u, SK_TACTICS, 0);
+    int h, i, tactics = effskill(u, SK_TACTICS, NULL);
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
@@ -3331,17 +3331,17 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
      * keine addierten boni. */
 
     /* Zuerst mal die Spezialbehandlung gewisser Sonderf�lle. */
-    fig->magic = effskill(u, SK_MAGIC, 0);
+    fig->magic = effskill(u, SK_MAGIC, NULL);
 
     if (fig->horses) {
         if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
-            || effskill(u, SK_RIDING, 0) < CavalrySkill()
+            || effskill(u, SK_RIDING, NULL) < CavalrySkill()
             || u_race(u) == get_race(RC_TROLL) || fval(u, UFL_WERE))
             fig->horses = 0;
     }
 
     if (fig->elvenhorses) {
-        if (effskill(u, SK_RIDING, 0) < 5 || u_race(u) == get_race(RC_TROLL)
+        if (effskill(u, SK_RIDING, NULL) < 5 || u_race(u) == get_race(RC_TROLL)
             || fval(u, UFL_WERE))
             fig->elvenhorses = 0;
     }

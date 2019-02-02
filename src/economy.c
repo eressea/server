@@ -1012,7 +1012,7 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     }
 
     assert(sk != NOSKILL || !"limited resource needs a required skill for making it");
-    skill = effskill(u, sk, 0);
+    skill = effskill(u, sk, NULL);
     if (skill == 0) {
         add_message(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "skill_needed", "skill", sk));
@@ -1101,7 +1101,7 @@ leveled_allocation(const resource_type * rtype, region * r, allocation * alist)
                 if (!fval(al, AFL_DONE)) {
                     int req = required(al->want - al->get, al->save);
                     assert(al->get <= al->want && al->get >= 0);
-                    if (effskill(al->unit, itype->construction->skill, 0)
+                    if (effskill(al->unit, itype->construction->skill, NULL)
                         >= rm->level + itype->construction->minskill - 1) {
                         if (req) {
                             nreq += req;
@@ -1628,7 +1628,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     /* Ein H�ndler kann nur 10 G�ter pro Talentpunkt handeln. */
-    k = u->number * 10 * effskill(u, SK_TRADE, 0);
+    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
 
     /* hat der H�ndler bereits gehandelt, muss die Menge der bereits
      * verkauften/gekauften G�ter abgezogen werden */
@@ -1947,7 +1947,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
 
     /* Ein H�ndler kann nur 10 G�ter pro Talentpunkt verkaufen. */
 
-    i = u->number * 10 * effskill(u, SK_TRADE, 0);
+    i = u->number * 10 * effskill(u, SK_TRADE, NULL);
     if (n > i) n = i;
 
     if (!n) {
@@ -1996,7 +1996,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
          * existiert, so dass man arrays von orders machen kann. */
 
          /* Ein H�ndler kann nur 10 G�ter pro Talentpunkt handeln. */
-        k = u->number * 10 * effskill(u, SK_TRADE, 0);
+        k = u->number * 10 * effskill(u, SK_TRADE, NULL);
 
         /* hat der H�ndler bereits gehandelt, muss die Menge der bereits
          * verkauften/gekauften G�ter abgezogen werden */
@@ -2041,7 +2041,7 @@ static void plant(unit * u, int raw)
     }
 
     /* Skill pr�fen */
-    skill = effskill(u, SK_HERBALISM, 0);
+    skill = effskill(u, SK_HERBALISM, NULL);
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
@@ -2095,7 +2095,7 @@ static void planttrees(unit * u, int raw)
     rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORN_SEED : R_SEED);
 
     /* Skill pr�fen */
-    skill = effskill(u, SK_HERBALISM, 0);
+    skill = effskill(u, SK_HERBALISM, NULL);
     if (skill < 6) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
@@ -2160,7 +2160,7 @@ static void breedtrees(unit * u, int raw)
     rtype = get_resourcetype(fval(r, RF_MALLORN) ? R_MALLORN_SEED : R_SEED);
 
     /* Skill pr�fen */
-    skill = effskill(u, SK_HERBALISM, 0);
+    skill = effskill(u, SK_HERBALISM, NULL);
     if (skill < 12) {
         planttrees(u, raw);
         return;
@@ -2216,7 +2216,7 @@ static void breedhorses(unit * u)
         cmistake(u, u->thisorder, 107, MSG_PRODUCE);
         return;
     }
-    effsk = effskill(u, SK_HORSE_TRAINING, 0);
+    effsk = effskill(u, SK_HORSE_TRAINING, NULL);
     n = u->number * effsk;
     if (n > horses) n = horses;
 
@@ -2317,7 +2317,7 @@ static void research_cmd(unit * u, struct order *ord)
     kwd = init_order_depr(ord);
     assert(kwd == K_RESEARCH);
 
-    if (effskill(u, SK_HERBALISM, 0) < 7) {
+    if (effskill(u, SK_HERBALISM, NULL) < 7) {
         cmistake(u, ord, 227, MSG_EVENT);
         return;
     }
@@ -2391,7 +2391,7 @@ void entertain_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 58, MSG_INCOME);
         return;
     }
-    if (!effskill(u, SK_ENTERTAINMENT, 0)) {
+    if (!effskill(u, SK_ENTERTAINMENT, NULL)) {
         cmistake(u, ord, 58, MSG_INCOME);
         return;
     }
@@ -2404,7 +2404,7 @@ void entertain_cmd(unit * u, struct order *ord)
         return;
     }
 
-    u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, 0)
+    u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, NULL)
         * entertainperlevel);
 
     max_e = getuint();
@@ -2598,7 +2598,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
         return;
     }
 
-    if (effskill(u, SK_TAXING, 0) <= 0) {
+    if (effskill(u, SK_TAXING, NULL) <= 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "error_no_tax_skill", ""));
         return;
@@ -2613,7 +2613,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
         u->wants = income(u);
     }
     else {
-        u->wants = n * effskill(u, SK_TAXING, 0) * taxperlevel;
+        u->wants = n * effskill(u, SK_TAXING, NULL) * taxperlevel;
     }
     if (u->wants > max) u->wants = max;
 
@@ -2686,8 +2686,8 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     }
     else {
         /* For player start with 20 Silver +10 every 5 level of close combat skill*/
-        int skm = effskill(u, SK_MELEE, 0);
-        int sks = effskill(u, SK_SPEAR, 0);
+        int skm = effskill(u, SK_MELEE, NULL);
+        int sks = effskill(u, SK_SPEAR, NULL);
         int skbonus = ((skm > sks ? skm : sks) * 2 / 10) + 2;
         u->wants = n * skbonus * 10;
         if (u->wants > max) u->wants = max;

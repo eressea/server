@@ -93,7 +93,7 @@ int lighthouse_view_distance(const building * b, const unit *u)
         int maxd = lighthouse_range(b);
 
         if (maxd > 0 && u && skill_enabled(SK_PERCEPTION)) {
-            int sk = effskill(u, SK_PERCEPTION, 0) / 3;
+            int sk = effskill(u, SK_PERCEPTION, NULL) / 3;
             assert(u->building == b);
             if (maxd > sk) maxd = sk;
         }
