@@ -138,14 +138,14 @@ int spy_cmd(unit * u, struct order *ord)
             msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
         return 0;
     }
-    if (effskill(u, SK_SPY, 0) < 1) {
+    if (effskill(u, SK_SPY, NULL) < 1) {
         cmistake(u, u->thisorder, 39, MSG_EVENT);
         return 0;
     }
     /* Die Grundchance fuer einen erfolgreichen Spionage-Versuch ist 10%.
      * Fuer jeden Talentpunkt, den das Spionagetalent das Tarnungstalent
      * des Opfers uebersteigt, erhoeht sich dieses um 5%*/
-    spy = effskill(u, SK_SPY, 0) - effskill(target, SK_STEALTH, r);
+    spy = effskill(u, SK_SPY, NULL) - effskill(target, SK_STEALTH, r);
     spychance = 0.1 + fmax(spy * 0.05, 0.0);
 
     if (chance(spychance)) {
@@ -159,7 +159,7 @@ int spy_cmd(unit * u, struct order *ord)
     /* der Spion kann identifiziert werden, wenn das Opfer bessere
      * Wahrnehmung als das Ziel Tarnung + Spionage/2 hat */
     observe = effskill(target, SK_PERCEPTION, r)
-        - (effskill(u, SK_STEALTH, 0) + effskill(u, SK_SPY, 0) / 2);
+        - (effskill(u, SK_STEALTH, NULL) + effskill(u, SK_SPY, NULL) / 2);
 
     if (invisible(u, target) >= u->number) {
         if (observe > 0) observe = 0;
@@ -168,8 +168,8 @@ int spy_cmd(unit * u, struct order *ord)
     /* Anschliessend wird - unabhaengig vom Erfolg - gewuerfelt, ob der
      * Spionageversuch bemerkt wurde. Die Wahrscheinlich dafuer ist (100 -
      * SpionageSpion*5 + WahrnehmungOpfer*2)%. */
-    observechance = 1.0 - (effskill(u, SK_SPY, 0) * 0.05)
-        + (effskill(target, SK_PERCEPTION, 0) * 0.02);
+    observechance = 1.0 - (effskill(u, SK_SPY, NULL) * 0.05)
+        + (effskill(target, SK_PERCEPTION, NULL) * 0.02);
 
     if (chance(observechance)) {
         ADDMSG(&target->faction->msgs, msg_message("spydetect",
@@ -232,7 +232,7 @@ int setstealth_cmd(unit * u, struct order *ord)
     if (isdigit(*(const unsigned char *)s)) {
         /* Tarnungslevel setzen */
         level = atoi((const char *)s);
-        if (level > effskill(u, SK_STEALTH, 0)) {
+        if (level > effskill(u, SK_STEALTH, NULL)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
             return 0;
         }
@@ -343,7 +343,7 @@ static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
 
     for (u = r->units; u; u = u->next) {
         if (u->ship == sh && u->faction == f) {
-            int s = effskill(u, sk, 0);
+            int s = effskill(u, sk, NULL);
             if (value < s) value = s;
         }
     }
@@ -456,7 +456,7 @@ int sabotage_cmd(unit * u, struct order *ord)
         u2 = ship_owner(sh);
         if (u2->faction != u->faction) {
             skdiff =
-                effskill(u, SK_SPY, 0) - top_skill(u->region, u2->faction, sh, SK_PERCEPTION);
+                effskill(u, SK_SPY, NULL) - top_skill(u->region, u2->faction, sh, SK_PERCEPTION);
         }
         if (try_destruction(u, u2, sh, skdiff)) {
             sink_ship(sh);

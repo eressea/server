@@ -945,7 +945,7 @@ void cr_output_unit(stream *out, const faction * f,
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             if (sv->level > 0) {
                 skill_t sk = sv->id;
-                int esk = effskill(u, sk, 0);
+                int esk = effskill(u, sk, NULL);
                 if (!pr) {
                     pr = 1;
                     stream_printf(out, "TALENTE\n");
@@ -959,7 +959,7 @@ void cr_output_unit(stream *out, const faction * f,
         /* spells that this unit can cast */
         mage = get_mage(u);
         if (mage) {
-            int maxlevel = effskill(u, SK_MAGIC, 0);
+            int maxlevel = effskill(u, SK_MAGIC, NULL);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {

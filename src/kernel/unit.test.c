@@ -234,22 +234,22 @@ static void test_skillmod(CuTest *tc) {
     test_setup();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_ARMORER, 5);
-    CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, NULL));
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 2.0, 0));
-    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(NOSKILL, 0, 2.0, 0)); /* NOSKILL means any skill */
-    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 0, 2));
-    CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, cb_skillmod, 0, 0));
-    CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     test_teardown();
@@ -263,10 +263,10 @@ static void test_skill_hunger(CuTest *tc) {
     set_level(u, SK_ARMORER, 6);
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
-    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, 0));
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, NULL));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, NULL));
     set_level(u, SK_SAILING, 2);
-    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING, 0));
+    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING, NULL));
     test_teardown();
 }
 
@@ -280,21 +280,21 @@ static void test_skill_familiar(CuTest *tc) {
     mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
     set_level(fam, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, NULL));
     set_level(mag, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, NULL));
 
     /* make them mage and familiar to each other */
     create_newfamiliar(mag, fam);
 
     /* when they are in the same region, the mage gets half their skill as a bonus */
-    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
-    CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, NULL));
+    CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, NULL));
 
     /* when they are further apart, divide bonus by distance */
     r = test_create_region(3, 0, 0);
     move_unit(fam, r, &r->units);
-    CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, NULL));
     test_teardown();
 }
 

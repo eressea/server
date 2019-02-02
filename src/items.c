@@ -263,7 +263,7 @@ static int use_foolpotion(unit *u, const item_type *itype, int amount,
             ""));
         return ECUSTOM;
     }
-    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
+    if (effskill(u, SK_STEALTH, NULL) <= effskill(target, SK_PERCEPTION, NULL)) {
         cmistake(u, ord, 64, MSG_EVENT);
         return ECUSTOM;
     }
