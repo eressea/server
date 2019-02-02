@@ -426,7 +426,7 @@ static int tolua_unit_effskill(lua_State * L)
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *skname = tolua_tostring(L, 2, 0);
     skill_t sk = findskill(skname);
-    int value = (sk == NOSKILL) ? -1 : effskill(self, sk, 0);
+    int value = (sk == NOSKILL) ? -1 : effskill(self, sk, NULL);
     lua_pushinteger(L, value);
     return 1;
 }

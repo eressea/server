@@ -533,10 +533,6 @@
       <arg name="weight" type="int"/>
     </type>
   </message>
-  <message name="healall" section="events">
-    <type>
-  </type>
-  </message>
   <message name="lucky_item" section="events">
     <type>
       <arg name="unit" type="unit"/>

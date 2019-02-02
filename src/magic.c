@@ -509,7 +509,7 @@ int u_hasspell(const unit *u, const struct spell *sp)
     spellbook * book = unit_get_spellbook(u);
     spellbook_entry * sbe = book ? spellbook_get(book, sp) : 0;
     if (sbe) {
-        return sbe->level <= effskill(u, SK_MAGIC, 0);
+        return sbe->level <= effskill(u, SK_MAGIC, NULL);
     }
     return 0;
 }
@@ -521,7 +521,7 @@ int get_combatspelllevel(const unit * u, int nr)
 {
     int level;
     if (mage_get_combatspell(get_mage(u), nr, &level) != NULL) {
-        int maxlevel = effskill(u, SK_MAGIC, 0);
+        int maxlevel = effskill(u, SK_MAGIC, NULL);
         if (level > maxlevel) {
             return maxlevel;
         }
@@ -898,7 +898,7 @@ cancast(unit * u, const spell * sp, int level, int range, struct order * ord)
         return false;
     }
     /* reicht die Stufe aus? */
-    if (effskill(u, SK_MAGIC, 0) < level) {
+    if (effskill(u, SK_MAGIC, NULL) < level) {
         /* die Einheit ist nicht erfahren genug für diesen Zauber */
         cmistake(u, ord, 169, MSG_MAGIC);
         return false;
@@ -1088,7 +1088,7 @@ variant magic_resistance(unit * target)
     }
     assert(target->number > 0);
     /* Magier haben einen Resistenzbonus vom Magietalent * 5% */
-    prob = frac_add(prob, frac_make(effskill(target, SK_MAGIC, 0), 20));
+    prob = frac_add(prob, frac_make(effskill(target, SK_MAGIC, NULL), 20));
 
     /* Auswirkungen von Zaubern auf der Einheit */
     c = get_curse(target->attribs, &ct_magicresistance);
@@ -1184,10 +1184,10 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         skill *sv;
         unit *u = (unit *)obj;
 
-        at = effskill(magician, SK_MAGIC, 0);
+        at = effskill(magician, SK_MAGIC, NULL);
 
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            int sk = eff_skill(u, sv, 0);
+            int sk = eff_skill(u, sv, NULL);
             if (pa < sk)
                 pa = sk;
         }
@@ -1432,7 +1432,7 @@ static double regeneration(unit * u)
     double potenz = 1.5;
     double divisor = 2.0;
 
-    sk = effskill(u, SK_MAGIC, 0);
+    sk = effskill(u, SK_MAGIC, NULL);
     /* Rassenbonus/-malus */
     d = pow(sk, potenz) * u_race(u)->regaura / divisor;
     d++;
@@ -2541,7 +2541,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         cmistake(u, ord, 269, MSG_MAGIC);
         return 0;
     }
-    level = effskill(u, SK_MAGIC, 0);
+    level = effskill(u, SK_MAGIC, NULL);
 
     init_order_depr(ord);
     s = gettoken(token, sizeof(token));
@@ -2674,7 +2674,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     }
     /* Stufenangabe bei nicht Stufenvariierbaren Sprüchen abfangen */
     if (!(sp->sptyp & SPELLLEVEL)) {
-        int ilevel = effskill(u, SK_MAGIC, 0);
+        int ilevel = effskill(u, SK_MAGIC, NULL);
         if (ilevel != level) {
             level = ilevel;
             ADDMSG(&u->faction->msgs, msg_message("spellfail::nolevel",
@@ -2701,7 +2701,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                     "mage", mage));
                 return 0;
             }
-            sk = effskill(mage, SK_MAGIC, 0);
+            sk = effskill(mage, SK_MAGIC, NULL);
             if (distance(mage->region, r) > sk) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_toofar",
                     "mage", mage));
