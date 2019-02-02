@@ -128,7 +128,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
+            int willdo = effskill(u, SK_ROAD_BUILDING, NULL) * u->number;
             if (willdo > n) willdo = n;
             if (willdo == 0) {
                 /* TODO: error message */
@@ -278,7 +278,7 @@ void build_road(unit * u, int size, direction_t d)
     region *rn = rconnect(r, d);
 
     assert(u->number);
-    effsk = effskill(u, SK_ROAD_BUILDING, 0);
+    effsk = effskill(u, SK_ROAD_BUILDING, NULL);
     if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
         return;
@@ -616,7 +616,7 @@ int build(unit * u, const construction * con, int completed, int want, int skill
     int made, basesk = 0;
 
     assert(con->skill != NOSKILL);
-    basesk = effskill(u, con->skill, 0);
+    basesk = effskill(u, con->skill, NULL);
     if (basesk == 0) {
         return ENEEDSKILL;
     }
@@ -759,7 +759,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     assert(u->number);
     assert(btype->stages && btype->stages->construction);
 
-    basesk = effskill(u, SK_BUILDING, 0);
+    basesk = effskill(u, SK_BUILDING, NULL);
     skills = build_skill(u, basesk, 0);
     if (skills == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
@@ -959,13 +959,13 @@ create_ship(unit * u, const struct ship_type *newtype, int want,
     order *new_order;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
         return;
     }
 
     /* check if skill and material for 1 size is available */
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;
@@ -1003,7 +1003,7 @@ void continue_ship(unit * u, int want)
     int msize;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
         return;
     }
@@ -1023,7 +1023,7 @@ void continue_ship(unit * u, int want)
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;

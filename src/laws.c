@@ -2215,7 +2215,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             if (itype->flags & ITF_POTION) {
                 /* we don't have the item, but it is a potion. do we know it? */
                 int level = potion_level(itype);
-                if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, 0)) {
+                if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, NULL)) {
                     display_potion(u, itype);
                     found = true;
                 }
@@ -2658,7 +2658,7 @@ static void age_stonecircle(building *b) {
         if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
             curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
-                int sk = effskill(mage, SK_MAGIC, 0);
+                int sk = effskill(mage, SK_MAGIC, NULL);
                 if (sk > 0) {
                     int vig = sk;
                     int dur = (sk + 1) / 2;
@@ -2671,7 +2671,7 @@ static void age_stonecircle(building *b) {
                 }
             }
             else {
-                int sk = effskill(mage, SK_MAGIC, 0);
+                int sk = effskill(mage, SK_MAGIC, NULL);
                 if (c->duration < sk / 2) c->duration = sk / 2;
                 if (c->vigour < sk) c->vigour = sk;
             }
@@ -3206,7 +3206,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
         if (u->number > 0) {
             struct sc_mage * mage = get_mage(u);
             if (mage && mage_get_spellbook(mage)) {
-                int level = effskill(u, SK_MAGIC, 0);
+                int level = effskill(u, SK_MAGIC, NULL);
                 if (level > maxlevel) {
                     maxlevel = level;
                 }
@@ -3720,7 +3720,7 @@ int armedmen(const unit * u, bool siege_weapons)
     item *itm;
     int n = 0;
     if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
-        if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
+        if (effskill(u, SK_WEAPONLESS, NULL) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
         }
@@ -3731,7 +3731,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 const weapon_type *wtype = resource2weapon(itm->type->rtype);
                 if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
                     continue;
-                if (effskill(u, wtype->skill, 0) >= 1)
+                if (effskill(u, wtype->skill, NULL) >= 1)
                     n += itm->number;
                 if (n >= u->number)
                     break;
@@ -4027,7 +4027,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
         if (u2->faction == f) {
             if (rings < u->number || invisible(u, u2) < u->number) {
                 if (skill_enabled(SK_PERCEPTION)) {
-                    int observation = effskill(u2, SK_PERCEPTION, 0);
+                    int observation = effskill(u2, SK_PERCEPTION, NULL);
 
                     if (observation >= stealth) {
                         return true;
@@ -4113,7 +4113,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
                 if (rings && invisible(u, u2) >= u->number)
                     continue;
 
-                o = effskill(u2, SK_PERCEPTION, 0);
+                o = effskill(u2, SK_PERCEPTION, NULL);
 
                 if (o >= n) {
                     return true;

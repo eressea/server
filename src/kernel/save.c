@@ -1506,7 +1506,7 @@ int read_game(gamedata *data)
                     struct sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
-                        int skl = effskill(u, SK_MAGIC, 0);
+                        int skl = effskill(u, SK_MAGIC, NULL);
                         if (f->magiegebiet == M_GRAY) {
                             f->magiegebiet = mage_get_type(mage);
                             log_error("faction %s had magic=gray, fixing (%s)",

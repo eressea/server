@@ -474,7 +474,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   * Spezielle V. fuer Katzen, Trolle, Elfen, Daemonen, Insekten, Zwerge?
   */
 
-static const race *select_familiar(const race * magerace, magic_t magiegebiet)
+static const race *select_familiar(const race * magerace, int level, magic_t magiegebiet)
 {
     const race *retval;
     int rnd = rng_int() % 100;
@@ -493,7 +493,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
     }
 
     assert(magerace->familiars[0]);
-    if (rnd >= 70) {
+    if (rnd >= 100 - (level * 5)) {
         retval = magerace->familiars[magiegebiet];
         assert(retval);
     }
@@ -501,7 +501,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
         retval = magerace->familiars[0];
     }
 
-    if (!retval || rnd < 3) {
+    if (!retval || rnd < level) {
         race_list *familiarraces = get_familiarraces();
         unsigned int maxlen = listlen(familiarraces);
         if (maxlen > 0) {
@@ -557,7 +557,7 @@ static int sp_summon_familiar(castorder * co)
         cmistake(caster, co->order, 199, MSG_MAGIC);
         return 0;
     }
-    rc = select_familiar(caster->_race, caster->faction->magiegebiet);
+    rc = select_familiar(caster->_race, cast_level, caster->faction->magiegebiet);
     if (rc == NULL) {
         log_error("could not find suitable familiar for %s.\n", caster->faction->race->_name);
         return 0;
@@ -2509,7 +2509,7 @@ static int sp_fumblecurse(castorder * co)
 
     target = pa->param[0]->data.u;
 
-    duration = cast_level - effskill(target, SK_MAGIC, 0);
+    duration = cast_level - effskill(target, SK_MAGIC, NULL);
     if (duration < 2) {
         int rx = rng_int() % 3;
         if (duration < rx) duration = rx;
@@ -3191,7 +3191,7 @@ static int sp_bloodsacrifice(castorder * co)
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
     int aura;
-    int skill = effskill(caster, SK_MAGIC, 0);
+    int skill = effskill(caster, SK_MAGIC, NULL);
     int hp = (int)(co->force * 8);
 
     if (hp <= 0) {
@@ -3530,11 +3530,11 @@ static int sp_charmingsong(castorder * co)
     }
     /* Magieresistensbonus fuer hoehere Talentwerte */
     for (i = 0; i < MAXSKILLS; i++) {
-        int sk = effskill(target, i, 0);
+        int sk = effskill(target, i, NULL);
         if (tb < sk)
             tb = sk;
     }
-    tb -= effskill(mage, SK_MAGIC, 0);
+    tb -= effskill(mage, SK_MAGIC, NULL);
     if (tb > 0) {
         resist_bonus += tb * 15;
     }
@@ -4077,7 +4077,7 @@ static int sp_pump(castorder * co)
         return cast_level / 2;
     }
 
-    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, 0), 2);
+    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, NULL), 2);
     return cast_level;
 }
 

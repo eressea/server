@@ -71,9 +71,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier hat 
 msgid "error195"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg.\""
 
-msgid "healall"
-msgstr "\"Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt.\""
-
 msgid "build_required"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $resources($required).\""
 
