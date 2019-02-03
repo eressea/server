@@ -600,7 +600,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
             if (rc == get_race(RC_ORC)) {
                 int sword = effskill(u, SK_MELEE, NULL);
-                int spear = effskill(u, SK_SPEAR,NULL0);
+                int spear = effskill(u, SK_SPEAR, NULL);
                 skill = ((sword > spear) ? sword : spear) - 3;
             }
         }
