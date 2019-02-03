@@ -3840,6 +3840,10 @@ void init_processor(void)
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
     add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+
+    /* all recruitment must be finished before we can calculate 
+     * promotion cost of ability */
+    p += 10;
     add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;

@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "unit.h"
 
@@ -1229,7 +1231,7 @@ int invisible(const unit * target, const unit * viewer)
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = MIN(hidden, target->number);
+            if (hidden > target->number) hidden = target->number;
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);

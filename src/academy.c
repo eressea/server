@@ -27,7 +27,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "study.h"
 
 void academy_teaching_bonus(struct unit *u, skill_t sk, int students) {
-    if (students && sk != NOSKILL) {
+    if (students > 0 && sk != NOSKILL) {
         /* actually students * EXPERIENCEDAYS / MAX_STUDENTS */
         learn_skill(u, sk, students);
     }
