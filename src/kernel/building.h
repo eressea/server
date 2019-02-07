@@ -69,8 +69,8 @@ extern "C" {
         char *_name;
 
         int flags;                  /* flags */
-        int capacity;               /* Kapazit�t pro Gr��enpunkt */
-        int maxcapacity;            /* Max. Kapazit�t */
+        int capacity;               /* Kapazitaet pro Groessenpunkt */
+        int maxcapacity;            /* Max. Kapazitaet */
         int maxsize;                /* how big can it get, with all the extensions? */
         variant magres;                 /* how well it resists against spells */
         int magresbonus;            /* bonus it gives the target against spells */
