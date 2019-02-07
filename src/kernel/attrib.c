@@ -191,7 +191,7 @@ static attrib_type *at_find_key(unsigned int hk)
     if (!find) {
         const char *translate[3][2] = {
             { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-            { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
+            { "verzaubert", "curse" },    /* remapping: frueher verzaubert, jetzt curse */
             { NULL, NULL }
         };
         int i = 0;
@@ -388,7 +388,7 @@ int a_age(attrib ** p, void *owner)
 {
     attrib **ap = p;
     /* Attribute altern, und die Entfernung (age()==0) eines Attributs
-     * hat Einfluß auf den Besitzer */
+     * hat Einfluss auf den Besitzer */
     while (*ap) {
         attrib *a = *ap;
         if (a->type->age) {

@@ -144,34 +144,34 @@ extern "C" {
  *
  * u : eine Einheitennummer
  * r : hier kommen zwei Regionskoordinaten x y
- * b : Geb�ude- oder Burgnummer
+ * b : Gebaeude- oder Burgnummer
  * s : Schiffsnummer
- * c : String, wird ohne Weiterverarbeitung �bergeben
- * i : Zahl (int), wird ohne Weiterverarbeitung �bergeben
+ * c : String, wird ohne Weiterverarbeitung uebergeben
+ * i : Zahl (int), wird ohne Weiterverarbeitung uebergeben
  * k : Keywort - dieser String gibt den Paramter an, der folgt. Der
  *     Parameter wird mit findparam() identifiziert.
- *     k muss immer von einem c als Platzhalter f�r das Objekt gefolgt
+ *     k muss immer von einem c als Platzhalter fuer das Objekt gefolgt
  *     werden.
- *     Ein gutes Beispiel sind hierf�r die Spr�che zur Magieanalyse.
+ *     Ein gutes Beispiel sind hierfuer die Sprueche zur Magieanalyse.
  * + : gibt an, das der vorherige Parameter mehrfach vorkommen kann. Da
  *     ein Ende nicht definiert werden kann, muss dies immer am Schluss
  *     kommen.
  *
- * Flags f�r das Parsing:
+ * Flags fuer das Parsing:
  * TESTRESISTANCE : alle Zielobjekte, also alle Parameter vom Typ Unit,
  *		  Burg, Schiff oder Region, werden auf ihre
- *		  Magieresistenz �berpr�ft
+ *		  Magieresistenz ueberprueft
  * TESTCANSEE     : jedes Objekt vom Typ Einheit wird auf seine
- *		  Sichtbarkeit �berpr�ft
+ *		  Sichtbarkeit ueberprueft
  * SEARCHLOCAL   : die Zielobjekte werden nur regional gesucht
  * REGIONSPELL    : Ziel ist die Region, auch wenn kein Zielobjekt
  *		  angegeben wird. Ist TESTRESISTANCE gesetzt, so wird
- *		  die Magieresistenz der Region �berpr�ft
+ *		  die Magieresistenz der Region ueberprueft
  *
  * Bei fehlendem Ziel oder wenn dieses dem Zauber widersteht, wird die
  * Spruchfunktion nicht aufgerufen.
  * Sind zu wenig Parameter vorhanden, wird der Zauber ebenfalls nicht
- * ausgef�hrt.
+ * ausgefuehrt.
  * Ist eins von mehreren Zielobjekten resistent, so wird das Flag
  * pa->param[n]->flag == TARGET_RESISTS
  * Ist eins von mehreren Zielobjekten nicht gefunden worden, so ist
