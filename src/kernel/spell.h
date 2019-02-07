@@ -76,7 +76,8 @@ extern "C" {
 }
 #endif
 #endif
-/* ------------------------------------------------------------- *//* Erl�uterungen zu den Spruchdefinitionen
+/**
+ * Erlaeuterungen zu den Spruchdefinitionen
  *
  * Spruchstukturdefinition:
  * spell{
@@ -94,35 +95,35 @@ extern "C" {
  * id:
  * SPL_NOSPELL muss der letzte Spruch in der Liste spelldaten sein,
  * denn nicht auf die Reihenfolge in der Liste sondern auf die id wird
- * gepr�ft
+ * geprueft
  *
  * sptyp:
  * besondere Spruchtypen und Flags
  *    (Regionszauber, Kampfzauber, Farcastbar, Stufe variable, ..)
  *
  * rank:
- * gibt die Priorit�t und damit die Reihenfolge an, in der der Spruch
+ * gibt die Prioritaet und damit die Reihenfolge an, in der der Spruch
  * gezaubert wird.
- * 1: Aura �bertragen
+ * 1: Aura uebertragen
  * 2: Antimagie
- * 3: Magierver�ndernde Spr�che (Magic Boost, ..)
+ * 3: Magierveraendernde Sprueche (Magic Boost, ..)
  * 4: Monster erschaffen
  * 5: Standartlevel
  * 7: Teleport
  *
- * Komponenten[Anzahl m�gl. Items][Art:Anzahl:Kostentyp]
+ * Komponenten[Anzahl moegl. Items][Art:Anzahl:Kostentyp]
  *
  * R_AURA:
- * Grundkosten f�r einen Zauber. Soviel Mp m�ssen mindestens investiert
- * werden, um den Spruch zu wirken. Zus�tzliche Mp k�nnen unterschiedliche
+ * Grundkosten fuer einen Zauber. Soviel Mp muessen mindestens investiert
+ * werden, um den Spruch zu wirken. Zusaetzliche Mp koennen unterschiedliche
  * Auswirkungen haben, die in der Spruchfunktionsroutine definiert werden.
  *
  * R_PERMAURA:
  * Kosten an permantenter Aura
  *
  * Komponenten Kostentyp:
- * SPC_LEVEL == Spruch mit Levelabh�ngigen Magiekosten. Die angegeben
- * Kosten m�ssen f�r Stufe 1 berechnet sein.
+ * SPC_LEVEL == Spruch mit Levelabhaengigen Magiekosten. Die angegeben
+ * Kosten muessen fuer Stufe 1 berechnet s
  * SPC_FIX   == Feste Kosten
  *
  * Wenn keine spezielle Syntax angegeben ist, wird die

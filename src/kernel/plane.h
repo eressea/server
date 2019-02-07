@@ -32,7 +32,7 @@ extern "C" {
 #define PFL_NORECRUITS      2   /* cannot recruit */
 #define PFL_NOALLIANCES     4   /* not implemented */
 #define PFL_LOWSTEALING     8   /* not implemented */
-#define PFL_NOGIVE         16   /* Übergaben sind unmoeglich */
+#define PFL_NOGIVE         16   /* Uebergaben sind unmoeglich */
 #define PFL_NOATTACK       32   /* Angriffe und Diebstaehle sind unmoeglich */
 #define PFL_NOTERRAIN      64   /* Terraintyp wird nicht angezeigt TODO? */
 #define PFL_NOMAGIC       128   /* Zaubern ist unmoeglich */
