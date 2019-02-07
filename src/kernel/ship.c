@@ -442,7 +442,7 @@ static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
 
-    /* Eigent�mer tot oder kein Eigent�mer vorhanden. Erste lebende Einheit
+    /* Eigentuemer tot oder kein Eigentuemer vorhanden. Erste lebende Einheit
       * nehmen. */
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
