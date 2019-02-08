@@ -125,7 +125,7 @@ static char *entish_syllable2[] = {
 };
 
 static char *entish_syllable3[] = {
-  "Hueter", "Pflanzer", "Hirte", "Waechter", "Wachser", "Beschützer",
+  "H\xc3\xbcter", "Pflanzer", "Hirte", "W\xc3\xa4chter", "Wachser", "Besch\xc3\xbctzer",
 };
 
 static char *cthuloid_syllable1[] = {
@@ -200,13 +200,13 @@ static char *create_random_name(race_t race)
       strcat(name,
         orc_syllable3[rand() % (sizeof(orc_syllable3) / sizeof(char *))]);
       break;
-/*
+
 	case RC_TREEMAN:
 		strcpy(name, entish_syllable1[rand()%(sizeof(entish_syllable1) / sizeof(char*))]);
 		strcat(name, entish_syllable2[rand()%(sizeof(entish_syllable2) / sizeof(char*))]);
 		strcat(name, entish_syllable3[rand()%(sizeof(entish_syllable3) / sizeof(char*))]);
 		break;
-*/
+
     case RC_DAEMON:
     case RC_INSECT:
       strcpy(name,

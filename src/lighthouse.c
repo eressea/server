@@ -16,7 +16,7 @@
 
 attrib_type at_lighthouse = {
     "lighthouse"
-    /* Rest ist NULL; tempor�res, nicht alterndes Attribut */
+    /* Rest ist NULL; temporaeres, nicht alterndes Attribut */
 };
 
 bool is_lighthouse(const building_type *btype)

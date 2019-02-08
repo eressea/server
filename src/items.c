@@ -136,15 +136,15 @@ struct order *ord)
         UNUSED_ARG(ord);
         assert(sp);
 
-        /* Reduziert die St�rke jedes Spruchs um effect */
+        /* Reduziert die Staerke jedes Spruchs um effect */
         effect = 5;
 
-        /* H�lt Spr�che bis zu einem summierten Gesamtlevel von power aus.
+        /* Haelt Sprueche bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
         force = effect * 20.0;     /* Stufe 5 =~ 100 */
 
-        /* Regionszauber aufl�sen */
+        /* Regionszauber aufloesen */
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
@@ -156,7 +156,7 @@ struct order *ord)
             }
             c = (curse *)a->data.v;
 
-            /* Immunit�t pr�fen */
+            /* Immunitaet pruefen */
             if (c_flags(c) & CURSE_IMMUNE) {
                 do {
                     ap = &(*ap)->next;
