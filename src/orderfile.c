@@ -108,7 +108,7 @@ static void unitorders(input *in, faction *f)
                         }
                     }
                 }
-                /* Nun wird der Befehl erzeut und eingeh�ngt */
+                /* Nun wird der Befehl erzeut und eingehaengt */
                 *ordp = parse_order(s, u->faction->locale);
                 if (*ordp) {
                     ordp = &(*ordp)->next;
@@ -137,7 +137,7 @@ static faction *factionorders(void)
             return 0;
         }
         /* Die Partei hat sich zumindest gemeldet, so dass sie noch
-        * nicht als unt�tig gilt */
+        * nicht als untaetig gilt */
         f->lastorders = turn;
 
     }
@@ -201,11 +201,12 @@ int read_orders(input *in)
             break;
 
             /* Falls in unitorders() abgebrochen wird, steht dort entweder eine neue
-            * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
-            * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
-            * auf alle F�lle nicht �berschreiben! Bei allen anderen Eintr�gen hier
-            * muss buf erneut gef�llt werden, da die betreffende Information in nur
-            * einer Zeile steht, und nun die n�chste gelesen werden muss. */
+             * Partei, eine neue Einheit oder das File-Ende. Das switch() wird erneut
+             * durchlaufen, und die entsprechende Funktion aufgerufen. Man darf buf
+             * auf alle Faelle nicht ueberschreiben! Bei allen anderen Eintraegen hier
+             * muss buf erneut gefaellt werden, da die betreffende Information in nur
+             * einer Zeile steht, und nun die naechste gelesen werden muss.
+             */
 
         case P_NEXT:
             f = NULL;

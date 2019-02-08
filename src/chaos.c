@@ -136,7 +136,7 @@ static void chaos(region * r)
                 u->flags |= (UFL_ISNEW | UFL_MOVED);
             }
             break;
-        case 2:                  /* Terrainver�nderung */
+        case 2:                  /* Terrainveraenderung */
             if (!(r->terrain->flags & FORBIDDEN_REGION)) {
                 if (!(r->terrain->flags & SEA_REGION)) {
                     direction_t dir;

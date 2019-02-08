@@ -55,7 +55,7 @@ static int nb_armor(const unit * u, int index)
     if (!(u_race(u)->battle_flags & BF_EQUIPMENT))
         return 0;
 
-    /* Normale R�stung */
+    /* Normale Ruestung */
 
     for (itm = u->items; itm; itm = itm->next) {
         const armor_type *atype = itm->type->rtype->atype;
@@ -186,11 +186,11 @@ static region *rrandneighbour(region * r)
     for (i = 0; i != MAXDIRECTIONS; i++) {
         c++;
     }
-    /* Zuf�llig eine ausw�hlen */
+    /* Zufaellig eine auswaehlen */
 
     rr = rng_int() % c;
 
-    /* Durchz�hlen */
+    /* Durchzaehlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -221,7 +221,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     else {
         /* Produktion vierteln ... */
         a->data.sa[0] = (short)percent;
-        /* F�r 6-17 Runden */
+        /* Fuer 6-17 Runden */
         a->data.sa[1] = (short)(a->data.sa[1] + time);
     }
 
