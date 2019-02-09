@@ -62,7 +62,7 @@ static const char *spell_damage(int sp)
 {
     switch (sp) {
     case 0:
-        /* meist t�dlich 20-65 HP */
+        /* meist toetlich 20-65 HP */
         return "5d10+15";
     case 1:
         /* sehr variabel 4-48 HP */
@@ -71,7 +71,7 @@ static const char *spell_damage(int sp)
         /* leicht verwundet 4-18 HP */
         return "2d8+2";
     case 3:
-        /* fast immer t�dlich 30-50 HP */
+        /* fast immer toetlich 30-50 HP */
         return "5d5+25";
     case 4:
         /* verwundet 11-26 HP */
@@ -335,11 +335,11 @@ int sp_combatrosthauch(struct castorder * co)
     selist_free(fgs);
 
     if (k == 0) {
-        /* keine Waffen mehr da, die zerst�rt werden k�nnten */
+        /* keine Waffen mehr da, die zerstoert werden koennten */
         message *msg = msg_message("rust_effect_1", "mage", fi->unit);
         message_all(b, msg);
         msg_release(msg);
-        fi->magic = 0;              /* k�mpft nichtmagisch weiter */
+        fi->magic = 0;              /* kaempft nichtmagisch weiter */
         level = 0;
     }
     else {
@@ -405,7 +405,7 @@ int sp_speed(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -871,7 +871,7 @@ static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
 }
 
 /* Gesang der Furcht (Kampfzauber) */
-/* Panik (Pr�kampfzauber) */
+/* Panik (Praekampfzauber) */
 int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
@@ -900,7 +900,7 @@ int flee_spell(struct castorder * co, int strength)
         fighter *df = (fighter *)selist_get(ql, qi);
 
         for (n = 0; force > 0 && n != df->alive; ++n) {
-            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR m�glich */
+            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR moeglich */
                 df->person[n].attack -= 1;
                 --force;
                 ++panik;
@@ -944,7 +944,7 @@ int sp_hero(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -992,7 +992,7 @@ int sp_berserk(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -1181,7 +1181,7 @@ int sp_reeling_arrows(struct castorder * co)
 }
 
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
- * eine Nachbarregion, wobei ein NACH ber�cksichtigt wird. Ansonsten
+ * eine Nachbarregion, wobei ein NACH beruecksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
 int sp_appeasement(struct castorder * co)
 {
@@ -1194,7 +1194,7 @@ int sp_appeasement(struct castorder * co)
     region *r = b->region;
     message *m;
 
-    /* Fliehende Einheiten verlassen auf jeden Fall Geb�ude und Schiffe. */
+    /* Fliehende Einheiten verlassen auf jeden Fall Gebaeude und Schiffe. */
     if (!(r->terrain->flags & SEA_REGION)) {
         leave(mage, false);
     }
@@ -1202,7 +1202,7 @@ int sp_appeasement(struct castorder * co)
     setguard(mage, false);
     unit_setstatus(mage, ST_FLEE);
 
-    /* wir tun so, als w�re die Person geflohen */
+    /* wir tun so, als waere die Person geflohen */
     fi->flags |= FIG_NOLOOT;
     fi->run.hp = mage->hp;
     fi->run.number = mage->number;
@@ -1242,7 +1242,7 @@ int armor_spell(struct castorder * co, int per_level, int time_multi)
     message_all(b, m);
     msg_release(m);
 
-    /* gibt R�stung +effect f�r duration Treffer */
+    /* gibt Ruestung +effect fuer duration Treffer */
 
     effect = level / per_level;
     duration = (int)(time_multi * power * power);
@@ -1286,7 +1286,7 @@ int sp_fumbleshield(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    /* der erste Zauber schl�gt mit 100% fehl  */
+    /* der erste Zauber schlaegt mit 100% fehl  */
     duration = 100;
     effect = 25 - level;
     if (effect < 1) effect = 1;
@@ -1344,7 +1344,7 @@ int sp_reanimate(struct castorder * co)
             && u_race(tf->unit) != get_race(RC_DAEMON)
             && (chance(c))) {
             assert(tf->alive < tf->unit->number);
-            /* t.fighter->person[].hp beginnt mit t.index = 0 zu z�hlen,
+            /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,
              * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
              * also sind die hp von t.fighter->alive
              * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote

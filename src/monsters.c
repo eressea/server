@@ -9,7 +9,7 @@
  *  based on:
  *
  * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schr�der
+ * Atlantis v1.7                    Copyright 1996 by Alex Schroeder
  *
  * This program may not be used, modified or distributed without
  * prior permission by the authors of Eressea.
@@ -74,7 +74,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define DRAGON_RANGE       20  /* max. Distanz zum n�chsten Drachenziel */
+#define DRAGON_RANGE       20  /* max. Distanz zum naechsten Drachenziel */
 #define MOVE_PERCENT       25  /* chance fuer bewegung */
 #define MAXILLUSION_TEXTS   3
 
@@ -371,11 +371,11 @@ static direction_t random_neighbour(region * r, unit * u)
         }
     }
 
-    /* Zuf�llig eine ausw�hlen */
+    /* Zufaellig eine auswaehlen */
 
     rr = rng_int() % c;
 
-    /* Durchz�hlen */
+    /* Durchzaehlen */
 
     c = 0;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -412,11 +412,11 @@ static direction_t treeman_neighbour(region * r)
     if (c == 0) {
         return NODIRECTION;
     }
-    /* Zuf�llig eine ausw�hlen */
+    /* Zufaellig eine auswaehlen */
 
     rr = rng_int() % c;
 
-    /* Durchz�hlen */
+    /* Durchzaehlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -561,7 +561,7 @@ static order *monster_learn(unit * u)
         return NULL;
     }
 
-    /* Monster lernt ein zuf�lliges Talent aus allen, in denen es schon
+    /* Monster lernt ein zufaelliges Talent aus allen, in denen es schon
      * Lerntage hat. */
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
         if (sv->level > 0)
@@ -650,7 +650,7 @@ static order *plan_dragon(unit * u)
     if (rc == rc_wyrm && !move) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            /* wyrme sind einzelg�nger */
+            /* Wyrme sind Einzelgaenger */
             if (u2 == u) {
                 /* we do not make room for newcomers, so we don't need to look at them */
                 break;
@@ -747,7 +747,7 @@ void plan_monsters(faction * f)
             order *long_order = NULL;
             bool can_move = true;
 
-            /* Ab hier nur noch Befehle f�r NPC-Einheiten. */
+            /* Ab hier nur noch Befehle fuer NPC-Einheiten. */
             if (u->faction!=f)
                 continue;
 
@@ -761,7 +761,7 @@ void plan_monsters(faction * f)
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            /* Befehle m�ssen jede Runde neu gegeben werden: */
+            /* Befehle muessen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
 
             /* All monsters guard the region: */
@@ -833,7 +833,7 @@ void plan_monsters(faction * f)
                 }
             }
             if (long_order == NULL && check_student(u, NULL, SK_WEAPONLESS)) {
-                /* Einheiten, die Waffenlosen Kampf lernen k�nnten, lernen es um
+                /* Einheiten, die Waffenlosen Kampf lernen koennten, lernen es um
                 * zu bewachen: */
                 if (rc->bonus[SK_WEAPONLESS] != -99) {
                     if (effskill(u, SK_WEAPONLESS, NULL) < 1) {
@@ -875,7 +875,7 @@ unit *spawn_seaserpent(region *r, faction *f) {
 }
 
 /** 
- * Drachen und Seeschlangen k�nnen entstehen 
+ * Drachen und Seeschlangen koennen entstehen
  */
 void spawn_dragons(void)
 {
@@ -926,7 +926,7 @@ void spawn_dragons(void)
     }
 }
 
-/** Untote k�nnen entstehen */
+/** Untote koennen entstehen */
 void spawn_undead(void)
 {
     region *r;
@@ -946,7 +946,7 @@ void spawn_undead(void)
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
-             * Lieber sammeln lassen, bis sie mindestens 5% der Bev�lkerung sind, und
+             * Lieber sammeln lassen, bis sie mindestens 5% der Bevoelkerung sind, und
              * dann erst auferstehen. */
             int undead = unburied / (rng_int() % 2 + 1);
             const race *rc = NULL;
@@ -1005,7 +1005,7 @@ void spawn_undead(void)
         else {
             int i = deathcount(r);
             if (i) {
-                /* Gr�ber verwittern, 3% der Untoten finden die ewige Ruhe */
+                /* Groeber verwittern, 3% der Untoten finden die ewige Ruhe */
                 deathcounts(r, (int)(-i * 0.03));
             }
         }

@@ -57,7 +57,7 @@ void expandstealing(region * r, econ_request * stealorders)
     norders = expand_production(r, stealorders, &requests);
     if (!norders) return;
 
-    /* F�r jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
+    /* Fuer jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
      * Beklauen-Orders ist. Jedes Opfer muss einzeln behandelt werden.
      *
      * u ist die beklaute unit. oa.unit ist die klauende unit.
