@@ -1000,8 +1000,6 @@ static char *makename(void)
         *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
-    /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
-
     nk = strlen(kons);
     ne = strlen(handle_end);
     nv = strlen(vowels);
@@ -1114,7 +1112,7 @@ void init_region(region *r)
 
 void terraform_region(region * r, const terrain_type * terrain)
 {
-    /* Resourcen, die nicht mehr vorkommen koennen, löschen */
+    /* Resourcen, die nicht mehr vorkommen koennen, loeschen */
     const terrain_type *oldterrain = r->terrain;
     rawmaterial **lrm = &r->resources;
 
