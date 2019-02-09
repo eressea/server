@@ -128,7 +128,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
+            int willdo = effskill(u, SK_ROAD_BUILDING, NULL) * u->number;
             if (willdo > n) willdo = n;
             if (willdo == 0) {
                 /* TODO: error message */
@@ -147,7 +147,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 }
 
 static int recycle(unit *u, construction *con, int size) {
-    /* TODO: Nicht an ZERST�RE mit Punktangabe angepasst! */
+    /* TODO: Nicht an ZERSTOERE mit Punktangabe angepasst! */
     int c;
     for (c = 0; con->materials[c].number; ++c) {
         const requirement *rq = con->materials + c;
@@ -278,7 +278,7 @@ void build_road(unit * u, int size, direction_t d)
     region *rn = rconnect(r, d);
 
     assert(u->number);
-    effsk = effskill(u, SK_ROAD_BUILDING, 0);
+    effsk = effskill(u, SK_ROAD_BUILDING, NULL);
     if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
         return;
@@ -545,8 +545,8 @@ static int build_limited(unit * u, const construction * con, int completed, int 
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
-         *  (enno): Nein, das ist f�r Dinge, bei denen die n�chste Ausbaustufe
-         *  die gleiche wie die vorherige ist. z.b. gegenst�nde.
+         *  (enno): Nein, das ist fuer Dinge, bei denen die naechste Ausbaustufe
+         *  die gleiche wie die vorherige ist. z.b. Gegenstaende.
          */
         if (con->maxsize > 0) {
             completed = completed % con->maxsize;
@@ -616,7 +616,7 @@ int build(unit * u, const construction * con, int completed, int want, int skill
     int made, basesk = 0;
 
     assert(con->skill != NOSKILL);
-    basesk = effskill(u, con->skill, 0);
+    basesk = effskill(u, con->skill, NULL);
     if (basesk == 0) {
         return ENEEDSKILL;
     }
@@ -759,7 +759,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     assert(u->number);
     assert(btype->stages && btype->stages->construction);
 
-    basesk = effskill(u, SK_BUILDING, 0);
+    basesk = effskill(u, SK_BUILDING, NULL);
     skills = build_skill(u, basesk, 0);
     if (skills == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
@@ -870,11 +870,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     btname = LOC(lang, btype->_name);
 
     if (want <= built) {
-        /* geb�ude fertig */
+        /* gebaeude fertig */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX && btname) {
-        /* reduzierte restgr��e */
+        /* reduzierte restgroesse */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order =
@@ -886,7 +886,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
     else if (btname) {
-        /* Neues Haus, Befehl mit Geb�udename */
+        /* Neues Haus, Befehl mit Gebaeudename */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
@@ -959,13 +959,13 @@ create_ship(unit * u, const struct ship_type *newtype, int want,
     order *new_order;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
         return;
     }
 
     /* check if skill and material for 1 size is available */
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;
@@ -1003,7 +1003,7 @@ void continue_ship(unit * u, int want)
     int msize;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
         return;
     }
@@ -1023,7 +1023,7 @@ void continue_ship(unit * u, int want)
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;

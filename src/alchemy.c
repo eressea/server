@@ -90,7 +90,7 @@ void herbsearch(unit * u, int max_take)
     region * r = u->region;
     int herbsfound;
     const item_type *whichherb;
-    int effsk = effskill(u, SK_HERBALISM, 0);
+    int effsk = effskill(u, SK_HERBALISM, NULL);
     int herbs = rherbs(r);
 
     if (effsk == 0) {
@@ -275,7 +275,7 @@ int change_effect(unit * u, const item_type * effect, int delta)
 
 bool display_potions(struct unit *u)
 {
-    int skill = effskill(u, SK_ALCHEMY, 0);
+    int skill = effskill(u, SK_ALCHEMY, NULL);
     int c = 0;
     const potion_type *ptype;
     for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {

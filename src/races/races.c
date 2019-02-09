@@ -75,7 +75,7 @@ void equip_newunits(struct unit *u)
     }
 }
 
-/* Die Funktionen werden �ber den hier registrierten Namen in races.xml
+/* Die Funktionen werden ueber den hier registrierten Namen in races.xml
  * in die jeweilige Rassendefiniton eingebunden */
 void register_races(void)
 {

@@ -89,8 +89,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
 
-#define BASE_CHANCE    70       /* 70% Basis-�berlebenschance */
-#define TDIFF_CHANGE    5       /* 5% h�her pro Stufe */
+#define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
+#define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
 
 #define DEBUG_SELECT            /* should be disabled if select_enemy works */
@@ -303,11 +303,11 @@ static int dead_fighters(const fighter * df)
 }
 
 fighter *select_corpse(battle * b, fighter * af)
-/* W�hlt eine Leiche aus, der af hilft. casualties ist die Anzahl der
+/* Waehlt eine Leiche aus, der af hilft. casualties ist die Anzahl der
  * Toten auf allen Seiten (im Array). Wenn af == NULL, wird die
- * Parteizugeh�rigkeit ignoriert, und irgendeine Leiche genommen.
+ * Parteizugehoerigkeit ignoriert, und irgendeine Leiche genommen.
  *
- * Untote werden nicht ausgew�hlt (casualties, not dead) */
+ * Untote werden nicht ausgewaehlt (casualties, not dead) */
 {
     int si, maxcasualties = 0;
     fighter *df;
@@ -323,7 +323,7 @@ fighter *select_corpse(battle * b, fighter * af)
         side *s;
         for (s = b->sides; s != b->sides + b->nsides; ++s) {
             for (df = s->fighters; df; df = df->next) {
-                /* Geflohene haben auch 0 hp, d�rfen hier aber nicht ausgew�hlt
+                /* Geflohene haben auch 0 hp, duerfen hier aber nicht ausgewaehlt
                  * werden! */
                 int dead = dead_fighters(df);
                 if (!playerrace(u_race(df->unit)))
@@ -594,13 +594,13 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
     const race * rc = u_race(u);
 
     if (wtype == NULL) {
-        skill = effskill(u, SK_WEAPONLESS, 0);
+        skill = effskill(u, SK_WEAPONLESS, NULL);
         int def = attacking ? rc->at_default : rc->df_default;
         if (skill <= 0) {
             /* wenn kein waffenloser kampf, dann den rassen-defaultwert */
             if (rc == get_race(RC_ORC)) {
-                int sword = effskill(u, SK_MELEE, 0);
-                int spear = effskill(u, SK_SPEAR, 0);
+                int sword = effskill(u, SK_MELEE, NULL);
+                int spear = effskill(u, SK_SPEAR, NULL);
                 skill = ((sword > spear) ? sword : spear) - 3;
             }
         }
@@ -620,7 +620,7 @@ weapon_skill(const weapon_type * wtype, const unit * u, bool attacking)
         /* changed: if we own a weapon, we have at least a skill of 0 */
         if (!i_canuse(u, wtype->itype))
             return -1;
-        skill = effskill(u, wtype->skill, 0);
+        skill = effskill(u, wtype->skill, NULL);
         if (skill > 0) {
             if (attacking) {
                 skill += rc->at_bonus;
@@ -655,7 +655,7 @@ static int CavalryBonus(const unit * u, troop enemy, int type)
     }
     else {
         /* new rule, chargers in Eressea 1.1 */
-        int skl = effskill(u, SK_RIDING, 0);
+        int skl = effskill(u, SK_RIDING, NULL);
         /* only half against trolls */
         if (skl > 0) {
             if (type == BONUS_SKILL) {
@@ -731,16 +731,16 @@ weapon_effskill(troop t, troop enemy, const weapon * w,
 
         if (t.index < tf->elvenhorses) {
             /* Elfenpferde: Helfen dem Reiter, egal ob und welche Waffe. Das ist
-             * eleganter, und vor allem einfacher, sonst mu� man noch ein
+             * eleganter, und vor allem einfacher, sonst muss man noch ein
              * WMF_ELVENHORSE einbauen. */
             skill += 2;
         }
 
         if (skill > 0 && !attacking && missile) {
             /*
-             * Wenn ich verteidige, und nicht direkt meinem Feind gegen�berstehe,
-             * halbiert sich mein Skill: (z.B. gegen Fernk�mpfer. Nahk�mpfer
-             * k�nnen mich eh nicht treffen)
+             * Wenn ich verteidige, und nicht direkt meinem Feind gegenueberstehe,
+             * halbiert sich mein Skill: (z.B. gegen Fernkaempfer. Nahkaempfer
+             * koennen mich eh nicht treffen)
              */
             skill /= 2;
         }
@@ -779,9 +779,9 @@ const armor_type *select_armor(troop t, bool shield)
 }
 
 /* Hier ist zu beachten, ob und wie sich Zauber und Artefakte, die
- * R�stungschutz geben, addieren.
- * - Artefakt "trollbelt" gibt R�stung +1
- * - Zauber Rindenhaut gibt R�stung +3
+ * Ruestungschutz geben, addieren.
+ * - Artefakt "trollbelt" gibt Ruestung +1
+ * - Zauber Rindenhaut gibt Ruestung +3
  */
 static int trollbelts(const unit *u) {
     const struct resource_type *belt = rt_find("trollbelt");
@@ -799,7 +799,7 @@ int select_magicarmor(troop t)
     return ma;
 }
 
-/* Sind side ds und Magier des meffect verb�ndet, dann return 1*/
+/* Sind side ds und Magier des meffect verbuendet, dann return 1*/
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
     UNUSED_ARG(b);
@@ -837,7 +837,7 @@ void rmfighter(fighter * df, int i)
     assert(df->alive >= i);
     assert(df->alive <= df->unit->number);
 
-    /* erst ziehen wir die Anzahl der Personen von den K�mpfern in der
+    /* erst ziehen wir die Anzahl der Personen von den Kaempfern in der
      * Schlacht, dann von denen auf dieser Seite ab*/
     df->side->alive -= i;
     df->side->battle->alive -= i;
@@ -968,7 +968,7 @@ int natural_armor(unit * du)
     assert(rc);
     an = rc_armor_bonus(rc);
     if (an > 0) {
-        int sk = effskill(du, SK_STAMINA, 0);
+        int sk = effskill(du, SK_STAMINA, NULL);
         return rc->armor + sk / an;
     }
     return rc->armor;
@@ -1031,15 +1031,15 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
       total_armor = 0;
     }
 
-    /* nat�rliche R�stung */
+    /* natuerliche Ruestung */
     nat_armor = natural_armor(du);
 
-    /* magische R�stung durch Artefakte oder Spr�che */
-    /* Momentan nur Trollg�rtel und Werwolf-Eigenschaft */
+    /* magische Ruestung durch Artefakte oder Sprueche */
+    /* Momentan nur Trollguertel und Werwolf-Eigenschaft */
     magic_armor = select_magicarmor(dt);
 
     if (rule_nat_armor == 0) {
-        /* nat�rliche R�stung ist halbkumulativ */
+        /* natuerliche Ruestung ist halbkumulativ */
         if (total_armor > 0) {
             total_armor += nat_armor / 2;
         }
@@ -1124,7 +1124,7 @@ static bool survives(fighter *af, troop dt, battle *b) {
     const unit *du = af->unit;
     const fighter *df = dt.fighter;
 
-    if (df->person[dt.index].hp > 0) {    /* Hat �berlebt */
+    if (df->person[dt.index].hp > 0) {    /* Hat ueberlebt */
         demon_dazzle(af, dt);
 
         return true;
@@ -1261,7 +1261,7 @@ static int apply_magicshield(int reduced_damage, fighter *df,
                 reduced_damage -= hp;
                 me->duration -= hp;
             }
-            /* gibt R�stung +effect f�r duration Treffer */
+            /* gibt Ruestung +effect fuer duration Treffer */
             if (me->typ == SHIELD_ARMOR) {
                 reduced_damage -= me->effect;
                 if (reduced_damage < 0) reduced_damage = 0;
@@ -1743,7 +1743,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
             unit *caster = mage;
 
             if (fig->alive <= 0)
-                continue;               /* fighter kann im Kampf get�tet worden sein */
+                continue;               /* fighter kann im Kampf getoetet worden sein */
 
             level = effskill(mage, SK_MAGIC, r);
             if (level > 0) {
@@ -1847,12 +1847,12 @@ static void do_combatspell(troop at)
 
     sp = get_combatspell(mage, 1);
     if (sp == NULL) {
-        fi->magic = 0;              /* Hat keinen Kampfzauber, k�mpft nichtmagisch weiter */
+        fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
     ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
     if (!cancast(mage, sp, 1, 1, ord)) {
-        fi->magic = 0;              /* Kann nicht mehr Zaubern, k�mpft nichtmagisch weiter */
+        fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;
     }
 
@@ -1878,7 +1878,7 @@ static void do_combatspell(troop at)
         }
     }
 
-    /* Antimagie die Fehlschlag erh�ht */
+    /* Antimagie die Fehlschlag erhoeht */
     if (rng_int() % 100 < fumblechance) {
         report_failed_spell(b, mage, sp);
         pay_spell(mage, NULL, sp, level, 1);
@@ -1897,7 +1897,7 @@ static void do_combatspell(troop at)
 }
 
 /* Sonderattacken: Monster patzern nicht und zahlen auch keine
- * Spruchkosten. Da die Spruchst�rke direkt durch den Level bestimmt
+ * Spruchkosten. Da die Spruchstaerke direkt durch den Level bestimmt
  * wird, wirkt auch keine Antimagie (wird sonst in spellpower
  * gemacht) */
 
@@ -1948,7 +1948,7 @@ int skilldiff(troop at, troop dt, int dist)
         if (b->attribs) {
             curse *c = get_curse(b->attribs, &ct_strongwall);
             if (curse_active(c)) {
-                /* wirkt auf alle Geb�ude */
+                /* wirkt auf alle Gebaeude */
                 skdiff -= curse_geteffect_int(c);
                 is_protected = 2;
             }
@@ -2037,7 +2037,7 @@ int hits(troop at, troop dt, weapon * awp)
     }
 
     skdiff = skilldiff(at, dt, dist);
-    /* Verteidiger bekommt eine R�stung */
+    /* Verteidiger bekommt eine Ruestung */
     armor = select_armor(dt, true);
     if (dwp == NULL || (dwp->type->flags & WTF_USESHIELD)) {
         shield = select_armor(dt, false);
@@ -2066,7 +2066,7 @@ void damage_building(battle * b, building * bldg, int damage_abs)
     bldg->size -= damage_abs;
     if (bldg->size < 1) bldg->size = 1;
 
-    /* Wenn Burg, dann gucken, ob die Leute alle noch in das Geb�ude passen. */
+    /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebaeude passen. */
 
     if (bldg->type->flags & BTF_FORTIFICATION) {
         side *s;
@@ -2124,7 +2124,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
     switch (a->type) {
     case AT_COMBATSPELL:
         /* Magier versuchen immer erstmal zu zaubern, erst wenn das
-         * fehlschl�gt, wird af->magic == 0 und  der Magier k�mpft
+         * fehlschlaegt, wird af->magic == 0 und  der Magier kaempft
          * konventionell weiter */
         if (numattack == 0 && af->magic > 0) {
             /* wenn der magier in die potenzielle Reichweite von Attacken des
@@ -2136,7 +2136,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             }
         }
         break;
-    case AT_STANDARD:          /* Waffen, mag. Gegenst�nde, Kampfzauber */
+    case AT_STANDARD:          /* Waffen, mag. Gegenstaende, Kampfzauber */
         if (numattack > 0 || af->magic <= 0) {
             weapon *wp = ta.fighter->person[ta.index].missile;
             int melee =
@@ -2153,7 +2153,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 bool standard_attack = true;
                 bool reload = false;
                 /* spezialattacken der waffe nur, wenn erste attacke in der runde.
-                 * sonst helden mit feuerschwertern zu m�chtig */
+                 * sonst helden mit feuerschwertern zu maechtig */
                 if (numattack == 0 && wp && wp->type->attack) {
                     int dead = 0;
                     standard_attack = wp->type->attack(&ta, wp->type, &dead);
@@ -2197,7 +2197,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             }
         }
         break;
-    case AT_SPELL:             /* Extra-Spr�che. Kampfzauber in AT_COMBATSPELL! */
+    case AT_SPELL:             /* Extra-Sprueche. Kampfzauber in AT_COMBATSPELL! */
         do_extra_spell(ta, a);
         break;
     case AT_NATURAL:
@@ -2282,14 +2282,14 @@ void do_attack(fighter * af)
 
     assert(au && au->number);
     /* Da das Zuschlagen auf Einheiten und nicht auf den einzelnen
-     * K�mpfern beruht, darf die Reihenfolge und Gr��e der Einheit keine
+     * Kaempfern beruht, darf die Reihenfolge und Groesse der Einheit keine
      * Rolle spielen, Das tut sie nur dann, wenn jeder, der am Anfang der
-     * Runde lebte, auch zuschlagen darf. Ansonsten ist der, der zuf�llig
-     * mit einer gro�en Einheit zuerst drankommt, extrem bevorteilt. */
+     * Runde lebte, auch zuschlagen darf. Ansonsten ist der, der zufaellig
+     * mit einer grossen Einheit zuerst drankommt, extrem bevorteilt. */
     ta.index = af->fighting;
 
     while (ta.index--) {
-        /* Wir suchen eine beliebige Feind-Einheit aus. An der k�nnen
+        /* Wir suchen eine beliebige Feind-Einheit aus. An der koennen
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
         if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
@@ -2314,7 +2314,7 @@ void do_attack(fighter * af)
             }
         }
     }
-    /* Der letzte Katapultsch�tze setzt die
+    /* Der letzte Katapultschuetze setzt die
      * Ladezeit neu und generiert die Meldung. */
     if (af->catmsg >= 0) {
         struct message *m =
@@ -2343,7 +2343,7 @@ static int horse_fleeing_bonus(const unit * u)
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     int n1 = 0, n2 = 0, n3 = 0;
     item *itm;
-    int skl = effskill(u, SK_RIDING, 0);
+    int skl = effskill(u, SK_RIDING, NULL);
     const resource_type *rtype;
 
     it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
@@ -2372,9 +2372,9 @@ static int horse_fleeing_bonus(const unit * u)
 static int fleechance(unit * u)
 {
     int p = flee_chance_base;              /* Fluchtwahrscheinlichkeit in % */
-    /* Einheit u versucht, dem Get�mmel zu entkommen */
+    /* Einheit u versucht, dem Getuemmel zu entkommen */
 
-    p += (effskill(u, SK_STEALTH, 0) * flee_chance_skill_bonus);
+    p += (effskill(u, SK_STEALTH, NULL) * flee_chance_skill_bonus);
     p += horse_fleeing_bonus(u);
 
     if (u_race(u) == get_race(RC_HALFLING)) {
@@ -2660,7 +2660,7 @@ static void aftermath(battle * b)
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         int snumber = 0;
         fighter *df;
-        bool relevant = false;   /* Kampf relevant f�r diese Partei? */
+        bool relevant = false;   /* Kampf relevant fuer diese Partei? */
         if (!fval(s, SIDE_HASGUARDS)) {
             relevant = true;
         }
@@ -2700,7 +2700,7 @@ static void aftermath(battle * b)
                     /* Report the casualties */
                     reportcasualties(b, df, dead);
 
-                    /* Zuerst d�rfen die Feinde pl�ndern, die mitgenommenen Items
+                    /* Zuerst duerfen die Feinde pluendern, die mitgenommenen Items
                      * stehen in fig->run.items. Dann werden die Fliehenden auf
                      * die leere (tote) alte Einheit gemapt */
                     if (!fval(df, FIG_NOLOOT)) {
@@ -2735,7 +2735,7 @@ static void aftermath(battle * b)
             }
             else {
                 if (df->alive == 0) {
-                    /* alle sind tot, niemand geflohen. Einheit aufl�sen */
+                    /* alle sind tot, niemand geflohen. Einheit aufloesen */
                     df->run.number = 0;
                     df->run.hp = 0;
 
@@ -2797,7 +2797,7 @@ static void aftermath(battle * b)
 
     /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
      * schonmal Schaden genommen hat. (moved und drifted
-     * sollten in flags �berf�hrt werden */
+     * sollten in flags ueberfuehrt werden */
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *df;
@@ -2818,7 +2818,7 @@ static void aftermath(battle * b)
             }
 
             /* Wenn sich die Einheit auf einem Schiff befindet, wird
-             * dieses Schiff besch�digt. Andernfalls ein Schiff, welches
+             * dieses Schiff beschaedigt. Andernfalls ein Schiff, welches
              * evt. zuvor verlassen wurde. */
             if (ships_damaged) {
                 ship *sh;
@@ -3085,7 +3085,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     region *r = b->region;
     item *itm;
     fighter *fig = NULL;
-    int h, i, tactics = effskill(u, SK_TACTICS, 0);
+    int h, i, tactics = effskill(u, SK_TACTICS, NULL);
     int berserk;
     int strongmen;
     int speeded = 0, speed = 1;
@@ -3114,8 +3114,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         else if (!stealthfaction) {
             s1->stealthfaction = NULL;
         }
-        /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit f�r noch
-         * keinen Kampf ausgew�hlt wurde (sonst w�rde ein fighter existieren) */
+        /* Zu diesem Zeitpunkt ist attacked noch 0, da die Einheit fuer noch
+         * keinen Kampf ausgewaehlt wurde (sonst wuerde ein fighter existieren) */
     }
     fig = (struct fighter*)calloc(1, sizeof(struct fighter));
 
@@ -3123,8 +3123,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     s1->fighters = fig;
 
     fig->unit = u;
-    /* In einer Burg mu� man a) nicht Angreifer sein, und b) drin sein, und
-     * c) noch Platz finden. d) menschan�hnlich sein */
+    /* In einer Burg muss man a) nicht Angreifer sein, und b) drin sein, und
+     * c) noch Platz finden. d) menschanaehnlich sein */
     if (attack) {
         set_attacker(fig);
     }
@@ -3150,7 +3150,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     assert(h);
     rest = u->hp % u->number;
 
-    /* Effekte von Spr�chen */
+    /* Effekte von Spruechen */
 
     if (u->attribs) {
         curse *c = get_curse(u->attribs, &ct_speed);
@@ -3189,8 +3189,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         }
     }
 
-    /* F�r alle Waffengattungen wird bestimmt, wie viele der Personen mit
-     * ihr k�mpfen k�nnten, und was ihr Wert darin ist. */
+    /* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
+     * ihr kaempfen koennten, und was ihr Wert darin ist. */
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
         int owp[WMAX];
         int dwp[WMAX];
@@ -3311,23 +3311,23 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         }
     }
 
-    /* Jetzt mu� noch geschaut werden, wo die Einheit die jeweils besten
-     * Werte hat, das kommt aber erst irgendwo sp�ter. Ich entscheide
-     * w�rend des Kampfes, welche ich nehme, je nach Gegner. Deswegen auch
+    /* Jetzt muss noch geschaut werden, wo die Einheit die jeweils besten
+     * Werte hat, das kommt aber erst irgendwo spaeter. Ich entscheide
+     * waehrend des Kampfes, welche ich nehme, je nach Gegner. Deswegen auch
      * keine addierten boni. */
 
-    /* Zuerst mal die Spezialbehandlung gewisser Sonderf�lle. */
-    fig->magic = effskill(u, SK_MAGIC, 0);
+    /* Zuerst mal die Spezialbehandlung gewisser Sonderfaelle. */
+    fig->magic = effskill(u, SK_MAGIC, NULL);
 
     if (fig->horses) {
         if (!fval(r->terrain, CAVALRY_REGION) || r_isforest(r)
-            || effskill(u, SK_RIDING, 0) < CavalrySkill()
+            || effskill(u, SK_RIDING, NULL) < CavalrySkill()
             || u_race(u) == get_race(RC_TROLL) || fval(u, UFL_WERE))
             fig->horses = 0;
     }
 
     if (fig->elvenhorses) {
-        if (effskill(u, SK_RIDING, 0) < 5 || u_race(u) == get_race(RC_TROLL)
+        if (effskill(u, SK_RIDING, NULL) < 5 || u_race(u) == get_race(RC_TROLL)
             || fval(u, UFL_WERE))
             fig->elvenhorses = 0;
     }
@@ -3410,7 +3410,7 @@ battle *make_battle(region * r)
 
     b->region = r;
     b->plane = getplane(r);
-    /* Finde alle Parteien, die den Kampf beobachten k�nnen: */
+    /* Finde alle Parteien, die den Kampf beobachten koennen: */
     for (u = r->units; u; u = u->next) {
         if (u->number > 0) {
             if (!fval(u->faction, FFL_MARK)) {
@@ -3593,18 +3593,18 @@ static void join_allies(battle * b)
 
             for (s = b->sides; s != s_end; ++s) {
                 side *se;
-                /* Wenn alle attackierten noch FFL_NOAID haben, dann k�mpfe nicht mit. */
+                /* Wenn alle attackierten noch FFL_NOAID haben, dann kaempfe nicht mit. */
                 if (fval(s->faction, FFL_NOAID))
                     continue;
                 if (s->faction != f) {
                     /* Wenn wir attackiert haben, kommt niemand mehr hinzu: */
                     if (s->bf->attacker)
                         continue;
-                    /* alliiert m�ssen wir schon sein, sonst ist's eh egal : */
+                    /* alliiert muessen wir schon sein, sonst ist's eh egal : */
                     if (!alliedunit(u, s->faction, HELP_FIGHT))
                         continue;
                     /* wenn die partei verborgen ist, oder gar eine andere
-                     * vorgespiegelt wird, und er sich uns gegen�ber nicht zu
+                     * vorgespiegelt wird, und er sich uns gegenueber nicht zu
                      * erkennen gibt, helfen wir ihm nicht */
                     if (s->stealthfaction) {
                         if (!alliedside(s, u->faction, HELP_FSTEALTH)) {
@@ -3612,7 +3612,7 @@ static void join_allies(battle * b)
                         }
                     }
                 }
-                /* einen alliierten angreifen d�rfen sie nicht, es sei denn, der
+                /* einen alliierten angreifen duerfen sie nicht, es sei denn, der
                  * ist mit einem alliierten verfeindet, der nicht attackiert
                  * hat: */
                 for (se = b->sides; se != s_end; ++se) {
@@ -3626,7 +3626,7 @@ static void join_allies(battle * b)
                 }
                 if (se == s_end)
                     continue;
-                /* keine Einw�nde, also soll er mitmachen: */
+                /* keine Einwaende, also soll er mitmachen: */
                 if (c == NULL) {
                     if (!join_battle(b, u, false, &c)) {
                         continue;
@@ -3750,7 +3750,7 @@ static bool start_battle(region * r, battle ** bp)
                         continue;
                     }
 
-                    /* ist ein Fl�chtling aus einem andern Kampf */
+                    /* ist ein Fluechtling aus einem andern Kampf */
                     if (fval(u, UFL_LONGACTION))
                         continue;
 
@@ -3771,7 +3771,7 @@ static bool start_battle(region * r, battle ** bp)
                                 cmistake(u, ord, 234, MSG_BATTLE);
                             }
                             else {
-                                /* Fehler: "Das Schiff mu� erst verlassen werden" */
+                                /* Fehler: "Das Schiff muss erst verlassen werden" */
                                 cmistake(u, ord, 19, MSG_BATTLE);
                             }
                             continue;
@@ -3845,8 +3845,8 @@ static bool start_battle(region * r, battle ** bp)
                         freset(u2->faction, FFL_NOAID);
 
                     if (c1 && c2 && c2->run.number < c2->unit->number) {
-                        /* Merken, wer Angreifer ist, f�r die R�ckzahlung der
-                         * Pr�combataura bei kurzem Kampf. */
+                        /* Merken, wer Angreifer ist, fuer die Rueckzahlung der
+                         * Praecombataura bei kurzem Kampf. */
                         c1->side->bf->attacker = true;
 
                         set_enemy(c1->side, c2->side, true);
@@ -3875,7 +3875,7 @@ static void battle_attacks(battle * b)
             && get_tactics(s, NULL) == b->max_tactics)) {
             for (fig = s->fighters; fig; fig = fig->next) {
 
-                /* ist in dieser Einheit noch jemand handlungsf�hig? */
+                /* ist in dieser Einheit noch jemand handlungsfaehig? */
                 if (fig->fighting <= 0)
                     continue;
 
@@ -3918,7 +3918,7 @@ static void battle_flee(battle * b)
             for (fig = s->fighters; fig; fig = fig->next) {
                 unit *u = fig->unit;
                 troop dt;
-                /* Flucht nicht bei mehr als 600 HP. Damit Wyrme t�tbar bleiben. */
+                /* Flucht nicht bei mehr als 600 HP. Damit Wyrme toetbar bleiben. */
                 int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
                 if (runhp > 600) runhp = 600;
 
@@ -4023,7 +4023,7 @@ static void do_battle(region * r) {
         return;
 
     /* Bevor wir die alliierten hineinziehen, sollten wir schauen, *
-     * Ob jemand fliehen kann. Dann er�brigt sich das ganze ja
+     * Ob jemand fliehen kann. Dann eruebrigt sich das ganze ja
      * vielleicht schon. */
     report_battle_start(b);
     if (!fighting) {
@@ -4069,8 +4069,8 @@ static void do_battle(region * r) {
     if (rule_force_leave(FORCE_LEAVE_POSTCOMBAT)) {
         force_leave(b->region, b);
     }
-    /* Hier ist das Gefecht beendet, und wir k�nnen die
-     * Hilfsstrukturen * wieder l�schen: */
+    /* Hier ist das Gefecht beendet, und wir koennen die
+     * Hilfsstrukturen * wieder loeschen: */
 
     free_battle(b);
 }

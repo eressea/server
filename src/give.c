@@ -402,7 +402,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
             k += n;
 
-        /* Wenn Parteigrenzen überschritten werden */
+        /* Wenn Parteigrenzen ueberschritten werden */
         if (u2->faction != u->faction)
             k += n;
 
@@ -416,8 +416,8 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     if (error == 0) {
         ship *sh = leftship(u);
 
-        /* Einheiten von Schiffen können nicht NACH in von
-        * Nicht-alliierten bewachten Regionen ausführen */
+        /* Einheiten von Schiffen koennen nicht NACH in von
+        * Nicht-alliierten bewachten Regionen ausfuehren */
         if (sh) {
             set_leftship(u2, sh);
         }
@@ -608,7 +608,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 }
 
 bool can_give_to(unit *u, unit *u2) {
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden koennen */
     if (!u2) {
         return false;
     }
@@ -638,8 +638,8 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
             return;
         }
 
-        /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-        * reserviert ist besitzen und diesen Teil dann übergeben */
+        /* fuer alle items einmal pruefen, ob wir mehr als von diesem Typ
+        * reserviert ist besitzen und diesen Teil dann uebergeben */
         if (u->items) {
             item **itmp = &u->items;
             while (*itmp) {
@@ -768,7 +768,7 @@ void give_cmd(unit * u, order * ord)
             while (*itmp) {
                 item *itm = *itmp;
                 if (fval(itm->type, ITF_HERB) && itm->number > 0) {
-                    /* give_item ändert im fall,das man alles übergibt, die
+                    /* give_item aendert im fall,das man alles uebergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;

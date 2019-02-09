@@ -449,7 +449,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   * Vertrauten sehen, und durch den Vertrauten zaubern, allerdings nur
   * mit seiner halben Stufe. Je nach Vertrautem erhaelt der Magier
   * evtl diverse Skillmodifikationen.  Der Typ des Vertrauten ist
-  * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflußt.
+  * zufaellig bestimmt, wird aber durch Magiegebiet und Rasse beeinflusst.
   * "Tierische" Vertraute brauchen keinen Unterhalt.
   *
   * Ein paar Moeglichkeiten:
@@ -474,7 +474,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
   * Spezielle V. fuer Katzen, Trolle, Elfen, Daemonen, Insekten, Zwerge?
   */
 
-static const race *select_familiar(const race * magerace, magic_t magiegebiet)
+static const race *select_familiar(const race * magerace, int level, magic_t magiegebiet)
 {
     const race *retval;
     int rnd = rng_int() % 100;
@@ -493,7 +493,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
     }
 
     assert(magerace->familiars[0]);
-    if (rnd >= 70) {
+    if (rnd >= 100 - (level * 5)) {
         retval = magerace->familiars[magiegebiet];
         assert(retval);
     }
@@ -501,7 +501,7 @@ static const race *select_familiar(const race * magerace, magic_t magiegebiet)
         retval = magerace->familiars[0];
     }
 
-    if (!retval || rnd < 3) {
+    if (!retval || rnd < level) {
         race_list *familiarraces = get_familiarraces();
         unsigned int maxlen = listlen(familiarraces);
         if (maxlen > 0) {
@@ -557,7 +557,7 @@ static int sp_summon_familiar(castorder * co)
         cmistake(caster, co->order, 199, MSG_MAGIC);
         return 0;
     }
-    rc = select_familiar(caster->_race, caster->faction->magiegebiet);
+    rc = select_familiar(caster->_race, cast_level, caster->faction->magiegebiet);
     if (rc == NULL) {
         log_error("could not find suitable familiar for %s.\n", caster->faction->race->_name);
         return 0;
@@ -1588,7 +1588,7 @@ static int sp_create_stonegolem(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Gro�e Duerre
+/* Name:       Grosse Duerre
  * Stufe:      17
  * Kategorie:  Region, negativ
  * Gebiet:     Gwyrrd
@@ -1896,7 +1896,7 @@ static int sp_treewalkexit(castorder * co)
         return 0;
     }
 
-    /* Koordinaten setzen und Region loeschen fuer �berpruefung auf
+    /* Koordinaten setzen und Region loeschen fuer Ueberpruefung auf
      * Gueltigkeit */
     rt = pa->param[0]->data.r;
     tax = rt->x;
@@ -2179,7 +2179,7 @@ static int sp_ironkeeper(castorder * co)
     unit_setstatus(keeper, ST_AVOID);  /* kaempft nicht */
     setguard(keeper, true);
     fset(keeper, UFL_ISNEW);
-    /* Parteitarnen, damit man nicht sofort wei�, wer dahinter steckt */
+    /* Parteitarnen, damit man nicht sofort weiss, wer dahinter steckt */
     if (rule_stealth_anon()) {
         fset(keeper, UFL_ANON_FACTION);
     }
@@ -2509,7 +2509,7 @@ static int sp_fumblecurse(castorder * co)
 
     target = pa->param[0]->data.u;
 
-    duration = cast_level - effskill(target, SK_MAGIC, 0);
+    duration = cast_level - effskill(target, SK_MAGIC, NULL);
     if (duration < 2) {
         int rx = rng_int() % 3;
         if (duration < rx) duration = rx;
@@ -2557,7 +2557,7 @@ static void patzer_fumblecurse(const castorder * co)
  *
  * Wirkung:
  *  In einer Wueste, Sumpf oder Gletscher gezaubert kann innerhalb der
- *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groe�e Wyrm
+ *  naechsten 6 Runden ein bis 6 Dracheneinheiten bis Groesse Wyrm
  *  entstehen.
  *
  *  Mit Stufe 12-15 erscheinen Jung- oder normaler Drachen, mit Stufe
@@ -2803,7 +2803,7 @@ static int change_hitpoints(unit * u, int value)
 
     hp += value;
 
-    /* Jede Person ben�tigt mindestens 1 HP */
+    /* Jede Person benoetigt mindestens 1 HP */
     if (hp < u->number) {
         if (hp < 0) {               /* Einheit tot */
             hp = 0;
@@ -3191,7 +3191,7 @@ static int sp_bloodsacrifice(castorder * co)
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
     int aura;
-    int skill = effskill(caster, SK_MAGIC, 0);
+    int skill = effskill(caster, SK_MAGIC, NULL);
     int hp = (int)(co->force * 8);
 
     if (hp <= 0) {
@@ -3530,11 +3530,11 @@ static int sp_charmingsong(castorder * co)
     }
     /* Magieresistensbonus fuer hoehere Talentwerte */
     for (i = 0; i < MAXSKILLS; i++) {
-        int sk = effskill(target, i, 0);
+        int sk = effskill(target, i, NULL);
         if (tb < sk)
             tb = sk;
     }
-    tb -= effskill(mage, SK_MAGIC, 0);
+    tb -= effskill(mage, SK_MAGIC, NULL);
     if (tb > 0) {
         resist_bonus += tb * 15;
     }
@@ -3680,7 +3680,7 @@ static int sp_rallypeasantmob(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Wiegelt 60% bis 90% der Bauern einer Region auf.  Bauern werden ein
- *  gro�er Mob, der zur Monsterpartei gehoert und die Region bewacht.
+ *  grosser Mob, der zur Monsterpartei gehoert und die Region bewacht.
  *  Regionssilber sollte auch nicht durch Unterhaltung gewonnen werden
  *  koennen.
  *
@@ -3941,7 +3941,7 @@ static int sp_recruit(castorder * co)
         return 0;
     }
     /* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
-     * mit einfliessen lassen und dafuer den Exponenten etwas groe�er.
+     * mit einfliessen lassen und dafuer den Exponenten etwas groesser.
      * Wenn die Rekrutierungskosten deutlich hoeher sind als der Faktor,
      * ist das Verhaeltniss von ausgegebene Aura pro Bauer bei Stufe 2
      * ein mehrfaches von Stufe 1, denn in beiden Faellen gibt es nur 1
@@ -3972,7 +3972,7 @@ static int sp_recruit(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:    Wanderprediger - Gro�e Anwerbung
+/* Name:    Wanderprediger - Grosse Anwerbung
  * Stufe:   14
  * Gebiet:  Cerddor
  * Wirkung:
@@ -4027,8 +4027,8 @@ static int sp_bigrecruit(castorder * co)
  * Gebiet:   Cerddor
  * Wirkung:
  *  Erliegt die Einheit dem Zauber, so wird sie dem Magier alles
- *  erzaehlen, was sie ueber die gefragte Region wei�. Ist in der Region
- *  niemand ihrer Partei, so wei� sie nichts zu berichten.  Auch kann
+ *  erzaehlen, was sie ueber die gefragte Region weiss. Ist in der Region
+ *  niemand ihrer Partei, so weiss sie nichts zu berichten.  Auch kann
  *  sie nur das erzaehlen, was sie selber sehen koennte.
  * Flags:
  *   (UNITSPELL | TESTCANSEE)
@@ -4077,7 +4077,7 @@ static int sp_pump(castorder * co)
         return cast_level / 2;
     }
 
-    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, 0), 2);
+    set_observer(rt, mage->faction, effskill(target, SK_PERCEPTION, NULL), 2);
     return cast_level;
 }
 
@@ -4086,7 +4086,7 @@ static int sp_pump(castorder * co)
  * Stufe:   6
  * Gebiet:   Cerddor
  * Wirkung:
- *  Betoert eine Einheit, so das sie ihm den groe�ten Teil ihres Bargelds
+ *  Betoert eine Einheit, so dass sie ihm den groessten Teil ihres Bargelds
  *  und 50% ihres Besitzes schenkt. Sie behaelt jedoch immer soviel, wie
  *  sie zum ueberleben braucht. Wirkt gegen Magieresistenz.
  *  min(Stufe*1000$, u->money - maintenance)
@@ -4256,7 +4256,7 @@ static int sp_headache(castorder * co)
     if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
 
-    /* finde das groe�te Talent: */
+    /* finde das groesste Talent: */
     for (i = 0; i != target->skill_size; ++i) {
         skill *sv = target->skills + i;
         if (smax == NULL || skill_compare(sv, smax) > 0) {
@@ -4405,7 +4405,7 @@ int sp_puttorest(castorder * co)
     return co->level;
 }
 
-/* Name:       Traumschloe�chen
+/* Name:       Traumschloesschen
  * Stufe:      3
  * Kategorie:  Region, Gebaeude, positiv
  * Gebiet:     Illaun
@@ -4440,7 +4440,7 @@ int sp_icastle(castorder * co)
 
     b = new_building(bt_illusion, r, mage->faction->locale);
 
-    /* Groe�e festlegen. */
+    /* Groesse festlegen. */
     if (type == bt_illusion) {
         b->size = (rng_int() % (int)((power * power) + 1) * 10);
     }
@@ -4613,7 +4613,7 @@ int sp_baddreams(castorder * co)
  * Kategorie:
  * Wirkung:
  *   Dieser Zauber ermoeglicht es dem Traeumer, den Schlaf aller aliierten
- *   Einheiten in der Region so zu beeinflussen, da� sie fuer einige Zeit
+ *   Einheiten in der Region so zu beeinflussen, dass sie fuer einige Zeit
  *   einen Bonus von 1 Talentstufe in allen Talenten
  *   bekommen. Der Zauber wirkt erst im Folgemonat.
  * Flags:

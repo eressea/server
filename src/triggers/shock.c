@@ -87,7 +87,7 @@ static void do_shock(unit * u, const char *reason)
         }
 
     /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
-     * zu l�schen wenn der Familiar get�tet wird. Da sollten wir �ber eine
+     * zu loeschen wenn der Familiar getoetet wird. Da sollten wir ueber eine
      * saubere Implementation nachdenken. */
 
     if (strcmp(reason, "trigger") == 0) {

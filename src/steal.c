@@ -57,7 +57,7 @@ void expandstealing(region * r, econ_request * stealorders)
     norders = expand_production(r, stealorders, &requests);
     if (!norders) return;
 
-    /* F�r jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
+    /* Fuer jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
      * Beklauen-Orders ist. Jedes Opfer muss einzeln behandelt werden.
      *
      * u ist die beklaute unit. oa.unit ist die klauende unit.
@@ -102,7 +102,7 @@ static int max_skill(region * r, struct faction * f, skill_t sk)
 
     for (u = r->units; u; u = u->next) {
         if (u->faction == f) {
-            int effsk = effskill(u, sk, 0);
+            int effsk = effskill(u, sk, NULL);
             if (effsk > w) {
                 w = effsk;
             }
@@ -189,7 +189,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
 
     assert(u->region == u2->region);
 
-    effsk = effskill(u, SK_STEALTH, 0);
+    effsk = effskill(u, SK_STEALTH, NULL);
     n = effsk - max_skill(r, f, SK_PERCEPTION);
 
     if (n <= 0) {

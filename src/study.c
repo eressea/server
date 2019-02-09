@@ -510,7 +510,7 @@ static bool cb_msg_teach(void *el, void *arg) {
         if (feedback) {
             ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
                 "teacher student skill level", ut, u, sk,
-                effskill(u, sk, 0)));
+                effskill(u, sk, NULL)));
         }
         ADDMSG(&u->faction->msgs, msg_message("teach_student",
             "teacher student skill", ut, u, sk));
@@ -691,7 +691,7 @@ int study_cmd(unit * u, order * ord)
         }
     }
     if (sk == SK_ALCHEMY) {
-        maxalchemy = effskill(u, SK_ALCHEMY, 0);
+        maxalchemy = effskill(u, SK_ALCHEMY, NULL);
         if (!has_skill(u, SK_ALCHEMY)) {
             int amax = skill_limit(u->faction, SK_ALCHEMY);
             if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
@@ -780,7 +780,7 @@ int study_cmd(unit * u, order * ord)
 
     if (sk == SK_ALCHEMY) {
         faction *f = u->faction;
-        int skill = effskill(u, SK_ALCHEMY, 0);
+        int skill = effskill(u, SK_ALCHEMY, NULL);
         if (skill > maxalchemy) {
             show_potions(f, skill);
         }
@@ -859,7 +859,7 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Dämonen verschieben sich.
+/** Talente von Daemonen verschieben sich.
 */
 void demon_skillchange(unit *u)
 {
