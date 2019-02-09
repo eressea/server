@@ -193,8 +193,17 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     n = effsk - max_skill(r, f, SK_PERCEPTION);
 
     if (n <= 0) {
-        /* Wahrnehmung == Tarnung */
-        if (u_race(u) != get_race(RC_GOBLIN) || effsk <= 3) {
+        /* Wenn Goblins mit einem Tarnungstalent von mindestens 4 klauen, bekommen 
+         * sie mindestens 50 Silber, selbst dann, wenn sie erwischt werden. */
+        if (u_race(u) == get_race(RC_GOBLIN) && effsk >= 4) {
+            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
+                u2));
+            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
+                u2));
+            n = 1;
+            goblin = true;
+        }
+        else {
             ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
             if (n == 0) {
                 ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -204,14 +213,6 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
                     u, u2));
             }
             return;
-        }
-        else {
-            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
-                u2));
-            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
-                u2));
-            n = 1;
-            goblin = true;
         }
     }
 
