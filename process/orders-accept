@@ -5,3 +5,4 @@ cd $(dirname $SCRIPT)
 lockfile -r3 -l120 orders.queue.lock
 python accept-orders.py "$@"
 rm -f orders.queue.lock
+

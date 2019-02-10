@@ -129,6 +129,7 @@ for line in lines:
 tmpfile.close()
 
 openlog("orders")
+unlink(queue_file)
 
 for line in lines:
     tokens = split(line[:-1], ' ')
