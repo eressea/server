@@ -60,28 +60,6 @@ writeheaders = True
 # reject all html email?
 rejecthtml = True
 
-def unlock_file(filename):
-    try:
-        os.unlink(filename+".lock")
-    except:
-        print "could not unlock %s.lock, file not found" % filename
-
-def lock_file(filename):
-    i = 0
-    wait = 1
-    if not os.path.exists(filename):
-        file=open(filename, "w")
-        file.close()
-    while True:
-        try:
-            os.symlink(filename, filename+".lock")
-            return
-        except:
-            i = i+1
-            if i == 5: unlock_file(filename)
-            sleep(wait)
-            wait = wait*2
-
 messages = {
         "multipart-en" :
                 "ERROR: The orders you sent contain no plaintext. " \
@@ -300,14 +278,12 @@ def accept(game, locale, stream, extend=None):
         return -1
     logger.info("received orders from " + email)
     # get an available filename
-    lock_file(gamedir + "/orders.queue")
     maxdate, filename = available_file(savedir, prefix + email)
     if filename is None:
         logger.warning("more than " + str(maxfiles) + " orders from " + email)
         return -1
     # copy the orders to the file
     text_ok = copy_orders(message, filename, email)
-    unlock_file(gamedir + "/orders.queue")
 
     warning, msg, fail = None, "", False
     maildate = message.get("Date")
@@ -331,10 +307,8 @@ def accept(game, locale, stream, extend=None):
         os.unlink(filename)
         savedir = savedir + "/rejected"
         if not os.path.exists(savedir): os.mkdir(savedir)
-        lock_file(gamedir + "/orders.queue")
         maxdate, filename = available_file(savedir, prefix + email)
         store_message(message, filename)
-        unlock_file(gamedir + "/orders.queue")
         fail = True
 
     if sendmail and warning is not None:
@@ -348,11 +322,9 @@ def accept(game, locale, stream, extend=None):
         print filename
 
     if not fail:
-        lock_file(gamedir + "/orders.queue")
         queue = open(gamedir + "/orders.queue", "a")
         queue.write("email=%s file=%s locale=%s game=%s\n" % (email, filename, locale, game))
         queue.close()
-        unlock_file(gamedir + "/orders.queue")
 
     logger.info("done - accepted orders from " + email)
 
