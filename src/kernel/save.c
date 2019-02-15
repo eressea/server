@@ -1186,6 +1186,9 @@ int readgame(const char *filename)
         binstore_done(&store);
         fstream_done(&strm);
     }
+    else {
+        fclose(F);
+    }
     return n;
 }
 
