@@ -1443,7 +1443,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
             ++begin;
         }
         pos = begin;
-        while (pos) {
+        do {
             char *next = strchr(pos+1, ' ');
             if (next == NULL) {
                 if (isfinal) {
@@ -1474,7 +1474,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 break;
             }
             pos = next;
-        }
+        } while (pos);
     }
     if (isfinal) {
         char *pos = sbp->begin;
