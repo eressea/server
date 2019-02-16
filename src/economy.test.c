@@ -232,7 +232,7 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
 }
 
 static void test_trade_insect(CuTest *tc) {
-    /* Insekten k�nnen in W�sten und S�mpfen auch ohne Burgen handeln. */
+    /* Insekten koennen in Wuesten und Suempfen auch ohne Burgen handeln. */
     unit *u;
     region *r;
     const item_type *it_luxury;

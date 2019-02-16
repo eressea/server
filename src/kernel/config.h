@@ -31,12 +31,12 @@ extern "C" {
     struct param;
     struct _dictionary_;
 
-#define DISPLAYSIZE         4096 /* max. L�nge einer Beschreibung, incl trailing 0 */
+#define DISPLAYSIZE         4096 /* max. Laenge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           4096 /* max. length of an order */
-#define NAMESIZE            128 /* max. L�nge eines Namens, incl trailing 0 */
-#define IDSIZE              16  /* max. L�nge einer no (als String), incl trailing 0 */
-#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. L�nge der Strings, die
-     * von struct unitname, etc. zur�ckgegeben werden. ohne die 0 */
+#define NAMESIZE            128 /* max. Laenge eines Namens, incl trailing 0 */
+#define IDSIZE              16  /* max. Laenge einer no (als String), incl trailing 0 */
+#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Laenge der Strings, die
+     * von struct unitname, etc. zurueckgegeben werden. ohne die 0 */
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
@@ -83,7 +83,7 @@ extern "C" {
 #define GF_SPECIFIC 16
     /* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
-    /* mehr Informationen. z.b. stra�e zu 50% */
+    /* mehr Informationen. z.b. strasse zu 50% */
 #define GF_PURE 64
     /* untranslated */
 

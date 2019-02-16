@@ -527,12 +527,13 @@ static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
 
 bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
     int err = 0;
+    const race *rc = u_race(u);
 
     if (sk < 0) {
         err = 77;
     }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
-    else if (u_race(u)->bonus[sk] == -99) {
+    else if (rc->bonus[sk] == -99) {
         err = 771;
     }
     else {
@@ -859,7 +860,7 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Dämonen verschieben sich.
+/** Talente von Daemonen verschieben sich.
 */
 void demon_skillchange(unit *u)
 {

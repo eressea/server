@@ -75,7 +75,7 @@ extern "C" {
 
     typedef struct resource_type {
         /* --- constants --- */
-        char *_name;             /* wie es hei�t */
+        char *_name;             /* wie es heisst */
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
@@ -119,7 +119,7 @@ extern "C" {
         int mask_allow;
         int mask_deny;
         struct construction *construction;
-        char *_appearance[2];       /* wie es f�r andere aussieht */
+        char *_appearance[2];       /* wie es fuer andere aussieht */
         int score;
     } item_type;
 

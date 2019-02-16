@@ -993,12 +993,19 @@ static int nfamiliars;
 static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
-        "playerrace", "killpeasants", "scarepeasants", "!cansteal",
-        "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
-        "!learn", "!teach", "horse", "desert", "illusionary",
-        "absorbpeasants", "noheal", "noweapons", "shapeshift",
+        "playerrace", "", "", "!cansteal",
+        "", "cannotmove", "", "fly", "swim", "walk",
+        "!learn", "!teach","horse", "desert", "illusionary",
+        "", "noheal", "noweapons", "shapeshift",
         "shapeshiftany", "undead", "dragon", "coastal", "unarmedguard",
-        "cansail", "invisible", "shipspeed", "moveattack", "migrants", NULL };
+        "cansail", "invisible", "shipspeed", "", "migrants", NULL };
+    const char *ai_flag_names[] = {
+        "", "killpeasants", "scarepeasants", "",
+        "moverandom", "", "learn", "", "", "",
+        "", "", "", "", "",
+        "absorbpeasants", "", "", "",
+        "", "", "", "", "",
+        "", "", "", "moveattack", "", NULL };
     const char *bflag_names[] = {
         "equipment", "noblock", "resistpierce", "resistcut", "resistbash",
         "invinciblenonmagic", "noattack", NULL };
@@ -1106,7 +1113,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             else if (xml_strequal(key, "scare")) {
                 rc_set_param(rc, "scare", val);
             }
-            else if (!handle_flag(&flags, attr + i, flag_names)) {
+            else if (!handle_flag(&flags, attr + i, ai_flag_names)) {
                 handle_bad_input(pi, el, key);
             }
         }

@@ -551,9 +551,9 @@ static void nr_curses(struct stream *out, int indent, const faction *viewer, obj
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * Gebaeuden und Schiffen je nach, ob man Besitzer ist, verschieden.
     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * Spezialfaelle (besonderes Talent, verursachender Magier usw. werde
     * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -1443,7 +1443,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
             ++begin;
         }
         pos = begin;
-        while (pos) {
+        do {
             char *next = strchr(pos+1, ' ');
             if (next == NULL) {
                 if (isfinal) {
@@ -1474,7 +1474,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 break;
             }
             pos = next;
-        }
+        } while (pos);
     }
     if (isfinal) {
         char *pos = sbp->begin;

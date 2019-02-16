@@ -39,7 +39,7 @@ extern "C" {
      * (struct attribute)
      */
 
-    /* Brainstorming Überarbeitung curse
+    /* Brainstorming Ueberarbeitung curse
      *
      * Ziel: Keine Enum-Liste, flexible, leicht erweiterbare Curse-Objekte
      *
@@ -52,13 +52,13 @@ extern "C" {
      *   auch Antimagieverhalten
      * - Ausgabe von Beschreibungen in verschiedenen Sprachen
      * - definiertes gekapseltes Verhalten zb bei Zusammenlegung von
-     *   Einheiten, Übergabe von Personen, Mehrfachverzauberung
+     *   Einheiten, Uebergabe von Personen, Mehrfachverzauberung
      * - (Rueck-)Referenzen auf Objekt, Verursacher (Magier), ?
      *
      * Vieleicht waere ein Wirkungsklassensystem sinnvoll, so das im uebrigen
      * source einfach alle curse-attribs abgefragt werden koennen und bei
-     * gewuenschter Wirkungsklasse angewendet, also nicht für jeden curse
-     * spezielle Änderungen im uebrigen source notwendig sind.
+     * gewuenschter Wirkungsklasse angewendet, also nicht fuer jeden curse
+     * spezielle Aenderungen im uebrigen source notwendig sind.
      *
      * Die (Wirkungs-)Typen sollten die wichtigen Funktionen speziell
      * belegen koennen, zb Alterung, Ausgabetexte, Merge-Verhalten
@@ -95,7 +95,7 @@ extern "C" {
      * - Laden des C-Objekts
      * - Erzeugen des C-Objekts
      * - Loeschen und Aufraeumen des C-Objekts
-     * - Funktionen zur Änderung der Werte
+     * - Funktionen zur Aenderung der Werte
      *
      * */
 
@@ -145,7 +145,7 @@ extern "C" {
     /* ------------------------------------------------------------- */
     /* Flags */
 
-    /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
+    /* Verhalten von Zaubern auf Units beim Uebergeben von Personen */
     typedef enum {
         CURSE_ISNEW = 0x01,         /* wirkt in der zauberrunde nicht (default) */
         CURSE_NOAGE = 0x02,         /* wirkt ewig */
@@ -262,18 +262,18 @@ extern "C" {
     int curse_geteffect_int(const struct curse *c);
     double curse_geteffect(const struct curse *c);
 
-    /* veraendert die Stärke der Verzauberung um i */
+    /* veraendert die Staerke der Verzauberung um i */
     double curse_changevigour(struct attrib **ap, curse * c, double delta);
 
     /* gibt bei Personenbeschraenkten Verzauberungen die Anzahl der
-     * betroffenen Personen zurueck. Ansonsten wird 0 zurückgegeben. */
+     * betroffenen Personen zurueck. Ansonsten wird 0 zurueckgegeben. */
     int get_cursedmen(const struct unit *u, const struct curse *c);
 
     /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
     void c_setflag(curse * c, unsigned int flag);
     void c_clearflag(curse * c, unsigned int flags);
 
-    /* sorgt dafuer, das bei der Übergabe von Personen die curse-attribute
+    /* sorgt dafuer, das bei der Uebergabe von Personen die curse-attribute
      * korrekt gehandhabt werden. Je nach internen Flag kann dies
      * unterschiedlich gewuenscht sein
      * */
