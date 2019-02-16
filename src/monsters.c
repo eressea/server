@@ -826,7 +826,7 @@ void plan_monsters(faction * f)
                         long_order = create_order(K_PIRACY, f->locale, NULL);
                     }
                     else {
-                        if (rc->flags & RCF_LEARN) {
+                        if (rc->flags & RCF_AI_LEARN) {
                             long_order = monster_learn(u);
                         }
                     }

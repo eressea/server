@@ -60,3 +60,14 @@ function test_clones_dont_give_person()
     process_orders()
     assert_equal(2, u1.number)
 end
+
+-- bug 2504
+function test_skeleton_cannot_learn()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("elf")
+    local u = unit.create(f, r, 2)
+    u.race = "skeleton"
+    u:add_order("LERNE Wahrnehmung")
+    process_orders()
+    assert_equal(0, u:get_skill('perception'))
+end

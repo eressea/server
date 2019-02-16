@@ -208,7 +208,7 @@ extern "C" {
 #define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
-#define RCF_LEARN          (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
+#define RCF_AI_LEARN       (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
 #define RCF_FLY            (1<<7)       /* kann fliegen */
 #define RCF_SWIM           (1<<8)       /* kann schwimmen */
 #define RCF_WALK           (1<<9)       /* kann ueber Land gehen */
