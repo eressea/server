@@ -23,15 +23,16 @@ if [ ! -d backup ] ; then
   ln -sf ~/backup/eressea/game-$GAME backup
 fi
 
+if [ -e reports/reports.txt ] ; then
+  echo "backup reports $TURN, game $GAME"
+  tar cjf backup/$TURN-reports.tar.bz2 reports
+  curl -s -n -T backup/$TURN-reports.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN-reports.tar.bz2
+fi
 files="data/$TURN.dat parteien.full parteien"
 if [ -e orders.$TURN ]; then
 files="$files orders.$TURN"
 fi
 echo "backup turn $TURN, game $GAME, files: $files"
-if [ -d reports ] ; then
-  tar cjf backup/$TURN-reports.tar.bz2 reports
-fi
 tar cjf backup/$TURN.tar.bz2 $files
-echo "uploading game-$GAME/$TURN.tar.bz2"
 curl -s -n -T backup/$TURN.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN.tar.bz2
 #curl -s -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db
