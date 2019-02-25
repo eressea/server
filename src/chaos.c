@@ -53,11 +53,12 @@ static const terrain_type *chaosterrain(void)
             }
         }
         if (numtypes > 0) {
+            int n = 0;
             types = malloc(sizeof(terrain_type *) * numtypes);
-            numtypes = 0;
-            for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+            if (!types) abort();
+            for (terrain = terrains(); n != numtypes && terrain != NULL; terrain = terrain->next) {
                 if ((terrain->flags & LAND_REGION) && terrain->herbs) {
-                    types[numtypes++] = terrain;
+                    types[n++] = terrain;
                 }
             }
         }
@@ -135,7 +136,7 @@ static void chaos(region * r)
                 u->flags |= (UFL_ISNEW | UFL_MOVED);
             }
             break;
-        case 2:                  /* Terrainver�nderung */
+        case 2:                  /* Terrainveraenderung */
             if (!(r->terrain->flags & FORBIDDEN_REGION)) {
                 if (!(r->terrain->flags & SEA_REGION)) {
                     direction_t dir;

@@ -141,7 +141,7 @@ order * ord)
 
     UNUSED_ARG(amount);
 
-    /* Prüfen ob in Eingangshalle */
+    /* Pruefen ob in Eingangshalle */
     if (u->region->x != 9525 || u->region->y != 9525) {
         cmistake(u, ord, 266, MSG_MAGIC);
         return 0;
@@ -152,7 +152,7 @@ order * ord)
     r = findregion(a->data.sa[0], a->data.sa[1]);
     assert(r);
     a_remove(&u->attribs, a);
-    /* Ãœbergebene GegenstÃ¤nde zurÃ¼ckgeben */
+    /* Uebergebene Gegenstaende zurueckgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
     if (a) {
@@ -177,7 +177,7 @@ order * ord)
         }
     }
 
-    /* Benutzer zurück teleportieren */
+    /* Benutzer zurueck teleportieren */
     move_unit(u, r, NULL);
 
     /* Exitticket abziehen */
@@ -210,8 +210,8 @@ order * ord)
         return 0;
     }
 
-    /* In diesem Attribut merken wir uns, wohin die Einheit zurückgesetzt
-     * wird, wenn sie das Museum verläßt. */
+    /* In diesem Attribut merken wir uns, wohin die Einheit zurueckgesetzt
+     * wird, wenn sie das Museum verlaesst. */
 
     a = a_add(&u->attribs, a_new(&at_museumexit));
     a->data.sa[0] = (short)r->x;

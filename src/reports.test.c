@@ -338,11 +338,11 @@ static void test_newbie_password_message(CuTest *tc) {
     f = test_create_faction(NULL);
     f->age = 5;
     f->flags = 0;
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
     f->age=2;
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
     finish_reports(&ctx);
@@ -365,7 +365,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     test_create_unit(f2, r3);
     u = test_create_unit(f, r1);
     travelthru_add(r2, u);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, r3, ctx.last);
     CuAssertPtrEquals(tc, f, ctx.f);
@@ -375,7 +375,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     finish_reports(&ctx);
     CuAssertIntEquals(tc, seen_none, r2->seen.mode);
 
-    prepare_report(&ctx, f2);
+    prepare_report(&ctx, f2, NULL);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r2->seen.mode);
     CuAssertIntEquals(tc, seen_unit, r3->seen.mode);
@@ -399,7 +399,7 @@ static void test_get_addresses(CuTest *tc) {
     test_create_unit(f, r);
     test_create_unit(f1, r);
     test_create_unit(f2, r);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
@@ -427,7 +427,7 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     u = test_create_unit(f1, r);
     set_factionstealth(u, f2);
 
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
@@ -470,7 +470,7 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     u = test_create_unit(f4, r1);
     set_level(u, SK_STEALTH, 1);
 
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     get_addresses(&ctx);
@@ -516,14 +516,14 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     u2->building = b;
     set_level(u2, SK_PERCEPTION, 3);
     CuAssertPtrEquals(tc, NULL, inside_building(u2));
-    prepare_report(&ctx, u1->faction);
+    prepare_report(&ctx, u1->faction, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     finish_reports(&ctx);
 
-    prepare_report(&ctx, u2->faction);
+    prepare_report(&ctx, u2->faction, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -532,7 +532,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
 
     /* lighthouse capacity is # of units, not people: */
     config_set_int("rules.lighthouse.unit_capacity", 1);
-    prepare_report(&ctx, u2->faction);
+    prepare_report(&ctx, u2->faction, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -567,7 +567,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     u = test_create_unit(f, r1);
     u->building = b;
     set_level(u, SK_PERCEPTION, 3);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -601,19 +601,19 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     f = test_create_faction(NULL);
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
-    r3 = test_create_region(2, 0, t_ocean);
+    test_create_region(2, 0, t_ocean);
     r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
     b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
-    u = test_create_unit(f, r1);
+    test_create_unit(f, r1);
     u = test_create_unit(test_create_faction(NULL), r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
     CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -632,14 +632,14 @@ static void test_prepare_report(CuTest *tc) {
     f = test_create_faction(NULL);
     r = test_create_region(0, 0, NULL);
 
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, NULL, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
     finish_reports(&ctx);
 
     test_create_unit(f, r);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r->seen.mode);
@@ -648,7 +648,7 @@ static void test_prepare_report(CuTest *tc) {
 
     r = test_create_region(2, 0, 0);
     CuAssertPtrEquals(tc, r, regions->next);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, regions, ctx.first);
     CuAssertPtrEquals(tc, r, ctx.last);
     CuAssertIntEquals(tc, seen_none, r->seen.mode);
@@ -667,7 +667,7 @@ static void test_seen_neighbours(CuTest *tc) {
     r2 = test_create_region(1, 0, 0);
 
     test_create_unit(f, r1);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -694,7 +694,7 @@ static void test_seen_travelthru(CuTest *tc) {
     travelthru_add(r2, u);
     CuAssertPtrEquals(tc, r1, f->first);
     CuAssertPtrEquals(tc, r3, f->last);
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
@@ -772,7 +772,7 @@ static void test_report_far_vision(CuTest *tc) {
     CuAssertPtrEquals(tc, r1, f->first);
     CuAssertPtrEquals(tc, r2, f->last);
     report_context ctx;
-    prepare_report(&ctx, f);
+    prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, r1, ctx.first);
     CuAssertPtrEquals(tc, NULL, ctx.last);
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);

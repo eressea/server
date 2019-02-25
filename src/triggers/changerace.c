@@ -52,7 +52,7 @@ typedef struct changerace_data {
 
 static void changerace_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(changerace_data), 1);
+    t->data.v = calloc(1, sizeof(changerace_data));
 }
 
 static void changerace_free(trigger * t)

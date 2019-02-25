@@ -80,15 +80,6 @@ void translist(void *l1, void *l2, void *p)
     addlist(l2, p);
 }
 
-void removelist(void *l, void *p)
-{
-
-    /* remove entry p from list l; free p */
-
-    choplist(l, p);
-    free(p);
-}
-
 void freelist(void *p1)
 {
 
@@ -120,6 +111,7 @@ unsigned int listlen(void *l)
 void addstrlist(strlist ** SP, const char *s)
 {
     strlist *slist = malloc(sizeof(strlist));
+    if (!slist) abort();
     slist->next = NULL;
     slist->s = str_strdup(s);
     addlist(SP, slist);

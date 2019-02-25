@@ -25,14 +25,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
+    const char *itoa36(int i);
+    int atoi36(const char *s);
+
     const char *itoa36_r(int i, char *result, size_t len);
     const char *itoab_r(int i, int base, char *result, size_t len);
     const char *itoab(int i, int base);
-    const char *itoa36(int i);
     const char *itoa10(int i);
-    extern int atoi36(const char *s);
-    extern int atoi10(const char *s);
-    int i10toi36(int i);
 
 #ifdef __cplusplus
 }

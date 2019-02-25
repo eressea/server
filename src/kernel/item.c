@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -194,12 +194,10 @@ resource_type *rt_get_or_create(const char *name) {
     if (!rtype) {
         rtype = calloc(1, sizeof(resource_type));
         if (!rtype) {
-            perror("resource_type allocation failed");
+            abort();
         }
-        else {
-            rtype->_name = str_strdup(name);
-            rt_register(rtype);
-        }
+        rtype->_name = str_strdup(name);
+        rt_register(rtype);
     }
     return rtype;
 }
@@ -246,7 +244,8 @@ item_type *it_get_or_create(resource_type *rtype) {
     assert(rtype);
     if (!rtype->itype) {
         item_type * itype;
-        itype = (item_type *)calloc(sizeof(item_type), 1);
+        itype = (item_type *)calloc(1, sizeof(item_type));
+        if (!itype) abort();
         itype->rtype = rtype;
         rtype->uchange = res_changeitem;
         rtype->itype = itype;
@@ -268,7 +267,8 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 
     assert(resource2luxury(itype->rtype) == NULL);
 
-    ltype = calloc(sizeof(luxury_type), 1);
+    ltype = calloc(1, sizeof(luxury_type));
+    if (!ltype) abort();
     ltype->itype = itype;
     ltype->price = price;
     lt_register(ltype);
@@ -284,7 +284,8 @@ weapon_type *new_weapontype(item_type * itype,
 
     assert(itype && (!itype->rtype || !resource2weapon(itype->rtype)));
 
-    wtype = calloc(sizeof(weapon_type), 1);
+    wtype = calloc(1, sizeof(weapon_type));
+    if (!wtype) abort();
     if (damage) {
         wtype->damage[0] = str_strdup(damage[0]);
         wtype->damage[1] = str_strdup(damage[1]);
@@ -296,6 +297,7 @@ weapon_type *new_weapontype(item_type * itype,
     wtype->offmod = offmod;
     wtype->reload = reload;
     wtype->skill = sk;
+    assert(itype->rtype);
     itype->rtype->wtype = wtype;
 
     return wtype;
@@ -308,7 +310,8 @@ armor_type *new_armortype(item_type * itype, double penalty, variant magres,
 
     assert(itype->rtype->atype == NULL);
 
-    atype = calloc(sizeof(armor_type), 1);
+    atype = calloc(1, sizeof(armor_type));
+    if (!atype) abort();
 
     atype->itype = itype;
     atype->penalty = penalty;
@@ -530,6 +533,7 @@ item *i_new(const item_type * itype, int size)
     }
     else {
         i = malloc(sizeof(item));
+        if (!i) abort();
     }
     assert(itype);
     i->next = NULL;

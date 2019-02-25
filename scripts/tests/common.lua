@@ -1182,3 +1182,21 @@ function test_cartmaking()
     assert_equal(1, u:get_item('cart'))
     assert_equal(5, u:get_item('log'))
 end
+
+function test_promote_after_recruit()
+    local f = faction.create('human')
+    local r1 = region.create(0, 0, 'plain')
+    local r2 = region.create(1, 0, 'plain')
+    local u1 = unit.create(f, r1, 1)
+    u1.name = 'Xolgrim'
+    local u2 = unit.create(f, r2, 55)
+    u2:add_order('REKRUTIERE 1')
+    u1:add_order('BEFOERDERE')
+    u1:add_item('money', 57)
+    u2:add_item('money', 150)
+    local fl = u1.flags
+    process_orders()
+    assert_equal(56, u2.number)
+    assert_equal(fl + 128, u1.flags) -- UFL_HERO
+    assert_equal(0, u1:get_item('money'))
+end

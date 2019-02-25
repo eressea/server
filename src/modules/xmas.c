@@ -65,13 +65,6 @@ struct trigger_type tt_xmasgate = {
     xmasgate_read
 };
 
-trigger *trigger_xmasgate(building * b)
-{
-    trigger *t = t_new(&tt_xmasgate);
-    t->data.v = b;
-    return t;
-}
-
 void register_xmas(void)
 {
     tt_register(&tt_xmasgate);

@@ -101,6 +101,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
     variant *v = NULL;
     if (!rc->options) {
         rc->options = malloc(sizeof(rcoption));
+        if (!rc->options) abort();
         rc->options->key[0] = key;
         rc->options->key[1] = RCO_NONE;
         v = rc->options->value;
@@ -202,6 +203,7 @@ race_t old_race(const struct race * rc)
         int i;
         if (!xrefs) {
             xrefs = malloc(sizeof(rc_xref) * MAXRACES);
+            if (!xrefs) abort();
         }
         for (i = 0; i != MAXRACES; ++i) {
             xrefs[i].rc = get_race(i);
@@ -240,19 +242,11 @@ race_list *get_familiarraces(void)
     return familiarraces;
 }
 
-void racelist_clear(struct race_list **rl)
-{
-    while (*rl) {
-        race_list *rl2 = (*rl)->next;
-        free(*rl);
-        *rl = rl2;
-    }
-}
-
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
     race_list *rl2 = (race_list *)malloc(sizeof(race_list));
 
+    if (!rl2) abort();
     rl2->data = r;
     rl2->next = *rl;
 
@@ -349,7 +343,8 @@ race *rc_create(const char *zName)
     char zText[64];
 
     assert(zName);
-    rc = (race *)calloc(sizeof(race), 1);
+    rc = (race *)calloc(1, sizeof(race));
+    if (!rc) abort();
 
     rc->mask_item = 1 << race_mask;
     ++race_mask;
@@ -455,8 +450,10 @@ int rc_herb_trade(const struct race *rc)
 }
 
 void set_study_speed(race *rc, skill_t sk, int modifier) {
-    if (!rc->study_speed)
+    if (!rc->study_speed) {
         rc->study_speed = calloc(1, MAXSKILLS);
+        if (!rc->study_speed) abort();
+    }
     rc->study_speed[sk] = (char)modifier;
 }
 
@@ -546,7 +543,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
         char ch[2];
 
         sbs_init(&sbs, lbuf, sizeof(lbuf));
-        sbs_strcpy(&sbs, LOC(loc, mkname("prefix", prefix)));
+        sbs_strcat(&sbs, LOC(loc, mkname("prefix", prefix)));
 
         str = LOC(loc, rc_name_s(rc, u->number != 1));
         assert(~str[0] & 0x80 || !"unicode/not implemented");

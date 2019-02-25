@@ -26,8 +26,8 @@
 * Stufe:      6
 *
 * Wirkung:
-* Lae�t ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
-* bis Kapazit�t 50.
+* Laesst ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
+* bis Kapazitaet 50.
 * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
 *
 * Flag:

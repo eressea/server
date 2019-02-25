@@ -77,9 +77,10 @@ extern "C" {
         struct region *first, *last;
         void *userdata;
         time_t report_time;
+        const char *password;
     } report_context;
 
-    void prepare_report(report_context *ctx, struct faction *f);
+    void prepare_report(report_context *ctx, struct faction *f, const char *password);
     void finish_reports(report_context *ctx);
     void get_addresses(report_context * ctx);
 

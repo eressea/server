@@ -15,14 +15,14 @@
 #define ESCAPE_CHAR       '\\'
 #define MAXTOKENSIZE      8192
 
-typedef struct parser_state {
+typedef struct parse_state {
     const char *current_token;
-    struct parser_state *next;
+    struct parse_state *next;
     void *data;
     void(*dtor)(void *);
-} parser_state;
+} parse_state;
 
-static parser_state *states;
+static parse_state *states;
 
 static int eatwhitespace_c(const char **str_p)
 {
@@ -57,7 +57,8 @@ static int eatwhitespace_c(const char **str_p)
 void init_tokens_ex(const char *initstr, void *data, void (*dtor)(void *))
 {
     if (states == NULL) {
-        states = calloc(1, sizeof(parser_state));
+        states = calloc(1, sizeof(parse_state));
+        if (!states) abort();
     }
     else if (states->dtor) {
         states->dtor(states->data);
@@ -73,7 +74,8 @@ void init_tokens_str(const char *initstr) {
 
 void parser_pushstate(void)
 {
-    parser_state *new_state = calloc(1, sizeof(parser_state));
+    parse_state *new_state = calloc(1, sizeof(parse_state));
+    if (!new_state) abort();
     new_state->current_token = NULL;
     new_state->next = states;
     states = new_state;
@@ -81,7 +83,7 @@ void parser_pushstate(void)
 
 void parser_popstate(void)
 {
-    parser_state *new_state = states->next;
+    parse_state *new_state = states->next;
     if (states->dtor) {
         states->dtor(states->data);
     }

@@ -32,7 +32,6 @@ extern "C" {
     void addlist(void *l1, void *p1);
     void translist(void *l1, void *l2, void *p);
     void freelist(void *p1);
-    void removelist(void *l, void *p);
     unsigned int listlen(void *l);
 
 #ifdef __cplusplus

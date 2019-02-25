@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
@@ -185,15 +185,15 @@ void at_register(attrib_type * at)
 
 static attrib_type *at_find_key(unsigned int hk)
 {
-    const char *translate[3][2] = {
-        { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-        { "verzaubert", "curse" },    /* remapping: früher verzaubert, jetzt curse */
-        { NULL, NULL }
-    };
     attrib_type *find = at_hash[hk % MAXATHASH];
     while (find && hk != find->hashkey)
         find = find->nexthash;
     if (!find) {
+        const char *translate[3][2] = {
+            { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
+            { "verzaubert", "curse" },    /* remapping: frueher verzaubert, jetzt curse */
+            { NULL, NULL }
+        };
         int i = 0;
         while (translate[i][0]) {
             if (__at_hashkey(translate[i][0]) == hk)
@@ -377,6 +377,7 @@ attrib *a_new(const attrib_type * at)
 {
     attrib *a = (attrib *)calloc(1, sizeof(attrib));
     assert(at != NULL);
+    if (!a) abort();
     a->type = at;
     if (at->initialize)
         at->initialize(&a->data);
@@ -387,7 +388,7 @@ int a_age(attrib ** p, void *owner)
 {
     attrib **ap = p;
     /* Attribute altern, und die Entfernung (age()==0) eines Attributs
-     * hat Einfluß auf den Besitzer */
+     * hat Einfluss auf den Besitzer */
     while (*ap) {
         attrib *a = *ap;
         if (a->type->age) {

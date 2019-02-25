@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
+
 #include "region.h"
 
 /* kernel includes */
@@ -141,8 +144,11 @@ const char *regionname(const region * r, const faction * f)
 int region_maxworkers(const region *r)
 {
     int size = max_production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return MAX(size - treespace, MIN(size / 10, 200));
+    int treespace = size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    size /=10;
+    if (size > 200) size = 200;
+    if (treespace < size) treespace = size;
+    return treespace;
 }
 
 int deathcount(const region * r)
@@ -175,7 +181,7 @@ void deathcounts(region * r, int fallen)
     }
 }
 
-/* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
+/* Moveblock wird zur Zeit nicht ueber Attribute, sondern ein Bitfeld
    r->moveblock gemacht. Sollte umgestellt werden, wenn kompliziertere
    Dinge gefragt werden. */
 
@@ -400,7 +406,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     int dx = x1 - x2;
     int dy = y1 - y2;
     int result, dist;
-    int mindist = MIN(width, height) >> 1;
+    int mindist = ((width > height) ? height : width) / 2;
 
     /* Bei negativem dy am Ursprung spiegeln, das veraendert
      * den Abstand nicht
@@ -423,13 +429,15 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
         if (result <= mindist)
             return result;
     }
-    dist = MAX(dx, height - dy);
+    dist = height - dy;
+    if (dist < dx) dist = dx;
     if (dist >= 0 && dist < result) {
         result = dist;
         if (result <= mindist)
             return result;
     }
-    dist = MAX(width - dx, dy);
+    dist = width - dx;
+    if (dist < dy) dist = dy;
     if (dist >= 0 && dist < result)
         result = dist;
     return result;
@@ -471,6 +479,7 @@ void add_regionlist(region_list ** rl, region * r)
 {
     region_list *rl2 = (region_list *)malloc(sizeof(region_list));
 
+    if (!rl2) abort();
     rl2->data = r;
     rl2->next = *rl;
 
@@ -799,7 +808,7 @@ static region *deleted_regions;
 
 void remove_region(region ** rlist, region * r)
 {
-
+    assert(r);
     while (r->units) {
         unit *u = r->units;
         i_freeall(&u->items);
@@ -991,8 +1000,6 @@ static char *makename(void)
         *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
-    /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
-
     nk = strlen(kons);
     ne = strlen(handle_end);
     nv = strlen(vowels);
@@ -1040,6 +1047,7 @@ void setluxuries(region * r, const luxury_type * sale)
 
     for (ltype = luxurytypes; ltype; ltype = ltype->next) {
         struct demand *dmd = malloc(sizeof(struct demand));
+        if (!dmd) abort();
         dmd->type = ltype;
         if (ltype != sale)
             dmd->value = 1 + rng_int() % 5;
@@ -1095,7 +1103,8 @@ void init_region(region *r)
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
         peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
-        rsetpeasants(r, MAX(100, peasants));
+        if (peasants < 100) peasants = 100;
+        rsetpeasants(r, peasants);
         rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
             INT_MAX) + 1) + rng_int() % 5));
     }
@@ -1103,7 +1112,7 @@ void init_region(region *r)
 
 void terraform_region(region * r, const terrain_type * terrain)
 {
-    /* Resourcen, die nicht mehr vorkommen können, löschen */
+    /* Resourcen, die nicht mehr vorkommen koennen, loeschen */
     const terrain_type *oldterrain = r->terrain;
     rawmaterial **lrm = &r->resources;
 
@@ -1165,6 +1174,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         int mnr = 0;
 
         r->land = calloc(1, sizeof(land_region));
+        if (!r->land) abort();
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
@@ -1186,6 +1196,7 @@ void terraform_region(region * r, const terrain_type * terrain)
                         }
                         else {
                             sr = calloc(1, sizeof(struct surround));
+                            if (!sr) abort();
                         }
                         sr->next = nb;
                         sr->type = sale->type;
@@ -1262,7 +1273,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 #include "curse.h"
 int max_production(const region * r)
 {
-    /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
+    /* muss rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
     if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;
@@ -1321,6 +1332,7 @@ struct message *msg)
             imsg = imsg->next;
         if (imsg == NULL) {
             imsg = malloc(sizeof(struct individual_message));
+            if (!imsg) abort();
             imsg->next = r->individual_messages;
             imsg->msgs = NULL;
             r->individual_messages = imsg;
@@ -1372,11 +1384,13 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
     assert(rule_region_owners());
     if (r->land) {
         if (!r->land->ownership) {
-            r->land->ownership = malloc(sizeof(region_owner));
+            region_owner *ro = malloc(sizeof(region_owner));
+            if (!ro) abort();
             assert(region_get_morale(r) == MORALE_DEFAULT);
-            r->land->ownership->owner = NULL;
-            r->land->ownership->last_owner = NULL;
-            r->land->ownership->flags = 0;
+            ro->owner = NULL;
+            ro->last_owner = NULL;
+            ro->flags = 0;
+            r->land->ownership = ro;
         }
         r->land->ownership->since_turn = turn;
         r->land->ownership->morale_turn = turn;
@@ -1412,7 +1426,8 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = MAX(0, region_get_morale(r) - MORALE_TRANSFER);
+                            int morale = region_get_morale(r) - MORALE_TRANSFER;
+                            if (morale < 0) morale = 0;
                             region_set_morale(r, morale, turn);
                         }
                         else {

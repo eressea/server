@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "unit.h"
 
@@ -776,7 +778,6 @@ void clone_men(const unit * u, unit * dst, int n)
     /* "hat attackiert"-status wird uebergeben */
 
     if (dst) {
-        skill *sv, *sn;
         skill_t sk;
         ship *sh;
 
@@ -784,9 +785,8 @@ void clone_men(const unit * u, unit * dst, int n)
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
             int weeks, level = 0;
-
-            sv = unit_skill(u, sk);
-            sn = unit_skill(dst, sk);
+            skill *sv = unit_skill(u, sk);
+            skill *sn = unit_skill(dst, sk);
 
             if (sv == NULL && sn == NULL)
                 continue;
@@ -984,9 +984,8 @@ void set_number(unit * u, int count)
 void remove_skill(unit * u, skill_t sk)
 {
     int i;
-    skill *sv;
     for (i = 0; i != u->skill_size; ++i) {
-        sv = u->skills + i;
+        skill *sv = u->skills + i;
         if (sv->id == sk) {
             if (u->skill_size - i - 1 > 0) {
                 memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
@@ -1232,7 +1231,7 @@ int invisible(const unit * target, const unit * viewer)
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = MIN(hidden, target->number);
+            if (hidden > target->number) hidden = target->number;
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);

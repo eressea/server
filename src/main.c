@@ -108,11 +108,11 @@ static const char * valid_keys[] = {
 
 static dictionary *parse_config(const char *filename)
 {
-    char path[PATH_MAX];
     dictionary *d;
     const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
+        char path[PATH_MAX];
         path_join(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
         d = iniparser_load(path);
@@ -268,10 +268,10 @@ static int parse_args(int argc, char **argv)
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #include <signal.h>
+static void *btrace[50];
 
 static void report_segfault(int signo, siginfo_t * sinf, void *arg)
 {
-    void *btrace[50];
     size_t size;
     int fd = fileno(stderr);
 

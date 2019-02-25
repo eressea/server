@@ -86,7 +86,7 @@ static int gate_read(trigger * t, gamedata *data)
 
 static void gate_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(gate_data), 1);
+    t->data.v = calloc(1, sizeof(gate_data));
 }
 
 static void gate_done(trigger * t)

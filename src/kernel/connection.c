@@ -134,6 +134,7 @@ connection *new_border(border_type * type, region * from, region * to)
         bp = &(*bp)->next;
     }
     *bp = b = calloc(1, sizeof(connection));
+    if (!b) abort();
     b->type = type;
     b->from = from;
     b->to = to;
@@ -620,7 +621,7 @@ int read_borders(gamedata *data)
         }
         if (type->read) {
             connection *b = new_border(type, from, to);
-            nextborder--;               /* new_border erh�ht den Wert */
+            nextborder--;               /* new_border erhoeht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
             type->read(b, data);

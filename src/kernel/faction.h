@@ -117,7 +117,6 @@ extern "C" {
     int max_magicians(const faction * f);
     void set_show_item(faction * f, const struct item_type *itype);
 
-    const struct unit *random_unit_in_faction(const struct faction *f);
     const char *factionname(const struct faction *f);
     struct unit *addplayer(struct region *r, faction * f);
     struct faction *addfaction(const char *email, const char *password,
@@ -151,7 +150,7 @@ extern "C" {
     const char *faction_getemail(const struct faction *self);
     void faction_setemail(struct faction *self, const char *email);
 
-    void faction_genpassword(struct faction *f);
+    char *faction_genpassword(struct faction *f, char *buffer);
     void faction_setpassword(struct faction *self, const char *pwhash);
     const char *faction_getpassword(const struct faction *f);
     bool valid_race(const struct faction *f, const struct race *rc);

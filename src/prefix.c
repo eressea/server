@@ -20,14 +20,12 @@ int add_raceprefix(const char *prefix)
         next = 0;
         size = 4;
         race_prefixes = malloc(size * sizeof(char *));
+        if (!race_prefixes) abort();
     }
     if (next + 1 == size) {
         char **tmp;
         tmp = realloc(race_prefixes, 2 * size * sizeof(char *));
-        if (!tmp) {
-            log_fatal("allocation failure");
-            return 1;
-        }
+        if (!tmp) abort();
         race_prefixes = tmp;
         size *= 2;
     }
