@@ -157,7 +157,7 @@ for line in lines:
         if success: failed = False
         else: msg = msg + messages["unknown-"+locale] + "\n"
         msg = msg + "\n"
-        logfile.write("%s:%s:%s:%s:%s:%s\n" % (ctime(time()), email, game_email, faction, pwd, success))
+        logfile.write("%s:%s:%s:%s:%s\n" % (ctime(time()), email, game_email, faction, success))
     logfile.close()
 
     if failed:
