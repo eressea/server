@@ -70,9 +70,9 @@ class EPasswd:
         pw = self.get_passwd(id)
         if pw[0:4]=='$2a$' or pw[0:4]=='$2y$':
             try:
-                h1 = pw.encode('utf8')
-                h2 = passwd.encode('utf8')
-                return bcrypt.checkpw(h1, h2)
+                uhash = pw.encode('utf8')
+                upass = passwd.encode('utf8')
+                return bcrypt.checkpw(upass, uhash)
             except:
                 return False
         return pw == passwd
