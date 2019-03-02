@@ -3205,7 +3205,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
             struct sc_mage * mage = get_mage(u);
-            if (mage && mage_get_spellbook(mage)) {
+            if (mage) {
                 int level = effskill(u, SK_MAGIC, NULL);
                 if (level > maxlevel) {
                     maxlevel = level;
