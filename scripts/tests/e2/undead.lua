@@ -32,8 +32,7 @@ function test_undead_reserve_other()
     process_orders()
 
     -- Intermittent Failure: expected 0 but was 2
-    -- assert_equal(0, u1:get_item("log"))
-
+    assert_equal(0, u1:get_item("log"))
     assert_equal(2, u2:get_item("log"))
 end
 

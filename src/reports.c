@@ -144,8 +144,6 @@ bool omniscient(const faction *f)
     return (f->race == rc_template);
 }
 
-
-
 static char *groupid(const struct group *g, const struct faction *f)
 {
     typedef char name[OBJECTIDSIZE + 1];
