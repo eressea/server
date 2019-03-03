@@ -1603,7 +1603,9 @@ int write_reports(faction * f)
     if (noreports) {
         return false;
     }
-    if (f->lastorders == 0) {
+    if (f->lastorders == 0 || f->age <= 1) {
+        /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
+         * kriegen ein neues Passwort: */
         password = faction_genpassword(f, buffer);
     }
     prepare_report(&ctx, f, password);

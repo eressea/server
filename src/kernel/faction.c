@@ -299,7 +299,7 @@ unit *addplayer(region * r, faction * f)
         } while (rc == NULL || urc == RC_DAEMON || !playerrace(rc));
         u->irace = rc;
     }
-
+    f->lastorders = 0;
     return u;
 }
 
