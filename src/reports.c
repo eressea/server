@@ -144,8 +144,6 @@ bool omniscient(const faction *f)
     return (f->race == rc_template);
 }
 
-
-
 static char *groupid(const struct group *g, const struct faction *f)
 {
     typedef char name[OBJECTIDSIZE + 1];
@@ -1603,7 +1601,9 @@ int write_reports(faction * f)
     if (noreports) {
         return false;
     }
-    if (f->lastorders == 0) {
+    if (f->lastorders == 0 || f->age <= 1) {
+        /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
+         * kriegen ein neues Passwort: */
         password = faction_genpassword(f, buffer);
     }
     prepare_report(&ctx, f, password);

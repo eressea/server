@@ -58,6 +58,7 @@ static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, r
     int err;
     region *r;
     cJSON *json, *attr, *result, *regs;
+    size_t sz;
 
     r = test_create_region(0, 0, terrain);
 
@@ -65,7 +66,8 @@ static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, r
     err = json_export(&out, EXPORT_REGIONS);
     CuAssertIntEquals(tc, 0, err);
     out.api->rewind(out.handle);
-    out.api->read(out.handle, buf, sizeof(buf));
+    sz = out.api->read(out.handle, buf, sizeof(buf));
+    buf[sz] = '\0';
     mstream_done(&out);
 
     json = cJSON_Parse(buf);
