@@ -31,8 +31,15 @@ function test_undead_reserve_other()
     u1.name = 'Xolgrim'
     process_orders()
 
-    -- Intermittent Failure: expected 0 but was 2
-    -- assert_equal(0, u1:get_item("log"))
+    if 0 ~= u1:get_item("log") then
+        -- try to catch that intermittent bug:
+        print(u1:show())
+    end
+    assert_equal(0, u1:get_item("log"))
+    if 2 ~= u2:get_item("log") then
+        -- try to catch that intermittent bug:
+        print(u2:show())
+    end
     assert_equal(2, u2:get_item("log"))
 end
 
