@@ -613,6 +613,27 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
     }
 }
 
+static void fix_baselevel(region *r) {
+    struct terrain_production *p;
+    for (p = r->terrain->production; p->type; ++p) {
+        char *end;
+        long start = (int)strtol(p->startlevel, &end, 10);
+        if (*end == '\0') {
+            rawmaterial *res;
+            for (res = r->resources; res; res = res->next) {
+                if (p->type == res->rtype) {
+                    if (start != res->startlevel) {
+                        log_debug("setting resource start level for %s in %s to %d",
+                            res->rtype->_name, regionname(r, NULL), start);
+                        res->startlevel = start;
+                    }
+                }
+            }
+        }
+
+    }
+}
+
 static region *readregion(gamedata *data, int x, int y)
 {
     region *r;
@@ -781,6 +802,11 @@ static region *readregion(gamedata *data, int x, int y)
         }
     }
     read_attribs(data, &r->attribs, r);
+
+    if (r->resources && data->version < FIX_STARTLEVEL_VERSION) {
+        /* we had some badly made rawmaterials before this */
+        fix_baselevel(r);
+    }
     return r;
 }
 
