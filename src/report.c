@@ -1509,7 +1509,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
     if ((mode & HELP_ALL) == HELP_ALL) {
         sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
     }
-    else {
+    else if (mode > 0) {
         int h, hh = 0;
         for (h = 1; h <= HELP_TRAVEL; h *= 2) {
             int p = MAXPARAMS;
@@ -1545,7 +1545,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
         }
     }
     if (show->num_allies == show->num_listed) {
-        sbs_strcat(sbp, ").");
+        sbs_strcat(sbp, ").\n");
         pump_paragraph(sbp, show->out, show->maxlen, true);
     }
     else {
@@ -1577,10 +1577,23 @@ void report_allies(struct stream *out, size_t maxlen, const struct faction * f, 
     }
 }
 
+static void rpline(struct stream *out)
+{
+    static char line[REPORTWIDTH + 1];
+    if (line[0] != '-') {
+        memset(line, '-', sizeof(line));
+        line[REPORTWIDTH] = '\n';
+    }
+    swrite(line, sizeof(line), 1, out);
+}
+
 static void allies(struct stream *out, const faction * f)
 {
     const group *g = f->groups;
     char prefix[64];
+
+    centre(out, LOC(f->locale, "nr_alliances"), false);
+    newline(out);
 
     if (f->allies) {
         snprintf(prefix, sizeof(prefix), "%s ", LOC(f->locale, "faction_help"));
@@ -1594,6 +1607,7 @@ static void allies(struct stream *out, const faction * f)
         }
         g = g->next;
     }
+    rpline(out);
 }
 
 static void guards(struct stream *out, const region * r, const faction * see)
@@ -1658,16 +1672,6 @@ static void guards(struct stream *out, const region * r, const faction * see)
         newline(out);
         pump_paragraph(&sbs, out, REPORTWIDTH, true);
     }
-}
-
-static void rpline(struct stream *out)
-{
-    static char line[REPORTWIDTH + 1];
-    if (line[0] != '-') {
-        memset(line, '-', sizeof(line));
-        line[REPORTWIDTH] = '\n';
-    }
-    swrite(line, sizeof(line), 1, out);
 }
 
 static void list_address(struct stream *out, const faction * uf, selist * seenfactions)
@@ -2115,14 +2119,6 @@ report_plaintext(const char *filename, report_context * ctx,
     }
     newline(out);
     ERRNO_CHECK();
-    centre(out, LOC(f->locale, "nr_alliances"), false);
-    newline(out);
-
-    allies(out, f);
-
-    rpline(out);
-
-    ERRNO_CHECK();
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
@@ -2177,8 +2173,8 @@ report_plaintext(const char *filename, report_context * ctx,
 
         if (wants_stats && r->seen.mode >= seen_travel) {
             if (r->land || r->seen.mode >= seen_unit) {
-                newline(out);
                 statistics(out, r, f);
+                newline(out);
             }
         }
 
@@ -2249,6 +2245,7 @@ report_plaintext(const char *filename, report_context * ctx,
             paragraph(out, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
         }
         else {
+            allies(out, f);
             list_address(out, f, ctx->addresses);
         }
     }
