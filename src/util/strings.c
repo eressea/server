@@ -76,9 +76,10 @@ size_t str_strlcpy(char *dst, const char *src, size_t len)
 
     /* Not enough room in dst, add NUL and traverse rest of src */
     if (n == 0) {
-        if (len != 0)
-            *d = '\0';                /* NUL-terminate dst */
-        while (*s++);
+        if (len != 0) {
+            *d = '\0'; /* NUL-terminate dst */
+        }
+        return (s - src) + strlen(s); /* count does not include NUL */
     }
 
     return (s - src - 1);         /* count does not include NUL */
@@ -176,49 +177,6 @@ int str_hash(const char *s)
     return key & 0x7FFFFFFF;
 }
 
-const char *str_escape_wrong(const char *str, char *buffer, size_t len)
-{
-    const char *handle_start = strchr(str, '\"');
-    if (!handle_start) handle_start = strchr(str, '\\');
-    assert(buffer);
-    if (handle_start) {
-        const char *p = str;
-        char *o = buffer;
-        size_t skip = handle_start - str;
-
-        if (skip > len) {
-            skip = len;
-        }
-        if (skip > 0) {
-            memcpy(buffer, str, skip);
-            o += skip;
-            p += skip;
-            len -= skip;
-        }
-        do {
-            if (*p == '\"' || *p == '\\') {
-                if (len < 2) {
-                    break;
-                }
-                (*o++) = '\\';
-                len -= 2;
-            }
-            else {
-                if (len < 1) {
-                    break;
-                }
-                --len;
-            }
-            if (len > 0) {
-                (*o++) = (*p);
-            }
-        } while (len > 0 && *p++);
-        *o = '\0';
-        return buffer;
-    }
-    return str;
-}
-
 unsigned int jenkins_hash(unsigned int a)
 {
     a = (a + 0x7ed55d16) + (a << 12);
@@ -255,14 +213,44 @@ char *str_strdup(const char *s) {
 #endif
 }
 
+void sbs_printf(struct sbstring *sbs, const char *format, ...)
+{
+    size_t size = sbs->size - (sbs->end - sbs->begin);
+
+    if (size > 0) {
+        va_list argp;
+        va_start(argp, format);
+        int bytes = vsnprintf(sbs->end, size, format, argp);
+        if (bytes > 0) {
+            if ((size_t)bytes >= size) {
+                bytes = size - 1;
+                /* terminate truncated output */
+                sbs->end[bytes] = '\0';
+            }
+            sbs->end += bytes;
+        }
+        va_end(argp);
+    }
+}
+
 void sbs_init(struct sbstring *sbs, char *buffer, size_t size)
 {
     assert(sbs);
-    assert(size>0);
+    assert(size > 0);
     sbs->begin = buffer;
     sbs->size = size;
     sbs->end = buffer;
     buffer[0] = '\0';
+}
+
+void sbs_adopt(struct sbstring *sbs, char *buffer, size_t size)
+{
+    size_t len = strlen(buffer);
+    assert(sbs);
+    assert(size > len);
+    sbs->begin = buffer;
+    sbs->size = size;
+    sbs->end = buffer + len;
 }
 
 void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
@@ -283,21 +271,34 @@ void sbs_strcat(struct sbstring *sbs, const char *str)
     size_t len;
     assert(sbs);
     len = sbs->size - (sbs->end - sbs->begin);
-    len = str_strlcpy(sbs->end, str, len);
-    sbs->end += len;
+    str_strlcpy(sbs->end, str, len);
+    sbs->end += strlen(sbs->end);
+    assert(sbs->begin + sbs->size >= sbs->end);
 }
 
-void sbs_strcpy(struct sbstring *sbs, const char *str)
+void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)
 {
-    size_t len = str_strlcpy(sbs->begin, str, sbs->size);
-    if (len >= sbs->size) {
-        len = sbs->size - 1;
+    if (pos > sbs->end - sbs->begin) {
+        /* starting past end of string, do nothing */
+        sbs->end = sbs->begin;
     }
-    sbs->end = sbs->begin + len;
+    if (pos >= 0) {
+        size_t sz = sbs->end - (sbs->begin + pos);
+        if (len > sz) len = sz;
+        if (len - pos > 0) {
+            memmove(sbs->begin, sbs->begin + pos, len);
+        }
+        else {
+            memcpy(sbs->begin, sbs->begin + pos, len);
+        }
+        sbs->end = sbs->begin + len;
+        sbs->end[0] = '\0';
+    }
 }
 
 size_t sbs_length(const struct sbstring *sbs)
 {
+    assert(sbs->begin + sbs->size >= sbs->end);
     return sbs->end - sbs->begin;
 }
 
@@ -305,8 +306,8 @@ char *str_unescape(char *str) {
     char *read = str, *write = str;
     while (*read) {
         char * pos = strchr(read, '\\');
-        if (pos) {
-            size_t len = pos - read;
+        if (pos >= read) {
+            size_t len = (size_t)(pos - read);
             memmove(write, read, len);
             write += len;
             read += (len + 1);
@@ -340,14 +341,14 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
 {
     size_t slen = strlen(str);
     const char *read = str;
-    char *write = buffer;
+    unsigned char *write = (unsigned char *)buffer;
     if (size < 1) {
         return NULL;
     }
     while (slen > 0 && size > 1 && *read) {
         const char *pos = strpbrk(read, chars);
         size_t len = size;
-        if (pos) {
+        if (pos >= read) {
             len = pos - read;
         }
         if (len < size) {
@@ -398,7 +399,7 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
                 break;
             default:
                 if (size > 5) {
-                    int n = sprintf(write, "\\%03o", ch);
+                    int n = snprintf((char *)write, size, "\\%03o", ch);
                     if (n > 0) {
                         assert(n == 5);
                         write += n;

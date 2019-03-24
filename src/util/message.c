@@ -41,6 +41,7 @@ register_argtype(const char *name, void(*free_arg) (variant),
 variant(*copy_arg) (variant), variant_type type)
 {
     arg_type *atype = (arg_type *)malloc(sizeof(arg_type));
+    if (!atype) abort();
     atype->name = name;
     atype->next = argtypes;
     atype->release = free_arg;
@@ -90,7 +91,9 @@ message_type *mt_create(message_type * mtype, const char *args[], int nparameter
         int i;
         mtype->nparameters = nparameters;
         mtype->pnames = (char **)malloc(sizeof(char *) * nparameters);
+        if (!mtype->pnames) abort();
         mtype->types = (arg_type **)malloc(sizeof(arg_type *) * nparameters);
+        if (!mtype->types) abort();
         for (i = 0; args[i]; ++i) {
             const char *x = args[i];
             const char *spos = strchr(x, ':');
@@ -103,8 +106,8 @@ message_type *mt_create(message_type * mtype, const char *args[], int nparameter
                 assert(atype);
             }
             else {
-                char *cp;
-                cp = malloc(spos - x + 1);
+                char *cp = malloc(spos - x + 1);
+                if (!cp) abort();
                 memcpy(cp, x, spos - x);
                 cp[spos - x] = '\0';
                 mtype->pnames[i] = cp;
@@ -145,6 +148,9 @@ const char *section_add(const char *name) {
         }
     }
     assert(i < MAXSECTIONS);
+    if (i == MAXSECTIONS) {
+        return NULL;
+    }
     assert(sections[i] == NULL);
     if (i + 1 < MAXSECTIONS) {
         sections[i + 1] = NULL;
@@ -162,8 +168,10 @@ message_type *mt_new(const char *name, const char *section)
         return NULL;
     }
     mtype = (message_type *)malloc(sizeof(message_type));
+    if (!mtype) abort();
     mtype->key = 0;
     mtype->name = str_strdup(name);
+    if (!mtype->name) abort();
     mtype->section = section_find(section);
     if (!mtype->section) {
         mtype->section = section_add(section);
@@ -219,7 +227,6 @@ static void free_arg(const arg_type * atype, variant data)
 
 message *msg_create(const struct message_type *mtype, variant args[])
 {
-    int i;
     message *msg;
 
     assert(mtype != NULL);
@@ -228,11 +235,17 @@ message *msg_create(const struct message_type *mtype, variant args[])
         return NULL;
     }
     msg = (message *)malloc(sizeof(message));
+    if (!msg) abort();
     msg->type = mtype;
-    msg->parameters = (variant *)(mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL);
     msg->refcount = 1;
-    for (i = 0; i != mtype->nparameters; ++i) {
-        msg->parameters[i] = copy_arg(mtype->types[i], args[i]);
+    msg->parameters = NULL;
+    if (mtype->nparameters > 0) {
+        int i;
+        msg->parameters = (variant *)(mtype->nparameters ? calloc(mtype->nparameters, sizeof(variant)) : NULL);
+        if (!msg->parameters) abort();
+        for (i = 0; i != mtype->nparameters; ++i) {
+            msg->parameters[i] = copy_arg(mtype->types[i], args[i]);
+        }
     }
     if (msg_log_create)
         msg_log_create(msg);

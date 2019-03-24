@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 typedef enum cryptalgo_t {
     PASSWORD_PLAINTEXT,
     PASSWORD_BCRYPT
@@ -16,3 +17,4 @@ extern int bcrypt_workfactor;
 int password_verify(const char *hash, const char *passwd);
 const char * password_hash(const char *passwd, cryptalgo_t algo);
 bool password_is_implemented(cryptalgo_t algo);
+void password_generate(char *password, size_t length);

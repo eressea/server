@@ -217,7 +217,6 @@ int setstealth_cmd(unit * u, struct order *ord)
 {
     char token[64];
     const char *s;
-    int level;
 
     init_order_depr(ord);
     s = gettoken(token, sizeof(token));
@@ -231,7 +230,7 @@ int setstealth_cmd(unit * u, struct order *ord)
 
     if (isdigit(*(const unsigned char *)s)) {
         /* Tarnungslevel setzen */
-        level = atoi((const char *)s);
+        int level = atoi((const char *)s);
         if (level > effskill(u, SK_STEALTH, NULL)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
             return 0;

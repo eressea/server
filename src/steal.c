@@ -57,7 +57,7 @@ void expandstealing(region * r, econ_request * stealorders)
     norders = expand_production(r, stealorders, &requests);
     if (!norders) return;
 
-    /* F�r jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
+    /* Fuer jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
      * Beklauen-Orders ist. Jedes Opfer muss einzeln behandelt werden.
      *
      * u ist die beklaute unit. oa.unit ist die klauende unit.
@@ -193,8 +193,17 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     n = effsk - max_skill(r, f, SK_PERCEPTION);
 
     if (n <= 0) {
-        /* Wahrnehmung == Tarnung */
-        if (u_race(u) != get_race(RC_GOBLIN) || effsk <= 3) {
+        /* Wenn Goblins mit einem Tarnungstalent von mindestens 4 klauen, bekommen 
+         * sie mindestens 50 Silber, selbst dann, wenn sie erwischt werden. */
+        if (u_race(u) == get_race(RC_GOBLIN) && effsk >= 4) {
+            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
+                u2));
+            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
+                u2));
+            n = 1;
+            goblin = true;
+        }
+        else {
             ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
             if (n == 0) {
                 ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -204,14 +213,6 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
                     u, u2));
             }
             return;
-        }
-        else {
-            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
-                u2));
-            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
-                u2));
-            n = 1;
-            goblin = true;
         }
     }
 
@@ -230,6 +231,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
      * guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
 
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->unit = u;
     o->qty = 1;                   /* Betrag steht in u->wants */
     o->type.steal.no = u2->no;

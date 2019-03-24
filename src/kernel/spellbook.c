@@ -19,6 +19,7 @@
 spellbook * create_spellbook(const char * name)
 {
     spellbook *result = (spellbook *)malloc(sizeof(spellbook));
+    if (!result) abort();
     result->name = name ? str_strdup(name) : 0;
     result->spells = 0;
     return result;
@@ -79,6 +80,7 @@ void spellbook_addref(spellbook *sb, const char *name, int level) {
 
     assert(sb && name && level > 0);
     sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
+    if (!sbe) abort();
     spellref_init(&sbe->spref, NULL, name);
     sbe->level = level;
     selist_push(&sb->spells, sbe);
@@ -95,6 +97,7 @@ void spellbook_add(spellbook *sb, spell *sp, int level)
     }
 #endif  
     sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
+    if (!sbe) abort();
     spellref_init(&sbe->spref, sp, NULL);
     sbe->level = level;
     selist_push(&sb->spells, sbe);

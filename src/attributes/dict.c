@@ -86,6 +86,7 @@ static void dict_init(variant *var)
 {
     dict_data *dd;
     var->v = malloc(sizeof(dict_data));
+    if (!var->v) abort();
     dd = (dict_data *)var->v;
     dd->type = TNONE;
 }
@@ -143,7 +144,9 @@ static void dict_upgrade(attrib **alist, attrib *abegin) {
         }
     }
     if (i > 0) {
-        keys = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
+        int *tmp = realloc(keys, sizeof(int) * (2 * (n + i) + 1));
+        if (!tmp) abort();
+        keys = tmp;
         memcpy(keys + n*2 + 1, val, sizeof(int)*i*2);
         if (!ak) {
             ak = a_add(alist, a_new(&at_keys));

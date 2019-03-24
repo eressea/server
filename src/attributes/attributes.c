@@ -169,7 +169,7 @@ static int read_ext(variant *var, void *owner, gamedata *data)
 
 void register_attributes(void)
 {
-    /* Alle speicherbaren Attribute müssen hier registriert werden */
+    /* Alle speicherbaren Attribute muessen hier registriert werden */
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);

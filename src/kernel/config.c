@@ -106,27 +106,31 @@ int findoption(const char *s, const struct locale *lang)
 
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
-static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 static int *forbidden_ids;
+static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 
-int forbiddenid(int id)
+bool forbiddenid(int id)
 {
     static size_t len;
     size_t i;
-    if (id <= 0)
-        return 1;
+    if (id <= 0) {
+        return true;
+    }
     if (!forbidden_ids) {
         while (forbidden[len])
             ++len;
-        forbidden_ids = calloc(len, sizeof(int));
+        forbidden_ids = malloc(len * sizeof(int));
+        if (!forbidden_ids) abort();
         for (i = 0; i != len; ++i) {
             forbidden_ids[i] = atoi36(forbidden[i]);
         }
     }
-    for (i = 0; i != len; ++i)
-        if (id == forbidden_ids[i])
-            return 1;
-    return 0;
+    for (i = 0; i != len; ++i) {
+        if (id == forbidden_ids[i]) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int newcontainerid(void)
@@ -274,6 +278,7 @@ void set_param(struct param **p, const char *key, const char *value)
     par = *p;
     if (!par && value) {
         *p = par = calloc(1, sizeof(param));
+        if (!par) abort();
     }
     if (par) {
         void *match;
@@ -509,7 +514,6 @@ order *default_order(const struct locale *lang)
     int i = locale_index(lang);
     keyword_t kwd;
     const char * str;
-    order *result = 0;
 
     assert(i < MAXLOCALES);
     kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
@@ -518,7 +522,8 @@ order *default_order(const struct locale *lang)
         kwd = findkeyword(str);
     }
     if (kwd != NOKEYWORD) {
-        result = create_order(kwd, lang, NULL);
+        /* TODO: why is there a copy_order made here? */
+        order *result = create_order(kwd, lang, NULL);
         return copy_order(result);
     }
     return NULL;

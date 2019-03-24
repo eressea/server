@@ -39,37 +39,37 @@ extern "C" {
      * (struct attribute)
      */
 
-    /* Brainstorming Überarbeitung curse
+    /* Brainstorming Ueberarbeitung curse
      *
      * Ziel: Keine Enum-Liste, flexible, leicht erweiterbare Curse-Objekte
      *
      * Was wird gebraucht?
-     * - Eindeutige Kennung für globale Suche
-     * - eine Wirkung, die sich einfach 'anwenden' läßt, dabei flexibel ist,
-     *   Raum läßt für variable Boni, Anzahl betroffener Personen,
+     * - Eindeutige Kennung fuer globale Suche
+     * - eine Wirkung, die sich einfach 'anwenden' laesst, dabei flexibel ist,
+     *   Raum laesst fuer variable Boni, Anzahl betroffener Personen,
      *   spezielle Effekte oder anderes
      * - einfacher Zugriff auf allgemeine Funktionen wie zb Alterung, aber
      *   auch Antimagieverhalten
      * - Ausgabe von Beschreibungen in verschiedenen Sprachen
      * - definiertes gekapseltes Verhalten zb bei Zusammenlegung von
-     *   Einheiten, Übergabe von Personen, Mehrfachverzauberung
-     * - (Rück-)Referenzen auf Objekt, Verursacher (Magier), ?
+     *   Einheiten, Uebergabe von Personen, Mehrfachverzauberung
+     * - (Rueck-)Referenzen auf Objekt, Verursacher (Magier), ?
      *
-     * Vieleicht wäre ein Wirkungsklassensystem sinnvoll, so das im übrigen
-     * source einfach alle curse-attribs abgefragt werden können und bei
-     * gewünschter Wirkungsklasse angewendet, also nicht für jeden curse
-     * spezielle Änderungen im übrigen source notwendig sind.
+     * Vieleicht waere ein Wirkungsklassensystem sinnvoll, so das im uebrigen
+     * source einfach alle curse-attribs abgefragt werden koennen und bei
+     * gewuenschter Wirkungsklasse angewendet, also nicht fuer jeden curse
+     * spezielle Aenderungen im uebrigen source notwendig sind.
      *
      * Die (Wirkungs-)Typen sollten die wichtigen Funktionen speziell
-     * belegen können, zb Alterung, Ausgabetexte, Merge-Verhalten
+     * belegen koennen, zb Alterung, Ausgabetexte, Merge-Verhalten
      *
      * Was sind wichtige individuelle Eigenschaften?
      * - Referenzen auf Objekt und Verursacher
-     * - Referenzen für globale Liste
+     * - Referenzen fuer globale Liste
      * > die Wirkung:
      * - Dauer
      * - Widerstandskraft, zb gegen Antimagie
-     * - Seiteneffekte zb Flag ONLYONE, Unverträglichkeiten
+     * - Seiteneffekte zb Flag ONLYONE, Unvertraeglichkeiten
      * - Alterungsverhalten zb Flag NOAGE
      * - Effektverhalten, zb Bonus (variabel)
      * - bei Einheitenzaubern die Zahl der betroffenen Personen
@@ -77,16 +77,16 @@ extern "C" {
      * Dabei sind nur die beiden letzten Punkte wirklich reine individuelle
      * Wirkung, die anderen sind eher allgemeine Kennzeichen eines jeden
      * Curse, die individuell belegt sind.
-     * ONLYONE und NOAGE könnten auch Eigenschaften des Typs sein, nicht des
+     * ONLYONE und NOAGE koennten auch Eigenschaften des Typs sein, nicht des
      * individuellen curse. Allgemein ist Alterung wohl eher eine
      * Typeigenschaft als die eines individuellen curse.
-     * Dagegen ist der Widerstand gegen Antimagie sowohl abhängig von der
-     * Güte des Verursachers, also des Magiers zum Zeitpunkt des Zaubers,
+     * Dagegen ist der Widerstand gegen Antimagie sowohl abhaengig von der
+     * Guete des Verursachers, also des Magiers zum Zeitpunkt des Zaubers,
      * als auch vom Typ, der gegen bestimmte Arten des 'Fluchbrechens' immun
-     * sein könnte.
+     * sein koennte.
      *
      * Was sind wichtige Typeigenschaften?
-     * - Verhalten bei Personenübergaben
+     * - Verhalten bei Personenuebergaben
      * - allgemeine Wirkung
      * - Beschreibungstexte
      * - Verhalten bei Antimagie
@@ -94,8 +94,8 @@ extern "C" {
      * - Speicherung des C-Objekts
      * - Laden des C-Objekts
      * - Erzeugen des C-Objekts
-     * - Löschen und Aufräumen des C-Objekts
-     * - Funktionen zur Änderung der Werte
+     * - Loeschen und Aufraeumen des C-Objekts
+     * - Funktionen zur Aenderung der Werte
      *
      * */
 
@@ -118,17 +118,17 @@ extern "C" {
         C_BADLEARN,
         C_SHIP_SPEEDUP,             /*  9 - Sturmwind-Zauber */
         C_SHIP_FLYING,              /* 10 - Luftschiff-Zauber */
-        C_SHIP_NODRIFT,             /* 11 - GünstigeWinde-Zauber */
+        C_SHIP_NODRIFT,             /* 11 - GuenstigeWinde-Zauber */
         C_DEPRESSION,
         C_MAGICWALLS,               /* 13 - Heimstein */
         C_STRONGWALL,               /* 14 - Feste Mauer - Precombat */
         C_ASTRALBLOCK,              /* 15 - Astralblock */
         C_GENEROUS,                 /* 16 - Unterhaltung vermehren */
         C_PEACE,                    /* 17 - Regionsweit Attacken verhindern */
-        C_MAGICSTREET,              /* 19 - magisches Straßennetz */
-        C_RESIST_MAGIC,             /* 20 - verändert Magieresistenz von Objekten */
-        C_SONG_BADMR,               /* 21 - verändert Magieresistenz */
-        C_SONG_GOODMR,              /* 22 - verändert Magieresistenz */
+        C_MAGICSTREET,              /* 19 - magisches Strassennetz */
+        C_RESIST_MAGIC,             /* 20 - veraendert Magieresistenz von Objekten */
+        C_SONG_BADMR,               /* 21 - veraendert Magieresistenz */
+        C_SONG_GOODMR,              /* 22 - veraendert Magieresistenz */
         C_SLAVE,                    /* 23 - dient fremder Partei */
         C_CALM,                     /* 25 - Beinflussung */
         C_OLDRACE,
@@ -145,7 +145,7 @@ extern "C" {
     /* ------------------------------------------------------------- */
     /* Flags */
 
-    /* Verhalten von Zaubern auf Units beim Übergeben von Personen */
+    /* Verhalten von Zaubern auf Units beim Uebergeben von Personen */
     typedef enum {
         CURSE_ISNEW = 0x01,         /* wirkt in der zauberrunde nicht (default) */
         CURSE_NOAGE = 0x02,         /* wirkt ewig */
@@ -153,10 +153,10 @@ extern "C" {
         CURSE_ONLYONE = 0x08,       /* Verhindert, das ein weiterer Zauber dieser Art auf das Objekt gezaubert wird */
 
         /* the following are mutually exclusive */
-        CURSE_SPREADNEVER = 0x00,   /* wird nie mit übertragen */
-        CURSE_SPREADALWAYS = 0x10,  /* wird immer mit übertragen */
+        CURSE_SPREADNEVER = 0x00,   /* wird nie mit uebertragen */
+        CURSE_SPREADALWAYS = 0x10,  /* wird immer mit uebertragen */
         CURSE_SPREADMODULO = 0x20,  /* personenweise weitergabe */
-        CURSE_SPREADCHANCE = 0x30   /* Ansteckungschance je nach Mengenverhältnis */
+        CURSE_SPREADCHANCE = 0x30   /* Ansteckungschance je nach Mengenverhaeltnis */
     } curseflags;
 
 #define CURSE_FLAGSMASK 0x0F
@@ -180,8 +180,8 @@ extern "C" {
 #define M_SUMEFFECT   8         /* der Effekt summiert sich */
 #define M_MEN        16         /* die Anzahl der betroffenen Personen summiert
      sich */
-#define M_VIGOUR     32         /* das Maximum der beiden Stärken wird die
-     Stärke des neuen Zaubers */
+#define M_VIGOUR     32         /* das Maximum der beiden Staerken wird die
+     Staerke des neuen Zaubers */
 #define M_VIGOUR_ADD 64         /* Vigour wird addiert */
 
     /* ------------------------------------------------------------- */
@@ -212,7 +212,7 @@ extern "C" {
         struct curse *nexthash;
         const curse_type *type;     /* Zeiger auf ein curse_type-struct */
         struct unit *magician;      /* Pointer auf den Magier, der den Spruch gewirkt hat */
-        double vigour;              /* Stärke der Verzauberung, Widerstand gegen Antimagie */
+        double vigour;              /* Staerke der Verzauberung, Widerstand gegen Antimagie */
         double effect;
         int no;                     /* 'Einheitennummer' dieses Curse */
         int mask;                   /* This is XORed with type->flags, see c_flags()! */
@@ -251,35 +251,35 @@ extern "C" {
     /* ignoriert CURSE_ISNEW */
     bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 
-    /* löscht einen konkreten Spruch auf einem Objekt.  */
+    /* loescht einen konkreten Spruch auf einem Objekt.  */
     bool remove_curse(struct attrib **ap, const struct curse *c);
 
-    /* gibt die Auswirkungen der Verzauberungen zurück. zB bei
+    /* gibt die Auswirkungen der Verzauberungen zurueck. zB bei
      * Skillmodifiziernden Verzauberungen ist hier der Modifizierer
      * gespeichert. Wird automatisch beim Anlegen eines neuen curse
-     * gesetzt. Gibt immer den ersten Treffer von ap aus zurück.
+     * gesetzt. Gibt immer den ersten Treffer von ap aus zurueck.
      */
     int curse_geteffect_int(const struct curse *c);
     double curse_geteffect(const struct curse *c);
 
-    /* verändert die Stärke der Verzauberung um i */
+    /* veraendert die Staerke der Verzauberung um i */
     double curse_changevigour(struct attrib **ap, curse * c, double delta);
 
-    /* gibt bei Personenbeschränkten Verzauberungen die Anzahl der
-     * betroffenen Personen zurück. Ansonsten wird 0 zurückgegeben. */
+    /* gibt bei Personenbeschraenkten Verzauberungen die Anzahl der
+     * betroffenen Personen zurueck. Ansonsten wird 0 zurueckgegeben. */
     int get_cursedmen(const struct unit *u, const struct curse *c);
 
     /* setzt/loescht Spezialflag einer Verzauberung (zB 'dauert ewig') */
     void c_setflag(curse * c, unsigned int flag);
     void c_clearflag(curse * c, unsigned int flags);
 
-    /* sorgt dafür, das bei der Übergabe von Personen die curse-attribute
+    /* sorgt dafuer, das bei der Uebergabe von Personen die curse-attribute
      * korrekt gehandhabt werden. Je nach internen Flag kann dies
-     * unterschiedlich gewünscht sein
+     * unterschiedlich gewuenscht sein
      * */
     void transfer_curse(const struct unit *u, struct unit *u2, int n);
 
-    /* gibt pointer auf die erste curse-struct zurück, deren Typ ctype ist,
+    /* gibt pointer auf die erste curse-struct zurueck, deren Typ ctype ist,
      * oder einen NULL-pointer
      * */
     struct curse *get_curse(struct attrib *ap, const curse_type * ctype);

@@ -17,8 +17,11 @@ without prior permission by the authors of Eressea.
 
 /* tweakable features */
 #define RENDER_CRMESSAGES
-#define BUFFERSIZE 32768
 #define RESOURCECOMPAT
+
+#define BUFFERSIZE 32768
+/* riesig, wegen spionage-messages :-( */
+static char g_bigbuf[BUFFERSIZE];
 
 #include <spells/regioncurse.h>
 
@@ -132,9 +135,12 @@ static const char *translate(const char *key, const char *value)
             t = junkyard;
             junkyard = junkyard->next;
         }
-        else
+        else {
             t = malloc(sizeof(translation));
+            if (!t) abort();
+        }
         t->key = str_strdup(key);
+        if (!t->key) abort();
         t->value = value;
         t->next = translation_table[kk];
         translation_table[kk] = t;
@@ -264,13 +270,12 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
             msg = msg_curse(c, obj, typ, self);
 
             if (msg) {
-                char buf[BUFFERSIZE];
                 if (!header) {
                     header = 1;
                     stream_printf(out, "EFFECTS\n");
                 }
-                nr_render(msg, viewer->locale, buf, sizeof(buf), viewer);
-                stream_printf(out, "\"%s\"\n", buf);
+                nr_render(msg, viewer->locale, g_bigbuf, sizeof(g_bigbuf), viewer);
+                stream_printf(out, "\"%s\"\n", g_bigbuf);
                 msg_release(msg);
             }
             a = a->next;
@@ -571,28 +576,26 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
 {
     struct mlist *m = msgs->begin;
     while (m) {
-        char crbuffer[BUFFERSIZE];  /* gross, wegen spionage-messages :-( */
         bool printed = false;
         const struct message_type *mtype = m->msg->type;
         unsigned int hash = mtype->key;
 #ifdef RENDER_CRMESSAGES
-        char nrbuffer[1024 * 32];
-        nrbuffer[0] = '\0';
-        if (nr_render(m->msg, f->locale, nrbuffer, sizeof(nrbuffer), f) > 0) {
+        g_bigbuf[0] = '\0';
+        if (nr_render(m->msg, f->locale, g_bigbuf, sizeof(g_bigbuf), f) > 0) {
             fprintf(F, "MESSAGE %d\n", message_id(m->msg));
             fprintf(F, "%u;type\n", hash);
-            fwritestr(F, nrbuffer);
+            fwritestr(F, g_bigbuf);
             fputs(";rendered\n", F);
             printed = true;
         }
 #endif
-        crbuffer[0] = '\0';
-        if (cr_render(m->msg, crbuffer, (const void *)f) == 0) {
-            if (crbuffer[0]) {
+        g_bigbuf[0] = '\0';
+        if (cr_render(m->msg, g_bigbuf, (const void *)f) == 0) {
+            if (g_bigbuf[0]) {
                 if (!printed) {
                     fprintf(F, "MESSAGE %d\n", message_id(m->msg));
                 }
-                fputs(crbuffer, F);
+                fputs(g_bigbuf, F);
             }
         }
         else {
@@ -605,6 +608,7 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
                 kmt = kmt->nexthash;
             if (kmt == NULL) {
                 kmt = (struct known_mtype *)malloc(sizeof(struct known_mtype));
+                if (!kmt) abort();
                 kmt->nexthash = mtypehash[ihash];
                 kmt->mtype = mtype;
                 mtypehash[ihash] = kmt;
@@ -844,11 +848,13 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        stream_printf(out, "\"%s\";Typ\n", pzTmp);
+        const char *pzRace = LOC(lang, mkname("race", pzTmp));
+        pzTmp = pzRace ? pzRace : pzTmp;
+        stream_printf(out, "\"%s\";Typ\n", translate(pzTmp, LOC(lang, pzTmp)));
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            const char *zRace = rc_name_s(u_race(u), NAME_PLURAL);
+            pzRace = rc_name_s(u_race(u), NAME_PLURAL);
             stream_printf(out, "\"%s\";wahrerTyp\n",
-                translate(zRace, LOC(lang, zRace)));
+                translate(pzRace, LOC(lang, pzRace)));
         }
     }
     else {
@@ -1151,7 +1157,7 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
     assert(rtype);
     name = resourcename(rtype, NMF_PLURAL);
     assert(name);
-    buf += sprintf(buf, "RESOURCE %u\n", str_hash(rtype->_name));
+    buf += sprintf(buf, "RESOURCE %d\n", str_hash(rtype->_name));
     tname = LOC(loc, name);
     assert(tname);
     tname = translate(name, tname);
@@ -1218,7 +1224,7 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
 
 void cr_output_resources(stream *out, const faction * f, const region *r, bool see_unit)
 {
-    char cbuf[BUFFERSIZE], *pos = cbuf;
+    char *pos = g_bigbuf;
     resource_report result[MAX_RAWMATERIALS];
     int n, size = report_resources(r, result, MAX_RAWMATERIALS, f, see_unit);
 
@@ -1251,8 +1257,8 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
                     result[n].level);
         }
     }
-    if (pos != cbuf) {
-        swrite(cbuf, 1, pos - cbuf, out);
+    if (pos != g_bigbuf) {
+        swrite(g_bigbuf, 1, pos - g_bigbuf, out);
     }
 }
 
@@ -1393,7 +1399,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
             fprintf(F, "%d;Bauern\n", rpeasants(r));
             fprintf(F, "%d;Pferde\n", rhorses(r));
 
-            if (r->seen.mode >= seen_unit) {
+            if (r->seen.mode >= seen_travel) {
                 if (rule_region_owners()) {
                     faction *owner = region_get_owner(r);
                     if (owner) {

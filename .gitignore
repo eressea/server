@@ -27,6 +27,7 @@ ipch/
 *~
 *.pyc
 *.bak
+*.swp
 bin/
 build*/
 *.log

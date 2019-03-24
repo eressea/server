@@ -4,9 +4,9 @@
 	hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="no"
 	walk="yes" shapeshift="no" giveperson="no" giveunit="no"
 	getitem="no" equipment="yes" scarepeasants="yes"
-	cansteal="no" unarmedguard="yes" absorbpeasants="yes" noheal="yes"
+	cansteal="no" unarmedguard="yes" noheal="yes"
 	undead="yes" resistpierce="yes">
-	<ai splitsize="1000" moverandom="yes" learn="yes" />
+	<ai splitsize="1000" moverandom="yes" learn="yes" absorbpeasants="yes"/>
 	<attack type="1" damage="1d5" />
 	<attack type="5" />
 </race>

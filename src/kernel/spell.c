@@ -124,6 +124,7 @@ spell * create_spell(const char * name)
         return 0;
     }
     sp = (spell *)calloc(1, sizeof(spell));
+    if (!sp) abort();
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
     if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
         sp->sname = str_strdup(name);
@@ -177,6 +178,7 @@ spell *find_spell(const char *name)
 struct spellref *spellref_create(spell *sp, const char *name)
 {
     spellref *spref = malloc(sizeof(spellref));
+    if (!spref) abort();
 
     if (sp) {
         spref->sp = sp;

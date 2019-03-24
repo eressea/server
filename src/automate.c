@@ -82,7 +82,7 @@ void autostudy_run(scholar scholars[], int nscholars)
     int ti = 0;
     while (ti != nscholars) {
         skill_t sk = scholars[ti].sk;
-        int t, s, se, ts = 0, tt = 0, si = ti;
+        int t, se, ts = 0, tt = 0, si = ti;
         for (se = ti; se != nscholars && scholars[se].sk == sk; ++se) {
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
@@ -110,7 +110,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit ti can still teach i students */
             int i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
             /* invariant: unit si has n students that can still be taught */
-            int n = scholars[si].u->number;
+            int s, n = scholars[si].u->number;
             for (t = ti, s = si; t != si && s != se; ) {
                 if (i >= n) {
                     /* t has more than enough teaching capacity for s */

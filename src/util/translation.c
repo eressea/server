@@ -164,10 +164,10 @@ static void free_functions(void)
 
 void add_function(const char *symbol, evalfun parse)
 {
-    char token[64];
+    char token[64]; /* Flawfinder: ignore */
     size_t len = strlen(symbol);
 
-    assert(len + 1 + sizeof(parse) <= sizeof(token));
+    assert(len + sizeof(parse) < sizeof(token));
     len = cb_new_kv(symbol, len, &parse, sizeof(parse), token);
     cb_insert(&functions, token, len);
 }
@@ -193,15 +193,17 @@ static const char *parse_symbol(opstack ** stack, const char *in,
      */
 {
     bool braces = false;
-    char symbol[32];
+    char symbol[32]; /* Flawfinder: ignore */
     char *cp = symbol;            /* current position */
 
     if (*in == '{') {
         braces = true;
         ++in;
     }
-    while (isalnum(*in) || *in == '.')
+    while (isalnum(*in) || *in == '.') {
         *cp++ = *in++;
+        assert(cp < symbol + sizeof(symbol));
+    }
     *cp = '\0';
     /* symbol will now contain the symbol name */
     if (*in == '(') {
@@ -371,7 +373,7 @@ const char *translate(const char *format, const void *userdata,
 {
     unsigned int i = 0;
     const char *ic = vars;
-    char symbol[32];
+    char symbol[32]; /* Flawfinder: ignore */
     char *oc = symbol;
     opstack *stack = NULL;
     const char *rv;
@@ -383,11 +385,15 @@ const char *translate(const char *format, const void *userdata,
     assert(*ic == 0 || isalnum(*ic));
     while (*ic) {
         *oc++ = *ic++;
+        assert(oc < symbol + sizeof(symbol));
         if (!isalnum(*ic)) {
+            size_t len;
             variant x = args[i++];
             *oc = '\0';
+            len = oc - symbol + 1;
+            str_strlcpy(oc = balloc(len), symbol, len);
+            add_variable(oc, x);
             oc = symbol;
-            add_variable(strcpy(balloc(strlen(symbol) + 1), symbol), x);
             while (*ic && !isalnum(*ic))
                 ++ic;
         }
@@ -452,22 +458,15 @@ static void eval_if(opstack ** stack, const void *userdata)
     UNUSED_ARG(userdata);
 }
 
-static void eval_strlen(opstack ** stack, const void *userdata)
-{                               /* string -> int */
-    const char *c = (const char *)opop_v(stack);
-    opush_i(stack, c ? (int)strlen(c) : 0);
-    UNUSED_ARG(userdata);
-}
-
 #include "base36.h"
 static void eval_int(opstack ** stack, const void *userdata)
 {
     int i = opop_i(stack);
     const char *c = itoa10(i);
-    size_t len = strlen(c);
+    size_t size = strlen(c) + 1; /* Flawfinder: ignore */
     variant var;
 
-    var.v = strcpy(balloc(len + 1), c);
+    str_strlcpy(var.v = balloc(size), c, size);
     opush(stack, var);
 }
 
@@ -477,7 +476,6 @@ void translation_init(void)
     add_function("eq", &eval_eq);
     add_function("int", &eval_int);
     add_function("add", &eval_add);
-    add_function("strlen", &eval_strlen);
     add_function("if", &eval_if);
     add_function("isnull", &eval_isnull);
 }

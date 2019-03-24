@@ -699,6 +699,24 @@ static int tolua_distance(lua_State * L)
     return 1;
 }
 
+static int tolua_region_add_curse(lua_State *L) {
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
+    const curse_type *ctype = ct_find(name);
+    if (ctype) {
+        unit *u = (unit *)tolua_tousertype(L, 3, NULL);
+        int duration = (int)tolua_tonumber(L, 4, 1);
+        double vigour = tolua_tonumber(L, 5, 0.0);
+        int effect = (int)tolua_tonumber(L, 6, vigour/2);
+        curse * c = create_curse(u, &r->attribs, ctype, vigour, duration, effect, 0);
+        if (c) {
+            lua_pushinteger(L, c->no);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static int tolua_region_get_curse(lua_State *L) {
     region *self = (region *)tolua_tousertype(L, 1, NULL);
     const char *name = tolua_tostring(L, 2, NULL);
@@ -741,6 +759,7 @@ void tolua_region_open(lua_State * L)
 
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_region_count_msg_type);
 
+            tolua_function(L, TOLUA_CAST "add_curse", &tolua_region_add_curse);
             tolua_function(L, TOLUA_CAST "get_curse", &tolua_region_get_curse);
             tolua_function(L, TOLUA_CAST "has_attrib", &tolua_region_has_attrib);
             /* flags */

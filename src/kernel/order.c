@@ -10,7 +10,10 @@
  without prior permission by the authors of Eressea.
  */
 
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
+
 #include <kernel/config.h>
 #include "order.h"
 
@@ -61,6 +64,7 @@ void odata_create(order_data **pdata, size_t len, const char *str)
 
     assert(pdata);
     data = malloc(sizeof(order_data) + len + 1);
+    if (!data) abort();
     data->_refcount = 1;
     result = (char *)(data + 1);
     data->_str = (len > 0) ? result : NULL;
@@ -120,7 +124,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
 
     sbs_init(&sbs, sbuffer, size);
     if (ord->command & CMD_QUIET) {
-        sbs_strcpy(&sbs, "!");
+        sbs_strcat(&sbs, "!");
     }
     if (ord->command & CMD_PERSIST) {
         sbs_strcat(&sbs, "@");
@@ -170,7 +174,6 @@ const char *crescape(const char *str, char *buffer, size_t size) {
 int stream_order(struct stream *out, const struct order *ord, const struct locale *lang, bool escape)
 {
     const char *text;
-    order_data *od = NULL;
     keyword_t kwd = ORD_KEYWORD(ord);
 
     if (ord->command & CMD_QUIET) {
@@ -203,7 +206,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         }
     }
     else {
-        od = odata_load(ord->id);
+        order_data *od = odata_load(ord->id);
         text = OD_STRING(od);
         if (text) {
             char obuf[1024];
@@ -231,6 +234,7 @@ order *copy_order(const order * src)
 {
     if (src != NULL) {
         order *ord = (order *)malloc(sizeof(order));
+        if (!ord) abort();
         ord->next = NULL;
         ord->command = src->command;
         ord->id = src->id;
@@ -397,6 +401,7 @@ order *parse_order(const char *s, const struct locale * lang)
         }
         if (kwd != NOKEYWORD) {
             order *ord = (order *)malloc(sizeof(order));
+            if (ord == NULL) abort();
             create_order_i(ord, kwd, sptr, persistent, noerror, lang);
             return ord;
         }

@@ -124,6 +124,16 @@ static void test_select_weapon_restricted(CuTest *tc) {
     free_battle(b);
 
     itype->mask_deny = 0;
+    itype->mask_allow = rc_mask(au->_race);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertIntEquals(tc, 1, af->weapons[0].count);
+    CuAssertPtrEquals(tc, itype->rtype->wtype, (void *)af->weapons[0].type);
+    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    free_battle(b);
+
+    itype->mask_deny = 0;
     itype->mask_allow = rc_mask(rc);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);

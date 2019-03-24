@@ -70,8 +70,9 @@ struct rawmaterial *
 add_resource(region * r, int level, int base, int divisor,
 const resource_type * rtype)
 {
-    struct rawmaterial *rm = calloc(sizeof(struct rawmaterial), 1);
+    struct rawmaterial *rm = calloc(1, sizeof(struct rawmaterial));
 
+    if (!rm) abort();
     rm->next = r->resources;
     r->resources = rm;
     rm->flags = 0;
@@ -181,10 +182,9 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
-    rawmaterial_type *rmtype;
-
     if (!rtype->raw) {
-        rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        if (!rmtype) abort();
         rmtype->rtype = rtype;
         rmtype->terraform = terraform_default;
         rmtype->update = NULL;

@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#ifdef _MSC_VER
+#ifndef PATH_MAX
 /* @see https://insanecoding.blogspot.no/2007/11/pathmax-simply-isnt.html */
 #define PATH_MAX 260
 #endif

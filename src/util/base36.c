@@ -37,12 +37,12 @@ int atoi36(const char *str)
         ++s;
     }
     while (isalnum(*(unsigned char *)s)) {
-        if (isupper(*(unsigned char *)s))
-            i = i * 36 + (*s) - 'A' + 10;
-        else if (islower(*s))
+        if (islower(*s))
             i = i * 36 + (*s) - 'a' + 10;
         else if (isdigit(*s))
             i = i * 36 + (*s) - '0';
+        else if (isupper(*(unsigned char *)s))
+            i = i * 36 + (*s) - 'A' + 10;
         else
             break;
         ++s;
@@ -124,14 +124,4 @@ const char *itoa36(int i)
 const char *itoa10(int i)
 {
     return itoab(i, 10);
-}
-
-int i10toi36(int i)
-{
-    int r = 0;
-    while (i) {
-        r = r * 36 + i % 10;
-        i = i / 10;
-    }
-    return r;
 }

@@ -55,7 +55,7 @@ typedef struct createunit_data {
 
 static void createunit_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(createunit_data), 1);
+    t->data.v = calloc(1, sizeof(createunit_data));
 }
 
 static void createunit_free(trigger * t)

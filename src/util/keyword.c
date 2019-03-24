@@ -52,13 +52,13 @@ keyword_t findkeyword(const char *s) {
 
 keyword_t get_keyword(const char *s, const struct locale *lang) {
     keyword_t result = NOKEYWORD;
-    char buffer[64];
 
     assert(lang);
     assert(s);
     while (*s == '@') ++s;
 
     if (*s) {
+        char buffer[64];
         char *str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
 
         if (str) {

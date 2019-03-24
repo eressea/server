@@ -121,7 +121,7 @@ extern "C" {
         int healing;
         int maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
-        double recruit_multi;      /* Faktor f�r Bauernverbrauch */
+        double recruit_multi;      /* Faktor fuer Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;
@@ -135,8 +135,8 @@ extern "C" {
         int armor;
         int at_default;             /* Angriffsskill Unbewaffnet (default: -2) */
         int df_default;             /* Verteidigungsskill Unbewaffnet (default: -2) */
-        int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
-        int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
+        int at_bonus;               /* Veraendert den Angriffsskill (default: 0) */
+        int df_bonus;               /* Veraendert den Verteidigungskill (default: 0) */
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
         int flags;
         int battle_flags;
@@ -208,23 +208,23 @@ extern "C" {
 #define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
-#define RCF_LEARN          (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
+#define RCF_AI_LEARN       (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
 #define RCF_FLY            (1<<7)       /* kann fliegen */
 #define RCF_SWIM           (1<<8)       /* kann schwimmen */
-#define RCF_WALK           (1<<9)       /* kann �ber Land gehen */
+#define RCF_WALK           (1<<9)       /* kann ueber Land gehen */
 #define RCF_NOLEARN        (1<<10)      /* kann nicht normal lernen */
 #define RCF_NOTEACH        (1<<11)      /* kann nicht lehren */
 #define RCF_HORSE          (1<<12)      /* Einheit ist Pferd, sozusagen */
 #define RCF_DESERT         (1<<13)      /* 5% Chance, das Einheit desertiert */
 #define RCF_ILLUSIONARY    (1<<14)      /* (Illusion & Spell) Does not drop items. */
-#define RCF_ABSORBPEASANTS (1<<15)      /* T�tet und absorbiert Bauern */
+#define RCF_ABSORBPEASANTS (1<<15)      /* Toetet und absorbiert Bauern */
 #define RCF_NOHEAL         (1<<16)      /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)      /* Einheit kann keine Waffen benutzen */
 #define RCF_SHAPESHIFT     (1<<18)      /* Kann TARNE RASSE benutzen. */
 #define RCF_SHAPESHIFTANY  (1<<19)      /* Kann TARNE RASSE "string" benutzen. */
 #define RCF_UNDEAD         (1<<20)      /* Undead. */
-#define RCF_DRAGON         (1<<21)      /* Drachenart (f�r Zauber) */
-#define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der K�ste sein */
+#define RCF_DRAGON         (1<<21)      /* Drachenart (fuer Zauber) */
+#define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Kueste sein */
 #define RCF_UNARMEDGUARD   (1<<23)      /* kann ohne Waffen bewachen */
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
 #define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
@@ -236,17 +236,17 @@ extern "C" {
 #define RCF_DEFAULT RCF_CANSAIL
 
     /* Economic flags */
-#define ECF_GIVEPERSON     (1<<0)   /* �bergibt Personen */
-#define ECF_GIVEUNIT       (1<<1)   /* Einheiten an andere Partei �bergeben */
-#define ECF_GETITEM        (1<<2)   /* nimmt Gegenst�nde an */
+#define ECF_GIVEPERSON     (1<<0)   /* Uebergibt Personen */
+#define ECF_GIVEUNIT       (1<<1)   /* Einheiten an andere Partei uebergeben */
+#define ECF_GETITEM        (1<<2)   /* nimmt Gegenstaende an */
 #define ECF_REC_ETHEREAL   (1<<3)       /* Rekrutiert aus dem Nichts */
 #define ECF_REC_UNLIMITED  (1<<4)       /* Rekrutiert ohne Limit */
 #define ECF_STONEGOLEM     (1<<5)      /* race gets stonegolem properties */
 #define ECF_IRONGOLEM      (1<<6)      /* race gets irongolem properties */
 
     /* Battle-Flags */
-#define BF_EQUIPMENT    (1<<0)  /* Kann Ausr�stung benutzen */
-#define BF_NOBLOCK      (1<<1)  /* Wird in die R�ckzugsberechnung nicht einbezogen */
+#define BF_EQUIPMENT    (1<<0)  /* Kann Ausruestung benutzen */
+#define BF_NOBLOCK      (1<<1)  /* Wird in die Rueckzugsberechnung nicht einbezogen */
 #define BF_RES_PIERCE   (1<<2)  /* Halber Schaden durch PIERCE */
 #define BF_RES_CUT      (1<<3)  /* Halber Schaden durch CUT */
 #define BF_RES_BASH     (1<<4)  /* Halber Schaden durch BASH */

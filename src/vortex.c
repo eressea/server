@@ -91,7 +91,7 @@ static int a_readdirection(variant *var, void *owner, struct gamedata *data)
 {
     struct storage *store = data->store;
     spec_direction *d = (spec_direction *)(var->v);
-    char lbuf[32];
+    char lbuf[32]; /* Flawfinder: ignore */
 
     (void)owner;
     READ_INT(store, &d->x);
@@ -129,13 +129,12 @@ attrib_type at_direction = {
 region *find_special_direction(const region * r, const char *token)
 {
     attrib *a;
-    spec_direction *d;
 
-    if (strlen(token) == 0)
+    if (*token == '\0')
         return NULL;
     for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
         a = a->next) {
-        d = (spec_direction *)(a->data.v);
+        spec_direction *d = (spec_direction *)(a->data.v);
 
         if (d->active && strcmp(token, d->keyword) == 0) {
             return findregion(d->x, d->y);

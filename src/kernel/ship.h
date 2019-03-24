@@ -57,8 +57,8 @@ extern "C" {
         int minskill;               /* min. skill to sail this (crew) */
         int sumskill;               /* min. sum of crew+captain */
 
-        int at_bonus;               /* Ver�ndert den Angriffsskill (default: 0) */
-        int df_bonus;               /* Ver�ndert den Verteidigungskill (default: 0) */
+        int at_bonus;               /* Veraendert den Angriffsskill (default: 0) */
+        int df_bonus;               /* Veraendert den Verteidigungskill (default: 0) */
         double tac_bonus;
 
         struct terrain_type ** coasts; /* coast that this ship can land on */

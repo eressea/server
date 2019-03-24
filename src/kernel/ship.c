@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "ship.h"
 
@@ -71,7 +73,8 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
         selist *ql;
         int qi;
 
-        sn = (local_names *)calloc(sizeof(local_names), 1);
+        sn = (local_names *)calloc(1, sizeof(local_names));
+        if (!sn) abort();
         sn->next = snames;
         sn->lang = lang;
 
@@ -124,7 +127,8 @@ ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     assert(!snames);
     if (!st) {
-        st = (ship_type *)calloc(sizeof(ship_type), 1);
+        st = (ship_type *)calloc(1, sizeof(ship_type));
+        if (!st) abort();
         st->_name = str_strdup(name);
         st->storm = 1.0;
         st->tac_bonus = 1.0;
@@ -189,6 +193,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     ship *sh = (ship *)calloc(1, sizeof(ship));
     const char *sname = 0;
 
+    if (!sh) abort();
     assert(stype);
     sh->no = newcontainerid();
     sh->coast = NODIRECTION;
@@ -356,8 +361,9 @@ int shipspeed(const ship * sh, const unit * u)
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
-            bonus = MIN(bonus, crew_bonus);
-            bonus = MIN(bonus, sh->type->range_max - sh->type->range);
+            int sbonus = sh->type->range_max - sh->type->range;
+            if (bonus > sbonus) bonus = sbonus;
+            if (bonus > crew_bonus) bonus = crew_bonus;
         }
         else {
             bonus = 0;
@@ -436,7 +442,7 @@ static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
 
-    /* Eigent�mer tot oder kein Eigent�mer vorhanden. Erste lebende Einheit
+    /* Eigentuemer tot oder kein Eigentuemer vorhanden. Erste lebende Einheit
       * nehmen. */
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {

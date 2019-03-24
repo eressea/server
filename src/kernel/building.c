@@ -136,6 +136,7 @@ building_type *bt_get_or_create(const char *name)
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
             btype = (building_type *)calloc(1, sizeof(building_type));
+            if (!btype) abort();
             btype->_name = str_strdup(name);
             btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;
@@ -285,7 +286,8 @@ static local_names *get_bnames(const struct locale *lang)
         selist *ql = buildingtypes;
         int qi;
 
-        bn = (local_names *)calloc(sizeof(local_names), 1);
+        bn = (local_names *)calloc(1, sizeof(local_names));
+        if (!bn) abort();
         bn->next = bnames;
         bn->lang = lang;
 
@@ -378,6 +380,7 @@ int read_building_reference(gamedata * data, building **bp)
 building *building_create(int id)
 {
     building *b = (building *)calloc(1, sizeof(building));
+    if (!b) abort();
     b->no = id;
     bhash(b);
     return b;
@@ -444,7 +447,7 @@ void remove_building(building ** blist, building * b)
     b->size = 0;
     bunhash(b);
 
-    /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
+    /* Falls Karawanserei, Damm oder Tunnel einstuerzen, wird die schon
      * gebaute Strasse zur Haelfte vernichtet */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         int d;
@@ -557,8 +560,8 @@ void building_set_owner(struct unit * owner)
 static unit *building_owner_ex(const building * bld, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
-    /* Eigent�mer tot oder kein Eigent�mer vorhanden. Erste lebende Einheit
-      * nehmen. */
+    /* Eigentuemer tot oder kein Eigentuemer vorhanden.
+     * Erste lebende Einheit nehmen. */
     for (u = bld->region->units; u; u = u->next) {
         if (u->building == bld) {
             if (u->number > 0) {
@@ -708,7 +711,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     }
     return best;
 }
-/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern */
+/* Lohn bei den einzelnen Burgstufen fuer Normale Typen, Orks, Bauern */
 
 static const int wagetable[7][3] = {
     { 10, 10, 11 },             /* Baustelle */
@@ -767,7 +770,7 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         }
         vm = frac_make(wage, 1);
 
-        /* Bei einer D�rre verdient man nur noch ein Viertel  */
+        /* Bei einer Duerre verdient man nur noch ein Viertel  */
         c = get_curse(r->attribs, &ct_drought);
         if (c && curse_active(c)) {
             vm = frac_mul(vm, frac_make(1, curse_geteffect_int(c)));
@@ -791,8 +794,9 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-/* Gibt Arbeitslohn f�r entsprechende Rasse zur�ck, oder f�r
-* die Bauern wenn f == NULL. */
+/**
+ * Gibt Arbeitslohn fuer entsprechende Rasse zurueck, oder fuer
+ * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
     static int config;

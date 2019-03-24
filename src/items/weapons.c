@@ -16,7 +16,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
+
 #include "weapons.h"
 #include "battle.h"
 
@@ -106,7 +109,7 @@ int *casualties)
     }
 
     enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
-    enemies = MIN(enemies, CATAPULT_ATTACKS);
+    if (enemies > CATAPULT_ATTACKS) enemies = CATAPULT_ATTACKS;
     if (enemies == 0) {
         return true;                /* allow further attacks */
     }
