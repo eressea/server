@@ -32,6 +32,10 @@ function test_undead_reserve_other()
     process_orders()
 
     assert_equal(0, u1:get_item("log"))
+    if 2 ~= u2:get_item("log") then
+        -- try to catch that intermittent bug:
+        print(u2:show())
+    end
     assert_equal(2, u2:get_item("log"))
 end
 
