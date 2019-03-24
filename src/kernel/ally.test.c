@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "types.h"
 #include "ally.h"
+#include "faction.h"
 
 #include <CuTest.h>
 #include <tests.h>
@@ -41,11 +42,36 @@ static void test_allies(CuTest *tc) {
     test_teardown();
 }
 
+static void test_allies_set(CuTest *tc) {
+    struct faction *f1, *f2;
+    struct allies * al = NULL;
+
+    test_setup();
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+
+    CuAssertPtrEquals(tc, NULL, al);
+    ally_set(&al, f1, HELP_ALL);
+    CuAssertPtrNotNull(tc, al);
+    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, NULL, f1->allies);
+    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, NULL, al);
+
+    ally_set(&al, f1, HELP_ALL);
+    ally_set(&al, f2, DONT_HELP);
+    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, NULL, al);
+
+    test_teardown();
+}
+
 CuSuite *get_ally_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_allies);
     SUITE_ADD_TEST(suite, test_allies_clone);
+    SUITE_ADD_TEST(suite, test_allies_set);
     return suite;
 }
 
