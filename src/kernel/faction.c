@@ -564,8 +564,12 @@ const char *faction_getpassword(const faction *f) {
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(pwhash);
-    f->password_id = dbstring_save(pwhash);
+    if (pwhash) {
+        f->password_id = dbstring_save(pwhash);
+    }
+    else {
+        f->password_id = 0;
+    }
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
