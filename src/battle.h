@@ -121,7 +121,6 @@ extern "C" {
     } battle;
 
     typedef struct weapon {
-        int count, used;
         const struct weapon_type *type;
         int attackskill;
         int defenseskill;
