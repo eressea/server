@@ -41,8 +41,9 @@
 #define CRYPT_VERSION 363 /* passwords are encrypted */
 #define FAMILIAR_FIXMAGE_VERSION 364 /* familiar links are fixed */
 #define FAMILIAR_FIXSPELLBOOK_VERSION 365 /* familiar spells are fixed */
+#define FIX_STARTLEVEL_VERSION 366 /* fixing resource startlevels */
 
-#define RELEASE_VERSION FAMILIAR_FIXSPELLBOOK_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_STARTLEVEL_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
