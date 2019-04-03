@@ -630,6 +630,7 @@ static void fix_baselevel(region *r) {
                 }
             }
         }
+
     }
 }
 
@@ -801,6 +802,11 @@ static region *readregion(gamedata *data, int x, int y)
         }
     }
     read_attribs(data, &r->attribs, r);
+
+    if (r->resources && data->version < FIX_STARTLEVEL_VERSION) {
+        /* we had some badly made rawmaterials before this */
+        fix_baselevel(r);
+    }
     return r;
 }
 

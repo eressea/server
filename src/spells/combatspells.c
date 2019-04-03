@@ -298,35 +298,35 @@ int sp_combatrosthauch(struct castorder * co)
 
         for (w = 0; df->weapons[w].type != NULL; ++w) {
             weapon *wp = df->weapons;
-            int n = force;
-            if (n > wp->used) n = wp->used;
-            if (n) {
-                requirement *mat = wp->type->itype->construction->materials;
-                bool iron = false;
-                while (mat && mat->number > 0) {
-                    if (mat->rtype == get_resourcetype(R_IRON)) {
-                        iron = true;
-                        break;
-                    }
-                    mat++;
-                }
-                if (iron) {
-                    int p;
-                    force -= n;
-                    wp->used -= n;
-                    k += n;
-                    i_change(&df->unit->items, wp->type->itype, -n);
-                    for (p = 0; n && p != df->unit->number; ++p) {
-                        if (df->person[p].missile == wp) {
-                            df->person[p].missile = NULL;
-                            --n;
+            if (df->unit->items && force > 0) {
+                item ** itp = i_find(&df->unit->items, wp->type->itype);
+                if (*itp) {
+                    item *it = *itp;
+                    requirement *mat = wp->type->itype->construction->materials;
+                    int n = force;
+                    if (it->number < n) n = it->number;
+
+                    while (mat && mat->number > 0) {
+                        if (mat->rtype == get_resourcetype(R_IRON)) {
+                            int p;
+                            force -= n;
+                            k += n;
+                            i_change(itp, wp->type->itype, -n);
+                            for (p = 0; n && p != df->unit->number; ++p) {
+                                if (df->person[p].melee == wp) {
+                                    df->person[p].melee = NULL;
+                                    --n;
+                                }
+                            }
+                            for (p = 0; n && p != df->unit->number; ++p) {
+                                if (df->person[p].missile == wp) {
+                                    df->person[p].missile = NULL;
+                                    --n;
+                                }
+                            }
+                            break;
                         }
-                    }
-                    for (p = 0; n && p != df->unit->number; ++p) {
-                        if (df->person[p].melee == wp) {
-                            df->person[p].melee = NULL;
-                            --n;
-                        }
+                        mat++;
                     }
                 }
             }

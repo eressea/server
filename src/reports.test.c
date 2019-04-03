@@ -963,6 +963,7 @@ static void test_reports_genpassword(CuTest *tc) {
     CuAssertTrue(tc, f->password_id != 0);
     test_clear_messagelist(&f->msgs);
     f->lastorders = 1;
+    f->age = 2;
     pwid = f->password_id;
     write_reports(f);
     CuAssertIntEquals(tc, pwid, f->password_id);

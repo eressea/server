@@ -88,7 +88,7 @@ const char *itoab_r(int i, int base, char *s, size_t len)
             }
         }
         else {
-            log_error("static buffer exhauset, itoab(%d, %d)", i, base);
+            log_error("static buffer exhausted, itoab(%d, %d)", i, base);
             assert(i == 0 || !"itoab: static buffer exhausted");
         }
     }

@@ -1509,7 +1509,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
     if ((mode & HELP_ALL) == HELP_ALL) {
         sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
     }
-    else {
+    else if (mode > 0) {
         int h, hh = 0;
         for (h = 1; h <= HELP_TRAVEL; h *= 2) {
             int p = MAXPARAMS;
@@ -2173,8 +2173,8 @@ report_plaintext(const char *filename, report_context * ctx,
 
         if (wants_stats && r->seen.mode >= seen_travel) {
             if (r->land || r->seen.mode >= seen_unit) {
-                newline(out);
                 statistics(out, r, f);
+                newline(out);
             }
         }
 
