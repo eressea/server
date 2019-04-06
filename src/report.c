@@ -1216,14 +1216,14 @@ static void statistics(struct stream *out, const region * r, const faction * f)
 
         if (!markets_module()) {
             if (buildingtype_exists(r, bt_find("caravan"), true)) {
-                m = msg_message("nr_stat_luxuries", "max", (p * 2) / TRADE_FRACTION);
+                p *= 2;
             }
-            else {
+            if (p >= TRADE_FRACTION) {
                 m = msg_message("nr_stat_luxuries", "max", p / TRADE_FRACTION);
+                nr_render(m, f->locale, buf, sizeof(buf), f);
+                paragraph(out, buf, 2, 2, 0);
+                msg_release(m);
             }
-            nr_render(m, f->locale, buf, sizeof(buf), f);
-            paragraph(out, buf, 2, 2, 0);
-            msg_release(m);
         }
 
         /* count */
