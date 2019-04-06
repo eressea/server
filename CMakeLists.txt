@@ -31,9 +31,6 @@ ELSE (HAVE_LIBBSD)
 CHECK_FUNCTION_EXISTS(strlcat HAVE_STRLCAT)
 ENDIF(HAVE_LIBBSD)
 
-endif (MSVC)
-
-if (MSVC)
 find_package (PDCurses)
 SET(CURSES_FOUND ${PDCURSES_FOUND})
 SET(CURSES_LIBRARIES ${PDCURSES_LIBRARY})
@@ -42,7 +39,8 @@ else (MSVC)
 find_package (Curses)
 endif (MSVC)
 
-find_package (Readline)
+# find_package (Readline)
+find_package (EXPAT REQUIRED)
 
 if (ERESSEA_DB STREQUAL "db")
 find_package (BerkeleyDB REQUIRED QUIET)
@@ -50,7 +48,6 @@ else()
 find_package (SQLite3 REQUIRED QUIET)
 endif()
 
-find_package(EXPAT REQUIRED)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
 if (${TOLUA_VERSION_STRING} VERSION_EQUAL "5.2")
