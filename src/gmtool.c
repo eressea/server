@@ -1143,7 +1143,7 @@ static void handlekey(state * st, int c)
         else {
             n = minpop;
         }
-        build_island_e3(nx, ny, n, NULL, 0);
+        build_island(nx, ny, n, NULL, 0);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;

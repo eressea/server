@@ -64,6 +64,4 @@ void gamedata_close(gamedata *data);
 gamedata *gamedata_open(const char *filename, const char *mode, int version);
 int gamedata_openfile(gamedata *data, const char *filename, const char *mode, int version);
 
-#define STREAM_VERSION 2 /* internal encoding of binary files */
-
 #endif
