@@ -1607,7 +1607,6 @@ static void allies(struct stream *out, const faction * f)
         }
         g = g->next;
     }
-    rpline(out);
 }
 
 static void guards(struct stream *out, const region * r, const faction * see)
@@ -1703,8 +1702,6 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
         }
         selist_advance(&flist, &qi, 1);
     }
-    newline(out);
-    rpline(out);
 }
 
 static void
@@ -2130,9 +2127,10 @@ report_plaintext(const char *filename, report_context * ctx,
             continue;
         /* Beschreibung */
 
+        rpline(out);
+        newline(out);
         if (r->seen.mode >= seen_unit) {
             anyunits = 1;
-            newline(out);
             report_region(out, r, f);
             if (markets_module() && r->land) {
                 const item_type *lux = r_luxury(r);
@@ -2169,20 +2167,21 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
-        newline(out);
 
         if (wants_stats && r->seen.mode >= seen_travel) {
             if (r->land || r->seen.mode >= seen_unit) {
-                statistics(out, r, f);
                 newline(out);
+                statistics(out, r, f);
             }
         }
 
         /* Nachrichten an REGION in der Region */
         if (r->seen.mode >= seen_travel) {
             message_list *mlist = r_getmessages(r, f);
+            newline(out);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
+                newline(out);
                 rp_messages(out, mlist, f, 0, false);
                 split_messages(mlist, split);
             }
@@ -2236,7 +2235,6 @@ report_plaintext(const char *filename, report_context * ctx,
         assert(!u);
 
         newline(out);
-        rpline(out);
         ERRNO_CHECK();
     }
     if (!is_monsters(f)) {
