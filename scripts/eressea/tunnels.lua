@@ -27,11 +27,21 @@ end
 local function tunnel_action(b, param)
   local units = tunnel_travelers(b)
   local rto = get_target(param)
+  eressea.log.info("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
   if rto and units then
-    eressea.log.debug("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
-    for key, u in pairs(units) do
+    for _, u in pairs(units) do
         u.region = rto
-        eressea.log.debug("teleported " .. tostring(u) .. " to " .. tostring(rto))
+        eressea.log.info("teleported " .. tostring(u) .. " to " .. tostring(rto))
+    end
+  elseif not units then 
+    eressea.log.info("No units in tunnel " .. tostring(b) .. " [" .. param .. "]")
+  elseif not rto then 
+    eressea.log.error("No target for tunnel " .. tostring(b) .. " [" .. param .. "]")
+  end
+  -- debug code to find bugs:
+  for u in b.region.units do
+    if u.building == b then
+        eressea.log.error("Did not teleport " .. tostring(u) .. " from tunnel " .. tostring(b))
     end
   end
 end
