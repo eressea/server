@@ -848,13 +848,12 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        const char *pzRace = LOC(lang, mkname("race", pzTmp));
-        pzTmp = pzRace ? pzRace : pzTmp;
-        stream_printf(out, "\"%s\";Typ\n", translate(pzTmp, LOC(lang, pzTmp)));
+        const char *pzRace = locale_string(lang, mkname("race", pzTmp), false);
+        pzTmp = pzRace ? translate(pzRace, LOC(lang, pzRace)) : pzTmp;
+        stream_printf(out, "\"%s\";Typ\n", pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             pzRace = rc_name_s(u_race(u), NAME_PLURAL);
-            stream_printf(out, "\"%s\";wahrerTyp\n",
-                translate(pzRace, LOC(lang, pzRace)));
+            stream_printf(out, "\"%s\";wahrerTyp\n", pzTmp);
         }
     }
     else {

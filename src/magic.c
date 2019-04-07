@@ -2237,7 +2237,7 @@ static void equip_familiar(unit *fam) {
 
     snprintf(eqname, sizeof(eqname), "fam_%s", rc->_name);
     if (!equip_unit(fam, eqname)) {
-        log_info("could not perform initialization for familiar %s.\n", rc->_name);
+        log_debug("could not perform initialization for familiar %s.\n", rc->_name);
     }
 }
 
