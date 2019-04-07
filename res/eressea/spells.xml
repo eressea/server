@@ -446,12 +446,13 @@
     <resource name="permaura" amount="10" cost="fixed"/>
     <resource name="toadslime" amount="1" cost="fixed"/>
   </spell>
-  <spell name="clone" rank="5">
+     <!-- Seelenkopie, disabled version 3.20, Bug 1982
+ <spell name="clone" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="20" cost="fixed"/>
     <resource name="dragonblood" amount="5" cost="fixed"/>
     <resource name="lifepotion" amount="5" cost="fixed"/>
-  </spell>
+  </spell> -->
   <spell name="drain_skills" rank="5" combat="2">
     <resource name="aura" amount="4" cost="fixed"/>
   </spell>
