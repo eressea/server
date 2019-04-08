@@ -100,7 +100,7 @@ struct locale *crtag_locale(void) {
     static int config;
     if (config_changed(&config)) {
         const char *lname = config_get("creport.tags");
-        lang = get_locale(lname ? lname : "de");
+        lang = lname ? get_locale(lname) : default_locale;
     }
     return lang;
 }
