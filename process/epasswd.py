@@ -45,7 +45,9 @@ class EPasswd:
     def load_database(self, file):
         conn = sqlite3.connect(file)
         c = conn.cursor()
-        for row in c.execute('SELECT no, email, password FROM factions ORDER BY turn'):
+        c.execute('SELECT MAX(turn) FROM factions')
+        args = c.fetchone()
+        for row in c.execute('SELECT no, email, password FROM factions WHERE turn=?', args):
             (no, email, passwd) = row
             self.set_data(baseconvert(no, 36), email, passwd)
         conn.close()
