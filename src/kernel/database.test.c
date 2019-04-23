@@ -47,19 +47,26 @@ static void test_save_load_order(CuTest *tc) {
 
 static void test_update_faction(CuTest *tc) {
     faction *f;
-    int uid;
+    int err;
+    dbrow_id id;
 
     test_setup();
     db_driver_open(DB_GAME, NULL);
     f = test_create_faction(NULL);
-    uid = db_driver_faction_save(f->uid, f->no, 0,
+    CuAssertIntEquals(tc, 0, f->uid);
+    id = 0;
+    err = db_driver_faction_save(&id, f->no,
         faction_getemail(f),
         faction_getpassword(f));
-    f->uid = uid;
-    uid = db_driver_faction_save(f->uid, f->no, 0,
+    CuAssertTrue(tc, 0 != id);
+    f->uid = (int)id;
+    db_driver_close(DB_GAME);
+
+    db_driver_open(DB_GAME, NULL);
+    db_driver_faction_save(&id, f->no,
         faction_getemail(f),
         faction_getpassword(f));
-    CuAssertIntEquals(tc, f->uid, uid);
+    CuAssertIntEquals(tc, f->uid, id);
     db_driver_close(DB_GAME);
     test_teardown();
 }

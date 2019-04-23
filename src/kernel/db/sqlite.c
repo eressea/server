@@ -95,68 +95,104 @@ dbrow_id db_driver_order_save(const char *str) {
     return (dbrow_id)id;
 }
 
-
-dbrow_id db_driver_faction_save(dbrow_id id, int no, int turn, const char *email, const char *password)
+int db_driver_faction_save(dbrow_id * p_id, int no, const char *email, const char *password)
 {
-    sqlite3_int64 row_id;
+    dbrow_id id = *p_id;
     int err;
+    sqlite3_stmt *stmt = (id > 0) ? g_stmt_update_faction : g_stmt_insert_faction;
 
     assert(g_game_db);
-    if (id != 0) {
-        int rows;
 
-        err = sqlite3_reset(g_stmt_update_faction);
-        assert(err == SQLITE_OK);
-        err = sqlite3_bind_int(g_stmt_update_faction, 1, no);
-        assert(err == SQLITE_OK);
-        err = sqlite3_bind_int(g_stmt_update_faction, 2, turn);
-        assert(err == SQLITE_OK);
-        err = sqlite3_bind_text(g_stmt_update_faction, 3, email, -1, SQLITE_STATIC);
-        assert(err == SQLITE_OK);
-        err = sqlite3_bind_text(g_stmt_update_faction, 4, password, -1, SQLITE_STATIC);
-        assert(err == SQLITE_OK);
-        err = sqlite3_bind_int(g_stmt_update_faction, 5, id);
-        assert(err == SQLITE_OK);
-        err = sqlite3_step(g_stmt_update_faction);
-        assert(err == SQLITE_DONE);
-        rows = sqlite3_changes(g_game_db);
-        if (rows != 0) {
-            return id;
-        }
+    err = sqlite3_reset(stmt);
+    if (err != SQLITE_OK) return err;
+    err = sqlite3_bind_int(stmt, 1, no);
+    if (err != SQLITE_OK) return err;
+    err = sqlite3_bind_text(stmt, 2, email, -1, SQLITE_STATIC);
+    if (err != SQLITE_OK) return err;
+    err = sqlite3_bind_text(stmt, 3, password, -1, SQLITE_STATIC);
+    if (err != SQLITE_OK) return err;
+
+    if (id > 0) {
+        err = sqlite3_bind_int(stmt, 4, id);
+        if (err != SQLITE_OK) return err;
     }
-    err = sqlite3_reset(g_stmt_insert_faction);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_int(g_stmt_insert_faction, 1, no);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_int(g_stmt_insert_faction, 2, turn);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_faction, 3, email, -1, SQLITE_STATIC);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_faction, 4, password, -1, SQLITE_STATIC);
-    assert(err == SQLITE_OK);
-    err = sqlite3_step(g_stmt_insert_faction);
-    assert(err == SQLITE_DONE);
+    err = sqlite3_step(stmt);
+    if (err != SQLITE_DONE) return err;
     ERRNO_CHECK();
 
-    row_id = sqlite3_last_insert_rowid(g_game_db);
-    assert(row_id>0 && row_id <= UINT_MAX);
-    return (dbrow_id)row_id;
+    if (id <= 0) {
+        sqlite3_int64 row_id;
+        row_id = sqlite3_last_insert_rowid(g_game_db);
+        assert(row_id > 0 && row_id <= UINT_MAX);
+        *p_id = (dbrow_id)row_id;
+    }
+    return SQLITE_OK;
+}
+
+int db_driver_update_factions(db_faction_generator gen, void *data)
+{
+    db_faction results[32];
+    int num, err;
+
+    err = sqlite3_exec(g_game_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
+    assert(err == SQLITE_OK);
+    err = sqlite3_exec(g_game_db, "DELETE FROM `faction`", NULL, NULL, NULL);
+    if (err != SQLITE_OK) {
+        sqlite3_exec(g_game_db, "ROLLBACK", NULL, NULL, NULL);
+        return err;
+    }
+    num = gen(data, results, 32);
+    while (num > 0) {
+        int i;
+        for (i = 0; i != num; ++i) {
+            db_faction *dbf = results + i;
+            dbrow_id id = (dbrow_id)*dbf->p_uid;
+            err = db_driver_faction_save(&id, dbf->no, dbf->email, dbf->pwhash);
+            if (err != SQLITE_OK) {
+                sqlite3_exec(g_game_db, "ROLLBACK", NULL, NULL, NULL);
+                return err;
+            }
+            assert(id > 0 && id <= INT_MAX);
+            *dbf->p_uid = (int)id;
+        }
+        num = gen(data, results, 32);
+    }
+    err = sqlite3_exec(g_game_db, "COMMIT", NULL, NULL, NULL);
+    return err;
+}
+
+static int cb_int_col(void *data, int ncols, char **text, char **name) {
+    int *p_int = (int *)data;
+    *p_int = atoi(text[0]);
+    return SQLITE_OK;
 }
 
 static int db_open_game(const char *dbname) {
-    int err;
+    int err, version = 0;
 
     err = sqlite3_open(dbname, &g_game_db);
     assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_game_db, "CREATE TABLE IF NOT EXISTS factions (id INTEGER PRIMARY KEY, no INTEGER NOT NULL, email VARCHAR(128), password VARCHAR(128), turn INTEGER NOT NULL)", NULL, NULL, NULL);
+
+    err = sqlite3_exec(g_game_db, "PRAGMA user_version", cb_int_col, &version, NULL);
     assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_game_db, "UPDATE factions SET no=?, turn=?, email=?, password=? WHERE id=?", -1, &g_stmt_update_faction, NULL);
+    if (version < 1) {
+        /* drop deprecated table */
+        err = sqlite3_exec(g_game_db, "DROP TABLE IF EXISTS `factions`", NULL, NULL, NULL);
+        assert(err == SQLITE_OK);
+        /* install schema version 1: */
+        err = sqlite3_exec(g_game_db, "CREATE TABLE IF NOT EXISTS `faction` (`id` INTEGER PRIMARY KEY, `no` INTEGER NOT NULL UNIQUE, `email` VARCHAR(128), `password` VARCHAR(128))", NULL, NULL, NULL);
+        assert(err == SQLITE_OK);
+        err = sqlite3_exec(g_game_db, "PRAGMA user_version = 1", NULL, NULL, NULL);
+        assert(err == SQLITE_OK);
+    }
+    /* create prepared statments: */
+    err = sqlite3_prepare_v2(g_game_db, "INSERT INTO `faction` (`no`, `email`, `password`, `id`) VALUES (?,?,?,?)", -1, &g_stmt_update_faction, NULL);
     assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_game_db, "INSERT INTO factions (no, turn, email, password) VALUES (?,?,?,?)", -1, &g_stmt_insert_faction, NULL);
+    err = sqlite3_prepare_v2(g_game_db, "INSERT INTO `faction` (`no`, `email`, `password`) VALUES (?,?,?)", -1, &g_stmt_insert_faction, NULL);
     assert(err == SQLITE_OK);
 
     ERRNO_CHECK();
-    return 0;
+    return err;
 }
 
 static int db_open_swap(const char *dbname) {
@@ -303,3 +339,13 @@ const char *db_driver_string_load(dbrow_id id, size_t *size) {
     ERRNO_CHECK();
     return NULL;
 }
+
+void db_driver_compact(int turn)
+{
+    int err;
+
+    /* repack database: */
+    err = sqlite3_exec(g_game_db, "VACUUM", 0, 0, 0);
+    assert(err == SQLITE_OK);
+}
+
