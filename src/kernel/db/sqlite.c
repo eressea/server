@@ -3,6 +3,7 @@
 #include <kernel/config.h>
 
 #include <util/log.h>
+#include <util/base36.h>
 
 #include "driver.h"
 
@@ -105,7 +106,7 @@ int db_driver_faction_save(dbrow_id * p_id, int no, const char *email, const cha
 
     err = sqlite3_reset(stmt);
     if (err != SQLITE_OK) return err;
-    err = sqlite3_bind_int(stmt, 1, no);
+    err = sqlite3_bind_text(stmt, 1, itoa36(no), -1, SQLITE_STATIC);
     if (err != SQLITE_OK) return err;
     err = sqlite3_bind_text(stmt, 2, email, -1, SQLITE_STATIC);
     if (err != SQLITE_OK) return err;
@@ -179,10 +180,12 @@ static int db_open_game(const char *dbname) {
         /* drop deprecated table */
         err = sqlite3_exec(g_game_db, "DROP TABLE IF EXISTS `factions`", NULL, NULL, NULL);
         assert(err == SQLITE_OK);
-        /* install schema version 1: */
-        err = sqlite3_exec(g_game_db, "CREATE TABLE IF NOT EXISTS `faction` (`id` INTEGER PRIMARY KEY, `no` INTEGER NOT NULL UNIQUE, `email` VARCHAR(128), `password` VARCHAR(128))", NULL, NULL, NULL);
+    }
+    if (version < 2) {
+        /* install schema version 2: */
+        err = sqlite3_exec(g_game_db, "CREATE TABLE IF NOT EXISTS `faction` (`id` INTEGER PRIMARY KEY, `no` CHAR(4) NOT NULL UNIQUE, `email` VARCHAR(128), `password` VARCHAR(128))", NULL, NULL, NULL);
         assert(err == SQLITE_OK);
-        err = sqlite3_exec(g_game_db, "PRAGMA user_version = 1", NULL, NULL, NULL);
+        err = sqlite3_exec(g_game_db, "PRAGMA user_version = 2", NULL, NULL, NULL);
         assert(err == SQLITE_OK);
     }
     /* create prepared statments: */
