@@ -17,10 +17,12 @@ static int generate_factions(void *data, db_faction *results, int nresults)
     faction **iter = (faction **)data;
     for (i = 0; *iter && i != nresults; ++i) {
         faction *f = *iter;
+        const char *pwhash;
         results[i].p_uid = &f->uid;
         results[i].no = f->no;
         results[i].email = faction_getemail(f);
-        str_strlcpy(results[i].pwhash, faction_getpassword(f), sizeof(results[i].pwhash));
+        pwhash = faction_getpassword(f);
+        str_strlcpy(results[i].pwhash, pwhash ? pwhash : "", sizeof(results[i].pwhash));
         *iter = f->next;
     }
     return i;
