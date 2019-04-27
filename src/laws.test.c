@@ -221,6 +221,21 @@ static void test_display_cmd(CuTest *tc) {
     CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
     free_order(ord);
 
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_UNIT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", unit_getinfo(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Hodor", uprivate(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", uprivate(u));
+    free_order(ord);
+
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
     CuAssertPtrEquals(tc, NULL, (void *)unit_getinfo(u));
@@ -940,6 +955,12 @@ static void test_name_unit(CuTest *tc) {
 
     u = setup_name_cmd();
     f = u->faction;
+
+    ord = create_order(K_NAME, f->locale, "%s ' Klabauterfrau '", LOC(f->locale, parameters[P_UNIT]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Klabauterfrau", u->_name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->_name);
@@ -960,10 +981,15 @@ static void test_name_region(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
+    u_set_building(u, test_create_building(u->region, NULL));
     f = u->faction;
 
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->region->land->name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
-    u_set_building(u, test_create_building(u->region, NULL));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
@@ -980,6 +1006,7 @@ static void test_name_region(CuTest *tc) {
 static void test_name_building(CuTest *tc) {
     unit *uo, *u, *ux;
     faction *f;
+    order *ord;
 
     u = setup_name_cmd();
     u->building = test_create_building(u->region, NULL);
@@ -989,29 +1016,33 @@ static void test_name_building(CuTest *tc) {
     ux = test_create_unit(f, test_create_region(0, 0, NULL));
     u_set_building(ux, u->building);
 
-    u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
-
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_BUILDING]));
     building_set_owner(uo);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error148"));
     test_clear_messages(f);
-
     building_set_owner(u);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->building->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
 
     building_setname(u->building, "Home");
     building_set_owner(ux);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error148"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
-
     test_clear_messages(f);
-    free_order(u->thisorder);
-    u->thisorder = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
-    name_cmd(u, u->thisorder);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
 
     /* TODO: test BTF_NAMECHANGE:
     btype->flags |= BTF_NAMECHANGE;

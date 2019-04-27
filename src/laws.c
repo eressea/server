@@ -1488,7 +1488,7 @@ int display_cmd(unit * u, struct order *ord)
 {
     char token[128];
     char **s = NULL;
-    const char *str;
+    char *str;
     region *r = u->region;
 
     init_order_depr(ord);
@@ -1525,11 +1525,19 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        unit_setinfo(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        unit_setinfo(u, str);
         break;
 
     case P_PRIVAT:
-        usetprivate(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        usetprivate(u, str);
         break;
 
     case P_REGION:
@@ -1664,7 +1672,7 @@ int name_cmd(struct unit *u, struct order *ord)
     bool foreign = false;
     const char *str;
 
-    init_order_depr(ord);
+    init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
 

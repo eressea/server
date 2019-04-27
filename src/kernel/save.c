@@ -1368,6 +1368,72 @@ static void fix_fam_triggers(unit *u) {
     }
 }
 
+static void fix_clone(unit *uc) {
+    attrib * a;
+    assert(uc);
+    assert(uc->number > 0);
+    ADDMSG(&uc->faction->msgs, msg_message("dissolve_units_5",
+        "unit region number race", uc, uc->region, uc->number, u_race(uc)));
+    a_removeall(&uc->attribs, &at_clonemage);
+    a = a_new(&at_unitdissolve);
+    a->data.ca[0] = 0;
+    a->data.ca[1] = 100;
+    a_add(&uc->attribs, a);
+}
+
+static void fix_clone_mage(unit *um, const item_type *itype) {
+    i_change(&um->items, itype, 1);
+    change_maxspellpoints(um, 20);
+    a_removeall(&um->attribs, &at_clone);
+}
+
+static void fix_clones(void) {
+    const race *rc_clone = rc_find("clone");
+    const item_type *it_potion = it_find("lifepotion");
+    
+    if (rc_clone && it_potion) {
+        region *r;
+        for (r = regions; r; r = r->next) {
+            unit * u;
+            for (u = r->units; u; u = u->next) {
+                if (!fval(u, UFL_MARK)) {
+                    if (u_race(u) == rc_clone) {
+                        attrib *a = a_find(u->attribs, &at_clonemage);
+                        unit * um = NULL;
+                        fset(u, UFL_MARK);
+                        if (a) {
+                            um = (unit *)a->data.v;
+                            fset(um, UFL_MARK);
+                        }
+                    }
+                    else {
+                        attrib *a = a_find(u->attribs, &at_clone);
+                        if (a) {
+                            unit *uc = (unit *)a->data.v;
+                            fset(u, UFL_MARK);
+                            fset(uc, UFL_MARK);
+                        }
+                    }
+                }
+            }
+        }
+        for (r = regions; r; r = r->next) {
+            unit * u;
+            for (u = r->units; u; u = u->next) {
+                if (fval(u, UFL_MARK)) {
+                    if (u_race(u) == rc_clone) {
+                        fix_clone(u);
+                    }
+                    else {
+                        fix_clone_mage(u, it_potion);
+                    }
+                    freset(u, UFL_MARK);
+                }
+            }
+        }
+    }
+}
+
 static void fix_familiars(void (*callback)(unit *)) {
     region *r;
     for (r = regions; r; r = r->next) {
@@ -1559,7 +1625,9 @@ int read_game(gamedata *data)
             }
         }
     }
-
+    if (data->version < FIX_CLONES_VERSION) {
+        fix_clones();
+    }
     if (data->version < FAMILIAR_FIX_VERSION) {
         fix_familiars(fix_fam_triggers);
     }

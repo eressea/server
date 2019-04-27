@@ -54,7 +54,7 @@ hostname = gethostname()
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
-maxfiles = 20
+maxfiles = 30
 # write headers to file?
 writeheaders = True
 # reject all html email?
