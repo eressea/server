@@ -53,7 +53,7 @@ static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
-static int verbosity = 1;
+static int verbosity = 2;
 
 static void load_inifile(void)
 {
@@ -183,7 +183,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr, log_flags = 2;
+    int log_stderr, log_flags = 3;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
