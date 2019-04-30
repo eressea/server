@@ -587,9 +587,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unknown option.
 msgid "error131"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a tunnel before building roads through glaciers.\""
 
-msgid "error241"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The faction must be at least 81 weeks old to restart with a new race.\""
-
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit could not be found.\""
 
@@ -1119,7 +1116,7 @@ msgid "dissolve_units_4"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) turned to dust.\""
 
 msgid "error281"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - What race did you want the jihad to be against?\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The target faction must have the same race as yours.\""
 
 msgid "error171"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - This combat spell does not exist.\""
@@ -1783,9 +1780,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - No peasant coul
 
 msgid "error50"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not experienced enough to do this.\""
-
-msgid "error282"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot start a jihad against this race.\""
 
 msgid "nmr_warning_final"
 msgstr "\"Please send in orders for the next turn if you want to continue playing.\""

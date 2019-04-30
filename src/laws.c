@@ -395,8 +395,7 @@ static void peasants(region * r, int rule)
     dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("phunger", "dead", dead));
         peasants -= dead;
     }
 
@@ -941,6 +940,10 @@ int leave_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+int transfer_faction(faction *fsrc, faction *fdst) {
+    return 0;
+}
+
 int quit_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -952,6 +955,34 @@ int quit_cmd(unit * u, struct order *ord)
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
+        param_t p;
+        p = getparam(f->locale);
+        if (p == P_FACTION) {
+            faction *f2 = getfaction();
+            if (f2 == NULL) {
+                cmistake(u, ord, 66, MSG_EVENT);
+            } 
+            else if (f->race != f2->race) {
+                cmistake(u, ord, 281, MSG_EVENT);
+            }
+            else {
+                unit *u2;
+                for (u2 = u->region->units; u2; u2 = u2->next) {
+                    if (u2->faction == f2 && ucontact(u2, u)) {
+                        int err = transfer_faction(u->faction, u2->faction);
+                        if (err != 0) {
+                            /* something went wrong */
+                            cmistake(u, ord, err, MSG_EVENT);
+                        }
+                        break;
+                    }
+                }
+                if (u2 == NULL) {
+                    /* no target unit found */
+                    cmistake(u, ord, 0, MSG_EVENT);
+                }
+            }
+        }
         fset(f, FFL_QUIT);
     }
     else {
@@ -2077,7 +2108,7 @@ int banner_cmd(unit * u, struct order *ord)
     init_order_depr(ord);
     s = getstrtoken();
     faction_setbanner(u->faction, s);
-    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
+    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }
