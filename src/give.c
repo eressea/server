@@ -299,7 +299,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
     return false;
 }
 
-static bool rule_transfermen(void)
+bool rule_transfermen(void)
 {
     int rule = config_get_int("rules.transfermen", 1);
     return rule != 0;
@@ -472,9 +472,23 @@ message * disband_men(int n, unit * u, struct order *ord) {
     return msg_message("give_person_peasants", "unit amount", u, n);
 }
 
+int give_unit_allowed(const unit * u)
+{
+    if (unit_has_cursed_item(u)) {
+        return 78;
+    }
+    if (fval(u, UFL_HERO)) {
+        return 75;
+    }
+    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
+        return 74;
+    }
+    return 0;
+}
+
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    int maxt = max_transfers();
+    int err, maxt = max_transfers();
 
     assert(u);
     if (!rule_transfermen() && u2 && u->faction != u2->faction) {
@@ -482,17 +496,9 @@ void give_unit(unit * u, unit * u2, order * ord)
         return;
     }
 
-    if (unit_has_cursed_item(u)) {
-        cmistake(u, ord, 78, MSG_COMMERCE);
-        return;
-    }
-
-    if (fval(u, UFL_HERO)) {
-        cmistake(u, ord, 75, MSG_COMMERCE);
-        return;
-    }
-    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
-        cmistake(u, ord, 74, MSG_COMMERCE);
+    err = give_unit_allowed(u);
+    if (err != 0) {
+        cmistake(u, ord, err, MSG_COMMERCE);
         return;
     }
 

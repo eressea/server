@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "contact.h"
 #include "economy.h"
+#include "give.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -940,8 +941,13 @@ int leave_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-int transfer_faction(faction *fsrc, faction *fdst) {
-    return 0;
+void transfer_faction(faction *fsrc, faction *fdst) {
+    unit *u;
+    for (u = fsrc->units; u != NULL; u = u->nextF) {
+        if (give_unit_allowed(u) == 0) {
+            u_setfaction(u, fdst);
+        }
+    }
 }
 
 int quit_cmd(unit * u, struct order *ord)
@@ -955,35 +961,37 @@ int quit_cmd(unit * u, struct order *ord)
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
-        param_t p;
-        p = getparam(f->locale);
-        if (p == P_FACTION) {
-            faction *f2 = getfaction();
-            if (f2 == NULL) {
-                cmistake(u, ord, 66, MSG_EVENT);
-            } 
-            else if (f->race != f2->race) {
-                cmistake(u, ord, 281, MSG_EVENT);
-            }
-            else {
-                unit *u2;
-                for (u2 = u->region->units; u2; u2 = u2->next) {
-                    if (u2->faction == f2 && ucontact(u2, u)) {
-                        int err = transfer_faction(u->faction, u2->faction);
-                        if (err != 0) {
-                            /* something went wrong */
-                            cmistake(u, ord, err, MSG_EVENT);
-                        }
-                        break;
-                    }
+        int flags = FFL_QUIT;
+        if (rule_transfermen()) {
+            param_t p;
+            p = getparam(f->locale);
+            if (p == P_FACTION) {
+                faction *f2 = getfaction();
+                if (f2 == NULL) {
+                    cmistake(u, ord, 66, MSG_EVENT);
+                    flags = 0;
                 }
-                if (u2 == NULL) {
-                    /* no target unit found */
-                    cmistake(u, ord, 0, MSG_EVENT);
+                else if (f->race != f2->race) {
+                    cmistake(u, ord, 281, MSG_EVENT);
+                    flags = 0;
+                }
+                else {
+                    unit *u2;
+                    for (u2 = u->region->units; u2; u2 = u2->next) {
+                        if (u2->faction == f2 && ucontact(u2, u)) {
+                            transfer_faction(u->faction, u2->faction);
+                            break;
+                        }
+                    }
+                    if (u2 == NULL) {
+                        /* no target unit found */
+                        cmistake(u, ord, 0, MSG_EVENT);
+                        flags = 0;
+                    }
                 }
             }
         }
-        fset(f, FFL_QUIT);
+        f->flags |= flags;
     }
     else {
         char buffer[64];

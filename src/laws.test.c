@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "laws.h"
 #include "battle.h"
+#include "contact.h"
 #include "guard.h"
 #include "monsters.h"
 
@@ -1868,6 +1869,49 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_quit(CuTest *tc) {
+    faction *f;
+    unit *u;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, r);
+    u->thisorder = create_order(K_QUIT, f->locale, "password");
+
+    faction_setpassword(f, "passwort");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 0, f->flags & FFL_QUIT);
+
+    faction_setpassword(f, "password");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f->flags & FFL_QUIT);
+
+    test_teardown();
+}
+
+static void test_quit_transfer(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    test_teardown();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1943,6 +1987,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
+    SUITE_ADD_TEST(suite, test_quit);
+    SUITE_ADD_TEST(suite, test_quit_transfer);
 
     return suite;
 }
