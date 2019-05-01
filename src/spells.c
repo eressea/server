@@ -2242,13 +2242,12 @@ static int sp_stormwinds(castorder * co)
 
         sh = pa->param[n]->data.sh;
 
-        /* mit C_SHIP_NODRIFT haben wir kein Problem */
         if (is_cursed(sh->attribs, &ct_flyingship)) {
             ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                 "error_spell_on_flying_ship", "ship", sh))
                 continue;
         }
-        if (is_cursed(sh->attribs, &ct_shipspeedup)) {
+        if (is_cursed(sh->attribs, &ct_stormwind)) {
             ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                 "error_spell_on_ship_already", "ship", sh))
                 continue;
