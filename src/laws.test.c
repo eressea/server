@@ -1912,6 +1912,40 @@ static void test_quit_transfer(CuTest *tc) {
     test_teardown();
 }
 
+static void test_quit_transfer_limited(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    set_level(u1, SK_MAGIC, 1);
+    set_level(u2, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, true, has_limited_skills(u1));
+
+    config_set_int("rules.maxskills.magic", 1);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    f1->flags -= FFL_QUIT;
+    config_set_int("rules.maxskills.magic", 2);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+
+    test_teardown();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1989,6 +2023,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
     SUITE_ADD_TEST(suite, test_quit_transfer);
+    SUITE_ADD_TEST(suite, test_quit_transfer_limited);
 
     return suite;
 }

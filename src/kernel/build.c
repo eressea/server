@@ -572,7 +572,7 @@ static int build_limited(unit * u, const construction * con, int completed, int 
         }
         /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
          * Talente */
-        if (skill_limit(u->faction, con->skill) == INT_MAX) {
+        if (faction_skill_limit(u->faction, con->skill) == INT_MAX) {
             const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
             item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
             int i = itm ? itm->number : 0;

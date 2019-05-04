@@ -548,7 +548,7 @@ static void recruit(unit * u, struct order *ord, econ_request ** recruitorders)
         return;
     }
     if (has_skill(u, SK_ALCHEMY)) {
-        if (count_skill(u->faction, SK_ALCHEMY) + n > skill_limit(u->faction, SK_ALCHEMY)) {
+        if (faction_count_skill(u->faction, SK_ALCHEMY) + n > faction_skill_limit(u->faction, SK_ALCHEMY)) {
             cmistake(u, ord, 156, MSG_EVENT);
             return;
         }

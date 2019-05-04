@@ -161,8 +161,8 @@ extern "C" {
     struct spellbook * faction_get_spellbook(struct faction *f);
 
     /* skills */
-    int skill_limit(struct faction *f, skill_t sk);
-    int count_skill(struct faction *f, skill_t sk);
+    int faction_skill_limit(const struct faction *f, skill_t sk);
+    int faction_count_skill(struct faction *f, skill_t sk);
     bool faction_id_is_unused(int);
 
 #define COUNT_MONSTERS 0x01

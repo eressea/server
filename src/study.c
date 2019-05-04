@@ -635,9 +635,9 @@ int study_cmd(unit * u, order * ord)
             mtype = M_GRAY;
         }
         else if (!has_skill(u, SK_MAGIC)) {
-            int mmax = skill_limit(u->faction, SK_MAGIC);
+            int mmax = faction_skill_limit(u->faction, SK_MAGIC);
             /* Die Einheit ist noch kein Magier */
-            if (count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
+            if (faction_count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians",
                     "amount", mmax));
                 return -1;
@@ -694,8 +694,8 @@ int study_cmd(unit * u, order * ord)
     if (sk == SK_ALCHEMY) {
         maxalchemy = effskill(u, SK_ALCHEMY, NULL);
         if (!has_skill(u, SK_ALCHEMY)) {
-            int amax = skill_limit(u->faction, SK_ALCHEMY);
-            if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
+            int amax = faction_skill_limit(u->faction, SK_ALCHEMY);
+            if (faction_count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists",
                     "amount", amax));
                 return -1;

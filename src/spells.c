@@ -3451,7 +3451,7 @@ static bool can_charm(const unit * u, int maxlevel)
         while (l < h) {
             int m = (l + h) / 2;
             if (sk == expskills[m]) {
-                if (skill_limit(u->faction, sk) != INT_MAX) {
+                if (faction_skill_limit(u->faction, sk) != INT_MAX) {
                     return false;
                 }
                 else if ((int)sv->level > maxlevel) {

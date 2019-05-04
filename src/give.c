@@ -391,7 +391,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
-        int k = count_skill(u2->faction, SK_ALCHEMY);
+        int k = faction_count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
          * welche. */
@@ -408,7 +408,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 
         /* wird das Alchemistenmaximum ueberschritten ? */
 
-        if (k > skill_limit(u2->faction, SK_ALCHEMY)) {
+        if (k > faction_skill_limit(u2->faction, SK_ALCHEMY)) {
             error = 156;
         }
     }
@@ -592,8 +592,8 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_MAGIC)) {
-        if (count_skill(u2->faction, SK_MAGIC) + u->number >
-            skill_limit(u2->faction, SK_MAGIC)) {
+        if (faction_count_skill(u2->faction, SK_MAGIC) + u->number >
+            faction_skill_limit(u2->faction, SK_MAGIC)) {
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
@@ -603,8 +603,8 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_ALCHEMY)
-        && count_skill(u2->faction, SK_ALCHEMY) + u->number >
-        skill_limit(u2->faction, SK_ALCHEMY)) {
+        && faction_count_skill(u2->faction, SK_ALCHEMY) + u->number >
+        faction_skill_limit(u2->faction, SK_ALCHEMY)) {
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }

@@ -943,8 +943,42 @@ int leave_cmd(unit * u, struct order *ord)
 
 void transfer_faction(faction *fsrc, faction *fdst) {
     unit *u;
+    skill_t sk;
+    int skill_count[MAXSKILLS];
+    int skill_limit[MAXSKILLS];
+
+    for (sk = 0; sk != MAXSKILLS; ++sk) {
+        skill_limit[sk] = faction_skill_limit(fdst, sk);
+    }
+    memset(skill_count, 0, sizeof(skill_count));
+
+    for (u = fdst->units; u != NULL; u = u->nextF) {
+        if (u->skills) {
+            int i;
+            for (i = 0; i != u->skill_size; ++i) {
+                const skill *sv = u->skills + i;
+                skill_t sk = (skill_t)sv->id;
+                skill_count[sk] += u->number;
+            }
+        }
+    }
+
     for (u = fsrc->units; u != NULL; u = u->nextF) {
         if (give_unit_allowed(u) == 0) {
+            if (u->skills) {
+                int i;
+
+                for (i = 0; i != u->skill_size; ++i) {
+                    const skill *sv = u->skills + i;
+                    skill_t sk = (skill_t)sv->id;
+                    if (skill_count[sk] + u->number > skill_limit[sk]) {
+                        break;
+                    }
+                }
+                if (i != u->skill_size) {
+                    continue;
+                }
+            }
             u_setfaction(u, fdst);
         }
     }
