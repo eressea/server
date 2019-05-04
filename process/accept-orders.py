@@ -13,7 +13,7 @@ import logging
 import sys
 import subprocess
 from sys import stdin
-from time import ctime, sleep, time
+import time
 from socket import gethostname
 from rfc822 import parsedate_tz, mktime_tz
 
@@ -57,6 +57,9 @@ sendmail = True
 maxfiles = 30
 # write headers to file?
 writeheaders = True
+# write received files to datrabase?
+tooldir = os.path.join(rootdir, 'orders-php')
+writedb = os.path.exists(tooldir)
 # reject all html email?
 rejecthtml = True
 
@@ -223,17 +226,23 @@ def write_part(outfile, part):
     outfile.write("\n");
     return True
 
-def copy_orders(message, filename, sender):
-        # print the header first
+def copy_orders(message, filename, sender, mtime):
+    # print the header first
+    dirname, basename = os.path.split(filename)
     if writeheaders:
-        from os.path import split
-        dirname, basename = split(filename)
-        dirname = dirname + '/headers'
-        if not os.path.exists(dirname): os.mkdir(dirname)
-        outfile = open(dirname + '/' + basename, "w")
+        header_dir = dirname + '/headers'
+        if not os.path.exists(header_dir): os.mkdir(header_dir)
+        outfile = open(header_dir + '/' + basename, "w")
         for name, value in message.items():
             outfile.write(name + ": " + value + "\n")
         outfile.close()
+
+    if writedb:
+        dirname, basename = os.path.split(filename)
+        cli = os.path.join(tooldir, 'cli.php');
+        dbname = os.path.join(dirname, 'orders.db')
+        datestr = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(mtime))
+        subprocess.call(['php', cli, '-d', dbname, 'insert', basename, sender, datestr])
 
     found = False
     outfile = open(filename, "w")
@@ -283,18 +292,23 @@ def accept(game, locale, stream, extend=None):
         logger.warning("more than " + str(maxfiles) + " orders from " + email)
         return -1
     # copy the orders to the file
-    text_ok = copy_orders(message, filename, email)
-
-    warning, msg, fail = None, "", False
+    
+    turndate = None
     maildate = message.get("Date")
-    if maildate != None:
+    if maildate is None:
+        turndate = time.time()
+    else:
         turndate = mktime_tz(parsedate_tz(maildate))
+
+    text_ok = copy_orders(message, filename, email, turndate)
+    warning, msg, fail = None, "", False
+    if not maildate is None:
         os.utime(filename, (turndate, turndate))
         logger.debug("mail date is '%s' (%d)" % (maildate, turndate))
         if False and turndate < maxdate:
             logger.warning("inconsistent message date " + email)
             warning = " (" + messages["warning-" + locale] + ")"
-            msg = msg + formatpar(messages["maildate-" + locale] % (ctime(maxdate),ctime(turndate)), 76, 2) + "\n"
+            msg = msg + formatpar(messages["maildate-" + locale] % (time.ctime(maxdate), time.ctime(turndate)), 76, 2) + "\n"
     else:
         logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
