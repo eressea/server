@@ -587,9 +587,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannte Opti
 msgid "error131"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden.\""
 
-msgid "error241"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei muß mindestens 81 Wochen alt sein, um einen Neustart mit einer anderen Rasse zu versuchen.\""
-
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wurde nicht gefunden.\""
 
@@ -1119,7 +1116,7 @@ msgid "dissolve_units_4"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"zerfiel\", \"zerfielen\") zu Staub.\""
 
 msgid "error281"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen welche Rasse soll der Jihad ausgerufen werden?\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Zielpartei muss die selbe Rasse haben.\""
 
 msgid "error171"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Kampfzauber gibt es nicht.\""
@@ -1783,9 +1780,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnte kein 
 
 msgid "error50"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht erfahren genug dafür.\""
-
-msgid "error282"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen diese Rasse kann kein Jihad ausgerufen werden.\""
 
 msgid "nmr_warning_final"
 msgstr "\"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest.\""

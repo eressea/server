@@ -3110,8 +3110,8 @@ static int sp_chaossuction(castorder * co)
     create_special_direction(rt, r, 2, "vortex_desc", "vortex", false);
     new_border(&bt_chaosgate, r, rt);
 
-    add_message(&r->msgs, msg_message("chaosgate_effect_1", "mage", caster));
-    add_message(&rt->msgs, msg_message("chaosgate_effect_2", ""));
+    ADDMSG(&r->msgs, msg_message("chaosgate_effect_1", "mage", caster));
+    ADDMSG(&rt->msgs, msg_message("chaosgate_effect_2", ""));
     return cast_level;
 }
 
@@ -3451,7 +3451,7 @@ static bool can_charm(const unit * u, int maxlevel)
         while (l < h) {
             int m = (l + h) / 2;
             if (sk == expskills[m]) {
-                if (skill_limit(u->faction, sk) != INT_MAX) {
+                if (faction_skill_limit(u->faction, sk) != INT_MAX) {
                     return false;
                 }
                 else if ((int)sv->level > maxlevel) {
