@@ -603,8 +603,7 @@ void plagues(region * r)
     }
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("pest", "dead", dead));
         deathcounts(r, dead);
         rsetpeasants(r, peasants - dead);
     }

@@ -251,6 +251,7 @@ extern "C" {
     bool has_horses(const struct unit *u);
     int maintenance_cost(const struct unit *u);
     bool has_limited_skills(const struct unit *u);
+    bool is_limited_skill(skill_t sk);
 
 #ifdef __cplusplus
 }

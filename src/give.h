@@ -29,10 +29,12 @@ extern "C" {
     struct message * disband_men(int n, struct unit * u, struct order *ord);
     struct message * give_men(int n, struct unit *u, struct unit *u2,
     struct order *ord);
+    int give_unit_allowed(const struct unit * u);
     void give_unit(struct unit *u, struct unit *u2, struct order *ord);
     void give_cmd(struct unit * u, struct order * ord);
     struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
     bool can_give_to(struct unit *u, struct unit *u2);
+    bool rule_transfermen(void);
 
 #ifdef __cplusplus
 }

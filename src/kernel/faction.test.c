@@ -25,6 +25,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <limits.h>
 
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
@@ -211,6 +212,26 @@ static void test_max_migrants(CuTest *tc) {
     test_teardown();
 }
 
+static void test_skill_limit(CuTest *tc) {
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    CuAssertIntEquals(tc, INT_MAX, faction_skill_limit(f, SK_ENTERTAINMENT));
+    CuAssertIntEquals(tc, 3, faction_skill_limit(f, SK_ALCHEMY));
+    config_set_int("rules.maxskills.alchemy", 4);
+    CuAssertIntEquals(tc, 4, faction_skill_limit(f, SK_ALCHEMY));
+    CuAssertIntEquals(tc, 3, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 3, max_magicians(f));
+    config_set_int("rules.maxskills.magic", 4);
+    CuAssertIntEquals(tc, 4, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 4, max_magicians(f));
+    f->race = test_create_race(racenames[RC_ELF]);
+    CuAssertIntEquals(tc, 5, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 5, max_magicians(f));
+    test_teardown();
+}
+
 static void test_valid_race(CuTest *tc) {
     race * rc1, *rc2;
     faction *f;
@@ -334,6 +355,7 @@ CuSuite *get_faction_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addplayer);
     SUITE_ADD_TEST(suite, test_max_migrants);
+    SUITE_ADD_TEST(suite, test_skill_limit);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);
