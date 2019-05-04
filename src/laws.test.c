@@ -1984,7 +1984,7 @@ static void test_quit_transfer_migrants(CuTest *tc) {
 }
 
 /**
- * Heroes cannot be gifted to another faction.
+ * A hero that is gifted to another faction loses their status.
  */
 static void test_quit_transfer_hero(CuTest *tc) {
     faction *f1, *f2;
@@ -2006,7 +2006,8 @@ static void test_quit_transfer_hero(CuTest *tc) {
 
     quit_cmd(u1, u1->thisorder);
     CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
-    CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertIntEquals(tc, 0, u1->flags & UFL_HERO);
 
     test_teardown();
 }

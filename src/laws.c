@@ -965,6 +965,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
     for (u = fsrc->units; u != NULL; u = u->nextF) {
         if (u_race(u) == fdst->race) {
+            u->flags &= ~UFL_HERO;
             if (give_unit_allowed(u) == 0) {
                 if (u->skills) {
                     int i;
