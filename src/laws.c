@@ -964,22 +964,24 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     }
 
     for (u = fsrc->units; u != NULL; u = u->nextF) {
-        if (give_unit_allowed(u) == 0) {
-            if (u->skills) {
-                int i;
+        if (u_race(u) == fdst->race) {
+            if (give_unit_allowed(u) == 0) {
+                if (u->skills) {
+                    int i;
 
-                for (i = 0; i != u->skill_size; ++i) {
-                    const skill *sv = u->skills + i;
-                    skill_t sk = (skill_t)sv->id;
-                    if (skill_count[sk] + u->number > skill_limit[sk]) {
-                        break;
+                    for (i = 0; i != u->skill_size; ++i) {
+                        const skill *sv = u->skills + i;
+                        skill_t sk = (skill_t)sv->id;
+                        if (skill_count[sk] + u->number > skill_limit[sk]) {
+                            break;
+                        }
+                    }
+                    if (i != u->skill_size) {
+                        continue;
                     }
                 }
-                if (i != u->skill_size) {
-                    continue;
-                }
+                u_setfaction(u, fdst);
             }
-            u_setfaction(u, fdst);
         }
     }
 }

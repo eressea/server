@@ -1891,6 +1891,9 @@ static void test_quit(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * Gifting units to another faction upon voluntary death (QUIT).
+ */ 
 static void test_quit_transfer(CuTest *tc) {
     faction *f1, *f2;
     unit *u1, *u2;
@@ -1912,6 +1915,12 @@ static void test_quit_transfer(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * Gifting units with limited skills to another faction.
+ *
+ * This is allowed only up to the limit of the target faction.
+ * Units that would break the limit are not transferred.
+ */
 static void test_quit_transfer_limited(CuTest *tc) {
     faction *f1, *f2;
     unit *u1, *u2;
@@ -1942,6 +1951,62 @@ static void test_quit_transfer_limited(CuTest *tc) {
     quit_cmd(u1, u1->thisorder);
     CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
     CuAssertPtrEquals(tc, f2, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * Only units of the same race can be gifted to another faction.
+ */
+static void test_quit_transfer_migrants(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u_setrace(u1, test_create_race("smurf"));
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * Heroes cannot be gifted to another faction.
+ */
+static void test_quit_transfer_hero(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u1->flags |= UFL_HERO;
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
 
     test_teardown();
 }
@@ -2024,6 +2089,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_quit);
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
+    SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
+    SUITE_ADD_TEST(suite, test_quit_transfer_hero);
 
     return suite;
 }
