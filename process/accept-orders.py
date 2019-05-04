@@ -57,6 +57,9 @@ sendmail = True
 maxfiles = 30
 # write headers to file?
 writeheaders = True
+# write received files to datrabase?
+tooldir = os.path.join(rootdir, orderbase)
+writedb = os.path.exists(tooldir)
 # reject all html email?
 rejecthtml = True
 
@@ -225,15 +228,19 @@ def write_part(outfile, part):
 
 def copy_orders(message, filename, sender):
         # print the header first
+    dirname, basename = split(filename)
     if writeheaders:
-        from os.path import split
-        dirname, basename = split(filename)
-        dirname = dirname + '/headers'
-        if not os.path.exists(dirname): os.mkdir(dirname)
-        outfile = open(dirname + '/' + basename, "w")
+        header_dir = dirname + '/headers'
+        if not os.path.exists(header_dir): os.mkdir(header_dir)
+        outfile = open(header_dir + '/' + basename, "w")
         for name, value in message.items():
             outfile.write(name + ": " + value + "\n")
         outfile.close()
+
+    if writedb:
+        cli = os.path.join(tooldir, 'cli.php');
+        dbname = os.path.join(dirname, 'orders.db')
+        subprocess.call(['php', cli, '-d', dbname, 'insert', basename])
 
     found = False
     outfile = open(filename, "w")
