@@ -105,7 +105,7 @@ msgid "massive_overload"
 msgstr "\"Die $ship($ship) ist zu stark überladen und wird stark beschädigt.\""
 
 msgid "curseinfo::shipspeedup"
-msgstr "\"Die Winde scheinen dieses Schiff besonders zu beguenstigen. ($int36($id))\""
+msgstr "\"Die Winde scheinen dieses Schiff besonders zu begünstigen. ($int36($id))\""
 
 msgid "error152"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit springt über Bord und ertrinkt.\""
@@ -999,7 +999,7 @@ msgid "battle_critical"
 msgstr "\"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer.\""
 
 msgid "error_spell_on_ship_already"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt beeits ein Zauber.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt bereits ein Zauber.\""
 
 msgid "error228"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur normale Personen können Steuern eintreiben.\""
