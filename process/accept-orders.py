@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from email.Utils import parseaddr
-from email.Parser import Parser
 import os
 import os.path
 import ConfigParser
-from re import compile, IGNORECASE
-from stat import ST_MTIME
-from string import upper, split, replace
+import string
 import logging
 import sys
 import subprocess
-from sys import stdin
 import time
-from socket import gethostname
-from rfc822 import parsedate_tz, mktime_tz
+import socket
+import rfc822
+from stat import ST_MTIME
+from email.Utils import parseaddr
+from email.Parser import Parser
 
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
@@ -50,14 +48,14 @@ else:
         sender = "%s Server <%s>" % (gamename, frommail)
     config = None
 prefix = 'turn-'
-hostname = gethostname()
+hostname = socket.gethostname()
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
 maxfiles = 30
 # write headers to file?
 writeheaders = True
-# write received files to datrabase?
+# write received files to database?
 tooldir = os.path.join(rootdir, 'orders-php')
 writedb = os.path.exists(tooldir)
 # reject all html email?
@@ -180,7 +178,7 @@ def available_file(dirname, basename):
     return maxdate, filename
 
 def formatpar(string, l=76, indent=2):
-    words = split(string)
+    words = string.split(string)
     res = ""
     ll = 0
     first = 1
@@ -298,7 +296,7 @@ def accept(game, locale, stream, extend=None):
     if maildate is None:
         turndate = time.time()
     else:
-        turndate = mktime_tz(parsedate_tz(maildate))
+        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
     warning, msg, fail = None, "", False
@@ -354,10 +352,10 @@ logging.basicConfig(level=logging.DEBUG, filename=LOG_FILENAME)
 logger = logging
 delay = None # TODO: parse the turn delay
 locale = sys.argv[2]
-infile = stdin
+infile = sys.stdin
 if len(sys.argv)>3:
     infile = open(sys.argv[3], "r")
 retval = accept(game, locale, infile, delay)
-if infile!=stdin:
+if infile!=sys.stdin:
     infile.close()
 sys.exit(retval)
