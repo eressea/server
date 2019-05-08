@@ -55,9 +55,6 @@ sendmail = True
 maxfiles = 30
 # write headers to file?
 writeheaders = True
-# write received files to database?
-tooldir = os.path.join(rootdir, 'orders-php')
-writedb = os.path.exists(tooldir)
 # reject all html email?
 rejecthtml = True
 
@@ -306,11 +303,8 @@ def accept(game, locale, stream, extend=None):
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
 
-    if writedb:
-        dirname, basename = os.path.split(filename)
-        cli = os.path.join(tooldir, 'cli.php');
-        dbname = os.path.join(dirname, 'orders.db')
-        subprocess.call(['php', cli, '-d', dbname, 'insert', basename, email])
+    print('ACCEPT_MAIL=' + email)
+    print('ACCEPT_FILE="' + filename + '"')
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
