@@ -16,10 +16,10 @@ mkdir -p orders.dir
 cd orders.dir
 lockfile -r3 -l120 "$LOCKFILE"
 eval "$(python "$BIN/accept-orders.py" "$@")"
+rm -f "$LOCKFILE"
 filename=$(basename "$ACCEPT_FILE")
 email="$ACCEPT_MAIL"
 if [ -d "$ERESSEA/orders-php" ]
 then
   php "$ERESSEA/orders-php/cli.php" insert "$filename" "$email"
 fi
-rm -f "$LOCKFILE"
