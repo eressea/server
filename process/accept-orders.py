@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from email.Utils import parseaddr
-from email.Parser import Parser
 import os
 import os.path
 import ConfigParser
-from re import compile, IGNORECASE
-from stat import ST_MTIME
-from string import upper, split, replace
+import string
 import logging
 import sys
 import subprocess
-from sys import stdin
 import time
-from socket import gethostname
-from rfc822 import parsedate_tz, mktime_tz
+import socket
+import rfc822
+from stat import ST_MTIME
+from email.Utils import parseaddr
+from email.Parser import Parser
 
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
@@ -50,16 +48,13 @@ else:
         sender = "%s Server <%s>" % (gamename, frommail)
     config = None
 prefix = 'turn-'
-hostname = gethostname()
+hostname = socket.gethostname()
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
 maxfiles = 30
 # write headers to file?
 writeheaders = True
-# write received files to datrabase?
-tooldir = os.path.join(rootdir, 'orders-php')
-writedb = os.path.exists(tooldir)
 # reject all html email?
 rejecthtml = True
 
@@ -180,7 +175,7 @@ def available_file(dirname, basename):
     return maxdate, filename
 
 def formatpar(string, l=76, indent=2):
-    words = split(string)
+    words = string.split(string)
     res = ""
     ll = 0
     first = 1
@@ -237,13 +232,6 @@ def copy_orders(message, filename, sender, mtime):
             outfile.write(name + ": " + value + "\n")
         outfile.close()
 
-    if writedb:
-        dirname, basename = os.path.split(filename)
-        cli = os.path.join(tooldir, 'cli.php');
-        dbname = os.path.join(dirname, 'orders.db')
-        datestr = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(mtime))
-        subprocess.call(['php', cli, '-d', dbname, 'insert', basename, sender, datestr])
-
     found = False
     outfile = open(filename, "w")
     if message.is_multipart():
@@ -264,6 +252,7 @@ def copy_orders(message, filename, sender, mtime):
             charset = message.get_content_charset()
             logger.error("could not write text/plain message (charset=%s) for %s" % (charset, sender))
     outfile.close()
+
     return found
 
 # create a file, containing:
@@ -298,7 +287,7 @@ def accept(game, locale, stream, extend=None):
     if maildate is None:
         turndate = time.time()
     else:
-        turndate = mktime_tz(parsedate_tz(maildate))
+        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
     warning, msg, fail = None, "", False
@@ -313,6 +302,9 @@ def accept(game, locale, stream, extend=None):
         logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
+
+    print('ACCEPT_MAIL=' + email)
+    print('ACCEPT_FILE="' + filename + '"')
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
@@ -354,10 +346,10 @@ logging.basicConfig(level=logging.DEBUG, filename=LOG_FILENAME)
 logger = logging
 delay = None # TODO: parse the turn delay
 locale = sys.argv[2]
-infile = stdin
+infile = sys.stdin
 if len(sys.argv)>3:
     infile = open(sys.argv[3], "r")
 retval = accept(game, locale, infile, delay)
-if infile!=stdin:
+if infile!=sys.stdin:
     infile.close()
 sys.exit(retval)
