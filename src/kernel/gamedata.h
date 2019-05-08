@@ -42,7 +42,8 @@
 #define FAMILIAR_FIXMAGE_VERSION 364 /* familiar links are fixed */
 #define FAMILIAR_FIXSPELLBOOK_VERSION 365 /* familiar spells are fixed */
 #define FIX_STARTLEVEL_VERSION 366 /* fixing resource startlevels */
-#define FIX_CLONES_VERSION 367 /* dissolve clones */
+#define FIX_RES_BASE_VERSION 367 /* fixing resource base */
+#define FIX_CLONES_VERSION 368 /* dissolve clones */
 
 #define RELEASE_VERSION FIX_CLONES_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
