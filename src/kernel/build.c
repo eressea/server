@@ -729,8 +729,9 @@ static int build_stages(unit *u, const building_type *btype, int built, int n, i
             }
             else {
                 /* err is the amount we built of this stage */
+                built += err;
                 made += err;
-                if (err != con->maxsize && con->maxsize > 0) {
+                if (con->maxsize > 0 && built < con->maxsize) {
                     /* we did not finish the stage, can quit here */
                     break;
                 }
