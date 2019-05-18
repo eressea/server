@@ -210,6 +210,7 @@ extern "C" {
     const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
     struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
     int mage_get_spellpoints(const struct sc_mage *m);
+    void mage_set_spellpoints(struct sc_mage *m, int aura);
     int mage_change_spellpoints(struct sc_mage *m, int delta);
 
     enum magic_t unit_get_magic(const struct unit *u);

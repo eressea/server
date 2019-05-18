@@ -117,6 +117,11 @@ typedef struct sc_mage {
     struct spellbook *spellbook;
 } sc_mage;
 
+void mage_set_spellpoints(sc_mage *m, int aura)
+{
+    m->spellpoints = aura;
+}
+
 int mage_get_spellpoints(const sc_mage *m)
 {
     return m ? m->spellpoints : 0;
@@ -603,7 +608,7 @@ void set_spellpoints(unit * u, int sp)
 {
     sc_mage *m = get_mage(u);
     if (m) {
-        m->spellpoints = sp;
+        mage_set_spellpoints(m, sp);
     }
 }
 
@@ -613,18 +618,6 @@ void set_spellpoints(unit * u, int sp)
 int change_spellpoints(unit * u, int mp)
 {
     return mage_change_spellpoints(get_mage(u), mp);
-}
-
-/**
- * Bietet die Moeglichkeit, die maximale Anzahl der Magiepunkte mit
- * Regionszaubern oder Attributen zu beinflussen
- */
-static int get_spchange(const unit * u)
-{
-    sc_mage *m;
-
-    m = get_mage(u);
-    return m ? m->spchange : 0;
 }
 
 /* ein Magier kann normalerweise maximal Stufe^2.1/1.2+1 Magiepunkte
@@ -655,12 +648,15 @@ int max_spellpoints(const struct unit *u, const region * r)
     double potenz = 2.1;
     double divisor = 1.2;
     const struct resource_type *rtype;
+    const sc_mage *m;
 
     assert(u);
     if (!r) r = u->region;
 
     sk = effskill(u, SK_MAGIC, r);
-    msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1) + get_spchange(u);
+    msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1);
+    m = get_mage(u);
+    if (m) msp += m->spchange;
 
     rtype = rt_find("aurafocus");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
@@ -1464,44 +1460,47 @@ void regenerate_aura(void)
 
     for (r = regions; r; r = r->next) {
         for (u = r->units; u; u = u->next) {
-            if (u->number && is_mage(u)) {
-                aura = get_spellpoints(u);
-                auramax = max_spellpoints_depr(r, u);
-                if (aura < auramax) {
-                    struct building *b = inside_building(u);
-                    const struct building_type *btype = building_is_active(b) ? b->type : NULL;
-                    reg_aura = regeneration(u);
+            if (u->number && u->attribs) {
+                sc_mage *m = get_mage(u);
+                if (m) {
+                    aura = mage_get_spellpoints(m);
+                    auramax = max_spellpoints(u, r);
+                    if (aura < auramax) {
+                        struct building *b = inside_building(u);
+                        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
+                        reg_aura = regeneration(u);
 
-                    /* Magierturm erhoeht die Regeneration um 75% */
-                    /* Steinkreis erhoeht die Regeneration um 50% */
-                    if (btype)
-                        reg_aura *= btype->auraregen;
+                        /* Magierturm erhoeht die Regeneration um 75% */
+                        /* Steinkreis erhoeht die Regeneration um 50% */
+                        if (btype)
+                            reg_aura *= btype->auraregen;
 
-                    /* Bonus/Malus durch Zauber */
-                    mod = get_curseeffect(u->attribs, &ct_auraboost);
-                    if (mod > 0) {
-                        reg_aura = (reg_aura * mod) / 100.0;
+                        /* Bonus/Malus durch Zauber */
+                        mod = get_curseeffect(u->attribs, &ct_auraboost);
+                        if (mod > 0) {
+                            reg_aura = (reg_aura * mod) / 100.0;
+                        }
+
+                        /* Einfluss von Artefakten */
+                        /* TODO (noch gibs keine) */
+
+                        /* maximal Differenz bis Maximale-Aura regenerieren
+                         * mindestens 1 Aura pro Monat */
+                        regen = (int)reg_aura;
+                        reg_aura -= regen;
+                        if (chance(reg_aura)) {
+                            ++regen;
+                        }
+                        if (regen < 1) regen = 1;
+                        if (regen > auramax - aura) regen = auramax - aura;
+
+                        aura += regen;
+                        ADDMSG(&u->faction->msgs, msg_message("regenaura",
+                            "unit region amount", u, r, regen));
                     }
-
-                    /* Einfluss von Artefakten */
-                    /* TODO (noch gibs keine) */
-
-                    /* maximal Differenz bis Maximale-Aura regenerieren
-                     * mindestens 1 Aura pro Monat */
-                    regen = (int)reg_aura;
-                    reg_aura -= regen;
-                    if (chance(reg_aura)) {
-                        ++regen;
-                    }
-                    if (regen < 1) regen = 1;
-                    if (regen > auramax - aura) regen = auramax - aura;
-
-                    aura += regen;
-                    ADDMSG(&u->faction->msgs, msg_message("regenaura",
-                        "unit region amount", u, r, regen));
+                    if (aura > auramax) aura = auramax;
+                    mage_set_spellpoints(m, aura);
                 }
-                if (aura > auramax) aura = auramax;
-                set_spellpoints(u, aura);
             }
         }
     }
