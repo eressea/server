@@ -210,6 +210,7 @@ extern "C" {
     const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
     struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
     int mage_get_spellpoints(const struct sc_mage *m);
+    void mage_set_spellpoints(struct sc_mage *m, int aura);
     int mage_change_spellpoints(struct sc_mage *m, int delta);
 
     enum magic_t unit_get_magic(const struct unit *u);
@@ -259,7 +260,7 @@ extern "C" {
     /* veraendert die maximalen Magiepunkte einer Einheit */
 
     /* Zaubern */
-    extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
+    double spellpower(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level, struct order *ord);
     /*      ermittelt die Staerke eines Spruchs */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
@@ -315,7 +316,7 @@ extern "C" {
         int resist_bonus);
     /*      gibt false zurueck, wenn der Zauber gelingt, true, wenn das Ziel
      *      widersteht */
-    extern struct spell * unit_getspell(struct unit *u, const char *s,
+    struct spell * unit_getspell(struct unit *u, const char *s,
         const struct locale *lang);
     const char *magic_name(magic_t mtype, const struct locale *lang);
 
