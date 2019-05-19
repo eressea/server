@@ -1661,6 +1661,9 @@ int read_game(gamedata *data)
     if (data->version < FAMILIAR_FIXSPELLBOOK_VERSION) {
         fix_familiars(fix_fam_spells);
     }
+    if (data->version < FIX_MIGRANT_AURA_VERSION) {
+        fix_familiars(fix_fam_migrant);
+    }
 
     log_debug("Done loading turn %d.", turn);
 

@@ -2256,7 +2256,9 @@ static int copy_spell_cb(spellbook_entry *sbe, void *udata) {
  * Einmalige Reparatur von Vertrauten (Bug 2585).
  */
 void fix_fam_migrant(unit *u) {
-
+    if (!is_familiar(u)) {
+        a_removeall(&u->attribs, &at_mage);
+    }
 }
 
 /**

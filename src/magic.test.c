@@ -512,6 +512,41 @@ static void test_regenerate_aura_migrants(CuTest *tc) {
     test_teardown();
 }
 
+static void test_fix_fam_migrants(CuTest *tc) {
+    unit *u, *mage;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
+    /* u is a migrant with at_mage attribute, but not a familiar */
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    create_mage(u, M_GRAY);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+    fix_fam_migrant(u);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrEquals(tc, NULL, get_mage(u));
+
+    /* u is a familiar, and stays unchanged: */
+    mage = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    /* reproduce the bug, create a broken familiar: */
+    create_newfamiliar(mage, u);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertTrue(tc, is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+    fix_fam_migrant(u);
+    CuAssertTrue(tc, is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+
+    test_teardown();
+}
+
 static bool equip_spell(unit *u, const char *eqname, int mask) {
     spell * sp = find_spell("test");
     unit_add_spell(u, sp, 1);
@@ -710,5 +745,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_regenerate_aura);
     SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
     SUITE_ADD_TEST(suite, test_fix_fam_spells);
+    SUITE_ADD_TEST(suite, test_fix_fam_migrants);
     return suite;
 }
