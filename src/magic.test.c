@@ -442,6 +442,7 @@ static void test_magic_resistance(CuTest *tc) {
 static void test_max_spellpoints(CuTest *tc) {
     unit *u;
     race *rc;
+    item_type *it_aura;
 
     test_setup();
     rc = test_create_race("human");
@@ -451,16 +452,20 @@ static void test_max_spellpoints(CuTest *tc) {
     CuAssertIntEquals(tc, 0, max_spellpoints(u, NULL));
     create_mage(u, M_GWYRRD);
     rc->maxaura = 100;
-    CuAssertIntEquals(tc, 1, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
     rc->maxaura = 200;
-    CuAssertIntEquals(tc, 2, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 2, max_spellpoints(u, NULL));
     set_level(u, SK_MAGIC, 1);
-    CuAssertIntEquals(tc, 3, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 3, max_spellpoints(u, NULL));
     set_level(u, SK_MAGIC, 2);
-    CuAssertIntEquals(tc, 9, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 9, max_spellpoints(u, NULL));
     /* permanent aura loss: */
     CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
-    CuAssertIntEquals(tc, 7, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 7, max_spellpoints(u, NULL));
+    /* aurafocus: */
+    it_aura = test_create_itemtype("aurafocus");
+    i_change(&u->items, it_aura, 1);
+    CuAssertIntEquals(tc, 9, max_spellpoints(u, NULL));
     test_teardown();
 }
 
