@@ -281,6 +281,7 @@ unit *addplayer(region * r, faction * f)
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
+    u->status = ST_FLEE;
     u->thisorder = default_order(f->locale);
     unit_addorder(u, copy_order(u->thisorder));
     name = config_get("rules.equip_first");

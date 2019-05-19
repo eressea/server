@@ -44,8 +44,9 @@
 #define FIX_STARTLEVEL_VERSION 366 /* fixing resource startlevels */
 #define FIX_RES_BASE_VERSION 367 /* fixing resource base */
 #define FIX_CLONES_VERSION 368 /* dissolve clones */
+#define FIX_MIGRANT_AURA_VERSION 369 /* bug 2585, migrants with aura */
 
-#define RELEASE_VERSION FIX_CLONES_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_MIGRANT_AURA_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
