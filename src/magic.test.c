@@ -446,14 +446,14 @@ static void test_max_spellpoints(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
-    CuAssertIntEquals(tc, 1, max_spellpoints_depr(u->region, u));
-    CuAssertIntEquals(tc, 1, max_spellpoints(u, u->region));
-    CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
+    CuAssertIntEquals(tc, 0, max_spellpoints_depr(u->region, u));
+    CuAssertIntEquals(tc, 0, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 0, max_spellpoints(u, NULL));
+    create_mage(u, M_GWYRRD);
     rc->maxaura = 100;
     CuAssertIntEquals(tc, 1, max_spellpoints(u, u->region));
     rc->maxaura = 200;
     CuAssertIntEquals(tc, 2, max_spellpoints(u, u->region));
-    create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 1);
     CuAssertIntEquals(tc, 3, max_spellpoints(u, u->region));
     set_level(u, SK_MAGIC, 2);
@@ -482,6 +482,27 @@ static void test_regenerate_aura(CuTest *tc) {
     CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
     regenerate_aura();
     CuAssertIntEquals(tc, 1, get_spellpoints(u));
+}
+
+/**
+ * Test for Bug 2582.
+ *
+ * Migrant units that are not familiars, but whose race has a maxaura
+ * must not regenerate aura.
+ */
+static void test_regenerate_aura_migrants(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    test_teardown();
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    regenerate_aura();
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
 }
 
 static void test_illusioncastle(CuTest *tc)
@@ -635,5 +656,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_max_spellpoints);
     SUITE_ADD_TEST(suite, test_illusioncastle);
     SUITE_ADD_TEST(suite, test_regenerate_aura);
+    SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
     return suite;
 }

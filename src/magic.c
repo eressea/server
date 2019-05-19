@@ -651,12 +651,13 @@ int max_spellpoints(const struct unit *u, const region * r)
     const sc_mage *m;
 
     assert(u);
+    m = get_mage(u);
+    if (!m) return 0;
     if (!r) r = u->region;
 
     sk = effskill(u, SK_MAGIC, r);
     msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1);
-    m = get_mage(u);
-    if (m) msp += m->spchange;
+    msp += m->spchange;
 
     rtype = rt_find("aurafocus");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
