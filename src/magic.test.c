@@ -540,11 +540,19 @@ static void test_fix_fam_spells(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, unit_get_spellbook(u));
     CuAssertTrue(tc, !u_hasspell(u, sp));
     callbacks.equip_unit = equip_spell;
+    CuAssertTrue(tc, is_familiar(u));
     fix_fam_spells(u);
+    CuAssertTrue(tc, is_familiar(u));
     CuAssertPtrNotNull(tc, unit_get_spellbook(u));
     CuAssertTrue(tc, u_hasspell(u, sp));
 
     /* u is a migrant, and does not get equipped: */
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    CuAssertTrue(tc, !is_familiar(u));
+    fix_fam_spells(u);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrEquals(tc, NULL, unit_get_spellbook(u));
 
     test_teardown();
 }

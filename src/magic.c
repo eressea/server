@@ -2268,6 +2268,10 @@ void fix_fam_spells(unit *u) {
     sc_mage *dmage;
     unit *du = unit_create(0);
 
+    if (!is_familiar(u)) {
+        return;
+    }
+
     u_setrace(du, u_race(u));
     dmage = create_mage(du, M_GRAY);
     equip_familiar(du);
