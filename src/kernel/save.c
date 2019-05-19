@@ -1659,7 +1659,7 @@ int read_game(gamedata *data)
         fix_familiars(fix_fam_triggers);
     }
     if (data->version < FAMILIAR_FIXSPELLBOOK_VERSION) {
-        fix_familiars(fix_fam_mage);
+        fix_familiars(fix_fam_spells);
     }
 
     log_debug("Done loading turn %d.", turn);

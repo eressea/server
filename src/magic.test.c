@@ -473,7 +473,6 @@ static void test_regenerate_aura(CuTest *tc) {
     unit *u;
 
     test_setup();
-    test_teardown();
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     create_mage(u, M_GWYRRD);
     CuAssertIntEquals(tc, 0, get_spellpoints(u));
@@ -487,6 +486,7 @@ static void test_regenerate_aura(CuTest *tc) {
     CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
     regenerate_aura();
     CuAssertIntEquals(tc, 1, get_spellpoints(u));
+    test_teardown();
 }
 
 /**
@@ -500,14 +500,53 @@ static void test_regenerate_aura_migrants(CuTest *tc) {
     race *rc;
 
     test_setup();
-    test_teardown();
     rc = test_create_race("demon");
     rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     u_setrace(u, rc);
     CuAssertIntEquals(tc, 0, get_spellpoints(u));
     regenerate_aura();
     CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    test_teardown();
+}
+
+static bool equip_spell(unit *u, const char *eqname, int mask) {
+    spell * sp = find_spell("test");
+    unit_add_spell(u, sp, 1);
+    return true;
+}
+
+static void test_fix_fam_spells(CuTest *tc) {
+    unit *u, *mage;
+    race *rc;
+    spell * sp;
+
+    test_setup();
+    sp = create_spell("test");
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
+    /* u is a familiar, and gets equipped: */
+    mage = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    /* reproduce the bug, create a broken familiar: */
+    callbacks.equip_unit = NULL;
+    create_newfamiliar(mage, u);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertPtrEquals(tc, NULL, unit_get_spellbook(u));
+    CuAssertTrue(tc, !u_hasspell(u, sp));
+    callbacks.equip_unit = equip_spell;
+    fix_fam_spells(u);
+    CuAssertPtrNotNull(tc, unit_get_spellbook(u));
+    CuAssertTrue(tc, u_hasspell(u, sp));
+
+    /* u is a migrant, and does not get equipped: */
+
+    test_teardown();
 }
 
 static void test_illusioncastle(CuTest *tc)
@@ -662,5 +701,6 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_illusioncastle);
     SUITE_ADD_TEST(suite, test_regenerate_aura);
     SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
+    SUITE_ADD_TEST(suite, test_fix_fam_spells);
     return suite;
 }

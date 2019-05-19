@@ -2251,9 +2251,20 @@ static int copy_spell_cb(spellbook_entry *sbe, void *udata) {
 }
 
 /**
+ * Entferne Magie-Attribut von Migranten, die keine Vertrauten sind.
+ *
+ * Einmalige Reparatur von Vertrauten (Bug 2585).
+ */
+void fix_fam_migrant(unit *u) {
+
+}
+
+/**
+ * Einheiten, die Vertraute sind, bekommen ihre fehlenden Zauber.
+ *
  * Einmalige Reparatur von Vertrauten (Bugs 2451, 2517).
  */
-void fix_fam_mage(unit *u) {
+void fix_fam_spells(unit *u) {
     sc_mage *dmage;
     unit *du = unit_create(0);
 
@@ -2286,7 +2297,6 @@ void fix_fam_mage(unit *u) {
 
 void create_newfamiliar(unit * mage, unit * fam)
 {
-
     create_mage(fam, M_GRAY);
     set_familiar(mage, fam);
     equip_familiar(fam);
