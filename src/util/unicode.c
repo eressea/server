@@ -11,6 +11,7 @@
 #include <platform.h>
 #include "unicode.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 #include <wctype.h>
@@ -36,6 +37,7 @@ int unicode_utf8_trim(utf8_t *buf)
 {
     int result = 0, ts = 0;
     utf8_t *op = buf, *ip = buf, *lc = buf;
+    assert(buf);
     while (*ip) {
         size_t size = 1;
         wint_t wc = *ip;

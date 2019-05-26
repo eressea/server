@@ -100,7 +100,7 @@ struct locale *crtag_locale(void) {
     static int config;
     if (config_changed(&config)) {
         const char *lname = config_get("creport.tags");
-        lang = get_locale(lname ? lname : "de");
+        lang = lname ? get_locale(lname) : default_locale;
     }
     return lang;
 }
@@ -108,8 +108,8 @@ struct locale *crtag_locale(void) {
 static const char *crtag(const char *key)
 {
     const char *result;
-    result = LOC(crtag_locale(), key);
-    return result;
+    result = locale_string(crtag_locale(), key, false);
+    return result ? result : key;
 }
 /*
  * translation table
@@ -849,11 +849,17 @@ void cr_output_unit(stream *out, const faction * f,
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
         const char *pzRace = locale_string(lang, mkname("race", pzTmp), false);
-        pzTmp = pzRace ? translate(pzRace, LOC(lang, pzRace)) : pzTmp;
-        stream_printf(out, "\"%s\";Typ\n", pzTmp);
+        if (pzRace) {
+            pzTmp = pzRace;
+        }
+        pzRace = translate(pzTmp, locale_string(lang, pzTmp, false));
+        if (!pzRace) {
+            pzRace = pzTmp;
+        }
+        stream_printf(out, "\"%s\";Typ\n", pzRace);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             pzRace = rc_name_s(u_race(u), NAME_PLURAL);
-            stream_printf(out, "\"%s\";wahrerTyp\n", pzTmp);
+            stream_printf(out, "\"%s\";wahrerTyp\n", pzRace);
         }
     }
     else {

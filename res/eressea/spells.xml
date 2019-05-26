@@ -314,7 +314,7 @@
     <resource name="aura" amount="10" cost="fixed"/>
   </spell>
   <spell name="analyse_object" rank="5" parameters="kc+" ship="true" variable="true" regiontarget="true" unittarget="false" buildingtarget="true" shiptarget="true">
-	  <resource name="aura" amount="3" cost="level"/>
+    <resource name="aura" amount="3" cost="level"/>
   </spell>
   <spell name="destroy_magic" rank="2" parameters="kc+" los="true" ship="true" far="true" variable="true">
     <resource name="aura" amount="4" cost="level"/>
@@ -446,12 +446,13 @@
     <resource name="permaura" amount="10" cost="fixed"/>
     <resource name="toadslime" amount="1" cost="fixed"/>
   </spell>
-  <spell name="clone" rank="5">
+     <!-- Seelenkopie, disabled version 3.20, Bug 1982
+ <spell name="clone" rank="5">
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="20" cost="fixed"/>
     <resource name="dragonblood" amount="5" cost="fixed"/>
     <resource name="lifepotion" amount="5" cost="fixed"/>
-  </spell>
+  </spell> -->
   <spell name="drain_skills" rank="5" combat="2">
     <resource name="aura" amount="4" cost="fixed"/>
   </spell>

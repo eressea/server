@@ -1812,17 +1812,27 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+static skill_t limited_skills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
+
+bool is_limited_skill(skill_t sk)
+{
+    int i;
+    for (i = 0; limited_skills[i] != NOSKILL; ++i) {
+        if (sk == limited_skills[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool has_limited_skills(const struct unit * u)
 {
-    int i, j;
+    int i;
 
     for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
-        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
-            if (sv->id == limited_skills[j]) {
-                return true;
-            }
+        if (is_limited_skill(sv->id)) {
+            return true;
         }
     }
     return false;

@@ -651,12 +651,13 @@ int max_spellpoints(const struct unit *u, const region * r)
     const sc_mage *m;
 
     assert(u);
+    m = get_mage(u);
+    if (!m) return 0;
     if (!r) r = u->region;
 
     sk = effskill(u, SK_MAGIC, r);
     msp = rc_maxaura(u_race(u)) * (pow(sk, potenz) / divisor + 1);
-    m = get_mage(u);
-    if (m) msp += m->spchange;
+    msp += m->spchange;
 
     rtype = rt_find("aurafocus");
     if (rtype && i_get(u->items, rtype->itype) > 0) {
@@ -2250,11 +2251,28 @@ static int copy_spell_cb(spellbook_entry *sbe, void *udata) {
 }
 
 /**
+ * Entferne Magie-Attribut von Migranten, die keine Vertrauten sind.
+ *
+ * Einmalige Reparatur von Vertrauten (Bug 2585).
+ */
+void fix_fam_migrant(unit *u) {
+    if (!is_familiar(u)) {
+        a_removeall(&u->attribs, &at_mage);
+    }
+}
+
+/**
+ * Einheiten, die Vertraute sind, bekommen ihre fehlenden Zauber.
+ *
  * Einmalige Reparatur von Vertrauten (Bugs 2451, 2517).
  */
-void fix_fam_mage(unit *u) {
+void fix_fam_spells(unit *u) {
     sc_mage *dmage;
     unit *du = unit_create(0);
+
+    if (!is_familiar(u)) {
+        return;
+    }
 
     u_setrace(du, u_race(u));
     dmage = create_mage(du, M_GRAY);
@@ -2285,7 +2303,6 @@ void fix_fam_mage(unit *u) {
 
 void create_newfamiliar(unit * mage, unit * fam)
 {
-
     create_mage(fam, M_GRAY);
     set_familiar(mage, fam);
     equip_familiar(fam);

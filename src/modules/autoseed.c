@@ -49,7 +49,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-const terrain_type *random_terrain(const terrain_type * terrains[],
+static const terrain_type *random_terrain_select(const terrain_type * terrains[],
     int distribution[], int size)
 {
     int ndistribution = size;
@@ -583,7 +583,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
                 break;
         }
         else {
-            terraform_region(r, random_terrain(terrainarr, distribution, nterrains));
+            terraform_region(r, random_terrain_select(terrainarr, distribution, nterrains));
             --isize;
         }
     }
@@ -619,7 +619,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
                         pnormalize(&x, &y, pl);
                         rn = new_region(x, y, pl, 0);
                         if (rng_int() % SPECIALCHANCE < special) {
-                            terrain = random_terrain(terrainarr, distribution, nterrains);
+                            terrain = random_terrain_select(terrainarr, distribution, nterrains);
                             special = SPECIALCHANCE / 3;      /* 33% chance auf noch eines */
                         }
                         else {
@@ -698,23 +698,21 @@ region *regionqueue_pop(region_list ** rlist)
     return 0;
 }
 
-#define GEOMAX 8
+#define GEOMAX 7
 static struct geo {
     int distribution;
     terrain_t type;
 } geography_e3[GEOMAX] = {
-    {
-        8, T_OCEAN }, {
-            3, T_SWAMP }, {
-                1, T_VOLCANO }, {
-                    3, T_DESERT }, {
-                        4, T_HIGHLAND }, {
-                            3, T_MOUNTAIN }, {
-                                2, T_GLACIER }, {
-                                    1, T_PLAIN }
+    { 8, T_OCEAN },
+    { 3, T_SWAMP },
+    { 3, T_DESERT },
+    { 4, T_HIGHLAND },
+    { 3, T_MOUNTAIN },
+    { 2, T_GLACIER },
+    { 1, T_PLAIN }
 };
 
-const terrain_type *random_terrain_e3(direction_t dir)
+const terrain_type *random_terrain(direction_t dir)
 {
     static const terrain_type **terrainarr = 0;
     static int *distribution = 0;
@@ -731,7 +729,7 @@ const terrain_type *random_terrain_e3(direction_t dir)
             distribution[n] = geography_e3[n].distribution;
         }
     }
-    return random_terrain(terrainarr, distribution, GEOMAX);
+    return random_terrain_select(terrainarr, distribution, GEOMAX);
 }
 
 static int
@@ -864,8 +862,8 @@ static void starting_region(newfaction ** players, region * r, region * rn[])
     }
 }
 
-/* E3A island generation */
-int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfactions)
+/* island generator */
+int build_island(int x, int y, int minsize, newfaction ** players, int numfactions)
 {
 #define MIN_QUALITY 1000
     int nfactions = 0;
@@ -881,14 +879,14 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
         r = new_region(x, y, pl, 0);
     }
     do {
-        terraform_region(r, random_terrain_e3(NODIRECTION));
+        terraform_region(r, random_terrain(NODIRECTION));
     } while (!r->land);
 
     while (r) {
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, &random_terrain_e3, minsize - nsize);
+                nsize += random_neighbours(r, &rlist, &random_terrain, minsize - nsize);
             }
             else {
                 nsize += random_neighbours(r, &rlist, &get_ocean, minsize - nsize);

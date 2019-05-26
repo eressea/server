@@ -239,6 +239,7 @@ static void move_iceberg(region * r)
                         "region dir", r, dir));
                 }
 
+            stats_count("iceberg.drift", 1);
             x = r->x;
             y = r->y;
 
@@ -379,6 +380,7 @@ static void create_icebergs(void)
                 continue;
 
             r->terrain = t_iceberg;
+            stats_count("iceberg.terraform", 1);
 
             fset(r, RF_SELECT);
             move_iceberg(r);
@@ -603,8 +605,7 @@ void plagues(region * r)
     }
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("pest", "dead", dead));
         deathcounts(r, dead);
         rsetpeasants(r, peasants - dead);
     }
