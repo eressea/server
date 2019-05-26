@@ -42,7 +42,7 @@
         "nmr.removenewbie": false,
         "GiveRestriction": 3,
         "hunger.long": false,
-        "hunger.damage": "1d9+9",
+        "hunger.damage": "1d8+6",
         "init_spells": 0,
         "game.era": 2,
         "game.start": 184,
