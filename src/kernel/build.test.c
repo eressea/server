@@ -101,6 +101,28 @@ static void test_build_building_stages(CuTest *tc) {
     it_stone = test_create_itemtype("stone");
     btype = setup_castle(it_stone);
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->building = test_create_building(u->region, btype);
+    u->building->size = 1;
+    set_level(u, SK_BUILDING, 2);
+    i_change(&u->items, it_stone, 4);
+    build_building(u, btype, -1, INT_MAX, NULL);
+    CuAssertPtrNotNull(tc, u->building);
+    CuAssertIntEquals(tc, 3, u->building->size);
+    CuAssertIntEquals(tc, 2, i_get(u->items, it_stone));
+
+    test_teardown();
+}
+
+static void test_build_building_stage_continue(CuTest *tc) {
+    building_type *btype;
+    item_type *it_stone;
+    unit *u;
+
+    test_setup();
+    init_resources();
+    it_stone = test_create_itemtype("stone");
+    btype = setup_castle(it_stone);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     set_level(u, SK_BUILDING, 2);
     i_change(&u->items, it_stone, 4);
     build_building(u, btype, -1, INT_MAX, NULL);
@@ -450,6 +472,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_stages);
+    SUITE_ADD_TEST(suite, test_build_building_stage_continue);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     SUITE_ADD_TEST(suite, test_build_destroy_cmd);

@@ -16,12 +16,17 @@ local function tunnel_travelers(b)
 end
 
 local function get_target(param)
-    local ntargets = table.maxn(targets)
-    if ntargets==0 then
+    local ntargets = #targets
+    if ntargets == 0 then
+        eressea.log.error("Zero tunnel targets for  [" .. param .. "]")
         return nil
     end
     local rn = math.fmod(rng_int(), ntargets)
-    return targets[rn]
+    local t = targets[rn + 1]
+    if not t then
+        eressea.log.error("NULL target for  [" .. param .. "]" .. " at index " .. rn)
+    end
+    return t
 end
 
 local function tunnel_action(b, param)
@@ -50,7 +55,7 @@ function tunnels.init()
     local r, b
     for r in regions() do
         if r:get_key('tnnL') then
-            targets[table.maxn(targets)+1] = r
+            table.insert(targets, r)
             if (r:get_flag(0)) then
                 -- target region is chaotic? nope.
                 r:set_flag(0, false)
@@ -62,10 +67,11 @@ function tunnels.init()
         end
         for b in r.buildings do
             if b.type == 'portal' then
-                buildings[table.maxn(buildings)+1] = b
+                table.insert(buildings, b)
             end
         end
     end
+    eressea.log.info("Found " .. #targets .. " tunnel targets")
 end
 
 function tunnels.update()

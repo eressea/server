@@ -216,21 +216,3 @@ function test_sawmill()
     assert_equal(6, u:get_item("log"))
     assert_equal(97, r:get_resource("tree"))
 end
-
-function test_ent_guards_trees()
-    local r = region.create(0, 0, "plain")
-    r:set_resource("tree", 100)
-    local u = unit.create(faction.create("human"), r)
-    u:set_skill("mining", 1)
-    local guard = unit.create(get_monsters(), r, 1, "ent")
-    u:set_skill("forestry", 1)
-    guard:clear_orders()
-    u:clear_orders()
-
-    guard:add_order("BEWACHEN")
-    u:add_order("MACHE HOLZ")
-    process_orders()
-    assert_equal(1, u:get_item("log"))
-    process_orders()
-    assert_equal(1, u:get_item("log"))
-end

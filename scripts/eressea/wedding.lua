@@ -15,7 +15,7 @@ local function wedding_travellers(b)
   local units = {}
   
   for u in b.units do
-    if u:get_flag('wdgt') then
+    if u:get_key('wdgt') then
       units[u] = u
     end
   end

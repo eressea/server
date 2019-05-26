@@ -233,12 +233,12 @@ const char *parse_token_depr(const char **str)
     return parse_token(str, pbuf, MAXTOKENSIZE);
 }
 
-const char *getstrtoken(void)
+char *getstrtoken(void)
 {
     return parse_token((const char **)&states->current_token, pbuf, MAXTOKENSIZE);
 }
 
-const char *gettoken(char *lbuf, size_t bufsize)
+char *gettoken(char *lbuf, size_t bufsize)
 {
     return parse_token((const char **)&states->current_token, lbuf, bufsize);
 }

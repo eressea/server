@@ -281,6 +281,7 @@ unit *addplayer(region * r, faction * f)
     assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
+    u->status = ST_FLEE;
     u->thisorder = default_order(f->locale);
     unit_addorder(u, copy_order(u->thisorder));
     name = config_get("rules.equip_first");
@@ -609,7 +610,7 @@ static int allied_skillcount(const faction * f, skill_t sk)
 
     for (qi = 0; members; selist_advance(&members, &qi, 1)) {
         faction *m = (faction *)selist_get(members, qi);
-        num += count_skill(m, sk);
+        num += faction_count_skill(m, sk);
     }
     return num;
 }
@@ -623,7 +624,7 @@ static int allied_skilllimit(const faction * f, skill_t sk)
     return value;
 }
 
-int count_skill(faction * f, skill_t sk)
+int faction_count_skill(faction * f, skill_t sk)
 {
     int n = 0;
     unit *u;
@@ -638,7 +639,7 @@ int count_skill(faction * f, skill_t sk)
     return n;
 }
 
-int skill_limit(faction * f, skill_t sk)
+int faction_skill_limit(const faction * f, skill_t sk)
 {
     int m = INT_MAX;
     int al = allied_skilllimit(f, sk);

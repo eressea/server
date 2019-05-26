@@ -442,7 +442,7 @@ static order *monster_move(region * r, unit * u)
     if (fval(u_race(u), RCF_DRAGON)) {
         d = richest_neighbour(r, u->faction, 1);
     }
-    else if (get_race(RC_TREEMAN)==u_race(u)) {
+    else if (get_race(RC_TREEMAN) == u_race(u)) {
         d = treeman_neighbour(r);
     }
     else {
