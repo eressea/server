@@ -510,7 +510,7 @@ static bool cb_msg_teach(void *el, void *arg) {
         if (feedback) {
             ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
                 "teacher student skill level", ut, u, sk,
-                effskill(u, sk, 0)));
+                effskill(u, sk, NULL)));
         }
         ADDMSG(&u->faction->msgs, msg_message("teach_student",
             "teacher student skill", ut, u, sk));
@@ -527,12 +527,13 @@ static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
 
 bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
     int err = 0;
+    const race *rc = u_race(u);
 
     if (sk < 0) {
         err = 77;
     }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
-    else if (u_race(u)->bonus[sk] == -99) {
+    else if (rc->bonus[sk] == -99) {
         err = 771;
     }
     else {
@@ -634,9 +635,9 @@ int study_cmd(unit * u, order * ord)
             mtype = M_GRAY;
         }
         else if (!has_skill(u, SK_MAGIC)) {
-            int mmax = skill_limit(u->faction, SK_MAGIC);
+            int mmax = faction_skill_limit(u->faction, SK_MAGIC);
             /* Die Einheit ist noch kein Magier */
-            if (count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
+            if (faction_count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians",
                     "amount", mmax));
                 return -1;
@@ -691,10 +692,10 @@ int study_cmd(unit * u, order * ord)
         }
     }
     if (sk == SK_ALCHEMY) {
-        maxalchemy = effskill(u, SK_ALCHEMY, 0);
+        maxalchemy = effskill(u, SK_ALCHEMY, NULL);
         if (!has_skill(u, SK_ALCHEMY)) {
-            int amax = skill_limit(u->faction, SK_ALCHEMY);
-            if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
+            int amax = faction_skill_limit(u->faction, SK_ALCHEMY);
+            if (faction_count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists",
                     "amount", amax));
                 return -1;
@@ -780,7 +781,7 @@ int study_cmd(unit * u, order * ord)
 
     if (sk == SK_ALCHEMY) {
         faction *f = u->faction;
-        int skill = effskill(u, SK_ALCHEMY, 0);
+        int skill = effskill(u, SK_ALCHEMY, NULL);
         if (skill > maxalchemy) {
             show_potions(f, skill);
         }
@@ -859,7 +860,7 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Dämonen verschieben sich.
+/** Talente von Daemonen verschieben sich.
 */
 void demon_skillchange(unit *u)
 {

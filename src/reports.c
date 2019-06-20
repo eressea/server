@@ -144,8 +144,6 @@ bool omniscient(const faction *f)
     return (f->race == rc_template);
 }
 
-
-
 static char *groupid(const struct group *g, const struct faction *f)
 {
     typedef char name[OBJECTIDSIZE + 1];
@@ -563,7 +561,7 @@ report_resources(const region * r, resource_report * result, int size,
                 int maxskill = 0;
                 for (u = r->units; visible != res->amount && u != NULL; u = u->next) {
                     if (u->faction == viewer) {
-                        int s = effskill(u, skill, 0);
+                        int s = effskill(u, skill, NULL);
                         if (s > maxskill) {
                             maxskill = s;
                             visible = raw->visible(res, maxskill);
@@ -622,7 +620,7 @@ static void spskill(sbstring *sbp, const struct locale * lang,
         }
     }
 
-    effsk = eff_skill(u, sv, 0);
+    effsk = eff_skill(u, sv, NULL);
     sbs_strcat(sbp, str_itoa(effsk));
 
     if (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) {
@@ -715,7 +713,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        const char *name = LOC(lang, mkname("race", pzTmp));
+        const char *name = locale_string(lang, mkname("race", pzTmp), false);
         sbs_strcat(sbp, name ? name : pzTmp);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             sbs_strcat(sbp, " (");
@@ -812,7 +810,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 
         if (book) {
             selist *ql = book->spells;
-            int qi, header, maxlevel = effskill(u, SK_MAGIC, 0);
+            int qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
             sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
 
             for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
@@ -1603,7 +1601,9 @@ int write_reports(faction * f)
     if (noreports) {
         return false;
     }
-    if (f->lastorders == 0) {
+    if (f->lastorders == 0 || f->age <= 1) {
+        /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
+         * kriegen ein neues Passwort: */
         password = faction_genpassword(f, buffer);
     }
     prepare_report(&ctx, f, password);

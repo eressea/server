@@ -71,9 +71,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier hat 
 msgid "error195"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg.\""
 
-msgid "healall"
-msgstr "\"Ein Hauch des Lebens liegt über der Welt und alle Wesen fühlen sich frisch und erholt.\""
-
 msgid "build_required"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür braucht die Einheit $resources($required).\""
 
@@ -108,7 +105,7 @@ msgid "massive_overload"
 msgstr "\"Die $ship($ship) ist zu stark überladen und wird stark beschädigt.\""
 
 msgid "curseinfo::shipspeedup"
-msgstr "\"Die Winde scheinen dieses Schiff besonders zu beguenstigen. ($int36($id))\""
+msgstr "\"Die Winde scheinen dieses Schiff besonders zu begünstigen. ($int36($id))\""
 
 msgid "error152"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit springt über Bord und ertrinkt.\""
@@ -590,9 +587,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unbekannte Opti
 msgid "error131"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Gletschern Straßen bauen zu können, muß zuerst ein Tunnel errichtet werden.\""
 
-msgid "error241"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei muß mindestens 81 Wochen alt sein, um einen Neustart mit einer anderen Rasse zu versuchen.\""
-
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wurde nicht gefunden.\""
 
@@ -1005,7 +999,7 @@ msgid "battle_critical"
 msgstr "\"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer.\""
 
 msgid "error_spell_on_ship_already"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt beeits ein Zauber.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt bereits ein Zauber.\""
 
 msgid "error228"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur normale Personen können Steuern eintreiben.\""
@@ -1122,7 +1116,7 @@ msgid "dissolve_units_4"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"zerfiel\", \"zerfielen\") zu Staub.\""
 
 msgid "error281"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen welche Rasse soll der Jihad ausgerufen werden?\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Zielpartei muss die selbe Rasse haben.\""
 
 msgid "error171"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Kampfzauber gibt es nicht.\""
@@ -1786,9 +1780,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es konnte kein 
 
 msgid "error50"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht erfahren genug dafür.\""
-
-msgid "error282"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gegen diese Rasse kann kein Jihad ausgerufen werden.\""
 
 msgid "nmr_warning_final"
 msgstr "\"Bitte sende die Befehle nächste Runde ein, wenn du weiterspielen möchtest.\""

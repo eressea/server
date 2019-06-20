@@ -39,9 +39,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* ------------------------------------------------------------- */
 /* Ausgabe der Spruchbeschreibungen
  * Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
- * kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
+ * kleiner war (u->faction->seenspells). Ansonsten muss nur geprueft
  * werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
- * Spruch zu seiner List-of-known-spells hinzugefügt werden.
+ * Spruch zu seiner List-of-known-spells hinzugefuegt werden.
  */
 
 static int read_seenspells(variant *var, void *owner, struct gamedata *data)
@@ -54,11 +54,12 @@ static int read_seenspells(variant *var, void *owner, struct gamedata *data)
     READ_TOK(store, token, sizeof(token));
     while (token[0]) {
         spell *sp = find_spell(token);
-        if (!sp) {
-            log_info("read_seenspells: could not find spell '%s'\n", token);
-            return AT_READ_FAIL;
+        if (sp) {
+            selist_push(&ql, sp);
         }
-        selist_push(&ql, sp);
+        else {
+            log_info("read_seenspells: could not find spell '%s'\n", token);
+        }
         READ_TOK(store, token, sizeof(token));
     }
     var->v = ql;
@@ -70,8 +71,8 @@ static bool cb_write_spell(void *data, void *more) {
     storage *store = (storage *)more;
     WRITE_TOK(store, sp->sname);
     return true;
-
 }
+
 static void
 write_seenspells(const variant *var, const void *owner, struct storage *store)
 {

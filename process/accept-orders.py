@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from email.Utils import parseaddr
-from email.Parser import Parser
 import os
 import os.path
 import ConfigParser
-from re import compile, IGNORECASE
-from stat import ST_MTIME
-from string import upper, split, replace
+import string
 import logging
 import sys
 import subprocess
-from sys import stdin
-from time import ctime, sleep, time
-from socket import gethostname
-from rfc822 import parsedate_tz, mktime_tz
+import time
+import socket
+import rfc822
+from stat import ST_MTIME
+from email.Utils import parseaddr
+from email.Parser import Parser
 
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
@@ -50,37 +48,15 @@ else:
         sender = "%s Server <%s>" % (gamename, frommail)
     config = None
 prefix = 'turn-'
-hostname = gethostname()
+hostname = socket.gethostname()
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
-maxfiles = 20
+maxfiles = 30
 # write headers to file?
 writeheaders = True
 # reject all html email?
 rejecthtml = True
-
-def unlock_file(filename):
-    try:
-        os.unlink(filename+".lock")
-    except:
-        print "could not unlock %s.lock, file not found" % filename
-
-def lock_file(filename):
-    i = 0
-    wait = 1
-    if not os.path.exists(filename):
-        file=open(filename, "w")
-        file.close()
-    while True:
-        try:
-            os.symlink(filename, filename+".lock")
-            return
-        except:
-            i = i+1
-            if i == 5: unlock_file(filename)
-            sleep(wait)
-            wait = wait*2
 
 messages = {
         "multipart-en" :
@@ -199,7 +175,7 @@ def available_file(dirname, basename):
     return maxdate, filename
 
 def formatpar(string, l=76, indent=2):
-    words = split(string)
+    words = string.split(string)
     res = ""
     ll = 0
     first = 1
@@ -245,14 +221,13 @@ def write_part(outfile, part):
     outfile.write("\n");
     return True
 
-def copy_orders(message, filename, sender):
-        # print the header first
+def copy_orders(message, filename, sender, mtime):
+    # print the header first
+    dirname, basename = os.path.split(filename)
     if writeheaders:
-        from os.path import split
-        dirname, basename = split(filename)
-        dirname = dirname + '/headers'
-        if not os.path.exists(dirname): os.mkdir(dirname)
-        outfile = open(dirname + '/' + basename, "w")
+        header_dir = dirname + '/headers'
+        if not os.path.exists(header_dir): os.mkdir(header_dir)
+        outfile = open(header_dir + '/' + basename, "w")
         for name, value in message.items():
             outfile.write(name + ": " + value + "\n")
         outfile.close()
@@ -277,6 +252,7 @@ def copy_orders(message, filename, sender):
             charset = message.get_content_charset()
             logger.error("could not write text/plain message (charset=%s) for %s" % (charset, sender))
     outfile.close()
+
     return found
 
 # create a file, containing:
@@ -300,29 +276,35 @@ def accept(game, locale, stream, extend=None):
         return -1
     logger.info("received orders from " + email)
     # get an available filename
-    lock_file(gamedir + "/orders.queue")
     maxdate, filename = available_file(savedir, prefix + email)
     if filename is None:
         logger.warning("more than " + str(maxfiles) + " orders from " + email)
         return -1
     # copy the orders to the file
-    text_ok = copy_orders(message, filename, email)
-    unlock_file(gamedir + "/orders.queue")
-
-    warning, msg, fail = None, "", False
+    
+    turndate = None
     maildate = message.get("Date")
-    if maildate != None:
-        turndate = mktime_tz(parsedate_tz(maildate))
+    if maildate is None:
+        turndate = time.time()
+    else:
+        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
+
+    text_ok = copy_orders(message, filename, email, turndate)
+    warning, msg, fail = None, "", False
+    if not maildate is None:
         os.utime(filename, (turndate, turndate))
         logger.debug("mail date is '%s' (%d)" % (maildate, turndate))
         if False and turndate < maxdate:
             logger.warning("inconsistent message date " + email)
             warning = " (" + messages["warning-" + locale] + ")"
-            msg = msg + formatpar(messages["maildate-" + locale] % (ctime(maxdate),ctime(turndate)), 76, 2) + "\n"
+            msg = msg + formatpar(messages["maildate-" + locale] % (time.ctime(maxdate), time.ctime(turndate)), 76, 2) + "\n"
     else:
         logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
+
+    print('ACCEPT_MAIL=' + email)
+    print('ACCEPT_FILE="' + filename + '"')
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
@@ -331,10 +313,8 @@ def accept(game, locale, stream, extend=None):
         os.unlink(filename)
         savedir = savedir + "/rejected"
         if not os.path.exists(savedir): os.mkdir(savedir)
-        lock_file(gamedir + "/orders.queue")
         maxdate, filename = available_file(savedir, prefix + email)
         store_message(message, filename)
-        unlock_file(gamedir + "/orders.queue")
         fail = True
 
     if sendmail and warning is not None:
@@ -348,11 +328,9 @@ def accept(game, locale, stream, extend=None):
         print filename
 
     if not fail:
-        lock_file(gamedir + "/orders.queue")
         queue = open(gamedir + "/orders.queue", "a")
         queue.write("email=%s file=%s locale=%s game=%s\n" % (email, filename, locale, game))
         queue.close()
-        unlock_file(gamedir + "/orders.queue")
 
     logger.info("done - accepted orders from " + email)
 
@@ -368,10 +346,10 @@ logging.basicConfig(level=logging.DEBUG, filename=LOG_FILENAME)
 logger = logging
 delay = None # TODO: parse the turn delay
 locale = sys.argv[2]
-infile = stdin
+infile = sys.stdin
 if len(sys.argv)>3:
     infile = open(sys.argv[3], "r")
 retval = accept(game, locale, infile, delay)
-if infile!=stdin:
+if infile!=sys.stdin:
     infile.close()
 sys.exit(retval)

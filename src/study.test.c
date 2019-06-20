@@ -59,6 +59,8 @@ typedef struct {
 
 static void setup_study(void) {
     test_setup();
+    mt_create_error(77);
+    mt_create_error(771);
     mt_create_error(178);
     mt_create_error(65);
     mt_create_va(mt_new("teach_asgood", NULL),
@@ -148,6 +150,32 @@ static void test_study_with_bad_teacher(CuTest *tc) {
     test_teardown();
 }
 
+static void test_check_student(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    setup_study();
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_CROSSBOW]);
+    CuAssertTrue(tc, check_student(u, u->thisorder, SK_CROSSBOW));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+
+    rc = test_create_race("skeleton");
+    rc->flags |= RCF_NOLEARN;
+    u_setrace(u, rc);
+    CuAssertTrue(tc, !check_student(u, u->thisorder, SK_CROSSBOW));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_race_nolearn"));
+    test_clear_messages(u->faction);
+    rc->flags -= RCF_NOLEARN;
+
+    rc->bonus[SK_CROSSBOW] = -99;
+    CuAssertTrue(tc, !check_student(u, u->thisorder, SK_CROSSBOW));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error771"));
+    test_clear_messages(u->faction);
+
+    test_teardown();
+}
+
 static void test_study_bug_2194(CuTest *tc) {
     unit *u, *u1, *u2;
     struct locale * loc;
@@ -158,7 +186,7 @@ static void test_study_bug_2194(CuTest *tc) {
     init_resources();
     loc = test_create_locale();
     setup_locale(loc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     scale_number(u, 2);
     set_level(u, SK_CROSSBOW, TEACHDIFFERENCE);
     u->faction->locale = loc;
@@ -742,5 +770,6 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_academy_bonus);
     SUITE_ADD_TEST(suite, test_demon_skillchanges);
     SUITE_ADD_TEST(suite, test_study_bug_2194);
+    SUITE_ADD_TEST(suite, test_check_student);
     return suite;
 }

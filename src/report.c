@@ -551,9 +551,9 @@ static void nr_curses(struct stream *out, int indent, const faction *viewer, obj
     region *r;
 
     /* Die Sichtbarkeit eines Zaubers und die Zaubermeldung sind bei
-    * Gebäuden und Schiffen je nach, ob man Besitzer ist, verschieden.
+    * Gebaeuden und Schiffen je nach, ob man Besitzer ist, verschieden.
     * Bei Einheiten sieht man Wirkungen auf eigene Einheiten immer.
-    * Spezialfälle (besonderes Talent, verursachender Magier usw. werde
+    * Spezialfaelle (besonderes Talent, verursachender Magier usw. werde
     * bei jedem curse gesondert behandelt. */
     if (typ == TYP_SHIP) {
         ship *sh = (ship *)obj;
@@ -1216,14 +1216,14 @@ static void statistics(struct stream *out, const region * r, const faction * f)
 
         if (!markets_module()) {
             if (buildingtype_exists(r, bt_find("caravan"), true)) {
-                m = msg_message("nr_stat_luxuries", "max", (p * 2) / TRADE_FRACTION);
+                p *= 2;
             }
-            else {
+            if (p >= TRADE_FRACTION) {
                 m = msg_message("nr_stat_luxuries", "max", p / TRADE_FRACTION);
+                nr_render(m, f->locale, buf, sizeof(buf), f);
+                paragraph(out, buf, 2, 2, 0);
+                msg_release(m);
             }
-            nr_render(m, f->locale, buf, sizeof(buf), f);
-            paragraph(out, buf, 2, 2, 0);
-            msg_release(m);
         }
 
         /* count */
@@ -1443,7 +1443,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
             ++begin;
         }
         pos = begin;
-        while (pos) {
+        do {
             char *next = strchr(pos+1, ' ');
             if (next == NULL) {
                 if (isfinal) {
@@ -1474,7 +1474,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
                 break;
             }
             pos = next;
-        }
+        } while (pos);
     }
     if (isfinal) {
         char *pos = sbp->begin;
@@ -1509,7 +1509,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
     if ((mode & HELP_ALL) == HELP_ALL) {
         sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
     }
-    else {
+    else if (mode > 0) {
         int h, hh = 0;
         for (h = 1; h <= HELP_TRAVEL; h *= 2) {
             int p = MAXPARAMS;
@@ -1545,7 +1545,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
         }
     }
     if (show->num_allies == show->num_listed) {
-        sbs_strcat(sbp, ").");
+        sbs_strcat(sbp, ").\n");
         pump_paragraph(sbp, show->out, show->maxlen, true);
     }
     else {
@@ -1577,10 +1577,23 @@ void report_allies(struct stream *out, size_t maxlen, const struct faction * f, 
     }
 }
 
+static void rpline(struct stream *out)
+{
+    static char line[REPORTWIDTH + 1];
+    if (line[0] != '-') {
+        memset(line, '-', sizeof(line));
+        line[REPORTWIDTH] = '\n';
+    }
+    swrite(line, sizeof(line), 1, out);
+}
+
 static void allies(struct stream *out, const faction * f)
 {
     const group *g = f->groups;
     char prefix[64];
+
+    centre(out, LOC(f->locale, "nr_alliances"), false);
+    newline(out);
 
     if (f->allies) {
         snprintf(prefix, sizeof(prefix), "%s ", LOC(f->locale, "faction_help"));
@@ -1660,16 +1673,6 @@ static void guards(struct stream *out, const region * r, const faction * see)
     }
 }
 
-static void rpline(struct stream *out)
-{
-    static char line[REPORTWIDTH + 1];
-    if (line[0] != '-') {
-        memset(line, '-', sizeof(line));
-        line[REPORTWIDTH] = '\n';
-    }
-    swrite(line, sizeof(line), 1, out);
-}
-
 static void list_address(struct stream *out, const faction * uf, selist * seenfactions)
 {
     int qi = 0;
@@ -1699,8 +1702,6 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
         }
         selist_advance(&flist, &qi, 1);
     }
-    newline(out);
-    rpline(out);
 }
 
 static void
@@ -2115,14 +2116,6 @@ report_plaintext(const char *filename, report_context * ctx,
     }
     newline(out);
     ERRNO_CHECK();
-    centre(out, LOC(f->locale, "nr_alliances"), false);
-    newline(out);
-
-    allies(out, f);
-
-    rpline(out);
-
-    ERRNO_CHECK();
     anyunits = 0;
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
@@ -2134,9 +2127,10 @@ report_plaintext(const char *filename, report_context * ctx,
             continue;
         /* Beschreibung */
 
+        rpline(out);
+        newline(out);
         if (r->seen.mode >= seen_unit) {
             anyunits = 1;
-            newline(out);
             report_region(out, r, f);
             if (markets_module() && r->land) {
                 const item_type *lux = r_luxury(r);
@@ -2173,7 +2167,6 @@ report_plaintext(const char *filename, report_context * ctx,
             newline(out);
             report_travelthru(out, r, f);
         }
-        newline(out);
 
         if (wants_stats && r->seen.mode >= seen_travel) {
             if (r->land || r->seen.mode >= seen_unit) {
@@ -2185,8 +2178,10 @@ report_plaintext(const char *filename, report_context * ctx,
         /* Nachrichten an REGION in der Region */
         if (r->seen.mode >= seen_travel) {
             message_list *mlist = r_getmessages(r, f);
+            newline(out);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
+                newline(out);
                 rp_messages(out, mlist, f, 0, false);
                 split_messages(mlist, split);
             }
@@ -2240,7 +2235,6 @@ report_plaintext(const char *filename, report_context * ctx,
         assert(!u);
 
         newline(out);
-        rpline(out);
         ERRNO_CHECK();
     }
     if (!is_monsters(f)) {
@@ -2249,6 +2243,7 @@ report_plaintext(const char *filename, report_context * ctx,
             paragraph(out, LOC(f->locale, "nr_youaredead"), 0, 2, 0);
         }
         else {
+            allies(out, f);
             list_address(out, f, ctx->addresses);
         }
     }

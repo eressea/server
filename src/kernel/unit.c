@@ -16,7 +16,9 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "unit.h"
 
@@ -1229,7 +1231,7 @@ int invisible(const unit * target, const unit * viewer)
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = MIN(hidden, target->number);
+            if (hidden > target->number) hidden = target->number;
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);
@@ -1810,17 +1812,27 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+static skill_t limited_skills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
+
+bool is_limited_skill(skill_t sk)
+{
+    int i;
+    for (i = 0; limited_skills[i] != NOSKILL; ++i) {
+        if (sk == limited_skills[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool has_limited_skills(const struct unit * u)
 {
-    int i, j;
+    int i;
 
     for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
-        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
-            if (sv->id == limited_skills[j]) {
-                return true;
-            }
+        if (is_limited_skill(sv->id)) {
+            return true;
         }
     }
     return false;

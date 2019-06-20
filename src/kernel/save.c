@@ -448,7 +448,7 @@ unit *read_unit(gamedata *data)
     set_number(u, number);
 
     READ_INT(data->store, &n);
-    u->age = (short)n;
+    u->age = n;
 
     READ_TOK(data->store, rname, sizeof(rname));
     rc = rc_find(rname);
@@ -610,6 +610,48 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
     READ_STR(data->store, info, len);
     if (unicode_utf8_trim(info) != 0) {
         log_warning("trim region %d info to '%s'", r->uid, info);
+    }
+}
+
+static void fix_resource_levels(region *r) {
+    struct terrain_production *p;
+    for (p = r->terrain->production; p->type; ++p) {
+        char *end;
+        long start = (int)strtol(p->startlevel, &end, 10);
+        if (*end == '\0') {
+            rawmaterial *res;
+            for (res = r->resources; res; res = res->next) {
+                if (p->type == res->rtype) {
+                    if (start != res->startlevel) {
+                        log_debug("setting resource start level for %s in %s to %d",
+                            res->rtype->_name, regionname(r, NULL), start);
+                        res->startlevel = start;
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+static void fix_resource_bases(region *r) {
+    struct terrain_production *p;
+    for (p = r->terrain->production; p->type; ++p) {
+        char *end;
+        long base = (int)strtol(p->base, &end, 10);
+        if (*end == '\0') {
+            rawmaterial *res;
+            for (res = r->resources; res; res = res->next) {
+                if (p->type == res->rtype) {
+                    if (base != res->base) {
+                        log_debug("setting resource base for %s in %s to %d",
+                            res->rtype->_name, regionname(r, NULL), base);
+                        res->base = base;
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -775,11 +817,23 @@ static region *readregion(gamedata *data, int x, int y)
         }
         if (data->version >= REGIONOWNER_VERSION) {
             READ_INT(data->store, &n);
-            region_set_morale(r, MAX(0, (short)n), -1);
+            if (n < 0) n = 0;
+            region_set_morale(r, n, -1);
             read_owner(data, &r->land->ownership);
         }
     }
     read_attribs(data, &r->attribs, r);
+
+    if (r->resources) {
+        if (data->version < FIX_STARTLEVEL_VERSION) {
+            /* we had some badly made rawmaterials before this */
+            fix_resource_levels(r);
+        }
+        if (data->version < FIX_RES_BASE_VERSION) {
+            /* we had some badly made rawmaterials before this */
+            fix_resource_bases(r);
+        }
+    }
     return r;
 }
 
@@ -1185,6 +1239,9 @@ int readgame(const char *filename)
         binstore_done(&store);
         fstream_done(&strm);
     }
+    else {
+        fclose(F);
+    }
     return n;
 }
 
@@ -1332,6 +1389,72 @@ static void fix_fam_triggers(unit *u) {
                 }
                 else {
                     log_error("%s seems to be a broken familiar with no trigger.", unitname(u));
+                }
+            }
+        }
+    }
+}
+
+static void fix_clone(unit *uc) {
+    attrib * a;
+    assert(uc);
+    assert(uc->number > 0);
+    ADDMSG(&uc->faction->msgs, msg_message("dissolve_units_5",
+        "unit region number race", uc, uc->region, uc->number, u_race(uc)));
+    a_removeall(&uc->attribs, &at_clonemage);
+    a = a_new(&at_unitdissolve);
+    a->data.ca[0] = 0;
+    a->data.ca[1] = 100;
+    a_add(&uc->attribs, a);
+}
+
+static void fix_clone_mage(unit *um, const item_type *itype) {
+    i_change(&um->items, itype, 1);
+    change_maxspellpoints(um, 20);
+    a_removeall(&um->attribs, &at_clone);
+}
+
+static void fix_clones(void) {
+    const race *rc_clone = rc_find("clone");
+    const item_type *it_potion = it_find("lifepotion");
+    
+    if (rc_clone && it_potion) {
+        region *r;
+        for (r = regions; r; r = r->next) {
+            unit * u;
+            for (u = r->units; u; u = u->next) {
+                if (!fval(u, UFL_MARK)) {
+                    if (u_race(u) == rc_clone) {
+                        attrib *a = a_find(u->attribs, &at_clonemage);
+                        unit * um = NULL;
+                        fset(u, UFL_MARK);
+                        if (a) {
+                            um = (unit *)a->data.v;
+                            fset(um, UFL_MARK);
+                        }
+                    }
+                    else {
+                        attrib *a = a_find(u->attribs, &at_clone);
+                        if (a) {
+                            unit *uc = (unit *)a->data.v;
+                            fset(u, UFL_MARK);
+                            fset(uc, UFL_MARK);
+                        }
+                    }
+                }
+            }
+        }
+        for (r = regions; r; r = r->next) {
+            unit * u;
+            for (u = r->units; u; u = u->next) {
+                if (fval(u, UFL_MARK)) {
+                    if (u_race(u) == rc_clone) {
+                        fix_clone(u);
+                    }
+                    else {
+                        fix_clone_mage(u, it_potion);
+                    }
+                    freset(u, UFL_MARK);
                 }
             }
         }
@@ -1506,7 +1629,7 @@ int read_game(gamedata *data)
                     struct sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
-                        int skl = effskill(u, SK_MAGIC, 0);
+                        int skl = effskill(u, SK_MAGIC, NULL);
                         if (f->magiegebiet == M_GRAY) {
                             f->magiegebiet = mage_get_type(mage);
                             log_error("faction %s had magic=gray, fixing (%s)",
@@ -1529,12 +1652,17 @@ int read_game(gamedata *data)
             }
         }
     }
-
+    if (data->version < FIX_CLONES_VERSION) {
+        fix_clones();
+    }
     if (data->version < FAMILIAR_FIX_VERSION) {
         fix_familiars(fix_fam_triggers);
     }
     if (data->version < FAMILIAR_FIXSPELLBOOK_VERSION) {
-        fix_familiars(fix_fam_mage);
+        fix_familiars(fix_fam_spells);
+    }
+    if (data->version < FIX_MIGRANT_AURA_VERSION) {
+        fix_familiars(fix_fam_migrant);
     }
 
     log_debug("Done loading turn %d.", turn);

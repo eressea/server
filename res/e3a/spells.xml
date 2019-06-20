@@ -79,13 +79,13 @@
     <!-- Traumbilder entwirren -->
     <resource name="aura" amount="6" cost="level"/>
   </spell>
+    <!-- Seelenkopie, disabled version 3.20, Bug 1982
   <spell name="clone" rank="5">
-    <!-- Seelenkopie -->
     <resource name="aura" amount="100" cost="fixed"/>
     <resource name="permaura" amount="20" cost="fixed"/>
     <resource name="dragonblood" amount="5" cost="fixed"/>
     <resource name="silk" amount="20" cost="fixed"/>
-  </spell>
+  </spell> -->
   <spell name="bad_dreams" rank="5" far="true">
     <!-- Schlechte Träume -->
     <resource name="aura" amount="90" cost="fixed"/>

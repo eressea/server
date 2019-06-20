@@ -90,7 +90,7 @@ extern "C" {
      * - Magierichtung
      * - Magiepunkte derzeit
      * - Malus (neg. Wert)/ Bonus (pos. Wert) auf maximale Magiepunkte
-     *   (koennen sich durch Questen absolut veraendern und durch Gegenstände
+     *   (koennen sich durch Questen absolut veraendern und durch Gegenstaende
      *   temporaer). Auch fuer Artefakt benoetigt man permanente MP
      * - Anzahl bereits gezauberte Sprueche diese Runde
      * - Kampfzauber (3) (vor/waehrend/nach)
@@ -145,7 +145,7 @@ extern "C" {
      Schiffen stehend gezaubert werden */
 #define TESTCANSEE      (1<<4) /* alle Zielunits auf cansee pruefen */
 
-     /* ID's koennen zu drei unterschiedlichen Entitaeten gehören: Einheiten,
+     /* ID's koennen zu drei unterschiedlichen Entitaeten gehoeren: Einheiten,
      * Gebaeuden und Schiffen. */
 #define UNITSPELL       (1<<5)  /* ZAUBER .. <Einheit-Nr> [<Einheit-Nr> ..] */
 #define SHIPSPELL       (1<<6)  /* ZAUBER .. <Schiff-Nr> [<Schiff-Nr> ..] */
@@ -153,7 +153,7 @@ extern "C" {
 #define REGIONSPELL     (1<<8)  /* wirkt auf struct region */
 #define GLOBALTARGET    (1<<9) /* Ziel kann ausserhalb der region sein */
 
-#define PRECOMBATSPELL	(1<<10)  /* PRÄKAMPFZAUBER .. */
+#define PRECOMBATSPELL	(1<<10)  /* PRAEKAMPFZAUBER .. */
 #define COMBATSPELL     (1<<11)  /* KAMPFZAUBER .. */
 #define POSTCOMBATSPELL	(1<<12)  /* POSTKAMPFZAUBER .. */
 #define ISCOMBATSPELL   (PRECOMBATSPELL|COMBATSPELL|POSTCOMBATSPELL)
@@ -210,6 +210,7 @@ extern "C" {
     const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
     struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
     int mage_get_spellpoints(const struct sc_mage *m);
+    void mage_set_spellpoints(struct sc_mage *m, int aura);
     int mage_change_spellpoints(struct sc_mage *m, int delta);
 
     enum magic_t unit_get_magic(const struct unit *u);
@@ -259,7 +260,7 @@ extern "C" {
     /* veraendert die maximalen Magiepunkte einer Einheit */
 
     /* Zaubern */
-    extern double spellpower(struct region *r, struct unit *u, const struct spell * sp,
+    double spellpower(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level, struct order *ord);
     /*      ermittelt die Staerke eines Spruchs */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
@@ -275,18 +276,18 @@ extern "C" {
     struct unit * familiar, const struct spell * sp, struct region * r,
         int lev, double force, int range, struct order * ord, struct spellparameter * p);
     void free_castorder(struct castorder *co);
-    /* Zwischenspreicher fuer Zauberbefehle, notwendig für Prioritaeten */
+    /* Zwischenspreicher fuer Zauberbefehle, notwendig fuer Prioritaeten */
     void add_castorder(struct spellrank *cll, struct castorder *co);
     /* Haenge c-order co an die letze c-order von cll an */
     void free_castorders(struct castorder *co);
     /* Speicher wieder freigeben */
     int cast_spell(struct castorder *co);
 
-    /* Pruefroutinen für Zaubern */
+    /* Pruefroutinen fuer Zaubern */
     int countspells(struct unit *u, int step);
     int spellcount(const struct unit *u);
-    /*      erhoeht den Counter fuer Zaubersprüche um 'step' und gibt die neue
-     *      Anzahl der gezauberten Sprueche zurück. */
+    /*      erhoeht den Counter fuer Zaubersprueche um 'step' und gibt die neue
+     *      Anzahl der gezauberten Sprueche zurueck. */
     int auracost(const struct unit *caster, const struct spell *sp);
     int spellcost(const struct unit *caster, const struct spell_component *spc);
     /*      gibt die fuer diesen Spruch derzeit notwendigen Magiepunkte auf der
@@ -315,7 +316,7 @@ extern "C" {
         int resist_bonus);
     /*      gibt false zurueck, wenn der Zauber gelingt, true, wenn das Ziel
      *      widersteht */
-    extern struct spell * unit_getspell(struct unit *u, const char *s,
+    struct spell * unit_getspell(struct unit *u, const char *s,
         const struct locale *lang);
     const char *magic_name(magic_t mtype, const struct locale *lang);
 
@@ -329,7 +330,8 @@ extern "C" {
     void create_newfamiliar(struct unit *mage, struct unit *familiar);
     void create_newclone(struct unit *mage, struct unit *familiar);
 
-    void fix_fam_mage(struct unit *u);
+    void fix_fam_spells(struct unit *u);
+    void fix_fam_migrant(struct unit *u);
 
     const char *spell_info(const struct spell *sp,
         const struct locale *lang);

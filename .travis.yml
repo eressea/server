@@ -13,7 +13,7 @@ addons:
       - libtolua-dev
       - libncurses5-dev
       - libsqlite3-dev
-      - libxml2-dev
+      - libexpat1-dev
       - valgrind
       - cppcheck
       - shellcheck

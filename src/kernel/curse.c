@@ -402,8 +402,8 @@ static void set_cursevigour(curse * c, double vigour)
     c->vigour = vigour;
 }
 
-/* veraendert die Stärke der Verzauberung um +i und gibt die neue
- * Staerke zurueck. Sollte die Zauberstärke unter Null sinken, loest er
+/* veraendert die Staerke der Verzauberung um +i und gibt die neue
+ * Staerke zurueck. Sollte die Zauberstaerke unter Null sinken, loest er
  * sich auf.
  */
 double curse_changevigour(attrib ** ap, curse * c, double vigour)
@@ -454,7 +454,7 @@ set_curseingmagician(struct unit *magician, struct attrib *ap_target,
 
 /* ------------------------------------------------------------- */
 /* gibt bei Personenbeschraenkten Verzauberungen die Anzahl der
- * betroffenen Personen zurueck. Ansonsten wird 0 zurückgegeben. */
+ * betroffenen Personen zurueck. Ansonsten wird 0 zurueckgegeben. */
 int get_cursedmen(const unit * u, const curse * c)
 {
     int cursedmen = u->number;

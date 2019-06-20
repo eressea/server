@@ -96,6 +96,7 @@ static void test_make_fighter(CuTest * tc)
 
 static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
+    weapon_type * wtype;
     unit *au;
     fighter *af;
     battle *b;
@@ -104,7 +105,7 @@ static void test_select_weapon_restricted(CuTest *tc) {
     test_setup();
     au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("halberd");
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&au->items, itype, 1);
     rc = test_create_race("smurf");
     CuAssertIntEquals(tc, 0, rc->mask_item & au->_race->mask_item);
@@ -112,15 +113,15 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 1, af->weapons[0].count);
-    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
     free_battle(b);
 
     itype->mask_deny = rc_mask(au->_race);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 0, af->weapons[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
     free_battle(b);
 
     itype->mask_deny = 0;
@@ -128,9 +129,8 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 1, af->weapons[0].count);
-    CuAssertPtrEquals(tc, itype->rtype->wtype, (void *)af->weapons[0].type);
-    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
     free_battle(b);
 
     itype->mask_deny = 0;
@@ -138,7 +138,7 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 0, af->weapons[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
     free_battle(b);
 
     itype->mask_deny = 0;
@@ -146,8 +146,8 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 1, af->weapons[0].count);
-    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
     free_battle(b);
 
     test_teardown();

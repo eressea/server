@@ -299,7 +299,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
     return false;
 }
 
-static bool rule_transfermen(void)
+bool rule_transfermen(void)
 {
     int rule = config_get_int("rules.transfermen", 1);
     return rule != 0;
@@ -391,7 +391,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
-        int k = count_skill(u2->faction, SK_ALCHEMY);
+        int k = faction_count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
          * welche. */
@@ -402,13 +402,13 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
             k += n;
 
-        /* Wenn Parteigrenzen überschritten werden */
+        /* Wenn Parteigrenzen ueberschritten werden */
         if (u2->faction != u->faction)
             k += n;
 
         /* wird das Alchemistenmaximum ueberschritten ? */
 
-        if (k > skill_limit(u2->faction, SK_ALCHEMY)) {
+        if (k > faction_skill_limit(u2->faction, SK_ALCHEMY)) {
             error = 156;
         }
     }
@@ -416,8 +416,8 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     if (error == 0) {
         ship *sh = leftship(u);
 
-        /* Einheiten von Schiffen können nicht NACH in von
-        * Nicht-alliierten bewachten Regionen ausführen */
+        /* Einheiten von Schiffen koennen nicht NACH in von
+        * Nicht-alliierten bewachten Regionen ausfuehren */
         if (sh) {
             set_leftship(u2, sh);
         }
@@ -472,9 +472,23 @@ message * disband_men(int n, unit * u, struct order *ord) {
     return msg_message("give_person_peasants", "unit amount", u, n);
 }
 
+int give_unit_allowed(const unit * u)
+{
+    if (unit_has_cursed_item(u)) {
+        return 78;
+    }
+    if (fval(u, UFL_HERO)) {
+        return 75;
+    }
+    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
+        return 74;
+    }
+    return 0;
+}
+
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    int maxt = max_transfers();
+    int err, maxt = max_transfers();
 
     assert(u);
     if (!rule_transfermen() && u2 && u->faction != u2->faction) {
@@ -482,17 +496,9 @@ void give_unit(unit * u, unit * u2, order * ord)
         return;
     }
 
-    if (unit_has_cursed_item(u)) {
-        cmistake(u, ord, 78, MSG_COMMERCE);
-        return;
-    }
-
-    if (fval(u, UFL_HERO)) {
-        cmistake(u, ord, 75, MSG_COMMERCE);
-        return;
-    }
-    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
-        cmistake(u, ord, 74, MSG_COMMERCE);
+    err = give_unit_allowed(u);
+    if (err != 0) {
+        cmistake(u, ord, err, MSG_COMMERCE);
         return;
     }
 
@@ -586,8 +592,8 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_MAGIC)) {
-        if (count_skill(u2->faction, SK_MAGIC) + u->number >
-            skill_limit(u2->faction, SK_MAGIC)) {
+        if (faction_count_skill(u2->faction, SK_MAGIC) + u->number >
+            faction_skill_limit(u2->faction, SK_MAGIC)) {
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
@@ -597,8 +603,8 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_ALCHEMY)
-        && count_skill(u2->faction, SK_ALCHEMY) + u->number >
-        skill_limit(u2->faction, SK_ALCHEMY)) {
+        && faction_count_skill(u2->faction, SK_ALCHEMY) + u->number >
+        faction_skill_limit(u2->faction, SK_ALCHEMY)) {
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
@@ -608,7 +614,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 }
 
 bool can_give_to(unit *u, unit *u2) {
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden koennen */
     if (!u2) {
         return false;
     }
@@ -638,8 +644,8 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
             return;
         }
 
-        /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-        * reserviert ist besitzen und diesen Teil dann übergeben */
+        /* fuer alle items einmal pruefen, ob wir mehr als von diesem Typ
+        * reserviert ist besitzen und diesen Teil dann uebergeben */
         if (u->items) {
             item **itmp = &u->items;
             while (*itmp) {
@@ -768,7 +774,7 @@ void give_cmd(unit * u, order * ord)
             while (*itmp) {
                 item *itm = *itmp;
                 if (fval(itm->type, ITF_HERB) && itm->number > 0) {
-                    /* give_item ändert im fall,das man alles übergibt, die
+                    /* give_item aendert im fall,das man alles uebergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;

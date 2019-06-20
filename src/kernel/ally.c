@@ -28,6 +28,7 @@ typedef struct allies {
 
 static void block_insert(allies *al, struct faction *f, int status) {
     int i = al->num++;
+    assert(status > 0);
     al->status[i] = status;
     al->factions[i] = f;
     /* TODO: heapify */
@@ -46,7 +47,7 @@ static int block_search(allies *al, const struct faction *f) {
 
 int allies_walk(struct allies *all, cb_allies_walk callback, void *udata)
 {
-     allies *al;
+    allies *al;
     for (al = all; al; al = al->next) {
         int i;
         for (i = 0; i != al->num; ++i) {
@@ -94,13 +95,17 @@ void ally_set(allies **p_al, struct faction *f, int status)
             return;
         }
         if (al->num < BLOCKSIZE) {
-            block_insert(al, f, status);
+            if (status > 0) {
+                block_insert(al, f, status);
+            }
             return;
         }
         p_al = &al->next;
     }
-    *p_al = calloc(1, sizeof(allies));
-    block_insert(*p_al, f, status);
+    if (status > 0) {
+        *p_al = calloc(1, sizeof(allies));
+        block_insert(*p_al, f, status);
+    }
 }
 
 void write_allies(gamedata * data, const allies *alist)
@@ -112,6 +117,7 @@ void write_allies(gamedata * data, const allies *alist)
             const faction * f = al->factions[i];
             if (f && f->_alive) {
                 write_faction_reference(f, data->store);
+                assert(al->status[i] > 0);
                 WRITE_INT(data->store, al->status[i]);
             }
         }
@@ -132,7 +138,10 @@ void read_allies(gamedata * data, allies **p_al)
         f = findfaction(aid);
         if (!f) f = faction_create(aid);
         READ_INT(data->store, &status);
-        ally_set(p_al, f, status);
+        /* NB: some data files have allies with status=0 */
+        if (status > 0) {
+            ally_set(p_al, f, status);
+        }
     }
 }
 

@@ -533,10 +533,6 @@
       <arg name="weight" type="int"/>
     </type>
   </message>
-  <message name="healall" section="events">
-    <type>
-  </type>
-  </message>
   <message name="lucky_item" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -2941,13 +2937,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error282" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error281" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -3246,13 +3235,6 @@
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
       <arg name="target" type="region"/>
-    </type>
-  </message>
-  <message name="error241" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
     </type>
   </message>
   <message name="error240" section="errors">

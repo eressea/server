@@ -426,7 +426,7 @@ static int tolua_unit_effskill(lua_State * L)
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *skname = tolua_tostring(L, 2, 0);
     skill_t sk = findskill(skname);
-    int value = (sk == NOSKILL) ? -1 : effskill(self, sk, 0);
+    int value = (sk == NOSKILL) ? -1 : effskill(self, sk, NULL);
     lua_pushinteger(L, value);
     return 1;
 }
@@ -760,7 +760,7 @@ static int tolua_unit_has_attrib(lua_State *L) {
     return 1;
 }
 
-static int tolua_unit_get_flag(lua_State * L)
+static int tolua_unit_get_key(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
@@ -769,7 +769,7 @@ static int tolua_unit_get_flag(lua_State * L)
     return 1;
 }
 
-static int tolua_unit_set_flag(lua_State * L)
+static int tolua_unit_set_key(lua_State * L)
 {
     unit *self = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
@@ -781,6 +781,28 @@ static int tolua_unit_set_flag(lua_State * L)
     else {
         key_unset(&self->attribs, flag);
     }
+    return 0;
+}
+
+static int tolua_unit_get_flag(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, NULL);
+    int bit = (int)tolua_tonumber(L, 2, 0);
+
+    lua_pushboolean(L, (self->flags & (1 << bit)));
+    return 1;
+}
+
+static int tolua_unit_set_flag(lua_State * L)
+{
+    unit *self = (unit *)tolua_tousertype(L, 1, NULL);
+    int bit = (int)tolua_tonumber(L, 2, 0);
+    int set = tolua_toboolean(L, 3, 1);
+
+    if (set)
+        self->flags |= (1 << bit);
+    else
+        self->flags &= ~(1 << bit);
     return 0;
 }
 
@@ -959,6 +981,8 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "has_attrib", tolua_unit_has_attrib);
 
             /*  key-attributes for named flags: */
+            tolua_function(L, TOLUA_CAST "set_key", tolua_unit_set_key);
+            tolua_function(L, TOLUA_CAST "get_key", tolua_unit_get_key);
             tolua_function(L, TOLUA_CAST "set_flag", tolua_unit_set_flag);
             tolua_function(L, TOLUA_CAST "get_flag", tolua_unit_get_flag);
             tolua_variable(L, TOLUA_CAST "guard", tolua_unit_get_guard,

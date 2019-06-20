@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "contact.h"
 #include "economy.h"
+#include "give.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -202,7 +203,7 @@ static void dumbeffect(unit *u) {
             reduce_skill(u, sb, weeks);
             ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                 "unit weeks skill", u, weeks, (skill_t)sb->id));
-        }                         /* sonst Glück gehabt: wer nix weiss, kann nix vergessen... */
+        }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
         change_effect(u, oldpotiontype[P_FOOL], -effect);
     }
 }
@@ -249,7 +250,7 @@ static void live(region * r)
     while (*up) {
         unit *u = *up;
         /* IUW: age_unit() kann u loeschen, u->next ist dann
-         * undefiniert, also muessen wir hier schon das nächste
+         * undefiniert, also muessen wir hier schon das naechste
          * Element bestimmen */
         age_unit(r, u);
         if (*up == u)
@@ -378,25 +379,24 @@ static void peasants(region * r, int rule)
         peasants += births + luck;
     }
 
-    /* Alle werden satt, oder halt soviele für die es auch Geld gibt */
+    /* Alle werden satt, oder halt soviele fuer die es auch Geld gibt */
 
     satiated = money / maintenance_cost(NULL);
     if (satiated > peasants) satiated = peasants;
     rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
     /* Von denjenigen, die nicht satt geworden sind, verhungert der
-     * Großteil. dead kann nie größer als rpeasants(r) - satiated werden,
-     * so dass rpeasants(r) >= 0 bleiben muß. */
+     * Grossteil. dead kann nie groesser als rpeasants(r) - satiated werden,
+     * so dass rpeasants(r) >= 0 bleiben muss. */
 
-     /* Es verhungert maximal die unterernährten Bevölkerung. */
+     /* Es verhungert maximal die unterernaehrten Bevoelkerung. */
 
     n = peasants - satiated;
     if (n > rp) n = rp;
     dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("phunger", "dead", dead));
         peasants -= dead;
     }
 
@@ -456,9 +456,9 @@ static void migrate(region * r)
         rsethorses(r, rhorses(r) + m->horses);
         /* Was macht das denn hier?
          * Baumwanderung wird in trees() gemacht.
-         * wer fragt das? Die Baumwanderung war abhängig von der
+         * wer fragt das? Die Baumwanderung war abhaengig von der
          * Auswertungsreihenfolge der regionen,
-         * das hatte ich geändert. jemand hat es wieder gelöscht, toll.
+         * das hatte ich geaendert. jemand hat es wieder geloescht, toll.
          * ich habe es wieder aktiviert, muss getestet werden.
          */
         *hp = m->next;
@@ -500,7 +500,7 @@ static void horses(region * r)
     /* Pferde wandern in Nachbarregionen.
      * Falls die Nachbarregion noch berechnet
      * werden muss, wird eine migration-Struktur gebildet,
-     * die dann erst in die Berechnung der Nachbarstruktur einfließt.
+     * die dann erst in die Berechnung der Nachbarstruktur einfliesst.
      */
 
     for (n = 0; n != MAXDIRECTIONS; n++) {
@@ -514,7 +514,7 @@ static void horses(region * r)
             else {
                 migration *nb;
                 /* haben wir die Migration schonmal benutzt?
-                 * wenn nicht, müssen wir sie suchen.
+                 * wenn nicht, muessen wir sie suchen.
                  * Wandernde Pferde vermehren sich nicht.
                  */
                 nb = get_migrants(r2);
@@ -620,12 +620,12 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
         a = a_find(r->attribs, &at_germs);
         if (a && last_weeks_season == SEASON_SPRING) {
-            /* ungekeimte Samen bleiben erhalten, Sprößlinge wachsen */
+            /* ungekeimte Samen bleiben erhalten, Sproesslinge wachsen */
             sprout = rtrees(r, 1);
             if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
-            /* aus dem gesamt Sprößlingepool abziehen */
+            /* aus dem gesamt Sproesslingepool abziehen */
             rsettrees(r, 1, rtrees(r, 1) - sprout);
-            /* zu den Bäumen hinzufügen */
+            /* zu den Baeumen hinzufuegen */
             rsettrees(r, 2, rtrees(r, 2) + sprout);
 
             a_removeall(&r->attribs, &at_germs);
@@ -642,7 +642,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             return;
 
         /* Grundchance 1.0% */
-        /* Jeder Elf in der Region erhöht die Chance marginal */
+        /* Jeder Elf in der Region erhoeht die Chance marginal */
         mp = mp / 8;
         if (elves > mp) elves = mp;
         if (elves) {
@@ -664,19 +664,19 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             }
         }
 
-        /* Bäume breiten sich in Nachbarregionen aus. */
+        /* Baeume breiten sich in Nachbarregionen aus. */
 
         /* Gesamtzahl der Samen:
-         * bis zu 6% (FORESTGROWTH*3) der Bäume samen in die Nachbarregionen */
+         * bis zu 6% (FORESTGROWTH*3) der Baeume samen in die Nachbarregionen */
         seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *r2 = rconnect(r, d);
             if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
                 /* Eine Landregion, wir versuchen Samen zu verteilen:
-                 * Die Chance, das Samen ein Stück Boden finden, in dem sie
-                 * keimen können, hängt von der Bewuchsdichte und der
-                 * verfügbaren Fläche ab. In Gletschern gibt es weniger
-                 * Möglichkeiten als in Ebenen. */
+                 * Die Chance, das Samen ein Stueck Boden finden, in dem sie
+                 * keimen koennen, haengt von der Bewuchsdichte und der
+                 * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
+                 * Moeglichkeiten als in Ebenen. */
                 sprout = 0;
                 seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
                 for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
@@ -694,8 +694,8 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
         if (is_cursed(r->attribs, &ct_godcursezone))
             return;
 
-        /* in at_germs merken uns die Zahl der Samen und Sprößlinge, die
-         * dieses Jahr älter werden dürfen, damit nicht ein Same im selben
+        /* in at_germs merken uns die Zahl der Samen und Sproesslinge, die
+         * dieses Jahr aelter werden duerfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
         a = a_find(r->attribs, &at_germs);
         if (!a) {
@@ -709,7 +709,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 
         /* Samenwachstum */
 
-        /* Raubbau abfangen, es dürfen nie mehr Samen wachsen, als aktuell
+        /* Raubbau abfangen, es duerfen nie mehr Samen wachsen, als aktuell
          * in der Region sind */
         seeds = rtrees(r, 0);
         if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
@@ -723,15 +723,15 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
         a->data.sa[0] = (short)(seeds - sprout);
         /* aus dem gesamt Samenpool abziehen */
         rsettrees(r, 0, rtrees(r, 0) - sprout);
-        /* zu den Sprößlinge hinzufügen */
+        /* zu den Sproesslinge hinzufuegen */
         rsettrees(r, 1, rtrees(r, 1) + sprout);
 
         /* Baumwachstum */
 
-        /* hier gehen wir davon aus, das Jungbäume nicht ohne weiteres aus
-         * der Region entfernt werden können, da Jungbäume in der gleichen
-         * Runde nachwachsen, wir also nicht mehr zwischen diesjährigen und
-         * 'alten' Jungbäumen unterscheiden könnten */
+        /* hier gehen wir davon aus, das Jungbaeume nicht ohne weiteres aus
+         * der Region entfernt werden koennen, da Jungbaeume in der gleichen
+         * Runde nachwachsen, wir also nicht mehr zwischen diesjaehrigen und
+         * 'alten' Jungbaeumen unterscheiden koennten */
         sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
         grownup_trees = 0;
@@ -740,11 +740,11 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
             if (rng_int() % 10000 < growth)
                 grownup_trees++;
         }
-        /* aus dem Sprößlingepool dieses Jahres abziehen */
+        /* aus dem Sproesslingepool dieses Jahres abziehen */
         a->data.sa[1] = (short)(sprout - grownup_trees);
-        /* aus dem gesamt Sprößlingepool abziehen */
+        /* aus dem gesamt Sproesslingepool abziehen */
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
-        /* zu den Bäumen hinzufügen */
+        /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
     }
 }
@@ -752,10 +752,10 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 static void
 growing_herbs(region * r, const int current_season, const int last_weeks_season)
 {
-    /* Jetzt die Kräutervermehrung. Vermehrt wird logistisch:
+    /* Jetzt die Kraeutervermehrung. Vermehrt wird logistisch:
      *
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
-     * Kräuter))% sich zu vermehren. */
+     * Kraeuter))% sich zu vermehren. */
     UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
         int i, herbs = rherbs(r);
@@ -941,6 +941,52 @@ int leave_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+void transfer_faction(faction *fsrc, faction *fdst) {
+    unit *u;
+    skill_t sk;
+    int skill_count[MAXSKILLS];
+    int skill_limit[MAXSKILLS];
+
+    for (sk = 0; sk != MAXSKILLS; ++sk) {
+        skill_limit[sk] = faction_skill_limit(fdst, sk);
+    }
+    memset(skill_count, 0, sizeof(skill_count));
+
+    for (u = fdst->units; u != NULL; u = u->nextF) {
+        if (u->skills) {
+            int i;
+            for (i = 0; i != u->skill_size; ++i) {
+                const skill *sv = u->skills + i;
+                skill_t sk = (skill_t)sv->id;
+                skill_count[sk] += u->number;
+            }
+        }
+    }
+
+    for (u = fsrc->units; u != NULL; u = u->nextF) {
+        if (u_race(u) == fdst->race) {
+            u->flags &= ~UFL_HERO;
+            if (give_unit_allowed(u) == 0) {
+                if (u->skills) {
+                    int i;
+
+                    for (i = 0; i != u->skill_size; ++i) {
+                        const skill *sv = u->skills + i;
+                        skill_t sk = (skill_t)sv->id;
+                        if (skill_count[sk] + u->number > skill_limit[sk]) {
+                            break;
+                        }
+                    }
+                    if (i != u->skill_size) {
+                        continue;
+                    }
+                }
+                u_setfaction(u, fdst);
+            }
+        }
+    }
+}
+
 int quit_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -952,7 +998,37 @@ int quit_cmd(unit * u, struct order *ord)
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
-        fset(f, FFL_QUIT);
+        int flags = FFL_QUIT;
+        if (rule_transfermen()) {
+            param_t p;
+            p = getparam(f->locale);
+            if (p == P_FACTION) {
+                faction *f2 = getfaction();
+                if (f2 == NULL) {
+                    cmistake(u, ord, 66, MSG_EVENT);
+                    flags = 0;
+                }
+                else if (f->race != f2->race) {
+                    cmistake(u, ord, 281, MSG_EVENT);
+                    flags = 0;
+                }
+                else {
+                    unit *u2;
+                    for (u2 = u->region->units; u2; u2 = u2->next) {
+                        if (u2->faction == f2 && ucontact(u2, u)) {
+                            transfer_faction(u->faction, u2->faction);
+                            break;
+                        }
+                    }
+                    if (u2 == NULL) {
+                        /* no target unit found */
+                        cmistake(u, ord, 0, MSG_EVENT);
+                        flags = 0;
+                    }
+                }
+            }
+        }
+        f->flags |= flags;
     }
     else {
         char buffer[64];
@@ -1060,7 +1136,7 @@ int enter_building(unit * u, order * ord, int id, bool report)
     region *r = u->region;
     building *b;
 
-    /* Schwimmer können keine Gebäude betreten, außer diese sind
+    /* Schwimmer koennen keine Gebaeude betreten, ausser diese sind
      * auf dem Ozean */
     if (!fval(u_race(u), RCF_WALK) && !fval(u_race(u), RCF_FLY)) {
         if (!fval(r->terrain, SEA_REGION)) {
@@ -1169,8 +1245,8 @@ void do_enter(struct region *r, bool is_final_attempt)
                 }
                 if (ulast != NULL) {
                     /* Wenn wir hier angekommen sind, war der Befehl
-                     * erfolgreich und wir löschen ihn, damit er im
-                     * zweiten Versuch nicht nochmal ausgeführt wird. */
+                     * erfolgreich und wir loeschen ihn, damit er im
+                     * zweiten Versuch nicht nochmal ausgefuehrt wird. */
                     *ordp = ord->next;
                     ord->next = NULL;
                     free_order(ord);
@@ -1488,7 +1564,7 @@ int display_cmd(unit * u, struct order *ord)
 {
     char token[128];
     char **s = NULL;
-    const char *str;
+    char *str;
     region *r = u->region;
 
     init_order_depr(ord);
@@ -1525,11 +1601,19 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        unit_setinfo(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        unit_setinfo(u, str);
         break;
 
     case P_PRIVAT:
-        usetprivate(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        usetprivate(u, str);
         break;
 
     case P_REGION:
@@ -1664,7 +1748,7 @@ int name_cmd(struct unit *u, struct order *ord)
     bool foreign = false;
     const char *str;
 
-    init_order_depr(ord);
+    init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
 
@@ -1925,13 +2009,13 @@ int mail_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* Falls kein Parameter, ist das eine Einheitsnummer;
-     * das Füllwort "AN" muss wegfallen, da gültige Nummer! */
+     * das Fuellwort "AN" muss wegfallen, da gueltige Nummer! */
 
     do {
         cont = 0;
         switch (findparam_ex(s, u->faction->locale)) {
         case P_REGION:
-            /* können alle Einheiten in der Region sehen */
+            /* koennen alle Einheiten in der Region sehen */
             s = getstrtoken();
             if (!s || !s[0]) {
                 cmistake(u, ord, 30, MSG_MESSAGE);
@@ -2069,7 +2153,7 @@ int banner_cmd(unit * u, struct order *ord)
     init_order_depr(ord);
     s = getstrtoken();
     faction_setbanner(u->faction, s);
-    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
+    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }
@@ -2215,7 +2299,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
             if (itype->flags & ITF_POTION) {
                 /* we don't have the item, but it is a potion. do we know it? */
                 int level = potion_level(itype);
-                if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, 0)) {
+                if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, NULL)) {
                     display_potion(u, itype);
                     found = true;
                 }
@@ -2408,7 +2492,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     init_order_depr(ord);
     s = gettoken(token, sizeof(token));
 
-    /* KAMPFZAUBER [NICHT] löscht alle gesetzten Kampfzauber */
+    /* KAMPFZAUBER [NICHT] loescht alle gesetzten Kampfzauber */
     if (!s || *s == 0 || findparam(s, u->faction->locale) == P_NOT) {
         unset_combatspell(u, 0);
         return 0;
@@ -2416,7 +2500,7 @@ int combatspell_cmd(unit * u, struct order *ord)
 
     /* Optional: STUFE n */
     if (findparam(s, u->faction->locale) == P_LEVEL) {
-        /* Merken, setzen kommt erst später */
+        /* Merken, setzen kommt erst spaeter */
         level = getuint();
         s = gettoken(token, sizeof(token));
     }
@@ -2430,14 +2514,14 @@ int combatspell_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (findparam(s, u->faction->locale) == P_NOT) {
-        /* KAMPFZAUBER "<Spruchname>" NICHT  löscht diesen speziellen
+        /* KAMPFZAUBER "<Spruchname>" NICHT  loescht diesen speziellen
          * Kampfzauber */
         unset_combatspell(u, sp);
         return 0;
     }
     else {
         /* KAMPFZAUBER "<Spruchname>"  setzt diesen Kampfzauber */
-        /* knowsspell prüft auf ist_magier, ist_spruch, kennt_spruch */
+        /* knowsspell prueft auf ist_magier, ist_spruch, kennt_spruch */
         if (!knowsspell(u->region, u, sp)) {
             /* Fehler 'Spell not found' */
             cmistake(u, ord, 173, MSG_MAGIC);
@@ -2658,7 +2742,7 @@ static void age_stonecircle(building *b) {
         if (mage && rt && !fval(rt->terrain, FORBIDDEN_REGION)) {
             curse *c = get_curse(rt->attribs, &ct_astralblock);
             if (!c) {
-                int sk = effskill(mage, SK_MAGIC, 0);
+                int sk = effskill(mage, SK_MAGIC, NULL);
                 if (sk > 0) {
                     int vig = sk;
                     int dur = (sk + 1) / 2;
@@ -2671,7 +2755,7 @@ static void age_stonecircle(building *b) {
                 }
             }
             else {
-                int sk = effskill(mage, SK_MAGIC, 0);
+                int sk = effskill(mage, SK_MAGIC, NULL);
                 if (c->duration < sk / 2) c->duration = sk / 2;
                 if (c->vigour < sk) c->vigour = sk;
             }
@@ -2773,7 +2857,7 @@ static void ageing(void)
                 sp = &(*sp)->next;
         }
 
-        /* Gebäude */
+        /* Gebaeude */
         for (bp = &r->buildings; *bp;) {
             building *b = *bp;
             age_building(b);
@@ -2978,7 +3062,7 @@ void update_long_order(unit * u)
                 /* we have found the (first) long order
                  * some long orders can have multiple instances: */
                 switch (kwd) {
-                    /* Wenn gehandelt wird, darf kein langer Befehl ausgeführt
+                    /* Wenn gehandelt wird, darf kein langer Befehl ausgefuehrt
                      * werden. Da Handel erst nach anderen langen Befehlen kommt,
                      * muss das vorher abgefangen werden. Wir merken uns also
                      * hier, ob die Einheit handelt. */
@@ -3034,11 +3118,11 @@ void update_long_order(unit * u)
         }
     }
     if (hunger) {
-        /* Hungernde Einheiten führen NUR den default-Befehl aus */
+        /* Hungernde Einheiten fuehren NUR den default-Befehl aus */
         set_order(&u->thisorder, default_order(u->faction->locale));
     }
     else if (!exclusive) {
-        /* Wenn die Einheit handelt oder zaubert, muss der Default-Befehl gelöscht werden. */
+        /* Wenn die Einheit handelt oder zaubert, muss der Default-Befehl geloescht werden. */
         set_order(&u->thisorder, NULL);
     }
 }
@@ -3075,7 +3159,7 @@ void monthly_healing(void)
         double healingcurse = 0;
 
         if (r->attribs) {
-            /* bonus zurücksetzen */
+            /* bonus zuruecksetzen */
             curse *c = get_curse(r->attribs, &ct_healing);
             if (c != NULL) {
                 healingcurse = curse_geteffect(c);
@@ -3085,8 +3169,8 @@ void monthly_healing(void)
             int umhp = unit_max_hp(u) * u->number;
             double p = 1.0;
 
-            /* hp über Maximum bauen sich ab. Wird zb durch Elixier der Macht
-             * oder verändertes Ausdauertalent verursacht */
+            /* hp ueber Maximum bauen sich ab. Wird zb durch Elixier der Macht
+             * oder veraendertes Ausdauertalent verursacht */
             if (u->hp > umhp) {
                 int diff = u->hp - umhp;
                 u->hp -= (int)ceil(diff / 2.0);
@@ -3113,7 +3197,7 @@ void monthly_healing(void)
                 if (active_building(u, bt_find("inn"))) {
                     p *= 1.5;
                 }
-                /* pro punkt 5% höher */
+                /* pro punkt 5% hoeher */
                 p *= (1.0 + healingcurse * 0.05);
 
                 maxheal = p * maxheal;
@@ -3126,7 +3210,7 @@ void monthly_healing(void)
                 if (umhp > u->hp + addhp) umhp = u->hp + addhp;
                 u->hp = umhp;
 
-                /* soll man an negativer regeneration sterben können? */
+                /* soll man an negativer regeneration sterben koennen? */
                 assert(u->hp > 0);
             }
         }
@@ -3173,7 +3257,7 @@ void defaultorders(void)
                     ord->next = NULL;
                     free_order(ord);
                     if (!neworders) {
-                        /* lange Befehle aus orders und old_orders löschen zu gunsten des neuen */
+                        /* lange Befehle aus orders und old_orders loeschen zu gunsten des neuen */
                         /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
                         remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
@@ -3205,8 +3289,8 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
             struct sc_mage * mage = get_mage(u);
-            if (mage && mage_get_spellbook(mage)) {
-                int level = effskill(u, SK_MAGIC, 0);
+            if (mage) {
+                int level = effskill(u, SK_MAGIC, NULL);
                 if (level > maxlevel) {
                     maxlevel = level;
                 }
@@ -3720,7 +3804,7 @@ int armedmen(const unit * u, bool siege_weapons)
     item *itm;
     int n = 0;
     if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
-        if (effskill(u, SK_WEAPONLESS, 0) >= 1) {
+        if (effskill(u, SK_WEAPONLESS, NULL) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
         }
@@ -3731,7 +3815,7 @@ int armedmen(const unit * u, bool siege_weapons)
                 const weapon_type *wtype = resource2weapon(itm->type->rtype);
                 if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
                     continue;
-                if (effskill(u, wtype->skill, 0) >= 1)
+                if (effskill(u, wtype->skill, NULL) >= 1)
                     n += itm->number;
                 if (n >= u->number)
                     break;
@@ -3981,8 +4065,8 @@ void turn_end(void)
         wormholes_update();
     }
 
-    /* immer ausführen, wenn neue Sprüche dazugekommen sind, oder sich
-     * Beschreibungen geändert haben */
+    /* immer ausfuehren, wenn neue Sprueche dazugekommen sind, oder sich
+     * Beschreibungen geaendert haben */
     update_spells();
 }
 
@@ -4031,7 +4115,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
         if (u2->faction == f) {
             if (rings < u->number || invisible(u, u2) < u->number) {
                 if (skill_enabled(SK_PERCEPTION)) {
-                    int observation = effskill(u2, SK_PERCEPTION, 0);
+                    int observation = effskill(u2, SK_PERCEPTION, NULL);
 
                     if (observation >= stealth) {
                         return true;
@@ -4117,7 +4201,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
                 if (rings && invisible(u, u2) >= u->number)
                     continue;
 
-                o = effskill(u2, SK_PERCEPTION, 0);
+                o = effskill(u2, SK_PERCEPTION, NULL);
 
                 if (o >= n) {
                     return true;

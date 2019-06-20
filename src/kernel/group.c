@@ -60,7 +60,7 @@ group *new_group(faction * f, const char *name, int gid)
         gp = &(*gp)->next;
     *gp = g;
 
-    maxgid = MAX(gid, maxgid);
+    if (gid > maxgid) maxgid = gid;
     g->name = str_strdup(name);
     g->gid = gid;
 

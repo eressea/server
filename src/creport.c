@@ -100,7 +100,7 @@ struct locale *crtag_locale(void) {
     static int config;
     if (config_changed(&config)) {
         const char *lname = config_get("creport.tags");
-        lang = get_locale(lname ? lname : "de");
+        lang = lname ? get_locale(lname) : default_locale;
     }
     return lang;
 }
@@ -108,8 +108,8 @@ struct locale *crtag_locale(void) {
 static const char *crtag(const char *key)
 {
     const char *result;
-    result = LOC(crtag_locale(), key);
-    return result;
+    result = locale_string(crtag_locale(), key, false);
+    return result ? result : key;
 }
 /*
  * translation table
@@ -848,13 +848,18 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        const char *pzRace = LOC(lang, mkname("race", pzTmp));
-        pzTmp = pzRace ? pzRace : pzTmp;
-        stream_printf(out, "\"%s\";Typ\n", translate(pzTmp, LOC(lang, pzTmp)));
+        const char *pzRace = locale_string(lang, mkname("race", pzTmp), false);
+        if (pzRace) {
+            pzTmp = pzRace;
+        }
+        pzRace = translate(pzTmp, locale_string(lang, pzTmp, false));
+        if (!pzRace) {
+            pzRace = pzTmp;
+        }
+        stream_printf(out, "\"%s\";Typ\n", pzRace);
         if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
             pzRace = rc_name_s(u_race(u), NAME_PLURAL);
-            stream_printf(out, "\"%s\";wahrerTyp\n",
-                translate(pzRace, LOC(lang, pzRace)));
+            stream_printf(out, "\"%s\";wahrerTyp\n", pzRace);
         }
     }
     else {
@@ -921,7 +926,8 @@ void cr_output_unit(stream *out, const faction * f,
         if (fval(u, UFL_HUNGER) && (u->faction == f)) {
             stream_printf(out, "1;hunger\n");
         }
-        if (is_mage(u)) {
+        mage = get_mage(u);
+        if (mage) {
             stream_printf(out, "%d;Aura\n", get_spellpoints(u));
             stream_printf(out, "%d;Auramax\n", max_spellpoints_depr(u->region, u));
         }
@@ -951,7 +957,7 @@ void cr_output_unit(stream *out, const faction * f,
         for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
             if (sv->level > 0) {
                 skill_t sk = sv->id;
-                int esk = effskill(u, sk, 0);
+                int esk = effskill(u, sk, NULL);
                 if (!pr) {
                     pr = 1;
                     stream_printf(out, "TALENTE\n");
@@ -963,9 +969,8 @@ void cr_output_unit(stream *out, const faction * f,
         }
 
         /* spells that this unit can cast */
-        mage = get_mage(u);
         if (mage) {
-            int maxlevel = effskill(u, SK_MAGIC, 0);
+            int maxlevel = effskill(u, SK_MAGIC, NULL);
             cr_output_spells(out, u, maxlevel);
 
             for (i = 0; i != MAXCOMBATSPELLS; ++i) {

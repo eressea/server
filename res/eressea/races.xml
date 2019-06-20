@@ -298,8 +298,8 @@
     <attack type="1" damage="1d4"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="ghost" magres="80" maxaura="0.500000" regaura="0.100000" weight="500" capacity="540" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes" invinciblenonmagic="yes">
-    <ai splitsize="5000"/>
+  <race name="ghost" magres="80" maxaura="0.500000" regaura="0.100000" weight="500" capacity="540" speed="1.000000" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes" invinciblenonmagic="yes">
+    <ai splitsize="5000" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
@@ -328,8 +328,8 @@
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="wolf" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.000000" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
-    <ai splitsize="5000"/>
+  <race name="wolf" maxaura="0.000000" regaura="0.000000" weight="500" capacity="540" speed="1.000000" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" getitem="yes">
+    <ai splitsize="5000" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
@@ -507,8 +507,8 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d3"/>
   </race>
-  <race name="tunnelworm" magres="80" maxaura="0.000000" regaura="0.000000" weight="30000" capacity="10000" speed="1.000000" hp="300" ac="6" damage="3d20" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="1" scarepeasants="yes" walk="yes" teach="no" getitem="yes">
-    <ai splitsize="99999"/>
+  <race name="tunnelworm" magres="80" maxaura="0.000000" regaura="0.000000" weight="30000" capacity="10000" speed="1.000000" hp="300" ac="6" damage="3d20" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="1" walk="yes" teach="no" getitem="yes">
+    <ai splitsize="99999" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="10"/>
@@ -578,8 +578,8 @@
     <attack type="1" damage="1d6"/>
   </race>
   <race name="braineater" magres="90" maxaura="1.000000"
-  regaura="1.000000" weight="100" capacity="540" speed="1.000000" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
-    <ai splitsize="500" killpeasants="yes" moverandom="yes" learn="yes"/>
+  regaura="1.000000" weight="100" capacity="540" speed="1.000000" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
+    <ai splitsize="500" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
@@ -652,14 +652,14 @@
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="shadowmaster" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.000000" regaura="2.000000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" scarepeasants="yes" walk="yes" teach="no" desert="yes">
-    <ai splitsize="50" killpeasants="yes" moverandom="yes" learn="yes"/>
+  <race name="shadowmaster" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.000000" regaura="2.000000" weight="500" capacity="540" speed="1.000000" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" walk="yes" teach="no" desert="yes">
+    <ai splitsize="50" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
-  <race name="shadowdemon" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" scarepeasants="yes" walk="yes" teach="no" desert="yes" recruitethereal="yes">
-    <ai splitsize="1000" killpeasants="yes" moverandom="yes" learn="yes"/>
+  <race name="shadowdemon" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" walk="yes" teach="no" desert="yes" recruitethereal="yes">
+    <ai splitsize="1000" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
@@ -696,13 +696,13 @@
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="ent" magres="25" maxaura="1.000000" regaura="0.500000" weight="5000" capacity="2500" speed="1.000000" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" scarepeasants="yes" walk="yes" teach="no">
-    <ai splitsize="1000" moverandom="yes" learn="yes"/>
+  <race name="ent" magres="25" maxaura="1.000000" regaura="0.500000" weight="5000" capacity="2500" speed="1.000000" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" walk="yes" teach="no">
+    <ai splitsize="1000" moverandom="yes" learn="yes" scarepeasants="yes"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
-  <race name="wyrm" magres="90" maxaura="1.000000" regaura="3.000000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" dragon="yes" unarmedguard="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
+  <race name="wyrm" magres="90" maxaura="1.000000" regaura="3.000000" weight="18000" capacity="1000000" speed="1.000000" hp="2700" ac="8" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="10" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" dragon="yes" unarmedguard="yes">
+    <ai splitsize="1" killpeasants="yes" learn="yes" scarepeasants="yes"/>
     <skill name="magic" modifier="12"/>
     <skill name="tactics" modifier="12"/>
     <skill name="perception" modifier="10"/>
@@ -711,8 +711,8 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="powerful_dragonbreath" level="12" />
   </race>
-  <race name="dragon" magres="70" maxaura="1.000000" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes" dragon="yes">
-    <ai splitsize="2" killpeasants="yes" learn="yes"/>
+  <race name="dragon" magres="70" maxaura="1.000000" regaura="2.000000" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes" dragon="yes">
+    <ai splitsize="2" killpeasants="yes" learn="yes" scarepeasants="yes"/>
     <skill name="magic" modifier="8"/>
     <skill name="tactics" modifier="8"/>
     <skill name="perception" modifier="5"/>
@@ -721,8 +721,8 @@
     <attack type="4" damage="3d30"/>
     <attack type="6" spell="icy_dragonbreath" level="6" />
   </race>
-  <race name="youngdragon" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
-    <ai splitsize="6" killpeasants="yes" learn="yes"/>
+  <race name="youngdragon" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
+    <ai splitsize="6" killpeasants="yes" learn="yes" scarepeasants="yes"/>
     <skill name="magic" modifier="4"/>
     <skill name="tactics" modifier="4"/>
     <skill name="stealth" modifier="2"/>
@@ -732,8 +732,8 @@
     <attack type="4" damage="1d30"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="undead" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
-    <ai splitsize="20000" moverandom="yes"/>
+  <race name="undead" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="20" damage="1d7" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
+    <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
   </race>
@@ -782,7 +782,7 @@
   </race>
   <race name="halfling" magres="5" maxaura="1" regaura="1" recruitcost="80" maintenance="10" weight="1000" capacity="540" speed="1" hp="18" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
-    <param name="hunger_damage" value="1d14+14"/>
+    <param name="hunger_damage" value="1d10+7"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="bow" modifier="-1"/>
@@ -983,8 +983,8 @@
     <attack type="2" damage="5d600"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="ghast" magres="60" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" learn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
-    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
+  <race name="ghast" magres="60" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
+    <ai splitsize="2000" killpeasants="yes" moverandom="yes" scarepeasants="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1000,8 +1000,8 @@
     <attack type="2" damage="1d30"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="ghoul" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" scarepeasants="yes" walk="yes" learn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
-    <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
+  <race name="ghoul" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
+    <ai splitsize="10000" absorbpeasants="yes" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1016,8 +1016,8 @@
     <attack type="3" damage="1d2"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="juju" magres="50" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" learn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
-    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
+  <race name="juju" magres="50" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+    <ai splitsize="2000" absorbpeasants="yes" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1031,8 +1031,8 @@
     <attack type="3" damage="1d1"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" scarepeasants="yes" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
-    <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
+  <race name="zombie" magres="20" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+    <ai splitsize="10000" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1044,8 +1044,8 @@
     <skill name="unarmed" modifier="1"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeletonlord" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" scarepeasants="yes" walk="yes" learn="no" teach="no" absorbpeasants="yes" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
-    <ai splitsize="2000" killpeasants="yes" moverandom="yes"/>
+  <race name="skeletonlord" magres="30" maxaura="1.000000" regaura="1.000000" weight="1000" capacity="540" speed="1.000000" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+    <ai splitsize="2000" absorbpeasants="yes" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1058,8 +1058,8 @@
     <attack type="1" damage="1d7"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="skeleton" magres="10" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" scarepeasants="yes" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
-    <ai splitsize="10000" killpeasants="yes" moverandom="yes"/>
+  <race name="skeleton" magres="10" maxaura="1.000000" regaura="1.000000" weight="500" capacity="540" speed="1.000000" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+    <ai splitsize="10000" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
     <skill name="catapult" modifier="1"/>
@@ -1071,12 +1071,12 @@
     <skill name="unarmed" modifier="1"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="shadowknight" maxaura="0.000000" regaura="0.000000" weight="0" capacity="540" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" scarepeasants="yes" walk="yes" learn="no" teach="no" noblock="yes">
-    <ai splitsize="20000" moverandom="yes"/>
+  <race name="shadowknight" maxaura="0.000000" regaura="0.000000" weight="0" capacity="540" speed="1.000000" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" learn="no" teach="no" noblock="yes">
+    <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="1" damage="1d1"/>
   </race>
-  <race name="seaserpent" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" scarepeasants="yes" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
-    <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes"/>
+  <race name="seaserpent" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="5000" speed="1.000000" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
+    <ai splitsize="6" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes" scarepeasants="yes"/>
     <skill name="tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
@@ -1202,8 +1202,8 @@
     <familiar race="wolf"/>
     <familiar race="demon"/>
   </race>
-  <race name="shadowdragon" magres="95" maxaura="1.000000" regaura="3.000000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" scarepeasants="yes" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
-    <ai splitsize="1" killpeasants="yes" learn="yes"/>
+  <race name="shadowdragon" magres="95" maxaura="1.000000" regaura="3.000000" weight="100" capacity="100000" speed="1.000000" hp="2700" ac="10" damage="2d60" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="12" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes">
+    <ai splitsize="1" killpeasants="yes" learn="yes" scarepeasants="yes"/>
     <skill name="tactics" modifier="20"/>
     <skill name="perception" modifier="20"/>
     <attack type="4" damage="5d30"/>

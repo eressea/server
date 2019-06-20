@@ -75,7 +75,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern struct attrib_type at_unitdissolve;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
- * aufl�st, in a->data.ca[0] kann angegeben werden, wohin die Personen
+ * aufloest, in a->data.ca[0] kann angegeben werden, wohin die Personen
  * verschwinden. Passiert bereits in der ersten Runde! */
 static void dissolve_units(void)
 {
@@ -187,12 +187,12 @@ static void melt_iceberg(region * r, const terrain_type *t_ocean)
             ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
         }
 
-    /* driftrichtung l�schen */
+    /* driftrichtung loeschen */
     a = a_find(r->attribs, &at_iceberg);
     if (a)
         a_remove(&r->attribs, a);
 
-    /* Geb�ude l�schen */
+    /* Gebaeude loeschen */
     while (r->buildings) {
         remove_building(&r->buildings, r->buildings);
     }
@@ -239,6 +239,7 @@ static void move_iceberg(region * r)
                         "region dir", r, dir));
                 }
 
+            stats_count("iceberg.drift", 1);
             x = r->x;
             y = r->y;
 
@@ -260,13 +261,13 @@ static void move_iceberg(region * r)
                 freset(sh, SF_SELECT);
 
             for (sh = r->ships; sh; sh = sh->next) {
-                /* Meldung an Kapit�n */
+                /* Meldung an Kapitaen */
                 double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
 
-            /* Personen, Schiffe und Geb�ude verschieben */
+            /* Personen, Schiffe und Gebaeude verschieben */
             while (rc->buildings) {
                 rc->buildings->region = r;
                 translist(&rc->buildings, &r->buildings, rc->buildings);
@@ -285,7 +286,7 @@ static void move_iceberg(region * r)
                 u_set_building(u, b); /* undo leave-prevention */
             }
 
-            /* Besch�digte Schiffe k�nnen sinken */
+            /* Beschaedigte Schiffe koennen sinken */
 
             for (sh = r->ships; sh;) {
                 shn = sh->next;
@@ -379,6 +380,7 @@ static void create_icebergs(void)
                 continue;
 
             r->terrain = t_iceberg;
+            stats_count("iceberg.terraform", 1);
 
             fset(r, RF_SELECT);
             move_iceberg(r);
@@ -475,7 +477,7 @@ static void orc_growth(void)
     }
 }
 
-/** Talente von D�monen verschieben sich.
+/** Talente von Daemonen verschieben sich.
  */
 static void demon_skillchanges(void)
 {
@@ -505,7 +507,7 @@ static void icebergs(void)
     move_icebergs();
 }
 
-#define HERBROTCHANCE 5         /* Verrottchance f�r Kr�uter (ifdef HERBS_ROT) */
+#define HERBROTCHANCE 5         /* Verrottchance fuer Kraeuter (ifdef HERBS_ROT) */
 
 static void rotting_herbs(void)
 {
@@ -603,8 +605,7 @@ void plagues(region * r)
     }
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("pest", "dead", dead));
         deathcounts(r, dead);
         rsetpeasants(r, peasants - dead);
     }

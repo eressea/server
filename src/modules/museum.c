@@ -152,7 +152,7 @@ order * ord)
     r = findregion(a->data.sa[0], a->data.sa[1]);
     assert(r);
     a_remove(&u->attribs, a);
-    /* Ãbergebene GegenstÃ¤nde zurÃ¼ckgeben */
+    /* Uebergebene Gegenstaende zurueckgeben */
 
     a = a_find(u->attribs, &at_museumgivebackcookie);
     if (a) {

@@ -306,8 +306,8 @@ char *str_unescape(char *str) {
     char *read = str, *write = str;
     while (*read) {
         char * pos = strchr(read, '\\');
-        if (pos) {
-            size_t len = pos - read;
+        if (pos >= read) {
+            size_t len = (size_t)(pos - read);
             memmove(write, read, len);
             write += len;
             read += (len + 1);
@@ -341,14 +341,14 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
 {
     size_t slen = strlen(str);
     const char *read = str;
-    char *write = buffer;
+    unsigned char *write = (unsigned char *)buffer;
     if (size < 1) {
         return NULL;
     }
     while (slen > 0 && size > 1 && *read) {
         const char *pos = strpbrk(read, chars);
         size_t len = size;
-        if (pos) {
+        if (pos >= read) {
             len = pos - read;
         }
         if (len < size) {
@@ -399,7 +399,7 @@ const char *str_escape_ex(const char *str, char *buffer, size_t size, const char
                 break;
             default:
                 if (size > 5) {
-                    int n = sprintf(write, "\\%03o", ch);
+                    int n = snprintf((char *)write, size, "\\%03o", ch);
                     if (n > 0) {
                         assert(n == 5);
                         write += n;

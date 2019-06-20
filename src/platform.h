@@ -14,6 +14,3 @@
 #pragma warning(disable: 4224) // formal parameter was previously defined as a type
 #pragma warning(disable: 4214) // bit field types other than int
 #endif
-
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))

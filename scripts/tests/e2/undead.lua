@@ -31,9 +31,15 @@ function test_undead_reserve_other()
     u1.name = 'Xolgrim'
     process_orders()
 
-    -- Intermittent Failure: expected 0 but was 2
+    if 0 ~= u1:get_item("log") then
+        -- try to catch that intermittent bug:
+        print(u1:show())
+    end
     assert_equal(0, u1:get_item("log"))
-
+    if 2 ~= u2:get_item("log") then
+        -- try to catch that intermittent bug:
+        print(u2:show())
+    end
     assert_equal(2, u2:get_item("log"))
 end
 
@@ -59,4 +65,15 @@ function test_clones_dont_give_person()
     u1:add_order("GIB 0 1 Person")
     process_orders()
     assert_equal(2, u1.number)
+end
+
+-- bug 2504
+function test_skeleton_cannot_learn()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("elf")
+    local u = unit.create(f, r, 2)
+    u.race = "skeleton"
+    u:add_order("LERNE Wahrnehmung")
+    process_orders()
+    assert_equal(0, u:get_skill('perception'))
 end

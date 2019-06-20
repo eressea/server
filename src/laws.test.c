@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "laws.h"
 #include "battle.h"
+#include "contact.h"
 #include "guard.h"
 #include "monsters.h"
 
@@ -219,6 +220,21 @@ static void test_display_cmd(CuTest *tc) {
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
     CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_UNIT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", unit_getinfo(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Hodor", uprivate(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", uprivate(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
@@ -940,6 +956,12 @@ static void test_name_unit(CuTest *tc) {
 
     u = setup_name_cmd();
     f = u->faction;
+
+    ord = create_order(K_NAME, f->locale, "%s ' Klabauterfrau '", LOC(f->locale, parameters[P_UNIT]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Klabauterfrau", u->_name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->_name);
@@ -960,10 +982,15 @@ static void test_name_region(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
+    u_set_building(u, test_create_building(u->region, NULL));
     f = u->faction;
 
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->region->land->name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
-    u_set_building(u, test_create_building(u->region, NULL));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
@@ -980,6 +1007,7 @@ static void test_name_region(CuTest *tc) {
 static void test_name_building(CuTest *tc) {
     unit *uo, *u, *ux;
     faction *f;
+    order *ord;
 
     u = setup_name_cmd();
     u->building = test_create_building(u->region, NULL);
@@ -989,29 +1017,33 @@ static void test_name_building(CuTest *tc) {
     ux = test_create_unit(f, test_create_region(0, 0, NULL));
     u_set_building(ux, u->building);
 
-    u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
-
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_BUILDING]));
     building_set_owner(uo);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error148"));
     test_clear_messages(f);
-
     building_set_owner(u);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->building->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
 
     building_setname(u->building, "Home");
     building_set_owner(ux);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error148"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
-
     test_clear_messages(f);
-    free_order(u->thisorder);
-    u->thisorder = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
-    name_cmd(u, u->thisorder);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
 
     /* TODO: test BTF_NAMECHANGE:
     btype->flags |= BTF_NAMECHANGE;
@@ -1837,6 +1869,149 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_quit(CuTest *tc) {
+    faction *f;
+    unit *u;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, r);
+    u->thisorder = create_order(K_QUIT, f->locale, "password");
+
+    faction_setpassword(f, "passwort");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 0, f->flags & FFL_QUIT);
+
+    faction_setpassword(f, "password");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f->flags & FFL_QUIT);
+
+    test_teardown();
+}
+
+/**
+ * Gifting units to another faction upon voluntary death (QUIT).
+ */ 
+static void test_quit_transfer(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    test_teardown();
+}
+
+/**
+ * Gifting units with limited skills to another faction.
+ *
+ * This is allowed only up to the limit of the target faction.
+ * Units that would break the limit are not transferred.
+ */
+static void test_quit_transfer_limited(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    set_level(u1, SK_MAGIC, 1);
+    set_level(u2, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, true, has_limited_skills(u1));
+
+    config_set_int("rules.maxskills.magic", 1);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    f1->flags -= FFL_QUIT;
+    config_set_int("rules.maxskills.magic", 2);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * Only units of the same race can be gifted to another faction.
+ */
+static void test_quit_transfer_migrants(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u_setrace(u1, test_create_race("smurf"));
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * A hero that is gifted to another faction loses their status.
+ */
+static void test_quit_transfer_hero(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u1->flags |= UFL_HERO;
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertIntEquals(tc, 0, u1->flags & UFL_HERO);
+
+    test_teardown();
+}
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1912,6 +2087,11 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
+    SUITE_ADD_TEST(suite, test_quit);
+    SUITE_ADD_TEST(suite, test_quit_transfer);
+    SUITE_ADD_TEST(suite, test_quit_transfer_limited);
+    SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
+    SUITE_ADD_TEST(suite, test_quit_transfer_hero);
 
     return suite;
 }
