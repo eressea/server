@@ -161,7 +161,7 @@ void autostudy_run(scholar scholars[], int nscholars)
     }
 }
 
-#define MAXSCHOLARS 512
+#define MAXSCHOLARS 2048
 
 void do_autostudy(region *r)
 {
