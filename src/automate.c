@@ -1,5 +1,6 @@
 #include <platform.h>
 
+#include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/messages.h"
 #include "kernel/order.h"
@@ -46,8 +47,10 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
                         st->level = (short)effskill_study(u, sk);
                         st->learn = 0;
                         st->u = u;
-                        if (++nscholars > max_scholars) {
-                            log_fatal("you must increase MAXSCHOLARS");
+                        if (++nscholars >= max_scholars) {
+                            log_warning("you must increase MAXSCHOLARS");
+                            *units = u->next;
+                            return max_scholars;
                         }
                     }
                 }
@@ -161,15 +164,19 @@ void autostudy_run(scholar scholars[], int nscholars)
     }
 }
 
-#define MAXSCHOLARS 512
-
 void do_autostudy(region *r)
 {
     static int max_scholars;
     unit *units = r->units;
     scholar scholars[MAXSCHOLARS];
+    static int config;
+    static int batchsize = MAXSCHOLARS;
+    if (config_changed(&config)) {
+        batchsize = config_get_int("automate.batchsize", MAXSCHOLARS);
+        assert(batchsize <= MAXSCHOLARS);
+    }
     while (units) {
-        int i, nscholars = autostudy_init(scholars, MAXSCHOLARS, &units);
+        int i, nscholars = autostudy_init(scholars, batchsize, &units);
         if (nscholars > max_scholars) {
             stats_count("automate.max_scholars", nscholars - max_scholars);
             max_scholars = nscholars;

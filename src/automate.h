@@ -33,6 +33,7 @@ typedef struct scholar {
     short level;
 } scholar;
 
+#define MAXSCHOLARS 128
 #define STUDENTS_PER_TEACHER 10
 
 void do_autostudy(struct region *r);
