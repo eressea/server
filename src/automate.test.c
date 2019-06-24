@@ -46,22 +46,22 @@ static void test_autostudy_init(CuTest *tc) {
     CuAssertPtrEquals(tc, u2, scholars[0].u);
     CuAssertIntEquals(tc, 2, scholars[0].level);
     CuAssertIntEquals(tc, 0, scholars[0].learn);
-    CuAssertIntEquals(tc, SK_ENTERTAINMENT, scholars[0].sk);
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT, scholars[0].skill);
     CuAssertPtrEquals(tc, u1, scholars[1].u);
     CuAssertIntEquals(tc, 0, scholars[1].level);
     CuAssertIntEquals(tc, 0, scholars[1].learn);
-    CuAssertIntEquals(tc, SK_ENTERTAINMENT, scholars[1].sk);
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT, scholars[1].skill);
     CuAssertPtrEquals(tc, u3, scholars[2].u);
     CuAssertIntEquals(tc, 0, scholars[2].level);
     CuAssertIntEquals(tc, 0, scholars[2].learn);
-    CuAssertIntEquals(tc, SK_PERCEPTION, scholars[2].sk);
+    CuAssertIntEquals(tc, SK_PERCEPTION, scholars[2].skill);
     CuAssertPtrEquals(tc, NULL, scholars[3].u);
     CuAssertPtrEquals(tc, u5, ulist);
     CuAssertIntEquals(tc, 1, autostudy_init(scholars, 4, &ulist));
     CuAssertPtrEquals(tc, u5, scholars[0].u);
     CuAssertIntEquals(tc, 0, scholars[0].level);
     CuAssertIntEquals(tc, 0, scholars[0].learn);
-    CuAssertIntEquals(tc, SK_PERCEPTION, scholars[0].sk);
+    CuAssertIntEquals(tc, SK_PERCEPTION, scholars[0].skill);
     CuAssertPtrEquals(tc, NULL, ulist);
     test_teardown();
 }

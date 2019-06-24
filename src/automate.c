@@ -20,12 +20,12 @@ static int cmp_scholars(const void *lhs, const void *rhs)
 {
     const scholar *a = (const scholar *)lhs;
     const scholar *b = (const scholar *)rhs;
-    if (a->sk == b->sk) {
+    if (a->skill == b->skill) {
         /* sort by level, descending: */
         return b->level - a->level;
     }
     /* order by skill */
-    return (int)a->sk - (int)b->sk;
+    return a->skill - b->skill;
 }
 
 int autostudy_init(scholar scholars[], int max_scholars, unit **units)
@@ -42,8 +42,8 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units)
                     scholar * st = scholars + nscholars;
                     skill_t sk = getskill(u->faction->locale);
                     if (check_student(u, u->thisorder, sk)) {
-                        st->sk = sk;
-                        st->level = effskill_study(u, st->sk);
+                        st->skill = (short)sk;
+                        st->level = (short)effskill_study(u, sk);
                         st->learn = 0;
                         st->u = u;
                         if (++nscholars > max_scholars) {
@@ -81,26 +81,26 @@ void autostudy_run(scholar scholars[], int nscholars)
 {
     int ti = 0;
     while (ti != nscholars) {
-        skill_t sk = scholars[ti].sk;
+        int skill = scholars[ti].skill;
         int t, se, ts = 0, tt = 0, si = ti;
-        for (se = ti; se != nscholars && scholars[se].sk == sk; ++se) {
+        for (se = ti; se != nscholars && scholars[se].skill == skill; ++se) {
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-            for (; mint > tt && si != nscholars && scholars[si].sk == sk; ++si) {
+            for (; mint > tt && si != nscholars && scholars[si].skill == skill; ++si) {
                 tt += scholars[si].u->number;
             }
         }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se && scholars[si].sk == sk; ++si) {
+        for (; si != se && scholars[si].skill == skill; ++si) {
             if (scholars[si].level + TEACHDIFFERENCE <= scholars[ti].level) {
                 break;
             }
             tt += scholars[si].u->number;
         }
         /* now si is the first unit we can teach, if we can teach any */
-        if (si == se || scholars[si].sk != sk) {
+        if (si == se || scholars[si].skill != skill) {
             /* there are no students, so standard learning for everyone */
             for (t = ti; t != se; ++t) {
                 learning(scholars + t, scholars[t].u->number);
@@ -177,7 +177,7 @@ void do_autostudy(region *r)
         autostudy_run(scholars, nscholars);
         for (i = 0; i != nscholars; ++i) {
             int days = STUDYDAYS * scholars[i].learn;
-            learn_skill(scholars[i].u, scholars[i].sk, days);
+            learn_skill(scholars[i].u, (skill_t)scholars[i].skill, days);
         }
     }
 }

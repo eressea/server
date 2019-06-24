@@ -28,9 +28,9 @@ struct unit;
 
 typedef struct scholar {
     struct unit *u;
-    skill_t sk;
-    int level;
     int learn;
+    short skill;
+    short level;
 } scholar;
 
 #define STUDENTS_PER_TEACHER 10
