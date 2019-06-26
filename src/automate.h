@@ -29,7 +29,6 @@ struct unit;
 typedef struct scholar {
     struct unit *u;
     int learn;
-    short skill;
     short level;
 } scholar;
 
@@ -38,7 +37,7 @@ typedef struct scholar {
 
 void do_autostudy(struct region *r);
 
-int autostudy_init(scholar scholars[], int max_scholars, struct unit **units);
+int autostudy_init(scholar scholars[], int max_scholars, struct unit **units, skill_t *o_skill);
 void autostudy_run(scholar scholars[], int nscholars);
 
 #endif
