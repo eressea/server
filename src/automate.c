@@ -17,49 +17,56 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static int cmp_scholars(const void *lhs, const void *rhs)
-{
+static int cmp_scholars(const void *lhs, const void *rhs) {
     const scholar *a = (const scholar *)lhs;
     const scholar *b = (const scholar *)rhs;
-    if (a->skill == b->skill) {
-        /* sort by level, descending: */
-        return b->level - a->level;
-    }
-    /* order by skill */
-    return a->skill - b->skill;
+    return b->level - a->level;
 }
 
-int autostudy_init(scholar scholars[], int max_scholars, unit **units)
+int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *o_skill)
 {
     unit *unext = NULL, *u = *units;
     faction *f = u->faction;
     int nscholars = 0;
-
+    skill_t skill = NOSKILL;
     while (u) {
-        keyword_t kwd = init_order(u->thisorder, u->faction->locale);
-        if (kwd == K_AUTOSTUDY) {
-            if (long_order_allowed(u)) {
+        if (!fval(u, UFL_MARK)) {
+            keyword_t kwd = init_order(u->thisorder, u->faction->locale);
+            if (kwd == K_AUTOSTUDY) {
                 if (f == u->faction) {
-                    scholar * st = scholars + nscholars;
-                    skill_t sk = getskill(u->faction->locale);
-                    if (check_student(u, u->thisorder, sk)) {
-                        st->skill = (short)sk;
-                        st->level = (short)effskill_study(u, sk);
-                        st->learn = 0;
-                        st->u = u;
-                        if (++nscholars >= max_scholars) {
-                            log_warning("you must increase MAXSCHOLARS");
-                            *units = u->next;
-                            return max_scholars;
+                    unext = u->next;
+                    if (long_order_allowed(u)) {
+                        scholar * st = scholars + nscholars;
+                        skill_t sk = getskill(u->faction->locale);
+                        if (skill == NOSKILL && sk != NOSKILL) {
+                            skill = sk;
+                            if (o_skill) {
+                                *o_skill = skill;
+                            }
+                        }
+                        if (check_student(u, u->thisorder, sk)) {
+                            if (sk == skill) {
+                                fset(u, UFL_MARK);
+                                st->level = (short)effskill_study(u, sk);
+                                st->learn = 0;
+                                st->u = u;
+                                if (++nscholars >= max_scholars) {
+                                    log_warning("you must increase MAXSCHOLARS");
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            fset(u, UFL_MARK);
                         }
                     }
-                }
-                else if (!unext) {
-                    unext = u;
                 }
             }
         }
         u = u->next;
+    }
+    while (unext && unext->faction != f) {
+        unext = unext->next;
     }
     *units = unext;
     if (nscholars > 0) {
@@ -84,26 +91,25 @@ void autostudy_run(scholar scholars[], int nscholars)
 {
     int ti = 0;
     while (ti != nscholars) {
-        int skill = scholars[ti].skill;
         int t, se, ts = 0, tt = 0, si = ti;
-        for (se = ti; se != nscholars && scholars[se].skill == skill; ++se) {
+        for (se = ti; se != nscholars; ++se) {
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-            for (; mint > tt && si != nscholars && scholars[si].skill == skill; ++si) {
+            for (; mint > tt && si != nscholars; ++si) {
                 tt += scholars[si].u->number;
             }
         }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se && scholars[si].skill == skill; ++si) {
+        for (; si != se; ++si) {
             if (scholars[si].level + TEACHDIFFERENCE <= scholars[ti].level) {
                 break;
             }
             tt += scholars[si].u->number;
         }
         /* now si is the first unit we can teach, if we can teach any */
-        if (si == se || scholars[si].skill != skill) {
+        if (si == se) {
             /* there are no students, so standard learning for everyone */
             for (t = ti; t != se; ++t) {
                 learning(scholars + t, scholars[t].u->number);
@@ -166,25 +172,36 @@ void autostudy_run(scholar scholars[], int nscholars)
 
 void do_autostudy(region *r)
 {
-    static int max_scholars;
-    unit *units = r->units;
-    scholar scholars[MAXSCHOLARS];
     static int config;
     static int batchsize = MAXSCHOLARS;
+    static int max_scholars;
+    scholar scholars[MAXSCHOLARS];
+    unit *u;
+
     if (config_changed(&config)) {
         batchsize = config_get_int("automate.batchsize", MAXSCHOLARS);
         assert(batchsize <= MAXSCHOLARS);
     }
-    while (units) {
-        int i, nscholars = autostudy_init(scholars, batchsize, &units);
-        if (nscholars > max_scholars) {
-            stats_count("automate.max_scholars", nscholars - max_scholars);
-            max_scholars = nscholars;
+    for (u = r->units; u; u = u->next) {
+        if (!fval(u, UFL_MARK)) {
+            unit *ulist = u;
+            int sum_scholars = 0;
+            while (ulist) {
+                skill_t skill = NOSKILL;
+                int i, nscholars = autostudy_init(scholars, batchsize, &ulist, &skill);
+                assert(ulist == NULL || ulist->faction == u->faction);
+                sum_scholars += nscholars;
+                if (sum_scholars > max_scholars) {
+                    stats_count("automate.max_scholars", sum_scholars - max_scholars);
+                    max_scholars = sum_scholars;
+                }
+                autostudy_run(scholars, nscholars);
+                for (i = 0; i != nscholars; ++i) {
+                    int days = STUDYDAYS * scholars[i].learn;
+                    learn_skill(scholars[i].u, skill, days);
+                }
+            }
         }
-        autostudy_run(scholars, nscholars);
-        for (i = 0; i != nscholars; ++i) {
-            int days = STUDYDAYS * scholars[i].learn;
-            learn_skill(scholars[i].u, (skill_t)scholars[i].skill, days);
-        }
+        freset(u, UFL_MARK);
     }
 }
