@@ -3,33 +3,8 @@
 from string import split
 from string import strip
 from string import lower
-import subprocess
 import bcrypt
 import sqlite3
-
-def baseconvert(n, base):
-    """convert positive decimal integer n to equivalent in another base (2-36)"""
-
-    digits = "0123456789abcdefghijkLmnopqrstuvwxyz"
-
-    try:
-        n = int(n)
-        base = int(base)
-    except:
-        return ""
-
-    if n < 0 or base < 2 or base > 36:
-        return ""
-
-    s = ""
-    while True:
-        r = n % base
-        s = digits[r] + s
-        n = n / base
-        if n == 0:
-            break
-
-    return s
 
 class EPasswd:
     def __init__(self):
@@ -47,7 +22,7 @@ class EPasswd:
         c = conn.cursor()
         for row in c.execute('SELECT `no`, `email`, `password` FROM `faction`'):
             (no, email, passwd) = row
-            self.set_data(baseconvert(no, 36), email, passwd)
+            self.set_data(no, email, passwd)
         conn.close()
 
     def load_file(self, file):
