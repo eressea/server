@@ -963,7 +963,10 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
-    for (u = fsrc->units; u != NULL; u = u->nextF) {
+    u = fsrc->units;
+    while (u) {
+        unit *unext = u->nextF;
+
         if (u_race(u) == fdst->race) {
             u->flags &= ~UFL_HERO;
             if (give_unit_allowed(u) == 0) {
@@ -978,12 +981,14 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                         }
                     }
                     if (i != u->skill_size) {
+                        u = u->nextF;
                         continue;
                     }
                 }
                 u_setfaction(u, fdst);
             }
         }
+        u = unext;
     }
 }
 
@@ -1015,14 +1020,16 @@ int quit_cmd(unit * u, struct order *ord)
                 else {
                     unit *u2;
                     for (u2 = u->region->units; u2; u2 = u2->next) {
-                        if (u2->faction == f2 && ucontact(u2, u)) {
-                            transfer_faction(u->faction, u2->faction);
-                            break;
+                        if (u2->faction == f2) {
+                            if (ucontact(u2, u)) {
+                                transfer_faction(u->faction, u2->faction);
+                                break;
+                            }
                         }
                     }
                     if (u2 == NULL) {
                         /* no target unit found */
-                        cmistake(u, ord, 0, MSG_EVENT);
+                        cmistake(u, ord, 40, MSG_EVENT);
                         flags = 0;
                     }
                 }
