@@ -62,7 +62,7 @@ static const char *spell_damage(int sp)
 {
     switch (sp) {
     case 0:
-        /* meist toetlich 20-65 HP */
+        /* meist toedlich 20-65 HP */
         return "5d10+15";
     case 1:
         /* sehr variabel 4-48 HP */
@@ -71,7 +71,7 @@ static const char *spell_damage(int sp)
         /* leicht verwundet 4-18 HP */
         return "2d8+2";
     case 3:
-        /* fast immer toetlich 30-50 HP */
+        /* fast immer toedlich 30-50 HP */
         return "5d5+25";
     case 4:
         /* verwundet 11-26 HP */

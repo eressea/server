@@ -30,6 +30,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "battle.h"
 #include "contact.h"
 #include "economy.h"
+#include "give.h"
 #include "market.h"
 #include "morale.h"
 #include "monsters.h"
@@ -395,8 +396,7 @@ static void peasants(region * r, int rule)
     dead += (int)(0.5 + n * PEASANT_STARVATION_CHANCE);
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("phunger", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("phunger", "dead", dead));
         peasants -= dead;
     }
 
@@ -941,6 +941,52 @@ int leave_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+void transfer_faction(faction *fsrc, faction *fdst) {
+    unit *u;
+    skill_t sk;
+    int skill_count[MAXSKILLS];
+    int skill_limit[MAXSKILLS];
+
+    for (sk = 0; sk != MAXSKILLS; ++sk) {
+        skill_limit[sk] = faction_skill_limit(fdst, sk);
+    }
+    memset(skill_count, 0, sizeof(skill_count));
+
+    for (u = fdst->units; u != NULL; u = u->nextF) {
+        if (u->skills) {
+            int i;
+            for (i = 0; i != u->skill_size; ++i) {
+                const skill *sv = u->skills + i;
+                skill_t sk = (skill_t)sv->id;
+                skill_count[sk] += u->number;
+            }
+        }
+    }
+
+    for (u = fsrc->units; u != NULL; u = u->nextF) {
+        if (u_race(u) == fdst->race) {
+            u->flags &= ~UFL_HERO;
+            if (give_unit_allowed(u) == 0) {
+                if (u->skills) {
+                    int i;
+
+                    for (i = 0; i != u->skill_size; ++i) {
+                        const skill *sv = u->skills + i;
+                        skill_t sk = (skill_t)sv->id;
+                        if (skill_count[sk] + u->number > skill_limit[sk]) {
+                            break;
+                        }
+                    }
+                    if (i != u->skill_size) {
+                        continue;
+                    }
+                }
+                u_setfaction(u, fdst);
+            }
+        }
+    }
+}
+
 int quit_cmd(unit * u, struct order *ord)
 {
     char token[128];
@@ -952,7 +998,37 @@ int quit_cmd(unit * u, struct order *ord)
     assert(kwd == K_QUIT);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
-        fset(f, FFL_QUIT);
+        int flags = FFL_QUIT;
+        if (rule_transfermen()) {
+            param_t p;
+            p = getparam(f->locale);
+            if (p == P_FACTION) {
+                faction *f2 = getfaction();
+                if (f2 == NULL) {
+                    cmistake(u, ord, 66, MSG_EVENT);
+                    flags = 0;
+                }
+                else if (f->race != f2->race) {
+                    cmistake(u, ord, 281, MSG_EVENT);
+                    flags = 0;
+                }
+                else {
+                    unit *u2;
+                    for (u2 = u->region->units; u2; u2 = u2->next) {
+                        if (u2->faction == f2 && ucontact(u2, u)) {
+                            transfer_faction(u->faction, u2->faction);
+                            break;
+                        }
+                    }
+                    if (u2 == NULL) {
+                        /* no target unit found */
+                        cmistake(u, ord, 0, MSG_EVENT);
+                        flags = 0;
+                    }
+                }
+            }
+        }
+        f->flags |= flags;
     }
     else {
         char buffer[64];
@@ -1488,7 +1564,7 @@ int display_cmd(unit * u, struct order *ord)
 {
     char token[128];
     char **s = NULL;
-    const char *str;
+    char *str;
     region *r = u->region;
 
     init_order_depr(ord);
@@ -1525,11 +1601,19 @@ int display_cmd(unit * u, struct order *ord)
         break;
 
     case P_UNIT:
-        unit_setinfo(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        unit_setinfo(u, str);
         break;
 
     case P_PRIVAT:
-        usetprivate(u, getstrtoken());
+        str = getstrtoken();
+        if (str) {
+            unicode_utf8_trim(str);
+        }
+        usetprivate(u, str);
         break;
 
     case P_REGION:
@@ -1664,7 +1748,7 @@ int name_cmd(struct unit *u, struct order *ord)
     bool foreign = false;
     const char *str;
 
-    init_order_depr(ord);
+    init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
 
@@ -2069,7 +2153,7 @@ int banner_cmd(unit * u, struct order *ord)
     init_order_depr(ord);
     s = getstrtoken();
     faction_setbanner(u->faction, s);
-    add_message(&u->faction->msgs, msg_message("changebanner", "value", s));
+    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }
@@ -3205,7 +3289,7 @@ static int faction_getmages(faction * f, unit ** results, int numresults)
     for (u = f->units; u; u = u->nextF) {
         if (u->number > 0) {
             struct sc_mage * mage = get_mage(u);
-            if (mage && mage_get_spellbook(mage)) {
+            if (mage) {
                 int level = effskill(u, SK_MAGIC, NULL);
                 if (level > maxlevel) {
                     maxlevel = level;

@@ -32,9 +32,9 @@ static int age_chance(int a, int b, int p) {
 
 static void evolve_dragon(unit * u, const struct race *rc) {
     scale_number(u, 1);
+    u->hp = unit_max_hp(u);
     u_setrace(u, rc);
     u->irace = NULL;
-    u->hp = unit_max_hp(u);
 }
 
 void age_firedragon(unit * u)

@@ -9,9 +9,27 @@
 #include "kernel/faction.h"
 #include "kernel/db/driver.h"
 
+#include "util/strings.h"
+
+static int generate_factions(void *data, db_faction *results, int nresults)
+{
+    int i;
+    faction **iter = (faction **)data;
+    for (i = 0; *iter && i != nresults; ++i) {
+        faction *f = *iter;
+        const char *pwhash;
+        results[i].p_uid = &f->uid;
+        results[i].no = f->no;
+        results[i].email = faction_getemail(f);
+        pwhash = faction_getpassword(f);
+        str_strlcpy(results[i].pwhash, pwhash ? pwhash : "", sizeof(results[i].pwhash));
+        *iter = f->next;
+    }
+    return i;
+}
+
 int gamedb_update(void)
 {
-    faction *f;
     int err;
     const char *dbname;
 
@@ -19,14 +37,9 @@ int gamedb_update(void)
 
     err = db_driver_open(DB_GAME, dbname);
     if (err == 0) {
-        for (f = factions; f; f = f->next) {
-            int uid = db_driver_faction_save(f->uid, f->no, turn,
-                faction_getemail(f),
-                faction_getpassword(f));
-            if (uid > 0) {
-                f->uid = uid;
-            }
-        }
+        faction *list = factions;
+        db_driver_update_factions(generate_factions, &list);
+        db_driver_compact(turn);
         db_driver_close(DB_GAME);
     }
     return err;

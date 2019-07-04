@@ -33,10 +33,8 @@ extern "C" {
 
     extern int autoseed(newfaction ** players, int nsize, int max_agediff);
     extern newfaction *read_newfactions(const char *filename);
-    extern const struct terrain_type *random_terrain(const struct terrain_type
-        *terrains[], int distribution[], int size);
 
-    extern int build_island_e3(int x, int y, int minsize, newfaction **players, int numfactions);
+    extern int build_island(int x, int y, int minsize, newfaction **players, int numfactions);
 
 #ifdef __cplusplus
 }

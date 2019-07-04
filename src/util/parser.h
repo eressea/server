@@ -26,8 +26,8 @@ extern "C" {
     void parser_pushstate(void);
     void parser_popstate(void);
     bool parser_end(void);
-    const char *getstrtoken(void);
-    const char *gettoken(char *lbuf, size_t bufsize);
+    char *getstrtoken(void);
+    char *gettoken(char *lbuf, size_t bufsize);
     int getuint(void);
     int getint(void);
     int getid(void);

@@ -572,7 +572,7 @@ static int build_limited(unit * u, const construction * con, int completed, int 
         }
         /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
          * Talente */
-        if (skill_limit(u->faction, con->skill) == INT_MAX) {
+        if (faction_skill_limit(u->faction, con->skill) == INT_MAX) {
             const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
             item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
             int i = itm ? itm->number : 0;
@@ -729,8 +729,9 @@ static int build_stages(unit *u, const building_type *btype, int built, int n, i
             }
             else {
                 /* err is the amount we built of this stage */
+                built += err;
                 made += err;
-                if (err != con->maxsize && con->maxsize > 0) {
+                if (con->maxsize > 0 && built < con->maxsize) {
                     /* we did not finish the stage, can quit here */
                     break;
                 }

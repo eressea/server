@@ -27,7 +27,7 @@
   <entry spell="readmind" level="7" />
   <entry spell="gooddreams" level="8" />
   <entry spell="illaundestroymagic" level="8" />
-  <entry spell="clone" level="9" />
+    <!-- <entry spell="clone" level="9" /> -->
   <entry spell="bad_dreams" level="10" />
   <entry spell="mindblast" level="11" />
   <entry spell="create_dreameye" level="14" />

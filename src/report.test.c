@@ -192,7 +192,7 @@ static void test_report_allies(CuTest *tc) {
     f1 = test_create_faction(NULL);
     f2 = test_create_faction(NULL);
     f3 = test_create_faction(NULL);
-    snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n",
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n\n",
         factionname(f1),
         LOC(lang, parameters[P_GUARD]));
     ally_set(&f->allies, f1, HELP_GUARD);
@@ -211,7 +211,7 @@ static void test_report_allies(CuTest *tc) {
         factionname(f2),
         LOC(lang, parameters[P_GIVE]));
     linebreak = strlen(exp);
-    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)\nund %s (%s).\n",
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)\nund %s (%s).\n\n",
         factionname(f1),
         LOC(lang, parameters[P_GUARD]),
         factionname(f2),

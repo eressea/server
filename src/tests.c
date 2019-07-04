@@ -7,8 +7,9 @@
 #include "vortex.h"
 
 #include "kernel/calendar.h"
-#include <kernel/config.h>
-#include <kernel/alliance.h>
+#include "kernel/callbacks.h"
+#include "kernel/config.h"
+#include "kernel/alliance.h"
 #include <kernel/equipment.h>
 #include <kernel/messages.h>
 #include <kernel/plane.h>
@@ -228,7 +229,7 @@ static void test_reset(void) {
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
-
+    memset(&callbacks, 0, sizeof(callbacks));
     free_gamedata();
     free_terrains();
     free_resources();

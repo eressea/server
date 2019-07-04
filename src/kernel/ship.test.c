@@ -470,7 +470,7 @@ static void test_shipspeed_stormwind(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     register_shipcurse();
     assert(sh && cap && crew);
 
@@ -488,7 +488,7 @@ static void test_shipspeed_nodrift(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     register_shipcurse();
     assert(sh && cap && crew);
 
@@ -503,7 +503,7 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     register_shipcurse();
     assert(sh && cap && crew);
 
@@ -519,7 +519,7 @@ static void test_shipspeed_at_speedup(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
     a = a_new(&at_speedup);
@@ -536,7 +536,7 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
     rc = rc_get_or_create(cap->_race->_name);
@@ -551,7 +551,7 @@ static void test_shipspeed_damage(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
     sh->damage = 1;
@@ -561,6 +561,32 @@ static void test_shipspeed_damage(CuTest *tc) {
     sh->damage = sh->size * DAMAGE_SCALE;
     CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, shipspeed(sh, cap));
     test_teardown();
+}
+
+static void test_maximum_shipspeed(CuTest *tc) {
+    ship *sh;
+    unit *cap, *crew;
+    race *rc;
+    struct faction *f;
+    attrib *a;
+
+    test_setup();
+    sh = setup_ship();
+    rc = test_create_race("aquarian");
+    rc->flags |= RCF_SHIPSPEED;
+    f = test_create_faction(rc);
+    setup_crew(sh, f, &cap, &crew);
+    CuAssertIntEquals(tc, sh->type->range + 1, shipspeed(sh, cap));
+    create_curse(0, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
+    CuAssertIntEquals(tc, 2 * sh->type->range + 1, shipspeed(sh, cap));
+    create_curse(0, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
+    CuAssertIntEquals(tc, 2 * sh->type->range + 2, shipspeed(sh, cap));
+    a = a_new(&at_speedup);
+    a->data.i = 3;
+    a_add(&sh->attribs, a);
+    CuAssertIntEquals(tc, 2 * sh->type->range + 5, shipspeed(sh, cap));
+    create_curse(0, &sh->attribs, &ct_shipspeedup, 1, 1, 4, 0);
+    CuAssertIntEquals(tc, 2 * sh->type->range + 9, shipspeed(sh, cap));
 }
 
 static void test_shipspeed(CuTest *tc) {
@@ -574,7 +600,7 @@ static void test_shipspeed(CuTest *tc) {
 
     CuAssertIntEquals_Msg(tc, "ship without a captain cannot move", 0, shipspeed(sh, NULL));
 
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
 
     CuAssertPtrEquals(tc, cap, ship_owner(sh));
     CuAssertIntEquals_Msg(tc, "ship with fully skilled crew can sail at max speed", 2, shipspeed(sh, cap));
@@ -603,7 +629,7 @@ static void test_shipspeed_max_range(CuTest *tc) {
 
     test_setup();
     sh = setup_ship();
-    setup_crew(sh, 0, &cap, &crew);
+    setup_crew(sh, NULL, &cap, &crew);
     config_set("movement.shipspeed.skillbonus", "5");
     r = sh->region;
     f = test_create_faction(NULL);
@@ -649,5 +675,6 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipspeed_race_bonus);
     SUITE_ADD_TEST(suite, test_shipspeed_damage);
     SUITE_ADD_TEST(suite, test_shipspeed_max_range);
+    SUITE_ADD_TEST(suite, test_maximum_shipspeed);
     return suite;
 }

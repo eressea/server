@@ -55,9 +55,6 @@ sendmail = True
 maxfiles = 30
 # write headers to file?
 writeheaders = True
-# write received files to database?
-tooldir = os.path.join(rootdir, 'orders-php')
-writedb = os.path.exists(tooldir)
 # reject all html email?
 rejecthtml = True
 
@@ -235,13 +232,6 @@ def copy_orders(message, filename, sender, mtime):
             outfile.write(name + ": " + value + "\n")
         outfile.close()
 
-    if writedb:
-        dirname, basename = os.path.split(filename)
-        cli = os.path.join(tooldir, 'cli.php');
-        dbname = os.path.join(dirname, 'orders.db')
-        datestr = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(mtime))
-        subprocess.call(['php', cli, '-d', dbname, 'insert', basename, sender, datestr])
-
     found = False
     outfile = open(filename, "w")
     if message.is_multipart():
@@ -262,6 +252,7 @@ def copy_orders(message, filename, sender, mtime):
             charset = message.get_content_charset()
             logger.error("could not write text/plain message (charset=%s) for %s" % (charset, sender))
     outfile.close()
+
     return found
 
 # create a file, containing:
@@ -311,6 +302,9 @@ def accept(game, locale, stream, extend=None):
         logger.warning("missing message date " + email)
         warning = " (" + messages["warning-" + locale] + ")"
         msg = msg + formatpar(messages["nodate-" + locale], 76, 2) + "\n"
+
+    print('ACCEPT_MAIL=' + email)
+    print('ACCEPT_FILE="' + filename + '"')
 
     if not text_ok:
         warning = " (" + messages["error-" + locale] + ")"
