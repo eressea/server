@@ -1915,6 +1915,7 @@ static void test_quit_transfer(CuTest *tc) {
     test_teardown();
 }
 
+#ifdef QUIT_WITH_TRANSFER
 /**
  * Gifting units with limited skills to another faction.
  *
@@ -2034,6 +2035,7 @@ static void test_transfer_faction(CuTest *tc) {
 
     test_teardown();
 }
+#endif
 
 CuSuite *get_laws_suite(void)
 {
@@ -2111,11 +2113,13 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
+#ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
     SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
     SUITE_ADD_TEST(suite, test_quit_transfer_hero);
     SUITE_ADD_TEST(suite, test_transfer_faction);
+#endif
 
     return suite;
 }

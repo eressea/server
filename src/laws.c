@@ -947,6 +947,8 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
+    assert(fsrc != fdst);
+
     for (sk = 0; sk != MAXSKILLS; ++sk) {
         skill_limit[sk] = faction_skill_limit(fdst, sk);
     }
@@ -985,6 +987,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                         continue;
                     }
                 }
+                ADDMSG(&fdst->msgs, msg_message("transfer_unit", "unit", u));
                 u_setfaction(u, fdst);
             }
         }
@@ -1008,6 +1011,7 @@ int quit_cmd(unit * u, struct order *ord)
             param_t p;
             p = getparam(f->locale);
             if (p == P_FACTION) {
+#ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
                 if (f2 == NULL) {
                     cmistake(u, ord, 66, MSG_EVENT);
@@ -1033,6 +1037,10 @@ int quit_cmd(unit * u, struct order *ord)
                         flags = 0;
                     }
                 }
+#else
+                log_error("faction %s: QUIT FACTION is disabled.", factionname(f));
+                flags = 0;
+#endif
             }
         }
         f->flags |= flags;
