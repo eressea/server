@@ -216,6 +216,7 @@ faction *addfaction(const char *email, const char *password,
     const struct race * frace, const struct locale * loc)
 {
     faction *f = calloc(1, sizeof(faction));
+    const char *fname;
     char buf[128];
 
     if (!f) abort();
@@ -255,7 +256,8 @@ faction *addfaction(const char *email, const char *password,
     addlist(&factions, f);
     fhash(f);
 
-    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
+    fname = LOC(loc, "factiondefault");
+    slprintf(buf, sizeof(buf), "%s %s", fname ? fname : "faction", itoa36(f->no));
     f->name = str_strdup(buf);
 
     if (!f->race) {
