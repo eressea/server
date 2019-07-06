@@ -1891,6 +1891,7 @@ static void test_quit(CuTest *tc) {
     test_teardown();
 }
 
+#ifdef QUIT_WITH_TRANSFER
 /**
  * Gifting units to another faction upon voluntary death (QUIT).
  */ 
@@ -2012,6 +2013,30 @@ static void test_quit_transfer_hero(CuTest *tc) {
     test_teardown();
 }
 
+static void test_transfer_faction(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2, *u3, *u4;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f1, r);
+    u_setrace(u2, test_create_race("smurf"));
+    u3 = test_create_unit(f2, r);
+    u4 = test_create_unit(f1, r);
+    transfer_faction(f1, f2);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertPtrEquals(tc, f1, u2->faction);
+    CuAssertPtrEquals(tc, f2, u3->faction);
+    CuAssertPtrEquals(tc, f2, u4->faction);
+
+    test_teardown();
+}
+#endif
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -2088,10 +2113,13 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
+#ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
     SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
     SUITE_ADD_TEST(suite, test_quit_transfer_hero);
+    SUITE_ADD_TEST(suite, test_transfer_faction);
+#endif
 
     return suite;
 }
