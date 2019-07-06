@@ -1891,6 +1891,7 @@ static void test_quit(CuTest *tc) {
     test_teardown();
 }
 
+#ifdef QUIT_WITH_TRANSFER
 /**
  * Gifting units to another faction upon voluntary death (QUIT).
  */ 
@@ -1915,7 +1916,6 @@ static void test_quit_transfer(CuTest *tc) {
     test_teardown();
 }
 
-#ifdef QUIT_WITH_TRANSFER
 /**
  * Gifting units with limited skills to another faction.
  *
