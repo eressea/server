@@ -5196,6 +5196,12 @@
     </type>
   </message>
 
+  <message name="transfer_unit" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+  </message>
+
   <message name="receive_person" section="economy">
     <type>
       <arg name="unit" type="unit"/>

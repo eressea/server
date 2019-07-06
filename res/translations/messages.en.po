@@ -38,6 +38,9 @@ msgstr "\"$unit($mage) tranforms $unit($target) to $race($race,0).\""
 msgid "give_person"
 msgstr "\"$unit($unit) transfers $int($amount) person$if($eq($amount,1),\"\",\"s\") to $unit($target).\""
 
+msgid "transfer_unit"
+msgstr "\"$unit($unit) joins our faction.\""
+
 msgid "rust_effect_2"
 msgstr "\"$unit($mage) calls forth a terrible torment over the enemy. The magical rain makes all iron rusty.\""
 
