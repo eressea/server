@@ -22,5 +22,5 @@ filename=$(basename "$ACCEPT_FILE")
 email="$ACCEPT_MAIL"
 if [ -d "$ERESSEA/orders-php" ]
 then
-  php "$ERESSEA/orders-php/cli.php" insert "$filename" "$email" "$lang"
+  php "$ERESSEA/orders-php/cli.php" insert "$filename" "$lang" "$email"
 fi
