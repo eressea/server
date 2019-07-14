@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2014,
+Copyright (c) 1998-2019,
 Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
