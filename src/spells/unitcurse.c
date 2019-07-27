@@ -1,6 +1,6 @@
 /* 
  *
- * Eressea PB(E)M host Copyright (C) 1998-2015
+ * Eressea PB(E)M host Copyright (C) 1998-2019
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
