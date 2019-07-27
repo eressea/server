@@ -2709,10 +2709,11 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     return;
 }
 
-#define MAX_WORKERS 512
+#define MAX_WORKERS 1024
+static struct econ_request workers[MAX_WORKERS];
+
 void auto_work(region * r)
 {
-    econ_request workers[MAX_WORKERS];
     econ_request *nextworker = workers;
     unit *u;
 
@@ -2781,7 +2782,6 @@ static bool rule_autowork(void) {
 
 void produce(struct region *r)
 {
-    econ_request workers[MAX_WORKERS];
     econ_request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
     bool limited = true;
