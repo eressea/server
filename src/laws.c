@@ -1,6 +1,5 @@
 /*
-Copyright (c) 1998-2014,
-Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -2167,8 +2166,13 @@ int banner_cmd(unit * u, struct order *ord)
 
     init_order_depr(ord);
     s = getstrtoken();
-    faction_setbanner(u->faction, s);
-    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    if (!s || !s[0]) {
+        cmistake(u, ord, 125, MSG_EVENT);
+    }
+    else {
+        faction_setbanner(u->faction, s);
+        ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    }
 
     return 0;
 }

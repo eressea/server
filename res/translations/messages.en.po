@@ -689,6 +689,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - No email address was supplied.\""
 
+msgid "error125"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - No banner text was supplied.\""
+
 msgid "starvation"
 msgstr "\"$unit($unit) loses $int($dead) of $int($add($live,$dead)) people due to starvation in $region($region).\""
 
