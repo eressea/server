@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2018, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -193,7 +193,7 @@ static int parse_args(int argc, char **argv)
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
                 printf("Eressea version %s, "
-                    "Copyright (C) 2018 Enno Rehling et al.\n",
+                    "Copyright (C) 2019 Enno Rehling et al.\n",
                     eressea_version());
                 return 1;
 #ifdef USE_CURSES          

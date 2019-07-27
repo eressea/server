@@ -1248,6 +1248,68 @@ static void test_ally_cmd_errors(CuTest *tc) {
     test_teardown();
 }
 
+static void test_banner_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(125);
+    mt_create_va(mt_new("changebanner", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_BANNER, f->locale, "Hodor!");
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changebanner"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_BANNER, f->locale, NULL);
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error125"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
+static void test_email_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(85);
+    mt_create_va(mt_new("changemail", NULL), "value:string", MT_NEW_END);
+    mt_create_va(mt_new("changemail_invalid", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_EMAIL, f->locale, "hodor@example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, "example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail_invalid"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, NULL);
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error85"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
 static void test_name_cmd(CuTest *tc) {
     unit *u;
     faction *f;
@@ -2046,6 +2108,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_banner_cmd);
+    SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);

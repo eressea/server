@@ -1,7 +1,7 @@
 /*
  *
  *
- * Eressea PB(E)M host Copyright (C) 1998-2015
+ * Eressea PB(E)M host Copyright (C) 1998-2019
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -1484,8 +1484,7 @@ static int sp_create_irongolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    double force = co->force;
-    int number = lovar(force * 8 * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 4 + lovar(co->force * 4)) * RESOURCE_QUANTITY);
     static int cache;
     static const race * golem_rc;
 
@@ -1554,7 +1553,7 @@ static int sp_create_stonegolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int number = lovar(co->force * 5 * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 2 + lovar(co->force * 3)) * RESOURCE_QUANTITY);
     static int cache;
     static const race * golem_rc;
 
