@@ -115,13 +115,13 @@ int contact_cmd(unit * u, order * ord)
     }
     else {
         /* old-style syntax, KONTAKTIERE foo */
-        unit *u2;
+        unit *u2 = NULL;
         int n = 0;
         if (p == P_TEMP) {
             n = getid();
             u2 = findnewunit(u->region, u->faction, n);
         }
-        else {
+        else if (str) {
             n = atoi36((const char *)str);
             u2 = findunit(n);
         }
