@@ -74,11 +74,73 @@ static void test_contact_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_contact_cmd_invalid(CuTest *tc) {
+    struct unit *u;
+    struct region *r;
+    const struct locale *lang;
+    struct order *ord;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(NULL), r);
+    lang = u->faction->locale;
+
+    /* KONTAKTIERE EINHEIT <not-found> */
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
+        LOC(lang, parameters[P_UNIT]), u->no + 1);
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    /* KONTAKTIERE EINHEIT TEMP <not-found> */
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
+        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), u->no + 1);
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    /* KONTAKTIERE EINHEIT TEMP */
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %s",
+        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]));
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    /* KONTAKTIERE EINHEIT */
+    ord = create_order(K_CONTACT, u->faction->locale,
+        LOC(lang, parameters[P_UNIT]));
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    /* KONTAKTIERE TEMP */
+    ord = create_order(K_CONTACT, u->faction->locale,
+        LOC(lang, parameters[P_TEMP]));
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    /* KONTAKTIERE */
+    ord = create_order(K_CONTACT, u->faction->locale, NULL);
+    contact_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_clear_messages(u->faction);
+
+    test_teardown();
+}
+
 CuSuite *get_contact_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_contact_cmd);
+    SUITE_ADD_TEST(suite, test_contact_cmd_invalid);
 
     return suite;
 }
