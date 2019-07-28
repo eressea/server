@@ -22,8 +22,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern "C" {
 #endif
 
-  extern void wormholes_update(void);
-  extern void wormholes_register(void);
+    struct region;
+    struct building;
+
+    void wormholes_update(void);
+    void wormholes_register(void);
+    void wormhole_transfer(struct building *b, struct region *exit);
 
 #ifdef __cplusplus
 }
