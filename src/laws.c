@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "move.h"
 #include "randenc.h"
+#include "recruit.h"
 #include "renumber.h"
 #include "spy.h"
 #include "study.h"
@@ -3942,7 +3943,9 @@ void init_processor(void)
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
-    add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_region(p, economics, "Geben, Vergessen");
+    add_proc_region(p+1, recruit, "Rekrutieren");
+    add_proc_region(p+2, destroy, "Zerstoeren");
 
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */

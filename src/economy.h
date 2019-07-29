@@ -73,6 +73,7 @@ extern "C" {
     int entertainmoney(const struct region *r);
 
     void economics(struct region *r);
+    void destroy(struct region *r);
     void produce(struct region *r);
     void auto_work(struct region *r);
 
@@ -94,9 +95,6 @@ extern "C" {
     struct message * steal_message(const struct unit * u, struct order *ord);
     void steal_cmd(struct unit * u, struct order *ord, struct econ_request ** stealorders);
     void expandstealing(struct region * r, struct econ_request * stealorders);
-
-    struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
-    void add_recruits(struct unit * u, int number, int wanted);
 
 #ifdef __cplusplus
 }
