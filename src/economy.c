@@ -84,19 +84,28 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <limits.h>
 
-static int working;
-
-#define MAX_WORKERS 1024
-static struct econ_request workers[MAX_WORKERS];
-
-#define MAX_ENTERTAINERS 256
-static econ_request entertainers[MAX_ENTERTAINERS];
-static econ_request *nextentertainer;
-static int entertaining;
+#define MAX_REQUESTS 512
+static struct econ_request econ_requests[MAX_REQUESTS];
 
 static econ_request **g_requests; /* TODO: no need for this to be module-global */
 
 #define ENTERTAINFRACTION 20
+
+static void add_request(econ_request * req, enum econ_type type, unit *u, order *ord, int want) {
+    req->next = NULL;
+    req->unit = u;
+    req->qty = u->wants = want;
+    req->type = type;
+}
+
+static bool rule_auto_taxation(void)
+{
+    return config_get_int("rules.economy.taxation", 0) != 0;
+}
+
+static bool rule_autowork(void) {
+    return config_get_int("work.auto", 0) != 0;
+}
 
 int entertainmoney(const region * r)
 {
@@ -178,16 +187,16 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
     return norders;
 }
 
+static int expandorders(region * r, econ_request * requests) {
+    return expand_production(r, requests, &g_requests);
+}
+
 static void free_requests(econ_request *requests) {
     while (requests) {
         econ_request *req = requests->next;
         free(requests);
         requests = req;
     }
-}
-
-static int expandorders(region * r, econ_request * requests) {
-    return expand_production(r, requests, &g_requests);
 }
 
 /* ------------------------------------------------------------- */
@@ -1091,7 +1100,7 @@ static void expandbuying(region * r, econ_request * buyorders)
             unsigned int j;
             for (j = 0; j != norders; j++) {
                 int price, multi;
-                ltype = g_requests[j]->type.trade.ltype;
+                ltype = g_requests[j]->data.trade.ltype;
                 trade = trades;
                 while (trade->type && trade->type != ltype)
                     ++trade;
@@ -1272,10 +1281,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
     o = (econ_request *)calloc(1, sizeof(econ_request));
     if (!o) abort();
-    o->type.trade.ltype = ltype;        /* sollte immer gleich sein */
+    o->data.trade.ltype = ltype;        /* sollte immer gleich sein */
 
     o->unit = u;
     o->qty = n;
+    o->type = ECON_BUY;
     addlist(buyorders, o);
 }
 
@@ -1375,7 +1385,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
         int j;
         for (j = 0; j != norders; j++) {
             const luxury_type *search = NULL;
-            const luxury_type *ltype = g_requests[j]->type.trade.ltype;
+            const luxury_type *ltype = g_requests[j]->data.trade.ltype;
             int multi = r_demand(r, ltype);
             int i, price;
             int use = 0;
@@ -1582,7 +1592,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         /* Wenn andere Einheiten das selbe verkaufen, muss ihr Zeug abgezogen
          * werden damit es nicht zweimal verkauft wird: */
         for (o = *sellorders; o; o = o->next) {
-            if (o->type.trade.ltype == ltype && o->unit->faction == u->faction) {
+            if (o->data.trade.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
                 if (fpool < 0) fpool = 0;
@@ -1623,7 +1633,8 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         if (!o) abort();
         o->unit = u;
         o->qty = n;
-        o->type.trade.ltype = ltype;
+        o->type = ECON_SELL;
+        o->data.trade.ltype = ltype;
         addlist(sellorders, o);
 
         return unlimited;
@@ -1950,36 +1961,39 @@ static void research_cmd(unit * u, struct order *ord)
     }
 }
 
-static void expandentertainment(region * r)
+static void expandentertainment(region * r, econ_request *ecbegin, econ_request *ecend, long total)
 {
     int m = entertainmoney(r);
     econ_request *o;
 
-    for (o = &entertainers[0]; o != nextentertainer; ++o) {
-        double part = m / (double)entertaining;
-        unit *u = o->unit;
+    for (o = ecbegin; o != ecend; ++o) {
+        if (o->type == ECON_ENTERTAIN) {
+            double part = m / (double)total;
+            unit *u = o->unit;
 
-        if (entertaining <= m)
-            u->n = o->qty;
-        else
-            u->n = (int)(o->qty * part);
-        change_money(u, u->n);
-        rsetmoney(r, rmoney(r) - u->n);
-        m -= u->n;
-        entertaining -= o->qty;
+            if (total <= m)
+                u->n = o->qty;
+            else
+                u->n = (int)(o->qty * part);
+            change_money(u, u->n);
+            rsetmoney(r, rmoney(r) - u->n);
+            m -= u->n;
+            total -= o->qty;
 
-        /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-        produceexp(u, SK_ENTERTAINMENT, (u->n < u->number) ? u->n : u->number);
-        add_income(u, IC_ENTERTAIN, o->qty, u->n);
-        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
+            produceexp(u, SK_ENTERTAINMENT, (u->n < u->number) ? u->n : u->number);
+            add_income(u, IC_ENTERTAIN, o->qty, u->n);
+            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        }
     }
+    assert(total == 0);
 }
 
-void entertain_cmd(unit * u, struct order *ord)
+int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
 {
     region *r = u->region;
-    int max_e;
-    econ_request *o;
+    int wants, max_e;
+    econ_request *req = *io_req;
     static int entertainbase = 0;
     static int entertainperlevel = 0;
     keyword_t kwd;
@@ -1996,40 +2010,36 @@ void entertain_cmd(unit * u, struct order *ord)
     }
     if (fval(u, UFL_WERE)) {
         cmistake(u, ord, 58, MSG_INCOME);
-        return;
+        return 0;
     }
     if (!effskill(u, SK_ENTERTAINMENT, NULL)) {
         cmistake(u, ord, 58, MSG_INCOME);
-        return;
+        return 0;
     }
     if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
-        return;
+        return 0;
     }
     if (is_cursed(r->attribs, &ct_depression)) {
         cmistake(u, ord, 28, MSG_INCOME);
-        return;
+        return 0;
     }
 
-    u->wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, NULL)
-        * entertainperlevel);
-
+    wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, NULL) * entertainperlevel);
     max_e = getuint();
     if (max_e != 0) {
-        if (u->wants > max_e) u->wants = max_e;
+        if (wants > max_e) wants = max_e;
     }
-    o = nextentertainer++;
-    assert(nextentertainer - entertainers < MAX_ENTERTAINERS);
-    o->unit = u;
-    o->qty = u->wants;
-    entertaining += o->qty;
+    add_request(req++, ECON_ENTERTAIN, u, ord, max_e);
+    *io_req = req;
+    return max_e;
 }
 
 /**
  * \return number of working spaces taken by players
  */
 static void
-expandwork(region * r, econ_request * work_begin, econ_request * work_end, int maxwork)
+expandwork(region * r, econ_request * work_begin, econ_request * work_end, int maxwork, long total)
 {
     int earnings;
     /* n: verbleibende Einnahmen */
@@ -2037,37 +2047,41 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
     int jobs = maxwork;
     int p_wage = wage(r, NULL, NULL, turn);
     int money = rmoney(r);
-    econ_request *o;
+    if (total > 0 && !rule_autowork()) {
+        econ_request *o;
 
-    for (o = work_begin; o != work_end; ++o) {
-        unit *u = o->unit;
-        int workers;
+        for (o = work_begin; o != work_end; ++o) {
+            if (o->type == ECON_WORK) {
+                unit *u = o->unit;
+                int workers;
 
-        if (u->number == 0)
-            continue;
+                if (u->number == 0)
+                    continue;
 
-        if (jobs >= working)
-            workers = u->number;
-        else {
-            int req = (u->number * jobs) % working;
-            workers = u->number * jobs / working;
-            if (req > 0 && rng_int() % working < req)
-                workers++;
+                if (jobs >= total)
+                    workers = u->number;
+                else {
+                    int req = (u->number * jobs) % total;
+                    workers = u->number * jobs / total;
+                    if (req > 0 && rng_int() % total < req)
+                        workers++;
+                }
+
+                assert(workers >= 0);
+
+                u->n = workers * wage(u->region, u->faction, u_race(u), turn);
+
+                jobs -= workers;
+                assert(jobs >= 0);
+
+                change_money(u, u->n);
+                total -= o->unit->number;
+                add_income(u, IC_WORK, o->qty, u->n);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+            }
         }
-
-        assert(workers >= 0);
-
-        u->n = workers * wage(u->region, u->faction, u_race(u), turn);
-
-        jobs -= workers;
-        assert(jobs >= 0);
-
-        change_money(u, u->n);
-        working -= o->unit->number;
-        add_income(u, IC_WORK, o->qty, u->n);
-        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+        assert(total == 0);
     }
-
     if (jobs > rpeasants(r)) {
         jobs = rpeasants(r);
     }
@@ -2080,34 +2094,35 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
     rsetmoney(r, money + earnings);
 }
 
-static int do_work(unit * u, order * ord, econ_request * o)
+static int work_cmd(unit * u, order * ord, econ_request ** io_req)
 {
     if (playerrace(u_race(u))) {
+        econ_request *req = *io_req;
         region *r = u->region;
         int w;
 
         if (fval(u, UFL_WERE)) {
-            if (ord)
+            if (ord) {
                 cmistake(u, ord, 313, MSG_INCOME);
-            return -1;
+            }
+            return 0;
         }
         if (u->ship && is_guarded(r, u)) {
-            if (ord)
+            if (ord) {
                 cmistake(u, ord, 69, MSG_INCOME);
-            return -1;
+            }
+            return 0;
         }
         w = wage(r, u->faction, u_race(u), turn);
-        u->wants = u->number * w;
-        o->unit = u;
-        o->qty = u->number * w;
-        working += u->number;
-        return 0;
+        add_request(req++, ECON_WORK, u, ord, w * u->number);
+        *io_req = req;
+        return u->number;
     }
     else if (ord && !is_monsters(u->faction)) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "race_cantwork", "race", u_race(u)));
     }
-    return -1;
+    return 0;
 }
 
 static void expandloot(region * r, econ_request * lootorders)
@@ -2239,6 +2254,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
     o = (econ_request *)calloc(1, sizeof(econ_request));
     if (!o) abort();
     o->qty = u->wants / TAXFRACTION;
+    o->type = ECON_TAX;
     o->unit = u;
     addlist(taxorders, o);
     return;
@@ -2305,6 +2321,7 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     o = (econ_request *)calloc(1, sizeof(econ_request));
     if (!o) abort();
     o->qty = u->wants / TAXFRACTION;
+    o->type = ECON_LOOT;
     o->unit = u;
     addlist(lootorders, o);
 
@@ -2313,19 +2330,21 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
 
 void auto_work(region * r)
 {
-    econ_request *nextworker = workers;
+    econ_request *nextrequest = econ_requests;
     unit *u;
+    long total = 0;
 
     for (u = r->units; u; u = u->next) {
         if (!(u->flags & UFL_LONGACTION) && !is_monsters(u->faction)) {
-            if (do_work(u, NULL, nextworker) == 0) {
-                assert(nextworker - workers < MAX_WORKERS);
-                ++nextworker;
+            int work = work_cmd(u, NULL, &nextrequest);
+            if (work) {
+                total += work;
+                assert(nextrequest - econ_requests <= MAX_REQUESTS);
             }
         }
     }
-    if (nextworker != workers) {
-        expandwork(r, workers, nextworker, region_maxworkers(r));
+    if (nextrequest != econ_requests) {
+        expandwork(r, econ_requests, nextrequest, region_maxworkers(r), total);
     }
 }
 
@@ -2370,21 +2389,13 @@ static void peasant_taxes(region * r)
     }
 }
 
-static bool rule_auto_taxation(void)
-{
-    return config_get_int("rules.economy.taxation", 0) != 0;
-}
-
-static bool rule_autowork(void) {
-    return config_get_int("work.auto", 0) != 0;
-}
-
 void produce(struct region *r)
 {
     econ_request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
     unit *u;
     bool limited = true;
-    econ_request *nextworker = workers;
+    long entertaining = 0, working = 0;
+    econ_request *nextrequest = econ_requests;
     static int bt_cache;
     static const struct building_type *caravan_bt;
     static int rc_cache;
@@ -2419,9 +2430,6 @@ void produce(struct region *r)
 
     buyorders = 0;
     sellorders = 0;
-    working = 0;
-    nextentertainer = &entertainers[0];
-    entertaining = 0;
     taxorders = 0;
     lootorders = 0;
     stealorders = 0;
@@ -2478,13 +2486,17 @@ void produce(struct region *r)
 
         switch (todo) {
         case K_ENTERTAIN:
-            entertain_cmd(u, u->thisorder);
+            entertaining += entertain_cmd(u, u->thisorder, &nextrequest);
+            assert(nextrequest - econ_requests <= MAX_REQUESTS);
             break;
 
         case K_WORK:
-            if (!rule_autowork() && do_work(u, u->thisorder, nextworker) == 0) {
-                assert(nextworker - workers < MAX_WORKERS);
-                ++nextworker;
+            if (!rule_autowork()) {
+                int work = work_cmd(u, u->thisorder, &nextrequest);
+                if (work != 0) {
+                    working += work;
+                    assert(nextrequest - econ_requests <= MAX_REQUESTS);
+                }
             }
             break;
 
@@ -2526,11 +2538,11 @@ void produce(struct region *r)
      * Befehlen, die den Bauern mehr Geld geben, damit man aus den Zahlen der
      * letzten Runde berechnen kann, wieviel die Bauern fuer Unterhaltung
      * auszugeben bereit sind. */
-    if (entertaining)
-        expandentertainment(r);
-    if (!rule_autowork()) {
-        expandwork(r, workers, nextworker, region_maxworkers(r));
+    if (entertaining > 0) {
+        expandentertainment(r, econ_requests, nextrequest, entertaining);
     }
+    expandwork(r, econ_requests, nextrequest, region_maxworkers(r), working);
+
     if (taxorders) {
         expandtax(r, taxorders);
         free_requests(taxorders);
