@@ -1,5 +1,5 @@
 /*
- *	Eressea PB(E)M host Copyright (C) 1998-2015
+ *	Eressea PB(E)M host Copyright (C) 1998-2019
  *      Christian Schlittchen (corwin@amber.kn-bremen.de)
  *      Katja Zedel (katze@felidae.kn-bremen.de)
  *      Henning Peters (faroul@beyond.kn-bremen.de)
@@ -730,6 +730,17 @@ static order *plan_dragon(unit * u)
     return long_order;
 }
 
+static void monster_cannibalism(unit *u) {
+    unit *u2;
+
+    for (u2 = u->next; u2; u2 = u2->next) {
+        if (u2->_race == u->_race) {
+            stats_count("monsters.cannibalism", u2->number);
+            u2->number = 0;
+        }
+    }
+}
+
 void plan_monsters(faction * f)
 {
     region *r;
@@ -748,12 +759,18 @@ void plan_monsters(faction * f)
             bool can_move = true;
 
             /* Ab hier nur noch Befehle fuer NPC-Einheiten. */
-            if (u->faction!=f)
+            if (u->faction != f || u->number <= 0) {
                 continue;
+            }
 
             /* Parteitarnung von Monstern ist doof: */
             if (fval(u, UFL_ANON_FACTION)) {
                 u->flags &= ~UFL_ANON_FACTION;
+            }
+
+            if (rc->splitsize < 10) {
+                /* hermit-type monsters eat each other */
+                monster_cannibalism(u);
             }
 
             if (skill_enabled(SK_PERCEPTION)) {

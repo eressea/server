@@ -1,6 +1,5 @@
 /*
-Copyright (c) 1998-2014,
-Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -36,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "move.h"
 #include "randenc.h"
+#include "recruit.h"
 #include "renumber.h"
 #include "spy.h"
 #include "study.h"
@@ -947,6 +947,8 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
+    assert(fsrc != fdst);
+
     for (sk = 0; sk != MAXSKILLS; ++sk) {
         skill_limit[sk] = faction_skill_limit(fdst, sk);
     }
@@ -963,7 +965,10 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
-    for (u = fsrc->units; u != NULL; u = u->nextF) {
+    u = fsrc->units;
+    while (u) {
+        unit *unext = u->nextF;
+
         if (u_race(u) == fdst->race) {
             u->flags &= ~UFL_HERO;
             if (give_unit_allowed(u) == 0) {
@@ -978,12 +983,15 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                         }
                     }
                     if (i != u->skill_size) {
+                        u = u->nextF;
                         continue;
                     }
                 }
+                ADDMSG(&fdst->msgs, msg_message("transfer_unit", "unit", u));
                 u_setfaction(u, fdst);
             }
         }
+        u = unext;
     }
 }
 
@@ -1003,6 +1011,7 @@ int quit_cmd(unit * u, struct order *ord)
             param_t p;
             p = getparam(f->locale);
             if (p == P_FACTION) {
+#ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
                 if (f2 == NULL) {
                     cmistake(u, ord, 66, MSG_EVENT);
@@ -1015,17 +1024,23 @@ int quit_cmd(unit * u, struct order *ord)
                 else {
                     unit *u2;
                     for (u2 = u->region->units; u2; u2 = u2->next) {
-                        if (u2->faction == f2 && ucontact(u2, u)) {
-                            transfer_faction(u->faction, u2->faction);
-                            break;
+                        if (u2->faction == f2) {
+                            if (ucontact(u2, u)) {
+                                transfer_faction(u->faction, u2->faction);
+                                break;
+                            }
                         }
                     }
                     if (u2 == NULL) {
                         /* no target unit found */
-                        cmistake(u, ord, 0, MSG_EVENT);
+                        cmistake(u, ord, 40, MSG_EVENT);
                         flags = 0;
                     }
                 }
+#else
+                log_error("faction %s: QUIT FACTION is disabled.", factionname(f));
+                flags = 0;
+#endif
             }
         }
         f->flags |= flags;
@@ -2152,8 +2167,13 @@ int banner_cmd(unit * u, struct order *ord)
 
     init_order_depr(ord);
     s = getstrtoken();
-    faction_setbanner(u->faction, s);
-    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    if (!s || !s[0]) {
+        cmistake(u, ord, 125, MSG_EVENT);
+    }
+    else {
+        faction_setbanner(u->faction, s);
+        ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    }
 
     return 0;
 }
@@ -3923,7 +3943,9 @@ void init_processor(void)
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
-    add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_region(p, economics, "Geben, Vergessen");
+    add_proc_region(p+1, recruit, "Rekrutieren");
+    add_proc_region(p+2, destroy, "Zerstoeren");
 
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */

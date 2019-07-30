@@ -55,10 +55,17 @@ extern "C" {
         struct econ_request *next;
         struct unit *unit;
         int qty;
+        enum econ_type {
+            ECON_LIST,
+            ECON_ENTERTAIN,
+            ECON_WORK,
+            ECON_TAX,
+            ECON_LOOT,
+            ECON_BUY,
+            ECON_SELL,
+            ECON_STEAL,
+        } type;
         union {
-            struct {
-                struct order *ord;
-            } recruit;
             struct {
                 int no;
                 bool goblin;             /* stealing */
@@ -66,17 +73,18 @@ extern "C" {
             struct {
                 const struct luxury_type *ltype;    /* trading */
             } trade;
-        } type;
+        } data;
     } econ_request;
+
+    int expand_production(struct region * r, struct econ_request * requests, struct econ_request ***results);
 
     int income(const struct unit *u);
     int entertainmoney(const struct region *r);
 
     void economics(struct region *r);
+    void destroy(struct region *r);
     void produce(struct region *r);
     void auto_work(struct region *r);
-
-    int expand_production(struct region * r, struct econ_request * requests, struct econ_request ***results);
 
     typedef enum income_t { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT } income_t;
     void add_income(struct unit * u, income_t type, int want, int qty);
@@ -94,9 +102,6 @@ extern "C" {
     struct message * steal_message(const struct unit * u, struct order *ord);
     void steal_cmd(struct unit * u, struct order *ord, struct econ_request ** stealorders);
     void expandstealing(struct region * r, struct econ_request * stealorders);
-
-    struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
-    void add_recruits(struct unit * u, int number, int wanted);
 
 #ifdef __cplusplus
 }

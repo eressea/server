@@ -3,6 +3,7 @@
 #endif
 #include <kernel/config.h>
 #include "economy.h"
+#include "recruit.h"
 
 #include <util/message.h>
 #include <kernel/building.h>
@@ -162,7 +163,7 @@ static void test_heroes_dont_recruit(CuTest * tc) {
     fset(u, UFL_HERO);
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_herorecruit"));
@@ -178,7 +179,7 @@ static void test_normals_recruit(CuTest * tc) {
     u = create_recruiter();
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 2, u->number);
 

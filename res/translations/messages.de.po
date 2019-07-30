@@ -38,6 +38,9 @@ msgstr "\"$unit($mage) verwandelt $unit($target) in $race($race,0).\""
 msgid "give_person"
 msgstr "\"$unit($unit) übergibt $int($amount) Person$if($eq($amount,1),\"\",\"en\") an $unit($target).\""
 
+msgid "transfer_unit"
+msgstr "\"$unit($unit) schließt sich unserer Partei an.\""
+
 msgid "rust_effect_2"
 msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde. Der magischen Regen lässt alles Eisen rosten.\""
 
@@ -685,6 +688,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kan
 
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde keine Emailadresse angegeben.\""
+
+msgid "error125"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Banner angegeben.\""
 
 msgid "starvation"
 msgstr "\"$unit($unit) verliert in $region($region) $int($dead) von $int($add($live,$dead)) Personen durch Unterernährung.\""
