@@ -120,6 +120,8 @@ extern "C" {
 
     enum param_t findparam_ex(const char *s, const struct locale * lang);
 
+#define QUIT_WITH_TRANSFER
+
 #ifdef __cplusplus
 }
 #endif

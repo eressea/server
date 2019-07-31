@@ -3892,7 +3892,6 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
     add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
     add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
     add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
@@ -3916,6 +3915,7 @@ void init_processor(void)
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
+    add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
@@ -3950,6 +3950,7 @@ void init_processor(void)
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */
     p += 10;
+    add_proc_global(p, quit, "Sterben");
     add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
@@ -3957,9 +3958,6 @@ void init_processor(void)
         add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (BEZAHLE NICHT)");
     }
     add_proc_postregion(p, maintain_buildings, "Gebaeudeunterhalt");
-
-    p += 10;                      /* QUIT fuer sich alleine */
-    add_proc_global(p, quit, "Sterben");
 
     if (!keyword_disabled(K_CAST)) {
         p += 10;
