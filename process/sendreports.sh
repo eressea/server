@@ -5,10 +5,10 @@
 
 if [ -z "$ERESSEA" ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
-  exit -2
+  exit 2
 fi
 
-if [ ! -z "$1" ]; then
+if [ -n "$1" ]; then
   GAME="$ERESSEA/game-$1"
 else
   GAME=$ERESSEA
