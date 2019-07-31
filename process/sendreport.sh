@@ -3,14 +3,14 @@
 
 if [ -z "$ERESSEA" ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
-  exit -2
+  exit 2
 fi
 
 function abort() {
   if [ $# -gt 0 ]; then
     echo "$@"
   fi
-  exit -1
+  exit 1
 }
 
 GAME=$1
@@ -47,7 +47,7 @@ fi
 bash "${FACTION}.sh" "$EMAIL" || reply "Unbekannte Partei $FACTION"
 
 OWNER=$("$BIN/getfaction.py" "$PWFILE" "$FACTION")
-if [ ! -z "$OWNER" ]; then
+if [ -n "$OWNER" ]; then
   echo "Der Report Deiner Partei wurde an ${EMAIL} gesandt." \
   | mutt -s "Reportnachforderung Partei ${FACTION}" "$OWNER"
 fi
