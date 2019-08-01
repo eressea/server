@@ -5,7 +5,7 @@ if [ -z "$ERESSEA" ]; then
 fi
 if [ ! -f reports.txt ]; then
   echo "need to run $0 from the report direcory"
-  exit -2
+  exit 2
 fi
 
 TEMPLATE=report-mail.txt
