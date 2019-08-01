@@ -40,7 +40,7 @@ size_t unicode_utf8_trim(char *buf)
     assert(buf);
     while (*ip) {
         size_t size = 1;
-        wint_t wc = *ip;
+        wint_t wc = *(unsigned char *)ip;
         if (wc & 0x80) {
             wint_t ucs = 0;
             if (ip[1]) {
