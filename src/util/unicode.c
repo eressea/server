@@ -56,7 +56,7 @@ size_t unicode_utf8_trim(char *buf)
                 ++result;
             }
         }
-        if (op == buf && (iswcntrl(wc) || iswspace(wc))) {
+        if (op == buf && (iswspace(wc) || !iswprint(wc))) {
             result += size;
         }
         else if (wc>255 || !iscntrl(wc)) {
@@ -64,7 +64,7 @@ size_t unicode_utf8_trim(char *buf)
                 memmove(op, ip, size);
             }
             op += size;
-            if (iswcntrl(wc) || iswspace(wc)) {
+            if (iswspace(wc) || !iswprint(wc)) {
                 ts += size;
             }
             else {
