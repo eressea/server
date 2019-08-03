@@ -281,13 +281,12 @@ static void live(region * r)
 #define MAX_EMIGRATION(p) ((p)/MAXDIRECTIONS)
 #define MAX_IMMIGRATION(p) ((p)*2/3)
 
-static void calculate_emigration(region * r)
+void peasant_migration(region * r)
 {
     int i;
     int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
-
 
     if (volcano_module()) {
         static int terrain_cache;
@@ -314,8 +313,14 @@ static void calculate_emigration(region * r)
 
             if (max_emigration > 0) {
                 if (max_emigration > max_immigrants) max_emigration = max_immigrants;
-                r->land->newpeasants += max_emigration;
-                rc->land->newpeasants -= max_emigration;
+                if (max_emigration + r->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - r->land->newpeasants;
+                }
+                if (max_emigration + rc->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - rc->land->newpeasants;
+                }
+                r->land->newpeasants += (short)max_emigration;
+                rc->land->newpeasants -= (short)max_emigration;
                 max_immigrants -= max_emigration;
             }
         }
@@ -779,6 +784,7 @@ void immigration(void)
             /* FIXME: kann ernsthaft abs(newpeasants) > rpeasants(r) sein? */
             if (rp < 0) rp = 0;
             rsetpeasants(r, rp);
+            r->land->newpeasants = 0;
         }
         /* Genereate some (0-6 depending on the income) peasants out of nothing */
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
@@ -878,7 +884,7 @@ void demographics(void)
                 /* Seuchen erst nachdem die Bauern sich vermehrt haben
                  * und gewandert sind */
 
-                calculate_emigration(r);
+                peasant_migration(r);
                 peasants(r, peasant_rules);
 
                 if (r->age > 20) {

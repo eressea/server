@@ -94,6 +94,7 @@ extern "C" {
     int reserve_self(struct unit *u, struct order *ord);
     int claim_cmd(struct unit *u, struct order *ord);
     void transfer_faction(struct faction *fsrc, struct faction *fdst);
+    void peasant_migration(struct region * r);
 
     void nmr_warnings(void);
     bool nmr_death(const struct faction * f, int turn, int timeout);

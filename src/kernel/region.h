@@ -97,12 +97,12 @@ extern "C" {
         char *display;
         demand *demands;
         const struct item_type *herbtype;
+        unsigned short peasants;
+        short newpeasants;
         int herbs;
         int morale;
         int trees[3];               /* 0 -> seeds, 1 -> shoots, 2 -> trees */
         int horses;
-        int peasants;
-        int newpeasants;
         int money;
         struct region_owner *ownership;
     } land_region;

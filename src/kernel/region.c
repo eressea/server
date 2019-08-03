@@ -625,7 +625,10 @@ void rsetpeasants(region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->peasants = value;
+        if (value > USHRT_MAX) {
+            value = USHRT_MAX;
+        }
+        r->land->peasants = (unsigned short)value;
     }
 }
 
