@@ -643,7 +643,11 @@ void rsethorses(const region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->horses = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d horses.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->horses = (unsigned short)value;
     }
 }
 
