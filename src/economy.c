@@ -84,7 +84,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <assert.h>
 #include <limits.h>
 
-#define MAX_REQUESTS 512
+#define MAX_REQUESTS 1024
 static struct econ_request econ_requests[MAX_REQUESTS];
 
 static econ_request **g_requests; /* TODO: no need for this to be module-global */
