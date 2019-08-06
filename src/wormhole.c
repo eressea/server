@@ -55,17 +55,15 @@ static int cmp_age(const void *v1, const void *v2)
     return 0;
 }
 
-static int wormhole_age(struct attrib *a, void *owner)
+void wormhole_transfer(building *b, region *exit)
 {
-    building *entry = (building *)owner;
-    region *exit = (region *)a->data.v;
-    int maxtransport = entry->size;
-    region *r = entry->region;
+    int maxtransport = b->size;
+    region *r = b->region;
     unit *u = r->units;
 
-    UNUSED_ARG(owner);
-    for (; u != NULL && maxtransport != 0; u = u->next) {
-        if (u->building == entry) {
+    while (u != NULL && maxtransport != 0) {
+        unit *unext = u->next;
+        if (u->building == b) {
             message *m = NULL;
             if (u->number > maxtransport || has_limited_skills(u)) {
                 m = msg_message("wormhole_requirements", "unit region", u, u->region);
@@ -81,11 +79,18 @@ static int wormhole_age(struct attrib *a, void *owner)
                 msg_release(m);
             }
         }
+        u = unext;
     }
 
-    remove_building(&r->buildings, entry);
+    remove_building(&r->buildings, b);
     ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
+}
 
+static int wormhole_age(struct attrib *a, void *owner) {
+    building *b = (building *)owner;
+    region *exit = (region *)a->data.v;
+
+    wormhole_transfer(b, exit);
     /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
     return AT_AGE_KEEP;
 }
