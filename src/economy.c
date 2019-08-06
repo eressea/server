@@ -2027,11 +2027,13 @@ int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
 
     wants = u->number * (entertainbase + effskill(u, SK_ENTERTAINMENT, NULL) * entertainperlevel);
     max_e = getuint();
-    if (max_e != 0) {
-        if (wants > max_e) wants = max_e;
+    if (max_e != 0 && wants > max_e) {
+        wants = max_e;
     }
-    add_request(req++, ECON_ENTERTAIN, u, ord, max_e);
-    *io_req = req;
+    if (max_e > 0) {
+        add_request(req++, ECON_ENTERTAIN, u, ord, max_e);
+        *io_req = req;
+    }
     return max_e;
 }
 
