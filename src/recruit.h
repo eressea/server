@@ -1,7 +1,7 @@
 /*
 Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
+Katja Zedel <katze@felidae.kn-bremen.de
+Christian Schlittchen <corwin@amber.kn-bremen.de>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -16,18 +16,23 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#ifndef H_MOD_WORMHOLE
-#define H_MOD_WORMHOLE
+#pragma once
+#ifndef H_GC_RECRUIT
+#define H_GC_RECRUIT
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+    struct message;
+    struct order;
+    struct race;
     struct region;
-    struct building;
+    struct unit;
 
-    void wormholes_update(void);
-    void wormholes_register(void);
-    void wormhole_transfer(struct building *b, struct region *exit);
+    struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
+    void add_recruits(struct unit * u, int number, int wanted);
+    void recruit(struct region * r);
 
 #ifdef __cplusplus
 }

@@ -1931,6 +1931,53 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_peasant_migration(CuTest *tc) {
+    region *r1, *r2;
+    int rmax;
+
+    test_setup();
+    config_set("rules.economy.repopulate_maximum", "0");
+    r1 = test_create_plain(0, 0);
+    rsettrees(r1, 0, 0);
+    rsettrees(r1, 1, 0);
+    rsettrees(r1, 2, 0);
+    rmax = region_maxworkers(r1);
+    r2 = test_create_plain(0, 1);
+    rsettrees(r2, 0, 0);
+    rsettrees(r2, 1, 0);
+    rsettrees(r2, 2, 0);
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 90, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax + 60);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 80, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 50, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 60); /* max 10 emigrants. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 2, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 56, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 6); /* max 1 emigrant. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 5, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 5, rpeasants(r2));
+
+    test_teardown();
+}
+
 static void test_quit(CuTest *tc) {
     faction *f;
     unit *u;
@@ -2177,6 +2224,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
+    SUITE_ADD_TEST(suite, test_peasant_migration);
 #ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);

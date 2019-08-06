@@ -6,7 +6,7 @@ if [ -z "$ERESSEA" ]; then
 fi
 if [ ! -f reports.txt ]; then
   echo "need to run $0 from the report direcory"
-  exit -2
+  exit 2
 fi
 
 PWD=$(pwd)
@@ -33,7 +33,7 @@ fi
 
 if [ ! -e "$TEMPLATE" ]; then
   echo "no such email template: $TEMPLATE"
-  exit -3
+  exit 3
 fi
 
 while [ -e /tmp/.stopped ] ; do

@@ -7,6 +7,7 @@
 #include <kernel/building.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 #include <kernel/attrib.h>
 #include <util/message.h>
@@ -31,15 +32,13 @@ static void setup_wormholes(void) {
 
 static void test_make_wormholes(CuTest *tc) {
     region *r1, *r2, *match[2];
-    terrain_type *t_plain;
     building_type *btype;
 
     test_setup();
     setup_wormholes();
-    t_plain = test_create_terrain("plain", LAND_REGION);
     btype = test_create_buildingtype("wormhole");
-    match[0] = r1 = test_create_region(0, 0, t_plain);
-    match[1] = r2 = test_create_region(1, 0, t_plain);
+    match[0] = r1 = test_create_plain(0, 0);
+    match[1] = r2 = test_create_plain(1, 0);
     make_wormholes(match, 2, btype);
     CuAssertPtrNotNull(tc, r1->buildings);
     CuAssertPtrNotNull(tc, r1->buildings->attribs);
@@ -54,14 +53,12 @@ static void test_make_wormholes(CuTest *tc) {
 
 static void test_sort_wormhole_regions(CuTest *tc) {
     region *r1, *r2, *match[2];
-    terrain_type *t_plain;
     selist *rlist = 0;
 
     test_setup();
     setup_wormholes();
-    t_plain = test_create_terrain("plain", LAND_REGION);
-    r1 = test_create_region(0, 0, t_plain);
-    r2 = test_create_region(1, 0, t_plain);
+    r1 = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
     r1->age = 4;
     r2->age = 2;
     selist_push(&rlist, r1);
@@ -73,10 +70,42 @@ static void test_sort_wormhole_regions(CuTest *tc) {
     test_teardown();
 }
 
+static void test_wormhole_transfer(CuTest *tc) {
+    region *r1, *r2;
+    building *b;
+    unit *u1, *u2;
+    struct faction *f;
+
+    test_setup();
+    setup_wormholes();
+    r1 = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    b = test_create_building(r1, NULL);
+    b->size = 4;
+    f = test_create_faction(NULL);
+    u1 = test_create_unit(f, r1);
+    u1->number = 2;
+    u_set_building(u1, b);
+    u2 = test_create_unit(f, r1);
+    u2->number = 3;
+    u_set_building(u2, b);
+    u1 = test_create_unit(f, r1);
+    u1->number = 2;
+    u_set_building(u1, b);
+    wormhole_transfer(b, r2);
+    CuAssertPtrEquals(tc, u2, r1->units);
+    CuAssertPtrEquals(tc, NULL, u2->building);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+    CuAssertPtrEquals(tc, r2, u1->region);
+    CuAssertPtrEquals(tc, u1, r2->units->next);
+    test_teardown();
+}
+
 CuSuite *get_wormhole_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_sort_wormhole_regions);
     SUITE_ADD_TEST(suite, test_make_wormholes);
+    SUITE_ADD_TEST(suite, test_wormhole_transfer);
     return suite;
 }

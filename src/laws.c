@@ -35,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "move.h"
 #include "randenc.h"
+#include "recruit.h"
 #include "renumber.h"
 #include "spy.h"
 #include "study.h"
@@ -280,13 +281,12 @@ static void live(region * r)
 #define MAX_EMIGRATION(p) ((p)/MAXDIRECTIONS)
 #define MAX_IMMIGRATION(p) ((p)*2/3)
 
-static void calculate_emigration(region * r)
+void peasant_migration(region * r)
 {
     int i;
     int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
-
 
     if (volcano_module()) {
         static int terrain_cache;
@@ -313,8 +313,14 @@ static void calculate_emigration(region * r)
 
             if (max_emigration > 0) {
                 if (max_emigration > max_immigrants) max_emigration = max_immigrants;
-                r->land->newpeasants += max_emigration;
-                rc->land->newpeasants -= max_emigration;
+                if (max_emigration + r->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - r->land->newpeasants;
+                }
+                if (max_emigration + rc->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - rc->land->newpeasants;
+                }
+                r->land->newpeasants += (short)max_emigration;
+                rc->land->newpeasants -= (short)max_emigration;
                 max_immigrants -= max_emigration;
             }
         }
@@ -778,6 +784,7 @@ void immigration(void)
             /* FIXME: kann ernsthaft abs(newpeasants) > rpeasants(r) sein? */
             if (rp < 0) rp = 0;
             rsetpeasants(r, rp);
+            r->land->newpeasants = 0;
         }
         /* Genereate some (0-6 depending on the income) peasants out of nothing */
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
@@ -877,7 +884,7 @@ void demographics(void)
                 /* Seuchen erst nachdem die Bauern sich vermehrt haben
                  * und gewandert sind */
 
-                calculate_emigration(r);
+                peasant_migration(r);
                 peasants(r, peasant_rules);
 
                 if (r->age > 20) {
@@ -3891,7 +3898,6 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
     add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
     add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
     add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
@@ -3915,6 +3921,7 @@ void init_processor(void)
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
+    add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
@@ -3942,11 +3949,14 @@ void init_processor(void)
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
-    add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_region(p, economics, "Geben, Vergessen");
+    add_proc_region(p+1, recruit, "Rekrutieren");
+    add_proc_region(p+2, destroy, "Zerstoeren");
 
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */
     p += 10;
+    add_proc_global(p, quit, "Sterben");
     add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
@@ -3954,9 +3964,6 @@ void init_processor(void)
         add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (BEZAHLE NICHT)");
     }
     add_proc_postregion(p, maintain_buildings, "Gebaeudeunterhalt");
-
-    p += 10;                      /* QUIT fuer sich alleine */
-    add_proc_global(p, quit, "Sterben");
 
     if (!keyword_disabled(K_CAST)) {
         p += 10;

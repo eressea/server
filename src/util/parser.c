@@ -27,7 +27,7 @@ static parse_state *states;
 static int eatwhitespace_c(const char **str_p)
 {
     int ret = 0;
-    ucs4_t ucs;
+    wint_t wc;
     size_t len;
     const char *str = *str_p;
 
@@ -40,12 +40,12 @@ static int eatwhitespace_c(const char **str_p)
             ++str;
         }
         else {
-            ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+            ret = unicode_utf8_decode(&wc, str, &len);
             if (ret != 0) {
                 log_warning("illegal character sequence in UTF8 string: %s\n", str);
                 break;
             }
-            if (!iswspace((wint_t)ucs))
+            if (!iswspace(wc))
                 break;
             str += len;
         }
@@ -106,16 +106,16 @@ void skip_token(void)
     eatwhitespace_c(&states->current_token);
 
     while (*states->current_token) {
-        ucs4_t ucs;
+        wint_t wc;
         size_t len;
 
         unsigned char utf8_character = (unsigned char)states->current_token[0];
         if (~utf8_character & 0x80) {
-            ucs = utf8_character;
+            wc = utf8_character;
             ++states->current_token;
         }
         else {
-            int ret = unicode_utf8_to_ucs4(&ucs, states->current_token, &len);
+            int ret = unicode_utf8_decode(&wc, states->current_token, &len);
             if (ret == 0) {
                 states->current_token += len;
             }
@@ -123,7 +123,7 @@ void skip_token(void)
                 log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
             }
         }
-        if (iswspace((wint_t)ucs) && quotechar == 0) {
+        if (iswspace(wc) && quotechar == 0) {
             return;
         }
         else {
@@ -160,17 +160,17 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         return 0;
     }
     while (*ctoken) {
-        ucs4_t ucs;
+        wint_t wc;
         size_t len;
         bool copy = false;
 
         unsigned char utf8_character = *(unsigned char *)ctoken;
         if (~utf8_character & 0x80) {
-            ucs = utf8_character;
+            wc = utf8_character;
             len = 1;
         }
         else {
-            int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
+            int ret = unicode_utf8_decode(&wc, ctoken, &len);
             if (ret != 0) {
                 log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
                 break;
@@ -180,7 +180,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             copy = true;
             escape = false;
         }
-        else if (iswspace((wint_t)ucs)) {
+        else if (iswspace(wc)) {
             if (quotechar == 0)
                 break;
             copy = true;
