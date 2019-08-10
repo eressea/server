@@ -173,12 +173,23 @@ static void test_unicode_trim_ltrm(CuTest *tc) {
     CuAssertStrEquals(tc, expect, name);
 }
 
+static void test_unicode_trim_emoji(CuTest *tc) {
+    const char clock[] = { 0xE2, 0x8F, 0xB0, 0x00 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%s Alarm%sClock %s", clock, clock, clock);
+    strcpy(expect, name);
+    CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_trim_zwnj);
     SUITE_ADD_TEST(suite, test_unicode_trim_ltrm);
+    SUITE_ADD_TEST(suite, test_unicode_trim_emoji);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
     SUITE_ADD_TEST(suite, test_unicode_compare);

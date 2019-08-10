@@ -13,6 +13,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <string.h>
 #include <wctype.h>
 #include <ctype.h>
@@ -32,6 +33,14 @@
 #define B00000111 0x07
 #define B00000011 0x03
 #define B00000001 0x01
+
+static bool char_trimmed(wint_t wc) {
+    if (wc >= 0x2000 && wc <= 0x200f) {
+        /* only weird stuff here */
+        return true;
+    }
+    return iswspace(wc) || iswcntrl(wc);
+}
 
 size_t unicode_utf8_trim(char *buf)
 {
@@ -56,15 +65,15 @@ size_t unicode_utf8_trim(char *buf)
                 ++result;
             }
         }
-        if (op == buf && (iswspace(wc) || !iswprint(wc))) {
+        if (op == buf && char_trimmed(wc)) {
             result += size;
         }
-        else if (wc>255 || !iscntrl(wc)) {
+        else if (wc>255 || !iswcntrl(wc)) {
             if (op != ip) {
                 memmove(op, ip, size);
             }
             op += size;
-            if (iswspace(wc) || !iswprint(wc)) {
+            if (char_trimmed(wc)) {
                 ts += size;
             }
             else {

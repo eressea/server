@@ -125,6 +125,7 @@ void free_recruitments(recruitment * recruits)
         recruitment *rec = recruits;
         recruits = rec->next;
         free_requests(rec->requests);
+        free(rec);
     }
 }
 
