@@ -1989,7 +1989,7 @@ static void expandentertainment(region * r, econ_request *ecbegin, econ_request 
     assert(total == 0);
 }
 
-int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
+static int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
 {
     region *r = u->region;
     int wants, max_e;
