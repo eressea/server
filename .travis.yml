@@ -17,8 +17,6 @@ addons:
       - valgrind
       - cppcheck
       - shellcheck
-      - iwyu
-      - clang-7
 os:
   - linux
 notifications:
