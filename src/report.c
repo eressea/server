@@ -1592,6 +1592,8 @@ static void allies(struct stream *out, const faction * f)
     const group *g = f->groups;
     char prefix[64];
 
+    rpline(out);
+    newline(out);
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -1678,6 +1680,8 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     int qi = 0;
     selist *flist = seenfactions;
 
+    rpline(out);
+    newline(out);
     centre(out, LOC(uf->locale, "nr_addresses"), false);
     newline(out);
 
