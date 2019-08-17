@@ -1707,6 +1707,9 @@ msgstr "Ring der Unsichtbarkeit"
 msgid "caravel_a"
 msgstr "eine Karavelle"
 
+msgid "galleon_a"
+msgstr "eine Galleone"
+
 msgctxt "keyword"
 msgid "describe"
 msgstr "BESCHREIBE"
@@ -2063,6 +2066,9 @@ msgstr "Wir schreiben %s des Monats %s im Jahre %d %s."
 
 msgid "caravel"
 msgstr "Karavelle"
+
+msgid "galleon"
+msgstr "Galleone"
 
 msgid "dragon_postfix_10"
 msgstr "der Goldene"

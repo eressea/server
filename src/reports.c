@@ -1293,6 +1293,9 @@ static void add_seen_lighthouse(region *r, faction *f)
     if (r->terrain->flags & SEA_REGION) {
         add_seen_nb(f, r, seen_lighthouse);
     }
+    else {
+        add_seen_nb(f, r, seen_neighbour);
+    }
 }
 
 /** mark all regions seen by the lighthouse.
