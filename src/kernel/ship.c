@@ -318,7 +318,10 @@ int crew_skill(const ship *sh) {
 
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
-            n += effskill(u, SK_SAILING, NULL) * u->number;
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es >= sh->type->minskill) {
+                n += es * u->number;
+            }
         }
     }
     return n;
