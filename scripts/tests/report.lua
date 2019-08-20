@@ -90,11 +90,13 @@ function test_coordinates_noname_plane()
     remove_report(f)
 end
 
-function disable_test_lighthouse()
+function test_lighthouse()
     eressea.free_game()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("human", "human@example.com")
-    region.create(1, 0, "mountain")
+    local f2 = faction.create("dwarf")
+    local r2 = region.create(1, 0, "mountain")
+    unit.create(f2, r2, 1).name = 'The Babadook'
     region.create(2, 0, "ocean")
     region.create(0, 1, "firewall")
     region.create(3, 0, "ocean")
@@ -110,12 +112,13 @@ function disable_test_lighthouse()
 
     init_reports()
     write_report(f)
-    assert_false(find_in_report(f, " %(1,0%) %(vom Turm erblickt%)"))
+    assert_false(find_in_report(f, "The Babadook"))
+    assert_true(find_in_report(f, " %(1,0%) %(vom Turm erblickt%)"))
     assert_true(find_in_report(f, " %(2,0%) %(vom Turm erblickt%)"))
     assert_true(find_in_report(f, " %(3,0%) %(vom Turm erblickt%)"))
+    assert_true(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
 
     assert_false(find_in_report(f, " %(0,0%) %(vom Turm erblickt%)"))
-    assert_false(find_in_report(f, " %(0,1%) %(vom Turm erblickt%)"))
     assert_false(find_in_report(f, " %(4,0%) %(vom Turm erblickt%)"))
     remove_report(f)
 end
