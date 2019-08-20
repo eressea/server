@@ -90,7 +90,7 @@ function test_coordinates_noname_plane()
     remove_report(f)
 end
 
-function test_lighthouse()
+function disable_test_lighthouse()
     eressea.free_game()
     local r = region.create(0, 0, "mountain")
     local f = faction.create("human", "human@example.com")
