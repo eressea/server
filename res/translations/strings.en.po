@@ -1458,6 +1458,12 @@ msgstr "DESCRIBE"
 msgid "roi"
 msgstr "ring of invisibility"
 
+msgid "galleon_a"
+msgstr "a galleon"
+
+msgid "galleon"
+msgstr "galleon"
+
 msgid "caravel_a"
 msgstr "a caravel"
 

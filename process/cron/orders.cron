@@ -11,10 +11,5 @@ fi
 
 for GAME in $*
 do
-  if [ "$GAME" == "eressea" ]; then GAME=2 ; fi
-  if [ "$GAME" == "e3a" ]; then GAME=3 ; fi
-  if [ -e $HOME/eressea/game-$GAME/orders.queue ]
-  then
-    $HOME/bin/orders-process $GAME
-  fi
+  $HOME/eressea/orders-php/check-orders.sh $GAME
 done

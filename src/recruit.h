@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -16,26 +16,25 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
-#include <platform.h>
-#include <kernel/config.h>
-#include "iceberg.h"
+#pragma once
+#ifndef H_GC_RECRUIT
+#define H_GC_RECRUIT
 
-#include <kernel/attrib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-attrib_type at_iceberg = {
-    "iceberg_drift",
-    NULL,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
+    struct message;
+    struct order;
+    struct race;
+    struct region;
+    struct unit;
 
-attrib *make_iceberg(direction_t dir)
-{
-    attrib *a = a_new(&at_iceberg);
-    a->data.i = (int)dir;
-    return a;
+    struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
+    void add_recruits(struct unit * u, int number, int wanted);
+    void recruit(struct region * r);
+
+#ifdef __cplusplus
 }
+#endif
+#endif

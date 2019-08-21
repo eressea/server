@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -860,8 +860,9 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Daemonen verschieben sich.
-*/
+/**
+ * Talente von Daemonen verschieben sich.
+ */
 void demon_skillchange(unit *u)
 {
     skill *sv = u->skills;

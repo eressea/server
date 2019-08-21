@@ -2,6 +2,7 @@
 # example: orders-accept 2 de < mail.txt
 
 game="$1"
+lang="$2"
 
 [ -z "$ERESSEA" ] && ERESSEA="$HOME/eressea"
 SCRIPT=$(readlink -f "$0")
@@ -21,5 +22,5 @@ filename=$(basename "$ACCEPT_FILE")
 email="$ACCEPT_MAIL"
 if [ -d "$ERESSEA/orders-php" ]
 then
-  php "$ERESSEA/orders-php/cli.php" insert "$filename" "$email"
+  php "$ERESSEA/orders-php/cli.php" insert "$filename" "$lang" "$email"
 fi

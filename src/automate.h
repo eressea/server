@@ -28,16 +28,16 @@ struct unit;
 
 typedef struct scholar {
     struct unit *u;
-    skill_t sk;
-    int level;
     int learn;
+    short level;
 } scholar;
 
+#define MAXSCHOLARS 128
 #define STUDENTS_PER_TEACHER 10
 
 void do_autostudy(struct region *r);
 
-int autostudy_init(scholar scholars[], int max_scholars, struct unit **units);
+int autostudy_init(scholar scholars[], int max_scholars, struct unit **units, skill_t *o_skill);
 void autostudy_run(scholar scholars[], int nscholars);
 
 #endif

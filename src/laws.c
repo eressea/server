@@ -1,6 +1,5 @@
 /*
-Copyright (c) 1998-2014,
-Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -36,6 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "monsters.h"
 #include "move.h"
 #include "randenc.h"
+#include "recruit.h"
 #include "renumber.h"
 #include "spy.h"
 #include "study.h"
@@ -281,13 +281,12 @@ static void live(region * r)
 #define MAX_EMIGRATION(p) ((p)/MAXDIRECTIONS)
 #define MAX_IMMIGRATION(p) ((p)*2/3)
 
-static void calculate_emigration(region * r)
+void peasant_migration(region * r)
 {
     int i;
     int maxp = region_maxworkers(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
-
 
     if (volcano_module()) {
         static int terrain_cache;
@@ -314,8 +313,14 @@ static void calculate_emigration(region * r)
 
             if (max_emigration > 0) {
                 if (max_emigration > max_immigrants) max_emigration = max_immigrants;
-                r->land->newpeasants += max_emigration;
-                rc->land->newpeasants -= max_emigration;
+                if (max_emigration + r->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - r->land->newpeasants;
+                }
+                if (max_emigration + rc->land->newpeasants > USHRT_MAX) {
+                    max_emigration = USHRT_MAX - rc->land->newpeasants;
+                }
+                r->land->newpeasants += (short)max_emigration;
+                rc->land->newpeasants -= (short)max_emigration;
                 max_immigrants -= max_emigration;
             }
         }
@@ -779,6 +784,7 @@ void immigration(void)
             /* FIXME: kann ernsthaft abs(newpeasants) > rpeasants(r) sein? */
             if (rp < 0) rp = 0;
             rsetpeasants(r, rp);
+            r->land->newpeasants = 0;
         }
         /* Genereate some (0-6 depending on the income) peasants out of nothing */
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
@@ -878,7 +884,7 @@ void demographics(void)
                 /* Seuchen erst nachdem die Bauern sich vermehrt haben
                  * und gewandert sind */
 
-                calculate_emigration(r);
+                peasant_migration(r);
                 peasants(r, peasant_rules);
 
                 if (r->age > 20) {
@@ -947,6 +953,8 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
+    assert(fsrc != fdst);
+
     for (sk = 0; sk != MAXSKILLS; ++sk) {
         skill_limit[sk] = faction_skill_limit(fdst, sk);
     }
@@ -963,7 +971,10 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
-    for (u = fsrc->units; u != NULL; u = u->nextF) {
+    u = fsrc->units;
+    while (u) {
+        unit *unext = u->nextF;
+
         if (u_race(u) == fdst->race) {
             u->flags &= ~UFL_HERO;
             if (give_unit_allowed(u) == 0) {
@@ -978,12 +989,15 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                         }
                     }
                     if (i != u->skill_size) {
+                        u = u->nextF;
                         continue;
                     }
                 }
+                ADDMSG(&fdst->msgs, msg_message("transfer_unit", "unit", u));
                 u_setfaction(u, fdst);
             }
         }
+        u = unext;
     }
 }
 
@@ -1003,6 +1017,7 @@ int quit_cmd(unit * u, struct order *ord)
             param_t p;
             p = getparam(f->locale);
             if (p == P_FACTION) {
+#ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
                 if (f2 == NULL) {
                     cmistake(u, ord, 66, MSG_EVENT);
@@ -1015,17 +1030,23 @@ int quit_cmd(unit * u, struct order *ord)
                 else {
                     unit *u2;
                     for (u2 = u->region->units; u2; u2 = u2->next) {
-                        if (u2->faction == f2 && ucontact(u2, u)) {
-                            transfer_faction(u->faction, u2->faction);
-                            break;
+                        if (u2->faction == f2) {
+                            if (ucontact(u2, u)) {
+                                transfer_faction(u->faction, u2->faction);
+                                break;
+                            }
                         }
                     }
                     if (u2 == NULL) {
                         /* no target unit found */
-                        cmistake(u, ord, 0, MSG_EVENT);
+                        cmistake(u, ord, 40, MSG_EVENT);
                         flags = 0;
                     }
                 }
+#else
+                log_error("faction %s: QUIT FACTION is disabled.", factionname(f));
+                flags = 0;
+#endif
             }
         }
         f->flags |= flags;
@@ -2152,8 +2173,13 @@ int banner_cmd(unit * u, struct order *ord)
 
     init_order_depr(ord);
     s = getstrtoken();
-    faction_setbanner(u->faction, s);
-    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    if (!s || !s[0]) {
+        cmistake(u, ord, 125, MSG_EVENT);
+    }
+    else {
+        faction_setbanner(u->faction, s);
+        ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
+    }
 
     return 0;
 }
@@ -3872,7 +3898,6 @@ void init_processor(void)
     add_proc_order(p, K_GROUP, group_cmd, 0, NULL);
 
     p += 10;
-    add_proc_order(p, K_QUIT, quit_cmd, 0, NULL);
     add_proc_order(p, K_URSPRUNG, origin_cmd, 0, NULL);
     add_proc_order(p, K_ALLY, ally_cmd, 0, NULL);
     add_proc_order(p, K_PREFIX, prefix_cmd, 0, NULL);
@@ -3896,6 +3921,7 @@ void init_processor(void)
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
+    add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
@@ -3923,11 +3949,14 @@ void init_processor(void)
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
-    add_proc_region(p, economics, "Zerstoeren, Geben, Rekrutieren, Vergessen");
+    add_proc_region(p, economics, "Geben, Vergessen");
+    add_proc_region(p+1, recruit, "Rekrutieren");
+    add_proc_region(p+2, destroy, "Zerstoeren");
 
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */
     p += 10;
+    add_proc_global(p, quit, "Sterben");
     add_proc_order(p, K_PROMOTION, promotion_cmd, 0, "Heldenbefoerderung");
 
     p += 10;
@@ -3935,9 +3964,6 @@ void init_processor(void)
         add_proc_order(p, K_PAY, pay_cmd, 0, "Gebaeudeunterhalt (BEZAHLE NICHT)");
     }
     add_proc_postregion(p, maintain_buildings, "Gebaeudeunterhalt");
-
-    p += 10;                      /* QUIT fuer sich alleine */
-    add_proc_global(p, quit, "Sterben");
 
     if (!keyword_disabled(K_CAST)) {
         p += 10;

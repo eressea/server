@@ -19,30 +19,29 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #ifndef _UNICODE_H
 #define _UNICODE_H
 
+#include <stddef.h>
+#include <wchar.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <wchar.h>
 #define USE_UNICODE
-    typedef long ucs4_t;
-    typedef char utf8_t;
-
-    int unicode_utf8_to_cp437(unsigned char *result, const utf8_t * utf8_string,
+    int unicode_utf8_to_cp437(unsigned char *result, const char * utf8_string,
         size_t * length);
-    int unicode_utf8_to_cp1252(unsigned char *result, const utf8_t * utf8_string,
+    int unicode_utf8_to_cp1252(unsigned char *result, const char * utf8_string,
         size_t * length);
-    int unicode_utf8_to_ucs4(ucs4_t * result, const utf8_t * utf8_string,
+    int unicode_utf8_decode(wint_t * result, const char * utf8_string,
         size_t * length);
-    int unicode_ucs4_to_utf8(utf8_t * result, size_t * size,
-        ucs4_t ucs4_character);
-    int unicode_utf8_to_ascii(unsigned char *cp_character, const utf8_t * utf8_string,
+    int unicode_utf8_encode(char * result, size_t * size,
+        wint_t ucs4_character);
+    int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
         size_t *length);
-    int unicode_utf8_strcasecmp(const utf8_t * a, const utf8_t * b);
-    int unicode_latin1_to_utf8(utf8_t * out, size_t * outlen,
+    int unicode_utf8_strcasecmp(const char * a, const char * b);
+    int unicode_latin1_to_utf8(char * out, size_t * outlen,
         const char *in, size_t * inlen);
-    int unicode_utf8_tolower(utf8_t *op, size_t outlen, const utf8_t *ip);
-	int unicode_utf8_trim(utf8_t *ip);
+    int unicode_utf8_tolower(char *op, size_t outlen, const char *ip);
+    size_t unicode_utf8_trim(char *ip);
 
 #ifdef __cplusplus
 }

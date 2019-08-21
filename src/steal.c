@@ -1,6 +1,5 @@
 /*
-Copyright (c) 1998-2014,
-Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -71,7 +70,7 @@ void expandstealing(region * r, econ_request * stealorders)
             break;
         }
 
-        u = findunit(requests[j]->type.steal.no);
+        u = findunit(requests[j]->data.steal.no);
 
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -234,8 +233,9 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     if (!o) abort();
     o->unit = u;
     o->qty = 1;                   /* Betrag steht in u->wants */
-    o->type.steal.no = u2->no;
-    o->type.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
+    o->type = ECON_STEAL;
+    o->data.steal.no = u2->no;
+    o->data.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
     o->next = *stealorders;
     *stealorders = o;
 

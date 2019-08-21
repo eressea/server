@@ -576,15 +576,11 @@ struct message * test_find_messagetype_ex(struct message_list *msgs, const char 
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
-        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
-            if (prev) {
-                if (ml->msg == prev) {
-                    prev = NULL;
-                }
-            }
-            else {
-                return ml->msg;
-            }
+        if (prev && ml->msg == prev) {
+            prev = NULL;
+        }
+        else if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            return ml->msg;
         }
     }
     return 0;

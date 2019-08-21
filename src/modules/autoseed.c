@@ -565,8 +565,8 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             nfp = &nextf->next;
             while (*nfp) {
                 newfaction *nf = *nfp;
-                if (strcmp(nextf->email, nf->email) == 0) {
-                    log_warning("Duplicate email %s\n", nf->email?nf->email:"");
+                if (nf->email && nextf->email && strcmp(nextf->email, nf->email) == 0) {
+                    log_warning("Duplicate email %s\n", nf->email ? nf->email : "");
                     *nfp = nf->next;
                     free_newfaction(nf);
                 }

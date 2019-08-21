@@ -4391,6 +4391,13 @@
       <arg name="command" type="order"/>
     </type>
   </message>
+  <message name="error125" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
   <message name="error84" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -5193,6 +5200,12 @@
       <arg name="unit" type="unit"/>
       <arg name="amount" type="int"/>
       <arg name="target" type="unit"/>
+    </type>
+  </message>
+
+  <message name="transfer_unit" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
     </type>
   </message>
 

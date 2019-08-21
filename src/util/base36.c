@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -21,12 +21,20 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "log.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <ctype.h>
 
+#define USE_STRTOL
+#ifdef USE_STRTOL
 int atoi36(const char *str)
 {
-    /* cannot use strtol, because invalid strings will cause crash */
+    assert(str);
+    return (int)strtol(str, NULL, 36);
+}
+#else
+int atoi36(const char *str)
+{
     const unsigned char *s = (const unsigned char *)str;
     int i = 0, sign = 1;
     assert(s);
@@ -51,6 +59,7 @@ int atoi36(const char *str)
         return 0;
     return i * sign;
 }
+#endif
 
 const char *itoab_r(int i, int base, char *s, size_t len)
 {

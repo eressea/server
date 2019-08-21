@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -318,7 +318,10 @@ int crew_skill(const ship *sh) {
 
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
-            n += effskill(u, SK_SAILING, NULL) * u->number;
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es >= sh->type->minskill) {
+                n += es * u->number;
+            }
         }
     }
     return n;

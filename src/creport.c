@@ -1503,33 +1503,34 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 cr_output_messages(F, mlist, f);
             }
         }
-        /* buildings */
-        for (b = rbuildings(r); b; b = b->next) {
-            int fno = -1;
-            u = building_owner(b);
-            if (u && !fval(u, UFL_ANON_FACTION)) {
-                const faction *sf = visible_faction(f, u);
-                fno = sf->no;
-            }
-            cr_output_building_compat(F, b, u, fno, f);
-        }
-
-        /* ships */
-        for (sh = r->ships; sh; sh = sh->next) {
-            int fno = -1;
-            u = ship_owner(sh);
-            if (u && !fval(u, UFL_ANON_FACTION)) {
-                const faction *sf = visible_faction(f, u);
-                fno = sf->no;
+        if (r->seen.mode >= seen_lighthouse) {
+            /* buildings */
+            for (b = rbuildings(r); b; b = b->next) {
+                int fno = -1;
+                u = building_owner(b);
+                if (u && !fval(u, UFL_ANON_FACTION)) {
+                    const faction *sf = visible_faction(f, u);
+                    fno = sf->no;
+                }
+                cr_output_building_compat(F, b, u, fno, f);
             }
 
-            cr_output_ship_compat(F, sh, u, fno, f, r);
-        }
+            /* ships */
+            for (sh = r->ships; sh; sh = sh->next) {
+                int fno = -1;
+                u = ship_owner(sh);
+                if (u && !fval(u, UFL_ANON_FACTION)) {
+                    const faction *sf = visible_faction(f, u);
+                    fno = sf->no;
+                }
 
-        /* visible units */
-        for (u = r->units; u; u = u->next) {
-            if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                cr_output_unit_compat(F, f, u, r->seen.mode);
+                cr_output_ship_compat(F, sh, u, fno, f, r);
+            }
+            /* visible units */
+            for (u = r->units; u; u = u->next) {
+                if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                    cr_output_unit_compat(F, f, u, r->seen.mode);
+                }
             }
         }
     }

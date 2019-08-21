@@ -1248,6 +1248,68 @@ static void test_ally_cmd_errors(CuTest *tc) {
     test_teardown();
 }
 
+static void test_banner_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(125);
+    mt_create_va(mt_new("changebanner", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_BANNER, f->locale, "Hodor!");
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changebanner"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_BANNER, f->locale, NULL);
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error125"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
+static void test_email_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(85);
+    mt_create_va(mt_new("changemail", NULL), "value:string", MT_NEW_END);
+    mt_create_va(mt_new("changemail_invalid", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_EMAIL, f->locale, "hodor@example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, "example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail_invalid"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, NULL);
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error85"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
 static void test_name_cmd(CuTest *tc) {
     unit *u;
     faction *f;
@@ -1869,6 +1931,53 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_peasant_migration(CuTest *tc) {
+    region *r1, *r2;
+    int rmax;
+
+    test_setup();
+    config_set("rules.economy.repopulate_maximum", "0");
+    r1 = test_create_plain(0, 0);
+    rsettrees(r1, 0, 0);
+    rsettrees(r1, 1, 0);
+    rsettrees(r1, 2, 0);
+    rmax = region_maxworkers(r1);
+    r2 = test_create_plain(0, 1);
+    rsettrees(r2, 0, 0);
+    rsettrees(r2, 1, 0);
+    rsettrees(r2, 2, 0);
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 90, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax + 60);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 80, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 50, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 60); /* max 10 emigrants. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 2, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 56, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 6); /* max 1 emigrant. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 5, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 5, rpeasants(r2));
+
+    test_teardown();
+}
+
 static void test_quit(CuTest *tc) {
     faction *f;
     unit *u;
@@ -1891,6 +2000,7 @@ static void test_quit(CuTest *tc) {
     test_teardown();
 }
 
+#ifdef QUIT_WITH_TRANSFER
 /**
  * Gifting units to another faction upon voluntary death (QUIT).
  */ 
@@ -2012,6 +2122,30 @@ static void test_quit_transfer_hero(CuTest *tc) {
     test_teardown();
 }
 
+static void test_transfer_faction(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2, *u3, *u4;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f1, r);
+    u_setrace(u2, test_create_race("smurf"));
+    u3 = test_create_unit(f2, r);
+    u4 = test_create_unit(f1, r);
+    transfer_faction(f1, f2);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertPtrEquals(tc, f1, u2->faction);
+    CuAssertPtrEquals(tc, f2, u3->faction);
+    CuAssertPtrEquals(tc, f2, u4->faction);
+
+    test_teardown();
+}
+#endif
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -2021,6 +2155,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_banner_cmd);
+    SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);
@@ -2088,10 +2224,14 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
+    SUITE_ADD_TEST(suite, test_peasant_migration);
+#ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
     SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
     SUITE_ADD_TEST(suite, test_quit_transfer_hero);
+    SUITE_ADD_TEST(suite, test_transfer_faction);
+#endif
 
     return suite;
 }

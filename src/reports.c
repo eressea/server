@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -101,6 +101,7 @@ bool noreports = false;
 const char *visibility[] = {
     "none",
     "neighbour",
+    "lighthouse",
     "lighthouse",
     "travel",
     "far",
@@ -1115,38 +1116,40 @@ void get_addresses(report_context * ctx)
     }
 
     for (; r != NULL; r = r->next) {
-        int stealthmod = stealth_modifier(r, ctx->f, r->seen.mode);
-        if (r->seen.mode == seen_lighthouse) {
-            unit *u = r->units;
-            for (; u; u = u->next) {
-                faction *sf = visible_faction(ctx->f, u);
-                if (lastf != sf) {
-                    if (u->building || u->ship || (stealthmod > INT_MIN
-                        && cansee(ctx->f, r, u, stealthmod))) {
-                        add_seen_faction_i(&flist, sf);
-                        lastf = sf;
+        if (r->seen.mode >= seen_lighthouse) {
+            int stealthmod = stealth_modifier(r, ctx->f, r->seen.mode);
+            if (r->seen.mode == seen_lighthouse) {
+                unit *u = r->units;
+                for (; u; u = u->next) {
+                    faction *sf = visible_faction(ctx->f, u);
+                    if (lastf != sf) {
+                        if (u->building || u->ship || (stealthmod > INT_MIN
+                            && cansee(ctx->f, r, u, stealthmod))) {
+                            add_seen_faction_i(&flist, sf);
+                            lastf = sf;
+                        }
                     }
                 }
             }
-        }
-        else if (r->seen.mode == seen_travel) {
-            /* when we travel through a region, then we must add
-             * the factions of any units we saw */
-            add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
-        }
-        else if (r->seen.mode > seen_travel) {
-            const unit *u = r->units;
-            while (u != NULL) {
-                if (u->faction != ctx->f) {
-                    faction *sf = visible_faction(ctx->f, u);
-                    bool ballied = sf && sf != ctx->f && sf != lastf
-                        && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                    if (ballied || is_allied(ctx->f, sf)) {
-                        add_seen_faction_i(&flist, sf);
-                        lastf = sf;
+            else if (r->seen.mode == seen_travel) {
+                /* when we travel through a region, then we must add
+                 * the factions of any units we saw */
+                add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
+            }
+            else if (r->seen.mode > seen_travel) {
+                const unit *u = r->units;
+                while (u != NULL) {
+                    if (u->faction != ctx->f) {
+                        faction *sf = visible_faction(ctx->f, u);
+                        bool ballied = sf && sf != ctx->f && sf != lastf
+                            && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
+                        if (ballied || is_allied(ctx->f, sf)) {
+                            add_seen_faction_i(&flist, sf);
+                            lastf = sf;
+                        }
                     }
+                    u = u->next;
                 }
-                u = u->next;
             }
         }
     }
@@ -1292,6 +1295,9 @@ static void add_seen_lighthouse(region *r, faction *f)
 {
     if (r->terrain->flags & SEA_REGION) {
         add_seen_nb(f, r, seen_lighthouse);
+    }
+    else {
+        add_seen_nb(f, r, seen_lighthouse_land);
     }
 }
 

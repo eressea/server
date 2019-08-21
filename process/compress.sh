@@ -2,7 +2,7 @@
 
 if [ -z "$ERESSEA" ]; then
   echo "You need to define the \$ERESSEA environment variable to run $0"
-  exit -2
+  exit 2
 fi
 
 GAME="$ERESSEA/game-$1"
@@ -16,7 +16,7 @@ fi
 
 if [ ! -d "$GAME/reports" ]; then
   echo "cannot find reports directory in $GAME"
-  exit -1
+  exit 1
 fi
 
 cd "$GAME/reports" || exit
