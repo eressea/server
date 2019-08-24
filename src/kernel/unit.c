@@ -239,18 +239,8 @@ int gift_items(unit * u, int flags)
     region *r = u->region;
     item **itm_p = &u->items;
     int retval = 0;
-    int rule = rule_give();
 
     assert(u->region);
-
-    if ((rule & GIVE_ONDEATH) == 0 || !u->faction || (u->faction->flags & FFL_QUIT) == 0) {
-        if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
-            flags -= GIFT_FRIENDS;
-        if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
-            flags -= GIFT_PEASANTS;
-        if ((rule & GIVE_SELF) == 0 && (flags & GIFT_SELF))
-            flags -= GIFT_SELF;
-    }
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
