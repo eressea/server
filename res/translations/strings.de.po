@@ -1708,7 +1708,7 @@ msgid "caravel_a"
 msgstr "eine Karavelle"
 
 msgid "galleon_a"
-msgstr "eine Galleone"
+msgstr "eine Galeone"
 
 msgctxt "keyword"
 msgid "describe"
@@ -2068,7 +2068,7 @@ msgid "caravel"
 msgstr "Karavelle"
 
 msgid "galleon"
-msgstr "Galleone"
+msgstr "Galeone"
 
 msgid "dragon_postfix_10"
 msgstr "der Goldene"
