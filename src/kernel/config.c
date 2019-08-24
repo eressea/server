@@ -534,6 +534,7 @@ int rule_give(void)
     static int config;
     static int rule;
     if (config_changed(&config)) {
+        /* TODO: No game uses this. Eliminate? */
         rule = config_get_int("rules.give.flags", GIVE_DEFAULT);
     }
     return rule;
