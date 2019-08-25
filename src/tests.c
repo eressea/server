@@ -277,7 +277,7 @@ static void test_reset(void) {
 void test_create_calendar(void) {
     config_set_int("game.start", 184);
     months_per_year = 9;
-    month_season = malloc(sizeof(int) * months_per_year);
+    month_season = malloc(sizeof(season_t) * months_per_year);
     if (!month_season) abort();
     month_season[0] = SEASON_SUMMER;
     month_season[1] = SEASON_AUTUMN;

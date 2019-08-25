@@ -1466,14 +1466,14 @@ void report_warnings(faction *f, int now)
     }
 
     if (f->race == get_race(RC_INSECT)) {
-        gamedate date;
-        get_gamedate(now + 1, &date);
+        season_t season = calendar_season(now + 1);
 
-        if (date.season == SEASON_WINTER) {
+        if (season == SEASON_WINTER) {
             ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
         }
-        else if (date.season == SEASON_AUTUMN) {
-            if (get_gamedate(now + 2 + 2, &date)->season == SEASON_WINTER) {
+        else if (season == SEASON_AUTUMN) {
+            /* warning: next turn is the last week of autumn */
+            if (calendar_season(now + 2) == SEASON_WINTER) {
                 ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
             }
         }

@@ -613,7 +613,7 @@ growing_trees_e3(region * r, const int current_season,
 }
 
 static void
-growing_trees(region * r, const int current_season, const int last_weeks_season)
+growing_trees(region * r, const season_t current_season, const season_t last_weeks_season)
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
@@ -755,7 +755,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 }
 
 static void
-growing_herbs(region * r, const int current_season, const int last_weeks_season)
+growing_herbs(region * r, const int current_season, const season_t last_weeks_season)
 {
     /* Jetzt die Kraeutervermehrung. Vermehrt wird logistisch:
      *
@@ -849,20 +849,12 @@ void nmr_warnings(void)
 void demographics(void)
 {
     region *r;
-    static int last_weeks_season = -1;
-    static int current_season = -1;
     int plant_rules = config_get_int("rules.grow.formula", 2);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
-
-    if (current_season < 0) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        current_season = date.season;
-        get_gamedate(turn - 1, &date);
-        last_weeks_season = date.season;
-    }
+    season_t current_season = calendar_season(turn);
+    season_t last_weeks_season = calendar_season(turn - 1);
 
     for (r = regions; r; r = r->next) {
         ++r->age; /* also oceans. no idea why we didn't always do that */

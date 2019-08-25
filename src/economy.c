@@ -1758,12 +1758,8 @@ static void breedtrees(unit * u, int raw)
 {
     int n, i, skill, planted = 0;
     const resource_type *rtype;
-    int current_season;
+    season_t current_season = calendar_season(turn);
     region *r = u->region;
-    gamedate date;
-
-    get_gamedate(turn, &date);
-    current_season = date.season;
 
     /* Baeume zuechten geht nur im Fruehling */
     if (current_season != SEASON_SPRING) {
