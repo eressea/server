@@ -259,10 +259,9 @@ static int tolua_dice_rand(lua_State * L)
 
 static int tolua_get_season(lua_State * L)
 {
-    int turnno = (int)tolua_tonumber(L, 1, 0);
-    gamedate gd;
-    get_gamedate(turnno, &gd);
-    tolua_pushstring(L, seasonnames[gd.season]);
+    int turn_no = (int)tolua_tonumber(L, 1, 0);
+    season_t season = calendar_season(turn_no);
+    tolua_pushstring(L, seasonnames[season]);
     return 1;
 }
 

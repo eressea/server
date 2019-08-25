@@ -630,7 +630,6 @@ static void fix_resource_levels(region *r) {
                 }
             }
         }
-
     }
 }
 

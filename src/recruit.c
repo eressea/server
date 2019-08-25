@@ -351,9 +351,14 @@ message *can_recruit(unit *u, const race *rc, order *ord, int now)
     }
 
     if (rc == get_race(RC_INSECT)) {
-        gamedate date;
-        get_gamedate(now, &date);
-        if (date.season == SEASON_WINTER && r->terrain != newterrain(T_DESERT)) {
+
+        /* in Gletschern, Eisbergen gar nicht rekrutieren */
+        if (r_insectstalled(r)) {
+            return msg_error(u, ord, 97);
+        }
+
+        /* in Wüsten ganzjährig rekrutieren, sonst im Winter nur mit Trank */
+        if (r->terrain != newterrain(T_DESERT) && calendar_season(now) == SEASON_WINTER) {
             bool usepotion = false;
             unit *u2;
 
@@ -366,10 +371,6 @@ message *can_recruit(unit *u, const race *rc, order *ord, int now)
             if (!usepotion) {
                 return msg_error(u, ord, 98);
             }
-        }
-        /* in Gletschern, Eisbergen gar nicht rekrutieren */
-        if (r_insectstalled(r)) {
-            return msg_error(u, ord, 97);
         }
     }
     if (is_cursed(r->attribs, &ct_riotzone)) {

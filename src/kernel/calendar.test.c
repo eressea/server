@@ -65,26 +65,59 @@ static void test_calendar(CuTest * tc)
     test_teardown();
 }
 
+static void setup_calendar() {
+    int i;
+
+    months_per_year = 4;
+    weeks_per_month = 2;
+    free(month_season);
+    month_season = calloc(months_per_year, sizeof(int));
+    for (i = 0; i != 4; ++i) {
+        month_season[i] = (season_t)i;
+    }
+}
+
 static void test_calendar_season(CuTest * tc)
+{
+    test_setup();
+    setup_calendar();
+
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(0));
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(1));
+    CuAssertIntEquals(tc, SEASON_SPRING, calendar_season(2));
+    CuAssertIntEquals(tc, SEASON_SPRING, calendar_season(3));
+    CuAssertIntEquals(tc, SEASON_SUMMER, calendar_season(4));
+    CuAssertIntEquals(tc, SEASON_SUMMER, calendar_season(5));
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(6));
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(7));
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(8));
+
+    free(month_season);
+    month_season = NULL;
+    test_teardown();
+}
+
+static void test_gamedate(CuTest * tc)
 {
     gamedate gd;
 
     test_setup();
-    month_season = calloc(months_per_year, sizeof(int));
+    setup_calendar();
 
     get_gamedate(0, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
-    CuAssertIntEquals(tc, 0, gd.season);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.season);
     CuAssertIntEquals(tc, 0, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
-    month_season[1] = 1;
     get_gamedate(weeks_per_month + 1, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
-    CuAssertIntEquals(tc, 1, gd.season);
+    CuAssertIntEquals(tc, SEASON_SPRING, gd.season);
     CuAssertIntEquals(tc, 1, gd.month);
     CuAssertIntEquals(tc, 1, gd.week);
 
+    free(month_season);
+    month_season = NULL;
     test_teardown();
 }
 
@@ -94,5 +127,6 @@ CuSuite *get_calendar_suite(void)
     SUITE_ADD_TEST(suite, test_calendar_config);
     SUITE_ADD_TEST(suite, test_calendar);
     SUITE_ADD_TEST(suite, test_calendar_season);
+    SUITE_ADD_TEST(suite, test_gamedate);
     return suite;
 }

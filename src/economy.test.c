@@ -5,10 +5,11 @@
 #include "economy.h"
 #include "recruit.h"
 
-#include <util/message.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/item.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -20,9 +21,9 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -494,6 +495,7 @@ static void test_recruit_insect(CuTest *tc) {
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
     msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
     CuAssertPtrEquals(tc, NULL, msg);
 
