@@ -15,7 +15,7 @@ extern "C" {
     extern const char *seasonnames[CALENDAR_SEASONS];
 
     extern int months_per_year;
-    extern int *month_season;
+    extern season_t *month_season;
     extern int first_month;
     extern int turn;
 
