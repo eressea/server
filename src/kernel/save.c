@@ -1,3 +1,4 @@
+#include "save.h"
 /*
 Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -1473,10 +1474,11 @@ static void fix_familiars(void (*callback)(unit *)) {
     }
 }
 
-void read_regions(gamedata *data) {
+static void read_regions(gamedata *data) {
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
     const struct race *rc_spell = rc_find("spell");
+    region *r;
     int nread;
 
     READ_INT(store, &nread);
@@ -1488,7 +1490,6 @@ void read_regions(gamedata *data) {
         unit **up;
         building **bp;
         ship **shp;
-        region *r;
         int p;
 
         r = read_region(data);
@@ -1550,15 +1551,90 @@ void read_regions(gamedata *data) {
             }
         }
     }
+
+    log_debug("updating area information for lighthouses.");
+    for (r = regions; r; r = r->next) {
+        if (r->flags & RF_LIGHTHOUSE) {
+            building *b;
+            for (b = r->buildings; b; b = b->next) {
+                if (is_lighthouse(b->type)) {
+                    update_lighthouse(b);
+                }
+            }
+        }
+    }
+}
+
+static void init_factions(int data_version)
+{
+    log_debug("marking factions as alive.");
+    for (faction *f = factions; f; f = f->next) {
+        if (f->flags & FFL_NPC) {
+            f->_alive = true;
+            f->magiegebiet = M_GRAY;
+            if (f->no == 0) {
+                int no = 666;
+                while (findfaction(no))
+                    ++no;
+                log_warning("renum(monsters, %d)", no);
+                renumber_faction(f, no);
+            }
+        }
+        else {
+            assert(f->units);
+            for (unit *u = f->units; u; u = u->nextF) {
+                if (data_version < SPELL_LEVEL_VERSION) {
+                    struct sc_mage *mage = get_mage(u);
+                    if (mage) {
+                        faction *f = u->faction;
+                        int skl = effskill(u, SK_MAGIC, NULL);
+                        if (f->magiegebiet == M_GRAY) {
+                            f->magiegebiet = mage_get_type(mage);
+                            log_error("faction %s had magic=gray, fixing (%s)",
+                                factionname(f), magic_school[f->magiegebiet]);
+                        }
+                        if (f->max_spelllevel < skl) {
+                            f->max_spelllevel = skl;
+                        }
+                    }
+                }
+                if (u->number > 0) {
+                    f->_alive = true;
+                    if (data_version >= SPELL_LEVEL_VERSION) {
+                        break;
+                    }
+                }
+            }
+            if (data_version < SPELL_LEVEL_VERSION && f->spellbook) {
+                spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
+            }
+        }
+    }
+}
+
+static void read_factions(gamedata * data)
+{
+    storage * store = data->store;
+    int nread;
+    faction **fp;
+    READ_INT(store, &nread);
+    log_debug(" - Einzulesende Parteien: %d\n", nread);
+    fp = &factions;
+    while (*fp) {
+        fp = &(*fp)->next;
+    }
+
+    while (--nread >= 0) {
+        faction *f = read_faction(data);
+
+        *fp = f;
+        fp = &f->next;
+    }
 }
 
 int read_game(gamedata *data)
 {
     storage * store = data->store;
-    int nread;
-    faction *f, **fp;
-    region *r;
-    unit *u;
 
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
@@ -1586,80 +1662,14 @@ int read_game(gamedata *data)
 
     read_planes(data);
     read_alliances(data);
-    READ_INT(store, &nread);
-    log_debug(" - Einzulesende Parteien: %d\n", nread);
-    fp = &factions;
-    while (*fp) {
-        fp = &(*fp)->next;
-    }
 
-    while (--nread >= 0) {
-        faction *f = read_faction(data);
-
-        *fp = f;
-        fp = &f->next;
-    }
-    *fp = 0;
+    read_factions(data);
 
     /* Regionen */
 
     read_regions(data);
     read_borders(data);
-
-    log_debug("updating area information for lighthouses.");
-    for (r = regions; r; r = r->next) {
-        if (r->flags & RF_LIGHTHOUSE) {
-            building *b;
-            for (b = r->buildings; b; b = b->next) {
-                if (is_lighthouse(b->type)) {
-                    update_lighthouse(b);
-                }
-            }
-        }
-    }
-    log_debug("marking factions as alive.");
-    for (f = factions; f; f = f->next) {
-        if (f->flags & FFL_NPC) {
-            f->_alive = true;
-            f->magiegebiet = M_GRAY;
-            if (f->no == 0) {
-                int no = 666;
-                while (findfaction(no))
-                    ++no;
-                log_warning("renum(monsters, %d)", no);
-                renumber_faction(f, no);
-            }
-        }
-        else {
-            assert(f->units);
-            for (u = f->units; u; u = u->nextF) {
-                if (data->version < SPELL_LEVEL_VERSION) {
-                    struct sc_mage *mage = get_mage(u);
-                    if (mage) {
-                        faction *f = u->faction;
-                        int skl = effskill(u, SK_MAGIC, NULL);
-                        if (f->magiegebiet == M_GRAY) {
-                            f->magiegebiet = mage_get_type(mage);
-                            log_error("faction %s had magic=gray, fixing (%s)",
-                                factionname(f), magic_school[f->magiegebiet]);
-                        }
-                        if (f->max_spelllevel < skl) {
-                            f->max_spelllevel = skl;
-                        }
-                    }
-                }
-                if (u->number > 0) {
-                    f->_alive = true;
-                    if (data->version >= SPELL_LEVEL_VERSION) {
-                        break;
-                    }
-                }
-            }
-            if (data->version < SPELL_LEVEL_VERSION && f->spellbook) {
-                spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
-            }
-        }
-    }
+    init_factions(data->version);
     if (data->version < FIX_CLONES_VERSION) {
         fix_clones();
     }

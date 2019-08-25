@@ -37,23 +37,6 @@ function setup()
     eressea.settings.set("study.random_progress", "0")
 end
 
-function test_give_unit()
-  local r = region.create(0, 0, "plain")
-  local f1 = create_faction('elf')
-  local f2 = create_faction('elf')
-  local u1, u2 = two_units(r, f1, f2)
-  assert_equal(f1, u1.faction)
-  assert_equal(f2, u2.faction)
-  u2.name = 'Xolgrim'
-  u2.group = 'Experten'
-  assert_equal('Experten', u2.group)
-  u1:add_order("HELFE " .. itoa36(f2.id) .. " GIB")
-  u2:add_order("GIB " .. itoa36(u1.id) .. " EINHEIT")
-  process_orders()
-  assert_equal(f1, u2.faction)
-  assert_nil(u2.group)
-end
-
 function test_set_faction()
   local r = region.create(0, 0, "plain")
   local f1 = create_faction('elf')
