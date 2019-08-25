@@ -65,7 +65,7 @@ static void test_calendar(CuTest * tc)
     test_teardown();
 }
 
-static void setup_calendar() {
+static void setup_calendar(void) {
     int i;
 
     months_per_year = 4;
