@@ -65,13 +65,13 @@ static void test_calendar(CuTest * tc)
     test_teardown();
 }
 
-static void setup_calendar() {
+static void setup_calendar(void) {
     int i;
 
     months_per_year = 4;
     weeks_per_month = 2;
     free(month_season);
-    month_season = calloc(months_per_year, sizeof(int));
+    month_season = calloc(months_per_year, sizeof(season_t));
     for (i = 0; i != 4; ++i) {
         month_season[i] = (season_t)i;
     }

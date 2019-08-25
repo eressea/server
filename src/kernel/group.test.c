@@ -80,8 +80,10 @@ static void test_group_readwrite(CuTest * tc)
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     f = test_create_faction(NULL);
-    new_group(f, "NW", 42);
-    g = new_group(f, "Egoisten", 43);
+    create_group(f, "NW", 42);
+    g = create_group(f, "Egoisten", 43);
+    CuAssertPtrEquals(tc, f, g->f);
+    CuAssertStrEquals(tc, "Egoisten", g->name);
     key_set(&g->attribs, 44, 44);
     ally_set(&g->allies, f, HELP_GIVE);
     write_groups(&data, f);
