@@ -145,47 +145,45 @@ static region **internal_path_find(region * handle_start, const region * target,
     node *root = new_node(handle_start, 0, NULL);
     node **handle_end = &root->next;
     node *n = root;
-    bool found = false;
     assert(maxlen <= MAXDEPTH);
     fset(handle_start, RF_MARK);
 
     while (n != NULL) {
+        region *adj[MAXDIRECTIONS];
         region *r = n->r;
         int depth = n->distance + 1;
         if (n->distance >= maxlen)
             break;
+        get_neighbours(r, adj);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *rn = rconnect(r, d);
-            if (rn == NULL)
-                continue;
-            if (fval(rn, RF_MARK))
-                continue;               /* already been there */
-            if (!allowed(r, rn))
-                continue;               /* can't go there */
-            if (rn == target) {
-                int i = depth;
-                path[i + 1] = NULL;
-                path[i] = rn;
-                while (n) {
-                    path[--i] = n->r;
-                    n = n->prev;
+            region *rn = adj[d];
+            if (rn && !fval(rn, RF_MARK) && allowed(r, rn)) {
+                if (rn == target) {
+                    int i = depth;
+                    path[i + 1] = NULL;
+                    path[i] = rn;
+                    while (n) {
+                        path[--i] = n->r;
+                        n = n->prev;
+                    }
+                    break;
                 }
-                found = true;
-                break;
-            }
-            else {
-                fset(rn, RF_MARK);
-                *handle_end = new_node(rn, depth, n);
-                handle_end = &(*handle_end)->next;
+                else {
+                    fset(rn, RF_MARK);
+                    *handle_end = new_node(rn, depth, n);
+                    handle_end = &(*handle_end)->next;
+                }
             }
         }
-        if (found)
+        if (d != MAXDIRECTIONS) {
             break;
+        }
         n = n->next;
     }
     free_nodes(root);
-    if (found)
+    if (n) {
         return path;
+    }
     return NULL;
 }
 
