@@ -215,11 +215,6 @@ autoalliance(const faction * sf, const faction * f2)
     return 0;
 }
 
-static void init_npcfaction(variant *var)
-{
-    var->i = 1;
-}
-
 /** Limits the available help modes
 * The bitfield returned by this function specifies the available help modes
 * in this game (so you can, for example, disable HELP GIVE globally).
