@@ -220,17 +220,6 @@ static void init_npcfaction(variant *var)
     var->i = 1;
 }
 
-attrib_type at_npcfaction = {
-    "npcfaction",
-    init_npcfaction,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
-
 /** Limits the available help modes
 * The bitfield returned by this function specifies the available help modes
 * in this game (so you can, for example, disable HELP GIVE globally).
@@ -284,12 +273,6 @@ int alliance_status(const faction *f, const faction *f2, int status) {
     if (status > 0) {
         int mask = AllianceRestricted();
         if (mask) {
-            if (a_find(f->attribs, &at_npcfaction)) {
-                return status;
-            }
-            if (a_find(f2->attribs, &at_npcfaction)) {
-                return status;
-            }
             if (f->alliance != f2->alliance) {
                 status &= ~mask;
             }
