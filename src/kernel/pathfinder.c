@@ -149,14 +149,12 @@ static region **internal_path_find(region * handle_start, const region * target,
     fset(handle_start, RF_MARK);
 
     while (n != NULL) {
-        region *adj[MAXDIRECTIONS];
         region *r = n->r;
         int depth = n->distance + 1;
         if (n->distance >= maxlen)
             break;
-        get_neighbours(r, adj);
         for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *rn = adj[d];
+            region *rn = rconnect(r, d);
             if (rn && !fval(rn, RF_MARK) && allowed(r, rn)) {
                 if (rn == target) {
                     int i = depth;
