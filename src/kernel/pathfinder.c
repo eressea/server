@@ -141,7 +141,7 @@ static region **internal_path_find(region * handle_start, const region * target,
     int maxlen, bool(*allowed) (const region *, const region *))
 {
     static region *path[MAXDEPTH + 2];    /* STATIC_RETURN: used for return, not across calls */
-    direction_t d;
+    direction_t d = MAXDIRECTIONS;
     node *root = new_node(handle_start, 0, NULL);
     node **handle_end = &root->next;
     node *n = root;
@@ -179,7 +179,7 @@ static region **internal_path_find(region * handle_start, const region * target,
         n = n->next;
     }
     free_nodes(root);
-    if (n) {
+    if (d != MAXDIRECTIONS) {
         return path;
     }
     return NULL;

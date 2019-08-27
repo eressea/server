@@ -1355,6 +1355,24 @@ static void test_name_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_name_foreign_cmd(CuTest *tc) {
+    building *b;
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(NULL), r = test_create_region(0, 0, NULL));
+    b = test_create_building(u->region, NULL);
+    u->thisorder = create_order(K_NAME, f->locale, "%s %s %s Hodor",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_BUILDING]),
+        itoa36(b->no));
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    test_teardown();
+}
+
 static void test_name_cmd_2274(CuTest *tc) {
     unit *u1, *u2, *u3;
     faction *f;
@@ -2155,6 +2173,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_name_foreign_cmd);
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
