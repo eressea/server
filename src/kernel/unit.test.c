@@ -1,4 +1,4 @@
-#include <platform.h>
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
@@ -652,6 +652,62 @@ static void test_get_modifier(CuTest *tc) {
     test_teardown();
 }
 
+static void test_gift_items(CuTest *tc) {
+    unit *u, *u1, *u2;
+    region *r;
+    const resource_type *rtype;
+    test_setup();
+    init_resources();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(NULL), r);
+    rtype = get_resourcetype(R_SILVER);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 10, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+
+    region_setresource(r, get_resourcetype(R_HORSE), 0);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    i_change(&u->items, get_resourcetype(R_HORSE)->itype, 20);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(u1->faction, r);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 20, region_getresource(r, get_resourcetype(R_HORSE)));
+    CuAssertIntEquals(tc, 10, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    ally_set(&u->faction->allies, u1->faction, HELP_MONEY);
+    ally_set(&u1->faction->allies, u->faction, HELP_GIVE);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 10, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    i_change(&u1->items, rtype->itype, -10);
+
+    set_number(u1, 2);
+    u_setfaction(u2, test_create_faction(NULL));
+    ally_set(&u->faction->allies, u2->faction, HELP_MONEY);
+    ally_set(&u2->faction->allies, u->faction, HELP_GIVE);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 15);
+    ally_set(&u->faction->allies, u1->faction, HELP_MONEY);
+    ally_set(&u1->faction->allies, u->faction, HELP_GIVE);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 10, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 5, i_get(u2->items, rtype->itype));
+
+    test_teardown();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -683,5 +739,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
     SUITE_ADD_TEST(suite, test_get_modifier);
+    SUITE_ADD_TEST(suite, test_gift_items);
     return suite;
 }
