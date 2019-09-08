@@ -1189,6 +1189,18 @@ bool trade_needs_castle(const terrain_type *terrain, const race *rc)
     return rc != rc_insect && (terrain == t_swamp || terrain == t_desert);
 }
 
+static building * first_building(region *r, const struct building_type *btype, int minsize) {
+    building *b = NULL;
+    if (r->buildings) {
+        for (b = r->buildings; b; b = b->next) {
+            if (b->type == btype && b->size >= minsize) {
+                return b;
+            }
+        }
+    }
+    return NULL;
+}
+
 static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
@@ -1223,21 +1235,12 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
     if (trade_needs_castle(r->terrain, u_race(u))) {
-        building *b = NULL;
-        if (r->buildings) {
-            static int cache;
-            static const struct building_type *bt_castle;
-            if (bt_changed(&cache)) {
-                bt_castle = bt_find("castle");
-            }
-
-            for (b = r->buildings; b; b = b->next) {
-                if (b->type == bt_castle && b->size >= 2) {
-                    break;
-                }
-            }
+        static int cache;
+        static const struct building_type *castle_bt;
+        if (bt_changed(&cache)) {
+            castle_bt = bt_find("castle");
         }
-        if (b == NULL) {
+        if (first_building(r, castle_bt, 2) == NULL) {
             cmistake(u, ord, 119, MSG_COMMERCE);
             return;
         }
@@ -1540,29 +1543,14 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             return false;
         }
     }
-    /* In der Region muss es eine Burg geben. */
 
-    if (u_race(u) == get_race(RC_INSECT)) {
-        if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
-            && !rbuildings(r)) {
+    if (trade_needs_castle(r->terrain, u_race(u))) {
+        /* In der Region muss es eine Burg geben. */
+        if (first_building(r, castle_bt, 2) == NULL) {
             cmistake(u, ord, 119, MSG_COMMERCE);
             return false;
         }
     }
-    else {
-        /* ...oder in der Region muss es eine Burg geben. */
-        building *b = 0;
-        if (r->buildings) {
-            for (b = r->buildings; b; b = b->next) {
-                if (b->type == castle_bt && b->size >= 2) break;
-            }
-        }
-        if (!b) {
-            cmistake(u, ord, 119, MSG_COMMERCE);
-            return false;
-        }
-    }
-
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt verkaufen. */
 
     i = u->number * 10 * effskill(u, SK_TRADE, NULL);

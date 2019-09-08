@@ -591,6 +591,19 @@ struct message * test_find_messagetype(struct message_list *msgs, const char *na
     return test_find_messagetype_ex(msgs, name, NULL);
 }
 
+int test_count_messagetype(struct message_list *msgs, const char *name)
+{
+    int count = 0;
+    struct mlist *ml;
+    if (!msgs) return 0;
+    for (ml = msgs->begin; ml; ml = ml->next) {
+        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 void test_clear_messagelist(message_list **msgs) {
     if (*msgs) {
         free_messagelist((*msgs)->begin);

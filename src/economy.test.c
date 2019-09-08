@@ -237,7 +237,10 @@ static void test_trade_needs_castle(CuTest *tc) {
     /* Handeln ist nur in Regionen mit Burgen möglich. */
     race *rc;
     region *r;
+    unit *u;
+    building *b;
     const terrain_type *t_swamp;
+    const item_type *it_luxury;
 
     test_setup();
     setup_production();
@@ -246,9 +249,32 @@ static void test_trade_needs_castle(CuTest *tc) {
     init_terrains();
     t_swamp = get_terrain("swamp");
     r = setup_trade_region(tc, t_swamp);
-    rc = test_create_race(NULL);
+    it_luxury = r_luxury(r);
 
+    rc = test_create_race(NULL);
     CuAssertTrue(tc, trade_needs_castle(t_swamp, rc));
+
+    u = test_create_unit(test_create_faction(rc), r);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
+
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 1;
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
+
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b->size = 2;
+    test_clear_messages(u->faction);
+    produce(r);
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
     test_teardown();
 }
 
@@ -259,7 +285,6 @@ static void test_trade_insect(CuTest *tc) {
     race *rc;
     const terrain_type *t_swamp;
     const item_type *it_luxury;
-    const item_type *it_silver;
 
     test_setup();
     setup_production();
@@ -273,21 +298,13 @@ static void test_trade_insect(CuTest *tc) {
     it_luxury = r_luxury(r);
     CuAssertTrue(tc, !trade_needs_castle(t_swamp, rc));
     CuAssertPtrNotNull(tc, it_luxury);
-    it_silver = get_resourcetype(R_SILVER)->itype;
-
     u = setup_trade_unit(tc, r, rc);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
-
-    test_set_item(u, it_silver, 10);
-    CuAssertPtrEquals(tc, r, u->region);
-    CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
     produce(u->region);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
-    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
-    CuAssertIntEquals(tc, 5, get_item(u, it_silver));
-
-    terraform_region(r, get_terrain("swamp"));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
     test_teardown();
 }
 
