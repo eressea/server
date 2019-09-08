@@ -233,10 +233,31 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
     return u;
 }
 
+static void test_trade_needs_castle(CuTest *tc) {
+    /* Handeln ist nur in Regionen mit Burgen möglich. */
+    race *rc;
+    region *r;
+    const terrain_type *t_swamp;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    t_swamp = get_terrain("swamp");
+    r = setup_trade_region(tc, t_swamp);
+    rc = test_create_race(NULL);
+
+    CuAssertTrue(tc, trade_needs_castle(t_swamp, rc));
+    test_teardown();
+}
+
 static void test_trade_insect(CuTest *tc) {
     /* Insekten koennen in Wuesten und Suempfen auch ohne Burgen handeln. */
     unit *u;
     region *r;
+    race *rc;
+    const terrain_type *t_swamp;
     const item_type *it_luxury;
     const item_type *it_silver;
 
@@ -244,14 +265,17 @@ static void test_trade_insect(CuTest *tc) {
     setup_production();
     test_create_locale();
     setup_terrains(tc);
-    r = setup_trade_region(tc, get_terrain("swamp"));
     init_terrains();
+    t_swamp = get_terrain("swamp");
+    rc = test_create_race("insect");
 
+    r = setup_trade_region(tc, t_swamp);
     it_luxury = r_luxury(r);
+    CuAssertTrue(tc, !trade_needs_castle(t_swamp, rc));
     CuAssertPtrNotNull(tc, it_luxury);
     it_silver = get_resourcetype(R_SILVER)->itype;
 
-    u = setup_trade_unit(tc, r, test_create_race("insect"));
+    u = setup_trade_unit(tc, r, rc);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
 
@@ -796,6 +820,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);

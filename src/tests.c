@@ -583,7 +583,7 @@ struct message * test_find_messagetype_ex(struct message_list *msgs, const char 
             return ml->msg;
         }
     }
-    return 0;
+    return NULL;
 }
 
 struct message * test_find_messagetype(struct message_list *msgs, const char *name)
@@ -603,7 +603,7 @@ void test_clear_messages(faction *f) {
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
-        f->msgs = 0;
+        f->msgs = NULL;
     }
 }
 

@@ -49,6 +49,7 @@ extern "C" {
     struct faction;
     struct order;
     struct message;
+    struct terrain_type;
     struct item_type;
     
     typedef struct econ_request {
@@ -85,6 +86,8 @@ extern "C" {
     void destroy(struct region *r);
     void produce(struct region *r);
     void auto_work(struct region *r);
+    
+    bool trade_needs_castle(const struct terrain_type *terrain, const struct race *rc);
 
     typedef enum income_t { IC_WORK, IC_ENTERTAIN, IC_TAX, IC_TRADE, IC_TRADETAX, IC_STEAL, IC_MAGIC, IC_LOOT } income_t;
     void add_income(struct unit * u, income_t type, int want, int qty);
