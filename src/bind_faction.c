@@ -34,6 +34,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
+#include <util/nrmessage.h>
 #include <util/password.h>
 
 #include "attributes/key.h"
@@ -259,6 +260,23 @@ static int tolua_faction_setkey(lua_State * L)
         key_unset(&self->attribs, flag);
     }
     return 0;
+}
+
+static int tolua_faction_debug_messages(lua_State * L)
+{
+    faction *self = (faction *)tolua_tousertype(L, 1, NULL);
+    int i = 1;
+    mlist *ml;
+    if (!self->msgs) {
+        return 0;
+    }
+    lua_newtable(L);
+    for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
+        char buf[80];
+        nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
+        puts(buf);
+    }
+    return 1;
 }
 
 static int tolua_faction_get_messages(lua_State * L)
@@ -592,6 +610,7 @@ void tolua_faction_open(lua_State * L)
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
             tolua_variable(L, TOLUA_CAST "messages", tolua_faction_get_messages, NULL);
+            tolua_function(L, TOLUA_CAST "debug_messages", tolua_faction_debug_messages);
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);
