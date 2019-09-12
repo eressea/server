@@ -272,7 +272,7 @@ static int tolua_faction_debug_messages(lua_State * L)
     }
     lua_newtable(L);
     for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
-        char buf[80];
+        char buf[120];
         nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
         puts(buf);
     }

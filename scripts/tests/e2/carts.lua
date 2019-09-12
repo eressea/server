@@ -1,6 +1,6 @@
 require "lunit"
 
-module("tests.e2.capacity", package.seeall, lunit.testcase)
+module("tests.e2.carts", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()
@@ -115,4 +115,73 @@ function test_rider_leads_horses()
     assert_equal(r2, u1.region)
     assert_equal(r1, u2.region)
     assert_equal(r1, u3.region)
+end
+
+function test_carts()
+    local r0 = region.create(0, 0, "plain")
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "plain")
+    local r3 = region.create(3, 0, "plain")
+    local f = faction.create("human")
+    -- 1. two walkers, each with two horses and a cart:
+    local u1 = unit.create(f, r0, 2)
+    u1:add_item("horse", 2)
+    u1:add_item("cart", 1)
+    u1:add_order("NACH O O O")
+    -- 2. two riders, each with two horses and a cart:
+    local u2 = unit.create(f, r0, 2)
+    u2:set_skill("riding", 1)
+    u2:add_item("horse", 4)
+    u2:add_item("cart", 2)
+    u2:add_order("NACH O O O")
+    -- 2. two riders, each with five horses, and max carts:
+    local u3 = unit.create(f, r0, 2)
+    u3:set_skill("riding", 1)
+    u3:add_item("horse", 10)
+    u3:add_item("cart", 5)
+    u3:add_order("NACH O O O")
+
+    process_orders()
+    assert_equal(r1, u1.region)
+    assert_equal(r2, u2.region)
+    assert_equal(r1, u3.region)
+end
+
+function test_walking_carts()
+    local r0 = region.create(0, 0, "plain")
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "plain")
+    local r3 = region.create(3, 0, "plain")
+    local f = faction.create("human")
+    -- 1. ten riders walk with 50 horses and 25 carts, carry 3554 GE:
+    local u1 = unit.create(f, r0, 10)
+    u1:set_skill("riding", 1)
+    u1:add_item("horse", 50)
+    u1:add_item("cart", 25)
+    u1:add_item("money", 355400)
+    u1:add_order("NACH O O O")
+
+    process_orders()
+    assert_equal(r1, u1.region)
+end
+
+function test_trolls_pull_carts()
+    local r0 = region.create(0, 0, "plain")
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "plain")
+    local r3 = region.create(3, 0, "plain")
+    local f = faction.create("troll")
+    -- 1. 20 trolls can pull 5 loaded carts:
+    local u1 = unit.create(f, r0, 20)
+    u1:add_item("cart", 5)
+    -- trolls carry 10.8 GE, carts carry 100 GE:
+    u1:add_item("money", 100 * (5 * 100 + 2 * 108))
+    u1:add_order("NACH O O O")
+
+    process_orders()
+    assert_equal(r1, u1.region)
+
+    u1:add_item("money", 1) -- just one wafer thin mint
+    process_orders()
+    assert_equal(r1, u1.region)
 end
