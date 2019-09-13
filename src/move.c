@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -258,6 +240,14 @@ get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
     *p_acap = acap;
 }
 
+static int walking_horse_limit(const unit *u, int skill) {
+    return (1 + skill * 4) * u->number;
+}
+
+static int riding_horse_limit(const unit *u, int skill) {
+    return skill * 2 * u->number;
+}
+
 static int ridingcapacity(const unit * u)
 {
     int vehicles = 0, vcap = 0;
@@ -270,7 +260,7 @@ static int ridingcapacity(const unit * u)
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zaehlt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    horses = effskill(u, SK_RIDING, NULL) * u->number * 2;
+    horses = riding_horse_limit(u, effskill(u, SK_RIDING, NULL));
     if (animals > horses) animals = horses;
 
     if (fval(u_race(u), RCF_HORSE))
@@ -297,7 +287,7 @@ int walkingcapacity(const struct unit *u)
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
-    horses = effskill(u, SK_RIDING, NULL) * u->number * 4;
+    horses = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
     pferde_fuer_wagen = (animals < horses) ? animals : horses;
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
@@ -366,7 +356,6 @@ static int canwalk(unit * u)
     int maxwagen, maxpferde;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
-    int effsk;
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
@@ -375,13 +364,12 @@ static int canwalk(unit * u)
 
     get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
 
-    effsk = effskill(u, SK_RIDING, NULL);
-    maxwagen = effsk * u->number * 2;
+    maxpferde = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
+    maxwagen = maxpferde / 2;
     if (u_race(u) == get_race(RC_TROLL)) {
         int trolls = u->number / 4;
-        if (maxwagen > trolls) maxwagen = trolls;
+        if (maxwagen < trolls) maxwagen = trolls;
     }
-    maxpferde = effsk * u->number * 4 + u->number;
 
     if (animals > maxpferde)
         return E_CANWALK_TOOMANYHORSES;
@@ -440,7 +428,7 @@ bool canswim(unit * u)
 static int walk_mode(const unit * u)
 {
     int horses = 0, maxhorses, unicorns = 0, maxunicorns;
-    int skill = effskill(u, SK_RIDING, NULL);
+    int skill;
     item *itm;
     const item_type *it_horse, *it_elvenhorse, *it_charger;
     const resource_type *rtype;
@@ -458,8 +446,9 @@ static int walk_mode(const unit * u)
         }
     }
 
+    skill = effskill(u, SK_RIDING, NULL);
     maxunicorns = (skill / 5) * u->number;
-    maxhorses = skill * u->number * 2;
+    maxhorses = riding_horse_limit(u, skill);
 
     if (!(u_race(u)->flags & RCF_HORSE)
         && ((horses == 0 && unicorns == 0)
