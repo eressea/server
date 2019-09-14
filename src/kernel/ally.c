@@ -185,6 +185,29 @@ static int ally_flag(const char *s, int help_mask)
     return 0;
 }
 
+int ally_status(const char *s)
+{
+    if (strcmp(s, "give") == 0) {
+        return HELP_GIVE;
+    }
+    else if (strcmp(s, "fight") == 0) {
+        return HELP_FIGHT;
+    }
+    else if (strcmp(s, "money") == 0) {
+        return HELP_MONEY;
+    }
+    else if (strcmp(s, "travel") == 0) {
+        return HELP_TRAVEL;
+    }
+    else if (strcmp(s, "guard") == 0) {
+        return HELP_GUARD;
+    }
+    else if (strcmp(s, "all") == 0) {
+        return HELP_ALL;
+    }
+    return 0;
+}
+
 /** Specifies automatic alliance modes.
 * If this returns a value then the bits set are immutable between alliance
 * partners (faction::alliance) and cannot be changed with the HELP command.

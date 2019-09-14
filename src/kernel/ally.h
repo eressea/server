@@ -14,6 +14,7 @@ struct allies;
 
 extern struct attrib_type at_npcfaction;
 
+int ally_status(const char *s);
 int ally_get(struct allies *al, const struct faction *f);
 void ally_set(struct allies **p_al, struct faction *f, int status);
 void write_allies(struct gamedata * data, const struct allies *alist);
