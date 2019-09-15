@@ -32,7 +32,10 @@
 #include <lauxlib.h>
 #include <tolua.h>
 #include <string.h>
-#include <stdlib.h>
+#include <stdbool.h>          // for bool
+#include <stdio.h>            // for puts
+
+struct allies;
 
 int tolua_factionlist_next(lua_State * L)
 {

@@ -23,7 +23,7 @@ function test_get_allies()
     assert_equal(0, #allies)
     f1:set_ally(f2, "give", true)
     allies = f1.allies
-    assert_not_nil(1, table.getn(allies))
+    assert_not_nil(allies[f2.id])
     assert_equal('table', type(allies[f2.id]))
     assert_equal(1, #allies[f2.id])
     assert_equal("give", allies[f2.id][1])
