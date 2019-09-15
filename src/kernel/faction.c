@@ -408,9 +408,6 @@ void destroyfaction(faction ** fp)
     f->next = dead_factions;
     dead_factions = f;
 
-    fset(f, FFL_QUIT);
-    f->_alive = false;
-
     if (f->spellbook) {
         spellbook_clear(f->spellbook);
         free(f->spellbook);
@@ -463,6 +460,8 @@ void destroyfaction(faction ** fp)
         setalliance(f, NULL);
     }
 
+    fset(f, FFL_QUIT);
+    f->_alive = false;
     funhash(f);
 
     /* units of other factions that were disguised as this faction
