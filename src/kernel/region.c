@@ -625,7 +625,11 @@ void rsetpeasants(region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->peasants = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d peasants.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->peasants = (unsigned short)value;
     }
 }
 
@@ -639,7 +643,11 @@ void rsethorses(const region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->horses = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d horses.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->horses = (unsigned short)value;
     }
 }
 
@@ -659,15 +667,18 @@ void rsetmoney(region * r, int value)
 
 int rherbs(const region *r)
 {
-    return r->land?r->land->herbs:0;
+    return r->land ? r->land->herbs : 0;
 }
 
 void rsetherbs(region *r, int value)
 {
     assert(r->land || value==0);
-    assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d herbs.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->herbs = (unsigned short)value;
     }
 }
 
@@ -1478,7 +1489,7 @@ const char *region_getname(const region * r)
 int region_get_morale(const region * r)
 {
     if (r->land) {
-        assert(r->land->morale >= 0 && r->land->morale <= MORALE_MAX);
+        assert(r->land->morale <= MORALE_MAX);
         return r->land->morale;
     }
     return -1;
@@ -1487,11 +1498,11 @@ int region_get_morale(const region * r)
 void region_set_morale(region * r, int morale, int turn)
 {
     if (r->land) {
-        r->land->morale = morale;
+        r->land->morale = (unsigned short)morale;
         if (turn >= 0 && r->land->ownership) {
             r->land->ownership->morale_turn = turn;
         }
-        assert(r->land->morale >= 0 && r->land->morale <= MORALE_MAX);
+        assert(r->land->morale <= MORALE_MAX);
     }
 }
 

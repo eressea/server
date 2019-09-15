@@ -26,12 +26,12 @@ static int eatwhite(const char *ptr, size_t * total_size)
     *total_size = 0;
 
     while (*ptr) {
-        ucs4_t ucs;
+        wint_t wc;
         size_t size = 0;
-        ret = unicode_utf8_to_ucs4(&ucs, ptr, &size);
+        ret = unicode_utf8_decode(&wc, ptr, &size);
         if (ret != 0)
             break;
-        if (!iswspace((wint_t)ucs))
+        if (!iswspace(wc))
             break;
         *total_size += size;
         ptr += size;
@@ -86,7 +86,7 @@ static const char *getbuf_utf8(FILE * F)
         }
         cont = false;
         while (*bp && cp < fbuf + MAXLINE) {
-            ucs4_t ucs;
+            wint_t wc;
             size_t size;
             int ret;
 
@@ -119,14 +119,14 @@ static const char *getbuf_utf8(FILE * F)
                 }
             }
 
-            ret = unicode_utf8_to_ucs4(&ucs, bp, &size);
+            ret = unicode_utf8_decode(&wc, bp, &size);
 
             if (ret != 0) {
                 unicode_warning(bp);
                 break;
             }
 
-            if (iswspace((wint_t)ucs)) {
+            if (iswspace(wc)) {
                 if (!quote) {
                     bp += size;
                     ret = eatwhite(bp, &size);
@@ -151,7 +151,7 @@ static const char *getbuf_utf8(FILE * F)
                     bp += size;
                 }
             }
-            else if (iswcntrl((wint_t)ucs)) {
+            else if (iswcntrl(wc)) {
                 if (!comment && cp < fbuf + MAXLINE) {
                     *cp++ = '?';
                 }

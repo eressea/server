@@ -573,7 +573,7 @@ static void test_prepare_lighthouse(CuTest *tc) {
     CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
     CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
     CuAssertIntEquals(tc, seen_neighbour, r3->seen.mode);
-    CuAssertIntEquals(tc, seen_neighbour, r4->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse_land, r4->seen.mode);
     finish_reports(&ctx);
     test_teardown();
 }
@@ -868,6 +868,7 @@ static void test_visible_unit(CuTest *tc) {
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_travel));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse_land));
 
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
     CuAssertTrue(tc, !visible_unit(u, f, -2, seen_lighthouse));

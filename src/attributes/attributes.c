@@ -196,7 +196,6 @@ void register_attributes(void)
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
-    at_register(&at_npcfaction);
 
     /* connection-typen */
     register_bordertype(&bt_noway);
@@ -205,6 +204,7 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
+    at_deprecate("npcfaction", a_readint);
     at_deprecate("siege", a_readint);
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
     at_deprecate("hurting", a_readint); /* an old arena attribute */

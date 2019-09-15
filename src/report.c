@@ -750,7 +750,7 @@ static void append_message(sbstring *sbp, message *m, const faction * f) {
     sbp->end += size;
 }
 
-static void prices(struct stream *out, const region * r, const faction * f)
+static void report_prices(struct stream *out, const region * r, const faction * f)
 {
     const luxury_type *sale = NULL;
     struct demand *dmd;
@@ -771,6 +771,7 @@ static void prices(struct stream *out, const region * r, const faction * f)
 
     m = msg_message("nr_market_sale", "product price",
         sale->itype->rtype, sale->price);
+    newline(out);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     sbs_adopt(&sbs, buf, sizeof(buf));
@@ -867,7 +868,8 @@ static void report_region_description(struct stream *out, const region * r, fact
         sbs_strcat(&sbs, LOC(f->locale, "see_neighbour"));
         sbs_strcat(&sbs, ")");
     }
-    else if (r->seen.mode == seen_lighthouse) {
+    else if ((r->seen.mode == seen_lighthouse)
+        || (r->seen.mode == seen_lighthouse_land)) {
         sbs_strcat(&sbs, " (");
         sbs_strcat(&sbs, LOC(f->locale, "see_lighthouse"));
         sbs_strcat(&sbs, ")");
@@ -1154,17 +1156,22 @@ void report_region(struct stream *out, const region * r, faction * f)
     }
 
     report_region_description(out, r, f, see);
-    report_region_schemes(out, r, f);
-    report_region_edges(out, r, f, edges, ne);
+    if (r->seen.mode >= seen_unit) {
+        report_region_schemes(out, r, f);
+    }
+    if (r->seen.mode >= seen_lighthouse) {
+        report_region_edges(out, r, f, edges, ne);
+    }
 }
 
-static void statistics(struct stream *out, const region * r, const faction * f)
+static void report_statistics(struct stream *out, const region * r, const faction * f)
 {
     int p = rpeasants(r);
     message *m;
     char buf[4096];
 
     /* print */
+    newline(out);
     m = msg_message("nr_stat_header", "region", r);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
@@ -1592,6 +1599,8 @@ static void allies(struct stream *out, const faction * f)
     const group *g = f->groups;
     char prefix[64];
 
+    rpline(out);
+    newline(out);
     centre(out, LOC(f->locale, "nr_alliances"), false);
     newline(out);
 
@@ -1609,7 +1618,7 @@ static void allies(struct stream *out, const faction * f)
     }
 }
 
-static void guards(struct stream *out, const region * r, const faction * see)
+static void report_guards(struct stream *out, const region * r, const faction * see)
 {
     /* die Partei  see  sieht dies; wegen
      * "unbekannte Partei", wenn man es selbst ist... */
@@ -1678,6 +1687,8 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
     int qi = 0;
     selist *flist = seenfactions;
 
+    rpline(out);
+    newline(out);
     centre(out, LOC(uf->locale, "nr_addresses"), false);
     newline(out);
 
@@ -1806,12 +1817,10 @@ nr_building(struct stream *out, const region *r, const building *b, const factio
     }
     paragraph(out, buffer, 2, 0, 0);
 
-    if (r->seen.mode >= seen_lighthouse) {
-        nr_curses(out, 4, f, TYP_BUILDING, b);
-    }
+    nr_curses(out, 4, f, TYP_BUILDING, b);
 }
 
-static void nr_paragraph(struct stream *out, message * m, faction * f)
+static void nr_paragraph(struct stream *out, message * m, const faction * f)
 {
     char buf[4096];
 
@@ -1897,26 +1906,44 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
 
 void report_travelthru(struct stream *out, region *r, const faction *f)
 {
-    int maxtravel;
-
     assert(r);
     assert(f);
-    if (!fval(r, RF_TRAVELUNIT)) {
-        return;
+    if (fval(r, RF_TRAVELUNIT)) {
+        int maxtravel = count_travelthru(r, f);
+
+        if (maxtravel > 0) {
+            cb_data cbdata;
+            char buf[8192];
+
+            newline(out);
+            init_cb(&cbdata, out, buf, sizeof(buf), f);
+            cbdata.maxtravel = maxtravel;
+            cbdata.writep +=
+                str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+            travelthru_map(r, cb_write_travelthru, &cbdata);
+            return;
+        }
     }
+}
 
-    /* How many are we listing? For grammar. */
-    maxtravel = count_travelthru(r, f);
-    if (maxtravel > 0) {
-        cb_data cbdata;
-        char buf[8192];
+static void report_market(stream * out, const region *r, const faction *f) {
+    const item_type *lux = r_luxury(r);
+    const item_type *herb = r->land->herbtype;
+    message * m = NULL;
 
-        init_cb(&cbdata, out, buf, sizeof(buf), f);
-        cbdata.maxtravel = maxtravel;
-        cbdata.writep +=
-            str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
-        travelthru_map(r, cb_write_travelthru, &cbdata);
-        return;
+    if (herb && lux) {
+        m = msg_message("nr_market_info_p", "p1 p2",
+            lux->rtype, herb->rtype);
+    }
+    else if (lux) {
+        m = msg_message("nr_market_info_s", "p1", lux->rtype);
+    }
+    else if (herb) {
+        m = msg_message("nr_market_info_s", "p1", herb->rtype);
+    }
+    if (m) {
+        newline(out);
+        nr_paragraph(out, m, f);
     }
 }
 
@@ -2120,121 +2147,92 @@ report_plaintext(const char *filename, report_context * ctx,
 
     for (r = ctx->first; r != ctx->last; r = r->next) {
         int stealthmod = stealth_modifier(r, f, r->seen.mode);
-        building *b = r->buildings;
         ship *sh = r->ships;
 
-        if (r->seen.mode < seen_lighthouse)
-            continue;
-        /* Beschreibung */
+        if (r->seen.mode >= seen_lighthouse_land) {
+            rpline(out);
+            newline(out);
+            report_region(out, r, f);
+        }
 
-        rpline(out);
-        newline(out);
         if (r->seen.mode >= seen_unit) {
             anyunits = 1;
-            report_region(out, r, f);
             if (markets_module() && r->land) {
-                const item_type *lux = r_luxury(r);
-                const item_type *herb = r->land->herbtype;
-
-                m = NULL;
-                if (herb && lux) {
-                    m = msg_message("nr_market_info_p", "p1 p2",
-                        lux->rtype, herb->rtype);
-                }
-                else if (lux) {
-                    m = msg_message("nr_market_info_s", "p1",lux->rtype);
-                }
-                else if (herb) {
-                    m = msg_message("nr_market_info_s", "p1", herb->rtype);
-                }
-                if (m) {
-                    newline(out);
-                    nr_paragraph(out, m, f);
-                }
+                report_market(out, r, f);
             }
-            else {
-                if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
-                    newline(out);
-                    prices(out, r, f);
-                }
+            else if (!fval(r->terrain, SEA_REGION) && rpeasants(r) / TRADE_FRACTION > 0) {
+                report_prices(out, r, f);
             }
-            guards(out, r, f);
-            newline(out);
+            report_guards(out, r, f);
             report_travelthru(out, r, f);
-        }
-        else {
-            report_region(out, r, f);
-            newline(out);
-            report_travelthru(out, r, f);
-        }
-
-        if (wants_stats && r->seen.mode >= seen_travel) {
-            if (r->land || r->seen.mode >= seen_unit) {
-                newline(out);
-                statistics(out, r, f);
+            if (wants_stats) {
+                report_statistics(out, r, f);
             }
+        }
+        else if (r->seen.mode >= seen_lighthouse) {
+            report_travelthru(out, r, f);
         }
 
         /* Nachrichten an REGION in der Region */
-        if (r->seen.mode >= seen_travel) {
+        if (r->seen.mode >= seen_lighthouse) {
             message_list *mlist = r_getmessages(r, f);
-            newline(out);
             if (mlist) {
                 struct mlist **split = merge_messages(mlist, r->msgs);
                 newline(out);
                 rp_messages(out, mlist, f, 0, false);
                 split_messages(mlist, split);
             }
-            else {
+            else if (r->msgs) {
+                newline(out);
                 rp_messages(out, r->msgs, f, 0, false);
             }
-        }
 
-        /* report all units. they are pre-sorted in an efficient manner */
-        u = r->units;
-        while (b) {
-            while (b && (!u || u->building != b)) {
-                nr_building(out, r, b, f);
-                b = b->next;
-            }
-            if (b) {
-                nr_building(out, r, b, f);
-                while (u && u->building == b) {
-                    if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                        nr_unit(out, f, u, 6, r->seen.mode);
+            /* report all units. they are pre-sorted in an efficient manner */
+            u = r->units;
+            if (r->seen.mode >= seen_travel) {
+                building *b = r->buildings;
+                while (b) {
+                    while (b && (!u || u->building != b)) {
+                        nr_building(out, r, b, f);
+                        b = b->next;
                     }
-                    u = u->next;
-                }
-                b = b->next;
-            }
-        }
-        while (u && !u->ship) {
-            if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                nr_unit(out, f, u, 4, r->seen.mode);
-            }
-            assert(!u->building);
-            u = u->next;
-        }
-        while (sh) {
-            while (sh && (!u || u->ship != sh)) {
-                nr_ship(out, r, sh, f, NULL);
-                sh = sh->next;
-            }
-            if (sh) {
-                nr_ship(out, r, sh, f, u);
-                while (u && u->ship == sh) {
-                    if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                        nr_unit(out, f, u, 6, r->seen.mode);
+                    if (b) {
+                        nr_building(out, r, b, f);
+                        while (u && u->building == b) {
+                            if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                                nr_unit(out, f, u, 6, r->seen.mode);
+                            }
+                            u = u->next;
+                        }
+                        b = b->next;
                     }
-                    u = u->next;
                 }
-                sh = sh->next;
             }
+            while (u && !u->ship) {
+                if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                    nr_unit(out, f, u, 4, r->seen.mode);
+                }
+                assert(!u->building);
+                u = u->next;
+            }
+            while (sh) {
+                while (sh && (!u || u->ship != sh)) {
+                    nr_ship(out, r, sh, f, NULL);
+                    sh = sh->next;
+                }
+                if (sh) {
+                    nr_ship(out, r, sh, f, u);
+                    while (u && u->ship == sh) {
+                        if (visible_unit(u, f, stealthmod, r->seen.mode)) {
+                            nr_unit(out, f, u, 6, r->seen.mode);
+                        }
+                        u = u->next;
+                    }
+                    sh = sh->next;
+                }
+            }
+            assert(!u);
         }
-
-        assert(!u);
-
-        newline(out);
         ERRNO_CHECK();
     }
     if (!is_monsters(f)) {

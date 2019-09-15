@@ -1335,8 +1335,8 @@ static void do_fumble(castorder * co)
     static int rc_cache;
     fumble_f fun;
 
-    ADDMSG(&mage->faction->msgs,
-        msg_message("patzer", "unit region spell", mage, r, sp));
+    ADDMSG(&caster->faction->msgs,
+        msg_message("patzer", "unit region spell", caster, r, sp));
     switch (rng_int() % 10) {
     case 0:
         /* wenn vorhanden spezieller Patzer, ansonsten nix */
@@ -1385,14 +1385,14 @@ static void do_fumble(castorder * co)
         c = create_curse(mage, &mage->attribs, &ct_skillmod, level,
             duration, effect, 1);
         c->data.i = SK_MAGIC;
-        ADDMSG(&mage->faction->msgs, msg_message("patzer2", "unit region", mage, r));
+        ADDMSG(&caster->faction->msgs, msg_message("patzer2", "unit region", caster, r));
         break;
     case 3:
     case 4:
         /* Spruch schlaegt fehl, alle Magiepunkte weg */
         set_spellpoints(mage, 0);
-        ADDMSG(&mage->faction->msgs, msg_message("patzer3", "unit region spell",
-            mage, r, sp));
+        ADDMSG(&caster->faction->msgs, msg_message("patzer3", "unit region spell",
+            caster, r, sp));
         break;
 
     case 5:
@@ -1400,8 +1400,8 @@ static void do_fumble(castorder * co)
         /* Spruch gelingt, aber alle Magiepunkte weg */
         co->level = cast_spell(co);
         set_spellpoints(mage, 0);
-        ADDMSG(&mage->faction->msgs, msg_message("patzer4", "unit region spell",
-            mage, r, sp));
+        ADDMSG(&caster->faction->msgs, msg_message("patzer4", "unit region spell",
+            caster, r, sp));
         break;
 
     case 7:
@@ -1410,8 +1410,8 @@ static void do_fumble(castorder * co)
     default:
         /* Spruch gelingt, alle nachfolgenden Sprueche werden 2^4 so teuer */
         co->level = cast_spell(co);
-        ADDMSG(&mage->faction->msgs, msg_message("patzer5", "unit region spell",
-            mage, r, sp));
+        ADDMSG(&caster->faction->msgs, msg_message("patzer5", "unit region spell",
+            caster, r, sp));
         countspells(caster, 3);
     }
 }
@@ -1626,7 +1626,7 @@ verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
 static void
 verify_targets(castorder * co, int *invalid, int *resist, int *success)
 {
-    unit *mage = co_get_magician(co);
+    unit *caster = co_get_caster(co);
     const spell *sp = co->sp;
     region *target_r = co_get_region(co);
     spellparameter *sa = co->par;
@@ -1647,15 +1647,15 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             switch (spobj->typ) {
             case SPP_TEMP:
             case SPP_UNIT:
-                if (!verify_unit(target_r, mage, sp, spobj, co->order))
+                if (!verify_unit(target_r, caster, sp, spobj, co->order))
                     ++ * invalid;
                 break;
             case SPP_BUILDING:
-                if (!verify_building(target_r, mage, sp, spobj, co->order))
+                if (!verify_building(target_r, caster, sp, spobj, co->order))
                     ++ * invalid;
                 break;
             case SPP_SHIP:
-                if (!verify_ship(target_r, mage, sp, spobj, co->order))
+                if (!verify_ship(target_r, caster, sp, spobj, co->order))
                     ++ * invalid;
                 break;
             default:
@@ -1679,13 +1679,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
                 u = spobj->data.u;
 
                 if ((sp->sptyp & TESTRESISTANCE)
-                    && target_resists_magic(mage, u, TYP_UNIT, 0)) {
+                    && target_resists_magic(caster, u, TYP_UNIT, 0)) {
                     /* Fehlermeldung */
                     spobj->data.i = u->no;
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
-                    ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
-                        "unit region command target", mage, mage->region, co->order, u));
+                    ADDMSG(&caster->faction->msgs, msg_message("spellunitresists",
+                        "unit region command target", caster, caster->region, co->order, u));
                     break;
                 }
 
@@ -1696,13 +1696,13 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
                 b = spobj->data.b;
 
                 if ((sp->sptyp & TESTRESISTANCE)
-                    && target_resists_magic(mage, b, TYP_BUILDING, 0)) {  /* Fehlermeldung */
+                    && target_resists_magic(caster, b, TYP_BUILDING, 0)) {  /* Fehlermeldung */
                     spobj->data.i = b->no;
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
-                    ADDMSG(&mage->faction->msgs, msg_message("spellbuildingresists",
+                    ADDMSG(&caster->faction->msgs, msg_message("spellbuildingresists",
                         "unit region command id",
-                        mage, mage->region, co->order, spobj->data.i));
+                        caster, caster->region, co->order, spobj->data.i));
                     break;
                 }
                 ++*success;
@@ -1711,11 +1711,11 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
                 sh = spobj->data.sh;
 
                 if ((sp->sptyp & TESTRESISTANCE)
-                    && target_resists_magic(mage, sh, TYP_SHIP, 0)) {     /* Fehlermeldung */
+                    && target_resists_magic(caster, sh, TYP_SHIP, 0)) {     /* Fehlermeldung */
                     spobj->data.i = sh->no;
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
-                    ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+                    ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                         "spellshipresists", "ship", sh));
                     break;
                 }
@@ -1728,11 +1728,11 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
                 tr = spobj->data.r;
 
                 if ((sp->sptyp & TESTRESISTANCE)
-                    && target_resists_magic(mage, tr, TYP_REGION, 0)) {   /* Fehlermeldung */
+                    && target_resists_magic(caster, tr, TYP_REGION, 0)) {   /* Fehlermeldung */
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
-                    ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
-                        "unit region command", mage, mage->region, co->order));
+                    ADDMSG(&caster->faction->msgs, msg_message("spellregionresists",
+                        "unit region command", caster, caster->region, co->order));
                     break;
                 }
                 ++*success;
@@ -1767,10 +1767,10 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             co->par = sa;
 
             if ((sp->sptyp & TESTRESISTANCE)) {
-                if (target_resists_magic(mage, target_r, TYP_REGION, 0)) {
+                if (target_resists_magic(caster, target_r, TYP_REGION, 0)) {
                     /* Fehlermeldung */
-                    ADDMSG(&mage->faction->msgs, msg_message("spellregionresists",
-                        "unit region command", mage, mage->region, co->order));
+                    ADDMSG(&caster->faction->msgs, msg_message("spellregionresists",
+                        "unit region command", caster, caster->region, co->order));
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
                 }
@@ -2848,8 +2848,8 @@ void magic(void)
                 /* Sprueche mit Fixkosten werden immer auf Stufe des Spruchs
                  * gezaubert, co->level ist aber defaultmaessig Stufe des Magiers */
                 if (spl_costtyp(sp) != SPC_FIX) {
-                    ADDMSG(&mage->faction->msgs, msg_message("missing_components",
-                        "unit spell level", mage, sp, cast_level));
+                    ADDMSG(&caster->faction->msgs, msg_message("missing_components",
+                        "unit spell level", caster, sp, cast_level));
                 }
             }
 
@@ -2864,8 +2864,8 @@ void magic(void)
             /* die Staerke kann durch Antimagie auf 0 sinken */
             if (co->force <= 0) {
                 co->force = 0;
-                ADDMSG(&mage->faction->msgs, msg_message("missing_force",
-                    "unit spell level", mage, sp, co->level));
+                ADDMSG(&caster->faction->msgs, msg_message("missing_force",
+                    "unit spell level", caster, sp, co->level));
             }
 
             /* Ziele auf Existenz pruefen und Magieresistenz feststellen. Wurde
@@ -2885,8 +2885,8 @@ void magic(void)
                     co->force = 0;
                     /* zwar wurde mindestens ein Ziel gefunden, das widerstand
                      * jedoch dem Zauber. Kosten abziehen und abbrechen. */
-                    ADDMSG(&mage->faction->msgs, msg_message("spell_resist",
-                        "unit region spell", mage, r, sp));
+                    ADDMSG(&caster->faction->msgs, msg_message("spell_resist",
+                        "unit region spell", caster, r, sp));
                 }
             }
 

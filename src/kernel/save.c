@@ -1,3 +1,4 @@
+#include "save.h"
 /*
 Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
@@ -630,7 +631,6 @@ static void fix_resource_levels(region *r) {
                 }
             }
         }
-
     }
 }
 
@@ -1474,61 +1474,15 @@ static void fix_familiars(void (*callback)(unit *)) {
     }
 }
 
-int read_game(gamedata *data)
-{
-    int p, nread;
-    faction *f, **fp;
-    region *r;
-    unit *u;
+static void read_regions(gamedata *data) {
     storage * store = data->store;
     const struct building_type *bt_lighthouse = bt_find("lighthouse");
     const struct race *rc_spell = rc_find("spell");
-
-    if (data->version >= SAVEGAMEID_VERSION) {
-        int gameid;
-
-        READ_INT(store, &gameid);
-        if (gameid != game_id()) {
-            log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
-        }
-    }
-    else {
-        READ_STR(store, NULL, 0);
-    }
-
-    if (data->version < FIXATKEYS_VERSION) {
-        attrib *a = NULL;
-        read_attribs(data, &a, NULL);
-        a_removeall(&a, NULL);
-    }
-
-    READ_INT(store, &turn);
-    log_debug(" - reading turn %d", turn);
-    rng_init(turn + config_get_int("game.seed", 0));
-    READ_INT(store, NULL);          /* max_unique_id = ignore */
-    READ_INT(store, &nextborder);
-
-    read_planes(data);
-    read_alliances(data);
-    READ_INT(store, &nread);
-    log_debug(" - Einzulesende Parteien: %d\n", nread);
-    fp = &factions;
-    while (*fp) {
-        fp = &(*fp)->next;
-    }
-
-    while (--nread >= 0) {
-        faction *f = read_faction(data);
-
-        *fp = f;
-        fp = &f->next;
-    }
-    *fp = 0;
-
-    /* Regionen */
+    region *r;
+    int nread;
 
     READ_INT(store, &nread);
-    assert(nread < MAXREGIONS && nread >=0);
+    assert(nread < MAXREGIONS && nread >= 0);
 
     log_debug(" - Einzulesende Regionen: %d", nread);
 
@@ -1536,13 +1490,14 @@ int read_game(gamedata *data)
         unit **up;
         building **bp;
         ship **shp;
+        int p;
 
         r = read_region(data);
 
         /* Burgen */
         READ_INT(store, &p);
         if (p > 0 && !r->land) {
-            log_debug("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p==1) ? "building" : "buildings");
+            log_debug("%s, uid=%d has %d %s", regionname(r, NULL), r->uid, p, (p == 1) ? "building" : "buildings");
         }
         bp = &r->buildings;
 
@@ -1596,7 +1551,6 @@ int read_game(gamedata *data)
             }
         }
     }
-    read_borders(data);
 
     log_debug("updating area information for lighthouses.");
     for (r = regions; r; r = r->next) {
@@ -1609,8 +1563,12 @@ int read_game(gamedata *data)
             }
         }
     }
+}
+
+static void init_factions(int data_version)
+{
     log_debug("marking factions as alive.");
-    for (f = factions; f; f = f->next) {
+    for (faction *f = factions; f; f = f->next) {
         if (f->flags & FFL_NPC) {
             f->_alive = true;
             f->magiegebiet = M_GRAY;
@@ -1624,8 +1582,8 @@ int read_game(gamedata *data)
         }
         else {
             assert(f->units);
-            for (u = f->units; u; u = u->nextF) {
-                if (data->version < SPELL_LEVEL_VERSION) {
+            for (unit *u = f->units; u; u = u->nextF) {
+                if (data_version < SPELL_LEVEL_VERSION) {
                     struct sc_mage *mage = get_mage(u);
                     if (mage) {
                         faction *f = u->faction;
@@ -1642,16 +1600,76 @@ int read_game(gamedata *data)
                 }
                 if (u->number > 0) {
                     f->_alive = true;
-                    if (data->version >= SPELL_LEVEL_VERSION) {
+                    if (data_version >= SPELL_LEVEL_VERSION) {
                         break;
                     }
                 }
             }
-            if (data->version < SPELL_LEVEL_VERSION && f->spellbook) {
+            if (data_version < SPELL_LEVEL_VERSION && f->spellbook) {
                 spellbook_foreach(f->spellbook, cb_sb_maxlevel, f);
             }
         }
     }
+}
+
+static void read_factions(gamedata * data)
+{
+    storage * store = data->store;
+    int nread;
+    faction **fp;
+    READ_INT(store, &nread);
+    log_debug(" - Einzulesende Parteien: %d\n", nread);
+    fp = &factions;
+    while (*fp) {
+        fp = &(*fp)->next;
+    }
+
+    while (--nread >= 0) {
+        faction *f = read_faction(data);
+
+        *fp = f;
+        fp = &f->next;
+    }
+}
+
+int read_game(gamedata *data)
+{
+    storage * store = data->store;
+
+    if (data->version >= SAVEGAMEID_VERSION) {
+        int gameid;
+
+        READ_INT(store, &gameid);
+        if (gameid != game_id()) {
+            log_warning("game mismatch: datafile contains game %d, but config is for %d", gameid, game_id());
+        }
+    }
+    else {
+        READ_STR(store, NULL, 0);
+    }
+
+    if (data->version < FIXATKEYS_VERSION) {
+        attrib *a = NULL;
+        read_attribs(data, &a, NULL);
+        a_removeall(&a, NULL);
+    }
+
+    READ_INT(store, &turn);
+    log_debug(" - reading turn %d", turn);
+    rng_init(turn + config_get_int("game.seed", 0));
+    READ_INT(store, NULL);          /* max_unique_id = ignore */
+    READ_INT(store, &nextborder);
+
+    read_planes(data);
+    read_alliances(data);
+
+    read_factions(data);
+
+    /* Regionen */
+
+    read_regions(data);
+    read_borders(data);
+    init_factions(data->version);
     if (data->version < FIX_CLONES_VERSION) {
         fix_clones();
     }

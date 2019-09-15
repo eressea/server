@@ -36,6 +36,20 @@ function teardown()
     end
 end
 
+function test_new_faction_cannot_give_unit()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create('elf')
+  local f2 = faction.create('elf')
+  local u1 = unit.create(f1, r)
+  local u2 = unit.create(f2, r)
+  assert_equal(f1, u1.faction)
+  assert_equal(f2, u2.faction)
+  u1:add_order("HELFE " .. itoa36(f2.id) .. " GIB")
+  u2:add_order("GIB " .. itoa36(u1.id) .. " EINHEIT")
+  process_orders()
+  assert_equal(f2, u2.faction)
+end
+
 function test_calendar()
     assert_equal("winter", get_season(396))
 end

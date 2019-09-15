@@ -37,6 +37,18 @@ function setup()
     eressea.settings.set("study.random_progress", "0")
 end
 
+function test_set_faction()
+  local r = region.create(0, 0, "plain")
+  local f1 = create_faction('elf')
+  local f2 = create_faction('elf')
+  local u = one_unit(r, f1)
+  u.group = 'Experten'
+  assert_equal('Experten', u.group)
+  u.faction = f2
+  assert_equal(f2, u.faction)
+  assert_nil(u.group)
+end
+
 function test_locales()
     assert_equal(2, eressea.locale.direction("de", "Ost"))
     assert_equal(5, eressea.locale.direction("de", "westen"))

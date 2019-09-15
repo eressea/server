@@ -49,7 +49,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static group *ghash[GMAXHASH];
 static int maxgid;
 
-group *new_group(faction * f, const char *name, int gid)
+group *create_group(faction * f, const char *name, int gid)
 {
     group **gp = &f->groups;
     int index = gid % GMAXHASH;
@@ -63,6 +63,7 @@ group *new_group(faction * f, const char *name, int gid)
     if (gid > maxgid) maxgid = gid;
     g->name = str_strdup(name);
     g->gid = gid;
+    g->f = f;
 
     g->nexthash = ghash[index];
     return ghash[index] = g;
@@ -93,11 +94,15 @@ static int read_group(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     group *g;
+    unit * u = (unit *)owner;
     int gid;
 
     READ_INT(store, &gid);
     var->v = g = find_group(gid);
-    if (g != 0) {
+    if (g != NULL) {
+        if (g->f != u->faction) {
+            return AT_READ_FAIL;
+        }
         g->members++;
         return AT_READ_OK;
     }
@@ -184,7 +189,7 @@ group *join_group(unit * u, const char *name)
     if (name && name[0]) {
         g = find_groupbyname(u->faction->groups, name);
         if (g == NULL) {
-            g = new_group(u->faction, name, ++maxgid);
+            g = create_group(u->faction, name, ++maxgid);
             init_group(u->faction, g);
         }
     }
@@ -219,7 +224,7 @@ void read_groups(gamedata *data, faction * f)
         if (gid == 0)
             break;
         READ_STR(store, buf, sizeof(buf));
-        g = new_group(f, buf, gid);
+        g = create_group(f, buf, gid);
         read_allies(data, &g->allies);
         read_attribs(data, &g->attribs, g);
     }

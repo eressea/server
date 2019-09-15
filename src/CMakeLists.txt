@@ -101,6 +101,7 @@ set (ERESSEA_SRC
   creport.c
   direction.c
   donations.c
+  recruit.c
   economy.c
   eressea.c
   exparse.c

@@ -260,7 +260,7 @@ static void test_report_travelthru(CuTest *tc) {
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
-    CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
+    CuAssertStrEquals_Msg(tc, "list one unit", "\nDurchreise: Hodor (1).\n", buf);
     mstream_done(&out);
 
     mstream_init(&out);
