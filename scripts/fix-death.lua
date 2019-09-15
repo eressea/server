@@ -50,7 +50,7 @@ eressea.read_game('1138.dat')
 newf = {}
 
 for fid, rlist in pairs(gifts) do
-    local name = "Erben von " . info[fid].name
+    local name = "Erben von " .. info[fid].name
     local race = info[fid].race
     local f = faction.create(race, "noreply@eressea.de")
     f.name = name
