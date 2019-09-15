@@ -486,8 +486,38 @@ static int tolua_faction_set_info(lua_State * L)
     return 0;
 }
 
-static int tolua_faction_set_ally(lua_State * L)
-{
+/* TODO: this is probably useful elsewhere */
+static const char *status_names[] = {
+    "money", "fight", "observe", "give", "guard", "stealth", "travel", NULL
+};
+
+static int cb_ally_push(struct allies *af, struct faction *f, int status, void *udata) {
+    struct lua_State *L = (struct lua_State *)udata;
+    int len = 1;
+    int i;
+
+    lua_pushnumber(L, f->no);
+    lua_newtable(L);
+    for (i = 0; status_names[i]; ++i) {
+        int flag = 1 << i;
+        if (status & flag) {
+            lua_pushstring(L, status_names[i]);
+            lua_rawseti(L, -2, len++);
+        }
+    }
+
+    lua_rawset(L, -3);
+    return 0;
+}
+
+static int tolua_faction_get_allies(lua_State * L) {
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_newtable(L);
+    allies_walk(f->allies, cb_ally_push, L);
+    return 1;
+}
+
+static int tolua_faction_set_ally(lua_State * L) {
     faction *f1 = (faction *)tolua_tousertype(L, 1, NULL);
     faction *f2 = (faction *)tolua_tousertype(L, 2, NULL);
     const char *status = tolua_tostring(L, 3, NULL);
@@ -612,6 +642,7 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliances,
                 tolua_faction_set_alliance);
 
+            tolua_variable(L, TOLUA_CAST "allies", tolua_faction_get_allies, NULL);
             tolua_function(L, TOLUA_CAST "set_ally", tolua_faction_set_ally);
             tolua_function(L, TOLUA_CAST "get_ally", tolua_faction_get_ally);
 
