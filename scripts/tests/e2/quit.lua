@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e2.quit", package.seeall, lunit.testcase)
 
 function test_quit_faction()
-    local r = region.create(0, 0, "plain")
+    local r = region.create(47, 0, "plain")
     local f1 = faction.create("human")
     f1.password = "steamedhams"
     local f2 = faction.create("human")
