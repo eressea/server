@@ -282,9 +282,21 @@ static int forget_cmd(unit * u, order * ord)
 
     sk = get_skill(s, u->faction->locale);
     if (sk != NOSKILL) {
-        if (sk == SK_MAGIC && is_familiar(u)) {
-            /* some units cannot forget their innate magical abilities */
-            return 0;
+        if (sk == SK_MAGIC) {
+            if (is_familiar(u)) {
+                /* some units cannot forget their innate magical abilities */
+                return 0;
+            }
+            else {
+                unit *ufam = get_familiar(u);
+                if (ufam) {
+                    a_removeall(&ufam->attribs, NULL);
+                    u_setfaction(ufam, get_monsters());
+                    unit_convert_race(ufam, NULL, "ghost");
+                }
+                a_removeall(&u->attribs, &at_mage);
+                a_removeall(&u->attribs, &at_familiar);
+            }
         }
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
         set_level(u, sk, 0);
