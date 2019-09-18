@@ -1833,3 +1833,14 @@ double u_heal_factor(const unit * u)
     }
     return 1.0;
 }
+
+void unit_convert_race(unit *u, const race *rc, const char *rcname)
+{
+    if (rc && u->_race != rc) {
+        u_setrace(u, rc);
+    }
+    if (rcname && strcmp(rcname, u->_race->_name) != 0) {
+        set_racename(&u->attribs, rcname);
+    }
+}
+
