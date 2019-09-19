@@ -441,16 +441,6 @@ static void paint_info_region(window * wnd, const state * st)
                 r->land->trees[1] + r->land->trees[2]);
         }
         line++;
-        if (r->ships && (st->info_flags & IFL_SHIPS)) {
-            ship *sh;
-            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
-            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
-                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
-                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
-            }
-        }
         if (r->units && (st->info_flags & IFL_FACTIONS)) {
             unit *u;
             wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -475,6 +465,16 @@ static void paint_info_region(window * wnd, const state * st)
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
                 umvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
+            }
+        }
+        if (r->ships && (st->info_flags & IFL_SHIPS)) {
+            ship *sh;
+            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
+            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
+                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
+                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
             }
         }
     }
