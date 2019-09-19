@@ -747,6 +747,15 @@ static int tolua_unit_get_curse(lua_State *L) {
     return 0;
 }
 
+static int tolua_unit_clear_attribs(lua_State *L) {
+    unit *u = (unit *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
+    const attrib_type *at = name ? at_find(name) : NULL;
+
+    a_removeall(&u->attribs, at);    
+    return 0;
+}
+
 static int tolua_unit_has_attrib(lua_State *L) {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     const char *name = tolua_tostring(L, 2, 0);
@@ -979,6 +988,7 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, TOLUA_CAST "add_order", tolua_unit_add_order);
             tolua_function(L, TOLUA_CAST "clear_orders", tolua_unit_clear_orders);
             tolua_function(L, TOLUA_CAST "get_curse", tolua_unit_get_curse);
+            tolua_function(L, TOLUA_CAST "clear_attribs", tolua_unit_clear_attribs);
             tolua_function(L, TOLUA_CAST "has_attrib", tolua_unit_has_attrib);
 
             /*  key-attributes for named flags: */
