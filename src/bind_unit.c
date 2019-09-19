@@ -531,8 +531,8 @@ static int tolua_unit_setskill(lua_State * L)
     bool rcmod = tolua_toboolean(L, 4, 0);
     skill_t sk = findskill(skname);
 
-    if (rcmod) level -= u_race(u)->bonus[sk];
     if (sk != NOSKILL) {
+        if (rcmod) level -= u_race(u)->bonus[sk];
         set_level(u, sk, level);
         lua_pushinteger(L, level);
         return 1;
