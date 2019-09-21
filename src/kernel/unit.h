@@ -221,6 +221,7 @@ extern "C" {
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
 
+    void unit_convert_race(struct unit *u, const struct race *rc, const char *rcname);
     /* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1

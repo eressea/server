@@ -570,8 +570,20 @@ msgstr "Dieses Ritual, ausgeführt vor einem Kampf, verwirbelt die astralen Ener
 msgid "balloon"
 msgstr "Ballon"
 
-msgid "nr_schemes_postfix"
-msgstr "sind erkennbar."
+msgid "nr_schemes_template"
+msgstr "Schemen der Regionen {0} sind erkennbar."
+
+msgid "list_two"
+msgstr "{0} und {1}"
+
+msgid "list_start"
+msgstr "{0}, {1}"
+
+msgid "list_middle"
+msgstr "{0}, {1}"
+
+msgid "list_end"
+msgstr "{0} und {1}"
 
 msgid "SILBER"
 msgstr "SILBER"
@@ -4407,9 +4419,6 @@ msgstr "Magie"
 
 msgid "see_lighthouse"
 msgstr "vom Turm erblickt"
-
-msgid "nr_schemes_prefix"
-msgstr "Schemen der Regionen"
 
 msgid "aoc_p"
 msgstr "Katzenamulette"

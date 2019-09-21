@@ -71,6 +71,7 @@
 #include <util/rng.h>
 #include <util/strings.h>
 
+#include <format.h>
 #include <selist.h>
 #include <filestream.h>
 #include <stream.h>
@@ -1053,35 +1054,50 @@ static void report_region_edges(struct stream *out, const region * r, faction * 
     }
 }
 
+char *report_list(const struct locale *lang, char *buffer, size_t len, int argc, const char **argv) {
+    const char *two = LOC(lang, "list_two");
+    const char *start = LOC(lang, "list_start");
+    const char *middle = LOC(lang, "list_middle");
+    const char *end = LOC(lang, "list_end");
+    return format_list(argc, argv, buffer, len, two, start, middle, end);
+}
+
+#define MAX_SCHEMES ((TP_RADIUS * 2 + 1) * (TP_RADIUS * 2 + 1) - 4)
+
 static void report_region_schemes(struct stream *out, const region * r, faction * f) {
-    char buf[4096];
-    sbstring sbs;
-    sbs_init(&sbs, buf, sizeof(buf));
 
     if (r->seen.mode >= seen_unit && is_astral(r) &&
         !is_cursed(r->attribs, &ct_astralblock)) {
         /* Sonderbehandlung Teleport-Ebene */
-        region_list *rl = astralregions(r, inhabitable);
-        region_list *rl2;
+        region *rl[MAX_SCHEMES];
+        int num = get_astralregions(r, inhabitable, rl);
+        char buf[4096];
 
-        if (rl) {
-            /* this localization might not work for every language but is fine for de and en */
-            sbs_strcat(&sbs, LOC(f->locale, "nr_schemes_prefix"));
-            rl2 = rl;
-            while (rl2) {
+        if (num == 1) {
+            /* single region is easy */
+            region *rn = rl[0];
+            f_regionid(rn, f, buf, sizeof(buf));
+        }
+        else if (num > 1) {
+            int i;
+            const char *rnames[MAX_SCHEMES];
+
+            for (i = 0; i != num; ++i) {
                 char rbuf[REPORTWIDTH];
-                f_regionid(rl2->data, f, rbuf, sizeof(rbuf));
-                sbs_strcat(&sbs, rbuf);
-                rl2 = rl2->next;
-                if (rl2) {
-                    sbs_strcat(&sbs, ", ");
-                }
+                region *rn = rl[i];
+                f_regionid(rn, f, rbuf, sizeof(rbuf));
+                rnames[i] = str_strdup(rbuf);
             }
-            sbs_strcat(&sbs,LOC(f->locale, "nr_schemes_postfix"));
-            free_regionlist(rl);
-            /* Schreibe Paragraphen */
-            newline(out);
-            paragraph(out, buf, 0, 0, 0);
+            report_list(f->locale, buf, sizeof(buf), num, rnames);
+            for (i = 0; i != num; ++i) {
+                free((char *)rnames[i]);
+            }
+        }
+        if (num > 0) {
+            if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
+                newline(out);
+                paragraph(out, buf, 0, 0, 0);
+            }
         }
     }
 }

@@ -395,7 +395,7 @@ void save_special_items(unit *usrc)
         /* some units have plural names, it would be neat if they aren't single: */
         scale_number(u, 2);
     }
-    set_racename(&u->attribs, "ghost");
+    unit_convert_race(u, rc_ghost, "ghost");
     give_special_items(u, &usrc->items);
 }
 
