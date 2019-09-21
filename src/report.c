@@ -1094,9 +1094,10 @@ static void report_region_schemes(struct stream *out, const region * r, faction 
             }
         }
         if (num > 0) {
-            format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf));
-            newline(out);
-            paragraph(out, buf, 0, 0, 0);
+            if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
+                newline(out);
+                paragraph(out, buf, 0, 0, 0);
+            }
         }
     }
 }
