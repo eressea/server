@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#define TP_RADIUS 2 /* Radius von Schemen */
+
     struct region;
     struct region_list;
     struct plane;
@@ -20,6 +22,7 @@ extern "C" {
     bool inhabitable(const struct region *r);
     bool is_astral(const struct region *r);
     struct plane *get_astralplane(void);
+    int get_astralregions(const struct region * r, bool(*valid) (const struct region *), struct region *result[]);
 
     void create_teleport_plane(void);
     void spawn_braineaters(float chance);

@@ -22,7 +22,6 @@
 #include <assert.h>
 
 #define TE_CENTER 1000
-#define TP_RADIUS 2
 #define TP_DISTANCE 4
 
 int real2tp(int rk)
@@ -73,6 +72,33 @@ region_list *astralregions(const region * r, bool(*valid) (const region *))
         }
     }
     return rlist;
+}
+
+
+int get_astralregions(const region * r, bool(*valid) (const region *), region *result[])
+{
+    assert(is_astral(r));
+    r = r_astral_to_standard(r);
+    if (r) {
+        int x, y, num = 0;
+        for (x = -TP_RADIUS; x <= +TP_RADIUS; ++x) {
+            for (y = -TP_RADIUS; y <= +TP_RADIUS; ++y) {
+                region *rn;
+                int dist = koor_distance(0, 0, x, y);
+
+                if (dist <= TP_RADIUS) {
+                    int nx = r->x + x, ny = r->y + y;
+                    pnormalize(&nx, &ny, rplane(r));
+                    rn = findregion(nx, ny);
+                    if (rn != NULL && (valid == NULL || valid(rn))) {
+                        result[num++] = rn;
+                    }
+                }
+            }
+        }
+        return num;
+    }
+    return 0;
 }
 
 region *r_standard_to_astral(const region * r)
