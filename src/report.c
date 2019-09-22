@@ -1080,7 +1080,7 @@ static void report_region_schemes(struct stream *out, const region * r, faction 
         }
         else if (num > 1) {
             int i;
-            char *rnames[MAX_SCHEMES];
+            const char *rnames[MAX_SCHEMES];
 
             for (i = 0; i != num; ++i) {
                 char rbuf[REPORTWIDTH];
@@ -1090,13 +1090,14 @@ static void report_region_schemes(struct stream *out, const region * r, faction 
             }
             report_list(f->locale, buf, sizeof(buf), num, rnames);
             for (i = 0; i != num; ++i) {
-                free(rnames[i]);
+                free((char *)rnames[i]);
             }
         }
         if (num > 0) {
-            format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf));
-            newline(out);
-            paragraph(out, buf, 0, 0, 0);
+            if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
+                newline(out);
+                paragraph(out, buf, 0, 0, 0);
+            }
         }
     }
 }
