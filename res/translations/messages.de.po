@@ -2370,7 +2370,7 @@ msgid "sp_confusion_effect_0"
 msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
 
 msgid "pest"
-msgstr "\"Hier wütete die Pest, und $int($dead) Bauern starben.\""
+msgstr "\"Hier wütete die Pest, und $int($dead) $resource($peasants,$dead) $if($eq($dead,1), \"starb\", \"starben\").\""
 
 msgid "wormhole_exit"
 msgstr "\"$unit($unit) reist durch ein Wurmloch nach $region($region).\""

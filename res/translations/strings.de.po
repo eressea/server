@@ -571,7 +571,7 @@ msgid "balloon"
 msgstr "Ballon"
 
 msgid "nr_schemes_template"
-msgstr "Schemen der Regionen {0} sind erkennbar."
+msgstr "Schemen von {0} sind erkennbar."
 
 msgid "list_two"
 msgstr "{0} und {1}"
