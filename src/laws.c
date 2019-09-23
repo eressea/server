@@ -2181,6 +2181,21 @@ int email_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+bool password_wellformed(const char *password)
+{
+    unsigned char *c = (unsigned char *)password;
+    int i;
+    if (!password || password[0]=='\0') {
+        return false;
+    }
+    for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
+        if (!isalnum(c[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int password_cmd(unit * u, struct order *ord)
 {
     char pwbuf[PASSWORD_MAXSIZE + 1];
@@ -2194,19 +2209,11 @@ int password_cmd(unit * u, struct order *ord)
         pwbuf[PASSWORD_MAXSIZE - 1] = '\0';
     }
 
-    if (s && *s) {
-        unsigned char *c = (unsigned char *)pwbuf;
-        int i, r = 0;
-
-        for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
-            if (!isalnum(c[i])) {
-                c[i] = 'X';
-                ++r;
-            }
-        }
-        if (r != 0) {
+    if (!s || !password_wellformed(s)) {
+        if (s) {
             cmistake(u, ord, 283, MSG_EVENT);
         }
+        password_generate(pwbuf, PASSWORD_MAXSIZE);
     }
     faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd", "value", pwbuf));

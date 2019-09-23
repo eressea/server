@@ -5291,6 +5291,7 @@
   <message name="pest" section="events">
     <type>
       <arg name="dead" type="int"/>
+      <arg name="peasants" type="resource"/>
     </type>
   </message>
   <message name="error131" section="errors">

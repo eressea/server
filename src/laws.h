@@ -48,6 +48,7 @@ extern "C" {
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
     bool long_order_allowed(const struct unit *u);
+    bool password_wellformed(const char *password);
 
     int password_cmd(struct unit *u, struct order *ord);
     int banner_cmd(struct unit *u, struct order *ord);
