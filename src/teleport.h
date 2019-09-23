@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #define TP_RADIUS 2 /* Radius von Schemen */
+#define MAX_SCHEMES ((TP_RADIUS * 2 + 1) * (TP_RADIUS * 2 + 1) - 4)
 
     struct region;
     struct region_list;

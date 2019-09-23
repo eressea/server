@@ -91,7 +91,10 @@ int get_astralregions(const region * r, bool(*valid) (const region *), region *r
                     pnormalize(&nx, &ny, rplane(r));
                     rn = findregion(nx, ny);
                     if (rn != NULL && (valid == NULL || valid(rn))) {
-                        result[num++] = rn;
+                        if (result) {
+                            result[num] = rn;
+                        }
+                        ++num;
                     }
                 }
             }
