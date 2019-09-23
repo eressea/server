@@ -32,7 +32,7 @@ fi
 
 if [ -e reports/reports.txt ] ; then
   echo "backup reports $TURN, game $GAME"
-  tar cjf backup/$TURN-reports.tar.bz2 reports
+  tar cjf backup/$TURN-reports.tar.bz2 reports eressea.db
   upload backup/$TURN-reports.tar.bz2
 fi
 files="data/$TURN.dat parteien.full parteien"

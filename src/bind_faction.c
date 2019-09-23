@@ -256,36 +256,35 @@ static int tolua_faction_setkey(lua_State * L)
 
 static int tolua_faction_debug_messages(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, NULL);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int i = 1;
-    mlist *ml;
-    if (!self->msgs) {
-        return 0;
+    if (f->msgs) {
+        mlist *ml;
+        for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
+            char buf[120];
+            nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
+            puts(buf);
+        }
     }
-    lua_newtable(L);
-    for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
-        char buf[120];
-        nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
-        puts(buf);
-    }
-    return 1;
+    return 0;
 }
 
 static int tolua_faction_get_messages(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    int i = 1;
-    mlist *ml;
-    if (!f->msgs) {
-        return 0;
+
+    if (f->msgs) {
+        int i = 1;
+        mlist *ml;
+        lua_newtable(L);
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
+            lua_pushnumber(L, i);
+            lua_pushstring(L, ml->msg->type->name);
+            lua_rawset(L, -3);
+        }
+        return 1;
     }
-    lua_newtable(L);
-    for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
-        lua_pushnumber(L, i);
-        lua_pushstring(L, ml->msg->type->name);
-        lua_rawset(L, -3);
-    }
-    return 1;
+    return 0;
 }
 
 static int tolua_faction_count_msg_type(lua_State *L) {
