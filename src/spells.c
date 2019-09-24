@@ -5283,7 +5283,6 @@ int sp_fetchastral(castorder * co)
     spellparameter *pa = co->par;
     double power = co->force;
     int remaining_cap = (int)((power - 3) * 1500);
-    region_list *rtl = NULL;
     region *rt = co_get_region(co);          /* region to which we are fetching */
     region *ro = NULL;            /* region in which the target is */
 
@@ -5305,21 +5304,13 @@ int sp_fetchastral(castorder * co)
         if (u->region != ro) {
             /* this can happen several times if the units are from different astral
              * regions. Only possible on the intersections of schemes */
-            region_list *rfind;
             if (!is_astral(u->region)) {
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "spellfail_astralonly", ""));
                 continue;
             }
 
-            if (rtl != NULL)
-                free_regionlist(rtl);
-            rtl = astralregions(u->region, NULL);
-            for (rfind = rtl; rfind != NULL; rfind = rfind->next) {
-                if (rfind->data == mage->region)
-                    break;
-            }
-            if (rfind == NULL) {
+            if (r_standard_to_astral(mage->region) != u->region) {
                 /* the region r is not in the schemes of rt */
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "spellfail_distance", "target", u));
@@ -5401,8 +5392,6 @@ int sp_fetchastral(castorder * co)
         if (m)
             msg_release(m);
     }
-    if (rtl != NULL)
-        free_regionlist(rtl);
     return cast_level;
 }
 

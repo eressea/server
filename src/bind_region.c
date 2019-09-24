@@ -114,6 +114,14 @@ static int tolua_region_get_plane(lua_State * L)
     return 1;
 }
 
+static int tolua_region_set_plane(lua_State * L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    plane *pl = (plane *)tolua_tousertype(L, 2, NULL);
+    r->_plane = pl;
+    return 0;
+}
+
 static int tolua_region_get_terrain(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, NULL);
@@ -768,7 +776,8 @@ void tolua_region_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "id", tolua_region_get_id, NULL);
             tolua_variable(L, TOLUA_CAST "x", tolua_region_get_x, NULL);
             tolua_variable(L, TOLUA_CAST "y", tolua_region_get_y, NULL);
-            tolua_variable(L, TOLUA_CAST "plane", tolua_region_get_plane, NULL);
+            tolua_variable(L, TOLUA_CAST "plane", tolua_region_get_plane,
+                tolua_region_set_plane);
             tolua_variable(L, TOLUA_CAST "name", tolua_region_get_name,
                 tolua_region_set_name);
             tolua_variable(L, TOLUA_CAST "morale", tolua_region_get_morale,
