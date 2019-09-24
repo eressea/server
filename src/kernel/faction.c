@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 
 #include "faction.h"
@@ -413,7 +395,7 @@ void save_special_items(unit *usrc)
         /* some units have plural names, it would be neat if they aren't single: */
         scale_number(u, 2);
     }
-    set_racename(&u->attribs, "ghost");
+    unit_convert_race(u, rc_ghost, "ghost");
     give_special_items(u, &usrc->items);
 }
 
@@ -425,9 +407,6 @@ void destroyfaction(faction ** fp)
     *fp = f->next;
     f->next = dead_factions;
     dead_factions = f;
-
-    fset(f, FFL_QUIT);
-    f->_alive = false;
 
     if (f->spellbook) {
         spellbook_clear(f->spellbook);
@@ -481,6 +460,8 @@ void destroyfaction(faction ** fp)
         setalliance(f, NULL);
     }
 
+    fset(f, FFL_QUIT);
+    f->_alive = false;
     funhash(f);
 
     /* units of other factions that were disguised as this faction

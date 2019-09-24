@@ -1,15 +1,3 @@
-/* 
- +-------------------+
- |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
- | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
- |                   |
- +-------------------+
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include <kernel/config.h>
 
@@ -40,8 +28,10 @@
 
 static bool good_region(const region * r)
 {
-    return (!fval(r, RF_CHAOTIC) && r->age > 30 && rplane(r) == NULL
-        && r->units != NULL && r->land != NULL);
+    if (fval(r, RF_CHAOTIC) || r->age <= 100 || !r->units || !r->land || rplane(r)) {
+        return false;
+    }
+    return true;
 }
 
 static int cmp_age(const void *v1, const void *v2)

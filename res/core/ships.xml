@@ -8,6 +8,13 @@
     </construction>
   </ship>
 
+  <ship name="galleon" range="5" storm="1.00" damage="1.00" cargo="2000000" cptskill="5" minskill="2" sumskill="250" opensea="yes">
+    <coast terrain="plain"/>
+    <construction skill="shipcraft" minskill="5" maxsize="2000">
+      <requirement type="log" quantity="1"/>
+    </construction>
+  </ship>
+
   <ship name="caravel" range="5" storm="1.00" damage="1.00" cargo="300000" cptskill="3" minskill="1" sumskill="30" opensea="yes">
     <coast terrain="plain"/>
     <construction skill="shipcraft" minskill="3" maxsize="250">

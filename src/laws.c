@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -613,7 +595,7 @@ growing_trees_e3(region * r, const int current_season,
 }
 
 static void
-growing_trees(region * r, const int current_season, const int last_weeks_season)
+growing_trees(region * r, const season_t current_season, const season_t last_weeks_season)
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
@@ -755,7 +737,7 @@ growing_trees(region * r, const int current_season, const int last_weeks_season)
 }
 
 static void
-growing_herbs(region * r, const int current_season, const int last_weeks_season)
+growing_herbs(region * r, const int current_season, const season_t last_weeks_season)
 {
     /* Jetzt die Kraeutervermehrung. Vermehrt wird logistisch:
      *
@@ -849,20 +831,12 @@ void nmr_warnings(void)
 void demographics(void)
 {
     region *r;
-    static int last_weeks_season = -1;
-    static int current_season = -1;
     int plant_rules = config_get_int("rules.grow.formula", 2);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
-
-    if (current_season < 0) {
-        gamedate date;
-        get_gamedate(turn, &date);
-        current_season = date.season;
-        get_gamedate(turn - 1, &date);
-        last_weeks_season = date.season;
-    }
+    season_t current_season = calendar_season(turn);
+    season_t last_weeks_season = calendar_season(turn - 1);
 
     for (r = regions; r; r = r->next) {
         ++r->age; /* also oceans. no idea why we didn't always do that */
@@ -1710,7 +1684,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
 }
 
 static bool try_rename(unit *u, building *b, order *ord) {
-    unit *owner = b ? building_owner(b) : 0;
+    unit *owner = b ? building_owner(b) : NULL;
     bool foreign = !(owner && owner->faction == u->faction);
 
     if (!b) {
@@ -1740,11 +1714,11 @@ static bool try_rename(unit *u, building *b, order *ord) {
                     msg_message("renamed_building_notseen",
                         "building region", b, u->region));
             }
-            if (owner != u) {
-                cmistake(u, ord, 148, MSG_PRODUCE);
-                return false;
-            }
         }
+    }
+    if (owner && owner->faction != u->faction) {
+        cmistake(u, ord, 148, MSG_PRODUCE);
+        return false;
     }
     return true;
 }
@@ -2207,6 +2181,21 @@ int email_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+bool password_wellformed(const char *password)
+{
+    unsigned char *c = (unsigned char *)password;
+    int i;
+    if (!password || password[0]=='\0') {
+        return false;
+    }
+    for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
+        if (!isalnum(c[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int password_cmd(unit * u, struct order *ord)
 {
     char pwbuf[PASSWORD_MAXSIZE + 1];
@@ -2220,19 +2209,11 @@ int password_cmd(unit * u, struct order *ord)
         pwbuf[PASSWORD_MAXSIZE - 1] = '\0';
     }
 
-    if (s && *s) {
-        unsigned char *c = (unsigned char *)pwbuf;
-        int i, r = 0;
-
-        for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
-            if (!isalnum(c[i])) {
-                c[i] = 'X';
-                ++r;
-            }
-        }
-        if (r != 0) {
+    if (!s || !password_wellformed(s)) {
+        if (s) {
             cmistake(u, ord, 283, MSG_EVENT);
         }
+        password_generate(pwbuf, PASSWORD_MAXSIZE);
     }
     faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd", "value", pwbuf));

@@ -37,6 +37,7 @@ function use_snowglobe(u, amount, token, ord)
     local transform = {
         ocean = "glacier",
         firewall = "volcano",
+        activevolcano = "volcano",
         volcano = "mountain",
         desert = "plain"
     }

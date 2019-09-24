@@ -1,15 +1,3 @@
-/*
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #include <platform.h>
 #include "jsonconf.h"
 
@@ -792,7 +780,7 @@ static void json_calendar(cJSON *json) {
             for (i = 0, jmonth = child->child; jmonth; jmonth = jmonth->next, ++i) {
                 if (jmonth->type == cJSON_Object) {
                     storms[i] = cJSON_GetObjectItem(jmonth, "storm")->valueint;
-                    month_season[i] = cJSON_GetObjectItem(jmonth, "season")->valueint;
+                    month_season[i] = (season_t) cJSON_GetObjectItem(jmonth, "season")->valueint;
                 }
                 else {
                     log_error("calendar.months[%d] is not an object: %d", i, json->type);

@@ -1,13 +1,3 @@
-/*
- * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- * |                   |  Enno Rehling <enno@eressea.de>
- * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2006   |
- * |                   |  This program may not be used, modified or distributed
- * +-------------------+  without prior permission by the authors of Eressea.
- *
- */
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -451,16 +441,6 @@ static void paint_info_region(window * wnd, const state * st)
                 r->land->trees[1] + r->land->trees[2]);
         }
         line++;
-        if (r->ships && (st->info_flags & IFL_SHIPS)) {
-            ship *sh;
-            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
-            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
-                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
-                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
-            }
-        }
         if (r->units && (st->info_flags & IFL_FACTIONS)) {
             unit *u;
             wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -485,6 +465,16 @@ static void paint_info_region(window * wnd, const state * st)
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
                 umvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
+            }
+        }
+        if (r->ships && (st->info_flags & IFL_SHIPS)) {
+            ship *sh;
+            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
+            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
+                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
+                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
             }
         }
     }
@@ -580,12 +570,49 @@ static void reset_region(region *r) {
     }
 }
 
-static void reset_cursor(state *st) {
+static region * state_region(state *st) {
     int nx = st->cursor.x;
     int ny = st->cursor.y;
-    region *r;
     pnormalize(&nx, &ny, st->cursor.pl);
-    if ((r = findregion(nx, ny)) != NULL) {
+    return findregion(nx, ny);
+}
+
+static void reset_area_cb(void *arg) {
+    region *r = (region *)arg;
+    r->age = 0;
+    freset(r, RF_MARK);
+}
+
+static void reset_area(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
+        selist * ql = NULL;
+        int qi = 0, qlen = 0;
+        fset(r, RF_MARK);
+        selist_insert(&ql, qlen++, r);
+        while (qi != qlen) {
+            int i;
+            region *adj[MAXDIRECTIONS];
+            r = selist_get(ql, qi++);
+            get_neighbours(r, adj);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = adj[i];
+                if (rn && !fval(rn, RF_MARK)) {
+                    if ((rn->terrain->flags & FORBIDDEN_REGION) == 0) {
+                        fset(rn, RF_MARK);
+                        selist_insert(&ql, qlen++, rn);
+                    }
+                }
+            }
+        }
+        selist_foreach(ql, reset_area_cb);
+        selist_free(ql);
+    }
+}
+
+static void reset_cursor(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
         reset_region(r);
     }
 }
@@ -1072,6 +1099,16 @@ static void seed_player(state *st, const newfaction *player) {
     }
 }
 
+static bool confirm(WINDOW * win, const char *q) {
+    int ch;
+    werase(win);
+    mvwaddstr(win, 0, 0, (char *)q);
+    wmove(win, 0, (int)(strlen(q) + 1));
+    ch = wgetch(win);
+    return (ch == 'y') || (ch == 'Y');
+}
+
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -1156,6 +1193,13 @@ static void handlekey(state * st, int c)
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
         st->wnd_map->update |= 1;
+        break;
+    case 'A': /* clear/reset area */
+        if (confirm(st->wnd_status->handle, "Are you sure you want to reset this entire area?")) {
+            reset_area(st);
+            st->modified = 1;
+            st->wnd_map->update |= 1;
+        }
         break;
     case 'c': /* clear/reset */
         reset_cursor(st);

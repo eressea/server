@@ -185,6 +185,29 @@ static int ally_flag(const char *s, int help_mask)
     return 0;
 }
 
+int ally_status(const char *s)
+{
+    if (strcmp(s, "give") == 0) {
+        return HELP_GIVE;
+    }
+    else if (strcmp(s, "fight") == 0) {
+        return HELP_FIGHT;
+    }
+    else if (strcmp(s, "money") == 0) {
+        return HELP_MONEY;
+    }
+    else if (strcmp(s, "travel") == 0) {
+        return HELP_TRAVEL;
+    }
+    else if (strcmp(s, "guard") == 0) {
+        return HELP_GUARD;
+    }
+    else if (strcmp(s, "all") == 0) {
+        return HELP_ALL;
+    }
+    return 0;
+}
+
 /** Specifies automatic alliance modes.
 * If this returns a value then the bits set are immutable between alliance
 * partners (faction::alliance) and cannot be changed with the HELP command.
@@ -214,22 +237,6 @@ autoalliance(const faction * sf, const faction * f2)
     }
     return 0;
 }
-
-static void init_npcfaction(variant *var)
-{
-    var->i = 1;
-}
-
-attrib_type at_npcfaction = {
-    "npcfaction",
-    init_npcfaction,
-    NULL,
-    NULL,
-    a_writeint,
-    a_readint,
-    NULL,
-    ATF_UNIQUE
-};
 
 /** Limits the available help modes
 * The bitfield returned by this function specifies the available help modes
@@ -284,12 +291,6 @@ int alliance_status(const faction *f, const faction *f2, int status) {
     if (status > 0) {
         int mask = AllianceRestricted();
         if (mask) {
-            if (a_find(f->attribs, &at_npcfaction)) {
-                return status;
-            }
-            if (a_find(f2->attribs, &at_npcfaction)) {
-                return status;
-            }
             if (f->alliance != f2->alliance) {
                 status &= ~mask;
             }

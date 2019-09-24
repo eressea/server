@@ -570,8 +570,20 @@ msgstr "Dieses Ritual, ausgeführt vor einem Kampf, verwirbelt die astralen Ener
 msgid "balloon"
 msgstr "Ballon"
 
-msgid "nr_schemes_postfix"
-msgstr "sind erkennbar."
+msgid "nr_schemes_template"
+msgstr "Schemen von {0} sind erkennbar."
+
+msgid "list_two"
+msgstr "{0} und {1}"
+
+msgid "list_start"
+msgstr "{0}, {1}"
+
+msgid "list_middle"
+msgstr "{0}, {1}"
+
+msgid "list_end"
+msgstr "{0} und {1}"
 
 msgid "SILBER"
 msgstr "SILBER"
@@ -1707,6 +1719,9 @@ msgstr "Ring der Unsichtbarkeit"
 msgid "caravel_a"
 msgstr "eine Karavelle"
 
+msgid "galleon_a"
+msgstr "eine Galeone"
+
 msgctxt "keyword"
 msgid "describe"
 msgstr "BESCHREIBE"
@@ -2063,6 +2078,9 @@ msgstr "Wir schreiben %s des Monats %s im Jahre %d %s."
 
 msgid "caravel"
 msgstr "Karavelle"
+
+msgid "galleon"
+msgstr "Galeone"
 
 msgid "dragon_postfix_10"
 msgstr "der Goldene"
@@ -4401,9 +4419,6 @@ msgstr "Magie"
 
 msgid "see_lighthouse"
 msgstr "vom Turm erblickt"
-
-msgid "nr_schemes_prefix"
-msgstr "Schemen der Regionen"
 
 msgid "aoc_p"
 msgstr "Katzenamulette"

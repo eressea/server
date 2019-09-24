@@ -5,10 +5,11 @@
 #include "economy.h"
 #include "recruit.h"
 
-#include <util/message.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/item.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -20,9 +21,9 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -232,37 +233,78 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
     return u;
 }
 
-static void test_trade_insect(CuTest *tc) {
-    /* Insekten koennen in Wuesten und Suempfen auch ohne Burgen handeln. */
-    unit *u;
+static void test_trade_needs_castle(CuTest *tc) {
+    /* Handeln ist nur in Regionen mit Burgen möglich. */
+    race *rc;
     region *r;
+    unit *u;
+    building *b;
+    const terrain_type *t_swamp;
     const item_type *it_luxury;
-    const item_type *it_silver;
 
     test_setup();
     setup_production();
     test_create_locale();
     setup_terrains(tc);
-    r = setup_trade_region(tc, get_terrain("swamp"));
     init_terrains();
-
+    t_swamp = get_terrain("swamp");
+    r = setup_trade_region(tc, t_swamp);
     it_luxury = r_luxury(r);
-    CuAssertPtrNotNull(tc, it_luxury);
-    it_silver = get_resourcetype(R_SILVER)->itype;
 
-    u = setup_trade_unit(tc, r, test_create_race("insect"));
+    rc = test_create_race(NULL);
+    CuAssertTrue(tc, trade_needs_castle(t_swamp, rc));
+
+    u = test_create_unit(test_create_faction(rc), r);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
 
-    test_set_item(u, it_silver, 10);
-    CuAssertPtrEquals(tc, r, u->region);
-    CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 1;
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
+
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b->size = 2;
+    test_clear_messages(u->faction);
+    produce(r);
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
+    test_teardown();
+}
+
+static void test_trade_insect(CuTest *tc) {
+    /* Insekten koennen in Wuesten und Suempfen auch ohne Burgen handeln. */
+    unit *u;
+    region *r;
+    race *rc;
+    const terrain_type *t_swamp;
+    const item_type *it_luxury;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    t_swamp = get_terrain("swamp");
+    rc = test_create_race("insect");
+
+    r = setup_trade_region(tc, t_swamp);
+    it_luxury = r_luxury(r);
+    CuAssertTrue(tc, !trade_needs_castle(t_swamp, rc));
+    CuAssertPtrNotNull(tc, it_luxury);
+    u = setup_trade_unit(tc, r, rc);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
     produce(u->region);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
-    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
-    CuAssertIntEquals(tc, 5, get_item(u, it_silver));
-
-    terraform_region(r, get_terrain("swamp"));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
     test_teardown();
 }
 
@@ -494,6 +536,7 @@ static void test_recruit_insect(CuTest *tc) {
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
     msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
     CuAssertPtrEquals(tc, NULL, msg);
 
@@ -794,6 +837,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);

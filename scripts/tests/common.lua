@@ -37,6 +37,18 @@ function setup()
     eressea.settings.set("study.random_progress", "0")
 end
 
+function test_set_faction()
+  local r = region.create(0, 0, "plain")
+  local f1 = create_faction('elf')
+  local f2 = create_faction('elf')
+  local u = one_unit(r, f1)
+  u.group = 'Experten'
+  assert_equal('Experten', u.group)
+  u.faction = f2
+  assert_equal(f2, u.faction)
+  assert_nil(u.group)
+end
+
 function test_locales()
     assert_equal(2, eressea.locale.direction("de", "Ost"))
     assert_equal(5, eressea.locale.direction("de", "westen"))
@@ -1119,19 +1131,6 @@ function test_route_pause()
     u:add_order("ROUTE P O W")
     process_orders()
     assert_equal("ROUTE P O W", u:get_order(0))
-    assert_equal(r1, u.region)
-end
-
-function test_bug_2393_cart()
-    local r1 = region.create(0, 0, "plain")
-    local r2 = region.create(1, 0, "plain")
-    local f = faction.create("human", "cart@example.com")
-    local u = unit.create(f, r1, 2)
-    u:add_order("NACH O")
-    u:add_item('stone', 2)
-    u:add_item('horse', 2)
-    u:add_item('cart', 1)
-    process_orders()
     assert_equal(r1, u.region)
 end
 

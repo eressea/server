@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -101,6 +83,7 @@ bool noreports = false;
 const char *visibility[] = {
     "none",
     "neighbour",
+    "lighthouse",
     "lighthouse",
     "travel",
     "far",
@@ -1115,38 +1098,40 @@ void get_addresses(report_context * ctx)
     }
 
     for (; r != NULL; r = r->next) {
-        int stealthmod = stealth_modifier(r, ctx->f, r->seen.mode);
-        if (r->seen.mode == seen_lighthouse) {
-            unit *u = r->units;
-            for (; u; u = u->next) {
-                faction *sf = visible_faction(ctx->f, u);
-                if (lastf != sf) {
-                    if (u->building || u->ship || (stealthmod > INT_MIN
-                        && cansee(ctx->f, r, u, stealthmod))) {
-                        add_seen_faction_i(&flist, sf);
-                        lastf = sf;
+        if (r->seen.mode >= seen_lighthouse) {
+            int stealthmod = stealth_modifier(r, ctx->f, r->seen.mode);
+            if (r->seen.mode == seen_lighthouse) {
+                unit *u = r->units;
+                for (; u; u = u->next) {
+                    faction *sf = visible_faction(ctx->f, u);
+                    if (lastf != sf) {
+                        if (u->building || u->ship || (stealthmod > INT_MIN
+                            && cansee(ctx->f, r, u, stealthmod))) {
+                            add_seen_faction_i(&flist, sf);
+                            lastf = sf;
+                        }
                     }
                 }
             }
-        }
-        else if (r->seen.mode == seen_travel) {
-            /* when we travel through a region, then we must add
-             * the factions of any units we saw */
-            add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
-        }
-        else if (r->seen.mode > seen_travel) {
-            const unit *u = r->units;
-            while (u != NULL) {
-                if (u->faction != ctx->f) {
-                    faction *sf = visible_faction(ctx->f, u);
-                    bool ballied = sf && sf != ctx->f && sf != lastf
-                        && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                    if (ballied || is_allied(ctx->f, sf)) {
-                        add_seen_faction_i(&flist, sf);
-                        lastf = sf;
+            else if (r->seen.mode == seen_travel) {
+                /* when we travel through a region, then we must add
+                 * the factions of any units we saw */
+                add_travelthru_addresses(r, ctx->f, &flist, stealthmod);
+            }
+            else if (r->seen.mode > seen_travel) {
+                const unit *u = r->units;
+                while (u != NULL) {
+                    if (u->faction != ctx->f) {
+                        faction *sf = visible_faction(ctx->f, u);
+                        bool ballied = sf && sf != ctx->f && sf != lastf
+                            && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
+                        if (ballied || is_allied(ctx->f, sf)) {
+                            add_seen_faction_i(&flist, sf);
+                            lastf = sf;
+                        }
                     }
+                    u = u->next;
                 }
-                u = u->next;
             }
         }
     }
@@ -1292,6 +1277,9 @@ static void add_seen_lighthouse(region *r, faction *f)
 {
     if (r->terrain->flags & SEA_REGION) {
         add_seen_nb(f, r, seen_lighthouse);
+    }
+    else {
+        add_seen_nb(f, r, seen_lighthouse_land);
     }
 }
 
@@ -1460,14 +1448,14 @@ void report_warnings(faction *f, int now)
     }
 
     if (f->race == get_race(RC_INSECT)) {
-        gamedate date;
-        get_gamedate(now + 1, &date);
+        season_t season = calendar_season(now + 1);
 
-        if (date.season == SEASON_WINTER) {
+        if (season == SEASON_WINTER) {
             ADDMSG(&f->msgs, msg_message("nr_insectwinter", ""));
         }
-        else if (date.season == SEASON_AUTUMN) {
-            if (get_gamedate(now + 2 + 2, &date)->season == SEASON_WINTER) {
+        else if (season == SEASON_AUTUMN) {
+            /* warning: next turn is the last week of autumn */
+            if (calendar_season(now + 2) == SEASON_WINTER) {
                 ADDMSG(&f->msgs, msg_message("nr_insectfall", ""));
             }
         }

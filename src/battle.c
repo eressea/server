@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -1171,7 +1153,8 @@ static void destroy_items(troop dt) {
 }
 
 static void calculate_defense_type(troop at, troop dt, int type, bool missile,
-                                   const weapon_type **dwtype, int *defskill) {
+    const weapon_type **dwtype, int *defskill)
+{
     const weapon *weapon;
     weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
     *defskill = weapon_effskill(dt, at, weapon, false, false);
@@ -1180,9 +1163,9 @@ static void calculate_defense_type(troop at, troop dt, int type, bool missile,
 }
 
 static void calculate_attack_type(troop at, troop dt, int type, bool missile,
-                                  const weapon_type **awtype, int *attskill, bool *magic) {
+    const weapon_type **awtype, int *attskill, bool *magic) {
     const weapon *weapon;
-    
+
     switch (type) {
     case AT_STANDARD:
         weapon = select_weapon(at, true, missile);
@@ -1209,10 +1192,10 @@ static int crit_damage(int attskill, int defskill, const char *damage_formula) {
     if (rule_damage & DAMAGE_CRITICAL) {
         double kritchance = ((double)attskill * 3.0 - (double)defskill) / 200.0;
         int maxk = 4;
-        
+
         kritchance = fmax(kritchance, 0.005);
         kritchance = fmin(0.9, kritchance);
-        
+
         while (maxk-- && chance(kritchance)) {
             damage += dice_rand(damage_formula);
         }
@@ -1221,21 +1204,21 @@ static int crit_damage(int attskill, int defskill, const char *damage_formula) {
 }
 
 static int apply_race_resistance(int reduced_damage, fighter *df,
-                                 const weapon_type *awtype, bool magic) {
+    const weapon_type *awtype, bool magic) {
     unit *du = df->unit;
-    
+
     if ((u_race(du)->battle_flags & BF_INV_NONMAGIC) && !magic)
         reduced_damage = 0;
     else {
         unsigned int i = 0;
-        
+
         if (u_race(du)->battle_flags & BF_RES_PIERCE)
             i |= WTF_PIERCE;
         if (u_race(du)->battle_flags & BF_RES_CUT)
             i |= WTF_CUT;
         if (u_race(du)->battle_flags & BF_RES_BASH)
             i |= WTF_BLUNT;
-        
+
         if (i && awtype && fval(awtype, i))
             reduced_damage /= 2;
     }
@@ -1243,21 +1226,21 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
 }
 
 static int apply_magicshield(int reduced_damage, fighter *df,
-                             const weapon_type *awtype, battle *b, bool magic) {
+    const weapon_type *awtype, battle *b, bool magic) {
     side *ds = df->side;
     selist *ql;
     int qi;
-    
+
     if (reduced_damage <= 0)
         return 0;
-    
+
     /* Schilde */
     for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
         meffect *me = (meffect *)selist_get(ql, qi);
         if (meffect_protection(b, me, ds) != 0) {
             assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
-                /* jeder Schaden wird um effect% reduziert bis der Schild duration
-                 * Trefferpunkte aufgefangen hat */
+            /* jeder Schaden wird um effect% reduziert bis der Schild duration
+             * Trefferpunkte aufgefangen hat */
             if (me->typ == SHIELD_REDUCE) {
                 int hp = reduced_damage * (me->effect / 100);
                 reduced_damage -= hp;
@@ -1283,14 +1266,11 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     unit *au = af->unit;
     unit *du = df->unit;
     battle *b = df->side->battle;
-    
     int armor_value;
-    
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const armor_type *armor = NULL;
     const armor_type *shield = NULL;
-    
     int reduced_damage, attskill = 0, defskill = 0;
     bool magic = false;
     
@@ -1303,63 +1283,63 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     calculate_defense_type(at, dt, type, missile, &dwtype, &defskill);
     
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
-                                             && !fval(awtype, WTF_MISSILE)))) {
+        && !fval(awtype, WTF_MISSILE)))) {
         damage += CavalryBonus(au, dt, BONUS_DAMAGE);
     }
-    
+
     armor = select_armor(dt, false);
     shield = select_armor(dt, true);
-    
+
     armor_value = calculate_armor(dt, dwtype, awtype, armor, shield, magic);
     if (armor_value < 0) {
         return false;
     }
-    
+
     damage = apply_resistance(damage, dt, dwtype, armor, shield, magic);
-    
+
     if (type != AT_COMBATSPELL && type != AT_SPELL) {
         damage += crit_damage(attskill, defskill, damage_formula);
-        
+
         damage += rc_specialdamage(au, du, awtype);
-        
+
         if (awtype == NULL || !fval(awtype, WTF_MISSILE)) {
             /* melee bonus */
             if (rule_damage & DAMAGE_MELEE_BONUS) {
                 damage += af->person[at.index].damage;
             }
         }
-        
+
         /* Skilldifferenzbonus */
         if (rule_damage & DAMAGE_SKILL_BONUS) {
             int b = (attskill - defskill) / DAMAGE_QUOTIENT;
             if (b > 0) damage += b;
         }
     }
-    
+
     reduced_damage = damage - armor_value;
     if (reduced_damage < 0) reduced_damage = 0;
-    
+
     reduced_damage = apply_race_resistance(reduced_damage, df, awtype, magic);
     reduced_damage = apply_magicshield(reduced_damage, df, awtype, b, magic);
-    
+
     assert(dt.index >= 0 && dt.index < du->number);
     if (reduced_damage > 0) {
         df->person[dt.index].hp -= reduced_damage;
-        
+
         vampirism(at, reduced_damage);
-        
+
         ship_damage(b->turn, du);
     }
-    
+
     if (survives(af, dt, b))
         return false;
-    
+
     ++at.fighter->kills;
-    
+
     destroy_items(dt);
-    
+
     kill_troop(dt);
-    
+
     return true;
 }
 
@@ -1369,13 +1349,13 @@ count_side(const side * s, const side * vs, int minrow, int maxrow, int select)
     fighter *fig;
     int people = 0;
     int unitrow[NUMROWS];
-    
+
     if (maxrow < FIGHT_ROW)
         return 0;
     if (select & SELECT_ADVANCE) {
         memset(unitrow, -1, sizeof(unitrow));
     }
-    
+
     for (fig = s->fighters; fig; fig = fig->next) {
         if (fig->alive - fig->removed > 0) {
             int row = statusrow(fig->status);
@@ -1396,18 +1376,18 @@ count_side(const side * s, const side * vs, int minrow, int maxrow, int select)
 }
 
 /* return the number of live allies warning: this function only considers
- * troops that are still alive, not those that are still fighting although
- * dead. */
+* troops that are still alive, not those that are still fighting although
+* dead. */
 int
 count_allies(const side * as, int minrow, int maxrow, int select, int allytype)
 {
     battle *b = as->battle;
     side *ds;
     int count = 0;
-    
+
     for (ds = b->sides; ds != b->sides + b->nsides; ++ds) {
         if ((allytype == ALLY_ANY && helping(as, ds)) || (allytype == ALLY_SELF
-                                                          && as->faction == ds->faction)) {
+            && as->faction == ds->faction)) {
             count += count_side(ds, NULL, minrow, maxrow, select);
             if (count > 0 && (select & SELECT_FIND))
                 break;
@@ -1418,11 +1398,11 @@ count_allies(const side * as, int minrow, int maxrow, int select, int allytype)
 
 static int
 count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
-                int select)
+    int select)
 {
     side *es, *as = af->side;
     int i = 0;
-    
+
     for (es = b->sides; es != b->sides + b->nsides; ++es) {
         if (as == NULL || enemy(es, as)) {
             int offset = 0;
@@ -1438,8 +1418,8 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
 }
 
 int
-    count_enemies(battle * b, const fighter * af, int minrow, int maxrow,
-        int select)
+count_enemies(battle * b, const fighter * af, int minrow, int maxrow,
+    int select)
 {
     int sr = statusrow(af->status);
     side *as = af->side;
@@ -3261,7 +3241,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         /* hand out missile weapons (from back to front, in case of mixed troops). */
         for (di = 0, i = fig->alive; i-- != 0;) {
             while (di != w && (wused[dwp[di]] == wcount[dwp[di]]
-                    || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
+                || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
                 ++di;
             }
             if (di == w)

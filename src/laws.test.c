@@ -49,37 +49,6 @@ static void test_new_building_can_be_renamed(CuTest * tc)
     test_teardown();
 }
 
-static void test_password_cmd(CuTest * tc)
-{
-    unit *u;
-    faction * f;
-    test_setup();
-    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
-
-    u->thisorder = create_order(K_PASSWORD, f->locale, "abcdefgh");
-    password_cmd(u, u->thisorder);
-    CuAssertPtrNotNull(tc, faction_getpassword(f));
-    CuAssertTrue(tc, checkpasswd(f, "abcdefgh"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
-    free_order(u->thisorder);
-
-    u->thisorder = create_order(K_PASSWORD, f->locale, "abc*de*");
-    password_cmd(u, u->thisorder);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
-    CuAssertTrue(tc, !checkpasswd(f, "abc*de*"));
-    CuAssertTrue(tc, checkpasswd(f, "abcXdeX"));
-    free_order(u->thisorder);
-
-    u->thisorder = create_order(K_PASSWORD, f->locale, "1234567890123456789012345678901234567890");
-    password_cmd(u, u->thisorder);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error321"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
-    CuAssertTrue(tc, checkpasswd(f, "1234567890123456789012345678901"));
-
-    test_teardown();
-}
-
 static void test_rename_building(CuTest * tc)
 {
     region *r;
@@ -1355,6 +1324,24 @@ static void test_name_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_name_foreign_cmd(CuTest *tc) {
+    building *b;
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(NULL), r = test_create_region(0, 0, NULL));
+    b = test_create_building(u->region, NULL);
+    u->thisorder = create_order(K_NAME, f->locale, "%s %s %s Hodor",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_BUILDING]),
+        itoa36(b->no));
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    test_teardown();
+}
+
 static void test_name_cmd_2274(CuTest *tc) {
     unit *u1, *u2, *u3;
     faction *f;
@@ -1931,6 +1918,60 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_password_cmd(CuTest *tc) {
+    unit *u;
+    message *msg;
+    faction * f;
+
+    CuAssertTrue(tc, password_wellformed("PASSword"));
+    CuAssertTrue(tc, password_wellformed("1234567"));
+    CuAssertTrue(tc, !password_wellformed("$password"));
+    CuAssertTrue(tc, !password_wellformed("no space"));
+
+    test_setup();
+    mt_create_error(283);
+    mt_create_error(321);
+    mt_create_va(mt_new("changepasswd", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_PASSWORD, f->locale, "password1234", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertTrue(tc, checkpasswd(f, "password1234"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "bad-password", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, !checkpasswd(f, "password1234"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "''", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertTrue(tc, !checkpasswd(f, "password1234"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "1234567890123456789012345678901234567890");
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error321"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, checkpasswd(f, "1234567890123456789012345678901"));
+
+    test_teardown();
+}
+
 static void test_peasant_migration(CuTest *tc) {
     region *r1, *r2;
     int rmax;
@@ -2155,6 +2196,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_name_foreign_cmd);
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);

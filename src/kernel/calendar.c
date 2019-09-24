@@ -18,13 +18,20 @@ int months_per_year = 12;
 const char *seasonnames[CALENDAR_SEASONS] = { "winter", "spring", "summer", "fall" };
 char **weeknames = NULL;
 char **weeknames2 = NULL;
-int *month_season = NULL;
+season_t *month_season = NULL;
 
 const char *calendar_month(int index)
 {
     static char result[20];
     snprintf(result, sizeof(result), "month_%d", index + 1);
     return result;
+}
+
+season_t calendar_season(int now) {
+    gamedate date;
+    get_gamedate(now, &date);
+
+    return date.season;
 }
 
 const char *calendar_era(void)
