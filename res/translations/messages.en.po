@@ -2370,7 +2370,7 @@ msgid "sp_confusion_effect_0"
 msgstr "\"$unit($mage) intones a mysterious chant. There is a sudden hubbub, but order is restored quickly.\""
 
 msgid "pest"
-msgstr "\"The region is visited by the plague and $int($dead) peasants died.\""
+msgstr "\"The region is visited by the plague and $int($dead) $resource($peasants,$dead) died.\""
 
 msgid "wormhole_exit"
 msgstr "\"$unit($unit) travels through a wormhole to $region($region).\""

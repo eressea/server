@@ -1852,8 +1852,6 @@ static int sp_treewalkenter(castorder * co)
 static int sp_treewalkexit(castorder * co)
 {
     region *rt;
-    region_list *rl, *rl2;
-    int tax, tay;
     unit *u, *u2;
     int remaining_cap;
     int n;
@@ -1885,23 +1883,7 @@ static int sp_treewalkexit(castorder * co)
     /* Koordinaten setzen und Region loeschen fuer Ueberpruefung auf
      * Gueltigkeit */
     rt = pa->param[0]->data.r;
-    tax = rt->x;
-    tay = rt->y;
-
-    rl = astralregions(r, inhabitable);
-    rt = NULL;
-
-    rl2 = rl;
-    while (rl2) {
-        if (rl2->data->x == tax && rl2->data->y == tay) {
-            rt = rl2->data;
-            break;
-        }
-        rl2 = rl2->next;
-    }
-    free_regionlist(rl);
-
-    if (!rt) {
+    if (!rt || !inhabitable(rt) || r_standard_to_astral(rt) != r) {
         cmistake(caster, co->order, 195, MSG_MAGIC);
         return 0;
     }
@@ -5051,7 +5033,6 @@ int sp_pullastral(castorder * co)
 {
     region *rt, *ro;
     unit *u, *u2;
-    region_list *rl, *rl2;
     int remaining_cap;
     int n, w;
     region *r = co_get_region(co);
@@ -5064,23 +5045,12 @@ int sp_pullastral(castorder * co)
     case 1:
         rt = r;
         ro = pa->param[0]->data.r;
-        rl = astralregions(r, NULL);
-        rl2 = rl;
-        while (rl2 != NULL) {
-            region *r2 = rl2->data;
-            if (r2->x == ro->x && r2->y == ro->y) {
-                ro = r2;
-                break;
-            }
-            rl2 = rl2->next;
-        }
-        if (!rl2) {
+
+        if (r_astral_to_standard(r) != ro) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "spellfail::nocontact", "target", rt));
-            free_regionlist(rl);
             return 0;
         }
-        free_regionlist(rl);
         break;
     default:
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
@@ -5192,7 +5162,6 @@ int sp_pullastral(castorder * co)
 int sp_leaveastral(castorder * co)
 {
     region *rt, *ro;
-    region_list *rl, *rl2;
     unit *u, *u2;
     int remaining_cap;
     int n, w;
@@ -5204,27 +5173,13 @@ int sp_leaveastral(castorder * co)
 
     switch (getplaneid(r)) {
     case 1:
-        ro = r;
         rt = pa->param[0]->data.r;
-        if (!rt) {
+        if (!rt || r_standard_to_astral(rt) != r || !inhabitable(rt)) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                 "spellfail::noway", ""));
             return 0;
         }
-        rl = astralregions(r, inhabitable);
-        rl2 = rl;
-        while (rl2 != NULL) {
-            if (rl2->data == rt)
-                break;
-            rl2 = rl2->next;
-        }
-        if (rl2 == NULL) {
-            ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-                "spellfail::noway", ""));
-            free_regionlist(rl);
-            return 0;
-        }
-        free_regionlist(rl);
+        ro = r;
         break;
     default:
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
@@ -5328,7 +5283,6 @@ int sp_fetchastral(castorder * co)
     spellparameter *pa = co->par;
     double power = co->force;
     int remaining_cap = (int)((power - 3) * 1500);
-    region_list *rtl = NULL;
     region *rt = co_get_region(co);          /* region to which we are fetching */
     region *ro = NULL;            /* region in which the target is */
 
@@ -5350,21 +5304,13 @@ int sp_fetchastral(castorder * co)
         if (u->region != ro) {
             /* this can happen several times if the units are from different astral
              * regions. Only possible on the intersections of schemes */
-            region_list *rfind;
             if (!is_astral(u->region)) {
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "spellfail_astralonly", ""));
                 continue;
             }
 
-            if (rtl != NULL)
-                free_regionlist(rtl);
-            rtl = astralregions(u->region, NULL);
-            for (rfind = rtl; rfind != NULL; rfind = rfind->next) {
-                if (rfind->data == mage->region)
-                    break;
-            }
-            if (rfind == NULL) {
+            if (r_standard_to_astral(mage->region) != u->region) {
                 /* the region r is not in the schemes of rt */
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "spellfail_distance", "target", u));
@@ -5446,8 +5392,6 @@ int sp_fetchastral(castorder * co)
         if (m)
             msg_release(m);
     }
-    if (rtl != NULL)
-        free_regionlist(rtl);
     return cast_level;
 }
 
@@ -5545,11 +5489,12 @@ int sp_showastral(castorder * co)
 /* ------------------------------------------------------------- */
 int sp_viewreality(castorder * co)
 {
-    region_list *rl, *rl2;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     message *m;
+    region *rl[MAX_SCHEMES];
+    int num;
 
     if (getplaneid(r) != 1) {
         /* sprintf(buf, "Dieser Zauber kann nur im Astralraum gezaubert werden."); */
@@ -5558,17 +5503,16 @@ int sp_viewreality(castorder * co)
         return 0;
     }
 
-    rl = astralregions(r, NULL);
-
-    /* Irgendwann mal auf Curses u/o Attribut umstellen. */
-    for (rl2 = rl; rl2; rl2 = rl2->next) {
-        region *rt = rl2->data;
-        if (!is_cursed(rt->attribs, &ct_astralblock)) {
-            set_observer(rt, mage->faction, co->level / 2, 2);
+    num = get_astralregions(r, NULL, rl);
+    if (num > 0) {
+        int i;
+        for (i = 0; i != num; ++i) {
+            region *rt = rl[i];
+            if (!is_cursed(rt->attribs, &ct_astralblock)) {
+                set_observer(rt, mage->faction, co->level / 2, 2);
+            }
         }
     }
-
-    free_regionlist(rl);
 
     m = msg_message("viewreality_effect", "unit", mage);
     r_addmessage(r, mage->faction, m);
@@ -5620,11 +5564,7 @@ int sp_disruptastral(castorder * co)
             continue;
 
         if (r2->units != NULL) {
-            region_list *trl2;
-
-            trl = astralregions(rl2->data, inhabitable);
-            for (trl2 = trl; trl2; trl2 = trl2->next)
-                ++inhab_regions;
+            inhab_regions = get_astralregions(r, inhabitable, NULL);
         }
 
         /* Nicht-Permanente Tore zerstoeren */

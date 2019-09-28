@@ -260,7 +260,7 @@ static int tolua_faction_debug_messages(lua_State * L)
     int i = 1;
     if (f->msgs) {
         mlist *ml;
-        for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
             char buf[120];
             nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
             puts(buf);

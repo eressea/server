@@ -1153,7 +1153,8 @@ static void destroy_items(troop dt) {
 }
 
 static void calculate_defense_type(troop at, troop dt, int type, bool missile,
-    const weapon_type **dwtype, int *defskill) {
+    const weapon_type **dwtype, int *defskill)
+{
     const weapon *weapon;
     weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
     *defskill = weapon_effskill(dt, at, weapon, false, false);
@@ -1253,7 +1254,7 @@ static int apply_magicshield(int reduced_damage, fighter *df,
             }
         }
     }
-
+    
     return reduced_damage;
 }
 
@@ -1265,25 +1266,22 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
     unit *au = af->unit;
     unit *du = df->unit;
     battle *b = df->side->battle;
-
     int armor_value;
-
     const weapon_type *dwtype = NULL;
     const weapon_type *awtype = NULL;
     const armor_type *armor = NULL;
     const armor_type *shield = NULL;
-
     int reduced_damage, attskill = 0, defskill = 0;
     bool magic = false;
-
+    
     int damage = dice_rand(damage_formula);
-
+    
     assert(du->number > 0);
     ++at.fighter->hits;
-
+    
     calculate_attack_type(at, dt, type, missile, &awtype, &attskill, &magic);
     calculate_defense_type(at, dt, type, missile, &dwtype, &defskill);
-
+    
     if (is_riding(at) && (awtype == NULL || (fval(awtype, WTF_HORSEBONUS)
         && !fval(awtype, WTF_MISSILE)))) {
         damage += CavalryBonus(au, dt, BONUS_DAMAGE);

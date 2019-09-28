@@ -587,7 +587,8 @@ void plagues(region * r)
     }
 
     if (dead > 0) {
-        ADDMSG(&r->msgs, msg_message("pest", "dead", dead));
+        ADDMSG(&r->msgs, msg_message("pest", "peasants dead",
+            get_resourcetype(R_PEASANT), dead));
         deathcounts(r, dead);
         rsetpeasants(r, peasants - dead);
     }
