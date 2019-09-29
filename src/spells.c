@@ -142,11 +142,6 @@ static void for_all_in_range(const region * r, int range, void(*callback)(region
     }
 }
 
-static void cb_collect(region *r, void *cbdata) {
-    region_list **rlistp = (region_list **)cbdata;
-    add_regionlist(rlistp, r);
-}
-
 static void magicanalyse_region(region * r, unit * mage, double force)
 {
     attrib *a;
