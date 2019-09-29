@@ -5554,7 +5554,14 @@ int sp_viewreality(castorder * co)
     return cast_level;
 }
 
-/* ------------------------------------------------------------- */
+/** 
+ * Zauber: Störe astrale Integrität
+ *
+ * Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb eines
+ * astralen Radius von Stufe/5 Regionen werden alle Astralwesen, die dem Zauber
+ * nicht wiederstehen können, aus der astralen Ebene geschleudert. Der astrale 
+ * Kontakt mit allen betroffenen Regionen ist für Stufe/3 Wochen gestört.
+ */
 int sp_disruptastral(castorder * co)
 {
     region_list *rl, *rl2;
@@ -5584,20 +5591,20 @@ int sp_disruptastral(castorder * co)
         return 0;
     }
 
-    rl = list_all_in_range(rt, (short)(power / 5));
+    rl = list_all_in_range(rt, (int)(power / 5));
 
     for (rl2 = rl; rl2 != NULL; rl2 = rl2->next) {
         attrib *a;
         double effect;
         region *r2 = rl2->data;
         int inhab_regions = 0;
-        region_list *trl = NULL;
+        region *rtargets[MAX_SCHEMES];
 
         if (is_cursed(r2->attribs, &ct_astralblock))
             continue;
 
         if (r2->units != NULL) {
-            inhab_regions = get_astralregions(r, inhabitable, NULL);
+            inhab_regions = get_astralregions(r2, inhabitable, rtargets);
         }
 
         /* Nicht-Permanente Tore zerstoeren */
@@ -5613,17 +5620,10 @@ int sp_disruptastral(castorder * co)
 
         /* Einheiten auswerfen */
 
-        if (trl != NULL) {
+        if (inhab_regions) {
             for (u = r2->units; u; u = u->next) {
-                region_list *trl2 = trl;
-                region *tr;
                 int c = rng_int() % inhab_regions;
-
-                /* Zufaellige Zielregion suchen */
-                while (c-- != 0) {
-                    trl2 = trl2->next;
-                }
-                tr = trl2->data;
+                region *tr = rtargets[c];
 
                 if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
                     message *msg = msg_message("disrupt_astral", "unit region", u, tr);
@@ -5634,7 +5634,6 @@ int sp_disruptastral(castorder * co)
                     move_unit(u, tr, NULL);
                 }
             }
-            free_regionlist(trl);
         }
 
         /* Kontakt unterbinden */

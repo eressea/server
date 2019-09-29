@@ -234,8 +234,6 @@ function test_familiar_school()
     local u = unit.create(f, r)
     u.magic = "draig"
     u:set_skill("magic", 10)
-    u.aura = 200
-    u:add_spell("fireball")
     local uf = unit.create(f, r)
     uf.race = "lynx"
     u.familiar = uf
@@ -246,4 +244,19 @@ function test_familiar_school()
     uf.aura = 10
     assert_equal(0, uf.aura)
     assert_nil(uf.magic)
+end
+
+function test_astral_disruption()
+    local r = region.create(0, 0, "plain")
+    local r2 = r:get_astral('fog')
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    local uh = unit.create(get_monsters(), r2, 1, "braineater")
+    u.magic = "draig"
+    u:set_skill("magic", 100) -- level 100 should beat magic resistance
+    u.aura = 200
+    u:add_spell("astral_disruption")
+    u:add_order('ZAUBERE STUFE 1 "Stoere Astrale Integritaet"')
+    process_orders()
+    assert_equal(r, uh.region)
 end

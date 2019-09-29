@@ -587,10 +587,10 @@ static int tolua_region_getastral(lua_State * L)
 
     if (!rt) {
         const char *tname = tolua_tostring(L, 2, NULL);
+        const terrain_type *terrain = get_terrain(tname ? tname : "fog");
         plane *pl = get_astralplane();
         rt = new_region(real2tp(r->x), real2tp(r->y), pl, 0);
-        if (tname) {
-            const terrain_type *terrain = get_terrain(tname);
+        if (terrain) {
             terraform_region(rt, terrain);
         }
     }
