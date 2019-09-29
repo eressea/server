@@ -121,6 +121,41 @@ static double curse_chance(const struct curse *c, double force)
     return 1.0 + (force - c->vigour) * 0.1;
 }
 
+#define RANGE_MAX 32
+static void for_all_in_range(const region * r, int range, void (*callback)(region *, void *), void *cbdata) {
+    if (r) {
+        int x, y;
+        plane *pl = rplane(r);
+        for (x = r->x - range; x <= r->x + range; ++x) {
+            for (y = r->y - range; y <= r->y + range; ++y) {
+                if (koor_distance(r->x, r->y, x, y) <= range) {
+                    region *r2;
+                    int nx = x, ny = y;
+                    pnormalize(&nx, &ny, pl);
+                    r2 = findregion(nx, ny);
+                    if (r2) {
+                        callback(r2, cbdata);
+                    }
+                }
+            }
+        }
+    }
+}
+
+static void cb_collect(region *r, void *cbdata) {
+    region_list **rlistp = (region_list **)cbdata;
+    add_regionlist(rlistp, r);
+}
+
+static region_list *list_all_in_range(const region * r, int n)
+{
+    region_list *rlist = NULL;
+    for_all_in_range(r, n, cb_collect, &rlist);
+    return rlist;
+}
+
+
+
 static void magicanalyse_region(region * r, unit * mage, double force)
 {
     attrib *a;
@@ -2516,6 +2551,23 @@ static void patzer_fumblecurse(const castorder * co)
     return;
 }
 
+static void cb_set_dragon_target(region *r2, void *cbdata) {
+    region *r = (region *)cbdata;
+    unit *u;
+    for (u = r2->units; u; u = u->next) {
+        if (u_race(u) == get_race(RC_WYRM) || u_race(u) == get_race(RC_DRAGON)) {
+            attrib *a = a_find(u->attribs, &at_targetregion);
+            if (!a) {
+                a = a_add(&u->attribs, make_targetregion(r));
+            }
+            else {
+                a->data.v = r;
+            }
+        }
+    }
+
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Drachenruf
  * Stufe:      11
@@ -2538,13 +2590,10 @@ static int sp_summondragon(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    unit *u;
     int cast_level = co->level;
     double power = co->force;
-    region_list *rl, *rl2;
     faction *f;
-    int time;
-    int number;
+    int time, number;
     const race *race;
 
     f = get_monsters();
@@ -2581,27 +2630,11 @@ static int sp_summondragon(castorder * co)
         }
     }
 
-    rl = all_in_range(r, (short)power, NULL);
-
-    for (rl2 = rl; rl2; rl2 = rl2->next) {
-        region *r2 = rl2->data;
-        for (u = r2->units; u; u = u->next) {
-            if (u_race(u) == get_race(RC_WYRM) || u_race(u) == get_race(RC_DRAGON)) {
-                attrib *a = a_find(u->attribs, &at_targetregion);
-                if (!a) {
-                    a = a_add(&u->attribs, make_targetregion(r));
-                }
-                else {
-                    a->data.v = r;
-                }
-            }
-        }
-    }
+    for_all_in_range(r, (int)power, cb_set_dragon_target, r);
 
     ADDMSG(&caster->faction->msgs, msg_message("summondragon",
         "unit region command target", caster, caster->region, co->order, r));
 
-    free_regionlist(rl);
     return cast_level;
 }
 
@@ -5551,7 +5584,7 @@ int sp_disruptastral(castorder * co)
         return 0;
     }
 
-    rl = all_in_range(rt, (short)(power / 5), NULL);
+    rl = list_all_in_range(rt, (short)(power / 5));
 
     for (rl2 = rl; rl2 != NULL; rl2 = rl2->next) {
         attrib *a;
