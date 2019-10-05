@@ -73,6 +73,7 @@ extern "C" {
         struct ship *nexthash;
         struct unit * _owner; /* never use directly, always use ship_owner() */
         int no;
+        int number;
         struct region *region;
         char *name;
         char *display;

@@ -389,7 +389,7 @@ int shipcapacity(const ship * sh)
 {
     int i = sh->type->cargo;
 
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize)
+    if (sh->type->construction && sh->size < sh->number * sh->type->construction->maxsize)
         return 0;
 
     if (sh->damage) {
@@ -465,17 +465,17 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
     WRITE_INT(store, (sh && sh->region) ? sh->no : 0);
 }
 
-void ship_setname(ship * self, const char *name)
+void ship_setname(ship * sh, const char *name)
 {
-    free(self->name);
-    self->name = name ? str_strdup(name) : 0;
+    free(sh->name);
+    sh->name = name ? str_strdup(name) : 0;
 }
 
-const char *ship_getname(const ship * self)
+const char *ship_getname(const ship * sh)
 {
-    return self->name;
+    return sh->name;
 }
 
-int ship_damage_percent(const ship *ship) {
-    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+int ship_damage_percent(const ship *sh) {
+    return (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
 }
