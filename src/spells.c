@@ -5546,7 +5546,7 @@ static void cb_disrupt_astral(region *r2, void *cbdata) {
     region *rtargets[MAX_SCHEMES];
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int duration = (int)(co->force / 3) + 1;
+    int duration = (int)(co->force / 3) + 2;
 
     if (is_cursed(r2->attribs, &ct_astralblock)) {
         return;
