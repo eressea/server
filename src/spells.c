@@ -15,7 +15,7 @@
 #include "monsters.h"
 #include "teleport.h"
 
- /* triggers includes */
+/* triggers includes */
 #include <triggers/changefaction.h>
 #include <triggers/changerace.h>
 #include <triggers/createcurse.h>
@@ -119,6 +119,27 @@ static void report_failure(unit * mage, struct order *ord)
 static double curse_chance(const struct curse *c, double force)
 {
     return 1.0 + (force - c->vigour) * 0.1;
+}
+
+#define RANGE_MAX 32
+static void for_all_in_range(const region * r, int range, void(*callback)(region *, void *), void *cbdata) {
+    if (r) {
+        int x, y;
+        plane *pl = rplane(r);
+        for (x = r->x - range; x <= r->x + range; ++x) {
+            for (y = r->y - range; y <= r->y + range; ++y) {
+                if (koor_distance(r->x, r->y, x, y) <= range) {
+                    region *r2;
+                    int nx = x, ny = y;
+                    pnormalize(&nx, &ny, pl);
+                    r2 = findregion(nx, ny);
+                    if (r2) {
+                        callback(r2, cbdata);
+                    }
+                }
+            }
+        }
+    }
 }
 
 static void magicanalyse_region(region * r, unit * mage, double force)
@@ -1071,7 +1092,7 @@ static int sp_blessedharvest(castorder * co)
 
     if (create_curse(caster, &r->attribs, &ct_blessedharvest, co->force,
         duration, 1.0, 0)) {
-        const char * effect = co->sp->sname[0]=='b' ? "harvest_effect" : "raindance_effect";
+        const char * effect = co->sp->sname[0] == 'b' ? "harvest_effect" : "raindance_effect";
         message *seen = msg_message(effect, "mage", caster);
         message *unseen = msg_message(effect, "mage", (unit *)NULL);
         report_effect(r, caster, seen, unseen);
@@ -2516,6 +2537,23 @@ static void patzer_fumblecurse(const castorder * co)
     return;
 }
 
+static void cb_set_dragon_target(region *r2, void *cbdata) {
+    region *r = (region *)cbdata;
+    unit *u;
+    for (u = r2->units; u; u = u->next) {
+        if (u_race(u) == get_race(RC_WYRM) || u_race(u) == get_race(RC_DRAGON)) {
+            attrib *a = a_find(u->attribs, &at_targetregion);
+            if (!a) {
+                a = a_add(&u->attribs, make_targetregion(r));
+            }
+            else {
+                a->data.v = r;
+            }
+        }
+    }
+
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Drachenruf
  * Stufe:      11
@@ -2538,13 +2576,10 @@ static int sp_summondragon(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    unit *u;
     int cast_level = co->level;
     double power = co->force;
-    region_list *rl, *rl2;
     faction *f;
-    int time;
-    int number;
+    int time, number;
     const race *race;
 
     f = get_monsters();
@@ -2581,27 +2616,11 @@ static int sp_summondragon(castorder * co)
         }
     }
 
-    rl = all_in_range(r, (short)power, NULL);
-
-    for (rl2 = rl; rl2; rl2 = rl2->next) {
-        region *r2 = rl2->data;
-        for (u = r2->units; u; u = u->next) {
-            if (u_race(u) == get_race(RC_WYRM) || u_race(u) == get_race(RC_DRAGON)) {
-                attrib *a = a_find(u->attribs, &at_targetregion);
-                if (!a) {
-                    a = a_add(&u->attribs, make_targetregion(r));
-                }
-                else {
-                    a->data.v = r;
-                }
-            }
-        }
-    }
+    for_all_in_range(r, (int)power, cb_set_dragon_target, r);
 
     ADDMSG(&caster->faction->msgs, msg_message("summondragon",
         "unit region command target", caster, caster->region, co->order, r));
 
-    free_regionlist(rl);
     return cast_level;
 }
 
@@ -2807,7 +2826,7 @@ static int dc_age(struct curse *c)
             }
 
             /* Reduziert durch Magieresistenz */
-            dmg = frac_mul(dmg, frac_sub(frac_make(1,1), magic_resistance(u)));
+            dmg = frac_mul(dmg, frac_sub(frac_make(1, 1), magic_resistance(u)));
             damage *= dmg.sa[0];
             damage /= dmg.sa[1];
             hp = change_hitpoints(u, -(int)damage);
@@ -5521,17 +5540,70 @@ int sp_viewreality(castorder * co)
     return cast_level;
 }
 
-/* ------------------------------------------------------------- */
+static void cb_disrupt_astral(region *r2, void *cbdata) {
+    castorder *co = (castorder *)cbdata;
+    attrib *a;
+    region *rtargets[MAX_SCHEMES];
+    region *r = co_get_region(co);
+    unit *caster = co_get_caster(co);
+    int duration = (int)(co->force / 3) + 2;
+
+    if (is_cursed(r2->attribs, &ct_astralblock)) {
+        return;
+    }
+
+    /* Nicht-Permanente Tore zerstoeren */
+    a = a_find(r->attribs, &at_direction);
+
+    while (a != NULL && a->type == &at_direction) {
+        attrib *a2 = a->next;
+        spec_direction *sd = (spec_direction *)(a->data.v);
+        if (sd->duration != -1)
+            a_remove(&r->attribs, a);
+        a = a2;
+    }
+
+    /* Einheiten auswerfen */
+
+    if (r2->units != NULL) {
+        int inhab_regions = get_astralregions(r2, inhabitable, rtargets);
+
+        if (inhab_regions) {
+            unit *u;
+            for (u = r2->units; u; u = u->next) {
+                int c = rng_int() % inhab_regions;
+                region *tr = rtargets[c];
+
+                if (!is_magic_resistant(caster, u, 0) && can_survive(u, tr)) {
+                    message *msg = msg_message("disrupt_astral", "unit region", u, tr);
+                    add_message(&u->faction->msgs, msg);
+                    add_message(&tr->msgs, msg);
+                    msg_release(msg);
+
+                    move_unit(u, tr, NULL);
+                }
+            }
+        }
+    }
+
+    /* Kontakt unterbinden */
+    create_curse(caster, &r2->attribs, &ct_astralblock, co->force, duration, 100, 0);
+}
+
+/**
+ * Zauber: Störe astrale Integrität
+ *
+ * Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb eines
+ * astralen Radius von Stufe/5 Regionen werden alle Astralwesen, die dem Zauber
+ * nicht wiederstehen können, aus der astralen Ebene geschleudert. Der astrale
+ * Kontakt mit allen betroffenen Regionen ist für Stufe/3 Wochen gestört.
+ */
 int sp_disruptastral(castorder * co)
 {
-    region_list *rl, *rl2;
     region *rt;
-    unit *u;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     double power = co->force;
-    int duration = (int)(power / 3) + 1;
 
     switch (getplaneid(r)) {
     case 0:
@@ -5551,67 +5623,8 @@ int sp_disruptastral(castorder * co)
         return 0;
     }
 
-    rl = all_in_range(rt, (short)(power / 5), NULL);
-
-    for (rl2 = rl; rl2 != NULL; rl2 = rl2->next) {
-        attrib *a;
-        double effect;
-        region *r2 = rl2->data;
-        int inhab_regions = 0;
-        region_list *trl = NULL;
-
-        if (is_cursed(r2->attribs, &ct_astralblock))
-            continue;
-
-        if (r2->units != NULL) {
-            inhab_regions = get_astralregions(r, inhabitable, NULL);
-        }
-
-        /* Nicht-Permanente Tore zerstoeren */
-        a = a_find(r->attribs, &at_direction);
-
-        while (a != NULL && a->type == &at_direction) {
-            attrib *a2 = a->next;
-            spec_direction *sd = (spec_direction *)(a->data.v);
-            if (sd->duration != -1)
-                a_remove(&r->attribs, a);
-            a = a2;
-        }
-
-        /* Einheiten auswerfen */
-
-        if (trl != NULL) {
-            for (u = r2->units; u; u = u->next) {
-                region_list *trl2 = trl;
-                region *tr;
-                int c = rng_int() % inhab_regions;
-
-                /* Zufaellige Zielregion suchen */
-                while (c-- != 0) {
-                    trl2 = trl2->next;
-                }
-                tr = trl2->data;
-
-                if (!is_magic_resistant(mage, u, 0) && can_survive(u, tr)) {
-                    message *msg = msg_message("disrupt_astral", "unit region", u, tr);
-                    add_message(&u->faction->msgs, msg);
-                    add_message(&tr->msgs, msg);
-                    msg_release(msg);
-
-                    move_unit(u, tr, NULL);
-                }
-            }
-            free_regionlist(trl);
-        }
-
-        /* Kontakt unterbinden */
-        effect = 100;
-        create_curse(mage, &rl2->data->attribs, &ct_astralblock,
-            power, duration, effect, 0);
-    }
-
-    free_regionlist(rl);
-    return cast_level;
+    for_all_in_range(rt, (int)(power / 5), cb_disrupt_astral, co);
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -6506,7 +6519,7 @@ void register_spells(void)
     register_borders();
 
     at_deprecate("zauber_todeswolke", dc_read_compat);
-    
+
     /* init_firewall(); */
     ct_register(&ct_firewall);
     ct_register(&ct_deathcloud);

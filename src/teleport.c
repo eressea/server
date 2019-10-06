@@ -95,32 +95,6 @@ region *r_astral_to_standard(const region * r)
     return r2;
 }
 
-region_list *all_in_range(const region * r, int n,
-    bool(*valid) (const region *))
-{
-    int x, y;
-    region_list *rlist = NULL;
-    plane *pl = rplane(r);
-
-    if (r == NULL)
-        return NULL;
-
-    for (x = r->x - n; x <= r->x + n; x++) {
-        for (y = r->y - n; y <= r->y + n; y++) {
-            if (koor_distance(r->x, r->y, x, y) <= n) {
-                region *r2;
-                int nx = x, ny = y;
-                pnormalize(&nx, &ny, pl);
-                r2 = findregion(nx, ny);
-                if (r2 != NULL && (valid == NULL || valid(r2)))
-                    add_regionlist(&rlist, r2);
-            }
-        }
-    }
-
-    return rlist;
-}
-
 #define MAX_BRAIN_SIZE 100
 
 void spawn_braineaters(float chance)

@@ -1152,6 +1152,14 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
 {
     variant v02p, v98p, prob = frac_make(t_bonus, 100);
     attrib *a = NULL;
+    static bool never_resist;
+    static int config;
+    if (config_changed(&config)) {
+        never_resist = config_get_int("magic.resist.enable", 1) == 0;
+    }
+    if (never_resist) {
+        return false;
+    }
 
     if (magician == NULL || obj == NULL) {
         return true;
