@@ -43,37 +43,6 @@ static region *tpregion(const region * r)
     return rt;
 }
 
-region_list *astralregions(const region * r, bool(*valid) (const region *))
-{
-    region_list *rlist = NULL;
-    int x, y;
-
-    assert(is_astral(r));
-    if (!is_astral(r)) {
-        log_error("astralregions was called with a non-astral region.\n");
-        return NULL;
-    }
-    r = r_astral_to_standard(r);
-    if (r == NULL)
-        return NULL;
-
-    for (x = -TP_RADIUS; x <= +TP_RADIUS; ++x) {
-        for (y = -TP_RADIUS; y <= +TP_RADIUS; ++y) {
-            region *rn;
-            int dist = koor_distance(0, 0, x, y);
-            int nx = r->x + x, ny = r->y + y;
-
-            if (dist > TP_RADIUS)
-                continue;
-            pnormalize(&nx, &ny, rplane(r));
-            rn = findregion(nx, ny);
-            if (rn != NULL && (valid == NULL || valid(rn)))
-                add_regionlist(&rlist, rn);
-        }
-    }
-    return rlist;
-}
-
 
 int get_astralregions(const region * r, bool(*valid) (const region *), region *result[])
 {
@@ -91,7 +60,10 @@ int get_astralregions(const region * r, bool(*valid) (const region *), region *r
                     pnormalize(&nx, &ny, rplane(r));
                     rn = findregion(nx, ny);
                     if (rn != NULL && (valid == NULL || valid(rn))) {
-                        result[num++] = rn;
+                        if (result) {
+                            result[num] = rn;
+                        }
+                        ++num;
                     }
                 }
             }
@@ -121,32 +93,6 @@ region *r_astral_to_standard(const region * r)
         return NULL;
 
     return r2;
-}
-
-region_list *all_in_range(const region * r, int n,
-    bool(*valid) (const region *))
-{
-    int x, y;
-    region_list *rlist = NULL;
-    plane *pl = rplane(r);
-
-    if (r == NULL)
-        return NULL;
-
-    for (x = r->x - n; x <= r->x + n; x++) {
-        for (y = r->y - n; y <= r->y + n; y++) {
-            if (koor_distance(r->x, r->y, x, y) <= n) {
-                region *r2;
-                int nx = x, ny = y;
-                pnormalize(&nx, &ny, pl);
-                r2 = findregion(nx, ny);
-                if (r2 != NULL && (valid == NULL || valid(r2)))
-                    add_regionlist(&rlist, r2);
-            }
-        }
-    }
-
-    return rlist;
 }
 
 #define MAX_BRAIN_SIZE 100

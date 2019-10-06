@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #define TP_RADIUS 2 /* Radius von Schemen */
+#define MAX_SCHEMES ((TP_RADIUS * 2 + 1) * (TP_RADIUS * 2 + 1) - 4)
 
     struct region;
     struct region_list;
@@ -15,10 +16,6 @@ extern "C" {
 
     struct region *r_standard_to_astral(const struct region *r);
     struct region *r_astral_to_standard(const struct region *);
-    struct region_list *astralregions(const struct region *rastral,
-        bool(*valid) (const struct region *));
-    struct region_list *all_in_range(const struct region *r, int n,
-        bool(*valid) (const struct region *));
     bool inhabitable(const struct region *r);
     bool is_astral(const struct region *r);
     struct plane *get_astralplane(void);

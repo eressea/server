@@ -1464,14 +1464,16 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(r, f, r->seen.mode, F);
         if (r->seen.mode >= seen_unit && is_astral(r)
-            && !is_cursed(r->attribs, &ct_astralblock)) {
+            && !is_cursed(r->attribs, &ct_astralblock))
+        {
             /* Sonderbehandlung Teleport-Ebene */
-            region_list *rl = astralregions(r, inhabitable);
+            region *rl[MAX_SCHEMES];
+            int num = get_astralregions(r, inhabitable, rl);
 
-            if (rl) {
-                region_list *rl2 = rl;
-                while (rl2) {
-                    region *r2 = rl2->data;
+            if (num > 0) {
+                int i;
+                for (i = 0; i != num; ++i) {
+                    region *r2 = rl[i];
                     plane *plx = rplane(r2);
 
                     nx = r2->x;
@@ -1480,9 +1482,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                     adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
                     fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
-                    rl2 = rl2->next;
                 }
-                free_regionlist(rl);
             }
         }
 

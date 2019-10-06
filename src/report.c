@@ -1062,8 +1062,6 @@ char *report_list(const struct locale *lang, char *buffer, size_t len, int argc,
     return format_list(argc, argv, buffer, len, two, start, middle, end);
 }
 
-#define MAX_SCHEMES ((TP_RADIUS * 2 + 1) * (TP_RADIUS * 2 + 1) - 4)
-
 static void report_region_schemes(struct stream *out, const region * r, faction * f) {
 
     if (r->seen.mode >= seen_unit && is_astral(r) &&
