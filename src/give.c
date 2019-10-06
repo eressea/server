@@ -293,6 +293,14 @@ bool rule_transfermen(void)
     return rule != 0;
 }
 
+message * give_ship(unit *u, unit *u2, int n, order *ord) {
+    assert(u->ship);
+    if (u->ship->number < n) {
+        n = u->ship->number;
+    }
+    return NULL;
+}
+
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
 {
     int error = 0;
@@ -652,7 +660,19 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
         }
     }
     else {
-        if (isparam(s, u->faction->locale, P_PERSON)) {
+        param_t p = findparam(s, u->faction->locale);
+        if (p == P_SHIP) {
+            if (u->ship) {
+                message * msg = give_ship(u, u2, u->ship->number, ord);
+                if (msg) {
+                    ADDMSG(&u->faction->msgs, msg);
+                }
+            }
+            else {
+                cmistake(u, ord, 144, MSG_COMMERCE);
+            }
+        }
+        else if (p == P_PERSON) {
             if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
@@ -815,7 +835,19 @@ void give_cmd(unit * u, order * ord)
         return;
     }
 
-    if (isparam(s, u->faction->locale, P_PERSON)) {
+    p = findparam(s, u->faction->locale);
+    if (p == P_SHIP) {
+        if (u->ship) {
+            message * msg = give_ship(u, u2, n, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+        }
+        else {
+            cmistake(u, ord, 144, MSG_COMMERCE);
+        }
+    }
+    else if (p == P_PERSON) {
         if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));

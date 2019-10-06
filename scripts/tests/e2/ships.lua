@@ -163,3 +163,30 @@ function test_ship_convoy_skill()
     process_orders()
     assert_equal(r3, u.region)
 end
+
+function test_give_ship()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 2
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+end
+
+function test_give_ship_merge()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u2.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 2
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(2, u2.ship.number)
+end
