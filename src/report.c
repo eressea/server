@@ -1728,7 +1728,7 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
         sbs_printf(&sbs, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
+            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
     }
     else {
         sbs_printf(&sbs, "%s, %s", shipname(sh), LOC(f->locale, sh->type->_name));

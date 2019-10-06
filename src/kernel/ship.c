@@ -181,6 +181,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     sh->coast = NODIRECTION;
     sh->type = stype;
     sh->region = r;
+    sh->number = 1;
 
     if (lang) {
         sname = LOC(lang, stype->_name);
@@ -275,13 +276,13 @@ static int ShipSpeedBonus(const unit * u)
     }
     if (bonus > 0) {
         int skl = effskill(u, SK_SAILING, NULL);
-        int minsk = (sh->type->cptskill + 1) / 2;
+        int minsk = (ship_captain_minskill(sh) + 1) / 2;
         return (skl - minsk) / bonus;
     }
     else if (sh->type->flags & SFL_SPEEDY) {
         int base = 3;
         int speed = 0;
-        int minsk = sh->type->cptskill * base;
+        int minsk = ship_captain_minskill(sh) * base;
         int skl = effskill(u, SK_SAILING, NULL);
         while (skl >= minsk) {
             ++speed;
@@ -292,21 +293,8 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
-int crew_skill(const ship *sh) {
-    int n = 0;
-    unit *u;
-
-    n = 0;
-
-    for (u = sh->region->units; u; u = u->next) {
-        if (u->ship == sh) {
-            int es = effskill(u, SK_SAILING, NULL);
-            if (es >= sh->type->minskill) {
-                n += es * u->number;
-            }
-        }
-    }
-    return n;
+int ship_captain_minskill(const ship *sh) {
+    return sh->type->cptskill;
 }
 
 int shipspeed(const ship * sh, const unit * u)
@@ -323,8 +311,9 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
 
     k = sh->type->range;
-    if (sh->size != sh->type->construction->maxsize)
+    if (!ship_finished(sh)) {
         return 0;
+    }
 
     if (sh->attribs) {
         if (curse_active(get_curse(sh->attribs, &ct_stormwind))) {
@@ -343,7 +332,7 @@ int shipspeed(const ship * sh, const unit * u)
 
     bonus = ShipSpeedBonus(u);
     if (bonus > 0 && sh->type->range_max > sh->type->range) {
-        int crew = crew_skill(sh);
+        int crew = crew_skill(sh, NULL);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
             int sbonus = sh->type->range_max - sh->type->range;
@@ -385,17 +374,68 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
-int shipcapacity(const ship * sh)
+bool ship_finished(const ship *sh)
 {
-    int i = sh->type->cargo;
-
-    if (sh->type->construction && sh->size < sh->number * sh->type->construction->maxsize)
-        return 0;
-
-    if (sh->damage) {
-        i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+    if (sh->type->construction) {
+        return (sh->size >= sh->number * sh->type->construction->maxsize);
     }
-    return i;
+    return true;
+}
+
+int enoughsailors(const ship * sh, int crew_skill)
+{
+    return crew_skill >= sh->type->sumskill * sh->number;
+}
+
+int crew_skill(const ship *sh, int *o_captains) {
+    int n = 0, captains = 0;
+    unit *u;
+
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es >= sh->type->cptskill) {
+                captains += u->number;
+            }
+            if (es >= sh->type->minskill) {
+                n += es * u->number;
+            }
+        }
+    }
+    if (o_captains) {
+        *o_captains = captains;
+    }
+    return n;
+}
+
+bool ship_crewed(const ship *sh)
+{
+    int num_caps, crew = crew_skill(sh, &num_caps);
+    return num_caps >= sh->number && enoughsailors(sh, crew);
+}
+
+int ship_capacity(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cargo * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
+}
+
+int ship_cabins(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cabins * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
 }
 
 void getshipweight(const ship * sh, int *sweight, int *scabins)

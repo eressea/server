@@ -90,8 +90,10 @@ extern "C" {
     struct unit *ship_owner(const struct ship *sh);
     void ship_update_owner(struct ship * sh);
 
-    extern const char *shipname(const struct ship *self);
-    extern int shipcapacity(const struct ship *sh);
+    const char *shipname(const struct ship *self);
+    int ship_capacity(const struct ship *sh);
+    int ship_cabins(const struct ship *sh);
+    bool ship_finished(const struct ship *sh);
     extern void getshipweight(const struct ship *sh, int *weight, int *cabins);
 
     extern ship *new_ship(const struct ship_type *stype, struct region *r,
@@ -114,7 +116,10 @@ extern "C" {
     const char *ship_getname(const struct ship *sh);
     void ship_setname(struct ship *self, const char *name);
     int shipspeed(const struct ship *sh, const struct unit *u);
-    int crew_skill(const struct ship *sh);
+
+    bool ship_crewed(const struct ship *sh);
+    int crew_skill(const struct ship *sh, int *num_captains);
+    int ship_captain_minskill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *sh);
 #ifdef __cplusplus

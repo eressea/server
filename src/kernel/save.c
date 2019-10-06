@@ -1283,6 +1283,7 @@ void write_ship(gamedata *data, const ship *sh)
     WRITE_STR(store, (const char *)sh->name);
     WRITE_STR(store, sh->display ? (const char *)sh->display : "");
     WRITE_TOK(store, sh->type->_name);
+    assert(sh->number > 0);
     WRITE_INT(store, sh->number);
     WRITE_INT(store, sh->size);
     WRITE_INT(store, sh->damage);

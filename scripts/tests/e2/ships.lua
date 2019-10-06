@@ -75,3 +75,92 @@ function test_speedy_ship_fast()
     process_orders()
     assert_equal(8, u1.region.x)
 end
+
+function test_ship_convoy_capacity()
+    local r1 = region.create(1, 0, 'ocean')
+    local r2 = region.create(2, 0, 'ocean')
+    local f = faction.create("human")
+    local u = unit.create(f, r1, 1)
+
+    u:add_order('NACH O')
+    u:set_skill('sailing', 2, true)
+    u:add_item('jewel', 40)
+    u.ship = ship.create(r1, 'boat')
+    assert_equal(1, u.ship.number)
+    process_orders()
+    u:clear_orders()
+    assert_equal(r2, u.region)
+
+    u:add_order('NACH W')
+    u:add_item('jewel', 1)
+    u:set_skill('sailing', 2, true)
+    process_orders()
+    u:clear_orders()
+    assert_equal(r2, u.region) -- too heavy
+
+    u:add_order('NACH W')
+    u:add_item('jewel', 39)
+    u.name = 'Xolgrim'
+    u.ship.number = 2
+    u.number = 2
+    u:set_skill('sailing', 2, true)
+    process_orders()
+    u:clear_orders()
+    assert_equal(r1, u.region) -- double capacity
+
+    u:add_order('NACH O')
+    u.ship.number = 2
+    u.name = 'Bolgrim'
+    u:add_item('jewel', 1) -- too heavy again
+    u:set_skill('sailing', 2, true)
+    process_orders()
+    u:clear_orders()
+    assert_equal(r1, u.region)
+end
+
+function test_ship_convoy_crew()
+    local r1 = region.create(1, 0, 'ocean')
+    local r2 = region.create(2, 0, 'ocean')
+    local f = faction.create("human")
+    local u = unit.create(f, r1, 1)
+    u.ship = ship.create(r1, 'boat')
+    u.ship.number = 2
+
+    u:set_skill('sailing', 4, true)
+    u:add_order('NACH O')
+    process_orders()
+    u:clear_orders()
+    assert_equal(r1, u.region) -- not enough captains
+
+    u.number = 2
+    u:set_skill('sailing', 2, true)
+    u:add_order('NACH O')
+    process_orders()
+    u:clear_orders()
+    assert_equal(r2, u.region)
+end
+
+function test_ship_convoy_skill()
+    local r1 = region.create(1, 0, 'ocean')
+    local r2 = region.create(2, 0, 'ocean')
+    local r3 = region.create(3, 0, 'ocean')
+    local f = faction.create("human")
+    local u = unit.create(f, r1, 1)
+    
+    u:set_skill('sailing', 2, true)
+    u.ship = ship.create(r1, 'boat')
+    assert_equal(1, u.ship.number)
+    u:add_order('NACH O')
+    process_orders()
+    assert_equal(r2, u.region)
+
+    u.ship.number = 2
+    u:set_skill('sailing', 2, true)
+    process_orders()
+    assert_equal(r2, u.region)
+
+    u.number = 2
+    u:set_skill('sailing', 2, true)
+    process_orders()
+    assert_equal(r3, u.region)
+end
