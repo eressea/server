@@ -118,7 +118,7 @@ extern "C" {
     int shipspeed(const struct ship *sh, const struct unit *u);
 
     bool ship_crewed(const struct ship *sh);
-    int crew_skill(const struct ship *sh, int *num_captains);
+    int crew_skill(const struct ship *sh);
     int ship_captain_minskill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *sh);

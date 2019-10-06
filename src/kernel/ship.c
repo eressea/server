@@ -332,7 +332,7 @@ int shipspeed(const ship * sh, const unit * u)
 
     bonus = ShipSpeedBonus(u);
     if (bonus > 0 && sh->type->range_max > sh->type->range) {
-        int crew = crew_skill(sh, NULL);
+        int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
             int sbonus = sh->type->range_max - sh->type->range;
@@ -387,31 +387,41 @@ int enoughsailors(const ship * sh, int crew_skill)
     return crew_skill >= sh->type->sumskill * sh->number;
 }
 
-int crew_skill(const ship *sh, int *o_captains) {
-    int n = 0, captains = 0;
+int crew_skill(const ship *sh) {
+    int n = 0;
     unit *u;
 
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
             int es = effskill(u, SK_SAILING, NULL);
-            if (es >= sh->type->cptskill) {
-                captains += u->number;
-            }
             if (es >= sh->type->minskill) {
                 n += es * u->number;
             }
         }
     }
-    if (o_captains) {
-        *o_captains = captains;
-    }
     return n;
 }
 
-bool ship_crewed(const ship *sh)
-{
-    int num_caps, crew = crew_skill(sh, &num_caps);
-    return num_caps >= sh->number && enoughsailors(sh, crew);
+bool ship_crewed(const ship *sh) {
+    unit *u;
+    int capskill = -1, sumskill = 0;
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (capskill < 0) {
+                if (u->number >= sh->number) {
+                    capskill = es;
+                }
+                else {
+                    capskill = 0;
+                }
+            }
+            if (es >= sh->type->minskill) {
+                sumskill += es * u->number;
+            }
+        }
+    }
+    return (capskill >= ship_captain_minskill(sh)) && (sumskill >= sh->type->sumskill * sh->number);
 }
 
 int ship_capacity(const ship * sh)

@@ -100,7 +100,6 @@ function test_ship_convoy_capacity()
 
     u:add_order('NACH W')
     u:add_item('jewel', 39)
-    u.name = 'Xolgrim'
     u.ship.number = 2
     u.number = 2
     u:set_skill('sailing', 2, true)
@@ -146,7 +145,7 @@ function test_ship_convoy_skill()
     local r3 = region.create(3, 0, 'ocean')
     local f = faction.create("human")
     local u = unit.create(f, r1, 1)
-    
+
     u:set_skill('sailing', 2, true)
     u.ship = ship.create(r1, 'boat')
     assert_equal(1, u.ship.number)
@@ -155,9 +154,9 @@ function test_ship_convoy_skill()
     assert_equal(r2, u.region)
 
     u.ship.number = 2
-    u:set_skill('sailing', 2, true)
+    u:set_skill('sailing', 4, true)
     process_orders()
-    assert_equal(r2, u.region)
+    assert_equal(r2, u.region) -- not enough captains
 
     u.number = 2
     u:set_skill('sailing', 2, true)

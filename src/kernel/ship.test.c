@@ -641,21 +641,21 @@ static void test_crew_skill(CuTest *tc) {
     CuAssertIntEquals(tc, 1, stype->minskill);
     r = test_create_ocean(0, 0);
     sh = test_create_ship(r, stype);
-    CuAssertIntEquals(tc, 0, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 0, crew_skill(sh));
     u = test_create_unit(test_create_faction(NULL), r);
     set_level(u, SK_SAILING, 1);
-    CuAssertIntEquals(tc, 0, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 0, crew_skill(sh));
     u_set_ship(u, sh);
     set_level(u, SK_SAILING, 1);
-    CuAssertIntEquals(tc, 1, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 1, crew_skill(sh));
     set_number(u, 10);
-    CuAssertIntEquals(tc, 10, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 10, crew_skill(sh));
     stype->minskill = 2;
-    CuAssertIntEquals(tc, 0, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 0, crew_skill(sh));
     set_level(u, SK_SAILING, 2);
-    CuAssertIntEquals(tc, 20, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 20, crew_skill(sh));
     set_level(u, SK_SAILING, 3);
-    CuAssertIntEquals(tc, 30, crew_skill(sh, NULL));
+    CuAssertIntEquals(tc, 30, crew_skill(sh));
     test_teardown();
 }
 
