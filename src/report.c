@@ -1724,11 +1724,14 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
+        const char *stname;
+
         getshipweight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
-        sbs_printf(&sbs, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, ship_capacity(sh) / 100);
+        stname = locale_plural(f->locale, sh->type->_name, sh->number, true);
+        sbs_printf(&sbs, "%s, %d %s, (%d/%d)", shipname(sh), sh->number,
+            stname, n, ship_capacity(sh) / 100);
     }
     else {
         sbs_printf(&sbs, "%s, %s", shipname(sh), LOC(f->locale, sh->type->_name));

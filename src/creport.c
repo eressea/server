@@ -84,7 +84,7 @@ static char g_bigbuf[BUFFERSIZE];
 bool opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 66
+#define C_REPORT_VERSION 67
 
 struct locale *crtag_locale(void) {
     static struct locale * lang;
