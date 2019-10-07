@@ -424,6 +424,13 @@ bool ship_crewed(const ship *sh) {
     return (capskill >= ship_captain_minskill(sh)) && (sumskill >= sh->type->sumskill * sh->number);
 }
 
+void scale_ship(ship *sh, int n)
+{
+    sh->size = sh->size * n / sh->number;
+    sh->damage = sh->damage * n / sh->number;
+    sh->number = n;
+}
+
 int ship_capacity(const ship * sh)
 {
     if (ship_finished(sh)) {

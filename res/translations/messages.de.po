@@ -2768,6 +2768,12 @@ msgstr "\"$unit($unit) verspeiste $int($amount) Bauern.\""
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen.\""
 
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit gehört nicht zu unserer Partei.\""
+
+msgid "error322"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist bereits auf einem Schiff.\""
+
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"wurde zum Baum\", \"wurden zu Bäumen\").\""
 

@@ -190,3 +190,38 @@ function test_give_ship_merge()
     assert_equal(1, u1.ship.number)
     assert_equal(2, u2.ship.number)
 end
+
+function test_give_ship_max()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    local sh = ship.create(r, 'boat')
+    sh.number = 3
+    sh.damage = 9
+    sh.size = 12
+    u1.ship = sh
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 4 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(3, u1.ship.damage)
+    assert_equal(4, u1.ship.size)
+    assert_equal(2, u2.ship.number)
+    assert_equal(6, u2.ship.damage)
+    assert_equal(8, u2.ship.size)
+end
+
+function test_give_ship_self_only()
+    local r = region.create(1, 0, 'plain')
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
+    local u1 = unit.create(f1, r, 1)
+    local u2 = unit.create(f2, r, 1)
+    local sh = ship.create(r, 'boat')
+    sh.number = 2
+    u1.ship = sh
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(2, u1.ship.number)
+    assert_equal(nil, u2.ship)
+end

@@ -293,8 +293,40 @@ bool rule_transfermen(void)
     return rule != 0;
 }
 
-message * give_ship(unit *u, unit *u2, int n, order *ord) {
+static void transfer_ships(ship *s1, ship *s2, int n)
+{
+    assert(n < s1->number);
+    s2->damage += s1->damage * n / s1->number;
+    s2->size += s1->size * n / s1->number;
+    s2->number += n;
+    scale_ship(s1, s1->number - n);
+}
+
+message * give_ship(unit *u, unit *u2, int n, order *ord)
+{
     assert(u->ship);
+    assert(n > 0 && n < u->ship->number);
+    if (u->faction != u2->faction) {
+        return msg_error(u, ord, 321);
+    }
+    if (u2->ship) {
+        if (u2->ship->type != u->ship->type) {
+            return msg_error(u, ord, 322);
+        }
+        transfer_ships(u->ship, u2->ship, n);
+    }
+    else{
+        if (fval(u_race(u2), RCF_CANSAIL)) {
+            ship * sh = new_ship(u->ship->type, u->region, u->faction->locale);
+            scale_ship(sh, 0);
+            u_set_ship(u2, sh);
+            transfer_ships(u->ship, sh, n);
+        }
+        else {
+            return msg_error(u, ord, 233);
+        }
+
+    }
     if (u->ship->number < n) {
         n = u->ship->number;
     }
@@ -661,18 +693,7 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
     }
     else {
         param_t p = findparam(s, u->faction->locale);
-        if (p == P_SHIP) {
-            if (u->ship) {
-                message * msg = give_ship(u, u2, u->ship->number, ord);
-                if (msg) {
-                    ADDMSG(&u->faction->msgs, msg);
-                }
-            }
-            else {
-                cmistake(u, ord, 144, MSG_COMMERCE);
-            }
-        }
-        else if (p == P_PERSON) {
+        if (p == P_PERSON) {
             if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
@@ -838,7 +859,11 @@ void give_cmd(unit * u, order * ord)
     p = findparam(s, u->faction->locale);
     if (p == P_SHIP) {
         if (u->ship) {
-            message * msg = give_ship(u, u2, n, ord);
+            message * msg;
+            if (n >= u->ship->number) {
+                n = u->ship->number - 1;
+            }
+            msg = give_ship(u, u2, n, ord);
             if (msg) {
                 ADDMSG(&u->faction->msgs, msg);
             }

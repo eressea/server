@@ -49,8 +49,7 @@ static int tolua_ship_set_number(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
     int n = (int)tolua_tonumber(L, 2, 0);
-    sh->number = n;
-    sh->size += sh->type->construction->maxsize;
+    scale_ship(sh, n);
     return 0;
 }
 

@@ -122,6 +122,7 @@ extern "C" {
     int ship_captain_minskill(const struct ship *sh);
 
     int ship_damage_percent(const struct ship *sh);
+    void scale_ship(struct ship *sh, int n);
 #ifdef __cplusplus
 }
 #endif
