@@ -328,7 +328,13 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
     if (ship_cursed(u1->ship)) {
         return msg_error(u1, ord, 323);
     }
+    if (u1 != ship_owner(u1->ship)) {
+        return msg_error(u1, ord, 146);
+    }
     if (u2->ship) {
+        if (u2 != ship_owner(u2->ship)) {
+            return msg_error(u1, ord, 146);
+        }
         if (ship_cursed(u2->ship)) {
             return msg_error(u1, ord, 323);
         }

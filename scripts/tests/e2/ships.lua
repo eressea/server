@@ -183,11 +183,27 @@ function test_give_ship_only_to_captain()
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     local u3 = unit.create(f, r, 1)
-    u2.ship = ship.create(r, 'boat')
-    u3.ship = u2.ship
     u1.ship = ship.create(r, 'boat')
     u1.ship.number = 2
+    u2.ship = ship.create(r, 'boat')
+    u3.ship = u2.ship
     u1:add_order("GIB " .. itoa36(u3.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(2, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+end
+
+function test_give_ship_only_from_captain()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    local u3 = unit.create(f, r, 1)
+    u2.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 2
+    u3.ship = u1.ship
+    u3:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(2, u1.ship.number)
     assert_equal(1, u2.ship.number)
