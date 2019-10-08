@@ -295,40 +295,61 @@ bool rule_transfermen(void)
 
 static void transfer_ships(ship *s1, ship *s2, int n)
 {
-    assert(n < s1->number);
+    assert(n <= s1->number);
     s2->damage += s1->damage * n / s1->number;
     s2->size += s1->size * n / s1->number;
     s2->number += n;
     scale_ship(s1, s1->number - n);
 }
 
-message * give_ship(unit *u, unit *u2, int n, order *ord)
+static void transfer_units(ship *s1, ship *s2)
 {
-    assert(u->ship);
-    assert(n > 0 && n < u->ship->number);
-    if (u->faction != u2->faction) {
-        return msg_error(u, ord, 321);
-    }
-    if (u2->ship) {
-        if (u2->ship->type != u->ship->type) {
-            return msg_error(u, ord, 322);
+    region * r = s1->region;
+    unit *u;
+    for (u = r->units; u; u = u->next) {
+        if (u->ship == s1) {
+            leave_ship(u);
+            u_set_ship(u, s2);
         }
-        transfer_ships(u->ship, u2->ship, n);
     }
-    else{
-        if (fval(u_race(u2), RCF_CANSAIL)) {
-            ship * sh = new_ship(u->ship->type, u->region, u->faction->locale);
-            scale_ship(sh, 0);
-            u_set_ship(u2, sh);
-            transfer_ships(u->ship, sh, n);
+}
+
+message * give_ship(unit *u1, unit *u2, int n, order *ord)
+{
+    assert(u1->ship);
+    assert(n > 0 && n <= u1->ship->number);
+    if (u1->faction != u2->faction) {
+        return msg_error(u1, ord, 321);
+    }
+    /* TODO: when transferring all ships, unit must hop on the target ship */
+    if (u2->ship) {
+        if (n < u1->ship->number) {
+            if (u2->ship->type != u1->ship->type) {
+                return msg_error(u1, ord, 322);
+            }
+            transfer_ships(u1->ship, u2->ship, n);
         }
         else {
-            return msg_error(u, ord, 233);
+            transfer_ships(u1->ship, u2->ship, n);
+            transfer_units(u1->ship, u2->ship);
         }
-
     }
-    if (u->ship->number < n) {
-        n = u->ship->number;
+    else {
+        if (fval(u_race(u2), RCF_CANSAIL)) {
+            if (n < u1->ship->number) {
+                ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                scale_ship(sh, 0);
+                u_set_ship(u2, sh);
+                transfer_ships(u1->ship, sh, n);
+            }
+            else {
+                u_set_ship(u2, u1->ship);
+                ship_set_owner(u2);
+            }
+        }
+        else {
+            return msg_error(u1, ord, 233);
+        }
     }
     return NULL;
 }
@@ -860,8 +881,8 @@ void give_cmd(unit * u, order * ord)
     if (p == P_SHIP) {
         if (u->ship) {
             message * msg;
-            if (n >= u->ship->number) {
-                n = u->ship->number - 1;
+            if (n > u->ship->number) {
+                n = u->ship->number;
             }
             msg = give_ship(u, u2, n, ord);
             if (msg) {
