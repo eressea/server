@@ -314,15 +314,24 @@ static void transfer_units(ship *s1, ship *s2)
     }
 }
 
+static bool ship_cursed(const ship *sh) {
+    return a_find(sh->attribs, &at_curse) != NULL;
+}
+
 message * give_ship(unit *u1, unit *u2, int n, order *ord)
 {
     assert(u1->ship);
     assert(n > 0 && n <= u1->ship->number);
     if (u1->faction != u2->faction) {
-        return msg_error(u1, ord, 321);
+        return msg_error(u1, ord, 324);
     }
-    /* TODO: when transferring all ships, unit must hop on the target ship */
+    if (ship_cursed(u1->ship)) {
+        return msg_error(u1, ord, 323);
+    }
     if (u2->ship) {
+        if (ship_cursed(u2->ship)) {
+            return msg_error(u1, ord, 323);
+        }
         if (n < u1->ship->number) {
             if (u2->ship->type != u1->ship->type) {
                 return msg_error(u1, ord, 322);
@@ -892,6 +901,7 @@ void give_cmd(unit * u, order * ord)
         else {
             cmistake(u, ord, 144, MSG_COMMERCE);
         }
+        return;
     }
     else if (p == P_PERSON) {
         if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {

@@ -2768,6 +2768,18 @@ msgstr "\"$unit($unit) ate $int($amount) peasants.\""
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it is trying to flee.\""
 
+msgid "error325"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Spells can only be cast on a single ship.\""
+
+msgid "error324"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not one of ours.\""
+
+msgid "error322"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is already on a ship.\""
+
+msgid "error323"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is under a spell.\""
+
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) turned into $if($eq($number,1),\"a tree\", \"trees\").\""
 

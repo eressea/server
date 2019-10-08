@@ -177,6 +177,22 @@ function test_give_ship()
     assert_equal(1, u2.ship.number)
 end
 
+function test_give_ship_only_to_captain()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    local u3 = unit.create(f, r, 1)
+    u2.ship = ship.create(r, 'boat')
+    u3.ship = u2.ship
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 2
+    u1:add_order("GIB " .. itoa36(u3.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(2, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+end
+
 function test_give_ship_merge()
     local r = region.create(1, 0, 'ocean')
     local f = faction.create("human")
@@ -227,15 +243,17 @@ end
 
 function test_give_ship_all_ships()
     local r = region.create(1, 0, 'plain')
-    local f = faction.create("human")
+    local f = faction.create("human", 'noreply@vg.no')
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     u1.ship = ship.create(r, 'boat')
+    u1.ship.damage = 2
     u1.ship.number = 2
     u2.ship = ship.create(r, 'boat')
     u2.ship.number = 1
     u1:add_order("GIB " .. itoa36(u2.id) .. " 2 SCHIFF")
     process_orders()
+    write_reports()
     assert_equal(3, u2.ship.number)
     assert_equal(u2.ship, u1.ship)
 end
@@ -253,4 +271,47 @@ function test_give_ship_self_only()
     process_orders()
     assert_equal(2, u1.ship.number)
     assert_equal(nil, u2.ship)
+end
+
+function test_give_ship_not_cursed()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    local sh = ship.create(r, 'boat')
+    u.ship = sh
+    u:add_item("speedsail", 1)
+    u:add_order("BENUTZE 1 Sonnensegel")
+    process_orders()
+    u:clear_orders()
+    assert_equal(1, sh:get_curse('shipspeedup'))
+
+    u:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(nil, u2.ship)
+end
+
+function test_speedsail_on_ship()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local sh = ship.create(r, 'boat')
+    u.ship = sh
+    u:add_item("speedsail", 1)
+    u:add_order("BENUTZE 1 Sonnensegel")
+    process_orders()
+    assert_equal(1, sh:get_curse('shipspeedup'))
+end
+
+function test_no_speedsail_on_convoy()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local sh = ship.create(r, 'boat')
+    u.ship = sh
+    sh.number = 2
+    u:add_item("speedsail", 2)
+    u:add_order("BENUTZE 2 Sonnensegel")
+    process_orders()
+    assert_equal(nil, sh:get_curse('shipspeedup'))
 end

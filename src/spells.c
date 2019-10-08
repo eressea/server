@@ -808,6 +808,10 @@ static int sp_goodwinds(castorder * co)
         return 0;
 
     sh = pa->param[0]->data.sh;
+    if (sh->number > 1) {
+        cmistake(caster, co->order, 325, MSG_MAGIC);
+        return 0;
+    }
 
     /* keine Probleme mit C_SHIP_SPEEDUP und C_SHIP_FLYING */
     /* NODRIFT bewirkt auch +1 Geschwindigkeit */
@@ -2231,6 +2235,10 @@ static int sp_stormwinds(castorder * co)
 
         sh = pa->param[n]->data.sh;
 
+        if (sh->number > 1) {
+            cmistake(caster, co->order, 325, MSG_MAGIC);
+            continue;
+        }
         if (is_cursed(sh->attribs, &ct_flyingship)) {
             ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                 "error_spell_on_flying_ship", "ship", sh))
