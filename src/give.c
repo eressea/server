@@ -331,26 +331,36 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
     if (u1 != ship_owner(u1->ship)) {
         return msg_error(u1, ord, 146);
     }
-    if (u2->ship) {
-        if (u2 != ship_owner(u2->ship)) {
-            return msg_error(u1, ord, 146);
-        }
-        if (ship_cursed(u2->ship)) {
-            return msg_error(u1, ord, 323);
-        }
-        if (n < u1->ship->number) {
+    if (fval(u_race(u2), RCF_CANSAIL)) {
+        if (u2->ship) {
+            if (u2 != ship_owner(u2->ship)) {
+                return msg_error(u1, ord, 146);
+            }
             if (u2->ship->type != u1->ship->type) {
                 return msg_error(u1, ord, 322);
             }
-            transfer_ships(u1->ship, u2->ship, n);
+            if (ship_cursed(u2->ship)) {
+                return msg_error(u1, ord, 323);
+            }
+            if (u1->ship->coast != u2->ship->coast) {
+                if (u1->ship->coast != NODIRECTION) {
+                    if (u2->ship->coast == NODIRECTION) {
+                        u2->ship->coast = u1->ship->coast;
+                    }
+                    else {
+                        return msg_error(u1, ord, 182);
+                    }
+                }
+            }
+            if (n < u1->ship->number) {
+                transfer_ships(u1->ship, u2->ship, n);
+            }
+            else {
+                transfer_ships(u1->ship, u2->ship, n);
+                transfer_units(u1->ship, u2->ship);
+            }
         }
         else {
-            transfer_ships(u1->ship, u2->ship, n);
-            transfer_units(u1->ship, u2->ship);
-        }
-    }
-    else {
-        if (fval(u_race(u2), RCF_CANSAIL)) {
             if (n < u1->ship->number) {
                 ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
                 scale_ship(sh, 0);
@@ -362,9 +372,9 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
                 ship_set_owner(u2);
             }
         }
-        else {
-            return msg_error(u1, ord, 233);
-        }
+    }
+    else {
+        return msg_error(u1, ord, 233);
     }
     return NULL;
 }

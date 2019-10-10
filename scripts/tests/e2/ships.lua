@@ -193,6 +193,49 @@ function test_give_ship_only_to_captain()
     assert_equal(1, u2.ship.number)
 end
 
+function test_give_ship_compatible_coasts()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 4
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    u2.ship = ship.create(r, 'boat')
+
+    -- cannot give a ship with different coast:
+    u1.ship.coast = 1
+    u2.ship.coast = 2
+    process_orders()
+    assert_equal(4, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+
+    -- can give a ship with no coast:
+    u1.ship.coast = -1
+    u2.ship.coast = 2
+    process_orders()
+    assert_equal(3, u1.ship.number)
+    assert_equal(2, u2.ship.number)
+    assert_equal(2, u2.ship.coast)
+
+    -- can give a ship with same coast:
+    u1.ship.coast = 2
+    u2.ship.coast = 2
+    process_orders()
+    assert_equal(2, u1.ship.number)
+    assert_equal(3, u2.ship.number)
+    assert_equal(2, u2.ship.coast)
+
+    -- giving to a ship with no coast:
+    u1.ship.coast = 2
+    u2.ship.coast = -1
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(4, u2.ship.number)
+    assert_equal(2, u2.ship.coast)
+
+end
+
 function test_give_ship_only_from_captain()
     local r = region.create(1, 0, 'ocean')
     local f = faction.create("human")
