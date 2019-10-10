@@ -181,6 +181,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     sh->coast = NODIRECTION;
     sh->type = stype;
     sh->region = r;
+    sh->number = 1;
 
     if (lang) {
         sname = LOC(lang, stype->_name);
@@ -275,13 +276,13 @@ static int ShipSpeedBonus(const unit * u)
     }
     if (bonus > 0) {
         int skl = effskill(u, SK_SAILING, NULL);
-        int minsk = (sh->type->cptskill + 1) / 2;
+        int minsk = (ship_captain_minskill(sh) + 1) / 2;
         return (skl - minsk) / bonus;
     }
     else if (sh->type->flags & SFL_SPEEDY) {
         int base = 3;
         int speed = 0;
-        int minsk = sh->type->cptskill * base;
+        int minsk = ship_captain_minskill(sh) * base;
         int skl = effskill(u, SK_SAILING, NULL);
         while (skl >= minsk) {
             ++speed;
@@ -292,21 +293,8 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
-int crew_skill(const ship *sh) {
-    int n = 0;
-    unit *u;
-
-    n = 0;
-
-    for (u = sh->region->units; u; u = u->next) {
-        if (u->ship == sh) {
-            int es = effskill(u, SK_SAILING, NULL);
-            if (es >= sh->type->minskill) {
-                n += es * u->number;
-            }
-        }
-    }
-    return n;
+int ship_captain_minskill(const ship *sh) {
+    return sh->type->cptskill;
 }
 
 int shipspeed(const ship * sh, const unit * u)
@@ -323,9 +311,9 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
 
     k = sh->type->range;
-    if (sh->size != sh->type->construction->maxsize)
+    if (!ship_finished(sh)) {
         return 0;
-
+    }
     if (sh->attribs) {
         if (curse_active(get_curse(sh->attribs, &ct_stormwind))) {
             k *= 2;
@@ -385,17 +373,85 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
-int shipcapacity(const ship * sh)
+bool ship_finished(const ship *sh)
 {
-    int i = sh->type->cargo;
-
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize)
-        return 0;
-
-    if (sh->damage) {
-        i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+    if (sh->type->construction) {
+        return (sh->size >= sh->number * sh->type->construction->maxsize);
     }
-    return i;
+    return true;
+}
+
+int enoughsailors(const ship * sh, int crew_skill)
+{
+    return crew_skill >= sh->type->sumskill * sh->number;
+}
+
+int crew_skill(const ship *sh) {
+    int n = 0;
+    unit *u;
+
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es >= sh->type->minskill) {
+                n += es * u->number;
+            }
+        }
+    }
+    return n;
+}
+
+bool ship_crewed(const ship *sh) {
+    unit *u;
+    int capskill = -1, sumskill = 0;
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (capskill < 0) {
+                if (u->number >= sh->number) {
+                    capskill = es;
+                }
+                else {
+                    capskill = 0;
+                }
+            }
+            if (es >= sh->type->minskill) {
+                sumskill += es * u->number;
+            }
+        }
+    }
+    return (capskill >= ship_captain_minskill(sh)) && (sumskill >= sh->type->sumskill * sh->number);
+}
+
+void scale_ship(ship *sh, int n)
+{
+    sh->size = sh->size * n / sh->number;
+    sh->damage = sh->damage * n / sh->number;
+    sh->number = n;
+}
+
+int ship_capacity(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cargo * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
+}
+
+int ship_cabins(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cabins * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
 }
 
 void getshipweight(const ship * sh, int *sweight, int *scabins)
@@ -465,17 +521,17 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
     WRITE_INT(store, (sh && sh->region) ? sh->no : 0);
 }
 
-void ship_setname(ship * self, const char *name)
+void ship_setname(ship * sh, const char *name)
 {
-    free(self->name);
-    self->name = name ? str_strdup(name) : 0;
+    free(sh->name);
+    sh->name = name ? str_strdup(name) : 0;
 }
 
-const char *ship_getname(const ship * self)
+const char *ship_getname(const ship * sh)
 {
-    return self->name;
+    return sh->name;
 }
 
-int ship_damage_percent(const ship *ship) {
-    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+int ship_damage_percent(const ship *sh) {
+    return (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
 }
