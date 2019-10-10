@@ -932,8 +932,7 @@ static void build_ship(unit * u, ship * sh, int want)
             msg_message("buildship", "ship unit size", sh, u, n));
 }
 
-void
-create_ship(unit * u, const struct ship_type *newtype, int want,
+void create_ship(unit * u, const struct ship_type *newtype, int want,
     order * ord)
 {
     ship *sh;

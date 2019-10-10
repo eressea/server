@@ -884,9 +884,19 @@ static int tolua_unit_create(lua_State * L)
     const char *rcname = tolua_tostring(L, 4, NULL);
     const race *rc;
 
-    assert(f && r);
+    if (!r) {
+        log_warning("unit.create: arg(2) is not a region");
+        return 0;
+    }
+    if (!f) {
+        log_warning("unit.create: arg(1) is not a faction");
+        return 0;
+    }
     rc = rcname ? rc_find(rcname) : f->race;
-    assert(rc);
+    if (!rc) {
+        log_warning("unit.create: unknown race %s", rcname);
+        return 0;
+    }
     u = create_unit(r, f, num, rc, 0, NULL, NULL);
     tolua_pushusertype(L, u, TOLUA_CAST "unit");
     return 1;

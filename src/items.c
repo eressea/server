@@ -101,6 +101,10 @@ struct order *ord)
         cmistake(u, ord, 20, MSG_MOVE);
         return -1;
     }
+    if (sh->number > 1) {
+        cmistake(u, ord, 325, MSG_MAGIC);
+        return -1;
+    }
 
     effect = SPEEDSAIL_EFFECT;
     create_curse(u, &sh->attribs, &ct_shipspeedup, 20, INT_MAX, effect, 0);

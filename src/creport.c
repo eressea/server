@@ -84,7 +84,7 @@ static char g_bigbuf[BUFFERSIZE];
 bool opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 66
+#define C_REPORT_VERSION 67
 
 struct locale *crtag_locale(void) {
     static struct locale * lang;
@@ -515,7 +515,9 @@ static void report_crtypes(FILE * F, const struct locale *lang)
             fputc('\"', F);
             fputs(crescape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
             fputs("\";text\n", F);
-            fprintf(F, "\"%s\";section\n", kmt->mtype->section);
+            if (kmt->mtype->section) {
+                fprintf(F, "\"%s\";section\n", kmt->mtype->section);
+            }
         }
         while (mtypehash[i]) {
             kmt = mtypehash[i];
@@ -695,6 +697,7 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
         stream_printf(out, "\"%s\";Beschr\n", sh->display);
     stream_printf(out, "\"%s\";Typ\n", translate(sh->type->_name,
         LOC(f->locale, sh->type->_name)));
+    stream_printf(out, "%d;Anzahl\n", sh->number);
     stream_printf(out, "%d;Groesse\n", sh->size);
     if (sh->damage) {
         int percent =
@@ -710,7 +713,7 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
     /* calculate cargo */
     if (u && (u->faction == f || omniscient(f))) {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
+        int mweight = ship_capacity(sh);
         getshipweight(sh, &n, &p);
 
         stream_printf(out, "%d;capacity\n", mweight);
