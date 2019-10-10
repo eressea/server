@@ -470,13 +470,13 @@ static bool cansail(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
 
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_finished(sh)) {
         return false;
     }
     else {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
-        int mcabins = sh->type->cabins;
+        int mweight = ship_capacity(sh);
+        int mcabins = ship_cabins(sh);
 
         getshipweight(sh, &n, &p);
 
@@ -492,12 +492,12 @@ static double overload(const region * r, ship * sh)
 {
     UNUSED_ARG(r);
 
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize) {
+    if (!ship_finished(sh)) {
         return DBL_MAX;
     }
     else {
         int n = 0, p = 0;
-        int mcabins = sh->type->cabins;
+        int mcabins = sh->type->cabins * sh->number;
         double ovl;
 
         getshipweight(sh, &n, &p);
@@ -507,11 +507,6 @@ static double overload(const region * r, ship * sh)
         }
         return ovl;
     }
-}
-
-int enoughsailors(const ship * sh, int crew_skill)
-{
-    return crew_skill >= sh->type->sumskill;
 }
 
 /* ------------------------------------------------------------- */
@@ -808,7 +803,7 @@ static void drifting_ships(region * r)
             ship *sh = *shp;
             region *rnext = NULL;
             region_list *route = NULL;
-            unit *firstu = r->units, *lastu = NULL, *captain;
+            unit *firstu = r->units, *lastu = NULL;
             direction_t dir = NODIRECTION;
             double ovl;
 
@@ -822,16 +817,10 @@ static void drifting_ships(region * r)
                 continue;
             }
 
-            /* Kapitaen bestimmen */
-            captain = ship_owner(sh);
-            if (captain && effskill(captain, SK_SAILING, r) < sh->type->cptskill)
-                captain = NULL;
-
             /* Kapitaen da? Beschaedigt? Genuegend Matrosen?
              * Genuegend leicht? Dann ist alles OK. */
 
-            if (captain && sh->size == sh->type->construction->maxsize
-                && enoughsailors(sh, crew_skill(sh)) && cansail(r, sh)) {
+            if (ship_finished(sh) && ship_crewed(sh) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1639,19 +1628,17 @@ static bool ship_ready(const region * r, unit * u, order * ord)
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
-    if (effskill(u, SK_SAILING, r) < u->ship->type->cptskill) {
+    if (effskill(u, SK_SAILING, r) < ship_captain_minskill(u->ship)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-            "error_captain_skill_low", "value ship", u->ship->type->cptskill,
+            "error_captain_skill_low", "value ship", ship_captain_minskill(u->ship),
             u->ship));
         return false;
     }
-    if (u->ship->type->construction) {
-        if (u->ship->size != u->ship->type->construction->maxsize) {
-            cmistake(u, ord, 15, MSG_MOVE);
-            return false;
-        }
+    if (!ship_finished(u->ship)) {
+        cmistake(u, ord, 15, MSG_MOVE);
+        return false;
     }
-    if (!enoughsailors(u->ship, crew_skill(u->ship))) {
+    if (!ship_crewed(u->ship)) {
         cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }

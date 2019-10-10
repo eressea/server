@@ -303,6 +303,9 @@ msgstr "busybeer"
 msgid "balloon_a"
 msgstr "a balloon"
 
+msgid "balloon_p"
+msgstr "balloons"
+
 msgid "jadee_ring"
 msgstr "Jadee's wedding ring"
 
@@ -878,6 +881,9 @@ msgstr "gems"
 
 msgid "boat_a"
 msgstr "a boat"
+
+msgid "boat_p"
+msgstr "boats"
 
 msgctxt "race"
 msgid "orc_p"
@@ -1458,11 +1464,17 @@ msgstr "ring of invisibility"
 msgid "galleon_a"
 msgstr "a galleon"
 
+msgid "galleon_p"
+msgstr "galleons"
+
 msgid "galleon"
 msgstr "galleon"
 
 msgid "caravel_a"
 msgstr "a caravel"
+
+msgid "caravel_p"
+msgstr "caravels"
 
 msgid "mallornspear_p"
 msgstr "mallorn spear"
@@ -2438,6 +2450,9 @@ msgstr "fjord fungus"
 
 msgid "trireme_a"
 msgstr "a trireme"
+
+msgid "trireme_p"
+msgstr "triremes"
 
 msgctxt "spell"
 msgid "healing"
@@ -3638,6 +3653,9 @@ msgstr "goblin head"
 
 msgid "longboat_a"
 msgstr "a longboat"
+
+msgid "longboat_p"
+msgstr "longboats"
 
 msgctxt "race"
 msgid "lynx"
@@ -5170,6 +5188,9 @@ msgstr "tiger"
 
 msgid "dragonship_a"
 msgstr "a dragonship"
+
+msgid "dragonship_p"
+msgstr "dragonships"
 
 msgctxt "race"
 msgid "mountainguard_x"

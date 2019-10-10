@@ -53,7 +53,6 @@ extern "C" {
 
     int personcapacity(const struct unit *u);
     void movement(void);
-    void run_to(struct unit *u, struct region *to);
     int enoughsailors(const struct ship *sh, int sumskill);
     bool canswim(struct unit *u);
     bool canfly(struct unit *u);

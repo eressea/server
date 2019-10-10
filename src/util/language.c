@@ -129,6 +129,19 @@ const char *locale_getstring(const locale * lang, const char *key)
     return NULL;
 }
 
+const char *locale_plural(const struct locale *lang, const char *key, int n, bool warn) {
+    assert(lang);
+    assert(key);
+
+    if (n != 1) {
+        char plural[32];
+        snprintf(plural, 32, "%s_p", key);
+        plural[31] = '\0';
+        return locale_string(lang, plural, warn);
+    }
+    return locale_string(lang, key, warn);
+}
+
 const char *locale_string(const locale * lang, const char *key, bool warn)
 {
     assert(lang);

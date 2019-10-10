@@ -32,6 +32,7 @@ extern "C" {
     const char *locale_getstring(const struct locale *lang,
         const char *key);
     const char *locale_string(const struct locale *lang, const char *key, bool warn); /* does fallback */
+    const char *locale_plural(const struct locale *lang, const char *key, int n, bool warn);
     unsigned int locale_index(const struct locale *lang);
     const char *locale_name(const struct locale *lang);
 
