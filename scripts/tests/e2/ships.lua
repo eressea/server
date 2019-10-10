@@ -83,9 +83,9 @@ function test_ship_convoy_capacity()
     local u = unit.create(f, r1, 1)
 
     u:add_order('NACH O')
-    u:set_skill('sailing', 2, true)
-    u:add_item('jewel', 40)
-    u.ship = ship.create(r1, 'boat')
+    u:set_skill('sailing', 10, true)
+    u:add_item('jewel', 490)
+    u.ship = ship.create(r1, 'longboat')
     assert_equal(1, u.ship.number)
     process_orders()
     u:clear_orders()
@@ -99,19 +99,17 @@ function test_ship_convoy_capacity()
     assert_equal(r2, u.region) -- too heavy
 
     u:add_order('NACH W')
-    u:add_item('jewel', 39)
+    u:add_item('jewel', 489)
     u.ship.number = 2
     u.number = 2
-    u:set_skill('sailing', 2, true)
+    u:set_skill('sailing', 10, true)
     process_orders()
     u:clear_orders()
     assert_equal(r1, u.region) -- double capacity
 
     u:add_order('NACH O')
     u.ship.number = 2
-    u.name = 'Bolgrim'
     u:add_item('jewel', 1) -- too heavy again
-    u:set_skill('sailing', 2, true)
     process_orders()
     u:clear_orders()
     assert_equal(r1, u.region)
@@ -122,17 +120,17 @@ function test_ship_convoy_crew()
     local r2 = region.create(2, 0, 'ocean')
     local f = faction.create("human")
     local u = unit.create(f, r1, 1)
-    u.ship = ship.create(r1, 'boat')
+    u.ship = ship.create(r1, 'longboat')
     u.ship.number = 2
 
-    u:set_skill('sailing', 4, true)
+    u.number = 2
+    u:set_skill('sailing', 5, true)
     u:add_order('NACH O')
     process_orders()
     u:clear_orders()
     assert_equal(r1, u.region) -- not enough captains
 
-    u.number = 2
-    u:set_skill('sailing', 2, true)
+    u:set_skill('sailing', 10, true)
     u:add_order('NACH O')
     process_orders()
     u:clear_orders()
@@ -146,20 +144,20 @@ function test_ship_convoy_skill()
     local f = faction.create("human")
     local u = unit.create(f, r1, 1)
 
-    u:set_skill('sailing', 2, true)
-    u.ship = ship.create(r1, 'boat')
+    u:set_skill('sailing', 10, true)
+    u.ship = ship.create(r1, 'longboat')
     assert_equal(1, u.ship.number)
     u:add_order('NACH O')
     process_orders()
     assert_equal(r2, u.region)
 
     u.ship.number = 2
-    u:set_skill('sailing', 4, true)
+    u:set_skill('sailing', 20, true)
     process_orders()
     assert_equal(r2, u.region) -- not enough captains
 
     u.number = 2
-    u:set_skill('sailing', 2, true)
+    u:set_skill('sailing', 10, true)
     process_orders()
     assert_equal(r3, u.region)
 end
@@ -169,12 +167,81 @@ function test_give_ship()
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    u1.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 2
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(1, u1.ship.number)
     assert_equal(1, u2.ship.number)
+end
+
+function test_give_ship_new_unit()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'longboat')
+    u1.ship.number = 2
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+end
+
+function test_give_ship_same_ship()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'longboat')
+    u2.ship = u1.ship
+    u1.ship.number = 2
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(1, u2.ship.number)
+    assert_not_equal(u1.ship, u2.ship)
+end
+
+function test_give_ship_dont_give_all()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'longboat')
+    u1.ship.number = 2
+    u1:add_order("GIB 0 2 SCHIFF")
+    process_orders()
+    assert_equal(2, u1.ship.number)
+end
+
+function test_give_ship_no_boat()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'boat')
+    u1.ship.number = 1
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    assert_equal(nil, u2.ship)
+end
+
+function test_give_ship_away()
+    local r = region.create(1, 0, 'ocean')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'longboat')
+    u1.ship.number = 2
+    u1:add_order("GIB 0 1 SCHIFF")
+    process_orders()
+    assert_equal(1, u1.ship.number)
+    local count = 0
+    for sh in r.ships do
+        assert_equal(1, sh.number)
+        count = count + 1
+    end
+    assert_equal(2, count)
 end
 
 function test_give_ship_only_to_captain()
@@ -183,9 +250,9 @@ function test_give_ship_only_to_captain()
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     local u3 = unit.create(f, r, 1)
-    u1.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 2
-    u2.ship = ship.create(r, 'boat')
+    u2.ship = ship.create(r, 'longboat')
     u3.ship = u2.ship
     u1:add_order("GIB " .. itoa36(u3.id) .. " 1 SCHIFF")
     process_orders()
@@ -198,10 +265,10 @@ function test_give_ship_compatible_coasts()
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    u1.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 4
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
-    u2.ship = ship.create(r, 'boat')
+    u2.ship = ship.create(r, 'longboat')
 
     -- cannot give a ship with different coast:
     u1.ship.coast = 1
@@ -242,8 +309,8 @@ function test_give_ship_only_from_captain()
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     local u3 = unit.create(f, r, 1)
-    u2.ship = ship.create(r, 'boat')
-    u1.ship = ship.create(r, 'boat')
+    u2.ship = ship.create(r, 'longboat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 2
     u3.ship = u1.ship
     u3:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
@@ -257,8 +324,8 @@ function test_give_ship_merge()
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    u2.ship = ship.create(r, 'boat')
-    u1.ship = ship.create(r, 'boat')
+    u2.ship = ship.create(r, 'longboat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 2
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
@@ -271,8 +338,8 @@ function test_give_ship_only_same()
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    u2.ship = ship.create(r, 'boat')
-    u1.ship = ship.create(r, 'longboat')
+    u2.ship = ship.create(r, 'longboat')
+    u1.ship = ship.create(r, 'caravel')
     u1.ship.number = 2
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
@@ -285,7 +352,7 @@ function test_give_ship_scale()
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    local sh = ship.create(r, 'boat')
+    local sh = ship.create(r, 'longboat')
     sh.number = 3
     sh.damage = 9
     sh.size = 12
@@ -305,10 +372,10 @@ function test_give_ship_all_ships()
     local f = faction.create("human", 'noreply@vg.no')
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    u1.ship = ship.create(r, 'boat')
+    u1.ship = ship.create(r, 'longboat')
     u1.ship.damage = 2
     u1.ship.number = 2
-    u2.ship = ship.create(r, 'boat')
+    u2.ship = ship.create(r, 'longboat')
     u2.ship.number = 1
     u1:add_order("GIB " .. itoa36(u2.id) .. " 2 SCHIFF")
     process_orders()
@@ -323,7 +390,7 @@ function test_give_ship_self_only()
     local f2 = faction.create("human")
     local u1 = unit.create(f1, r, 1)
     local u2 = unit.create(f2, r, 1)
-    local sh = ship.create(r, 'boat')
+    local sh = ship.create(r, 'longboat')
     sh.number = 2
     u1.ship = sh
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
@@ -337,7 +404,7 @@ function test_give_ship_not_cursed()
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
-    local sh = ship.create(r, 'boat')
+    local sh = ship.create(r, 'longboat')
     u.ship = sh
     u:add_item("speedsail", 1)
     u:add_order("BENUTZE 1 Sonnensegel")
@@ -354,7 +421,7 @@ function test_speedsail_on_ship()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
-    local sh = ship.create(r, 'boat')
+    local sh = ship.create(r, 'longboat')
     u.ship = sh
     u:add_item("speedsail", 1)
     u:add_order("BENUTZE 1 Sonnensegel")
@@ -366,7 +433,7 @@ function test_no_speedsail_on_convoy()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
-    local sh = ship.create(r, 'boat')
+    local sh = ship.create(r, 'longboat')
     u.ship = sh
     sh.number = 2
     u:add_item("speedsail", 2)

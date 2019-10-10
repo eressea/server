@@ -2771,6 +2771,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot
 msgid "error325"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Spells can only be cast on a single ship.\""
 
+msgid "error326"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - These ships cannot form a convoy.\""
+
 msgid "error324"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not one of ours.\""
 

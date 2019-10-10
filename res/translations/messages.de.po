@@ -2780,6 +2780,12 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist
 msgid "error323"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist verzaubert.\""
 
+msgid "error327"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Schiffe kann die Einheit nicht übergeben.\""
+
+msgid "error326"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe können keinen Konvoi bilden.\""
+
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"wurde zum Baum\", \"wurden zu Bäumen\").\""
 

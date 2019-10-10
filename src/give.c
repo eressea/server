@@ -299,6 +299,9 @@ static void transfer_ships(ship *s1, ship *s2, int n)
     s2->damage += s1->damage * n / s1->number;
     s2->size += s1->size * n / s1->number;
     s2->number += n;
+    if (s1->coast != NODIRECTION) {
+        s2->coast = s1->coast;
+    }
     scale_ship(s1, s1->number - n);
 }
 
@@ -322,8 +325,9 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
 {
     assert(u1->ship);
     assert(n > 0 && n <= u1->ship->number);
-    if (u1->faction != u2->faction) {
-        return msg_error(u1, ord, 324);
+    if (u1->ship->type->range < 3) {
+        /* Keine Boote und anderes Kleinzeug erlaubt */
+        return msg_error(u1, ord, 326);
     }
     if (ship_cursed(u1->ship)) {
         return msg_error(u1, ord, 323);
@@ -331,50 +335,71 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
     if (u1 != ship_owner(u1->ship)) {
         return msg_error(u1, ord, 146);
     }
-    if (fval(u_race(u2), RCF_CANSAIL)) {
-        if (u2->ship) {
-            if (u2 != ship_owner(u2->ship)) {
-                return msg_error(u1, ord, 146);
-            }
-            if (u2->ship->type != u1->ship->type) {
-                return msg_error(u1, ord, 322);
-            }
-            if (ship_cursed(u2->ship)) {
-                return msg_error(u1, ord, 323);
-            }
-            if (u1->ship->coast != u2->ship->coast) {
-                if (u1->ship->coast != NODIRECTION) {
-                    if (u2->ship->coast == NODIRECTION) {
-                        u2->ship->coast = u1->ship->coast;
+    if (u2 == NULL) {
+        if (n < u1->ship->number) {
+            ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+            scale_ship(sh, 0);
+            transfer_ships(u1->ship, sh, n);
+        }
+        else {
+            return msg_error(u1, ord, 327);
+        }
+    } else {
+        if (u1->faction != u2->faction) {
+            return msg_error(u1, ord, 324);
+        }
+        if (fval(u_race(u2), RCF_CANSAIL)) {
+            if (u2->ship) {
+                if (u2->ship == u1->ship) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    leave_ship(u2);
+                    u_set_ship(u2, sh);
+                } else {
+                    if (u2 != ship_owner(u2->ship)) {
+                        return msg_error(u1, ord, 146);
                     }
-                    else {
-                        return msg_error(u1, ord, 182);
+                    if (u2->ship->type != u1->ship->type) {
+                        return msg_error(u1, ord, 322);
+                    }
+                    if (ship_cursed(u2->ship)) {
+                        return msg_error(u1, ord, 323);
+                    }
+                    if (u1->ship->coast != u2->ship->coast) {
+                        if (u1->ship->coast != NODIRECTION) {
+                            if (u2->ship->coast == NODIRECTION) {
+                                u2->ship->coast = u1->ship->coast;
+                            }
+                            else {
+                                return msg_error(u1, ord, 182);
+                            }
+                        }
                     }
                 }
-            }
-            if (n < u1->ship->number) {
-                transfer_ships(u1->ship, u2->ship, n);
+                if (n < u1->ship->number) {
+                    transfer_ships(u1->ship, u2->ship, n);
+                }
+                else {
+                    transfer_ships(u1->ship, u2->ship, n);
+                    transfer_units(u1->ship, u2->ship);
+                }
             }
             else {
-                transfer_ships(u1->ship, u2->ship, n);
-                transfer_units(u1->ship, u2->ship);
+                if (n < u1->ship->number) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    u_set_ship(u2, sh);
+                    transfer_ships(u1->ship, sh, n);
+                }
+                else {
+                    u_set_ship(u2, u1->ship);
+                    ship_set_owner(u2);
+                }
             }
         }
         else {
-            if (n < u1->ship->number) {
-                ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
-                scale_ship(sh, 0);
-                u_set_ship(u2, sh);
-                transfer_ships(u1->ship, sh, n);
-            }
-            else {
-                u_set_ship(u2, u1->ship);
-                ship_set_owner(u2);
-            }
+            return msg_error(u1, ord, 233);
         }
-    }
-    else {
-        return msg_error(u1, ord, 233);
     }
     return NULL;
 }
