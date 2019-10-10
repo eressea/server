@@ -203,8 +203,8 @@ function test_give_ship_same_ship()
     assert_not_equal(u1.ship, u2.ship)
 end
 
-function test_give_ship_dont_give_all()
-    local r = region.create(1, 0, 'ocean')
+function test_give_ship_all_on_ocean()
+    local r = region.create(0, 0, 'ocean')
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     u1.ship = ship.create(r, 'longboat')
@@ -212,6 +212,18 @@ function test_give_ship_dont_give_all()
     u1:add_order("GIB 0 2 SCHIFF")
     process_orders()
     assert_equal(2, u1.ship.number)
+end
+
+function test_give_ship_all_on_land()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create("human")
+    local u1 = unit.create(f, r, 1)
+    u1.ship = ship.create(r, 'longboat')
+    u1.ship.number = 2
+    u1:add_order("GIB 0 2 SCHIFF")
+    process_orders()
+    assert_equal(nil, u1.ship)
+    assert_not_equal(nil, r.ships())
 end
 
 function test_give_ship_no_boat()
