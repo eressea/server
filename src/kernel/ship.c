@@ -373,10 +373,15 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
+int ship_maxsize(const ship *sh)
+{
+    return sh->number * sh->type->construction->maxsize;
+}
+
 bool ship_finished(const ship *sh)
 {
     if (sh->type->construction) {
-        return (sh->size >= sh->number * sh->type->construction->maxsize);
+        return (sh->size >= ship_maxsize(sh));
     }
     return true;
 }
