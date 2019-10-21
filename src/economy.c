@@ -509,7 +509,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    n = build(u, itype->construction, 0, want, skill_mod);
+    n = build(u, 1, itype->construction, 0, want, skill_mod);
     switch (n) {
     case ENEEDSKILL:
         ADDMSG(&u->faction->msgs,
@@ -850,7 +850,7 @@ static void create_potion(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    built = build(u, itype->construction, 0, want, 0);
+    built = build(u, 1, itype->construction, 0, want, 0);
     switch (built) {
     case ELOWSKILL:
     case ENEEDSKILL:

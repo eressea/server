@@ -312,7 +312,6 @@ function test_give_ship_compatible_coasts()
     assert_equal(1, u1.ship.number)
     assert_equal(4, u2.ship.number)
     assert_equal(2, u2.ship.coast)
-
 end
 
 function test_give_ship_only_from_captain()
@@ -452,4 +451,67 @@ function test_no_speedsail_on_convoy()
     u:add_order("BENUTZE 2 Sonnensegel")
     process_orders()
     assert_equal(nil, sh:get_curse('shipspeedup'))
+end
+
+function test_build_ship()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 25)
+    local sh = ship.create(r, 'longboat')
+    u.ship = sh
+    sh.size = 25
+    u:set_skill('shipcraft', 1)
+    u:add_item("log", 50)
+    u:add_order("MACHE SCHIFF " .. itoa36(sh.id))
+    process_orders()
+    assert_equal(50, sh.size)
+    assert_equal(25, u:get_item('log'))
+end
+
+function test_build_convoi()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 50)
+    local sh = ship.create(r, 'longboat')
+    u.ship = sh
+    sh.number = 2
+    sh.size = 25
+    u:set_skill('shipcraft', 1)
+    u:add_item("log", 100)
+    u:add_order("MACHE SCHIFF " .. itoa36(sh.id))
+    process_orders()
+    assert_equal(75, sh.size)
+    assert_equal(50, u:get_item('log'))
+end
+
+function test_repair_convoi()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 50)
+    local sh = ship.create(r, 'longboat')
+    u.ship = sh
+    sh.number = 2
+    sh.damage = 7500 -- 75 Holz
+    u:set_skill('shipcraft', 1)
+    u:add_item("log", 100)
+    u:add_order("MACHE SCHIFF " .. itoa36(sh.id))
+    process_orders()
+    assert_equal(2500, sh.damage)
+    assert_equal(50, u:get_item('log'))
+end
+
+function test_build_convoi_max()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 100)
+    local sh = ship.create(r, 'longboat')
+    u.ship = sh
+    sh.number = 2
+    sh.size = 25
+    u:set_skill('shipcraft', 1)
+    u:add_item("log", 100)
+    u:add_order("MACHE SCHIFF " .. itoa36(sh.id))
+    process_orders()
+    assert_equal(100, sh.size)
+    assert_equal(25, u:get_item('log'))
 end
