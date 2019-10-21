@@ -468,7 +468,7 @@ function test_build_ship()
     assert_equal(25, u:get_item('log'))
 end
 
-function test_build_convoi()
+function test_build_convoy()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("insect")
     local u = unit.create(f, r, 50)
@@ -484,7 +484,7 @@ function test_build_convoi()
     assert_equal(50, u:get_item('log'))
 end
 
-function test_repair_convoi()
+function test_repair_convoy()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("insect")
     local u = unit.create(f, r, 50)
@@ -500,7 +500,7 @@ function test_repair_convoi()
     assert_equal(50, u:get_item('log'))
 end
 
-function test_build_convoi_max()
+function test_build_convoy_max()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("insect")
     local u = unit.create(f, r, 100)
