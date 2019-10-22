@@ -2227,6 +2227,7 @@ int follow_ship(unit * u, order * ord)
     int  moves, id, speed;
     char command[256];
     direction_t dir;
+    ship *sh;
 
     if (fval(u, UFL_NOTMOVING)) {
         return 0;
@@ -2251,10 +2252,10 @@ int follow_ship(unit * u, order * ord)
         return 0;
     }
 
+    sh = findship(id);
     dir = hunted_dir(rc->attribs, id);
 
     if (dir == NODIRECTION) {
-        ship *sh = findship(id);
         if (sh == NULL || sh->region != rc) {
             cmistake(u, ord, 20, MSG_MOVE);
         }
@@ -2278,7 +2279,7 @@ int follow_ship(unit * u, order * ord)
             speed = maxspeed;
     }
     rc = rconnect(rc, dir);
-    while (rc && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
+    while (rc && rc != sh->region && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
         sbs_strcat(&sbcmd, " ");
         sbs_strcat(&sbcmd, loc);
