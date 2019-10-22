@@ -239,7 +239,7 @@ int destroy_cmd(unit * u, struct order *ord)
         }
         else {
             /* partial destroy */
-            sh->size -= (sh->type->construction->maxsize * n) / 100;
+            sh->size -= (ship_maxsize(sh) * n) / 100;
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
                 "unit region ship", u, r, sh));
         }
