@@ -2279,7 +2279,7 @@ int follow_ship(unit * u, order * ord)
             speed = maxspeed;
     }
     rc = rconnect(rc, dir);
-    while (rc && rc != sh->region && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
+    while (rc && (!sh || rc != sh->region) && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
         const char *loc = LOC(u->faction->locale, directions[dir]);
         sbs_strcat(&sbcmd, " ");
         sbs_strcat(&sbcmd, loc);
