@@ -509,7 +509,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    n = build(u, itype->construction, 0, want, skill_mod);
+    n = build(u, 1, itype->construction, 0, want, skill_mod);
     switch (n) {
     case ENEEDSKILL:
         ADDMSG(&u->faction->msgs,
@@ -607,9 +607,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (is_guard(u)
-                && !fval(u2, UFL_ISNEW)
-                && u2->number && !alliedunit(u2, u->faction, HELP_GUARD)) {
+            if (!fval(u2, UFL_ISNEW) && u2->number 
+                && is_guard(u2) && !alliedunit(u2, u->faction, HELP_GUARD)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
                 return;
@@ -851,7 +850,7 @@ static void create_potion(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    built = build(u, itype->construction, 0, want, 0);
+    built = build(u, 1, itype->construction, 0, want, 0);
     switch (built) {
     case ELOWSKILL:
     case ENEEDSKILL:

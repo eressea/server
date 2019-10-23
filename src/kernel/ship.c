@@ -373,10 +373,15 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
+int ship_maxsize(const ship *sh)
+{
+    return sh->number * sh->type->construction->maxsize;
+}
+
 bool ship_finished(const ship *sh)
 {
     if (sh->type->construction) {
-        return (sh->size >= sh->number * sh->type->construction->maxsize);
+        return (sh->size >= ship_maxsize(sh));
     }
     return true;
 }
@@ -533,5 +538,8 @@ const char *ship_getname(const ship * sh)
 }
 
 int ship_damage_percent(const ship *sh) {
-    return (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+    /* Schaden muss granularer sein als Größe, deshalb ist er skaliert
+     * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Größenpunkt.
+     */
+    return ((DAMAGE_SCALE - 1) + sh->damage * 100) / (sh->size * DAMAGE_SCALE);
 }

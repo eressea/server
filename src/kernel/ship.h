@@ -93,20 +93,20 @@ extern "C" {
     const char *shipname(const struct ship *self);
     int ship_capacity(const struct ship *sh);
     int ship_cabins(const struct ship *sh);
+    int ship_maxsize(const struct ship *sh);
     bool ship_finished(const struct ship *sh);
-    extern void getshipweight(const struct ship *sh, int *weight, int *cabins);
+    void getshipweight(const struct ship *sh, int *weight, int *cabins);
 
-    extern ship *new_ship(const struct ship_type *stype, struct region *r,
+    ship *new_ship(const struct ship_type *stype, struct region *r,
         const struct locale *lang);
-    extern const char *write_shipname(const struct ship *sh, char *buffer,
+    const char *write_shipname(const struct ship *sh, char *buffer,
         size_t size);
-    extern struct ship *findship(int n);
-    extern struct ship *findshipr(const struct region *r, int n);
+    struct ship *findship(int n);
 
-    extern const struct ship_type *findshiptype(const char *s,
+    const struct ship_type *findshiptype(const char *s,
         const struct locale *lang);
 
-    extern void write_ship_reference(const struct ship *sh,
+    void write_ship_reference(const struct ship *sh,
     struct storage *store);
 
     void remove_ship(struct ship **slist, struct ship *s);

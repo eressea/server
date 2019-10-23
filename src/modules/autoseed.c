@@ -874,10 +874,10 @@ int build_island(int x, int y, int minsize, newfaction ** players, int numfactio
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, &random_terrain, minsize - nsize);
+                nsize += random_neighbours(r, &rlist, random_terrain, minsize - nsize);
             }
             else {
-                nsize += random_neighbours(r, &rlist, &get_ocean, minsize - nsize);
+                nsize += random_neighbours(r, &rlist, get_ocean, minsize - nsize);
             }
         }
         regionqueue_push(&island, r);
