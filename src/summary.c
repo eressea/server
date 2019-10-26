@@ -177,11 +177,11 @@ static int count_umlaut(const char *s)
     int result = 0;
     const char *cp;
     for (cp = s; *cp; ++cp) {
-        ucs4_t ucs = *cp;
-        if (ucs & 0x80) {
+        wint_t wc = *cp;
+        if (wc & 0x80) {
             size_t size;
             int err;
-            err = unicode_utf8_to_ucs4(&ucs, cp, &size);
+            err = unicode_utf8_decode(&wc, cp, &size);
             if (err != 0) {
                 log_error("illegal utf8 encoding %s at %s", s, cp);
                 return result;

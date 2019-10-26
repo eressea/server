@@ -70,15 +70,15 @@ end
 function test_give_temp()
     u.number = 2
     u:add_order("GIB TEMP 123 1 PERSON")
-    u:add_order("MACHE TEMP 123 'Herpderp'")
+    u:add_order("MACHE TEMP 123 'Lorax'")
     u:add_order("ENDE")
     _G.process_orders()
     assert_equal(1, u.number)
 
     for x in f.units do
-        if x.name == 'Herpderp' then u=x end
+        if x.name == 'Lorax' then u=x end
     end
-    assert_equal('Herpderp', u.name)
+    assert_equal('Lorax', u.name)
     assert_equal(1, u.number)
 end
 

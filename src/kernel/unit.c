@@ -913,7 +913,7 @@ void u_setfaction(unit * u, faction * f)
             --u->faction->num_units;
             u->faction->num_people -= u->number;
         }
-        join_group(u, NULL);
+        set_group(u, NULL);
         free_orders(&u->orders);
         set_order(&u->thisorder, NULL);
 

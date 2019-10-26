@@ -963,8 +963,7 @@ int sp_hero(struct castorder * co)
         }
     }
 
-    m =
-        msg_message("cast_hero_effect", "mage spell amount", fi->unit, sp, targets);
+    m = msg_message("cast_hero_effect", "mage spell amount", fi->unit, sp, targets);
     message_all(b, m);
     msg_release(m);
 

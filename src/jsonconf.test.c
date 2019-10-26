@@ -160,8 +160,8 @@ static void test_calendar(CuTest * tc)
     CuAssertIntEquals(tc, 99, storms[0]);
     CuAssertIntEquals(tc, 22, storms[1]);
     CuAssertPtrNotNull(tc, month_season);
-    CuAssertIntEquals(tc, 1, month_season[0]);
-    CuAssertIntEquals(tc, 2, month_season[1]);
+    CuAssertIntEquals(tc, SEASON_SPRING, month_season[0]);
+    CuAssertIntEquals(tc, SEASON_SUMMER, month_season[1]);
     cJSON_Delete(json);
     test_teardown();
 }

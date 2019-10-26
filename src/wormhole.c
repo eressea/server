@@ -40,8 +40,10 @@
 
 static bool good_region(const region * r)
 {
-    return (!fval(r, RF_CHAOTIC) && r->age > 30 && rplane(r) == NULL
-        && r->units != NULL && r->land != NULL);
+    if (fval(r, RF_CHAOTIC) || r->age <= 100 || !r->units || !r->land || rplane(r)) {
+        return false;
+    }
+    return true;
 }
 
 static int cmp_age(const void *v1, const void *v2)

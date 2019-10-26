@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1998-2018, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
 Katja Zedel <katze@felidae.kn-bremen.de
 Christian Schlittchen <corwin@amber.kn-bremen.de>
 
@@ -17,27 +17,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 **/
 
 #pragma once
+#ifndef H_GC_RECRUIT
+#define H_GC_RECRUIT
 
-#ifndef H_GC_AUTOMATE
-#define H_GC_AUTOMATE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "skill.h"
+    struct message;
+    struct order;
+    struct race;
+    struct region;
+    struct unit;
 
-struct region;
-struct unit;
+    struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
+    void add_recruits(struct unit * u, int number, int wanted);
+    void recruit(struct region * r);
 
-typedef struct scholar {
-    struct unit *u;
-    int learn;
-    short level;
-} scholar;
-
-#define MAXSCHOLARS 128
-#define STUDENTS_PER_TEACHER 10
-
-void do_autostudy(struct region *r);
-
-int autostudy_init(scholar scholars[], int max_scholars, struct unit **units, skill_t *o_skill);
-void autostudy_run(scholar scholars[], int nscholars);
-
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -32,7 +32,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 typedef struct tref {
     struct tref *nexthash;
-    ucs4_t ucs;
+    wint_t wc;
     struct tnode *node;
 } tref;
 
@@ -99,8 +99,8 @@ char * transliterate(char * out, size_t size, const char * in)
                 size -= advance;
             }
             else {
-                ucs4_t ucs;
-                int ret = unicode_utf8_to_ucs4(&ucs, src, &len);
+                wint_t wc;
+                int ret = unicode_utf8_decode(&wc, src, &len);
                 if (ret != 0) {
                     /* encoding is broken. yikes */
                     log_error("transliterate | encoding error in '%s'\n", src);
@@ -127,7 +127,7 @@ void addtoken(tnode ** root, const char *str, variant id)
 {
     tnode * tk;
     static const struct replace {
-        ucs4_t ucs;
+        wint_t wc;
         const char str[3];
     } replace[] = {
         /* match lower-case (!) umlauts and others to transcriptions */
@@ -150,10 +150,10 @@ void addtoken(tnode ** root, const char *str, variant id)
     else {
         tref *next;
         int ret, index, i = 0;
-        ucs4_t ucs, lcs;
+        wint_t ucs, lcs;
         size_t len;
 
-        ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+        ret = unicode_utf8_decode(&ucs, str, &len);
         assert(ret == 0 || !"invalid utf8 string");
         lcs = ucs;
 
@@ -166,7 +166,7 @@ void addtoken(tnode ** root, const char *str, variant id)
         next = tk->next[index];
         if (!(tk->flags & LEAF))
             tk->id = id;
-        while (next && next->ucs != ucs)
+        while (next && next->wc != ucs)
             next = next->nexthash;
         if (!next) {
             tref *ref;
@@ -181,7 +181,7 @@ void addtoken(tnode ** root, const char *str, variant id)
 
             ref = (tref *)malloc(sizeof(tref));
             if (!ref) abort();
-            ref->ucs = ucs;
+            ref->wc = ucs;
             ref->node = node;
             ref->nexthash = tk->next[index];
             tk->next[index] = ref;
@@ -195,7 +195,7 @@ void addtoken(tnode ** root, const char *str, variant id)
 #endif
                 ref = (tref *)malloc(sizeof(tref));
                 assert_alloc(ref);
-                ref->ucs = lcs;
+                ref->wc = lcs;
                 ref->node = node;
                 ++node->refcount;
                 ref->nexthash = tk->next[index];
@@ -211,7 +211,7 @@ void addtoken(tnode ** root, const char *str, variant id)
         }
         addtoken(&next->node, str + len, id);
         while (replace[i].str[0]) {
-            if (lcs == replace[i].ucs) {
+            if (lcs == replace[i].wc) {
                 char zText[1024];
                 memcpy(zText, replace[i].str, 3);
                 str_strlcpy(zText + 2, (const char *)str + len, sizeof(zText)-2);
@@ -255,9 +255,9 @@ int findtoken(const void * root, const char *key, variant * result)
     do {
         int index;
         const tref *ref;
-        ucs4_t ucs;
+        wint_t wc;
         size_t len;
-        int ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+        int ret = unicode_utf8_decode(&wc, str, &len);
 
         if (ret != 0) {
             /* encoding is broken. youch */
@@ -265,12 +265,12 @@ int findtoken(const void * root, const char *key, variant * result)
             return E_TOK_NOMATCH;
         }
 #if NODEHASHSIZE == 8
-        index = ucs & 7;
+        index = wc & 7;
 #else
-        index = ucs % NODEHASHSIZE;
+        index = wc % NODEHASHSIZE;
 #endif
         ref = tk->next[index];
-        while (ref && ref->ucs != ucs)
+        while (ref && ref->wc != wc)
             ref = ref->nexthash;
         str += len;
         if (!ref) {

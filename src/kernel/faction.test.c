@@ -344,6 +344,7 @@ static void test_addplayer(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertIntEquals(tc, turn, u->faction->lastorders);
     CuAssertIntEquals(tc, i_get(u->items, itype), 10);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));

@@ -860,8 +860,9 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Daemonen verschieben sich.
-*/
+/**
+ * Talente von Daemonen verschieben sich.
+ */
 void demon_skillchange(unit *u)
 {
     skill *sv = u->skills;

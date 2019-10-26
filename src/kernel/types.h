@@ -59,6 +59,7 @@ struct weapon_type;
 typedef enum {
     seen_none,
     seen_neighbour,
+    seen_lighthouse_land,
     seen_lighthouse,
     seen_travel,
     seen_unit,

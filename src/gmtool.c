@@ -580,12 +580,49 @@ static void reset_region(region *r) {
     }
 }
 
-static void reset_cursor(state *st) {
+static region * state_region(state *st) {
     int nx = st->cursor.x;
     int ny = st->cursor.y;
-    region *r;
     pnormalize(&nx, &ny, st->cursor.pl);
-    if ((r = findregion(nx, ny)) != NULL) {
+    return findregion(nx, ny);
+}
+
+static void reset_area_cb(void *arg) {
+    region *r = (region *)arg;
+    r->age = 0;
+    freset(r, RF_MARK);
+}
+
+static void reset_area(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
+        selist * ql = NULL;
+        int qi = 0, qlen = 0;
+        fset(r, RF_MARK);
+        selist_insert(&ql, qlen++, r);
+        while (qi != qlen) {
+            int i;
+            region *adj[MAXDIRECTIONS];
+            r = selist_get(ql, qi++);
+            get_neighbours(r, adj);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = adj[i];
+                if (rn && !fval(rn, RF_MARK)) {
+                    if ((rn->terrain->flags & FORBIDDEN_REGION) == 0) {
+                        fset(rn, RF_MARK);
+                        selist_insert(&ql, qlen++, rn);
+                    }
+                }
+            }
+        }
+        selist_foreach(ql, reset_area_cb);
+        selist_free(ql);
+    }
+}
+
+static void reset_cursor(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
         reset_region(r);
     }
 }
@@ -1072,6 +1109,16 @@ static void seed_player(state *st, const newfaction *player) {
     }
 }
 
+static bool confirm(WINDOW * win, const char *q) {
+    int ch;
+    werase(win);
+    mvwaddstr(win, 0, 0, (char *)q);
+    wmove(win, 0, (int)(strlen(q) + 1));
+    ch = wgetch(win);
+    return (ch == 'y') || (ch == 'Y');
+}
+
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -1156,6 +1203,13 @@ static void handlekey(state * st, int c)
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
         st->wnd_map->update |= 1;
+        break;
+    case 'A': /* clear/reset area */
+        if (confirm(st->wnd_status->handle, "Are you sure you want to reset this entire area?")) {
+            reset_area(st);
+            st->modified = 1;
+            st->wnd_map->update |= 1;
+        }
         break;
     case 'c': /* clear/reset */
         reset_cursor(st);

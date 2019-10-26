@@ -3,11 +3,13 @@
 #endif
 #include <kernel/config.h>
 #include "economy.h"
+#include "recruit.h"
 
-#include <util/message.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/item.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -19,9 +21,9 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -162,7 +164,7 @@ static void test_heroes_dont_recruit(CuTest * tc) {
     fset(u, UFL_HERO);
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_herorecruit"));
@@ -178,7 +180,7 @@ static void test_normals_recruit(CuTest * tc) {
     u = create_recruiter();
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 2, u->number);
 
@@ -493,6 +495,7 @@ static void test_recruit_insect(CuTest *tc) {
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
     msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
     CuAssertPtrEquals(tc, NULL, msg);
 

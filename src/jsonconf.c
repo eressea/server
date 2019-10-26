@@ -792,7 +792,7 @@ static void json_calendar(cJSON *json) {
             for (i = 0, jmonth = child->child; jmonth; jmonth = jmonth->next, ++i) {
                 if (jmonth->type == cJSON_Object) {
                     storms[i] = cJSON_GetObjectItem(jmonth, "storm")->valueint;
-                    month_season[i] = cJSON_GetObjectItem(jmonth, "season")->valueint;
+                    month_season[i] = (season_t) cJSON_GetObjectItem(jmonth, "season")->valueint;
                 }
                 else {
                     log_error("calendar.months[%d] is not an object: %d", i, json->type);
