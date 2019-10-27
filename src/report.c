@@ -1737,10 +1737,10 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
         sbs_printf(&sbs, "%s, %s", shipname(sh), LOC(f->locale, sh->type->_name));
     }
 
-    if (sh->size != sh->type->construction->maxsize) {
+    if (!ship_finished(sh)) {
         sbs_printf(&sbs, ", %s (%d/%d)",
             LOC(f->locale, "nr_undercons"), sh->size,
-            sh->type->construction->maxsize);
+            ship_maxsize(sh));
     }
     if (sh->damage) {
         int percent = ship_damage_percent(sh);

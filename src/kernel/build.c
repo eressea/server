@@ -224,7 +224,7 @@ int destroy_cmd(unit * u, struct order *ord)
             return 14;
         }
 
-        if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
+        if (n >= (sh->size * 100) / ship_maxsize(sh)) {
             /* destroy completly */
             /* all units leave the ship */
             for (u2 = r->units; u2; u2 = u2->next) {
@@ -239,7 +239,7 @@ int destroy_cmd(unit * u, struct order *ord)
         }
         else {
             /* partial destroy */
-            sh->size -= (sh->type->construction->maxsize * n) / 100;
+            sh->size -= (ship_maxsize(sh) * n) / 100;
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
                 "unit region ship", u, r, sh));
         }
@@ -509,9 +509,9 @@ int build_skill(unit *u, int basesk, int skill_mod) {
 * of the first object have already been finished. return the
 * actual size that could be built.
 */
-static int build_limited(unit * u, const construction * con, int completed, int want, int basesk, int *skill_total) {
+static int build_limited(unit * u, const construction * con, int completed, int number, int want, int basesk, int *skill_total) {
     int skills = *skill_total;
-    int made = 0;
+    int made = 0, maxsize = con->maxsize * number;
 
     if (want <= 0) {
         return 0;
@@ -519,7 +519,7 @@ static int build_limited(unit * u, const construction * con, int completed, int 
     if (con == NULL) {
         return ENOMATERIALS;
     }
-    if (completed == con->maxsize) {
+    if (completed == maxsize) {
         return ECOMPLETE;
     }
     for (; want > 0 && skills > 0;) {
@@ -530,8 +530,8 @@ static int build_limited(unit * u, const construction * con, int completed, int 
          *  (enno): Nein, das ist fuer Dinge, bei denen die naechste Ausbaustufe
          *  die gleiche wie die vorherige ist. z.b. Gegenstaende.
          */
-        if (con->maxsize > 0) {
-            completed = completed % con->maxsize;
+        if (maxsize > 0) {
+            completed = completed % (maxsize);
         }
         else {
             completed = 0;
@@ -566,8 +566,8 @@ static int build_limited(unit * u, const construction * con, int completed, int 
 
         if (want < n) n = want;
 
-        if (con->maxsize > 0) {
-            int req = con->maxsize - completed;
+        if (maxsize > 0) {
+            int req = maxsize - completed;
             if (req < n) n = req;
             want = n;
         }
@@ -592,11 +592,12 @@ static int build_limited(unit * u, const construction * con, int completed, int 
     return made;
 }
 
-int build(unit * u, const construction * con, int completed, int want, int skill_mod)
+int build(unit * u, int number, const construction * con, int completed, int want, int skill_mod)
 {
     int skills = INT_MAX;         /* number of skill points remainig */
     int made, basesk = 0;
 
+    assert(number >= 1);
     assert(con->skill != NOSKILL);
     basesk = effskill(u, con->skill, NULL);
     if (basesk == 0) {
@@ -604,7 +605,7 @@ int build(unit * u, const construction * con, int completed, int want, int skill
     }
 
     skills = build_skill(u, basesk, skill_mod);
-    made = build_limited(u, con, completed, want, basesk, &skills);
+    made = build_limited(u, con, completed, number, want, basesk, &skills);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     if (made > 0) {
         produceexp(u, con->skill, (made < u->number) ? made : u->number);
@@ -698,7 +699,7 @@ static int build_stages(unit *u, const building_type *btype, int built, int n, i
                     want = todo;
                 }
             }
-            err = build_limited(u, con, built, want, basesk, skill_total);
+            err = build_limited(u, con, 1, built, want, basesk, skill_total);
             if (err < 0) {
                 if (made == 0) {
                     /* could not make any part at all */
@@ -904,9 +905,9 @@ static void build_ship(unit * u, ship * sh, int want)
     const construction *construction = sh->type->construction;
     int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
     int n;
-    int can = build(u, construction, size, want, 0);
+    int can = build(u, sh->number, construction, size, want, 0);
 
-    if ((n = construction->maxsize - sh->size) > 0 && can > 0) {
+    if ((n = ship_maxsize(sh) - sh->size) > 0 && can > 0) {
         if (can >= n) {
             sh->size += n;
             can -= n;
@@ -1000,11 +1001,12 @@ void continue_ship(unit * u, int want)
         cmistake(u, u->thisorder, 20, MSG_PRODUCE);
         return;
     }
-    cons = sh->type->construction;
-    if (sh->size == cons->maxsize && !sh->damage) {
+    msize = ship_maxsize(sh);
+    if (sh->size >= msize && !sh->damage) {
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
+    cons = sh->type->construction;
     if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));

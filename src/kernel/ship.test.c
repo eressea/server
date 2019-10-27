@@ -30,6 +30,58 @@ static void test_register_ship(CuTest * tc)
     test_teardown();
 }
 
+static void test_ship_crewed(CuTest * tc)
+{
+    struct region *r;
+    struct faction *f;
+    struct ship *sh;
+    struct unit *u1, *u2;
+    struct ship_type *stype;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    r = test_create_ocean(0, 0);
+    stype = test_create_shiptype("longboat");
+    stype->cptskill = 2;
+    stype->sumskill = 4;
+    sh = test_create_ship(r, stype);
+    CuAssertTrue(tc, !ship_crewed(sh));
+    u1 = test_create_unit(f, r);
+    set_level(u1, SK_SAILING, 4);
+    u_set_ship(u1, sh);
+    CuAssertTrue(tc, ship_crewed(sh));
+    u2 = test_create_unit(f, r);
+    set_level(u1, SK_SAILING, 2);
+    set_level(u2, SK_SAILING, 2);
+    u_set_ship(u2, sh);
+    CuAssertTrue(tc, ship_crewed(sh));
+    set_level(u1, SK_SAILING, 1);
+    set_level(u2, SK_SAILING, 2);
+    CuAssertTrue(tc, !ship_crewed(sh));
+    set_level(u1, SK_SAILING, 2);
+    set_level(u2, SK_SAILING, 1);
+    CuAssertTrue(tc, !ship_crewed(sh));
+    set_level(u1, SK_SAILING, 3);
+    set_level(u2, SK_SAILING, 1);
+    CuAssertTrue(tc, ship_crewed(sh));
+    stype->minskill = 2;
+    CuAssertTrue(tc, !ship_crewed(sh));
+    set_level(u1, SK_SAILING, 2);
+    set_level(u2, SK_SAILING, 2);
+    CuAssertTrue(tc, ship_crewed(sh));
+    sh->number = 2;
+    CuAssertTrue(tc, !ship_crewed(sh));
+    set_level(u1, SK_SAILING, 4);
+    set_level(u2, SK_SAILING, 4);
+    CuAssertTrue(tc, !ship_crewed(sh));
+    u1->number = 2;
+    set_level(u1, SK_SAILING, 2);
+    set_level(u2, SK_SAILING, 4);
+    CuAssertTrue(tc, ship_crewed(sh));
+
+    test_teardown();
+}
+
 static void test_ship_set_owner(CuTest * tc)
 {
     struct region *r;
@@ -665,6 +717,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_register_ship);
     SUITE_ADD_TEST(suite, test_stype_defaults);
     SUITE_ADD_TEST(suite, test_ship_set_owner);
+    SUITE_ADD_TEST(suite, test_ship_crewed);
     SUITE_ADD_TEST(suite, test_shipowner_resets_when_empty);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_next_when_empty);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_other_when_empty);

@@ -703,8 +703,8 @@
   <race name="undead" maxaura="1" regaura="1" weight="1000"
   capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0"
   unarmeddefense="0" attackmodifier="1" defensemodifier="1"
-  walk="yes" learn="no" teach="no" noheal="yes"
-  undead="yes" equipment="yes" giveperson="yes">
+  walk="yes" learn="no" teach="no" noheal="yes" desert="yes"
+  undead="yes" equipment="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
@@ -801,7 +801,7 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <race name="skeletonlord" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+  <race name="skeletonlord" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" desert="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="2000" killpeasants="yes" scarepeasants="yes" moverandom="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -816,7 +816,7 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+  <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="10000" killpeasants="yes" scarepeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>

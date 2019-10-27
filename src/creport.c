@@ -700,8 +700,7 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
     stream_printf(out, "%d;Anzahl\n", sh->number);
     stream_printf(out, "%d;Groesse\n", sh->size);
     if (sh->damage) {
-        int percent =
-            (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+        int percent = ship_damage_percent(sh);
         stream_printf(out, "%d;Schaden\n", percent);
     }
     if (u) {
