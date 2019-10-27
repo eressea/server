@@ -52,7 +52,7 @@ static void test_ship_crewed(CuTest * tc)
     CuAssertTrue(tc, ship_crewed(sh));
     u2 = test_create_unit(f, r);
     set_level(u1, SK_SAILING, 2);
-    set_level(u1, SK_SAILING, 2);
+    set_level(u2, SK_SAILING, 2);
     u_set_ship(u2, sh);
     CuAssertTrue(tc, ship_crewed(sh));
     set_level(u1, SK_SAILING, 1);
