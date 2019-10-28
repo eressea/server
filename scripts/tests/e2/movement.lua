@@ -5,11 +5,40 @@ module("tests.e2.movement", package.seeall, lunit.testcase)
 function setup()
     eressea.free_game()
     eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.ship.damage.nocrewocean", "0")
+    eressea.settings.set("rules.ship.damage.nocrew", "0")
+    eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
 end
 
 function test_piracy()
+    local r = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "ocean")
+    local r3 = region.create(-1, 0, "ocean")
+    local f = faction.create("human", "pirate@eressea.de", "de")
+    local f2 = faction.create("human", "elf@eressea.de", "de")
+    local u1 = unit.create(f, r2, 1)
+    local u2 = unit.create(f2, r3, 1)
+    
+    u1.ship = ship.create(r2, "longboat")
+    u2.ship = ship.create(r3, "longboat")
+    u1:set_skill("sailing", 10)
+    u2:set_skill("sailing", 10)
+
+    u1:clear_orders()
+    u1:add_order("PIRATERIE")
+    u2:clear_orders()
+    u2:add_order("NACH o")
+
+    process_orders()
+
+    assert_equal(r, u2.region) -- Nach Osten
+    assert_equal(r, u1.region) -- Entern!
+end 
+
+function test_piracy_to_land()
     local r = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
     local r3 = region.create(-1, 0, "ocean")
@@ -30,10 +59,8 @@ function test_piracy()
 
     process_orders()
 
-    if r2~=u1.region then
-        write_reports()
-    end
-    assert_equal(r2, u1.region) -- should pass, but fails!!!
+    assert_equal(r, u2.region) -- Nach Osten
+    assert_equal(r2, u1.region) -- bewegt sich nicht
 end 
 
 function test_dolphin_on_land()
