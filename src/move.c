@@ -696,18 +696,17 @@ int check_ship_allowed(struct ship *sh, const region * r)
     return SA_NO_COAST;
 }
 
-static void set_coast(ship * sh, region * r, region * rnext)
+static enum direction_t set_coast(ship * sh, region * r, region * rnext)
 {
     if (sh->type->flags & SFL_NOCOAST) {
-        sh->coast = NODIRECTION;
+        return sh->coast = NODIRECTION;
     }
     else if (!fval(rnext->terrain, SEA_REGION) && !flying_ship(sh)) {
-        sh->coast = reldirection(rnext, r);
-        assert(fval(r->terrain, SEA_REGION));
+        if (fval(r->terrain, SEA_REGION)) {
+            return sh->coast = reldirection(rnext, r);
+        }
     }
-    else {
-        sh->coast = NODIRECTION;
-    }
+    return sh->coast = NODIRECTION;
 }
 
 static double overload_start(void) {
@@ -1923,7 +1922,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
             replace_order(&u->orders, ord, norder);
             free_order(norder);
         }
-        set_order(&u->thisorder, NULL);
         set_coast(sh, last_point, current_point);
 
         if (is_cursed(sh->attribs, &ct_flyingship)) {
