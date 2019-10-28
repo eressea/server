@@ -1,8 +1,5 @@
 sudo: false
 language: c
-arch:
-  - amd64
-  - arm64
 compiler:
   - gcc
   - clang
