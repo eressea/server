@@ -501,7 +501,7 @@ static double overload(const region * r, ship * sh)
         double ovl;
 
         getshipweight(sh, &n, &p);
-        ovl = n / (double)sh->type->cargo;
+        ovl = n / (double)(sh->type->cargo * sh->number);
         if (mcabins) {
             ovl = fmax(ovl, p / (double)mcabins);
         }
@@ -746,7 +746,7 @@ double damage_overload(double overload)
 }
 
 /* message to all factions in ship, start from firstu, end before lastu (may be NULL) */
-static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *msg) {
+static void msg_to_passengers(ship *sh, unit **firstu, unit **lastu, message *msg) {
     unit *u, *shipfirst = NULL;
     for (u = *firstu; u != *lastu; u = u->next) {
         if (u->ship == sh) {
@@ -836,19 +836,19 @@ static void drifting_ships(region * r)
 
             if (rnext && firstu) {
                 message *msg = msg_message("ship_drift", "ship dir", sh, dir);
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg);
+                msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
             fset(sh, SF_DRIFTED);
             if (ovl >= overload_start()) {
                 damage_ship(sh, damage_overload(ovl));
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+                msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
             }
             else {
                 damage_ship(sh, damage_drift);
             }
             if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
+                msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                 sink_ship(sh);
                 remove_ship(shp, sh);
             }
