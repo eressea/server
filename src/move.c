@@ -501,7 +501,7 @@ static double overload(const region * r, ship * sh)
         double ovl;
 
         getshipweight(sh, &n, &p);
-        ovl = n / (double)sh->type->cargo;
+        ovl = n / (double)(sh->type->cargo * sh->number);
         if (mcabins) {
             ovl = fmax(ovl, p / (double)mcabins);
         }
@@ -746,7 +746,7 @@ double damage_overload(double overload)
 }
 
 /* message to all factions in ship, start from firstu, end before lastu (may be NULL) */
-static void msg_to_ship_inmates(ship *sh, unit **firstu, unit **lastu, message *msg) {
+static void msg_to_passengers(ship *sh, unit **firstu, unit **lastu, message *msg) {
     unit *u, *shipfirst = NULL;
     for (u = *firstu; u != *lastu; u = u->next) {
         if (u->ship == sh) {
@@ -836,19 +836,19 @@ static void drifting_ships(region * r)
 
             if (rnext && firstu) {
                 message *msg = msg_message("ship_drift", "ship dir", sh, dir);
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg);
+                msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
             fset(sh, SF_DRIFTED);
             if (ovl >= overload_start()) {
                 damage_ship(sh, damage_overload(ovl));
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+                msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
             }
             else {
                 damage_ship(sh, damage_drift);
             }
             if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                msg_to_ship_inmates(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
+                msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                 sink_ship(sh);
                 remove_ship(shp, sh);
             }
@@ -1683,12 +1683,13 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
+static void sail(unit * u, order * ord, bool drifting)
 {
+    region_list *route = NULL;
     region *starting_point = u->region;
     region *current_point, *last_point;
     int k, step = 0;
-    region_list **iroute = routep;
+    region_list **iroute = &route;
     ship *sh = u->ship;
     faction *f = u->faction;
     region *next_point = NULL;
@@ -1697,10 +1698,6 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
     double damage_storm = storms_enabled ? config_get_flt("rules.ship.damage_storm", 0.02) : 0.0;
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
-
-    if (routep) {
-        *routep = NULL;
-    }
 
     error = movewhere(u, token, starting_point, &next_point);
     if (error) {
@@ -1940,7 +1937,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
         if (fval(u, UFL_FOLLOWING))
             caught_target(current_point, u);
 
-        move_ship(sh, starting_point, current_point, routep ? *routep : NULL);
+        move_ship(sh, starting_point, current_point, route);
 
         /* Hafengebuehren ? */
 
@@ -1982,6 +1979,7 @@ static void sail(unit * u, order * ord, region_list ** routep, bool drifting)
             }
         }
     }
+    free_regionlist(route);
 }
 
 /* Segeln, Wandern, Reiten
@@ -2088,14 +2086,12 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 /** traveling without ships
  * walking, flying or riding units use this function
  */
-static void travel(unit * u, order *ord, region_list ** routep)
+static void travel(unit * u, order *ord)
 {
-    region *r = u->region;
-    region_list *route_begin;
-    follower *followers = NULL;
+    region_list *route = NULL;
 
-    assert(routep);
-    *routep = NULL;
+    region *r = u->region;
+    follower *followers = NULL;
 
     /* a few pre-checks that need not be done for each step: */
     if (!fval(r->terrain, SEA_REGION)) {
@@ -2131,12 +2127,10 @@ static void travel(unit * u, order *ord, region_list ** routep)
         return;
     }
 
-    make_route(u, ord, routep);
-    route_begin = *routep;
-
-    if (route_begin) {
+    make_route(u, ord, &route);
+    if (route) {
         /* und ab die post: */
-        travel_i(u, route_begin, NULL, ord, TRAVEL_NORMAL, &followers);
+        travel_i(u, route, NULL, ord, TRAVEL_NORMAL, &followers);
 
         /* followers */
         while (followers != NULL) {
@@ -2157,34 +2151,30 @@ static void travel(unit * u, order *ord, region_list ** routep)
                 follow_order = create_order(K_FOLLOW, lang, "%s %i",
                     s, ut->no);
 
-                route_end = reroute(uf, route_begin, route_end);
-                travel_i(uf, route_begin, route_end, follow_order, TRAVEL_FOLLOWING,
+                route_end = reroute(uf, route, route_end);
+                travel_i(uf, route, route_end, follow_order, TRAVEL_FOLLOWING,
                     &followers);
                 caught_target(uf->region, uf);
                 free_order(follow_order);
             }
         }
+        free_regionlist(route);
     }
 }
 
 void move_cmd(unit * u, order * ord)
 {
-    region_list *route = NULL;
-
     assert(u->number);
     if (u->ship && u == ship_owner(u->ship)) {
         bool drifting = (getkeyword(ord) == K_MOVE);
-        sail(u, ord, &route, drifting);
+        sail(u, ord, drifting);
     }
     else {
-        travel(u, ord, &route);
+        travel(u, ord);
     }
 
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
     set_order(&u->thisorder, NULL);
-
-    if (route != NULL)
-        free_regionlist(route);
 }
 
 static void age_traveldir(region * r)
