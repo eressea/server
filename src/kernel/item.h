@@ -169,7 +169,7 @@ extern "C" {
         int offmod;
         int defmod;
         variant magres;
-        int reload;                 /* time to reload this weapon */
+        unsigned char reload;                 /* time to reload this weapon */
         weapon_mod *modifiers;
         /* --- functions --- */
         bool(*attack) (const struct troop *, const struct weapon_type *,
@@ -208,7 +208,7 @@ extern "C" {
     item_type *it_get_or_create(resource_type *rtype);
     luxury_type *new_luxurytype(item_type * itype, int price);
     weapon_type *new_weapontype(item_type * itype, int wflags,
-        variant magres, const char *damage[], int offmod, int defmod, int reload,
+        variant magres, const char *damage[], int offmod, int defmod, unsigned char reload,
         skill_t sk);
     void free_wtype(struct weapon_type *wtype);
     armor_type *new_armortype(item_type * itype, double penalty,

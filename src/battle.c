@@ -104,8 +104,6 @@ const troop no_troop = { 0, 0 };
 #define LOOT_KEEPLOOT      (1<<4)
 
 #define DAMAGE_CRITICAL      (1<<0)
-#define DAMAGE_MELEE_BONUS   (1<<1)
-#define DAMAGE_MISSILE_BONUS (1<<2)   /* deprecated */
 #define DAMAGE_SKILL_BONUS   (1<<4)
 
 static int max_turns;
@@ -117,7 +115,7 @@ static int flee_chance_skill_bonus;
 static int skill_formula;
 static int rule_cavalry_skill;
 static int rule_population_damage;
-static int rule_hero_speed;
+static unsigned char rule_hero_speed;
 static bool rule_anon_battle;
 static bool rule_igjarjuk_curse;
 static int rule_goblin_bonus;
@@ -139,7 +137,7 @@ static void init_rules(void)
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
-    rule_hero_speed = config_get_int("rules.combat.herospeed", 10);
+    rule_hero_speed = (unsigned char)config_get_int("rules.combat.herospeed", 10);
     rule_population_damage = config_get_int("rules.combat.populationdamage", 20);
     rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     rule_igjarjuk_curse = config_get_int("rules.combat.igjarjuk_curse", 0) != 0;
@@ -156,12 +154,6 @@ static void init_rules(void)
     /* damage calculation */
     if (config_get_int("rules.combat.critical", 1)) {
         rule_damage |= DAMAGE_CRITICAL;
-    }
-    if (config_get_int("rules.combat.melee_bonus", 1)) {
-        rule_damage |= DAMAGE_MELEE_BONUS;
-    }
-    if (config_get_int("rules.combat.missile_bonus", 1)) { /* deprecated */
-        rule_damage |= DAMAGE_MISSILE_BONUS;
     }
     if (config_get_int("rules.combat.skill_bonus", 1)) {
         rule_damage |= DAMAGE_SKILL_BONUS;
@@ -1304,9 +1296,7 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
 
         if (awtype == NULL || !fval(awtype, WTF_MISSILE)) {
             /* melee bonus */
-            if (rule_damage & DAMAGE_MELEE_BONUS) {
-                damage += af->person[at.index].damage;
-            }
+            damage += af->person[at.index].damage;
         }
 
         /* Skilldifferenzbonus */
@@ -3158,7 +3148,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             fig->person[i].hp++;
 
         if (i < speeded)
-            fig->person[i].speed = speed;
+            fig->person[i].speed = (unsigned char) speed;
         else
             fig->person[i].speed = 1;
 

@@ -280,7 +280,7 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
             wtype->defmod = xml_int(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "reload")) {
-            wtype->reload = xml_int(attr[i + 1]);
+            wtype->reload = (unsigned char) xml_int(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "skill")) {
             wtype->skill = findskill(attr[i + 1]);
