@@ -2107,7 +2107,7 @@ static void test_quit_transfer_limited(CuTest *tc) {
 }
 
 /**
- * Gifting units with same magic schools.
+ * Mages cannot be transfered. At all.
  */
 static void test_quit_transfer_mages(CuTest *tc) {
     faction *f1, *f2;
@@ -2130,28 +2130,13 @@ static void test_quit_transfer_mages(CuTest *tc) {
     set_level(u1, SK_MAGIC, 1);
     create_mage(u1, M_GWYRRD);
 
-    f2->magiegebiet = M_CERDDOR;
+    f2->magiegebiet = M_GWYRRD;
     set_level(u2, SK_MAGIC, 1);
-    create_mage(u2, M_CERDDOR);
+    create_mage(u2, M_GWYRRD);
 
     quit_cmd(u1, u1->thisorder);
     CuAssertPtrEquals(tc, f1, u1->faction);
     CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
-    f1->flags -= FFL_QUIT;
-
-    unit_set_magic(u1, M_CERDDOR);
-    scale_number(u1, 2);
-    f1->magiegebiet = M_CERDDOR;
-    quit_cmd(u1, u1->thisorder);
-    CuAssertPtrEquals(tc, f1, u1->faction);
-    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
-    f1->flags -= FFL_QUIT;
-
-    unit_set_magic(u1, M_CERDDOR);
-    scale_number(u1, 1);
-    f1->magiegebiet = M_CERDDOR;
-    quit_cmd(u1, u1->thisorder);
-    CuAssertPtrEquals(tc, f2, u1->faction);
 
     test_teardown();
 }

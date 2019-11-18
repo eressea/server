@@ -951,23 +951,15 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
         if (u_race(u) == fdst->race) {
             u->flags &= ~UFL_HERO;
-            if (give_unit_allowed(u) == 0) {
+            if (give_unit_allowed(u) == 0 && !get_mage(u)) {
                 if (u->skills) {
                     int i;
-
                     for (i = 0; i != u->skill_size; ++i) {
                         const skill *sv = u->skills + i;
                         skill_t sk = (skill_t)sv->id;
-                        struct sc_mage *mage;
 
                         if (skill_count[sk] + u->number > skill_limit[sk]) {
                             break;
-                        }
-                        mage = get_mage(u);
-                        if (mage) {
-                            if (fdst->magiegebiet != mage_get_type(mage)) {
-                                break;
-                            }
                         }
                     }
                     if (i != u->skill_size) {
