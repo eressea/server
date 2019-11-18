@@ -976,8 +976,16 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                     for (i = 0; i != u->skill_size; ++i) {
                         const skill *sv = u->skills + i;
                         skill_t sk = (skill_t)sv->id;
+                        struct sc_mage *mage;
+
                         if (skill_count[sk] + u->number > skill_limit[sk]) {
                             break;
+                        }
+                        mage = get_mage(u);
+                        if (mage) {
+                            if (fdst->magiegebiet != mage_get_type(mage)) {
+                                break;
+                            }
                         }
                     }
                     if (i != u->skill_size) {
