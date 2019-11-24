@@ -292,6 +292,7 @@ static int forget_cmd(unit * u, order * ord)
                 if (ufam) {
                     a_removeall(&ufam->attribs, NULL);
                     u_setfaction(ufam, get_monsters());
+                    u_freeorders(ufam);
                     unit_convert_race(ufam, NULL, "ghost");
                 }
                 a_removeall(&u->attribs, &at_mage);

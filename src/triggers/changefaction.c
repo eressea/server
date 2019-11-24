@@ -48,7 +48,9 @@ static int changefaction_handle(trigger * t, void *data)
      */
     changefaction_data *td = (changefaction_data *)t->data.v;
     if (td->unit && td->faction) {
-        u_setfaction(td->unit, td->faction);
+        unit * u = td->unit;
+        u_setfaction(u, td->faction);
+        u_freeorders(u);
     }
     else {
         log_error("could not perform changefaction::handle()\n");

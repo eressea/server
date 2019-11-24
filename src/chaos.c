@@ -86,6 +86,7 @@ static void chaos(region * r)
                 if (u && playerrace(u_race(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
                     u_setfaction(u, get_monsters());
+                    u_freeorders(u);
                     u_setrace(u, get_race(RC_GHOUL));
                 }
             }

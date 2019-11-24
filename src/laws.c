@@ -3764,6 +3764,10 @@ void process(void)
                                 }
                                 if (ord) {
                                     porder->data.per_order.process(u, ord);
+                                    if (!u->orders) {
+                                        /* GIVE UNIT or QUIT delete all orders of the unit, stop */
+                                        break;
+                                    }
                                 }
                             }
                             if (!ord || *ordp == ord)
