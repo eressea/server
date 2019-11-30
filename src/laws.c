@@ -924,6 +924,7 @@ int leave_cmd(unit * u, struct order *ord)
 void transfer_faction(faction *fsrc, faction *fdst) {
     unit *u;
     skill_t sk;
+    int hmax, hnow;
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
@@ -945,12 +946,21 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
+    hnow = countheroes(fdst);
+    hmax = maxheroes(fdst);
     u = fsrc->units;
     while (u) {
         unit *unext = u->nextF;
 
         if (u_race(u) == fdst->race) {
-            u->flags &= ~UFL_HERO;
+            if (u->flags & UFL_HERO) {
+                if (u->number + hnow > hmax) {
+                    u->flags &= ~UFL_HERO;
+                }
+                else {
+                    hnow += u->number;
+                }
+            }
             if (give_unit_allowed(u) == 0 && !get_mage(u)) {
                 if (u->skills) {
                     int i;
