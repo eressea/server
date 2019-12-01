@@ -179,6 +179,7 @@ extern "C" {
     /* cleanup code for this module */
     void free_units(void);
     void u_setfaction(struct unit *u, struct faction *f);
+    void u_freeorders(struct unit *u);
     void set_number(struct unit *u, int count);
 
     int invisible(const struct unit *target, const struct unit *viewer);

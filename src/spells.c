@@ -3553,7 +3553,7 @@ static int sp_charmingsong(castorder * co)
 
     /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
     u_setfaction(target, mage->faction);
-    set_order(&target->thisorder, NULL);
+    u_freeorders(target);
 
     /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
      * steckt */
@@ -3796,7 +3796,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     u_setfaction(target, mage->faction);
-    set_order(&target->thisorder, NULL);
+    u_freeorders(target);
 
     /* Erfolg melden */
     ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "sp_migranten",

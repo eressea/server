@@ -174,6 +174,7 @@ void monsters_desert(struct faction *monsters)
                     ADDMSG(&u->faction->msgs, msg_message("desertion",
                         "unit region", u, r));
                     u_setfaction(u, monsters);
+                    u_freeorders(u);
                 }
             }
         }
@@ -1157,6 +1158,7 @@ void monster_kills_peasants(unit * u)
 void make_zombie(unit * u)
 {
     u_setfaction(u, get_monsters());
+    u_freeorders(u);
     scale_number(u, 1);
     u->hp = unit_max_hp(u) * u->number;
     u_setrace(u, get_race(RC_ZOMBIE));

@@ -886,6 +886,12 @@ struct building *inside_building(const struct unit *u)
     return NULL;
 }
 
+void u_freeorders(unit *u)
+{
+    free_orders(&u->orders);
+    set_order(&u->thisorder, NULL);
+}
+
 void u_setfaction(unit * u, faction * f)
 {
     if (u->faction == f)
@@ -896,9 +902,6 @@ void u_setfaction(unit * u, faction * f)
             u->faction->num_people -= u->number;
         }
         set_group(u, NULL);
-        free_orders(&u->orders);
-        set_order(&u->thisorder, NULL);
-
         if (u->nextF) {
             u->nextF->prevF = u->prevF;
         }

@@ -709,6 +709,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
     add_give_person(u, u2, u->number, ord, 0);
     u_setfaction(u, u2->faction);
+    u_freeorders(u);
     u2->faction->newbies += u->number;
 }
 
