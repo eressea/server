@@ -389,6 +389,9 @@ msgstr "Schaffenstrunk"
 msgid "balloon_a"
 msgstr "ein Ballon"
 
+msgid "balloon_p"
+msgstr "Ballons"
+
 msgid "undead_name_8"
 msgstr "Monster"
 
@@ -570,8 +573,20 @@ msgstr "Dieses Ritual, ausgeführt vor einem Kampf, verwirbelt die astralen Ener
 msgid "balloon"
 msgstr "Ballon"
 
-msgid "nr_schemes_postfix"
-msgstr "sind erkennbar."
+msgid "nr_schemes_template"
+msgstr "Schemen von {0} sind erkennbar."
+
+msgid "list_two"
+msgstr "{0} und {1}"
+
+msgid "list_start"
+msgstr "{0}, {1}"
+
+msgid "list_middle"
+msgstr "{0}, {1}"
+
+msgid "list_end"
+msgstr "{0} und {1}"
 
 msgid "SILBER"
 msgstr "SILBER"
@@ -1102,6 +1117,9 @@ msgstr "Orks"
 
 msgid "boat_a"
 msgstr "ein Boot"
+
+msgid "boat_p"
+msgstr "Boote"
 
 msgctxt "race"
 msgid "nymph"
@@ -1707,8 +1725,14 @@ msgstr "Ring der Unsichtbarkeit"
 msgid "caravel_a"
 msgstr "eine Karavelle"
 
+msgid "caravel_p"
+msgstr "Karavellen"
+
 msgid "galleon_a"
 msgstr "eine Galeone"
+
+msgid "galleon_p"
+msgstr "Galeonen"
 
 msgctxt "keyword"
 msgid "describe"
@@ -1882,6 +1906,9 @@ msgstr "Untoten"
 
 msgid "flyingcarpet_a"
 msgstr "ein fliegender Teppich"
+
+msgid "flyingcarpet_p"
+msgstr "fliegende Teppiche"
 
 msgid "mallorntree_p"
 msgstr "Mallorn"
@@ -2793,6 +2820,9 @@ msgstr "Fjordwuchs"
 
 msgid "trireme_a"
 msgstr "eine Trireme"
+
+msgid "trireme_p"
+msgstr "Triremen"
 
 msgctxt "prefix"
 msgid "Dunkel"
@@ -4100,6 +4130,9 @@ msgstr "Luchs"
 msgid "longboat_a"
 msgstr "ein Langboot"
 
+msgid "longboat_p"
+msgstr "Langboote"
+
 msgctxt "race"
 msgid "human_d"
 msgstr "Menschen"
@@ -4407,9 +4440,6 @@ msgstr "Magie"
 
 msgid "see_lighthouse"
 msgstr "vom Turm erblickt"
-
-msgid "nr_schemes_prefix"
-msgstr "Schemen der Regionen"
 
 msgid "aoc_p"
 msgstr "Katzenamulette"
@@ -5848,6 +5878,9 @@ msgstr "Tiger"
 
 msgid "dragonship_a"
 msgstr "ein Drachenschiff"
+
+msgid "dragonship_p"
+msgstr "Drachenschiffe"
 
 msgctxt "race"
 msgid "mountainguard_x"

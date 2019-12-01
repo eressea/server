@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -89,6 +71,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/rng.h>
 #include <util/strings.h>
 
+#include <format.h>
 #include <selist.h>
 #include <filestream.h>
 #include <stream.h>
@@ -1071,35 +1054,48 @@ static void report_region_edges(struct stream *out, const region * r, faction * 
     }
 }
 
+char *report_list(const struct locale *lang, char *buffer, size_t len, int argc, const char **argv) {
+    const char *two = LOC(lang, "list_two");
+    const char *start = LOC(lang, "list_start");
+    const char *middle = LOC(lang, "list_middle");
+    const char *end = LOC(lang, "list_end");
+    return format_list(argc, argv, buffer, len, two, start, middle, end);
+}
+
 static void report_region_schemes(struct stream *out, const region * r, faction * f) {
-    char buf[4096];
-    sbstring sbs;
-    sbs_init(&sbs, buf, sizeof(buf));
 
     if (r->seen.mode >= seen_unit && is_astral(r) &&
         !is_cursed(r->attribs, &ct_astralblock)) {
         /* Sonderbehandlung Teleport-Ebene */
-        region_list *rl = astralregions(r, inhabitable);
-        region_list *rl2;
+        region *rl[MAX_SCHEMES];
+        int num = get_astralregions(r, inhabitable, rl);
+        char buf[4096];
 
-        if (rl) {
-            /* this localization might not work for every language but is fine for de and en */
-            sbs_strcat(&sbs, LOC(f->locale, "nr_schemes_prefix"));
-            rl2 = rl;
-            while (rl2) {
+        if (num == 1) {
+            /* single region is easy */
+            region *rn = rl[0];
+            f_regionid(rn, f, buf, sizeof(buf));
+        }
+        else if (num > 1) {
+            int i;
+            const char *rnames[MAX_SCHEMES];
+
+            for (i = 0; i != num; ++i) {
                 char rbuf[REPORTWIDTH];
-                f_regionid(rl2->data, f, rbuf, sizeof(rbuf));
-                sbs_strcat(&sbs, rbuf);
-                rl2 = rl2->next;
-                if (rl2) {
-                    sbs_strcat(&sbs, ", ");
-                }
+                region *rn = rl[i];
+                f_regionid(rn, f, rbuf, sizeof(rbuf));
+                rnames[i] = str_strdup(rbuf);
             }
-            sbs_strcat(&sbs,LOC(f->locale, "nr_schemes_postfix"));
-            free_regionlist(rl);
-            /* Schreibe Paragraphen */
-            newline(out);
-            paragraph(out, buf, 0, 0, 0);
+            report_list(f->locale, buf, sizeof(buf), num, rnames);
+            for (i = 0; i != num; ++i) {
+                free((char *)rnames[i]);
+            }
+        }
+        if (num > 0) {
+            if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
+                newline(out);
+                paragraph(out, buf, 0, 0, 0);
+            }
         }
     }
 }
@@ -1728,20 +1724,23 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
 
     if (captain && captain->faction == f) {
         int n = 0, p = 0;
+        const char *stname;
+
         getshipweight(sh, &n, &p);
         n = (n + 99) / 100;         /* 1 Silber = 1 GE */
 
-        sbs_printf(&sbs, "%s, %s, (%d/%d)", shipname(sh),
-            LOC(f->locale, sh->type->_name), n, shipcapacity(sh) / 100);
+        stname = locale_plural(f->locale, sh->type->_name, sh->number, true);
+        sbs_printf(&sbs, "%s, %d %s, (%d/%d)", shipname(sh), sh->number,
+            stname, n, ship_capacity(sh) / 100);
     }
     else {
         sbs_printf(&sbs, "%s, %s", shipname(sh), LOC(f->locale, sh->type->_name));
     }
 
-    if (sh->size != sh->type->construction->maxsize) {
+    if (!ship_finished(sh)) {
         sbs_printf(&sbs, ", %s (%d/%d)",
             LOC(f->locale, "nr_undercons"), sh->size,
-            sh->type->construction->maxsize);
+            ship_maxsize(sh));
     }
     if (sh->damage) {
         int percent = ship_damage_percent(sh);

@@ -303,6 +303,9 @@ msgstr "busybeer"
 msgid "balloon_a"
 msgstr "a balloon"
 
+msgid "balloon_p"
+msgstr "balloons"
+
 msgid "jadee_ring"
 msgstr "Jadee's wedding ring"
 
@@ -443,9 +446,6 @@ msgstr "balloon"
 msgctxt "spellinfo"
 msgid "draigfumbleshield"
 msgstr "This ritual, performed before a battle, causes the astral energies on the battlefield to whirl and churn and thereby makes spellcasting more difficult for the enemy mages."
-
-msgid "nr_schemes_postfix"
-msgstr "can be discerned."
 
 msgid "SILBER"
 msgstr "SILVER"
@@ -881,6 +881,9 @@ msgstr "gems"
 
 msgid "boat_a"
 msgstr "a boat"
+
+msgid "boat_p"
+msgstr "boats"
 
 msgctxt "race"
 msgid "orc_p"
@@ -1461,11 +1464,17 @@ msgstr "ring of invisibility"
 msgid "galleon_a"
 msgstr "a galleon"
 
+msgid "galleon_p"
+msgstr "galleons"
+
 msgid "galleon"
 msgstr "galleon"
 
 msgid "caravel_a"
 msgstr "a caravel"
+
+msgid "caravel_p"
+msgstr "caravels"
 
 msgid "mallornspear_p"
 msgstr "mallorn spear"
@@ -2441,6 +2450,9 @@ msgstr "fjord fungus"
 
 msgid "trireme_a"
 msgstr "a trireme"
+
+msgid "trireme_p"
+msgstr "triremes"
 
 msgctxt "spell"
 msgid "healing"
@@ -3642,6 +3654,9 @@ msgstr "goblin head"
 msgid "longboat_a"
 msgstr "a longboat"
 
+msgid "longboat_p"
+msgstr "longboats"
+
 msgctxt "race"
 msgid "lynx"
 msgstr "lynx"
@@ -3937,8 +3952,20 @@ msgstr "magic"
 msgid "see_lighthouse"
 msgstr "from lighthouse"
 
-msgid "nr_schemes_prefix"
-msgstr "Schemes of "
+msgid "list_two"
+msgstr "{0} and {1}"
+
+msgid "list_start"
+msgstr "{0}, {1}"
+
+msgid "list_middle"
+msgstr "{0}, {1}"
+
+msgid "list_end"
+msgstr "{0}, and {1}"
+
+msgid "nr_schemes_template"
+msgstr "Schemes of {0} can be discerned."
 
 msgid "aoc_p"
 msgstr "amulets of the kitten"
@@ -5161,6 +5188,9 @@ msgstr "tiger"
 
 msgid "dragonship_a"
 msgstr "a dragonship"
+
+msgid "dragonship_p"
+msgstr "dragonships"
 
 msgctxt "race"
 msgid "mountainguard_x"

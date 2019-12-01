@@ -1,15 +1,3 @@
-/*
- +-------------------+
- |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
- | (c) 1998 - 2014   |  Katja Zedel <katze@felidae.kn-bremen.de>
- |                   |
- +-------------------+
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif

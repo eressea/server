@@ -85,3 +85,30 @@ function test_recruit_in_desert()
     assert_equal('winter', get_season(get_turn()))
     assert_equal(2, u.number)
 end 
+
+function test_ride_through_mountain()
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "mountain")
+    local r3 = region.create(3, 0, "plain")
+    local f = faction.create("insect")
+    local u = unit.create(f, r1, 1)
+    u.name="Hercules"
+    u:add_order('NACH O O')
+    u:add_item('horse', 1)
+    u:set_skill('riding', 1, true)
+    process_orders()
+    assert_equal(r3, u.region)
+end
+
+function test_ride_from_mountain()
+    local r1 = region.create(1, 0, "mountain")
+    local r2 = region.create(2, 0, "plain")
+    local r3 = region.create(3, 0, "plain")
+    local f = faction.create("insect")
+    local u = unit.create(f, r1, 1)
+    u:add_order('NACH O O')
+    u:add_item('horse', 1)
+    u:set_skill('riding', 1, true)
+    process_orders()
+    assert_equal(r2, u.region)
+end
