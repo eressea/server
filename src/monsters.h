@@ -21,6 +21,10 @@ extern "C" {
     bool monster_is_waiting(const struct unit *u);
     void make_zombie(struct unit * u);
 
+    void spawn_undead(void);
+    void plan_monsters(struct faction *f);
+
+
 #ifdef __cplusplus
 }
 #endif
