@@ -1,22 +1,3 @@
-#include "save.h"
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/version.h>
@@ -1302,6 +1283,8 @@ void write_ship(gamedata *data, const ship *sh)
     WRITE_STR(store, (const char *)sh->name);
     WRITE_STR(store, sh->display ? (const char *)sh->display : "");
     WRITE_TOK(store, sh->type->_name);
+    assert(sh->number > 0);
+    WRITE_INT(store, sh->number);
     WRITE_INT(store, sh->size);
     WRITE_INT(store, sh->damage);
     WRITE_INT(store, sh->flags & SFL_SAVEMASK);
@@ -1339,6 +1322,12 @@ ship *read_ship(gamedata *data)
     }
     assert(sh->type || !"ship_type not registered!");
 
+    if (data->version < SHIP_NUMBER_VERISON) {
+        sh->number = 1;
+    }
+    else {
+        READ_INT(store, &sh->number);
+    }
     READ_INT(store, &sh->size);
     READ_INT(store, &sh->damage);
     if (data->version >= FOSS_VERSION) {

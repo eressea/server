@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_UNIT_H
 #define H_KRNL_UNIT_H
 
@@ -72,7 +54,7 @@ extern "C" {
     /* Flags, die gespeichert werden sollen: */
 #define UFL_SAVEMASK (UFL_DEFENDER|UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
-#define UNIT_MAXSIZE 50000
+#define UNIT_MAXSIZE 128 * 1024
     extern int maxheroes(const struct faction *f);
     extern int countheroes(const struct faction *f);
 
@@ -197,6 +179,7 @@ extern "C" {
     /* cleanup code for this module */
     void free_units(void);
     void u_setfaction(struct unit *u, struct faction *f);
+    void u_freeorders(struct unit *u);
     void set_number(struct unit *u, int count);
 
     int invisible(const struct unit *target, const struct unit *viewer);
@@ -239,6 +222,7 @@ extern "C" {
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
 
+    void unit_convert_race(struct unit *u, const struct race *rc, const char *rcname);
     /* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1

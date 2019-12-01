@@ -1134,19 +1134,6 @@ function test_route_pause()
     assert_equal(r1, u.region)
 end
 
-function test_bug_2393_cart()
-    local r1 = region.create(0, 0, "plain")
-    local r2 = region.create(1, 0, "plain")
-    local f = faction.create("human", "cart@example.com")
-    local u = unit.create(f, r1, 2)
-    u:add_order("NACH O")
-    u:add_item('stone', 2)
-    u:add_item('horse', 2)
-    u:add_item('cart', 1)
-    process_orders()
-    assert_equal(r1, u.region)
-end
-
 function test_immunity_stops_guard()
     eressea.settings.set("NewbieImmunity", 2)
     local f = faction.create('human')

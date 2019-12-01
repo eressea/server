@@ -64,6 +64,7 @@ extern "C" {
 
     void test_translate_param(const struct locale *lang, enum param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
+    int test_count_messagetype(struct message_list *msgs, const char *name);
     struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
