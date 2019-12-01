@@ -924,6 +924,7 @@ int leave_cmd(unit * u, struct order *ord)
 void transfer_faction(faction *fsrc, faction *fdst) {
     unit *u;
     skill_t sk;
+    int hmax, hnow;
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
@@ -945,19 +946,28 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
+    hnow = countheroes(fdst);
+    hmax = maxheroes(fdst);
     u = fsrc->units;
     while (u) {
         unit *unext = u->nextF;
 
         if (u_race(u) == fdst->race) {
-            u->flags &= ~UFL_HERO;
-            if (give_unit_allowed(u) == 0) {
+            if (u->flags & UFL_HERO) {
+                if (u->number + hnow > hmax) {
+                    u->flags &= ~UFL_HERO;
+                }
+                else {
+                    hnow += u->number;
+                }
+            }
+            if (give_unit_allowed(u) == 0 && !get_mage(u)) {
                 if (u->skills) {
                     int i;
-
                     for (i = 0; i != u->skill_size; ++i) {
                         const skill *sv = u->skills + i;
                         skill_t sk = (skill_t)sv->id;
+
                         if (skill_count[sk] + u->number > skill_limit[sk]) {
                             break;
                         }
@@ -3764,6 +3774,10 @@ void process(void)
                                 }
                                 if (ord) {
                                     porder->data.per_order.process(u, ord);
+                                    if (!u->orders) {
+                                        /* GIVE UNIT or QUIT delete all orders of the unit, stop */
+                                        break;
+                                    }
                                 }
                             }
                             if (!ord || *ordp == ord)

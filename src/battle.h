@@ -81,9 +81,9 @@ extern "C" {
         int nsides;
         struct selist *meffects;
         int max_tactics;
-        int turn;
+        unsigned char turn;
+        signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
         bool has_tactics_turn;
-        int keeploot;
         bool reelarrow;
         int alive;
         struct {
@@ -153,13 +153,13 @@ extern "C" {
         int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
         struct person {
             int hp;                   /* Trefferpunkte der Personen */
-            int attack;
-            int defense;
-            int damage;
             int flags;
-            int speed;
-            int reload;
-            int last_action;
+            int attack;  /* weapon skill bonus for attacker */
+            int defense; /* weapon skill bonus for defender */
+            char damage;  /* bonus damage for melee attacks (e.g. troll belt) */
+            unsigned char speed;
+            unsigned char reload;
+            unsigned char last_action;
             struct weapon *missile;   /* missile weapon */
             struct weapon *melee;     /* melee weapon */
         } *person;

@@ -511,14 +511,13 @@ int build_skill(unit *u, int basesk, int skill_mod) {
 */
 static int build_limited(unit * u, const construction * con, int completed, int number, int want, int basesk, int *skill_total) {
     int skills = *skill_total;
-    int made = 0, maxsize = con->maxsize * number;
+    int made = 0, maxsize;
 
+    assert(con);
     if (want <= 0) {
         return 0;
     }
-    if (con == NULL) {
-        return ENOMATERIALS;
-    }
+    maxsize = con->maxsize * number;
     if (completed == maxsize) {
         return ECOMPLETE;
     }

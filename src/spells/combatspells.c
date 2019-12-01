@@ -1378,7 +1378,7 @@ int sp_keeploot(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    b->keeploot = (int)fmax(25, b->keeploot + 5 * power);
+    b->keeploot = (signed char) fmax(25, b->keeploot + 5 * power);
 
     return level;
 }

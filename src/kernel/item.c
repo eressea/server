@@ -260,7 +260,7 @@ luxury_type *new_luxurytype(item_type * itype, int price)
 
 weapon_type *new_weapontype(item_type * itype,
     int wflags, variant magres, const char *damage[], int offmod, int defmod,
-    int reload, skill_t sk)
+    unsigned char reload, skill_t sk)
 {
     weapon_type *wtype;
 

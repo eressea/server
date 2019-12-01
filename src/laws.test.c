@@ -2107,6 +2107,41 @@ static void test_quit_transfer_limited(CuTest *tc) {
 }
 
 /**
+ * Mages cannot be transfered. At all.
+ */
+static void test_quit_transfer_mages(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    config_set_int("rules.maxskills.magic", 2);
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    f1->magiegebiet = M_GWYRRD;
+    set_level(u1, SK_MAGIC, 1);
+    create_mage(u1, M_GWYRRD);
+
+    f2->magiegebiet = M_GWYRRD;
+    set_level(u2, SK_MAGIC, 1);
+    create_mage(u2, M_GWYRRD);
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+
+    test_teardown();
+}
+
+/**
  * Only units of the same race can be gifted to another faction.
  */
 static void test_quit_transfer_migrants(CuTest *tc) {
@@ -2271,6 +2306,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
     SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
+    SUITE_ADD_TEST(suite, test_quit_transfer_mages);
     SUITE_ADD_TEST(suite, test_quit_transfer_hero);
     SUITE_ADD_TEST(suite, test_transfer_faction);
 #endif
