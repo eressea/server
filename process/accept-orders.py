@@ -52,7 +52,7 @@ hostname = socket.gethostname()
 orderbase = "orders.dir"
 sendmail = True
 # maximum number of reports per sender:
-maxfiles = 30
+maxfiles = 50
 # write headers to file?
 writeheaders = True
 # reject all html email?
