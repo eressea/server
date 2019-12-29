@@ -14,6 +14,29 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
+function test_undead_cannot_enter_holyground()
+    local r1 = region.create(0, 0, 'plain')
+    local r2 = region.create(1, 0, 'plain')
+    local f = faction.create('human')
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f, r2, 1)
+
+    u2.name = "Xolgrim's Magier"
+    u1.name = "Xolgrim's Opfer"
+
+    u2.magic = 'gwyrrd'
+    u2:set_skill('magic', 100)
+    u2.aura = 200
+    u2:add_spell('holyground')
+    u2:add_order('ZAUBERE STUFE 10 "Heiliger Boden"')
+
+    u1.race = "skeleton"
+    u1:add_order("NACH Osten")
+    process_orders()
+    assert_not_nil(r2:get_curse('holyground'))
+    assert_equal(r1, u1.region)
+end
+
 function test_shapeshift()
     local r = region.create(42, 0, "plain")
     local f = faction.create("demon", "noreply@eressea.de", "de")

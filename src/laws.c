@@ -3712,8 +3712,9 @@ void process(void)
 
         log_debug("- Step %u", prio);
         while (proc && proc->priority == prio) {
-            if (proc->name)
+            if (proc->name) {
                 log_debug(" - %s", proc->name);
+            }
             proc = proc->next;
         }
 
@@ -3721,8 +3722,9 @@ void process(void)
             pglobal->data.global.process();
             pglobal = pglobal->next;
         }
-        if (pglobal == NULL || pglobal->priority != prio)
+        if (pglobal == NULL || pglobal->priority != prio) {
             continue;
+        }
 
         for (r = regions; r; r = r->next) {
             unit *u;
@@ -3733,8 +3735,9 @@ void process(void)
                 pregion->data.per_region.process(r);
                 pregion = pregion->next;
             }
-            if (pregion == NULL || pregion->priority != prio)
+            if (pregion == NULL || pregion->priority != prio) {
                 continue;
+            }
 
             if (r->units) {
                 for (u = r->units; u; u = u->next) {
@@ -3744,14 +3747,16 @@ void process(void)
                         punit->data.per_unit.process(u);
                         punit = punit->next;
                     }
-                    if (punit == NULL || punit->priority != prio)
+                    if (punit == NULL || punit->priority != prio) {
                         continue;
+                    }
 
                     porder = punit;
                     while (porder && porder->priority == prio && porder->type == PR_ORDER) {
                         order **ordp = &u->orders;
-                        if (porder->flags & PROC_THISORDER)
+                        if (porder->flags & PROC_THISORDER) {
                             ordp = &u->thisorder;
+                        }
                         while (*ordp) {
                             order *ord = *ordp;
                             if (getkeyword(ord) == porder->data.per_order.kword) {
@@ -3780,8 +3785,9 @@ void process(void)
                                     }
                                 }
                             }
-                            if (!ord || *ordp == ord)
+                            if (!ord || *ordp == ord) {
                                 ordp = &(*ordp)->next;
+                            }
                         }
                         porder = porder->next;
                     }
@@ -3798,9 +3804,9 @@ void process(void)
                 pregion->data.per_region.process(r);
                 pregion = pregion->next;
             }
-            if (pregion == NULL || pregion->priority != prio)
+            if (pregion == NULL || pregion->priority != prio) {
                 continue;
-
+            }
         }
     }
 
