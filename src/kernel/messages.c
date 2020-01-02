@@ -62,6 +62,7 @@ static message *missing_feedback(const char *name, const struct unit *u,
         log_error("trying to create undefined feedback of type \"%s\"\n", name);
     }
     else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
+        log_warning("trying to create undefined message of type \"%s\"\n", name);
         if (strcmp(name, "missing_feedback") != 0) {
             if (!mt_find("missing_feedback")) {
                 mt_create_va(mt_new("missing_feedback", NULL), "unit:unit",
