@@ -594,6 +594,13 @@ growing_trees_e3(region * r, const int current_season,
     }
 }
 
+static short cap_short(int i) {
+    if (i > SHRT_MIN) {
+        return ((i < SHRT_MAX) ? (short)i : SHRT_MAX);
+    }
+    return SHRT_MIN;
+}
+
 static void
 growing_trees(region * r, const season_t current_season, const season_t last_weeks_season)
 {
@@ -687,8 +694,8 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         a = a_find(r->attribs, &at_germs);
         if (!a) {
             a = a_add(&r->attribs, a_new(&at_germs));
-            a->data.sa[0] = (short)rtrees(r, 0);
-            a->data.sa[1] = (short)rtrees(r, 1);
+            a->data.sa[0] = cap_short(rtrees(r, 0));
+            a->data.sa[1] = cap_short(rtrees(r, 1));
         }
         /* wir haben 6 Wochen zum wachsen, jeder Same/Spross hat 18% Chance
          * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
