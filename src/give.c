@@ -371,7 +371,7 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
                                 u2->ship->coast = u1->ship->coast;
                             }
                             else {
-                                return msg_error(u1, ord, 182);
+                                return msg_error(u1, ord, 328);
                             }
                         }
                     }
