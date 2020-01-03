@@ -1775,12 +1775,12 @@ static void breedtrees(unit * u, int raw)
     }
     if (n > raw) n = raw;
 
-    /* Talent * 5% der Samen setzen an (max 100%) */
-    planted = n;
-    if (skill < 20) {
-        planted = planted * skill / 20;
+    /* Fuer jeden Samen Talent*5% Erfolgschance. */
+    for (i = n; i > 0; i--) {
+        if (rng_int() % 100 < skill * 5)
+            planted++;
     }
-    rsettrees(r, 0, rtrees(r, 0) + planted);
+    rsettrees(r, 1, rtrees(r, 1) + planted);
 
     /* Alles ok. Abziehen. */
     produceexp(u, SK_HERBALISM, u->number);
