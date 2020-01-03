@@ -974,10 +974,17 @@ bool move_blocked(const unit * u, const region * r, const region * r2)
     }
 
     if (r->attribs) {
-        const curse_type *fogtrap_ct = &ct_fogtrap;
-        curse *c = get_curse(r->attribs, fogtrap_ct);
+        curse *c = get_curse(r->attribs, &ct_fogtrap);
+        if (curse_active(c)) {
+            return true;
+        }
+    }
+
+    if (r2->attribs && fval(u_race(u), RCF_UNDEAD)) {
+        curse *c = get_curse(r2->attribs, &ct_holyground);
         return curse_active(c);
     }
+
     return false;
 }
 

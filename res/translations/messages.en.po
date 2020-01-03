@@ -2781,10 +2781,13 @@ msgid "error324"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not one of ours.\""
 
 msgid "error322"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is already on a ship.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Only ships of the same type can form a convoy.\""
 
 msgid "error323"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is under a spell.\""
+
+msgid "error328"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - All ships of a convoy must be on the same coast.\""
 
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) turned into $if($eq($number,1),\"a tree\", \"trees\").\""

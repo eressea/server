@@ -14,7 +14,8 @@
 
 #include <lua.h>
 
-void tolua_bind_open(lua_State * L) {
+void tolua_bind_open(lua_State * L)
+{
     tolua_eressea_open(L);
     tolua_process_open(L);
     tolua_settings_open(L);
