@@ -2778,7 +2778,7 @@ msgid "error322"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe gleicher Bauart können einen Konvoi bilden.\""
 
 msgid "error328"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe an der selbe Küste können einen Konvoi bilden.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe an der selben Küste können einen Konvoi bilden.\""
 
 msgid "error323"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist verzaubert.\""
