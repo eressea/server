@@ -1,12 +1,3 @@
-/*
-+-------------------+  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-+-------------------+
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include <kernel/version.h>
@@ -93,7 +84,7 @@ static char g_bigbuf[BUFFERSIZE];
 bool opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 66
+#define C_REPORT_VERSION 67
 
 struct locale *crtag_locale(void) {
     static struct locale * lang;
@@ -524,7 +515,9 @@ static void report_crtypes(FILE * F, const struct locale *lang)
             fputc('\"', F);
             fputs(crescape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
             fputs("\";text\n", F);
-            fprintf(F, "\"%s\";section\n", kmt->mtype->section);
+            if (kmt->mtype->section) {
+                fprintf(F, "\"%s\";section\n", kmt->mtype->section);
+            }
         }
         while (mtypehash[i]) {
             kmt = mtypehash[i];
@@ -704,10 +697,10 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
         stream_printf(out, "\"%s\";Beschr\n", sh->display);
     stream_printf(out, "\"%s\";Typ\n", translate(sh->type->_name,
         LOC(f->locale, sh->type->_name)));
+    stream_printf(out, "%d;Anzahl\n", sh->number);
     stream_printf(out, "%d;Groesse\n", sh->size);
     if (sh->damage) {
-        int percent =
-            (sh->damage * 100 + DAMAGE_SCALE - 1) / (sh->size * DAMAGE_SCALE);
+        int percent = ship_damage_percent(sh);
         stream_printf(out, "%d;Schaden\n", percent);
     }
     if (u) {
@@ -719,7 +712,7 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
     /* calculate cargo */
     if (u && (u->faction == f || omniscient(f))) {
         int n = 0, p = 0;
-        int mweight = shipcapacity(sh);
+        int mweight = ship_capacity(sh);
         getshipweight(sh, &n, &p);
 
         stream_printf(out, "%d;capacity\n", mweight);
@@ -1473,14 +1466,16 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         cr_output_curses_compat(F, f, r, TYP_REGION);
         cr_borders(r, f, r->seen.mode, F);
         if (r->seen.mode >= seen_unit && is_astral(r)
-            && !is_cursed(r->attribs, &ct_astralblock)) {
+            && !is_cursed(r->attribs, &ct_astralblock))
+        {
             /* Sonderbehandlung Teleport-Ebene */
-            region_list *rl = astralregions(r, inhabitable);
+            region *rl[MAX_SCHEMES];
+            int num = get_astralregions(r, inhabitable, rl);
 
-            if (rl) {
-                region_list *rl2 = rl;
-                while (rl2) {
-                    region *r2 = rl2->data;
+            if (num > 0) {
+                int i;
+                for (i = 0; i != num; ++i) {
+                    region *r2 = rl[i];
                     plane *plx = rplane(r2);
 
                     nx = r2->x;
@@ -1489,9 +1484,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                     adjust_coordinates(f, &nx, &ny, plx);
                     fprintf(F, "SCHEMEN %d %d\n", nx, ny);
                     fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
-                    rl2 = rl2->next;
                 }
-                free_regionlist(rl);
             }
         }
 

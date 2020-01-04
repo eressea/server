@@ -1,22 +1,3 @@
-/*
-Copyright (c) 1998-2019,
-Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -301,9 +282,22 @@ static int forget_cmd(unit * u, order * ord)
 
     sk = get_skill(s, u->faction->locale);
     if (sk != NOSKILL) {
-        if (sk == SK_MAGIC && is_familiar(u)) {
-            /* some units cannot forget their innate magical abilities */
-            return 0;
+        if (sk == SK_MAGIC) {
+            if (is_familiar(u)) {
+                /* some units cannot forget their innate magical abilities */
+                return 0;
+            }
+            else {
+                unit *ufam = get_familiar(u);
+                if (ufam) {
+                    a_removeall(&ufam->attribs, NULL);
+                    u_setfaction(ufam, get_monsters());
+                    u_freeorders(ufam);
+                    unit_convert_race(ufam, NULL, "ghost");
+                }
+                a_removeall(&u->attribs, &at_mage);
+                a_removeall(&u->attribs, &at_familiar);
+            }
         }
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
         set_level(u, sk, 0);
@@ -516,7 +510,7 @@ static void manufacture(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    n = build(u, itype->construction, 0, want, skill_mod);
+    n = build(u, 1, itype->construction, 0, want, skill_mod);
     switch (n) {
     case ENEEDSKILL:
         ADDMSG(&u->faction->msgs,
@@ -614,9 +608,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (is_guard(u)
-                && !fval(u2, UFL_ISNEW)
-                && u2->number && !alliedunit(u2, u->faction, HELP_GUARD)) {
+            if (!fval(u2, UFL_ISNEW) && u2->number 
+                && is_guard(u2) && !alliedunit(u2, u->faction, HELP_GUARD)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
                 return;
@@ -858,7 +851,7 @@ static void create_potion(unit * u, const item_type * itype, int want)
     if (want == 0) {
         want = maxbuild(u, itype->construction);
     }
-    built = build(u, itype->construction, 0, want, 0);
+    built = build(u, 1, itype->construction, 0, want, 0);
     switch (built) {
     case ELOWSKILL:
     case ENEEDSKILL:
@@ -1174,7 +1167,8 @@ attrib_type at_trades = {
     NO_READ
 };
 
-static bool trade_needs_castle(const region *r, const race *rc) {
+bool trade_needs_castle(const terrain_type *terrain, const race *rc)
+{
     static int rc_change, terrain_change;
     static const race *rc_insect;
     static const terrain_type *t_desert, *t_swamp;
@@ -1185,7 +1179,19 @@ static bool trade_needs_castle(const region *r, const race *rc) {
         t_swamp = newterrain(T_SWAMP);
         t_desert = newterrain(T_DESERT);
     }
-    return rc != rc_insect && (r->terrain == t_swamp || r->terrain == t_desert);
+    return rc != rc_insect && (terrain == t_swamp || terrain == t_desert);
+}
+
+static building * first_building(region *r, const struct building_type *btype, int minsize) {
+    building *b = NULL;
+    if (r->buildings) {
+        for (b = r->buildings; b; b = b->next) {
+            if (b->type == btype && b->size >= minsize) {
+                return b;
+            }
+        }
+    }
+    return NULL;
 }
 
 static void buy(unit * u, econ_request ** buyorders, struct order *ord)
@@ -1221,22 +1227,13 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 
     /* Entweder man ist Insekt in Sumpf/Wueste, oder es muss
      * einen Handelsposten in der Region geben: */
-    if (trade_needs_castle(r, u_race(u))) {
-        building *b = NULL;
-        if (r->buildings) {
-            static int cache;
-            static const struct building_type *bt_castle;
-            if (bt_changed(&cache)) {
-                bt_castle = bt_find("castle");
-            }
-
-            for (b = r->buildings; b; b = b->next) {
-                if (b->type == bt_castle && b->size >= 2) {
-                    break;
-                }
-            }
+    if (trade_needs_castle(r->terrain, u_race(u))) {
+        static int cache;
+        static const struct building_type *castle_bt;
+        if (bt_changed(&cache)) {
+            castle_bt = bt_find("castle");
         }
-        if (b == NULL) {
+        if (first_building(r, castle_bt, 2) == NULL) {
             cmistake(u, ord, 119, MSG_COMMERCE);
             return;
         }
@@ -1539,29 +1536,14 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             return false;
         }
     }
-    /* In der Region muss es eine Burg geben. */
 
-    if (u_race(u) == get_race(RC_INSECT)) {
-        if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
-            && !rbuildings(r)) {
+    if (trade_needs_castle(r->terrain, u_race(u))) {
+        /* In der Region muss es eine Burg geben. */
+        if (first_building(r, castle_bt, 2) == NULL) {
             cmistake(u, ord, 119, MSG_COMMERCE);
             return false;
         }
     }
-    else {
-        /* ...oder in der Region muss es eine Burg geben. */
-        building *b = 0;
-        if (r->buildings) {
-            for (b = r->buildings; b; b = b->next) {
-                if (b->type == castle_bt && b->size >= 2) break;
-            }
-        }
-        if (!b) {
-            cmistake(u, ord, 119, MSG_COMMERCE);
-            return false;
-        }
-    }
-
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt verkaufen. */
 
     i = u->number * 10 * effskill(u, SK_TRADE, NULL);

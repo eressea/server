@@ -1,15 +1,3 @@
-/* 
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -35,6 +23,7 @@ without prior permission by the authors of Eressea.
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
+#include <util/nrmessage.h>
 #include <util/password.h>
 
 #include "attributes/key.h"
@@ -265,21 +254,37 @@ static int tolua_faction_setkey(lua_State * L)
     return 0;
 }
 
-static int tolua_faction_get_messages(lua_State * L)
+static int tolua_faction_debug_messages(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int i = 1;
-    mlist *ml;
-    if (!f->msgs) {
-        return 0;
+    if (f->msgs) {
+        mlist *ml;
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
+            char buf[120];
+            nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
+            puts(buf);
+        }
     }
-    lua_newtable(L);
-    for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
-        lua_pushnumber(L, i);
-        lua_pushstring(L, ml->msg->type->name);
-        lua_rawset(L, -3);
+    return 0;
+}
+
+static int tolua_faction_get_messages(lua_State * L)
+{
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+
+    if (f->msgs) {
+        int i = 1;
+        mlist *ml;
+        lua_newtable(L);
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
+            lua_pushnumber(L, i);
+            lua_pushstring(L, ml->msg->type->name);
+            lua_rawset(L, -3);
+        }
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 static int tolua_faction_count_msg_type(lua_State *L) {
@@ -665,6 +670,7 @@ void tolua_faction_open(lua_State * L)
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
             tolua_variable(L, TOLUA_CAST "messages", tolua_faction_get_messages, NULL);
+            tolua_function(L, TOLUA_CAST "debug_messages", tolua_faction_debug_messages);
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);

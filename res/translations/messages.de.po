@@ -2370,7 +2370,7 @@ msgid "sp_confusion_effect_0"
 msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
 
 msgid "pest"
-msgstr "\"Hier wütete die Pest, und $int($dead) Bauern starben.\""
+msgstr "\"Hier wütete die Pest, und $int($dead) $resource($peasants,$dead) $if($eq($dead,1), \"starb\", \"starben\").\""
 
 msgid "wormhole_exit"
 msgstr "\"$unit($unit) reist durch ein Wurmloch nach $region($region).\""
@@ -2767,6 +2767,24 @@ msgstr "\"$unit($unit) verspeiste $int($amount) Bauern.\""
 
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen.\""
+
+msgid "error325"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber kann nur auf ein einzelnes Schiff gewirkt werden.\""
+
+msgid "error324"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit gehört nicht zu unserer Partei.\""
+
+msgid "error322"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist bereits auf einem Schiff.\""
+
+msgid "error323"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist verzaubert.\""
+
+msgid "error327"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Schiffe kann die Einheit nicht übergeben.\""
+
+msgid "error326"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe können keinen Konvoi bilden.\""
 
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"wurde zum Baum\", \"wurden zu Bäumen\").\""

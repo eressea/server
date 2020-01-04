@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -942,6 +924,7 @@ int leave_cmd(unit * u, struct order *ord)
 void transfer_faction(faction *fsrc, faction *fdst) {
     unit *u;
     skill_t sk;
+    int hmax, hnow;
     int skill_count[MAXSKILLS];
     int skill_limit[MAXSKILLS];
 
@@ -963,12 +946,21 @@ void transfer_faction(faction *fsrc, faction *fdst) {
         }
     }
 
+    hnow = countheroes(fdst);
+    hmax = maxheroes(fdst);
     u = fsrc->units;
     while (u) {
         unit *unext = u->nextF;
 
         if (u_race(u) == fdst->race) {
-            u->flags &= ~UFL_HERO;
+            if (u->flags & UFL_HERO) {
+                if (u->number + hnow > hmax) {
+                    u->flags &= ~UFL_HERO;
+                }
+                else {
+                    hnow += u->number;
+                }
+            }
             if (give_unit_allowed(u) == 0 && !get_mage(u)) {
                 if (u->skills) {
                     int i;
@@ -1112,8 +1104,8 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
     }
     if (CheckOverload()) {
         int sweight, scabins;
-        int mweight = shipcapacity(sh);
-        int mcabins = sh->type->cabins;
+        int mweight = ship_capacity(sh);
+        int mcabins = ship_cabins(sh);
 
         if (mweight > 0) {
             getshipweight(sh, &sweight, &scabins);
@@ -2199,6 +2191,21 @@ int email_cmd(unit * u, struct order *ord)
     return 0;
 }
 
+bool password_wellformed(const char *password)
+{
+    unsigned char *c = (unsigned char *)password;
+    int i;
+    if (!password || password[0]=='\0') {
+        return false;
+    }
+    for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
+        if (!isalnum(c[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int password_cmd(unit * u, struct order *ord)
 {
     char pwbuf[PASSWORD_MAXSIZE + 1];
@@ -2212,19 +2219,11 @@ int password_cmd(unit * u, struct order *ord)
         pwbuf[PASSWORD_MAXSIZE - 1] = '\0';
     }
 
-    if (s && *s) {
-        unsigned char *c = (unsigned char *)pwbuf;
-        int i, r = 0;
-
-        for (i = 0; c[i] && i != PASSWORD_MAXSIZE; ++i) {
-            if (!isalnum(c[i])) {
-                c[i] = 'X';
-                ++r;
-            }
-        }
-        if (r != 0) {
+    if (!s || !password_wellformed(s)) {
+        if (s) {
             cmistake(u, ord, 283, MSG_EVENT);
         }
+        password_generate(pwbuf, PASSWORD_MAXSIZE);
     }
     faction_setpassword(u->faction, password_hash(pwbuf, PASSWORD_DEFAULT));
     ADDMSG(&u->faction->msgs, msg_message("changepasswd", "value", pwbuf));
@@ -2609,7 +2608,7 @@ void sinkships(struct region * r)
 
         if (!sh->type->construction || sh->size >= sh->type->construction->maxsize) {
             if (fval(r->terrain, SEA_REGION)) {
-                if (!enoughsailors(sh, crew_skill(sh))) {
+                if (!ship_crewed(sh)) {
                     /* ship is at sea, but not enough people to control it */
                     double dmg = config_get_flt("rules.ship.damage.nocrewocean", 0.3);
                     damage_ship(sh, dmg);
@@ -3775,6 +3774,10 @@ void process(void)
                                 }
                                 if (ord) {
                                     porder->data.per_order.process(u, ord);
+                                    if (!u->orders) {
+                                        /* GIVE UNIT or QUIT delete all orders of the unit, stop */
+                                        break;
+                                    }
                                 }
                             }
                             if (!ord || *ordp == ord)

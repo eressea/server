@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2014   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
-
- */
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -303,6 +291,117 @@ bool rule_transfermen(void)
 {
     int rule = config_get_int("rules.transfermen", 1);
     return rule != 0;
+}
+
+static void transfer_ships(ship *s1, ship *s2, int n)
+{
+    assert(n <= s1->number);
+    s2->damage += s1->damage * n / s1->number;
+    s2->size += s1->size * n / s1->number;
+    s2->number += n;
+    if (s1->coast != NODIRECTION) {
+        s2->coast = s1->coast;
+    }
+    scale_ship(s1, s1->number - n);
+}
+
+static void transfer_units(ship *s1, ship *s2)
+{
+    region * r = s1->region;
+    unit *u;
+    for (u = r->units; u; u = u->next) {
+        if (u->ship == s1) {
+            leave_ship(u);
+            u_set_ship(u, s2);
+        }
+    }
+}
+
+static bool ship_cursed(const ship *sh) {
+    return a_find(sh->attribs, &at_curse) != NULL;
+}
+
+message * give_ship(unit *u1, unit *u2, int n, order *ord)
+{
+    assert(u1->ship);
+    assert(n > 0 && n <= u1->ship->number);
+    if (u1->ship->type->range < 3) {
+        /* Keine Boote und anderes Kleinzeug erlaubt */
+        return msg_error(u1, ord, 326);
+    }
+    if (ship_cursed(u1->ship)) {
+        return msg_error(u1, ord, 323);
+    }
+    if (u1 != ship_owner(u1->ship)) {
+        return msg_error(u1, ord, 146);
+    }
+    if (u2 == NULL) {
+        if (fval(u1->region->terrain, LAND_REGION) || n < u1->ship->number) {
+            ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+            scale_ship(sh, 0);
+            transfer_ships(u1->ship, sh, n);
+        }
+        else {
+            return msg_error(u1, ord, 327);
+        }
+    } else {
+        if (u1->faction != u2->faction) {
+            return msg_error(u1, ord, 324);
+        }
+        if (fval(u_race(u2), RCF_CANSAIL)) {
+            if (u2->ship) {
+                if (u2->ship == u1->ship) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    leave_ship(u2);
+                    u_set_ship(u2, sh);
+                } else {
+                    if (u2 != ship_owner(u2->ship)) {
+                        return msg_error(u1, ord, 146);
+                    }
+                    if (u2->ship->type != u1->ship->type) {
+                        return msg_error(u1, ord, 322);
+                    }
+                    if (ship_cursed(u2->ship)) {
+                        return msg_error(u1, ord, 323);
+                    }
+                    if (u1->ship->coast != u2->ship->coast) {
+                        if (u1->ship->coast != NODIRECTION) {
+                            if (u2->ship->coast == NODIRECTION) {
+                                u2->ship->coast = u1->ship->coast;
+                            }
+                            else {
+                                return msg_error(u1, ord, 182);
+                            }
+                        }
+                    }
+                }
+                if (n < u1->ship->number) {
+                    transfer_ships(u1->ship, u2->ship, n);
+                }
+                else {
+                    transfer_ships(u1->ship, u2->ship, n);
+                    transfer_units(u1->ship, u2->ship);
+                }
+            }
+            else {
+                if (n < u1->ship->number) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    u_set_ship(u2, sh);
+                    transfer_ships(u1->ship, sh, n);
+                }
+                else {
+                    u_set_ship(u2, u1->ship);
+                    ship_set_owner(u2);
+                }
+            }
+        }
+        else {
+            return msg_error(u1, ord, 233);
+        }
+    }
+    return NULL;
 }
 
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
@@ -610,6 +709,7 @@ void give_unit(unit * u, unit * u2, order * ord)
     }
     add_give_person(u, u2, u->number, ord, 0);
     u_setfaction(u, u2->faction);
+    u_freeorders(u);
     u2->faction->newbies += u->number;
 }
 
@@ -664,7 +764,8 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
         }
     }
     else {
-        if (isparam(s, u->faction->locale, P_PERSON)) {
+        param_t p = findparam(s, u->faction->locale);
+        if (p == P_PERSON) {
             if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
@@ -827,7 +928,24 @@ void give_cmd(unit * u, order * ord)
         return;
     }
 
-    if (isparam(s, u->faction->locale, P_PERSON)) {
+    p = findparam(s, u->faction->locale);
+    if (p == P_SHIP) {
+        if (u->ship) {
+            message * msg;
+            if (n > u->ship->number) {
+                n = u->ship->number;
+            }
+            msg = give_ship(u, u2, n, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+        }
+        else {
+            cmistake(u, ord, 144, MSG_COMMERCE);
+        }
+        return;
+    }
+    else if (p == P_PERSON) {
         if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
