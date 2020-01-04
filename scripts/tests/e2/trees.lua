@@ -21,7 +21,7 @@ function test_no_growth()
     assert_equal(0, r:get_resource('tree'))
 end
 
-function x_test_plant_seeds()
+function test_plant_seeds()
     set_turn(184)
     assert_equal('summer', get_season())
     local f = faction.create('goblin')
