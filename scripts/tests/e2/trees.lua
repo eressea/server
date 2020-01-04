@@ -40,7 +40,7 @@ function test_plant_seeds()
     assert_equal(20, u:get_item('seed'))
 end
 
-function test_plant_seeds_spring()
+function disable_test_plant_seeds_spring()
     set_turn(202)
     assert_equal('spring', get_season())
     local f = faction.create('goblin')
