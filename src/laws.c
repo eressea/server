@@ -463,10 +463,7 @@ static void horses(region * r)
     maxhorses = region_maxworkers(r) / 10;
     horses = rhorses(r);
     if (horses > 0) {
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            rsethorses(r, (int)(horses * 0.9));
-        }
-        else if (maxhorses > 0) {
+        if (maxhorses > 0) {
             double growth =
                 (RESOURCE_QUANTITY * (HORSEGROWTH * 200.0 * ((double)maxhorses -
                     horses))) / (double)maxhorses;
@@ -625,12 +622,6 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             a_removeall(&r->attribs, &at_germs);
         }
 
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            rsettrees(r, 1, (int)(rtrees(r, 1) * 0.9));
-            rsettrees(r, 2, (int)(rtrees(r, 2) * 0.9));
-            return;
-        }
-
         mp = max_production(r);
         if (mp <= 0)
             return;
@@ -685,9 +676,6 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
     else if (current_season == SEASON_SPRING) {
         int growth;
 
-        if (is_cursed(r->attribs, &ct_godcursezone))
-            return;
-
         /* in at_germs merken uns die Zahl der Samen und Sproesslinge, die
          * dieses Jahr aelter werden duerfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
@@ -701,31 +689,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
          * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
         growth = 1800;
 
-        /* Samenwachstum */
-
-        /* Raubbau abfangen, es duerfen nie mehr Samen wachsen, als aktuell
-         * in der Region sind */
-        seeds = rtrees(r, 0);
-        if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
-        sprout = 0;
-
-        for (i = 0; i < seeds; i++) {
-            if (rng_int() % 10000 < growth)
-                sprout++;
-        }
-        /* aus dem Samenpool dieses Jahres abziehen */
-        a->data.sa[0] = (short)(seeds - sprout);
-        /* aus dem gesamt Samenpool abziehen */
-        rsettrees(r, 0, rtrees(r, 0) - sprout);
-        /* zu den Sproesslinge hinzufuegen */
-        rsettrees(r, 1, rtrees(r, 1) + sprout);
-
         /* Baumwachstum */
-
-        /* hier gehen wir davon aus, das Jungbaeume nicht ohne weiteres aus
-         * der Region entfernt werden koennen, da Jungbaeume in der gleichen
-         * Runde nachwachsen, wir also nicht mehr zwischen diesjaehrigen und
-         * 'alten' Jungbaeumen unterscheiden koennten */
         sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
         grownup_trees = 0;
@@ -740,6 +704,22 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
         /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
+
+        /* Samenwachstum */
+        seeds = rtrees(r, 0);
+        if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
+        sprout = 0;
+
+        for (i = 0; i < seeds; i++) {
+            if (rng_int() % 10000 < growth)
+                sprout++;
+        }
+        /* aus dem Samenpool dieses Jahres abziehen */
+        a->data.sa[0] = (short)(seeds - sprout);
+        /* aus dem gesamt Samenpool abziehen */
+        rsettrees(r, 0, rtrees(r, 0) - sprout);
+        /* zu den Sproesslinge hinzufuegen */
+        rsettrees(r, 1, rtrees(r, 1) + sprout);
     }
 }
 

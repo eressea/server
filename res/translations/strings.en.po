@@ -1976,10 +1976,6 @@ msgstr " and "
 msgid "h18_p"
 msgstr "ice begonias"
 
-msgctxt "spell"
-msgid "godcursezone"
-msgstr "Curse of the Gods"
-
 msgid "sptype_postcombat"
 msgstr "post-combat spell"
 
