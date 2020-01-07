@@ -217,7 +217,7 @@ int monster_attacks(unit * monster, bool rich_only)
 static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     int money;
-    bool attacks = (attack_chance > 0.0) && armedmen(u);
+    bool attacks = (attack_chance > 0.0) && armedmen(u, false);
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
