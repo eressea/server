@@ -1684,13 +1684,15 @@ static void plant(unit * u, int raw)
 
 static void planttrees(region * r, int type, int n)
 {
-    rsettrees(r, type, rtrees(r, type) + n);
+    if (n > 0) {
+        rsettrees(r, type, rtrees(r, type) + n);
+    }
 }
 
 /* zuechte baeume */
 static void breedtrees(unit * u, int raw)
 {
-    int n, i, skill, planted;
+    int n, i, skill;
     const resource_type *rtype;
     season_t current_season = calendar_season(turn);
     region *r = u->region;
@@ -1731,17 +1733,12 @@ static void breedtrees(unit * u, int raw)
     if (n > raw) n = raw;
 
     if (skill >= 12 && current_season == SEASON_SPRING) {
-        // Plant saplings at a rate of 10:1
-        int remain = n % 10;
-        planted = n / 10;
-        if ((remain > 0) && (rng_int() % 10) < remain) {
-            ++planted;
-        }
-        planttrees(r, 1, planted);
+        // Plant saplings for every 10 seeds
+        planttrees(r, 0, n % 10);
+        planttrees(r, 1, n / 10);
     }
     else {
-        planted = n;
-        planttrees(r, 0, planted);
+        planttrees(r, 0, n);
     }
 
     /* Alles ok. Samen abziehen. */
@@ -1749,7 +1746,7 @@ static void breedtrees(unit * u, int raw)
     use_pooled(u, rtype, GET_DEFAULT, n);
 
     ADDMSG(&u->faction->msgs, msg_message("plant",
-        "unit region amount herb", u, r, planted, rtype));
+        "unit region amount herb", u, r, n, rtype));
 }
 
 /* zuechte pferde */

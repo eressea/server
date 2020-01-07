@@ -71,14 +71,14 @@ function test_plant_spring_saplings()
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)
     local u = unit.create(f, r)
-    u:set_skill('herbalism', 20)
-    u:add_item('seed', 40)
-    u:add_order("PFLANZE 20 Samen")
+    u:set_skill('herbalism', 12)
+    u:add_item('seed', 20)
+    u:add_order("PFLANZE 20 Samen") -- limited by herbalism
     process_orders()
-    assert_equal(2, r:get_resource('sapling'))
-    assert_equal(0, r:get_resource('seed'))
+    assert_equal(1, r:get_resource('sapling'))
+    assert_equal(2, r:get_resource('seed'))
     assert_equal(0, r:get_resource('tree'))
-    assert_equal(20, u:get_item('seed'))
+    assert_equal(8, u:get_item('seed'))
 end
 
 -- herbalism < T12 means we are still planting seeds at 1:1
