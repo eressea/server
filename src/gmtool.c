@@ -47,7 +47,7 @@
 
 static int g_quit;
 int force_color = 0;
-newfaction * new_players = 0;
+newfaction * new_players = NULL;
 
 state *current_state = NULL;
 
