@@ -1061,9 +1061,9 @@ static const attrib_type at_trades = {
     NO_READ
 };
 
-static int trade_add(unit *u, int n) {
+static int trade_add(unit *u, int wants, int skill) {
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    int k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+    int k = u->number * 10 * skill;
 
     attrib *a = a_find(u->attribs, &at_trades);
     /* hat der Haendler bereits gehandelt, muss die Menge der bereits
@@ -1075,11 +1075,11 @@ static int trade_add(unit *u, int n) {
         k -= a->data.i;
     }
 
-    if (n > k) n = k;
+    if (wants > k) wants = k;
 
     /* die Menge der verkauften Gueter merken */
-    a->data.i += n;
-    return n;
+    a->data.i += wants;
+    return wants;
 }
 
 static void expandbuying(region * r, econ_request * buyorders)
@@ -1220,7 +1220,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
     region *r = u->region;
-    int n;
+    int n, skill = effskill(u, SK_TRADE, NULL);
     econ_request *o;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
@@ -1260,7 +1260,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         }
     }
 
-    n = trade_add(u, n);
+    n = trade_add(u, n, skill);
     if (n <= 0) {
         cmistake(u, ord, 102, MSG_COMMERCE);
         return;
@@ -1386,10 +1386,11 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             const luxury_type *search = NULL;
             const luxury_type *ltype = g_requests[j]->data.trade.ltype;
             int multi = r_demand(r, ltype);
-            int i, price;
+            int i, price, skill;
             int use = 0;
             
             u = g_requests[j]->unit;
+            skill = effskill(u, SK_TRADE, NULL);
             for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
                 /* TODO: this is slow and lame! */
                 ++i;
@@ -1401,7 +1402,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             price = ltype->price * multi;
 
             if (money >= price) {
-                if (trade_add(u, 1) != 1) {
+                if (trade_add(u, 1, skill) != 1) {
                     break;
                 }
                 else {
