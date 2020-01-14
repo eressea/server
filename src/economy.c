@@ -1052,6 +1052,36 @@ const attrib_type at_luxuries = {
     "luxuries", NULL, free_luxuries, NULL, NULL, NULL
 };
 
+static const attrib_type at_trades = {
+    "trades",
+    DEFAULT_INIT,
+    DEFAULT_FINALIZE,
+    DEFAULT_AGE,
+    NO_WRITE,
+    NO_READ
+};
+
+static int trade_add(unit *u, int n) {
+    /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
+    int k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+
+    attrib *a = a_find(u->attribs, &at_trades);
+    /* hat der Haendler bereits gehandelt, muss die Menge der bereits
+     * verkauften/gekauften Gueter abgezogen werden */
+    if (!a) {
+        a = a_add(&u->attribs, a_new(&at_trades));
+    }
+    else {
+        k -= a->data.i;
+    }
+
+    if (n > k) n = k;
+
+    /* die Menge der verkauften Gueter merken */
+    a->data.i += n;
+    return n;
+}
+
 static void expandbuying(region * r, econ_request * buyorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
@@ -1120,15 +1150,16 @@ static void expandbuying(region * r, econ_request * buyorders)
                     a->data.v = items;
                     i_change(&g_requests[j]->unit->items, ltype->itype, 1);
                     use_pooled(u, rsilver, GET_DEFAULT, price);
-                    if (u->n < 0)
+                    if (u->n < 0) {
                         u->n = 0;
+                    }
                     u->n += price;
 
                     rsetmoney(r, rmoney(r) + price);
 
                     /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
-                     * der Preis Multiplikator fuer das Produkt um den Faktor 1. Der Zaehler
-                     * wird wieder auf 0 gesetzt. */
+                        * der Preis Multiplikator fuer das Produkt um den Faktor 1. Der Zaehler
+                        * wird wieder auf 0 gesetzt. */
                     if (++trade->number == max_products) {
                         trade->number = 0;
                         ++trade->multi;
@@ -1157,15 +1188,6 @@ static void expandbuying(region * r, econ_request * buyorders)
         }
     }
 }
-
-attrib_type at_trades = {
-    "trades",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
 
 bool trade_needs_castle(const terrain_type *terrain, const race *rc)
 {
@@ -1198,9 +1220,8 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
     region *r = u->region;
-    int n, k;
+    int n;
     econ_request *o;
-    attrib *a;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
     keyword_t kwd;
@@ -1239,29 +1260,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         }
     }
 
-    /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
-
-    /* hat der Haendler bereits gehandelt, muss die Menge der bereits
-     * verkauften/gekauften Gueter abgezogen werden */
-    a = a_find(u->attribs, &at_trades);
-    if (!a) {
-        a = a_add(&u->attribs, a_new(&at_trades));
-    }
-    else {
-        k -= a->data.i;
-    }
-
-    if (n > k) n = k;
-
-    if (!n) {
+    n = trade_add(u, n);
+    if (n <= 0) {
         cmistake(u, ord, 102, MSG_COMMERCE);
         return;
     }
-
-    assert(n >= 0);
-    /* die Menge der verkauften Gueter merken */
-    a->data.i += n;
 
     s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
@@ -1309,8 +1312,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     unit *maxowner = (unit *)NULL;
     building *maxb = (building *)NULL;
     building *b;
-    unit *u;
-    unit *hafenowner;
+    unit *hafenowner, *u;
     static int counter[MAXLUXURIES];
     static int ncounter = 0;
     static int bt_cache;
@@ -1386,6 +1388,8 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             int multi = r_demand(r, ltype);
             int i, price;
             int use = 0;
+            
+            u = g_requests[j]->unit;
             for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
                 /* TODO: this is slow and lame! */
                 ++i;
@@ -1397,58 +1401,62 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             price = ltype->price * multi;
 
             if (money >= price) {
-                item *itm;
-                attrib *a;
-                u = g_requests[j]->unit;
-                a = a_find(u->attribs, &at_luxuries);
-                if (!a) {
-                    a = a_add(&u->attribs, a_new(&at_luxuries));
+                if (trade_add(u, 1) != 1) {
+                    break;
                 }
-                itm = (item *)a->data.v;
-                i_change(&itm, ltype->itype, 1);
-                a->data.v = itm;
-                ++use;
-                if (u->n < 0) {
-                    u->n = 0;
-                }
-
-                if (hafenowner) {
-                    if (hafenowner->faction != u->faction) {
-                        int abgezogenhafen = price / 10;
-                        hafencollected += abgezogenhafen;
-                        price -= abgezogenhafen;
-                        money -= abgezogenhafen;
+                else {
+                    item *itm;
+                    attrib *a;
+                    a = a_find(u->attribs, &at_luxuries);
+                    if (!a) {
+                        a = a_add(&u->attribs, a_new(&at_luxuries));
                     }
-                }
-                if (maxb) {
-                    if (maxowner->faction != u->faction) {
-                        int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
-                        taxcollected += abgezogensteuer;
-                        price -= abgezogensteuer;
-                        money -= abgezogensteuer;
+                    itm = (item *)a->data.v;
+                    i_change(&itm, ltype->itype, 1);
+                    a->data.v = itm;
+                    ++use;
+                    if (u->n < 0) {
+                        u->n = 0;
                     }
-                }
-                u->n += price;
-                change_money(u, price);
-                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
 
-                /* r->money -= price; --- dies wird eben nicht ausgefuehrt, denn die
-                 * Produkte koennen auch als Steuern eingetrieben werden. In der Region
-                 * wurden Silberstuecke gegen Luxusgueter des selben Wertes eingetauscht!
-                 * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
-                 * die Nachfrage fuer das Produkt um 1. Der Zaehler wird wieder auf 0
-                 * gesetzt. */
-
-                if (++counter[i] > max_products) {
-                    int d = r_demand(r, ltype);
-                    if (d > 1) {
-                        r_setdemand(r, ltype, d - 1);
+                    if (hafenowner) {
+                        if (hafenowner->faction != u->faction) {
+                            int abgezogenhafen = price / 10;
+                            hafencollected += abgezogenhafen;
+                            price -= abgezogenhafen;
+                            money -= abgezogenhafen;
+                        }
                     }
-                    counter[i] = 0;
+                    if (maxb) {
+                        if (maxowner->faction != u->faction) {
+                            int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
+                            taxcollected += abgezogensteuer;
+                            price -= abgezogensteuer;
+                            money -= abgezogensteuer;
+                        }
+                    }
+                    u->n += price;
+                    change_money(u, price);
+                    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+
+                    /* r->money -= price; --- dies wird eben nicht ausgefuehrt, denn die
+                     * Produkte koennen auch als Steuern eingetrieben werden. In der Region
+                     * wurden Silberstuecke gegen Luxusgueter des selben Wertes eingetauscht!
+                     * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
+                     * die Nachfrage fuer das Produkt um 1. Der Zaehler wird wieder auf 0
+                     * gesetzt. */
+
+                    if (++counter[i] > max_products) {
+                        int d = r_demand(r, ltype);
+                        if (d > 1) {
+                            r_setdemand(r, ltype, d - 1);
+                        }
+                        counter[i] = 0;
+                    }
                 }
             }
             if (use > 0) {
-                use_pooled(g_requests[j]->unit, ltype->itype->rtype, GET_DEFAULT, use);
+                use_pooled(u, ltype->itype->rtype, GET_DEFAULT, use);
             }
         }
     }
@@ -1561,7 +1569,6 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         return false;
     }
     else {
-        attrib *a;
         econ_request *o;
         int k, available;
 
@@ -1597,20 +1604,9 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
          /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
         k = u->number * 10 * effskill(u, SK_TRADE, NULL);
 
-        /* hat der Haendler bereits gehandelt, muss die Menge der bereits
-         * verkauften/gekauften Gueter abgezogen werden */
-        a = a_find(u->attribs, &at_trades);
-        if (!a) {
-            a = a_add(&u->attribs, a_new(&at_trades));
-        }
-        else {
-            k -= a->data.i;
-        }
-
         if (n > k) n = k;
         assert(n >= 0);
         /* die Menge der verkauften Gueter merken */
-        a->data.i += n;
         o = (econ_request *)calloc(1, sizeof(econ_request));
         if (!o) abort();
         o->unit = u;
