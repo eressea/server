@@ -12,7 +12,6 @@
 
  /* attributes includes */
 #include <attributes/racename.h>
-#include <attributes/movement.h>
 
  /* kernel includes */
 #include <kernel/attrib.h>
@@ -319,7 +318,7 @@ static void transfer_units(ship *s1, ship *s2)
 }
 
 static bool ship_cursed(const ship *sh) {
-    return a_find(sh->attribs, &at_curse) != NULL || a_find(sh->attribs, &at_speedup) != NULL;
+    return a_find(sh->attribs, &at_curse) != NULL;
 }
 
 message * give_ship(unit *u1, unit *u2, int n, order *ord)

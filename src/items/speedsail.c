@@ -31,7 +31,7 @@ struct order *ord)
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "use_realworld_only", ""));
     }
     else {
-        if (u->ship && u->ship->number == 1) {
+        if (u->ship) {
             attrib *a = a_find(u->ship->attribs, &at_speedup);
             if (a == NULL) {
                 a = a_add(&u->ship->attribs, a_new(&at_speedup));
