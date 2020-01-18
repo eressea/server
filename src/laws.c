@@ -603,9 +603,9 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
+    double seedchance = config_get_flt("rules.treeseeds.chance", 0.01F) * RESOURCE_QUANTITY;
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
-        double seedchance = 0.01F * RESOURCE_QUANTITY;
         int mp, elves = count_race(r, get_race(RC_ELF));
         direction_t d;
 
@@ -653,29 +653,28 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 
         /* Gesamtzahl der Samen:
          * bis zu 6% (FORESTGROWTH*3) der Baeume samen in die Nachbarregionen */
-        seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *r2 = rconnect(r, d);
-            if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
-                /* Eine Landregion, wir versuchen Samen zu verteilen:
-                 * Die Chance, das Samen ein Stueck Boden finden, in dem sie
-                 * keimen koennen, haengt von der Bewuchsdichte und der
-                 * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
-                 * Moeglichkeiten als in Ebenen. */
-                sprout = 0;
-                seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
-                for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
-                    if (rng_int() % 10000 < seedchance)
-                        sprout++;
+        if (seedchance > 0) {
+            seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                region *r2 = rconnect(r, d);
+                if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
+                    /* Eine Landregion, wir versuchen Samen zu verteilen:
+                     * Die Chance, das Samen ein Stueck Boden finden, in dem sie
+                     * keimen koennen, haengt von der Bewuchsdichte und der
+                     * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
+                     * Moeglichkeiten als in Ebenen. */
+                    sprout = 0;
+                    seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
+                    for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
+                        if (rng_int() % 10000 < seedchance)
+                            sprout++;
+                    }
+                    rsettrees(r2, 0, rtrees(r2, 0) + sprout);
                 }
-                rsettrees(r2, 0, rtrees(r2, 0) + sprout);
             }
         }
-
     }
     else if (current_season == SEASON_SPRING) {
-        int growth;
-
         /* in at_germs merken uns die Zahl der Samen und Sproesslinge, die
          * dieses Jahr aelter werden duerfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
@@ -685,19 +684,11 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             a->data.sa[0] = cap_short(rtrees(r, 0));
             a->data.sa[1] = cap_short(rtrees(r, 1));
         }
-        /* wir haben 6 Wochen zum wachsen, jeder Same/Spross hat 18% Chance
-         * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
-        growth = 1800;
 
         /* Baumwachstum */
         sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
-        grownup_trees = 0;
-
-        for (i = 0; i < sprout; i++) {
-            if (rng_int() % 10000 < growth)
-                grownup_trees++;
-        }
+        grownup_trees = sprout / 6;
         /* aus dem Sproesslingepool dieses Jahres abziehen */
         a->data.sa[1] = (short)(sprout - grownup_trees);
         /* aus dem gesamt Sproesslingepool abziehen */
@@ -708,12 +699,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* Samenwachstum */
         seeds = rtrees(r, 0);
         if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
-        sprout = 0;
-
-        for (i = 0; i < seeds; i++) {
-            if (rng_int() % 10000 < growth)
-                sprout++;
-        }
+        sprout = seeds / 6;
         /* aus dem Samenpool dieses Jahres abziehen */
         a->data.sa[0] = (short)(seeds - sprout);
         /* aus dem gesamt Samenpool abziehen */
