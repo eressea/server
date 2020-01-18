@@ -214,10 +214,10 @@ int monster_attacks(unit * monster, bool rich_only)
     return result;
 }
 
-static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
+static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     int money;
-    bool attacks = attack_chance > 0.0;
+    bool attacks = (attack_chance > 0.0) && armedmen(u, false);
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
@@ -231,8 +231,8 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
-    if (attacks && is_guard(udragon)) {
-        int m = monster_attacks(udragon, true);
+    if (attacks && is_guard(u)) {
+        int m = monster_attacks(u, true);
         if (m > 0) money += m;
     }
 
@@ -623,11 +623,11 @@ static order *plan_dragon(unit * u)
         rc_wyrm = get_race(RC_WYRM);
     }
 
-    if (ta == NULL) {
-        move |= (rpeasants(r) == 0);   /* when no peasants, move */
-        move |= (rmoney(r) == 0);      /* when no money, move */
+    if (!move && ta == NULL) {
+        move = (rpeasants(r) == 0);   /* when no peasants, move */
+        move = move || (rmoney(r) == 0);      /* when no money, move */
     }
-    move |= chance(0.04);         /* 4% chance to change your mind */
+    move = move || chance(0.04);         /* 4% chance to change your mind */
 
     if (rc == rc_wyrm && !move) {
         unit *u2;
@@ -739,6 +739,7 @@ void plan_monsters(faction * f)
             attrib *ta;
             order *long_order = NULL;
             bool can_move = true;
+            bool guarding;
 
             /* Ab hier nur noch Befehle fuer NPC-Einheiten. */
             if (u->faction != f || u->number <= 0) {
@@ -763,8 +764,9 @@ void plan_monsters(faction * f)
             /* Befehle muessen jede Runde neu gegeben werden: */
             free_orders(&u->orders);
 
-            /* All monsters guard the region: */
-            if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
+            guarding = is_guard(u);
+            /* All monsters want to guard the region: */
+            if (!guarding && u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
                 unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
             }
 
@@ -790,7 +792,7 @@ void plan_monsters(faction * f)
                 else
                     a_remove(&u->attribs, ta);
             }
-            else if (!r->land || is_guard(u)) {
+            else if (!r->land || guarding) {
                 if (chance(attack_chance)) {
                     int m = monster_attacks(u, false);
                     if (m >= 0) {

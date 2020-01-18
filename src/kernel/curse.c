@@ -129,6 +129,7 @@ static int read_ccompat(const char *cursename, struct storage *store)
     } *seek, old_curses[] = {
         { "disorientationzone", "" },
         { "shipdisorientation", "" },
+        { "godcursezone", "" },
         { NULL, NULL }
     };
     for (seek = old_curses; seek->name; ++seek) {

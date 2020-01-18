@@ -746,10 +746,6 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         variant vm;
 
         /* Godcurse: Income -10 */
-        c = get_curse(r->attribs, &ct_godcursezone);
-        if (c && curse_active(c)) {
-            wage = (wage < 10) ? 0 : (wage - 10);
-        }
         vm = frac_make(wage, 1);
 
         /* Bei einer Duerre verdient man nur noch ein Viertel  */

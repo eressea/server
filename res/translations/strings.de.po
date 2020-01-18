@@ -2331,10 +2331,6 @@ msgstr "Seelenfrieden"
 msgid "list_and"
 msgstr " und "
 
-msgctxt "spell"
-msgid "godcursezone"
-msgstr "Fluch der Götter"
-
 msgid "sptype_postcombat"
 msgstr "Postkampfzauber"
 
