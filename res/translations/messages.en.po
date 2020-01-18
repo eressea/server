@@ -437,9 +437,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You can only br
 msgid "error307"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - We snotlings is too stupid fer dat!\""
 
-msgid "godcurse_destroy_ship"
-msgstr "\"Her sailors sick from the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks.\""
-
 msgid "too_many_units_in_faction"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - A faction may not consist of more than $int($allowed) units.\""
 
@@ -1033,9 +1030,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - There are not e
 
 msgid "sp_icastle_effect"
 msgstr "\"Flabbergasted, the peasants of $region($region) behold a new building.\""
-
-msgid "curseinfo::godcurse"
-msgstr "\"This region was cursed by the gods. Stinking vapors billow over the dead ground and hideous creatures move about the country. The wells are poisened and the edible plants are covered by a pink fungus. Noone can live here for long. ($int36($id))\""
 
 msgid "recruit_archetype"
 msgstr "\"$unit($unit) recruits $int($amount) $localize($archetype).\""
@@ -2554,9 +2548,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You need at lea
 
 msgid "error177"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The familiar cannot cast this spell.\""
-
-msgid "curseinfo::godcurseocean"
-msgstr "\"This region was cursed by the gods. The sea is a foul cesspool, noxious gases rise from the deep, undead seamonsters attack all ships. Noone can live here for long. ($int36($id))\""
 
 msgid "curseinfo::sparkle_4"
 msgstr "\"A circle of shimmering lights surrounds $unit($unit). ($int36($id))\""

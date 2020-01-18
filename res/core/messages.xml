@@ -391,16 +391,6 @@
       <arg name="id" type="int"/>
     </type>
   </message>
-  <message name="curseinfo::godcurseocean" section="events">
-    <type>
-      <arg name="id" type="int"/>
-    </type>
-  </message>
-  <message name="curseinfo::godcurse" section="events">
-    <type>
-      <arg name="id" type="int"/>
-    </type>
-  </message>
   <message name="curseinfo::disorientationzone" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -710,11 +700,6 @@
   <message name="newbie_password" section="events">
     <type>
       <arg name="password" type="string"/>
-    </type>
-  </message>
-  <message name="godcurse_destroy_ship" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
     </type>
   </message>
   <message name="skillpotion_use" section="events">

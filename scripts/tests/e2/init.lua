@@ -1,3 +1,6 @@
+require 'tests.e2.trees'
+require 'tests.e2.allies'
+require 'tests.e2.quit'
 require 'tests.e2.movement'
 require 'tests.e2.carts'
 require 'tests.e2.quit'
