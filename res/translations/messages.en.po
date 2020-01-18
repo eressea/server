@@ -1245,7 +1245,7 @@ msgid "error184"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit does not move.\""
 
 msgid "income_entertainment"
-msgstr "\"$unit($unit) earns $int($amount) in $region($region) with entertainment.\""
+msgstr "\"$unit($unit) earns $int($amount) in $region($region) from entertainment.\""
 
 msgid "error180"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The spell fails.\""
@@ -1614,7 +1614,7 @@ msgid "curseinfo::deathcloud"
 msgstr "\"A poison elemental is spreading pestilence and death. ($int36($id))\""
 
 msgid "income"
-msgstr "\"$unit($unit) earns $int($amount)$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") in $region($region) $if($eq($mode,1),\" by entertainment\",$if($eq($mode,2),\" by taxes\",$if($eq($mode,3),\" by trade\",$if($eq($mode,5),\" by stealing\",$if($eq($mode,6),\" by magic\",$if($eq($mode,7),\" by pillaging\",\"\")))))).\""
+msgstr "\"$unit($unit) in $region($region) earns $int($amount)$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") silver.\""
 
 msgid "researchherb"
 msgstr "\"$unit($unit) discovers that $localize($amount) $resource($herb,0) grow in $region($region).\""
@@ -2109,7 +2109,7 @@ msgid "deathcloud_effect"
 msgstr "\"$unit($mage) summons a poison elemental in $region($region).\""
 
 msgid "nr_population"
-msgstr "\"Your faction has $int($population) people in $int($units) of $int($limit) possible units.\""
+msgstr "\"Your faction has $int($population) $if($eq($population,1), \"person\", \"persons\") in $int($units) of $int($limit) possible units.\""
 
 msgid "curseinfo::shipdisorientation"
 msgstr "This ship has lost its path. ($int36($id))"
@@ -2217,7 +2217,7 @@ msgid "curseinfo::healingzone"
 msgstr "Healing in this region is affected by magic. ($int36($id))"
 
 msgid "income_entertainment_reduced"
-msgstr "\"In $region($region), $unit($unit) earns only $int($amount) instead of$if($eq($wanted,$amount),\"\",\" of$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") \") with entertainment.\""
+msgstr "\"In $region($region), $unit($unit) earns only $int($amount) instead of$if($eq($wanted,$amount),\"\",\" of$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") \") from entertainment.\""
 
 msgid "errusingpotion"
 msgstr "\"$unit($unit): '$order($command)' - The unit already uses $resource($using,0).\""
