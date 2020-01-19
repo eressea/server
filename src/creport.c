@@ -84,7 +84,7 @@ static char g_bigbuf[BUFFERSIZE];
 bool opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 67
+#define C_REPORT_VERSION 68
 
 struct locale *crtag_locale(void) {
     static struct locale * lang;
@@ -495,38 +495,6 @@ static int cr_curse(variant var, char *buffer, const void *userdata)
 
 /*static int msgno; */
 
-#define MTMAXHASH 1021
-
-static struct known_mtype {
-    const struct message_type *mtype;
-    struct known_mtype *nexthash;
-} *mtypehash[MTMAXHASH];
-
-static void report_crtypes(FILE * F, const struct locale *lang)
-{
-    int i;
-    for (i = 0; i != MTMAXHASH; ++i) {
-        struct known_mtype *kmt;
-        for (kmt = mtypehash[i]; kmt; kmt = kmt->nexthash) {
-            char buffer[DISPLAYSIZE];
-            int hash = (int)kmt->mtype->key;
-            assert(hash > 0);
-            fprintf(F, "MESSAGETYPE %d\n", hash);
-            fputc('\"', F);
-            fputs(crescape(nrt_string(kmt->mtype, lang), buffer, sizeof(buffer)), F);
-            fputs("\";text\n", F);
-            if (kmt->mtype->section) {
-                fprintf(F, "\"%s\";section\n", kmt->mtype->section);
-            }
-        }
-        while (mtypehash[i]) {
-            kmt = mtypehash[i];
-            mtypehash[i] = mtypehash[i]->nexthash;
-            free(kmt);
-        }
-    }
-}
-
 static int message_id(const struct message *msg)
 {
     variant var;
@@ -593,19 +561,6 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
         }
         else {
             log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
-        }
-        if (printed) {
-            unsigned int ihash = hash % MTMAXHASH;
-            struct known_mtype *kmt = mtypehash[ihash];
-            while (kmt && kmt->mtype != mtype)
-                kmt = kmt->nexthash;
-            if (kmt == NULL) {
-                kmt = (struct known_mtype *)malloc(sizeof(struct known_mtype));
-                if (!kmt) abort();
-                kmt->nexthash = mtypehash[ihash];
-                kmt->mtype = mtype;
-                mtypehash[ihash] = kmt;
-            }
         }
         m = m->next;
     }
@@ -1714,7 +1669,6 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             cr_output_region(F, ctx, r);
         }
     }
-    report_crtypes(F, f->locale);
     if (f->locale != crtag_locale()) {
         report_translations(F);
     }
