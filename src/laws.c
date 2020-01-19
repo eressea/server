@@ -591,11 +591,11 @@ growing_trees_e3(region * r, const int current_season,
     }
 }
 
-static short cap_short(int i) {
-    if (i > SHRT_MIN) {
-        return ((i < SHRT_MAX) ? (short)i : SHRT_MAX);
+static int cap_int(int i, int imin, int imax) {
+    if (i > imin) {
+        return ((i < imax) ? i : imax);
     }
-    return SHRT_MIN;
+    return imin;
 }
 
 static void
@@ -681,8 +681,12 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         a = a_find(r->attribs, &at_germs);
         if (!a) {
             a = a_add(&r->attribs, a_new(&at_germs));
-            a->data.sa[0] = cap_short(rtrees(r, 0));
-            a->data.sa[1] = cap_short(rtrees(r, 1));
+            a->data.sa[0] = (short)cap_int(rtrees(r, 0), 0, SHRT_MAX);
+            a->data.sa[1] = (short)cap_int(rtrees(r, 1), 0, SHRT_MAX);
+        }
+        else if (a->data.sa[0] < 0 || a->data.sa[1] << 0) {
+            a->data.sa[0] = (short)cap_int(a->data.sa[0], 0, SHRT_MAX);
+            a->data.sa[1] = (short)cap_int(a->data.sa[1], 0, SHRT_MAX);
         }
 
         /* Baumwachstum */
