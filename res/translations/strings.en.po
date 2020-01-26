@@ -5515,7 +5515,7 @@ msgstr "aquarians"
 
 msgctxt "iteminfo"
 msgid "fairyboot"
-msgstr "These leather boots are embroidere with unicorn hair and allow their wearer to walk at twice his normal speed."
+msgstr "These leather boots are embroidered with unicorn hair and allow their wearer to walk at twice his normal speed."
 
 msgctxt "spell"
 msgid "skillmod"
