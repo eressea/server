@@ -209,7 +209,7 @@ static void setup_terrains(CuTest *tc) {
 static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain) {
     region *r;
     item_type *it_luxury;
-    struct locale * lang = default_locale;
+    struct locale * lang = test_create_locale();
 
     new_luxurytype(it_luxury = test_create_itemtype("balm"), 5);
     locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
@@ -231,6 +231,36 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
     u = test_create_unit(test_create_faction(rc), r);
     set_level(u, SK_TRADE, 2);
     return u;
+}
+
+static void test_trade_limits(CuTest *tc) {
+    region *r;
+    unit *u;
+    building *b;
+    const item_type *it_jewel, *it_balm;
+
+    test_setup();
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    rsetpeasants(r, TRADE_FRACTION * 20);
+    it_jewel = it_find("jewel");
+    u = test_create_unit(test_create_faction(NULL), r);
+    set_level(u, SK_TRADE, 1);
+    i_change(&u->items, it_find("money"), 500);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "5 %s",
+        LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
+    it_balm = it_find("balm");
+    i_change(&u->items, it_balm, 10);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_balm->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 5, i_get(u->items, it_jewel));
+    CuAssertIntEquals(tc, 5, i_get(u->items, it_balm));
+    test_teardown();
 }
 
 static void test_trade_needs_castle(CuTest *tc) {
@@ -837,6 +867,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
