@@ -980,7 +980,7 @@ int quit_cmd(unit * u, struct order *ord)
             if (p == P_FACTION) {
 #ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
-                if (f2 == NULL) {
+                if (f2 == NULL || f2 == u->faction) {
                     cmistake(u, ord, 66, MSG_EVENT);
                     flags = 0;
                 }
