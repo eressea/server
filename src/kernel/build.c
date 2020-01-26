@@ -810,25 +810,13 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
         built = b->size;
     }
-    if (n <= 0 || n == INT_MAX) {
-        if (b == NULL) {
-            if (btype->maxsize > 0) {
-                n = btype->maxsize - built;
-            }
-            else {
-                n = INT_MAX;
-            }
-        }
-        else {
-            if (b->type->maxsize > 0) {
-                n = b->type->maxsize - built;
-            }
-            else {
-                n = INT_MAX;
-            }
+
+    if (btype->maxsize > 0) {
+        int remain = btype->maxsize - built;
+        if (remain < n) {
+            n = remain;
         }
     }
-
     built = build_stages(u, btype, built, n, basesk, &skills);
 
     if (built < 0) {
