@@ -1495,7 +1495,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     bool unlimited = true;
     const item_type *itype;
     const luxury_type *ltype;
-    int n, i;
+    int n, k;
     region *r = u->region;
     const char *s;
     keyword_t kwd;
@@ -1546,8 +1546,9 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     }
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt verkaufen. */
 
-    i = u->number * 10 * effskill(u, SK_TRADE, NULL);
-    if (n > i) n = i;
+    /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
+    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+    if (n > k) n = k;
 
     if (!n) {
         cmistake(u, ord, 54, MSG_COMMERCE);
@@ -1563,7 +1564,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     else {
         attrib *a;
         econ_request *o;
-        int k, available;
+        int available;
 
         if (!r->land || !r_demand(r, ltype)) {
             cmistake(u, ord, 263, MSG_COMMERCE);
@@ -1593,9 +1594,6 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
          * (!) produkte als summe gilt, als nicht wie bei der
          * produktion, wo fuer jedes produkt einzeln eine obere limite
          * existiert, so dass man arrays von orders machen kann. */
-
-         /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-        k = u->number * 10 * effskill(u, SK_TRADE, NULL);
 
         /* hat der Haendler bereits gehandelt, muss die Menge der bereits
          * verkauften/gekauften Gueter abgezogen werden */
