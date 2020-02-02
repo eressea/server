@@ -2358,9 +2358,8 @@ static void patzer_peasantmob(const castorder * co)
         rsetpeasants(r, rpeasants(r) - n);
         assert(rpeasants(r) >= 0);
 
-        u =
-            create_unit(r, f, n, get_race(RC_PEASANT), 0, LOC(f->locale, "angry_mob"),
-                NULL);
+        u = create_unit(r, f, n, get_race(RC_PEASANT), 0,
+            LOC(f->locale, "angry_mob"), NULL);
         fset(u, UFL_ISNEW);
         unit_addorder(u, create_order(K_GUARD, lang, NULL));
         set_order(&u->thisorder, default_order(lang));
