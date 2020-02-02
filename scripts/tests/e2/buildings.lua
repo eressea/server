@@ -41,7 +41,6 @@ function test_build_tunnel_limited()
     u:add_item('iron', 2)
     u:add_item('money', 700)
     u.building = b
-    u.name = 'Xolgrim'
     u:add_order('MACHE 2 BURG ' .. itoa36(b.id))
     b.size = 99
     process_orders()

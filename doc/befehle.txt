@@ -1,0 +1,15 @@
+# Befehlsverarbeitung in Eressea
+
+Einheiten haben zwei Listen von Befehlen: orders und old_orders.
+
+1. `read_unit`: Aus dem Datenfile gelesene (Default-)Befehl der Vorwoche werden in u->orders gespeichert.
+2. `begin_orders`: Wenn die Einheit neue Befehle erhält, werden "wiederholbare" Befehle (Handel, lange Befehle ausser NACH) aus u->orders nach u->old_orders kopiert.
+3. `unitorders`: Die neuen Befehle werden in u->orders gelesen.
+4. `update_long_order`: u->thisorder wird auf den ersten "langen" Befehl in u->orders gesetzt.
+5. Auswertung: Für lange Befehle wird in u->thisorder geschaut, für kurze und andere (inkl. KAUFE/ATTACKIERE) in u->orders.
+6. `movement`: NACH löscht u->thisorder, damit es nicht bei Auswertung der Zielregion ein zweites Mal ausgeführt werden kann. Das hat allerdings keine Auswirkung auf die beiden Listen.
+7. `build_building`: Wenn ein MACHE GEBAEUDE Befehl "fertig" ist, wird der Befehl in u->orders durch ein ARBEITE ersetzt (aber u->thisorder nicht geändert, das sollte also nichts tun).
+8. `defaultorders`: Nach allen langen Befehlen wird der DEFAULT Befehl gesetzt. Dieser löscht zuerst alle nicht-kurzen Befehle aus u->orders und u->old_orders, und hängt dann den neuen Befehl in u->old_orders an. 
+9.1: `cr_output_unit`: In den CR werden alle "dauerhaften" Befehle aus u->old_orders geschrieben, d.h. kurze Befehle mit @ Prefix, Kommentare mit // und lange Befehle ausser NACH.
+9.2: `cr_output_unit`: In den CR werden alle "dauerhaften" Befehle aus u->orders geschrieben, d.h. kurze Befehle mit @ Prefix, Kommentare mit // und lange Befehle ausser NACH. Wenn u->old_orders nicht leer ist, werden "wiederholbare" Befehle dabei ignoriert.
+
