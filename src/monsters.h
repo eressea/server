@@ -18,7 +18,6 @@ extern "C" {
     void monsters_desert(struct faction *monsters);
     
     void monster_kills_peasants(struct unit *u);
-    bool monster_is_waiting(const struct unit *u);
     void make_zombie(struct unit * u);
 
     void spawn_undead(void);
