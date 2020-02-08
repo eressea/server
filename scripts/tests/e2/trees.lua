@@ -15,7 +15,7 @@ function test_no_growth()
     set_turn(204)
     assert_equal('spring', get_season())
     local r = region.create(0, 0, 'plain')
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 0)
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)
@@ -30,7 +30,7 @@ function test_spring_growth()
     set_turn(204)
     assert_equal('spring', get_season())
     local r = region.create(0, 0, 'plain')
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 6)
     r:set_resource('sapling', 17)
     r:set_resource('tree', 0)
@@ -46,7 +46,7 @@ function test_plant_fail()
     assert_equal('summer', get_season())
     local f = faction.create('goblin')
     local r = region.create(0, 0, 'plain')
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 0)
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)
@@ -67,7 +67,7 @@ function test_plant_summer()
     assert_equal('summer', get_season())
     local f = faction.create('goblin')
     local r = region.create(0, 0, 'plain')
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 0)
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)
@@ -89,7 +89,7 @@ function test_plant_spring_saplings()
     local f = faction.create('goblin')
     local r = region.create(0, 0, 'plain')
     local u = unit.create(f, r)
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 0)
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)
@@ -117,7 +117,7 @@ function test_plant_spring_seeds()
     local f = faction.create('goblin')
     local r = region.create(0, 0, 'plain')
     local u = unit.create(f, r)
-    r:set_flag(2, 0) -- no mallorn
+    r:set_flag(1, false) -- no mallorn
     r:set_resource('seed', 0)
     r:set_resource('sapling', 0)
     r:set_resource('tree', 0)

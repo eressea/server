@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e2.spells", package.seeall, lunit.testcase)
 
 function setup()
-    eressea.free_game()
+    eressea.game.reset()
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
