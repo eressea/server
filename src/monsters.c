@@ -794,9 +794,9 @@ void plan_monsters(faction * f)
 
             /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
-            if (ta && !monster_is_waiting(u) && monster_can_attack(u)) {
+            if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
-                if (tu && tu->region == r) {
+                if (tu && tu->region == r && monster_can_attack(u)) {
                     order * ord = monster_attack(u, tu);
                     if (ord) {
                         unit_addorder(u, ord);

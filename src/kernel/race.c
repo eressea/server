@@ -294,7 +294,7 @@ static race *rc_find_i(const char *name)
     return rc;
 }
 
-const race * rc_find(const char *name) {
+race * rc_find(const char *name) {
     return rc_find_i(name);
 }
 
