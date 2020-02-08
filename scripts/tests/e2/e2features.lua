@@ -12,6 +12,26 @@ function setup()
     eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
+function disabled_double_default()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    region.create(3, 0, "plain")
+
+    u:add_order('NACH O')
+    u:add_order('DEFAULT "NACH O"')
+    u:add_order('DEFAULT "DEFAULT ARBEITE"')
+    process_orders()
+    assert_equal(1, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    assert_equal("ARBEITE", u:get_order())
+end
+
 function test_give_unit()
   local r = region.create(0, 0, "plain")
   local f1 = faction.create('elf')

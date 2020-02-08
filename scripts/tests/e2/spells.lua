@@ -3,7 +3,7 @@ require "lunit"
 module("tests.e2.spells", package.seeall, lunit.testcase)
 
 function setup()
-    eressea.free_game()
+    eressea.game.reset()
     eressea.settings.set("nmr.removenewbie", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
@@ -20,9 +20,6 @@ function test_undead_cannot_enter_holyground()
     local f = faction.create('human')
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f, r2, 1)
-
-    u2.name = "Xolgrim's Magier"
-    u1.name = "Xolgrim's Opfer"
 
     u2.magic = 'gwyrrd'
     u2:set_skill('magic', 100)
@@ -227,7 +224,6 @@ function test_bug_2517()
   local uf = nil
   eressea.settings.set("magic.familiar.race", "lynx")
   f.magic = 'gwyrrd'
-  um.name = 'Xolgrim'
   um.magic = 'gwyrrd'
   um.race = 'elf'
   um:set_skill('magic', 10)

@@ -28,7 +28,6 @@ function test_undead_reserve_other()
     u1.race = "undead"
     u1:clear_orders()
     u1:add_order("RESERVIERE 1 Holz")
-    u1.name = 'Xolgrim'
     process_orders()
 
     if 0 ~= u1:get_item("log") then

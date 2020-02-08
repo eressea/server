@@ -142,18 +142,39 @@ static void reduce_weight(unit * u)
     }
 }
 
+static bool monster_is_waiting(const unit * u)
+{
+    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
+    if (fval(u, test))
+        return true;
+    return false;
+}
+
+static bool monster_can_attack(const unit * u)
+{
+    if (u->status >= ST_AVOID) {
+        return false;
+    }
+    if (u->region->land) {
+        return is_guard(u);
+    }
+    else if (fval(u->region->terrain, SEA_REGION)) {
+        return fval(u_race(u), RCF_SWIM);
+    }
+    return fval(u_race(u), RCF_FLY);
+}
+
 static order *monster_attack(unit * u, const unit * target)
 {
     assert(u->region == target->region);
     assert(u->faction != target->faction);
-    if (!cansee(u->faction, u->region, target, 0))
-        return NULL;
-    if (monster_is_waiting(u))
-        return NULL;
-
-    if (u->region->land && (u->region->flags & RF_GUARDED) == 0) {
+    if (!cansee(u->faction, u->region, target, 0)) {
         return NULL;
     }
+    if (monster_is_waiting(u)) {
+        return NULL;
+    }
+
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
@@ -185,7 +206,8 @@ int monster_attacks(unit * monster, bool rich_only)
 {
     const race *rc_serpent = get_race(RC_SEASERPENT);
     int result = -1;
-    if (monster->status < ST_AVOID) {
+
+    if (monster_can_attack(monster)) {
         region *r = monster->region;
         unit *u2;
         int money = 0;
@@ -231,7 +253,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
-    if (attacks && is_guard(u)) {
+    if (attacks && monster_can_attack(u)) {
         int m = monster_attacks(u, true);
         if (m > 0) money += m;
     }
@@ -774,7 +796,7 @@ void plan_monsters(faction * f)
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
-                if (tu && tu->region == r) {
+                if (tu && tu->region == r && monster_can_attack(u)) {
                     order * ord = monster_attack(u, tu);
                     if (ord) {
                         unit_addorder(u, ord);
@@ -792,7 +814,7 @@ void plan_monsters(faction * f)
                 else
                     a_remove(&u->attribs, ta);
             }
-            else if (!r->land || guarding) {
+            else if (monster_can_attack(u)) {
                 if (chance(attack_chance)) {
                     int m = monster_attacks(u, false);
                     if (m >= 0) {
@@ -1011,14 +1033,6 @@ void spawn_undead(void)
             }
         }
     }
-}
-
-bool monster_is_waiting(const unit * u)
-{
-    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
-    if (fval(u, test))
-        return true;
-    return false;
 }
 
 static void eaten_by_monster(unit * u)
