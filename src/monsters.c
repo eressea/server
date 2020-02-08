@@ -253,7 +253,7 @@ static order *get_money_for_dragon(region * r, unit * u, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
-    if (attacks && && monster_can_attack(u)) {
+    if (attacks && monster_can_attack(u)) {
         int m = monster_attacks(u, true);
         if (m > 0) money += m;
     }
