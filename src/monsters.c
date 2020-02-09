@@ -44,6 +44,7 @@
 
 /* attributes includes */
 #include <attributes/targetregion.h>
+#include <attributes/otherfaction.h>
 #include <attributes/hate.h>
 
 #include <spells/regioncurse.h>
@@ -772,6 +773,7 @@ void plan_monsters(faction * f)
             if (fval(u, UFL_ANON_FACTION)) {
                 u->flags &= ~UFL_ANON_FACTION;
             }
+            a_removeall(&u->attribs, &at_otherfaction);
 
             if (rc->splitsize < 10) {
                 /* hermit-type monsters eat each other */
