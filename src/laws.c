@@ -1226,13 +1226,6 @@ void do_enter(struct region *r, bool is_final_attempt)
                     }
                 }
                 if (ulast != NULL) {
-                    /* Wenn wir hier angekommen sind, war der Befehl
-                     * erfolgreich und wir loeschen ihn, damit er im
-                     * zweiten Versuch nicht nochmal ausgefuehrt wird. */
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
-
                     if (ulast != u) {
                         /* put u behind ulast so it's the last unit in the building */
                         *uptr = u->next;
