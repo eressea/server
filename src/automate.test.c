@@ -110,6 +110,40 @@ static void test_autostudy_run_twoteachers(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * Reproduce Bug 2640
+ */
+static void test_autostudy_run_bigunit(CuTest *tc) {
+    scholar scholars[4];
+    int nscholars;
+    unit *u1, *u2, *ulist;
+    faction *f;
+    region *r;
+    skill_t skill;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction(NULL);
+    u1 = test_create_unit(f, r);
+    set_number(u1, 20);
+    set_level(u1, SK_ENTERTAINMENT, 16);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    u2 = test_create_unit(f, r);
+    set_number(u2, 1000);
+    set_level(u2, SK_ENTERTAINMENT, 10);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+
+    ulist = r->units;
+    CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, &skill));
+    CuAssertPtrEquals(tc, NULL, ulist);
+    autostudy_run(scholars, nscholars);
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT, skill);
+    CuAssertIntEquals(tc, 0, scholars[0].learn);
+    CuAssertIntEquals(tc, 200, scholars[1].learn);
+
+    test_teardown();
+}
+
 static void test_autostudy_run(CuTest *tc) {
     scholar scholars[4];
     int nscholars;
@@ -325,6 +359,7 @@ CuSuite *get_automate_suite(void)
     SUITE_ADD_TEST(suite, test_autostudy_run_noteachers);
     SUITE_ADD_TEST(suite, test_autostudy_run_teachers_learn);
     SUITE_ADD_TEST(suite, test_autostudy_run_twoteachers);
+    SUITE_ADD_TEST(suite, test_autostudy_run_bigunit);
     SUITE_ADD_TEST(suite, test_autostudy_run_skilldiff);
     return suite;
 }

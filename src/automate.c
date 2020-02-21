@@ -96,7 +96,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-            for (; mint > tt && si != nscholars; ++si) {
+            for (; mint > tt && si != nscholars - 1; ++si) {
                 tt += scholars[si].u->number;
             }
         }

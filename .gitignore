@@ -46,3 +46,5 @@ tests/data/185.dat
 /cutest/
 /critbit/
 *.mo
+/CMakeSettings.json
+/.vs
