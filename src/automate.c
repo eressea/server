@@ -77,7 +77,8 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *
 
 static void teaching(scholar *s, int n) {
     assert(n <= s->u->number);
-    s->learn += n;
+    // doppelter Effekt mit Lehrer:
+    s->learn += n * 2;
     s->u->flags |= UFL_LONGACTION;
 }
 
@@ -96,7 +97,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             int mint;
             ts += scholars[se].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
-            for (; mint > tt && si != nscholars - 1; ++si) {
+            for (; mint > tt && si != nscholars; ++si) {
                 tt += scholars[si].u->number;
             }
         }
@@ -125,10 +126,10 @@ void autostudy_run(scholar scholars[], int nscholars)
                     /* t has more than enough teaching capacity for s */
                     i -= n;
                     teaching(scholars + s, n);
-                    learning(scholars + s, scholars[s].u->number);
                     /* next student, please: */
                     if (++s == se) {
-                        continue;
+                        /* no more students */
+                        break;
                     }
                     n = scholars[s].u->number;
                 }
@@ -163,7 +164,12 @@ void autostudy_run(scholar scholars[], int nscholars)
             }
             ++t;
             for (; t < si; ++t) {
+                /* teachers that did not teach */
                 learning(scholars + t, scholars[t].u->number);
+            }
+            for (; s < se; ++s) {
+                /* students that were not taught */
+                learning(scholars + s, scholars[s].u->number);
             }
         }
         ti = se;
