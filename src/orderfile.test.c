@@ -48,17 +48,6 @@ static void test_unit_orders(CuTest *tc) {
     test_teardown();
 }
 
-typedef struct order_list {
-    const char **orders;
-    int next;
-} order_list;
-
-static const char *getbuf_list(void *data)
-{
-    order_list * olist = (order_list *)data;
-    return olist->orders[olist->next++];
-}
-
 static void test_faction_password_okay(CuTest *tc) {
     faction *f;
     FILE *F;
