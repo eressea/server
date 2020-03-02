@@ -232,20 +232,22 @@ typedef struct parser_state {
 
 static void handle_faction(void *userData, int no, const char *password) {
     parser_state *state = (parser_state *)userData;
-    faction * f = state->f = findfaction(no);
+    faction * f = findfaction(no);
     if (!f) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
     else {
+        state->u = NULL;
+        state->next_order = NULL;
+        state->f = NULL;
         if (checkpasswd(f, password)) {
+            state->f = f;
             f->lastorders = turn;
         }
         else {
             log_debug("invalid password for faction %s", itoa36(no));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
         }
-        state->u = NULL;
-        state->next_order = NULL;
     }
 }
 
