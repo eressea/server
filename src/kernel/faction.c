@@ -258,11 +258,14 @@ unit *addplayer(region * r, faction * f)
     const char * name;
 
     assert(r->land);
+    assert(f->units == NULL);
     if (rpeasants(r) < PEASANT_MIN) {
         rsetpeasants(r, PEASANT_MIN + rng_int() % (PEASANT_MAX - PEASANT_MIN));
     }
+    if (rtrees(r, TREE_TREE) < 50) {
+        rsettrees(r, TREE_TREE, 50);
+    }
 
-    assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
     u->status = ST_FLEE;
