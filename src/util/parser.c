@@ -223,6 +223,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     }
 
     *cursor = '\0';
+    unicode_utf8_trim(lbuf);
     *str = ctoken;
     return lbuf;
 }
