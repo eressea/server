@@ -17,8 +17,8 @@ fi
 cd "$GAME/reports" || exit
 for REPORT in *.sh
 do
-  echo -n "Sending "
-  basename "$REPORT" .sh
+  #echo -n "Sending "
+  #basename "$REPORT" .sh
   bash "$REPORT"
 done
 cd - || exit
