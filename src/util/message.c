@@ -277,7 +277,7 @@ const message_type *mt_find(const char *name)
             return data;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void msg_free(message * msg)

@@ -2723,6 +2723,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit did no
 msgid "error182"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship cannot leave in this direction.\""
 
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ships need to be on the same coast for this.\""
+
 msgid "analyse_ship_nospell"
 msgstr "\"It appears to $unit($mage) that $ship($ship) is not charmed.\""
 
