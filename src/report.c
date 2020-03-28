@@ -1734,7 +1734,7 @@ nr_ship(struct stream *out, const region *r, const ship * sh, const faction * f,
             stname, n, ship_capacity(sh) / 100);
     }
     else {
-        sbs_printf(&sbs, "%s, %d %s", sh->number, shipname(sh), stname);
+        sbs_printf(&sbs, "%s, %d %s", shipname(sh), sh->number, stname);
     }
 
     if (!ship_finished(sh)) {
