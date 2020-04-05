@@ -2775,7 +2775,7 @@ msgid "error327"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Schiffe kann die Einheit nicht übergeben.\""
 
 msgid "error328"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen die Schiffe an der selben Küste liegen.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen die Schiffe an derselben Küste liegen.\""
 
 msgid "error326"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe können keinen Konvoi bilden.\""
