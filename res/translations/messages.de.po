@@ -2768,9 +2768,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit geh
 msgid "error322"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe gleicher Bauart können einen Konvoi bilden.\""
 
-msgid "error328"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe an der selben Küste können einen Konvoi bilden.\""
-
 msgid "error323"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist verzaubert.\""
 
@@ -2778,7 +2775,7 @@ msgid "error327"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Schiffe kann die Einheit nicht übergeben.\""
 
 msgid "error328"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen die Schiffe an der selben Küste liegen.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen die Schiffe an derselben Küste liegen.\""
 
 msgid "error326"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe können keinen Konvoi bilden.\""

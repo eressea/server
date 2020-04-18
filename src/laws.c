@@ -3091,14 +3091,7 @@ void update_long_order(unit * u)
                     }
                     break;
                 default:
-                    if (kwd > thiskwd) {
-                        /* swap out thisorder for the new one */
-                        cmistake(u, u->thisorder, 52, MSG_EVENT);
-                        set_order(&u->thisorder, copy_order(ord));
-                    }
-                    else {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
+                    cmistake(u, ord, 52, MSG_EVENT);
                     break;
                 }
             }
