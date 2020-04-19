@@ -1,10 +1,11 @@
 -- Tests that work in all games. With game config of E2. 
 -- Tests are under scripts/test/e2 and all files must be in scripts/test/e2/init.lua
 
+lunit = require('lunit')
+module = lunit.module
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
-    package.path = package.path .. ';' .. config.install .. '/lunit/?.lua'
     --needed to find lunit if not run from eressea root. Needs right [lua] install setting in eressea.ini (point to eressea root from the start folder)
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
@@ -15,7 +16,6 @@ require 'eressea'
 require 'eressea.xmlconf'
 require 'eressea.path'
 require 'tests.e2'
-require 'lunit'
 
 rng.inject(0)
 eressea.settings.set("rules.food.flags", "4")

@@ -1,6 +1,3 @@
-[submodule "lunit"]
-	path = lunit
-	url = https://github.com/ennorehling/lunit.git
 [submodule "dlmalloc"]
 	path = dlmalloc
 	url = https://github.com/ennorehling/dlmalloc.git

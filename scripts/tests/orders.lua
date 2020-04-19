@@ -1,12 +1,14 @@
-require "lunit"
+local tcname = 'tests.shared.orders'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, 'seeall')
+end
 
 local _G = _G
-local eressea = eressea
 local default_ship = config.ships[1]
 local default_building = config.buildings[1]
-
-module('tests.eressea.orders', package.seeall, lunit.testcase)
-
 local r, f, u
 
 function setup()
