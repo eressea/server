@@ -1,6 +1,9 @@
 -- Tests that work in E3. With game config of E3. 
 -- Tests are under scripts/test/e3 and all files must be in scripts/test/e3/init.lua
 
+lunit = require('lunit')
+module = lunit.module
+
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path

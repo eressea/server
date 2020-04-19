@@ -1,4 +1,10 @@
-require "lunit"
+local tcname = 'tests.shared.common'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, 'seeall')
+end
 
 local function _test_create_ship(r)
     local s = ship.create(r, config.ships[1])
@@ -25,8 +31,6 @@ local function two_factions()
   local f2 = create_faction('elf')
   return f1, f2
 end
-
-module("tests.common", package.seeall, lunit.testcase)
 
 function setup()
     eressea.free_game()

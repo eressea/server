@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.magicbag", package.seeall, lunit.testcase)
+local tcname = 'tests.shared.magicbag'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, 'seeall')
+end
 
 local u
 
