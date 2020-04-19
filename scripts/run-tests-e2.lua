@@ -1,6 +1,8 @@
 -- Tests that work in all games. With game config of E2. 
 -- Tests are under scripts/test/e2 and all files must be in scripts/test/e2/init.lua
 
+lunit = require('lunit')
+module = lunit.module
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path

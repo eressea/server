@@ -1,6 +1,9 @@
-require "lunit"
-
-module("tests.movement", package.seeall, lunit.testcase)
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module("tests.movement", 'seeall')
+else
+  module("tests.movement", 'seeall')
+end
 
 function setup()
     eressea.free_game()

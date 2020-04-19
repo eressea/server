@@ -1,6 +1,9 @@
-require "lunit"
-
-module("tests.eressea.pool", package.seeall, lunit.testcase )
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module("tests.pool", 'seeall')
+else
+  module("tests.pool", 'seeall')
+end
 
 function setup()
     eressea.game.reset()
