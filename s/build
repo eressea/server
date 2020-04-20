@@ -1,6 +1,6 @@
 #!/bin/sh
 ROOT=$(git rev-parse --show-toplevel)
-
+eval $(luarocks path)
 [ -z "$BUILD" ] && BUILD=Debug
 if [ -z "$JOBS" ] ; then
   if [ -e /usr/sbin/sysctl ]; then
