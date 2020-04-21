@@ -32,3 +32,4 @@ require 'tests.xmas'
 require 'tests.production'
 require 'tests.spells'
 require 'tests.undead'
+
