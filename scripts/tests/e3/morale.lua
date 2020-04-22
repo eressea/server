@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e3.morale", package.seeall, lunit.testcase )
+local tcname = 'tests.e3.morale'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, 'seeall')
+end
 
 function setup()
     eressea.game.reset()
@@ -171,7 +175,7 @@ function test_morale_change()
     run_a_turn()
     assert_equal(4, r.morale)
     
-    -- regel: ohne herrscher f‰llt die moral jede woche um 1 punkt, bis sie 1 erreicht
+    -- regel: ohne herrscher f√§llt die moral jede woche um 1 punkt, bis sie 1 erreicht
     assert_false(r.is_mourning)
     u1.building = nil
     update_owners()
@@ -186,7 +190,7 @@ function test_morale_change()
     run_a_turn()
     assert_equal(1, r.morale)
     
-    -- ohne herrscher ‰ndert sich auch beschissene Moral nicht:
+    -- ohne herrscher √§ndert sich auch beschissene Moral nicht:
     r.morale = 0
     run_a_turn()
     assert_equal(0, r.morale)
