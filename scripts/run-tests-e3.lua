@@ -11,11 +11,11 @@ package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 config.rules = 'e3'
 
+lunit = require 'lunit'
 require 'eressea'
 require 'eressea.path'
 require 'eressea.xmlconf'
 require 'tests.e3'
-require 'lunit'
 
 rng.inject(0)
 eressea.settings.set("rules.alliances", "0")
