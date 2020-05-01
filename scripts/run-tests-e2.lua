@@ -4,18 +4,16 @@
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
-    package.path = package.path .. ';' .. config.install .. '/lunit/?.lua'
-    --needed to find lunit if not run from eressea root. Needs right [lua] install setting in eressea.ini (point to eressea root from the start folder)
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 config.rules = 'e2'
 
+lunit = require 'lunit'
 require 'eressea'
 require 'eressea.xmlconf'
 require 'eressea.path'
 require 'tests.e2'
-require 'lunit'
 
 rng.inject(0)
 eressea.settings.set("rules.food.flags", "4")

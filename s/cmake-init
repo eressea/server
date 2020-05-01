@@ -125,6 +125,7 @@ TOLUA
 else
  echo "tolua is $path"
 fi
+luarocks --local install lunitx
 unset path
 
 set -e
