@@ -796,6 +796,9 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
                     }
                 }
             }
+            else {
+                cmistake(u, ord, 123, MSG_COMMERCE);
+            }
         }
     }
 }
