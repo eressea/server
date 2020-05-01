@@ -4,8 +4,6 @@
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
-    package.path = package.path .. ';' .. config.install .. '/lunit/?.lua' 
-    --needed to find lunit if not run form eressea root. Needs right [lua] install setting in eressea.ini (point to eressea root from the start folder)
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
