@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+eval ($luarocks path)
 ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 
