@@ -130,8 +130,9 @@ function process(rules, orders)
     end
 
     turn_begin()
-
-    -- run the turn:
+    -- create orders for monsters:
+    plan_monsters()
+    -- read orders for players:
     if eressea.read_orders(orders) ~= 0 then
         print("could not read " .. orders)
         return -1
@@ -140,8 +141,9 @@ function process(rules, orders)
     if nmr_check(config.maxnmrs or 80)~=0 then
         return -1
     end
-    plan_monsters()
     callbacks(rules, 'init')
+    
+    -- run the turn:
     turn_process()
     callbacks(rules, 'update')
     turn_end() -- ageing, etc.

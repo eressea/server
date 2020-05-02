@@ -3,6 +3,7 @@
 #endif
 
 #include "bindings.h"
+#include "bind_tolua.h"
 
 #include "console.h"
 #include "gamedb.h"
@@ -259,7 +260,7 @@ static int tolua_dice_rand(lua_State * L)
 
 static int tolua_get_season(lua_State * L)
 {
-    int turn_no = (int)tolua_tonumber(L, 1, 0);
+    int turn_no = (int)tolua_tonumber(L, 1, turn);
     season_t season = calendar_season(turn_no);
     tolua_pushstring(L, seasonnames[season]);
     return 1;
@@ -864,8 +865,6 @@ static int lua_rng_default(lua_State *L) {
     random_source_inject_constant(0);
     return 0;
 }
-
-void tolua_bind_open(lua_State * L);
 
 int tolua_bindings_open(lua_State * L, const dictionary *inifile)
 {

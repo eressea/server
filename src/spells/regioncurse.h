@@ -10,7 +10,6 @@ extern "C" {
     extern const struct curse_type ct_peacezone;
     extern const struct curse_type ct_drought;
     extern const struct curse_type ct_blessedharvest;
-    extern const struct curse_type ct_godcursezone;
     extern const struct curse_type ct_gbdream;
     extern const struct curse_type ct_healing;
     extern const struct curse_type ct_antimagiczone;

@@ -647,7 +647,7 @@ void leave_building(unit * u)
 {
     building * b = u->building;
 
-    u->building = 0;
+    u->building = NULL;
     if (b->_owner == u) {
         building_update_owner(b);
         assert(b->_owner != u);

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+eval $(luarocks path)
 GAME=$1
 (
 [ "$ENABLED" != "yes" ] && exit

@@ -371,7 +371,7 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
                                 u2->ship->coast = u1->ship->coast;
                             }
                             else {
-                                return msg_error(u1, ord, 182);
+                                return msg_error(u1, ord, 328);
                             }
                         }
                     }
@@ -795,6 +795,9 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
                         feedback_give_not_allowed(u, ord);
                     }
                 }
+            }
+            else {
+                cmistake(u, ord, 123, MSG_COMMERCE);
             }
         }
     }

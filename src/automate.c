@@ -20,7 +20,8 @@
 static int cmp_scholars(const void *lhs, const void *rhs) {
     const scholar *a = (const scholar *)lhs;
     const scholar *b = (const scholar *)rhs;
-    return b->level - a->level;
+    int diff = b->level - a->level;
+    return (diff != 0) ? diff : b->u->number - a->u->number;
 }
 
 int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *o_skill)
@@ -77,6 +78,7 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *
 
 static void teaching(scholar *s, int n) {
     assert(n <= s->u->number);
+    // doppelter Effekt mit Lehrer:
     s->learn += n;
     s->u->flags |= UFL_LONGACTION;
 }
@@ -91,27 +93,31 @@ void autostudy_run(scholar scholars[], int nscholars)
 {
     int ti = 0;
     while (ti != nscholars) {
-        int t, se, ts = 0, tt = 0, si = ti;
-        for (se = ti; se != nscholars; ++se) {
-            int mint;
-            ts += scholars[se].u->number; /* count total scholars */
+        int t, ts = 0, tt = 0, si = ti, mint = 0, ns = 0;
+        for (t = ti; t != nscholars; ++t) {
+            ts += scholars[t].u->number; /* count total scholars */
             mint = (ts + 10) / 11; /* need a minimum of ceil(ts/11) teachers */
             for (; mint > tt && si != nscholars; ++si) {
                 tt += scholars[si].u->number;
             }
         }
+        if (mint < tt) {
+            /* die Einheit si-1 hat einen Mix aus Lehrer und Schüler */
+            --si;
+            ns = tt - mint;
+        }
         /* now si splits the teachers and students 1:10 */
         /* first student must be 2 levels below first teacher: */
-        for (; si != se; ++si) {
+        for (; si != nscholars; ++si) {
             if (scholars[si].level + TEACHDIFFERENCE <= scholars[ti].level) {
                 break;
             }
-            tt += scholars[si].u->number;
+            ns = 0;
         }
         /* now si is the first unit we can teach, if we can teach any */
-        if (si == se) {
+        if (si == nscholars) {
             /* there are no students, so standard learning for everyone */
-            for (t = ti; t != se; ++t) {
+            for (t = ti; t != nscholars; ++t) {
                 learning(scholars + t, scholars[t].u->number);
             }
         }
@@ -119,16 +125,17 @@ void autostudy_run(scholar scholars[], int nscholars)
             /* invariant: unit ti can still teach i students */
             int i = scholars[ti].u->number * STUDENTS_PER_TEACHER;
             /* invariant: unit si has n students that can still be taught */
-            int s, n = scholars[si].u->number;
-            for (t = ti, s = si; t != si && s != se; ) {
+            int s, n = (ns > 0) ? ns : scholars[si].u->number;
+            for (t = ti, s = si; t != si && s != nscholars; ) {
                 if (i >= n) {
                     /* t has more than enough teaching capacity for s */
                     i -= n;
                     teaching(scholars + s, n);
                     learning(scholars + s, scholars[s].u->number);
                     /* next student, please: */
-                    if (++s == se) {
-                        continue;
+                    if (++s == nscholars) {
+                        /* no more students */
+                        break;
                     }
                     n = scholars[s].u->number;
                 }
@@ -147,7 +154,7 @@ void autostudy_run(scholar scholars[], int nscholars)
                         do {
                             /* remaining students learn without a teacher: */
                             learning(scholars + s, n);
-                            if (++s == se) {
+                            if (++s == nscholars) {
                                 break;
                             }
                             n = scholars[s].u->number;
@@ -163,10 +170,15 @@ void autostudy_run(scholar scholars[], int nscholars)
             }
             ++t;
             for (; t < si; ++t) {
+                /* teachers that did not teach */
                 learning(scholars + t, scholars[t].u->number);
             }
+            for (; s < nscholars; ++s) {
+                /* students that were not taught */
+                learning(scholars + s, scholars[s].u->number);
+            }
         }
-        ti = se;
+        ti = nscholars;
     }
 }
 

@@ -463,10 +463,7 @@ static void horses(region * r)
     maxhorses = region_maxworkers(r) / 10;
     horses = rhorses(r);
     if (horses > 0) {
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            rsethorses(r, (int)(horses * 0.9));
-        }
-        else if (maxhorses > 0) {
+        if (maxhorses > 0) {
             double growth =
                 (RESOURCE_QUANTITY * (HORSEGROWTH * 200.0 * ((double)maxhorses -
                     horses))) / (double)maxhorses;
@@ -594,14 +591,21 @@ growing_trees_e3(region * r, const int current_season,
     }
 }
 
+static int cap_int(int i, int imin, int imax) {
+    if (i > imin) {
+        return ((i < imax) ? i : imax);
+    }
+    return imin;
+}
+
 static void
 growing_trees(region * r, const season_t current_season, const season_t last_weeks_season)
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
+    double seedchance = config_get_flt("rules.treeseeds.chance", 0.01F) * RESOURCE_QUANTITY;
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
-        double seedchance = 0.01F * RESOURCE_QUANTITY;
         int mp, elves = count_race(r, get_race(RC_ELF));
         direction_t d;
 
@@ -616,12 +620,6 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             rsettrees(r, 2, rtrees(r, 2) + sprout);
 
             a_removeall(&r->attribs, &at_germs);
-        }
-
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            rsettrees(r, 1, (int)(rtrees(r, 1) * 0.9));
-            rsettrees(r, 2, (int)(rtrees(r, 2) * 0.9));
-            return;
         }
 
         mp = max_production(r);
@@ -655,84 +653,63 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 
         /* Gesamtzahl der Samen:
          * bis zu 6% (FORESTGROWTH*3) der Baeume samen in die Nachbarregionen */
-        seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *r2 = rconnect(r, d);
-            if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
-                /* Eine Landregion, wir versuchen Samen zu verteilen:
-                 * Die Chance, das Samen ein Stueck Boden finden, in dem sie
-                 * keimen koennen, haengt von der Bewuchsdichte und der
-                 * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
-                 * Moeglichkeiten als in Ebenen. */
-                sprout = 0;
-                seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
-                for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
-                    if (rng_int() % 10000 < seedchance)
-                        sprout++;
+        if (seedchance > 0) {
+            seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                region *r2 = rconnect(r, d);
+                if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
+                    /* Eine Landregion, wir versuchen Samen zu verteilen:
+                     * Die Chance, das Samen ein Stueck Boden finden, in dem sie
+                     * keimen koennen, haengt von der Bewuchsdichte und der
+                     * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
+                     * Moeglichkeiten als in Ebenen. */
+                    sprout = 0;
+                    seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
+                    for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
+                        if (rng_int() % 10000 < seedchance)
+                            sprout++;
+                    }
+                    rsettrees(r2, 0, rtrees(r2, 0) + sprout);
                 }
-                rsettrees(r2, 0, rtrees(r2, 0) + sprout);
             }
         }
-
     }
     else if (current_season == SEASON_SPRING) {
-        int growth;
-
-        if (is_cursed(r->attribs, &ct_godcursezone))
-            return;
-
         /* in at_germs merken uns die Zahl der Samen und Sproesslinge, die
          * dieses Jahr aelter werden duerfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
         a = a_find(r->attribs, &at_germs);
         if (!a) {
             a = a_add(&r->attribs, a_new(&at_germs));
-            a->data.sa[0] = (short)rtrees(r, 0);
-            a->data.sa[1] = (short)rtrees(r, 1);
+            a->data.sa[0] = (short)cap_int(rtrees(r, 0), 0, SHRT_MAX);
+            a->data.sa[1] = (short)cap_int(rtrees(r, 1), 0, SHRT_MAX);
         }
-        /* wir haben 6 Wochen zum wachsen, jeder Same/Spross hat 18% Chance
-         * zu wachsen, damit sollten nach 5-6 Wochen alle gewachsen sein */
-        growth = 1800;
-
-        /* Samenwachstum */
-
-        /* Raubbau abfangen, es duerfen nie mehr Samen wachsen, als aktuell
-         * in der Region sind */
-        seeds = rtrees(r, 0);
-        if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
-        sprout = 0;
-
-        for (i = 0; i < seeds; i++) {
-            if (rng_int() % 10000 < growth)
-                sprout++;
+        else if (a->data.sa[0] < 0 || a->data.sa[1] << 0) {
+            a->data.sa[0] = (short)cap_int(a->data.sa[0], 0, SHRT_MAX);
+            a->data.sa[1] = (short)cap_int(a->data.sa[1], 0, SHRT_MAX);
         }
-        /* aus dem Samenpool dieses Jahres abziehen */
-        a->data.sa[0] = (short)(seeds - sprout);
-        /* aus dem gesamt Samenpool abziehen */
-        rsettrees(r, 0, rtrees(r, 0) - sprout);
-        /* zu den Sproesslinge hinzufuegen */
-        rsettrees(r, 1, rtrees(r, 1) + sprout);
 
         /* Baumwachstum */
-
-        /* hier gehen wir davon aus, das Jungbaeume nicht ohne weiteres aus
-         * der Region entfernt werden koennen, da Jungbaeume in der gleichen
-         * Runde nachwachsen, wir also nicht mehr zwischen diesjaehrigen und
-         * 'alten' Jungbaeumen unterscheiden koennten */
         sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
-        grownup_trees = 0;
-
-        for (i = 0; i < sprout; i++) {
-            if (rng_int() % 10000 < growth)
-                grownup_trees++;
-        }
+        grownup_trees = sprout / 6;
         /* aus dem Sproesslingepool dieses Jahres abziehen */
         a->data.sa[1] = (short)(sprout - grownup_trees);
         /* aus dem gesamt Sproesslingepool abziehen */
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
         /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
+
+        /* Samenwachstum */
+        seeds = rtrees(r, 0);
+        if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
+        sprout = seeds / 6;
+        /* aus dem Samenpool dieses Jahres abziehen */
+        a->data.sa[0] = (short)(seeds - sprout);
+        /* aus dem gesamt Samenpool abziehen */
+        rsettrees(r, 0, rtrees(r, 0) - sprout);
+        /* zu den Sproesslinge hinzufuegen */
+        rsettrees(r, 1, rtrees(r, 1) + sprout);
     }
 }
 
@@ -1003,7 +980,7 @@ int quit_cmd(unit * u, struct order *ord)
             if (p == P_FACTION) {
 #ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
-                if (f2 == NULL) {
+                if (f2 == NULL || f2 == u->faction) {
                     cmistake(u, ord, 66, MSG_EVENT);
                     flags = 0;
                 }
@@ -1249,13 +1226,6 @@ void do_enter(struct region *r, bool is_final_attempt)
                     }
                 }
                 if (ulast != NULL) {
-                    /* Wenn wir hier angekommen sind, war der Befehl
-                     * erfolgreich und wir loeschen ihn, damit er im
-                     * zweiten Versuch nicht nochmal ausgefuehrt wird. */
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
-
                     if (ulast != u) {
                         /* put u behind ulast so it's the last unit in the building */
                         *uptr = u->next;
@@ -3121,14 +3091,7 @@ void update_long_order(unit * u)
                     }
                     break;
                 default:
-                    if (kwd > thiskwd) {
-                        /* swap out thisorder for the new one */
-                        cmistake(u, u->thisorder, 52, MSG_EVENT);
-                        set_order(&u->thisorder, copy_order(ord));
-                    }
-                    else {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
+                    cmistake(u, ord, 52, MSG_EVENT);
                     break;
                 }
             }
@@ -3712,8 +3675,9 @@ void process(void)
 
         log_debug("- Step %u", prio);
         while (proc && proc->priority == prio) {
-            if (proc->name)
+            if (proc->name) {
                 log_debug(" - %s", proc->name);
+            }
             proc = proc->next;
         }
 
@@ -3721,8 +3685,9 @@ void process(void)
             pglobal->data.global.process();
             pglobal = pglobal->next;
         }
-        if (pglobal == NULL || pglobal->priority != prio)
+        if (pglobal == NULL || pglobal->priority != prio) {
             continue;
+        }
 
         for (r = regions; r; r = r->next) {
             unit *u;
@@ -3733,8 +3698,9 @@ void process(void)
                 pregion->data.per_region.process(r);
                 pregion = pregion->next;
             }
-            if (pregion == NULL || pregion->priority != prio)
+            if (pregion == NULL || pregion->priority != prio) {
                 continue;
+            }
 
             if (r->units) {
                 for (u = r->units; u; u = u->next) {
@@ -3744,14 +3710,16 @@ void process(void)
                         punit->data.per_unit.process(u);
                         punit = punit->next;
                     }
-                    if (punit == NULL || punit->priority != prio)
+                    if (punit == NULL || punit->priority != prio) {
                         continue;
+                    }
 
                     porder = punit;
                     while (porder && porder->priority == prio && porder->type == PR_ORDER) {
                         order **ordp = &u->orders;
-                        if (porder->flags & PROC_THISORDER)
+                        if (porder->flags & PROC_THISORDER) {
                             ordp = &u->thisorder;
+                        }
                         while (*ordp) {
                             order *ord = *ordp;
                             if (getkeyword(ord) == porder->data.per_order.kword) {
@@ -3780,8 +3748,9 @@ void process(void)
                                     }
                                 }
                             }
-                            if (!ord || *ordp == ord)
+                            if (!ord || *ordp == ord) {
                                 ordp = &(*ordp)->next;
+                            }
                         }
                         porder = porder->next;
                     }
@@ -3798,9 +3767,9 @@ void process(void)
                 pregion->data.per_region.process(r);
                 pregion = pregion->next;
             }
-            if (pregion == NULL || pregion->priority != prio)
+            if (pregion == NULL || pregion->priority != prio) {
                 continue;
-
+            }
         }
     }
 

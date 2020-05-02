@@ -898,4 +898,3 @@ function test_walk_and_carry_the_cart()
     process_orders()
     assert_equal(1, u.region.x)
 end
-

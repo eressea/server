@@ -155,7 +155,7 @@ extern "C" {
     race *rc_create(const char *zName);
     race *rc_get_or_create(const char *name);
     bool rc_changed(int *cache);
-    const race *rc_find(const char *);
+    race *rc_find(const char *);
     void free_races(void);
 
     bool rc_can_use(const struct race *rc, const struct item_type *itype);
