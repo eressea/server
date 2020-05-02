@@ -3,6 +3,7 @@
 [ "$PREVIEW" != "yes" ] && exit
 [ -z "${ERESSEA}" ] && ERESSEA="$HOME/eressea"
 
+eval $(luarocks path)
 branch="develop"
 if [ -e "${ERESSEA}/build/.preview" ]; then
     branch=$(cat "${ERESSEA}/build/.preview")
