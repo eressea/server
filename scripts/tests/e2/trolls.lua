@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.trolls", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.trolls'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, 'seeall')
+end
 
 function setup()
     eressea.free_game()
