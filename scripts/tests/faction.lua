@@ -1,8 +1,9 @@
-local lunit = require("lunit")
+local tcname = 'tests.faction'
+local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
-  _ENV = module("tests.faction", 'seeall')
+  _ENV = module(tcname, 'seeall')
 else
-  module("tests.faction", 'seeall')
+  module(tcname, lunit.testcase, package.seeall)
 end
 
 local f

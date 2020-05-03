@@ -1,9 +1,9 @@
 local tcname = 'tests.e2.features'
-local lunit = require("lunit")
+local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
 else
-  module(tcname, 'seeall')
+  module(tcname, lunit.testcase, package.seeall)
 end
 
 function setup()

@@ -1,9 +1,9 @@
 local tcname = 'tests.shared.orders'
 local lunit = require("lunit")
 if _VERSION >= 'Lua 5.2' then
-  _ENV = module(tcname, 'seeall')
+  _ENV = module(tcname , 'seeall')
 else
-  module(tcname, 'seeall')
+  module(tcname, lunit.testcase, package.seeall)
 end
 
 local _G = _G
