@@ -10,6 +10,8 @@ package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 lunit = require 'lunit'
 require 'eressea'
 require 'eressea.path'
+
+lunit = require('lunit')
 module = lunit.module
 require 'tests'
 result = lunit.main()

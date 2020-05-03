@@ -6,6 +6,10 @@ else
   module(tcname, 'seeall')
 end
 
+function setup()
+    eressea.free_game()
+end
+
 function test_get_allies()
     local f1 = faction.create("human")
     local f2 = faction.create("human")
