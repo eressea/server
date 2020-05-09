@@ -635,7 +635,7 @@ void leave_ship(unit * u)
 {
     struct ship *sh = u->ship;
 
-    u->ship = 0;
+    u->ship = NULL;
     if (sh->_owner == u) {
         ship_update_owner(sh);
         sh->_owner = ship_owner(sh);
