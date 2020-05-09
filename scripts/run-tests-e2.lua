@@ -11,11 +11,11 @@ package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 config.rules = 'e2'
 
+lunit = require 'lunit'
 require 'eressea'
 require 'eressea.xmlconf'
 require 'eressea.path'
 require 'tests.e2'
-require 'lunit'
 
 rng.inject(0)
 eressea.settings.set("rules.food.flags", "4")

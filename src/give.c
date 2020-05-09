@@ -385,6 +385,9 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
                 }
             }
             else {
+                if (u2->building) {
+                    leave_building(u2);
+                }
                 if (n < u1->ship->number) {
                     ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
                     scale_ship(sh, 0);

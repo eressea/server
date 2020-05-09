@@ -635,7 +635,7 @@ void leave_ship(unit * u)
 {
     struct ship *sh = u->ship;
 
-    u->ship = 0;
+    u->ship = NULL;
     if (sh->_owner == u) {
         ship_update_owner(sh);
         sh->_owner = ship_owner(sh);
@@ -647,7 +647,7 @@ void leave_building(unit * u)
 {
     building * b = u->building;
 
-    u->building = 0;
+    u->building = NULL;
     if (b->_owner == u) {
         building_update_owner(b);
         assert(b->_owner != u);

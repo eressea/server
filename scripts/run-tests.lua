@@ -9,9 +9,9 @@ if config.install then
 end
 package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
+lunit = require 'lunit'
 require 'eressea'
 require 'eressea.path'
 require 'tests'
-require 'lunit'
 result = lunit.main()
 return result.errors + result.failed
