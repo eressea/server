@@ -376,7 +376,7 @@ unit *read_unit(gamedata *data)
 {
     unit *u;
     const race *rc;
-    int number, n, p;
+    int number, n, p, bn, sn;
     order **orderp;
     char obuf[DISPLAYSIZE];
     faction *f;
@@ -443,9 +443,10 @@ unit *read_unit(gamedata *data)
     else
         u->irace = NULL;
 
-    READ_INT(data->store, &n);
-    if (n > 0) {
-        building * b = findbuilding(n);
+    READ_INT(data->store, &bn);
+    READ_INT(data->store, &sn);
+    if (sn <= 0 && bn > 0) {
+        building * b = findbuilding(bn);
         if (b) {
             u_set_building(u, b);
             if (fval(u, UFL_OWNER)) {
@@ -453,13 +454,12 @@ unit *read_unit(gamedata *data)
             }
         }
         else {
-            log_error("read_unit: unit in unkown building '%s'", itoa36(n));
+            log_error("read_unit: unit in unkown building '%s'", itoa36(bn));
         }
     }
 
-    READ_INT(data->store, &n);
-    if (n > 0) {
-        ship * sh = findship(n);
+    if (sn > 0) {
+        ship * sh = findship(sn);
         if (sh) {
             u_set_ship(u, sh);
             if (fval(u, UFL_OWNER)) {
@@ -467,7 +467,7 @@ unit *read_unit(gamedata *data)
             }
         }
         else {
-            log_error("read_unit: unit in unkown ship '%s'", itoa36(n));
+            log_error("read_unit: unit in unkown ship '%s'", itoa36(sn));
         }
     }
 
