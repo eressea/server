@@ -35,7 +35,7 @@ extern "C" {
     typedef enum {
         RC_DWARF,                     /* 0 - Zwerg */
         RC_ELF,
-        RC_GOBLIN = 3,
+        RC_GOBLIN,
         RC_HUMAN,
         RC_TROLL,
         RC_DAEMON,
@@ -44,17 +44,19 @@ extern "C" {
         RC_CAT,
         RC_AQUARIAN,
         RC_ORC,
+        /* last of the addplayer races */
+
         RC_SNOTLING,
         RC_UNDEAD,
 
-        RC_FIREDRAGON = 15,
+        RC_FIREDRAGON,
         RC_DRAGON,
         RC_WYRM,
         RC_TREEMAN,
         RC_BIRTHDAYDRAGON,
         RC_DRACOID,
 
-        RC_IRONGOLEM = 23,
+        RC_IRONGOLEM,
         RC_STONEGOLEM,
         RC_SHADOW,
         RC_SHADOWLORD,
@@ -63,24 +65,26 @@ extern "C" {
         RC_TOAD,
         RC_HIRNTOETER,
         RC_PEASANT,
-        RC_WOLF = 32,
+        RC_WOLF,
 
-        RC_SONGDRAGON = 37,
+        RC_SONGDRAGON,
 
-        RC_SEASERPENT = 51,
+        RC_SEASERPENT,
         RC_SHADOWKNIGHT,
 
-        RC_SKELETON = 54,
+        RC_SKELETON,
         RC_SKELETON_LORD,
         RC_ZOMBIE,
         RC_ZOMBIE_LORD,
         RC_GHOUL,
         RC_GHOUL_LORD,
-        RC_TEMPLATE = 62,
+        RC_TEMPLATE,
         RC_CLONE,
         MAXRACES,
         NORACE = -1
     } race_t;
+
+#define MAX_START_RACE RC_ORC
 
     extern int num_races;
     extern const char *racenames[MAXRACES];
@@ -241,6 +245,7 @@ extern "C" {
 #define playerrace(rc) ((rc)->flags & RCF_PLAYABLE)
 #define dragonrace(rc) ((rc)->flags & RCF_DRAGON)
 #define humanoidrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
+#define undeadrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID))
 #define illusionaryrace(rc) ((rc)->flags & RCF_ILLUSIONARY)
 
     bool allowed_dragon(const struct region *src,

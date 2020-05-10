@@ -48,16 +48,14 @@ int num_races = 0;
 static int rc_changes = 1;
 
 const char *racenames[MAXRACES] = {
-    "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
+    "dwarf", "elf", "goblin", "human", "troll", "demon", "insect",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead",
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    NULL, NULL, "irongolem", "stonegolem", "shadowdemon",
+    "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
-    "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, "seaserpent",
-    "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
-    "juju", "ghoul", "ghast", NULL, NULL, "template",
+    "wolf", "songdragon", "seaserpent",
+    "shadowknight", "skeleton", "skeletonlord", "zombie",
+    "juju", "ghoul", "ghast", "template",
     "clone"
 };
 

@@ -6,10 +6,6 @@ local function equip_first(u)
     equip_unit(u, name, 255)
 end
 
-local function equip_demon(u)
-    u.race_name = 'human'
-end
-
 local mysets = {
     ['first_unit'] = {
         ['items'] = {
@@ -82,7 +78,6 @@ local mysets = {
         ['skills'] = {
             ['stamina'] = 15
         },
-        ['callback'] = equip_demon
     },
     ['seed_insect'] = {
         ['items'] = {
