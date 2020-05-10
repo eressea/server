@@ -279,12 +279,10 @@ unit *addplayer(region * r, faction * f)
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
-        race_t urc;
         const race *rc;
-        do {
-            urc = (race_t)(rng_int() % MAXRACES);
-            rc = get_race(urc);
-        } while (rc == NULL || urc == RC_DAEMON || !playerrace(rc));
+        int urc = (race_t)(rng_int() % MAX_START_RACE);
+        if (urc >= RC_DAEMON) ++urc;
+        rc = get_race(urc);
         u->irace = rc;
     }
     f->lastorders = turn;

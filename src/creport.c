@@ -724,6 +724,7 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 void cr_output_unit(stream *out, const faction * f,
     const unit * u, seen_mode mode)
 {
+    const struct locale *lang = crtag_locale();
     /* Race attributes are always plural and item attributes always
      * singular */
     const char *str;
@@ -736,7 +737,6 @@ void cr_output_unit(stream *out, const faction * f,
     const faction *fother;
     const char *prefix;
     bool allied;
-    const struct locale *lang = f->locale;
 
     assert(u && u->number);
 
@@ -796,17 +796,16 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        const char *pzRace = locale_string(lang, mkname("race", pzTmp), false);
-        if (pzRace) {
-            pzTmp = pzRace;
+        const char *pzRace = pzTmp;
+        const struct race *rc = rc_find(pzTmp);
+        if (rc) {
+            pzRace = rc_name_s(rc, NAME_PLURAL);
         }
-        pzRace = translate(pzTmp, locale_string(lang, pzTmp, false));
-        if (!pzRace) {
-            pzRace = pzTmp;
-        }
-        stream_printf(out, "\"%s\";Typ\n", pzRace);
-        if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            pzRace = rc_name_s(u_race(u), NAME_PLURAL);
+        pzTmp = translate(pzRace, locale_string(lang, pzRace, false));
+        stream_printf(out, "\"%s\";Typ\n", pzTmp);
+        rc = u_race(u);
+        if (u->faction == f && fval(rc, RCF_SHAPESHIFTANY)) {
+            pzRace = rc_name_s(rc, NAME_PLURAL);
             stream_printf(out, "\"%s\";wahrerTyp\n", pzRace);
         }
     }
@@ -1514,7 +1513,7 @@ static void report_itemtype(FILE *F, faction *f, const item_type *itype) {
 static int
 report_computer(const char *filename, report_context * ctx, const char *bom)
 {
-    static int era = -1;
+    const struct locale *lang = crtag_locale();
     int i;
     faction *f = ctx->f;
     const char *prefix, *str;
@@ -1524,6 +1523,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     FILE *F = fopen(filename, "w");
     static const race *rc_human;
     static int rc_cache;
+    static int era = -1;
 
     if (era < 0) {
         era = config_get_int("game.era", 1);
@@ -1578,13 +1578,13 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     }
     {
         const char *zRace = rc_name_s(f->race, NAME_PLURAL);
-        fprintf(F, "\"%s\";Typ\n", translate(zRace, LOC(f->locale, zRace)));
+        fprintf(F, "\"%s\";Typ\n", translate(zRace, LOC(lang, zRace)));
     }
     prefix = get_prefix(f->attribs);
     if (prefix != NULL) {
         prefix = mkname("prefix", prefix);
         fprintf(F, "\"%s\";typprefix\n",
-            translate(prefix, LOC(f->locale, prefix)));
+            translate(prefix, LOC(lang, prefix)));
     }
     fprintf(F, "%d;Rekrutierungskosten\n", f->race->recruitcost);
     fprintf(F, "%d;Anzahl Personen\n", f->num_people);
@@ -1637,7 +1637,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
             if (prefix != NULL) {
                 prefix = mkname("prefix", prefix);
                 fprintf(F, "\"%s\";typprefix\n",
-                    translate(prefix, LOC(f->locale, prefix)));
+                    translate(prefix, LOC(lang, prefix)));
             }
             show_allies_cr(F, f, g);
         }

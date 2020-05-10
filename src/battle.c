@@ -300,15 +300,16 @@ fighter *select_corpse(battle * b, fighter * af)
                 /* Geflohene haben auch 0 hp, duerfen hier aber nicht ausgewaehlt
                  * werden! */
                 int dead = dead_fighters(df);
-                if (!playerrace(u_race(df->unit)))
-                    continue;
-
-                if (af && !helping(af->side, df->side))
-                    continue;
-                if (di < dead) {
-                    return df;
+                const race *rc = u_race(df->unit);
+                /* Untote sinc für immer tot */
+                if (!undeadrace(rc)) {
+                    if (af && !helping(af->side, df->side))
+                        continue;
+                    if (di < dead) {
+                        return df;
+                    }
+                    di -= dead;
                 }
-                di -= dead;
             }
         }
     }
@@ -2076,9 +2077,6 @@ static void make_heroes(battle * b)
             unit *u = fig->unit;
             if (fval(u, UFL_HERO)) {
                 int i;
-                if (!playerrace(u_race(u))) {
-                    log_error("Hero %s is a %s.\n", unitname(u), u_race(u)->_name);
-                }
                 for (i = 0; i != u->number; ++i) {
                     fig->person[i].speed += (rule_hero_speed - 1);
                 }
@@ -2609,11 +2607,12 @@ static void aftermath(battle * b)
         for (df = s->fighters; df; df = df->next) {
             unit *du = df->unit;
             int dead = dead_fighters(df);
+            const race *rc = u_race(du);
 
             /* tote insgesamt: */
             s->dead += dead;
             /* Tote, die wiederbelebt werde koennen: */
-            if (playerrace(u_race(df->unit))) {
+            if (!undeadrace(rc)) {
                 s->casualties += dead;
             }
             if (df->hits + df->kills) {
@@ -2640,6 +2639,7 @@ static void aftermath(battle * b)
 
         for (df = s->fighters; df; df = df->next) {
             unit *du = df->unit;
+            const race *rc = u_race(du);
             int dead = dead_fighters(df);
             int sum_hp = 0;
             int n;
@@ -2732,7 +2732,7 @@ static void aftermath(battle * b)
             }
             s->flee += df->run.number;
 
-            if (playerrace(u_race(du))) {
+            if (!undeadrace(rc)) {
                 /* tote im kampf werden zu regionsuntoten:
                  * for each of them, a peasant will die as well */
                 dead_players += dead;
@@ -3102,7 +3102,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
     else {
         building *bld = u->building;
-        if (bld && bld->sizeleft >= u->number && playerrace(u_race(u))) {
+        if (bld && bld->sizeleft >= u->number && humanoidrace(u_race(u))) {
             fig->building = bld;
             fig->building->sizeleft -= u->number;
         }
