@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.quit", package.seeall, lunit.testcase)
+local tcname = 'tests.e2.quit'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function test_quit_faction()
     local r = region.create(47, 0, "plain")

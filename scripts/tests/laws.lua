@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.laws", package.seeall, lunit.testcase)
+local tcname = 'tests.laws'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -115,3 +119,4 @@ function test_force_leave_postcombat()
     assert_equal(nil, u3.building)
     assert_equal(1, u3.number)
 end
+

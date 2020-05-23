@@ -1,6 +1,11 @@
 -- Tests that work in E3. With game config of E3. 
 -- Tests are under scripts/test/e3 and all files must be in scripts/test/e3/init.lua
 
+lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+module = lunit.module
+end
+
 path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
@@ -9,7 +14,6 @@ package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 
 config.rules = 'e3'
 
-lunit = require 'lunit'
 require 'eressea'
 require 'eressea.path'
 require 'eressea.xmlconf'

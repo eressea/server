@@ -6,6 +6,7 @@ pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 GETOPT=getopt
 GETOPT_LONG=1
 
+luarocks install lunitx --local
 if [ "Darwin" = "$(uname)" ] ; then
   if [ -x "/usr/local/opt/gnu-getopt/bin/getopt" ] ; then
     GETOPT="/usr/local/opt/gnu-getopt/bin/getopt"
@@ -74,18 +75,19 @@ fi
 
 DEST=$(dirname $ROOT)/server
 
-git submodule update --init
-
 LUA_VERSION="5.2"
 LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
-if [ -d /usr/include/lua5.1 ]; then
-   LUA_VERSION="5.1"
-   LUA_INCLUDE=/usr/include/lua5.1
+if [ -d /usr/local/include/lua5.3 ]; then
+   LUA_VERSION="5.3"
+   LUA_INCLUDE=/usr/local/include/lua5.3
 elif [ -d /usr/include/lua5.2 ]; then
    export LUA_DIR=/usr
    LUA_VERSION="5.2"
    LUA_INCLUDE=/usr/include/lua5.2
+elif [ -d /usr/include/lua5.1 ]; then
+   LUA_VERSION="5.1"
+   LUA_INCLUDE=/usr/include/lua5.1
 elif [ -d /usr/local/include/lua5.1 ]; then
    export LUA_DIR=/usr/local
    LUA_VERSION="5.1"

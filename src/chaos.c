@@ -83,7 +83,7 @@ static void chaos(region * r)
         case 0:                  /* Untote */
             if (!(r->terrain->flags & SEA_REGION)) {
                 unit *u = random_unit(r);
-                if (u && playerrace(u_race(u))) {
+                if (u && !undeadrace(u_race(u))) {
                     if (join_monsters(u)) {
                         ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
                         u_setrace(u, get_race(RC_GHOUL));

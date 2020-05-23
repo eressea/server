@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.report", package.seeall, lunit.testcase)
+local tcname = 'tests.shared.report'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
