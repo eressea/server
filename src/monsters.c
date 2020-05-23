@@ -43,9 +43,10 @@
 #include <util/strings.h>
 
 /* attributes includes */
-#include <attributes/targetregion.h>
-#include <attributes/otherfaction.h>
 #include <attributes/hate.h>
+#include <attributes/otherfaction.h>
+#include <attributes/stealth.h>
+#include <attributes/targetregion.h>
 
 #include <spells/regioncurse.h>
 
@@ -179,6 +180,22 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
+bool join_monsters(unit *u, faction *monsters) {
+    if (monsters == NULL) {
+        monsters = get_monsters();
+        if (monsters == NULL) {
+            return false;
+        }
+    }
+    u_setfaction(u, monsters);
+    u->status = ST_FIGHT;
+    a_removeall(&u->attribs, &at_otherfaction);
+    u->flags &= ~UFL_ANON_FACTION;
+    u_seteffstealth(u, -1);
+    u_freeorders(u);
+    return true;
+}
+
 void monsters_desert(struct faction *monsters)
 {
     region *r;
@@ -188,15 +205,15 @@ void monsters_desert(struct faction *monsters)
         unit *u;
         
         for (u = r->units; u; u = u->next) {
-            if (u->faction!=monsters
+            if (u->faction != monsters
                 && (u_race(u)->flags & RCF_DESERT)) {
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
-                    ADDMSG(&u->faction->msgs, msg_message("desertion",
-                        "unit region", u, r));
-                    u_setfaction(u, monsters);
-                    u_freeorders(u);
+                    if (join_monsters(u, monsters)) {
+                        ADDMSG(&u->faction->msgs, msg_message("desertion",
+                            "unit region", u, r));
+                    }
                 }
             }
         }
@@ -1175,10 +1192,11 @@ void monster_kills_peasants(unit * u)
 
 void make_zombie(unit * u)
 {
-    u_setfaction(u, get_monsters());
-    u_freeorders(u);
-    scale_number(u, 1);
-    u->hp = unit_max_hp(u) * u->number;
-    u_setrace(u, get_race(RC_ZOMBIE));
-    u->irace = NULL;
+    if (join_monsters(u, NULL)) {
+        u_freeorders(u);
+        scale_number(u, 1);
+        u->hp = unit_max_hp(u) * u->number;
+        u_setrace(u, get_race(RC_ZOMBIE));
+        u->irace = NULL;
+    }
 }
