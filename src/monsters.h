@@ -23,6 +23,7 @@ extern "C" {
     void spawn_undead(void);
     void plan_monsters(struct faction *f);
 
+    bool join_monsters(struct unit *u);
 
 #ifdef __cplusplus
 }
