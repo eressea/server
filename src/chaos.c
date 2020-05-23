@@ -76,7 +76,7 @@ static unit *random_unit(const region * r)
     return u;
 }
 
-static void chaos(region * r)
+static void chaos(region * r, faction *monsters)
 {
     if (rng_int() % 100 < 8) {
         switch (rng_int() % 3) {
@@ -84,7 +84,7 @@ static void chaos(region * r)
             if (!(r->terrain->flags & SEA_REGION)) {
                 unit *u = random_unit(r);
                 if (u && !undeadrace(u_race(u))) {
-                    if (join_monsters(u)) {
+                    if (join_monsters(u, monsters)) {
                         ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
                         u_setrace(u, get_race(RC_GHOUL));
                     }
@@ -99,17 +99,17 @@ static void chaos(region * r)
                 case 0:
                     mfac = 100;
                     u =
-                        create_unit(r, get_monsters(), rng_int() % 8 + 1,
+                        create_unit(r, monsters, rng_int() % 8 + 1,
                         get_race(RC_FIREDRAGON), 0, NULL, NULL);
                     break;
                 case 1:
                     mfac = 500;
-                    u = create_unit(r, get_monsters(), rng_int() % 4 + 1,
+                    u = create_unit(r, monsters, rng_int() % 4 + 1,
                         get_race(RC_DRAGON), 0, NULL, NULL);
                     break;
                 default:
                     mfac = 1000;
-                    u = create_unit(r, get_monsters(), rng_int() % 2 + 1,
+                    u = create_unit(r, monsters, rng_int() % 2 + 1,
                         get_race(RC_WYRM), 0, NULL, NULL);
                     break;
                 }
@@ -184,7 +184,7 @@ void chaos_update(void) {
     /* Chaos */
     for (r = regions; r; r = r->next) {
         if ((r->flags & RF_CHAOTIC)) {
-            chaos(r);
+            chaos(r, get_monsters());
         }
     }
 }

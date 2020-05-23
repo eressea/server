@@ -180,8 +180,7 @@ static order *monster_attack(unit * u, const unit * target)
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
 }
 
-bool join_monsters(unit *u) {
-    static faction *monsters = NULL;
+bool join_monsters(unit *u, faction *monsters) {
     if (monsters == NULL) {
         monsters = get_monsters();
         if (monsters == NULL) {
@@ -206,12 +205,12 @@ void monsters_desert(struct faction *monsters)
         unit *u;
         
         for (u = r->units; u; u = u->next) {
-            if (u->faction!=monsters
+            if (u->faction != monsters
                 && (u_race(u)->flags & RCF_DESERT)) {
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
-                    if (join_monsters(u)) {
+                    if (join_monsters(u, monsters)) {
                         ADDMSG(&u->faction->msgs, msg_message("desertion",
                             "unit region", u, r));
                     }
@@ -1193,7 +1192,7 @@ void monster_kills_peasants(unit * u)
 
 void make_zombie(unit * u)
 {
-    if (join_monsters(u)) {
+    if (join_monsters(u, NULL)) {
         u_freeorders(u);
         scale_number(u, 1);
         u->hp = unit_max_hp(u) * u->number;
