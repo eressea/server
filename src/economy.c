@@ -290,7 +290,7 @@ static int forget_cmd(unit * u, order * ord)
             else {
                 unit *ufam = get_familiar(u);
                 if (ufam) {
-                    if (join_monsters(ufam)) {
+                    if (join_monsters(ufam, NULL)) {
                         a_removeall(&ufam->attribs, NULL);
                         unit_convert_race(ufam, NULL, "ghost");
                     }
