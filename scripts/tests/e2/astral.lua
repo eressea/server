@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.astral", package.seeall, lunit.testcase)
+local tcname = 'tests.e2.astral'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -17,7 +21,7 @@ function test_fetch_astral()
     local r = region.create(0, 0, "plain")
     local ra = r:get_astral('fog')
     local rb = region.create(ra.x + 1, ra.y, 'fog')
-    local f = faction.create("human")
+    local f = faction.create("human");
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     local u3 = unit.create(f, rb, 1)

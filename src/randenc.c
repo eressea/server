@@ -380,44 +380,6 @@ static void create_icebergs(void)
     }
 }
 
-static void godcurse(void)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                skill *sv = u->skills;
-                while (sv != u->skills + u->skill_size) {
-                    int weeks = 1 + rng_int() % 3;
-                    reduce_skill(u, sv, weeks);
-                    ++sv;
-                }
-            }
-            if (fval(r->terrain, SEA_REGION)) {
-                ship *sh;
-                for (sh = r->ships; sh;) {
-                    ship *shn = sh->next;
-                    double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
-                    damage_ship(sh, dmg);
-                    if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                        unit *uo = ship_owner(sh);
-                        if (uo) {
-                            ADDMSG(&uo->faction->msgs,
-                                msg_message("godcurse_destroy_ship", "ship", sh));
-                        }
-                        sink_ship(sh);
-                        remove_ship(&sh->region->ships, sh);
-                    }
-                    sh = shn;
-                }
-            }
-        }
-    }
-
-}
-
 /** handles the "orcish" curse that makes units grow like old orks
  * TODO: This would probably be better handled in an age-function for the curse,
  * but it's now being called by randomevents()
@@ -535,7 +497,6 @@ void randomevents(void)
     for (r = regions; r; r = r->next) {
         drown(r);
     }
-    godcurse();
     orc_growth();
     demon_skillchanges();
     if (volcano_module()) {

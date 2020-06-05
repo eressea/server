@@ -290,8 +290,6 @@ void locale_init(void)
     }
 }
 
-extern void bind_monsters(lua_State *L);
-
 int main(int argc, char **argv)
 {
     int err = 0;

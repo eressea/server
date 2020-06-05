@@ -106,10 +106,9 @@ param_t findparam_block(const char *s, const struct locale *lang, bool any_local
 
 bool isparam(const char *s, const struct locale * lang, param_t param)
 {
-    assert(s);
     assert(param != P_GEBAEUDE);
     assert(param != P_BUILDING);
-    if (s[0] > '@') {
+    if (s && s[0] > '@') {
         param_t p = findparam(s, lang);
         return p == param;
     }

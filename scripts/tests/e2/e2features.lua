@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.e2features", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.features'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -10,6 +14,26 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+end
+
+function disabled_double_default()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    region.create(3, 0, "plain")
+
+    u:add_order('NACH O')
+    u:add_order('DEFAULT "NACH O"')
+    u:add_order('DEFAULT "DEFAULT ARBEITE"')
+    process_orders()
+    assert_equal(1, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    assert_equal("ARBEITE", u:get_order())
 end
 
 function test_give_unit()

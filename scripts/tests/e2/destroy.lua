@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.destroy", package.seeall, lunit.testcase)
+local tcname = 'tests.e2.destroy'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -41,8 +45,8 @@ function test_destroy_is_long()
     local u = unit.create(faction.create("human", "one@example.com", "de"), r1, 10)
     u.building = building.create(u.region, "castle")
     u:clear_orders()
-    u:add_order("LERNE Unterhaltung")
     u:add_order("ZERSTOERE " .. itoa36(u.building.id))
+    u:add_order("LERNE Unterhaltung")
     process_orders()
     assert_equal(0, u:get_skill("entertainment"))
     assert_equal(nil, u.building)

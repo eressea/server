@@ -2331,10 +2331,6 @@ msgstr "Seelenfrieden"
 msgid "list_and"
 msgstr " und "
 
-msgctxt "spell"
-msgid "godcursezone"
-msgstr "Fluch der Götter"
-
 msgid "sptype_postcombat"
 msgstr "Postkampfzauber"
 
@@ -3894,7 +3890,7 @@ msgstr "Ent"
 
 msgctxt "iteminfo"
 msgid "dwarfspoil"
-msgstr "Beim Barte des Proheten! Ach nein, Zwergen. Irgendetwas riecht hier ranzig."
+msgstr "Beim Barte des Propheten! Ach nein, Zwergen. Irgendetwas riecht hier ranzig."
 
 msgctxt "race"
 msgid "clone"
@@ -6324,3 +6320,44 @@ msgctxt "race"
 msgid "wolf"
 msgstr "Wolf"
 
+msgctxt "iteminfo"
+msgid "elfspoil"
+msgstr "Die Ohren sind spitz und beinahe trapezförmig. Wie kann
+damit hören?"
+
+msgctxt "iteminfo"
+msgid "goblinspoil"
+msgstr "Die Fratze des kleinen Kopfs wirkt beinahe etwas kindlich
+zierlich, aber dennoch liegt etwas Listiges darin."
+
+msgctxt "iteminfo"
+msgid "halflingspoil"
+msgstr "Die Sohle des behaarten Fußes ist deutlich dicker, beinahe
+wie ein Huf."
+
+msgctxt "iteminfo"
+msgid "aquarianspoil"
+msgstr "Die kleine, türkisfarbene Schuppe glänzt in der Sonne. Dennoch ist sie erstaunlich hart."
+
+msgctxt "iteminfo"
+msgid "humanspoil"
+msgstr "Ob blond oder braun, ob kurz oder lang, du hast ein Büschel Haare mit einem Stück Haut in der Hand."
+
+msgctxt "iteminfo"
+msgid "catspoil"
+msgstr "Wie ein kleines Seil aus weichem Fell."
+
+msgctxt "iteminfo"
+msgid "insectspoil"
+msgstr "Das am Kopf der meisten Gliederfüßer auftretende,
+gegliederte Extremitätenpaar, das mit Sensillen (Tastsinn, Geruchssinn)
+ausgestattet ist."
+
+msgctxt "iteminfo"
+msgid "orcspoil"
+msgstr "Große, spitze Zähne. Ob sie früher einem Ork oder doch einem Wildschwein gehörten ist nicht so leicht zu unterscheiden."
+
+msgctxt "iteminfo"
+msgid "demonspoil"
+msgstr "Eine giftige und grüne Flüssigkeit in einer kleinen Phiole,
+keine humanoide Rasse außer Dämonen wagt damit in Kontakt zu kommen."

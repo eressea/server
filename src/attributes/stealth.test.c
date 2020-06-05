@@ -20,7 +20,7 @@ static void test_stealth(CuTest *tc) {
     CuAssertIntEquals(tc, -1, u_geteffstealth(u));
     CuAssertIntEquals(tc, 2, eff_stealth(u, u->region));
     u_seteffstealth(u, 3);
-    CuAssertIntEquals(tc, 3, u_geteffstealth(u));
+    CuAssertIntEquals(tc, 2, u_geteffstealth(u));
     CuAssertIntEquals(tc, 2, eff_stealth(u, u->region));
     u_seteffstealth(u, 1);
     CuAssertIntEquals(tc, 1, u_geteffstealth(u));

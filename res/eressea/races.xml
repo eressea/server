@@ -721,7 +721,7 @@
     <attack type="4" damage="3d30"/>
     <attack type="6" spell="icy_dragonbreath" level="6" />
   </race>
-  <race name="youngdragon" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
+  <race name="youngdragon" magres="50" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="300" ac="4" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes" dragon="yes">
     <ai splitsize="6" killpeasants="yes" learn="yes" scarepeasants="yes"/>
     <skill name="magic" modifier="4"/>
     <skill name="tactics" modifier="4"/>

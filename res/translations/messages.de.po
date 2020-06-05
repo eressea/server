@@ -437,9 +437,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Pferde kann man
 msgid "error307"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Snotlinge sind zu dumm, um auf den Feldern zu arbeiten.\""
 
-msgid "godcurse_destroy_ship"
-msgstr "\"Die Mannschaft krank vom vergifteten Wasser, Planken, Ruder und Segel zerfressen von den Wassern des verfluchten Meeres, ergibt sich die $ship($ship) in ihr Schicksal und sinkt.\""
-
 msgid "too_many_units_in_faction"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Partei darf nicht aus mehr als $int($allowed) Einheiten bestehen.\""
 
@@ -1033,9 +1030,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff 
 
 msgid "sp_icastle_effect"
 msgstr "\"Verwundert blicken die Bauern von $region($region) auf ein neues Gebäude.\""
-
-msgid "curseinfo::godcurse"
-msgstr "\"Diese Region wurde von den Göttern verflucht. Stinkende Nebel ziehen über die tote Erde und furchtbare Kreaturen ziehen über das Land. Die Brunnen sind vergiftet, und die wenigen essbaren Früchte sind von einem rosa Pilz überzogen. Niemand kann hier lange überleben. ($int36($id))\""
 
 msgid "recruit_archetype"
 msgstr "\"$unit($unit) rekrutiert $int($amount) $localize($archetype).\""
@@ -2555,9 +2549,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man benötigt m
 msgid "error177"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diesen Spruch kann der Vertraute nicht zaubern.\""
 
-msgid "curseinfo::godcurseocean"
-msgstr "\"Diese Region wurde von den Göttern verflucht. Das Meer ist eine ekelige Brühe, braunschwarze, stinkende Gase steigen aus den unergründlichen Tiefen hervor, und untote Seeungeheuer, Schiffe zerfressend und giftige grüne Galle geifernd, sind der Schrecken aller Seeleute, die diese Gewässer durchqueren. Niemand kann hier lange überleben. ($int36($id))\""
-
 msgid "curseinfo::sparkle_4"
 msgstr "\"Ein schimmernder Lichterkranz umgibt $unit($unit). ($int36($id))\""
 
@@ -2775,13 +2766,16 @@ msgid "error324"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit gehört nicht zu unserer Partei.\""
 
 msgid "error322"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist bereits auf einem Schiff.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur Schiffe gleicher Bauart können einen Konvoi bilden.\""
 
 msgid "error323"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist verzaubert.\""
 
 msgid "error327"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Schiffe kann die Einheit nicht übergeben.\""
+
+msgid "error328"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen die Schiffe an derselben Küste liegen.\""
 
 msgid "error326"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe können keinen Konvoi bilden.\""

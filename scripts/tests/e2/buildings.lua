@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.buildings", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.buildings'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.game.reset()
@@ -41,7 +45,6 @@ function test_build_tunnel_limited()
     u:add_item('iron', 2)
     u:add_item('money', 700)
     u.building = b
-    u.name = 'Xolgrim'
     u:add_order('MACHE 2 BURG ' .. itoa36(b.id))
     b.size = 99
     process_orders()

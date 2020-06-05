@@ -2933,7 +2933,7 @@ static void print_stats(battle * b)
             header = LOC(f->locale, "battle_helpers");
 
             for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
-                if (friendly(s2, s)) {
+                if (s2 != s && friendly(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
                     rsize = slprintf(bufp, size, "%s %s %d(%s)",
                         komma++ ? "," : (const char *)header, loc_army, army_index(s2),

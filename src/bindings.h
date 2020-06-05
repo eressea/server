@@ -12,6 +12,8 @@ extern "C" {
     int tolua_selist_push(struct lua_State *L, const char *list_type,
         const char *elem_type, struct selist *list);
 
+    void bind_monsters(struct lua_State *L);
+
     int log_lua_error(struct lua_State *L);
 
     void lua_done(struct lua_State *L);

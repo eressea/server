@@ -22,30 +22,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-/*
- * godcursezone
- */
-static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
-    const curse * c, int self)
-{
-    region *r = (region *)obj;
-
-    UNUSED_ARG(typ);
-    UNUSED_ARG(self);
-    assert(typ == TYP_REGION);
-
-    if (r->terrain->flags & SEA_REGION) {
-        return msg_message("curseinfo::godcurseocean", "id", c->no);
-    }
-    return msg_message("curseinfo::godcurse", "id", c->no);
-}
-
-const struct curse_type ct_godcursezone = {
-    "godcursezone",
-    CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
-    cinfo_cursed_by_the_gods,
-};
-
 /* --------------------------------------------------------------------- */
 /*
  * C_GBDREAM
@@ -299,7 +275,6 @@ void register_regioncurse(void)
     ct_register(&ct_badmagicresistancezone);
     ct_register(&ct_goodmagicresistancezone);
     ct_register(&ct_riotzone);
-    ct_register(&ct_godcursezone);
     ct_register(&ct_holyground);
     ct_register(&ct_healing);
 }

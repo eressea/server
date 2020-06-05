@@ -87,16 +87,16 @@ newfaction *read_newfactions(const char *filename)
 
         if (fgets(buf, sizeof(buf), F) == NULL)
             break;
+        if (buf[0] == '#') {
+            continue;
+        }
 
         email[0] = '\0';
         password[0] = '\0';
 
-        if (sscanf(buf, "%54s %19s %7s %15s %4d", email, race, lang, 
+        if (sscanf(buf, "%54s %19s %7s %15s %4d", email, race, lang,
             password, &alliance) < 3) {
             break;
-        }
-        if (email[0] == '#') {
-            continue;
         }
         if (email[0] == '\0') {
             break;

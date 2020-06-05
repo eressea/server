@@ -1,6 +1,10 @@
-require "lunit"
-
-module ('tests.eressea.faction', package.seeall, lunit.testcase)
+local tcname = 'tests.faction'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 local f
 

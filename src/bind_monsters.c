@@ -28,9 +28,6 @@ static int tolua_levitate_ship(lua_State * L)
     return 1;
 }
 
-extern void spawn_undead(void);
-extern void plan_monsters(struct faction *f);
-
 static int tolua_planmonsters(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, get_monsters());
