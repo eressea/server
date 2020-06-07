@@ -25,7 +25,7 @@
 #define B00000001 0x01
 
 static bool char_trimmed(wint_t wc) {
-    if (wc >= 0x2000 && wc <= 0x200f) {
+    if (wc == 0xa0 || wc == 0x202f || (wc >= 0x2000 && wc <= 0x200f)) {
         /* only weird stuff here */
         return true;
     }

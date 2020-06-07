@@ -154,7 +154,7 @@ static void test_unicode_compare(CuTest *tc)
 }
 
 static void test_unicode_trim_zwnj(CuTest *tc) {
-    const char zwnj[] = { 0xe2, 0x80, 0x8c, 0x00 };
+    const char zwnj[] = { 0xe2, 0x80, 0x8c, 0 };
     char name[64];
     char expect[64];
     snprintf(name, sizeof(name), "%sA%sB%s  ", zwnj, zwnj, zwnj);
@@ -163,8 +163,38 @@ static void test_unicode_trim_zwnj(CuTest *tc) {
     CuAssertStrEquals(tc, expect, name);
 }
 
+static void test_unicode_trim_nbsp(CuTest *tc) {
+    const char code[] = { 0xc2, 0xa0, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 6, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_nnbsp(CuTest *tc) {
+    const char code[] = { 0xe2, 0x80, 0xaf, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_figure_space(CuTest *tc) {
+    const char code[] = { 0xe2, 0x80, 0x87, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
 static void test_unicode_trim_ltrm(CuTest *tc) {
-    const char ltrm[] = { 0xe2, 0x80, 0x8e, 0x00 };
+    const char ltrm[] = { 0xe2, 0x80, 0x8e, 0 };
     char name[64];
     char expect[64];
     snprintf(name, sizeof(name), "%sBrot%szeit%s  ", ltrm, ltrm, ltrm);
@@ -188,6 +218,9 @@ CuSuite *get_unicode_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_trim);
     SUITE_ADD_TEST(suite, test_unicode_trim_zwnj);
+    SUITE_ADD_TEST(suite, test_unicode_trim_nbsp);
+    SUITE_ADD_TEST(suite, test_unicode_trim_nnbsp);
+    SUITE_ADD_TEST(suite, test_unicode_trim_figure_space);
     SUITE_ADD_TEST(suite, test_unicode_trim_ltrm);
     SUITE_ADD_TEST(suite, test_unicode_trim_emoji);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
