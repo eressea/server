@@ -6,7 +6,6 @@ SET(_TEST_FILES
 base36.test.c
 # crmessage.test.c
 # dice.test.c
-# filereader.test.c
 functions.test.c
 # goodies.test.c
 keyword.test.c
@@ -35,7 +34,6 @@ SET(_FILES
 base36.c
 crmessage.c
 dice.c
-filereader.c
 functions.c
 goodies.c
 keyword.c
