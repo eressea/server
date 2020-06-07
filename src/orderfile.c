@@ -11,7 +11,6 @@
 #include "util/message.h"
 #include "util/language.h"
 #include "util/log.h"
-#include "util/filereader.h"
 #include "util/param.h"
 #include "util/parser.h"
 #include "util/password.h"
