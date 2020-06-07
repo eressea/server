@@ -43,7 +43,6 @@
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <kernel/event.h>
-#include <util/filereader.h>
 #include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <kernel/gamedata.h>
