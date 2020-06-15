@@ -67,7 +67,7 @@ param_t findparam(const char *s, const struct locale * lang)
     char buffer[64];
     char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
 
-    if (str && *str) {
+    if (str && str[0] && str[1]) {
         int i;
         void * match;
         void **tokens = get_translations(lang, UT_PARAMS);
