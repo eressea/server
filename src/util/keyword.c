@@ -61,7 +61,7 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
         char buffer[64];
         char *str = transliterate(buffer, sizeof(buffer) - sizeof(int), s);
 
-        if (str) {
+        if (str && str[0] && str[1]) {
             int i;
             void *match;
             void **tokens = get_translations(lang, UT_KEYWORDS);
