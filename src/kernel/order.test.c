@@ -103,7 +103,8 @@ static void test_parse_make(CuTest *tc) {
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
     init_locale(lang);
-    ord = parse_order("M hurrdurr", lang);
+    CuAssertPtrEquals(tc, NULL, parse_order("M herp", lang));
+    ord = parse_order("MA hurrdurr", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKE, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, lang, cmd, sizeof(cmd)));
@@ -163,7 +164,8 @@ static void test_parse_make_temp(CuTest *tc) {
     locale_setstring(lang, parameters[P_TEMP], "TEMP");
     init_locale(lang);
 
-    ord = parse_order("M T herp", lang);
+    CuAssertPtrEquals(tc, NULL, parse_order("M T herp", lang));
+    ord = parse_order("MA TE herp", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
