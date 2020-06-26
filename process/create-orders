@@ -16,12 +16,9 @@ else
   mv orders.dir "orders.dir.$TURN"
   mkdir -p orders.dir
 fi
-rm -f "orders.$TURN"
-find "orders.dir.$TURN" -maxdepth 1  -regextype posix-extended -regex "orders.dir.$TURN/(turn|upload)-.*" -type f -printf "%T+\t%p\n" | sort | cut -f2 | while read -r
-do
-  tr -d '\r' < "$REPLY" >> "orders.$TURN"
-done
 
+rm -f "orders.$TURN"
+php ../../orders-php/cli.php -d "orders.dir.$TURN/orders.db" export | tr -d '\r' > "../orders.$TURN"
 lockfile -r3 -l120 orders.queue.lock
 if [ -e orders.queue ] ; then
   mv orders.queue "orders.queue.bak.$TURN"
