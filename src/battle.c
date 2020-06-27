@@ -301,7 +301,7 @@ fighter *select_corpse(battle * b, fighter * af)
                  * werden! */
                 int dead = dead_fighters(df);
                 const race *rc = u_race(df->unit);
-                /* Untote sinc für immer tot */
+                /* Untote sinc fÃ¼r immer tot */
                 if (!undeadrace(rc)) {
                     if (af && !helping(af->side, df->side))
                         continue;
@@ -1130,7 +1130,7 @@ static void destroy_items(troop dt) {
     for (pitm = &du->items; *pitm;) {
         item *itm = *pitm;
         const item_type *itype = itm->type;
-        if (!(itype->flags & ITF_CURSED) && dt.index < itm->number) {
+        if (!(itype->flags & (ITF_CURSED | ITF_NOTLOST)) && dt.index < itm->number) {
             /* 25% Grundchance, das ein Item kaputtgeht. */
             if (rng_int() % 4 < 1) {
                 i_change(pitm, itype, -1);
