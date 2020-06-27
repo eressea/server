@@ -1,6 +1,7 @@
 #!/bin/sh
-SCRIPT=$(readlink -f $0)
-cd $(dirname $SCRIPT)
+SCRIPT=$(readlink -f "$0")
+SCRDIR=$(dirname "$SCRIPT") 
+cd "$SCRDIR" || exit
 
 lockfile -r3 -l120 orders.queue.lock
 python process-orders.py "$@"
