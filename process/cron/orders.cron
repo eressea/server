@@ -5,11 +5,18 @@
 # this here script to make a non-blocking syntax check and reject or
 # accept the order file.
 
-if [ "yes" != "$CONFIRM" ] ; then
+if [ "no" == "$CONFIRM" ] ; then
   exit
 fi
 
+if [ -z "$ERESSEA" ] ; then
+  ERESSEA="$HOME/eressea"
+  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+fi
+
+cd $ERESSEA
+
 for GAME in $*
 do
-  $HOME/eressea/orders-php/check-orders.sh $GAME
+  orders-php/check-orders.sh $GAME
 done
