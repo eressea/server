@@ -14,9 +14,10 @@ if [ -z "$ERESSEA" ] ; then
   echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
 fi
 
-cd $ERESSEA
+cd "$ERESSEA" || exit
 
-for GAME in $*
+for GAME in "$@"
 do
-  orders-php/check-orders.sh $GAME
+  orders-php/check-orders.sh "$GAME"
 done
+
