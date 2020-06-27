@@ -1132,10 +1132,6 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
         const connection *b;
         if (!r2)
             continue;
-        if (mode == seen_neighbour) {
-            if (r2->seen.mode <= seen_neighbour)
-                continue;
-        }
         b = get_borders(r, r2);
         while (b) {
             bool cs = b->type->fvisible(b, f, r);
