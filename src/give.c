@@ -302,7 +302,12 @@ static void transfer_ships(ship *s1, ship *s2, int n)
     if (s1->coast != NODIRECTION) {
         s2->coast = s1->coast;
     }
-    scale_ship(s1, s1->number - n);
+    if (n == s1->number) {
+        s1->number = 0;
+    }
+    else {
+        scale_ship(s1, s1->number - n);
+    }
 }
 
 static void transfer_units(ship *s1, ship *s2)

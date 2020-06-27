@@ -510,12 +510,15 @@ void ship_update_owner(ship * sh) {
 
 unit *ship_owner(const ship * sh)
 {
-    unit *owner = sh->_owner;
-    if (!owner || (owner->ship != sh || owner->number <= 0)) {
-        unit * heir = ship_owner_ex(sh, owner ? owner->faction : 0);
-        return (heir && heir->number > 0) ? heir : 0;
+    if (sh->number > 0) {
+        unit *owner = sh->_owner;
+        if (!owner || (owner->ship != sh || owner->number <= 0)) {
+            unit * heir = ship_owner_ex(sh, owner ? owner->faction : 0);
+            return (heir && heir->number > 0) ? heir : 0;
+        }
+        return owner;
     }
-    return owner;
+    return NULL;
 }
 
 void write_ship_reference(const struct ship *sh, struct storage *store)
