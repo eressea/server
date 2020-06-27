@@ -1514,14 +1514,12 @@ static void handlekey(state * st, int c)
         }
         if (wnd == NULL) {
             static char kbuffer[80];
-            if (kbuffer[0] == 0) {
+            if (kbuffer[0] == 0 || strlen(kbuffer) > 70) {
                 strcpy(kbuffer, "getch:");
             }
-            sprintf(sbuffer, " 0x%x", c);
+            snprintf(sbuffer, 10, " 0x%x", c);
             strncat(kbuffer, sbuffer, sizeof(kbuffer) - 1);
             statusline(st->wnd_status->handle, kbuffer);
-            if (strlen(kbuffer) > 70)
-                kbuffer[0] = 0;
         }
         break;
     }
