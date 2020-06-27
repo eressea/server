@@ -2,6 +2,7 @@
 #include "messages.h"
 
 #include "unit.h"
+#include "faction.h"
 #include "order.h"
 
 #include <CuTest.h>
@@ -18,6 +19,24 @@ void test_missing_message(CuTest *tc) {
     CuAssertPtrNotNull(tc, msg);
     CuAssertPtrNotNull(tc, msg->type);
     CuAssertStrEquals(tc, msg->type->name, "missing_message");
+    CuAssertStrEquals(tc, "unknown", (const char *)msg->parameters[0].v);
+    msg_release(msg);
+    test_teardown();
+}
+
+void test_missing_feedback(CuTest *tc) {
+    message *msg;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u->thisorder = create_order(K_ENTERTAIN, u->faction->locale, NULL);
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
+    msg = msg_error(u, NULL, 77);
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertPtrNotNull(tc, msg->type);
+    CuAssertStrEquals(tc, msg->type->name, "missing_feedback");
+    CuAssertStrEquals(tc, "error77", (const char *)msg->parameters[3].v);
     msg_release(msg);
     test_teardown();
 }
@@ -59,7 +78,7 @@ static void test_merge_split(CuTest *tc) {
     add_message(&append, msg = msg_message(mtype->name, ""));
     msg_release(msg);
 
-    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
     CuAssertPtrEquals(tc, &mlist->begin->next, mlist->end);
     split = merge_messages(mlist, append);
     CuAssertPtrNotNull(tc, split);
@@ -68,7 +87,7 @@ static void test_merge_split(CuTest *tc) {
     CuAssertPtrNotNull(tc, mlist->begin->next);
     CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
     split_messages(mlist, split);
-    CuAssertPtrEquals(tc, 0, mlist->begin->next);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
     free_messagelist(*split);
     free_messagelist(mlist->begin);
     free(mlist);
@@ -98,6 +117,7 @@ static void test_noerror(CuTest *tc) {
 CuSuite *get_messages_suite(void) {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_missing_message);
+    SUITE_ADD_TEST(suite, test_missing_feedback);
     SUITE_ADD_TEST(suite, test_merge_split);
     SUITE_ADD_TEST(suite, test_message);
     SUITE_ADD_TEST(suite, test_noerror);

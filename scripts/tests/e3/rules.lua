@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e3.e3features", package.seeall, lunit.testcase)
+local tcname = 'tests.e3.rules'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 local settings
 
@@ -34,6 +38,20 @@ function teardown()
     for k,_ in pairs(settings) do
         set_rule(k)
     end
+end
+
+function test_new_faction_cannot_give_unit()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create('elf')
+  local f2 = faction.create('elf')
+  local u1 = unit.create(f1, r)
+  local u2 = unit.create(f2, r)
+  assert_equal(f1, u1.faction)
+  assert_equal(f2, u2.faction)
+  u1:add_order("HELFE " .. itoa36(f2.id) .. " GIB")
+  u2:add_order("GIB " .. itoa36(u1.id) .. " EINHEIT")
+  process_orders()
+  assert_equal(f2, u2.faction)
 end
 
 function test_calendar()
@@ -953,12 +971,11 @@ function test_bug2083()
     -- this is a bit weird, but the bug was caused by market code
     -- being called in two places. We want to make sure this doesn't happen
     for k, v in pairs(rules) do
-        set_key("xm09", true)
-    	if 'table' == type(v) then
+        if 'table' == type(v) then
            cb = v['update']
-	   if 'function' == type(cb) then
+            if 'function' == type(cb) then
               cb()
-	   end
+            end
         end
      end
 

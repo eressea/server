@@ -1,3 +1,4 @@
+-- Weltentor portal module
 local tunnels = {}
 
 local buildings = {}
@@ -15,41 +16,46 @@ local function tunnel_travelers(b)
 end
 
 local function get_target(param)
-    local ntargets = table.maxn(targets)
-    if ntargets==0 then
+    local ntargets = #targets
+    if ntargets == 0 then
+        eressea.log.error("Zero tunnel targets for  [" .. param .. "]")
         return nil
     end
     local rn = math.fmod(rng_int(), ntargets)
-    return targets[rn]
+    local t = targets[rn + 1]
+    if not t then
+        eressea.log.error("NULL target for  [" .. param .. "]" .. " at index " .. rn)
+    end
+    return t
 end
 
 local function tunnel_action(b, param)
-  local r = nil
-  if tonumber(param)~=nil then
-    r = get_region_by_id(tonumber(param))
-  end
   local units = tunnel_travelers(b)
-  if units~=nil then
-    eressea.log.debug("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
-    for key, u in pairs(units) do
-      local rto = r
-      if r==nil then
-        rto = get_target(param)
-      end
-      if rto~=nil then
+  local rto = get_target(param)
+  eressea.log.info("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
+  if rto and units then
+    for _, u in pairs(units) do
         u.region = rto
-        eressea.log.debug("teleported " .. tostring(u) .. " to " .. tostring(rto))
-      end
+        eressea.log.info("teleported " .. tostring(u) .. " to " .. tostring(rto))
+    end
+  elseif not units then 
+    eressea.log.info("No units in tunnel " .. tostring(b) .. " [" .. param .. "]")
+  elseif not rto then 
+    eressea.log.error("No target for tunnel " .. tostring(b) .. " [" .. param .. "]")
+  end
+  -- debug code to find bugs:
+  for u in b.region.units do
+    if u.building == b then
+        eressea.log.error("Did not teleport " .. tostring(u) .. " from tunnel " .. tostring(b))
     end
   end
-  return 1 -- return 0 to destroy
 end
 
 function tunnels.init()
     local r, b
     for r in regions() do
         if r:get_key('tnnL') then
-            targets[table.maxn(targets)+1] = r
+            table.insert(targets, r)
             if (r:get_flag(0)) then
                 -- target region is chaotic? nope.
                 r:set_flag(0, false)
@@ -61,10 +67,11 @@ function tunnels.init()
         end
         for b in r.buildings do
             if b.type == 'portal' then
-                buildings[table.maxn(buildings)+1] = b
+                table.insert(buildings, b)
             end
         end
     end
+    eressea.log.info("Found " .. #targets .. " tunnel targets")
 end
 
 function tunnels.update()

@@ -1,13 +1,3 @@
-/* 
- * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- * |                   |  Enno Rehling <enno@eressea.de>
- * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2006   |  
- * |                   |  This program may not be used, modified or distributed
- * +-------------------+  without prior permission by the authors of Eressea.
- *  
- */
-
 #ifndef H_GMTOOL
 #define H_GMTOOL
 
@@ -29,7 +19,7 @@ extern "C" {
     const char *prompt);
 
   void highlight_region(struct region *r, int on);
-  void select_coordinate(struct selection *selected, int x, int y, int on);
+  void select_coordinate(struct selection *selected, int x, int y, bool on);
   void run_mapper(void);
 
   extern int force_color;

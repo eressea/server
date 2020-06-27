@@ -5,7 +5,6 @@
 
 #include "alchemy.h"
 #include "skill.h"
-#include "keyword.h"
 #include "direction.h"
 #include "study.h"
 #include "economy.h"
@@ -33,8 +32,9 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
-#include <util/attrib.h>
-#include <util/event.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+#include <util/keyword.h>
 #include <util/macros.h>
 #include <util/parser.h>
 #include <util/rand.h>
@@ -101,6 +101,10 @@ struct order *ord)
         cmistake(u, ord, 20, MSG_MOVE);
         return -1;
     }
+    if (sh->number > 1) {
+        cmistake(u, ord, 325, MSG_MAGIC);
+        return -1;
+    }
 
     effect = SPEEDSAIL_EFFECT;
     create_curse(u, &sh->attribs, &ct_shipspeedup, 20, INT_MAX, effect, 0);
@@ -136,15 +140,15 @@ struct order *ord)
         UNUSED_ARG(ord);
         assert(sp);
 
-        /* Reduziert die St�rke jedes Spruchs um effect */
+        /* Reduziert die Staerke jedes Spruchs um effect */
         effect = 5;
 
-        /* H�lt Spr�che bis zu einem summierten Gesamtlevel von power aus.
+        /* Haelt Sprueche bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
-        force = effect * 20;     /* Stufe 5 =~ 100 */
+        force = effect * 20.0;     /* Stufe 5 =~ 100 */
 
-        /* Regionszauber aufl�sen */
+        /* Regionszauber aufloesen */
         while (*ap && force > 0) {
             curse *c;
             attrib *a = *ap;
@@ -156,7 +160,7 @@ struct order *ord)
             }
             c = (curse *)a->data.v;
 
-            /* Immunit�t pr�fen */
+            /* Immunitaet pruefen */
             if (c_flags(c) & CURSE_IMMUNE) {
                 do {
                     ap = &(*ap)->next;
@@ -263,7 +267,7 @@ static int use_foolpotion(unit *u, const item_type *itype, int amount,
             ""));
         return ECUSTOM;
     }
-    if (effskill(u, SK_STEALTH, 0) <= effskill(target, SK_PERCEPTION, 0)) {
+    if (effskill(u, SK_STEALTH, NULL) <= effskill(target, SK_PERCEPTION, NULL)) {
         cmistake(u, ord, 64, MSG_EVENT);
         return ECUSTOM;
     }

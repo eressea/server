@@ -8,6 +8,7 @@
 #include <util/macros.h>
 
 /* lua includes */
+#include <lua.h>
 #include <tolua.h>
 
 #include <stdlib.h>

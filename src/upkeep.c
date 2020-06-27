@@ -95,11 +95,11 @@ static bool hunger(int number, unit * u)
         deathcounts(r, dead);
     }
     if (hpsub > 0) {
-        /* Jetzt die Sch�den der nicht gestorbenen abziehen. */
+        /* Jetzt die Schaeden der nicht gestorbenen abziehen. */
         u->hp -= hpsub;
-        /* Meldung nur, wenn noch keine f�r Tote generiert. */
+        /* Meldung nur, wenn noch keine fuer Tote generiert. */
         if (dead == 0) {
-            /* Durch unzureichende Ern�hrung wird %s geschw�cht */
+            /* Durch unzureichende Ernaehrung wird %s geschwaecht */
             ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
         }
     }
@@ -133,13 +133,13 @@ void get_food(region * r)
     is_cold = insect_hunger && r_insectstalled(r);
 
     /* 1. Versorgung von eigenen Einheiten. Das vorhandene Silber
-    * wird zun�chst so auf die Einheiten aufgeteilt, dass idealerweise
-    * jede Einheit genug Silber f�r ihren Unterhalt hat. */
+    * wird zunaechst so auf die Einheiten aufgeteilt, dass idealerweise
+    * jede Einheit genug Silber fuer ihren Unterhalt hat. */
 
     for (u = r->units; u; u = u->next) {
         int need = lifestyle(u);
 
-        /* Erstmal zur�cksetzen */
+        /* Erstmal zuruecksetzen */
         freset(u, UFL_HUNGER);
 
         if (u->ship && (u->ship->flags & SF_FISHING)) {
@@ -167,7 +167,7 @@ void get_food(region * r)
             struct faction *owner = region_get_owner(r);
             /* if the region is owned, and the owner is nice, then we'll get
             * food from the peasants - should not be used with WORK */
-            if (owner != NULL && (get_alliance(owner, u->faction) & HELP_MONEY)) {
+            if (owner != NULL && alliedfaction(owner, u->faction, HELP_MONEY)) {
                 int rm = rmoney(r);
                 int use = (rm < need) ? rm : need;
                 rsetmoney(r, rm - use);
@@ -237,7 +237,7 @@ void get_food(region * r)
     }
 
     /* 3. bestimmen, wie viele Bauern gefressen werden.
-    * bei fehlenden Bauern den D�mon hungern lassen
+    * bei fehlenden Bauern den Daemon hungern lassen
     */
     for (u = r->units; u; u = u->next) {
         const race * rc = u_race(u);
@@ -302,7 +302,7 @@ void get_food(region * r)
     }
     rsetpeasants(r, peasantfood / 10);
 
-    /* 3. Von den �berlebenden das Geld abziehen: */
+    /* 3. Von den Ueberlebenden das Geld abziehen: */
     for (u = r->units; u; u = u->next) {
         int m = get_money(u);
         int need = lifestyle(u);

@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-                         Katja Zedel <katze@felidae.kn-bremen.de
-                         Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef ERESSEA_TYPES_H
 #define ERESSEA_TYPES_H
 
@@ -55,16 +37,11 @@ struct terrain_type;
 struct unit;
 struct weapon_type;
 
-typedef struct ursprung {
-  struct ursprung *next;
-  int id;
-  int x, y;
-} ursprung;
-
 /* seen_mode: visibility in the report */
 typedef enum {
     seen_none,
     seen_neighbour,
+    seen_lighthouse_land,
     seen_lighthouse,
     seen_travel,
     seen_unit,
@@ -82,58 +59,6 @@ typedef enum {
   ST_AVOID,
   ST_FLEE
 } status_t;
-
-/* ----------------- Parameter --------------------------------- */
-
-typedef enum {
-  P_LOCALE,
-  P_ANY,
-  P_EACH,
-  P_PEASANT,
-  P_BUILDING,
-  P_UNIT,
-  P_PRIVAT,
-  P_BEHIND,
-  P_CONTROL,
-  P_HERBS,
-  P_NOT,
-  P_NEXT,
-  P_FACTION,
-  P_GAMENAME,
-  P_PERSON,
-  P_REGION,
-  P_SHIP,
-  P_MONEY,
-  P_ROAD,
-  P_TEMP,
-  P_FLEE,
-  P_GEBAEUDE,
-  P_GIVE,
-  P_FIGHT,
-  P_TRAVEL,
-  P_GUARD,
-  P_ZAUBER,
-  P_PAUSE,
-  P_VORNE,
-  P_AGGRO,
-  P_CHICKEN,
-  P_LEVEL,
-  P_HELP,
-  P_FOREIGN,
-  P_AURA,
-  P_AFTER,
-  P_BEFORE,
-  P_NUMBER,
-  P_ITEMS,
-  P_POTIONS,
-  P_GROUP,
-  P_FACTIONSTEALTH,
-  P_TREES,
-  P_ALLIANCE,
-  P_AUTO,
-  MAXPARAMS,
-  NOPARAM 
-} param_t;
 
 typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_BATTLE,
@@ -156,8 +81,6 @@ enum {                          /* Message-Level */
   ML_MAX
 };
 
-extern const char *parameters[MAXPARAMS];
-
 /* --------------- Reports Typen ------------------------------- */
 
 enum {
@@ -173,11 +96,11 @@ enum {
   O_ADRESSEN,                   /* 512 */
   O_BZIP2,                      /* 1024 - compress as bzip2 */
   O_SCORE,                      /* 2048 - punkte anzeigen? */
-  O_SHOWSKCHANGE,               /* 4096 - Skillveränderungen anzeigen? */
+  O_SHOWSKCHANGE,               /* 4096 - Skillveraenderungen anzeigen? */
   MAXOPTIONS
 };
 
-typedef enum {
+typedef enum magic_t {
   M_GRAY = 0,                 /* Gray */
   M_ILLAUN = 1,               /* Illaun */
   M_TYBIED = 2,               /* Tybied */

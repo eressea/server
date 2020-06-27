@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
-
- */
 #include <platform.h>
 #include "command.h"
 
@@ -37,8 +25,8 @@ static void test_command(CuTest * tc) {
     st = stree_create();
     CuAssertPtrNotNull(tc, st);
     CuAssertPtrEquals(tc, loc, (struct locale *)st->lang);
-    CuAssertPtrEquals(tc, 0, st->root);
-    CuAssertPtrEquals(tc, 0, st->next);
+    CuAssertPtrEquals(tc, NULL, st->root);
+    CuAssertPtrEquals(tc, NULL, st->next);
     stree_add(st, "two", parser_two);
     stree_add(st, "six", parser_six);
     CuAssertPtrNotNull(tc, st->root);

@@ -22,11 +22,12 @@ exit $2 # otherwise
 function build() {
 assert_dir $SOURCE
 cd $SOURCE
-rm -rf crypto tolua
+rm -rf tolua
 git fetch || abort "failed to update source. do you have local changes?"
 [ -z $1 ] || git checkout $1
 git pull -q
 git submodule update
+s/cmake-init
 s/build > /dev/null || abort "build failed."
 }
 
@@ -54,7 +55,8 @@ cd $TESTROOT
 
 cat >| eressea.ini <<HEREDOC
 [lua]
-dbname = preview.db
+dbname = eressea.db
+dbswap = :memory:
 install = $SOURCE
 paths = $SOURCE/lunit:$SOURCE/git/scripts
 rules = e$game
@@ -69,7 +71,6 @@ cd $TESTROOT
 [ -d data ] || mkdir data
 assert_dir data
 assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
-cp $LIVE/eressea.db preview.db
 ln -f $LIVE/orders.$turn
 ln -f $LIVE/data/$turn.dat data/
 rm -rf reports

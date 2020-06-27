@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "chaos.h"
@@ -34,7 +16,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/rng.h>
 
 #include <stdlib.h>
@@ -53,11 +35,12 @@ static const terrain_type *chaosterrain(void)
             }
         }
         if (numtypes > 0) {
+            int n = 0;
             types = malloc(sizeof(terrain_type *) * numtypes);
-            numtypes = 0;
-            for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
+            if (!types) abort();
+            for (terrain = terrains(); n != numtypes && terrain != NULL; terrain = terrain->next) {
                 if ((terrain->flags & LAND_REGION) && terrain->herbs) {
-                    types[numtypes++] = terrain;
+                    types[n++] = terrain;
                 }
             }
         }
@@ -93,17 +76,18 @@ static unit *random_unit(const region * r)
     return u;
 }
 
-static void chaos(region * r)
+static void chaos(region * r, faction *monsters)
 {
     if (rng_int() % 100 < 8) {
         switch (rng_int() % 3) {
         case 0:                  /* Untote */
             if (!(r->terrain->flags & SEA_REGION)) {
                 unit *u = random_unit(r);
-                if (u && playerrace(u_race(u))) {
-                    ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
-                    u_setfaction(u, get_monsters());
-                    u_setrace(u, get_race(RC_GHOUL));
+                if (u && !undeadrace(u_race(u))) {
+                    if (join_monsters(u, monsters)) {
+                        ADDMSG(&u->faction->msgs, msg_message("chaos_disease", "unit", u));
+                        u_setrace(u, get_race(RC_GHOUL));
+                    }
                 }
             }
             break;
@@ -115,17 +99,17 @@ static void chaos(region * r)
                 case 0:
                     mfac = 100;
                     u =
-                        create_unit(r, get_monsters(), rng_int() % 8 + 1,
+                        create_unit(r, monsters, rng_int() % 8 + 1,
                         get_race(RC_FIREDRAGON), 0, NULL, NULL);
                     break;
                 case 1:
                     mfac = 500;
-                    u = create_unit(r, get_monsters(), rng_int() % 4 + 1,
+                    u = create_unit(r, monsters, rng_int() % 4 + 1,
                         get_race(RC_DRAGON), 0, NULL, NULL);
                     break;
                 default:
                     mfac = 1000;
-                    u = create_unit(r, get_monsters(), rng_int() % 2 + 1,
+                    u = create_unit(r, monsters, rng_int() % 2 + 1,
                         get_race(RC_WYRM), 0, NULL, NULL);
                     break;
                 }
@@ -135,7 +119,7 @@ static void chaos(region * r)
                 u->flags |= (UFL_ISNEW | UFL_MOVED);
             }
             break;
-        case 2:                  /* Terrainver�nderung */
+        case 2:                  /* Terrainveraenderung */
             if (!(r->terrain->flags & FORBIDDEN_REGION)) {
                 if (!(r->terrain->flags & SEA_REGION)) {
                     direction_t dir;
@@ -200,7 +184,7 @@ void chaos_update(void) {
     /* Chaos */
     for (r = regions; r; r = r->next) {
         if ((r->flags & RF_CHAOTIC)) {
-            chaos(r);
+            chaos(r, get_monsters());
         }
     }
 }

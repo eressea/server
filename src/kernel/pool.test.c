@@ -6,6 +6,7 @@
 #include "unit.h"
 #include "item.h"
 #include "faction.h"
+#include "race.h"
 #include "region.h"
 #include "skill.h"
 
@@ -42,19 +43,42 @@ void test_reservation(CuTest *tc) {
     test_teardown();
 }
 
+void test_pool_get_item(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    race *rc;
+    struct resource_type *rtype;
+
+    test_setup();
+    rtype = rt_get_or_create("money");
+    rtype->flags |= RTF_POOLED;
+    it_get_or_create(rtype);
+    f = test_create_faction(NULL);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(f, r);
+    u_setrace(u1, rc = test_create_race("undead"));
+    rc->ec_flags &= ~ECF_GETITEM;
+    u2 = test_create_unit(f, r);
+    i_change(&u2->items, rtype->itype, 2);
+    CuAssertIntEquals(tc, 0, get_pooled(u1, rtype, GET_DEFAULT, 1));
+    CuAssertIntEquals(tc, 0, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 2, i_get(u2->items, rtype->itype));
+    test_teardown();
+}
+
 void test_pool(CuTest *tc) {
     unit *u1, *u2, *u3;
     faction *f;
     region *r;
     struct resource_type *rtype;
-    ally *al;
 
     test_setup();
-    test_create_world();
     rtype = rt_get_or_create("money");
+    rtype->flags |= RTF_POOLED;
     it_get_or_create(rtype);
     f = test_create_faction(NULL);
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f && rtype && rtype->itype);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
@@ -74,10 +98,9 @@ void test_pool(CuTest *tc) {
     CuAssertIntEquals(tc, 100, get_pooled(u1, rtype, GET_POOLED_SLACK, INT_MAX));
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_POOLED_SLACK | GET_POOLED_RESERVE, INT_MAX));
 
-    al = ally_add(&u3->faction->allies, f);
-    al->status = HELP_GUARD;
+    ally_set(&u3->faction->allies, f, HELP_GUARD);
     CuAssertIntEquals(tc, 0, get_pooled(u1, rtype, GET_ALLIED_SLACK | GET_ALLIED_RESERVE, INT_MAX));
-    al->status = HELP_MONEY;
+    ally_set(&u3->faction->allies, f, HELP_MONEY);
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_ALLIED_SLACK, INT_MAX));
     CuAssertIntEquals(tc, 200, get_pooled(u1, rtype, GET_ALLIED_RESERVE, INT_MAX));
     CuAssertIntEquals(tc, 400, get_pooled(u1, rtype, GET_ALLIED_SLACK | GET_ALLIED_RESERVE, INT_MAX));
@@ -117,7 +140,6 @@ void test_pool_use(CuTest *tc) {
     faction *f;
     region *r;
     struct item_type *itype;
-    ally *al;
 
     test_setup();
     test_create_world();
@@ -135,8 +157,7 @@ void test_pool_use(CuTest *tc) {
     set_resvalue(u2, itype, 100);
     i_change(&u3->items, itype, 400);
     set_resvalue(u3, itype, 200);
-    al = ally_add(&u3->faction->allies, f);
-    al->status = HELP_MONEY;
+    ally_set(&u3->faction->allies, f, HELP_MONEY);
 
     CuAssertIntEquals(tc, 10, use_pooled(u1, itype->rtype, GET_SLACK, 10));
     CuAssertIntEquals(tc, 40, use_pooled(u1, itype->rtype, GET_SLACK, 50));
@@ -192,6 +213,7 @@ CuSuite *get_pool_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_reservation);
     SUITE_ADD_TEST(suite, test_pool);
+    SUITE_ADD_TEST(suite, test_pool_get_item);
     SUITE_ADD_TEST(suite, test_pool_bug_2042);
     SUITE_ADD_TEST(suite, test_pool_use);
     SUITE_ADD_TEST(suite, test_change_resource);

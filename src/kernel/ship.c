@@ -1,22 +1,6 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "ship.h"
 
@@ -34,12 +18,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "skill.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
 
@@ -70,7 +55,8 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
         selist *ql;
         int qi;
 
-        sn = (local_names *)calloc(sizeof(local_names), 1);
+        sn = (local_names *)calloc(1, sizeof(local_names));
+        if (!sn) abort();
         sn->next = snames;
         sn->lang = lang;
 
@@ -123,7 +109,8 @@ ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
     assert(!snames);
     if (!st) {
-        st = (ship_type *)calloc(sizeof(ship_type), 1);
+        st = (ship_type *)calloc(1, sizeof(ship_type));
+        if (!st) abort();
         st->_name = str_strdup(name);
         st->storm = 1.0;
         st->tac_bonus = 1.0;
@@ -188,11 +175,13 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     ship *sh = (ship *)calloc(1, sizeof(ship));
     const char *sname = 0;
 
+    if (!sh) abort();
     assert(stype);
     sh->no = newcontainerid();
     sh->coast = NODIRECTION;
     sh->type = stype;
     sh->region = r;
+    sh->number = 1;
 
     if (lang) {
         sname = LOC(lang, stype->_name);
@@ -286,15 +275,15 @@ static int ShipSpeedBonus(const unit * u)
         bonus = config_get_int("movement.shipspeed.skillbonus", 0);
     }
     if (bonus > 0) {
-        int skl = effskill(u, SK_SAILING, 0);
-        int minsk = (sh->type->cptskill + 1) / 2;
+        int skl = effskill(u, SK_SAILING, NULL);
+        int minsk = (ship_captain_minskill(sh) + 1) / 2;
         return (skl - minsk) / bonus;
     }
     else if (sh->type->flags & SFL_SPEEDY) {
         int base = 3;
         int speed = 0;
-        int minsk = sh->type->cptskill * base;
-        int skl = effskill(u, SK_SAILING, 0);
+        int minsk = ship_captain_minskill(sh) * base;
+        int skl = effskill(u, SK_SAILING, NULL);
         while (skl >= minsk) {
             ++speed;
             minsk *= base;
@@ -304,18 +293,8 @@ static int ShipSpeedBonus(const unit * u)
     return 0;
 }
 
-int crew_skill(const ship *sh) {
-    int n = 0;
-    unit *u;
-
-    n = 0;
-
-    for (u = sh->region->units; u; u = u->next) {
-        if (u->ship == sh) {
-            n += effskill(u, SK_SAILING, 0) * u->number;
-        }
-    }
-    return n;
+int ship_captain_minskill(const ship *sh) {
+    return sh->type->cptskill;
 }
 
 int shipspeed(const ship * sh, const unit * u)
@@ -332,9 +311,9 @@ int shipspeed(const ship * sh, const unit * u)
     assert(sh->type->construction);
 
     k = sh->type->range;
-    if (sh->size != sh->type->construction->maxsize)
+    if (!ship_finished(sh)) {
         return 0;
-
+    }
     if (sh->attribs) {
         if (curse_active(get_curse(sh->attribs, &ct_stormwind))) {
             k *= 2;
@@ -355,8 +334,9 @@ int shipspeed(const ship * sh, const unit * u)
         int crew = crew_skill(sh);
         int crew_bonus = (crew / sh->type->sumskill / 2) - 1;
         if (crew_bonus > 0) {
-            bonus = MIN(bonus, crew_bonus);
-            bonus = MIN(bonus, sh->type->range_max - sh->type->range);
+            int sbonus = sh->type->range_max - sh->type->range;
+            if (bonus > sbonus) bonus = sbonus;
+            if (bonus > crew_bonus) bonus = crew_bonus;
         }
         else {
             bonus = 0;
@@ -393,17 +373,87 @@ const char *shipname(const ship * sh)
     return write_shipname(sh, ibuf, sizeof(idbuf[0]));
 }
 
-int shipcapacity(const ship * sh)
+int ship_maxsize(const ship *sh)
 {
-    int i = sh->type->cargo;
+    return sh->number * sh->type->construction->maxsize;
+}
 
-    if (sh->type->construction && sh->size != sh->type->construction->maxsize)
-        return 0;
-
-    if (sh->damage) {
-        i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+bool ship_finished(const ship *sh)
+{
+    if (sh->type->construction) {
+        return (sh->size >= ship_maxsize(sh));
     }
-    return i;
+    return true;
+}
+
+int enoughsailors(const ship * sh, int crew_skill)
+{
+    return crew_skill >= sh->type->sumskill * sh->number;
+}
+
+int crew_skill(const ship *sh) {
+    int n = 0;
+    unit *u;
+
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es >= sh->type->minskill) {
+                n += es * u->number;
+            }
+        }
+    }
+    return n;
+}
+
+bool ship_crewed(const ship *sh) {
+    unit *u, *cap = ship_owner(sh);
+    int capskill = -1, sumskill = 0;
+    for (u = sh->region->units; u; u = u->next) {
+        if (u->ship == sh) {
+            int es = effskill(u, SK_SAILING, NULL);
+            if (es > 0) {
+                if (u == cap && u->number >= sh->number) {
+                    capskill = es;
+                }
+                if (es >= sh->type->minskill) {
+                    sumskill += es * u->number;
+                }
+            }
+        }
+    }
+    return (capskill >= ship_captain_minskill(sh)) && (sumskill >= sh->type->sumskill * sh->number);
+}
+
+void scale_ship(ship *sh, int n)
+{
+    sh->size = sh->size * n / sh->number;
+    sh->damage = sh->damage * n / sh->number;
+    sh->number = n;
+}
+
+int ship_capacity(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cargo * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
+}
+
+int ship_cabins(const ship * sh)
+{
+    if (ship_finished(sh)) {
+        int i = sh->type->cabins * sh->number;
+        if (sh->damage) {
+            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+        }
+        return i;
+    }
+    return 0;
 }
 
 void getshipweight(const ship * sh, int *sweight, int *scabins)
@@ -435,7 +485,7 @@ static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
 
-    /* Eigentï¿½mer tot oder kein Eigentï¿½mer vorhanden. Erste lebende Einheit
+    /* Eigentuemer tot oder kein Eigentuemer vorhanden. Erste lebende Einheit
       * nehmen. */
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
@@ -473,17 +523,20 @@ void write_ship_reference(const struct ship *sh, struct storage *store)
     WRITE_INT(store, (sh && sh->region) ? sh->no : 0);
 }
 
-void ship_setname(ship * self, const char *name)
+void ship_setname(ship * sh, const char *name)
 {
-    free(self->name);
-    self->name = name ? str_strdup(name) : 0;
+    free(sh->name);
+    sh->name = name ? str_strdup(name) : 0;
 }
 
-const char *ship_getname(const ship * self)
+const char *ship_getname(const ship * sh)
 {
-    return self->name;
+    return sh->name;
 }
 
-int ship_damage_percent(const ship *ship) {
-    return (ship->damage * 100 + DAMAGE_SCALE - 1) / (ship->size * DAMAGE_SCALE);
+int ship_damage_percent(const ship *sh) {
+    /* Schaden muss granularer sein als Größe, deshalb ist er skaliert
+     * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Größenpunkt.
+     */
+    return ((DAMAGE_SCALE - 1) + sh->damage * 100) / (sh->size * DAMAGE_SCALE);
 }

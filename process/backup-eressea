@@ -4,6 +4,13 @@ if [ -z $ERESSEA ] ; then
   echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
 fi
 GAME=$1
+
+upload() {
+  SRC="$1"
+  DST=$(basename "$SRC")
+  echo put "$SRC" "$DST" | cadaver "https://dav.box.com/dav/Eressea/game-$GAME/"
+}
+
 if [ ! -d $ERESSEA/game-$GAME ]; then
   echo "No such game: game-$GAME."
   exit 1
@@ -23,12 +30,16 @@ if [ ! -d backup ] ; then
   ln -sf ~/backup/eressea/game-$GAME backup
 fi
 
+if [ -e reports/reports.txt ] ; then
+  echo "backup reports $TURN, game $GAME"
+  tar cjf backup/$TURN-reports.tar.bz2 reports eressea.db
+  upload backup/$TURN-reports.tar.bz2
+fi
 files="data/$TURN.dat parteien.full parteien"
 if [ -e orders.$TURN ]; then
 files="$files orders.$TURN"
 fi
 echo "backup turn $TURN, game $GAME, files: $files"
 tar cjf backup/$TURN.tar.bz2 $files
-echo "uploading game-$GAME/$TURN.tar.bz2"
-curl -s -n -T backup/$TURN.tar.bz2 https://dav.box.com/dav/Eressea/game-$GAME/$TURN.tar.bz2
-curl -s -n -T eressea.db https://dav.box.com/dav/Eressea/eressea.db
+upload backup/$TURN.tar.bz2
+

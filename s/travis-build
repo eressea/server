@@ -31,10 +31,11 @@ cppcheck_tests() {
 
 set -e
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
-s/cmake-init
 # cppcheck_tests
-s/build
-cd process
+s/cmake-init --db=sqlite
+cd Debug
+scan-build make
+cd ../process
 make
 cd $ROOT
 inifile

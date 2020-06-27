@@ -30,7 +30,7 @@
   <entry spell="cerddorfumbleshield" level="5" />
   <entry spell="chaosrow" level="8" />
   <entry spell="chaossuction" level="14" />
-  <entry spell="clone" level="9" />
+    <!-- <entry spell="clone" level="9" /> -->
   <entry spell="coldfront" level="8" />
   <entry spell="cold_protection" level="3" />
   <entry spell="combatrust" level="6" />

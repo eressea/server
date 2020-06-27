@@ -1,21 +1,3 @@
-﻿/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include "messages.h"
 
@@ -67,6 +49,47 @@ variant v)
     }
 }
 
+static int missing_message_mode;
+
+void message_handle_missing(int mode) {
+    missing_message_mode = mode;
+}
+
+static message *missing_feedback(const char *name, const struct unit *u,
+    const struct region *r, struct order *ord)
+{
+    if (missing_message_mode == MESSAGE_MISSING_ERROR) {
+        log_error("trying to create undefined feedback of type \"%s\"\n", name);
+    }
+    else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
+        log_warning("trying to create undefined message of type \"%s\"\n", name);
+        if (strcmp(name, "missing_feedback") != 0) {
+            if (!mt_find("missing_feedback")) {
+                mt_create_va(mt_new("missing_feedback", NULL), "unit:unit",
+                    "region:region", "command:order", "name:string", MT_NEW_END);
+            }
+            return msg_message("missing_feedback", "unit region command name", u, r, ord, name);
+        }
+    }
+    return NULL;
+}
+
+static message *missing_message(const char *name) {
+    if (missing_message_mode == MESSAGE_MISSING_ERROR) {
+        log_error("trying to create undefined message of type \"%s\"\n", name);
+    }
+    else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
+        log_warning("trying to create undefined message of type \"%s\"\n", name);
+        if (strcmp(name, "missing_message") != 0) {
+            if (!mt_find("missing_message")) {
+                mt_create_va(mt_new("missing_message", NULL), "name:string", MT_NEW_END);
+            }
+            return msg_message("missing_message", "name", name);
+        }
+    }
+    return NULL;
+}
+
 struct message *msg_feedback(const struct unit *u, struct order *ord,
     const char *name, const char *sig, ...)
 {
@@ -80,13 +103,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     }
 
     if (!mtype) {
-        log_warning("trying to create message of unknown type \"%s\"\n", name);
-        if (!mt_find("missing_feedback")) {
-            mt_create_va(mt_new("missing_feedback", NULL), "unit:unit", 
-                "region:region", "command:order", "name:string", MT_NEW_END);
-        }
-        return msg_message("missing_feedback", "name unit region command",
-            name, u, u->region, ord);
+        return missing_feedback(name, u, u->region, ord);
     }
 
     var.v = (void *)u;
@@ -137,28 +154,6 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         va_end(marker);
     }
     return msg_create(mtype, args);
-}
-
-static int missing_message_mode;
-
-void message_handle_missing(int mode) {
-    missing_message_mode = mode;
-}
-
-static message *missing_message(const char *name) {
-    if (missing_message_mode == MESSAGE_MISSING_ERROR) {
-        log_error("trying to create undefined message of type \"%s\"\n", name);
-    }
-    else if (missing_message_mode == MESSAGE_MISSING_REPLACE) {
-        log_warning("trying to create undefined message of type \"%s\"\n", name);
-        if (strcmp(name, "missing_message") != 0) {
-            if (!mt_find("missing_message")) {
-                mt_create_va(mt_new("missing_message", NULL), "name:string", MT_NEW_END);
-            }
-            return msg_message("missing_message", "name", name);
-        }
-    }
-    return NULL;
 }
 
 message *msg_message(const char *name, const char *sig, ...)
@@ -300,8 +295,10 @@ message *add_message(message_list ** pm, message * m)
     assert(m && m->type);
     if (m != NULL) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
+        if (!mnew) abort();
         if (*pm == NULL) {
             *pm = malloc(sizeof(message_list));
+            if (*pm == NULL) abort();
             (*pm)->end = &(*pm)->begin;
         }
         mnew->msg = msg_addref(m);

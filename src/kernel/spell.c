@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -124,6 +106,7 @@ spell * create_spell(const char * name)
         return 0;
     }
     sp = (spell *)calloc(1, sizeof(spell));
+    if (!sp) abort();
     len = cb_new_kv(name, len, &sp, sizeof(sp), buffer);
     if (cb_insert(&cb_spells, buffer, len) == CB_SUCCESS) {
         sp->sname = str_strdup(name);
@@ -177,6 +160,7 @@ spell *find_spell(const char *name)
 struct spellref *spellref_create(spell *sp, const char *name)
 {
     spellref *spref = malloc(sizeof(spellref));
+    if (!spref) abort();
 
     if (sp) {
         spref->sp = sp;

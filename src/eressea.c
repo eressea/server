@@ -1,14 +1,14 @@
 #include <platform.h>
 #include "eressea.h"
 
+#include "kernel/building.h"
 #include "kernel/calendar.h"
+#include "kernel/database.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
-#include "kernel/faction.h"
-#include "kernel/building.h"
 #include "kernel/equipment.h"
+#include "kernel/faction.h"
 #include "kernel/item.h"
-#include "kernel/database.h"
 
 #include "util/functions.h"
 #include "util/language.h"
@@ -28,6 +28,7 @@
 #include "creport.h"
 #include "report.h"
 #include "names.h"
+#include "prefix.h"
 #include "reports.h"
 #include "spells.h"
 #include "vortex.h"
@@ -50,16 +51,17 @@ void game_done(void)
     calendar_cleanup();
     free_functions();
     free_config();
-    free_special_directions();
     free_locales();
 #endif
+    free_prefixes();
+    free_special_directions();
     kernel_done();
-    dblib_close();
+    swapdb_close();
 }
 
 void game_init(void)
 {
-    dblib_open();
+    swapdb_open();
     errno = 0;
     kernel_init();
     register_triggers();

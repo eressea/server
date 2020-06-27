@@ -3,11 +3,13 @@
 #endif
 #include <kernel/config.h>
 #include "economy.h"
+#include "recruit.h"
 
-#include <util/message.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/item.h>
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
@@ -19,9 +21,9 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -145,6 +147,7 @@ static struct unit *create_recruiter(void) {
 
 static void setup_production(void) {
     init_resources();
+    mt_create_feedback("error_cannotmake");
     mt_create_va(mt_new("produce", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END);
     mt_create_va(mt_new("income", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END);
     mt_create_va(mt_new("buy", NULL), "unit:unit", "money:int", MT_NEW_END);
@@ -161,7 +164,7 @@ static void test_heroes_dont_recruit(CuTest * tc) {
     fset(u, UFL_HERO);
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_herorecruit"));
@@ -177,7 +180,7 @@ static void test_normals_recruit(CuTest * tc) {
     u = create_recruiter();
     unit_addorder(u, create_order(K_RECRUIT, default_locale, "1"));
 
-    economics(u->region);
+    recruit(u->region);
 
     CuAssertIntEquals(tc, 2, u->number);
 
@@ -206,7 +209,7 @@ static void setup_terrains(CuTest *tc) {
 static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain) {
     region *r;
     item_type *it_luxury;
-    struct locale * lang = default_locale;
+    struct locale * lang = test_create_locale();
 
     new_luxurytype(it_luxury = test_create_itemtype("balm"), 5);
     locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
@@ -230,37 +233,108 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
     return u;
 }
 
-static void test_trade_insect(CuTest *tc) {
-    /* Insekten kï¿½nnen in Wï¿½sten und Sï¿½mpfen auch ohne Burgen handeln. */
-    unit *u;
+static void test_trade_limits(CuTest *tc) {
     region *r;
+    unit *u;
+    building *b;
+    const item_type *it_jewel, *it_balm;
+
+    test_setup();
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    rsetpeasants(r, TRADE_FRACTION * 20);
+    it_jewel = it_find("jewel");
+    u = test_create_unit(test_create_faction(NULL), r);
+    set_level(u, SK_TRADE, 1);
+    i_change(&u->items, it_find("money"), 500);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "5 %s",
+        LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
+    it_balm = it_find("balm");
+    i_change(&u->items, it_balm, 10);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_balm->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 5, i_get(u->items, it_jewel));
+    CuAssertIntEquals(tc, 5, i_get(u->items, it_balm));
+    test_teardown();
+}
+
+static void test_trade_needs_castle(CuTest *tc) {
+    /* Handeln ist nur in Regionen mit Burgen möglich. */
+    race *rc;
+    region *r;
+    unit *u;
+    building *b;
+    const terrain_type *t_swamp;
     const item_type *it_luxury;
-    const item_type *it_silver;
 
     test_setup();
     setup_production();
     test_create_locale();
     setup_terrains(tc);
-    r = setup_trade_region(tc, get_terrain("swamp"));
     init_terrains();
-
+    t_swamp = get_terrain("swamp");
+    r = setup_trade_region(tc, t_swamp);
     it_luxury = r_luxury(r);
-    CuAssertPtrNotNull(tc, it_luxury);
-    it_silver = get_resourcetype(R_SILVER)->itype;
 
-    u = setup_trade_unit(tc, r, test_create_race("insect"));
+    rc = test_create_race(NULL);
+    CuAssertTrue(tc, trade_needs_castle(t_swamp, rc));
+
+    u = test_create_unit(test_create_faction(rc), r);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
 
-    test_set_item(u, it_silver, 10);
-    CuAssertPtrEquals(tc, r, u->region);
-    CuAssertPtrEquals(tc, (void *)it_luxury, (void *)r_luxury(u->region));
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 1;
+    produce(r);
+    CuAssertIntEquals(tc, 2, test_count_messagetype(u->faction->msgs, "error119"));
+
+    test_clear_messages(u->faction);
+    freset(u, UFL_LONGACTION);
+    b->size = 2;
+    test_clear_messages(u->faction);
+    produce(r);
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
+    test_teardown();
+}
+
+static void test_trade_insect(CuTest *tc) {
+    /* Insekten koennen in Wuesten und Suempfen auch ohne Burgen handeln. */
+    unit *u;
+    region *r;
+    race *rc;
+    const terrain_type *t_swamp;
+    const item_type *it_luxury;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    t_swamp = get_terrain("swamp");
+    rc = test_create_race("insect");
+
+    r = setup_trade_region(tc, t_swamp);
+    it_luxury = r_luxury(r);
+    CuAssertTrue(tc, !trade_needs_castle(t_swamp, rc));
+    CuAssertPtrNotNull(tc, it_luxury);
+    u = setup_trade_unit(tc, r, rc);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
     produce(u->region);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
-    CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
-    CuAssertIntEquals(tc, 5, get_item(u, it_silver));
-
-    terraform_region(r, get_terrain("swamp"));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
     test_teardown();
 }
 
@@ -357,7 +431,7 @@ static void test_tax_cmd(CuTest *tc) {
 
     set_level(u, SK_TAXING, 1);
     tax_cmd(u, ord, &taxorders);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error_no_tax_skill"));
     CuAssertPtrNotNull(tc, taxorders);
 
     rsetmoney(r, 11);
@@ -415,8 +489,8 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, f->msgs);
-    CuAssertPtrEquals(tc, 0, r->msgs);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrEquals(tc, NULL, r->msgs);
 
     req = calloc(2, sizeof(maintenance));
     req[0].number = 100;
@@ -438,8 +512,8 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrEquals(tc, 0, r->msgs);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
@@ -448,7 +522,7 @@ static void test_maintain_buildings(CuTest *tc) {
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
-    CuAssertPtrEquals(tc, 0, f->msgs);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
     test_clear_messagelist(&r->msgs);
 
@@ -487,10 +561,12 @@ static void test_recruit_insect(CuTest *tc) {
 
     test_setup();
     test_create_calendar();
+    test_create_terrain("desert", -1);
     f = test_create_faction(test_create_race("insect"));
     u = test_create_unit(f, test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
     msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
     CuAssertPtrEquals(tc, NULL, msg);
 
@@ -737,6 +813,7 @@ static void test_loot(CuTest *tc) {
 
     test_setup();
     setup_production();
+    mt_create_error(48); /* unit is unarmed */
     it_silver = test_create_silver();
     config_set("rules.enable_loot", "1");
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
@@ -746,7 +823,7 @@ static void test_loot(CuTest *tc) {
     test_clear_messages(f);
     arm_unit(u);
     produce(u->region);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "income")); /* unit is unarmed */
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "income"));
     CuAssertIntEquals(tc, 2 * TAXFRACTION, i_get(u->items, it_silver));
     CuAssertIntEquals(tc, UFL_LONGACTION | UFL_NOTMOVING, fval(u, UFL_LONGACTION | UFL_NOTMOVING));
     test_teardown();
@@ -790,6 +867,8 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_trade_limits);
+    SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
     SUITE_ADD_TEST(suite, test_recruit);

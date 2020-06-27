@@ -1,14 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
 #ifndef H_MESSAGE_H
 #define H_MESSAGE_H
 
@@ -64,6 +53,8 @@ extern "C" {
     struct message_type *mt_new(const char *name, const char *section);
     /** message_type registry (optional): **/
     struct message_type *mt_create(struct message_type *, const char *args[], int nargs);
+    struct message_type *mt_create_feedback(const char *name);
+    struct message_type *mt_create_error(int error);
     struct message_type *mt_create_va(struct message_type *, ...);
     const struct message_type *mt_find(const char *);
 

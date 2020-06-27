@@ -11,7 +11,7 @@
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 
 #include <magic.h>
 
@@ -26,8 +26,8 @@
 * Stufe:      6
 *
 * Wirkung:
-* Lae�t ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
-* bis Kapazit�t 50.
+* Laesst ein Schiff eine Runde lang fliegen.  Wirkt nur auf Boote
+* bis Kapazitaet 50.
 * Kombinierbar mit "Guenstige Winde", aber nicht mit "Sturmwind".
 *
 * Flag:
@@ -38,7 +38,7 @@ int sp_flying_ship(castorder * co)
     ship *sh;
     unit *u;
     region *r;
-    unit *mage;
+    unit *caster;
     int cast_level;
     double power;
     spellparameter *pa;
@@ -47,7 +47,7 @@ int sp_flying_ship(castorder * co)
 
     assert(co);
     r = co_get_region(co);
-    mage = co->magician.u;
+    caster = co_get_caster(co);
     cast_level = co->level;
     power = co->force;
     pa = co->par;
@@ -56,23 +56,23 @@ int sp_flying_ship(castorder * co)
     if (pa->param[0]->flag == TARGET_NOTFOUND)
         return 0;
     sh = pa->param[0]->data.sh;
-    if (sh->type->construction->maxsize > 50) {
-        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+    if (sh->number > 1 || sh->type->construction->maxsize > 50) {
+        ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
             "error_flying_ship_too_big", "ship", sh));
         return 0;
     }
 
     /* Duration = 1, nur diese Runde */
 
-    cno = levitate_ship(sh, mage, power, 1);
+    cno = levitate_ship(sh, caster, power, 1);
     if (cno == 0) {
         if (is_cursed(sh->attribs, &ct_flyingship)) {
             /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
-            cmistake(mage, co->order, 211, MSG_MAGIC);
+            cmistake(caster, co->order, 211, MSG_MAGIC);
         }
         else if (is_cursed(sh->attribs, &ct_shipspeedup)) {
             /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
-            cmistake(mage, co->order, 210, MSG_MAGIC);
+            cmistake(caster, co->order, 210, MSG_MAGIC);
         }
         return 0;
     }
@@ -86,7 +86,7 @@ int sp_flying_ship(castorder * co)
         if (!(u->faction->flags & FFL_SELECT)) {
             u->faction->flags |= FFL_SELECT;
             if (!m) {
-                m = msg_message("flying_ship_result", "mage ship", mage, sh);
+                m = msg_message("flying_ship_result", "mage ship", caster, sh);
             }
             add_message(&u->faction->msgs, m);
         }

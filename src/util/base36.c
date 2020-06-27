@@ -1,32 +1,22 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include "base36.h"
 #include "log.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <ctype.h>
 
+#define USE_STRTOL
+#ifdef USE_STRTOL
 int atoi36(const char *str)
 {
-    /* cannot use strtol, because invalid strings will cause crash */
+    assert(str);
+    return (int)strtol(str, NULL, 36);
+}
+#else
+int atoi36(const char *str)
+{
     const unsigned char *s = (const unsigned char *)str;
     int i = 0, sign = 1;
     assert(s);
@@ -37,12 +27,12 @@ int atoi36(const char *str)
         ++s;
     }
     while (isalnum(*(unsigned char *)s)) {
-        if (isupper(*(unsigned char *)s))
-            i = i * 36 + (*s) - 'A' + 10;
-        else if (islower(*s))
+        if (islower(*s))
             i = i * 36 + (*s) - 'a' + 10;
         else if (isdigit(*s))
             i = i * 36 + (*s) - '0';
+        else if (isupper(*(unsigned char *)s))
+            i = i * 36 + (*s) - 'A' + 10;
         else
             break;
         ++s;
@@ -51,6 +41,7 @@ int atoi36(const char *str)
         return 0;
     return i * sign;
 }
+#endif
 
 const char *itoab_r(int i, int base, char *s, size_t len)
 {
@@ -88,7 +79,7 @@ const char *itoab_r(int i, int base, char *s, size_t len)
             }
         }
         else {
-            log_error("static buffer exhauset, itoab(%d, %d)", i, base);
+            log_error("static buffer exhausted, itoab(%d, %d)", i, base);
             assert(i == 0 || !"itoab: static buffer exhausted");
         }
     }
@@ -124,14 +115,4 @@ const char *itoa36(int i)
 const char *itoa10(int i)
 {
     return itoab(i, 10);
-}
-
-int i10toi36(int i)
-{
-    int r = 0;
-    while (i) {
-        r = r * 36 + i % 10;
-        i = i / 10;
-    }
-    return r;
 }

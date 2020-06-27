@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef ERESSEA_H
 #define ERESSEA_H
 
@@ -31,24 +13,18 @@ extern "C" {
     struct param;
     struct _dictionary_;
 
-#define DISPLAYSIZE         8192        /* max. L�nge einer Beschreibung, incl trailing 0 */
-#define ORDERSIZE           (DISPLAYSIZE*2) /* max. length of an order */
-#define NAMESIZE            128 /* max. L�nge eines Namens, incl trailing 0 */
-#define IDSIZE              16  /* max. L�nge einer no (als String), incl trailing 0 */
-#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. L�nge der Strings, die
-     * von struct unitname, etc. zur�ckgegeben werden. ohne die 0 */
+#define DISPLAYSIZE         4096 /* max. Laenge einer Beschreibung, incl trailing 0 */
+#define ORDERSIZE           4096 /* max. length of an order */
+#define NAMESIZE            128 /* max. Laenge eines Namens, incl trailing 0 */
+#define IDSIZE              16  /* max. Laenge einer no (als String), incl trailing 0 */
+#define OBJECTIDSIZE        (NAMESIZE+5+IDSIZE) /* max. Laenge der Strings, die
+     * von struct unitname, etc. zurueckgegeben werden. ohne die 0 */
 
 #define fval(u, i) ((u)->flags & (i))
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
     int findoption(const char *s, const struct locale *lang);
-
-    param_t findparam(const char *s, const struct locale *lang);
-    param_t findparam_block(const char *s, const struct locale *lang, bool any_locale);
-    param_t findparam_ex(const char *s, const struct locale * lang);
-    bool isparam(const char *s, const struct locale * lang, param_t param);
-    param_t getparam(const struct locale *lang);
 
     const char * game_name(void);
     const char * game_mailcmd(void);
@@ -58,7 +34,7 @@ extern "C" {
     void init_locale(struct locale *lang);
     void init_races(struct locale *lang);
 
-    int forbiddenid(int id);
+    bool forbiddenid(int id);
     int newcontainerid(void);
 
     bool rule_region_owners(void);
@@ -89,7 +65,7 @@ extern "C" {
 #define GF_SPECIFIC 16
     /* der, die, das vs. ein, eine */
 #define GF_DETAILED 32
-    /* mehr Informationen. z.b. stra�e zu 50% */
+    /* mehr Informationen. z.b. strasse zu 50% */
 #define GF_PURE 64
     /* untranslated */
 
@@ -109,7 +85,6 @@ extern "C" {
 
     /* globale settings des Spieles */
     typedef struct settings {
-        struct attrib *attribs;
         void *vm_state;
     } settings;
 
@@ -133,12 +108,9 @@ extern "C" {
 
     struct order *default_order(const struct locale *lang);
 
-    void init_parameters(struct locale *lang);
-
     void free_gamedata(void);
     void free_config(void);
 
-    extern const char *parameters[];
     extern settings global;
 
 #ifdef __cplusplus

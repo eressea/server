@@ -25,7 +25,9 @@ ipch/
 *.user
 
 *~
+*.pyc
 *.bak
+*.swp
 bin/
 build*/
 *.log
@@ -36,6 +38,7 @@ Thumbs.db
 *.cfg
 *.cmd
 tmp/
+tests/orders.txt
 tests/config.lua
 tests/reports/
 tests/data/185.dat
@@ -43,3 +46,5 @@ tests/data/185.dat
 /cutest/
 /critbit/
 *.mo
+/.vs
+/CMakeSettings.json

@@ -1,19 +1,8 @@
-/*
- +-------------------+
- |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
- | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
- |                   |
- +-------------------+
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #ifndef KRNL_ORDER_H
 #define KRNL_ORDER_H
 
-#include "keyword.h"
+#include <util/keyword.h>
+
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -36,6 +25,18 @@ extern "C" {
 #define CMD_QUIET   0x010000
 #define CMD_PERSIST 0x020000
 #define CMD_DEFAULT 0x040000
+
+    typedef struct order_data {
+        const char *_str;
+        int _refcount;
+    } order_data;
+
+    extern order_data *odata_load(int id);
+    extern int odata_save(order_data *od);
+
+    void odata_create(order_data **pdata, size_t len, const char *str);
+    void odata_release(order_data * od);
+    void odata_addref(order_data *od);
 
     typedef struct order {
         struct order *next;

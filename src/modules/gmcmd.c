@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "gmcmd.h"
@@ -32,8 +20,8 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/macros.h>
 
 #include <storage.h>

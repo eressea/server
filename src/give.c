@@ -1,21 +1,10 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2014   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
-
- */
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
 #include <kernel/config.h>
 #include "give.h"
 
+#include "contact.h"
 #include "economy.h"
 #include "laws.h"
 
@@ -25,6 +14,8 @@
 #include <attributes/racename.h>
 
  /* kernel includes */
+#include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <kernel/ally.h>
 #include <kernel/build.h>
 #include <kernel/curse.h>
@@ -41,11 +32,10 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 
 /* libc includes */
@@ -167,7 +157,6 @@ int give_quota(const unit * src, const unit * dst, const item_type * type,
         if (config_changed(&config)) {
             divisor = config_get_int("rules.items.give_divisor", divisor);
         }
-        assert(divisor <= 0 || divisor >= 1);
         if (divisor >= 1) {
             /* predictable > correct: */
             return n / divisor;
@@ -298,10 +287,124 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
     return false;
 }
 
-static bool rule_transfermen(void)
+bool rule_transfermen(void)
 {
     int rule = config_get_int("rules.transfermen", 1);
     return rule != 0;
+}
+
+static void transfer_ships(ship *s1, ship *s2, int n)
+{
+    assert(n <= s1->number);
+    s2->damage += s1->damage * n / s1->number;
+    s2->size += s1->size * n / s1->number;
+    s2->number += n;
+    if (s1->coast != NODIRECTION) {
+        s2->coast = s1->coast;
+    }
+    scale_ship(s1, s1->number - n);
+}
+
+static void transfer_units(ship *s1, ship *s2)
+{
+    region * r = s1->region;
+    unit *u;
+    for (u = r->units; u; u = u->next) {
+        if (u->ship == s1) {
+            leave_ship(u);
+            u_set_ship(u, s2);
+        }
+    }
+}
+
+static bool ship_cursed(const ship *sh) {
+    return a_find(sh->attribs, &at_curse) != NULL;
+}
+
+message * give_ship(unit *u1, unit *u2, int n, order *ord)
+{
+    assert(u1->ship);
+    assert(n > 0 && n <= u1->ship->number);
+    if (u1->ship->type->range < 3) {
+        /* Keine Boote und anderes Kleinzeug erlaubt */
+        return msg_error(u1, ord, 326);
+    }
+    if (ship_cursed(u1->ship)) {
+        return msg_error(u1, ord, 323);
+    }
+    if (u1 != ship_owner(u1->ship)) {
+        return msg_error(u1, ord, 146);
+    }
+    if (u2 == NULL) {
+        if (fval(u1->region->terrain, LAND_REGION) || n < u1->ship->number) {
+            ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+            scale_ship(sh, 0);
+            transfer_ships(u1->ship, sh, n);
+        }
+        else {
+            return msg_error(u1, ord, 327);
+        }
+    } else {
+        if (u1->faction != u2->faction) {
+            return msg_error(u1, ord, 324);
+        }
+        if (fval(u_race(u2), RCF_CANSAIL)) {
+            if (u2->ship) {
+                if (u2->ship == u1->ship) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    leave_ship(u2);
+                    u_set_ship(u2, sh);
+                } else {
+                    if (u2 != ship_owner(u2->ship)) {
+                        return msg_error(u1, ord, 146);
+                    }
+                    if (u2->ship->type != u1->ship->type) {
+                        return msg_error(u1, ord, 322);
+                    }
+                    if (ship_cursed(u2->ship)) {
+                        return msg_error(u1, ord, 323);
+                    }
+                    if (u1->ship->coast != u2->ship->coast) {
+                        if (u1->ship->coast != NODIRECTION) {
+                            if (u2->ship->coast == NODIRECTION) {
+                                u2->ship->coast = u1->ship->coast;
+                            }
+                            else {
+                                return msg_error(u1, ord, 328);
+                            }
+                        }
+                    }
+                }
+                if (n < u1->ship->number) {
+                    transfer_ships(u1->ship, u2->ship, n);
+                }
+                else {
+                    transfer_ships(u1->ship, u2->ship, n);
+                    transfer_units(u1->ship, u2->ship);
+                }
+            }
+            else {
+                if (u2->building) {
+                    leave_building(u2);
+                }
+                if (n < u1->ship->number) {
+                    ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
+                    scale_ship(sh, 0);
+                    u_set_ship(u2, sh);
+                    transfer_ships(u1->ship, sh, n);
+                }
+                else {
+                    u_set_ship(u2, u1->ship);
+                    ship_set_owner(u2);
+                }
+            }
+        }
+        else {
+            return msg_error(u1, ord, 233);
+        }
+    }
+    return NULL;
 }
 
 message * give_men(int n, unit * u, unit * u2, struct order *ord)
@@ -390,7 +493,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     }
 
     if (has_skill(u, SK_ALCHEMY) || has_skill(u2, SK_ALCHEMY)) {
-        int k = count_skill(u2->faction, SK_ALCHEMY);
+        int k = faction_count_skill(u2->faction, SK_ALCHEMY);
 
         /* Falls die Zieleinheit keine Alchemisten sind, werden sie nun
          * welche. */
@@ -401,13 +504,13 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         if (has_skill(u2, SK_ALCHEMY) && !has_skill(u, SK_ALCHEMY))
             k += n;
 
-        /* Wenn Parteigrenzen überschritten werden */
+        /* Wenn Parteigrenzen ueberschritten werden */
         if (u2->faction != u->faction)
             k += n;
 
         /* wird das Alchemistenmaximum ueberschritten ? */
 
-        if (k > skill_limit(u2->faction, SK_ALCHEMY)) {
+        if (k > faction_skill_limit(u2->faction, SK_ALCHEMY)) {
             error = 156;
         }
     }
@@ -415,8 +518,8 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     if (error == 0) {
         ship *sh = leftship(u);
 
-        /* Einheiten von Schiffen können nicht NACH in von
-        * Nicht-alliierten bewachten Regionen ausführen */
+        /* Einheiten von Schiffen koennen nicht NACH in von
+        * Nicht-alliierten bewachten Regionen ausfuehren */
         if (sh) {
             set_leftship(u2, sh);
         }
@@ -471,9 +574,23 @@ message * disband_men(int n, unit * u, struct order *ord) {
     return msg_message("give_person_peasants", "unit amount", u, n);
 }
 
+int give_unit_allowed(const unit * u)
+{
+    if (unit_has_cursed_item(u)) {
+        return 78;
+    }
+    if (fval(u, UFL_HERO)) {
+        return 75;
+    }
+    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
+        return 74;
+    }
+    return 0;
+}
+
 void give_unit(unit * u, unit * u2, order * ord)
 {
-    int maxt = max_transfers();
+    int err, maxt = max_transfers();
 
     assert(u);
     if (!rule_transfermen() && u2 && u->faction != u2->faction) {
@@ -481,17 +598,9 @@ void give_unit(unit * u, unit * u2, order * ord)
         return;
     }
 
-    if (unit_has_cursed_item(u)) {
-        cmistake(u, ord, 78, MSG_COMMERCE);
-        return;
-    }
-
-    if (fval(u, UFL_HERO)) {
-        cmistake(u, ord, 75, MSG_COMMERCE);
-        return;
-    }
-    if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)) {
-        cmistake(u, ord, 74, MSG_COMMERCE);
+    err = give_unit_allowed(u);
+    if (err != 0) {
+        cmistake(u, ord, err, MSG_COMMERCE);
         return;
     }
 
@@ -585,31 +694,30 @@ void give_unit(unit * u, unit * u2, order * ord)
         }
     }
     if (has_skill(u, SK_MAGIC)) {
-        sc_mage *mage;
-        if (count_skill(u2->faction, SK_MAGIC) + u->number >
-            skill_limit(u2->faction, SK_MAGIC)) {
+        if (faction_count_skill(u2->faction, SK_MAGIC) + u->number >
+            faction_skill_limit(u2->faction, SK_MAGIC)) {
             cmistake(u, ord, 155, MSG_COMMERCE);
             return;
         }
-        mage = get_mage_depr(u);
-        if (!mage || u2->faction->magiegebiet != mage->magietyp) {
+        if (u2->faction->magiegebiet != unit_get_magic(u)) {
             cmistake(u, ord, 157, MSG_COMMERCE);
             return;
         }
     }
     if (has_skill(u, SK_ALCHEMY)
-        && count_skill(u2->faction, SK_ALCHEMY) + u->number >
-        skill_limit(u2->faction, SK_ALCHEMY)) {
+        && faction_count_skill(u2->faction, SK_ALCHEMY) + u->number >
+        faction_skill_limit(u2->faction, SK_ALCHEMY)) {
         cmistake(u, ord, 156, MSG_COMMERCE);
         return;
     }
     add_give_person(u, u2, u->number, ord, 0);
     u_setfaction(u, u2->faction);
+    u_freeorders(u);
     u2->faction->newbies += u->number;
 }
 
 bool can_give_to(unit *u, unit *u2) {
-    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden können */
+    /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden koennen */
     if (!u2) {
         return false;
     }
@@ -639,8 +747,8 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
             return;
         }
 
-        /* für alle items einmal prüfen, ob wir mehr als von diesem Typ
-        * reserviert ist besitzen und diesen Teil dann übergeben */
+        /* fuer alle items einmal pruefen, ob wir mehr als von diesem Typ
+        * reserviert ist besitzen und diesen Teil dann uebergeben */
         if (u->items) {
             item **itmp = &u->items;
             while (*itmp) {
@@ -659,7 +767,8 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
         }
     }
     else {
-        if (isparam(s, u->faction->locale, P_PERSON)) {
+        param_t p = findparam(s, u->faction->locale);
+        if (p == P_PERSON) {
             if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                 ADDMSG(&u->faction->msgs,
                     msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
@@ -689,6 +798,9 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
                         feedback_give_not_allowed(u, ord);
                     }
                 }
+            }
+            else {
+                cmistake(u, ord, 123, MSG_COMMERCE);
             }
         }
     }
@@ -769,7 +881,7 @@ void give_cmd(unit * u, order * ord)
             while (*itmp) {
                 item *itm = *itmp;
                 if (fval(itm->type, ITF_HERB) && itm->number > 0) {
-                    /* give_item ändert im fall,das man alles übergibt, die
+                    /* give_item aendert im fall,das man alles uebergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
                     if (give_item(itm->number, itm->type, u, u2, ord) == 0) {
                         given = true;
@@ -822,7 +934,24 @@ void give_cmd(unit * u, order * ord)
         return;
     }
 
-    if (isparam(s, u->faction->locale, P_PERSON)) {
+    p = findparam(s, u->faction->locale);
+    if (p == P_SHIP) {
+        if (u->ship) {
+            message * msg;
+            if (n > u->ship->number) {
+                n = u->ship->number;
+            }
+            msg = give_ship(u, u2, n, ord);
+            if (msg) {
+                ADDMSG(&u->faction->msgs, msg);
+            }
+        }
+        else {
+            cmistake(u, ord, 144, MSG_COMMERCE);
+        }
+        return;
+    }
+    else if (p == P_PERSON) {
         if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));

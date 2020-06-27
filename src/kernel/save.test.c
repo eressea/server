@@ -17,10 +17,10 @@
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/password.h>
 #include <util/path.h>
 #include <util/strings.h>
@@ -86,7 +86,7 @@ static void test_readwrite_unit(CuTest * tc)
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertStrEquals(tc, "Hodor", u->_name);
     CuAssertTrue(tc, irace == u_irace(u));
-    CuAssertPtrEquals(tc, 0, u->region);
+    CuAssertPtrEquals(tc, NULL, u->region);
 
     mstream_done(&data.strm);
     gamedata_done(&data);
@@ -115,7 +115,7 @@ static void test_readwrite_faction(CuTest * tc)
     f = read_faction(&data);
     CuAssertPtrNotNull(tc, f);
     CuAssertStrEquals(tc, "Hodor", f->name);
-    CuAssertPtrEquals(tc, 0, f->units);
+    CuAssertPtrEquals(tc, NULL, f->units);
     factions = f;
 
     mstream_done(&data.strm);
@@ -179,7 +179,7 @@ static void test_readwrite_building(CuTest * tc)
     b = read_building(&data);
     CuAssertPtrNotNull(tc, b);
     CuAssertStrEquals(tc, "Hodor", b->name);
-    CuAssertPtrEquals(tc, 0, b->region);
+    CuAssertPtrEquals(tc, NULL, b->region);
     b->region = r;
     r->buildings = b;
 
@@ -212,7 +212,7 @@ static void test_readwrite_ship(CuTest * tc)
     sh = read_ship(&data);
     CuAssertPtrNotNull(tc, sh);
     CuAssertStrEquals(tc, "Hodor", sh->name);
-    CuAssertPtrEquals(tc, 0, sh->region);
+    CuAssertPtrEquals(tc, NULL, sh->region);
     sh->region = r;
     r->ships = sh;
 
@@ -233,7 +233,7 @@ static void test_readwrite_attrib(CuTest *tc) {
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_attribs(data.store, a, NULL);
     a_removeall(&a, NULL);
-    CuAssertPtrEquals(tc, 0, a);
+    CuAssertPtrEquals(tc, NULL, a);
 
     data.strm.api->rewind(data.strm.handle);
     read_attribs(&data, &a, NULL);
@@ -250,7 +250,6 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     faction *f, *f2;
     unit * u;
     group *g;
-    ally *al;
     int fno;
     gamedata data;
     storage store;
@@ -262,15 +261,16 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     f = test_create_faction(NULL);
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
-    CuAssertPtrEquals(tc, 0, f->next);
+    CuAssertPtrEquals(tc, NULL, f->next);
     f2 = test_create_faction(NULL);
     CuAssertPtrEquals(tc, f2, factions->next);
     u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
-    al = ally_add(&g->allies, f);
-    CuAssertPtrNotNull(tc, al);
+    CuAssertPtrEquals(tc, NULL, g->allies);
+    ally_set(&g->allies, f, HELP_GIVE);
+    CuAssertPtrNotNull(tc, g->allies);
 
     CuAssertPtrEquals(tc, f, factions);
     destroyfaction(&factions);
@@ -278,17 +278,15 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertPtrEquals(tc, f2, factions);
     write_game(&data);
     free_gamedata();
-    f = f2 = NULL;
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
-    f2 = factions;
-    CuAssertPtrNotNull(tc, f2);
-    u = f2->units;
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
+    CuAssertPtrNotNull(tc, factions);
+    u = factions->units;
     CuAssertPtrNotNull(tc, u);
     g = get_group(u);
     CuAssertPtrNotNull(tc, g);
-    CuAssertPtrEquals(tc, 0, g->allies);
+    CuAssertPtrEquals(tc, NULL, g->allies);
     mstream_done(&data.strm);
     gamedata_done(&data);
     test_teardown();
@@ -313,16 +311,14 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     remove_empty_units();
     write_game(&data);
     free_gamedata();
-    f = NULL;
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
     mstream_done(&data.strm);
     gamedata_done(&data);
-    f = factions;
-    CuAssertPtrEquals(tc, 0, f);
+    CuAssertPtrEquals(tc, NULL, factions);
     r = regions;
     CuAssertPtrNotNull(tc, r);
-    CuAssertPtrEquals(tc, 0, region_get_owner(r));
+    CuAssertPtrEquals(tc, NULL, region_get_owner(r));
     test_teardown();
 }
 
@@ -359,7 +355,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     CuAssertPtrNotNull(tc, r);
     u = r->units;
     CuAssertPtrNotNull(tc, u);
-    CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
+    CuAssertPtrEquals(tc, NULL, a_find(u->attribs, &at_eventhandler));
     test_teardown();
 }
 
@@ -396,7 +392,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     CuAssertPtrNotNull(tc, r);
     u = r->units;
     CuAssertPtrNotNull(tc, u);
-    CuAssertPtrEquals(tc, 0, a_find(u->attribs, &at_eventhandler));
+    CuAssertPtrEquals(tc, NULL, a_find(u->attribs, &at_eventhandler));
     test_teardown();
 }
 
@@ -407,7 +403,7 @@ static void test_read_password(CuTest *tc) {
 
     test_setup();
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     _test_write_password(&data, f);
@@ -431,8 +427,8 @@ static void test_read_password_external(CuTest *tc) {
         errno = 0;
     }
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("secret", PASSWORD_DEFAULT));
-    CuAssertPtrNotNull(tc, f->_password);
+    faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
+    CuAssertPtrNotNull(tc, faction_getpassword(f));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     WRITE_TOK(data.store, "newpassword");
@@ -441,16 +437,15 @@ static void test_read_password_external(CuTest *tc) {
     data.strm.api->rewind(data.strm.handle);
     data.version = NOCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "newpassword", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "newpassword"));
     data.version = BADCRYPT_VERSION;
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "secret", f->_password);
+    CuAssertTrue(tc, checkpasswd(f, "secret"));
     F = fopen(pwfile, "wt");
     fprintf(F, "%s:pwfile\n", itoa36(f->no));
     fclose(F);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     _test_read_password(&data, f);
-    CuAssertStrEquals(tc, "pwfile", f->_password);
     CuAssertTrue(tc, checkpasswd(f, "pwfile"));
     mstream_done(&data.strm);
     gamedata_done(&data);

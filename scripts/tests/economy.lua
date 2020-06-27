@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.economy", package.seeall, lunit.testcase)
+local tcname = 'tests.shared.economy'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -28,8 +32,6 @@ function test_work()
 end
 
 function test_bug_2361_forget_magic()
-    -- https://bugs.eressea.de/view.php?id=2361
-    -- familiars cannot forget magic
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
@@ -38,12 +40,30 @@ function test_bug_2361_forget_magic()
     u:add_order("VERGESSE Magie")
     u:set_skill('magic', 5)
     uf.race = 'unicorn'
+    u.familiar = uf
+    process_orders()
+    assert_equal(0, u:get_skill('magic'))
+    assert_nil(u.familiar)
+    -- without a mage, familiars become ghosts:
+    assert_equal('ghost', uf.race_name)
+    assert_equal(0, uf:get_skill('magic'))
+end
+
+function test_bug_2361_familiar_cannot_forget_magic_()
+    -- https://bugs.eressea.de/view.php?id=2361
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local uf = unit.create(f, r, 1)
+    u:clear_orders()
+    u:set_skill('magic', 5)
+    uf.race = 'unicorn'
     uf:clear_orders()
     uf:add_order("VERGESSE Magie")
     uf:set_skill('magic', 5)
     u.familiar = uf
     process_orders()
-    assert_equal(0, u:get_skill('magic'))
+    -- familiars cannot forget magic:
     assert_equal(5, uf:get_skill('magic'))
 end
 
@@ -215,22 +235,4 @@ function test_sawmill()
     process_orders()
     assert_equal(6, u:get_item("log"))
     assert_equal(97, r:get_resource("tree"))
-end
-
-function test_ent_guards_trees()
-    local r = region.create(0, 0, "plain")
-    r:set_resource("tree", 100)
-    local u = unit.create(faction.create("human"), r)
-    u:set_skill("mining", 1)
-    local guard = unit.create(get_monsters(), r, 1, "ent")
-    u:set_skill("forestry", 1)
-    guard:clear_orders()
-    u:clear_orders()
-
-    guard:add_order("BEWACHEN")
-    u:add_order("MACHE HOLZ")
-    process_orders()
-    assert_equal(1, u:get_item("log"))
-    process_orders()
-    assert_equal(1, u:get_item("log"))
 end

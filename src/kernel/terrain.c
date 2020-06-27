@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "terrain.h"
@@ -30,7 +12,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrainid.h"
 
 #include <util/log.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/strings.h>
 
 /* libc includes */
@@ -66,7 +48,6 @@ bool terrain_changed(int *cache) {
     }
     return false;
 }
-
 
 void free_terrains(void)
 {
@@ -126,7 +107,7 @@ terrain_type * get_or_create_terrain(const char *name) {
     terrain_type *terrain = terrain_find_i(name);
     if (!terrain) {
         ++terrain_changes;
-        terrain = (terrain_type *)calloc(sizeof(terrain_type), 1);
+        terrain = (terrain_type *)calloc(1, sizeof(terrain_type));
         if (terrain) {
             terrain->_name = str_strdup(name);
             terrain->next = registered_terrains;

@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
-
- */
 #include <platform.h>
 #include <kernel/config.h>
 #include "command.h"
@@ -64,6 +52,7 @@ syntaxtree *stree_create(void)
     const struct locale *lang = locales;
     while (lang) {
         syntaxtree *stree = (syntaxtree *)malloc(sizeof(syntaxtree));
+        if (!stree) abort();
         stree->lang = lang;
         stree->next = sroot;
         stree->root = 0;
@@ -79,6 +68,7 @@ void stree_add(struct syntaxtree *stree, const char *str, parser fun) {
     variant var;
 
     assert(str);
+    if (!cmd) abort();
     cmd->fun = fun;
     var.v = cmd;
     cmd->next = stree->cmds;

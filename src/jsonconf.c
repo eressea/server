@@ -1,15 +1,3 @@
-/*
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #include <platform.h>
 #include "jsonconf.h"
 
@@ -29,9 +17,10 @@ without prior permission by the authors of Eressea.
 #include "kernel/spellbook.h"
 
 /* util includes */
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/crmessage.h"
 #include "util/functions.h"
+#include "util/keyword.h"
 #include "util/language.h"
 #include "util/log.h"
 #include "util/message.h"
@@ -42,7 +31,6 @@ without prior permission by the authors of Eressea.
 
 /* game modules */
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 #include "prefix.h"
 #include "skill.h"
@@ -79,7 +67,8 @@ static int json_flags(cJSON *json, const char *flags[]) {
 static void json_requirements(cJSON *json, requirement **matp) {
     cJSON *child;
     int i;
-    requirement *mat = calloc(sizeof(requirement), 1 + cJSON_GetArraySize(json));
+    requirement *mat = calloc(1 + cJSON_GetArraySize(json), sizeof(requirement));
+    if (!mat) abort();
     for (i = 0, child = json->child; child; child = child->next, ++i) {
         mat[i].number = child->valueint;
         mat[i].rtype = rt_get_or_create(child->string);
@@ -134,7 +123,7 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
         log_error("maintenance is not a json object or array (%d)", json->type);
         return;
     }
-    *mtp = mt = (struct maintenance *) calloc(sizeof(struct maintenance), size + 1);
+    *mtp = mt = (struct maintenance *) calloc(size + 1, sizeof(struct maintenance));
     if (json->type == cJSON_Array) {
         int i;
         for (i = 0, child = json->child; child; child = child->next, ++i) {
@@ -156,7 +145,8 @@ static void json_construction(cJSON *json, construction **consp) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
-    cons = (construction *)calloc(sizeof(construction), 1);
+    cons = (construction *)calloc(1, sizeof(construction));
+    if (!cons) abort();
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
@@ -236,6 +226,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 if (size > 0) {
                     int n;
                     ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
+                    if (!ter->production) abort();
                     ter->production[size].type = 0;
                     for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
                         ter->production[n].type = rt_get_or_create(entry->string);
@@ -266,6 +257,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                     int n;
                     free(ter->herbs);
                     ter->herbs = malloc(sizeof(const item_type *) * (size + 1));
+                    if (!ter->herbs) abort();
                     ter->herbs[size] = 0;
                     for (n = 0, entry = child->child; entry; entry = entry->next) {
                         ter->herbs[n++] = it_get_or_create(rt_get_or_create(entry->valuestring));
@@ -332,7 +324,8 @@ static void json_stages(cJSON *json, building_type *bt) {
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
-            stage = calloc(sizeof(building_stage), 1);
+            stage = calloc(1, sizeof(building_stage));
+            if (!stage) abort();
             json_stage(child, stage);
             if (stage->construction->maxsize > 0) {
                 stage->construction->maxsize -= size;
@@ -375,7 +368,8 @@ static void json_building(cJSON *json, building_type *bt) {
             if (strcmp(child->string, "construction") == 0) {
                 /* simple, single-stage building */
                 if (!bt->stages) {
-                    building_stage *stage = calloc(sizeof(building_stage), 1);
+                    building_stage *stage = calloc(1, sizeof(building_stage));
+                    if (!stage) abort();
                     json_construction(child, &stage->construction);
                     bt->stages = stage;
                 }
@@ -448,6 +442,7 @@ static void json_ship(cJSON *json, ship_type *st) {
         case cJSON_Array:
             st->coasts = (terrain_type **)
                 malloc(sizeof(terrain_type *) * (1 + cJSON_GetArraySize(child)));
+            if (!st->coasts) abort();
             for (i = 0, iter = child->child; iter; iter = iter->next) {
                 if (iter->type == cJSON_String) {
                     terrain_type *ter = get_or_create_terrain(iter->valuestring);
@@ -746,6 +741,7 @@ static void json_calendar(cJSON *json) {
             weeks_per_month = cJSON_GetArraySize(child);
             free(weeknames);
             weeknames = malloc(sizeof(char *) * weeks_per_month);
+            if (!weeknames) abort();
             for (i = 0, entry = child->child; entry; entry = entry->next, ++i) {
                 if (entry->type == cJSON_String) {
                     weeknames[i] = str_strdup(entry->valuestring);
@@ -760,6 +756,7 @@ static void json_calendar(cJSON *json) {
             assert(i == weeks_per_month);
             free(weeknames2);
             weeknames2 = malloc(sizeof(char *) * weeks_per_month);
+            if (!weeknames2) abort();
             for (i = 0; i != weeks_per_month; ++i) {
                 weeknames2[i] = malloc(strlen(weeknames[i]) + 3);
                 sprintf(weeknames2[i], "%s_d", weeknames[i]);
@@ -777,11 +774,13 @@ static void json_calendar(cJSON *json) {
             free(storms);
             months_per_year = cJSON_GetArraySize(child);
             storms = malloc(sizeof(int) * months_per_year);
+            if (!storms) abort();
             month_season = malloc(sizeof(int) * months_per_year);
+            if (!month_season) abort();
             for (i = 0, jmonth = child->child; jmonth; jmonth = jmonth->next, ++i) {
                 if (jmonth->type == cJSON_Object) {
                     storms[i] = cJSON_GetObjectItem(jmonth, "storm")->valueint;
-                    month_season[i] = cJSON_GetObjectItem(jmonth, "season")->valueint;
+                    month_season[i] = (season_t) cJSON_GetObjectItem(jmonth, "season")->valueint;
                 }
                 else {
                     log_error("calendar.months[%d] is not an object: %d", i, json->type);
@@ -846,7 +845,7 @@ static void json_keyword(cJSON *json, struct locale *lang) {
     }
     for (child = json->child; child; child = child->next) {
         keyword_t kwd = findkeyword(child->string);
-        if (kwd != NOKEYWORD) {
+        if (kwd != NOKEYWORD && keywords[kwd]) {
             if (child->type == cJSON_String) {
                 init_keyword(lang, kwd, child->valuestring);
                 locale_setstring(lang, mkname("keyword", keywords[kwd]), child->valuestring);
@@ -991,6 +990,7 @@ static int include_json(const char *uri) {
             size_t sz;
 
             data = malloc(pos + 1);
+            if (!data) abort();
             sz = fread(data, 1, (size_t)pos, F);
             data[sz] = 0;
             config = cJSON_Parse(data);
@@ -1032,12 +1032,14 @@ static int add_po_string(const char *msgid, const char *msgstr, const char *msgc
 }
 
 static int include_po(const char *uri) {
-    char name[PATH_MAX], lname[8];
+    char name[PATH_MAX];
     const char *filename = uri_to_file(uri, name, sizeof(name));
     const char *pos = strstr(filename, ".po");
     if (pos) {
         size_t len;
         const char *str = --pos;
+        char lname[8];
+
         while (str > filename && *str != '.') --str;
         len = (size_t)(pos - str);
         if (len < sizeof(lname)) {

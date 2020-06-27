@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -26,9 +8,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "terrain.h"
 #include "unit.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -134,6 +116,7 @@ connection *new_border(border_type * type, region * from, region * to)
         bp = &(*bp)->next;
     }
     *bp = b = calloc(1, sizeof(connection));
+    if (!b) abort();
     b->type = type;
     b->from = from;
     b->to = to;
@@ -263,7 +246,7 @@ bool b_blocknone(const connection * b, const unit * u, const region * r)
 
 bool b_rvisible(const connection * b, const region * r)
 {
-    return (bool)(b->to == r || b->from == r);
+    return (b->to == r || b->from == r);
 }
 
 bool b_fvisible(const connection * b, const struct faction * f,
@@ -412,7 +395,7 @@ b_blockfogwall(const connection * b, const unit * u, const region * r)
     UNUSED_ARG(b);
     if (!u)
         return true;
-    return (bool)(effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
+    return (effskill(u, SK_PERCEPTION, r) > 4);    /* Das ist die alte Nebelwand */
 }
 
 /** Legacy type used in old Eressea games, no longer in use. */
@@ -440,7 +423,7 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
         return (f && fno == f->no) ? "illusionwall" : "wall";
     if (gflags & GF_ARTICLE) {
         return LOC(f->locale, mkname("border", (f
-            && fno == f->subscription) ? "an_illusionwall" : "a_wall"));
+            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
     }
     return LOC(f->locale, mkname("border", (f
         && fno == f->no) ? "illusionwall" : "wall"));
@@ -620,7 +603,7 @@ int read_borders(gamedata *data)
         }
         if (type->read) {
             connection *b = new_border(type, from, to);
-            nextborder--;               /* new_border erh�ht den Wert */
+            nextborder--;               /* new_border erhoeht den Wert */
             b->id = bid;
             assert(bid <= nextborder);
             type->read(b, data);

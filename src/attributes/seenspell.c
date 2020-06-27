@@ -1,30 +1,11 @@
-/*
-Copyright (c) 1998-2018,
-Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
 #include <kernel/faction.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 
@@ -39,27 +20,27 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* ------------------------------------------------------------- */
 /* Ausgabe der Spruchbeschreibungen
  * Anzeige des Spruchs nur, wenn die Stufe des besten Magiers vorher
- * kleiner war (u->faction->seenspells). Ansonsten muss nur geprüft
+ * kleiner war (u->faction->seenspells). Ansonsten muss nur geprueft
  * werden, ob dieser Magier den Spruch schon kennt, und andernfalls der
- * Spruch zu seiner List-of-known-spells hinzugefügt werden.
+ * Spruch zu seiner List-of-known-spells hinzugefuegt werden.
  */
 
 static int read_seenspells(variant *var, void *owner, struct gamedata *data)
 {
     selist *ql = NULL;
     storage *store = data->store;
-    spell *sp = 0;
     char token[32];
 
     UNUSED_ARG(owner);
     READ_TOK(store, token, sizeof(token));
     while (token[0]) {
-        sp = find_spell(token);
-        if (!sp) {
-            log_info("read_seenspells: could not find spell '%s'\n", token);
-            return AT_READ_FAIL;
+        spell *sp = find_spell(token);
+        if (sp) {
+            selist_push(&ql, sp);
         }
-        selist_push(&ql, sp);
+        else {
+            log_info("read_seenspells: could not find spell '%s'\n", token);
+        }
         READ_TOK(store, token, sizeof(token));
     }
     var->v = ql;
@@ -71,8 +52,8 @@ static bool cb_write_spell(void *data, void *more) {
     storage *store = (storage *)more;
     WRITE_TOK(store, sp->sname);
     return true;
-
 }
+
 static void
 write_seenspells(const variant *var, const void *owner, struct storage *store)
 {

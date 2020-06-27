@@ -1,72 +1,53 @@
-/*
- * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- * |                   |  Enno Rehling <enno@eressea.de>
- * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2006   |
- * |                   |  This program may not be used, modified or distributed
- * +-------------------+  without prior permission by the authors of Eressea.
- *
- */
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
 
 #include <curses.h>
 
-#include <kernel/config.h>
-
 #include "gmtool.h"
+#include "direction.h"
 
-#include <modules/xmas.h>
-#include <modules/gmcmd.h>
-#include <modules/museum.h>
 #include <modules/autoseed.h>
 
 #include "kernel/building.h"
-#include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/plane.h"
-#include "kernel/race.h"
 #include "kernel/region.h"
+#include "kernel/resources.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
-#include "kernel/resources.h"
 #include "kernel/save.h"
 #include "kernel/ship.h"
 #include "kernel/terrain.h"
 
-#include <attributes/attributes.h>
-#include <triggers/triggers.h>
-
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/lists.h>
-#include <util/log.h>
 #include <util/macros.h>
-#include <util/path.h>
-#include <util/rng.h>
-#include <util/unicode.h>
+#include "util/path.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/unicode.h"
 
 #include "gmtool_structs.h"
 #include "console.h"
 #include "listbox.h"
-#include "wormhole.h"
 #include "teleport.h"
 
-#include <storage.h>
-#include <lua.h>
+#include <selist.h>
 
 #include <assert.h>
-#include <locale.h>
+#include <limits.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
 static int g_quit;
 int force_color = 0;
-newfaction * new_players = 0;
+newfaction * new_players = NULL;
 
 state *current_state = NULL;
 
@@ -451,22 +432,15 @@ static void paint_info_region(window * wnd, const state * st)
         line++;
         umvwprintw(win, line++, 1, "%s, age %d", r->terrain->_name, r->age);
         if (r->land) {
+            int iron = region_getresource_level(r, get_resourcetype(R_IRON));
+            int stone = region_getresource_level(r, get_resourcetype(R_STONE));
             mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "S:%6d  I:%5d", stone, iron);
             mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
         }
         line++;
-        if (r->ships && (st->info_flags & IFL_SHIPS)) {
-            ship *sh;
-            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
-            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
-            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
-                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
-                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
-            }
-        }
         if (r->units && (st->info_flags & IFL_FACTIONS)) {
             unit *u;
             wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
@@ -491,6 +465,16 @@ static void paint_info_region(window * wnd, const state * st)
             for (u = r->units; u && line < maxline; u = u->next) {
                 mvwprintw(win, line, 1, "%.4s ", itoa36(u->no));
                 umvwaddnstr(win, line++, 6, unit_getname(u), size - 5);
+            }
+        }
+        if (r->ships && (st->info_flags & IFL_SHIPS)) {
+            ship *sh;
+            wattron(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            mvwaddnstr(win, line++, 1, "* ships:", size - 5);
+            wattroff(win, A_BOLD | COLOR_PAIR(COLOR_YELLOW));
+            for (sh = r->ships; sh && line < maxline; sh = sh->next) {
+                mvwprintw(win, line, 1, "%.4s ", itoa36(sh->no));
+                umvwaddnstr(win, line++, 6, (char *)sh->type->_name, size - 5);
             }
         }
     }
@@ -529,6 +513,33 @@ static void statusline(WINDOW * win, const char *str)
     wnoutrefresh(win);
 }
 
+static void reset_resources(region *r, const struct terrain_type *terrain)
+{
+    int i;
+
+    for (i = 0; terrain->production[i].type; ++i) {
+        rawmaterial *rm;
+        const terrain_production *production = terrain->production + i;
+        const resource_type *rtype = production->type;
+
+        for (rm = r->resources; rm; rm = rm->next) {
+            if (rm->rtype == rtype)
+                break;
+        }
+        if (rm) {
+            struct rawmaterial_type *rmt;
+            set_resource(rm,
+                dice_rand(production->startlevel),
+                dice_rand(production->base),
+                dice_rand(production->divisor));
+            rmt = rmt_get(rtype);
+            if (rmt && rmt->terraform) {
+                rmt->terraform(rm, r);
+            }
+        }
+    }
+}
+
 static void reset_region(region *r) {
     unit **up = &r->units;
     bool players = false;
@@ -554,16 +565,54 @@ static void reset_region(region *r) {
         }
         if (r->land) {
             init_region(r);
+            reset_resources(r, r->terrain);
         }
     }
 }
 
-static void reset_cursor(state *st) {
+static region * state_region(state *st) {
     int nx = st->cursor.x;
     int ny = st->cursor.y;
-    region *r;
     pnormalize(&nx, &ny, st->cursor.pl);
-    if ((r = findregion(nx, ny)) != NULL) {
+    return findregion(nx, ny);
+}
+
+static void reset_area_cb(void *arg) {
+    region *r = (region *)arg;
+    r->age = 0;
+    freset(r, RF_MARK);
+}
+
+static void reset_area(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
+        selist * ql = NULL;
+        int qi = 0, qlen = 0;
+        fset(r, RF_MARK);
+        selist_insert(&ql, qlen++, r);
+        while (qi != qlen) {
+            int i;
+            region *adj[MAXDIRECTIONS];
+            r = selist_get(ql, qi++);
+            get_neighbours(r, adj);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = adj[i];
+                if (rn && !fval(rn, RF_MARK)) {
+                    if ((rn->terrain->flags & FORBIDDEN_REGION) == 0) {
+                        fset(rn, RF_MARK);
+                        selist_insert(&ql, qlen++, rn);
+                    }
+                }
+            }
+        }
+        selist_foreach(ql, reset_area_cb);
+        selist_free(ql);
+    }
+}
+
+static void reset_cursor(state *st) {
+    region * r = state_region(st);
+    if (r != NULL) {
         reset_region(r);
     }
 }
@@ -595,6 +644,69 @@ static void terraform_at(coordinate * c, const terrain_type * terrain)
         }
         if (!(r->units && fval(r->terrain, LAND_REGION) && !fval(terrain, LAND_REGION))) {
             terraform_region(r, terrain);
+        }
+    }
+}
+
+static void selection_walk(selection * selected, void(*callback)(region *, void *), void *udata) {
+    int i;
+
+    for (i = 0; i != MAXTHASH; ++i) {
+        tag **tp = &selected->tags[i];
+        while (*tp) {
+            region *r;
+            tag *t = *tp;
+            int nx = t->coord.x, ny = t->coord.y;
+            plane *pl = t->coord.pl;
+
+            pnormalize(&nx, &ny, pl);
+            r = findregion(nx, ny);
+            if (r != NULL) {
+                callback(r, udata);
+            }
+            tp = &t->nexthash;
+        }
+    }
+}
+
+static void reset_levels_cb(region *r, void *udata) {
+    struct rawmaterial *res;
+    UNUSED_ARG(udata);
+    for (res = r->resources; res; res = res->next) {
+        if (res->level > 3) {
+            res->level = 1;
+        }
+    }
+}
+
+/**
+ * BUG 2506: reset drained mountains to level 1
+ */
+static void
+fix_selection(selection * selected)
+{
+    selection_walk(selected, reset_levels_cb, NULL);
+}
+
+static void
+reset_selection(selection * selected)
+{
+    int i;
+
+    for (i = 0; i != MAXTHASH; ++i) {
+        tag **tp = &selected->tags[i];
+        while (*tp) {
+            region *r;
+            tag *t = *tp;
+            int nx = t->coord.x, ny = t->coord.y;
+            plane *pl = t->coord.pl;
+
+            pnormalize(&nx, &ny, pl);
+            r = findregion(nx, ny);
+            if (r != NULL) {
+                reset_region(r);
+            }
+            tp = &t->nexthash;
         }
     }
 }
@@ -708,7 +820,7 @@ void highlight_region(region * r, int toggle)
     }
 }
 
-void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
+void select_coordinate(struct selection *selected, int nx, int ny, bool toggle)
 {
     if (toggle)
         tag_region(selected, nx, ny);
@@ -716,7 +828,50 @@ void select_coordinate(struct selection *selected, int nx, int ny, int toggle)
         untag_region(selected, nx, ny);
 }
 
-enum { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+enum select_t { MODE_MARK, MODE_SELECT, MODE_UNMARK, MODE_UNSELECT };
+
+static void select_island(state *st, int selectmode)
+{
+    region *r;
+    int nx = st->cursor.x;
+    int ny = st->cursor.y;
+
+    pnormalize(&nx, &ny, st->cursor.pl);
+    r = findregion(nx, ny);
+    if (r && r->land) {
+        selist *ql, *stack = NULL;
+        int qi = 0;
+
+        selist_push(&stack, r);
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            region *rnext[MAXDIRECTIONS];
+            int i;
+
+            fset(r, RF_MARK);
+            if (selectmode & MODE_SELECT) {
+                select_coordinate(st->selected, r->x, r->y,
+                    selectmode == MODE_SELECT);
+            }
+            else {
+                highlight_region(r, selectmode == MODE_MARK);
+            }
+            get_neighbours(r, rnext);
+            for (i = 0; i != MAXDIRECTIONS; ++i) {
+                region *rn = rnext[i];
+                if (rn && rn->land && !fval(rn, RF_MARK)) {
+                    selist_push(&stack, rn);
+                }
+            }
+        }
+
+        for (ql = stack, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            region *r = (region *)selist_get(ql, qi);
+            freset(r, RF_MARK);
+        }
+        selist_free(stack);
+    }
+}
 
 static void select_regions(state * st, int selectmode)
 {
@@ -870,6 +1025,11 @@ static void select_regions(state * st, int selectmode)
             }
         }
     }
+    else if (findmode == 'i') {
+        sprintf(sbuffer, "%swand: ", status);
+        statusline(st->wnd_status->handle, sbuffer);
+        select_island(st, selectmode);
+    }
     else if (findmode == 't') {
         const struct terrain_type *terrain;
         sprintf(sbuffer, "%sterrain: ", status);
@@ -932,23 +1092,22 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            const char *at = strchr(player->email, '@');
-            faction *f;
-            addplayer(r, f = addfaction(player->email, player->password,
-                                        player->race, player->lang,
-                                        player->subscription));
-            if (at) {
-                char fname[64];
-                size_t len = at - player->email;
-                if (len>4 && len<sizeof(fname)) {
-                    memcpy(fname, player->email, len);
-                    fname[len]=0;
-                    faction_setname(f, fname);
-                }
-            }
+            faction *f = addfaction(player->email, player->password,
+                player->race, player->lang);
+            addplayer(r, f);
         }
     }
 }
+
+static bool confirm(WINDOW * win, const char *q) {
+    int ch;
+    werase(win);
+    mvwaddstr(win, 0, 0, (char *)q);
+    wmove(win, 0, (int)(strlen(q) + 1));
+    ch = wgetch(win);
+    return (ch == 'y') || (ch == 'Y');
+}
+
 
 static void handlekey(state * st, int c)
 {
@@ -1021,7 +1180,7 @@ static void handlekey(state * st, int c)
         else {
             n = minpop;
         }
-        build_island_e3(nx, ny, n, NULL, 0);
+        build_island(nx, ny, n, NULL, 0);
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
@@ -1034,6 +1193,13 @@ static void handlekey(state * st, int c)
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
         st->wnd_map->update |= 1;
+        break;
+    case 'A': /* clear/reset area */
+        if (confirm(st->wnd_status->handle, "Are you sure you want to reset this entire area?")) {
+            reset_area(st);
+            st->modified = 1;
+            st->wnd_map->update |= 1;
+        }
         break;
     case 'c': /* clear/reset */
         reset_cursor(st);
@@ -1210,7 +1376,12 @@ static void handlekey(state * st, int c)
         statusline(st->wnd_status->handle, "tag-");
         doupdate();
         switch (getch()) {
+        case 'r':
+            reset_selection(st->selected);
+            break;
         case 'f':
+            fix_selection(st->selected);
+            break;
         case 't':
             terraform_selection(st->selected, select_terrain(st, NULL));
             st->modified = 1;
@@ -1385,7 +1556,7 @@ static void update_view(view * vi)
 
 state *state_open(void)
 {
-    state *st = calloc(sizeof(state), 1);
+    state *st = (state *)calloc(1, sizeof(state));
     st->display.pl = get_homeplane();
     st->cursor.pl = get_homeplane();
     st->cursor.x = 0;

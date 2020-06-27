@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.astral", package.seeall, lunit.testcase)
+local tcname = 'tests.e2.astral'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -13,24 +17,22 @@ function setup()
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 
-local function dump_messages(f)
-    for k, v in ipairs(f.messages) do
-        print(v)
-    end
-end
-
 function test_fetch_astral()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
+    local ra = r:get_astral('fog')
+    local rb = region.create(ra.x + 1, ra.y, 'fog')
+    local f = faction.create("human");
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
+    local u3 = unit.create(f, rb, 1)
+    rb.plane = ra.plane
     u1.magic = "gray"
     u1:set_skill("magic", 6)
     u1.aura = 0
     u1:add_spell("fetch_astral")
 
     u1:clear_orders()
-    u1:add_order("ZAUBERE Ruf~der~Realitaet " .. itoa36(u2.id))
+    u1:add_order("ZAUBERE Ruf~der~Realitaet " .. itoa36(u2.id) .. " " .. itoa36(u3.id))
     process_orders()
     assert_equal(1, f:count_msg_type('missing_components_list'), 'no components')
 
@@ -39,10 +41,11 @@ function test_fetch_astral()
     assert_equal(12, u1.aura)
     assert_equal(1, f:count_msg_type('spellfail_astralonly'), 'astral space')
 
-    u2.region = u2.region:get_astral('fog')
+    u2.region = ra
     process_orders()
     assert_equal(0, u1.aura)
-    assert_equal(u1.region, u2.region)
+    assert_equal(r, u2.region)
+    assert_equal(rb, u3.region)
 end
 
 function test_pull_astral()

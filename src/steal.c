@@ -1,22 +1,3 @@
-/*
-Copyright (c) 1998-2014,
-Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -57,7 +38,7 @@ void expandstealing(region * r, econ_request * stealorders)
     norders = expand_production(r, stealorders, &requests);
     if (!norders) return;
 
-    /* F�r jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
+    /* Fuer jede unit in der Region wird Geld geklaut, wenn sie Opfer eines
      * Beklauen-Orders ist. Jedes Opfer muss einzeln behandelt werden.
      *
      * u ist die beklaute unit. oa.unit ist die klauende unit.
@@ -71,7 +52,7 @@ void expandstealing(region * r, econ_request * stealorders)
             break;
         }
 
-        u = findunit(requests[j]->type.steal.no);
+        u = findunit(requests[j]->data.steal.no);
 
         if (u && u->region == r) {
             n = get_pooled(u, rsilver, GET_ALL, INT_MAX);
@@ -102,7 +83,7 @@ static int max_skill(region * r, struct faction * f, skill_t sk)
 
     for (u = r->units; u; u = u->next) {
         if (u->faction == f) {
-            int effsk = effskill(u, sk, 0);
+            int effsk = effskill(u, sk, NULL);
             if (effsk > w) {
                 w = effsk;
             }
@@ -188,17 +169,22 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     }
 
     assert(u->region == u2->region);
-    if (!can_contact(r, u, u2)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error60", ""));
-        return;
-    }
 
-    effsk = effskill(u, SK_STEALTH, 0);
+    effsk = effskill(u, SK_STEALTH, NULL);
     n = effsk - max_skill(r, f, SK_PERCEPTION);
 
     if (n <= 0) {
-        /* Wahrnehmung == Tarnung */
-        if (u_race(u) != get_race(RC_GOBLIN) || effsk <= 3) {
+        /* Wenn Goblins mit einem Tarnungstalent von mindestens 4 klauen, bekommen 
+         * sie mindestens 50 Silber, selbst dann, wenn sie erwischt werden. */
+        if (u_race(u) == get_race(RC_GOBLIN) && effsk >= 4) {
+            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
+                u2));
+            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
+                u2));
+            n = 1;
+            goblin = true;
+        }
+        else {
             ADDMSG(&u->faction->msgs, msg_message("stealfail", "unit target", u, u2));
             if (n == 0) {
                 ADDMSG(&u2->faction->msgs, msg_message("stealdetect", "unit", u2));
@@ -208,14 +194,6 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
                     u, u2));
             }
             return;
-        }
-        else {
-            ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
-                u2));
-            ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
-                u2));
-            n = 1;
-            goblin = true;
         }
     }
 
@@ -234,10 +212,12 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
      * guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
 
     o = (econ_request *)calloc(1, sizeof(econ_request));
+    if (!o) abort();
     o->unit = u;
     o->qty = 1;                   /* Betrag steht in u->wants */
-    o->type.steal.no = u2->no;
-    o->type.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
+    o->type = ECON_STEAL;
+    o->data.steal.no = u2->no;
+    o->data.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
     o->next = *stealorders;
     *stealorders = o;
 

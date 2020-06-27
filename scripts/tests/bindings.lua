@@ -1,9 +1,12 @@
-require "lunit"
+local tcname = 'tests.bindings'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
-local eressea = eressea
 local _G = _G
-
-module("tests.bindings", lunit.testcase)
 
 function test_eressea()
 	assert_equal("function", _G.type(eressea.free_game))
@@ -31,7 +34,6 @@ function test_process()
 	assert_equal("function", _G.type(eressea.process.movement))
 	assert_equal("function", _G.type(eressea.process.use))
 	assert_equal("function", _G.type(eressea.process.battle))
-	assert_equal("function", _G.type(eressea.process.siege))
 	assert_equal("function", _G.type(eressea.process.leave))
 	assert_equal("function", _G.type(eressea.process.promote))
 	assert_equal("function", _G.type(eressea.process.restack))

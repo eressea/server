@@ -1,16 +1,3 @@
-/* 
- *
- * Eressea PB(E)M host Copyright (C) 1998-2015
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include "unitcurse.h"
 
@@ -23,7 +10,7 @@
 #include <kernel/objtypes.h>
 
 /* util includes */
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/nrmessage.h>
 #include <util/macros.h>
@@ -42,7 +29,7 @@
 /*
  * C_AURA
  */
-/* erhöht/senkt regeneration und maxaura um effect% */
+/* erhoeht/senkt regeneration und maxaura um effect% */
 static message *cinfo_auraboost(const void *obj, objtype_t typ, const curse * c,
     int self)
 {

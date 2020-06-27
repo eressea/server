@@ -1,13 +1,3 @@
-/* 
- * +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- * |                   |  Enno Rehling <enno@eressea.de>
- * | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- * | (c) 1998 - 2007   |
- * |                   |  This program may not be used, modified or distributed
- * +-------------------+  without prior permission by the authors of Eressea.
- *
- */
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -77,13 +67,15 @@ int *nmrs = NULL;
 
 int update_nmrs(void)
 {
-    int i, newplayers = 0;
+    int newplayers = 0;
     faction *f;
     int timeout = NMRTimeout();
 
     if (timeout>0) {
+        int i;
         if (nmrs == NULL) {
             nmrs = malloc(sizeof(int) * (timeout + 1));
+            if (!nmrs) abort();
         }
         for (i = 0; i <= timeout; ++i) {
             nmrs[i] = 0;
@@ -175,11 +167,11 @@ static int count_umlaut(const char *s)
     int result = 0;
     const char *cp;
     for (cp = s; *cp; ++cp) {
-        ucs4_t ucs = *cp;
-        if (ucs & 0x80) {
+        wint_t wc = *cp;
+        if (wc & 0x80) {
             size_t size;
             int err;
-            err = unicode_utf8_to_ucs4(&ucs, cp, &size);
+            err = unicode_utf8_decode(&wc, cp, &size);
             if (err != 0) {
                 log_error("illegal utf8 encoding %s at %s", s, cp);
                 return result;
@@ -403,7 +395,7 @@ summary *make_summary(void)
         while (plang && plang->locale != lang)
             plang = plang->next;
         if (!plang) {
-            plang = calloc(sizeof(struct language), 1);
+            plang = calloc(1, sizeof(struct language));
             plang->next = s->languages;
             s->languages = plang;
             plang->locale = lang;

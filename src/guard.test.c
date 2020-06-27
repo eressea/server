@@ -29,7 +29,7 @@ static void test_is_guarded(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(rc), r);
-    CuAssertPtrEquals(tc, 0, is_guarded(r, u1));
+    CuAssertPtrEquals(tc, NULL, is_guarded(r, u1));
     setguard(u2, true);
     CuAssertPtrEquals(tc, u2, is_guarded(r, u1));
     test_teardown();

@@ -1,16 +1,3 @@
-/* 
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2001   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed 
- without prior permission by the authors of Eressea.
- 
- */
-
 #include <stdio.h>
 #include <config.h>
 #include <eressea.h>
@@ -125,7 +112,7 @@ static char *entish_syllable2[] = {
 };
 
 static char *entish_syllable3[] = {
-  "Hüter", "Pflanzer", "Hirte", "Wächter", "Wachser", "Beschützer",
+  "H\xc3\xbcter", "Pflanzer", "Hirte", "W\xc3\xa4chter", "Wachser", "Besch\xc3\xbctzer",
 };
 
 static char *cthuloid_syllable1[] = {
@@ -200,13 +187,13 @@ static char *create_random_name(race_t race)
       strcat(name,
         orc_syllable3[rand() % (sizeof(orc_syllable3) / sizeof(char *))]);
       break;
-/*
+
 	case RC_TREEMAN:
 		strcpy(name, entish_syllable1[rand()%(sizeof(entish_syllable1) / sizeof(char*))]);
 		strcat(name, entish_syllable2[rand()%(sizeof(entish_syllable2) / sizeof(char*))]);
 		strcat(name, entish_syllable3[rand()%(sizeof(entish_syllable3) / sizeof(char*))]);
 		break;
-*/
+
     case RC_DAEMON:
     case RC_INSECT:
       strcpy(name,

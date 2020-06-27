@@ -1,7 +1,6 @@
 #ifndef ERESSEA_TESTS_H
 #define ERESSEA_TESTS_H
 
-#include <kernel/types.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
@@ -9,6 +8,8 @@ extern "C" {
 #endif
 
     #define ASSERT_DBL_DELTA 0.001
+
+    enum param_t;
 
     struct region;
     struct unit;
@@ -61,8 +62,9 @@ extern "C" {
     struct spell * test_create_spell(void);
     int test_set_item(struct unit * u, const struct item_type *itype, int value);
 
-    void test_translate_param(const struct locale *lang, param_t param, const char *text);
+    void test_translate_param(const struct locale *lang, enum param_t param, const char *text);
     const char * test_get_messagetype(const struct message *msg);
+    int test_count_messagetype(struct message_list *msgs, const char *name);
     struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
     struct message * test_find_messagetype(struct message_list *msgs, const char *name);
     struct message * test_get_last_message(struct message_list *mlist);
@@ -75,7 +77,6 @@ extern "C" {
     void assert_string_parameter(struct CuTest * tc, struct message *msg, int index, const char *arg);
 
     void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
-    void test_inject_messagetypes(void);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
 

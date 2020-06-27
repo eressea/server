@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include "createunit.h"
 
@@ -26,10 +8,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/region.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/resolve.h>
@@ -55,7 +37,7 @@ typedef struct createunit_data {
 
 static void createunit_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(createunit_data), 1);
+    t->data.v = calloc(1, sizeof(createunit_data));
 }
 
 static void createunit_free(trigger * t)
@@ -94,12 +76,12 @@ static int createunit_read(trigger * t, gamedata *data)
     int id;
     int result = AT_READ_OK;
 
-    id = read_faction_reference(data, &td->f, NULL);
+    id = read_faction_reference(data, &td->f);
     if (id <= 0) {
         result = AT_READ_FAIL;
     }
 
-    read_region_reference(data, &td->r, NULL);
+    read_region_reference(data, &td->r);
     td->race = read_race_reference(data->store);
     if (!td->race) {
         result = AT_READ_FAIL;

@@ -25,24 +25,23 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <limits.h>
 
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
     region *r;
-    ally *al;
 
     test_setup();
     r = test_create_region(0, 0, NULL);
     f1 = test_create_faction(NULL);
     test_create_unit(f1, r);
     f2 = test_create_faction(NULL);
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FIGHT;
-    CuAssertIntEquals(tc, HELP_FIGHT, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_FIGHT);
+    CuAssertIntEquals(tc, HELP_FIGHT, alliedfaction(f1, f2, HELP_ALL));
     CuAssertPtrEquals(tc, f2, f1->next);
     destroyfaction(&f1->next);
     CuAssertIntEquals(tc, false, faction_alive(f2));
-    CuAssertIntEquals(tc, 0, alliedgroup(0, f1, f2, f1->allies, HELP_ALL));
+    CuAssertIntEquals(tc, 0, alliedfaction(f1, f2, HELP_ALL));
     test_teardown();
 }
 
@@ -57,7 +56,7 @@ static void test_remove_empty_factions_alliance(CuTest *tc) {
     CuAssertPtrEquals(tc, f, alliance_get_leader(al));
     CuAssertIntEquals(tc, 1, selist_length(al->members));
     remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, al->_leader);
+    CuAssertPtrEquals(tc, NULL, al->_leader);
     CuAssertIntEquals(tc, 0, selist_length(al->members));
     test_teardown();
 }
@@ -75,7 +74,7 @@ static void test_remove_empty_factions(CuTest *tc) {
     CuAssertIntEquals(tc, false, f->_alive);
     CuAssertPtrEquals(tc, fm, factions);
     CuAssertPtrEquals(tc, NULL, fm->next);
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     CuAssertPtrEquals(tc, fm, get_monsters());
     test_teardown();
 }
@@ -99,7 +98,7 @@ static void test_remove_dead_factions(CuTest *tc) {
     f->_alive = false;
     fno = f->no;
     remove_empty_factions();
-    CuAssertPtrEquals(tc, 0, findfaction(fno));
+    CuAssertPtrEquals(tc, NULL, findfaction(fno));
     CuAssertPtrEquals(tc, fm, get_monsters());
     test_teardown();
 }
@@ -112,24 +111,23 @@ static void test_addfaction(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     lang = test_create_locale();
-    f = addfaction("test@eressea.de", "hurrdurr", rc, lang, 1234);
+    f = addfaction("test@example.com", NULL, rc, lang);
     CuAssertPtrNotNull(tc, f);
     CuAssertPtrNotNull(tc, f->name);
     CuAssertPtrEquals(tc, NULL, (void *)f->units);
     CuAssertPtrEquals(tc, NULL, (void *)f->next);
-    CuAssertPtrEquals(tc, NULL, (void *)f->banner);
+    CuAssertPtrEquals(tc, NULL, (void *)faction_getbanner(f));
     CuAssertPtrEquals(tc, NULL, (void *)f->spellbook);
-    CuAssertPtrEquals(tc, NULL, (void *)f->ursprung);
+    CuAssertPtrEquals(tc, NULL, (void *)f->origin);
     CuAssertPtrEquals(tc, (void *)factions, (void *)f);
-    CuAssertStrEquals(tc, "test@eressea.de", f->email);
+    CuAssertStrEquals(tc, "test@example.com", f->email);
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
-    CuAssertIntEquals(tc, 1234, f->subscription);
     CuAssertIntEquals(tc, FFL_ISNEW|FFL_PWMSG, f->flags);
     CuAssertIntEquals(tc, 0, f->age);
     CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
-    CuAssertIntEquals(tc, turn, f->lastorders);
+    CuAssertIntEquals(tc, 0, f->lastorders);
     CuAssertPtrEquals(tc, f, findfaction(f->no));
     test_teardown();
 }
@@ -138,7 +136,7 @@ static void test_check_passwd(CuTest *tc) {
     faction *f;
     
     f = test_create_faction(NULL);
-    faction_setpassword(f, password_encode("password", PASSWORD_DEFAULT));
+    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     CuAssertTrue(tc, checkpasswd(f, "password"));
     CuAssertTrue(tc, !checkpasswd(f, "assword"));
     CuAssertTrue(tc, !checkpasswd(f, "PASSWORD"));
@@ -163,11 +161,11 @@ static void test_set_origin(CuTest *tc) {
     test_setup();
     pl = create_new_plane(0, "", 0, 19, 0, 19, 0);
     f = test_create_faction(NULL);
-    CuAssertPtrEquals(tc, 0, f->ursprung);
+    CuAssertPtrEquals(tc, NULL, f->origin);
     faction_setorigin(f, 0, 1, 1);
-    CuAssertIntEquals(tc, 0, f->ursprung->id);
-    CuAssertIntEquals(tc, 1, f->ursprung->x);
-    CuAssertIntEquals(tc, 1, f->ursprung->y);
+    CuAssertIntEquals(tc, 0, f->origin->id);
+    CuAssertIntEquals(tc, 1, f->origin->x);
+    CuAssertIntEquals(tc, 1, f->origin->y);
     faction_getorigin(f, 0, &x, &y);
     CuAssertIntEquals(tc, 1, x);
     CuAssertIntEquals(tc, 1, y);
@@ -191,7 +189,7 @@ static void test_set_origin_bug(CuTest *tc) {
     faction_setorigin(f, 0, -10, 3);
     faction_setorigin(f, 0, -13, -4);
     adjust_coordinates(f, &x, &y, pl);
-    CuAssertIntEquals(tc, 0, f->ursprung->id);
+    CuAssertIntEquals(tc, 0, f->origin->id);
     CuAssertIntEquals(tc, -9, x);
     CuAssertIntEquals(tc, 2, y);
     test_teardown();
@@ -214,6 +212,26 @@ static void test_max_migrants(CuTest *tc) {
     test_teardown();
 }
 
+static void test_skill_limit(CuTest *tc) {
+    faction *f;
+
+    test_setup();
+    f = test_create_faction(NULL);
+    CuAssertIntEquals(tc, INT_MAX, faction_skill_limit(f, SK_ENTERTAINMENT));
+    CuAssertIntEquals(tc, 3, faction_skill_limit(f, SK_ALCHEMY));
+    config_set_int("rules.maxskills.alchemy", 4);
+    CuAssertIntEquals(tc, 4, faction_skill_limit(f, SK_ALCHEMY));
+    CuAssertIntEquals(tc, 3, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 3, max_magicians(f));
+    config_set_int("rules.maxskills.magic", 4);
+    CuAssertIntEquals(tc, 4, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 4, max_magicians(f));
+    f->race = test_create_race(racenames[RC_ELF]);
+    CuAssertIntEquals(tc, 5, faction_skill_limit(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 5, max_magicians(f));
+    test_teardown();
+}
+
 static void test_valid_race(CuTest *tc) {
     race * rc1, *rc2;
     faction *f;
@@ -227,6 +245,18 @@ static void test_valid_race(CuTest *tc) {
     rc_set_param(rc1, "other_race", "elf");
     CuAssertTrue(tc, valid_race(f, rc1));
     CuAssertTrue(tc, valid_race(f, rc2));
+    test_teardown();
+}
+
+static void test_dbstrings(CuTest *tc) {
+    const char *lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    faction *f;
+    test_setup();
+    f = test_create_faction(NULL);
+    faction_setbanner(f, lipsum);
+    faction_setpassword(f, lipsum + 12);
+    CuAssertStrEquals(tc, lipsum, faction_getbanner(f));
+    CuAssertStrEquals(tc, lipsum + 12, faction_getpassword(f));
     test_teardown();
 }
 
@@ -251,7 +281,7 @@ static void test_set_email(CuTest *tc) {
     faction_setemail(f, "bugs@eressea.de");
     CuAssertStrEquals(tc, "bugs@eressea.de", f->email);
     faction_setemail(f, NULL);
-    CuAssertPtrEquals(tc, 0, f->email);
+    CuAssertPtrEquals(tc, NULL, f->email);
     CuAssertStrEquals(tc, "", faction_getemail(f));
     test_teardown();
 }
@@ -314,6 +344,7 @@ static void test_addplayer(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, r, u->region);
     CuAssertPtrEquals(tc, f, u->faction);
+    CuAssertIntEquals(tc, turn, u->faction->lastorders);
     CuAssertIntEquals(tc, i_get(u->items, itype), 10);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
@@ -325,6 +356,7 @@ CuSuite *get_faction_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_addplayer);
     SUITE_ADD_TEST(suite, test_max_migrants);
+    SUITE_ADD_TEST(suite, test_skill_limit);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);
@@ -336,6 +368,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_check_passwd);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
+    SUITE_ADD_TEST(suite, test_dbstrings);
     SUITE_ADD_TEST(suite, test_save_special_items);
     return suite;
 }

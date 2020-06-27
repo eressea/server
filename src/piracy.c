@@ -2,10 +2,10 @@
 #include "piracy.h"
 
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 
 #include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
@@ -15,9 +15,9 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/parser.h>
 #include <util/rng.h>
@@ -140,7 +140,7 @@ void piracy_cmd(unit * u)
     if (target_dir == NODIRECTION) {
         int saff = 0;
         direction_t dir;
-        /* Einheit ist also Kapitän. Jetzt gucken, in wievielen
+        /* Einheit ist also Kapitaen. Jetzt gucken, in wievielen
         * Nachbarregionen potentielle Opfer sind. */
 
         for (dir = 0; dir < MAXDIRECTIONS; dir++) {
@@ -205,7 +205,7 @@ void piracy_cmd(unit * u)
     /* FIXME: when u->thisorder == ord, set_order calls free, destroys both. */
     ord = create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[target_dir]));
 
-    /* Bewegung ausführen */
+    /* Bewegung ausfuehren */
     init_order_depr(ord);
     move_cmd(u, ord);
     free_order(ord);

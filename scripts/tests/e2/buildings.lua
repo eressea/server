@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.buildings", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.buildings'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.game.reset()
@@ -27,6 +31,39 @@ function test_castle_names()
     assert_equal("fortress", b:get_typename(1250))
     assert_equal("fortress", b:get_typename(6249))
     assert_equal("citadel", b:get_typename(6250))
+end
+
+function test_build_tunnel_limited()
+    -- bug 2221
+    local r = region.create(0, 0, "plain")
+    local b = building.create(r, "tunnel")
+    local f = faction.create('human')
+    local u = unit.create(f, r, 2)
+    u:set_skill('building', 6, true)
+    u:add_item('stone', 22)
+    u:add_item('log', 10)
+    u:add_item('iron', 2)
+    u:add_item('money', 700)
+    u.building = b
+    u:add_order('MACHE 2 BURG ' .. itoa36(b.id))
+    b.size = 99
+    process_orders()
+    assert_equal(100, b.size)
+end
+
+function test_build_castle_one_stage()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r, 2)
+
+    u:add_item('stone', 4)
+
+    u:set_skill('building', 1)
+    u:add_order('MACHE BURG')
+
+    process_orders()
+    assert_equal(2, u.building.size)
+    assert_equal(2, u:get_item('stone'))
 end
 
 function test_build_castle_stages()

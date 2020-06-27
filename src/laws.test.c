@@ -1,6 +1,7 @@
 #include <platform.h>
 #include "laws.h"
 #include "battle.h"
+#include "contact.h"
 #include "guard.h"
 #include "monsters.h"
 
@@ -20,10 +21,11 @@
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/param.h>
 #include <util/rand.h>
 
 #include <CuTest.h>
@@ -95,37 +97,6 @@ static void test_rename_building_twice(CuTest * tc)
     test_teardown();
 }
 
-static void test_contact(CuTest * tc)
-{
-    region *r;
-    unit *u1, *u2, *u3;
-    building *b;
-    building_type *btype;
-    ally *al;
-
-    test_setup();
-    test_create_locale();
-    btype = test_create_buildingtype("castle");
-    r = test_create_region(0, 0, NULL);
-    b = new_building(btype, r, default_locale);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
-    u3 = test_create_unit(test_create_faction(NULL), r);
-    set_level(u3, SK_PERCEPTION, 2);
-    usetsiege(u3, b);
-    b->besieged = 1;
-    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
-
-    u_set_building(u1, b);
-    CuAssertIntEquals(tc, 0, can_contact(r, u1, u2));
-    al = ally_add(&u1->faction->allies, u2->faction);
-    al->status = HELP_ALL;
-    CuAssertIntEquals(tc, HELP_GIVE, can_contact(r, u1, u2));
-    u_set_building(u2, b);
-    CuAssertIntEquals(tc, 1, can_contact(r, u1, u2));
-    test_teardown();
-}
-
 static void test_enter_building(CuTest * tc)
 {
     unit *u;
@@ -153,8 +124,8 @@ static void test_enter_building(CuTest * tc)
     rc->flags = RCF_SWIM;
     u->building = 0;
     CuAssertIntEquals(tc, 0, enter_building(u, NULL, b->no, false));
-    CuAssertPtrEquals(tc, 0, u->building);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->building);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
 
     CuAssertIntEquals(tc, 0, enter_building(u, NULL, b->no, true));
     CuAssertPtrNotNull(tc, u->faction->msgs);
@@ -170,7 +141,6 @@ static void test_enter_ship(CuTest * tc)
     race * rc;
 
     test_setup();
-
     r = test_create_region(0, 0, NULL);
     rc = test_create_race("smurf");
     u = test_create_unit(test_create_faction(rc), r);
@@ -194,8 +164,8 @@ static void test_enter_ship(CuTest * tc)
     rc->flags = RCF_SWIM;
     u->ship = 0;
     CuAssertIntEquals(tc, 0, enter_ship(u, NULL, sh->no, false));
-    CuAssertPtrEquals(tc, 0, u->ship);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->ship);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
 
     CuAssertIntEquals(tc, 0, enter_ship(u, NULL, sh->no, true));
     CuAssertPtrNotNull(tc, u->faction->msgs);
@@ -218,12 +188,27 @@ static void test_display_cmd(CuTest *tc) {
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertStrEquals(tc, "Hodor", u->display);
+    CuAssertStrEquals(tc, "Hodor", unit_getinfo(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_UNIT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", unit_getinfo(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Hodor", uprivate(u));
+    free_order(ord);
+
+    ord = create_order(K_DISPLAY, f->locale, "%s ' Klabautermann '", LOC(f->locale, parameters[P_PRIVAT]));
+    CuAssertIntEquals(tc, 0, display_cmd(u, ord));
+    CuAssertStrEquals(tc, "Klabautermann", uprivate(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, LOC(f->locale, parameters[P_UNIT]));
     CuAssertIntEquals(tc, 0, display_cmd(u, ord));
-    CuAssertPtrEquals(tc, NULL, u->display);
+    CuAssertPtrEquals(tc, NULL, (void *)unit_getinfo(u));
     free_order(ord);
 
     ord = create_order(K_DISPLAY, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
@@ -252,7 +237,6 @@ static void test_rule_force_leave(CuTest *tc) {
 }
 
 static void test_force_leave_buildings(CuTest *tc) {
-    ally *al;
     region *r;
     unit *u1, *u2, *u3;
     building * b;
@@ -275,8 +259,7 @@ static void test_force_leave_buildings(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u3->faction->msgs, "force_leave_building"));
 
     u_set_building(u3, b);
-    al = ally_add(&u1->faction->allies, u3->faction);
-    al->status = HELP_GUARD;
+    ally_set(&u1->faction->allies, u3->faction, HELP_GUARD);
     force_leave(r, NULL);
     CuAssertPtrEquals_Msg(tc, "allies should not be forced to leave", b, u3->building);
     test_teardown();
@@ -422,6 +405,27 @@ static void test_unit_limit(CuTest * tc)
     test_teardown();
 }
 
+static void test_findparam_ex(CuTest *tc)
+{
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "temple", "TEMPEL");
+    test_create_buildingtype("temple");
+
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex("TEMPEL", lang));
+    CuAssertIntEquals(tc, P_GEBAEUDE, findparam_ex(
+        locale_string(lang, parameters[P_BUILDING], false), lang));
+    CuAssertIntEquals(tc, P_SHIP, findparam_ex(
+        locale_string(lang, parameters[P_SHIP], false), lang));
+    CuAssertIntEquals(tc, P_FACTION, findparam_ex(
+        locale_string(lang, parameters[P_FACTION], false), lang));
+    CuAssertIntEquals(tc, P_UNIT, findparam_ex(
+        locale_string(lang, parameters[P_UNIT], false), lang));
+    test_teardown();
+}
+
 static void test_maketemp(CuTest * tc)
 {
     faction *f;
@@ -486,6 +490,10 @@ static void test_limit_new_units(CuTest * tc)
     alliance *al;
 
     test_setup();
+    mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit",
+        "region:region", "command:order", "allowed:int", MT_NEW_END);
+    mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit",
+        "region:region", "command:order", "allowed:int", MT_NEW_END);
     al = makealliance(1, "Hodor");
     f = test_create_faction(NULL);
     u = test_create_unit(f, test_create_region(0, 0, NULL));
@@ -901,6 +909,9 @@ static unit * setup_name_cmd(void) {
     faction *f;
 
     test_setup();
+    mt_create_error(84);
+    mt_create_error(148);
+    mt_create_error(12);
     mt_create_va(mt_new("renamed_building_seen", NULL), "renamer:unit", "region:region", "building:building", MT_NEW_END);
     mt_create_va(mt_new("renamed_building_notseen", NULL), "region:region", "building:building", MT_NEW_END);
     f = test_create_faction(NULL);
@@ -914,6 +925,12 @@ static void test_name_unit(CuTest *tc) {
 
     u = setup_name_cmd();
     f = u->faction;
+
+    ord = create_order(K_NAME, f->locale, "%s ' Klabauterfrau '", LOC(f->locale, parameters[P_UNIT]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Klabauterfrau", u->_name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_UNIT]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->_name);
@@ -934,10 +951,15 @@ static void test_name_region(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
+    u_set_building(u, test_create_building(u->region, NULL));
     f = u->faction;
 
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_REGION]));
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->region->land->name);
+    free_order(ord);
+
     ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_REGION]));
-    u_set_building(u, test_create_building(u->region, NULL));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
     free_order(ord);
@@ -954,6 +976,7 @@ static void test_name_region(CuTest *tc) {
 static void test_name_building(CuTest *tc) {
     unit *uo, *u, *ux;
     faction *f;
+    order *ord;
 
     u = setup_name_cmd();
     u->building = test_create_building(u->region, NULL);
@@ -963,29 +986,33 @@ static void test_name_building(CuTest *tc) {
     ux = test_create_unit(f, test_create_region(0, 0, NULL));
     u_set_building(ux, u->building);
 
-    u->thisorder = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
-
+    ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", LOC(f->locale, parameters[P_BUILDING]));
     building_set_owner(uo);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error148"));
     test_clear_messages(f);
-
     building_set_owner(u);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor Hodor", u->building->name);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, "%s Hodor", LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
 
     building_setname(u->building, "Home");
     building_set_owner(ux);
-    name_cmd(u, u->thisorder);
+    name_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error148"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
-
     test_clear_messages(f);
-    free_order(u->thisorder);
-    u->thisorder = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
-    name_cmd(u, u->thisorder);
+    free_order(ord);
+
+    ord = create_order(K_NAME, f->locale, LOC(f->locale, parameters[P_BUILDING]));
+    name_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
+    free_order(ord);
 
     /* TODO: test BTF_NAMECHANGE:
     btype->flags |= BTF_NAMECHANGE;
@@ -1049,8 +1076,8 @@ static void test_long_order_normal(CuTest *tc) {
     CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
     CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    CuAssertPtrEquals(tc, 0, u->old_orders);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->old_orders);
     test_teardown();
 }
 
@@ -1060,9 +1087,9 @@ static void test_long_order_none(CuTest *tc) {
     test_setup();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
-    CuAssertPtrEquals(tc, 0, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -1074,9 +1101,9 @@ static void test_long_order_cast(CuTest *tc) {
     unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -1089,9 +1116,9 @@ static void test_long_order_buy_sell(CuTest *tc) {
     unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -1099,6 +1126,7 @@ static void test_long_order_multi_long(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
     test_setup();
+    mt_create_error(52);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_DESTROY, u->faction->locale, NULL));
@@ -1113,11 +1141,12 @@ static void test_long_order_multi_buy(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
     test_setup();
+    mt_create_error(52);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_teardown();
@@ -1132,9 +1161,9 @@ static void test_long_order_multi_sell(CuTest *tc) {
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -1142,11 +1171,12 @@ static void test_long_order_buy_cast(CuTest *tc) {
     /* TODO: write more tests */
     unit *u;
     test_setup();
+    mt_create_error(52);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
     update_long_order(u);
-    CuAssertPtrEquals(tc, 0, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_teardown();
@@ -1164,7 +1194,7 @@ static void test_long_order_hungry(CuTest *tc) {
     update_long_order(u);
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
     CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -1174,14 +1204,77 @@ static void test_ally_cmd_errors(CuTest *tc) {
     order *ord;
 
     test_setup();
+    mt_create_error(66);
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     fid = u->faction->no + 1;
-    CuAssertPtrEquals(tc, 0, findfaction(fid));
+    CuAssertPtrEquals(tc, NULL, findfaction(fid));
 
     ord = create_order(K_ALLY, u->faction->locale, itoa36(fid));
     ally_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
     free_order(ord);
+
+    test_teardown();
+}
+
+static void test_banner_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(125);
+    mt_create_va(mt_new("changebanner", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_BANNER, f->locale, "Hodor!");
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changebanner"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_BANNER, f->locale, NULL);
+    banner_cmd(u, ord);
+    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error125"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
+static void test_email_cmd(CuTest *tc) {
+    unit *u;
+    faction *f;
+    order *ord;
+
+    test_setup();
+    mt_create_error(85);
+    mt_create_va(mt_new("changemail", NULL), "value:string", MT_NEW_END);
+    mt_create_va(mt_new("changemail_invalid", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+
+    ord = create_order(K_EMAIL, f->locale, "hodor@example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, "example.com");
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changemail_invalid"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_EMAIL, f->locale, NULL);
+    email_cmd(u, ord);
+    CuAssertStrEquals(tc, "hodor@example.com", f->email);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error85"));
+    free_order(ord);
+    test_clear_messages(f);
 
     test_teardown();
 }
@@ -1231,6 +1324,24 @@ static void test_name_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_name_foreign_cmd(CuTest *tc) {
+    building *b;
+    faction *f;
+    region *r;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(NULL), r = test_create_region(0, 0, NULL));
+    b = test_create_building(u->region, NULL);
+    u->thisorder = create_order(K_NAME, f->locale, "%s %s %s Hodor",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_BUILDING]),
+        itoa36(b->no));
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    test_teardown();
+}
+
 static void test_name_cmd_2274(CuTest *tc) {
     unit *u1, *u2, *u3;
     faction *f;
@@ -1273,26 +1384,26 @@ static void test_ally_cmd(CuTest *tc) {
 
     ord = create_order(K_ALLY, f->locale, "%s", itoa36(f->no));
     ally_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_ALL, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertIntEquals(tc, HELP_ALL, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]));
     ally_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertIntEquals(tc, HELP_GUARD, ally_get(u->faction->allies, f));
     free_order(ord);
 
     ord = create_order(K_ALLY, f->locale, "%s %s %s", itoa36(f->no), LOC(f->locale, parameters[P_GUARD]), LOC(f->locale, parameters[P_NOT]));
     ally_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, u->faction->msgs);
-    CuAssertIntEquals(tc, 0, alliedfaction(0, u->faction, f, HELP_ALL));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertIntEquals(tc, 0, ally_get(u->faction->allies, f));
     free_order(ord);
 
     test_teardown();
@@ -1325,6 +1436,8 @@ static unit * setup_mail_cmd(void) {
     faction *f;
     
     test_setup();
+    mt_create_error(66);
+    mt_create_error(30);
     mt_create_va(mt_new("regionmessage", NULL), "region:region", "sender:unit", "string:string", MT_NEW_END);
     mt_create_va(mt_new("unitmessage", NULL), "region:region", "sender:unit", "string:string", "unit:unit", MT_NEW_END);
     mt_create_va(mt_new("mail_result", NULL), "message:string", "unit:unit", MT_NEW_END);
@@ -1383,7 +1496,7 @@ static void test_mail_unit_no_msg(CuTest *tc) {
     f = u->faction;
     ord = create_order(K_MAIL, f->locale, "%s %s", LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "unitmessage"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "unitmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
     test_teardown();
@@ -1398,7 +1511,7 @@ static void test_mail_faction_no_msg(CuTest *tc) {
     f = u->faction;
     ord = create_order(K_MAIL, f->locale, "%s %s", LOC(f->locale, parameters[P_FACTION]), itoa36(f->no));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "regionmessage"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
     test_teardown();
@@ -1413,7 +1526,7 @@ static void test_mail_faction_no_target(CuTest *tc) {
     f = u->faction;
     ord = create_order(K_MAIL, f->locale, "%s %s", LOC(f->locale, parameters[P_FACTION]), itoa36(f->no+1));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "regionmessage"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "regionmessage"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error66"));
     free_order(ord);
     test_teardown();
@@ -1428,7 +1541,7 @@ static void test_mail_region_no_msg(CuTest *tc) {
     f = u->faction;
     ord = create_order(K_MAIL, f->locale, LOC(f->locale, parameters[P_REGION]));
     mail_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(u->region->msgs, "mail_result"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->region->msgs, "mail_result"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error30"));
     free_order(ord);
     test_teardown();
@@ -1444,6 +1557,8 @@ static void test_show_without_item(CuTest *tc)
     struct locale *loc;
 
     test_setup();
+    mt_create_error(21);
+    mt_create_error(36);
     mt_create_va(mt_new("displayitem", NULL), "weight:int", "item:resource", "description:string", MT_NEW_END);
 
     loc = get_or_create_locale("de");
@@ -1466,18 +1581,46 @@ static void test_show_without_item(CuTest *tc)
     locale_setstring(loc, "iteminfo::testitem", "testdescription");
 
     reshow_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error21"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error21"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error36"));
     test_clear_messages(f);
 
     i_add(&(u->items), i_new(itype, 1));
     reshow_cmd(u, ord);
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error21"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "error36"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error21"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error36"));
     test_clear_messages(f);
 
     free_order(ord);
     test_teardown();
+}
+
+static struct locale *setup_locale(void) {
+    struct locale *loc;
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "iteminfo::elvenhorse", "Elfenpferd Informationen");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    locale_setstring(loc, "race::human_p", "Menschen");
+    locale_setstring(loc, "race::human", "Mensch");
+    locale_setstring(loc, "stat_hitpoints", "Trefferpunkte");
+    locale_setstring(loc, "stat_attack", "Angriff");
+    locale_setstring(loc, "stat_attacks", "Angriffe");
+    locale_setstring(loc, "stat_defense", "Verteidigung");
+    locale_setstring(loc, "stat_armor", "Ruestung");
+    locale_setstring(loc, "stat_equipment", "Gegenstaende");
+    locale_setstring(loc, "stat_pierce", "Pieks");
+    locale_setstring(loc, "stat_cut", "Schnipp");
+    locale_setstring(loc, "stat_bash", "Boink");
+    locale_setstring(loc, "attack_magical", "magisch");
+    locale_setstring(loc, "attack_standard", "normal");
+    locale_setstring(loc, "attack_natural", "natuerlich");
+    locale_setstring(loc, "attack_structural", "strukturell");
+    init_locale(loc);
+    return loc;
 }
 
 static void test_show_race(CuTest *tc) {
@@ -1488,24 +1631,18 @@ static void test_show_race(CuTest *tc) {
     message * msg;
 
     test_setup();
-
     mt_create_va(mt_new("msg_event", NULL), "string:string", MT_NEW_END);
     test_create_race("human");
     rc = test_create_race("elf");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    locale_setstring(loc, "race::human_p", "Menschen");
-    locale_setstring(loc, "race::human", "Mensch");
-    init_locale(loc);
+    loc = setup_locale();
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
     u->faction->locale = loc;
 
     ord = create_order(K_RESHOW, loc, "Mensch");
     reshow_cmd(u, ord);
-    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "error21") != NULL);
-    CuAssertTrue(tc, test_find_messagetype(u->faction->msgs, "msg_event") == NULL);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error21"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "msg_event"));
     test_clear_messages(u->faction);
     free_order(ord);
 
@@ -1534,13 +1671,7 @@ static void test_show_both(CuTest *tc) {
     rc = test_create_race("elf");
     test_create_itemtype("elvenhorse");
 
-    loc = get_or_create_locale("de");
-    locale_setstring(loc, "elvenhorse", "Elfenpferd");
-    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
-    locale_setstring(loc, "iteminfo::elvenhorse", "Hiyaa!");
-    locale_setstring(loc, "race::elf_p", "Elfen");
-    locale_setstring(loc, "race::elf", "Elf");
-    init_locale(loc);
+    loc = setup_locale();
 
     CuAssertPtrNotNull(tc, finditemtype("elf", loc));
     CuAssertPtrNotNull(tc, findrace("elf", loc));
@@ -1556,7 +1687,7 @@ static void test_show_both(CuTest *tc) {
     CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
     msg = test_find_messagetype(u->faction->msgs, "displayitem");
     CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Hiyaa!", msg->parameters[2].v, 4) == 0);
+    CuAssertTrue(tc, memcmp("Elfenpferd Informationen", msg->parameters[2].v, 4) == 0);
     test_clear_messages(u->faction);
     free_order(ord);
     test_teardown();
@@ -1618,7 +1749,7 @@ static void test_demon_hunger(CuTest * tc)
     get_food(r);
 
     CuAssertIntEquals(tc, 20, i_get(u->items, rtype->itype));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "malnourish"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "malnourish"));
 
     config_set("hunger.demon.peasant_tolerance", "0");
 
@@ -1787,14 +1918,322 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_teardown();
 }
 
+static void test_password_cmd(CuTest *tc) {
+    unit *u;
+    message *msg;
+    faction * f;
+
+    CuAssertTrue(tc, password_wellformed("PASSword"));
+    CuAssertTrue(tc, password_wellformed("1234567"));
+    CuAssertTrue(tc, !password_wellformed("$password"));
+    CuAssertTrue(tc, !password_wellformed("no space"));
+
+    test_setup();
+    mt_create_error(283);
+    mt_create_error(321);
+    mt_create_va(mt_new("changepasswd", NULL), "value:string", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
+    u->thisorder = create_order(K_PASSWORD, f->locale, "password1234", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertTrue(tc, checkpasswd(f, "password1234"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "bad-password", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, !checkpasswd(f, "password1234"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "''", NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, NULL);
+    password_cmd(u, u->thisorder);
+    CuAssertTrue(tc, !checkpasswd(f, "password1234"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error283"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "changepasswd"));
+    free_order(u->thisorder);
+    test_clear_messages(f);
+
+    u->thisorder = create_order(K_PASSWORD, f->locale, "1234567890123456789012345678901234567890");
+    password_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error321"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
+    CuAssertTrue(tc, checkpasswd(f, "1234567890123456789012345678901"));
+
+    test_teardown();
+}
+
+static void test_peasant_migration(CuTest *tc) {
+    region *r1, *r2;
+    int rmax;
+
+    test_setup();
+    config_set("rules.economy.repopulate_maximum", "0");
+    r1 = test_create_plain(0, 0);
+    rsettrees(r1, 0, 0);
+    rsettrees(r1, 1, 0);
+    rsettrees(r1, 2, 0);
+    rmax = region_maxworkers(r1);
+    r2 = test_create_plain(0, 1);
+    rsettrees(r2, 0, 0);
+    rsettrees(r2, 1, 0);
+    rsettrees(r2, 2, 0);
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 90, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 90);
+    rsetpeasants(r2, rmax + 60);
+    peasant_migration(r1);
+    immigration();
+    CuAssertIntEquals(tc, rmax - 80, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 50, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 60); /* max 10 emigrants. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 2, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 56, rpeasants(r2));
+
+    rsetpeasants(r1, rmax - 6); /* max 4 immigrants. */
+    rsetpeasants(r2, rmax + 6); /* max 1 emigrant. */
+    peasant_migration(r1);
+    immigration(); /* 4 peasants will move */
+    CuAssertIntEquals(tc, rmax - 5, rpeasants(r1));
+    CuAssertIntEquals(tc, rmax + 5, rpeasants(r2));
+
+    test_teardown();
+}
+
+static void test_quit(CuTest *tc) {
+    faction *f;
+    unit *u;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, r);
+    u->thisorder = create_order(K_QUIT, f->locale, "password");
+
+    faction_setpassword(f, "passwort");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 0, f->flags & FFL_QUIT);
+
+    faction_setpassword(f, "password");
+    quit_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f->flags & FFL_QUIT);
+
+    test_teardown();
+}
+
+#ifdef QUIT_WITH_TRANSFER
+/**
+ * Gifting units to another faction upon voluntary death (QUIT).
+ */ 
+static void test_quit_transfer(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    test_teardown();
+}
+
+/**
+ * Gifting units with limited skills to another faction.
+ *
+ * This is allowed only up to the limit of the target faction.
+ * Units that would break the limit are not transferred.
+ */
+static void test_quit_transfer_limited(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    set_level(u1, SK_MAGIC, 1);
+    set_level(u2, SK_MAGIC, 1);
+    CuAssertIntEquals(tc, true, has_limited_skills(u1));
+
+    config_set_int("rules.maxskills.magic", 1);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    f1->flags -= FFL_QUIT;
+    config_set_int("rules.maxskills.magic", 2);
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * Mages cannot be transfered. At all.
+ */
+static void test_quit_transfer_mages(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    config_set_int("rules.maxskills.magic", 2);
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    f1->magiegebiet = M_GWYRRD;
+    set_level(u1, SK_MAGIC, 1);
+    create_mage(u1, M_GWYRRD);
+
+    f2->magiegebiet = M_GWYRRD;
+    set_level(u2, SK_MAGIC, 1);
+    create_mage(u2, M_GWYRRD);
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+
+    test_teardown();
+}
+
+/**
+ * Only units of the same race can be gifted to another faction.
+ */
+static void test_quit_transfer_migrants(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u_setrace(u1, test_create_race("smurf"));
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+
+    test_teardown();
+}
+
+/**
+ * A hero that is gifted to another faction loses their status.
+ */
+static void test_quit_transfer_hero(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction(NULL);
+    u2 = test_create_unit(f2, r);
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+
+    u1->flags |= UFL_HERO;
+
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertIntEquals(tc, 0, u1->flags & UFL_HERO);
+
+    test_teardown();
+}
+
+static void test_transfer_faction(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2, *u3, *u4;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f1, r);
+    u_setrace(u2, test_create_race("smurf"));
+    u3 = test_create_unit(f2, r);
+    u4 = test_create_unit(f1, r);
+    transfer_faction(f1, f2);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    CuAssertPtrEquals(tc, f1, u2->faction);
+    CuAssertPtrEquals(tc, f2, u3->faction);
+    CuAssertPtrEquals(tc, f2, u4->faction);
+
+    test_teardown();
+}
+#endif
+
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
+    SUITE_ADD_TEST(suite, test_findparam_ex);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
+    SUITE_ADD_TEST(suite, test_name_foreign_cmd);
+    SUITE_ADD_TEST(suite, test_banner_cmd);
+    SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);
@@ -1811,6 +2250,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_buy_cast);
     SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
+    SUITE_ADD_TEST(suite, test_password_cmd);
     SUITE_ADD_TEST(suite, test_rename_building);
     SUITE_ADD_TEST(suite, test_rename_building_twice);
     SUITE_ADD_TEST(suite, test_fishing_feeds_2_people);
@@ -1832,7 +2272,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
     SUITE_ADD_TEST(suite, test_new_units);
     SUITE_ADD_TEST(suite, test_cannot_create_unit_above_limit);
-    SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_enter_building);
     SUITE_ADD_TEST(suite, test_enter_ship);
     SUITE_ADD_TEST(suite, test_display_cmd);
@@ -1861,6 +2300,16 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
+    SUITE_ADD_TEST(suite, test_quit);
+    SUITE_ADD_TEST(suite, test_peasant_migration);
+#ifdef QUIT_WITH_TRANSFER
+    SUITE_ADD_TEST(suite, test_quit_transfer);
+    SUITE_ADD_TEST(suite, test_quit_transfer_limited);
+    SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
+    SUITE_ADD_TEST(suite, test_quit_transfer_mages);
+    SUITE_ADD_TEST(suite, test_quit_transfer_hero);
+    SUITE_ADD_TEST(suite, test_transfer_faction);
+#endif
 
     return suite;
 }

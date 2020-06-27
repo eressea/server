@@ -17,7 +17,7 @@
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/strings.h>
 
@@ -45,7 +45,7 @@ void test_updatespells(CuTest * tc)
     CuAssertPtrNotNull(tc, book);
     spellbook_add(book, sp, 1);
 
-    CuAssertPtrEquals(tc, 0, f->spellbook);
+    CuAssertPtrEquals(tc, NULL, f->spellbook);
     pick_random_spells(f, 1, book, 1);
     CuAssertPtrNotNull(tc, f->spellbook);
     CuAssertIntEquals(tc, 1, selist_length(f->spellbook->spells));
@@ -108,7 +108,7 @@ void test_pay_spell(CuTest * tc)
 
     test_setup();
     init_resources();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
@@ -117,15 +117,15 @@ void test_pay_spell(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
 
     set_level(u, SK_MAGIC, 5);
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
 
     change_resource(u, get_resourcetype(R_SILVER), 1);
     change_resource(u, get_resourcetype(R_AURA), 3);
     change_resource(u, get_resourcetype(R_HORSE), 3);
 
-    level = eff_spelllevel(u, sp, 3, 1);
+    level = eff_spelllevel(u, u, sp, 3, 1);
     CuAssertIntEquals(tc, 3, level);
-    pay_spell(u, sp, level, 1);
+    pay_spell(u, NULL, sp, level, 1);
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_SILVER)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_AURA)));
     CuAssertIntEquals(tc, 0, get_resource(u, get_resourcetype(R_HORSE)));
@@ -142,7 +142,7 @@ void test_pay_spell_failure(CuTest * tc)
 
     test_setup();
     init_resources();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);
@@ -151,22 +151,22 @@ void test_pay_spell_failure(CuTest * tc)
     CuAssertPtrNotNull(tc, sp);
 
     set_level(u, SK_MAGIC, 5);
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
 
     CuAssertIntEquals(tc, 1, change_resource(u, get_resourcetype(R_SILVER), 1));
     CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_AURA), 2));
     CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_HORSE), 3));
 
-    level = eff_spelllevel(u, sp, 3, 1);
+    level = eff_spelllevel(u, u, sp, 3, 1);
     CuAssertIntEquals(tc, 2, level);
-    pay_spell(u, sp, level, 1);
+    pay_spell(u, NULL, sp, level, 1);
     CuAssertIntEquals(tc, 1, change_resource(u, get_resourcetype(R_SILVER), 1));
     CuAssertIntEquals(tc, 3, change_resource(u, get_resourcetype(R_AURA), 3));
     CuAssertIntEquals(tc, 2, change_resource(u, get_resourcetype(R_HORSE), 1));
 
-    CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 3, 1));
+    CuAssertIntEquals(tc, 0, eff_spelllevel(u, u, sp, 3, 1));
     CuAssertIntEquals(tc, 0, change_resource(u, get_resourcetype(R_SILVER), -1));
-    CuAssertIntEquals(tc, 0, eff_spelllevel(u, sp, 2, 1));
+    CuAssertIntEquals(tc, 0, eff_spelllevel(u, u, sp, 2, 1));
     test_teardown();
 }
 
@@ -179,10 +179,10 @@ void test_getspell_unit(CuTest * tc)
     struct locale * lang;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
-    create_mage(u, M_GRAY);
+    create_mage(u, M_GWYRRD);
     enable_skill(SK_MAGIC, true);
 
     set_level(u, SK_MAGIC, 1);
@@ -191,9 +191,9 @@ void test_getspell_unit(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
     CuAssertPtrNotNull(tc, unit_getspell(u, "Herp-a-derp", lang));
     test_teardown();
 }
@@ -207,7 +207,7 @@ void test_getspell_faction(CuTest * tc)
     struct locale * lang;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -220,7 +220,7 @@ void test_getspell_faction(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
     f->spellbook = create_spellbook(0);
     spellbook_add(f->spellbook, sp, 1);
@@ -238,7 +238,7 @@ void test_getspell_school(CuTest * tc)
     struct spellbook * book;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -250,7 +250,7 @@ void test_getspell_school(CuTest * tc)
     sp = create_spell("testspell");
     locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
 
-    CuAssertPtrEquals(tc, 0, unit_getspell(u, "Herp-a-derp", lang));
+    CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
     book = faction_get_spellbook(f);
     CuAssertPtrNotNull(tc, book);
@@ -268,7 +268,7 @@ void test_set_pre_combatspell(CuTest * tc)
     const int index = 0;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -277,7 +277,7 @@ void test_set_pre_combatspell(CuTest * tc)
     sp = create_spell("testspell");
     sp->sptyp |= PRECOMBATSPELL;
 
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
 
     set_combatspell(u, sp, 0, 2);
     CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
@@ -287,7 +287,7 @@ void test_set_pre_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 
@@ -300,7 +300,7 @@ void test_set_main_combatspell(CuTest * tc)
     const int index = 1;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -309,7 +309,7 @@ void test_set_main_combatspell(CuTest * tc)
     sp = create_spell("testspell");
     sp->sptyp |= COMBATSPELL;
 
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
 
     set_combatspell(u, sp, 0, 2);
     CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
@@ -319,7 +319,7 @@ void test_set_main_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 
@@ -332,7 +332,7 @@ void test_set_post_combatspell(CuTest * tc)
     const int index = 2;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -341,7 +341,7 @@ void test_set_post_combatspell(CuTest * tc)
     sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
 
     set_combatspell(u, sp, 0, 2);
     CuAssertPtrEquals(tc, sp, (spell *)get_combatspell(u, index));
@@ -351,7 +351,7 @@ void test_set_post_combatspell(CuTest * tc)
     CuAssertIntEquals(tc, 1, get_combatspelllevel(u, index));
     unset_combatspell(u, sp);
     CuAssertIntEquals(tc, 0, get_combatspelllevel(u, index));
-    CuAssertPtrEquals(tc, 0, (spell *)get_combatspell(u, index));
+    CuAssertPtrEquals(tc, NULL, (spell *)get_combatspell(u, index));
     test_teardown();
 }
 
@@ -363,7 +363,7 @@ void test_hasspell(CuTest * tc)
     struct region * r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction(NULL);
     f->magiegebiet = M_TYBIED;
     u = test_create_unit(f, r);
@@ -371,7 +371,7 @@ void test_hasspell(CuTest * tc)
     sp = create_spell("testspell");
     sp->sptyp |= POSTCOMBATSPELL;
 
-    unit_add_spell(u, 0, sp, 2);
+    unit_add_spell(u, sp, 2);
 
     set_level(u, SK_MAGIC, 1);
     CuAssertTrue(tc, !u_hasspell(u, sp));
@@ -405,9 +405,9 @@ void test_multi_cast(CuTest *tc) {
     locale_setstring(lang, mkname("spell", sp->sname), "Feuerball");
     CuAssertStrEquals(tc, "Feuerball", spell_name(sp, lang));
 
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     set_level(u, SK_MAGIC, 10);
-    unit_add_spell(u, 0, sp, 1);
+    unit_add_spell(u, sp, 1);
     CuAssertPtrEquals(tc, sp, unit_getspell(u, "Feuerball", lang));
 
     unit_addorder(u, create_order(K_CAST, u->faction->locale, "Feuerball"));
@@ -426,7 +426,7 @@ static void test_magic_resistance(CuTest *tc) {
 
     test_setup();
     rc = test_create_race("human");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
     CuAssertTrue(tc, frac_equal(rc->magres, magic_resistance(u)));
     rc->magres = frac_one;
     CuAssert(tc, "magic resistance is capped at 0.9", frac_equal(magic_resistance(u), frac_make(9, 10)));
@@ -442,23 +442,153 @@ static void test_magic_resistance(CuTest *tc) {
 static void test_max_spellpoints(CuTest *tc) {
     unit *u;
     race *rc;
+    item_type *it_aura;
 
     test_setup();
     rc = test_create_race("human");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
-    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
+    CuAssertIntEquals(tc, 0, max_spellpoints_depr(u->region, u));
+    CuAssertIntEquals(tc, 0, max_spellpoints(u, u->region));
+    CuAssertIntEquals(tc, 0, max_spellpoints(u, NULL));
+    create_mage(u, M_GWYRRD);
     rc->maxaura = 100;
-    CuAssertIntEquals(tc, 1, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
     rc->maxaura = 200;
-    CuAssertIntEquals(tc, 2, max_spellpoints(u->region, u));
-    create_mage(u, M_GRAY);
+    CuAssertIntEquals(tc, 2, max_spellpoints(u, NULL));
     set_level(u, SK_MAGIC, 1);
-    CuAssertIntEquals(tc, 3, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 3, max_spellpoints(u, NULL));
     set_level(u, SK_MAGIC, 2);
-    CuAssertIntEquals(tc, 9, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 9, max_spellpoints(u, NULL));
     /* permanent aura loss: */
     CuAssertIntEquals(tc, 7, change_maxspellpoints(u, -2));
-    CuAssertIntEquals(tc, 7, max_spellpoints(u->region, u));
+    CuAssertIntEquals(tc, 7, max_spellpoints(u, NULL));
+    /* aurafocus: */
+    it_aura = test_create_itemtype("aurafocus");
+    i_change(&u->items, it_aura, 1);
+    CuAssertIntEquals(tc, 9, max_spellpoints(u, NULL));
+    test_teardown();
+}
+
+static void test_regenerate_aura(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    create_mage(u, M_GWYRRD);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
+    regenerate_aura();
+    CuAssertIntEquals(tc, 1, get_spellpoints(u));
+
+    u = test_create_unit(u->faction, u->region);
+    create_mage(u, M_GRAY);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    CuAssertIntEquals(tc, 1, max_spellpoints(u, NULL));
+    regenerate_aura();
+    CuAssertIntEquals(tc, 1, get_spellpoints(u));
+    test_teardown();
+}
+
+/**
+ * Test for Bug 2582.
+ *
+ * Migrant units that are not familiars, but whose race has a maxaura
+ * must not regenerate aura.
+ */
+static void test_regenerate_aura_migrants(CuTest *tc) {
+    unit *u;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    regenerate_aura();
+    CuAssertIntEquals(tc, 0, get_spellpoints(u));
+    test_teardown();
+}
+
+static void test_fix_fam_migrants(CuTest *tc) {
+    unit *u, *mage;
+    race *rc;
+
+    test_setup();
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
+    /* u is a migrant with at_mage attribute, but not a familiar */
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    create_mage(u, M_GRAY);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+    fix_fam_migrant(u);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrEquals(tc, NULL, get_mage(u));
+
+    /* u is a familiar, and stays unchanged: */
+    mage = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    /* reproduce the bug, create a broken familiar: */
+    create_newfamiliar(mage, u);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertTrue(tc, is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+    fix_fam_migrant(u);
+    CuAssertTrue(tc, is_familiar(u));
+    CuAssertPtrNotNull(tc, get_mage(u));
+
+    test_teardown();
+}
+
+static bool equip_spell(unit *u, const char *eqname, int mask) {
+    spell * sp = find_spell("test");
+    unit_add_spell(u, sp, 1);
+    return true;
+}
+
+static void test_fix_fam_spells(CuTest *tc) {
+    unit *u, *mage;
+    race *rc;
+    spell * sp;
+
+    test_setup();
+    sp = create_spell("test");
+    rc = test_create_race("demon");
+    rc->maxaura = 100;
+    rc->flags |= RCF_FAMILIAR;
+
+    /* u is a familiar, and gets equipped: */
+    mage = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    /* reproduce the bug, create a broken familiar: */
+    callbacks.equip_unit = NULL;
+    create_newfamiliar(mage, u);
+    set_level(u, SK_MAGIC, 1);
+    CuAssertPtrEquals(tc, NULL, unit_get_spellbook(u));
+    CuAssertTrue(tc, !u_hasspell(u, sp));
+    callbacks.equip_unit = equip_spell;
+    CuAssertTrue(tc, is_familiar(u));
+    fix_fam_spells(u);
+    CuAssertTrue(tc, is_familiar(u));
+    CuAssertPtrNotNull(tc, unit_get_spellbook(u));
+    CuAssertTrue(tc, u_hasspell(u, sp));
+
+    /* u is a migrant, and does not get equipped: */
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u_setrace(u, rc);
+    CuAssertTrue(tc, !is_familiar(u));
+    fix_fam_spells(u);
+    CuAssertTrue(tc, !is_familiar(u));
+    CuAssertPtrEquals(tc, NULL, unit_get_spellbook(u));
+
     test_teardown();
 }
 
@@ -470,7 +600,7 @@ static void test_illusioncastle(CuTest *tc)
     test_setup();
     btype = test_create_buildingtype("castle");
     bt_icastle = test_create_buildingtype("illusioncastle");
-    b = test_create_building(test_create_region(0, 0, NULL), bt_icastle);
+    b = test_create_building(test_create_plain(0, 0), bt_icastle);
     b->size = 1;
     make_icastle(b, btype, 10);
     a = a_find(b->attribs, &at_icastle);
@@ -485,10 +615,10 @@ static void test_illusioncastle(CuTest *tc)
 
 static void test_is_mage(CuTest *tc) {
     unit *u;
-    sc_mage *mage;
+    struct sc_mage *mage;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     CuAssertPtrEquals(tc, NULL, get_mage(u));
     CuAssertTrue(tc, !is_mage(u));
     set_level(u, SK_MAGIC, 1);
@@ -502,18 +632,13 @@ static void test_is_mage(CuTest *tc) {
 
 static void test_get_mage(CuTest *tc) {
     unit *u;
-    sc_mage *mage;
+    struct sc_mage *mage;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     CuAssertPtrEquals(tc, NULL, get_mage(u));
-    CuAssertPtrEquals(tc, NULL, get_mage_depr(u));
     CuAssertPtrNotNull(tc, mage = create_mage(u, M_CERDDOR));
     CuAssertPtrEquals(tc, mage, get_mage(u));
-    CuAssertPtrEquals(tc, NULL, get_mage_depr(u));
-    set_level(u, SK_MAGIC, 1);
-    CuAssertPtrEquals(tc, mage, get_mage(u));
-    CuAssertPtrEquals(tc, mage, get_mage_depr(u));
     test_teardown();
 }
 
@@ -522,8 +647,8 @@ static void test_familiar_set(CuTest *tc) {
 
     test_setup();
 
-    mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    fam = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
+    mag = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    fam = test_create_unit(mag->faction, test_create_plain(0, 0));
     CuAssertPtrEquals(tc, NULL, get_familiar(mag));
     CuAssertPtrEquals(tc, NULL, get_familiar_mage(fam));
     CuAssertPtrEquals(tc, NULL, a_find(mag->attribs, &at_skillmod));
@@ -542,8 +667,8 @@ static void test_familiar_age(CuTest *tc) {
 
     test_setup();
 
-    mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    fam = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
+    mag = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    fam = test_create_unit(mag->faction, test_create_plain(0, 0));
     set_familiar(mag, fam);
     CuAssertPtrEquals(tc, fam, get_familiar(mag));
     CuAssertPtrEquals(tc, mag, get_familiar_mage(fam));
@@ -573,8 +698,8 @@ static void test_familiar_equip(CuTest *tc) {
 
     test_setup();
     callbacks.equip_unit = equip_callback;
-    mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
+    mag = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(mag->faction, test_create_plain(0, 0));
     CuAssertStrEquals(tc, "human", u->_race->_name);
     set_familiar(mag, u);
     create_newfamiliar(mag, u);
@@ -617,5 +742,9 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_magic_resistance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
     SUITE_ADD_TEST(suite, test_illusioncastle);
+    SUITE_ADD_TEST(suite, test_regenerate_aura);
+    SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
+    SUITE_ADD_TEST(suite, test_fix_fam_spells);
+    SUITE_ADD_TEST(suite, test_fix_fam_migrants);
     return suite;
 }

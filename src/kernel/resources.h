@@ -1,14 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
 #ifndef H_KRNL_RESOURCES
 #define H_KRNL_RESOURCES
 #ifdef __cplusplus
@@ -70,6 +59,7 @@ extern "C" {
         const struct resource_type *);
     struct rawmaterial_type *rmt_get(const struct resource_type *);
 
+    void set_resource(struct rawmaterial *rm, int level, int base, int divisor);
     struct rawmaterial *add_resource(struct region *r, int level, 
         int base, int divisor, const struct resource_type *rtype);
     struct rawmaterial_type *rmt_create(struct resource_type *rtype);

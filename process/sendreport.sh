@@ -3,14 +3,14 @@
 
 if [ -z "$ERESSEA" ]; then
   echo "You have to define the \$ERESSEA environment variable to run $0"
-  exit -2
+  exit 2
 fi
 
 function abort() {
   if [ $# -gt 0 ]; then
     echo "$@"
   fi
-  exit -1
+  exit 1
 }
 
 GAME=$1
@@ -30,7 +30,12 @@ LOCKFILE="$ERESSEA/.report.lock"
 echo "$(date):report:$GAME:$EMAIL:$FACTION:$PASSWD" >> "$ERESSEA/request.log"
 
 cd "$ERESSEA" || exit
-checkpasswd.py "game-$GAME/passwd" "$FACTION" "$PASSWD" || reply "Das Passwort fuer die Partei $FACTION ist ungueltig"
+BIN="$ERESSEA/server/bin"
+PWFILE="game-$GAME/eressea.db"
+if [ ! -e "$PWFILE" ]; then
+  PWFILE="game-$GAME/passwd"
+fi
+"$BIN/checkpasswd.py" "$PWFILE" "$FACTION" "$PASSWD" || reply "Das Passwort fuer die Partei $FACTION ist ungueltig"
 
 cd "$ERESSEA/game-$GAME/reports" || exit
 if [ ! -e "${FACTION}.sh" ]; then
@@ -41,12 +46,8 @@ fi
 
 bash "${FACTION}.sh" "$EMAIL" || reply "Unbekannte Partei $FACTION"
 
-if [ -e "$ERESSEA/game-$GAME/eressea.db" ]; then
-  SQL="select email from faction f left join faction_data fd on fd.faction_id=f.id where f.game_id=$GAME AND fd.code='$FACTION' and fd.turn=(select max(turn) from faction_data fx where fx.faction_id=f.id)"
-  OWNER=$(sqlite3 "$ERESSEA/game-$GAME/eressea.db" "$SQL")
-  if [ ! -z "$OWNER" ]; then
-    echo "Der Report Deiner Partei wurde an ${EMAIL} gesandt." \
-    | mutt -s "Reportnachforderung Partei ${FACTION}" "$OWNER"
-  fi
+OWNER=$("$BIN/getfaction.py" "$PWFILE" "$FACTION")
+if [ -n "$OWNER" ]; then
+  echo "Der Report Deiner Partei wurde an ${EMAIL} gesandt." \
+  | mutt -s "Reportnachforderung Partei ${FACTION}" "$OWNER"
 fi
-

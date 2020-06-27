@@ -38,6 +38,9 @@ msgstr "\"$unit($mage) tranforms $unit($target) to $race($race,0).\""
 msgid "give_person"
 msgstr "\"$unit($unit) transfers $int($amount) person$if($eq($amount,1),\"\",\"s\") to $unit($target).\""
 
+msgid "transfer_unit"
+msgstr "\"$unit($unit) joins our faction.\""
+
 msgid "rust_effect_2"
 msgstr "\"$unit($mage) calls forth a terrible torment over the enemy. The magical rain makes all iron rusty.\""
 
@@ -70,9 +73,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician al
 
 msgid "error195"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is no route leading there.\""
-
-msgid "healall"
-msgstr "\"Life itself touches the world and all beings are healed.\""
 
 msgid "build_required"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - For this, the unit needs $resources($required).\""
@@ -257,9 +257,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Buildings canno
 msgid "error165"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The potion does not agree with the unit.\""
 
-msgid "siege_catapults"
-msgstr "\"$building($building) is under siege by $unit($unit). During siege, catapults caused $int($destruction) points destruction.\""
-
 msgid "curseinfo::magicstreet"
 msgstr "\"The roads are extremely dry and well-kept. ($int36($id))\""
 
@@ -440,9 +437,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You can only br
 msgid "error307"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - We snotlings is too stupid fer dat!\""
 
-msgid "godcurse_destroy_ship"
-msgstr "\"Her sailors sick from the poisened ocean, planks, rudder und sails corroded by the waters of the cursed ocean, the $ship($ship) finally succumbs to her destiny and sinks.\""
-
 msgid "too_many_units_in_faction"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - A faction may not consist of more than $int($allowed) units.\""
 
@@ -593,9 +587,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unknown option.
 msgid "error131"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a tunnel before building roads through glaciers.\""
 
-msgid "error241"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The faction must be at least 81 weeks old to restart with a new race.\""
-
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit could not be found.\""
 
@@ -637,9 +628,6 @@ msgstr "\"$unit($unit) appears.\""
 
 msgid "magicresistance_effect"
 msgstr "\"$unit($unit) is briefly surrounded by a magical light.\""
-
-msgid "siege"
-msgstr "\"$building($building) is under siege by $unit($unit).\""
 
 msgid "missing_force"
 msgstr "\"$unit($unit) cannot muster enough energy to cast $spell($spell) on level $int($level).\""
@@ -697,6 +685,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot
 
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - No email address was supplied.\""
+
+msgid "error125"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - No banner text was supplied.\""
 
 msgid "starvation"
 msgstr "\"$unit($unit) loses $int($dead) of $int($add($live,$dead)) people due to starvation in $region($region).\""
@@ -977,9 +968,6 @@ msgstr "\"$unit($mage) sees after the wounded and heals $int($amount). A $resour
 msgid "error276"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ships cannot be built here.\""
 
-msgid "error166"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - This race cannot besiege a castle.\""
-
 msgid "chaosgate_effect_2"
 msgstr "\"A vortex of blinding light appears.\""
 
@@ -997,9 +985,6 @@ msgstr "\"'$order($command)' - $unit($unit) marched into $region($region) during
 
 msgid "error82"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is no agreement with this number.\""
-
-msgid "error60"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is under siege.\""
 
 msgid "error162"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - This healing potion will be automatically used when needed.\""
@@ -1045,9 +1030,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - There are not e
 
 msgid "sp_icastle_effect"
 msgstr "\"Flabbergasted, the peasants of $region($region) behold a new building.\""
-
-msgid "curseinfo::godcurse"
-msgstr "\"This region was cursed by the gods. Stinking vapors billow over the dead ground and hideous creatures move about the country. The wells are poisened and the edible plants are covered by a pink fungus. Noone can live here for long. ($int36($id))\""
 
 msgid "recruit_archetype"
 msgstr "\"$unit($unit) recruits $int($amount) $localize($archetype).\""
@@ -1134,7 +1116,7 @@ msgid "dissolve_units_4"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) turned to dust.\""
 
 msgid "error281"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - What race did you want the jihad to be against?\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The target faction must have the same race as yours.\""
 
 msgid "error171"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - This combat spell does not exist.\""
@@ -1263,7 +1245,7 @@ msgid "error184"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit does not move.\""
 
 msgid "income_entertainment"
-msgstr "\"$unit($unit) earns $int($amount) in $region($region) with entertainment.\""
+msgstr "\"$unit($unit) earns $int($amount) in $region($region) from entertainment.\""
 
 msgid "error180"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The spell fails.\""
@@ -1457,9 +1439,6 @@ msgstr "\"$unit($unit) unlocks one of the locks in $region($region) with $if($eq
 msgid "error255"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot sacrifice this.\""
 
-msgid "entrance_besieged"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - $building($building) is under siege.\""
-
 msgid "error260"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The owner of a ship or a building cannot be sorted.\""
 
@@ -1550,9 +1529,6 @@ msgstr "\"There is a battle in $region($region).\""
 msgid "wormhole_dissolve"
 msgstr "\"The wormhole in $region($region) disappears.\""
 
-msgid "error23"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Contact was not possible due to siege.\""
-
 msgid "error12"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is not ours.\""
 
@@ -1638,7 +1614,7 @@ msgid "curseinfo::deathcloud"
 msgstr "\"A poison elemental is spreading pestilence and death. ($int36($id))\""
 
 msgid "income"
-msgstr "\"$unit($unit) earns $int($amount)$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") in $region($region) $if($eq($mode,1),\" by entertainment\",$if($eq($mode,2),\" by taxes\",$if($eq($mode,3),\" by trade\",$if($eq($mode,5),\" by stealing\",$if($eq($mode,6),\" by magic\",$if($eq($mode,7),\" by pillaging\",\"\")))))).\""
+msgstr "\"$unit($unit) in $region($region) earns $int($amount)$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") silver.\""
 
 msgid "researchherb"
 msgstr "\"$unit($unit) discovers that $localize($amount) $resource($herb,0) grow in $region($region).\""
@@ -1804,9 +1780,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - No peasant coul
 
 msgid "error50"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not experienced enough to do this.\""
-
-msgid "error282"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot start a jihad against this race.\""
 
 msgid "nmr_warning_final"
 msgstr "\"Please send in orders for the next turn if you want to continue playing.\""
@@ -2135,11 +2108,8 @@ msgstr "\"Member of '$name ($int36($id))' for $int($age) weeks, led by $faction(
 msgid "deathcloud_effect"
 msgstr "\"$unit($mage) summons a poison elemental in $region($region).\""
 
-msgid "nr_building_besieged"
-msgstr "\", besieged by $int($soldiers) soldiers$if($lt($diff,0),\"\",\" (cut off)\")\""
-
 msgid "nr_population"
-msgstr "\"Your faction has $int($population) people in $int($units) of $int($limit) possible units.\""
+msgstr "\"Your faction has $int($population) $if($eq($population,1), \"person\", \"persons\") in $int($units) of $int($limit) possible units.\""
 
 msgid "curseinfo::shipdisorientation"
 msgstr "This ship has lost its path. ($int36($id))"
@@ -2247,7 +2217,7 @@ msgid "curseinfo::healingzone"
 msgstr "Healing in this region is affected by magic. ($int36($id))"
 
 msgid "income_entertainment_reduced"
-msgstr "\"In $region($region), $unit($unit) earns only $int($amount) instead of$if($eq($wanted,$amount),\"\",\" of$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") \") with entertainment.\""
+msgstr "\"In $region($region), $unit($unit) earns only $int($amount) instead of$if($eq($wanted,$amount),\"\",\" of$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") \") from entertainment.\""
 
 msgid "errusingpotion"
 msgstr "\"$unit($unit): '$order($command)' - The unit already uses $resource($using,0).\""
@@ -2394,7 +2364,7 @@ msgid "sp_confusion_effect_0"
 msgstr "\"$unit($mage) intones a mysterious chant. There is a sudden hubbub, but order is restored quickly.\""
 
 msgid "pest"
-msgstr "\"The region is visited by the plague and $int($dead) peasants died.\""
+msgstr "\"The region is visited by the plague and $int($dead) $resource($peasants,$dead) died.\""
 
 msgid "wormhole_exit"
 msgstr "\"$unit($unit) travels through a wormhole to $region($region).\""
@@ -2413,9 +2383,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship has mo
 
 msgid "aborted_battle"
 msgstr "\"The battle was aborted because all enemies escaped.\""
-
-msgid "error24"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Espionage was not possible due to siege.\""
 
 msgid "usecatapult"
 msgstr "\"$int($amount) fighters of $unit($unit) launch their catapults.\""
@@ -2449,6 +2416,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - No luxury items
 
 msgid "stormwinds_reduced"
 msgstr "\"$unit($unit) could only enchant $int($ships) of $int($maxships) ships.\""
+
+msgid "error321"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The chosen password was too long.\""
 
 msgid "error283"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Your password may only contain alphanumeric symbols.\""
@@ -2578,9 +2548,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You need at lea
 
 msgid "error177"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The familiar cannot cast this spell.\""
-
-msgid "curseinfo::godcurseocean"
-msgstr "\"This region was cursed by the gods. The sea is a foul cesspool, noxious gases rise from the deep, undead seamonsters attack all ships. Noone can live here for long. ($int36($id))\""
 
 msgid "curseinfo::sparkle_4"
 msgstr "\"A circle of shimmering lights surrounds $unit($unit). ($int36($id))\""
@@ -2791,6 +2758,27 @@ msgstr "\"$unit($unit) ate $int($amount) peasants.\""
 
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it is trying to flee.\""
+
+msgid "error325"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Spells can only be cast on a single ship.\""
+
+msgid "error326"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - These ships cannot form a convoy.\""
+
+msgid "error327"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must keep at least one ship.\""
+
+msgid "error324"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not one of ours.\""
+
+msgid "error322"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Only ships of the same type can form a convoy.\""
+
+msgid "error323"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is under a spell.\""
+
+msgid "error328"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - All ships of a convoy must be on the same coast.\""
 
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) turned into $if($eq($number,1),\"a tree\", \"trees\").\""

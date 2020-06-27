@@ -1,22 +1,7 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
-#include <platform.h>
 #include "region.h"
 
 /* kernel includes */
@@ -42,8 +27,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* util includes */
 #include <util/assert.h>
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -141,8 +126,11 @@ const char *regionname(const region * r, const faction * f)
 int region_maxworkers(const region *r)
 {
     int size = max_production(r);
-    int treespace = (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
-    return MAX(size - treespace, MIN(size / 10, 200));
+    int treespace = size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    size /=10;
+    if (size > 200) size = 200;
+    if (treespace < size) treespace = size;
+    return treespace;
 }
 
 int deathcount(const region * r)
@@ -175,7 +163,7 @@ void deathcounts(region * r, int fallen)
     }
 }
 
-/* Moveblock wird zur Zeit nicht über Attribute, sondern ein Bitfeld
+/* Moveblock wird zur Zeit nicht ueber Attribute, sondern ein Bitfeld
    r->moveblock gemacht. Sollte umgestellt werden, wenn kompliziertere
    Dinge gefragt werden. */
 
@@ -242,7 +230,7 @@ static void unhash_uid(region * r)
     uidhash[key].r = NULL;
 }
 
-static void hash_uid(region * r)
+static void rhash_uid(region * r)
 {
     int uid = r->uid;
     for (;;) {
@@ -268,7 +256,7 @@ static int hash_requests;
 static int hash_misses;
 #endif
 
-bool pnormalize(int *x, int *y, const plane * pl)
+void pnormalize(int *x, int *y, const plane * pl)
 {
     if (pl) {
         if (x) {
@@ -284,7 +272,6 @@ bool pnormalize(int *x, int *y, const plane * pl)
             *y = ny % height + pl->miny;
         }
     }
-    return false;                 /* TBD */
 }
 
 static region *rfindhash(int x, int y)
@@ -343,8 +330,9 @@ region *r_connect(const region * r, direction_t dir)
     int x, y;
     region *rmodify = (region *)r;
     assert(dir >= 0 && dir < MAXDIRECTIONS);
-    if (r->connect[dir])
+    if (r->connect[dir]) {
         return r->connect[dir];
+    }
     assert(dir < MAXDIRECTIONS);
     x = r->x + delta_x[dir];
     y = r->y + delta_y[dir];
@@ -400,7 +388,7 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
     int dx = x1 - x2;
     int dy = y1 - y2;
     int result, dist;
-    int mindist = MIN(width, height) >> 1;
+    int mindist = ((width > height) ? height : width) / 2;
 
     /* Bei negativem dy am Ursprung spiegeln, das veraendert
      * den Abstand nicht
@@ -423,13 +411,15 @@ koor_distance_wrap_xy(int x1, int y1, int x2, int y2, int width, int height)
         if (result <= mindist)
             return result;
     }
-    dist = MAX(dx, height - dy);
+    dist = height - dy;
+    if (dist < dx) dist = dx;
     if (dist >= 0 && dist < result) {
         result = dist;
         if (result <= mindist)
             return result;
     }
-    dist = MAX(width - dx, dy);
+    dist = width - dx;
+    if (dist < dy) dist = dy;
     if (dist >= 0 && dist < result)
         result = dist;
     return result;
@@ -471,6 +461,7 @@ void add_regionlist(region_list ** rl, region * r)
 {
     region_list *rl2 = (region_list *)malloc(sizeof(region_list));
 
+    if (!rl2) abort();
     rl2->data = r;
     rl2->next = *rl;
 
@@ -616,7 +607,11 @@ void rsetpeasants(region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->peasants = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d peasants.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->peasants = (unsigned short)value;
     }
 }
 
@@ -630,7 +625,11 @@ void rsethorses(const region * r, int value)
     assert(r->land || value==0);
     assert(value >= 0);
     if (r->land) {
-        r->land->horses = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d horses.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->horses = (unsigned short)value;
     }
 }
 
@@ -650,15 +649,18 @@ void rsetmoney(region * r, int value)
 
 int rherbs(const region *r)
 {
-    return r->land?r->land->herbs:0;
+    return r->land ? r->land->herbs : 0;
 }
 
 void rsetherbs(region *r, int value)
 {
     assert(r->land || value==0);
-    assert(value >= 0 && value<=SHRT_MAX);
     if (r->land) {
-        r->land->herbs = value;
+        if (value > USHRT_MAX) {
+            log_warning("region %s cannot have %d herbs.", regionname(r, NULL), value);
+            value = USHRT_MAX;
+        }
+        r->land->herbs = (unsigned short)value;
     }
 }
 
@@ -716,7 +718,10 @@ const item_type *r_luxury(const region * r)
 
 int r_demand(const region * r, const luxury_type * ltype)
 {
-    struct demand *d = r->land->demands;
+    struct demand *d;
+
+    assert(r && r->land);
+    d = r->land->demands;
     while (d && d->type != ltype)
         d = d->next;
     if (!d)
@@ -754,39 +759,41 @@ int rsettrees(const region * r, int ageclass, int value)
     return 0;
 }
 
-static region *last;
+region *region_create(int uid)
+{
+    region *r = (region *)calloc(1, sizeof(region));
+    assert_alloc(r);
+    r->uid = uid;
+    rhash_uid(r);
+    return r;
+}
 
-static unsigned int max_index = 0;
+static region *last;
+static unsigned int max_index;
+
+void add_region(region *r, int x, int y) {
+    r->x = x;
+    r->y = y;
+    r->_plane = findplane(x, y);
+    rhash(r);
+    if (last) {
+        addlist(&last, r);
+    }
+    else {
+        addlist(&regions, r);
+    }
+    last = r;
+    assert(r->next == NULL);
+    r->index = ++max_index;
+}
 
 region *new_region(int x, int y, struct plane *pl, int uid)
 {
     region *r;
-
-    pnormalize(&x, &y, pl);
-    r = rfindhash(x, y);
-
-    if (r) {
-        log_error("duplicate region discovered: %s(%d,%d)\n", regionname(r, NULL), x, y);
-        if (r->units)
-            log_error("duplicate region contains units\n");
-        return r;
-    }
-    r = calloc(1, sizeof(region));
-    assert_alloc(r);
-    r->x = x;
-    r->y = y;
-    r->uid = uid;
+    r = region_create(uid);
     r->age = 1;
-    r->_plane = pl;
-    rhash(r);
-    hash_uid(r);
-    if (last)
-        addlist(&last, r);
-    else
-        addlist(&regions, r);
-    last = r;
-    assert(r->next == NULL);
-    r->index = ++max_index;
+    add_region(r, x, y);
+    assert(pl == r->_plane);
     return r;
 }
 
@@ -794,7 +801,7 @@ static region *deleted_regions;
 
 void remove_region(region ** rlist, region * r)
 {
-
+    assert(r);
     while (r->units) {
         unit *u = r->units;
         i_freeall(&u->items);
@@ -824,7 +831,7 @@ void free_land(land_region * lr)
     free(lr);
 }
 
-void region_setresource(region * r, const resource_type * rtype, int value)
+void region_setresource(region * r, const struct resource_type *rtype, int value)
 {
     rawmaterial *rm = r->resources;
     while (rm) {
@@ -867,7 +874,18 @@ void region_setresource(region * r, const resource_type * rtype, int value)
     }
 }
 
-int region_getresource(const region * r, const resource_type * rtype)
+int region_getresource_level(const region * r, const struct resource_type * rtype)
+{
+    const rawmaterial *rm;
+    for (rm = r->resources; rm; rm = rm->next) {
+        if (rm->rtype == rtype) {
+            return rm->level;
+        }
+    }
+    return -1;
+}
+
+int region_getresource(const region * r, const struct resource_type *rtype)
 {
     const rawmaterial *rm;
     for (rm = r->resources; rm; rm = rm->next) {
@@ -975,8 +993,6 @@ static char *makename(void)
         *handle_end = "nlrdst",
         *vowels = "aaaaaaaaaaaeeeeeeeeeeeeiiiiiiiiiiioooooooooooouuuuuuuuuuyy";
 
-    /* const char * vowels_latin1 = "aaaaaaaaaàâeeeeeeeeeéèêiiiiiiiiiíîoooooooooóòôuuuuuuuuuúyy"; */
-
     nk = strlen(kons);
     ne = strlen(handle_end);
     nv = strlen(vowels);
@@ -1024,6 +1040,7 @@ void setluxuries(region * r, const luxury_type * sale)
 
     for (ltype = luxurytypes; ltype; ltype = ltype->next) {
         struct demand *dmd = malloc(sizeof(struct demand));
+        if (!dmd) abort();
         dmd->type = ltype;
         if (ltype != sale)
             dmd->value = 1 + rng_int() % 5;
@@ -1079,7 +1096,8 @@ void init_region(region *r)
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
         peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
-        rsetpeasants(r, MAX(100, peasants));
+        if (peasants < 100) peasants = 100;
+        rsetpeasants(r, peasants);
         rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
             INT_MAX) + 1) + rng_int() % 5));
     }
@@ -1087,7 +1105,7 @@ void init_region(region *r)
 
 void terraform_region(region * r, const terrain_type * terrain)
 {
-    /* Resourcen, die nicht mehr vorkommen können, löschen */
+    /* Resourcen, die nicht mehr vorkommen koennen, loeschen */
     const terrain_type *oldterrain = r->terrain;
     rawmaterial **lrm = &r->resources;
 
@@ -1149,6 +1167,7 @@ void terraform_region(region * r, const terrain_type * terrain)
         int mnr = 0;
 
         r->land = calloc(1, sizeof(land_region));
+        if (!r->land) abort();
         r->land->ownership = NULL;
         region_set_morale(r, MORALE_DEFAULT, -1);
         region_setname(r, makename());
@@ -1170,6 +1189,7 @@ void terraform_region(region * r, const terrain_type * terrain)
                         }
                         else {
                             sr = calloc(1, sizeof(struct surround));
+                            if (!sr) abort();
                         }
                         sr->next = nb;
                         sr->type = sale->type;
@@ -1246,7 +1266,7 @@ void terraform_region(region * r, const terrain_type * terrain)
 #include "curse.h"
 int max_production(const region * r)
 {
-    /* muß rterrain(r) sein, nicht rterrain() wegen rekursion */
+    /* muss rterrain(r) sein, nicht rterrain() wegen rekursion */
     int p = r->terrain->size;
     if (curse_active(get_curse(r->attribs, &ct_drought))) {
         p /= 2;
@@ -1260,7 +1280,7 @@ void resolve_region(region *r)
     resolve(RESOLVE_REGION | r->uid, r);
 }
 
-int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
+int read_region_reference(gamedata * data, region **rp)
 {
     struct storage * store = data->store;
     int id = 0;
@@ -1268,7 +1288,7 @@ int read_region_reference(gamedata * data, region **rp, resolve_fun fun)
     READ_INT(store, &id);
     *rp = findregionbyid(id);
     if (*rp == NULL) {
-        ur_add(RESOLVE_REGION | id, (void **)rp, fun);
+        *rp = region_create(id);
     }
     return id;
 }
@@ -1305,6 +1325,7 @@ struct message *msg)
             imsg = imsg->next;
         if (imsg == NULL) {
             imsg = malloc(sizeof(struct individual_message));
+            if (!imsg) abort();
             imsg->next = r->individual_messages;
             imsg->msgs = NULL;
             r->individual_messages = imsg;
@@ -1356,11 +1377,13 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
     assert(rule_region_owners());
     if (r->land) {
         if (!r->land->ownership) {
-            r->land->ownership = malloc(sizeof(region_owner));
+            region_owner *ro = malloc(sizeof(region_owner));
+            if (!ro) abort();
             assert(region_get_morale(r) == MORALE_DEFAULT);
-            r->land->ownership->owner = NULL;
-            r->land->ownership->last_owner = NULL;
-            r->land->ownership->flags = 0;
+            ro->owner = NULL;
+            ro->last_owner = NULL;
+            ro->flags = 0;
+            r->land->ownership = ro;
         }
         r->land->ownership->since_turn = turn;
         r->land->ownership->morale_turn = turn;
@@ -1396,7 +1419,8 @@ faction *update_owners(region * r)
                     else if (f || new_owner->faction != region_get_last_owner(r)) {
                         alliance *al = region_get_alliance(r);
                         if (al && new_owner->faction->alliance == al) {
-                            int morale = MAX(0, region_get_morale(r) - MORALE_TRANSFER);
+                            int morale = region_get_morale(r) - MORALE_TRANSFER;
+                            if (morale < 0) morale = 0;
                             region_set_morale(r, morale, turn);
                         }
                         else {
@@ -1447,7 +1471,7 @@ const char *region_getname(const region * r)
 int region_get_morale(const region * r)
 {
     if (r->land) {
-        assert(r->land->morale >= 0 && r->land->morale <= MORALE_MAX);
+        assert(r->land->morale <= MORALE_MAX);
         return r->land->morale;
     }
     return -1;
@@ -1456,11 +1480,11 @@ int region_get_morale(const region * r)
 void region_set_morale(region * r, int morale, int turn)
 {
     if (r->land) {
-        r->land->morale = morale;
+        r->land->morale = (unsigned short)morale;
         if (turn >= 0 && r->land->ownership) {
             r->land->ownership->morale_turn = turn;
         }
-        assert(r->land->morale >= 0 && r->land->morale <= MORALE_MAX);
+        assert(r->land->morale <= MORALE_MAX);
     }
 }
 

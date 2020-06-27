@@ -2,6 +2,7 @@
 
 #include "battle.h"
 
+#include "guard.h"
 #include "reports.h"
 #include "skill.h"
 
@@ -10,6 +11,7 @@
 #include <kernel/faction.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -17,7 +19,9 @@
 
 #include <spells/buildingcurse.h>
 
+#include <util/base36.h>
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/message.h>
 #include <util/rand.h>
@@ -30,6 +34,21 @@
 #include <stdio.h>
 
 #include "tests.h"
+
+static void setup_messages(void) {
+    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    mt_create_va(mt_new("para_army_index", NULL), "index:int", "name:string", MT_NEW_END);
+    mt_create_va(mt_new("battle_msg", NULL), "string:string", MT_NEW_END);
+    mt_create_va(mt_new("battle_row", NULL), "row:int", MT_NEW_END);
+    mt_create_va(mt_new("para_lineup_battle", NULL), "turn:int", MT_NEW_END);
+    mt_create_va(mt_new("para_after_battle", NULL), MT_NEW_END);
+    mt_create_va(mt_new("army_report", NULL), 
+        "index:int",  "abbrev:string", "dead:int", "fled:int", "survived:int",
+        MT_NEW_END);
+    mt_create_va(mt_new("casualties", NULL), 
+        "unit:unit", "runto:region", "run:int", "alive:int", "fallen:int",
+        MT_NEW_END);
+}
 
 static void test_make_fighter(CuTest * tc)
 {
@@ -59,7 +78,7 @@ static void test_make_fighter(CuTest * tc)
     af = make_fighter(b, au, as, false);
 
     CuAssertIntEquals(tc, 1, b->nfighters);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     CuAssertPtrEquals(tc, as, af->side);
     CuAssertIntEquals(tc, 0, af->run.hp);
     CuAssertIntEquals(tc, ST_BEHIND, af->status);
@@ -77,6 +96,7 @@ static void test_make_fighter(CuTest * tc)
 
 static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
+    weapon_type * wtype;
     unit *au;
     fighter *af;
     battle *b;
@@ -85,7 +105,7 @@ static void test_select_weapon_restricted(CuTest *tc) {
     test_setup();
     au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("halberd");
-    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&au->items, itype, 1);
     rc = test_create_race("smurf");
     CuAssertIntEquals(tc, 0, rc->mask_item & au->_race->mask_item);
@@ -93,23 +113,15 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 1, af->weapons[0].count);
-    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
     free_battle(b);
 
     itype->mask_deny = rc_mask(au->_race);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 0, af->weapons[0].count);
-    free_battle(b);
-
-    itype->mask_deny = 0;
-    itype->mask_allow = rc_mask(rc);
-    b = make_battle(au->region);
-    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 0, af->weapons[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
     free_battle(b);
 
     itype->mask_deny = 0;
@@ -117,8 +129,25 @@ static void test_select_weapon_restricted(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertIntEquals(tc, 1, af->weapons[0].count);
-    CuAssertIntEquals(tc, 0, af->weapons[1].count);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
+    free_battle(b);
+
+    itype->mask_deny = 0;
+    itype->mask_allow = rc_mask(rc);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
+    free_battle(b);
+
+    itype->mask_deny = 0;
+    itype->mask_allow = rc_mask(au->_race);
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertPtrNotNull(tc, af->weapons);
+    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
+    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
     free_battle(b);
 
     test_teardown();
@@ -197,7 +226,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     af = make_fighter(b, au, as, true);
 
     CuAssertPtrEquals(tc, bld, df->building);
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
 
     dt.fighter = df;
     dt.index = 0;
@@ -242,7 +271,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, true);
 
-    CuAssertPtrEquals(tc, 0, af->building);
+    CuAssertPtrEquals(tc, NULL, af->building);
     free_battle(b);
     test_teardown();
 }
@@ -279,12 +308,12 @@ static void test_building_bonus_respects_size(CuTest * tc)
     df = make_fighter(b, du, as, false);
 
     CuAssertPtrEquals(tc, bld, af->building);
-    CuAssertPtrEquals(tc, 0, df->building);
+    CuAssertPtrEquals(tc, NULL, df->building);
     free_battle(b);
     test_teardown();
 }
 
-static void test_building_defence_bonus(CuTest * tc)
+static void test_building_defense_bonus(CuTest * tc)
 {
     building_type * btype;
 
@@ -551,7 +580,7 @@ static void test_battle_skilldiff(CuTest *tc)
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ta.fighter->person[0].attack = 2;
-    td.fighter->person[0].defence = 1;
+    td.fighter->person[0].defense = 1;
     CuAssertIntEquals(tc, 1, skilldiff(ta, td, 0));
 
     td.fighter->person[0].flags |= FL_SLEEPING;
@@ -607,7 +636,7 @@ static void test_battle_report_one(CuTest *tc)
     fighter *fig;
 
     test_setup();
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u2 = test_create_unit(test_create_faction(NULL), r);
@@ -638,7 +667,7 @@ static void test_battle_report_two(CuTest *tc)
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "and", "and");
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u1->faction->locale = lang;
@@ -671,7 +700,7 @@ static void test_battle_report_three(CuTest *tc)
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "and", "and");
-    mt_create_va(mt_new("start_battle", NULL), "factions:string", MT_NEW_END);
+    setup_messages();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(NULL), r);
     u1->faction->locale = lang;
@@ -824,12 +853,43 @@ static void test_tactics_chance(CuTest *tc) {
     test_teardown();
 }
 
+static void test_battle_fleeing(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    test_setup();
+    setup_messages();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1->status = ST_FLEE;
+    u2->status = ST_AGGRO;
+#if 0
+    setguard(u1, true);
+    CuAssertIntEquals(tc, UFL_GUARD, (u1->flags & UFL_GUARD));
+    CuAssertIntEquals(tc, RF_GUARDED, (r->flags & RF_GUARDED));
+#endif
+    config_set_int("rules.combat.flee_chance_base", 100);
+    config_set_int("rules.combat.flee_chance_limit", 100);
+    unit_addorder(u2, create_order(K_ATTACK, u2->faction->locale, itoa36(u1->no)));
+    do_battles();
+    CuAssertIntEquals(tc, 1, u1->number);
+    CuAssertIntEquals(tc, 1, u2->number);
+#if 0
+    CuAssertIntEquals(tc, 0, (u1->flags & UFL_GUARD));
+    CuAssertIntEquals(tc, 0, (r->flags & RF_GUARDED));
+#endif
+    CuAssertIntEquals(tc, UFL_LONGACTION, (u1->flags & UFL_LONGACTION));
+    CuAssertIntEquals(tc, UFL_LONGACTION | UFL_NOTMOVING, (u2->flags & (UFL_LONGACTION | UFL_NOTMOVING)));
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
     SUITE_ADD_TEST(suite, test_select_weapon_restricted);
     SUITE_ADD_TEST(suite, test_select_armor);
+    SUITE_ADD_TEST(suite, test_battle_fleeing);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_battle_report_one);
@@ -838,7 +898,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
-    SUITE_ADD_TEST(suite, test_building_defence_bonus);
+    SUITE_ADD_TEST(suite, test_building_defense_bonus);
     SUITE_ADD_TEST(suite, test_calculate_armor);
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);

@@ -2,8 +2,8 @@
 #include "report.h"
 #include "move.h"
 #include "travelthru.h"
-#include "keyword.h"
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -15,6 +15,8 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 
+#include "util/keyword.h"
+#include "util/param.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
@@ -104,12 +106,30 @@ static void test_report_region(CuTest *tc) {
     rsettrees(r, 0, 1);
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
-    region_setname(r, "Hodor");
     f = test_create_faction(NULL);
     f->locale = lang;
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
 
+    region_setname(r, "1234567890123456789012345678901234567890");
+    r->seen.mode = seen_travel;
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "1234567890123456789012345678901234567890 (0,0) (durchgereist), Ebene, 3/2\nBlumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
+    out.api->rewind(out.handle);
+    region_setname(r, "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    r->seen.mode = seen_travel;
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "12345678901234567890123456789012345678901234567890123456789012345678901234567890\n(0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
+
+    out.api->rewind(out.handle);
+    region_setname(r, "Hodor");
     r->seen.mode = seen_travel;
     report_region(&out, r, f);
     out.api->rewind(out.handle);
@@ -117,28 +137,93 @@ static void test_report_region(CuTest *tc) {
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
-    r->seen.mode = seen_unit;
     out.api->rewind(out.handle);
+    r->seen.mode = seen_unit;
     report_region(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 135 Steine/1, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
+    out.api->rewind(out.handle);
     r->resources->amount = 1;
     r->land->peasants = 1;
     r->land->horses = 1;
     r->land->money = 1;
-
     r->seen.mode = seen_unit;
-    out.api->rewind(out.handle);
     report_region(&out, r, f);
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
 
+    r->land->peasants = 0;
+    r->land->horses = 0;
+    r->land->money = 0;
+    rsettrees(r, 0, 0);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 2, 0);
+
+    out.api->rewind(out.handle);
+    report_region(&out, r, f);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 1 Stein/1.\n", buf);
+
     mstream_done(&out);
+    test_teardown();
+}
+
+static void test_report_allies(CuTest *tc) {
+    stream out = { 0 };
+    char buf[1024];
+    char exp[1024];
+    size_t len, linebreak = 72;
+    struct locale *lang;
+    faction *f, *f1, *f2, *f3;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "list_and", " und ");
+    mstream_init(&out);
+    f = test_create_faction(NULL);
+    f->locale = lang;
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    f3 = test_create_faction(NULL);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n\n",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]));
+    ally_set(&f->allies, f1, HELP_GUARD);
+    report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = 0;
+    CuAssertStrEquals(tc, exp, buf);
+
+    out.api->rewind(out.handle);
+    ally_set(&f->allies, f2, HELP_GIVE);
+    ally_set(&f->allies, f3, HELP_ALL);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]),
+        factionname(f2),
+        LOC(lang, parameters[P_GIVE]));
+    linebreak = strlen(exp);
+    snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)\nund %s (%s).\n\n",
+        factionname(f1),
+        LOC(lang, parameters[P_GUARD]),
+        factionname(f2),
+        LOC(lang, parameters[P_GIVE]),
+        factionname(f3),
+        LOC(lang, parameters[P_ANY]));
+    report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = 0;
+    CuAssertStrEquals(tc, exp, buf);
+
     test_teardown();
 }
 
@@ -175,7 +260,7 @@ static void test_report_travelthru(CuTest *tc) {
     out.api->rewind(out.handle);
     len = out.api->read(out.handle, buf, sizeof(buf));
     buf[len] = '\0';
-    CuAssertStrEquals_Msg(tc, "list one unit", "Durchreise: Hodor (1).\n", buf);
+    CuAssertStrEquals_Msg(tc, "list one unit", "\nDurchreise: Hodor (1).\n", buf);
     mstream_done(&out);
 
     mstream_init(&out);
@@ -294,13 +379,69 @@ static void test_write_spell_syntax(CuTest *tc) {
     test_teardown();
 }
 
+static void test_paragraph(CuTest *tc) {
+    const char *toolong = "im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "im Westen das Hochland von Geraldin (93,-303).\n";
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    paragraph(&out, toolong, 0, 0, 0);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
+static void test_paragraph_break(CuTest *tc) {
+    const char *toolong = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin\n(93,-303).\n";
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    paragraph(&out, toolong, 0, 0, 0);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
+static void test_pump_paragraph_toolong(CuTest *tc) {
+    const char *toolong = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin (93,-303).";
+    const char *expect = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin\n(93,-303).\n";
+    sbstring sbs;
+    char buf[256];
+    stream out = { 0 };
+    size_t len;
+
+    mstream_init(&out);
+
+    sbs_init(&sbs, buf, sizeof(buf));
+    sbs_strcat(&sbs, toolong);
+
+    pump_paragraph(&sbs, &out, 78, true);
+    out.api->rewind(out.handle);
+    len = out.api->read(out.handle, buf, sizeof(buf));
+    buf[len] = '\0';
+    CuAssertStrEquals(tc, expect, buf);
+}
+
 CuSuite *get_report_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_write_spaces);
     SUITE_ADD_TEST(suite, test_write_many_spaces);
+    SUITE_ADD_TEST(suite, test_paragraph);
+    SUITE_ADD_TEST(suite, test_paragraph_break);
+    SUITE_ADD_TEST(suite, test_pump_paragraph_toolong);
     SUITE_ADD_TEST(suite, test_report_travelthru);
     SUITE_ADD_TEST(suite, test_report_region);
+    SUITE_ADD_TEST(suite, test_report_allies);
     SUITE_ADD_TEST(suite, test_write_spell_syntax);
     return suite;
 }

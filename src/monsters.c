@@ -1,22 +1,3 @@
-/*
- *	Eressea PB(E)M host Copyright (C) 1998-2015
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- *  based on:
- *
- * Atlantis v1.0  13 September 1993 Copyright 1993 by Russell Wallace
- * Atlantis v1.7                    Copyright 1996 by Alex Schr�der
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- * This program may not be sold or used commercially without prior written
- * permission from the authors.
- */
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -27,17 +8,18 @@
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
-#include "keyword.h"
 #include "study.h"
 #include "move.h"
 
 /* kernel includes */
+#include "kernel/attrib.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
+#include "kernel/event.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
@@ -52,19 +34,19 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/language.h>
-#include <util/lists.h>
+#include "util/keyword.h"
+#include "util/language.h"
 #include <util/log.h>
 #include <util/rand.h>
 #include <util/rng.h>
 #include <util/strings.h>
 
 /* attributes includes */
-#include <attributes/targetregion.h>
 #include <attributes/hate.h>
+#include <attributes/otherfaction.h>
+#include <attributes/stealth.h>
+#include <attributes/targetregion.h>
 
 #include <spells/regioncurse.h>
 
@@ -75,7 +57,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define DRAGON_RANGE       20  /* max. Distanz zum n�chsten Drachenziel */
+#define DRAGON_RANGE       20  /* max. Distanz zum naechsten Drachenziel */
 #define MOVE_PERCENT       25  /* chance fuer bewegung */
 #define MAXILLUSION_TEXTS   3
 
@@ -162,19 +144,56 @@ static void reduce_weight(unit * u)
     }
 }
 
+static bool monster_is_waiting(const unit * u)
+{
+    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
+    if (fval(u, test))
+        return true;
+    return false;
+}
+
+static bool monster_can_attack(const unit * u)
+{
+    if (u->status >= ST_AVOID) {
+        return false;
+    }
+    if (u->region->land) {
+        return is_guard(u);
+    }
+    else if (fval(u->region->terrain, SEA_REGION)) {
+        return fval(u_race(u), RCF_SWIM);
+    }
+    return fval(u_race(u), RCF_FLY);
+}
+
 static order *monster_attack(unit * u, const unit * target)
 {
     assert(u->region == target->region);
     assert(u->faction != target->faction);
-    if (!cansee(u->faction, u->region, target, 0))
-        return NULL;
-    if (monster_is_waiting(u))
-        return NULL;
-
-    if (u->region->land && (u->region->flags & RF_GUARDED) == 0) {
+    if (!cansee(u->faction, u->region, target, 0)) {
         return NULL;
     }
+    if (monster_is_waiting(u)) {
+        return NULL;
+    }
+
     return create_order(K_ATTACK, u->faction->locale, "%i", target->no);
+}
+
+bool join_monsters(unit *u, faction *monsters) {
+    if (monsters == NULL) {
+        monsters = get_monsters();
+        if (monsters == NULL) {
+            return false;
+        }
+    }
+    u_setfaction(u, monsters);
+    u->status = ST_FIGHT;
+    a_removeall(&u->attribs, &at_otherfaction);
+    u->flags &= ~UFL_ANON_FACTION;
+    u_seteffstealth(u, -1);
+    u_freeorders(u);
+    return true;
 }
 
 void monsters_desert(struct faction *monsters)
@@ -186,14 +205,15 @@ void monsters_desert(struct faction *monsters)
         unit *u;
         
         for (u = r->units; u; u = u->next) {
-            if (u->faction!=monsters
+            if (u->faction != monsters
                 && (u_race(u)->flags & RCF_DESERT)) {
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
-                    ADDMSG(&u->faction->msgs, msg_message("desertion",
-                        "unit region", u, r));
-                    u_setfaction(u, monsters);
+                    if (join_monsters(u, monsters)) {
+                        ADDMSG(&u->faction->msgs, msg_message("desertion",
+                            "unit region", u, r));
+                    }
                 }
             }
         }
@@ -203,7 +223,9 @@ void monsters_desert(struct faction *monsters)
 int monster_attacks(unit * monster, bool rich_only)
 {
     const race *rc_serpent = get_race(RC_SEASERPENT);
-    if (monster->status < ST_AVOID) {
+    int result = -1;
+
+    if (monster_can_attack(monster)) {
         region *r = monster->region;
         unit *u2;
         int money = 0;
@@ -220,21 +242,22 @@ int monster_attacks(unit * monster, bool rich_only)
                 if (!rich_only || m > 0) {
                     order *ord = monster_attack(monster, u2);
                     if (ord) {
-                        addlist(&monster->orders, ord);
+                        result = 0;
+                        unit_addorder(monster, ord);
                         money += m;
                     }
                 }
             }
         }
-        return money;
+        return money > 0 ? money : result;
     }
-    return 0;
+    return result;
 }
 
-static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
+static order *get_money_for_dragon(region * r, unit * u, int wanted)
 {
     int money;
-    bool attacks = attack_chance > 0.0;
+    bool attacks = (attack_chance > 0.0) && armedmen(u, false);
 
     /* falls genug geld in der region ist, treiben wir steuern ein. */
     if (rmoney(r) >= wanted) {
@@ -248,8 +271,9 @@ static order *get_money_for_dragon(region * r, unit * udragon, int wanted)
     /* falls der drache launisch ist, oder das regionssilber knapp, greift er alle an
      * und holt sich Silber von Einheiten, vorausgesetzt er bewacht bereits */
     money = 0;
-    if (attacks && is_guard(udragon)) {
-        money += monster_attacks(udragon, true);
+    if (attacks && monster_can_attack(u)) {
+        int m = monster_attacks(u, true);
+        if (m > 0) money += m;
     }
 
     /* falls die einnahmen erreicht werden, bleibt das monster noch eine */
@@ -369,11 +393,11 @@ static direction_t random_neighbour(region * r, unit * u)
         }
     }
 
-    /* Zuf�llig eine ausw�hlen */
+    /* Zufaellig eine auswaehlen */
 
     rr = rng_int() % c;
 
-    /* Durchz�hlen */
+    /* Durchzaehlen */
 
     c = 0;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -410,11 +434,11 @@ static direction_t treeman_neighbour(region * r)
     if (c == 0) {
         return NODIRECTION;
     }
-    /* Zuf�llig eine ausw�hlen */
+    /* Zufaellig eine auswaehlen */
 
     rr = rng_int() % c;
 
-    /* Durchz�hlen */
+    /* Durchzaehlen */
 
     c = -1;
     for (i = 0; i != MAXDIRECTIONS; i++) {
@@ -440,7 +464,7 @@ static order *monster_move(region * r, unit * u)
     if (fval(u_race(u), RCF_DRAGON)) {
         d = richest_neighbour(r, u->faction, 1);
     }
-    else if (get_race(RC_TREEMAN)==u_race(u)) {
+    else if (get_race(RC_TREEMAN) == u_race(u)) {
         d = treeman_neighbour(r);
     }
     else {
@@ -555,11 +579,11 @@ static order *monster_learn(unit * u)
     const struct locale *lang = u->faction->locale;
 
     /* can these monsters even study? */
-    if (!unit_can_study(u)) {
+    if (!check_student(u, NULL, SK_PERCEPTION)) {
         return NULL;
     }
 
-    /* Monster lernt ein zuf�lliges Talent aus allen, in denen es schon
+    /* Monster lernt ein zufaelliges Talent aus allen, in denen es schon
      * Lerntage hat. */
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
         if (sv->level > 0)
@@ -606,6 +630,7 @@ static void recruit_dracoids(unit * dragon, int size)
     region *r = dragon->region;
     const struct item *weapon = NULL;
     unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
+    stats_count("monsters.create.dracoid", 1);
 
     fset(un, UFL_ISNEW | UFL_MOVED);
 
@@ -638,16 +663,16 @@ static order *plan_dragon(unit * u)
         rc_wyrm = get_race(RC_WYRM);
     }
 
-    if (ta == NULL) {
-        move |= (rpeasants(r) == 0);   /* when no peasants, move */
-        move |= (rmoney(r) == 0);      /* when no money, move */
+    if (!move && ta == NULL) {
+        move = (rpeasants(r) == 0);   /* when no peasants, move */
+        move = move || (rmoney(r) == 0);      /* when no money, move */
     }
-    move |= chance(0.04);         /* 4% chance to change your mind */
+    move = move || chance(0.04);         /* 4% chance to change your mind */
 
     if (rc == rc_wyrm && !move) {
         unit *u2;
         for (u2 = r->units; u2; u2 = u2->next) {
-            /* wyrme sind einzelg�nger */
+            /* Wyrme sind Einzelgaenger */
             if (u2 == u) {
                 /* we do not make room for newcomers, so we don't need to look at them */
                 break;
@@ -727,6 +752,17 @@ static order *plan_dragon(unit * u)
     return long_order;
 }
 
+static void monster_cannibalism(unit *u) {
+    unit *u2;
+
+    for (u2 = u->next; u2; u2 = u2->next) {
+        if (u2->_race == u->_race) {
+            stats_count("monsters.cannibalism", u2->number);
+            u2->number = 0;
+        }
+    }
+}
+
 void plan_monsters(faction * f)
 {
     region *r;
@@ -737,47 +773,53 @@ void plan_monsters(faction * f)
 
     for (r = regions; r; r = r->next) {
         unit *u;
-        bool attacking = false;
-        /* Tiny optimization: Monsters on land only attack randomly when
-        * they are guarding. If nobody is guarding this region (RF_GUARDED),
-        * there can't be any random attacks.
-        */
-        if (!r->land || r->flags & RF_GUARDED) {
-            attacking = chance(attack_chance);
-        }
 
         for (u = r->units; u; u = u->next) {
             const race *rc = u_race(u);
             attrib *ta;
             order *long_order = NULL;
+            bool can_move = true;
+            bool guarding;
 
-            /* Ab hier nur noch Befehle f�r NPC-Einheiten. */
-            if (u->faction!=f)
+            /* Ab hier nur noch Befehle fuer NPC-Einheiten. */
+            if (u->faction != f || u->number <= 0) {
                 continue;
+            }
 
             /* Parteitarnung von Monstern ist doof: */
             if (fval(u, UFL_ANON_FACTION)) {
                 u->flags &= ~UFL_ANON_FACTION;
             }
+            a_removeall(&u->attribs, &at_otherfaction);
 
-            /* Befehle m�ssen jede Runde neu gegeben werden: */
-            free_orders(&u->orders);
+            if (rc->splitsize < 10) {
+                /* hermit-type monsters eat each other */
+                monster_cannibalism(u);
+            }
+
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
                 produceexp(u, SK_PERCEPTION, u->number);
             }
 
-            if (attacking && (!r->land || is_guard(u))) {
-                monster_attacks(u, false);
+            /* Befehle muessen jede Runde neu gegeben werden: */
+            free_orders(&u->orders);
+
+            guarding = is_guard(u);
+            /* All monsters want to guard the region: */
+            if (!guarding && u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
+                unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
             }
+
             /* units with a plan to kill get ATTACK orders (even if they don't guard): */
             ta = a_find(u->attribs, &at_hate);
             if (ta && !monster_is_waiting(u)) {
                 unit *tu = (unit *)ta->data.v;
-                if (tu && tu->region == r) {
+                if (tu && tu->region == r && monster_can_attack(u)) {
                     order * ord = monster_attack(u, tu);
                     if (ord) {
-                        addlist(&u->orders, ord);
+                        unit_addorder(u, ord);
+                        can_move = false;
                     }
                 }
                 else if (tu) {
@@ -786,17 +828,22 @@ void plan_monsters(faction * f)
                         allowed = allowed_fly;
                     }
                     long_order = plan_move_to_target(u, tu->region, 2, allowed);
+                    can_move = false;
                 }
                 else
                     a_remove(&u->attribs, ta);
             }
-            /* All monsters guard the region: */
-            if (u->status < ST_FLEE && !monster_is_waiting(u) && r->land) {
-                addlist(&u->orders, create_order(K_GUARD, u->faction->locale, NULL));
+            else if (monster_can_attack(u)) {
+                if (chance(attack_chance)) {
+                    int m = monster_attacks(u, false);
+                    if (m >= 0) {
+                        can_move = false;
+                    }
+                }
             }
 
             /* Einheiten mit Bewegungsplan kriegen ein NACH: */
-            if (long_order == NULL) {
+            if (can_move && long_order == NULL) {
                 ta = a_find(u->attribs, &at_targetregion);
                 if (ta) {
                     if (u->region == (region *)ta->data.v) {
@@ -817,21 +864,21 @@ void plan_monsters(faction * f)
                     long_order = plan_dragon(u);
                 }
                 else {
-                    if (rc == get_race(RC_SEASERPENT)) {
+                    if (can_move && rc == get_race(RC_SEASERPENT)) {
                         long_order = create_order(K_PIRACY, f->locale, NULL);
                     }
                     else {
-                        if (rc->flags & RCF_LEARN) {
+                        if (rc->flags & RCF_AI_LEARN) {
                             long_order = monster_learn(u);
                         }
                     }
                 }
             }
-            if (long_order == NULL && unit_can_study(u)) {
-                /* Einheiten, die Waffenlosen Kampf lernen k�nnten, lernen es um
+            if (long_order == NULL && check_student(u, NULL, SK_WEAPONLESS)) {
+                /* Einheiten, die Waffenlosen Kampf lernen koennten, lernen es um
                 * zu bewachen: */
                 if (rc->bonus[SK_WEAPONLESS] != -99) {
-                    if (effskill(u, SK_WEAPONLESS, 0) < 1) {
+                    if (effskill(u, SK_WEAPONLESS, NULL) < 1) {
                         long_order =
                             create_order(K_STUDY, f->locale, "'%s'",
                                 skillname(SK_WEAPONLESS, f->locale));
@@ -840,7 +887,7 @@ void plan_monsters(faction * f)
             }
 
             if (long_order) {
-                addlist(&u->orders, long_order);
+                unit_addorder(u, long_order);
             }
         }
     }
@@ -863,20 +910,21 @@ static int nrand(int handle_start, int sub)
 
 unit *spawn_seaserpent(region *r, faction *f) {
     unit *u = create_unit(r, f, 1, get_race(RC_SEASERPENT), 0, NULL, NULL);
+    stats_count("monsters.create.seaserpent", 1);
     fset(u, UFL_ISNEW | UFL_MOVED);
     equip_unit(u, "seed_seaserpent");
     return u;
 }
 
 /** 
- * Drachen und Seeschlangen k�nnen entstehen 
+ * Drachen und Seeschlangen koennen entstehen
  */
 void spawn_dragons(void)
 {
     region *r;
     faction *monsters = get_or_create_monsters();
     int minage = config_get_int("monsters.spawn.min_age", 100);
-    int spawn_chance = config_get_int("monsters.spawn.chance", 100);
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 100;
 
     if (spawn_chance <= 0) {
         /* monster spawning disabled */
@@ -903,6 +951,7 @@ void spawn_dragons(void)
             else {
                 u = create_unit(r, monsters, nrand(30, 20) + 1, get_race(RC_DRAGON), 0, NULL, NULL);
             }
+            stats_count("monsters.create.dragon", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             equip_unit(u, "seed_dragon");
 
@@ -919,7 +968,7 @@ void spawn_dragons(void)
     }
 }
 
-/** Untote k�nnen entstehen */
+/** Untote koennen entstehen */
 void spawn_undead(void)
 {
     region *r;
@@ -935,11 +984,11 @@ void spawn_undead(void)
         }
 
         if (r->land && unburied > rpeasants(r) / 20
-            && rng_int() % 10000 < 200) {
+            && rng_int() % 10000 < 100) {
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.
-             * Lieber sammeln lassen, bis sie mindestens 5% der Bev�lkerung sind, und
+             * Lieber sammeln lassen, bis sie mindestens 5% der Bevoelkerung sind, und
              * dann erst auferstehen. */
             int undead = unburied / (rng_int() % 2 + 1);
             const race *rc = NULL;
@@ -963,6 +1012,7 @@ void spawn_undead(void)
             }
 
             u = create_unit(r, monsters, undead, rc, 0, NULL, NULL);
+            stats_count("monsters.create.undead", 1);
             fset(u, UFL_ISNEW | UFL_MOVED);
             if ((rc == get_race(RC_SKELETON) || rc == get_race(RC_ZOMBIE))
                 && rng_int() % 10 < 4) {
@@ -997,19 +1047,11 @@ void spawn_undead(void)
         else {
             int i = deathcount(r);
             if (i) {
-                /* Gr�ber verwittern, 3% der Untoten finden die ewige Ruhe */
+                /* Groeber verwittern, 3% der Untoten finden die ewige Ruhe */
                 deathcounts(r, (int)(-i * 0.03));
             }
         }
     }
-}
-
-bool monster_is_waiting(const unit * u)
-{
-    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : UFL_ISNEW | UFL_MOVED;
-    if (fval(u, test))
-        return true;
-    return false;
 }
 
 static void eaten_by_monster(unit * u)
@@ -1150,9 +1192,11 @@ void monster_kills_peasants(unit * u)
 
 void make_zombie(unit * u)
 {
-    u_setfaction(u, get_monsters());
-    scale_number(u, 1);
-    u->hp = unit_max_hp(u) * u->number;
-    u_setrace(u, get_race(RC_ZOMBIE));
-    u->irace = NULL;
+    if (join_monsters(u, NULL)) {
+        u_freeorders(u);
+        scale_number(u, 1);
+        u->hp = unit_max_hp(u) * u->number;
+        u_setrace(u, get_race(RC_ZOMBIE));
+        u->irace = NULL;
+    }
 }

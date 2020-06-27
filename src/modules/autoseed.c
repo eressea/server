@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "autoseed.h"
@@ -31,7 +19,7 @@
 #include <attributes/key.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -49,7 +37,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-const terrain_type *random_terrain(const terrain_type * terrains[],
+static const terrain_type *random_terrain_select(const terrain_type * terrains[],
     int distribution[], int size)
 {
     int ndistribution = size;
@@ -95,20 +83,20 @@ newfaction *read_newfactions(const char *filename)
         faction *f;
         char race[20], email[64], lang[8], password[16];
         newfaction *nf, **nfi;
-        int alliance = 0, subscription = 0;
+        int alliance = 0;
 
         if (fgets(buf, sizeof(buf), F) == NULL)
             break;
+        if (buf[0] == '#') {
+            continue;
+        }
 
         email[0] = '\0';
         password[0] = '\0';
 
-        if (sscanf(buf, "%54s %19s %7s %15s %4d %4d", email, race, lang, 
-            password, &subscription, &alliance) < 3) {
+        if (sscanf(buf, "%54s %19s %7s %15s %4d", email, race, lang,
+            password, &alliance) < 3) {
             break;
-        }
-        if (email[0] == '#') {
-            continue;
         }
         if (email[0] == '\0') {
             break;
@@ -133,17 +121,16 @@ newfaction *read_newfactions(const char *filename)
         if (nf) {
             continue;
         }
-        nf = calloc(sizeof(newfaction), 1);
+        nf = (newfaction *)calloc(1, sizeof(newfaction));
         if (check_email(email) == 0) {
-          nf->email = str_strdup(email);
+            nf->email = str_strdup(email);
         } else {
-            log_error("Invalid email address for subscription %s: %s\n", itoa36(subscription), email);
+            log_error("Invalid email address for new faction: %s\n", email);
             free(nf);
             continue;
         }
         nf->password = str_strdup(password);
         nf->race = rc_find(race);
-        nf->subscription = subscription;
         if (alliances != NULL) {
             struct alliance *al = findalliance(alliance);
             if (al == NULL) {
@@ -557,7 +544,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             ++tsize;
             assert(r->land && r->units == 0);
             u = addplayer(r, addfaction(nextf->email, nextf->password, nextf->race,
-                nextf->lang, nextf->subscription));
+                nextf->lang));
             f = u->faction;
             fset(f, FFL_ISNEW);
             f->alliance = nextf->allies;
@@ -566,8 +553,8 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
             nfp = &nextf->next;
             while (*nfp) {
                 newfaction *nf = *nfp;
-                if (strcmp(nextf->email, nf->email) == 0) {
-                    log_warning("Duplicate email %s\n", nf->email?nf->email:"");
+                if (nf->email && nextf->email && strcmp(nextf->email, nf->email) == 0) {
+                    log_warning("Duplicate email %s\n", nf->email ? nf->email : "");
                     *nfp = nf->next;
                     free_newfaction(nf);
                 }
@@ -584,7 +571,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
                 break;
         }
         else {
-            terraform_region(r, random_terrain(terrainarr, distribution, nterrains));
+            terraform_region(r, random_terrain_select(terrainarr, distribution, nterrains));
             --isize;
         }
     }
@@ -620,7 +607,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
                         pnormalize(&x, &y, pl);
                         rn = new_region(x, y, pl, 0);
                         if (rng_int() % SPECIALCHANCE < special) {
-                            terrain = random_terrain(terrainarr, distribution, nterrains);
+                            terrain = random_terrain_select(terrainarr, distribution, nterrains);
                             special = SPECIALCHANCE / 3;      /* 33% chance auf noch eines */
                         }
                         else {
@@ -677,6 +664,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
 region_list *regionqueue_push(region_list ** rlist, region * r)
 {
     region_list *rnew = malloc(sizeof(region_list));
+    if (!rnew) abort();
     rnew->data = r;
     rnew->next = 0;
     while (*rlist) {
@@ -698,23 +686,21 @@ region *regionqueue_pop(region_list ** rlist)
     return 0;
 }
 
-#define GEOMAX 8
+#define GEOMAX 7
 static struct geo {
     int distribution;
     terrain_t type;
 } geography_e3[GEOMAX] = {
-    {
-        8, T_OCEAN }, {
-            3, T_SWAMP }, {
-                1, T_VOLCANO }, {
-                    3, T_DESERT }, {
-                        4, T_HIGHLAND }, {
-                            3, T_MOUNTAIN }, {
-                                2, T_GLACIER }, {
-                                    1, T_PLAIN }
+    { 8, T_OCEAN },
+    { 3, T_SWAMP },
+    { 3, T_DESERT },
+    { 4, T_HIGHLAND },
+    { 3, T_MOUNTAIN },
+    { 2, T_GLACIER },
+    { 1, T_PLAIN }
 };
 
-const terrain_type *random_terrain_e3(direction_t dir)
+const terrain_type *random_terrain(direction_t dir)
 {
     static const terrain_type **terrainarr = 0;
     static int *distribution = 0;
@@ -723,13 +709,15 @@ const terrain_type *random_terrain_e3(direction_t dir)
         int n = 0;
 
         terrainarr = malloc(GEOMAX * sizeof(const terrain_type *));
+        if (!terrainarr) abort();
         distribution = malloc(GEOMAX * sizeof(int));
+        if (!distribution) abort();
         for (n = 0; n != GEOMAX; ++n) {
             terrainarr[n] = newterrain(geography_e3[n].type);
             distribution[n] = geography_e3[n].distribution;
         }
     }
-    return random_terrain(terrainarr, distribution, GEOMAX);
+    return random_terrain_select(terrainarr, distribution, GEOMAX);
 }
 
 static int
@@ -856,15 +844,14 @@ static void starting_region(newfaction ** players, region * r, region * rn[])
         newfaction *nf = *players;
         const struct race *rc = nf->race ? nf->race : races;
         const struct locale *lang = nf->lang ? nf->lang : default_locale;
-        const char * passwd = nf->password ? nf->password : itoa36(rng_int());
-        addplayer(r, addfaction(nf->email, passwd, rc, lang, 0));
+        addplayer(r, addfaction(nf->email, nf->password, rc, lang));
         *players = nf->next;
         free_newfaction(nf);
     }
 }
 
-/* E3A island generation */
-int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfactions)
+/* island generator */
+int build_island(int x, int y, int minsize, newfaction ** players, int numfactions)
 {
 #define MIN_QUALITY 1000
     int nfactions = 0;
@@ -880,17 +867,17 @@ int build_island_e3(int x, int y, int minsize, newfaction ** players, int numfac
         r = new_region(x, y, pl, 0);
     }
     do {
-        terraform_region(r, random_terrain_e3(NODIRECTION));
+        terraform_region(r, random_terrain(NODIRECTION));
     } while (!r->land);
 
     while (r) {
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, &random_terrain_e3, minsize - nsize);
+                nsize += random_neighbours(r, &rlist, random_terrain, minsize - nsize);
             }
             else {
-                nsize += random_neighbours(r, &rlist, &get_ocean, minsize - nsize);
+                nsize += random_neighbours(r, &rlist, get_ocean, minsize - nsize);
             }
         }
         regionqueue_push(&island, r);

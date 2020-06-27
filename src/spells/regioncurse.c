@@ -1,16 +1,3 @@
-/*
- *
- * Eressea PB(E)M host Copyright (C) 1998-2015
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include "regioncurse.h"
 #include "magic.h"
@@ -34,30 +21,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-
-/*
- * godcursezone
- */
-static message *cinfo_cursed_by_the_gods(const void *obj, objtype_t typ,
-    const curse * c, int self)
-{
-    region *r = (region *)obj;
-
-    UNUSED_ARG(typ);
-    UNUSED_ARG(self);
-    assert(typ == TYP_REGION);
-
-    if (r->terrain->flags & SEA_REGION) {
-        return msg_message("curseinfo::godcurseocean", "id", c->no);
-    }
-    return msg_message("curseinfo::godcurse", "id", c->no);
-}
-
-const struct curse_type ct_godcursezone = {
-    "godcursezone",
-    CURSETYP_NORM, CURSE_IMMUNE, (NO_MERGE),
-    cinfo_cursed_by_the_gods,
-};
 
 /* --------------------------------------------------------------------- */
 /*
@@ -87,7 +50,7 @@ const struct curse_type ct_gbdream = {
 /* --------------------------------------------------------------------- */
 /*
  * C_MAGICSTREET
- *  erzeugt Straßennetz
+ *  erzeugt Strassennetz
  */
 static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * c,
     int self)
@@ -97,7 +60,7 @@ static message *cinfo_magicstreet(const void *obj, objtype_t typ, const curse * 
     UNUSED_ARG(obj);
     assert(typ == TYP_REGION);
 
-    /* Warnung vor Auflösung */
+    /* Warnung vor Aufloesung */
     if (c->duration >= 2) {
         return msg_message("curseinfo::magicstreet", "id", c->no);
     }
@@ -120,7 +83,7 @@ static message *cinfo_antimagiczone(const void *obj, objtype_t typ, const curse 
     UNUSED_ARG(obj);
     assert(typ == TYP_REGION);
 
-    /* Magier spüren eine Antimagiezone */
+    /* Magier spueren eine Antimagiezone */
     if (self != 0) {
         return msg_message("curseinfo::antimagiczone", "id", c->no);
     }
@@ -128,7 +91,7 @@ static message *cinfo_antimagiczone(const void *obj, objtype_t typ, const curse 
     return NULL;
 }
 
-/* alle Magier können eine Antimagiezone wahrnehmen */
+/* alle Magier koennen eine Antimagiezone wahrnehmen */
 static int
 cansee_antimagiczone(const struct faction *viewer, const void *obj, objtype_t typ,
 const curse * c, int self)
@@ -170,7 +133,7 @@ static message *cinfo_farvision(const void *obj, objtype_t typ, const curse * c,
 
     assert(typ == TYP_REGION);
 
-    /* Magier spüren eine farvision */
+    /* Magier spueren eine farvision */
     if (self != 0) {
         return msg_message("curseinfo::farvision", "id", c->no);
     }
@@ -232,7 +195,7 @@ const struct curse_type ct_badlearn = {
     cinfo_simple
 };
 
-/*  Trübsal-Zauber */
+/*  Truebsal-Zauber */
 const struct curse_type ct_depression = {
     "depression",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
@@ -268,7 +231,7 @@ const struct curse_type ct_badmagicresistancezone = {
     cinfo_simple
 };
 
-/* erhöht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
+/* erhoeht Magieresistenz von aliierten Einheiten, wirkt nur 1x pro
 * Einheit */
 const struct curse_type ct_goodmagicresistancezone = {
     "goodmagicresistancezone",
@@ -312,7 +275,6 @@ void register_regioncurse(void)
     ct_register(&ct_badmagicresistancezone);
     ct_register(&ct_goodmagicresistancezone);
     ct_register(&ct_riotzone);
-    ct_register(&ct_godcursezone);
     ct_register(&ct_holyground);
     ct_register(&ct_healing);
 }

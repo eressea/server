@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -38,13 +20,14 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "lighthouse.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
+#include <kernel/event.h>
 #include <util/functions.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
@@ -128,21 +111,14 @@ static void free_buildingtype(void *ptr) {
     free(btype);
 }
 
-void free_buildingtypes(void) {
-    cb_clear(&cb_bldgtypes);
-    selist_foreach(buildingtypes, free_buildingtype);
-    selist_free(buildingtypes);
-    buildingtypes = 0;
-    ++bt_changes;
-}
-
 building_type *bt_get_or_create(const char *name)
 {
     assert(name && name[0]);
     if (name != NULL) {
         building_type *btype = bt_find_i(name);
         if (btype == NULL) {
-            btype = calloc(sizeof(building_type), 1);
+            btype = (building_type *)calloc(1, sizeof(building_type));
+            if (!btype) abort();
             btype->_name = str_strdup(name);
             btype->flags = BTF_DEFAULT;
             btype->auraregen = 1.0;
@@ -264,24 +240,36 @@ building *findbuilding(int i)
 
 static local_names *bnames;
 
-/* Find the building type for a given localized name (as seen by the user). Useful for parsing
- * orders. The inverse of locale_string(lang, btype->_name), sort of. */
-const building_type *findbuildingtype(const char *name,
-    const struct locale *lang)
-{
-    variant type;
-    local_names *bn = bnames;
+static void free_bnames(void) {
+    while (bnames) {
+        local_names *bn = bnames;
+        bnames = bnames->next;
+        freetokens(bn->names);
+        free(bn);
+    }
+}
 
+static local_names *get_bnames(const struct locale *lang)
+{
+    static int config;
+    local_names *bn;
+
+    if (bt_changed(&config)) {
+        free_bnames();
+    }
+    bn = bnames;
     while (bn) {
-        if (bn->lang == lang)
+        if (bn->lang == lang) {
             break;
+        }
         bn = bn->next;
     }
     if (!bn) {
         selist *ql = buildingtypes;
         int qi;
 
-        bn = (local_names *)calloc(sizeof(local_names), 1);
+        bn = (local_names *)calloc(1, sizeof(local_names));
+        if (!bn) abort();
         bn->next = bnames;
         bn->lang = lang;
 
@@ -291,14 +279,26 @@ const building_type *findbuildingtype(const char *name,
             const char *n = LOC(lang, btype->_name);
             if (!n) {
                 log_error("building type %s has no translation in %s",
-                          btype->_name, locale_name(lang));
-            } else {
+                    btype->_name, locale_name(lang));
+            }
+            else {
+                variant type;
                 type.v = (void *)btype;
                 addtoken((struct tnode **)&bn->names, n, type);
             }
         }
         bnames = bn;
     }
+    return bn;
+}
+
+/* Find the building type for a given localized name (as seen by the user). Useful for parsing
+ * orders. The inverse of locale_string(lang, btype->_name), sort of. */
+const building_type *findbuildingtype(const char *name,
+    const struct locale *lang)
+{
+    variant type;
+    local_names *bn = get_bnames(lang);
     if (findtoken(bn->names, name, &type) == E_TOK_NOMATCH)
         return NULL;
     return (const building_type *)type.v;
@@ -343,15 +343,14 @@ void resolve_building(building *b)
     resolve(RESOLVE_BUILDING | b->no, b);
 }
 
-int read_building_reference(gamedata * data, building **bp, resolve_fun fun)
+int read_building_reference(gamedata * data, building **bp)
 {
     int id;
     READ_INT(data->store, &id);
     if (id > 0) {
         *bp = findbuilding(id);
         if (*bp == NULL) {
-            *bp = NULL;
-            ur_add(RESOLVE_BUILDING | id, (void**)bp, fun);
+            *bp = building_create(id);
         }
     }
     else {
@@ -360,16 +359,23 @@ int read_building_reference(gamedata * data, building **bp, resolve_fun fun)
     return id;
 }
 
+building *building_create(int id)
+{
+    building *b = (building *)calloc(1, sizeof(building));
+    if (!b) abort();
+    b->no = id;
+    bhash(b);
+    return b;
+}
+
 building *new_building(const struct building_type * btype, region * r,
     const struct locale * lang)
 {
     building **bptr = &r->buildings;
-    building *b = (building *)calloc(1, sizeof(building));
+    int id = newcontainerid();
+    building *b = building_create(id);
     const char *bname;
     char buffer[32];
-
-    b->no = newcontainerid();
-    bhash(b);
 
     b->type = btype;
     b->region = r;
@@ -423,7 +429,7 @@ void remove_building(building ** blist, building * b)
     b->size = 0;
     bunhash(b);
 
-    /* Falls Karawanserei, Damm oder Tunnel einst�rzen, wird die schon
+    /* Falls Karawanserei, Damm oder Tunnel einstuerzen, wird die schon
      * gebaute Strasse zur Haelfte vernichtet */
     if (b->type == bt_caravan || b->type == bt_dam || b->type == bt_tunnel) {
         int d;
@@ -536,8 +542,8 @@ void building_set_owner(struct unit * owner)
 static unit *building_owner_ex(const building * bld, const struct faction * last_owner)
 {
     unit *u, *heir = 0;
-    /* Eigent�mer tot oder kein Eigent�mer vorhanden. Erste lebende Einheit
-      * nehmen. */
+    /* Eigentuemer tot oder kein Eigentuemer vorhanden.
+     * Erste lebende Einheit nehmen. */
     for (u = bld->region->units; u; u = u->next) {
         if (u->building == bld) {
             if (u->number > 0) {
@@ -687,7 +693,7 @@ building *largestbuilding(const region * r, cmp_building_cb cmp_gt,
     }
     return best;
 }
-/* Lohn bei den einzelnen Burgstufen f�r Normale Typen, Orks, Bauern */
+/* Lohn bei den einzelnen Burgstufen fuer Normale Typen, Orks, Bauern */
 
 static const int wagetable[7][3] = {
     { 10, 10, 11 },             /* Baustelle */
@@ -740,13 +746,9 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         variant vm;
 
         /* Godcurse: Income -10 */
-        c = get_curse(r->attribs, &ct_godcursezone);
-        if (c && curse_active(c)) {
-            wage = (wage < 10) ? 0 : (wage - 10);
-        }
         vm = frac_make(wage, 1);
 
-        /* Bei einer D�rre verdient man nur noch ein Viertel  */
+        /* Bei einer Duerre verdient man nur noch ein Viertel  */
         c = get_curse(r->attribs, &ct_drought);
         if (c && curse_active(c)) {
             vm = frac_mul(vm, frac_make(1, curse_geteffect_int(c)));
@@ -770,8 +772,9 @@ minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
     return default_wage(r, f, rc, in_turn);
 }
 
-/* Gibt Arbeitslohn f�r entsprechende Rasse zur�ck, oder f�r
-* die Bauern wenn f == NULL. */
+/**
+ * Gibt Arbeitslohn fuer entsprechende Rasse zurueck, oder fuer
+ * die Bauern wenn f == NULL. */
 int wage(const region * r, const faction * f, const race * rc, int in_turn)
 {
     static int config;
@@ -869,4 +872,13 @@ int cmp_current_owner(const building * b, const building * a)
         }
     }
     return 0;
+}
+
+void free_buildingtypes(void) {
+    free_bnames();
+    cb_clear(&cb_bldgtypes);
+    selist_foreach(buildingtypes, free_buildingtype);
+    selist_free(buildingtypes);
+    buildingtypes = 0;
+    ++bt_changes;
 }

@@ -1,22 +1,7 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
-#include <platform.h>
 #include "shock.h"
 
 #include <magic.h>
@@ -29,10 +14,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/resolve.h>
@@ -61,13 +46,13 @@ static void do_shock(unit * u, const char *reason)
     if (u->number > 0) {
         /* HP - Verlust */
         int hp = (unit_max_hp(u) * u->number) / 10;
-        hp = MIN(u->hp, hp);
-        u->hp = MAX(1, hp);
+        if (hp > u->hp) hp = u->hp;
+        u->hp = (hp > 1) ? hp : 1;
     }
 
     /* Aura - Verlust */
     if (is_mage(u)) {
-        int aura = max_spellpoints(u->region, u) / 10;
+        int aura = max_spellpoints_depr(u->region, u) / 10;
         int now = get_spellpoints(u);
         if (now > aura) {
             set_spellpoints(u, aura);
@@ -84,7 +69,7 @@ static void do_shock(unit * u, const char *reason)
         }
 
     /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
-     * zu l�schen wenn der Familiar get�tet wird. Da sollten wir �ber eine
+     * zu loeschen wenn der Familiar getoetet wird. Da sollten wir ueber eine
      * saubere Implementation nachdenken. */
 
     if (strcmp(reason, "trigger") == 0) {

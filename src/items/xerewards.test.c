@@ -18,7 +18,6 @@ static void test_manacrystal(CuTest *tc) {
     unit *u;
 
     test_setup();
-    test_inject_messagetypes();
 
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("manacrystal");
@@ -26,7 +25,7 @@ static void test_manacrystal(CuTest *tc) {
     CuAssertIntEquals(tc, -1, use_manacrystal(u, itype, 1, NULL));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error295"));
     test_clear_messages(u->faction);
-    create_mage(u, M_GRAY);
+    create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 5);
     CuAssertIntEquals(tc, 0, get_spellpoints(u));
     CuAssertIntEquals(tc, 1, use_manacrystal(u, itype, 1, NULL));
@@ -49,7 +48,6 @@ static void test_skillpotion(CuTest *tc) {
     int initialWeeks_Magic = 0;
 
     test_setup();
-    test_inject_messagetypes();
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);

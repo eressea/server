@@ -1,32 +1,20 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
-#include <platform.h>
+#ifdef _MSC_VER
+# include <platform.h>
+#endif
 #include <kernel/config.h>
 #include "unit.h"
 
 #include "ally.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
-#include "faction.h"
-#include "group.h"
 #include "connection.h"
 #include "curse.h"
+#include "event.h"
+#include "faction.h"
+#include "gamedata.h"
+#include "group.h"
+#include "guard.h"
 #include "item.h"
 #include "move.h"
 #include "order.h"
@@ -47,18 +35,13 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
-#include "guard.h"
-
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
-#include <util/strings.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/resolve.h>
@@ -209,6 +192,7 @@ static buddy *get_friends(const unit * u, int *numfriends)
                     nf = *fr;
                     if (nf == NULL || nf->faction != u2->faction) {
                         nf = malloc(sizeof(buddy));
+                        assert(nf);
                         nf->next = *fr;
                         nf->faction = u2->faction;
                         nf->unit = u2;
@@ -237,18 +221,8 @@ int gift_items(unit * u, int flags)
     region *r = u->region;
     item **itm_p = &u->items;
     int retval = 0;
-    int rule = rule_give();
 
     assert(u->region);
-
-    if ((rule & GIVE_ONDEATH) == 0 || !u->faction || (u->faction->flags & FFL_QUIT) == 0) {
-        if ((rule & GIVE_ALLITEMS) == 0 && (flags & GIFT_FRIENDS))
-            flags -= GIFT_FRIENDS;
-        if ((rule & GIVE_PEASANTS) == 0 && (flags & GIFT_PEASANTS))
-            flags -= GIFT_PEASANTS;
-        if ((rule & GIVE_SELF) == 0 && (flags & GIFT_SELF))
-            flags -= GIFT_SELF;
-    }
 
     if (u->items == NULL || fval(u_race(u), RCF_ILLUSIONARY))
         return 0;
@@ -431,7 +405,7 @@ unit *findnewunit(const region * r, const faction * f, int n)
 /*********************/
 /*   at_alias   */
 /*********************/
-attrib_type at_alias = {
+static attrib_type at_alias = {
     "alias",
     DEFAULT_INIT,
     DEFAULT_FINALIZE,
@@ -450,6 +424,11 @@ int ualias(const unit * u)
     if (!a)
         return 0;
     return a->data.i;
+}
+
+void usetalias(unit *u, int alias)
+{
+    a_add(&u->attribs, a_new(&at_alias))->data.i = alias;
 }
 
 int a_readprivate(variant *var, void *owner, gamedata *data)
@@ -475,8 +454,8 @@ attrib_type at_private = {
 
 const char *u_description(const unit * u, const struct locale *lang)
 {
-    if (u->display && u->display[0]) {
-        return u->display;
+    if (u->display_id > 0) {
+        return unit_getinfo(u);
     }
     else {
         char zText[64];
@@ -516,112 +495,6 @@ void usetprivate(unit * u, const char *str)
         free(a->data.v);
     }
     a->data.v = str_strdup(str);
-}
-
-/*********************/
-/*   at_target   */
-/*********************/
-attrib_type at_target = {
-    "target",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-/*********************/
-/*   at_siege   */
-/*********************/
-
-void a_writesiege(const variant *var, const void *owner, struct storage *store)
-{
-    struct building *b = (struct building *)var->v;
-    write_building_reference(b, store);
-}
-
-int a_readsiege(variant *var, void *owner, gamedata *data)
-{
-    if (read_building_reference(data, (building **)&var->v, NULL) <= 0) {
-        return AT_READ_FAIL;
-    }
-    return AT_READ_OK;
-}
-
-attrib_type at_siege = {
-    "siege",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    a_writesiege,
-    a_readsiege
-};
-
-struct building *usiege(const unit * u)
-{
-    attrib *a;
-    if (!fval(u, UFL_SIEGE))
-        return NULL;
-    a = a_find(u->attribs, &at_siege);
-    assert(a || !"flag set, but no siege found");
-    return (struct building *)a->data.v;
-}
-
-void usetsiege(unit * u, const struct building *t)
-{
-    attrib *a = a_find(u->attribs, &at_siege);
-    if (!a && t)
-        a = a_add(&u->attribs, a_new(&at_siege));
-    if (a) {
-        if (!t) {
-            a_remove(&u->attribs, a);
-            freset(u, UFL_SIEGE);
-        }
-        else {
-            a->data.v = (void *)t;
-            fset(u, UFL_SIEGE);
-        }
-    }
-}
-
-/*********************/
-/*   at_contact   */
-/*********************/
-attrib_type at_contact = {
-    "contact",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
-
-void usetcontact(unit * u, const unit * u2)
-{
-    attrib *a = a_find(u->attribs, &at_contact);
-    while (a && a->type == &at_contact && a->data.v != u2)
-        a = a->next;
-    if (a && a->type == &at_contact)
-        return;
-    a_add(&u->attribs, a_new(&at_contact))->data.v = (void *)u2;
-}
-
-bool ucontact(const unit * u, const unit * u2)
-/* Prueft, ob u den Kontaktiere-Befehl zu u2 gesetzt hat. */
-{
-    attrib *ru;
-    if (u->faction == u2->faction)
-        return true;
-
-    /* Explizites KONTAKTIERE */
-    for (ru = a_find(u->attribs, &at_contact); ru && ru->type == &at_contact;
-        ru = ru->next) {
-        if (((unit *)ru->data.v) == u2) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /***
@@ -762,7 +635,7 @@ void leave_ship(unit * u)
 {
     struct ship *sh = u->ship;
 
-    u->ship = 0;
+    u->ship = NULL;
     if (sh->_owner == u) {
         ship_update_owner(sh);
         sh->_owner = ship_owner(sh);
@@ -774,7 +647,7 @@ void leave_building(unit * u)
 {
     building * b = u->building;
 
-    u->building = 0;
+    u->building = NULL;
     if (b->_owner == u) {
         building_update_owner(b);
         assert(b->_owner != u);
@@ -877,7 +750,6 @@ void clone_men(const unit * u, unit * dst, int n)
     /* "hat attackiert"-status wird uebergeben */
 
     if (dst) {
-        skill *sv, *sn;
         skill_t sk;
         ship *sh;
 
@@ -885,9 +757,8 @@ void clone_men(const unit * u, unit * dst, int n)
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
             int weeks, level = 0;
-
-            sv = unit_skill(u, sk);
-            sn = unit_skill(dst, sk);
+            skill *sv = unit_skill(u, sk);
+            skill *sn = unit_skill(dst, sk);
 
             if (sv == NULL && sn == NULL)
                 continue;
@@ -1015,6 +886,12 @@ struct building *inside_building(const struct unit *u)
     return NULL;
 }
 
+void u_freeorders(unit *u)
+{
+    free_orders(&u->orders);
+    set_order(&u->thisorder, NULL);
+}
+
 void u_setfaction(unit * u, faction * f)
 {
     if (u->faction == f)
@@ -1024,10 +901,7 @@ void u_setfaction(unit * u, faction * f)
             --u->faction->num_units;
             u->faction->num_people -= u->number;
         }
-        join_group(u, NULL);
-        free_orders(&u->orders);
-        set_order(&u->thisorder, NULL);
-
+        set_group(u, NULL);
         if (u->nextF) {
             u->nextF->prevF = u->prevF;
         }
@@ -1085,9 +959,8 @@ void set_number(unit * u, int count)
 void remove_skill(unit * u, skill_t sk)
 {
     int i;
-    skill *sv;
     for (i = 0; i != u->skill_size; ++i) {
-        sv = u->skills + i;
+        skill *sv = u->skills + i;
         if (sv->id == sk) {
             if (u->skill_size - i - 1 > 0) {
                 memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
@@ -1106,11 +979,15 @@ skill *add_skill(unit * u, skill_t sk)
     skill *sv;
     int i;
 
+    assert(u);
     for (i = 0; i != u->skill_size; ++i) {
         sv = u->skills + i;
         if (sv->id >= sk) break;
     }
-    u->skills = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    sv = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
+    assert(sv);
+    u->skills = sv;
+
     sv = u->skills + i;
     if (i < u->skill_size) {
         assert(sv->id != sk);
@@ -1329,7 +1206,7 @@ int invisible(const unit * target, const unit * viewer)
     else {
         int hidden = item_invis(target);
         if (hidden) {
-            hidden = MIN(hidden, target->number);
+            if (hidden > target->number) hidden = target->number;
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
                 hidden -= i_get(viewer->items, rtype->itype);
@@ -1346,25 +1223,30 @@ int invisible(const unit * target, const unit * viewer)
  */
 void free_unit(unit * u)
 {
+    struct reservation **pres = &u->reservations;
+
     assert(!u->region);
     free(u->_name);
-    free(u->display);
     free_order(u->thisorder);
     free_orders(&u->orders);
-    if (u->skills)
+
+    while (*pres) {
+        struct reservation *res = *pres;
+        *pres = res->next;
+        free(res);
+    }
+    if (u->skills) {
         free(u->skills);
+        u->skills = NULL;
+    }
     while (u->items) {
         item *it = u->items->next;
         u->items->next = NULL;
         i_free(u->items);
         u->items = it;
     }
-    while (u->attribs)
+    while (u->attribs) {
         a_remove(&u->attribs, u->attribs);
-    while (u->reservations) {
-        struct reservation *res = u->reservations;
-        u->reservations = res->next;
-        free(res);
     }
 }
 
@@ -1431,6 +1313,12 @@ void name_unit(unit * u)
     }
 }
 
+unit *unit_create(int id)
+{
+    unit *u = (unit *)calloc(1, sizeof(unit));
+    createunitid(u, id);
+    return u;
+}
 /** creates a new unit.
 *
 * @param dname: name, set to NULL to get a default.
@@ -1439,7 +1327,7 @@ void name_unit(unit * u)
 unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     int id, const char *dname, unit * creator)
 {
-    unit *u = (unit *)calloc(1, sizeof(unit));
+    unit *u = unit_create(id);
 
     assert(urace);
     u_setrace(u, urace);
@@ -1450,10 +1338,6 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     }
 
     set_number(u, number);
-
-    /* die nummer der neuen einheit muss vor name_unit generiert werden,
-     * da der default name immer noch 'Nummer u->no' ist */
-    createunitid(u, id);
 
     /* zuerst in die Region setzen, da zb Drachennamen den Regionsnamen
      * enthalten */
@@ -1510,10 +1394,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         }
 
         /* Gruppen */
-        if (creator->faction == f && fval(creator, UFL_GROUP)) {
-            a = a_find(creator->attribs, &at_group);
-            if (a) {
-                group *g = (group *)a->data.v;
+        if (creator->faction == f) {
+            group *g = get_group(creator);
+            if (g) {
                 set_group(u, g);
             }
         }
@@ -1577,16 +1460,20 @@ void unit_setname(unit * u, const char *name)
 
 const char *unit_getinfo(const unit * u)
 {
-    return (const char *)u->display;
+    if (u->display_id > 0) {
+        return dbstring_load(u->display_id, NULL);
+    }
+    return NULL;
 }
 
 void unit_setinfo(unit * u, const char *info)
 {
-    free(u->display);
-    if (info)
-        u->display = str_strdup(info);
-    else
-        u->display = NULL;
+    if (info) {
+        u->display_id = dbstring_save(info);
+    }
+    else {
+        u->display_id = 0;
+    }
 }
 
 int unit_getid(const unit * u)
@@ -1744,34 +1631,6 @@ void u_setrace(struct unit *u, const struct race *rc)
     }
 }
 
-void unit_add_spell(unit * u, sc_mage * m, struct spell * sp, int level)
-{
-    sc_mage *mage = m ? m : get_mage_depr(u);
-
-    if (!mage) {
-        log_debug("adding new spell %s to a previously non-mage unit %s\n", sp->sname, unitname(u));
-        mage = create_mage(u, u->faction ? u->faction->magiegebiet : M_GRAY);
-    }
-    if (!mage->spellbook) {
-        mage->spellbook = create_spellbook(0);
-    }
-    spellbook_add(mage->spellbook, sp, level);
-}
-
-struct spellbook * unit_get_spellbook(const struct unit * u)
-{
-    sc_mage * mage = get_mage_depr(u);
-    if (mage) {
-        if (mage->spellbook) {
-            return mage->spellbook;
-        }
-        if (mage->magietyp != M_GRAY) {
-            return faction_get_spellbook(u->faction);
-        }
-    }
-    return 0;
-}
-
 int effskill(const unit * u, skill_t sk, const region *r)
 {
     assert(u);
@@ -1853,10 +1712,6 @@ bool unit_name_equals_race(const unit *u) {
     return false;
 }
 
-bool unit_can_study(const unit *u) {
-    return !((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE));
-}
-
 static int read_newunitid(const faction * f, const region * r)
 {
     int n;
@@ -1914,14 +1769,6 @@ int getunit(const region * r, const faction * f, unit **uresult)
     return result;
 }
 
-int besieged(const unit * u)
-{
-    /* belagert kann man in schiffen und burgen werden */
-    return (u && !keyword_disabled(K_BESIEGE)
-        && u->building && u->building->besieged
-        && u->building->besieged >= u->building->size * SIEGEFACTOR);
-}
-
 bool has_horses(const unit * u)
 {
     item *itm = u->items;
@@ -1940,17 +1787,27 @@ int maintenance_cost(const struct unit *u)
     return u_race(u)->maintenance * u->number;
 }
 
-static skill_t limited_skills[] = { SK_MAGIC, SK_ALCHEMY, SK_TACTICS, SK_SPY, SK_HERBALISM, NOSKILL };
+static skill_t limited_skills[] = { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
+
+bool is_limited_skill(skill_t sk)
+{
+    int i;
+    for (i = 0; limited_skills[i] != NOSKILL; ++i) {
+        if (sk == limited_skills[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool has_limited_skills(const struct unit * u)
 {
-    int i, j;
+    int i;
 
     for (i = 0; i != u->skill_size; ++i) {
         skill *sv = u->skills + i;
-        for (j = 0; limited_skills[j] != NOSKILL; ++j) {
-            if (sv->id == limited_skills[j]) {
-                return true;
-            }
+        if (is_limited_skill(sv->id)) {
+            return true;
         }
     }
     return false;
@@ -1979,3 +1836,14 @@ double u_heal_factor(const unit * u)
     }
     return 1.0;
 }
+
+void unit_convert_race(unit *u, const race *rc, const char *rcname)
+{
+    if (rc && u->_race != rc) {
+        u_setrace(u, rc);
+    }
+    if (rcname && strcmp(rcname, u->_race->_name) != 0) {
+        set_racename(&u->attribs, rcname);
+    }
+}
+

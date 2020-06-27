@@ -1,7 +1,7 @@
 #include <platform.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <attributes/stealth.h>
 
 #include <stdlib.h>
@@ -37,8 +37,13 @@ int u_geteffstealth(const unit *u)
     if (skill_enabled(SK_STEALTH)) {
         if (u->flags & UFL_STEALTH) {
             attrib *a = a_find(u->attribs, &at_stealth);
-            if (a != NULL)
+            if (a != NULL) {
+                int eff = effskill(u, SK_STEALTH, u->region);
+                if (eff < a->data.i) {
+                    return eff;
+                }
                 return a->data.i;
+            }
         }
     }
     return -1;

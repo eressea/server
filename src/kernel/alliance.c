@@ -1,15 +1,3 @@
-/*
-+-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
-| (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
-|                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
-+-------------------+  Stefan Reich <reich@halbling.de>
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #include <platform.h>
 #include "alliance.h"
 
@@ -27,7 +15,7 @@ without prior permission by the authors of Eressea.
 #include <attributes/key.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/parser.h>
@@ -83,6 +71,7 @@ alliance *new_alliance(int id, const char *name) {
     assert(id>0);
 
     al = calloc(1, sizeof(alliance));
+    if (!al) abort();
     al->id = id;
     if (name) {
         al->name = str_strdup(name);
@@ -129,6 +118,7 @@ static void create_transaction(int type, unit * u, order * ord)
 {
     alliance_transaction *tr =
         (alliance_transaction *)calloc(1, sizeof(alliance_transaction));
+    if (!tr) abort();
     tr->ord = ord;
     tr->u = u;
     tr->next = transactions[type];

@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.e2features", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.features'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -10,6 +14,67 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+end
+
+function disabled_double_default()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    region.create(1, 0, "plain")
+    region.create(2, 0, "plain")
+    region.create(3, 0, "plain")
+
+    u:add_order('NACH O')
+    u:add_order('DEFAULT "NACH O"')
+    u:add_order('DEFAULT "DEFAULT ARBEITE"')
+    process_orders()
+    assert_equal(1, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    process_orders()
+    assert_equal(2, u.region.x)
+    assert_equal("ARBEITE", u:get_order())
+end
+
+function test_give_unit()
+  local r = region.create(0, 0, "plain")
+  local f1 = faction.create('elf')
+  local f2 = faction.create('elf')
+  local u1 = unit.create(f1, r)
+  local u2 = unit.create(f2, r)
+  assert_equal(f1, u1.faction)
+  assert_equal(f2, u2.faction)
+  u2.group = 'Experten'
+  assert_equal('Experten', u2.group)
+  u1:add_order("HELFE " .. itoa36(f2.id) .. " GIB")
+  u2:add_order("GIB " .. itoa36(u1.id) .. " EINHEIT")
+  process_orders()
+  assert_equal(f1, u2.faction)
+  assert_nil(u2.group)
+end
+
+function test_study_auto()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("LERN AUT Waffenbau")
+    assert_equal("LERNE AUTO Waffenbau", u:get_order(0))
+    process_orders()
+    assert_equal(1, u:get_skill("weaponsmithing"))
+end
+
+function test_study_auto_expensive()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("LERNE AUTO Magie")
+    assert_equal("LERNE Magie", u:get_order(0))
+    u:clear_orders()
+    u:add_order("LERN AUT Taktik")
+    assert_equal("LERNE Taktik", u:get_order(0))
+    u:clear_orders()
+    u:add_order("LERN AUT Waffenbau")
+    assert_equal("LERNE AUTO Waffenbau", u:get_order(0))
 end
 
 function test_calendar()
@@ -516,18 +581,4 @@ function test_buy_sell()
     process_orders()
     assert_equal(4, u:get_item(item))
     assert_not_equal(0, u:get_item('money'))
-end
-
-function test_seaserpent_attack()
-    -- FIXME what does this test do?
-    local r = region.create(0, 0, 'ocean')
-    local sh = ship.create(r, 'boat')
-    local us = unit.create(get_monsters(), r, 1, 'seaserpent')
-    local u = unit.create(faction.create('human', 'enno@example.com'), r, 20, 'human')
-    u.ship = sh
-    us:clear_orders()
-    us:add_order('ATTACKIERE ' .. itoa36(u.id))
-    us:set_skill('unarmed', 10)
-    process_orders()
-    write_reports()
 end

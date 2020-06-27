@@ -389,6 +389,9 @@ msgstr "Schaffenstrunk"
 msgid "balloon_a"
 msgstr "ein Ballon"
 
+msgid "balloon_p"
+msgstr "Ballons"
+
 msgid "undead_name_8"
 msgstr "Monster"
 
@@ -570,8 +573,20 @@ msgstr "Dieses Ritual, ausgeführt vor einem Kampf, verwirbelt die astralen Ener
 msgid "balloon"
 msgstr "Ballon"
 
-msgid "nr_schemes_postfix"
-msgstr "sind erkennbar."
+msgid "nr_schemes_template"
+msgstr "Schemen von {0} sind erkennbar."
+
+msgid "list_two"
+msgstr "{0} und {1}"
+
+msgid "list_start"
+msgstr "{0}, {1}"
+
+msgid "list_middle"
+msgstr "{0}, {1}"
+
+msgid "list_end"
+msgstr "{0} und {1}"
 
 msgid "SILBER"
 msgstr "SILBER"
@@ -1103,6 +1118,9 @@ msgstr "Orks"
 msgid "boat_a"
 msgstr "ein Boot"
 
+msgid "boat_p"
+msgstr "Boote"
+
 msgctxt "race"
 msgid "nymph"
 msgstr "Nymphe"
@@ -1437,7 +1455,7 @@ msgstr "Goblins"
 
 msgctxt "spellinfo"
 msgid "song_of_slavery"
-msgstr "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft sie den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig fühlen."
+msgstr "Dieser mächtige Bann raubt dem Opfer seinen freien Willen und unterwirft es den Befehlen des Barden. Für einige Zeit wird das Opfer sich völlig von seinen eigenen Leuten abwenden und der Partei des Barden zugehörig fühlen."
 
 msgctxt "spell"
 msgid "healingzone"
@@ -1707,6 +1725,15 @@ msgstr "Ring der Unsichtbarkeit"
 msgid "caravel_a"
 msgstr "eine Karavelle"
 
+msgid "caravel_p"
+msgstr "Karavellen"
+
+msgid "galleon_a"
+msgstr "eine Galeone"
+
+msgid "galleon_p"
+msgstr "Galeonen"
+
 msgctxt "keyword"
 msgid "describe"
 msgstr "BESCHREIBE"
@@ -1879,6 +1906,9 @@ msgstr "Untoten"
 
 msgid "flyingcarpet_a"
 msgstr "ein fliegender Teppich"
+
+msgid "flyingcarpet_p"
+msgstr "fliegende Teppiche"
 
 msgid "mallorntree_p"
 msgstr "Mallorn"
@@ -2063,6 +2093,9 @@ msgstr "Wir schreiben %s des Monats %s im Jahre %d %s."
 
 msgid "caravel"
 msgstr "Karavelle"
+
+msgid "galleon"
+msgstr "Galeone"
 
 msgid "dragon_postfix_10"
 msgstr "der Goldene"
@@ -2297,10 +2330,6 @@ msgstr "Seelenfrieden"
 
 msgid "list_and"
 msgstr " und "
-
-msgctxt "spell"
-msgid "godcursezone"
-msgstr "Fluch der Götter"
 
 msgid "sptype_postcombat"
 msgstr "Postkampfzauber"
@@ -2772,10 +2801,6 @@ msgstr "Dieser wunderschoen geschmueckte Baum entfaltet in den Wintermonaten ein
 msgid "h10"
 msgstr "Kakteenschwitz"
 
-msgctxt "keyword"
-msgid "besiege"
-msgstr "BELAGERE"
-
 msgid "h11"
 msgstr "Sandfäule"
 
@@ -2791,6 +2816,9 @@ msgstr "Fjordwuchs"
 
 msgid "trireme_a"
 msgstr "eine Trireme"
+
+msgid "trireme_p"
+msgstr "Triremen"
 
 msgctxt "prefix"
 msgid "Dunkel"
@@ -2863,6 +2891,9 @@ msgstr "der Schatten"
 
 msgid "ALLES"
 msgstr "ALLES"
+
+msgid "AUTO"
+msgstr "AUTO"
 
 msgid "undead_postfix_2"
 msgstr "der Finsternis"
@@ -3859,7 +3890,7 @@ msgstr "Ent"
 
 msgctxt "iteminfo"
 msgid "dwarfspoil"
-msgstr "Beim Barte des Proheten! Ach nein, Zwergen. Irgendetwas riecht hier ranzig."
+msgstr "Beim Barte des Propheten! Ach nein, Zwergen. Irgendetwas riecht hier ranzig."
 
 msgctxt "race"
 msgid "clone"
@@ -4094,6 +4125,9 @@ msgstr "Luchs"
 
 msgid "longboat_a"
 msgstr "ein Langboot"
+
+msgid "longboat_p"
+msgstr "Langboote"
 
 msgctxt "race"
 msgid "human_d"
@@ -4402,9 +4436,6 @@ msgstr "Magie"
 
 msgid "see_lighthouse"
 msgstr "vom Turm erblickt"
-
-msgid "nr_schemes_prefix"
-msgstr "Schemen der Regionen"
 
 msgid "aoc_p"
 msgstr "Katzenamulette"
@@ -5844,6 +5875,9 @@ msgstr "Tiger"
 msgid "dragonship_a"
 msgstr "ein Drachenschiff"
 
+msgid "dragonship_p"
+msgstr "Drachenschiffe"
+
 msgctxt "race"
 msgid "mountainguard_x"
 msgstr "Bergwächter"
@@ -5958,6 +5992,10 @@ msgctxt "keyword"
 msgid "maketemp"
 msgstr "MACHE TEMP"
 
+msgctxt "keyword"
+msgid "autostudy"
+msgstr "LERNE AUTO"
+
 msgctxt "spell"
 msgid "reanimate"
 msgstr "Wiederbelebung"
@@ -6011,6 +6049,9 @@ msgstr "Eigentümer"
 
 msgid "nr_template"
 msgstr "Vorlage für den nächsten Zug:"
+
+msgid "template_password_notice"
+msgstr "Achtung: Hier muss das Passwort Deiner Partei eingefügt werden."
 
 msgctxt "skill"
 msgid "espionage"
@@ -6279,3 +6320,44 @@ msgctxt "race"
 msgid "wolf"
 msgstr "Wolf"
 
+msgctxt "iteminfo"
+msgid "elfspoil"
+msgstr "Die Ohren sind spitz und beinahe trapezförmig. Wie kann
+damit hören?"
+
+msgctxt "iteminfo"
+msgid "goblinspoil"
+msgstr "Die Fratze des kleinen Kopfs wirkt beinahe etwas kindlich
+zierlich, aber dennoch liegt etwas Listiges darin."
+
+msgctxt "iteminfo"
+msgid "halflingspoil"
+msgstr "Die Sohle des behaarten Fußes ist deutlich dicker, beinahe
+wie ein Huf."
+
+msgctxt "iteminfo"
+msgid "aquarianspoil"
+msgstr "Die kleine, türkisfarbene Schuppe glänzt in der Sonne. Dennoch ist sie erstaunlich hart."
+
+msgctxt "iteminfo"
+msgid "humanspoil"
+msgstr "Ob blond oder braun, ob kurz oder lang, du hast ein Büschel Haare mit einem Stück Haut in der Hand."
+
+msgctxt "iteminfo"
+msgid "catspoil"
+msgstr "Wie ein kleines Seil aus weichem Fell."
+
+msgctxt "iteminfo"
+msgid "insectspoil"
+msgstr "Das am Kopf der meisten Gliederfüßer auftretende,
+gegliederte Extremitätenpaar, das mit Sensillen (Tastsinn, Geruchssinn)
+ausgestattet ist."
+
+msgctxt "iteminfo"
+msgid "orcspoil"
+msgstr "Große, spitze Zähne. Ob sie früher einem Ork oder doch einem Wildschwein gehörten ist nicht so leicht zu unterscheiden."
+
+msgctxt "iteminfo"
+msgid "demonspoil"
+msgstr "Eine giftige und grüne Flüssigkeit in einer kleinen Phiole,
+keine humanoide Rasse außer Dämonen wagt damit in Kontakt zu kommen."

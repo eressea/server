@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -33,7 +15,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 #include "group.h"
 #include "item.h"
-#include "keyword.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -50,15 +31,18 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/event.h>
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/macros.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/path.h>
 #include <util/rand.h>
@@ -91,54 +75,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 struct settings global;
 
-const char *parameters[MAXPARAMS] = {
-    "LOCALE",
-    "ALLES",
-    "JEDEM",
-    "BAUERN",
-    "BURG",
-    "EINHEIT",
-    "PRIVAT",
-    "HINTEN",
-    "KOMMANDO",
-    "KRAEUTER",
-    "NICHT",
-    "NAECHSTER",
-    "PARTEI",
-    "ERESSEA",
-    "PERSONEN",
-    "REGION",
-    "SCHIFF",
-    "SILBER",
-    "STRASSEN",
-    "TEMP",
-    "FLIEHE",
-    "GEBAEUDE",
-    "GIB",                        /* HELFE GIB */
-    "KAEMPFE",
-    "DURCHREISE",
-    "BEWACHE",
-    "ZAUBER",
-    "PAUSE",
-    "VORNE",
-    "AGGRESSIV",
-    "DEFENSIV",
-    "STUFE",
-    "HELFE",
-    "FREMDES",
-    "AURA",
-    "HINTER",
-    "VOR",
-    "ANZAHL",
-    "GEGENSTAENDE",
-    "TRAENKE",
-    "GRUPPE",
-    "PARTEITARNUNG",
-    "BAEUME",
-    "ALLIANZ",
-    "AUTO"
-};
-
 int findoption(const char *s, const struct locale *lang)
 {
     void **tokens = get_translations(lang, UT_OPTIONS);
@@ -150,101 +86,33 @@ int findoption(const char *s, const struct locale *lang)
     return NODIRECTION;
 }
 
-param_t findparam(const char *s, const struct locale * lang)
-{
-    param_t result = NOPARAM;
-    char buffer[64];
-    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
-
-    if (str && *str) {
-        int i;
-        void * match;
-        void **tokens = get_translations(lang, UT_PARAMS);
-        critbit_tree *cb = (critbit_tree *)*tokens;
-        if (!cb) {
-            log_warning("no parameters defined in locale %s", locale_name(lang));
-        }
-        else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-            cb_get_kv(match, &i, sizeof(int));
-            result = (param_t)i;
-        }
-    }
-    return result;
-}
-
-param_t findparam_block(const char *s, const struct locale *lang, bool any_locale)
-{
-    param_t p;
-    if (!s || s[0] == '@') {
-        return NOPARAM;
-    }
-    p = findparam(s, lang);
-    if (any_locale && p==NOPARAM) {
-        const struct locale *loc;
-        for (loc=locales;loc;loc=nextlocale(loc)) {
-            if (loc!=lang) {
-                p = findparam(s, loc);
-                if (p==P_FACTION || p==P_GAMENAME) {
-                    break;
-                }
-            }
-        }
-    }
-    return p;
-}
-
-param_t findparam_ex(const char *s, const struct locale * lang)
-{
-    param_t result = findparam(s, lang);
-
-    if (result == NOPARAM) {
-        const building_type *btype = findbuildingtype(s, lang);
-        if (btype != NULL)
-            return P_GEBAEUDE;
-    }
-    return (result == P_BUILDING) ? P_GEBAEUDE : result;
-}
-
-bool isparam(const char *s, const struct locale * lang, param_t param)
-{
-    assert(s);
-    if (s[0] > '@') {
-        param_t p = (param == P_GEBAEUDE) ? findparam_ex(s, lang) : findparam(s, lang);
-        return p == param;
-    }
-    return false;
-}
-
-param_t getparam(const struct locale * lang)
-{
-    char token[64];
-    const char *s = gettoken(token, sizeof(token));
-    return s ? findparam(s, lang) : NOPARAM;
-}
-
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
-static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 static int *forbidden_ids;
+static const char *forbidden[] = { "t", "te", "tem", "temp", NULL };
 
-int forbiddenid(int id)
+bool forbiddenid(int id)
 {
     static size_t len;
     size_t i;
-    if (id <= 0)
-        return 1;
+    if (id <= 0) {
+        return true;
+    }
     if (!forbidden_ids) {
         while (forbidden[len])
             ++len;
-        forbidden_ids = calloc(len, sizeof(int));
+        forbidden_ids = malloc(len * sizeof(int));
+        if (!forbidden_ids) abort();
         for (i = 0; i != len; ++i) {
             forbidden_ids[i] = atoi36(forbidden[i]);
         }
     }
-    for (i = 0; i != len; ++i)
-        if (id == forbidden_ids[i])
-            return 1;
-    return 0;
+    for (i = 0; i != len; ++i) {
+        if (id == forbidden_ids[i]) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int newcontainerid(void)
@@ -266,17 +134,6 @@ int newcontainerid(void)
     }
     return random_no;
 }
-
-static const char * parameter_key(int i)
-{
-    assert(i < MAXPARAMS && i >= 0);
-    return parameters[i];
-}
-
-void init_parameters(struct locale *lang) {
-    init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-}
-
 
 void init_terrains_translation(const struct locale *lang) {
     void **tokens;
@@ -368,6 +225,7 @@ static void init_magic(struct locale *lang)
         free(sstr);
     }
 }
+
 void init_locale(struct locale *lang)
 {
     init_magic(lang);
@@ -402,6 +260,7 @@ void set_param(struct param **p, const char *key, const char *value)
     par = *p;
     if (!par && value) {
         *p = par = calloc(1, sizeof(param));
+        if (!par) abort();
     }
     if (par) {
         void *match;
@@ -637,7 +496,6 @@ order *default_order(const struct locale *lang)
     int i = locale_index(lang);
     keyword_t kwd;
     const char * str;
-    order *result = 0;
 
     assert(i < MAXLOCALES);
     kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
@@ -646,7 +504,8 @@ order *default_order(const struct locale *lang)
         kwd = findkeyword(str);
     }
     if (kwd != NOKEYWORD) {
-        result = create_order(kwd, lang, NULL);
+        /* TODO: why is there a copy_order made here? */
+        order *result = create_order(kwd, lang, NULL);
         return copy_order(result);
     }
     return NULL;
@@ -657,6 +516,7 @@ int rule_give(void)
     static int config;
     static int rule;
     if (config_changed(&config)) {
+        /* TODO: No game uses this. Eliminate? */
         rule = config_get_int("rules.give.flags", GIVE_DEFAULT);
     }
     return rule;
@@ -766,10 +626,6 @@ void free_gamedata(void)
     free_regions();
     free_borders();
     free_alliances();
-
-    while (global.attribs) {
-        a_remove(&global.attribs, global.attribs);
-    }
 
     while (planes) {
         plane *pl = planes;

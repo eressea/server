@@ -61,7 +61,7 @@ static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
     CuAssertIntEquals(tc, 0, rtype->uchange(u, rtype, -n));
     CuAssertPtrNotNull(tc, sl);
     CuAssertStrEquals(tc, "serious accounting error. number of items is %d.", sl->s);
-    CuAssertPtrEquals(tc, 0, sl->next);
+    CuAssertPtrEquals(tc, NULL, sl->next);
     test_log_stop(log, sl);
 }
 
@@ -86,7 +86,7 @@ void test_resource_type(CuTest * tc)
 
     test_setup();
 
-    CuAssertPtrEquals(tc, 0, rt_find("herpderp"));
+    CuAssertPtrEquals(tc, NULL, rt_find("herpderp"));
 
     test_create_itemtype("herpderp");
     test_create_itemtype("herpes");
@@ -122,7 +122,7 @@ void test_findresourcetype(CuTest * tc)
     locale_setstring(lang, "peasant", "Bauer");
     init_resources();
     CuAssertPtrNotNull(tc, rt_find("peasant"));
-    CuAssertPtrEquals(tc, 0, rt_find("log"));
+    CuAssertPtrEquals(tc, NULL, rt_find("log"));
     itype = test_create_itemtype("log");
 
     CuAssertPtrEquals(tc, (void*)itype->rtype, (void*)findresourcetype("Holz", lang));
@@ -164,13 +164,13 @@ static void test_core_resources(CuTest *tc) {
     CuAssertPtrNotNull(tc, rtype->itype);
     CuAssertPtrNotNull(tc, rtype->uchange);
     CuAssertPtrNotNull(tc, rtype = rt_find("peasant"));
-    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrEquals(tc, NULL, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("permaura"));
-    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrEquals(tc, NULL, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("hp"));
-    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrEquals(tc, NULL, rtype->itype);
     CuAssertPtrNotNull(tc, rtype = rt_find("aura"));
-    CuAssertPtrEquals(tc, 0, rtype->itype);
+    CuAssertPtrEquals(tc, NULL, rtype->itype);
     test_teardown();
 }
 

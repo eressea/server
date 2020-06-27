@@ -1,6 +1,9 @@
 #include <platform.h>
 #include "renumber.h"
 
+#include "laws.h"
+
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
@@ -9,8 +12,8 @@
 #include <kernel/order.h>
 #include <kernel/messages.h>
 
-#include <util/attrib.h>
 #include <util/base36.h>
+#include <util/param.h>
 #include <util/parser.h>
 
 #include <assert.h>
@@ -53,7 +56,8 @@ void renumber_factions(void)
             ADDMSG(&f->msgs, msg_message("renumber_inuse", "id", want));
         }
         else {
-            struct renum *r = calloc(sizeof(struct renum), 1);
+            struct renum *r = calloc(1, sizeof(struct renum));
+            if (!r) abort();
             r->next = *rn;
             r->attrib = a;
             r->faction = f;
@@ -164,7 +168,7 @@ int renumber_cmd(unit * u, order * ord)
             break;
         }
         s = gettoken(token, sizeof(token));
-        if (*s == 0) {
+        if (s == NULL || *s == 0) {
             i = newcontainerid();
         }
         else {

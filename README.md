@@ -6,7 +6,7 @@ This repository contains the source code for the Play-by-Mail strategy game [Ere
 
 Eressea depends on a number of external libraries. On a recent Debian-based Linux system, this is the apt-get command to install all of them:
 
-    sudo apt-get install git cmake gcc make libxml2-dev liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev
+    sudo apt-get install git cmake gcc make libxml2-dev liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev luarocks
 
 # How to check out and build the Eressea server
 
@@ -21,3 +21,4 @@ If you got this far and all went well, you have built a server (it is linked fro
 
 * [![Static Analysis](https://scan.coverity.com/projects/6742/badge.svg?flat=1)](https://scan.coverity.com/projects/6742/)
 * [![Build Status](https://api.travis-ci.org/eressea/server.svg?branch=develop)](https://travis-ci.org/eressea/server)
+* [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)

@@ -1,16 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
-
- */
-
 #include <platform.h>
 #include "nrmessage.h"
 
@@ -33,7 +20,19 @@ typedef struct nrmessage_type {
 } nrmessage_type;
 
 #define NRT_MAXHASH 1021
-static nrmessage_type *nrtypes[NRT_MAXHASH];
+static nrmessage_type *nrtypes[NRT_MAXHASH] = { 0 };
+
+void free_nrmesssages(void) {
+    int i;
+    for (i = 0; i != NRT_MAXHASH; ++i) {
+        while (nrtypes[i]) {
+            nrmessage_type *nr = nrtypes[i];
+            nrtypes[i] = nr->next;
+            free(nr->vars);
+            free(nr);
+        }
+    }
+}
 
 const char *nrt_string(const struct message_type *mtype, 
         const struct locale *lang)
@@ -81,7 +80,8 @@ nrt_register(const struct message_type *mtype)
         int i;
         char zNames[256];
         char *c = zNames;
-        nrt = malloc(sizeof(nrmessage_type));
+        nrt = calloc(1, sizeof(nrmessage_type));
+        if (!nrt) abort();
         nrt->mtype = mtype;
         nrt->next = nrtypes[hash];
         nrtypes[hash] = nrt;
@@ -92,6 +92,7 @@ nrt_register(const struct message_type *mtype)
             c += str_strlcpy(c, mtype->pnames[i], sizeof(zNames)-(c-zNames));
         }
         nrt->vars = str_strdup(zNames);
+        if (!nrt->vars) abort();
     }
 }
 
@@ -115,16 +116,3 @@ size_t size, const void *userdata)
         buffer[0] = 0;
     return 0;
 }
-
-void free_nrmesssages(void) {
-    int i;
-    for (i = 0; i != NRT_MAXHASH; ++i) {
-        while (nrtypes[i]) {
-            nrmessage_type *nr = nrtypes[i];
-            nrtypes[i] = nr->next;
-            free(nr->vars);
-            free(nr);
-        }
-    }
-}
-

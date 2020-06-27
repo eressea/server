@@ -1,15 +1,3 @@
-/* 
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -17,47 +5,37 @@ without prior permission by the authors of Eressea.
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
-#include "helpers.h"
+#include "magic.h"
 
+#include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
-#include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/spellbook.h>
-#include <attributes/key.h>
+#include "kernel/types.h"
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
+#include <util/nrmessage.h>
 #include <util/password.h>
 
+#include "attributes/key.h"
+
+#include <lua.h>
+#include <lauxlib.h>
 #include <tolua.h>
 #include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include <stdbool.h>          // for bool
+#include <stdio.h>            // for puts
 
-typedef struct helpmode {
-    const char *name;
-    int status;
-} helpmode;
-
-static helpmode helpmodes[] = {
-    { "all", HELP_ALL },
-    { "money", HELP_MONEY },
-    { "fight", HELP_FIGHT },
-    { "observe", HELP_OBSERVE },
-    { "give", HELP_GIVE },
-    { "guard", HELP_GUARD },
-    { "stealth", HELP_FSTEALTH },
-    { "travel", HELP_TRAVEL },
-    { NULL, 0 }
-};
+struct allies;
 
 int tolua_factionlist_next(lua_State * L)
 {
@@ -74,13 +52,13 @@ int tolua_factionlist_next(lua_State * L)
 
 static int tolua_faction_get_units(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     unit **unit_ptr = (unit **)lua_newuserdata(L, sizeof(unit *));
 
     luaL_getmetatable(L, TOLUA_CAST "unit");
     lua_setmetatable(L, -2);
 
-    *unit_ptr = self->units;
+    *unit_ptr = f->units;
 
     lua_pushcclosure(L, tolua_unitlist_nextf, 1);
     return 1;
@@ -88,15 +66,15 @@ static int tolua_faction_get_units(lua_State * L)
 
 int tolua_faction_add_item(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *iname = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *iname = tolua_tostring(L, 2, NULL);
     int number = (int)tolua_tonumber(L, 3, 0);
     int result = -1;
 
     if (iname != NULL) {
         const resource_type *rtype = rt_find(iname);
         if (rtype && rtype->itype) {
-            item *i = i_change(&self->items, rtype->itype, number);
+            item *i = i_change(&f->items, rtype->itype, number);
             result = i ? i->number : 0;
         }                           /* if (itype!=NULL) */
     }
@@ -106,38 +84,38 @@ int tolua_faction_add_item(lua_State * L)
 
 static int tolua_faction_get_maxheroes(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, maxheroes(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, maxheroes(f));
     return 1;
 }
 
 static int tolua_faction_get_heroes(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, countheroes(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, countheroes(f));
     return 1;
 }
 
 static int tolua_faction_get_score(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushnumber(L, (lua_Number)self->score);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushnumber(L, (lua_Number)f->score);
     return 1;
 }
 
 static int tolua_faction_get_id(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->no);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->no);
     return 1;
 }
 
 static int tolua_faction_set_id(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int id = (int)tolua_tonumber(L, 2, 0);
     if (findfaction(id) == NULL) {
-        renumber_faction(self, id);
+        renumber_faction(f, id);
         lua_pushboolean(L, 1);
     }
     else {
@@ -148,20 +126,20 @@ static int tolua_faction_set_id(lua_State * L)
 
 static int tolua_faction_get_magic(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, magic_school[self->magiegebiet]);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushstring(L, magic_school[f->magiegebiet]);
     return 1;
 }
 
 static int tolua_faction_set_magic(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *type = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *type = tolua_tostring(L, 2, NULL);
     int mtype;
 
     for (mtype = 0; mtype != MAXMAGIETYP; ++mtype) {
         if (strcmp(magic_school[mtype], type) == 0) {
-            self->magiegebiet = (magic_t)mtype;
+            f->magiegebiet = (magic_t)mtype;
             break;
         }
     }
@@ -170,132 +148,151 @@ static int tolua_faction_set_magic(lua_State * L)
 
 static int tolua_faction_get_age(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->age);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->age);
     return 1;
 }
 
 static int tolua_faction_set_age(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int age = (int)tolua_tonumber(L, 2, 0);
-    self->age = age;
+    f->age = age;
     return 0;
 }
 
 static int tolua_faction_get_flags(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->flags);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->flags);
     return 1;
 }
 
 static int tolua_faction_set_flags(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    int flags = (int)tolua_tonumber(L, 2, self->flags);
-    self->flags = flags;
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    int flags = (int)tolua_tonumber(L, 2, f->flags);
+    f->flags = flags;
     return 1;
 }
 
 static int tolua_faction_get_options(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->options);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->options);
     return 1;
 }
 
 static int tolua_faction_set_options(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    int options = (int)tolua_tonumber(L, 2, self->options);
-    self->options = options;
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    int options = (int)tolua_tonumber(L, 2, f->options);
+    f->options = options;
     return 1;
 }
 
 static int tolua_faction_get_lastturn(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, self->lastorders);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->lastorders);
     return 1;
 }
 
 static int tolua_faction_set_lastturn(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    if (self) {
-        self->lastorders = (int)tolua_tonumber(L, 2, self->lastorders);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    if (f) {
+        f->lastorders = (int)tolua_tonumber(L, 2, f->lastorders);
     }
     return 0;
 }
 
 static int tolua_faction_renumber(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int no = (int)tolua_tonumber(L, 2, 0);
 
-    renumber_faction(self, no);
+    renumber_faction(f, no);
     return 0;
 }
 
 static int tolua_faction_addnotice(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *str = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *str = tolua_tostring(L, 2, NULL);
 
-    addmessage(NULL, self, str, MSG_MESSAGE, ML_IMPORTANT);
+    addmessage(NULL, f, str, MSG_MESSAGE, ML_IMPORTANT);
     return 0;
 }
 
 static int tolua_faction_getkey(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
     int flag = atoi36(name);
-
-    lua_pushinteger(L, key_get(self->attribs, flag));
-    return 1;
+    int value = key_get(f->attribs, flag);
+    if (value != 0) {
+        lua_pushinteger(L, value);
+        return 1;
+    }
+    return 0;
 }
 
 static int tolua_faction_setkey(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
-    int value = (int)tolua_tonumber(L, 3, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
+    int value = (int)tolua_tonumber(L, 3, 1);
     int flag = atoi36(name);
 
     if (value) {
-        key_set(&self->attribs, flag, value);
+        key_set(&f->attribs, flag, value);
     }
     else {
-        key_unset(&self->attribs, flag);
+        key_unset(&f->attribs, flag);
+    }
+    return 0;
+}
+
+static int tolua_faction_debug_messages(lua_State * L)
+{
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    int i = 1;
+    if (f->msgs) {
+        mlist *ml;
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
+            char buf[120];
+            nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
+            puts(buf);
+        }
     }
     return 0;
 }
 
 static int tolua_faction_get_messages(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    int i = 1;
-    mlist *ml;
-    if (!self->msgs) {
-        return 0;
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+
+    if (f->msgs) {
+        int i = 1;
+        mlist *ml;
+        lua_newtable(L);
+        for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
+            lua_pushnumber(L, i);
+            lua_pushstring(L, ml->msg->type->name);
+            lua_rawset(L, -3);
+        }
+        return 1;
     }
-    lua_newtable(L);
-    for (ml = self->msgs->begin; ml; ml = ml->next, ++i) {
-        lua_pushnumber(L, i);
-        lua_pushstring(L, ml->msg->type->name);
-        lua_rawset(L, -3);
-    }
-    return 1;
+    return 0;
 }
 
 static int tolua_faction_count_msg_type(lua_State *L) {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *str = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *str = tolua_tostring(L, 2, NULL);
     int n = 0;
-    if (self->msgs) {
-        mlist * ml = self->msgs->begin;
+    if (f->msgs) {
+        mlist * ml = f->msgs->begin;
         while (ml) {
             if (strcmp(str, ml->msg->type->name) == 0) {
                 ++n;
@@ -307,53 +304,10 @@ static int tolua_faction_count_msg_type(lua_State *L) {
     return 1;
 }
 
-static int tolua_faction_get_policy(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction *other = (faction *)tolua_tousertype(L, 2, 0);
-    const char *policy = tolua_tostring(L, 3, 0);
-
-    int result = 0, mode;
-    for (mode = 0; helpmodes[mode].name != NULL; ++mode) {
-        if (strcmp(policy, helpmodes[mode].name) == 0) {
-            result = get_alliance(self, other) & mode;
-            break;
-        }
-    }
-
-    lua_pushinteger(L, result);
-    return 1;
-}
-
-static int tolua_faction_set_policy(lua_State * L)
-{
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction *other = (faction *)tolua_tousertype(L, 2, 0);
-    const char *policy = tolua_tostring(L, 3, 0);
-    int value = tolua_toboolean(L, 4, 0);
-
-    int mode;
-    for (mode = 0; helpmodes[mode].name != NULL; ++mode) {
-        if (strcmp(policy, helpmodes[mode].name) == 0) {
-            if (value) {
-                set_alliance(self, other, get_alliance(self,
-                    other) | helpmodes[mode].status);
-            }
-            else {
-                set_alliance(self, other, get_alliance(self,
-                    other) & ~helpmodes[mode].status);
-            }
-            break;
-        }
-    }
-
-    return 0;
-}
-
 static int tolua_faction_normalize(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    region *r = (region *)tolua_tousertype(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    region *r = (region *)tolua_tousertype(L, 2, NULL);
     if (r) {
         plane *pl = rplane(r);
         int nx = r->x, ny = r->y;
@@ -368,8 +322,8 @@ static int tolua_faction_normalize(lua_State * L)
 
 static int tolua_faction_set_origin(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    region *r = (region *)tolua_tousertype(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    region *r = (region *)tolua_tousertype(L, 2, NULL);
     plane *pl = rplane(r);
     int id = pl ? pl->id : 0;
 
@@ -379,21 +333,9 @@ static int tolua_faction_set_origin(lua_State * L)
 
 static int tolua_faction_get_origin(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-
-    ursprung *origin = self->ursprung;
-    int x, y;
-    while (origin != NULL && origin->id != 0) {
-        origin = origin->next;
-    }
-    if (origin) {
-        x = origin->x;
-        y = origin->y;
-    }
-    else {
-        x = 0;
-        y = 0;
-    }
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    int x = 0, y = 0;
+    faction_getorigin(f, 0, &x, &y);
 
     lua_pushinteger(L, x);
     lua_pushinteger(L, y);
@@ -402,7 +344,7 @@ static int tolua_faction_get_origin(lua_State * L)
 
 static int tolua_faction_destroy(lua_State * L)
 {
-    faction **fp, *f = (faction *)tolua_tousertype(L, 1, 0);
+    faction **fp, *f = (faction *)tolua_tousertype(L, 1, NULL);
     /* TODO: this loop is slow af, but what can we do? */
     for (fp = &factions; *fp; fp = &(*fp)->next) {
         if (*fp == f) {
@@ -423,14 +365,14 @@ static int tolua_faction_get(lua_State * L)
 
 static int tolua_faction_create(lua_State * L)
 {
-    const char *racename = tolua_tostring(L, 1, 0);
-    const char *email = tolua_tostring(L, 2, 0);
-    const char *lang = tolua_tostring(L, 3, 0);
+    const char *racename = tolua_tostring(L, 1, NULL);
+    const char *email = tolua_tostring(L, 2, NULL);
+    const char *lang = tolua_tostring(L, 3, NULL);
     struct locale *loc = lang ? get_locale(lang) : default_locale;
     faction *f = NULL;
     const struct race *frace = rc_find(racename ? racename : "human");
     if (frace != NULL) {
-        f = addfaction(email, NULL, frace, loc, 0);
+        f = addfaction(email, NULL, frace, loc);
     }
     if (!f) {
         log_error("cannot create %s faction for %s, unknown race.", racename, email);
@@ -441,47 +383,48 @@ static int tolua_faction_create(lua_State * L)
 
 static int tolua_faction_get_password(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->_password);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, faction_getpassword(f));
     return 1;
 }
 
 static int tolua_faction_set_password(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char * passw = tolua_tostring(L, 2, 0);
-    faction_setpassword(self, password_encode(passw, PASSWORD_DEFAULT));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char * passw = tolua_tostring(L, 2, NULL);
+    faction_setpassword(f, 
+      passw ? password_hash(passw, PASSWORD_DEFAULT) : NULL);
     return 0;
 }
 
 static int tolua_faction_get_email(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, faction_getemail(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, faction_getemail(f));
     return 1;
 }
 
 static int tolua_faction_set_email(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction_setemail(self, tolua_tostring(L, 2, 0));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    faction_setemail(f, tolua_tostring(L, 2, NULL));
     return 0;
 }
 
 static int tolua_faction_get_locale(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, locale_name(self->locale));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, locale_name(f->locale));
     return 1;
 }
 
 static int tolua_faction_set_locale(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
     const struct locale *loc = get_locale(name);
     if (loc) {
-        self->locale = loc;
+        f->locale = loc;
     }
     else {
         tolua_pushstring(L, "invalid locale");
@@ -492,18 +435,18 @@ static int tolua_faction_set_locale(lua_State * L)
 
 static int tolua_faction_get_race(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, self->race->_name);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, f->race->_name);
     return 1;
 }
 
 static int tolua_faction_set_race(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    const char *name = tolua_tostring(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    const char *name = tolua_tostring(L, 2, NULL);
     const race *rc = rc_find(name);
     if (rc != NULL) {
-        self->race = rc;
+        f->race = rc;
     }
 
     return 0;
@@ -511,72 +454,136 @@ static int tolua_faction_set_race(lua_State * L)
 
 static int tolua_faction_get_name(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, faction_getname(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, faction_getname(f));
     return 1;
 }
 
 static int tolua_faction_set_name(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction_setname(self, tolua_tostring(L, 2, 0));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    faction_setname(f, tolua_tostring(L, 2, NULL));
     return 0;
 }
 
 static int tolua_faction_get_uid(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, f->subscription);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushinteger(L, f->uid);
     return 1;
 }
 
 static int tolua_faction_set_uid(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, 0);
-    f->subscription = (int)tolua_tonumber(L, 2, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    f->uid = (int)tolua_tonumber(L, 2, 0);
     return 0;
 }
 
 static int tolua_faction_get_info(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushstring(L, faction_getbanner(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushstring(L, faction_getbanner(f));
     return 1;
 }
 
 static int tolua_faction_set_info(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    faction_setbanner(self, tolua_tostring(L, 2, 0));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    faction_setbanner(f, tolua_tostring(L, 2, NULL));
     return 0;
 }
 
-static int tolua_faction_get_alliance(lua_State * L)
+/* TODO: this is probably useful elsewhere */
+static const char *status_names[] = {
+    "money", "fight", "observe", "give", "guard", "stealth", "travel", NULL
+};
+
+static int cb_ally_push(struct allies *af, struct faction *f, int status, void *udata) {
+    struct lua_State *L = (struct lua_State *)udata;
+    int len = 1;
+    int i;
+
+    lua_pushnumber(L, f->no);
+    lua_newtable(L);
+    for (i = 0; status_names[i]; ++i) {
+        int flag = 1 << i;
+        if (status & flag) {
+            lua_pushstring(L, status_names[i]);
+            lua_rawseti(L, -2, len++);
+        }
+    }
+
+    lua_rawset(L, -3);
+    return 0;
+}
+
+static int tolua_faction_get_allies(lua_State * L) {
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_newtable(L);
+    allies_walk(f->allies, cb_ally_push, L);
+    return 1;
+}
+
+static int tolua_faction_set_ally(lua_State * L) {
+    faction *f1 = (faction *)tolua_tousertype(L, 1, NULL);
+    faction *f2 = (faction *)tolua_tousertype(L, 2, NULL);
+    const char *status = tolua_tostring(L, 3, NULL);
+    bool value = tolua_toboolean(L, 4, 1);
+    if (status) {
+        int flag = ally_status(status);
+        int flags = ally_get(f1->allies, f2);
+        if (value) {
+            flags |= flag;
+        }
+        else {
+            flags &= ~flag;
+        }
+        ally_set(&f1->allies, f2, flags);
+    }
+    return 0;
+}
+
+static int tolua_faction_get_ally(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    tolua_pushusertype(L, f_get_alliance(self), TOLUA_CAST "alliance");
+    faction *f1 = (faction *)tolua_tousertype(L, 1, NULL);
+    faction *f2 = (faction *)tolua_tousertype(L, 2, NULL);
+    const char *status = tolua_tostring(L, 3, NULL);
+    if (f1 && f2 && status) {
+        int test = ally_status(status);
+        int flags = ally_get(f1->allies, f2);
+        lua_pushboolean(L, (test & flags) == test);
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_faction_get_alliances(lua_State * L)
+{
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    tolua_pushusertype(L, f_get_alliance(f), TOLUA_CAST "alliance");
     return 1;
 }
 
 static int tolua_faction_set_alliance(lua_State * L)
 {
-    struct faction *self = (struct faction *)tolua_tousertype(L, 1, 0);
-    struct alliance *alli = (struct alliance *) tolua_tousertype(L, 2, 0);
+    struct faction *f = (struct faction *)tolua_tousertype(L, 1, NULL);
+    struct alliance *alli = (struct alliance *) tolua_tousertype(L, 2, NULL);
 
-    setalliance(self, alli);
+    setalliance(f, alli);
 
     return 0;
 }
 
 static int tolua_faction_get_items(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     item **item_ptr = (item **)lua_newuserdata(L, sizeof(item *));
 
     luaL_getmetatable(L, TOLUA_CAST "item");
     lua_setmetatable(L, -2);
 
-    *item_ptr = self->items;
+    *item_ptr = f->items;
 
     lua_pushcclosure(L, tolua_itemlist_next, 1);
 
@@ -585,8 +592,8 @@ static int tolua_faction_get_items(lua_State * L)
 
 static int tolua_faction_tostring(lua_State * L)
 {
-    faction *self = (faction *)tolua_tousertype(L, 1, 0);
-    lua_pushstring(L, factionname(self));
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+    lua_pushstring(L, factionname(f));
     return 1;
 }
 
@@ -629,8 +636,6 @@ void tolua_faction_open(lua_State * L)
                 tolua_faction_set_locale);
             tolua_variable(L, TOLUA_CAST "race", tolua_faction_get_race,
                 tolua_faction_set_race);
-            tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliance,
-                tolua_faction_set_alliance);
             tolua_variable(L, TOLUA_CAST "score", tolua_faction_get_score, NULL);
             tolua_variable(L, TOLUA_CAST "magic", tolua_faction_get_magic,
                 tolua_faction_set_magic);
@@ -642,8 +647,13 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn,
                 tolua_faction_set_lastturn);
 
-            tolua_function(L, TOLUA_CAST "set_policy", tolua_faction_set_policy);
-            tolua_function(L, TOLUA_CAST "get_policy", tolua_faction_get_policy);
+            tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliances,
+                tolua_faction_set_alliance);
+
+            tolua_variable(L, TOLUA_CAST "allies", tolua_faction_get_allies, NULL);
+            tolua_function(L, TOLUA_CAST "set_ally", tolua_faction_set_ally);
+            tolua_function(L, TOLUA_CAST "get_ally", tolua_faction_get_ally);
+
             tolua_function(L, TOLUA_CAST "get_origin", tolua_faction_get_origin);
             tolua_function(L, TOLUA_CAST "set_origin", tolua_faction_set_origin);
             tolua_function(L, TOLUA_CAST "normalize", tolua_faction_normalize);
@@ -660,6 +670,7 @@ void tolua_faction_open(lua_State * L)
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
             tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
             tolua_variable(L, TOLUA_CAST "messages", tolua_faction_get_messages, NULL);
+            tolua_function(L, TOLUA_CAST "debug_messages", tolua_faction_debug_messages);
 
             tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
             tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);

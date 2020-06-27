@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #include <platform.h>
+#endif
 #include "parser.h"
 #include "unicode.h"
 #include "base36.h"
@@ -13,19 +15,19 @@
 #define ESCAPE_CHAR       '\\'
 #define MAXTOKENSIZE      8192
 
-typedef struct parser_state {
+typedef struct parse_state {
     const char *current_token;
-    struct parser_state *next;
+    struct parse_state *next;
     void *data;
     void(*dtor)(void *);
-} parser_state;
+} parse_state;
 
-static parser_state *states;
+static parse_state *states;
 
 static int eatwhitespace_c(const char **str_p)
 {
     int ret = 0;
-    ucs4_t ucs;
+    wint_t wc;
     size_t len;
     const char *str = *str_p;
 
@@ -38,12 +40,12 @@ static int eatwhitespace_c(const char **str_p)
             ++str;
         }
         else {
-            ret = unicode_utf8_to_ucs4(&ucs, str, &len);
+            ret = unicode_utf8_decode(&wc, str, &len);
             if (ret != 0) {
                 log_warning("illegal character sequence in UTF8 string: %s\n", str);
                 break;
             }
-            if (!iswspace((wint_t)ucs))
+            if (!iswspace(wc))
                 break;
             str += len;
         }
@@ -55,7 +57,8 @@ static int eatwhitespace_c(const char **str_p)
 void init_tokens_ex(const char *initstr, void *data, void (*dtor)(void *))
 {
     if (states == NULL) {
-        states = calloc(1, sizeof(parser_state));
+        states = calloc(1, sizeof(parse_state));
+        if (!states) abort();
     }
     else if (states->dtor) {
         states->dtor(states->data);
@@ -71,7 +74,8 @@ void init_tokens_str(const char *initstr) {
 
 void parser_pushstate(void)
 {
-    parser_state *new_state = calloc(1, sizeof(parser_state));
+    parse_state *new_state = calloc(1, sizeof(parse_state));
+    if (!new_state) abort();
     new_state->current_token = NULL;
     new_state->next = states;
     states = new_state;
@@ -79,7 +83,7 @@ void parser_pushstate(void)
 
 void parser_popstate(void)
 {
-    parser_state *new_state = states->next;
+    parse_state *new_state = states->next;
     if (states->dtor) {
         states->dtor(states->data);
     }
@@ -102,16 +106,16 @@ void skip_token(void)
     eatwhitespace_c(&states->current_token);
 
     while (*states->current_token) {
-        ucs4_t ucs;
+        wint_t wc;
         size_t len;
 
         unsigned char utf8_character = (unsigned char)states->current_token[0];
         if (~utf8_character & 0x80) {
-            ucs = utf8_character;
+            wc = utf8_character;
             ++states->current_token;
         }
         else {
-            int ret = unicode_utf8_to_ucs4(&ucs, states->current_token, &len);
+            int ret = unicode_utf8_decode(&wc, states->current_token, &len);
             if (ret == 0) {
                 states->current_token += len;
             }
@@ -119,7 +123,7 @@ void skip_token(void)
                 log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
             }
         }
-        if (iswspace((wint_t)ucs) && quotechar == 0) {
+        if (iswspace(wc) && quotechar == 0) {
             return;
         }
         else {
@@ -156,17 +160,17 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         return 0;
     }
     while (*ctoken) {
-        ucs4_t ucs;
+        wint_t wc;
         size_t len;
         bool copy = false;
 
         unsigned char utf8_character = *(unsigned char *)ctoken;
         if (~utf8_character & 0x80) {
-            ucs = utf8_character;
+            wc = utf8_character;
             len = 1;
         }
         else {
-            int ret = unicode_utf8_to_ucs4(&ucs, ctoken, &len);
+            int ret = unicode_utf8_decode(&wc, ctoken, &len);
             if (ret != 0) {
                 log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
                 break;
@@ -176,7 +180,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             copy = true;
             escape = false;
         }
-        else if (iswspace((wint_t)ucs)) {
+        else if (iswspace(wc)) {
             if (quotechar == 0)
                 break;
             copy = true;
@@ -219,6 +223,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     }
 
     *cursor = '\0';
+    unicode_utf8_trim(lbuf);
     *str = ctoken;
     return lbuf;
 }
@@ -229,12 +234,12 @@ const char *parse_token_depr(const char **str)
     return parse_token(str, pbuf, MAXTOKENSIZE);
 }
 
-const char *getstrtoken(void)
+char *getstrtoken(void)
 {
     return parse_token((const char **)&states->current_token, pbuf, MAXTOKENSIZE);
 }
 
-const char *gettoken(char *lbuf, size_t bufsize)
+char *gettoken(char *lbuf, size_t bufsize)
 {
     return parse_token((const char **)&states->current_token, lbuf, bufsize);
 }

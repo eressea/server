@@ -1,4 +1,4 @@
-#include <platform.h>
+#include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/item.h>
@@ -9,7 +9,7 @@
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/macros.h>
@@ -42,7 +42,7 @@ static void test_remove_empty_units(CuTest *tc) {
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units();
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     test_teardown();
 }
 
@@ -61,9 +61,9 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     CuAssertPtrNotNull(tc, findunit(uid));
     u->number = 0;
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
-    CuAssertPtrEquals(tc, 0, u->nextF);
-    CuAssertPtrEquals(tc, 0, u->region);
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, u->nextF);
+    CuAssertPtrEquals(tc, NULL, u->region);
     test_teardown();
 }
 
@@ -78,7 +78,7 @@ static void test_remove_units_without_faction(CuTest *tc) {
     uid = u->no;
     u_setfaction(u, 0);
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
     test_teardown();
 }
@@ -94,7 +94,7 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
     uid = u->no;
     u->faction->_alive = false;
     remove_empty_units_in_region(u->region);
-    CuAssertPtrEquals(tc, 0, findunit(uid));
+    CuAssertPtrEquals(tc, NULL, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
     test_teardown();
 }
@@ -234,22 +234,22 @@ static void test_skillmod(CuTest *tc) {
     test_setup();
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_ARMORER, 5);
-    CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, NULL));
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 2.0, 0));
-    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(NOSKILL, 0, 2.0, 0)); /* NOSKILL means any skill */
-    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 10, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, 0, 0, 2));
-    CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 7, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     a_add(&u->attribs, a = make_skillmod(SK_ARMORER, cb_skillmod, 0, 0));
-    CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, 0));
+    CuAssertIntEquals(tc, 8, effskill(u, SK_ARMORER, NULL));
     a_remove(&u->attribs, a);
 
     test_teardown();
@@ -263,10 +263,10 @@ static void test_skill_hunger(CuTest *tc) {
     set_level(u, SK_ARMORER, 6);
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
-    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, 0));
-    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, 0));
+    CuAssertIntEquals(tc, 3, effskill(u, SK_ARMORER, NULL));
+    CuAssertIntEquals(tc, 5, effskill(u, SK_SAILING, NULL));
     set_level(u, SK_SAILING, 2);
-    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING, 0));
+    CuAssertIntEquals(tc, 1, effskill(u, SK_SAILING, NULL));
     test_teardown();
 }
 
@@ -280,21 +280,21 @@ static void test_skill_familiar(CuTest *tc) {
     mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
     set_level(fam, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, NULL));
     set_level(mag, SK_PERCEPTION, 6);
-    CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(mag, SK_PERCEPTION, NULL));
 
     /* make them mage and familiar to each other */
     create_newfamiliar(mag, fam);
 
     /* when they are in the same region, the mage gets half their skill as a bonus */
-    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, 0));
-    CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, NULL));
+    CuAssertIntEquals(tc, 9, effskill(mag, SK_PERCEPTION, NULL));
 
     /* when they are further apart, divide bonus by distance */
     r = test_create_region(3, 0, 0);
     move_unit(fam, r, &r->units);
-    CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, 0));
+    CuAssertIntEquals(tc, 7, effskill(mag, SK_PERCEPTION, NULL));
     test_teardown();
 }
 
@@ -308,16 +308,16 @@ static void test_inside_building(CuTest *tc) {
 
     b->size = 1;
     scale_number(u, 1);
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     u->building = b;
     CuAssertPtrEquals(tc, b, inside_building(u));
     scale_number(u, 2);
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     b->size = 2;
     CuAssertPtrEquals(tc, b, inside_building(u));
     u = test_create_unit(u->faction, u->region);
     u->building = b;
-    CuAssertPtrEquals(tc, 0, inside_building(u));
+    CuAssertPtrEquals(tc, NULL, inside_building(u));
     b->size = 3;
     CuAssertPtrEquals(tc, b, inside_building(u));
     test_teardown();
@@ -397,14 +397,13 @@ static void test_unit_description(CuTest *tc) {
     rc = test_create_race("hodor");
     u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
 
-    CuAssertPtrEquals(tc, 0, u->display);
-    CuAssertStrEquals(tc, 0, u_description(u, lang));
-    u->display = str_strdup("Hodor");
+    CuAssertStrEquals(tc, NULL, unit_getinfo(u));
+    CuAssertStrEquals(tc, NULL, u_description(u, lang));
+    unit_setinfo(u, "Hodor");
     CuAssertStrEquals(tc, "Hodor", u_description(u, NULL));
     CuAssertStrEquals(tc, "Hodor", u_description(u, lang));
 
-    free(u->display);
-    u->display = NULL;
+    unit_setinfo(u, NULL);
     locale_setstring(lang, "describe_hodor", "HODOR");
     CuAssertStrEquals(tc, "HODOR", u_description(u, lang));
 
@@ -428,37 +427,37 @@ static void test_remove_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, u1, f->units);
     CuAssertPtrEquals(tc, u2, u1->nextF);
     CuAssertPtrEquals(tc, u1, u2->prevF);
-    CuAssertPtrEquals(tc, 0, u2->nextF);
+    CuAssertPtrEquals(tc, NULL, u2->nextF);
     uno = u1->no;
     region_setresource(r, rtype, 0);
     i_change(&u1->items, rtype->itype, 100);
     remove_unit(&r->units, u1);
     CuAssertIntEquals(tc, 0, u1->number);
-    CuAssertPtrEquals(tc, 0, u1->region);
+    CuAssertPtrEquals(tc, NULL, u1->region);
     /* money is given to a survivor: */
-    CuAssertPtrEquals(tc, 0, u1->items);
+    CuAssertPtrEquals(tc, NULL, u1->items);
     CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
 
     /* unit is removed from f->units: */
-    CuAssertPtrEquals(tc, 0, u1->nextF);
+    CuAssertPtrEquals(tc, NULL, u1->nextF);
     CuAssertPtrEquals(tc, u2, f->units);
-    CuAssertPtrEquals(tc, 0, u2->nextF);
-    CuAssertPtrEquals(tc, 0, u2->prevF);
+    CuAssertPtrEquals(tc, NULL, u2->nextF);
+    CuAssertPtrEquals(tc, NULL, u2->prevF);
     /* unit is no longer in r->units: */
     CuAssertPtrEquals(tc, u2, r->units);
-    CuAssertPtrEquals(tc, 0, u2->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
 
     /* unit is in deleted_units: */
-    CuAssertPtrEquals(tc, 0, findunit(uno));
+    CuAssertPtrEquals(tc, NULL, findunit(uno));
     CuAssertPtrEquals(tc, f, dfindhash(uno));
 
     remove_unit(&r->units, u2);
     /* no survivor, give money to peasants: */
     CuAssertIntEquals(tc, 100, region_getresource(r, rtype));
     /* there are now no more units: */
-    CuAssertPtrEquals(tc, 0, r->units);
-    CuAssertPtrEquals(tc, 0, f->units);
+    CuAssertPtrEquals(tc, NULL, r->units);
+    CuAssertPtrEquals(tc, NULL, f->units);
     test_teardown();
 }
 
@@ -653,6 +652,62 @@ static void test_get_modifier(CuTest *tc) {
     test_teardown();
 }
 
+static void test_gift_items(CuTest *tc) {
+    unit *u, *u1, *u2;
+    region *r;
+    const resource_type *rtype;
+    test_setup();
+    init_resources();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(NULL), r);
+    rtype = get_resourcetype(R_SILVER);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 10, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+
+    region_setresource(r, get_resourcetype(R_HORSE), 0);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    i_change(&u->items, get_resourcetype(R_HORSE)->itype, 20);
+    u1 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(u1->faction, r);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 20, region_getresource(r, get_resourcetype(R_HORSE)));
+    CuAssertIntEquals(tc, 10, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 10);
+    ally_set(&u->faction->allies, u1->faction, HELP_MONEY);
+    ally_set(&u1->faction->allies, u->faction, HELP_GIVE);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 10, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    i_change(&u1->items, rtype->itype, -10);
+
+    set_number(u1, 2);
+    u_setfaction(u2, test_create_faction(NULL));
+    ally_set(&u->faction->allies, u2->faction, HELP_MONEY);
+    ally_set(&u2->faction->allies, u->faction, HELP_GIVE);
+    region_setresource(r, rtype, 0);
+    i_change(&u->items, rtype->itype, 15);
+    ally_set(&u->faction->allies, u1->faction, HELP_MONEY);
+    ally_set(&u1->faction->allies, u->faction, HELP_GIVE);
+    gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
+    CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
+    CuAssertIntEquals(tc, 10, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 5, i_get(u2->items, rtype->itype));
+
+    test_teardown();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -684,5 +739,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
     SUITE_ADD_TEST(suite, test_get_modifier);
+    SUITE_ADD_TEST(suite, test_gift_items);
     return suite;
 }

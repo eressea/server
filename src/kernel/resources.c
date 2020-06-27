@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include "resources.h"
 
@@ -46,8 +34,6 @@ void update_resources(region * r)
     }
 }
 
-extern int dice_rand(const char *s);
-
 static void update_resource(struct rawmaterial *res, double modifier)
 {
     double amount = (res->level - res->startlevel) / 100.0 * res->divisor + 1;
@@ -59,21 +45,27 @@ static void update_resource(struct rawmaterial *res, double modifier)
     assert(res->amount > 0);
 }
 
-struct rawmaterial *
-add_resource(region * r, int level, int base, int divisor,
-const resource_type * rtype)
+void set_resource(struct rawmaterial *rm, int level, int base, int divisor)
 {
-    struct rawmaterial *rm = calloc(sizeof(struct rawmaterial), 1);
-
-    rm->next = r->resources;
-    r->resources = rm;
     rm->level = level;
     rm->startlevel = level;
     rm->base = base;
     rm->amount = base;
     rm->divisor = divisor;
+}
+
+struct rawmaterial *
+add_resource(region * r, int level, int base, int divisor,
+const resource_type * rtype)
+{
+    struct rawmaterial *rm = calloc(1, sizeof(struct rawmaterial));
+
+    if (!rm) abort();
+    rm->next = r->resources;
+    r->resources = rm;
     rm->flags = 0;
     rm->rtype = rtype;
+    set_resource(rm, level, base, divisor);
     return rm;
 }
 
@@ -178,10 +170,9 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
-    rawmaterial_type *rmtype;
-
     if (!rtype->raw) {
-        rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
+        if (!rmtype) abort();
         rmtype->rtype = rtype;
         rmtype->terraform = terraform_default;
         rmtype->update = NULL;

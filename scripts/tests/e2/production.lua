@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e2.production", package.seeall, lunit.testcase )
+local tcname = 'tests.e2.production'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.game.reset()
@@ -108,7 +112,7 @@ end
 
 function test_build_boat_high_skill()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "skillz@example.com")
+    local f = faction.create("human")
     local u = unit.create(f, r, 1)
     u:set_skill("shipcraft", 5) -- humans get +1
     u:add_item("log", 10)
@@ -117,4 +121,87 @@ function test_build_boat_high_skill()
     assert_not_equal(nil, u.ship)
     assert_equal(5, u.ship.size)
     assert_equal(5, u:get_item('log'))
+end
+
+function test_work()
+    eressea.settings.set("rules.peasants.growth.factor", "0")
+    local r = region.create(0, 0, "plain")
+    r:set_resource('peasant', 1)
+    r:set_resource('tree', 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    r:set_resource('money', 0)
+
+    process_orders()
+    assert_equal(10, u:get_item('money'))
+    assert_equal(1, r:get_resource('money'))
+    b = building.create(r, 'castle')
+
+    b.size = 2
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    process_orders()
+    assert_equal(10, u:get_item('money'))
+    assert_equal(1, r:get_resource('money'))
+
+    b.size = 10
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    process_orders()
+    assert_equal(11, u:get_item('money'))
+    assert_equal(2, r:get_resource('money'))
+
+    b.size = 50
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    process_orders()
+    assert_equal(12, u:get_item('money'))
+    assert_equal(3, r:get_resource('money'))
+
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    b.size = 250
+    process_orders()
+    assert_equal(13, u:get_item('money'))
+    assert_equal(4, r:get_resource('money'))
+
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    b.size = 1250
+    process_orders()
+    assert_equal(14, u:get_item('money'))
+    assert_equal(5, r:get_resource('money'))
+
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    b.size = 6250
+    process_orders()
+    assert_equal(15, u:get_item('money'))
+    assert_equal(6, r:get_resource('money'))
+end
+
+function test_blessed_harvest()
+    eressea.settings.set("rules.peasants.growth.factor", "0")
+    local r = region.create(0, 0, "plain")
+    r:set_resource('peasant', 1)
+    r:set_resource('tree', 0)
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    r:set_resource('money', 0)
+    r:add_curse('blessedharvest', nil, 2, 1, 1) -- duration, force, effect
+
+    process_orders()
+    assert_equal(10, u:get_item('money')) -- only peasants benefit
+    assert_equal(2, r:get_resource('money')) -- peasants work +1
+
+    b = building.create(r, 'castle')
+    b.size = 6250
+    r:set_resource('money', 0)
+    u:add_item('money', -u:get_item('money'))
+    assert_equal(1, r:get_curse('blessedharvest'))
+    process_orders()
+    assert_equal(15, u:get_item('money')) -- only peasants get +1
+    assert_equal(7, r:get_resource('money')) -- peasants get +1
 end

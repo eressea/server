@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "alchemy.h"
@@ -33,8 +15,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -66,7 +48,8 @@ void new_potiontype(item_type * itype, int level)
 {
     potion_type *ptype;
 
-    ptype = (potion_type *)calloc(sizeof(potion_type), 1);
+    ptype = (potion_type *)calloc(1, sizeof(potion_type));
+    assert(ptype);
     itype->flags |= ITF_POTION;
     ptype->itype = itype;
     ptype->level = level;
@@ -89,7 +72,7 @@ void herbsearch(unit * u, int max_take)
     region * r = u->region;
     int herbsfound;
     const item_type *whichherb;
-    int effsk = effskill(u, SK_HERBALISM, 0);
+    int effsk = effskill(u, SK_HERBALISM, NULL);
     int herbs = rherbs(r);
 
     if (effsk == 0) {
@@ -181,7 +164,7 @@ int use_potion(unit * u, const item_type * itype, int amount, struct order *ord)
 
 static void a_initeffect(variant *var)
 {
-    var->v = calloc(sizeof(effect_data), 1);
+    var->v = calloc(1, sizeof(effect_data));
 }
 
 static void
@@ -274,7 +257,7 @@ int change_effect(unit * u, const item_type * effect, int delta)
 
 bool display_potions(struct unit *u)
 {
-    int skill = effskill(u, SK_ALCHEMY, 0);
+    int skill = effskill(u, SK_ALCHEMY, NULL);
     int c = 0;
     const potion_type *ptype;
     for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {

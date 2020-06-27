@@ -74,10 +74,11 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
     line = read_line(F);
     while (line) {
         char token[8];
-        int err = sscanf(line, "%8s", token);
+        int err = sscanf(line, "%7s", token);
+        token[7] = 0;
         if (err == 1) {
             char *text = NULL;
-            size_t size, len = strlen(token);
+            size_t size = 0, len = strlen(token);
 
             line = line + len + 1;
             if (len == 7 && memcmp(token, "msgctxt", 7) == 0) {
@@ -99,7 +100,7 @@ int pofile_read(const char *filename, int (*callback)(const char *msgid, const c
                     msgid[0] = 0;
                 }
             }
-            if (text) {
+            if (size > 0) {
                 line = read_multiline(F, line, text, size);
             }
         }

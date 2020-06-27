@@ -24,10 +24,10 @@ static bool equip_callback(unit *u, const char *eqname, int mask) {
 
 static void test_equipment(CuTest * tc)
 {
-    callbacks.equip_unit = equip_callback;
     unit * u;
 
     test_setup();
+    callbacks.equip_unit = equip_callback;
 
     u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, true, equip_unit_mask(u, "hodor", EQUIP_ALL));

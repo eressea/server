@@ -5,6 +5,7 @@
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 
+#include "util/param.h"
 #include <util/parser.h>
 #include <util/language.h>
 
@@ -102,7 +103,8 @@ static void test_parse_make(CuTest *tc) {
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
     init_locale(lang);
-    ord = parse_order("M hurrdurr", lang);
+    CuAssertPtrEquals(tc, NULL, parse_order("M herp", lang));
+    ord = parse_order("MA hurrdurr", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKE, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, lang, cmd, sizeof(cmd)));
@@ -121,6 +123,8 @@ static void test_parse_autostudy(CuTest *tc) {
     test_setup();
     lang = get_or_create_locale("en");
     locale_setstring(lang, mkname("skill", skillnames[SK_ENTERTAINMENT]), "Entertainment");
+    locale_setstring(lang, mkname("skill", skillnames[SK_MAGIC]), "Magic");
+    locale_setstring(lang, mkname("skill", skillnames[SK_TACTICS]), "Tactics");
     locale_setstring(lang, keyword(K_STUDY), "STUDY");
     locale_setstring(lang, keyword(K_AUTOSTUDY), "AUTOSTUDY");
     locale_setstring(lang, parameters[P_AUTO], "AUTO");
@@ -134,6 +138,17 @@ static void test_parse_autostudy(CuTest *tc) {
     CuAssertIntEquals(tc, K_AUTOSTUDY, init_order(ord, lang));
     CuAssertStrEquals(tc, "Entertainment", getstrtoken());
     free_order(ord);
+
+    ord = parse_order("STUDY AUTO Magic", lang);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertStrEquals(tc, "STUDY Magic", get_command(ord, lang, cmd, sizeof(cmd)));
+    free_order(ord);
+
+    ord = parse_order("STUDY AUTO Tactics", lang);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertStrEquals(tc, "STUDY Tactics", get_command(ord, lang, cmd, sizeof(cmd)));
+    free_order(ord);
+
     test_teardown();
 }
 
@@ -149,7 +164,8 @@ static void test_parse_make_temp(CuTest *tc) {
     locale_setstring(lang, parameters[P_TEMP], "TEMP");
     init_locale(lang);
 
-    ord = parse_order("M T herp", lang);
+    CuAssertPtrEquals(tc, NULL, parse_order("M T herp", lang));
+    ord = parse_order("MA TE herp", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
@@ -225,11 +241,11 @@ static void test_replace_order(CuTest *tc) {
     orig = create_order(K_MAKE, lang, NULL);
     repl = create_order(K_ALLY, lang, NULL);
     replace_order(&orders, orig, repl);
-    CuAssertPtrEquals(tc, 0, orders);
+    CuAssertPtrEquals(tc, NULL, orders);
     orders = orig;
     replace_order(&orders, orig, repl);
     CuAssertPtrNotNull(tc, orders);
-    CuAssertPtrEquals(tc, 0, orders->next);
+    CuAssertPtrEquals(tc, NULL, orders->next);
     CuAssertIntEquals(tc, getkeyword(repl), getkeyword(orders));
     free_order(orders);
     free_order(repl);

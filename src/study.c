@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -32,6 +14,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <spells/regioncurse.h>
 
 #include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
@@ -46,10 +29,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
@@ -130,54 +113,30 @@ bool magic_lowskill(unit * u)
     return u_race(u) == toad_rc;
 }
 
-/* ------------------------------------------------------------- */
-
 int study_cost(struct unit *u, skill_t sk)
 {
-    static int config;
-    static int costs[MAXSKILLS];
-    int cost = -1;
-
     if (sk == SK_MAGIC) {
-        int next_level = 1 + (u ? get_level(u, sk) : 0);
+        static int config;
+        static int cost;
         /* Die Magiekosten betragen 50+Summe(50*Stufe) */
         /* 'Stufe' ist dabei die naechste zu erreichende Stufe */
-        cost = config_get_int("skills.cost.magic", 50);
-        return cost * (1 + ((next_level + next_level * next_level) / 2));
+        if (config_changed(&config)) {
+            cost = config_get_int("skills.cost.magic", 50);
+        }
+        if (cost > 0) {
+            int next_level = 1 + (u ? get_level(u, sk) : 0);
+            return cost * (1 + ((next_level + next_level * next_level) / 2));
+        }
+        return cost;
     }
-    else switch (sk) {
-    case SK_SPY:
-        cost = 100;
-        break;
-    case SK_TACTICS:
-    case SK_HERBALISM:
-    case SK_ALCHEMY:
-        cost = 200;
-        break;
-    default:
-        cost = -1;
-    }
-
-    if (config_changed(&config)) {
-        memset(costs, 0, sizeof(costs));
-    }
-
-    if (costs[sk] == 0) {
-        char buffer[256];
-        sprintf(buffer, "skills.cost.%s", skillnames[sk]);
-        costs[sk] = config_get_int(buffer, cost);
-    }
-    if (costs[sk] >= 0) {
-        return costs[sk];
-    }
-    return (cost > 0) ? cost : 0;
+    return skill_cost(sk);
 }
 
 /* ------------------------------------------------------------- */
 
 static void init_learning(variant *var)
 {
-    var->v = calloc(sizeof(teaching_info), 1);
+    var->v = calloc(1, sizeof(teaching_info));
 }
 
 static void done_learning(variant *var)
@@ -443,15 +402,16 @@ int teach_cmd(unit * teacher, struct order *ord)
             if (sk == SK_MAGIC) {
                 /* ist der Magier schon spezialisiert, so versteht er nur noch
                  * Lehrer seines Gebietes */
-                sc_mage *mage1 = get_mage_depr(teacher);
-                sc_mage *mage2 = get_mage_depr(scholar);
-                if (mage2 && mage1 && mage2->magietyp != M_GRAY
-                    && mage1->magietyp != mage2->magietyp) {
-                    if (feedback) {
-                        ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
-                            "error_different_magic", "target", scholar));
+                magic_t mage2 = unit_get_magic(scholar);
+                if (mage2 != M_GRAY) {
+                    magic_t mage1 = unit_get_magic(teacher);
+                    if (mage1 != mage2) {
+                        if (feedback) {
+                            ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
+                                "error_different_magic", "target", scholar));
+                        }
+                        continue;
                     }
-                    continue;
                 }
             }
             sk_academy = sk;
@@ -532,7 +492,7 @@ static bool cb_msg_teach(void *el, void *arg) {
         if (feedback) {
             ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
                 "teacher student skill level", ut, u, sk,
-                effskill(u, sk, 0)));
+                effskill(u, sk, NULL)));
         }
         ADDMSG(&u->faction->msgs, msg_message("teach_student",
             "teacher student skill", ut, u, sk));
@@ -545,6 +505,49 @@ static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
     cbdata.sk = sk;
     cbdata.u = u;
     selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
+}
+
+bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
+    int err = 0;
+    const race *rc = u_race(u);
+
+    if (sk < 0) {
+        err = 77;
+    }
+    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
+    else if (rc->bonus[sk] == -99) {
+        err = 771;
+    }
+    else {
+        static int config;
+        static bool learn_newskills;
+
+        if (config_changed(&config)) {
+            learn_newskills = config_get_int("study.newskills", 1) != 0;
+        }
+        if (!learn_newskills) {
+            skill *sv = unit_skill(u, sk);
+            if (sv == NULL) {
+                /* we can only learn skills we already have */
+                err = 771;
+            }
+        }
+    }
+    if (err) {
+        if (ord) {
+            cmistake(u, ord, err, MSG_EVENT);
+        }
+        return false;
+    }
+
+    if ((u_race(u)->flags & RCF_NOLEARN) || fval(u, UFL_WERE)) {
+        if (ord) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "error_race_nolearn", "race", u_race(u)));
+        }
+        return false;
+    }
+    return true;
 }
 
 int study_cmd(unit * u, order * ord)
@@ -560,7 +563,6 @@ int study_cmd(unit * u, order * ord)
     skill_t sk;
     int maxalchemy = 0;
     int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
-    bool learn_newskills = config_get_int("study.newskills", 1) != 0;
     static const race *rc_snotling;
     static int rc_cache;
 
@@ -568,31 +570,11 @@ int study_cmd(unit * u, order * ord)
         rc_snotling = get_race(RC_SNOTLING);
     }
 
-    if (!unit_can_study(u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_race_nolearn", "race",
-            u_race(u)));
-        return -1;
-    }
-
     (void)init_order(ord, u->faction->locale);
     sk = getskill(u->faction->locale);
 
-    if (sk < 0) {
-        cmistake(u, ord, 77, MSG_EVENT);
+    if (!check_student(u, ord, sk)) {
         return -1;
-    }
-    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
-    if (u_race(u)->bonus[sk] == -99) {
-        cmistake(u, ord, 771, MSG_EVENT);
-        return -1;
-    }
-    if (!learn_newskills) {
-        skill *sv = unit_skill(u, sk);
-        if (sv == NULL) {
-            /* we can only learn skills we already have */
-            cmistake(u, ord, 771, MSG_EVENT);
-            return -1;
-        }
     }
 
     /* snotlings koennen Talente nur bis T8 lernen */
@@ -624,7 +606,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     if (sk == SK_MAGIC) {
-        magic_t mtyp;
+        magic_t mtype;
         if (u->number > 1) {
             cmistake(u, ord, 106, MSG_MAGIC);
             return -1;
@@ -632,34 +614,34 @@ int study_cmd(unit * u, order * ord)
         if (is_familiar(u)) {
             /* Vertraute zaehlen nicht zu den Magiern einer Partei,
              * koennen aber nur Graue Magie lernen */
-            mtyp = M_GRAY;
+            mtype = M_GRAY;
         }
         else if (!has_skill(u, SK_MAGIC)) {
-            int mmax = skill_limit(u->faction, SK_MAGIC);
+            int mmax = faction_skill_limit(u->faction, SK_MAGIC);
             /* Die Einheit ist noch kein Magier */
-            if (count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
+            if (faction_count_skill(u->faction, SK_MAGIC) + u->number > mmax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_magicians",
                     "amount", mmax));
                 return -1;
             }
-            mtyp = getmagicskill(u->faction->locale);
-            if (mtyp == M_NONE || mtyp == M_GRAY) {
+            mtype = getmagicskill(u->faction->locale);
+            if (mtype == M_NONE || mtype == M_GRAY) {
                 /* wurde kein Magiegebiet angegeben, wird davon
                  * ausgegangen, dass das normal gelernt werden soll */
                 if (u->faction->magiegebiet != 0) {
-                    mtyp = u->faction->magiegebiet;
+                    mtype = u->faction->magiegebiet;
                 }
                 else {
                     /* Es wurde kein Magiegebiet angegeben und die Partei
                      * hat noch keins gewaehlt. */
-                    mtyp = getmagicskill(u->faction->locale);
-                    if (mtyp == M_NONE) {
+                    mtype = getmagicskill(u->faction->locale);
+                    if (mtype == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
                         return -1;
                     }
                 }
             }
-            if (mtyp != u->faction->magiegebiet) {
+            if (mtype != u->faction->magiegebiet) {
                 /* Es wurde versucht, ein anderes Magiegebiet zu lernen
                  * als das der Partei */
                 if (u->faction->magiegebiet != 0) {
@@ -669,33 +651,33 @@ int study_cmd(unit * u, order * ord)
                 else {
                     /* Lernt zum ersten mal Magie und legt damit das
                      * Magiegebiet der Partei fest */
-                    u->faction->magiegebiet = mtyp;
+                    u->faction->magiegebiet = mtype;
                 }
             }
-            create_mage(u, mtyp);
+            create_mage(u, mtype);
         }
         else {
             /* ist schon ein Magier und kein Vertrauter */
             if (u->faction->magiegebiet == 0) {
                 /* die Partei hat noch kein Magiegebiet gewaehlt. */
-                mtyp = getmagicskill(u->faction->locale);
-                if (mtyp == M_NONE) {
-                    mtyp = getmagicskill(u->faction->locale);
-                    if (mtyp == M_NONE) {
+                mtype = getmagicskill(u->faction->locale);
+                if (mtype == M_NONE) {
+                    mtype = getmagicskill(u->faction->locale);
+                    if (mtype == M_NONE) {
                         cmistake(u, ord, 178, MSG_MAGIC);
                         return -1;
                     }
                 }
                 /* Legt damit das Magiegebiet der Partei fest */
-                u->faction->magiegebiet = mtyp;
+                u->faction->magiegebiet = mtype;
             }
         }
     }
     if (sk == SK_ALCHEMY) {
-        maxalchemy = effskill(u, SK_ALCHEMY, 0);
+        maxalchemy = effskill(u, SK_ALCHEMY, NULL);
         if (!has_skill(u, SK_ALCHEMY)) {
-            int amax = skill_limit(u->faction, SK_ALCHEMY);
-            if (count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
+            int amax = faction_skill_limit(u->faction, SK_ALCHEMY);
+            if (faction_count_skill(u->faction, SK_ALCHEMY) + u->number > amax) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_max_alchemists",
                     "amount", amax));
                 return -1;
@@ -781,18 +763,12 @@ int study_cmd(unit * u, order * ord)
 
     if (sk == SK_ALCHEMY) {
         faction *f = u->faction;
-        int skill = effskill(u, SK_ALCHEMY, 0);
+        int skill = effskill(u, SK_ALCHEMY, NULL);
         if (skill > maxalchemy) {
             show_potions(f, skill);
         }
     }
-    else if (sk == SK_MAGIC) {
-        sc_mage *mage = get_mage_depr(u);
-        if (!mage) {
-            mage = create_mage(u, u->faction->magiegebiet);
-        }
-    }
-    init_order_depr(NULL);
+    init_order(NULL, NULL);
     return 0;
 }
 
@@ -866,8 +842,9 @@ void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-/** Talente von Dämonen verschieben sich.
-*/
+/**
+ * Talente von Daemonen verschieben sich.
+ */
 void demon_skillchange(unit *u)
 {
     skill *sv = u->skills;

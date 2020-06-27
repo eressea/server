@@ -8,14 +8,16 @@ addons:
   apt:
     packages:
       - libbsd-dev
+      - libdb-dev
       - liblua5.1-dev
       - libtolua-dev
       - libncurses5-dev
       - libsqlite3-dev
-      - libxml2-dev
+      - libexpat1-dev
       - valgrind
       - cppcheck
       - shellcheck
+      - luarocks
 os:
   - linux
 notifications:

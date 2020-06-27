@@ -1,30 +1,13 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "key.h"
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <storage.h>
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -76,27 +59,85 @@ static int keys_size(int n) {
     return 4096;
 }
 
+static int read_flags(gamedata *data, int *keys, int n) {
+    int i;
+    for (i = 0; i != n; ++i) {
+        int key;
+        READ_INT(data->store, &key);
+        keys[i * 2] = key;
+        keys[i * 2 + 1] = 1;
+    }
+    return n;
+}
+
+#ifdef KEYVAL_VERSION
+static int read_keyval(gamedata *data, int *keys, int n) {
+    int i;
+    for (i = 0; i != n; ++i) {
+        int key, val;
+        READ_INT(data->store, &key);
+        READ_INT(data->store, &val);
+        keys[i * 2] = key;
+        keys[i * 2 + 1] = val;
+    }
+    return n;
+}
+#endif
+
+#ifdef FIXATKEYS_VERSION
+static int read_keyval_orig(gamedata *data, int *keys, int n) {
+    int i, j = 0, dk = -1;
+    for (i = 0; i != n; ++i) {
+        int key, val;
+        READ_INT(data->store, &key);
+        READ_INT(data->store, &val);
+        if (key > dk) {
+            keys[j * 2] = key;
+            keys[j * 2 + 1] = val;
+            dk = key;
+            ++j;
+        }
+    }
+    return j;
+}
+#endif
+
 static int a_readkeys(variant *var, void *owner, gamedata *data) {
-    int i, n, *keys;
+    int n, ksn, *keys;
 
     READ_INT(data->store, &n);
     assert(n < 4096 && n >= 0);
     if (n == 0) {
         return AT_READ_FAIL;
     }
-    keys = malloc(sizeof(int)*(keys_size(n) * 2 + 1));
-    *keys = n;
-    for (i = 0; i != n; ++i) {
-        READ_INT(data->store, keys + i * 2 + 1);
-        if (data->version >= KEYVAL_VERSION) {
-            READ_INT(data->store, keys + i * 2 + 2);
-        }
-        else {
-            keys[i * 2 + 2] = 1;
+    ksn = keys_size(n);
+    keys = malloc((ksn * 2 + 1) * sizeof(int));
+    if (data->version >= FIXATKEYS_VERSION) {
+        n = read_keyval(data, keys + 1, n);
+    }
+    else if (data->version >= KEYVAL_VERSION) {
+        int m = read_keyval_orig(data, keys + 1, n);
+        if (n != m) {
+            int ksm = keys_size(m);
+            if (ksm != ksn) {
+                int *nkeys = (int *)realloc(keys, (ksm * 2 + 1) * sizeof(int));
+                if (nkeys != NULL) {
+                    keys = nkeys;
+                }
+                else {
+                    log_error("a_readkeys allocation failed: %s", strerror(errno));
+                    return AT_READ_FAIL;
+                }
+            }
+            n = m;
         }
     }
+    else {
+        n = read_flags(data, keys + 1, n);
+    }
+    keys[0] = n;
     if (data->version < SORTKEYS_VERSION) {
-        int e = 1;
+        int i, e = 1;
         for (i = 1; i != n; ++i) {
             int k = keys[i * 2 + 1];
             int v = keys[i * 2 + 2];
@@ -198,9 +239,12 @@ static int *keys_update(int *base, int key, int val)
             int sz = keys_size(n);
             assert(kv[0] > key);
             if (n + 1 > sz) {
+                int *tmp;
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
-                base = realloc(base, (sz * 2 + 1) * sizeof(int));
+                tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
+                if (!tmp) abort();
+                base = tmp;
                 kv = base + diff;
             }
             base[0] = n + 1;
@@ -212,8 +256,11 @@ static int *keys_update(int *base, int key, int val)
     else {
         int sz = keys_size(n);
         if (n + 1 > sz) {
+            void * tmp;
             sz = keys_size(n + 1);
-            base = realloc(base, (sz * 2 + 1) * sizeof(int));
+            tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
+            if (!tmp) abort();
+            base = (int *)tmp;
         }
         base[0] = n + 1;
         kv = keys_get(base, l);
@@ -236,6 +283,7 @@ void key_set(attrib ** alist, int key, int val)
     if (!keys) {
         int sz = keys_size(1);
         a->data.v = keys = malloc((2 * sz + 1) * sizeof(int));
+        if (!keys) abort();
         keys[0] = 1;
         keys[1] = key;
         keys[2] = val;

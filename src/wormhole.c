@@ -1,18 +1,5 @@
-/* 
- +-------------------+
- |                   |  Christian Schlittchen <corwin@amber.kn-bremen.de>
- | Eressea PBEM host |  Enno Rehling <enno@eressea.de>
- | (c) 1998 - 2004   |  Katja Zedel <katze@felidae.kn-bremen.de>
- |                   |
- +-------------------+
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include <kernel/config.h>
-#include "settings.h"
 
 #include "wormhole.h"
 
@@ -25,8 +12,8 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/resolve.h>
@@ -41,8 +28,10 @@
 
 static bool good_region(const region * r)
 {
-    return (!fval(r, RF_CHAOTIC) && r->age > 30 && rplane(r) == NULL
-        && r->units != NULL && r->land != NULL);
+    if (fval(r, RF_CHAOTIC) || r->age <= 100 || !r->units || !r->land || rplane(r)) {
+        return false;
+    }
+    return true;
 }
 
 static int cmp_age(const void *v1, const void *v2)
@@ -56,17 +45,15 @@ static int cmp_age(const void *v1, const void *v2)
     return 0;
 }
 
-static int wormhole_age(struct attrib *a, void *owner)
+void wormhole_transfer(building *b, region *exit)
 {
-    building *entry = (building *)owner;
-    region *exit = (region *)a->data.v;
-    int maxtransport = entry->size;
-    region *r = entry->region;
+    int maxtransport = b->size;
+    region *r = b->region;
     unit *u = r->units;
 
-    UNUSED_ARG(owner);
-    for (; u != NULL && maxtransport != 0; u = u->next) {
-        if (u->building == entry) {
+    while (u != NULL && maxtransport != 0) {
+        unit *unext = u->next;
+        if (u->building == b) {
             message *m = NULL;
             if (u->number > maxtransport || has_limited_skills(u)) {
                 m = msg_message("wormhole_requirements", "unit region", u, u->region);
@@ -82,11 +69,18 @@ static int wormhole_age(struct attrib *a, void *owner)
                 msg_release(m);
             }
         }
+        u = unext;
     }
 
-    remove_building(&r->buildings, entry);
+    remove_building(&r->buildings, b);
     ADDMSG(&r->msgs, msg_message("wormhole_dissolve", "region", r));
+}
 
+static int wormhole_age(struct attrib *a, void *owner) {
+    building *b = (building *)owner;
+    region *exit = (region *)a->data.v;
+
+    wormhole_transfer(b, exit);
     /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
     return AT_AGE_KEEP;
 }
@@ -104,7 +98,7 @@ static int wormhole_read(variant *var, void *owner, struct gamedata *data)
     if (data->version < ATTRIBOWNER_VERSION) {
         READ_INT(data->store, NULL);
     }
-    id = read_region_reference(data, (region **)&var->v, NULL);
+    id = read_region_reference(data, (region **)&var->v);
     return (id <= 0) ? AT_READ_FAIL : AT_READ_OK;
 }
 

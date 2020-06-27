@@ -1,24 +1,30 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <kernel/config.h>
+#endif
 
-#include <kernel/messages.h>
 #include "alchemy.h"
-#include "types.h"
 #include "build.h"
-#include "guard.h"
-#include "order.h"
-#include "unit.h"
 #include "building.h"
+#include "config.h"
 #include "faction.h"
-#include "region.h"
-#include "race.h"
+#include "guard.h"
 #include "item.h"
-#include <util/language.h>
+#include "messages.h"
+#include "order.h"
+#include "race.h"
+#include "region.h"
+#include "types.h"
+#include "unit.h"
+
+#include "util/language.h"
+#include "util/param.h"
+
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <limits.h>
 
 typedef struct build_fixture {
     faction *f;
@@ -31,7 +37,6 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_setup();
-    test_inject_messagetypes();
     init_resources();
 
     test_create_itemtype("stone");
@@ -53,6 +58,81 @@ static unit * setup_build(build_fixture *bf) {
     return bf->u;
 }
 
+static building_type *setup_castle(item_type *it_stone) {
+    building_type *btype;
+    building_stage *stage;
+    construction * cons;
+
+    btype = test_create_buildingtype("castle");
+    stage = btype->stages = calloc(1, sizeof(building_stage));
+    if (!stage) abort();
+    cons = stage->construction = calloc(1, sizeof(construction));
+    if (!cons) abort();
+    cons->materials = calloc(2, sizeof(requirement));
+    if (!cons->materials) abort();
+    cons->materials[0].number = 1;
+    cons->materials[0].rtype = it_stone->rtype;
+    cons->minskill = 1;
+    cons->maxsize = 2;
+    cons->reqsize = 1;
+    cons->skill = SK_BUILDING;
+    stage = stage->next = calloc(1, sizeof(building_stage));
+    if (!stage) abort();
+    cons = stage->construction = calloc(1, sizeof(construction));
+    if (!cons) abort();
+    cons->materials = calloc(2, sizeof(requirement));
+    if (!cons->materials) abort();
+    cons->materials[0].number = 1;
+    cons->materials[0].rtype = it_stone->rtype;
+    cons->minskill = 1;
+    cons->maxsize = 8;
+    cons->reqsize = 1;
+    cons->skill = SK_BUILDING;
+    return btype;
+}
+
+static void test_build_building_stages(CuTest *tc) {
+    building_type *btype;
+    item_type *it_stone;
+    unit *u;
+
+    test_setup();
+    init_resources();
+    it_stone = test_create_itemtype("stone");
+    btype = setup_castle(it_stone);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u->building = test_create_building(u->region, btype);
+    u->building->size = 1;
+    set_level(u, SK_BUILDING, 2);
+    i_change(&u->items, it_stone, 4);
+    build_building(u, btype, -1, INT_MAX, NULL);
+    CuAssertPtrNotNull(tc, u->building);
+    CuAssertIntEquals(tc, 3, u->building->size);
+    CuAssertIntEquals(tc, 2, i_get(u->items, it_stone));
+
+    test_teardown();
+}
+
+static void test_build_building_stage_continue(CuTest *tc) {
+    building_type *btype;
+    item_type *it_stone;
+    unit *u;
+
+    test_setup();
+    init_resources();
+    it_stone = test_create_itemtype("stone");
+    btype = setup_castle(it_stone);
+    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    set_level(u, SK_BUILDING, 2);
+    i_change(&u->items, it_stone, 4);
+    build_building(u, btype, -1, INT_MAX, NULL);
+    CuAssertPtrNotNull(tc, u->building);
+    CuAssertIntEquals(tc, 2, u->building->size);
+    CuAssertIntEquals(tc, 2, i_get(u->items, it_stone));
+
+    test_teardown();
+}
+
 static void teardown_build(build_fixture *bf) {
     free(bf->cons.materials);
     test_teardown();
@@ -65,10 +145,10 @@ static void test_build_requires_materials(CuTest *tc) {
 
     u = setup_build(&bf);
     set_level(u, SK_ARMORER, 2);
-    CuAssertIntEquals(tc, ENOMATERIALS, build(u, &bf.cons, 0, 1, 0));
+    CuAssertIntEquals(tc, ENOMATERIALS, build(u, 1, &bf.cons, 0, 1, 0));
     itype = bf.cons.materials[0].rtype->itype;
     i_change(&u->items, itype, 2);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 1, 0));
+    CuAssertIntEquals(tc, 1, build(u, 1, &bf.cons, 0, 1, 0));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
     teardown_build(&bf);
 }
@@ -81,7 +161,7 @@ static void test_build_failure_missing_skill(CuTest *tc) {
     u = setup_build(&bf);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
-    CuAssertIntEquals(tc, ENEEDSKILL, build(u, &bf.cons, 1, 1, 0));
+    CuAssertIntEquals(tc, ENEEDSKILL, build(u, 1, &bf.cons, 1, 1, 0));
     teardown_build(&bf);
 }
 
@@ -94,7 +174,7 @@ static void test_build_failure_low_skill(CuTest *tc) {
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill - 1);
-    CuAssertIntEquals(tc, ELOWSKILL, build(u, &bf.cons, 0, 10, 0));
+    CuAssertIntEquals(tc, ELOWSKILL, build(u, 1, &bf.cons, 0, 10, 0));
     teardown_build(&bf);
 }
 
@@ -108,7 +188,7 @@ static void test_build_failure_completed(CuTest *tc) {
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     bf.cons.maxsize = 1;
-    CuAssertIntEquals(tc, ECOMPLETE, build(u, &bf.cons, bf.cons.maxsize, 10, 0));
+    CuAssertIntEquals(tc, ECOMPLETE, build(u, 1, &bf.cons, bf.cons.maxsize, 10, 0));
     CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -123,19 +203,19 @@ static void test_build_limits(CuTest *tc) {
     assert(rtype);
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    CuAssertIntEquals(tc, 1, build(u, &bf.cons, 0, 10, 0));
+    CuAssertIntEquals(tc, 1, build(u, 1, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
 
     scale_number(u, 2);
     set_level(u, SK_ARMORER, bf.cons.minskill);
     i_change(&u->items, rtype->itype, 2);
-    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 10, 0));
+    CuAssertIntEquals(tc, 2, build(u, 1, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
 
     scale_number(u, 2);
     set_level(u, SK_ARMORER, bf.cons.minskill * 2);
     i_change(&u->items, rtype->itype, 4);
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 10, 0));
+    CuAssertIntEquals(tc, 4, build(u, 1, &bf.cons, 0, 10, 0));
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -154,7 +234,7 @@ static void test_build_with_ring(CuTest *tc) {
     set_level(u, SK_ARMORER, bf.cons.minskill);
     i_change(&u->items, rtype->itype, 20);
     i_change(&u->items, ring, 1);
-    CuAssertIntEquals(tc, 10, build(u, &bf.cons, 0, 20, 0));
+    CuAssertIntEquals(tc, 10, build(u, 1, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
     teardown_build(&bf);
 }
@@ -173,16 +253,16 @@ static void test_build_with_potion(CuTest *tc) {
     i_change(&u->items, rtype->itype, 20);
     change_effect(u, ptype, 4);
     set_level(u, SK_ARMORER, bf.cons.minskill);
-    CuAssertIntEquals(tc, 2, build(u, &bf.cons, 0, 20, 0));
+    CuAssertIntEquals(tc, 2, build(u, 1, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 18, i_get(u->items, rtype->itype));
     CuAssertIntEquals(tc, 3, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill * 2);
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20, 0));
+    CuAssertIntEquals(tc, 4, build(u, 1, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     set_level(u, SK_ARMORER, bf.cons.minskill);
     scale_number(u, 2); /* OBS: this scales the effects, too: */
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
-    CuAssertIntEquals(tc, 4, build(u, &bf.cons, 0, 20, 0));
+    CuAssertIntEquals(tc, 4, build(u, 1, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
     teardown_build(&bf);
 }
@@ -197,8 +277,8 @@ static void test_build_building_no_materials(CuTest *tc) {
     set_level(u, SK_BUILDING, 1);
     u->orders = create_order(K_MAKE, u->faction->locale, 0);
     CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
-    CuAssertPtrEquals(tc, 0, u->region->buildings);
-    CuAssertPtrEquals(tc, 0, u->building);
+    CuAssertPtrEquals(tc, NULL, u->region->buildings);
+    CuAssertPtrEquals(tc, NULL, u->building);
     teardown_build(&bf);
 }
 
@@ -262,7 +342,7 @@ static void test_build_destroy_road(CuTest *tc)
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "destroy_road"));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
@@ -307,7 +387,6 @@ static void test_build_destroy_road_guard(CuTest *tc)
     order *ord;
 
     test_setup();
-    test_inject_messagetypes();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
@@ -319,7 +398,7 @@ static void test_build_destroy_road_guard(CuTest *tc)
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error70"));
-    CuAssertPtrEquals(tc, 0, test_find_messagetype(f->msgs, "destroy_road"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "destroy_road"));
 
     test_clear_messages(f);
     setguard(ug, false);
@@ -340,7 +419,6 @@ static void test_build_destroy_road_limit(CuTest *tc)
     order *ord;
 
     test_setup();
-    test_inject_messagetypes();
     test_create_region(1, 0, 0);
     r = test_create_region(0, 0, NULL);
     rsetroad(r, D_EAST, 100);
@@ -365,6 +443,7 @@ static void test_build_destroy_cmd(CuTest *tc) {
     faction *f;
 
     test_setup();
+    mt_create_error(138);
     u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_DESTROY, f->locale, NULL);
     CuAssertIntEquals(tc, 138, destroy_cmd(u, u->thisorder));
@@ -392,6 +471,8 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_with_ring);
     SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_building_success);
+    SUITE_ADD_TEST(suite, test_build_building_stages);
+    SUITE_ADD_TEST(suite, test_build_building_stage_continue);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     SUITE_ADD_TEST(suite, test_build_destroy_cmd);

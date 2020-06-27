@@ -1,18 +1,21 @@
 #include <platform.h>
 #include "tests.h"
-#include "keyword.h"
 #include "prefix.h"
+#include "creport.h"
+#include "report.h"
 #include "reports.h"
-#include "kernel/calendar.h"
 #include "vortex.h"
 
-#include <kernel/config.h>
-#include <kernel/alliance.h>
+#include "kernel/calendar.h"
+#include "kernel/callbacks.h"
+#include "kernel/config.h"
+#include "kernel/alliance.h"
 #include <kernel/equipment.h>
 #include <kernel/messages.h>
 #include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/item.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
@@ -23,11 +26,14 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
+
 #include <util/functions.h>
+#include "util/keyword.h"
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
+#include "util/param.h"
 #include <util/rand.h>
 #include <util/assert.h>
 
@@ -146,7 +152,9 @@ struct locale * test_create_locale(void) {
             locale_setstring(loc, combatstatus[i], combatstatus[i] + 7);
         }
         for (i = 0; i != MAXKEYWORDS; ++i) {
-            locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            if (keywords[i]) {
+                locale_setstring(loc, mkname("keyword", keywords[i]), keywords[i]);
+            }
         }
         for (i = 0; i != MAXPARAMS; ++i) {
             locale_setstring(loc, parameters[i], parameters[i]);
@@ -163,7 +171,7 @@ struct locale * test_create_locale(void) {
 struct faction *test_create_faction(const struct race *rc)
 {
     struct locale * loc = test_create_locale();
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc, 0);
+    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc);
     test_clear_messages(f);
     return f;
 }
@@ -221,14 +229,19 @@ static void test_reset(void) {
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
-
+    memset(&callbacks, 0, sizeof(callbacks));
     free_gamedata();
     free_terrains();
     free_resources();
+    free_functions();
     free_config();
     default_locale = 0;
     calendar_cleanup();
+    creport_cleanup();
+    report_cleanup();
     close_orders();
+    log_close();
+    stats_close();
     free_special_directions();
     free_locales();
     free_spells();
@@ -238,6 +251,7 @@ static void test_reset(void) {
     free_spellbooks();
     free_prefixes();
     mt_clear();
+
     for (i = 0; i != MAXSKILLS; ++i) {
         enable_skill(i, true);
     }
@@ -263,7 +277,8 @@ static void test_reset(void) {
 void test_create_calendar(void) {
     config_set_int("game.start", 184);
     months_per_year = 9;
-    month_season = malloc(sizeof(int) * months_per_year);
+    month_season = malloc(sizeof(season_t) * months_per_year);
+    if (!month_season) abort();
     month_season[0] = SEASON_SUMMER;
     month_season[1] = SEASON_AUTUMN;
     month_season[2] = SEASON_AUTUMN;
@@ -275,15 +290,10 @@ void test_create_calendar(void) {
     month_season[8] = SEASON_SUMMER;
 }
 
-void test_inject_messagetypes(void)
-{
-    message_handle_missing(MESSAGE_MISSING_REPLACE);
-}
-
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset();
-    message_handle_missing(MESSAGE_MISSING_ERROR);
+    message_handle_missing(MESSAGE_MISSING_REPLACE);
     if (tc) {
         log_debug("start test: %s", tc->name);
     }
@@ -295,6 +305,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
 
 void test_teardown(void)
 {
+    message_handle_missing(MESSAGE_MISSING_IGNORE);
     test_reset();
     test_log_stderr(0);
 }
@@ -392,7 +403,9 @@ building_type * test_create_buildingtype(const char * name)
         con->materials[0].rtype = get_resourcetype(R_STONE);
     }
     if (default_locale) {
-        locale_setstring(default_locale, name, name);
+        if (locale_getstring(default_locale, name) == NULL) {
+            locale_setstring(default_locale, name, name);
+        }
     }
     return btype;
 }
@@ -563,23 +576,32 @@ struct message * test_find_messagetype_ex(struct message_list *msgs, const char 
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
-        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
-            if (prev) {
-                if (ml->msg == prev) {
-                    prev = NULL;
-                }
-            }
-            else {
-                return ml->msg;
-            }
+        if (prev && ml->msg == prev) {
+            prev = NULL;
+        }
+        else if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            return ml->msg;
         }
     }
-    return 0;
+    return NULL;
 }
 
 struct message * test_find_messagetype(struct message_list *msgs, const char *name)
 {
     return test_find_messagetype_ex(msgs, name, NULL);
+}
+
+int test_count_messagetype(struct message_list *msgs, const char *name)
+{
+    int count = 0;
+    struct mlist *ml;
+    if (!msgs) return 0;
+    for (ml = msgs->begin; ml; ml = ml->next) {
+        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+            ++count;
+        }
+    }
+    return count;
 }
 
 void test_clear_messagelist(message_list **msgs) {
@@ -594,7 +616,7 @@ void test_clear_messages(faction *f) {
     if (f->msgs) {
         free_messagelist(f->msgs->begin);
         free(f->msgs);
-        f->msgs = 0;
+        f->msgs = NULL;
     }
 }
 

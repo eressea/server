@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "group.h"
@@ -30,9 +12,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/raceprefix.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/unicode.h>
@@ -49,19 +31,21 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 static group *ghash[GMAXHASH];
 static int maxgid;
 
-group *new_group(faction * f, const char *name, int gid)
+group *create_group(faction * f, const char *name, int gid)
 {
     group **gp = &f->groups;
     int index = gid % GMAXHASH;
-    group *g = calloc(sizeof(group), 1);
+    group *g = calloc(1, sizeof(group));
 
+    if (!g) abort();
     while (*gp)
         gp = &(*gp)->next;
     *gp = g;
 
-    maxgid = MAX(gid, maxgid);
+    if (gid > maxgid) maxgid = gid;
     g->name = str_strdup(name);
     g->gid = gid;
+    g->f = f;
 
     g->nexthash = ghash[index];
     return ghash[index] = g;
@@ -69,15 +53,7 @@ group *new_group(faction * f, const char *name, int gid)
 
 static void init_group(faction * f, group * g)
 {
-    ally *a, **an;
-
-    an = &g->allies;
-    for (a = f->allies; a; a = a->next)
-        if (a->faction) {
-            ally *ga = ally_add(an, a->faction);
-            ga->status = a->status;
-            an = &ga->next;
-        }
+    g->allies = allies_clone(f->allies);
 }
 
 static group *find_groupbyname(group * g, const char *name)
@@ -100,11 +76,15 @@ static int read_group(variant *var, void *owner, gamedata *data)
 {
     struct storage *store = data->store;
     group *g;
+    unit * u = (unit *)owner;
     int gid;
 
     READ_INT(store, &gid);
     var->v = g = find_group(gid);
-    if (g != 0) {
+    if (g != NULL) {
+        if (g->f != u->faction) {
+            return AT_READ_FAIL;
+        }
         g->members++;
         return AT_READ_OK;
     }
@@ -139,11 +119,7 @@ void free_group(group * g)
     if (g->attribs) {
         a_removeall(&g->attribs, NULL);
     }
-    while (g->allies) {
-        ally *a = g->allies;
-        g->allies = a->next;
-        free(a);
-    }
+    allies_free(g->allies);
     free(g->name);
     free(g);
 }
@@ -195,7 +171,7 @@ group *join_group(unit * u, const char *name)
     if (name && name[0]) {
         g = find_groupbyname(u->faction->groups, name);
         if (g == NULL) {
-            g = new_group(u->faction, name, ++maxgid);
+            g = create_group(u->faction, name, ++maxgid);
             init_group(u->faction, g);
         }
     }
@@ -204,20 +180,14 @@ group *join_group(unit * u, const char *name)
     return g;
 }
 
-void write_groups(struct storage *store, const faction * f)
+void write_groups(struct gamedata *data, const faction * f)
 {
     group *g;
+    storage *store = data->store;
     for (g = f->groups; g; g = g->next) {
-        ally *a;
         WRITE_INT(store, g->gid);
         WRITE_STR(store, g->name);
-        for (a = g->allies; a; a = a->next) {
-            if (a->faction && a->faction->_alive) {
-                write_faction_reference(a->faction, store);
-                WRITE_INT(store, a->status);
-            }
-        }
-        write_faction_reference(NULL, store);
+        write_allies(data, g->allies);
         a_write(store, g->attribs, g);
         WRITE_SECTION(store);
     }
@@ -228,7 +198,6 @@ void read_groups(gamedata *data, faction * f)
 {
     struct storage *store = data->store;
     for (;;) {
-        ally **pa;
         group *g;
         int gid;
         char buf[1024];
@@ -237,20 +206,8 @@ void read_groups(gamedata *data, faction * f)
         if (gid == 0)
             break;
         READ_STR(store, buf, sizeof(buf));
-        g = new_group(f, buf, gid);
-        pa = &g->allies;
-        for (;;) {
-            ally *al;
-            int id;
-            READ_INT(store, &id);
-            if (id == 0) break;
-            al = ally_add(pa, NULL);
-            al->faction = findfaction(id);
-            if (!al->faction) {
-                ur_add(RESOLVE_FACTION | id, (void **)&al->faction, NULL);
-            }
-            READ_INT(store, &al->status);
-        }
+        g = create_group(f, buf, gid);
+        read_allies(data, &g->allies);
         read_attribs(data, &g->attribs, g);
     }
 }

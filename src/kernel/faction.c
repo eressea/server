@@ -1,27 +1,10 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 
 #include "faction.h"
 
 #include "calendar.h"
 #include "config.h"
+#include "database.h"
 #include "alliance.h"
 #include "ally.h"
 #include "curse.h"
@@ -42,10 +25,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <attributes/racename.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/language.h>
@@ -53,7 +36,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
-#include <util/resolve.h>
 #include <util/rng.h>
 #include <util/strings.h>
 #include <util/variant.h>
@@ -105,8 +87,6 @@ static void free_faction(faction * f)
     freelist(f->allies);
 
     free(f->email);
-    free(f->banner);
-    free(f->_password);
     free(f->name);
     if (f->seen_factions) {
         selist_free(f->seen_factions);
@@ -119,7 +99,7 @@ static void free_faction(faction * f)
 
     i_freeall(&f->items);
 
-    freelist(f->ursprung);
+    freelist(f->origin);
 }
 
 #define FMAXHASH 2039
@@ -170,28 +150,6 @@ void set_show_item(faction * f, const struct item_type *itype)
     a->data.v = (void *)itype;
 }
 
-const unit *random_unit_in_faction(const faction * f)
-{
-    unit *u;
-    int c = 0, u_nr;
-
-    if (!f->units) {
-        return NULL;
-    }
-    for (u = f->units; u; u = u->next)
-        c++;
-
-    u_nr = rng_int() % c;
-    c = 0;
-
-    for (u = f->units; u; u = u->next)
-        if (u_nr == c)
-            return u;
-
-    /* Hier sollte er nie ankommen */
-    return NULL;
-}
-
 const char *factionname(const faction * f)
 {
     typedef char name[OBJECTIDSIZE + 1];
@@ -229,12 +187,21 @@ static int unused_faction_id(void)
     return id;
 }
 
+char *faction_genpassword(faction *f, char *buffer) {
+    password_generate(buffer, 8);
+    faction_setpassword(f, password_hash(buffer, PASSWORD_DEFAULT));
+    ADDMSG(&f->msgs, msg_message("changepasswd", "value", buffer));
+    return buffer;
+}
+
 faction *addfaction(const char *email, const char *password,
-    const struct race * frace, const struct locale * loc, int subscription)
+    const struct race * frace, const struct locale * loc)
 {
-    faction *f = calloc(sizeof(faction), 1);
+    faction *f = calloc(1, sizeof(faction));
+    const char *fname;
     char buf[128];
 
+    if (!f) abort();
     if (check_email(email) == 0) {
         faction_setemail(f, email);
     } else {
@@ -243,18 +210,20 @@ faction *addfaction(const char *email, const char *password,
     }
 
     f->alliance_joindate = turn;
-    f->lastorders = turn;
+    f->lastorders = 0;
     f->_alive = true;
+    f->password_id = 0;
     f->age = 0;
     f->race = frace;
     f->magiegebiet = 0;
     f->locale = loc;
-    f->subscription = subscription;
+    f->uid = 0;
     f->flags = FFL_ISNEW|FFL_PWMSG;
 
-    if (!password) password = itoa36(rng_int());
-    faction_setpassword(f, password_encode(password, PASSWORD_DEFAULT));
-    ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+    if (password) {
+        faction_setpassword(f, password_hash(password, PASSWORD_DEFAULT));
+        ADDMSG(&f->msgs, msg_message("changepasswd", "value", password));
+    }
 
     f->options =
         WANT_OPTION(O_REPORT) | WANT_OPTION(O_ZUGVORLAGE) |
@@ -269,7 +238,8 @@ faction *addfaction(const char *email, const char *password,
     addlist(&factions, f);
     fhash(f);
 
-    slprintf(buf, sizeof(buf), "%s %s", LOC(loc, "factiondefault"), itoa36(f->no));
+    fname = LOC(loc, "factiondefault");
+    slprintf(buf, sizeof(buf), "%s %s", fname ? fname : "faction", itoa36(f->no));
     f->name = str_strdup(buf);
 
     if (!f->race) {
@@ -288,13 +258,17 @@ unit *addplayer(region * r, faction * f)
     const char * name;
 
     assert(r->land);
+    assert(f->units == NULL);
     if (rpeasants(r) < PEASANT_MIN) {
         rsetpeasants(r, PEASANT_MIN + rng_int() % (PEASANT_MAX - PEASANT_MIN));
     }
+    if (rtrees(r, TREE_TREE) < 50) {
+        rsettrees(r, TREE_TREE, 50);
+    }
 
-    assert(f->units == NULL);
     faction_setorigin(f, 0, r->x, r->y);
     u = create_unit(r, f, 1, f->race, 0, NULL, NULL);
+    u->status = ST_FLEE;
     u->thisorder = default_order(f->locale);
     unit_addorder(u, copy_order(u->thisorder));
     name = config_get("rules.equip_first");
@@ -305,43 +279,37 @@ unit *addplayer(region * r, faction * f)
     u->hp = unit_max_hp(u) * u->number;
     fset(u, UFL_ISNEW);
     if (f->race == get_race(RC_DAEMON)) {
-        race_t urc;
         const race *rc;
-        do {
-            urc = (race_t)(rng_int() % MAXRACES);
-            rc = get_race(urc);
-        } while (rc == NULL || urc == RC_DAEMON || !playerrace(rc));
+        int urc = (race_t)(rng_int() % MAX_START_RACE);
+        if (urc >= RC_DAEMON) ++urc;
+        rc = get_race(urc);
         u->irace = rc;
     }
-
+    f->lastorders = turn;
     return u;
 }
 
 bool checkpasswd(const faction * f, const char *passwd)
 {
+    const char *pwhash;
     if (!passwd) return false;
 
-    if (f->_password && password_verify(f->_password, passwd) == VERIFY_FAIL) {
+    pwhash = faction_getpassword(f);
+    if (pwhash && password_verify(pwhash, passwd) == VERIFY_FAIL) {
         log_info("password check failed: %s", factionname(f));
         return false;
     }
     return true;
 }
 
-void resolve_faction(faction *f)
-{
-    resolve(RESOLVE_FACTION | f->no, f);
-}
-
-int read_faction_reference(gamedata * data, faction **fp, resolve_fun fun)
+int read_faction_reference(gamedata * data, faction **fp)
 {
     int id;
     READ_INT(data->store, &id);
     if (id > 0) {
         *fp = findfaction(id);
         if (*fp == NULL) {
-            *fp = NULL;
-            ur_add(RESOLVE_FACTION | id, (void **)fp, fun);
+            *fp = faction_create(id);
         }
     }
     else {
@@ -393,7 +361,7 @@ faction *get_or_create_monsters(void)
     if (!f) {
         const race *rc = rc_get_or_create("dragon");
         const char *email = config_get("monster.email");
-        f = addfaction(email, NULL, rc, default_locale, 0);
+        f = addfaction(email, NULL, rc, default_locale);
         renumber_faction(f, MONSTER_ID);
         faction_setname(f, "Monster");
         fset(f, FFL_NPC | FFL_NOIDLEOUT);
@@ -428,7 +396,7 @@ void save_special_items(unit *usrc)
         /* some units have plural names, it would be neat if they aren't single: */
         scale_number(u, 2);
     }
-    set_racename(&u->attribs, "ghost");
+    unit_convert_race(u, rc_ghost, "ghost");
     give_special_items(u, &usrc->items);
 }
 
@@ -440,9 +408,6 @@ void destroyfaction(faction ** fp)
     *fp = f->next;
     f->next = dead_factions;
     dead_factions = f;
-
-    fset(f, FFL_QUIT);
-    f->_alive = false;
 
     if (f->spellbook) {
         spellbook_clear(f->spellbook);
@@ -493,9 +458,11 @@ void destroyfaction(faction ** fp)
 
     handle_event(f->attribs, "destroy", f);
     if (f->alliance) {
-        setalliance(f, 0);
+        setalliance(f, NULL);
     }
 
+    fset(f, FFL_QUIT);
+    f->_alive = false;
     funhash(f);
 
     /* units of other factions that were disguised as this faction
@@ -513,35 +480,6 @@ void destroyfaction(faction ** fp)
             }
         }
     }
-}
-
-int get_alliance(const faction * a, const faction * b)
-{
-    const ally *sf = a->allies;
-    for (; sf != NULL; sf = sf->next) {
-        if (sf->faction == b) {
-            return sf->status;
-        }
-    }
-    return 0;
-}
-
-void set_alliance(faction * a, faction * b, int status)
-{
-    ally **sfp;
-    sfp = &a->allies;
-    while (*sfp) {
-        ally *sf = *sfp;
-        if (sf->faction == b)
-            break;
-        sfp = &sf->next;
-    }
-    if (*sfp == NULL) {
-        ally *sf = ally_add(sfp, b);
-        sf->status = status;
-        return;
-    }
-    (*sfp)->status |= status;
 }
 
 void renumber_faction(faction * f, int no)
@@ -589,23 +527,34 @@ void faction_setemail(faction * self, const char *email)
         self->email = NULL;
 }
 
-const char *faction_getbanner(const faction * self)
+const char *faction_getbanner(const faction * f)
 {
-    return self->banner ? self->banner : "";
+    if (f->banner_id > 0) {
+        return dbstring_load(f->banner_id, NULL);
+    }
+    return NULL;
 }
 
-void faction_setbanner(faction * self, const char *banner)
+void faction_setbanner(faction * f, const char *banner)
 {
-    free(self->banner);
-    if (banner)
-        self->banner = str_strdup(banner);
+    f->banner_id = dbstring_save(banner);
+}
+
+const char *faction_getpassword(const faction *f) {
+    if (f->password_id > 0) {
+        return dbstring_load(f->password_id, NULL);
+    }
+    return NULL;
 }
 
 void faction_setpassword(faction * f, const char *pwhash)
 {
-    assert(pwhash);
-    free(f->_password);
-    f->_password = str_strdup(pwhash);
+    if (pwhash) {
+        f->password_id = dbstring_save(pwhash);
+    }
+    else {
+        f->password_id = 0;
+    }
 }
 
 bool valid_race(const struct faction *f, const struct race *rc)
@@ -633,7 +582,7 @@ struct spellbook * faction_get_spellbook(struct faction *f)
     if (f->magiegebiet != M_GRAY) {
         return get_spellbook(magic_school[f->magiegebiet]);
     }
-    return 0;
+    return NULL;
 }
 
 static int allied_skillcount(const faction * f, skill_t sk)
@@ -645,7 +594,7 @@ static int allied_skillcount(const faction * f, skill_t sk)
 
     for (qi = 0; members; selist_advance(&members, &qi, 1)) {
         faction *m = (faction *)selist_get(members, qi);
-        num += count_skill(m, sk);
+        num += faction_count_skill(m, sk);
     }
     return num;
 }
@@ -659,7 +608,7 @@ static int allied_skilllimit(const faction * f, skill_t sk)
     return value;
 }
 
-int count_skill(faction * f, skill_t sk)
+int faction_count_skill(faction * f, skill_t sk)
 {
     int n = 0;
     unit *u;
@@ -674,7 +623,7 @@ int count_skill(faction * f, skill_t sk)
     return n;
 }
 
-int skill_limit(faction * f, skill_t sk)
+int faction_skill_limit(const faction * f, skill_t sk)
 {
     int m = INT_MAX;
     int al = allied_skilllimit(f, sk);
@@ -725,10 +674,10 @@ bool faction_alive(const faction *f) {
 
 void faction_getorigin(const faction * f, int id, int *x, int *y)
 {
-    ursprung *ur;
+    origin *ur;
 
     assert(f && x && y);
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id) {
             *x = ur->x;
             *y = ur->y;
@@ -737,24 +686,28 @@ void faction_getorigin(const faction * f, int id, int *x, int *y)
     }
 }
 
-void faction_setorigin(faction * f, int id, int x, int y)
-{
-    ursprung *ur;
-    assert(f != NULL);
-    for (ur = f->ursprung; ur; ur = ur->next) {
-        if (ur->id == id) {
-            ur->x = ur->x + x;
-            ur->y = ur->y + y;
-            return;
-        }
-    }
-
-    ur = calloc(1, sizeof(ursprung));
+static origin *new_origin(int id, int x, int y) {
+    origin *ur = (origin *)calloc(1, sizeof(origin));
+    if (!ur) abort();
     ur->id = id;
     ur->x = x;
     ur->y = y;
+    return ur;
+}
 
-    addlist(&f->ursprung, ur);
+void faction_setorigin(faction * f, int id, int x, int y)
+{
+    origin **urp;
+    assert(f != NULL);
+    for (urp = &f->origin; *urp; urp = &(*urp)->next) {
+        origin *ur = *urp;
+        if (ur->id == id) {
+            ur->x += x;
+            ur->y += y;
+            return;
+        }
+    }
+    *urp = new_origin(id, x, y);
 }
 
 
@@ -839,7 +792,8 @@ int writepasswd(void)
 
         for (f = factions; f; f = f->next) {
             fprintf(F, "%s:%s:%s:%d\n",
-                itoa36(f->no), faction_getemail(f), f->_password, f->subscription);
+                itoa36(f->no), faction_getemail(f),
+               faction_getpassword(f), f->uid);
         }
         fclose(F);
         return 0;
@@ -871,4 +825,13 @@ void log_dead_factions(void)
 void free_factions(void) {
     free_flist(&factions);
     free_flist(&dead_factions);
+}
+
+faction *faction_create(int no)
+{
+    faction *f = (faction *)calloc(1, sizeof(faction));
+    if (!f) abort();
+    f->no = no;
+    fhash(f);
+    return f;
 }

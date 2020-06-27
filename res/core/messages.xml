@@ -30,7 +30,7 @@
     </type>
   </message>
 
-  <message name="target_region_invalid">
+  <message name="target_region_invalid" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -38,7 +38,7 @@
     </type>
   </message>
   
-  <message name="missing_direction">
+  <message name="missing_direction" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -46,7 +46,7 @@
     </type>
   </message>
   
-  <message name="target_region_not_empty">
+  <message name="target_region_not_empty" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -391,16 +391,6 @@
       <arg name="id" type="int"/>
     </type>
   </message>
-  <message name="curseinfo::godcurseocean" section="events">
-    <type>
-      <arg name="id" type="int"/>
-    </type>
-  </message>
-  <message name="curseinfo::godcurse" section="events">
-    <type>
-      <arg name="id" type="int"/>
-    </type>
-  </message>
   <message name="curseinfo::disorientationzone" section="events">
     <type>
       <arg name="id" type="int"/>
@@ -532,10 +522,6 @@
       <arg name="description" type="string"/>
       <arg name="weight" type="int"/>
     </type>
-  </message>
-  <message name="healall" section="events">
-    <type>
-  </type>
   </message>
   <message name="lucky_item" section="events">
     <type>
@@ -710,21 +696,10 @@
       <arg name="dir" type="direction"/>
     </type>
   </message>
-  <message name="nr_building_besieged" section="nr">
-    <type>
-      <arg name="soldiers" type="int"/>
-      <arg name="diff" type="int"/>
-    </type>
-  </message>
 
   <message name="newbie_password" section="events">
     <type>
       <arg name="password" type="string"/>
-    </type>
-  </message>
-  <message name="godcurse_destroy_ship" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
     </type>
   </message>
   <message name="skillpotion_use" section="events">
@@ -2684,19 +2659,6 @@
       <arg name="want" type="int"/>
     </type>
   </message>
-  <message name="siege_catapults" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="building" type="building"/>
-      <arg name="destruction" type="int"/>
-    </type>
-  </message>
-  <message name="siege" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="building" type="building"/>
-    </type>
-  </message>
   <message name="drown_on_ship" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -2706,6 +2668,70 @@
   </message>
 
   <message name="error320" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error321" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error322" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error323" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error324" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error325" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error326" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error327" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error328" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -2954,13 +2980,6 @@
     </type>
   </message>
   <message name="error283" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error282" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -3267,13 +3286,6 @@
       <arg name="target" type="region"/>
     </type>
   </message>
-  <message name="error241" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error240" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -3349,14 +3361,6 @@
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="entrance_besieged" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="building" type="building"/>
     </type>
   </message>
   <message name="entrance_denied" section="events">
@@ -3785,6 +3789,62 @@
       <arg name="command" type="order"/>
     </type>
   </message>
+  <message name="error321" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error322" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error323" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error324" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error325" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error326" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error327" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error328" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
   <message name="error181" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -3890,13 +3950,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error166" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error165" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -3996,13 +4049,6 @@
     </type>
   </message>
   <message name="error135" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error60" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4444,6 +4490,13 @@
     </type>
   </message>
   <message name="error85" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="error125" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4993,20 +5046,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error24" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error23" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error22" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -5269,6 +5308,12 @@
     </type>
   </message>
 
+  <message name="transfer_unit" section="economy">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+  </message>
+
   <message name="receive_person" section="economy">
     <type>
       <arg name="unit" type="unit"/>
@@ -5351,6 +5396,7 @@
   <message name="pest" section="events">
     <type>
       <arg name="dead" type="int"/>
+      <arg name="peasants" type="resource"/>
     </type>
   </message>
   <message name="error131" section="errors">

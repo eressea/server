@@ -1,6 +1,12 @@
+#ifdef _MSC_VER
 #include <platform.h>
-#include <CuTest.h>
+#endif
+
 #include "unicode.h"
+
+#include <CuTest.h>
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -9,9 +15,33 @@ static void test_unicode_trim(CuTest * tc)
 {
     char buffer[32];
 
-    strcpy(buffer, "Hello Word");
+    strcpy(buffer, "Hello World");
     CuAssertIntEquals(tc, 0, unicode_utf8_trim(buffer));
-    CuAssertStrEquals(tc, "Hello Word", buffer);
+    CuAssertStrEquals(tc, "Hello World", buffer);
+
+    strcpy(buffer, "  Hello World");
+    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello World", buffer);
+
+    strcpy(buffer, "Hello World  ");
+    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello World", buffer);
+
+    strcpy(buffer, " Hello World ");
+    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "Hello World", buffer);
+
+    strcpy(buffer, "Hello\t\r\nWorld");
+    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "HelloWorld", buffer);
+
+    strcpy(buffer, "LTR");
+    buffer[3] = -30;
+    buffer[4] = -128;
+    buffer[5] = -114;
+    buffer[6] = 0;
+    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertStrEquals(tc, "LTR", buffer);
 
     strcpy(buffer, "  Hello Word  ");
     CuAssertIntEquals(tc, 4, unicode_utf8_trim(buffer));
@@ -48,7 +78,7 @@ static void test_unicode_tolower(CuTest * tc)
 static void test_unicode_utf8_to_other(CuTest *tc)
 {
     const unsigned char uchar_str[] = { 0xc3, 0x98, 0xc5, 0xb8, 0xc2, 0x9d, 'l', 0 }; /* &Oslash;&Yuml;&#157;l */
-    utf8_t *utf8_str = (utf8_t *)uchar_str;
+    char *utf8_str = (char *)uchar_str;
     unsigned char ch;
     size_t sz;
     CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str, &sz));
@@ -92,27 +122,27 @@ static void test_unicode_utf8_to_other(CuTest *tc)
 }
 
 static void test_unicode_utf8_to_ucs(CuTest *tc) {
-    ucs4_t ucs;
+    wint_t wc;
     size_t sz;
 
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ucs4(&ucs, "a", &sz));
-    CuAssertIntEquals(tc, 'a', ucs);
+    CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, "a", &sz));
+    CuAssertIntEquals(tc, 'a', wc);
     CuAssertIntEquals(tc, 1, sz);
 }
 
 static void test_unicode_bug2262(CuTest *tc) {
     char name[7];
-    ucs4_t ucs;
+    wint_t wc;
     size_t sz;
 
     strcpy(name, "utende");
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ucs4(&ucs, name, &sz));
+    CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, name, &sz));
     CuAssertIntEquals(tc, 1, sz);
-    CuAssertIntEquals(tc, 'u', ucs);
+    CuAssertIntEquals(tc, 'u', wc);
     CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
 
     name[0] = -4; /* latin1: &uuml; should fail to decode */
-    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_to_ucs4(&ucs, name, &sz));
+    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_decode(&wc, name, &sz));
     CuAssertIntEquals(tc, EILSEQ, unicode_utf8_trim(name));
 }
 
@@ -123,26 +153,80 @@ static void test_unicode_compare(CuTest *tc)
     CuAssertIntEquals(tc, 1, unicode_utf8_strcasecmp("bacdefg123", "ABCDEFG123"));
 }
 
-static void test_unicode_farsi_nzwj(CuTest *tc) {
-    const char str[] = { 0xe2, 0x80, 0x8c, 0xd8, 0xa7, 0xd9, 0x84, 0xd8, 0xaf,
-        0xdb, 0x8c, 0xd9, 0x86, 0x20, 0xd9, 0x85, 0xd8, 0xad, 0xd9, 0x85, 0xd8,
-        0xaf, 0x20, 0xd8, 0xb1, 0xd9, 0x88, 0xd9, 0x85, 0xdb, 0x8c, 0xe2, 0x80,
-        0x8e, 0xe2, 0x80, 0x8e, 0x00 };
+static void test_unicode_trim_zwnj(CuTest *tc) {
+    const char zwnj[] = { 0xe2, 0x80, 0x8c, 0 };
     char name[64];
-    strcpy(name, str);
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", zwnj, zwnj, zwnj);
+    snprintf(expect, sizeof(expect), "A%sB", zwnj);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_nbsp(CuTest *tc) {
+    const char code[] = { 0xc2, 0xa0, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 6, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_nnbsp(CuTest *tc) {
+    const char code[] = { 0xe2, 0x80, 0xaf, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_figure_space(CuTest *tc) {
+    const char code[] = { 0xe2, 0x80, 0x87, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
+    snprintf(expect, sizeof(expect), "A%sB", code);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_ltrm(CuTest *tc) {
+    const char ltrm[] = { 0xe2, 0x80, 0x8e, 0 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%sBrot%szeit%s  ", ltrm, ltrm, ltrm);
+    snprintf(expect, sizeof(expect), "Brot%szeit", ltrm);
+    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertStrEquals(tc, expect, name);
+}
+
+static void test_unicode_trim_emoji(CuTest *tc) {
+    const char clock[] = { 0xE2, 0x8F, 0xB0, 0x00 };
+    char name[64];
+    char expect[64];
+    snprintf(name, sizeof(name), "%s Alarm%sClock %s", clock, clock, clock);
+    strcpy(expect, name);
     CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
-    CuAssertStrEquals(tc, str, name);
+    CuAssertStrEquals(tc, expect, name);
 }
 
 CuSuite *get_unicode_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_unicode_bug2262);
-    SUITE_ADD_TEST(suite, test_unicode_tolower);
     SUITE_ADD_TEST(suite, test_unicode_trim);
+    SUITE_ADD_TEST(suite, test_unicode_trim_zwnj);
+    SUITE_ADD_TEST(suite, test_unicode_trim_nbsp);
+    SUITE_ADD_TEST(suite, test_unicode_trim_nnbsp);
+    SUITE_ADD_TEST(suite, test_unicode_trim_figure_space);
+    SUITE_ADD_TEST(suite, test_unicode_trim_ltrm);
+    SUITE_ADD_TEST(suite, test_unicode_trim_emoji);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_other);
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
     SUITE_ADD_TEST(suite, test_unicode_compare);
-    SUITE_ADD_TEST(suite, test_unicode_farsi_nzwj);
+    SUITE_ADD_TEST(suite, test_unicode_bug2262);
+    SUITE_ADD_TEST(suite, test_unicode_tolower);
     return suite;
 }

@@ -3,7 +3,13 @@
 #include "move.h"
 #include "spy.h"
 #include "travelthru.h"
-#include "keyword.h"
+
+#include "attributes/racename.h"
+
+#include "util/keyword.h"
+#include <util/language.h>
+#include <util/lists.h>
+#include <util/message.h>
 
 #include <kernel/ally.h>
 #include <kernel/building.h>
@@ -16,10 +22,6 @@
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
-
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
 
 #include <stream.h>
 #include <memstream.h>
@@ -222,12 +224,101 @@ static int cr_get_int(stream *strm, const char *match, int def)
     return def;
 }
 
+static bool cr_find_string(stream *strm, const char *match, const char *value)
+{
+    char line[1024];
+    size_t len = strlen(match);
+
+    strm->api->rewind(strm->handle);
+    while (strm->api->readln(strm->handle, line, sizeof(line))==0) {
+        if (line[0] == '\"') {
+            const char * pos = strstr(line + 1, match);
+            if (pos && pos[len] == '\0') {
+                size_t vlen = strlen(value);
+                if (value != NULL && strncmp(line + 1, value, vlen) == 0) {
+                    return (line[vlen + 1] == '\"');
+                }
+                return false;
+            }
+        }
+    }
+    return value == NULL;
+}
+
+static void test_cr_hiderace(CuTest *tc) {
+    stream strm;
+    faction *f1, *f2;
+    region *r;
+    unit *u;
+    struct locale * lang;
+
+    test_setup();
+    default_locale = test_create_locale();
+    locale_setstring(default_locale, "race::elf_p", "Elfen");
+    locale_setstring(default_locale, "race::elf", "elf");
+    locale_setstring(default_locale, "race::human_p", "Menschen");
+    locale_setstring(default_locale, "race::human", "Mensch");
+    lang = get_or_create_locale("en");
+    locale_setstring(lang, "race::human_p", "humans");
+    locale_setstring(lang, "race::human", "human");
+    locale_setstring(lang, "race::elf_p", "elves");
+    locale_setstring(lang, "race::elf", "elf");
+    f1 = test_create_faction(NULL);
+    f2 = test_create_faction(NULL);
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(f1, r);
+
+    mstream_init(&strm);
+    CuAssertPtrEquals(tc, default_locale, (struct locale *)f1->locale);
+    CuAssertPtrEquals(tc, default_locale, (struct locale *)f2->locale);
+    cr_output_unit(&strm, f1, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Menschen"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+    mstream_init(&strm);
+    CuAssertPtrEquals(tc, default_locale, (struct locale *)f1->locale);
+    CuAssertPtrEquals(tc, default_locale, (struct locale *)f2->locale);
+    cr_output_unit(&strm, f2, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Menschen"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+
+    /* when we use irace, the owner can see the true race */
+    f1->locale = lang;
+    u->irace = test_create_race("elf");
+    mstream_init(&strm);
+    cr_output_unit(&strm, f1, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Elfen"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", "Menschen"));
+    mstream_done(&strm);
+    mstream_init(&strm);
+    cr_output_unit(&strm, f2, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Elfen"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+
+    /* when we use racename, nobody can tell it's not the real deal */
+    u->irace = NULL;
+    set_racename(&u->attribs, "Zwerge");
+    mstream_init(&strm);
+    cr_output_unit(&strm, f1, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Zwerge"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+    mstream_init(&strm);
+    cr_output_unit(&strm, f2, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Zwerge"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+
+    test_teardown();
+}
+
 static void test_cr_factionstealth(CuTest *tc) {
     stream strm;
     faction *f1, *f2;
     region *r;
     unit *u;
-    ally *al;
 
     test_setup();
     f1 = test_create_faction(NULL);
@@ -298,8 +389,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     mstream_done(&strm);
 
     /* we see the same thing as them when we are an ally */
-    al = ally_add(&f1->allies, f2);
-    al->status = HELP_FSTEALTH;
+    ally_set(&f1->allies, f2, HELP_FSTEALTH);
     mstream_init(&strm);
     cr_output_unit(&strm, f2, u, seen_unit);
     CuAssertIntEquals(tc, f1->no, cr_get_int(&strm, ";Partei", -1));
@@ -328,6 +418,7 @@ CuSuite *get_creport_suite(void)
     SUITE_ADD_TEST(suite, test_cr_unit);
     SUITE_ADD_TEST(suite, test_cr_resources);
     SUITE_ADD_TEST(suite, test_cr_mallorn);
+    SUITE_ADD_TEST(suite, test_cr_hiderace);
     SUITE_ADD_TEST(suite, test_cr_factionstealth);
     return suite;
 }

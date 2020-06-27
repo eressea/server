@@ -1,15 +1,3 @@
-/* 
- * Eressea PB(E)M host Copyright (C) 1998-2015
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 
 /* kernel includes */
@@ -31,7 +19,10 @@
 #define UNDEAD_BREAKUP              25  /* chance dafuer */
 #define UNDEAD_BREAKUP_FRACTION     (25+rng_int()%70)   /* anteil der weg geht */
 
-#define age_chance(a,b,p) (MAX(0,a-b)*p)
+static int age_chance(int a, int b, int p) {
+    int r = (a - b) * p;
+    return (r < 0) ? 0 : r;
+}
 
 void make_undead_unit(unit * u)
 {
@@ -40,34 +31,12 @@ void make_undead_unit(unit * u)
     u->flags |= UFL_ISNEW;
 }
 
-void age_undead(unit * u)
-{
-    region *r = u->region;
-
-    /* untote, die einer partei angehoeren, koennen sich
-     * absplitten, anstatt sich zu vermehren. monster
-     * untote vermehren sich nur noch */
-
-    if (u->number > UNDEAD_MIN && !is_monsters(u->faction)
-        && rng_int() % 100 < UNDEAD_BREAKUP) {
-        int m, n = 0;
-        unit *u2;
-
-        for (m = u->number; m; m--) {
-            if (rng_int() % 100 < UNDEAD_BREAKUP_FRACTION)
-                ++n;
-        }
-        u2 = create_unit(r, get_monsters(), 0, get_race(RC_UNDEAD), 0, NULL, u);
-        make_undead_unit(u2);
-        transfermen(u, u2, u->number - n);
-    }
-}
-
 void age_skeleton(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = MAX(1, u->number / 2);
+        int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+        if (n < 1) n = 1;
         u_setrace(u, get_race(RC_SKELETON_LORD));
         u->irace = NULL;
         scale_number(u, n);
@@ -78,8 +47,9 @@ void age_skeleton(unit * u)
 void age_zombie(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = MAX(1, u->number / 2);
+        int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
+        if (n < 1) n = 1;
         u_setrace(u, get_race(RC_ZOMBIE_LORD));
         u->irace = NULL;
         scale_number(u, n);
@@ -90,11 +60,11 @@ void age_zombie(unit * u)
 void age_ghoul(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
-        int n = MAX(1, u->number / 2);
+        int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         u_setrace(u, get_race(RC_GHOUL_LORD));
         u->irace = NULL;
-        scale_number(u, n);
+        scale_number(u, (n > 0) ? n : 1);
         u->hp = (int)(unit_max_hp(u) * u->number * q);
     }
 }

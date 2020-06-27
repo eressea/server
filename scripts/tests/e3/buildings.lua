@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.e3.buildings", package.seeall, lunit.testcase )
+local tcname = 'tests.e3.buildings'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.game.reset()
@@ -34,21 +38,18 @@ function test_build_watch()
     local u = unit.create(f, r, 1)
 
     u.number = 20
-    u:add_item("log", 20)
+    u:add_item("log", 30)
     u.id = 42
 
     u:set_skill("building", 1)
     u:add_order("MACHE Wache")
     process_orders()
     assert_not_nil(u.building)
-    if 5 ~= u.building.size then
-        for k,v in f.messages do
-            print(v)
-        end
-    end
+    -- stage two needs skill 2, this unit can only build a first stage:
     assert_equal(5, u.building.size)
 
     u:set_skill("building", 2)
+    u:clear_orders()
     u:add_order("MACHE Wache " .. itoa36(u.building.id))
     process_orders()
     assert_not_nil(u.building)

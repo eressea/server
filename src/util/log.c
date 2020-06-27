@@ -1,19 +1,11 @@
-﻿/*
-+-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
-| (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
-|                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
-+-------------------+  Stefan Reich <reich@halbling.de>
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
 #include <platform.h>
 #include "log.h"
 
-#include "unicode.h"
+#include "path.h"
 #include "strings.h"
+#include "unicode.h"
+
+#include <critbit.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -49,6 +41,7 @@ static log_t *loggers;
 
 log_t *log_create(int flags, void *data, log_fun call) {
     log_t *lgr = malloc(sizeof(log_t));
+    if (!lgr) abort();
     lgr->log = call;
     lgr->flags = flags;
     lgr->data = data;
@@ -144,7 +137,7 @@ static const char *log_prefix(int level) {
 static int check_dupe(const char *format, int level)
 {
     static int last_type; /* STATIC_XCALL: used across calls */
-    static char last_message[32]; /* STATIC_XCALL: used across calls */
+    static char last_message[32] = { 0 }; /* STATIC_XCALL: used across calls */
     static int dupes = 0;         /* STATIC_XCALL: used across calls */
     if (strncmp(last_message, format, sizeof(last_message)) == 0) {
         /* TODO: C6054: String 'last_message' might not be zero - terminated. */
@@ -201,15 +194,17 @@ log_t *log_to_file(int flags, FILE *out) {
     return log_create(flags, out, log_stdio);
 }
 
-#ifdef _MSC_VER
-/* https://social.msdn.microsoft.com/Forums/vstudio/en-US/53a4fd75-9f97-48b2-aa63-2e2e5a15efa3/stdcversion-problem?forum=vclanguage */
-#define VA_COPY(c, a) va_copy(c, a)
-#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-/* GNU only: https://www.gnu.org/software/libc/manual/html_node/Argument-Macros.html */
-#define VA_COPY(c, a) __va_copy(c, a)
-#else
-#define VA_COPY(c, a) va_copy(c, a)
-#endif
+/*
+ * Notes for va_copy compatibility:
+ * MSVC: https://social.msdn.microsoft.com/Forums/vstudio/en-US/53a4fd75-9f97-48b2-aa63-2e2e5a15efa3/stdcversion-problem?forum=vclanguage
+ * GNU: https://www.gnu.org/software/libc/manual/html_node/Argument-Macros.html
+ */
+static void vlog(log_t *lg, int level, const char *format, va_list args) {
+    va_list copy;
+    va_copy(copy, args);
+    lg->log(lg->data, level, NULL, format, copy);
+    va_end(copy);
+}
 
 static void log_write(int flags, const char *module, const char *format, va_list args) {
     log_t *lg;
@@ -221,10 +216,7 @@ static void log_write(int flags, const char *module, const char *format, va_list
                 dupe = check_dupe(format, level);
             }
             if (dupe == 0) {
-                va_list copy;
-                VA_COPY(copy, args);
-                lg->log(lg->data, level, NULL, format, copy);
-                va_end(copy);
+                vlog(lg, level, format, args);
             }
         }
     }
@@ -316,4 +308,78 @@ int log_level(log_t * log, int flags)
     int old = log->flags;
     log->flags = flags;
     return old;
+}
+
+static critbit_tree stats = CRITBIT_TREE();
+
+int stats_count(const char *stat, int delta) {
+    void * match;
+    if (cb_find_prefix_str(&stats, stat, &match, 1, 0) == 0) {
+        size_t len;
+        char data[128];
+        len = cb_new_kv(stat, strlen(stat), &delta, sizeof(delta), data);
+        cb_insert(&stats, data, len);
+        return delta;
+    }
+    else {
+        int *num;
+        cb_get_kv_ex(match, (void **)&num);
+        return *num += delta;
+    }
+}
+
+#if 0
+#define STATS_BATCH 8
+void stats_walk(const char *prefix, void(*callback)(const char *, int, void *), void *udata) {
+    void *match[STATS_BATCH];
+    int n, off = 0;
+    do {
+        int i;
+        n = cb_find_prefix_str(&stats, prefix, match, STATS_BATCH, off);
+        if (n == 0) {
+            break;
+        }
+        off += n;
+        for (i = 0; i != n; ++i) {
+            const void *kv = match[i];
+            int *num;
+            cb_get_kv_ex(kv, &(void *)num);
+            callback(kv, *num, udata);
+        }
+    } while (n == STATS_BATCH);
+}
+#else
+
+struct walk_data {
+    int (*callback)(const char *, int, void *);
+    void *udata;
+};
+
+static int walk_cb(void * match, const void * key, size_t keylen, void *udata) {
+    struct walk_data *data = (struct walk_data *)udata;
+    int *num;
+    cb_get_kv_ex(match, (void **)&num);
+    return data->callback((const char*)match, *num, data->udata);
+}
+
+int stats_walk(const char *prefix, int (*callback)(const char *, int, void *), void *udata) {
+    struct walk_data data;
+    data.callback = callback;
+    data.udata = udata;
+    return cb_foreach(&stats, prefix, strlen(prefix), walk_cb, &data);
+}
+#endif
+
+static int write_cb(const char *key, int val, void *udata) {
+    FILE * F = (FILE *)udata;
+    fprintf(F, "%s: %d\n", (const char *)key, val);
+    return 0;
+}
+
+void stats_write(FILE *F, const char *prefix) {
+    stats_walk(prefix, write_cb, F);
+}
+
+void stats_close(void) {
+    cb_clear(&stats);
 }

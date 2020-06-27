@@ -18,7 +18,7 @@
 #include "skill.h"
 #include "study.h"
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
@@ -97,6 +97,7 @@ static void test_monsters_attack_ocean(CuTest * tc)
 {
     region *r;
     unit *u, *m;
+    race *rc;
 
     test_setup();
     create_monsters(&u, &m);
@@ -105,12 +106,18 @@ static void test_monsters_attack_ocean(CuTest * tc)
     unit_setid(u, 2);
     m = test_create_unit(m->faction, r);
     assert(!m->region->land);
-
+    
     config_set("rules.monsters.attack_chance", "1");
+    rc = rc_find(m->_race->_name);
 
+    freset(rc, RCF_SWIM);
     plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
 
+    fset(rc, RCF_SWIM);
+    plan_monsters(m->faction);
     CuAssertPtrNotNull(tc, find_order("attack 2", m));
+
     test_teardown();
 }
 
@@ -123,7 +130,7 @@ static void test_monsters_waiting(CuTest * tc)
     setguard(m, true);
     fset(m, UFL_ISNEW);
     monster_attacks(m, false);
-    CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 1", m));
     test_teardown();
 }
 
@@ -145,7 +152,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     u_setrace(m, rc = test_create_race("seaserpent"));
     assert(!m->region->land);
     fset(m, UFL_MOVED);
-    fset(rc, RCF_ATTACK_MOVED);
+    fset(rc, RCF_ATTACK_MOVED|RCF_SWIM);
 
     config_set("rules.monsters.attack_chance", "1");
 
@@ -173,7 +180,7 @@ static void test_monsters_attack_not(CuTest * tc)
 
     plan_monsters(m->faction);
 
-    CuAssertPtrEquals(tc, 0, find_order("attack 1", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 1", m));
     test_teardown();
 }
 

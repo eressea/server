@@ -3,48 +3,61 @@
 from string import split
 from string import strip
 from string import lower
-import subprocess
+import bcrypt
+import sqlite3
 
 class EPasswd:
-	def _check_apr1(self, pwhash, pw):
-		spl = split(pwhash, '$')
-		salt = spl[2]
-		hash = subprocess.check_output(['openssl', 'passwd', '-apr1', '-salt', salt, pw]).decode('utf-8').strip()
-		return hash==pwhash
+    def __init__(self):
+        self.data = {}
 
-	def __init__(self, file):
-		self.data = {}
-		try:
-			fp = open(file,"r")
-		except:
-			fp = None
-		if fp != None:
-			while True:
-				line = fp.readline()
-				if not line: break
-				line = strip(line)
-				[id, email, passwd] = split(line, ":")[0:3]
-				lc_id = lower(id)
-				self.data[lc_id] = {}
-				self.data[lc_id]["id"] = id
-				self.data[lc_id]["email"] = email
-				self.data[lc_id]["passwd"] = passwd
-			fp.close()
+    def set_data(self, no, email, passwd):
+        lc_id = lower(no)
+        self.data[lc_id] = {}
+        self.data[lc_id]["id"] = no
+        self.data[lc_id]["email"] = email
+        self.data[lc_id]["passwd"] = passwd
 
-	def check(self, id, passwd):
-		pw = self.get_passwd(id)
-		if pw[0:6]=='$apr1$':
-			return self._check_apr1(pw, passwd)
-		return pw == passwd
+    def load_database(self, file):
+        conn = sqlite3.connect(file)
+        c = conn.cursor()
+        for row in c.execute('SELECT `no`, `email`, `password` FROM `faction`'):
+            (no, email, passwd) = row
+            self.set_data(no, email, passwd)
+        conn.close()
 
-	def get_passwd(self, id):
-		return self.data[lower(id)]["passwd"]
-	
-	def get_email(self, id):
-		return self.data[lower(id)]["email"]
-	
-	def get_canon_id(self, id):
-		return self.data[lower(id)]["id"]
+    def load_file(self, file):
+        try:
+            fp = open(file,"r")
+        except:
+            fp = None
+        if fp != None:
+            while True:
+                line = fp.readline()
+                if not line: break
+                line = strip(line)
+                [id, email, passwd] = split(line, ":")[0:3]
+                self.set_data(id, email, passwd)
+            fp.close()
 
-	def fac_exists(self, id):
-		return self.data.has_key(lower(id))
+    def check(self, id, passwd):
+        pw = self.get_passwd(id)
+        if pw[0:4]=='$2a$' or pw[0:4]=='$2y$':
+            try:
+                uhash = pw.encode('utf8')
+                upass = passwd.encode('utf8')
+                return bcrypt.checkpw(upass, uhash)
+            except:
+                return False
+        return pw == passwd
+
+    def get_passwd(self, id):
+        return self.data[lower(id)]["passwd"]
+    
+    def get_email(self, id):
+        return self.data[lower(id)]["email"]
+    
+    def get_canon_id(self, id):
+        return self.data[lower(id)]["id"]
+
+    def fac_exists(self, id):
+        return self.data.has_key(lower(id))

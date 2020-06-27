@@ -1,26 +1,9 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_UNIT_H
 #define H_KRNL_UNIT_H
 
 #include <util/resolve.h>
 #include "types.h"
+#include "database.h"
 #include "skills.h"
 #include <stddef.h>
 
@@ -46,8 +29,7 @@ extern "C" {
 #define UFL_MOVED         (1<<8)
 #define UFL_NOTMOVING     (1<<9)        /* Die Einheit kann sich wg. langen Kampfes nicht bewegen */
 #define UFL_DEFENDER      (1<<10)
-#define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl außer ARBEITE ausführen */
-#define UFL_SIEGE         (1<<12)       /* speedup: belagert eine burg, siehe attribut */
+#define UFL_HUNGER        (1<<11)       /* kann im Folgemonat keinen langen Befehl ausser ARBEITE ausfuehren */
 #define UFL_TARGET        (1<<13)       /* speedup: hat ein target, siehe attribut */
 #define UFL_WERE          (1<<14)
 #define UFL_ENTER         (1<<15)       /* unit has entered a ship/building and will not leave it */
@@ -55,14 +37,14 @@ extern "C" {
     /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16)       /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
 #define UFL_FLEEING       (1<<17)       /* unit was in a battle, fleeing. */
-#define UFL_STORM         (1<<19)       /* Kapitän war in einem Sturm */
+#define UFL_STORM         (1<<19)       /* Kapitaen war in einem Sturm */
 #define UFL_FOLLOWING     (1<<20)
 #define UFL_FOLLOWED      (1<<21)
 
 #define UFL_NOAID         (1<<22)       /* Einheit hat Noaid-Status */
 #define UFL_MARK          (1<<23)       /* same as FL_MARK */
 #define UFL_ORDERS        (1<<24)       /* Einheit hat Befehle erhalten */
-#define UFL_TAKEALL       (1<<25)       /* Einheit nimmt alle Gegenstände an */
+#define UFL_TAKEALL       (1<<25)       /* Einheit nimmt alle Gegenstaende an */
 
     /* flags that speed up attribute access: */
 #define UFL_STEALTH       (1<<26)
@@ -72,7 +54,7 @@ extern "C" {
     /* Flags, die gespeichert werden sollen: */
 #define UFL_SAVEMASK (UFL_DEFENDER|UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
-#define UNIT_MAXSIZE 50000
+#define UNIT_MAXSIZE 128 * 1024
     extern int maxheroes(const struct faction *f);
     extern int countheroes(const struct faction *f);
 
@@ -84,13 +66,13 @@ extern "C" {
 
     typedef struct unit {
         struct unit *next;          /* needs to be first entry, for region's unitlist */
-        struct unit *nextF;         /* nächste Einheit der Partei */
+        struct unit *nextF;         /* naechste Einheit der Partei */
         struct unit *prevF;         /* vorherige Einheit der Partei */
         struct region *region;
         int no;                     /* id */
         int hp;
         char *_name;
-        char *display;
+        dbrow_id display_id;
         struct faction *faction;
         struct building *building;
         struct ship *ship;
@@ -120,16 +102,14 @@ extern "C" {
     } unit;
 
     extern struct attrib_type at_creator;
-    extern struct attrib_type at_alias;
-    extern struct attrib_type at_siege;
-    extern struct attrib_type at_target;
     extern struct attrib_type at_potionuser;
-    extern struct attrib_type at_contact;
     extern struct attrib_type at_effect;
     extern struct attrib_type at_private;
     extern struct attrib_type at_showskchange;
 
     int ualias(const struct unit *u);
+    void usetalias(unit *u, int alias);
+
     int weight(const struct unit *u);
 
     void renumber_unit(struct unit *u, int no);
@@ -138,14 +118,9 @@ extern "C" {
     const struct race *u_irace(const struct unit *u);
     const struct race *u_race(const struct unit *u);
     void u_setrace(struct unit *u, const struct race *);
-    struct building *usiege(const struct unit *u);
-    void usetsiege(struct unit *u, const struct building *b);
 
     const char *uprivate(const struct unit *u);
     void usetprivate(struct unit *u, const char *c);
-
-    bool ucontact(const struct unit *u, const struct unit *u2);
-    void usetcontact(struct unit *u, const struct unit *c);
 
     struct unit *findnewunit(const struct region *r, const struct faction *f,
         int alias);
@@ -204,15 +179,17 @@ extern "C" {
     /* cleanup code for this module */
     void free_units(void);
     void u_setfaction(struct unit *u, struct faction *f);
+    void u_freeorders(struct unit *u);
     void set_number(struct unit *u, int count);
 
     int invisible(const struct unit *target, const struct unit *viewer);
     void free_unit(struct unit *u);
 
-    extern void name_unit(struct unit *u);
-    extern struct unit *create_unit(struct region *r1, struct faction *f,
+    void name_unit(struct unit *u);
+    struct unit *unit_create(int id);
+    struct unit *create_unit(struct region *r1, struct faction *f,
         int number, const struct race *rc, int id, const char *dname,
-    struct unit *creator);
+        struct unit *creator);
 
     void uhash(struct unit *u);
     void uunhash(struct unit *u);
@@ -234,8 +211,6 @@ extern "C" {
     int unit_max_hp(const struct unit *u);
     void scale_number(struct unit *u, int n);
 
-    struct spellbook * unit_get_spellbook(const struct unit * u);
-    void unit_add_spell(struct unit * u, struct sc_mage * m, struct spell * sp, int level);
     void remove_empty_units_in_region(struct region * r);
     void remove_empty_units(void);
 
@@ -246,8 +221,8 @@ extern "C" {
     const char *unitname(const struct unit *u);
     char *write_unitname(const struct unit *u, char *buffer, size_t size);
     bool unit_name_equals_race(const struct unit *u);
-    bool unit_can_study(const struct unit *u);
 
+    void unit_convert_race(struct unit *u, const struct race *rc, const char *rcname);
     /* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1
@@ -257,10 +232,10 @@ extern "C" {
     int read_unitid(const struct faction *f, const struct region *r);
 
     /* !< sets combatstatus of a unit */
-    int besieged(const struct unit *u);
     bool has_horses(const struct unit *u);
     int maintenance_cost(const struct unit *u);
     bool has_limited_skills(const struct unit *u);
+    bool is_limited_skill(skill_t sk);
 
 #ifdef __cplusplus
 }

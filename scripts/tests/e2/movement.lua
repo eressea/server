@@ -1,15 +1,48 @@
-require "lunit"
-
-module("tests.e2.movement", package.seeall, lunit.testcase)
+local tcname = 'tests.e2.movement'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
     eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.ship.damage.nocrewocean", "0")
+    eressea.settings.set("rules.ship.damage.nocrew", "0")
+    eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("NewbieImmunity", "0")
 end
 
- function test_piracy()
+function test_piracy()
+    local r = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "ocean")
+    local r3 = region.create(-1, 0, "ocean")
+    local f = faction.create("human", "pirate@eressea.de", "de")
+    local f2 = faction.create("human", "elf@eressea.de", "de")
+    local u1 = unit.create(f, r2, 1)
+    local u2 = unit.create(f2, r3, 1)
+    
+    u1.ship = ship.create(r2, "longboat")
+    u2.ship = ship.create(r3, "longboat")
+    u1:set_skill("sailing", 10)
+    u2:set_skill("sailing", 10)
+
+    u1:clear_orders()
+    u1:add_order("PIRATERIE")
+    u2:clear_orders()
+    u2:add_order("NACH o")
+
+    process_orders()
+
+    assert_equal(r, u2.region) -- Nach Osten
+    assert_equal(r, u1.region) -- Entern!
+end 
+
+function test_piracy_to_land()
     local r = region.create(0, 0, "plain")
     local r2 = region.create(1, 0, "plain")
     local r3 = region.create(-1, 0, "ocean")
@@ -30,10 +63,8 @@ end
 
     process_orders()
 
-    if r2~=u1.region then
-        write_reports()
-    end
-    assert_equal(r2, u1.region) -- should pass, but fails!!!
+    assert_equal(r, u2.region) -- Nach Osten
+    assert_equal(r2, u1.region) -- bewegt sich nicht
 end 
 
 function test_dolphin_on_land()
@@ -133,64 +164,4 @@ function assert_capacity(text, u, silver, r1, r2, rx)
     u:add_item("money", 1)
     process_orders()
     assert_equal(rx, u.region, text .. "unit should not move")
-end
-
-function test_dwarf_example()
-    local r1 = region.create(0, 0, "plain")
-    local r2 = region.create(1, 0, "plain")
-    region.create(2, 0, "plain")
-    local f = faction.create("dwarf", "dwarf@example.com", "de")
-    local u = unit.create(f, r1, 5)
-    u:add_item("horse", 5)
-    u:add_item("cart", 2)
-
-    -- 5 dwarves + 5 horse - 2 carts = 27 + 100 - 80 = 47.00
-    assert_capacity("dwarves", u, 4700, r1, r2)
-
-    u:set_skill("riding", 3)
-    assert_equal(1, u:eff_skill("riding"))
-    -- 5 dwarves + 5 horses + 2 carts = 327.00
-    assert_capacity("riding", u, 32700, r1, r2)
-
-end
-
-function test_troll_example()
-    local r1 = region.create(0, 0, "plain")
-    local r2 = region.create(1, 0, "plain")
-    local r3 = region.create(2, 0, "plain")
-    local f = faction.create("troll", "troll@example.com", "de")
-    local u1 = unit.create(f, r1, 3)
-
-    u1:add_item("cart", 1)
-    u1:clear_orders()
-
-    -- 3 trolls - 1 cart = 320, but not allowed?
-    u1.name='XXX'
-    assert_nomove("3 trolls", u1)
-
-    u1.number = 4
-
-    -- 4 trolls + 1 cart = 14320
-    assert_capacity("1 cart", u1, 14320, r1, r2)
-
-    
-    u1:add_item("horse", 4)
-    -- 4 horses, 4 trolls, 1 cart
-    assert_capacity("4 horses", u1, 22320, r1, r2)
-
-    
-    u1:add_item("cart", 1)
-
-    -- 4 horses + 4 trolls + 1 cart - 1 cart
-    assert_capacity("2 carts", u1, 18320, r1, r2)
-
-    u1:set_skill("riding", 3)
-    assert_equal(1, u1:eff_skill("riding"))
-
-    -- 4 horses + 4 trolls + 2 carts = 323.20
-    assert_capacity("walking", u1, 32320, r1, r2)
-
-    -- 4 horses + 2 carts - 4 trolls = 200.00
-    assert_capacity("riding", u1, 20000, r1, r3, r2)
-
 end

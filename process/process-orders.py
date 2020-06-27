@@ -21,29 +21,6 @@ def pwd_get_email(faction, pwd, pwdfile=None):
 def split_filename(filename):
     return os.path.split(filename)
 
-def unlock_file(filename):
-    try:
-        unlink(filename+".lock")
-    except:
-        print "could not unlock %s.lock, file not found" % filename
-        raise
-    
-def lock_file(filename):
-    i = 0
-    wait = 1
-    if not os.path.exists(filename):
-        file=open(filename, "w")
-        file.close()
-    while True:
-        try:
-            symlink(filename, filename+".lock")
-            return
-        except:
-            i = i+1
-            if i == 5:
-                raise
-            sleep(wait)
-            wait = wait*2
 
 messages = {
 "subject-de": "Befehle angekommen",
@@ -51,6 +28,9 @@ messages = {
 
 "validate-en": "Validating",
 "validate-de": "Verarbeite",
+
+"noorders-en": "The email contained no recognizable orders.",
+"noorders-de": "Es konnten keine Befehle gefunden werden.",
 
 "faction-en": "Faction",
 "faction-de": "Partei",
@@ -128,14 +108,14 @@ def echeck(filename, locale, rules):
     return mail
 
 #print "reading password file..."
-pw_data = EPasswd(os.path.join(game_dir,"passwd"))
+pw_data = EPasswd()
+try:
+    pw_data.load_database(os.path.join(game_dir, "eressea.db"))
+except:
+    pw_data.load_file(os.path.join(game_dir, "passwd"))
 
 #print "reading orders.queue..."
-# move the queue file to a save space while locking it:
-try:
-    lock_file(queue_file)
-except:
-    exit(0)
+# move the queue file to a safe space while locking it:
 queuefile = open(queue_file, "r")
 lines = queuefile.readlines()
 queuefile.close()
@@ -143,22 +123,13 @@ queuefile.close()
 # copy to a temp file
 
 tname="/tmp/orders.queue.%s" % str(time())
-try:
-    lock_file(tname)
-except:
-    exit(0)
 tmpfile=open(tname, "w")
 for line in lines:
     tmpfile.write(line)
 tmpfile.close()
 
 openlog("orders")
-
 unlink(queue_file)
-try:
-    unlock_file(queue_file)
-except:
-    pass
 
 for line in lines:
     tokens = split(line[:-1], ' ')
@@ -179,12 +150,14 @@ for line in lines:
     logfile = open(os.path.join(game_dir, "zug.log"), "a")
     dirname, filename = split_filename(infile)
     msg = messages["validate-"+locale] + " " + infile + "\n\n"
+    if len(results)==0:
+        msg = msg + messages["noorders-"+locale]
     for faction, game_email, success, pwd in results:
         msg = msg + messages["faction-"+locale] + " " + faction + "\n"
         if success: failed = False
         else: msg = msg + messages["unknown-"+locale] + "\n"
         msg = msg + "\n"
-        logfile.write("%s:%s:%s:%s:%s:%s\n" % (ctime(time()), email, game_email, faction, pwd, success))
+        logfile.write("%s:%s:%s:%s:%s\n" % (ctime(time()), email, game_email, faction, success))
     logfile.close()
 
     if failed:
@@ -212,4 +185,3 @@ for line in lines:
 
 closelog()
 unlink(tname)
-unlock_file(tname)

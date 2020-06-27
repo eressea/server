@@ -1,6 +1,10 @@
-require "lunit"
-
-module("tests.xmas", package.seeall, lunit.testcase )
+local tcname = 'tests.shared.xmas'
+local lunit = require('lunit')
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname, 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 function setup()
     eressea.free_game()
@@ -75,9 +79,11 @@ end
 function test_xmastree()
     local r
     r = use_tree("ocean")
+    assert_nil(r:get_key("xm06")) 
     assert_equal(0, r:get_resource("tree"))
     eressea.free_game()
     r = use_tree("plain")
+    assert_equal(get_turn(), r:get_key("xm06")) 
     assert_equal(10, r:get_resource("tree"))
 end
 

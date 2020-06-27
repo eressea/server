@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include "direction.h"
 #include <stdbool.h>
 
@@ -46,11 +28,11 @@ extern "C" {
 #define BP_NORMAL 3
 #define BP_ROAD   2
 
-    /* die Zahlen sind genau äquivalent zu den race Flags */
+    /* die Zahlen sind genau aequivalent zu den race Flags */
 #define MV_CANNOTMOVE     (1<<5)
 #define MV_FLY            (1<<7)        /* kann fliegen */
 #define MV_SWIM           (1<<8)        /* kann schwimmen */
-#define MV_WALK           (1<<9)        /* kann über Land gehen */
+#define MV_WALK           (1<<9)        /* kann ueber Land gehen */
 
 #define HORSES_PER_CART    2 /* number of horses for a cart */
 #define STRENGTHMULTIPLIER  50   /* multiplier for trollbelt */
@@ -71,13 +53,12 @@ extern "C" {
 
     int personcapacity(const struct unit *u);
     void movement(void);
-    void run_to(struct unit *u, struct region *to);
     int enoughsailors(const struct ship *sh, int sumskill);
     bool canswim(struct unit *u);
     bool canfly(struct unit *u);
     void leave_trail(struct ship *sh, struct region *from,
                             struct region_list *route);
-    struct ship *move_ship(struct ship *sh, struct region *from,
+    void move_ship(struct ship *sh, struct region *from,
     struct region *to, struct region_list *route);
     int walkingcapacity(const struct unit *u);
     int movement_speed(const struct unit * u);

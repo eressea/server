@@ -31,12 +31,12 @@ function embassy.update()
     if home==nil then
         return
     end
-    eressea.log.debug("updating embassies in " .. tostring(home))
+    eressea.log.info("updating embassies in " .. tostring(home))
     local u
     for u in home.units do
-        if u.faction:get_key('mupL')==0 then
-            if (u.faction:add_item('seashell', 1)>0) then
-                eressea.log.debug("new seashell for " .. tostring(u.faction))
+        if not u.faction:get_key('mupL') then
+            if u.faction:add_item('seashell', 1) > 0 then
+                eressea.log.info("new seashell for " .. tostring(u.faction))
                 u.faction:set_key('mupL', get_turn())
             end
         end

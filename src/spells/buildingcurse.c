@@ -1,16 +1,3 @@
-/*
- *
- * Eressea PB(E)M host Copyright (C) 1998-2015
- *      Christian Schlittchen (corwin@amber.kn-bremen.de)
- *      Katja Zedel (katze@felidae.kn-bremen.de)
- *      Henning Peters (faroul@beyond.kn-bremen.de)
- *      Enno Rehling (enno@eressea.de)
- *      Ingo Wilken (Ingo.Wilken@informatik.uni-oldenburg.de)
- *
- * This program may not be used, modified or distributed without
- * prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include "buildingcurse.h"
 
@@ -80,7 +67,7 @@ const struct curse_type ct_magicwalls = { "magicwalls",
 CURSETYP_NORM, CURSE_ONLYONE|CURSE_NOAGE, NO_MERGE, cinfo_building
 };
 
-/* Feste Mauer - Präkampfzauber, wirkt nur 1 Runde */
+/* Feste Mauer - Praekampfzauber, wirkt nur 1 Runde */
 const struct curse_type ct_strongwall = { "strongwall",
 CURSETYP_NORM, 0, NO_MERGE, NULL
 };

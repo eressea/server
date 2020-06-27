@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "plane.h"
@@ -25,7 +7,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "faction.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/resolve.h>
 #include <util/strings.h>
 #include <util/lists.h>
@@ -122,7 +104,7 @@ int getplaneid(const region * r)
 static int
 ursprung_x(const faction * f, const plane * pl, const region * rdefault)
 {
-    ursprung *ur;
+    origin *ur;
     int id = 0;
 
     if (!f)
@@ -131,7 +113,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
     if (pl)
         id = pl->id;
 
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id)
             return ur->x;
     }
@@ -145,7 +127,7 @@ ursprung_x(const faction * f, const plane * pl, const region * rdefault)
 static int
 ursprung_y(const faction * f, const plane * pl, const region * rdefault)
 {
-    ursprung *ur;
+    origin *ur;
     int id = 0;
 
     if (!f)
@@ -154,7 +136,7 @@ ursprung_y(const faction * f, const plane * pl, const region * rdefault)
     if (pl)
         id = pl->id;
 
-    for (ur = f->ursprung; ur; ur = ur->next) {
+    for (ur = f->origin; ur; ur = ur->next) {
         if (ur->id == id)
             return ur->y;
     }
@@ -231,7 +213,7 @@ plane *create_new_plane(int id, const char *name, int minx, int maxx, int miny,
     if (pl)
         return pl;
     pl = calloc(1, sizeof(plane));
-
+    if (!pl) abort();
     pl->next = NULL;
     pl->id = id;
     if (name)

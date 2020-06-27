@@ -1,22 +1,10 @@
-/*
-+-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
-| (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
-|                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
-+-------------------+  Stefan Reich <reich@halbling.de>
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-
-*/
 #include <platform.h>
 #include <kernel/config.h>
 #include "market.h"
 
 #include <assert.h>
 
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <selist.h>
 #include <util/rng.h>
 
@@ -71,7 +59,7 @@ attrib_type at_market = {
 
 bool markets_module(void)
 {
-    return (bool)config_get_int("modules.market", 0);
+    return config_get_int("modules.market", 0) != 0;
 }
 
 void do_markets(void)

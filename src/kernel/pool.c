@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -62,7 +44,7 @@ int get_resource(const unit * u, const resource_type * rtype)
         return get_spellpoints(u);
     }
     if (rtype == get_resourcetype(R_PERMAURA)) {
-        return max_spellpoints(u->region, u);
+        return max_spellpoints_depr(u->region, u);
     }
     log_error("trying to get unknown resource '%s'.\n", rtype->_name);
     return 0;
@@ -113,7 +95,8 @@ int change_reservation(unit * u, const item_type * itype, int value)
         rp = &(*rp)->next;
     res = *rp;
     if (!res) {
-        *rp = res = calloc(sizeof(reservation), 1);
+        *rp = res = calloc(1, sizeof(reservation));
+        if (!res) abort();
         res->type = itype;
         res->value = value;
     }
@@ -138,7 +121,8 @@ int set_resvalue(unit * u, const item_type * itype, int value)
     if (!res) {
         if (!value)
             return 0;
-        *rp = res = calloc(sizeof(reservation), 1);
+        *rp = res = calloc(1, sizeof(reservation));
+        if (!res) abort();
         res->type = itype;
         res->value = value;
     }
@@ -154,7 +138,7 @@ int set_resvalue(unit * u, const item_type * itype, int value)
 }
 
 int
-get_pooled(const unit * u, const resource_type * rtype, unsigned int mode,
+get_pooled(const unit * u, const resource_type * rtype, int mode,
 int count)
 {
     const faction *f = u->faction;
@@ -197,7 +181,7 @@ int count)
 }
 
 int
-use_pooled(unit * u, const resource_type * rtype, unsigned int mode, int count)
+use_pooled(unit * u, const resource_type * rtype, int mode, int count)
 {
     const faction *f = u->faction;
     unit *v;

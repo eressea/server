@@ -1,14 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -36,7 +25,7 @@
 #include <move.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -62,7 +51,7 @@ static const char *spell_damage(int sp)
 {
     switch (sp) {
     case 0:
-        /* meist t�dlich 20-65 HP */
+        /* meist toedlich 20-65 HP */
         return "5d10+15";
     case 1:
         /* sehr variabel 4-48 HP */
@@ -71,7 +60,7 @@ static const char *spell_damage(int sp)
         /* leicht verwundet 4-18 HP */
         return "2d8+2";
     case 3:
-        /* fast immer t�dlich 30-50 HP */
+        /* fast immer toedlich 30-50 HP */
         return "5d5+25";
     case 4:
         /* verwundet 11-26 HP */
@@ -298,35 +287,35 @@ int sp_combatrosthauch(struct castorder * co)
 
         for (w = 0; df->weapons[w].type != NULL; ++w) {
             weapon *wp = df->weapons;
-            int n = force;
-            if (n < wp->used) n = wp->used;
-            if (n) {
-                requirement *mat = wp->type->itype->construction->materials;
-                bool iron = false;
-                while (mat && mat->number > 0) {
-                    if (mat->rtype == get_resourcetype(R_IRON)) {
-                        iron = true;
-                        break;
-                    }
-                    mat++;
-                }
-                if (iron) {
-                    int p;
-                    force -= n;
-                    wp->used -= n;
-                    k += n;
-                    i_change(&df->unit->items, wp->type->itype, -n);
-                    for (p = 0; n && p != df->unit->number; ++p) {
-                        if (df->person[p].missile == wp) {
-                            df->person[p].missile = NULL;
-                            --n;
+            if (df->unit->items && force > 0) {
+                item ** itp = i_find(&df->unit->items, wp->type->itype);
+                if (*itp) {
+                    item *it = *itp;
+                    requirement *mat = wp->type->itype->construction->materials;
+                    int n = force;
+                    if (it->number < n) n = it->number;
+
+                    while (mat && mat->number > 0) {
+                        if (mat->rtype == get_resourcetype(R_IRON)) {
+                            int p;
+                            force -= n;
+                            k += n;
+                            i_change(itp, wp->type->itype, -n);
+                            for (p = 0; n && p != df->unit->number; ++p) {
+                                if (df->person[p].melee == wp) {
+                                    df->person[p].melee = NULL;
+                                    --n;
+                                }
+                            }
+                            for (p = 0; n && p != df->unit->number; ++p) {
+                                if (df->person[p].missile == wp) {
+                                    df->person[p].missile = NULL;
+                                    --n;
+                                }
+                            }
+                            break;
                         }
-                    }
-                    for (p = 0; n && p != df->unit->number; ++p) {
-                        if (df->person[p].melee == wp) {
-                            df->person[p].melee = NULL;
-                            --n;
-                        }
+                        mat++;
                     }
                 }
             }
@@ -335,11 +324,11 @@ int sp_combatrosthauch(struct castorder * co)
     selist_free(fgs);
 
     if (k == 0) {
-        /* keine Waffen mehr da, die zerst�rt werden k�nnten */
+        /* keine Waffen mehr da, die zerstoert werden koennten */
         message *msg = msg_message("rust_effect_1", "mage", fi->unit);
         message_all(b, msg);
         msg_release(msg);
-        fi->magic = 0;              /* k�mpft nichtmagisch weiter */
+        fi->magic = 0;              /* kaempft nichtmagisch weiter */
         level = 0;
     }
     else {
@@ -357,8 +346,6 @@ int sp_sleep(struct castorder * co)
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    unit *du;
-    troop dt;
     int force, enemies;
     int k = 0;
     message *m;
@@ -374,7 +361,8 @@ int sp_sleep(struct castorder * co)
         return 0;
     }
     while (force && enemies) {
-        dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+        unit *du;
+        troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
         assert(dt.fighter);
         du = dt.fighter->unit;
         if (!is_magic_resistant(mage, du, 0)) {
@@ -406,7 +394,7 @@ int sp_speed(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -872,7 +860,7 @@ static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
 }
 
 /* Gesang der Furcht (Kampfzauber) */
-/* Panik (Pr�kampfzauber) */
+/* Panik (Praekampfzauber) */
 int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
@@ -901,7 +889,7 @@ int flee_spell(struct castorder * co, int strength)
         fighter *df = (fighter *)selist_get(ql, qi);
 
         for (n = 0; force > 0 && n != df->alive; ++n) {
-            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR m�glich */
+            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR moeglich */
                 df->person[n].attack -= 1;
                 --force;
                 ++panik;
@@ -945,7 +933,7 @@ int sp_hero(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -956,7 +944,7 @@ int sp_hero(struct castorder * co)
 
         if (df) {
             if (!(df->person[dt.index].flags & FL_COURAGE)) {
-                df->person[dt.index].defence += df_bonus;
+                df->person[dt.index].defense += df_bonus;
                 df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
                 targets++;
                 --force;
@@ -964,8 +952,7 @@ int sp_hero(struct castorder * co)
         }
     }
 
-    m =
-        msg_message("cast_hero_effect", "mage spell amount", fi->unit, sp, targets);
+    m = msg_message("cast_hero_effect", "mage spell amount", fi->unit, sp, targets);
     message_all(b, m);
     msg_release(m);
 
@@ -993,7 +980,7 @@ int sp_berserk(struct castorder * co)
 
     allies =
         count_allies(fi->side, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE, ALLY_ANY);
-    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten best�nde
+    /* maximal 2*allies Versuche ein Opfer zu finden, ansonsten bestuende
      * die Gefahr eine Endlosschleife*/
     allies *= 2;
 
@@ -1005,7 +992,7 @@ int sp_berserk(struct castorder * co)
         if (df) {
             if (!(df->person[dt.index].flags & FL_COURAGE)) {
                 df->person[dt.index].attack += at_bonus;
-                df->person[dt.index].defence -= df_malus;
+                df->person[dt.index].defense -= df_malus;
                 df->person[dt.index].flags = df->person[dt.index].flags | FL_COURAGE;
                 targets++;
                 --force;
@@ -1064,7 +1051,7 @@ int sp_frighten(struct castorder * co)
         }
         if (!is_magic_resistant(mage, df->unit, 0)) {
             df->person[dt.index].attack -= at_malus;
-            df->person[dt.index].defence -= df_malus;
+            df->person[dt.index].defense -= df_malus;
             targets++;
         }
         --force;
@@ -1109,7 +1096,7 @@ int sp_tiredsoldiers(struct castorder * co)
         if (!(df->person[t.index].flags & FL_TIRED)) {
             if (!is_magic_resistant(mage, df->unit, 0)) {
                 df->person[t.index].flags = df->person[t.index].flags | FL_TIRED;
-                df->person[t.index].defence -= 2;
+                df->person[t.index].defense -= 2;
                 ++n;
             }
         }
@@ -1182,7 +1169,7 @@ int sp_reeling_arrows(struct castorder * co)
 }
 
 /* Magier weicht dem Kampf aus. Wenn er sich bewegen kann, zieht er in
- * eine Nachbarregion, wobei ein NACH ber�cksichtigt wird. Ansonsten
+ * eine Nachbarregion, wobei ein NACH beruecksichtigt wird. Ansonsten
  * bleibt er stehen und nimmt nicht weiter am Kampf teil. */
 int sp_appeasement(struct castorder * co)
 {
@@ -1195,7 +1182,7 @@ int sp_appeasement(struct castorder * co)
     region *r = b->region;
     message *m;
 
-    /* Fliehende Einheiten verlassen auf jeden Fall Geb�ude und Schiffe. */
+    /* Fliehende Einheiten verlassen auf jeden Fall Gebaeude und Schiffe. */
     if (!(r->terrain->flags & SEA_REGION)) {
         leave(mage, false);
     }
@@ -1203,7 +1190,7 @@ int sp_appeasement(struct castorder * co)
     setguard(mage, false);
     unit_setstatus(mage, ST_FLEE);
 
-    /* wir tun so, als w�re die Person geflohen */
+    /* wir tun so, als waere die Person geflohen */
     fi->flags |= FIG_NOLOOT;
     fi->run.hp = mage->hp;
     fi->run.number = mage->number;
@@ -1221,6 +1208,7 @@ static void do_meffect(fighter * af, int typ, int effect, int duration)
 {
     battle *b = af->side->battle;
     meffect *me = (meffect *)malloc(sizeof(struct meffect));
+    if (!me) abort();
     selist_push(&b->meffects, me);
     me->magician = af;
     me->typ = typ;
@@ -1242,7 +1230,7 @@ int armor_spell(struct castorder * co, int per_level, int time_multi)
     message_all(b, m);
     msg_release(m);
 
-    /* gibt R�stung +effect f�r duration Treffer */
+    /* gibt Ruestung +effect fuer duration Treffer */
 
     effect = level / per_level;
     duration = (int)(time_multi * power * power);
@@ -1286,7 +1274,7 @@ int sp_fumbleshield(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    /* der erste Zauber schl�gt mit 100% fehl  */
+    /* der erste Zauber schlaegt mit 100% fehl  */
     duration = 100;
     effect = 25 - level;
     if (effect < 1) effect = 1;
@@ -1344,7 +1332,7 @@ int sp_reanimate(struct castorder * co)
             && u_race(tf->unit) != get_race(RC_DAEMON)
             && (chance(c))) {
             assert(tf->alive < tf->unit->number);
-            /* t.fighter->person[].hp beginnt mit t.index = 0 zu z�hlen,
+            /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,
              * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
              * also sind die hp von t.fighter->alive
              * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote
@@ -1390,7 +1378,7 @@ int sp_keeploot(struct castorder * co)
     message_all(b, m);
     msg_release(m);
 
-    b->keeploot = (int)fmax(25, b->keeploot + 5 * power);
+    b->keeploot = (signed char) fmax(25, b->keeploot + 5 * power);
 
     return level;
 }
@@ -1411,7 +1399,7 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
             continue;
 
         /* wir heilen erstmal keine Monster */
-        if (heal_monsters || playerrace(u_race(df->unit))) {
+        if (heal_monsters || !undeadrace(u_race(df->unit))) {
             int n, hp = df->unit->hp / df->unit->number;
             int rest = df->unit->hp % df->unit->number;
 
@@ -1539,12 +1527,7 @@ int sp_undeadhero(struct castorder * co)
 
             /* new units gets some stats from old unit */
 
-            if (du->display) {
-                unit_setinfo(u, du->display);
-            }
-            else {
-                unit_setinfo(u, NULL);
-            }
+            unit_setinfo(u, unit_getinfo(du));
             unit_setstatus(u, du->status);
             setguard(u, false);
             for (ilist = &du->items; *ilist;) {

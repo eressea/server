@@ -1,31 +1,14 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_GC_LAWS
 #define H_GC_LAWS
 
-#include <kernel/types.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+    enum param_t;
 
+    struct locale;
     struct unit;
     struct region;
     struct building;
@@ -41,14 +24,12 @@ extern "C" {
     void demographics(void);
     void immigration(void);
     void update_guards(void);
-    void update_subscriptions(void);
     void deliverMail(struct faction *f, struct region *r, struct unit *u,
         const char *s, struct unit *receiver);
 
     bool renamed_building(const struct building * b);
     int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
     void get_food(struct region * r);
-    int can_contact(const struct region *r, const struct unit *u, const struct unit *u2);
 
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
     int enter_ship(struct unit *u, struct order *ord, int id, bool report);
@@ -67,6 +48,7 @@ extern "C" {
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
     bool long_order_allowed(const struct unit *u);
+    bool password_wellformed(const char *password);
 
     int password_cmd(struct unit *u, struct order *ord);
     int banner_cmd(struct unit *u, struct order *ord);
@@ -82,7 +64,6 @@ extern "C" {
     int quit_cmd(struct unit *u, struct order *ord);
     int name_cmd(struct unit *u, struct order *ord);
     int use_cmd(struct unit *u, struct order *ord);
-    int siege_cmd(struct unit *u, struct order *ord);
     int leave_cmd(struct unit *u, struct order *ord);
     int pay_cmd(struct unit *u, struct order *ord);
     int promotion_cmd(struct unit *u, struct order *ord);
@@ -95,8 +76,11 @@ extern "C" {
     int reserve_cmd(struct unit *u, struct order *ord);
     int reserve_self(struct unit *u, struct order *ord);
     int claim_cmd(struct unit *u, struct order *ord);
+    void transfer_faction(struct faction *fsrc, struct faction *fdst);
+    void peasant_migration(struct region * r);
 
     void nmr_warnings(void);
+    bool nmr_death(const struct faction * f, int turn, int timeout);
 
     bool cansee(const struct faction * f, const struct region * r,
         const struct unit *u, int modifier);
@@ -117,6 +101,10 @@ extern "C" {
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f);
     bool help_enter(struct unit *uo, struct unit *u);
+
+    enum param_t findparam_ex(const char *s, const struct locale * lang);
+
+#define QUIT_WITH_TRANSFER
 
 #ifdef __cplusplus
 }

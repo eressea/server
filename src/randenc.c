@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -56,7 +38,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "kernel/unit.h"
 
 /* util includes */
-#include "util/attrib.h"
+#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/log.h"
@@ -75,7 +57,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 extern struct attrib_type at_unitdissolve;
 
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
- * aufl�st, in a->data.ca[0] kann angegeben werden, wohin die Personen
+ * aufloest, in a->data.ca[0] kann angegeben werden, wohin die Personen
  * verschwinden. Passiert bereits in der ersten Runde! */
 static void dissolve_units(void)
 {
@@ -187,12 +169,12 @@ static void melt_iceberg(region * r, const terrain_type *t_ocean)
             ADDMSG(&u->faction->msgs, msg_message("iceberg_melt", "region", r));
         }
 
-    /* driftrichtung l�schen */
+    /* driftrichtung loeschen */
     a = a_find(r->attribs, &at_iceberg);
     if (a)
         a_remove(&r->attribs, a);
 
-    /* Geb�ude l�schen */
+    /* Gebaeude loeschen */
     while (r->buildings) {
         remove_building(&r->buildings, r->buildings);
     }
@@ -239,6 +221,7 @@ static void move_iceberg(region * r)
                         "region dir", r, dir));
                 }
 
+            stats_count("iceberg.drift", 1);
             x = r->x;
             y = r->y;
 
@@ -260,13 +243,13 @@ static void move_iceberg(region * r)
                 freset(sh, SF_SELECT);
 
             for (sh = r->ships; sh; sh = sh->next) {
-                /* Meldung an Kapit�n */
+                /* Meldung an Kapitaen */
                 double dmg = config_get_flt("rules.ship.damage.intoiceberg", 0.1);
                 damage_ship(sh, dmg);
                 fset(sh, SF_SELECT);
             }
 
-            /* Personen, Schiffe und Geb�ude verschieben */
+            /* Personen, Schiffe und Gebaeude verschieben */
             while (rc->buildings) {
                 rc->buildings->region = r;
                 translist(&rc->buildings, &r->buildings, rc->buildings);
@@ -285,7 +268,7 @@ static void move_iceberg(region * r)
                 u_set_building(u, b); /* undo leave-prevention */
             }
 
-            /* Besch�digte Schiffe k�nnen sinken */
+            /* Beschaedigte Schiffe koennen sinken */
 
             for (sh = r->ships; sh;) {
                 shn = sh->next;
@@ -379,6 +362,7 @@ static void create_icebergs(void)
                 continue;
 
             r->terrain = t_iceberg;
+            stats_count("iceberg.terraform", 1);
 
             fset(r, RF_SELECT);
             move_iceberg(r);
@@ -394,44 +378,6 @@ static void create_icebergs(void)
             }
         }
     }
-}
-
-static void godcurse(void)
-{
-    region *r;
-
-    for (r = regions; r; r = r->next) {
-        if (is_cursed(r->attribs, &ct_godcursezone)) {
-            unit *u;
-            for (u = r->units; u; u = u->next) {
-                skill *sv = u->skills;
-                while (sv != u->skills + u->skill_size) {
-                    int weeks = 1 + rng_int() % 3;
-                    reduce_skill(u, sv, weeks);
-                    ++sv;
-                }
-            }
-            if (fval(r->terrain, SEA_REGION)) {
-                ship *sh;
-                for (sh = r->ships; sh;) {
-                    ship *shn = sh->next;
-                    double dmg = config_get_flt("rules.ship.damage.godcurse", 0.1);
-                    damage_ship(sh, dmg);
-                    if (sh->damage >= sh->size * DAMAGE_SCALE) {
-                        unit *uo = ship_owner(sh);
-                        if (uo) {
-                            ADDMSG(&uo->faction->msgs,
-                                msg_message("godcurse_destroy_ship", "ship", sh));
-                        }
-                        sink_ship(sh);
-                        remove_ship(&sh->region->ships, sh);
-                    }
-                    sh = shn;
-                }
-            }
-        }
-    }
-
 }
 
 /** handles the "orcish" curse that makes units grow like old orks
@@ -475,7 +421,7 @@ static void orc_growth(void)
     }
 }
 
-/** Talente von D�monen verschieben sich.
+/** Talente von Daemonen verschieben sich.
  */
 static void demon_skillchanges(void)
 {
@@ -505,7 +451,7 @@ static void icebergs(void)
     move_icebergs();
 }
 
-#define HERBROTCHANCE 5         /* Verrottchance f�r Kr�uter (ifdef HERBS_ROT) */
+#define HERBROTCHANCE 5         /* Verrottchance fuer Kraeuter (ifdef HERBS_ROT) */
 
 static void rotting_herbs(void)
 {
@@ -551,7 +497,6 @@ void randomevents(void)
     for (r = regions; r; r = r->next) {
         drown(r);
     }
-    godcurse();
     orc_growth();
     demon_skillchanges();
     if (volcano_module()) {
@@ -603,8 +548,8 @@ void plagues(region * r)
     }
 
     if (dead > 0) {
-        message *msg = add_message(&r->msgs, msg_message("pest", "dead", dead));
-        msg_release(msg);
+        ADDMSG(&r->msgs, msg_message("pest", "peasants dead",
+            get_resourcetype(R_PEASANT), dead));
         deathcounts(r, dead);
         rsetpeasants(r, peasants - dead);
     }

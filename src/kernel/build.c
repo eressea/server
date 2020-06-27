@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -33,10 +15,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* kernel includes */
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
-#include <kernel/connection.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/config.h>
+#include <kernel/connection.h>
 #include <kernel/curse.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -52,17 +36,17 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/unit.h>
 
 /* from libutil */
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/event.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/resolve.h>
+#include <util/strings.h>
 
 /* from libc */
 #include <assert.h>
+#include <errno.h>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
@@ -79,7 +63,7 @@ struct building *getbuilding(const struct region *r)
 
 ship *getship(const struct region * r)
 {
-    ship *sh, *sx = findship(getshipid());
+    ship *sh, *sx = findship(getid());
     for (sh = r->ships; sh; sh = sh->next) {
         if (sh == sx)
             return sh;
@@ -126,7 +110,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 
         if (n != 0) {
             region *r2 = rconnect(r, d);
-            int willdo = effskill(u, SK_ROAD_BUILDING, 0) * u->number;
+            int willdo = effskill(u, SK_ROAD_BUILDING, NULL) * u->number;
             if (willdo > n) willdo = n;
             if (willdo == 0) {
                 /* TODO: error message */
@@ -145,7 +129,7 @@ static void destroy_road(unit * u, int nmax, struct order *ord)
 }
 
 static int recycle(unit *u, construction *con, int size) {
-    /* TODO: Nicht an ZERST�RE mit Punktangabe angepasst! */
+    /* TODO: Nicht an ZERSTOERE mit Punktangabe angepasst! */
     int c;
     for (c = 0; con->materials[c].number; ++c) {
         const requirement *rq = con->materials + c;
@@ -179,7 +163,9 @@ int destroy_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     if (s && *s) {
-        n = atoi((const char *)s);
+        ERRNO_CHECK();
+        n = atoi(s);
+        errno = 0;
         if (n <= 0) {
             n = INT_MAX;
         }
@@ -238,7 +224,7 @@ int destroy_cmd(unit * u, struct order *ord)
             return 14;
         }
 
-        if (n >= (sh->size * 100) / sh->type->construction->maxsize) {
+        if (n >= (sh->size * 100) / ship_maxsize(sh)) {
             /* destroy completly */
             /* all units leave the ship */
             for (u2 = r->units; u2; u2 = u2->next) {
@@ -253,7 +239,7 @@ int destroy_cmd(unit * u, struct order *ord)
         }
         else {
             /* partial destroy */
-            sh->size -= (sh->type->construction->maxsize * n) / 100;
+            sh->size -= (ship_maxsize(sh) * n) / 100;
             ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
                 "unit region ship", u, r, sh));
         }
@@ -274,13 +260,9 @@ void build_road(unit * u, int size, direction_t d)
     region *rn = rconnect(r, d);
 
     assert(u->number);
-    effsk = effskill(u, SK_ROAD_BUILDING, 0);
+    effsk = effskill(u, SK_ROAD_BUILDING, NULL);
     if (!effsk) {
         cmistake(u, u->thisorder, 103, MSG_PRODUCE);
-        return;
-    }
-    if (besieged(u)) {
-        cmistake(u, u->thisorder, 60, MSG_PRODUCE);
         return;
     }
 
@@ -500,60 +482,55 @@ static int count_materials(unit *u, const construction *type, int n, int complet
     return n;
 }
 
+int build_skill(unit *u, int basesk, int skill_mod) {
+    int effsk, skills;
+    int dm = get_effect(u, oldpotiontype[P_DOMORE]);
+
+    effsk = basesk + skill_mod;
+    assert(effsk >= 0);
+
+    skills = effsk * u->number;
+
+    /* technically, nimblefinge and domore should be in a global set of
+     * "game"-attributes, (as at_skillmod) but for a while, we're leaving
+     * them in here. */
+
+    if (dm != 0) {
+        /* Auswirkung Schaffenstrunk */
+        if (dm > u->number) dm = u->number;
+        change_effect(u, oldpotiontype[P_DOMORE], -dm);
+        skills += dm * effsk;
+    }
+    return skills;
+}
+
 /** Use up resources for building an object.
 * Build up to 'size' points of 'type', where 'completed'
 * of the first object have already been finished. return the
 * actual size that could be built.
 */
-int build(unit * u, const construction * ctype, int completed, int want, int skill_mod)
-{
-    const construction *con = ctype;
-    int skills = INT_MAX;         /* number of skill points remainig */
-    int basesk = 0;
-    int made = 0;
+static int build_limited(unit * u, const construction * con, int completed, int number, int want, int basesk, int *skill_total) {
+    int skills = *skill_total;
+    int made = 0, maxsize;
 
-    if (want <= 0)
+    assert(con);
+    if (want <= 0) {
         return 0;
-    if (con == NULL) {
-        return ENOMATERIALS;
     }
-    if (completed == con->maxsize) {
+    maxsize = con->maxsize * number;
+    if (completed == maxsize) {
         return ECOMPLETE;
-    }
-    if (con->skill != NOSKILL) {
-        int effsk;
-        int dm = get_effect(u, oldpotiontype[P_DOMORE]);
-
-        basesk = effskill(u, con->skill, 0);
-        if (basesk == 0)
-            return ENEEDSKILL;
-
-        effsk = basesk + skill_mod;
-        assert(effsk >= 0);
-
-        skills = effsk * u->number;
-
-        /* technically, nimblefinge and domore should be in a global set of
-         * "game"-attributes, (as at_skillmod) but for a while, we're leaving
-         * them in here. */
-
-        if (dm != 0) {
-            /* Auswirkung Schaffenstrunk */
-            if (dm > u->number) dm = u->number;
-            change_effect(u, oldpotiontype[P_DOMORE], -dm);
-            skills += dm * effsk;
-        }
     }
     for (; want > 0 && skills > 0;) {
         int err, n;
 
         /*  Hier ist entweder maxsize == -1, oder completed < maxsize.
          *  Andernfalls ist das Datenfile oder sonstwas kaputt...
-         *  (enno): Nein, das ist f�r Dinge, bei denen die n�chste Ausbaustufe
-         *  die gleiche wie die vorherige ist. z.b. gegenst�nde.
+         *  (enno): Nein, das ist fuer Dinge, bei denen die naechste Ausbaustufe
+         *  die gleiche wie die vorherige ist. z.b. Gegenstaende.
          */
-        if (con->maxsize > 0) {
-            completed = completed % con->maxsize;
+        if (maxsize > 0) {
+            completed = completed % (maxsize);
         }
         else {
             completed = 0;
@@ -576,7 +553,7 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         }
         /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
          * Talente */
-        if (skill_limit(u->faction, con->skill) == INT_MAX) {
+        if (faction_skill_limit(u->faction, con->skill) == INT_MAX) {
             const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
             item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
             int i = itm ? itm->number : 0;
@@ -588,8 +565,8 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
 
         if (want < n) n = want;
 
-        if (con->maxsize > 0) {
-            int req = con->maxsize - completed;
+        if (maxsize > 0) {
+            int req = maxsize - completed;
             if (req < n) n = req;
             want = n;
         }
@@ -610,9 +587,28 @@ int build(unit * u, const construction * ctype, int completed, int want, int ski
         want -= n;
         completed = completed + n;
     }
-    /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    produceexp(u, ctype->skill, (made < u->number) ? made : u->number);
+    *skill_total = skills;
+    return made;
+}
 
+int build(unit * u, int number, const construction * con, int completed, int want, int skill_mod)
+{
+    int skills = INT_MAX;         /* number of skill points remainig */
+    int made, basesk = 0;
+
+    assert(number >= 1);
+    assert(con->skill != NOSKILL);
+    basesk = effskill(u, con->skill, NULL);
+    if (basesk == 0) {
+        return ENEEDSKILL;
+    }
+
+    skills = build_skill(u, basesk, skill_mod);
+    made = build_limited(u, con, completed, number, want, basesk, &skills);
+    /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
+    if (made > 0) {
+        produceexp(u, con->skill, (made < u->number) ? made : u->number);
+    }
     return made;
 }
 
@@ -628,6 +624,7 @@ message *msg_materials_required(unit * u, order * ord,
         multi = 1;
     for (c = 0; ctype && ctype->materials[c].number; ++c) {
         resource *res = malloc(sizeof(resource));
+        if (!res) abort();
         res->number = multi * ctype->materials[c].number / ctype->reqsize;
         res->type = ctype->materials[c].rtype;
         res->next = reslist;
@@ -681,7 +678,7 @@ static int build_failure(unit *u, order *ord, const building_type *btype, int wa
     return err;
 }
 
-static int build_stages(unit *u, const building_type *btype, int built, int n) {
+static int build_stages(unit *u, const building_type *btype, int built, int n, int basesk, int *skill_total) {
     
     const building_stage *stage;
     int made = 0;
@@ -701,7 +698,7 @@ static int build_stages(unit *u, const building_type *btype, int built, int n) {
                     want = todo;
                 }
             }
-            err = build(u, con, built, want, 0);
+            err = build_limited(u, con, 1, built, want, basesk, skill_total);
             if (err < 0) {
                 if (made == 0) {
                     /* could not make any part at all */
@@ -714,8 +711,9 @@ static int build_stages(unit *u, const building_type *btype, int built, int n) {
             }
             else {
                 /* err is the amount we built of this stage */
+                built += err;
                 made += err;
-                if (err != con->maxsize && con->maxsize > 0) {
+                if (con->maxsize > 0 && built < con->maxsize) {
                     /* we did not finish the stage, can quit here */
                     break;
                 }
@@ -739,10 +737,14 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     const char *btname;
     order *new_order = NULL;
     const struct locale *lang = u->faction->locale;
+    int skills, basesk;         /* number of skill points remainig */
 
     assert(u->number);
     assert(btype->stages && btype->stages->construction);
-    if (effskill(u, SK_BUILDING, 0) == 0) {
+
+    basesk = effskill(u, SK_BUILDING, NULL);
+    skills = build_skill(u, basesk, 0);
+    if (skills == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
         return 0;
     }
@@ -780,11 +782,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         cmistake(u, ord, 93, MSG_PRODUCE);
         return 0;
     }
-    if (besieged(u)) {
-        /* units under siege can not build */
-        cmistake(u, ord, 60, MSG_PRODUCE);
-        return 0;
-    }
     if (btype->flags & BTF_NOBUILD) {
         /* special building, cannot be built */
         cmistake(u, ord, 221, MSG_PRODUCE);
@@ -813,26 +810,14 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
         built = b->size;
     }
-    if (n <= 0 || n == INT_MAX) {
-        if (b == NULL) {
-            if (btype->maxsize > 0) {
-                n = btype->maxsize - built;
-            }
-            else {
-                n = INT_MAX;
-            }
-        }
-        else {
-            if (b->type->maxsize > 0) {
-                n = b->type->maxsize - built;
-            }
-            else {
-                n = INT_MAX;
-            }
+
+    if (btype->maxsize > 0) {
+        int remain = btype->maxsize - built;
+        if (remain < n) {
+            n = remain;
         }
     }
-
-    built = build_stages(u, btype, built, n);
+    built = build_stages(u, btype, built, n, basesk, &skills);
 
     if (built < 0) {
         return build_failure(u, ord, btype, want, built);
@@ -856,11 +841,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     btname = LOC(lang, btype->_name);
 
     if (want <= built) {
-        /* geb�ude fertig */
+        /* gebaeude fertig */
         new_order = default_order(lang);
     }
     else if (want != INT_MAX && btname) {
-        /* reduzierte restgr��e */
+        /* reduzierte restgroesse */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order =
@@ -872,7 +857,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         }
     }
     else if (btname) {
-        /* Neues Haus, Befehl mit Geb�udename */
+        /* Neues Haus, Befehl mit Gebaeudename */
         const char *hasspace = strchr(btname, ' ');
         if (hasspace) {
             new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
@@ -907,9 +892,9 @@ static void build_ship(unit * u, ship * sh, int want)
     const construction *construction = sh->type->construction;
     int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
     int n;
-    int can = build(u, construction, size, want, 0);
+    int can = build(u, sh->number, construction, size, want, 0);
 
-    if ((n = construction->maxsize - sh->size) > 0 && can > 0) {
+    if ((n = ship_maxsize(sh) - sh->size) > 0 && can > 0) {
         if (can >= n) {
             sh->size += n;
             can -= n;
@@ -935,8 +920,7 @@ static void build_ship(unit * u, ship * sh, int want)
             msg_message("buildship", "ship unit size", sh, u, n));
 }
 
-void
-create_ship(unit * u, const struct ship_type *newtype, int want,
+void create_ship(unit * u, const struct ship_type *newtype, int want,
     order * ord)
 {
     ship *sh;
@@ -945,17 +929,13 @@ create_ship(unit * u, const struct ship_type *newtype, int want,
     order *new_order;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, ord, 100, MSG_PRODUCE);
-        return;
-    }
-    if (besieged(u)) {
-        cmistake(u, ord, 60, MSG_PRODUCE);
         return;
     }
 
     /* check if skill and material for 1 size is available */
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;
@@ -993,7 +973,7 @@ void continue_ship(unit * u, int want)
     int msize;
     region * r = u->region;
 
-    if (!effskill(u, SK_SHIPBUILDING, 0)) {
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
         cmistake(u, u->thisorder, 100, MSG_PRODUCE);
         return;
     }
@@ -1008,12 +988,13 @@ void continue_ship(unit * u, int want)
         cmistake(u, u->thisorder, 20, MSG_PRODUCE);
         return;
     }
-    cons = sh->type->construction;
-    if (sh->size == cons->maxsize && !sh->damage) {
+    msize = ship_maxsize(sh);
+    if (sh->size >= msize && !sh->damage) {
         cmistake(u, u->thisorder, 16, MSG_PRODUCE);
         return;
     }
-    if (effskill(u, cons->skill, 0) < cons->minskill) {
+    cons = sh->type->construction;
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
             "error_build_skill_low", "value", cons->minskill));
         return;

@@ -1,15 +1,3 @@
-/*
- +-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
- |                   |  Enno Rehling <enno@eressea.de>
- | Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
- | (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
- |                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
- +-------------------+  Stefan Reich <reich@halbling.de>
-
- This program may not be used, modified or distributed
- without prior permission by the authors of Eressea.
- */
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "xmas.h"
@@ -25,10 +13,10 @@
 #include <move.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
 
@@ -50,7 +38,7 @@ static void xmasgate_write(const trigger * t, struct storage *store)
 
 static int xmasgate_read(trigger * t, struct gamedata *data)
 {
-    if (read_building_reference(data, (building **)&t->data.v, NULL) <= 0) {
+    if (read_building_reference(data, (building **)&t->data.v) <= 0) {
         return AT_READ_FAIL;
     }
     return AT_READ_OK;
@@ -64,13 +52,6 @@ struct trigger_type tt_xmasgate = {
     xmasgate_write,
     xmasgate_read
 };
-
-trigger *trigger_xmasgate(building * b)
-{
-    trigger *t = t_new(&tt_xmasgate);
-    t->data.v = b;
-    return t;
-}
 
 void register_xmas(void)
 {

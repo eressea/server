@@ -13,8 +13,8 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/attrib.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/rand.h>
@@ -79,7 +79,8 @@ const curse_type ct_firewall = {
 
 static void wall_init(connection * b)
 {
-    wall_data *fd = (wall_data *)calloc(sizeof(wall_data), 1);
+    wall_data *fd = (wall_data *)calloc(1, sizeof(wall_data));
+    if (!fd) abort();
     fd->countdown = -1;           /* infinite */
     b->data.v = fd;
 }

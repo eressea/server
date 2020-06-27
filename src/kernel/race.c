@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "race.h"
@@ -37,7 +19,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include "unit.h"
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/functions.h>
 #include <util/umlaut.h>
 #include <util/language.h>
@@ -66,23 +48,21 @@ int num_races = 0;
 static int rc_changes = 1;
 
 const char *racenames[MAXRACES] = {
-    "dwarf", "elf", NULL, "goblin", "human", "troll", "demon", "insect",
-    "halfling", "cat", "aquarian", "orc", "snotling", "undead", NULL,
+    "dwarf", "elf", "goblin", "human", "troll", "demon", "insect",
+    "halfling", "cat", "aquarian", "orc", "snotling", "undead",
     "youngdragon", "dragon", "wyrm", "ent", "catdragon", "dracoid",
-    NULL, NULL, "irongolem", "stonegolem", "shadowdemon",
+    "irongolem", "stonegolem", "shadowdemon",
     "shadowmaster", "mountainguard", "alp", "toad", "braineater", "peasant",
-    "wolf", NULL, NULL, NULL, NULL, "songdragon", NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, "seaserpent",
-    "shadowknight", NULL, "skeleton", "skeletonlord", "zombie",
-    "juju", "ghoul", "ghast", NULL, NULL, "template",
+    "wolf", "songdragon", "seaserpent",
+    "shadowknight", "skeleton", "skeletonlord", "zombie",
+    "juju", "ghoul", "ghast", "template",
     "clone"
 };
 
-#define MAXOPTIONS 4
+#define MAX_OPTIONS 4
 typedef struct rcoption {
-    unsigned char key[MAXOPTIONS];
-    variant value[MAXOPTIONS];
+    unsigned char key[MAX_OPTIONS];
+    variant value[MAX_OPTIONS];
 } rcoption;
 
 enum {
@@ -101,12 +81,13 @@ static void rc_setoption(race *rc, int k, const char *value) {
     variant *v = NULL;
     if (!rc->options) {
         rc->options = malloc(sizeof(rcoption));
+        if (!rc->options) abort();
         rc->options->key[0] = key;
         rc->options->key[1] = RCO_NONE;
         v = rc->options->value;
     } else {
         int i;
-        for (i=0;!v && i < MAXOPTIONS;++i) {
+        for (i=0;!v && i < MAX_OPTIONS;++i) {
             if (rc->options->key[i]==key) {
                 v = rc->options->value+i;
                 break;
@@ -114,7 +95,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
             if (rc->options->key[i]==RCO_NONE) {
                 v = rc->options->value+i;
                 rc->options->key[i] = key;
-                if (i+1 < MAXOPTIONS) {
+                if (i+1 < MAX_OPTIONS) {
                     rc->options->key[i+1]=RCO_NONE;
                 }
                 break;
@@ -145,7 +126,7 @@ static void rc_setoption(race *rc, int k, const char *value) {
 static variant *rc_getoption(const race *rc, int key) {
     if (rc->options) {
         int i;
-        for (i=0;i!=MAXOPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
+        for (i=0;i!=MAX_OPTIONS && rc->options->key[i]!=RCO_NONE;++i) {
             if (rc->options->key[i]==key) {
                 return rc->options->value+i;
             }
@@ -202,6 +183,7 @@ race_t old_race(const struct race * rc)
         int i;
         if (!xrefs) {
             xrefs = malloc(sizeof(rc_xref) * MAXRACES);
+            if (!xrefs) abort();
         }
         for (i = 0; i != MAXRACES; ++i) {
             xrefs[i].rc = get_race(i);
@@ -240,19 +222,11 @@ race_list *get_familiarraces(void)
     return familiarraces;
 }
 
-void racelist_clear(struct race_list **rl)
-{
-    while (*rl) {
-        race_list *rl2 = (*rl)->next;
-        free(*rl);
-        *rl = rl2;
-    }
-}
-
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
     race_list *rl2 = (race_list *)malloc(sizeof(race_list));
 
+    if (!rl2) abort();
     rl2->data = r;
     rl2->next = *rl;
 
@@ -269,7 +243,7 @@ void free_races(void) {
         rcoption * opt = races->options;
         
         if (opt) {
-            for (i=0;i!=MAXOPTIONS && opt->key[i]!=RCO_NONE;++i) {
+            for (i=0;i!=MAX_OPTIONS && opt->key[i]!=RCO_NONE;++i) {
                 if (opt->key[i]==RCO_HUNGER) {
                     free(opt->value[i].v);
                 }
@@ -318,7 +292,7 @@ static race *rc_find_i(const char *name)
     return rc;
 }
 
-const race * rc_find(const char *name) {
+race * rc_find(const char *name) {
     return rc_find_i(name);
 }
 
@@ -349,7 +323,8 @@ race *rc_create(const char *zName)
     char zText[64];
 
     assert(zName);
-    rc = (race *)calloc(sizeof(race), 1);
+    rc = (race *)calloc(1, sizeof(race));
+    if (!rc) abort();
 
     rc->mask_item = 1 << race_mask;
     ++race_mask;
@@ -455,8 +430,10 @@ int rc_herb_trade(const struct race *rc)
 }
 
 void set_study_speed(race *rc, skill_t sk, int modifier) {
-    if (!rc->study_speed)
+    if (!rc->study_speed) {
         rc->study_speed = calloc(1, MAXSKILLS);
+        if (!rc->study_speed) abort();
+    }
     rc->study_speed[sk] = (char)modifier;
 }
 
@@ -531,14 +508,9 @@ const char *rc_name_s(const race * rc, name_t n)
 
 const char *raceprefix(const unit * u)
 {
-    attrib *asource = u->faction->attribs;
-
-    if (fval(u, UFL_GROUP)) {
-        attrib *agroup = a_find(u->attribs, &at_group);
-        if (agroup != NULL)
-            asource = ((const group *)(agroup->data.v))->attribs;
-    }
-    return get_prefix(asource);
+    group *g = get_group(u);
+    attrib *attr = g ? g->attribs : u->faction->attribs;
+    return get_prefix(attr);
 }
 
 const char *racename(const struct locale *loc, const unit * u, const race * rc)
@@ -551,7 +523,7 @@ const char *racename(const struct locale *loc, const unit * u, const race * rc)
         char ch[2];
 
         sbs_init(&sbs, lbuf, sizeof(lbuf));
-        sbs_strcpy(&sbs, LOC(loc, mkname("prefix", prefix)));
+        sbs_strcat(&sbs, LOC(loc, mkname("prefix", prefix)));
 
         str = LOC(loc, rc_name_s(rc, u->number != 1));
         assert(~str[0] & 0x80 || !"unicode/not implemented");

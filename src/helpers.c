@@ -1,15 +1,3 @@
-/*
-+-------------------+
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Christian Schlittchen <corwin@amber.kn-bremen.de>
-| (c) 1998 - 2008   |  Katja Zedel <katze@felidae.kn-bremen.de>
-|                   |  Henning Peters <faroul@beyond.kn-bremen.de>
-+-------------------+
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -17,26 +5,21 @@ without prior permission by the authors of Eressea.
 #include "helpers.h"
 #include "vortex.h"
 #include "alchemy.h"
+#include "magic.h"
 
-#include <util/attrib.h>
-#include <util/base36.h>
-#include <util/event.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <util/functions.h>
-#include <util/gamedata.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/parser.h>
-#include <util/resolve.h>
+#include <util/variant.h>
 
-#include <kernel/callbacks.h>
 #include <kernel/config.h>
 #include <kernel/callbacks.h>
-#include <kernel/faction.h>
 #include <kernel/spell.h>
-#include <kernel/race.h>
-#include <kernel/resources.h>
 #include <kernel/unit.h>
-#include <kernel/building.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 
@@ -46,8 +29,10 @@ without prior permission by the authors of Eressea.
 #include <lua.h>
 
 #include <assert.h>
-#include <string.h>
-#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+struct order;
 
 static int
 lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)
@@ -181,7 +166,7 @@ static bool lua_equipunit(unit *u, const char *eqname, int mask) {
             lua_pop(L, 1);
         }
         else {
-            result = (bool)lua_toboolean(L, -1);
+            result = lua_toboolean(L, -1) != 0;
             lua_pop(L, 1);
         }
     }

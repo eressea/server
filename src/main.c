@@ -1,37 +1,16 @@
-/*
-Copyright (c) 1998-2017, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
 
 #include <kernel/calendar.h>
 #include <kernel/config.h>
-#include <kernel/database.h>
 #include <kernel/messages.h>
-#include <kernel/save.h>
 #include <kernel/version.h>
 
-#include <util/filereader.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <util/macros.h>
 #include <util/path.h>
+#include <util/password.h>
 
 #include "eressea.h"
 #ifdef USE_CURSES
@@ -39,20 +18,24 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #endif
 
 #include "bindings.h"
-#include "races/races.h"
-#include "spells.h"
+
+#include <iniparser.h>
+#include <dictionary.h>
 
 #include <lua.h>
-#include <assert.h>
+
+#include <limits.h>
 #include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <wctype.h>
-#include <iniparser.h>
 
 static const char *logfile = "eressea.log";
 static const char *luafile = 0;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
-static int verbosity = 1;
+static int verbosity = 2;
 
 static void load_inifile(void)
 {
@@ -96,6 +79,7 @@ static const char * valid_keys[] = {
     "game.era",
     "game.sender",
     "game.dbname",
+    "game.dbswap",
     "game.dbbatch",
     "editor.color",
     "editor.codepage",
@@ -106,11 +90,11 @@ static const char * valid_keys[] = {
 
 static dictionary *parse_config(const char *filename)
 {
-    char path[PATH_MAX];
     dictionary *d;
     const char *str, *cfgpath = config_get("config.path");
 
     if (cfgpath) {
+        char path[PATH_MAX];
         path_join(cfgpath, filename, path, sizeof(path));
         log_debug("reading from configuration file %s\n", path);
         d = iniparser_load(path);
@@ -181,7 +165,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr, log_flags = 2;
+    int log_stderr, log_flags = 3;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -191,7 +175,7 @@ static int parse_args(int argc, char **argv)
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
                 printf("Eressea version %s, "
-                    "Copyright (C) 2017 Enno Rehling et al.\n",
+                    "Copyright (C) 2019 Enno Rehling et al.\n",
                     eressea_version());
                 return 1;
 #ifdef USE_CURSES          
@@ -230,6 +214,10 @@ static int parse_args(int argc, char **argv)
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 turn = atoi(arg);
                 break;
+            case 'w':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                bcrypt_workfactor = arg ? atoi(arg) : 0xff;
+                break;
             case 'q':
                 verbosity = 0;
                 break;
@@ -262,10 +250,10 @@ static int parse_args(int argc, char **argv)
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #include <signal.h>
+static void *btrace[50];
 
 static void report_segfault(int signo, siginfo_t * sinf, void *arg)
 {
-    void *btrace[50];
     size_t size;
     int fd = fileno(stderr);
 
@@ -302,8 +290,6 @@ void locale_init(void)
     }
 }
 
-extern void bind_monsters(struct lua_State *L);
-
 int main(int argc, char **argv)
 {
     int err = 0;
@@ -334,6 +320,8 @@ int main(int argc, char **argv)
     game_done();
     lua_done(L);
     log_close();
+    stats_write(stdout, "");
+    stats_close();
     if (d) {
         iniparser_freedict(d);
     }

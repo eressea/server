@@ -1,12 +1,14 @@
-require "lunit"
+local tcname = 'tests.shared.orders'
+local lunit = require("lunit")
+if _VERSION >= 'Lua 5.2' then
+  _ENV = module(tcname , 'seeall')
+else
+  module(tcname, lunit.testcase, package.seeall)
+end
 
 local _G = _G
-local eressea = eressea
 local default_ship = config.ships[1]
 local default_building = config.buildings[1]
-
-module('tests.eressea.orders', package.seeall, lunit.testcase)
-
 local r, f, u
 
 function setup()
@@ -70,15 +72,15 @@ end
 function test_give_temp()
     u.number = 2
     u:add_order("GIB TEMP 123 1 PERSON")
-    u:add_order("MACHE TEMP 123 'Herpderp'")
+    u:add_order("MACHE TEMP 123 'Lorax'")
     u:add_order("ENDE")
     _G.process_orders()
     assert_equal(1, u.number)
 
     for x in f.units do
-        if x.name == 'Herpderp' then u=x end
+        if x.name == 'Lorax' then u=x end
     end
-    assert_equal('Herpderp', u.name)
+    assert_equal('Lorax', u.name)
     assert_equal(1, u.number)
 end
 

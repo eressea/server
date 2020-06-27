@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_BATTLE
 #define H_KRNL_BATTLE
 
@@ -99,9 +81,9 @@ extern "C" {
         int nsides;
         struct selist *meffects;
         int max_tactics;
-        int turn;
+        unsigned char turn;
+        signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
         bool has_tactics_turn;
-        int keeploot;
         bool reelarrow;
         int alive;
         struct {
@@ -121,7 +103,6 @@ extern "C" {
     } battle;
 
     typedef struct weapon {
-        int count, used;
         const struct weapon_type *type;
         int attackskill;
         int defenseskill;
@@ -172,13 +153,13 @@ extern "C" {
         int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
         struct person {
             int hp;                   /* Trefferpunkte der Personen */
-            int attack;
-            int defence;
-            int damage;
             int flags;
-            int speed;
-            int reload;
-            int last_action;
+            int attack;  /* weapon skill bonus for attacker */
+            int defense; /* weapon skill bonus for defender */
+            char damage;  /* bonus damage for melee attacks (e.g. troll belt) */
+            unsigned char speed;
+            unsigned char reload;
+            unsigned char last_action;
             struct weapon *missile;   /* missile weapon */
             struct weapon *melee;     /* melee weapon */
         } *person;
@@ -213,7 +194,6 @@ extern "C" {
     /* BEGIN battle interface */
     side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);
     side * get_side(battle * b, const struct unit * u);
-    fighter * get_fighter(battle * b, const struct unit * u);
     /* END battle interface */
 
     void do_battles(void);

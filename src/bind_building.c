@@ -5,7 +5,6 @@
 #include "bind_building.h"
 #include "bind_unit.h"
 
-#include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/building.h>
 #include <kernel/region.h>
@@ -15,9 +14,12 @@
 #include <util/macros.h>
 #include <util/strings.h>
 
+#include <lua.h>
+#include <lauxlib.h>
 #include <tolua.h>
+
+#include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 
 int tolua_buildinglist_next(lua_State * L)
 {

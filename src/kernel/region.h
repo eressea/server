@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
 
@@ -97,12 +79,12 @@ extern "C" {
         char *display;
         demand *demands;
         const struct item_type *herbtype;
-        int herbs;
-        int morale;
+        unsigned short horses;
+        unsigned short herbs;
+        unsigned short peasants;
+        unsigned short morale;
+        short newpeasants;
         int trees[3];               /* 0 -> seeds, 1 -> shoots, 2 -> trees */
-        int horses;
-        int peasants;
-        int newpeasants;
         int money;
         struct region_owner *ownership;
     } land_region;
@@ -225,11 +207,13 @@ extern "C" {
     const char *write_regionname(const struct region *r, const struct faction *f,
         char *buffer, size_t size);
 
+    struct region *region_create(int uid);
+    void add_region(region *r, int x, int y);
     struct region *new_region(int x, int y, struct plane *pl, int uid);
     void remove_region(region ** rlist, region * r);
     void terraform_region(struct region *r, const struct terrain_type *terrain);
     void init_region(struct region *r);
-    bool pnormalize(int *x, int *y, const struct plane *pl);
+    void pnormalize(int *x, int *y, const struct plane *pl);
 
     extern const int delta_x[MAXDIRECTIONS];
     extern const int delta_y[MAXDIRECTIONS];
@@ -252,7 +236,7 @@ extern "C" {
 #define RESOLVE_REGION (TYP_REGION << 24)
     void resolve_region(region *r);
     void write_region_reference(const struct region *r, struct storage *store);
-    int read_region_reference(struct gamedata *data, region **rp, resolve_fun fun);
+    int read_region_reference(struct gamedata *data, region **rp);
 
     const char *regionname(const struct region *r, const struct faction *f);
 
@@ -261,6 +245,8 @@ extern "C" {
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
     void region_setinfo(struct region *self, const char *name);
+    int region_getresource_level(const struct region * r,
+        const struct resource_type * rtype);
     int region_getresource(const struct region *r,
         const struct resource_type *rtype);
     void region_setresource(struct region *r, const struct resource_type *rtype,

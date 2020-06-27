@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include <kernel/config.h>
 #include "attributes.h"
@@ -53,9 +35,9 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/building.h>
 
 /* util includes */
-#include <util/attrib.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/attrib.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/macros.h>
 #include <util/resolve.h>
 
@@ -98,7 +80,7 @@ static int obs_read(variant *var, void *owner, struct gamedata *data)
     obs_data *od = (obs_data *)var->v;
 
     UNUSED_ARG(owner);
-    read_faction_reference(data, &od->f, NULL);
+    read_faction_reference(data, &od->f);
     READ_INT(data->store, &od->skill);
     READ_INT(data->store, &od->timer);
     return AT_READ_OK;
@@ -169,7 +151,7 @@ static int read_ext(variant *var, void *owner, gamedata *data)
 
 void register_attributes(void)
 {
-    /* Alle speicherbaren Attribute müssen hier registriert werden */
+    /* Alle speicherbaren Attribute muessen hier registriert werden */
     at_register(&at_shiptrail);
     at_register(&at_familiar);
     at_register(&at_familiarmage);
@@ -182,13 +164,13 @@ void register_attributes(void)
     at_register(&at_seenspell);
     at_register(&at_seenspells);
 
-    /* neue REGION-Attribute */
+    /* REGION Attribute */
     at_register(&at_moveblock);
     at_register(&at_deathcount);
     at_register(&at_woodcount);
+    at_register(&at_germs);
 
-    /* neue UNIT-Attribute */
-    at_register(&at_siege);
+    /* UNIT Attribute */
     at_register(&at_effect);
     at_register(&at_private);
 
@@ -196,7 +178,6 @@ void register_attributes(void)
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
-    at_register(&at_npcfaction);
 
     /* connection-typen */
     register_bordertype(&bt_noway);
@@ -205,8 +186,8 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
-    at_register(&at_germs);
-
+    at_deprecate("npcfaction", a_readint);
+    at_deprecate("siege", a_readint);
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
     at_deprecate("hurting", a_readint); /* an old arena attribute */
     at_deprecate("chaoscount", a_readint); /* used to increase the chance of monster spawns */

@@ -1,22 +1,3 @@
-#pragma once
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_REPORTS
 #define H_KRNL_REPORTS
 
@@ -31,6 +12,7 @@ extern "C" {
 
     struct battle;
     struct gamedate;
+    struct sbstring;
     struct selist;
     struct stream;
     struct seen_region;
@@ -76,9 +58,10 @@ extern "C" {
         struct region *first, *last;
         void *userdata;
         time_t report_time;
+        const char *password;
     } report_context;
 
-    void prepare_report(report_context *ctx, struct faction *f);
+    void prepare_report(report_context *ctx, struct faction *f, const char *password);
     void finish_reports(report_context *ctx);
     void get_addresses(report_context * ctx);
 
@@ -87,12 +70,15 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit(const struct faction *f, const struct unit *u, seen_mode mode,
+    int bufunit_depr(const struct faction *f, const struct unit *u, seen_mode mode,
         char *buf, size_t size);
+    void bufunit(const struct faction * f, const struct unit * u,
+        const struct faction *fv, seen_mode mode, int getarnt, 
+        struct sbstring *sbp);
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);
-    size_t report_status(const struct unit *u,
+    size_t report_status_depr(const struct unit *u,
         const struct locale *lang, char *buf, size_t siz);
     void report_battle_start(struct battle * b);
 
@@ -116,8 +102,8 @@ extern "C" {
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, int now);
-    void report_raceinfo(const struct race *rc, const struct locale *lang, char *buf, size_t length);
-    void report_race_skills(const struct race *rc, char *zText, size_t length, const struct locale *lang);
+    void report_raceinfo(const struct race *rc, const struct locale *lang, struct sbstring *sbp);
+    void report_race_skills_depr(const struct race *rc, char *zText, size_t length, const struct locale *lang);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);

@@ -11,15 +11,15 @@ static void test_plane(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    CuAssertPtrEquals(tc, 0, findplane(0, 0));
-    CuAssertPtrEquals(tc, 0, getplane(r));
+    CuAssertPtrEquals(tc, NULL, findplane(0, 0));
+    CuAssertPtrEquals(tc, NULL, getplane(r));
     CuAssertIntEquals(tc, 0, getplaneid(r));
-    CuAssertPtrEquals(tc, 0, getplanebyid(0));
+    CuAssertPtrEquals(tc, NULL, getplanebyid(0));
     CuAssertIntEquals(tc, 0, plane_center_x(0));
     CuAssertIntEquals(tc, 0, plane_center_y(0));
     CuAssertIntEquals(tc, 0, plane_width(0));
     CuAssertIntEquals(tc, 0, plane_height(0));
-    CuAssertPtrEquals(tc, 0, get_homeplane());
+    CuAssertPtrEquals(tc, NULL, get_homeplane());
 
     pl = create_new_plane(1, "Hell", 4, 8, 40, 80, 15);
     r = test_create_region(4, 40, 0);
@@ -28,7 +28,7 @@ static void test_plane(CuTest *tc) {
     CuAssertIntEquals(tc, 8, pl->maxx);
     CuAssertIntEquals(tc, 40, pl->miny);
     CuAssertIntEquals(tc, 80, pl->maxy);
-    CuAssertPtrEquals(tc, 0, pl->attribs);
+    CuAssertPtrEquals(tc, NULL, pl->attribs);
     CuAssertStrEquals(tc, "Hell", pl->name);
     CuAssertPtrEquals(tc, pl, findplane(4, 40));
     CuAssertPtrEquals(tc, pl, getplane(r));

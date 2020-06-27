@@ -15,11 +15,11 @@
 #include "kernel/order.h"
 #include "kernel/terrain.h"
 
+#include "util/keyword.h"
 #include "util/language.h"
 
 #include "kernel/calendar.h"
 #include "direction.h"
-#include "keyword.h"
 #include "move.h"
 #include "prefix.h"
 
@@ -120,7 +120,7 @@ static void test_disable(CuTest * tc)
     const char * data = "{\"disabled\": [ "
         "\"alchemy\","
         "\"pay\","
-        "\"besiege\","
+        "\"attack\","
         "\"module\""
         "]}";
     cJSON *json = cJSON_Parse(data);
@@ -129,13 +129,13 @@ static void test_disable(CuTest * tc)
     CuAssertTrue(tc, skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, !keyword_disabled(K_PAY));
-    CuAssertTrue(tc, !keyword_disabled(K_BESIEGE));
+    CuAssertTrue(tc, !keyword_disabled(K_ATTACK));
     CuAssertIntEquals(tc, 1, config_get_int("module.enabled", 1));
     json_config(json);
     CuAssertTrue(tc, !skill_enabled(SK_ALCHEMY));
     CuAssertTrue(tc, !keyword_disabled(K_BANNER));
     CuAssertTrue(tc, keyword_disabled(K_PAY));
-    CuAssertTrue(tc, keyword_disabled(K_BESIEGE));
+    CuAssertTrue(tc, keyword_disabled(K_ATTACK));
     CuAssertIntEquals(tc, 0, config_get_int("module.enabled", 1));
     cJSON_Delete(json);
     test_teardown();
@@ -160,8 +160,8 @@ static void test_calendar(CuTest * tc)
     CuAssertIntEquals(tc, 99, storms[0]);
     CuAssertIntEquals(tc, 22, storms[1]);
     CuAssertPtrNotNull(tc, month_season);
-    CuAssertIntEquals(tc, 1, month_season[0]);
-    CuAssertIntEquals(tc, 2, month_season[1]);
+    CuAssertIntEquals(tc, SEASON_SPRING, month_season[0]);
+    CuAssertIntEquals(tc, SEASON_SUMMER, month_season[1]);
     cJSON_Delete(json);
     test_teardown();
 }

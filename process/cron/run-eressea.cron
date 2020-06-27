@@ -1,4 +1,6 @@
 #!/bin/bash
+
+eval $(luarocks path)
 GAME=$1
 (
 [ "$ENABLED" != "yes" ] && exit
@@ -19,30 +21,21 @@ mkdir $REPORTS
 
 cd $ERESSEA/game-$GAME
 
-# wait for the queue lock to go away
-maxt=5
-to=5
-while [ -e orders.queue.lock ] ; do
-  echo "waiting for orders to finish processing."
-  sleep $to
-  let to=$to+$to
-  let mast=$maxt-1
-  [ $maxt -lt 0 ] && break
-done
-
 if [ -d test ]; then
   touch test/execute.lock
 fi
+
 $BIN/create-orders $GAME $TURN
+if [ ! -s $ERESSEA/game-$GAME/orders.$TURN ]; then
+  echo "server did not create orders for turn $TURN in game $GAME"
+  exit 2
+fi
+
 $BIN/backup-eressea $GAME $TURN
 rm -f execute.lock
 $BIN/run-turn $GAME $TURN
 touch execute.lock
 
-if [ ! -s $ERESSEA/game-$GAME/orders.$TURN ]; then
-  echo "server did not create orders for turn $TURN in game $GAME"
-  exit 2
-fi
 if [ ! -s $REPORTS/reports.txt ]; then
   echo "server did not create reports.txt in game $GAME"
   exit 4

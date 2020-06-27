@@ -1,14 +1,3 @@
-/*
-+-------------------+  Christian Schlittchen <corwin@amber.kn-bremen.de>
-|                   |  Enno Rehling <enno@eressea.de>
-| Eressea PBEM host |  Katja Zedel <katze@felidae.kn-bremen.de>
-| (c) 1998 - 2003   |  Henning Peters <faroul@beyond.kn-bremen.de>
-|                   |  Ingo Wilken <Ingo.Wilken@informatik.uni-oldenburg.de>
-+-------------------+  Stefan Reich <reich@halbling.de>
-
-This program may not be used, modified or distributed
-without prior permission by the authors of Eressea.
-*/
 #ifndef H_UTIL_LOG
 #define H_UTIL_LOG
 #ifdef __cplusplus
@@ -36,6 +25,12 @@ extern "C" {
     void log_printf(FILE * ios, const char *format, ...);
 
     void errno_check(const char *file, int line);
+
+    int stats_count(const char *stat, int delta);
+    void stats_write(FILE *F, const char *prefix);
+    int stats_walk(const char *prefix, int (*callback)(const char *key, int val, void * udata), void *udata);
+    void stats_close(void);
+
 #define ERRNO_CHECK() errno_check(__FILE__, __LINE__)
 
     

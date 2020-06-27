@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifndef H_KRNL_ITEM
 #define H_KRNL_ITEM
 
@@ -75,7 +57,7 @@ extern "C" {
 
     typedef struct resource_type {
         /* --- constants --- */
-        char *_name;             /* wie es hei�t */
+        char *_name;             /* wie es heisst */
         unsigned int flags;
         /* --- functions --- */
         rtype_uchange uchange;
@@ -119,7 +101,7 @@ extern "C" {
         int mask_allow;
         int mask_deny;
         struct construction *construction;
-        char *_appearance[2];       /* wie es f�r andere aussieht */
+        char *_appearance[2];       /* wie es fuer andere aussieht */
         int score;
     } item_type;
 
@@ -187,7 +169,7 @@ extern "C" {
         int offmod;
         int defmod;
         variant magres;
-        int reload;                 /* time to reload this weapon */
+        unsigned char reload;                 /* time to reload this weapon */
         weapon_mod *modifiers;
         /* --- functions --- */
         bool(*attack) (const struct troop *, const struct weapon_type *,
@@ -226,7 +208,7 @@ extern "C" {
     item_type *it_get_or_create(resource_type *rtype);
     luxury_type *new_luxurytype(item_type * itype, int price);
     weapon_type *new_weapontype(item_type * itype, int wflags,
-        variant magres, const char *damage[], int offmod, int defmod, int reload,
+        variant magres, const char *damage[], int offmod, int defmod, unsigned char reload,
         skill_t sk);
     void free_wtype(struct weapon_type *wtype);
     armor_type *new_armortype(item_type * itype, double penalty,

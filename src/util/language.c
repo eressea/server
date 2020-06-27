@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #ifdef _MSC_VER
 #include <platform.h>
 #endif
@@ -83,7 +65,7 @@ locale *get_or_create_locale(const char *name)
             return *lp;
         }
     }
-    *lp = l = (locale *)calloc(sizeof(locale), 1);
+    *lp = l = (locale *)calloc(1, sizeof(locale));
     assert_alloc(l);
     l->hashkey = hkey;
     l->name = str_strdup(name);
@@ -147,6 +129,19 @@ const char *locale_getstring(const locale * lang, const char *key)
     return NULL;
 }
 
+const char *locale_plural(const struct locale *lang, const char *key, int n, bool warn) {
+    assert(lang);
+    assert(key);
+
+    if (n != 1) {
+        char plural[32];
+        snprintf(plural, 32, "%s_p", key);
+        plural[31] = '\0';
+        return locale_string(lang, plural, warn);
+    }
+    return locale_string(lang, key, warn);
+}
+
 const char *locale_string(const locale * lang, const char *key, bool warn)
 {
     assert(lang);
@@ -206,6 +201,7 @@ void locale_setstring(locale * lang, const char *key, const char *value)
     }
     if (!find) {
         find = calloc(1, sizeof(struct locale_str));
+        if (!find) abort();
         find->nexthash = lang->strings[id];
         lang->strings[id] = find;
         find->hashkey = hkey;
@@ -353,29 +349,20 @@ void *get_translation(const struct locale *lang, const char *str, int index) {
     return NULL;
 }
 
-void locale_foreach(void(*callback)(const struct locale *, const char *)) {
-    const locale * lang;
-    for (lang = locales; lang; lang = lang->next) {
-        callback(lang, lang->name);
-    }
-}
-
 const char *localenames[] = {
     "de", "en",
     NULL
 };
 
-extern void init_locale(struct locale *lang);
-
 static int locale_init = 0;
 
-void init_locales(void)
+void init_locales(locale_handler init)
 {
     locale * lang;
     if (locale_init) return;
     assert(locales);
-    for (lang = locales; lang; lang = lang->next) {
-        init_locale(lang);
+    for (lang = locales; lang; lang = nextlocale(lang)) {
+        init(lang);
     }
     locale_init = 1;
 }

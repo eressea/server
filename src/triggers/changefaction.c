@@ -1,21 +1,3 @@
-/*
-Copyright (c) 1998-2015, Enno Rehling <enno@eressea.de>
-Katja Zedel <katze@felidae.kn-bremen.de
-Christian Schlittchen <corwin@amber.kn-bremen.de>
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-**/
-
 #include <platform.h>
 #include "changefaction.h"
 
@@ -24,10 +6,10 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <kernel/faction.h>
 
 /* util includes */
-#include <util/attrib.h>
+#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <util/event.h>
-#include <util/gamedata.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/resolve.h>
@@ -51,7 +33,7 @@ typedef struct changefaction_data {
 
 static void changefaction_init(trigger * t)
 {
-    t->data.v = calloc(sizeof(changefaction_data), 1);
+    t->data.v = calloc(1, sizeof(changefaction_data));
 }
 
 static void changefaction_free(trigger * t)
@@ -66,7 +48,9 @@ static int changefaction_handle(trigger * t, void *data)
      */
     changefaction_data *td = (changefaction_data *)t->data.v;
     if (td->unit && td->faction) {
-        u_setfaction(td->unit, td->faction);
+        unit * u = td->unit;
+        u_setfaction(u, td->faction);
+        u_freeorders(u);
     }
     else {
         log_error("could not perform changefaction::handle()\n");
@@ -87,7 +71,7 @@ static int changefaction_read(trigger * t, gamedata *data)
     changefaction_data *td = (changefaction_data *)t->data.v;
 
     read_unit_reference(data, &td->unit, NULL);
-    return read_faction_reference(data, &td->faction, NULL) > 0 ? AT_READ_OK : AT_READ_FAIL;
+    return read_faction_reference(data, &td->faction) > 0 ? AT_READ_OK : AT_READ_FAIL;
 }
 
 trigger_type tt_changefaction = {
