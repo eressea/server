@@ -1155,7 +1155,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     if (r->seen.mode >= seen_unit) {
         report_region_schemes(out, r, f);
     }
-    if (r->seen.mode >= seen_lighthouse) {
+    if (r->seen.mode >= seen_lighthouse_land) {
         report_region_edges(out, r, f, edges, ne);
     }
 }
