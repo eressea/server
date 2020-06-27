@@ -10,19 +10,20 @@ fi
 
 cd "$ERESSEA/game-$GAME" || exit
 
+lockfile -r3 -l120 orders.queue.lock
 if [ -d "orders.dir.$TURN" ]; then
   echo "orders.dir.$TURN already exists"
-else
-  mv orders.dir "orders.dir.$TURN"
-  mkdir -p orders.dir
+  exit
 fi
-
 rm -f "orders.$TURN"
-php ../../orders-php/cli.php -d "orders.dir.$TURN/orders.db" export | tr -d '\r' > "../orders.$TURN"
-lockfile -r3 -l120 orders.queue.lock
-if [ -e orders.queue ] ; then
-  mv orders.queue "orders.queue.bak.$TURN"
-fi
-rm -f orders.queue.lock
 
+cd orders.dir || exit
+
+php ../../orders-php/cli.php -d "orders.db" export | tr -d '\r' > "../orders.$TURN"
+
+cd .. || exit
+mv orders.dir "orders.dir.$TURN"
+mkdir -p orders.dir
+
+rm -f orders.queue.lock
 
