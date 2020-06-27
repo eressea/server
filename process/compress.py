@@ -15,7 +15,7 @@ template="""#!/bin/bash
 
 addr=%(email)s
 [ $# -ge 1 ] && addr=$1
-[ -z $addr ] || send-%(compression)s-report $addr '%(gamename)s Report #%(turn)s' %(files)s
+[ -z $addr ] || $ERESSEA/server/bin/send-%(compression)s-report $addr '%(gamename)s Report #%(turn)s' %(files)s
 """
 
 turn = argv[1]
