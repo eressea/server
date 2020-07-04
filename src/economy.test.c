@@ -269,7 +269,7 @@ static void test_trade_needs_castle(CuTest *tc) {
     region *r;
     unit *u;
     building *b;
-    const terrain_type *t_swamp;
+    const terrain_type *t_swamp, *t_desert, *t_plain;
     const item_type *it_luxury;
 
     test_setup();
@@ -278,11 +278,15 @@ static void test_trade_needs_castle(CuTest *tc) {
     setup_terrains(tc);
     init_terrains();
     t_swamp = get_terrain("swamp");
-    r = setup_trade_region(tc, t_swamp);
+    t_desert = get_terrain("desert");
+    t_plain = get_terrain("plain");
+    r = setup_trade_region(tc, t_plain);
     it_luxury = r_luxury(r);
 
     rc = test_create_race(NULL);
     CuAssertTrue(tc, trade_needs_castle(t_swamp, rc));
+    CuAssertTrue(tc, trade_needs_castle(t_desert, rc));
+    CuAssertTrue(tc, trade_needs_castle(t_plain, rc));
 
     u = test_create_unit(test_create_faction(rc), r);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s",
@@ -305,6 +309,11 @@ static void test_trade_needs_castle(CuTest *tc) {
     test_clear_messages(u->faction);
     produce(r);
     CuAssertIntEquals(tc, 0, test_count_messagetype(u->faction->msgs, "error119"));
+
+    rc = test_create_race("insect");
+    CuAssertTrue(tc, !trade_needs_castle(t_swamp, rc));
+    CuAssertTrue(tc, !trade_needs_castle(t_desert, rc));
+    CuAssertTrue(tc, trade_needs_castle(t_plain, rc));
     test_teardown();
 }
 
