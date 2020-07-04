@@ -1175,11 +1175,14 @@ bool trade_needs_castle(const terrain_type *terrain, const race *rc)
     if (rc_changed(&rc_change)) {
         rc_insect = get_race(RC_INSECT);
     }
+    if (rc != rc_insect) {
+        return true;
+    }
     if (terrain_changed(&terrain_change)) {
         t_swamp = newterrain(T_SWAMP);
         t_desert = newterrain(T_DESERT);
     }
-    return rc != rc_insect && (terrain == t_swamp || terrain == t_desert);
+    return (terrain != t_swamp && terrain != t_desert);
 }
 
 static building * first_building(region *r, const struct building_type *btype, int minsize) {
