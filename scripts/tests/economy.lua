@@ -214,6 +214,7 @@ function test_ironkeeper_guards_iron()
     local level = r:get_resourcelevel("iron")
     local u = unit.create(faction.create("human"), r)
     u:set_skill("mining", level)
+    u:set_skill("stealth", 1) -- does not help against ironkeeper
     local guard = unit.create(faction.create("mountainguard"), r, 1, "mountainguard")
     guard:add_order("BEWACHEN")
     u:add_order("MACHE EISEN")
@@ -221,6 +222,23 @@ function test_ironkeeper_guards_iron()
     assert_equal(level, u:get_item("iron"))
     process_orders()
     assert_equal(level, u:get_item("iron"))
+end
+
+-- bug 2679
+function test_stealthy_iron_producer()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("iron", 100)
+    local level = r:get_resourcelevel("iron")
+    local u = unit.create(faction.create("human"), r)
+    u:set_skill("stealth", 1)
+    u:set_skill("mining", level)
+    local guard = unit.create(faction.create("human"), r, 1, "human")
+    guard:add_order("BEWACHEN")
+    u:add_order("MACHE EISEN")
+    process_orders()
+    assert_equal(level, u:get_item("iron"))
+    process_orders()
+    assert_equal(2 * level, u:get_item("iron"))
 end
 
 function test_sawmill()
