@@ -574,6 +574,12 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     int amount, skill, skill_mod = 0;
     variant save_mod;
     skill_t sk;
+    static const struct race *rc_mountainguard;
+    static int config;
+
+    if (rc_changed(&config)) {
+        rc_mountainguard = rc_find("mountainguard");
+    }
 
     /* momentan kann man keine ressourcen abbauen, wenn man dafuer
      * Materialverbrauch hat: */
@@ -605,14 +611,16 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
      * Als magische Wesen 'sehen' Bergwaechter alles und werden durch
      * Belagerung nicht aufgehalten.  (Ansonsten wie oben bei Elfen anpassen).
      */
-    if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
-        unit *u2;
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (!fval(u2, UFL_ISNEW) && u2->number 
-                && is_guard(u2) && !alliedunit(u2, u->faction, HELP_GUARD)) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
-                return;
+    if (rc_mountainguard) {
+        if (itype->rtype && (itype->rtype == get_resourcetype(R_IRON) || itype->rtype == rt_find("laen"))) {
+            unit *u2;
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (rc_mountainguard == u_race(u2) && !fval(u2, UFL_ISNEW) && u2->number > 0
+                    && is_guard(u2) && !alliedunit(u2, u->faction, HELP_GUARD)) {
+                    ADDMSG(&u->faction->msgs,
+                        msg_feedback(u, u->thisorder, "region_guarded", "guard", u2));
+                    return;
+                }
             }
         }
     }
