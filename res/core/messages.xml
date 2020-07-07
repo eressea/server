@@ -1299,6 +1299,14 @@
       <arg name="race" type="race"/>
     </type>
   </message>
+  <message name="sp_shapeshift_twice" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="target" type="unit"/>
+    </type>
+  </message>
 
   <message name="sp_movecastle_fail_0" section="magic">
     <type>
