@@ -4512,12 +4512,15 @@ int sp_illusionary_shapeshift(castorder * co)
         return 0;
     }
     irace = u_irace(u);
-    if (irace == u_race(u)) {
-        trigger *trestore = trigger_changerace(u, NULL, irace);
-        add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 3,
-            trestore));
-        u->irace = rc;
+    if (irace != u_race(u)) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+            "sp_shapeshift_twice", "target", u));
+        return 0;
     }
+
+    add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 3,
+        trigger_changerace(u, NULL, irace)));
+    u->irace = rc;
 
     ADDMSG(&mage->faction->msgs, msg_message("shapeshift_effect",
         "mage target race", mage, u, rc));
