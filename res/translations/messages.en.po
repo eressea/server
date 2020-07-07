@@ -1253,6 +1253,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The spell fails
 msgid "sp_shapeshift_fail"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) cannot take the form of $race($race,1).\""
 
+msgid "sp_shapeshift_twice"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) is already under this spell.\""
+
 msgid "error290"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Einheit kann nur in einem Verband Mitglied sein.\""
 
