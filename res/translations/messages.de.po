@@ -1250,6 +1250,9 @@ msgstr "\"$unit($unit) verdient in $region($region) $int($amount) Silber durch U
 msgid "error180"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber schlägt fehl.\""
 
+msgid "sp_shapeshift_twice"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) ist bereits verzaubert.\""
+
 msgid "sp_shapeshift_fail"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) kann nicht $race($race,1) werden.\""
 
