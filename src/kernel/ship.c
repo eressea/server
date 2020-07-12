@@ -146,12 +146,14 @@ void sunhash(ship * s)
 
 static ship *sfindhash(int i)
 {
-    ship *old;
+    ship *sh;
 
-    for (old = shiphash[i % MAXSHIPHASH]; old; old = old->nexthash)
-        if (old->no == i)
-            return old;
-    return 0;
+    for (sh  = shiphash[i % MAXSHIPHASH]; sh; sh = sh->nexthash) {
+        if (sh->no == i) {
+            return sh->number > 0 ? sh : NULL;
+        }
+    }
+    return NULL;
 }
 
 struct ship *findship(int i)
