@@ -736,6 +736,7 @@ msgctxt "race"
 msgid "seaserpent_x"
 msgstr "sea serpent"
 
+#, fuzzy
 msgctxt "spell"
 msgid "astralblock"
 msgstr "Astral Disruption"
@@ -955,7 +956,7 @@ msgstr "Like many magic chants this one also originates from the ancient knowled
 
 msgctxt "spell"
 msgid "nodrift"
-msgstr "Water Elemental"
+msgstr "Summon Water Elemental"
 
 msgctxt "spell"
 msgid "combat_speed"
@@ -1993,6 +1994,7 @@ msgctxt "prefix"
 msgid "Mond"
 msgstr "moon "
 
+#, fuzzy
 msgctxt "iteminfo"
 msgid "snowball"
 msgstr "These items stay frozen all year round. There seem to be bits of ice inside - in the right hands, these might put an eye out!"
@@ -2920,9 +2922,10 @@ msgctxt "keyword"
 msgid "destroy"
 msgstr "DESTROY"
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_dreameye"
-msgstr "Create a Visioneye"
+msgstr "Create a Dream Eye"
 
 msgid "nr_trade_intro"
 msgstr "Traders can sell"
@@ -3251,9 +3254,10 @@ msgctxt "spell"
 msgid "magicrunes"
 msgstr "Protective Runes"
 
+#, fuzzy
 msgctxt "spell"
 msgid "stormwind"
-msgstr "Storm Elemental"
+msgstr "Summon Storm Elemental"
 
 msgctxt "spell"
 msgid "irongolem"
@@ -4740,9 +4744,10 @@ msgctxt "race"
 msgid "shadowdragon_p"
 msgstr "shadow dragons"
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_firesword"
-msgstr "Create a Flamesword"
+msgstr "Create a Flaming Sword"
 
 msgctxt "iteminfo"
 msgid "roqf"
@@ -4887,6 +4892,7 @@ msgstr "Calm Monster"
 msgid "activevolcano"
 msgstr "active volcano"
 
+#, fuzzy
 msgctxt "spell"
 msgid "auraleak"
 msgstr "Astral Leak"
