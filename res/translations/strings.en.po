@@ -16,12 +16,13 @@ msgstr ""
 
 #, fuzzy
 msgid "rustychainmail"
-msgstr "rustychainmail"
+msgstr "rusty chainmail"
 
 msgctxt "spellinfo"
 msgid "destroy_magic"
 msgstr "This spell lets a magician destroy spells on a ship, a building, or a region."
 
+#, fuzzy
 msgctxt "spell"
 msgid "shadowknights"
 msgstr "Shadow Knights"
@@ -33,9 +34,10 @@ msgstr "snowman"
 msgid "par_unit"
 msgstr "unit-id"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowdemon_d"
-msgstr "shadowdemons"
+msgstr "shadow demons"
 
 msgctxt "coast"
 msgid "sw"
@@ -47,8 +49,9 @@ msgstr "pegasus"
 msgid "truthpotion_p"
 msgstr "potions of truth"
 
+#, fuzzy
 msgid "aurafocus"
-msgstr "aurafocus"
+msgstr "aura focus"
 
 msgid "firewall"
 msgstr "firewall"
@@ -67,9 +70,10 @@ msgctxt "spell"
 msgid "transferauratraum"
 msgstr "Dream of Magic"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowdemon_p"
-msgstr "shadowdemons"
+msgstr "shadow demons"
 
 msgid "h10_p"
 msgstr "peyote"
@@ -83,7 +87,7 @@ msgstr "Double Time"
 
 msgctxt "race"
 msgid "shadowdemon_x"
-msgstr "shadowdemon"
+msgstr "shadow demon"
 
 msgid "halberd_p"
 msgstr "halberds"
@@ -215,7 +219,7 @@ msgstr "Should the unit succumb to the spell, they will tell the mage everything
 #, fuzzy
 msgctxt "spell"
 msgid "readmind"
-msgstr "Mind Probe"
+msgstr "Dream Probe"
 
 msgid "nr_options"
 msgstr "Options"
@@ -265,8 +269,9 @@ msgctxt "race"
 msgid "illusion"
 msgstr "illusion"
 
+#, fuzzy
 msgid "stonecircle"
-msgstr "stonecircle"
+msgstr "stone circle"
 
 msgid "p0"
 msgstr "seven mile tea"
@@ -327,9 +332,10 @@ msgctxt "race"
 msgid "mummy"
 msgstr "mummy"
 
+#, fuzzy
 msgctxt "race"
 msgid "braineater"
-msgstr "braineater"
+msgstr "brain eater"
 
 msgid "nr_size"
 msgstr "size"
@@ -338,7 +344,7 @@ msgid "axe"
 msgstr "axe"
 
 msgid "blessedstonecircle"
-msgstr "blessed stonecircle"
+msgstr "blessed stone circle"
 
 msgctxt "race"
 msgid "dragon_p"
@@ -361,7 +367,7 @@ msgstr "antimagic crystals"
 #, fuzzy
 msgctxt "race"
 msgid "shadowdemon"
-msgstr "shadowdemon"
+msgstr "shadow demon"
 
 msgid "weight_per"
 msgstr "stone per"
@@ -371,7 +377,7 @@ msgstr "potions of nest warmth"
 
 msgctxt "race"
 msgid "irongolem_d"
-msgstr "irongolems"
+msgstr "iron golems"
 
 msgid "sphereofinv_p"
 msgstr "spheres of invisibility"
@@ -393,7 +399,7 @@ msgstr "The sorcerer opens their mind to the spheres of chaos so that they can a
 
 msgctxt "race"
 msgid "irongolem_p"
-msgstr "irongolems"
+msgstr "iron golems"
 
 msgid "snowman_p"
 msgstr "snowmen"
@@ -410,7 +416,7 @@ msgstr "This spell allows a magician to remove a specific enchantment from a uni
 
 msgctxt "race"
 msgid "irongolem_x"
-msgstr "irongolem"
+msgstr "iron golem"
 
 msgid "balloon"
 msgstr "balloon"
@@ -472,7 +478,7 @@ msgstr "masonry"
 #, fuzzy
 msgctxt "spell"
 msgid "summonshadow"
-msgstr "Summon Shadowdemons"
+msgstr "Summon Shadow Demons"
 
 msgid "unknown_faction_dative"
 msgstr "an unknown faction"
@@ -514,9 +520,10 @@ msgctxt "race"
 msgid "wolf_d"
 msgstr "wolves"
 
+#, fuzzy
 msgctxt "race"
 msgid "museumghost_d"
-msgstr "museumghosts"
+msgstr "museum ghosts"
 
 msgid "sehr viele"
 msgstr "a great many"
@@ -546,7 +553,7 @@ msgstr "museum ghosts"
 #, fuzzy
 msgctxt "race"
 msgid "catdragon"
-msgstr "catdragon"
+msgstr "cat dragon"
 
 msgctxt "spell"
 msgid "summonundead"
@@ -631,9 +638,10 @@ msgstr "hellcat"
 msgid "TEMP"
 msgstr "TEMPORARY"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowmaster_d"
-msgstr "shadowmasters"
+msgstr "shadow masters"
 
 msgid "aurapotion50_p"
 msgstr "aura potions"
@@ -642,6 +650,7 @@ msgctxt "spell"
 msgid "sound_out"
 msgstr "Sound out"
 
+#, fuzzy
 msgctxt "race"
 msgid "seaserpent_d"
 msgstr "sea serpents"
@@ -662,7 +671,7 @@ msgstr "plain"
 
 msgctxt "race"
 msgid "shadowmaster_p"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgid "unarmed"
 msgstr "unarmed"
@@ -686,18 +695,20 @@ msgctxt "spell"
 msgid "fogtrap"
 msgstr "an unknown spell"
 
+#, fuzzy
 msgid "dreameye"
-msgstr "dreameye"
+msgstr "dream eye"
 
 msgctxt "race"
 msgid "shadowmaster_x"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgid "adamantium"
 msgstr "adamantium"
 
+#, fuzzy
 msgid "seashell"
-msgstr "seashell"
+msgstr "sea shell"
 
 msgid "adamantiumplate"
 msgstr "adamantium plate"
@@ -708,7 +719,7 @@ msgstr "Meditate"
 
 msgctxt "iteminfo"
 msgid "dreameye"
-msgstr "This enchanted dragon-eye has to be eaten by the leader of your forces on the eve of the battle. During the night they gain insight into the dreams of the enemy leaders and may potentially gain a decisive advantage."
+msgstr "This enchanted dragon eye has to be eaten by the leader of your forces on the eve of the battle. During the night they gain insight into the dreams of the enemy leaders and may potentially gain a decisive advantage."
 
 msgid "nr_mallorntree_p"
 msgstr "mallorn trees"
@@ -954,9 +965,10 @@ msgctxt "spell"
 msgid "Feuerwand"
 msgstr "Firewall"
 
+#, fuzzy
 msgctxt "race"
 msgid "irongolem"
-msgstr "irongolem"
+msgstr "iron golem"
 
 msgid "snowman"
 msgstr "snowman"
@@ -1066,7 +1078,7 @@ msgstr "an illusionary wall"
 
 msgctxt "race"
 msgid "apepsnake"
-msgstr "apepsnake"
+msgstr "apep snake"
 
 msgctxt "race"
 msgid "dracoid_d"
@@ -1169,8 +1181,9 @@ msgctxt "spell"
 msgid "raindance"
 msgstr "Rain Dance"
 
+#, fuzzy
 msgid "goblinspoil_p"
-msgstr "goblinheads"
+msgstr "goblin heads"
 
 msgctxt "keyword"
 msgid "study"
@@ -1302,7 +1315,7 @@ msgid "icastle"
 msgstr "With this spell the mentalist can create the illusion of any building. The illusion can be entered, but it has no function and requires no maintenance. It will remain existing for several weeks."
 
 msgid "dreameye_p"
-msgstr "dreameyes"
+msgstr "dream eyes"
 
 msgid "peasantblood"
 msgstr "peasant blood"
@@ -1334,8 +1347,9 @@ msgstr "adamantium plates"
 msgid "log"
 msgstr "wood"
 
+#, fuzzy
 msgid "presspass_p"
-msgstr "presspasses"
+msgstr "press passes"
 
 msgctxt "school"
 msgid "draig"
@@ -1534,9 +1548,10 @@ msgstr "imp"
 msgid "ZUGVORLAGE"
 msgstr "TEMPLATE"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowbat_d"
-msgstr "darkbats"
+msgstr "shadow bats"
 
 msgctxt "race"
 msgid "nightmare_d"
@@ -1568,7 +1583,7 @@ msgstr "castle"
 
 msgctxt "race"
 msgid "shadowbat_p"
-msgstr "darkbats"
+msgstr "shadow bats"
 
 msgctxt "iteminfo"
 msgid "apple"
@@ -1603,7 +1618,7 @@ msgstr "Like creatures ships, buildings, and even regions also have their own so
 
 msgctxt "race"
 msgid "shadowbat_x"
-msgstr "darkbat"
+msgstr "shadow bat"
 
 msgctxt "race"
 msgid "nightmare_x"
@@ -1667,7 +1682,7 @@ msgstr "mummy"
 
 msgctxt "race"
 msgid "braineater_d"
-msgstr "braineaters"
+msgstr "brain eaters"
 
 msgctxt "describe"
 msgid "goliathwater"
@@ -1693,11 +1708,11 @@ msgstr "return ticket for the grand museum"
 #, fuzzy
 msgctxt "race"
 msgid "mummy_p"
-msgstr "mummys"
+msgstr "mummies"
 
 msgctxt "race"
 msgid "braineater_p"
-msgstr "braineaters"
+msgstr "brain eaters"
 
 msgctxt "keyword"
 msgid "attack"
@@ -1713,7 +1728,7 @@ msgstr "mummy"
 
 msgctxt "race"
 msgid "braineater_x"
-msgstr "braineater"
+msgstr "brain eater"
 
 msgctxt "spell"
 msgid "unholypower"
@@ -1743,8 +1758,9 @@ msgstr "This song, which is woven into the magical essence of the region, weaken
 msgid "plate"
 msgstr "platemail"
 
+#, fuzzy
 msgid "herbbag_p"
-msgstr "herbbags"
+msgstr "bag of herbs"
 
 msgid "skillpotion"
 msgstr "potion of skills"
@@ -1852,7 +1868,7 @@ msgstr "Chaos Curse"
 
 msgctxt "spell"
 msgid "wdwpyramid_illaun"
-msgstr "Dream of the gods"
+msgstr "Dream of the Gods"
 
 msgctxt "race"
 msgid "snotling"
@@ -1930,7 +1946,7 @@ msgstr "Air Shield"
 #, fuzzy
 msgctxt "race"
 msgid "museumghost"
-msgstr "museumghost"
+msgstr "museum ghost"
 
 msgctxt "spellinfo"
 msgid "fumblecurse"
@@ -1984,8 +2000,9 @@ msgstr "These items stay frozen all year round. There seem to be bits of ice ins
 msgid "nr_spell_syntax"
 msgstr "Syntax:"
 
+#, fuzzy
 msgid "seaserpenthead_p"
-msgstr "seaserpentheads"
+msgstr "sea serpent heads"
 
 msgid "forest"
 msgstr "forest"
@@ -2099,7 +2116,7 @@ msgid "powerful_dragonbreath"
 msgstr "Powerful Dragonbreath"
 
 msgid "dragonblood_p"
-msgstr "dragonblood"
+msgstr "dragon blood"
 
 msgid "aog_p"
 msgstr "amulets of gathering"
@@ -2109,7 +2126,7 @@ msgstr "TRAVEL"
 
 msgctxt "describe"
 msgid "p10"
-msgstr "The use of the berserkers blood potion is advised to increase one's warriors abilities to new heights. To create this, one needs a white hemlock, some flatroot, sand reeker and a mandrake. All ingredients have to be sliced as finely as possible, after which it is boiled for two hours. The cooled brew is strained through a cloth. The resulting juice is enough to improve up to ten warriors."
+msgstr "The use of the berserker blood potion is advised to increase one's warriors abilities to new heights. To create this, one needs a white hemlock, some flatroot, sand reeker and a mandrake. All ingredients have to be sliced as finely as possible, after which it is boiled for two hours. The cooled brew is strained through a cloth. The resulting juice is enough to improve up to ten warriors."
 
 msgctxt "describe"
 msgid "p11"
@@ -2425,7 +2442,7 @@ msgstr "bag of conservation"
 
 #, fuzzy
 msgid "rustychainmail_p"
-msgstr "rustychainmails"
+msgstr "rusty chainmails"
 
 msgctxt "spellpar"
 msgid "direction"
@@ -2551,7 +2568,7 @@ msgstr "ADDRESSES"
 
 msgctxt "race"
 msgid "apepsnake_d"
-msgstr "apepsnakes"
+msgstr "apep snakes"
 
 msgid "section_production"
 msgstr "Resources and Production"
@@ -2568,7 +2585,7 @@ msgstr "Chaos Gate"
 
 msgctxt "race"
 msgid "apepsnake_p"
-msgstr "apepsnakes"
+msgstr "apep snakes"
 
 msgid "PARTEITARNUNG"
 msgstr "FACTIONSTEALTH"
@@ -2587,7 +2604,7 @@ msgstr "NAME"
 
 msgctxt "race"
 msgid "apepsnake_x"
-msgstr "apepsnake"
+msgstr "apep snake"
 
 msgid "KOMMANDO"
 msgstr "CONTROL"
@@ -2599,9 +2616,10 @@ msgctxt "spellinfo"
 msgid "chaossuction"
 msgstr "By sacrificing the lives of 200 peasants, the chaos sorcerer is able to open a planar gate. This gate can be used during the following week to transfer units to the astral plane. It dissipates at the end of the following week."
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_focus"
-msgstr "Create an Aurafocus"
+msgstr "Create an Aura Focus"
 
 msgid "nr_combatspells"
 msgstr "combat spells"
@@ -2640,7 +2658,7 @@ msgstr "magical storm"
 
 msgctxt "spellinfo"
 msgid "create_focus"
-msgstr "Creates an aurafocus crystal."
+msgstr "Creates an aura focus crystal."
 
 msgctxt "spell"
 msgid "song_of_slavery"
@@ -2690,7 +2708,7 @@ msgstr "mistletoes"
 
 msgctxt "spell"
 msgid "wyrm_transformation"
-msgstr "Wyrmtransformation"
+msgstr "Wyrm Transformation"
 
 msgid "sptype_combat"
 msgstr "combat spell"
@@ -2703,7 +2721,7 @@ msgid "gwyrrdfumbleshield"
 msgstr "Astral Guardian Spirits"
 
 msgid "presspass"
-msgstr "presspass"
+msgstr "press pass"
 
 msgctxt "spell"
 msgid "wdwpyramid_tybied"
@@ -2725,8 +2743,9 @@ msgctxt "prefix"
 msgid "Nebel"
 msgstr "mist "
 
+#, fuzzy
 msgid "dragonhoard"
-msgstr "dragonhoard"
+msgstr "dragon hoard"
 
 msgctxt "race"
 msgid "tiger_d"
@@ -2812,10 +2831,12 @@ msgstr "These magic runes allow a boat with a capacity of up to 50 weight units 
 msgid "bagpipeoffear_p"
 msgstr "bagpipes of fear"
 
+# ordinary bag of unidentified herbs, not the magical conservation one
 #, fuzzy
 msgid "herbbag"
-msgstr "herbbag"
+msgstr "bag of herbs"
 
+#, fuzzy
 msgctxt "spell"
 msgid "astral_disruption"
 msgstr "Astral Disruption"
@@ -3154,7 +3175,7 @@ msgstr "kraken"
 #, fuzzy
 msgctxt "race"
 msgid "shadowbat"
-msgstr "darkbat"
+msgstr "shadow bat"
 
 msgid "group_help"
 msgstr "is helping"
@@ -3380,7 +3401,7 @@ msgstr "Path of Trees"
 
 #, fuzzy
 msgid "toadslime"
-msgstr "pot of toadslime"
+msgstr "pot of toad slime"
 
 msgctxt "race"
 msgid "cat_d"
@@ -3447,8 +3468,9 @@ msgstr "stone golems"
 msgid "spice"
 msgstr "spice"
 
+#, fuzzy
 msgid "dragonhead"
-msgstr "dragonhead"
+msgstr "dragon head"
 
 msgctxt "race"
 msgid "toad_x"
@@ -3827,7 +3849,7 @@ msgstr "bags of conservation"
 
 #, fuzzy
 msgid "seaserpenthead"
-msgstr "seaserpenthead"
+msgstr "sea serpent head"
 
 msgctxt "spellinfo"
 msgid "shapeshift"
@@ -3885,13 +3907,14 @@ msgctxt "spellinfo"
 msgid "double_time"
 msgstr "Abstract theories of space and time at last find practical application in this spell which warps the very fabric of time around a person. Such persons have twice as many movement points and double their attacks per round for a few weeks."
 
+#, fuzzy
 msgctxt "race"
 msgid "direwolf"
-msgstr "direwolf"
+msgstr "dire wolf"
 
 msgctxt "race"
 msgid "dreamcat_d"
-msgstr "dreamcats"
+msgstr "dream cats"
 
 msgid "Frühling"
 msgstr "spring"
@@ -3930,7 +3953,7 @@ msgstr "Before the eyes of the enemy soldiers the sorcerer sacrifices ten peasan
 
 msgctxt "race"
 msgid "dreamcat_p"
-msgstr "dreamcats"
+msgstr "dream cats"
 
 msgctxt "keyword"
 msgid "ready"
@@ -3948,7 +3971,7 @@ msgstr "attack"
 
 msgctxt "race"
 msgid "dreamcat_x"
-msgstr "dreamcat"
+msgstr "dream cat"
 
 msgid "mallornseed_p"
 msgstr "mallorn seeds"
@@ -3957,10 +3980,9 @@ msgctxt "spellinfo"
 msgid "treewalkexit"
 msgstr "A druid who has traveled to the world of spirits can use this spell to send level*5 weight units of living or dead matter back to a forest in the material world."
 
-#, fuzzy
 msgctxt "race"
 msgid "shadowmaster"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgctxt "race"
 msgid "fairy_d"
@@ -4008,7 +4030,7 @@ msgstr "an unknown unit"
 
 msgctxt "race"
 msgid "direwolf_d"
-msgstr "direwolves"
+msgstr "dire wolves"
 
 msgctxt "spellinfo"
 msgid "ironkeeper"
@@ -4048,7 +4070,7 @@ msgstr "clones"
 
 msgctxt "race"
 msgid "direwolf_p"
-msgstr "direwolves"
+msgstr "dire wolves"
 
 msgctxt "spellinfo"
 msgid "song_of_fear"
@@ -4093,7 +4115,7 @@ msgstr "Song of the Aging Spirit"
 
 msgctxt "race"
 msgid "direwolf_x"
-msgstr "direwolf"
+msgstr "dire wolf"
 
 msgctxt "race"
 msgid "troll_p"
@@ -4201,7 +4223,7 @@ msgstr "ghasts"
 
 msgctxt "spell"
 msgid "wdwpyramid_gwyrrd"
-msgstr "force of nature"
+msgstr "Force of Nature"
 
 msgctxt "spell"
 msgid "insectfur"
@@ -4259,10 +4281,10 @@ msgstr "undead"
 
 #, fuzzy
 msgid "p10"
-msgstr "berserkers blood potion"
+msgstr "berserker blood potion"
 
 msgid "toadslime_p"
-msgstr "pots of toadslime"
+msgstr "pots of toad slime"
 
 msgid "p11"
 msgstr "peasant love potion"
@@ -4307,7 +4329,7 @@ msgid "auratransfer"
 msgstr "Transfer Aura"
 
 msgid "aurafocus_p"
-msgstr "aurafocuses"
+msgstr "aura focuses"
 
 msgid "apple_p"
 msgstr "apples"
@@ -4315,7 +4337,7 @@ msgstr "apples"
 #, fuzzy
 msgctxt "spell"
 msgid "summonshadowlords"
-msgstr "Summon Shadowmasters"
+msgstr "Summon Shadow Masters"
 
 msgid "snowball_p"
 msgstr "snowball"
@@ -4328,7 +4350,7 @@ msgstr "myrrh"
 
 msgctxt "spell"
 msgid "big_recruit"
-msgstr "High art of persuasion"
+msgstr "High Art of Persuasion"
 
 msgctxt "iteminfo"
 msgid "magicherbbag"
@@ -4353,9 +4375,10 @@ msgctxt "spell"
 msgid "oldrace"
 msgstr "Unknown Effect"
 
+#, fuzzy
 msgctxt "skill"
 msgid "armorer"
-msgstr "armoursmithing"
+msgstr "armorsmithing"
 
 msgctxt "spell"
 msgid "itemcloak"
@@ -4376,7 +4399,7 @@ msgid "contact"
 msgstr "CONTACT"
 
 msgid "dragonhead_p"
-msgstr "dragonheads"
+msgstr "dragon heads"
 
 msgctxt "spell"
 msgid "view_reality"
@@ -4444,7 +4467,7 @@ msgstr "Minor Curses"
 #, fuzzy
 msgctxt "race"
 msgid "catdragon_d"
-msgstr "catdragons"
+msgstr "cat dragons"
 
 msgctxt "spell"
 msgid "wolfhowl"
@@ -4478,7 +4501,7 @@ msgstr "Miscellaneous"
 
 msgctxt "race"
 msgid "catdragon_p"
-msgstr "catdragons"
+msgstr "cat dragons"
 
 msgctxt "race"
 msgid "songdragon"
@@ -4492,7 +4515,7 @@ msgstr "unknown units"
 
 msgctxt "race"
 msgid "catdragon_x"
-msgstr "catdragon"
+msgstr "cat dragon"
 
 msgctxt "skill"
 msgid "alchemy"
@@ -4514,7 +4537,7 @@ msgstr "an attack causing structural damage to buildings"
 
 msgctxt "spell"
 msgid "antimagiczone"
-msgstr "Antimagic"
+msgstr "Antimagic Zone"
 
 msgid "boat"
 msgstr "boat"
@@ -4559,9 +4582,10 @@ msgstr "JOIN"
 msgid "lebkuchenherz_p"
 msgstr "gingerbread hearts"
 
+#, fuzzy
 msgctxt "spell"
 msgid "analysedream"
-msgstr "Analyse Dreams"
+msgstr "Analyze Dreams"
 
 msgctxt "prefix"
 msgid "Tal"
@@ -4676,7 +4700,7 @@ msgstr "Winds of Rust"
 #, fuzzy
 msgctxt "race"
 msgid "mountainguard"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "tunnel"
 msgstr "tunnel"
@@ -4848,7 +4872,7 @@ msgid "trade"
 msgstr "trade"
 
 msgid "dragonblood"
-msgstr "dragonblood"
+msgstr "dragon blood"
 
 msgid "aog"
 msgstr "amulet of gathering"
@@ -4968,7 +4992,7 @@ msgid "adamantium_p"
 msgstr "adamantium"
 
 msgid "seashell_p"
-msgstr "seashells"
+msgstr "sea shells"
 
 msgid "nr_spell_type"
 msgstr "Type:"
@@ -4990,7 +5014,7 @@ msgstr "chaos "
 
 msgctxt "race"
 msgid "mountainguard_d"
-msgstr "mountainguards"
+msgstr "mountain guards"
 
 msgctxt "prefix"
 msgid "Licht"
@@ -5045,7 +5069,7 @@ msgstr "Astral Exit"
 
 msgctxt "race"
 msgid "mountainguard_p"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "clone_of"
 msgstr "Clone of %s"
@@ -5086,7 +5110,7 @@ msgstr "dragonships"
 
 msgctxt "race"
 msgid "mountainguard_x"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "unitdefault"
 msgstr "Unit"
@@ -5191,7 +5215,7 @@ msgid "status_flee"
 msgstr "fleeing"
 
 msgid "p10_p"
-msgstr "berserkers blood potions"
+msgstr "berserker blood potions"
 
 msgctxt "keyword"
 msgid "maketemp"
@@ -5413,15 +5437,17 @@ msgctxt "spell"
 msgid "skillmod"
 msgstr "Unknown Effect"
 
+#, fuzzy
 msgctxt "race"
 msgid "dreamcat"
-msgstr "dreamcat"
+msgstr "dream cat"
 
 msgid "elfspoil_p"
 msgstr "elven ears"
 
+#, fuzzy
 msgid "moneychest"
-msgstr "silverchest"
+msgstr "silver chest"
 
 msgid "amulet"
 msgstr "amulet"
