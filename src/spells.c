@@ -3749,7 +3749,7 @@ static int sp_migranten(castorder * co)
     unit *target;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
+    int max_force = (int) co->force;
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
@@ -3782,7 +3782,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     /* maximal Stufe Personen */
-    if (target->number > cast_level || target->number > max_spellpoints_depr(r, mage)) {
+    if (target->number > max_force || target->number > max_spellpoints_depr(r, mage)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_toomanytargets", ""));
         return 0;

@@ -2040,7 +2040,7 @@ msgid "analyse_building_fail"
 msgstr "\"$unit($mage) meint, dass auf $building($building) ein Zauber liegt, konnte aber über den Zauber nichts herausfinden.\""
 
 msgid "spellfail_toomanytargets"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Persoenen übersteigen die Kräfte des Magiers.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Personen übersteigen die Kräfte des Magiers.\""
 
 msgid "harvest_effect"
 msgstr "\"$if($isnull($mage),\"Ein unentdeckter Magier\",$unit($mage)) segnet in einem kurzen Ritual die Felder.\""
