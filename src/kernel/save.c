@@ -1251,6 +1251,7 @@ void write_building(gamedata *data, const building *b)
     write_building_reference(b, store);
     WRITE_STR(store, b->name);
     WRITE_STR(store, b->display ? b->display : "");
+    assert(b->size > 0);
     WRITE_INT(store, b->size);
     WRITE_TOK(store, b->type->_name);
     write_attribs(store, b->attribs, b);
@@ -1276,6 +1277,10 @@ struct building *read_building(gamedata *data) {
     }
     b->display = str_strdup(name);
     READ_INT(store, &b->size);
+    if (b->size < 1) {
+        log_warning("trim building %s had size %d", itoa36(b->no), b->size);
+        b->size = 1;
+    }
     READ_STR(store, name, sizeof(name));
     b->type = bt_find(name);
     if (!b->type) {
