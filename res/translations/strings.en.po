@@ -1357,7 +1357,7 @@ msgstr "Draig"
 
 msgctxt "spellinfo"
 msgid "create_runesword"
-msgstr "This spell creates a magical sword. It is encarved with old, magical runes and its blade is warm to the touch and seems to lead a strange life of its own. Using this sword requires a skill of at least 7, but adds +4 to the combat skill of its owner as well as making them almost immune against magical attacks."
+msgstr "This spell creates a magic sword. It is encarved with old, magic runes and its blade is warm to the touch and seems to lead a strange life of its own. Using this sword requires a skill of at least 7, but adds +4 to the combat skill of its owner as well as making them almost immune against magical attacks."
 
 msgctxt "spell"
 msgid "magicboost"
@@ -1365,7 +1365,7 @@ msgstr "Chaos Gift"
 
 msgctxt "iteminfo"
 msgid "mistletoe"
-msgstr "The magical mistletoe has a wondrous property: Its use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week."
+msgstr "The magic mistletoe has a wondrous property: Its use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week."
 
 msgctxt "skill"
 msgid "taxation"
@@ -2831,7 +2831,7 @@ msgstr "These magic runes allow a boat with a capacity of up to 50 weight units 
 msgid "bagpipeoffear_p"
 msgstr "bagpipes of fear"
 
-# ordinary bag of unidentified herbs, not the magical conservation one
+# ordinary bag of unidentified herbs, not the magic conservation one
 #, fuzzy
 msgid "herbbag"
 msgstr "bag of herbs"
@@ -4496,7 +4496,7 @@ msgstr "Song of War"
 
 msgctxt "describe"
 msgid "ointment"
-msgstr "When one is severely wounded after a hard battle it is advisable to have some ointment to hand. Applied to wounds, this magical paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hit points."
+msgstr "When one is severely wounded after a hard battle it is advisable to have some ointment to hand. Applied to wounds, this magic paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hit points."
 
 msgid "section_none"
 msgstr "Miscellaneous"
@@ -4986,7 +4986,7 @@ msgstr "RESEARCH"
 
 msgctxt "spellinfo"
 msgid "song_of_healing"
-msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magic melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones, and even regenerate lost limbs."
+msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magical melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones, and even regenerate lost limbs."
 
 msgctxt "coast"
 msgid "nw"
@@ -5843,7 +5843,7 @@ msgstr "Using this talisman, the captain of a ship can drain the magical energy 
 
 msgctxt "iteminfo"
 msgid "runesword"
-msgstr "The blade of this awe-inspiring magical weapon is covered with dark runes. Only the most experience sword artist may wield it, but in their hands nothing may resist the rune sword. Even magical armor is easily pierced and it fills the mind of its wielder with unwavering confidence."
+msgstr "The blade of this awe-inspiring magic weapon is covered with dark runes. Only the most experience sword artist may wield it, but in their hands nothing may resist the rune sword. Even magical armor is easily pierced and it fills the mind of its wielder with unwavering confidence."
 
 msgid "skeleton_name_0"
 msgstr "skeletons"
