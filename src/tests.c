@@ -335,8 +335,7 @@ building * test_create_building(region * r, const building_type * btype)
         bt_castle->flags |= BTF_FORTIFICATION;
         btype = bt_castle;
     }
-    b = new_building(btype, r, default_locale);
-    b->size = btype->maxsize > 0 ? btype->maxsize : 1;
+    b = new_building(btype, r, default_locale, (btype->maxsize > 0) ? btype->maxsize : 1);
     return b;
 }
 

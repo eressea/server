@@ -61,7 +61,7 @@ static void test_rename_building(CuTest * tc)
     test_create_locale();
     btype = test_create_buildingtype("castle");
     r = test_create_region(0, 0, NULL);
-    b = new_building(btype, r, default_locale);
+    b = new_building(btype, r, default_locale, 1);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     u_set_building(u, b);
@@ -84,7 +84,7 @@ static void test_rename_building_twice(CuTest * tc)
     test_create_locale();
     btype = test_create_buildingtype("castle");
     r = test_create_region(0, 0, NULL);
-    b = new_building(btype, r, default_locale);
+    b = new_building(btype, r, default_locale, 1);
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
     u_set_building(u, b);

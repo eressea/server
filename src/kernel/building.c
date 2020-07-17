@@ -369,7 +369,7 @@ building *building_create(int id)
 }
 
 building *new_building(const struct building_type * btype, region * r,
-    const struct locale * lang)
+    const struct locale * lang, int size)
 {
     building **bptr = &r->buildings;
     int id = newcontainerid();
@@ -377,6 +377,7 @@ building *new_building(const struct building_type * btype, region * r,
     const char *bname;
     char buffer[32];
 
+    assert(size > 0);
     b->type = btype;
     b->region = r;
     while (*bptr)
@@ -396,6 +397,7 @@ building *new_building(const struct building_type * btype, region * r,
     assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
     b->name = str_strdup(bname);
+    b->size = size;
     return b;
 }
 

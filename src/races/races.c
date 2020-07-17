@@ -42,8 +42,7 @@ void equip_newunits(struct unit *u)
         if (u->building == NULL) {
             const building_type *btype = bt_find("castle");
             if (btype != NULL) {
-                building *b = new_building(btype, r, u->faction->locale);
-                b->size = 10;
+                building *b = new_building(btype, r, u->faction->locale, 10);
                 u_set_building(u, b);
                 building_set_owner(u);
             }
