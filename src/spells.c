@@ -4415,7 +4415,7 @@ int sp_icastle(castorder * co)
     const building_type *type;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
+    int size, cast_level = co->level;
     double power = co->force;
     spellparameter *pa = co->par;
     const char *bname;
@@ -4431,18 +4431,17 @@ int sp_icastle(castorder * co)
         type = bt_find("castle");
     }
 
-    b = new_building(bt_illusion, r, mage->faction->locale);
-
     /* Groesse festlegen. */
     if (type == bt_illusion) {
-        b->size = (rng_int() % (int)((power * power) + 1) * 10);
+        size = (rng_int() % (int)((power * power) + 1) * 10);
     }
     else if (type->maxsize > 0) {
-        b->size = type->maxsize;
+        size = type->maxsize;
     }
     else {
-        b->size = ((rng_int() % (int)(power)) + 1) * 5;
+        size = ((rng_int() % (int)(power)) + 1) * 5;
     }
+    b = new_building(bt_illusion, r, mage->faction->locale, size);
 
     bname = LOC(mage->faction->locale, buildingtype(type, b, 0));
     building_setname(b, bname);

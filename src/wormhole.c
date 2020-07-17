@@ -116,13 +116,13 @@ static attrib_type at_wormhole = {
 static void
 make_wormhole(const building_type * bt_wormhole, region * r1, region * r2)
 {
-    building *b1 = new_building(bt_wormhole, r1, default_locale);
-    building *b2 = new_building(bt_wormhole, r2, default_locale);
+    int size = bt_wormhole->maxcapacity * bt_wormhole->capacity;
+    building *b1 = new_building(bt_wormhole, r1, default_locale, size);
+    building *b2 = new_building(bt_wormhole, r2, default_locale, size);
     attrib *a1 = a_add(&b1->attribs, a_new(&at_wormhole));
     attrib *a2 = a_add(&b2->attribs, a_new(&at_wormhole));
     a1->data.v = b2->region;
     a2->data.v = b1->region;
-    b1->size = b2->size = bt_wormhole->maxcapacity * bt_wormhole->capacity;
     ADDMSG(&r1->msgs, msg_message("wormhole_appear", "region", r1));
     ADDMSG(&r2->msgs, msg_message("wormhole_appear", "region", r2));
 }

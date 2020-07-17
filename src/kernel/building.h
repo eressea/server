@@ -111,7 +111,7 @@ extern "C" {
     int buildingcapacity(const struct building *b);
     struct building *building_create(int id);
     struct building *new_building(const struct building_type *typ,
-        struct region *r, const struct locale *lang);
+        struct region *r, const struct locale *lang, int size);
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);

@@ -827,8 +827,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         b->size += built;
     } else {
         /* build a new building */
-        b = new_building(btype, r, lang);
-        b->size = built;
+        b = new_building(btype, r, lang, built);
         b->type = btype;
         fset(b, BLD_MAINTAINED);
 

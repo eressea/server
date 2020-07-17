@@ -183,16 +183,20 @@ static int tolua_building_set_owner(lua_State * L)
 
 static int tolua_building_create(lua_State * L)
 {
-    region *r = (region *)tolua_tousertype(L, 1, 0);
-    const char *bname = tolua_tostring(L, 2, 0);
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    const char *bname = tolua_tostring(L, 2, NULL);
+    int size = (int)tolua_tonumber(L, 3, 1);
     if (!r) {
         log_error("building.create expects a region as argument 1");
     } else if (!bname) {
         log_error("building.create expects a name as argument 2");
+    }
+    else if (size <= 0) {
+        log_error("building.create expects a size > 0");
     } else {
         const building_type *btype = bt_find(bname);
         if (btype) {
-            building *b = new_building(btype, r, default_locale);
+            building *b = new_building(btype, r, default_locale, size);
             tolua_pushusertype(L, (void *)b, TOLUA_CAST "building");
             return 1;
         }
