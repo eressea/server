@@ -37,6 +37,8 @@ static void test_make_wormholes(CuTest *tc) {
     test_setup();
     setup_wormholes();
     btype = test_create_buildingtype("wormhole");
+    btype->maxsize = 4;
+    btype->maxcapacity = 4;
     match[0] = r1 = test_create_plain(0, 0);
     match[1] = r2 = test_create_plain(1, 0);
     make_wormholes(match, 2, btype);
