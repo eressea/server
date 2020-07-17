@@ -18,6 +18,7 @@
 
 /* util includes */
 #include "kernel/attrib.h"
+#include "util/aliases.h"
 #include "util/crmessage.h"
 #include "util/functions.h"
 #include "util/keyword.h"
@@ -696,6 +697,41 @@ static void json_strings(cJSON *json) {
     }
 }
 
+static void json_add_aliases(cJSON *json, const struct locale *lang) {
+    cJSON *child;
+    str_aliases *aliases = get_aliases(lang);
+    for (child = json->child; child; child = child->next) {
+        if (child->type == cJSON_String) {
+            alias_add(aliases, child->string, child->valuestring);
+        }
+        else if (child->type == cJSON_Array) {
+            cJSON *entry;
+            for (entry = child->child; entry; entry = entry->next) {
+                if (entry->type == cJSON_String) {
+                    alias_add(aliases, child->string, entry->valuestring);
+                }
+            }
+        }
+    }
+}
+
+static void json_aliases(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error("aliases is not a json array: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        if (child->type == cJSON_Object) {
+            struct locale *lang = get_locale(child->string);
+            json_add_aliases(child, lang);
+        }
+        else {
+            log_error("strings for locale `%s` are not a json object: %d", child->string, child->type);
+        }
+    }
+}
+
 static void json_direction(cJSON *json, struct locale *lang) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -1107,6 +1143,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "strings") == 0) {
             json_strings(child);
+        }
+        else if (strcmp(child->string, "aliases") == 0) {
+            json_aliases(child);
         }
         else if (strcmp(child->string, "calendar") == 0) {
             json_calendar(child);

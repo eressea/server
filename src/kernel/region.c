@@ -1396,7 +1396,6 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
 faction *update_owners(region * r)
 {
     faction *f = NULL;
-    assert(rule_region_owners());
     if (r->land) {
         building *bowner = largestbuilding(r, cmp_current_owner, false);
         building *blargest = largestbuilding(r, cmp_taxes, false);

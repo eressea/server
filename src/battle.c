@@ -1738,7 +1738,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
                 if (sp == NULL)
                     continue;
 
-                ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
+                ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
                 if (!cancast(mage, sp, 1, 1, ord)) {
                     free_order(ord);
                     continue;
@@ -1820,7 +1820,7 @@ static void do_combatspell(troop at)
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
-    ord = create_order(K_CAST, lang, "'%s'", spell_name(sp, lang));
+    ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
     if (!cancast(mage, sp, 1, 1, ord)) {
         fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;

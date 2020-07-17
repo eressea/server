@@ -1,11 +1,34 @@
 {
-    "include": [
-      "config://res/translations/strings.de.po",
-      "config://res/translations/strings-e2.de.po",
-      "config://res/translations/strings.en.po",
-      "config://res/translations/strings-e2.en.po",
-      "config://res/translations/messages.de.po",
-      "config://res/translations/messages.en.po",
-      "config://res/core/messages.xml"
-    ]
+  "include": [
+    "config://res/translations/strings.de.po",
+    "config://res/translations/strings-e2.de.po",
+    "config://res/translations/strings.en.po",
+    "config://res/translations/strings-e2.en.po",
+    "config://res/translations/messages.de.po",
+    "config://res/translations/messages.en.po",
+    "config://res/core/messages.xml"
+  ],
+  "aliases": {
+    "de": {
+      "spell::earthquake": [
+        "Erdelementar",
+        "Beschwörung eines Erdelemntares"
+      ],
+      "spell::goodwinds": [
+        "Wasserelementar",
+        "Beschwöre einen Wasserelementar"
+      ],
+      "spell::stormwinds": [
+        "Sturmelementar",
+        "Beschwörung eines Sturmelementares"
+      ],
+      "spell::summonfireelemental": [
+        "Hitzeelementar",
+        "Beschwörung eines Hitzeelementares"
+      ]
+    },
+    "en": {
+      "spell::migration": "Rite of Acceptance"
+    }
+  }
 }

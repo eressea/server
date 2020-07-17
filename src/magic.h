@@ -315,9 +315,9 @@ extern "C" {
     void fix_fam_spells(struct unit *u);
     void fix_fam_migrant(struct unit *u);
 
+    const char *mkname_spell(const struct spell *sp);
+    const char *spell_name(const char *spname, const struct locale *lang);
     const char *spell_info(const struct spell *sp,
-        const struct locale *lang);
-    const char *spell_name(const struct spell *sp,
         const struct locale *lang);
     const char *curse_name(const struct curse_type *ctype,
         const struct locale *lang);

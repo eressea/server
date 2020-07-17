@@ -256,7 +256,7 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
         sbs_strcat(&sbs, " n]");
     }
 
-    spname = spell_name(sp, lang);
+    spname = spell_name(mkname_spell(sp), lang);
     if (strchr(spname, ' ') != NULL) {
         /* contains spaces, needs quotes */
         sbs_strcat(&sbs, " '");
@@ -422,7 +422,7 @@ void nr_spell(struct stream *out, spellbook_entry * sbe, const struct locale *la
     sbstring sbs;
 
     newline(out);
-    centre(out, spell_name(sp, lang), true);
+    centre(out, spell_name(mkname_spell(sp), lang), true);
     newline(out);
     paragraph(out, LOC(lang, "nr_spell_description"), 0, 0, 0);
     paragraph(out, spell_info(sp, lang), 2, 0, 0);

@@ -808,7 +808,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                         sbs_strcat(sbp, ", ");
                     }
                     /* TODO: no need to deref the spellref here (spref->name is good) */
-                    sbs_strcat(sbp, spell_name(sp, lang));
+                    sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
                 }
             }
 
@@ -830,7 +830,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
                     sp = get_combatspell(u, i);
                     if (sp) {
                         int sl = get_combatspelllevel(u, i);
-                        sbs_strcat(sbp, spell_name(sp, lang));
+                        sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
                         if (sl > 0) {
                             sbs_printf(sbp, "(%d)", sl);
                         }
@@ -1877,7 +1877,7 @@ static void eval_spell(struct opstack **stack, const void *userdata)
     const struct faction *f = (const struct faction *)userdata;
     const struct spell *sp = (const struct spell *)opop(stack).v;
     const char *c =
-        sp ? spell_name(sp, f->locale) : LOC(f->locale, "an_unknown_spell");
+        sp ? spell_name(mkname_spell(sp), f->locale) : LOC(f->locale, "an_unknown_spell");
     variant var;
 
     assert(c || !"spell without description!");

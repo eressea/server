@@ -582,3 +582,40 @@ function test_buy_sell()
     assert_equal(4, u:get_item(item))
     assert_not_equal(0, u:get_item('money'))
 end
+
+function test_seacast()
+    local r = region.create(0,0, "plain")
+    for i = 1,10 do
+        -- this prevents storms (only high seas have storms)
+        region.create(i, 1, "plain")
+    end
+    for i = 1,10 do
+        region.create(i, 0, "ocean")
+    end
+    local f = faction.create("human", "noreply@eressea.de", "de")
+    local s1 = ship.create(r, "boat")
+    local u1 = unit.create(f, r, 2)
+    u1:set_skill("sailing", 3)
+    u1:add_item("money", 1000)
+    u1.ship = s1
+    local u2 = unit.create(f, r, 1)
+    u2.race = "elf"
+    u2:set_skill("magic", 6)
+    u2.magic = "gwyrrd"
+    u2.aura = 60
+    u2.ship = s1
+    u2:add_spell("stormwinds")
+    u2:clear_orders()
+    u2:add_order("Zaubere stufe 2 'Sturmelementar' " .. itoa36(s1.id))
+    u1:clear_orders()
+    u1:add_order("NACH O O O O")
+    process_orders()
+    assert_equal(4, u2.region.x)
+
+    u2:clear_orders()
+    u2:add_order("Zaubere stufe 2 'Beschwörung eines Sturmelementares' " .. itoa36(s1.id))
+    u1:clear_orders()
+    u1:add_order("NACH O O O O")
+    process_orders()
+    assert_equal(8, u2.region.x)
+end

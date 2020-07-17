@@ -189,7 +189,7 @@ void test_getspell_unit(CuTest * tc)
 
     lang = test_create_locale();
     sp = create_spell("testspell");
-    locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
+    locale_setstring(lang, mkname_spell(sp), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
@@ -248,7 +248,7 @@ void test_getspell_school(CuTest * tc)
 
     lang = test_create_locale();
     sp = create_spell("testspell");
-    locale_setstring(lang, mkname("spell", sp->sname), "Herp-a-derp");
+    locale_setstring(lang, mkname_spell(sp), "Herp-a-derp");
 
     CuAssertPtrEquals(tc, NULL, unit_getspell(u, "Herp-a-derp", lang));
 
@@ -402,8 +402,8 @@ void test_multi_cast(CuTest *tc) {
     CuAssertPtrEquals(tc, sp, find_spell("fireball"));
 
     lang = test_create_locale();
-    locale_setstring(lang, mkname("spell", sp->sname), "Feuerball");
-    CuAssertStrEquals(tc, "Feuerball", spell_name(sp, lang));
+    locale_setstring(lang, mkname_spell(sp), "Feuerball");
+    CuAssertStrEquals(tc, "Feuerball", spell_name(mkname_spell(sp), lang));
 
     u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
     set_level(u, SK_MAGIC, 10);
