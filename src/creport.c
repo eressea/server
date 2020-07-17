@@ -474,10 +474,12 @@ static int cr_spell(variant var, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     spell *sp = (spell *)var.v;
-    if (sp != NULL)
-        sprintf(buffer, "\"%s\"", spell_name(sp, report->locale));
-    else
+    if (sp != NULL) {
+        sprintf(buffer, "\"%s\"", spell_name(mkname_spell(sp), report->locale));
+    } 
+    else {
         strcpy(buffer, "\"\"");
+    }
     return 0;
 }
 
@@ -706,7 +708,8 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
             spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
             if (sbe->level <= maxlevel) {
                 const spell *sp = spellref_get(&sbe->spref);
-                const char *name = translate(mkname("spell", sp->sname), spell_name(sp, f->locale));
+                const char * spname = mkname("spell", sp->sname);
+                const char *name = translate(spname, spell_name(spname, f->locale));
                 if (!header) {
                     stream_printf(out, "SPRUECHE\n");
                     header = 1;
@@ -925,12 +928,12 @@ void cr_output_unit(stream *out, const faction * f,
                 int level;
                 const spell *sp = mage_get_combatspell(mage, i, &level);
                 if (sp) {
-                    const char *name;
+                    const char *name = mkname_spell(sp);
                     if (level > maxlevel) {
                         level = maxlevel;
                     }
                     stream_printf(out, "KAMPFZAUBER %d\n", i);
-                    name = translate(mkname("spell", sp->sname), spell_name(sp, lang));
+                    name = translate(name, spell_name(name, lang));
                     stream_printf(out, "\"%s\";name\n", name);
                     stream_printf(out, "%d;level\n", level);
                 }
@@ -1059,8 +1062,8 @@ static void cr_find_address(FILE * F, const faction * uf, selist * addresses)
 static void cr_reportspell(FILE * F, const spell * sp, int level, const struct locale *lang)
 {
     int k;
-    const char *name =
-        translate(mkname("spell", sp->sname), spell_name(sp, lang));
+    const char *spname = mkname_spell(sp);
+    const char *name = translate(spname, spell_name(spname, lang));
 
     fprintf(F, "ZAUBER %d\n", str_hash(sp->sname));
     fprintf(F, "\"%s\";name\n", name);

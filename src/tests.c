@@ -27,13 +27,14 @@
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 
+#include <util/aliases.h>
 #include <util/functions.h>
-#include "util/keyword.h"
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 #include <util/log.h>
-#include "util/param.h"
+#include <util/param.h>
 #include <util/rand.h>
 #include <util/assert.h>
 
@@ -249,6 +250,7 @@ static void test_reset(void) {
     free_shiptypes();
     free_races();
     free_spellbooks();
+    free_aliases();
     free_prefixes();
     mt_clear();
 

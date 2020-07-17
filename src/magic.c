@@ -22,12 +22,15 @@
 #include <spells/unitcurse.h>
 
 #include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/equipment.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
+#include <kernel/gamedata.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/objtypes.h>
@@ -44,10 +47,8 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <kernel/attrib.h>
+#include <util/aliases.h>
 #include <util/base36.h>
-#include <kernel/event.h>
-#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
@@ -2927,10 +2928,14 @@ const char *spell_info(const spell * sp, const struct locale *lang)
     return LOC(lang, mkname("spellinfo", sp->sname));
 }
 
-/* TODO: should take the name, not the spell (spellref optimizations) */
-const char *spell_name(const spell * sp, const struct locale *lang)
+const char *mkname_spell(const spell *sp)
 {
-    return LOC(lang, mkname("spell", sp->sname));
+    return mkname("spell", sp->sname);
+}
+
+const char *spell_name(const char *spname, const struct locale *lang)
+{
+    return LOC(lang, spname);
 }
 
 const char *curse_name(const curse_type * ctype, const struct locale *lang)
@@ -2948,14 +2953,22 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
     for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
         spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
         const spell *sp = spellref_get(&sbe->spref);
-        const char *n = spell_name(sp, lang);
+        const char *spname = mkname("spell", sp->sname);
+        const char *n = spell_name(spname, lang);
         if (!n) {
             log_error("no translation in locale %s for spell %s\n", locale_name(lang), sp->sname);
         }
         else {
             variant token;
+            const str_alias *aliases = alias_get(lang, spname);
             token.v = (void *)sp;
             addtoken((struct tnode **)tokens, n, token);
+            if (aliases) {
+                int i;
+                for (i = 0; i != MAXSTRINGS && aliases->strings[i]; ++i) {
+                    addtoken((struct tnode **)tokens, aliases->strings[i], token);
+                }
+            }
         }
     }
 }
