@@ -10,6 +10,7 @@
 #include "kernel/faction.h"
 #include "kernel/item.h"
 
+#include "util/aliases.h"
 #include "util/functions.h"
 #include "util/language.h"
 #include "util/log.h"
@@ -53,6 +54,7 @@ void game_done(void)
     free_config();
     free_locales();
 #endif
+    free_aliases();
     free_prefixes();
     free_special_directions();
     kernel_done();

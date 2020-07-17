@@ -3,6 +3,7 @@ project(util C)
 add_subdirectory (crypto)
 
 SET(_TEST_FILES
+# aliases.test.c
 base36.test.c
 # crmessage.test.c
 # dice.test.c
@@ -31,6 +32,7 @@ variant.test.c
 )
 
 SET(_FILES
+aliases.c
 base36.c
 crmessage.c
 dice.c

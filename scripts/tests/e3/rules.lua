@@ -168,7 +168,7 @@ function test_no_teach()
     -- TODO: assert something (reflecting skills sucks!)
 end
 
-function test_seecast()
+function test_seacast()
     local r = region.create(0,0, "plain")
     for i = 1,10 do
         -- this prevents storms (only high seas have storms)
