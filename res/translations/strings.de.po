@@ -106,27 +106,15 @@ msgctxt "keyword"
 msgid "entertain"
 msgstr "UNTERHALTE"
 
-msgid "spinx00"
-msgstr "Das Schiff des Elfen hat ein rotes Segel"
-
 msgid "greatbow_p"
 msgstr "Elfenbögen"
-
-msgid "spinx01"
-msgstr "Der Zwerg hat eine Nuss dabei"
 
 msgid "person"
 msgstr "Person"
 
-msgid "spinx02"
-msgstr "Die Katze führt eine Hellebarde"
-
 msgctxt "spell"
 msgid "eternal_walls"
 msgstr "Mauern der Ewigkeit"
-
-msgid "spinx03"
-msgstr "Das Schiff mit dem grünen Segel liegt links neben dem mit einem weissen Segel"
 
 msgid "JEDEM"
 msgstr "JEDEM"
@@ -135,30 +123,8 @@ msgctxt "skill"
 msgid "sailing"
 msgstr "Segeln"
 
-msgid "spinx04"
-msgstr "Auf dem Schiff mit grünen Segeln kam der Speerkämpfer"
-
 msgid "h16_p"
 msgstr "Spaltwachse"
-
-msgid "spinx05"
-msgstr "Der Krieger mit dem Kreis im Wappen hat einen Keks"
-
-msgid "spinx06"
-msgstr "Der Krieger des mittleren Schiffs hat ein Schwert"
-
-msgid "fortress_generic"
-msgstr "Burg"
-
-msgid "spinx07"
-msgstr "Auf dem gelben Segel prankt ein Kreuz als Wappen"
-
-msgctxt "race"
-msgid "undeadpharaoh_d"
-msgstr "Untoten Pharao"
-
-msgid "spinx08"
-msgstr "Der Mensch kam mit dem ersten Schiff"
 
 msgid "TRAENKE"
 msgstr "TRÄNKE"
@@ -201,14 +167,6 @@ msgctxt "iteminfo"
 msgid "wente_dress"
 msgstr "Hach! Sieht der Mann beeindruckend aus in diesem Frack! Und so ordentlich! Und so ernst! Und so beeindruckend! Es fällt ein wenig schwer, sich auf den Bräutigam zu konzentrieren, weil das Brautkleid noch daneben strahlt, aber der Anzug des Bräutigams ist auf jeden Fall so, wie er sein soll und sieht toll aus und sehr geschmackvoll."
 
-msgctxt "race"
-msgid "apophis_d"
-msgstr "Apophis"
-
-msgctxt "race"
-msgid "undeadpharaoh_p"
-msgstr "Untoter Pharaonen"
-
 msgctxt "iteminfo"
 msgid "magicbag"
 msgstr "Dieser Beutel umschließt eine kleine Dimensionsfalte, in der bis zu 200 Gewichtseinheiten transportiert werden können, ohne dass sie auf das Traggewicht angerechnet werden. Pferde und andere Lebewesen sowie besonders sperrige Dinge (Wagen und Katapulte) können nicht in dem Beutel transportiert werden. Auch ist es nicht möglich, einen Zauberbeutel in einem anderen zu transportieren. Der Beutel selber wiegt 1 GE."
@@ -240,10 +198,6 @@ msgid "age_3"
 msgstr "des dritten Zeitalters"
 
 msgctxt "race"
-msgid "undeadpharaoh_x"
-msgstr "Untote Pharaonen"
-
-msgctxt "race"
 msgid "youngdragon_d"
 msgstr "Jungdrachen"
 
@@ -262,16 +216,9 @@ msgctxt "spellinfo"
 msgid "auraleak"
 msgstr "Der Schwarzmagier kann mit diesem dunklen Ritual einen Riss in das Gefüge der Magie bewirken, der alle magische Kraft aus der Region reißen wird. Alle magisch begabten in der Region werden einen Großteil ihrer Aura verlieren."
 
-msgctxt "race"
-msgid "apophis_p"
-msgstr "Apophis"
-
 msgctxt "spell"
 msgid "calm_monster"
 msgstr "Monster friedlich stimmen"
-
-msgid "spinx10"
-msgstr "Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat"
 
 msgctxt "spellinfo"
 msgid "sound_out"
@@ -281,25 +228,9 @@ msgctxt "spell"
 msgid "readmind"
 msgstr "Traumdeuten"
 
-msgid "spinx11"
-msgstr "Der Krieger mit dem Turm im Wappen trägt eine Axt"
-
-msgid "spinx12"
-msgstr "Das Schiff des Menschen liegt neben dem blauen Schiff"
-
-msgctxt "race"
-msgid "apophis_x"
-msgstr "Apophis"
-
-msgid "spinx13"
-msgstr "Das Insekt trägt einen Baum als Wappen"
-
 msgctxt "race"
 msgid "youngdragon_p"
 msgstr "Jungdrachen"
-
-msgid "spinx14"
-msgstr "Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt"
 
 msgid "nr_options"
 msgstr "Optionen"
@@ -706,10 +637,6 @@ msgid "zombie_prefix_8"
 msgstr "Fürchterliche"
 
 msgctxt "race"
-msgid "redscarab"
-msgstr "roter Scarabäus"
-
-msgctxt "race"
 msgid "wolf_d"
 msgstr "Wölfen"
 
@@ -893,10 +820,6 @@ msgctxt "race"
 msgid "shadowmaster_d"
 msgstr "Schattenmeistern"
 
-msgctxt "race"
-msgid "redscarab_d"
-msgstr "roten Scarabäen"
-
 msgid "aurapotion50_p"
 msgstr "Auratränke"
 
@@ -919,9 +842,6 @@ msgctxt "spellinfo"
 msgid "disturbingdreams"
 msgstr "Dieser Zauber führt in der betroffenen Region für einige Wochen zu Schlaflosigkeit und Unruhe. Den Betroffenen fällt das Lernen deutlich schwerer."
 
-msgid "wdw_pyramid"
-msgstr "Pyramide"
-
 msgctxt "race"
 msgid "shadowmaster_p"
 msgstr "Schattenmeister"
@@ -931,10 +851,6 @@ msgstr "unbewaffnet"
 
 msgid "plain"
 msgstr "Ebene"
-
-msgctxt "race"
-msgid "redscarab_p"
-msgstr "rote Scarabäen"
 
 msgctxt "race"
 msgid "seaserpent_p"
@@ -967,10 +883,6 @@ msgstr "Adamantium"
 
 msgid "seashell"
 msgstr "Muschel"
-
-msgctxt "race"
-msgid "redscarab_x"
-msgstr "rote Scarabäen"
 
 msgid "adamantiumplate"
 msgstr "Adamantiumrüstung"
@@ -1008,10 +920,6 @@ msgstr "Ritual der Aufnahme"
 
 msgid "SCHIFF"
 msgstr "SCHIFF"
-
-msgctxt "race"
-msgid "littlescarab"
-msgstr "kleiner Scarabäus"
 
 msgctxt "iteminfo"
 msgid "nut"
@@ -1267,7 +1175,7 @@ msgstr "Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb e
 
 msgctxt "spell"
 msgid "earthquake"
-msgstr "Beschwöre einen Erdelementar"
+msgstr "Erdelementar"
 
 msgctxt "spell"
 msgid "raise_mob"
@@ -1646,10 +1554,6 @@ msgstr "Adamantiumrüstungen"
 msgid "log"
 msgstr "Holz"
 
-msgctxt "race"
-msgid "bluescarab"
-msgstr "blauer Scarabäus"
-
 msgctxt "school"
 msgid "draig"
 msgstr "Draig"
@@ -1685,10 +1589,6 @@ msgctxt "spell"
 msgid "mallorntreegrow"
 msgstr "Segne Mallornstecken"
 
-msgctxt "race"
-msgid "littlescarab_d"
-msgstr "kleinen Scarabäen"
-
 msgctxt "keyword"
 msgid "hide"
 msgstr "TARNE"
@@ -1707,10 +1607,6 @@ msgstr "Dämonenblut"
 msgctxt "damage"
 msgid "plusstrong"
 msgstr "sehr stark"
-
-msgctxt "race"
-msgid "littlescarab_p"
-msgstr "kleine Scarabäen"
 
 msgid "an_unknown_ship"
 msgstr "ein unbekanntes Schiff"
@@ -1746,7 +1642,7 @@ msgstr "DEBUG"
 
 msgctxt "spell"
 msgid "goodwinds"
-msgstr "Beschwörung eines Wasserelementares"
+msgstr "Wasserelementar"
 
 msgid "GEBAEUDE"
 msgstr "GEBÄUDE"
@@ -1757,10 +1653,6 @@ msgstr "KRÄUTER"
 msgctxt "spellinfo"
 msgid "rustweapon"
 msgstr "Mit diesem Ritual wird eine dunkle Gewitterfront beschworen, die sich unheilverkündend über der Region auftürmt. Der magische Regen wird alles Erz rosten lassen. Eisenwaffen und Rüstungen werden schartig und rostig. Die Zerstörungskraft des Regens ist von der investierten Kraft des Magiers abhängig. Für jede Stufe können bis zu 10 Eisenwaffen betroffen werden. Ein Ring der Macht verstärkt die Wirkung wie eine zusätzliche Stufe."
-
-msgctxt "race"
-msgid "littlescarab_x"
-msgstr "kleine Scarabäen"
 
 msgid "rop"
 msgstr "Ring der Macht"
@@ -2283,10 +2175,6 @@ msgid "wdwpyramid_illaun"
 msgstr "Traum von den Göttern"
 
 msgctxt "race"
-msgid "bluescarab_d"
-msgstr "blauen Scarabäen"
-
-msgctxt "race"
 msgid "snotling"
 msgstr "Snotling"
 
@@ -2317,10 +2205,6 @@ msgctxt "prefix"
 msgid "Klein"
 msgstr "Klein"
 
-msgctxt "race"
-msgid "bluescarab_p"
-msgstr "blaue Scarabäen"
-
 msgid "citadel"
 msgstr "Zitadelle"
 
@@ -2343,10 +2227,6 @@ msgstr "Wyrme"
 
 msgid "viele"
 msgstr "viele"
-
-msgctxt "race"
-msgid "bluescarab_x"
-msgstr "blaue Scarabäen"
 
 msgctxt "spell"
 msgid "wdwpyramid_draig"
@@ -2947,7 +2827,7 @@ msgstr "aus dem Dunkel"
 
 msgctxt "spell"
 msgid "drought"
-msgstr "Beschwörung eines Hitzeelementar"
+msgstr "Tor in die Ebene der Hitze"
 
 msgctxt "describe"
 msgid "p6"
@@ -3653,7 +3533,7 @@ msgstr "FAHRE"
 
 msgctxt "spell"
 msgid "stormwinds"
-msgstr "Beschwöre einen Sturmelementar"
+msgstr "Sturmelementar"
 
 msgctxt "race"
 msgid "elf"
@@ -3811,10 +3691,6 @@ msgstr "Silber"
 
 msgid "jadee_ring_p"
 msgstr "Jadees Hochzeitsringe"
-
-msgctxt "race"
-msgid "apophis"
-msgstr "Apophis"
 
 msgctxt "shipinfo"
 msgid "no_info"
@@ -4086,10 +3962,6 @@ msgstr "Neue Zauber"
 msgid "nr_borderlist_prefix"
 msgstr "Im "
 
-msgctxt "race"
-msgid "greenscarab_d"
-msgstr "grünen Scarabäen"
-
 msgctxt "iteminfo"
 msgid "speedsail"
 msgstr "Setzt eine Einheit dieses Segel auf einem Schiff, so erhöht sich dessen Reichweite permanent um 1 Region."
@@ -4101,10 +3973,6 @@ msgstr "Nymphen"
 msgctxt "spell"
 msgid "flee"
 msgstr "Grauen der Schlacht"
-
-msgctxt "race"
-msgid "greenscarab_p"
-msgstr "grüne Scarabäen"
 
 msgid "studypotion_p"
 msgstr "Lerntränke"
@@ -4133,10 +4001,6 @@ msgctxt "race"
 msgid "human_d"
 msgstr "Menschen"
 
-msgctxt "race"
-msgid "greenscarab_x"
-msgstr "grünen Scarabäen"
-
 msgctxt "spellinfo"
 msgid "unholypower"
 msgstr "Nur geflüstert wird dieses Ritual an den dunklen Akademien an die Adepten weitergegeben, gehört es doch zu den finstersten, die je niedergeschrieben wurden. Durch die Anrufung unheiliger Dämonen wird die Kraft der lebenden Toten verstärkt und sie verwandeln sich in untote Monster großer Kraft."
@@ -4154,7 +4018,7 @@ msgstr "Kein Magiegebiet"
 
 msgctxt "spell"
 msgid "summonfireelemental"
-msgstr "Beschwörung eines Hitzeelementar"
+msgstr "Hitzeelementar"
 
 msgid "seed"
 msgstr "Same"
@@ -6120,10 +5984,6 @@ msgstr "das Bergland von %s"
 msgctxt "race"
 msgid "halfling_p"
 msgstr "Halblinge"
-
-msgctxt "race"
-msgid "greenscarab"
-msgstr "grüner Scarabäus"
 
 msgctxt "keyword"
 msgid "quit"
