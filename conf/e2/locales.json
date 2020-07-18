@@ -11,24 +11,24 @@
   "aliases": {
     "de": {
       "spell::earthquake": [
-        "Erdelementar",
-        "Beschwörung eines Erdelemntares"
+        "Beschwöre einen Erdelementar",
+        "Beschwörung eines Erdelementares"
       ],
       "spell::goodwinds": [
-        "Wasserelementar",
+        "Beschwörung eines Wasserelementares",
         "Beschwöre einen Wasserelementar"
       ],
       "spell::stormwinds": [
-        "Sturmelementar",
+        "Beschwöre einen Sturmelementar",
         "Beschwörung eines Sturmelementares"
       ],
       "spell::summonfireelemental": [
-        "Hitzeelementar",
+        "Beschwöre einen Hitzeelementar",
         "Beschwörung eines Hitzeelementares"
       ]
     },
     "en": {
-      "spell::migration": "Rite of Acceptance"
+      "spell::migration": "Rit of Acceptance"
     }
   }
 }

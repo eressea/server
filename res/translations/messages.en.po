@@ -1637,9 +1637,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ma
 msgid "curseinfo::sparkle_11"
 msgstr "\"Bird songs follow $unit($unit) on all his travels. ($int36($id))\""
 
-msgid "wdw_pyramidspell_notfound"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - No pyramids may be build in this region. The closest region to build a pyramid in is between $int($mindist) and $int($maxdist) regions away.\""
-
 msgid "sailforbidden"
 msgstr "\"The crew of the $ship($ship) refuses to travel to $region($region).\""
 
@@ -1861,9 +1858,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The paths to th
 
 msgid "familiar_toofar"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($mage) cannot raise enough energy to channel the spell through $unit($unit).\""
-
-msgid "wdw_pyramidspell_found"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Pyramids may be build in this region.\""
 
 msgid "deorcified"
 msgstr "\"Little by little, people return to $region($region).\""

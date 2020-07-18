@@ -131,10 +131,6 @@ msgstr "POTIONS"
 msgid "northwest"
 msgstr "northwest"
 
-msgctxt "race"
-msgid "undeadpharaoh_d"
-msgstr "undead Pharaoh"
-
 msgid "h19_p"
 msgstr "white hemlocks"
 
@@ -161,14 +157,6 @@ msgstr "The famous bard Mirim was known for exceptionally limber play of the har
 
 msgid "rustysword_p"
 msgstr "rusty swords"
-
-msgctxt "race"
-msgid "apophis_d"
-msgstr "apophis"
-
-msgctxt "race"
-msgid "undeadpharaoh_p"
-msgstr "undead Pharaohs"
 
 msgctxt "iteminfo"
 msgid "magicbag"
@@ -201,10 +189,6 @@ msgid "age_3"
 msgstr "the third age"
 
 msgctxt "race"
-msgid "undeadpharaoh_x"
-msgstr "undead Pharaoh"
-
-msgctxt "race"
 msgid "youngdragon_d"
 msgstr "young dragons"
 
@@ -223,10 +207,6 @@ msgctxt "spellinfo"
 msgid "auraleak"
 msgstr "With this dark ritual the chaos sorcerer causes a deep rift to appear in the astral balance that will tear all magical power from a region. All spellcasters in that region will lose most of their aura."
 
-msgctxt "race"
-msgid "apophis_p"
-msgstr "apophis"
-
 msgctxt "spell"
 msgid "calm_monster"
 msgstr "Calm Monster"
@@ -238,10 +218,6 @@ msgstr "Should the unit succumb to the spell, they will tell the mage everything
 msgctxt "spell"
 msgid "readmind"
 msgstr "Mind Probe"
-
-msgctxt "race"
-msgid "apophis_x"
-msgstr "apophis"
 
 msgid "nr_options"
 msgstr "Options"
@@ -538,10 +514,6 @@ msgid "tree"
 msgstr "tree"
 
 msgctxt "race"
-msgid "redscarab"
-msgstr "red scarab"
-
-msgctxt "race"
 msgid "wolf_d"
 msgstr "wolves"
 
@@ -665,10 +637,6 @@ msgctxt "race"
 msgid "shadowmaster_d"
 msgstr "shadowmasters"
 
-msgctxt "race"
-msgid "redscarab_d"
-msgstr "red scarab"
-
 msgid "aurapotion50_p"
 msgstr "aura potions"
 
@@ -691,9 +659,6 @@ msgctxt "spellinfo"
 msgid "disturbingdreams"
 msgstr "This spell causes insomnia and restlessness in a whole region for several weeks. All affected persons will learn much slower than normal."
 
-msgid "wdw_pyramid"
-msgstr "pyramid"
-
 msgid "plain"
 msgstr "plain"
 
@@ -703,10 +668,6 @@ msgstr "shadowmaster"
 
 msgid "unarmed"
 msgstr "unarmed"
-
-msgctxt "race"
-msgid "redscarab_p"
-msgstr "red scarabs"
 
 msgctxt "race"
 msgid "seaserpent_p"
@@ -740,10 +701,6 @@ msgstr "adamantium"
 msgid "seashell"
 msgstr "seashell"
 
-msgctxt "race"
-msgid "redscarab_x"
-msgstr "red scarab"
-
 msgid "adamantiumplate"
 msgstr "adamantium plate"
 
@@ -776,14 +733,10 @@ msgstr "Astral Disruption"
 
 msgctxt "spell"
 msgid "migration"
-msgstr "Rit of Acceptance"
+msgstr "Rite of Acceptance"
 
 msgid "SCHIFF"
 msgstr "SHIP"
-
-msgctxt "race"
-msgid "littlescarab"
-msgstr "little scarab"
 
 msgid "spice_p"
 msgstr "spice"
@@ -1388,10 +1341,6 @@ msgstr "wood"
 msgid "presspass_p"
 msgstr "presspasses"
 
-msgctxt "race"
-msgid "bluescarab"
-msgstr "blue scarab"
-
 msgctxt "school"
 msgid "draig"
 msgstr "Draig"
@@ -1412,10 +1361,6 @@ msgctxt "skill"
 msgid "taxation"
 msgstr "taxation"
 
-msgctxt "race"
-msgid "undeadpharaoh"
-msgstr "undead Pharaoh"
-
 msgctxt "spell"
 msgid "heroic_song"
 msgstr "Epic Heroes"
@@ -1423,10 +1368,6 @@ msgstr "Epic Heroes"
 msgctxt "spell"
 msgid "mallorntreegrow"
 msgstr "Bless Mallorn Logs"
-
-msgctxt "race"
-msgid "littlescarab_d"
-msgstr "little scarab"
 
 msgctxt "keyword"
 msgid "hide"
@@ -1446,10 +1387,6 @@ msgstr "demon blood"
 msgctxt "damage"
 msgid "plusstrong"
 msgstr "super strong"
-
-msgctxt "race"
-msgid "littlescarab_p"
-msgstr "little scarab"
 
 msgid "an_unknown_ship"
 msgstr "an unknown ship"
@@ -1495,10 +1432,6 @@ msgstr "HERBS"
 msgctxt "spellinfo"
 msgid "rustweapon"
 msgstr "This ritual conjurs up a dark thunderstorm that affects a whole region. The magic rain will let rust any ore. Iron weapons and armor will get rusty. The exact number of items affected by the rain depends on the ammount of power invested by the magician. Up to ten weapons can be destroyed per level - a Ring of Power increases the effect like an additional level."
-
-msgctxt "race"
-msgid "littlescarab_x"
-msgstr "little scarab"
 
 msgid "rop"
 msgstr "ring of power"
@@ -1925,10 +1858,6 @@ msgid "wdwpyramid_illaun"
 msgstr "Dream of the gods"
 
 msgctxt "race"
-msgid "bluescarab_d"
-msgstr "blue scarab"
-
-msgctxt "race"
 msgid "snotling"
 msgstr "snotling"
 
@@ -1962,10 +1891,6 @@ msgstr "gully "
 msgid "citadel"
 msgstr "citadel"
 
-msgctxt "race"
-msgid "bluescarab_p"
-msgstr "blue scarabs"
-
 msgctxt "spell"
 msgid "puttorest"
 msgstr "Eternal Rest"
@@ -1985,10 +1910,6 @@ msgstr "wyrms"
 
 msgid "viele"
 msgstr "many"
-
-msgctxt "race"
-msgid "bluescarab_x"
-msgstr "blue scarab"
 
 msgctxt "spell"
 msgid "wdwpyramid_draig"
@@ -2551,7 +2472,7 @@ msgstr "Allow a Tangy Temerity to simmer for three hours in a litre of water, th
 
 msgctxt "spell"
 msgid "drought"
-msgstr "Summon Fire Elemental"
+msgstr "Gate to the elemental plane of fire"
 
 msgid "pegasus_p"
 msgstr "pegasi"
@@ -3349,10 +3270,6 @@ msgstr "silver"
 msgid "jadee_ring_p"
 msgstr "Jadee's wedding rings"
 
-msgctxt "race"
-msgid "apophis"
-msgstr "apophis"
-
 msgctxt "shipinfo"
 msgid "no_info"
 msgstr "No Information available for this type of ship."
@@ -3614,10 +3531,6 @@ msgstr "New Spells"
 msgid "nr_borderlist_prefix"
 msgstr "To the "
 
-msgctxt "race"
-msgid "greenscarab_d"
-msgstr "green scarab"
-
 msgctxt "iteminfo"
 msgid "speedsail"
 msgstr "A unit setting this sail on a ship temporarily will permanently increase the ship's range by 1."
@@ -3629,10 +3542,6 @@ msgstr "nymphs"
 msgctxt "spell"
 msgid "flee"
 msgstr "Unspeakable Horrors"
-
-msgctxt "race"
-msgid "greenscarab_p"
-msgstr "green scarab"
 
 msgid "studypotion_p"
 msgstr "brain boosts"
@@ -3660,10 +3569,6 @@ msgstr "lynx"
 msgctxt "race"
 msgid "human_d"
 msgstr "humans"
-
-msgctxt "race"
-msgid "greenscarab_x"
-msgstr "green scarab"
 
 msgctxt "spellinfo"
 msgid "unholypower"
@@ -5420,10 +5325,6 @@ msgstr "halflings"
 msgctxt "keyword"
 msgid "quit"
 msgstr "QUIT"
-
-msgctxt "race"
-msgid "greenscarab"
-msgstr "green scarab"
 
 msgid "AURA"
 msgstr "AURA"

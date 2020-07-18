@@ -1637,9 +1637,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ge
 msgid "curseinfo::sparkle_11"
 msgstr "\"Vogelzwitschern begleitet $unit($unit) auf all seinen Wegen. ($int36($id))\""
 
-msgid "wdw_pyramidspell_notfound"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Region können keine Pyramiden gebaut werden. Die nächste Pyramidenregion ist zwischen $int($mindist) und $int($maxdist) Regionen entfernt.\""
-
 msgid "sailforbidden"
 msgstr "\"Die Mannschaft der $ship($ship) weigert sich, nach $region($region) zu reisen.\""
 
@@ -1861,9 +1858,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Wege zwisch
 
 msgid "familiar_toofar"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann nicht genug Energie aufbringen, um diesen Spruch durch $unit($unit) zu wirken.\""
-
-msgid "wdw_pyramidspell_found"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - In dieser Regione können Pyramiden gebaut werden.\""
 
 msgid "deorcified"
 msgstr "\"Langsam kehren andere Völker nach $region($region) zurück.\""
