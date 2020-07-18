@@ -5459,13 +5459,6 @@
       <arg name="alliance" type="alliance"/>
     </type>
   </message>
-  <message name="wdw_pyramidspell_found" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   
   <message name="error_spell_on_ship_already" section="errors">
     <type>
@@ -5485,16 +5478,6 @@
     </type>
   </message>
   
-  <message name="wdw_pyramidspell_notfound" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-      <arg name="mindist" type="int"/>
-      <arg name="maxdist" type="int"/>
-    </type>
-  </message>
-
   <message name="wormhole_requirements" section="errors">
     <type>
       <arg name="unit" type="unit"/>
