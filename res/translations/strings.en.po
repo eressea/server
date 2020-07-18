@@ -706,9 +706,8 @@ msgstr "shadow master"
 msgid "adamantium"
 msgstr "adamantium"
 
-#, fuzzy
 msgid "seashell"
-msgstr "sea shell"
+msgstr "seashell"
 
 msgid "adamantiumplate"
 msgstr "adamantium plate"
@@ -1077,10 +1076,6 @@ msgid "an_illusionwall"
 msgstr "an illusionary wall"
 
 msgctxt "race"
-msgid "apepsnake"
-msgstr "apep snake"
-
-msgctxt "race"
 msgid "dracoid_d"
 msgstr "dracoids"
 
@@ -1432,9 +1427,10 @@ msgstr "DEBUG"
 msgid "GEBAEUDE"
 msgstr "BUILDING"
 
+#, fuzzy
 msgctxt "spell"
 msgid "goodwinds"
-msgstr "Summon Water Elemental"
+msgstr "Water Elemental"
 
 msgid "KRAEUTER"
 msgstr "HERBS"
@@ -2566,10 +2562,6 @@ msgstr "This spell enhances natural magic resistance. Protected units are also l
 msgid "ADRESSEN"
 msgstr "ADDRESSES"
 
-msgctxt "race"
-msgid "apepsnake_d"
-msgstr "apep snakes"
-
 msgid "section_production"
 msgstr "Resources and Production"
 
@@ -2582,10 +2574,6 @@ msgstr "COMPUTER"
 msgctxt "spell"
 msgid "chaossuction"
 msgstr "Chaos Gate"
-
-msgctxt "race"
-msgid "apepsnake_p"
-msgstr "apep snakes"
 
 msgid "PARTEITARNUNG"
 msgstr "FACTIONSTEALTH"
@@ -2601,10 +2589,6 @@ msgstr "Tybied"
 msgctxt "keyword"
 msgid "name"
 msgstr "NAME"
-
-msgctxt "race"
-msgid "apepsnake_x"
-msgstr "apep snake"
 
 msgid "KOMMANDO"
 msgstr "CONTROL"
@@ -4996,7 +4980,7 @@ msgid "adamantium_p"
 msgstr "adamantium"
 
 msgid "seashell_p"
-msgstr "sea shells"
+msgstr "seashells"
 
 msgid "nr_spell_type"
 msgstr "Type:"
@@ -5686,9 +5670,6 @@ msgstr "a flying carpet"
 
 msgid "flyingcarpet_p"
 msgstr "flying carpets"
-
-msgid "fortress_generic"
-msgstr "fortress"
 
 msgid "ghoul_name_0"
 msgstr "ghouls"

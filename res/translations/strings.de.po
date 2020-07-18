@@ -119,10 +119,6 @@ msgstr "Segeln"
 msgid "h16_p"
 msgstr "Spaltwachse"
 
-#, fuzzy
-msgid "fortress_generic"
-msgstr "Burg"
-
 msgid "TRAENKE"
 msgstr "TRÄNKE"
 
@@ -1240,10 +1236,6 @@ msgstr "Neue Tränke"
 msgctxt "border"
 msgid "an_illusionwall"
 msgstr "eine Illusionswand"
-
-msgctxt "race"
-msgid "apepsnake"
-msgstr "Apepschlange"
 
 msgctxt "race"
 msgid "dracoid_d"
@@ -2883,10 +2875,6 @@ msgstr "BEKLAUE"
 msgid "ADRESSEN"
 msgstr "ADRESSEN"
 
-msgctxt "race"
-msgid "apepsnake_d"
-msgstr "Apepschlangen"
-
 msgid "section_production"
 msgstr "Rohstoffe und Produktion"
 
@@ -2899,10 +2887,6 @@ msgstr "COMPUTER"
 msgctxt "spell"
 msgid "chaossuction"
 msgstr "Chaossog"
-
-msgctxt "race"
-msgid "apepsnake_p"
-msgstr "Apepschlangen"
 
 msgid "skeleton_name_0"
 msgstr "Skelette"
@@ -2929,10 +2913,6 @@ msgstr "Kämpfer"
 
 msgid "skeleton_name_4"
 msgstr "Rächer"
-
-msgctxt "race"
-msgid "apepsnake_x"
-msgstr "Apepschlange"
 
 msgctxt "iteminfo"
 msgid "aots"
