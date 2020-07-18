@@ -28,6 +28,18 @@
       ]
     },
     "en": {
+      "spell::analyzedream": "Analyse Dreams",
+      "spell::antimagiczone": "Antimagic",
+      "spell::create_dreameye": "Create a Visioneye",
+      "spell::create_firesword": "Create a Flamesword",
+      "spell::create_focus": "Create an Aurafocus",
+      "spell::earthquake": "Summon Earth Elemental",
+      "spell::goodwinds": "Summon Water Elemental",
+      "spell::stormwinds": "Summon Storm Elemental",
+      "spell::summonfireelemental": "Summon Fire Elemental",
+      "spell::summonshadow": "Summon Shadowdemons",
+      "spell::summonshadowlords": "Summon Shadowmasters",
+      "spell::readmind": "Mind Probe",
       "spell::migration": "Rit of Acceptance"
     }
   }

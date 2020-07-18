@@ -896,7 +896,6 @@ msgctxt "race"
 msgid "seaserpent_x"
 msgstr "Seeschlangen"
 
-#, fuzzy
 msgctxt "spell"
 msgid "astralblock"
 msgstr "Störe Astrale Integrität"
@@ -3200,7 +3199,6 @@ msgstr "ERESSEA"
 msgid "bagpipeoffear_p"
 msgstr "Dudelsäcke der Furcht"
 
-#, fuzzy
 msgctxt "spell"
 msgid "astral_disruption"
 msgstr "Störe Astrale Integrität"

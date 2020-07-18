@@ -741,7 +741,6 @@ msgctxt "spell"
 msgid "astralblock"
 msgstr "Astral Disruption"
 
-#, fuzzy
 msgctxt "spell"
 msgid "migration"
 msgstr "Rite of Acceptance"
@@ -956,7 +955,7 @@ msgstr "Like many magic chants this one also originates from the ancient knowled
 
 msgctxt "spell"
 msgid "nodrift"
-msgstr "Summon Water Elemental"
+msgstr "Water Elemental"
 
 msgctxt "spell"
 msgid "combat_speed"
@@ -994,7 +993,7 @@ msgstr "This spell causes a severe disturbance of the astral plane. Within an as
 
 msgctxt "spell"
 msgid "earthquake"
-msgstr "Summon Earth Elemental"
+msgstr "Earth Elemental"
 
 msgid "unknownunit"
 msgstr "an unknown unit"
@@ -1994,7 +1993,6 @@ msgctxt "prefix"
 msgid "Mond"
 msgstr "moon "
 
-#, fuzzy
 msgctxt "iteminfo"
 msgid "snowball"
 msgstr "These items stay frozen all year round. There seem to be bits of ice inside - in the right hands, these might put an eye out!"
@@ -3133,7 +3131,7 @@ msgstr "RIDE"
 
 msgctxt "spell"
 msgid "stormwinds"
-msgstr "Summon Storm Elemental"
+msgstr "Storm Elemental"
 
 msgctxt "race"
 msgid "elf"
@@ -3254,10 +3252,9 @@ msgctxt "spell"
 msgid "magicrunes"
 msgstr "Protective Runes"
 
-#, fuzzy
 msgctxt "spell"
 msgid "stormwind"
-msgstr "Summon Storm Elemental"
+msgstr "Storm Elemental"
 
 msgctxt "spell"
 msgid "irongolem"
@@ -3605,9 +3602,10 @@ msgctxt "school"
 msgid "gray"
 msgstr "no magic school"
 
+#, fuzzy
 msgctxt "spell"
 msgid "summonfireelemental"
-msgstr "Summon Fire Elemental"
+msgstr "Heat Elemental"
 
 msgid "seed"
 msgstr "seed"
