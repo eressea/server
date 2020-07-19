@@ -4,6 +4,15 @@ local self = {}
 local function equip_first(u)
     name = 'seed_' .. u.race
     equip_unit(u, name, 255)
+    local r = u.region
+    r.terrain = 'plain'
+    r:set_flag(1, false) -- kein mallorn
+    r:set_resource('tree', 500)
+    r:set_resource('sapling', 100)
+    r:set_resource('seed', 50)
+    r:set_resource('peasant', 4000)
+    r:set_resource('money', 80000)
+    r:set_resource('horse', 50)
 end
 
 local mysets = {
