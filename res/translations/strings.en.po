@@ -1,23 +1,28 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: Eressea Server\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
-"Last-Translator: \n"
+"Last-Translator: stm <stm2@sourceforge.net>\n"
 "Language-Team: \n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
-"X-Generator: Poedit 2.0.7\n"
+"X-Generator: Poedit 2.0.6\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../src\n"
+"X-Poedit-SearchPath-0: .\n"
 
+#, fuzzy
 msgid "rustychainmail"
-msgstr "rustychainmail"
+msgstr "rusty chainmail"
 
 msgctxt "spellinfo"
 msgid "destroy_magic"
-msgstr "This spell lets a magician destroy spells on a ship, building or region."
+msgstr "This spell lets a magician destroy spells on a ship, a building, or a region."
 
+#, fuzzy
 msgctxt "spell"
 msgid "shadowknights"
 msgstr "Shadow Knights"
@@ -27,11 +32,12 @@ msgid "snowman"
 msgstr "snowman"
 
 msgid "par_unit"
-msgstr "unitid"
+msgstr "unit-id"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowdemon_d"
-msgstr "shadowdemons"
+msgstr "shadow demons"
 
 msgctxt "coast"
 msgid "sw"
@@ -40,15 +46,12 @@ msgstr "southwest coast"
 msgid "pegasus"
 msgstr "pegasus"
 
-msgctxt "race"
-msgid "sphinx_x"
-msgstr "sphinx"
-
 msgid "truthpotion_p"
 msgstr "potions of truth"
 
+#, fuzzy
 msgid "aurafocus"
-msgstr "aurafocus"
+msgstr "aura focus"
 
 msgid "firewall"
 msgstr "firewall"
@@ -67,9 +70,10 @@ msgctxt "spell"
 msgid "transferauratraum"
 msgstr "Dream of Magic"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowdemon_p"
-msgstr "shadowdemons"
+msgstr "shadow demons"
 
 msgid "h10_p"
 msgstr "peyote"
@@ -83,10 +87,7 @@ msgstr "Double Time"
 
 msgctxt "race"
 msgid "shadowdemon_x"
-msgstr "shadowdemon"
-
-msgid "jadee_dress"
-msgstr "wedding dress"
+msgstr "shadow demon"
 
 msgid "halberd_p"
 msgstr "halberds"
@@ -153,14 +154,14 @@ msgstr "magic bag"
 
 msgctxt "spellinfo"
 msgid "create_roqf"
-msgstr "The famous bard Mirim was known for exceptionally limber play of the harp. Her spell, which is easy to ban into a little silver ring, increases the wearer's dexterity by a factor of ten, which is siad to be useful to both craftsmen and shady natures."
+msgstr "The famous bard Miriam bhean'Meddaf was known for exceptionally limber play of the harp. It is said that her fingers blurred while playing its strings. Her spell, which is easy to infuse into a little silver ring, increases the wearer's dexterity by a factor of ten, which is said to be useful to both craftsmen and shady natures."
 
 msgid "rustysword_p"
 msgstr "rusty swords"
 
 msgctxt "iteminfo"
 msgid "magicbag"
-msgstr "This bag encloses a dimensional fold, which can store up to 200 stones of weight without any extra burden on the bearer. Large items such as horses or carts cannot be placed inside."
+msgstr "This bag encloses a dimensional rift in which up to 200 units of weight can be carried. Living beings and large items, such as horses, other living beings, or carts, cannot be put into the bag. It is also not possible to place such a bag inside another one. The bag itself weighs 1 weight unit."
 
 msgid "lighthouse"
 msgstr "lighthouse"
@@ -194,7 +195,7 @@ msgstr "young dragons"
 
 msgctxt "iteminfo"
 msgid "no_info"
-msgstr "No Information available."
+msgstr "No information available."
 
 msgid "insectspoil_p"
 msgstr "insect antenna"
@@ -213,11 +214,12 @@ msgstr "Calm Monster"
 
 msgctxt "spellinfo"
 msgid "sound_out"
-msgstr "Should the unit succumb to the spell, they will tell the mage everything they know about the region is question. Is no unit of their faction in that region, they'll have nothing to report. Also, they can only report, what they themselves could see."
+msgstr "Should the unit succumb to the spell, they will tell the mage everything they know about the region in question. If no unit of their faction is in that region, they will have nothing to report. Also, they can only report what they themselves could see."
 
+#, fuzzy
 msgctxt "spell"
 msgid "readmind"
-msgstr "Mind Probe"
+msgstr "Dream Probe"
 
 msgid "nr_options"
 msgstr "Options"
@@ -243,7 +245,7 @@ msgstr "young dragon"
 
 msgctxt "spellinfo"
 msgid "calm_monster"
-msgstr "This disarming chant can tame almost any intelligent monster. It will refrain from attacks on the mage and his companions. But one should not deceive oneself about the persisting unpredictable nature of the creature."
+msgstr "This disarming chant can tame almost any intelligent monster. It will refrain from attacks on the mage and their companions. But one should not deceive oneself about the persisting unpredictable nature of the creature."
 
 msgctxt "spell"
 msgid "clone"
@@ -261,14 +263,15 @@ msgstr "mage tower"
 
 msgctxt "spellinfo"
 msgid "migration"
-msgstr "This ritual facilitates the migration of an unit to the own faction. The candidate has to be able and willing to leave his previous faction. He attests to that by CONTACTing the mage and will otherwise be occupied with preparations for the ritual. The ritual will fail, if the candidate owes the previous faction fealty for an expensive training. The mage performing the ritual has to invest permanent aura to bind the candidate to the faction. Per level and per point of permanent aura the mage can bind one person."
+msgstr "This ritual facilitates the migration of a unit to your own faction. The candidate has to be able and willing to leave their previous faction. They attest to that by CONTACTing the mage and will otherwise be occupied with preparations for the ritual. The ritual will fail if the candidate owes the previous faction fealty for an expensive training. The mage performing the ritual has to invest permanent aura to bind the candidate to the faction. Per level and per point of permanent aura the mage can bind one person."
 
 msgctxt "race"
 msgid "illusion"
 msgstr "illusion"
 
+#, fuzzy
 msgid "stonecircle"
-msgstr "stonecircle"
+msgstr "stone circle"
 
 msgid "p0"
 msgstr "seven mile tea"
@@ -281,9 +284,6 @@ msgstr "a balloon"
 
 msgid "balloon_p"
 msgstr "balloons"
-
-msgid "jadee_ring"
-msgstr "Jadee's wedding ring"
 
 msgid "mallorntree"
 msgstr "mallorn"
@@ -302,7 +302,7 @@ msgid "p9"
 msgstr "horsepower potion"
 
 msgid "stat_hitpoints"
-msgstr "hitpoints"
+msgstr "hit points"
 
 msgctxt "damage"
 msgid "strong"
@@ -332,9 +332,10 @@ msgctxt "race"
 msgid "mummy"
 msgstr "mummy"
 
+#, fuzzy
 msgctxt "race"
 msgid "braineater"
-msgstr "braineater"
+msgstr "brain eater"
 
 msgid "nr_size"
 msgstr "size"
@@ -343,7 +344,7 @@ msgid "axe"
 msgstr "axe"
 
 msgid "blessedstonecircle"
-msgstr "blessed stonecircle"
+msgstr "blessed stone circle"
 
 msgctxt "race"
 msgid "dragon_p"
@@ -358,14 +359,15 @@ msgstr "dragon"
 
 msgctxt "spellinfo"
 msgid "gwyrrdfumbleshield"
-msgstr "This ritual summons some Elemental Spirits of Magic and sends them into the ranks of the enemy mages. Casting spells will be much harder for them during the battle."
+msgstr "This ritual summons some elemental spirits of magic and sends them into the ranks of the enemy mages. Casting spells will be much harder for them during the battle."
 
 msgid "antimagic_p"
 msgstr "antimagic crystals"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowdemon"
-msgstr "shadowdemon"
+msgstr "shadow demon"
 
 msgid "weight_per"
 msgstr "stone per"
@@ -375,7 +377,7 @@ msgstr "potions of nest warmth"
 
 msgctxt "race"
 msgid "irongolem_d"
-msgstr "irongolems"
+msgstr "iron golems"
 
 msgid "sphereofinv_p"
 msgstr "spheres of invisibility"
@@ -385,7 +387,7 @@ msgstr "."
 
 msgctxt "spellinfo"
 msgid "firewall"
-msgstr "The spell creates an opaque wall of fire in the gives direction that will harm anyone passing through it."
+msgstr "The spell creates an opaque wall of fire in the given direction that will harm anyone passing through it."
 
 msgctxt "border"
 msgid "gate_open"
@@ -393,11 +395,11 @@ msgstr "massive open door"
 
 msgctxt "spellinfo"
 msgid "magicboost"
-msgstr "The sorcerer opens his mind to the Spheres of Chaos so that he can access a greater ammount of magical power for a while. But the help of the Chaos Lords has its price - and so the period of power will be followed by a period of weakness."
+msgstr "The sorcerer opens their mind to the spheres of chaos so that they can access a greater amount of magical power for a while. But the help of the chaos lords has its price - and so the period of power will be followed by a period of weakness."
 
 msgctxt "race"
 msgid "irongolem_p"
-msgstr "irongolems"
+msgstr "iron golems"
 
 msgid "snowman_p"
 msgstr "snowmen"
@@ -410,11 +412,11 @@ msgstr "laen shields"
 
 msgctxt "spellinfo"
 msgid "break_curse"
-msgstr "This spell allows a magician to remove a specific enchantment from a unit, ship, bulding or region."
+msgstr "This spell allows a magician to remove a specific enchantment from a unit, ship, building or region."
 
 msgctxt "race"
 msgid "irongolem_x"
-msgstr "irongolem"
+msgstr "iron golem"
 
 msgid "balloon"
 msgstr "balloon"
@@ -473,9 +475,10 @@ msgctxt "skill"
 msgid "building"
 msgstr "masonry"
 
+#, fuzzy
 msgctxt "spell"
 msgid "summonshadow"
-msgstr "Summon Shadowdemons"
+msgstr "Summon Shadow Demons"
 
 msgid "unknown_faction_dative"
 msgstr "an unknown faction"
@@ -495,14 +498,14 @@ msgstr "ORIGIN"
 
 msgctxt "spellinfo"
 msgid "raise_mob"
-msgstr "Employing this magic chant the mage convinces the peasants of the region to join him. The peasants won't leave their home region and won't give up their possessions, though. Additionally each week some peasants will shake off the spell and return to their fields. How many peasants join the mage depends on the power of his chant."
+msgstr "Employing this magic chant, the mage convinces the peasants of the region to join them. The peasants won't leave their home region and won't give up their possessions, though. Additionally, each week some peasants will shake off the spell and return to their crops. How many peasants join the mage depends on the power of their chant."
 
 msgid "wand"
 msgstr "wand"
 
 msgctxt "spellinfo"
 msgid "summonshadow"
-msgstr "With the help of dark rituals the sorcerer summons demons from the Sphere of Shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadow demons are feared in combat for they are hard to hit and have the ability to drain strength from their victims."
+msgstr "With the help of dark rituals, the sorcerer summons demons from the sphere of shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadow demons are feared in combat for they are hard to hit and have the ability to drain strength from their victims."
 
 msgid "aurapotion50"
 msgstr "aura potion"
@@ -517,9 +520,10 @@ msgctxt "race"
 msgid "wolf_d"
 msgstr "wolves"
 
+#, fuzzy
 msgctxt "race"
 msgid "museumghost_d"
-msgstr "museumghosts"
+msgstr "museum ghosts"
 
 msgid "sehr viele"
 msgstr "a great many"
@@ -540,15 +544,16 @@ msgstr "wolves"
 
 msgctxt "spellinfo"
 msgid "living_rock"
-msgstr "This draining ritual summons a gigantic earth elemental from a sphere of laen and binds it to a building. The elemental can then be commanded to move the building with all its occupants to a neighbouring region. The strength of the elemental depends of the mage's skill: it can move up to [level-12]*250 size units of building. The building won't remain undamaged by the process."
+msgstr "This draining ritual summons a gigantic earth elemental using a sphere of laen and binds it to a building. The elemental can then be commanded to move the building with all its occupants to a neighboring region. The strength of the elemental depends of the mage's skill: It can move a building of up to [level-12]*250 size units. The building won't remain undamaged by the process."
 
 msgctxt "race"
 msgid "museumghost_p"
-msgstr "museumghosts"
+msgstr "museum ghosts"
 
+#, fuzzy
 msgctxt "race"
 msgid "catdragon"
-msgstr "catdragon"
+msgstr "cat dragon"
 
 msgctxt "spell"
 msgid "summonundead"
@@ -568,7 +573,7 @@ msgstr "hellcats"
 
 msgctxt "race"
 msgid "museumghost_x"
-msgstr "museumghost"
+msgstr "museum ghost"
 
 msgid "stat_armor"
 msgstr "armor"
@@ -579,7 +584,7 @@ msgstr "snowmen"
 
 msgctxt "spellinfo"
 msgid "hail"
-msgstr "During a battle the druid calls the Elemental Spirits of Cold and binds them to himself. Then he commands them to attack his foes with hail and ice missiles."
+msgstr "During a battle the druid calls the elemental spirits of cold and binds them to himself. Then you command them to attack your foes with hail and ice missiles."
 
 msgctxt "keyword"
 msgid "pay"
@@ -602,7 +607,7 @@ msgstr "hellcats"
 
 msgctxt "spellinfo"
 msgid "summonundead"
-msgstr "For many nights the sorcerer has to roam the graveyards and former battlefields of a region in order to find corpses to animate. The Undead will serve his will, but beware! Dealing with the mysteries of unlife can be a dangerous thing."
+msgstr "For many nights the sorcerer has to roam the graveyards and former battlefields of a region in order to find corpses to animate. The undead will obey you, but beware! Dealing with the mysteries of unlife can be a dangerous thing."
 
 msgctxt "keyword"
 msgid "buy"
@@ -633,9 +638,10 @@ msgstr "hellcat"
 msgid "TEMP"
 msgstr "TEMPORARY"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowmaster_d"
-msgstr "shadowmasters"
+msgstr "shadow masters"
 
 msgid "aurapotion50_p"
 msgstr "aura potions"
@@ -644,6 +650,7 @@ msgctxt "spell"
 msgid "sound_out"
 msgstr "Sound out"
 
+#, fuzzy
 msgctxt "race"
 msgid "seaserpent_d"
 msgstr "sea serpents"
@@ -653,18 +660,18 @@ msgid "antimagiczone"
 msgstr "This spell allows a magician to create a local instability in the astral field. This zone needs to return to its equilibrium, soaking up part of the power of all spells cast in the region - or even all of some of the weaker ones."
 
 msgid "villagers"
-msgstr "Villagers"
+msgstr "villagers"
 
 msgctxt "spellinfo"
 msgid "disturbingdreams"
-msgstr "This spell causes insomnia and restlessness in a whole region for several weeks. All affected persons will learn much slower than normal."
+msgstr "This spell causes insomnia and restlessness in a whole region for several weeks. All affected persons will learn much more slowly than normal."
 
 msgid "plain"
 msgstr "plain"
 
 msgctxt "race"
 msgid "shadowmaster_p"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgid "unarmed"
 msgstr "unarmed"
@@ -682,18 +689,19 @@ msgstr "fireworks"
 
 msgctxt "spellinfo"
 msgid "homestone"
-msgstr "With this spell the druid eternally binds the powers of earth to the walls of the castle in which he currently is. No magic and no ballistic attacks will ever be able to destroy a wall that has been fortified in this way and the castle will also be less affected by aging. In addition, the building will provide a better protection against attacks by sword or by magic."
+msgstr "With this spell the druid eternally binds the powers of earth to the walls of the castle in which they currently are. No magic and no ballistic attacks will ever be able to destroy a wall that has been fortified in this way and the castle will also be affected less by aging. In addition, the building will provide a better protection against attacks by sword or by magic."
 
 msgctxt "spell"
 msgid "fogtrap"
 msgstr "an unknown spell"
 
+#, fuzzy
 msgid "dreameye"
-msgstr "dreameye"
+msgstr "dream eye"
 
 msgctxt "race"
 msgid "shadowmaster_x"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgid "adamantium"
 msgstr "adamantium"
@@ -710,7 +718,7 @@ msgstr "Meditate"
 
 msgctxt "iteminfo"
 msgid "dreameye"
-msgstr "This enchanted dragon-eye has to be eaten by the leader of your forces on the eve before battle. During the night he gains insight into the dreams of the enemy leaders and may potentially glean a decisive advantage."
+msgstr "This enchanted dragon eye has to be eaten by the leader of your forces on the eve of the battle. During the night they gain insight into the dreams of the enemy leaders and may potentially gain a decisive advantage."
 
 msgid "nr_mallorntree_p"
 msgstr "mallorn trees"
@@ -727,6 +735,7 @@ msgctxt "race"
 msgid "seaserpent_x"
 msgstr "sea serpent"
 
+#, fuzzy
 msgctxt "spell"
 msgid "astralblock"
 msgstr "Astral Disruption"
@@ -781,7 +790,7 @@ msgstr "pyramid"
 
 msgctxt "spellinfo"
 msgid "big_recruit"
-msgstr "From 'Journeys' by Firudin the Wise: 'There's a small, scarcely visited inn in Weilersweide, near Wytharhafen. It is a little known fact, that it was home to the banished itinerant preacher Grauwolf until a few years ago. After he recruited almost the whole peasantry with one of his notorious speeches, he was convicted and banished for inciting unrest. Only hesitantly did he disclose the secret to his powers of persuasion to me.'"
+msgstr "From 'Journeys' by Firudin the Wise: 'There is a small, scarcely visited inn in Weilersweide, near Wytharhafen. It is a little known fact, that it was home to the banished itinerant preacher Grauwolf until a few years ago. After he recruited almost the whole peasantry with one of his notorious speeches, he was convicted and banished for inciting unrest. Only hesitantly did he disclose the secret to his powers of persuasion to me.'"
 
 msgid "catapultammo"
 msgstr "ammunition"
@@ -795,14 +804,14 @@ msgstr "HELP"
 
 msgctxt "describe"
 msgid "healing"
-msgstr "For a healing potion one takes the peel of a windbag and some bugleweed, stirr in some chopped elvendear and sprinkle it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury."
+msgstr "For a healing potion one takes the peel of a windbag and some bugleweed, stirs in some chopped elvendear and sprinkles it with the blossoms of an ice begonia. This has to cook through for four days, while a gapgrowth has to be added on the second day. Then one carefully scoops off the top layer of liquid. One such potion gives four men (or one man four times) a 50% chance to survive otherwise lethal wounds. The potion is automatically used in case of injury."
 
 msgctxt "race"
 msgid "orc_d"
 msgstr "orcs"
 
 msgid "stat_pierce"
-msgstr "Is hard to hit by piercing weapons."
+msgstr "Hard to hit by piercing weapons."
 
 msgid "snowglobe"
 msgstr "snow globe"
@@ -816,7 +825,7 @@ msgstr "EMAIL"
 
 msgctxt "spellinfo"
 msgid "analysesong_unit"
-msgstr "Each and every living being has its own, individual 'life-song'. No two of these songs are alike, even though songs of creatures of the same species are similar. Every spell alters this song of life in one way or the other and this can be identified. By casting this spell, the bard can detect all those magic variations in a person's 'life-song'. You will be able to decipher all enchantments or spells, which aren't disguised beyond your capability."
+msgstr "Each and every living being has its own, individual 'life-song'. No two of these songs are alike, even though songs of creatures of the same species are similar. Every spell alters this song of life in one way or the other and this can be identified. By casting this spell, the bard can detect all those magic variations in a person's 'life-song'. You will be able to decipher all enchantments or spells which aren't disguised beyond your capability."
 
 msgctxt "spell"
 msgid "fiery_dragonbreath"
@@ -850,10 +859,6 @@ msgctxt "spellinfo"
 msgid "immolation"
 msgstr "Injures all enemies."
 
-msgctxt "race"
-msgid "sphinx"
-msgstr "sphinx"
-
 msgctxt "coast"
 msgid "e"
 msgstr "east coast"
@@ -878,6 +883,7 @@ msgctxt "race"
 msgid "orc_x"
 msgstr "orc"
 
+#, fuzzy
 msgctxt "race"
 msgid "tunnelworm"
 msgstr "tunnelworm"
@@ -894,7 +900,7 @@ msgstr "mallorn crossbows"
 
 msgctxt "spellinfo"
 msgid "summonent"
-msgstr "With the help of this spell the druid awakens the ents who are slumbering in the forests of a region from aeons of sleep. These strange tree-creatures will join him and aid his cause, but after a while they will sink back into their slumber."
+msgstr "With the help of this spell the druid awakens the ents who are slumbering in the forests of a region from aeons of sleep. These strange tree-creatures will join you and aid your cause, but after a while they will sink back into their slumber."
 
 msgid "LOCALE"
 msgstr "LOCALE"
@@ -909,7 +915,7 @@ msgstr "MESSAGE"
 
 msgctxt "spellinfo"
 msgid "barkskin"
-msgstr "Performing this ritual before going into battle gives your troups an additional bonus to their armor. Every hit reduces the energy of the spell, dissolving it at some point during battle."
+msgstr "Performing this ritual before going into battle gives your troops an additional bonus to their armor. Every hit reduces the energy of the spell, dissolving it at some point during battle."
 
 msgid "goliathwater"
 msgstr "goliath water"
@@ -919,7 +925,7 @@ msgstr "men"
 
 msgctxt "spellinfo"
 msgid "readmind"
-msgstr "With this spell the mentalist penetrates the thoughts and dreams of his victim to reveal his most intimate secrets. The target's faction, skills and possessions will no longer be unknown."
+msgstr "With this spell the mentalist penetrates the thoughts and dreams of their victim to reveal its most intimate secrets. The target's faction, skills, and possessions will no longer be unknown."
 
 msgid "lance"
 msgstr "lance"
@@ -958,9 +964,10 @@ msgctxt "spell"
 msgid "Feuerwand"
 msgstr "Firewall"
 
+#, fuzzy
 msgctxt "race"
 msgid "irongolem"
-msgstr "irongolem"
+msgstr "iron golem"
 
 msgid "snowman"
 msgstr "snowman"
@@ -977,15 +984,15 @@ msgstr "insects"
 
 msgctxt "spellinfo"
 msgid "goodwinds"
-msgstr "While being aboard a ship, the druid uses this ritual to force the Elemental Spirits of Water to serve him and commands them to carry the ship across the water at a higher speed. In addition, the ship will not be affected by unfavourable winds or currents."
+msgstr "While being aboard a ship, the druid uses this ritual to force the elemental spirits of water to serve them and commands them to carry the ship across the water at a higher speed. In addition, the ship will not be affected by unfavourable winds or currents."
 
 msgctxt "spellinfo"
 msgid "astral_disruption"
-msgstr "This spell causes a severe disturbance of the atral plane. Within an astral radius of level/5 regions all astral creatures not able to resist the spell will be thrown from the astral plane. The astral contact with all affected regions will be disrupted for level/3 weeks."
+msgstr "This spell causes a severe disturbance of the astral plane. Within an astral radius of level/5 regions all astral creatures not able to resist the spell will be thrown from the astral plane. The astral contact with all affected regions will be disrupted for level/3 weeks."
 
 msgctxt "spell"
 msgid "earthquake"
-msgstr "Summon Earth Elemental"
+msgstr "Earth Elemental"
 
 msgid "unknownunit"
 msgstr "an unknown unit"
@@ -995,7 +1002,7 @@ msgid "raise_mob"
 msgstr "Mob Rule"
 
 msgid "stat_bash"
-msgstr "Is hard to hit by blunt weapons and catapults."
+msgstr "Hard to hit by blunt weapons and catapults."
 
 msgctxt "spellinfo"
 msgid "combat_speed"
@@ -1014,7 +1021,7 @@ msgstr "corridor"
 
 msgctxt "spellinfo"
 msgid "windshield"
-msgstr "Calling the Elemental Spirits of Wind conjurs up sudden breezes, small whirlwinds and minor turbulences that will hinder enemy archers."
+msgstr "Calling the elemental spirits of wind conjures up sudden breezes, small whirlwinds and minor turbulences that will hinder enemy archers."
 
 msgid "papyrus_p"
 msgstr "papyri"
@@ -1028,7 +1035,7 @@ msgstr "ALLIANCE"
 
 msgctxt "spell"
 msgid "song_of_healing"
-msgstr "Blessed Harvest"
+msgstr "Song of Healing"
 
 msgid "sapling"
 msgstr "sapling"
@@ -1051,7 +1058,7 @@ msgstr "Kills enemies with fire."
 
 msgctxt "spellinfo"
 msgid "strongwall"
-msgstr "At the beginning of a battle, the magician binds some Elemental Spirits of Rock to the walls of the builing in which he currently is. The structure will then provide a better protection against attacks by sword or by magic."
+msgstr "At the beginning of a battle, the magician binds some elemental spirits of rock to the walls of the building in which they currently are. The structure will then provide a better protection against attacks by sword or by magic."
 
 msgctxt "race"
 msgid "seaserpent"
@@ -1069,10 +1076,6 @@ msgid "an_illusionwall"
 msgstr "an illusionary wall"
 
 msgctxt "race"
-msgid "apepsnake"
-msgstr "apepsnake"
-
-msgctxt "race"
 msgid "dracoid_d"
 msgstr "dracoids"
 
@@ -1081,7 +1084,7 @@ msgstr "rings of quick fingers"
 
 msgctxt "spell"
 msgid "create_chastitybelt"
-msgstr "Create An Amulet of Chastity"
+msgstr "Create an Amulet of Chastity"
 
 msgctxt "school"
 msgid "common"
@@ -1140,7 +1143,7 @@ msgstr "desert"
 
 msgctxt "iteminfo"
 msgid "snowglobe"
-msgstr "A sphere with a diameter of three inches made of crystal glass, sitting on a granite base. On the inside countless tiny snowflakes dance around lively. On the bottom of the base a golden compass rose is engraved. A beautiful sight to behold, but it emanates a nameless cold. Among mages and others knowledgeable in the arcane arts the function and effect of the artefact are disputed intensely. Although there is agreement about something: upon release the intensity of the contained cold would have permanent repercussions for a large area. Gigantic fires would be extinguished, volcanos quelled and large bodies of water frozen solid. In less extreme environments permanent changes were also probable. Therefore it isn't recommended to drop the cold treasure. It should be thrown far off instead, while making sure there is no living being within the impact zone, if one is willing to risk the usage. (USE \"snow globe\" <DIRECTION>) "
+msgstr "A sphere with a diameter of three inches made of crystal glass, sitting on a granite base. On the inside, countless tiny snowflakes dance around lively. On the bottom of the base, a golden compass rose is engraved. A beautiful sight to behold, but it emanates a nameless cold. Among mages and others knowledgeable in the arcane arts, the function and effect of the artifact are disputed intensely. Although there is agreement about something: Upon release the intensity of the contained cold would have permanent repercussions for a large area. Gigantic fires would be extinguished, volcanoes quelled and large bodies of water frozen solid. In less extreme environments, permanent changes were also probable. Therefore it isn't recommended to drop the cold treasure. It should be thrown far off instead, while making sure there is no living being within the impact zone, if one is willing to risk the usage at all. (USE \"snow globe\" <DIRECTION>) "
 
 msgctxt "race"
 msgid "dolphin"
@@ -1173,8 +1176,9 @@ msgctxt "spell"
 msgid "raindance"
 msgstr "Rain Dance"
 
+#, fuzzy
 msgid "goblinspoil_p"
-msgstr "goblinheads"
+msgstr "goblin heads"
 
 msgctxt "keyword"
 msgid "study"
@@ -1182,7 +1186,7 @@ msgstr "LEARN"
 
 msgctxt "describe"
 msgid "nestwarmth"
-msgstr "A potion of nest warmth allows an insect to recruit outside of a desert region in winter. The learned alchemist prepares this by taking a peyote, mixing it with a portion of gapgrowth which has been gathered during a clear, starry night. To dispell winter, add some blossoms of the ice begonia in the mix, and stirr everything together with a spider ivy until it turns a nice shade of violet. One vial supplies an entire region for a whole week."
+msgstr "A potion of nest warmth allows an insect to recruit outside of a desert region in winter. The learned alchemist prepares this by taking a peyote, mixing it with a portion of gapgrowth which has been gathered during a clear, starry night. To dispel winter, add some blossoms of the ice begonia in the mix, and stir everything together with a spider ivy until it turns a nice shade of violet. One vial supplies an entire region for a whole week."
 
 msgid "attack_natural"
 msgstr "an unarmed attack"
@@ -1255,7 +1259,7 @@ msgstr "firewall"
 
 msgctxt "spellinfo"
 msgid "create_invisibility_sphere"
-msgstr "Using this spell the magician can create a Sphere of Invisibility. This artefact hides the person bearing it and one hundred persons in the same unit."
+msgstr "Using this spell the magician can create a sphere of invisibility. This artifact hides the person bearing it and one hundred persons in the same unit."
 
 msgid "unit"
 msgstr "unit"
@@ -1275,7 +1279,7 @@ msgstr "troll horn"
 
 msgctxt "spellinfo"
 msgid "great_drought"
-msgstr "This powerful ritual opens a gate to the elemental plane of fire. A great drought comes over the land. Farmers, animals and plants of the region are fighting for survival, but only half of all living things will be able to survive a drought like this. The region will suffer the consequences of such a drought for years to come."
+msgstr "This powerful ritual opens a gate to the elemental plane of fire. A great drought comes over the land. Farmers, animals and plants of the region must fight for survival, but only half of all living things will be able to survive a drought like this. The region will suffer the consequences of such a drought for years to come."
 
 msgid "fog"
 msgstr "fog"
@@ -1299,14 +1303,14 @@ msgstr "elven ear"
 
 msgctxt "iteminfo"
 msgid "trollspoil"
-msgstr "The horn of an adult troll. No troll would ever part with this while he's alive."
+msgstr "The horn of an adult troll. No troll would ever part with this while alive."
 
 msgctxt "spellinfo"
 msgid "icastle"
 msgstr "With this spell the mentalist can create the illusion of any building. The illusion can be entered, but it has no function and requires no maintenance. It will remain existing for several weeks."
 
 msgid "dreameye_p"
-msgstr "dreameyes"
+msgstr "dream eyes"
 
 msgid "peasantblood"
 msgstr "peasant blood"
@@ -1319,7 +1323,7 @@ msgid "human"
 msgstr "human"
 
 msgid "museumexitticket_p"
-msgstr "returntickets for the grand museum"
+msgstr "return tickets for the grand museum"
 
 msgctxt "spell"
 msgid "summonent"
@@ -1330,7 +1334,7 @@ msgstr "southeast"
 
 msgctxt "spellinfo"
 msgid "reelingarrows"
-msgstr "This summons opens a gate to the plane of Elemental Spirits of Wind. Immediately, strong winds or even storms will rise near the gate and hinder all archers during a battle."
+msgstr "This summons opens a gate to the plane of elemental spirits of wind. Immediately, strong winds or even storms will rise near the gate and hinder all archers during a battle."
 
 msgid "adamantiumplate_p"
 msgstr "adamantium plates"
@@ -1338,8 +1342,9 @@ msgstr "adamantium plates"
 msgid "log"
 msgstr "wood"
 
+#, fuzzy
 msgid "presspass_p"
-msgstr "presspasses"
+msgstr "press passes"
 
 msgctxt "school"
 msgid "draig"
@@ -1347,7 +1352,7 @@ msgstr "Draig"
 
 msgctxt "spellinfo"
 msgid "create_runesword"
-msgstr "This spell creates a magical sword. It requires a skill of at least 7, but adds +4 to the combat skill of its' owner as well as making them almost immune against magical attacks."
+msgstr "This spell creates a magic sword. It is encarved with old, magic runes and its blade is warm to the touch and seems to lead a strange life of its own. Using this sword requires a skill of at least 7, but adds +4 to the combat skill of its owner as well as making them almost immune against magical attacks."
 
 msgctxt "spell"
 msgid "magicboost"
@@ -1355,7 +1360,7 @@ msgstr "Chaos Gift"
 
 msgctxt "iteminfo"
 msgid "mistletoe"
-msgstr "The magical misteltoe has a wonderous property: It's use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week."
+msgstr "The magic mistletoe has a wondrous property: Its use will make one person able to escape unharmed from every conflict, no enemy will lay hand on the bearer for one week."
 
 msgctxt "skill"
 msgid "taxation"
@@ -1379,7 +1384,7 @@ msgstr "MOVE"
 
 msgctxt "spellinfo"
 msgid "create_dreameye"
-msgstr "An enchanted eye of a dragon gives the person who eats it for supper the power to see other people's dreams. For a long time this abillity was counted as beeing useless until the former elfish mistress for theurgy of war, Liarana Sonnentau from the academy Thall, presented a special appliance for this artefact: Before a battle captains often have an uncomfortable sleep and betray their plans in their dreams. This might give the user of the artefact a small advantage in the upcoming battle, but be warned: Interpreting dreams is a difficult exercise."
+msgstr "An enchanted eye of a dragon gives the person who eats it for supper the power to see other people's dreams. For a long time this ability was counted as being useless, until the former elfish mistress for theurgy of war, Liarana Sonnentau from the academy of Thall, presented a special appliance for this artifact: Before a battle, commanders often sleep uneasingly and betray their plans in their dreams. This might give the user of the artifact a small advantage in the upcoming battle. But be warned: Interpreting dreams is a difficult exercise."
 
 msgid "demonspoil"
 msgstr "demon blood"
@@ -1422,16 +1427,17 @@ msgstr "DEBUG"
 msgid "GEBAEUDE"
 msgstr "BUILDING"
 
+#, fuzzy
 msgctxt "spell"
 msgid "goodwinds"
-msgstr "Summon Water Elemental"
+msgstr "Water Elemental"
 
 msgid "KRAEUTER"
 msgstr "HERBS"
 
 msgctxt "spellinfo"
 msgid "rustweapon"
-msgstr "This ritual conjurs up a dark thunderstorm that affects a whole region. The magic rain will let rust any ore. Iron weapons and armor will get rusty. The exact number of items affected by the rain depends on the ammount of power invested by the magician. Up to ten weapons can be destroyed per level - a Ring of Power increases the effect like an additional level."
+msgstr "This ritual conjures up a dark thunderstorm that affects a whole region. The magic rain will let rust any ore. Iron weapons and armor will get rusty. The exact number of items affected by the rain depends on the amount of power invested by the magician. Up to ten weapons can be destroyed per level - a ring of power increases the effect like an additional level."
 
 msgid "rop"
 msgstr "ring of power"
@@ -1462,7 +1468,7 @@ msgid "icastle"
 msgstr "Castle of Illusion"
 
 msgid "newbie_info_cr"
-msgstr "With the first two turns, you will get a computer report (CR). It can be used with some tools like Magellan. If you want to continue getting it after the second turn, please make one of your units give the order OPTION COMPUTER."
+msgstr "With the first two turns, you will get a computer report (CR). It can be used with some tools like Magellan. If you want to continue getting it after the second turn, please make sure to give one of your units the order OPTION COMPUTER."
 
 msgctxt "keyword"
 msgid "report"
@@ -1470,7 +1476,7 @@ msgstr "REPORT"
 
 msgctxt "spellinfo"
 msgid "puttorest"
-msgstr "This ritual calms the tortured souls of those who died a violent death and finally releases them to the Otherlands. About 50 souls per level of the spell will be released. The spell will not affect existing undead, because they are too strongly tied to the Material World."
+msgstr "This ritual calms the tortured souls of those who died a violent death and finally releases them to the otherlands. About 50 souls per level of the spell will be released. The spell will not affect existing undead, because they are too strongly tied to the material world."
 
 msgid "aura_p"
 msgstr "auras"
@@ -1492,7 +1498,7 @@ msgstr "Cerddor"
 
 msgctxt "spell"
 msgid "create_aots"
-msgstr "Create An Amulet of True Sight"
+msgstr "Create an Amulet of True Sight"
 
 msgctxt "prefix"
 msgid "black"
@@ -1500,7 +1506,7 @@ msgstr "black "
 
 msgctxt "spellinfo"
 msgid "magic_roots"
-msgstr "Through a elaborate ritual a druid permanently channels a fragment of his power into the soil and the forests of the region. This forever changes the equilibrium of nature in the region. From this point on only the fierce but strong mallorn trees will grow there."
+msgstr "Through a elaborate ritual a druid permanently channels a fragment of their power into the soil and the forests of the region. This forever changes the equilibrium of nature in the region. From this point on, only the fierce but strong mallorn trees will grow there."
 
 msgctxt "race"
 msgid "undead_d"
@@ -1512,7 +1518,7 @@ msgstr "of the third week"
 
 msgctxt "spellinfo"
 msgid "leaveastral"
-msgstr "By concentrating on the structure of reality, the magician can breach it and thus briefly make a gateway to leave the astral plane. He can transport up to (level-3)*15 GE through the portal. If the magician is able to cast at at least level 11, he can even transport other units against their will."
+msgstr "By concentrating on the fabric of reality, the magician can breach it and thus briefly make a gateway to leave the astral plane. They can transport up to (level-3)*15 WU through the portal. If the magician is able to cast at at least level 11, they can even transport other units against their will."
 
 msgid "VORNE"
 msgstr "FRONT"
@@ -1538,9 +1544,10 @@ msgstr "imp"
 msgid "ZUGVORLAGE"
 msgstr "TEMPLATE"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowbat_d"
-msgstr "darkbats"
+msgstr "shadow bats"
 
 msgctxt "race"
 msgid "nightmare_d"
@@ -1554,7 +1561,7 @@ msgstr "Level:"
 
 msgctxt "spell"
 msgid "create_magicherbbag"
-msgstr "Create A Magical Herb Pouch"
+msgstr "Create a Magical Herb Pouch"
 
 msgctxt "spell"
 msgid "shockwave"
@@ -1572,7 +1579,7 @@ msgstr "castle"
 
 msgctxt "race"
 msgid "shadowbat_p"
-msgstr "darkbats"
+msgstr "shadow bats"
 
 msgctxt "iteminfo"
 msgid "apple"
@@ -1603,11 +1610,11 @@ msgstr "(in mourning)"
 
 msgctxt "spellinfo"
 msgid "analyse_object"
-msgstr "Like creatures ships, buildings and even regions also have their own song, even though it's faint and harder to hear. Like it can be discerned from the life song of a person, if the person is affected by a spell, it can also be done for ships, buildings and regions."
+msgstr "Like creatures ships, buildings, and even regions also have their own song, even though it's faint and harder to hear. It can be discerned from the life song of a person if the person is affected by a spell, it can also be done for ships, buildings and regions."
 
 msgctxt "race"
 msgid "shadowbat_x"
-msgstr "darkbat"
+msgstr "shadow bat"
 
 msgctxt "race"
 msgid "nightmare_x"
@@ -1629,7 +1636,7 @@ msgstr "eye of dragon"
 
 msgctxt "spellinfo"
 msgid "fetch_astral"
-msgstr "A magician in the material world can summon units from the adjacent part of the astral plane. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will."
+msgstr "A magician in the material world can summon units from the adjacent part of the astral plane. If the magician is experienced enough to cast the spell at level 13 or more, they can even summon units against their will."
 
 msgid "chainmail_p"
 msgstr "chainmails"
@@ -1663,7 +1670,7 @@ msgstr "troll horns"
 
 msgctxt "spellinfo"
 msgid "steal_aura"
-msgstr "Aided by this spell, a magician can steal another magician's aura against his will."
+msgstr "Aided by this spell, a magician can steal another magician's aura against their will."
 
 msgctxt "race"
 msgid "mummy_d"
@@ -1671,11 +1678,11 @@ msgstr "mummy"
 
 msgctxt "race"
 msgid "braineater_d"
-msgstr "braineaters"
+msgstr "brain eaters"
 
 msgctxt "describe"
 msgid "goliathwater"
-msgstr "'First roast the Gurgelkraut quickly and add some Fjordwuchs to spice it up. Let it all boil slowly until almost all liquid has evaporated. Leave the mash overnight and finally squeeze it the next morning until a thick fluid drips out.' The liquid thus produced, 'Goliath Water' as we call it, is enough for 10 men and gives each man the carrying capacity of a horse for one week."
+msgstr "First roast the bugleweed quickly and add some fjord fungus to spice it up. Add a bit of water and let it all boil slowly until almost all liquid has evaporated. Leave the mash outside overnight and finally squeeze it the next morning until a thick fluid drips out.' The liquid thus produced, 'goliath water' as we call it, is enough for 10 men and gives each man the carrying capacity of a horse for one week."
 
 msgctxt "spellinfo"
 msgid "eternal_walls"
@@ -1692,15 +1699,16 @@ msgid "an_unknown_building"
 msgstr "an unknown building"
 
 msgid "museumexitticket"
-msgstr "returnticket for the grand museum"
+msgstr "return ticket for the grand museum"
 
+#, fuzzy
 msgctxt "race"
 msgid "mummy_p"
-msgstr "mummys"
+msgstr "mummies"
 
 msgctxt "race"
 msgid "braineater_p"
-msgstr "braineaters"
+msgstr "brain eaters"
 
 msgctxt "keyword"
 msgid "attack"
@@ -1716,7 +1724,7 @@ msgstr "mummy"
 
 msgctxt "race"
 msgid "braineater_x"
-msgstr "braineater"
+msgstr "brain eater"
 
 msgctxt "spell"
 msgid "unholypower"
@@ -1746,8 +1754,9 @@ msgstr "This song, which is woven into the magical essence of the region, weaken
 msgid "plate"
 msgstr "platemail"
 
+#, fuzzy
 msgid "herbbag_p"
-msgstr "herbbags"
+msgstr "bag of herbs"
 
 msgid "skillpotion"
 msgstr "potion of skills"
@@ -1855,7 +1864,7 @@ msgstr "Chaos Curse"
 
 msgctxt "spell"
 msgid "wdwpyramid_illaun"
-msgstr "Dream of the gods"
+msgstr "Dream of the Gods"
 
 msgctxt "race"
 msgid "snotling"
@@ -1863,7 +1872,7 @@ msgstr "snotling"
 
 msgctxt "spellinfo"
 msgid "berserk"
-msgstr "During this bloody ritual the sorcerer sacrifices a newborn child before a battle right in front of his army. In this way he attracts spirits of blood that will take control of the soldiers who are present and force them into a blood frenzy."
+msgstr "During this bloody ritual the sorcerer sacrifices a newborn child right in front of their army before a battle. In this way they attract spirits of blood that will take control of the soldiers who are present and force them into a blood frenzy."
 
 msgid "h15_p"
 msgstr "rock weed"
@@ -1930,13 +1939,14 @@ msgctxt "spell"
 msgid "windshield"
 msgstr "Air Shield"
 
+#, fuzzy
 msgctxt "race"
 msgid "museumghost"
-msgstr "museumghost"
+msgstr "museum ghost"
 
 msgctxt "spellinfo"
 msgid "fumblecurse"
-msgstr "This wicked curse affects the magical abilities of the target. A field of raw chaos magic around the target lessens its concentration and makes it very hard to cast any spells."
+msgstr "This wicked curse affects the magical abilities of the target. A field of raw chaos magic around the target affects their concentration and hampers their ability to cast any spells."
 
 msgctxt "keyword"
 msgid "option"
@@ -1955,18 +1965,15 @@ msgstr "giant turtles"
 
 msgctxt "spell"
 msgid "create_runesword"
-msgstr "Create A Runesword"
+msgstr "Create a Runesword"
 
 msgctxt "spell"
 msgid "strongwall"
-msgstr "Strong Wall And Sturdy Gate"
+msgstr "Strong Wall and Sturdy Gate"
 
 msgctxt "spell"
 msgid "double_time"
 msgstr "Double Time"
-
-msgid "wente_ring"
-msgstr "Wildente's wedding ring"
 
 msgid "apple"
 msgstr "apple"
@@ -1984,13 +1991,14 @@ msgstr "moon "
 
 msgctxt "iteminfo"
 msgid "snowball"
-msgstr "These items stay frozen all year round. There seem to be bits of ice in them - in the right hands, these might put an eye out!"
+msgstr "These items stay frozen all year round. There seem to be bits of ice inside - in the right hands, these might put an eye out!"
 
 msgid "nr_spell_syntax"
 msgstr "Syntax:"
 
+#, fuzzy
 msgid "seaserpenthead_p"
-msgstr "seaserpentheads"
+msgstr "sea serpent heads"
 
 msgid "forest"
 msgstr "forest"
@@ -2019,7 +2027,7 @@ msgstr "Rank:"
 
 msgctxt "spellinfo"
 msgid "stonegolem"
-msgstr "'Take a flawless block of crystaline stone and humidify it with a vial of Water of Life until the potion has been soaked up completely. Then focus your power on the forming aura of life and shape a container for the unbound forces'. The more power a magician invests, the more golems can be created before the aura dissipates. Every week, there is a 10 percent chance that the golem will crumble to dust. If you command a golem to 'MAKE CASTLE' or 'MAKE ROAD', it will turn itself into 4 stones that it uses in construction, and disintegrate afterwards."
+msgstr "'Take a flawless block of crystalline stone and humidify it with a vial of water of life until the potion has been soaked up completely. Then focus your power on the forming aura of life and shape a container for the unbound forces. The more power a magician invests, the more golems can be created before the aura dissipates. Every week, there is a 10 percent chance that the golem will crumble to dust. If you command a golem to 'MAKE CASTLE' or 'MAKE ROAD', it will turn itself into 4 stones that it uses in construction, and disintegrate afterwards."
 
 msgid "dolphin"
 msgstr "dolphin"
@@ -2044,7 +2052,7 @@ msgstr "orc"
 
 msgctxt "spellinfo"
 msgid "create_antimagic"
-msgstr "This spell creates a portable crystal of antimagic which can be used by anybody to reduce or even eliminate the power of all spells cast in the region during the same week."
+msgstr "This spell creates a portable crystal of antimagic which can be used by anybody to reduce or even eliminate the power of all spells cast in the region during the same week, destroying the crystal in the process."
 
 msgid "goliathwater_p"
 msgstr "goliath waters"
@@ -2082,7 +2090,7 @@ msgstr "snotling"
 
 msgctxt "spellinfo"
 msgid "create_magicherbbag"
-msgstr "The druid takes some specially prepared leather and performes a great ritual during which the leather is cleansed of all impure spirits. Then he binds some minor spirits of air and water to the material. After completing this process, the druid works the enchanted leather into a small pouch which is suitable to contain herbs, for it is able to preserve them for a long time and prevents rot."
+msgstr "The druid takes some specially prepared leather and performs a great ritual during which the leather is cleansed of all impure spirits. Then they bind some minor spirits of air and water to the material. After completing this process, the druid works the enchanted leather into a small pouch which prevents rot and is able to preserve herbs contained in it for a long time."
 
 msgctxt "border"
 msgid "road"
@@ -2097,14 +2105,14 @@ msgstr "SPY"
 
 msgctxt "describe"
 msgid "peasantblood"
-msgstr "Knowledge of this potion is amongst the most dangerous and secret wisdom of the alchemist. Snatched from the darkest hells, the knowledge of this formula enables the production of an elixer which serves Demons as nourishment. If used by normal beings it leads to a swift death and eternal undeath. The creation requires Fjord Fungus together with some Cave Lichen and Cobalt Fungus, and an unfortunate peasant from the region, who is killed in the bloody days-long ritual. One vial of the potion satisfies the hunger of 100 Demons for a week."
+msgstr "Knowledge of this potion is amongst the most dangerous and secret wisdom of the alchemist. Snatched from the darkest hells, the knowledge of this formula enables the production of an elixir which serves demons as nourishment. If used by normal beings, it leads to a swift death and eternal undeath. The creation requires fjord fungus together with some cave lichen and cobalt fungus, and an unfortunate peasant from the region, who is killed in the bloody days-long ritual. One vial of the potion satisfies the hunger of 100 demons for a week."
 
 msgctxt "spell"
 msgid "powerful_dragonbreath"
 msgstr "Powerful Dragonbreath"
 
 msgid "dragonblood_p"
-msgstr "dragonblood"
+msgstr "dragon blood"
 
 msgid "aog_p"
 msgstr "amulets of gathering"
@@ -2114,15 +2122,15 @@ msgstr "TRAVEL"
 
 msgctxt "describe"
 msgid "p10"
-msgstr "The use of the berserkers blood potion is advised to increase one's warriors abilities to new heights. To create this, one needs a white hemlock, some flatroot, sand reeker and a mandrake. All ingredients have to be sliced as finely as possible, after which it is boiled for two hours. The cooled brew is strained through a cloth. The resulting juice is enough to improve up to ten warriors."
+msgstr "The use of the berserker blood potion is advised to increase one's warriors abilities to new heights. To create this, one needs a white hemlock, some flatroot, sand reeker and a mandrake. All ingredients have to be sliced as finely as possible, after which it is boiled for two hours. The cooled brew is strained through a cloth. The resulting juice is enough to improve up to ten warriors."
 
 msgctxt "describe"
 msgid "p11"
-msgstr "The peasant love potion enamors both Man and Woman to the same degree and results in a strong wish for children. For a big portion scoop out a mandrake, fill it with finely chopped bubblemorel, elvendear and snowcrystal petal, sprinkle grated rock weed on top and let it simmer on low heat for twenty hours. The potion can grant up to 1000 peasants the happiness of twins."
+msgstr "The peasant love potion enamors both men and women to the same degree and results in a strong wish for children. For a big portion scoop out a mandrake, fill it with finely chopped bubblemorel, elvendear and snowcrystal petal, sprinkle grated rock weed on top and let it simmer on low heat for twenty hours. The potion can grant up to 1000 peasants the happiness of twins."
 
 msgctxt "describe"
 msgid "p13"
-msgstr "One of the most rare and prized of all alchemist elixers, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people fivefold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally he dusts it with some minced bubblemorel and stirrs the powder into some dragon's blood."
+msgstr "One of the most rare and prized of all alchemist elixirs, this potion grants the user a dragon's power for a few weeks. The potion increases the life-energy of a maximum of ten people five-fold. The effect is strongest right after drinking and slowly decreases over time. To brew this potion, the alchemist needs an elvendear, a windbag, a piece of waterfinder and a spider ivy. Finally dust it with some minced bubblemorel and stir the powder into some dragon's blood."
 
 msgid "an_unknown_curse"
 msgstr "an unknown curse"
@@ -2192,7 +2200,7 @@ msgstr "storm moon"
 
 msgctxt "spellinfo"
 msgid "stormwinds"
-msgstr "Calling the Elemental Spirits of Storm is an ancient ritual. The druid binds the elementals to a ship's sails where they can help to carry the vessel across the waves at an amazing speed. The more power the druid invests, the greater is the number of spirits bound. Each ship needs an own spirit."
+msgstr "Calling the elemental spirits of storm is an ancient ritual. The druid binds the elementals to a ship's sails where they can help to carry the vessel across the waves at an amazing speed. The more power the druid invests, the greater is the number of spirits bound. Each ship needs its own spirit."
 
 msgid "trollbelt_p"
 msgstr "trollbelts"
@@ -2222,7 +2230,7 @@ msgstr "icewind"
 
 msgctxt "spellinfo"
 msgid "healing"
-msgstr "Combat medics are not the only ones who can help those who got injured during a battle. Druids are, with the help of a summons of the Elemental Spirits of Life, able to heal wounds, mend broken bones or even regenerate separated limbs as well."
+msgstr "Combat medics are not the only ones who can help those who got injured during a battle. Druids are, with the help of a summons of the elemental spirits of life, able to heal wounds, mend broken bones or even regenerate separated limbs as well."
 
 msgctxt "race"
 msgid "vampunicorn_d"
@@ -2428,8 +2436,9 @@ msgstr "giant turtle"
 msgid "magicherbbag"
 msgstr "bag of conservation"
 
+#, fuzzy
 msgid "rustychainmail_p"
-msgstr "rustychainmails"
+msgstr "rusty chainmails"
 
 msgctxt "spellpar"
 msgid "direction"
@@ -2450,7 +2459,7 @@ msgstr "song dragons"
 
 msgctxt "describe"
 msgid "p0"
-msgstr "For Seven Mile Tea, boil up a Cobalt Fungus and pour the resulting brew into a Windbag. Catch and filter the liquid that drips out and administer it. This tea allows up to ten men to move as fast as a horse."
+msgstr "For seven mile tea, boil up a cobalt fungus and pour the resulting brew into a windbag. Catch and filter the liquid that drips out and administer it. This tea allows up to ten men to move as fast as horses."
 
 msgid "nr_damaged"
 msgstr "damage"
@@ -2460,7 +2469,7 @@ msgstr "amulet of true seeing"
 
 msgctxt "spellinfo"
 msgid "analyze_magic"
-msgstr "With this spell the magician can try to identify the enchantments of a single object. He will get an impression of the operation of all spells that don't exceed his own capabilities. For more powerful spells he will need some luck for a successful analysis."
+msgstr "With this spell the magician can try to identify the enchantments of a single object. You will get an impression of the operation of all spells that don't exceed your own capabilities. For more powerful spells you will need some luck for a successful analysis."
 
 msgctxt "spell"
 msgid "rustweapon"
@@ -2468,7 +2477,7 @@ msgstr "Rain of Rust"
 
 msgctxt "describe"
 msgid "p3"
-msgstr "Allow a Tangy Temerity to simmer for three hours in a litre of water, then add a grated Mandrake, and sprinkle in a Gapgrowth harvested at full moon. The whole brew should then be allowed to stew for three days in a warm place. This potion increases the strength and endurance of ten men so that they can achieve twice as much in a week."
+msgstr "Allow a tangy temerity to simmer for three hours in a litre of water, then add a grated mandrake, and sprinkle in a gapgrowth harvested at full moon. The whole brew should then be allowed to stew for three days in a warm place. This potion increases the strength and endurance of ten men so that they can achieve twice as much in a week."
 
 msgctxt "spell"
 msgid "drought"
@@ -2479,11 +2488,11 @@ msgstr "pegasi"
 
 msgctxt "describe"
 msgid "p6"
-msgstr "To create the brain wax potion, mix the juice of a waterfinder with quite a bit of grated windbag and a pinch of bugleweed. Let this steep for just a minute. When the liquid is only lukewarm, add some rock weed. Using a large spoon, stirr exactly seven times clockwise and then seven times counterclockwise. Fill the vial when the liquid has gone still. The juice gives ten people a 33% chance of an additional attempt at learning a skill."
+msgstr "To create the brain wax potion, mix the juice of a waterfinder with quite a bit of grated windbag and a pinch of bugleweed. Let this steep for just a minute. When the liquid is only lukewarm, add some rock weed. Using a large spoon, stir exactly seven times clockwise and then seven times counterclockwise. Fill the vial when the liquid has gone still. The juice gives ten people a 33% chance of an additional attempt at learning a skill."
 
 msgctxt "describe"
 msgid "p7"
-msgstr "A duncebun is a nasty piece of work, negating any attempt at learning a skill, or even causing the subject to forget things! For ten servings knead a rasped fjord fungus, an abraded owlsgaze and a finely sliced spider ivy to a smooth dough. Bake for an hour at moderate heat and brush the result with some cave lichen. Who eats this bread will not learn what he's attempting to learn, and, in case there is no attempt to learn anything, will forget a week's worth of study in his best skill."
+msgstr "A duncebun is a nasty piece of work, negating any attempt at learning a skill, or even causing the subject to forget things! For ten servings knead a rasped fjord fungus, an abraded owlsgaze and a finely sliced spider ivy to a smooth dough. Bake for an hour at moderate heat and brush the result with some cave lichen. Who eats this bread will not learn what they are attempting to learn, and, in case there is no attempt to learn anything, will forget a week's worth of study in their best skill."
 
 msgid "h20"
 msgstr "snowcrystal petal"
@@ -2530,7 +2539,7 @@ msgstr "illusionary wall"
 
 msgctxt "spellinfo"
 msgid "summonshadowlords"
-msgstr "With the help of dark rituals the sorcerer summons demons from the Sphere of Shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadowmasters are feared in combat for they are hard to hit and have the ability to drain strength and life force from their victims."
+msgstr "With the help of dark rituals the sorcerer summons demons from the sphere of shadows. These fearsome creatures can walk almost unseen among the living, but their dark aura can be sensed by everyone. Shadow masters are feared in combat, for they are hard to hit and have the ability to drain strength and life force from their victims."
 
 msgid "nr_herbsrequired"
 msgstr "Herbs required"
@@ -2548,14 +2557,10 @@ msgstr "STEAL"
 
 msgctxt "spellinfo"
 msgid "resist_magic"
-msgstr "This spell enhances natural magic resistence. Protected units are less vulnerable to battle magic. The spell protects 5 people per level."
+msgstr "This spell enhances natural magic resistance. Protected units are also less vulnerable to battle magic. The spell protects 5 people per level."
 
 msgid "ADRESSEN"
 msgstr "ADDRESSES"
-
-msgctxt "race"
-msgid "apepsnake_d"
-msgstr "apepsnakes"
 
 msgid "section_production"
 msgstr "Resources and Production"
@@ -2569,10 +2574,6 @@ msgstr "COMPUTER"
 msgctxt "spell"
 msgid "chaossuction"
 msgstr "Chaos Gate"
-
-msgctxt "race"
-msgid "apepsnake_p"
-msgstr "apepsnakes"
 
 msgid "PARTEITARNUNG"
 msgstr "FACTIONSTEALTH"
@@ -2589,10 +2590,6 @@ msgctxt "keyword"
 msgid "name"
 msgstr "NAME"
 
-msgctxt "race"
-msgid "apepsnake_x"
-msgstr "apepsnake"
-
 msgid "KOMMANDO"
 msgstr "CONTROL"
 
@@ -2601,11 +2598,12 @@ msgstr "the glacier of %s"
 
 msgctxt "spellinfo"
 msgid "chaossuction"
-msgstr "By sacrificing the lives of 200 peasants, the chaossorcerer is able to open a planar gate. This gate can be used during the following week to transfer units to the astral plane. It dissipates at the end of the following week."
+msgstr "By sacrificing the lives of 200 peasants, the chaos sorcerer is able to open a planar gate. This gate can be used during the following week to transfer units to the astral plane. It dissipates at the end of the following week."
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_focus"
-msgstr "Create An Aurafocus"
+msgstr "Create an Aura Focus"
 
 msgid "nr_combatspells"
 msgstr "combat spells"
@@ -2644,7 +2642,7 @@ msgstr "magical storm"
 
 msgctxt "spellinfo"
 msgid "create_focus"
-msgstr "Creates an aurafocus crystal."
+msgstr "Creates an aura focus crystal."
 
 msgctxt "spell"
 msgid "song_of_slavery"
@@ -2652,7 +2650,7 @@ msgstr "Song of Slavery"
 
 msgctxt "spellinfo"
 msgid "song_of_confusion"
-msgstr "If is used before battle, this chant, taken from the ancient tunes of the cats, might give you the critical tactical advantage. Those under the spell's influence will act uncoordinated and inconsequent due to the nonsensical ideas planted into their minds through the melody. So it is supposed to have come to pass that well-organized armies found their archers up at the front (while the cavalry was back at the camp playing cards) or that even a famous general overslept a battle in his tent, as tale-tellers claim it really happened during the Great Wars in the Old World."
+msgstr "If used before battle, this chant, taken from the ancient tunes of the cats, might give you the critical tactical advantage. Those under the spell's influence will act uncoordinated and inconsistent due to the nonsensical ideas planted into their minds through the melody. So it is supposed to have come to pass that well-organized armies found their archers right at the front while the cavalry was back at the camp playing cards or that even a famous general overslept a battle in his tent, as tale-tellers claim it really happened during the Great Wars in the Old World."
 
 msgctxt "border"
 msgid "gate_locked"
@@ -2667,10 +2665,7 @@ msgstr "an incomplete road"
 
 msgctxt "spellinfo"
 msgid "plague"
-msgstr "In a complicated ritual the sorcerer sacrifices the lives of ten peasants and magically spreads their corpses within the wells of a region."
-
-msgid "jadee_dress_p"
-msgstr "wedding dresses"
+msgstr "In a complicated ritual the sorcerer sacrifices the lives of ten peasants and magically spreads their corpses within the wells of a region. The blight will spread through the region and many peasants may die."
 
 msgctxt "spell"
 msgid "magicstreet"
@@ -2697,7 +2692,7 @@ msgstr "mistletoes"
 
 msgctxt "spell"
 msgid "wyrm_transformation"
-msgstr "Wyrmtransformation"
+msgstr "Wyrm Transformation"
 
 msgid "sptype_combat"
 msgstr "combat spell"
@@ -2710,7 +2705,7 @@ msgid "gwyrrdfumbleshield"
 msgstr "Astral Guardian Spirits"
 
 msgid "presspass"
-msgstr "presspass"
+msgstr "press pass"
 
 msgctxt "spell"
 msgid "wdwpyramid_tybied"
@@ -2718,7 +2713,7 @@ msgstr "Web of the Gods"
 
 msgctxt "spell"
 msgid "create_antimagic"
-msgstr "Create An Antimagic Crystal"
+msgstr "Create an Antimagic Crystal"
 
 msgctxt "race"
 msgid "special_d"
@@ -2732,8 +2727,9 @@ msgctxt "prefix"
 msgid "Nebel"
 msgstr "mist "
 
+#, fuzzy
 msgid "dragonhoard"
-msgstr "dragonhoard"
+msgstr "dragon hoard"
 
 msgctxt "race"
 msgid "tiger_d"
@@ -2759,7 +2755,7 @@ msgid "special_p"
 msgstr "special"
 
 msgid "par_building"
-msgstr "buildingid"
+msgstr "building-id"
 
 msgctxt "race"
 msgid "tiger_p"
@@ -2819,9 +2815,12 @@ msgstr "These magic runes allow a boat with a capacity of up to 50 weight units 
 msgid "bagpipeoffear_p"
 msgstr "bagpipes of fear"
 
+# ordinary bag of unidentified herbs, not the magic conservation one
+#, fuzzy
 msgid "herbbag"
-msgstr "herbbag"
+msgstr "bag of herbs"
 
+#, fuzzy
 msgctxt "spell"
 msgid "astral_disruption"
 msgstr "Astral Disruption"
@@ -2834,7 +2833,7 @@ msgid "work"
 msgstr "WORK"
 
 msgid "iceberg_trail"
-msgstr "the glacier of %s"
+msgstr "the iceberg of %s"
 
 msgid "silk_p"
 msgstr "silk"
@@ -2843,7 +2842,7 @@ msgid "manacrystal_p"
 msgstr "astralcrystals"
 
 msgid "fog_trail"
-msgstr "fog_trail %s"
+msgstr "%s"
 
 msgctxt "spell"
 msgid "show_astral"
@@ -2851,7 +2850,7 @@ msgstr "Astral Gaze"
 
 msgctxt "iteminfo"
 msgid "skillpotion"
-msgstr "The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though, the drinker receives further insight into any learned skills, which furthers their progress towards the mastery of those skills."
+msgstr "The recipe of this potion is a well kept secret. Some even say it couldn't be brewed by mere mortals. One thing is certain though: The drinkers receive further insight into any learned skills, which furthers their progress towards the mastery of those skills."
 
 msgctxt "keyword"
 msgid "cast"
@@ -2862,7 +2861,7 @@ msgid "wounded"
 msgstr "wounded"
 
 msgid "par_ship"
-msgstr "shipid"
+msgstr "ship-id"
 
 msgctxt "race"
 msgid "dwarf"
@@ -2870,7 +2869,7 @@ msgstr "dwarf"
 
 msgctxt "spellinfo"
 msgid "irongolem"
-msgstr "The more power a magician invests, the more golems can be created before the aura dissipates. Each golem has a 15% chance per week to turn to dust. If you command a golem to 'MAKE SWORD/MAKE CLAYMORE' or 'MAKE SHIELD/CHAINMAIL/PLATEMAIL',it will work 5 iron ingots and disintegrate afterwards."
+msgstr "The more power a magician invests, the more golems can be created before the aura dissipates. Each golem has a 15% chance per week to turn to dust. If you command a golem to 'MAKE sword/MAKE claymore' or 'MAKE shield/chainmail/platemail', it will work 4 iron ingots and disintegrate afterwards."
 
 msgid "cookie_p"
 msgstr "cookies"
@@ -2880,13 +2879,13 @@ msgid "ghoul_d"
 msgstr "ghouls"
 
 msgid "santa2004"
-msgstr "'Ho ho ho!' A fat little gnome Gnom on a sled pulled by 8 young dragons flies through the stary night and presents your faction with a solar sail. (To claim this item, one of your units must issue the order 'CLAIM 1 solar sail'."
+msgstr "'Ho ho ho!' A fat little gnome on a sled pulled by 8 young dragons flies through the starry night and presents your faction with a solar sail. (To claim this item, one of your units must issue the order 'CLAIM 1 solar sail'."
 
 msgid "santa2005"
-msgstr "'Ho ho ho!' A fat little gnome Gnom on a sled pulled by 8 young dragons flies through the stary night and presents your faction with a vial of stardust. (To get more information about this item, use the CLAIM and SHOW commands)."
+msgstr "'Ho ho ho!' A fat little gnome on a sled pulled by 8 young dragons flies through the starry night and presents your faction with a vial of stardust. (To get more information about this item, use the CLAIM and SHOW commands)."
 
 msgid "santa2006"
-msgstr "'Ho ho ho!' A fat little gnome Gnom on a sled pulled by 8 young dragons flies through the stary night and presents your faction with a beautifully decorated tree. (To get more information about this item, use the CLAIM and SHOW commands)."
+msgstr "'Ho ho ho!' A fat little gnome on a sled pulled by 8 young dragons flies through the starry night and presents your faction with a beautifully decorated tree. (To get more information about this item, use the CLAIM and SHOW commands)."
 
 msgid "volcano_trail"
 msgstr "the volcano of %s"
@@ -2905,9 +2904,10 @@ msgctxt "keyword"
 msgid "destroy"
 msgstr "DESTROY"
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_dreameye"
-msgstr "Create a Visioneye"
+msgstr "Create a Dream Eye"
 
 msgid "nr_trade_intro"
 msgstr "Traders can sell"
@@ -2955,7 +2955,7 @@ msgstr "a connection to another road"
 
 msgctxt "spellinfo"
 msgid "courting"
-msgstr "From the 'Songs of the Elder' by Firudin the Sage: 'This enticing little melody and its ingratiating words will lure the peasants in no time. They will leave home and hearth to follow your lead.'"
+msgstr "From the 'Songs of the Elder' by Firudin the Sage: 'This enticing little melody and its ingratiating words will lure the peasants in no time. They will leave their homes and hearths to follow your lead.'"
 
 msgid "healing_p"
 msgstr "healing potions"
@@ -2973,7 +2973,7 @@ msgstr "gnome"
 
 msgctxt "iteminfo"
 msgid "snowman"
-msgstr "Orange nose, black hat, frosty character. A snowman. He'll make a fine guard if you use him in a cold place. (USE 1 snowman)"
+msgstr "Orange nose, black hat, frosty character. A snowman. He'll make a fine guard if you use him in a cold place (USE 1 snowman)."
 
 msgctxt "spell"
 msgid "stonegolem"
@@ -2994,7 +2994,7 @@ msgstr "permauras"
 
 msgctxt "spellinfo"
 msgid "song_of_peace"
-msgstr "This powerful spell prevents any attacks. Noone in the entire region will be able to raise his weapon against another. The effect can last for weeks."
+msgstr "This powerful spell prevents any attacks. No one in the entire region will be able to raise their weapon against another. The effect can last for weeks."
 
 msgctxt "spell"
 msgid "nocostbuilding"
@@ -3010,7 +3010,7 @@ msgstr "buildingtype"
 
 msgctxt "spellinfo"
 msgid "create_roi"
-msgstr "With this spell the caster can create a Ring of Invisibility. The wearer of this ring will be invisible to all units of other factions, no matter how good their perception skill may be. In an invisible unit, each person must wear a Ring of Invisibility."
+msgstr "With this spell the caster can create a ring of invisibility. The wearer of this ring will be invisible to all units of other factions, no matter how good their perception skill may be. In an invisible unit, each person must wear a ring of invisibility."
 
 msgctxt "spell"
 msgid "sparkledream"
@@ -3029,7 +3029,7 @@ msgstr "bagpipe of fear"
 
 msgctxt "spellinfo"
 msgid "create_rop"
-msgstr "A ring of power adds +1 to the power of each spell cast by its' wearer."
+msgstr "A ring of power adds +1 to the power of each spell cast by its wearer."
 
 msgid "papyrus"
 msgstr "papyrus"
@@ -3096,7 +3096,7 @@ msgstr "Acceleration"
 
 msgctxt "spellinfo"
 msgid "clone"
-msgstr "This powerful spell can keep the mage from certain death. The mage creates a clone of himself from a small blood sample and puts it into a bath of dragon's blood and thinned water of life. Subsequently he transfers a fragment of his soul into the clone in a complex ritual. If the mage dies afterwards, his soul takes possession of the clone which will serve as his new vessel. There is however a small chance the soul is to weak to reach the vessel in the wake of the mage's death."
+msgstr "This powerful spell can keep the mage from certain death. The mage creates a clone of themself from a small blood sample and puts it into a bath of dragon's blood and thinned water of life. Subsequently they transfer a fragment of their soul into the clone in a complex ritual. If the mage dies afterwards, their soul takes possession of the clone which will serve as their new vessel. There is, however, a small chance that the soul is too weak to reach the vessel in the wake of the mage's death."
 
 msgctxt "race"
 msgid "elf_p"
@@ -3107,7 +3107,7 @@ msgstr "elven horses"
 
 msgctxt "spellinfo"
 msgid "frighten"
-msgstr "This warsong sows panic among the enemy front line and weakens their fighting strength significantly. Fear will weaken their sword arm and dread will freeze their shield arm."
+msgstr "This war song sows panic among the enemy front line and weakens their fighting strength significantly. Fear will weaken their sword arm and dread will freeze their shield arm."
 
 msgctxt "keyword"
 msgid "ride"
@@ -3115,7 +3115,7 @@ msgstr "RIDE"
 
 msgctxt "spell"
 msgid "stormwinds"
-msgstr "Summon Storm Elemental"
+msgstr "Storm Elemental"
 
 msgctxt "race"
 msgid "elf"
@@ -3134,7 +3134,7 @@ msgstr "SORT"
 
 msgctxt "spellinfo"
 msgid "draigdestroymagic"
-msgstr "At midnight, when the Powers of Darkness are at their peak, the sorcerer can use his powers to destroy enchantments. In order to do so, he draws a pentagram on a surface of the enchanted object and begins calling the Lords of Darkness. The Lords will aid him, but whether he is able to undo the target spell or not depends upon his own power."
+msgstr "At midnight, when the powers of darkness are at their peak, the sorcerer can use their powers to destroy enchantments. In order to do so, they draw a pentagram on a surface of the enchanted object and begin calling the lords of darkness. The lords will aid them, but whether they are able to undo the target spell or not depends upon their own power."
 
 msgctxt "race"
 msgid "shadowknight"
@@ -3157,9 +3157,10 @@ msgctxt "race"
 msgid "kraken"
 msgstr "kraken"
 
+#, fuzzy
 msgctxt "race"
 msgid "shadowbat"
-msgstr "darkbat"
+msgstr "shadow bat"
 
 msgid "group_help"
 msgstr "is helping"
@@ -3194,7 +3195,7 @@ msgstr "portal"
 
 msgctxt "spellinfo"
 msgid "heroic_song"
-msgstr "This ancient battle chant lifts the spirit of your troops and helps them withstand even the fear-inspiring aura of demonic and undead beings. A fighter thus fortified against evil will not flee even in the face of terror, and his defenses will be strengthened."
+msgstr "This ancient battle chant lifts the spirit of your troops and helps them withstand even the fear-inspiring aura of demonic and undead beings. Fighters thus fortified against evil will not flee, even in the face of terror, and their defenses will be strengthened."
 
 msgid "firewall_trail"
 msgstr "a %s"
@@ -3267,12 +3268,9 @@ msgstr "krakens"
 msgid "money_p"
 msgstr "silver"
 
-msgid "jadee_ring_p"
-msgstr "Jadee's wedding rings"
-
 msgctxt "shipinfo"
 msgid "no_info"
-msgstr "No Information available for this type of ship."
+msgstr "No information available for this type of ship."
 
 msgid "p11_p"
 msgstr "peasant love potion"
@@ -3293,7 +3291,7 @@ msgstr "krakens"
 
 msgctxt "spellinfo"
 msgid "sleep"
-msgstr "This spell causes several enemies to fall asleep. Sleeping warriors don't attack and defend themselves worse than normal, but they'll wake up if they get hit during combat."
+msgstr "This spell causes several enemies to fall asleep. Sleeping warriors don't attack, and defend themselves worse than normal, but they'll wake up if they get hit during combat."
 
 msgctxt "spellinfo"
 msgid "tiredsoldiers"
@@ -3308,7 +3306,7 @@ msgstr "duncebuns"
 
 msgctxt "spell"
 msgid "appeasement"
-msgstr "Appeasing Song"
+msgstr "Friedenslied"
 
 msgid "dwarfspoil"
 msgstr "dwarven beard"
@@ -3336,7 +3334,7 @@ msgstr "mallorn seed"
 
 msgctxt "spellinfo"
 msgid "create_aots"
-msgstr "This spell enables the caster to create an Amulet of True Sight. Wearing such an amulet, a person can discover anyone wearing a Ring of Invisibility. Anyway, units concealed by the use of their stealth skill will remain undiscovered."
+msgstr "This spell enables the caster to create an amulet of true sight. Wearing such an amulet, a person can discover anyone wearing a ring of invisibility. Units concealed by the use of their stealth skill, however, will remain undiscovered."
 
 msgctxt "race"
 msgid "ent"
@@ -3344,7 +3342,7 @@ msgstr "ent"
 
 msgctxt "iteminfo"
 msgid "dwarfspoil"
-msgstr "Sniff... Bleah. Don't they ever wash these?"
+msgstr "Sniff... Yuck! Don't they ever wash these?"
 
 msgctxt "race"
 msgid "clone"
@@ -3386,8 +3384,9 @@ msgctxt "spell"
 msgid "treewalkenter"
 msgstr "Path of Trees"
 
+#, fuzzy
 msgid "toadslime"
-msgstr "pot of toadslime"
+msgstr "pot of toad slime"
 
 msgctxt "race"
 msgid "cat_d"
@@ -3402,7 +3401,7 @@ msgstr "shields"
 
 msgctxt "spellinfo"
 msgid "melancholy"
-msgstr "With this chant the bard spreads a melancholic, sad mood among the peasants. For a few weeks they will retreat to their huts and not spend any silver in the theatres and taverns."
+msgstr "With this chant the bard spreads a melancholic, sad mood among the peasants. For a few weeks they will retreat to their huts and not spend any silver in the theaters and taverns."
 
 msgctxt "spell"
 msgid "earn_silver#gwyrrd"
@@ -3412,6 +3411,7 @@ msgctxt "race"
 msgid "eagle_p"
 msgstr "eagles"
 
+#, fuzzy
 msgctxt "race"
 msgid "hellcat"
 msgstr "hellcat"
@@ -3453,8 +3453,9 @@ msgstr "stone golems"
 msgid "spice"
 msgstr "spice"
 
+#, fuzzy
 msgid "dragonhead"
-msgstr "dragonhead"
+msgstr "dragon head"
 
 msgctxt "race"
 msgid "toad_x"
@@ -3479,7 +3480,7 @@ msgstr "the %s"
 
 msgctxt "raceinfo"
 msgid "songdragon"
-msgstr "Song Dragons are roughly the size of a fully grown tiger. Their coloring ranges from bright red, through a dark green shade to a deep black. All known dragons of this species display a high level of intelligence and highly developed magical skills. Like their larger cousins, Song Dragons posess a firegland. They love singing and a good meal. From time to time one of these magnificent creatures will bond with a mage. When this happens, the mage is assured of a most loyal and useful familiar at his side."
+msgstr "Song dragons are roughly the size of a fully grown tiger. Their coloring ranges from bright red through a dark green shade to a deep black. All known dragons of this species display a high level of intelligence and highly developed magical skills. Like their larger cousins, song dragons possess a fire gland. They love singing and a good meal. From time to time one of these magnificent creatures will bond with a mage. When this happens, the mage is assured of a most loyal and useful familiar at their side."
 
 msgid "axe_p"
 msgstr "axes"
@@ -3507,7 +3508,7 @@ msgstr "wild "
 
 msgctxt "spellinfo"
 msgid "create_trollbelt"
-msgstr "This artifact gives the wearer the strength of a cavetroll. He will be able to carry fifty times his normal load, as well as gain strength and tough troll skin in combat."
+msgstr "This artifact gives the wearer the strength of a cave troll. They will be able to carry fifty times their normal load, as well as gain strength and tough troll skin in combat."
 
 msgctxt "spell"
 msgid "holyground"
@@ -3533,7 +3534,7 @@ msgstr "To the "
 
 msgctxt "iteminfo"
 msgid "speedsail"
-msgstr "A unit setting this sail on a ship temporarily will permanently increase the ship's range by 1."
+msgstr "A unit setting this sail on a ship will permanently increase the ship's range by 1."
 
 msgctxt "race"
 msgid "nymph_p"
@@ -3572,7 +3573,7 @@ msgstr "humans"
 
 msgctxt "spellinfo"
 msgid "unholypower"
-msgstr "Only whispered the knowledge of performing this ritual is passed to the adepts of the dark academies, for it is one of the darkest that has ever been written down. By calling unholy demons the strength of the living dead is greatly increased and they are turned into undead monsters of immense power."
+msgstr "Only whispered the knowledge of performing this ritual is passed to the adepts of the dark academies, for it is one of the darkest that has ever been written down. By calling unholy demons, the strength of the living dead is greatly increased and they are turned into undead monsters of immense power."
 
 msgid "balm"
 msgstr "balm"
@@ -3585,9 +3586,10 @@ msgctxt "school"
 msgid "gray"
 msgstr "no magic school"
 
+#, fuzzy
 msgctxt "spell"
 msgid "summonfireelemental"
-msgstr "Summon Fire Elemental"
+msgstr "Heat Elemental"
 
 msgid "seed"
 msgstr "seed"
@@ -3600,7 +3602,7 @@ msgstr "peasant bloods"
 
 msgctxt "spellinfo"
 msgid "undeadhero"
-msgstr "This ritual binds the escaping souls of some casualties back to their dead bodies and thus condemns them to an undead existance under the control of the sorcerer. The ritual affects the corpses of allies and foes alike - no matter on which side of the battle the soldiers fought before their death."
+msgstr "This ritual binds the escaping souls of some casualties back to their dead bodies and thus condemns them to an undead existence under the control of the sorcerer. The ritual affects the corpses of allies and foes alike, no matter on which side of the battle the soldiers fought before their death."
 
 msgctxt "spell"
 msgid "create_roqf"
@@ -3644,7 +3646,7 @@ msgstr "Jugglery"
 
 msgctxt "spellinfo"
 msgid "fireball"
-msgstr "The sorcerer hurls a ball of concentrated chaos into the ranks of his enemies. It will seriously hurt anyone who gets hit."
+msgstr "The sorcerer hurls a ball of concentrated chaos into the ranks of their enemies. It will seriously hurt anyone who gets hit."
 
 msgctxt "spell"
 msgid "summon_familiar"
@@ -3652,11 +3654,11 @@ msgstr "Summon Familiar"
 
 msgctxt "spellinfo"
 msgid "combatrust"
-msgstr "This ritual conjurs up a dark thunderstorm that affects a whole region. The magic rain will let rust any ore and thus destroy many weapons of the enemy."
+msgstr "This ritual conjures up a dark thunderstorm that affects a whole region. The magic rain will let rust any ore and thus destroy many weapons of the enemy."
 
 msgctxt "iteminfo"
 msgid "antimagic"
-msgstr "It may look like just another quartz, but your magician will tell you tha great power emenates from these crystals. Using it at the begining of a week will release a strong negative energy that reduce the power of all spells cast in the region during that week."
+msgstr "It may look like just another quartz, but your magician will tell you that great power emanates from these crystals. Using it at the beginning of a week will release a strong negative energy that reduces the power of all spells cast in the region during that week."
 
 msgid "HINTEN"
 msgstr "REAR"
@@ -3669,7 +3671,7 @@ msgstr "AFTER"
 
 msgctxt "spellinfo"
 msgid "seduction"
-msgstr "With this song a unit can be bewitched in a manner, which compels them to bequeath a large portion of their possessions to the bard. They will keep enough for their own survival, though."
+msgstr "With this song a unit can be bewitched in a manner that compels them to bequeath a large portion of their possessions to the bard. They will keep enough for their own survival, though."
 
 msgctxt "race"
 msgid "dwarf_d"
@@ -3698,7 +3700,7 @@ msgstr "gloom "
 
 msgctxt "spellinfo"
 msgid "deathcloud"
-msgstr "By performing a gruesome ritual and sacrificing his own blood the Sorcerer conjurs up a spirit from the Elemental Plane of Poison. It will take the form of a green cloud of toxic gases that envelops a whole region and that will harm anyone within."
+msgstr "By performing a gruesome ritual and sacrificing their own blood, the sorcerer conjures up a spirit from the elemental plane of poison. It will take the form of a green cloud of toxic gases that envelops a whole region and that will harm anyone within."
 
 msgid "iceberg"
 msgstr "iceberg"
@@ -3741,7 +3743,7 @@ msgstr "Bless Stone Circle"
 
 msgctxt "iteminfo"
 msgid "roi"
-msgstr "This magical artifact has been used since ancient times by Elves to conceal themselves from their enemies. Other races have also learned the value of these rings after encountering Elves - after all the ring makes its wearer invisible to normal eyes, and only magical methods enable the wearer to be discovered."
+msgstr "This magical artifact has been used since ancient times by elves to conceal themselves from their enemies. Other races have also learned the value of these rings after encountering elves - after all the ring makes its wearer invisible to normal eyes, and the wearer may only be discovered by magical methods."
 
 msgctxt "prefix"
 msgid "Berg"
@@ -3752,7 +3754,7 @@ msgstr "highland"
 
 msgctxt "iteminfo"
 msgid "rop"
-msgstr "A ring of power increases a magician's power. The level of all the spells he casts will be increased by one without increasing their costs."
+msgstr "A ring of power increases a magician's power. The level of all the spells they cast will be increased by one without increasing their costs."
 
 msgid "enterpasswd"
 msgstr "insert_your_password_here"
@@ -3788,7 +3790,7 @@ msgstr "The caster can transfer aura at a ratio of 2:1 to another member of the 
 
 msgctxt "spellinfo"
 msgid "blabbermouth"
-msgstr "The persons of the bewitched unit starts to babble without control about what it is said, speaking about their talents, the objects they carry or wear and if the unit is a magician, he or she will even list the spells they know. Unfortunately, this spell does not influence the memory of the subjects and afterwards, the enchanted will realize that they probably talked too much."
+msgstr "The persons of the bewitched unit start to babble without control, speaking about their talents, the objects they carry or wear and if the unit is a magician. They will even list the spells they know. Unfortunately, this spell does not influence the memory of the subjects, and afterwards the enchanted will realize that they probably talked too much."
 
 msgid "halberd"
 msgstr "halberd"
@@ -3798,14 +3800,14 @@ msgstr "temple"
 
 msgctxt "spellinfo"
 msgid "sacrifice_strength"
-msgstr "This spell allows the magician to transfer part of his magical powers to another magician. Magicians of the seam school will receive half the power invested, magicians of other schoolsreceive receive one third."
+msgstr "This spell allows the magician to transfer part of their magical powers to another magician. Magicians of the same school will receive half the power invested, magicians of other schools receive receive one third."
 
 msgid "nr_undercons"
 msgstr "under construction"
 
 msgctxt "spellinfo"
 msgid "cold_protection"
-msgstr "This spell enables the druid to magically protect insects from the paralysing cold of a glacier. Under the effect of this spell, insects are able to enter glaciers and act normally there. Ten insects per level can be protected in this way. A Ring of Power increases the number by additional ten."
+msgstr "This spell enables the druid to magically protect insects from the paralysing cold of a glacier. Under the effect of this spell, insects are able to enter glaciers and act normally there. Ten insects per level can be protected in this way. A ring of power increases the number by additional ten."
 
 msgctxt "keyword"
 msgid "route"
@@ -3831,12 +3833,13 @@ msgstr "XELAEN"
 msgid "magicherbbag_p"
 msgstr "bags of conservation"
 
+#, fuzzy
 msgid "seaserpenthead"
-msgstr "seaserpenthead"
+msgstr "sea serpent head"
 
 msgctxt "spellinfo"
 msgid "shapeshift"
-msgstr "With the help of this ritual the mentalist is able to conceal the true form of a target unit. To unknowing observers all persons in the target unit appear to be of a different race."
+msgstr "With the help of this ritual the mentalist is able to conceal the true form of a target unit. To unknowing observers, all persons in the target unit appear to be of a different race."
 
 msgctxt "skill"
 msgid "crossbow"
@@ -3884,19 +3887,20 @@ msgid "winter"
 msgstr "winter"
 
 msgid "wall1_trail"
-msgstr "a solid wall"
+msgstr "an impressive wall"
 
 msgctxt "spellinfo"
 msgid "double_time"
-msgstr "Abstract theories of space and time at last find practical application in this spell which warps the very fabric of time around a person. Such a person has twice as many movement points and doubles their attacks per round for a few weeks."
+msgstr "Abstract theories of space and time at last find practical application in this spell which warps the very fabric of time around a person. Such persons have twice as many movement points and double their attacks per round for a few weeks."
 
+#, fuzzy
 msgctxt "race"
 msgid "direwolf"
-msgstr "direwolf"
+msgstr "dire wolf"
 
 msgctxt "race"
 msgid "dreamcat_d"
-msgstr "dreamcats"
+msgstr "dream cats"
 
 msgid "Frühling"
 msgstr "spring"
@@ -3931,11 +3935,11 @@ msgstr "rings of invisibility"
 
 msgctxt "spellinfo"
 msgid "chaosrow"
-msgstr "Before the eyes of the enemy soldiers the sorcerer sacrifices ten peasants in a bloody ritual and thereby summons spirits of madness upon the enemy troops. The enemy soldiers will be in confusion during battle and no more be able to follow the commands of their leaders."
+msgstr "Before the eyes of the enemy soldiers the sorcerer sacrifices ten peasants in a horrid, gory ritual and thereby summons spirits of madness upon the enemy troops. The enemy soldiers will be in confusion during battle and no more be able to follow the commands of their leaders."
 
 msgctxt "race"
 msgid "dreamcat_p"
-msgstr "dreamcats"
+msgstr "dream cats"
 
 msgctxt "keyword"
 msgid "ready"
@@ -3953,18 +3957,18 @@ msgstr "attack"
 
 msgctxt "race"
 msgid "dreamcat_x"
-msgstr "dreamcat"
+msgstr "dream cat"
 
 msgid "mallornseed_p"
 msgstr "mallorn seeds"
 
 msgctxt "spellinfo"
 msgid "treewalkexit"
-msgstr "A druid who has traveled to the World of Spirits can use this spell to send level*5 weight units of living or dead matter back to a forest in the material world."
+msgstr "A druid who has traveled to the world of spirits can use this spell to send level*5 weight units of living or dead matter back to a forest in the material world."
 
 msgctxt "race"
 msgid "shadowmaster"
-msgstr "shadowmaster"
+msgstr "shadow master"
 
 msgctxt "race"
 msgid "fairy_d"
@@ -3998,7 +4002,7 @@ msgstr "Song of Terror"
 
 msgctxt "spellinfo"
 msgid "bloodsacrifice"
-msgstr "With this ritual the sorcerer can sacrifice part of his life force in order to gain raw astral power. Experienced mages report that this ritual, once started, is hard to control and that the ammount of power gained in this way varies."
+msgstr "With this ritual the sorcerer can sacrifice part of their life force in order to gain raw astral power. Experienced mages report that this ritual, once started, is hard to control and that the amount of power gained in this way varies."
 
 msgctxt "race"
 msgid "fairy_p"
@@ -4012,17 +4016,17 @@ msgstr "an unknown unit"
 
 msgctxt "race"
 msgid "direwolf_d"
-msgstr "direwolves"
+msgstr "dire wolves"
 
 msgctxt "spellinfo"
 msgid "ironkeeper"
-msgstr "Creates a guardian spirit on a mountain or glacier that keeps all factions that are not allied (HELP GUARD) from mining iron or laen as long as it guards the region. The Mountain Guardian is bound to the location where it has been summoned."
+msgstr "Creates a guardian spirit on a mountain or glacier that keeps all factions that are not allied (HELP GUARD) from mining iron or laen as long as it guards the region. The mountain guardian is bound to the location where it has been summoned."
 
 msgid "h20_p"
 msgstr "snowcrystal petals"
 
 msgid "hell"
-msgstr "hell"
+msgstr "hellfire"
 
 msgid "mailcmd"
 msgstr "ORDERS"
@@ -4033,7 +4037,7 @@ msgstr "spellid"
 
 msgctxt "spell"
 msgid "create_roi"
-msgstr "Create A Ring of Invisibility"
+msgstr "Create a Ring of Invisibility"
 
 msgctxt "race"
 msgid "fairy_x"
@@ -4052,7 +4056,7 @@ msgstr "clones"
 
 msgctxt "race"
 msgid "direwolf_p"
-msgstr "direwolves"
+msgstr "dire wolves"
 
 msgctxt "spellinfo"
 msgid "song_of_fear"
@@ -4060,7 +4064,7 @@ msgstr "This antique, powerful song, passed down by the cats, will penetrate the
 
 msgctxt "spell"
 msgid "create_rop"
-msgstr "Create A Ring of Power"
+msgstr "Create a Ring of Power"
 
 msgctxt "keyword"
 msgid "grow"
@@ -4068,7 +4072,7 @@ msgstr "GROW"
 
 msgctxt "spell"
 msgid "create_ror"
-msgstr "Create A Ring of Regeneration"
+msgstr "Create a Ring of Regeneration"
 
 msgid "plain_trail"
 msgstr "the plain of %s"
@@ -4089,7 +4093,7 @@ msgstr "healingpotions"
 
 msgctxt "spellinfo"
 msgid "create_firesword"
-msgstr "'So take the blood of a fierce warrior and apply it to the steel of the blade. Then start calling the Spheres of Chaos. If you did everything to their pleasure, they will send a minor one of their kind to fulfill the sword with his power.'"
+msgstr "'So take the blood of a fierce warrior and apply it to the steel of the blade. Then start calling the spheres of chaos. If you did everything to their pleasure, they will send a minor one of their kind to ensoul the sword with their power.'"
 
 msgctxt "spell"
 msgid "song_suscept_magic"
@@ -4097,7 +4101,7 @@ msgstr "Song of the Aging Spirit"
 
 msgctxt "race"
 msgid "direwolf_x"
-msgstr "direwolf"
+msgstr "dire wolf"
 
 msgctxt "race"
 msgid "troll_p"
@@ -4119,10 +4123,10 @@ msgid "generous"
 msgstr "This joyous song will spread like wildfire throughout the region and cause festive spirits in all the population. All the taverns and theaters will be packed to the brim and even the beggars will not go hungry."
 
 msgid "growl1"
-msgstr "Tshrrrk..."
+msgstr "Tshrrrk ..."
 
 msgid "growl2"
-msgstr "Shhhhhh..."
+msgstr "Shhhhhh ..."
 
 msgctxt "skill"
 msgid "bow"
@@ -4152,7 +4156,7 @@ msgid "healing"
 msgstr "healing potion"
 
 msgid "vortex_desc"
-msgstr "A vortex of pure chaos energy pulls over the region"
+msgstr "A vortex of pure chaos energy floats over the region."
 
 msgctxt "race"
 msgid "ghast_d"
@@ -4163,7 +4167,7 @@ msgstr "knotroots"
 
 msgctxt "spellinfo"
 msgid "mindblast"
-msgstr "With this spell the mentalist directly attacks his enemies' souls. A blast of astral and electrical energy strikes the foes. If a victim fails to resist the magic, he will permanently lose part of his memories. Being the target of this spell for too many times may result in death."
+msgstr "With this spell the mentalist directly attacks their enemies' souls. A blast of astral and electrical energy strikes the foes. If a victim failing to resist the magic will permanently lose part of their memories. Being the target of this spell for too many times may result in death."
 
 msgid "nr_spell_description"
 msgstr "Description:"
@@ -4205,7 +4209,7 @@ msgstr "ghasts"
 
 msgctxt "spell"
 msgid "wdwpyramid_gwyrrd"
-msgstr "force of nature"
+msgstr "Force of Nature"
 
 msgctxt "spell"
 msgid "insectfur"
@@ -4220,7 +4224,7 @@ msgstr "ticket to the grand museum"
 
 msgctxt "spellinfo"
 msgid "illaundestroymagic"
-msgstr "This spell allows the mentalist to distinguish between the natural and unnatural dreams of a person, a ship, a building or a region and remove those that are of magical origin."
+msgstr "This spell allows the mentalist to distinguish between the natural and unnatural dreams of a person, a ship, a building, or a region and to remove those that are of magical origin."
 
 msgctxt "race"
 msgid "juju_p"
@@ -4240,7 +4244,7 @@ msgstr "Song of Seduction"
 
 msgctxt "spell"
 msgid "create_trollbelt"
-msgstr "Create A Belt of Troll Strength"
+msgstr "Create a Belt of Troll Strength"
 
 msgctxt "race"
 msgid "spell_x"
@@ -4252,7 +4256,7 @@ msgstr "juju-zombie"
 
 msgctxt "spellinfo"
 msgid "summonfireelemental"
-msgstr "This Ritual summons an angry elemental spirit that puts a drought on the entire region. Trees wither, animals die of thirst and the harvest is destroyed. Workers find little to no work in farming."
+msgstr "This ritual summons an angry elemental spirit that puts a drought on the entire region. Trees wither, animals die of thirst and the harvest is destroyed. Workers find little to no work in farming."
 
 msgid "XEPOTION"
 msgstr "XEPOTION"
@@ -4261,11 +4265,12 @@ msgctxt "race"
 msgid "undead"
 msgstr "undead"
 
+#, fuzzy
 msgid "p10"
-msgstr "berserkers blood potion"
+msgstr "berserker blood potion"
 
 msgid "toadslime_p"
-msgstr "pots of toadslime"
+msgstr "pots of toad slime"
 
 msgid "p11"
 msgstr "peasant love potion"
@@ -4310,17 +4315,15 @@ msgid "auratransfer"
 msgstr "Transfer Aura"
 
 msgid "aurafocus_p"
-msgstr "aurafocuses"
-
-msgid "wente_ring_p"
-msgstr "Wildente's wedding rings"
+msgstr "aura focuses"
 
 msgid "apple_p"
 msgstr "apples"
 
+#, fuzzy
 msgctxt "spell"
 msgid "summonshadowlords"
-msgstr "Summon Shadowmasters"
+msgstr "Summon Shadow Masters"
 
 msgid "snowball_p"
 msgstr "snowball"
@@ -4333,7 +4336,7 @@ msgstr "myrrh"
 
 msgctxt "spell"
 msgid "big_recruit"
-msgstr "High art of persuasion"
+msgstr "High Art of Persuasion"
 
 msgctxt "iteminfo"
 msgid "magicherbbag"
@@ -4345,7 +4348,7 @@ msgstr "SELL"
 
 msgctxt "spellinfo"
 msgid "auratransfer"
-msgstr "With this spell the mage can transfer aura of his own to a mage of the same school with a rate of 2:1 or to a mage of a different school with a rate of 3:1."
+msgstr "With this spell the mage can transfer aura of their own to a mage of the same school with a rate of 2:1 or to a mage of a different school with a rate of 3:1."
 
 msgctxt "race"
 msgid "wyrm"
@@ -4358,9 +4361,10 @@ msgctxt "spell"
 msgid "oldrace"
 msgstr "Unknown Effect"
 
+#, fuzzy
 msgctxt "skill"
 msgid "armorer"
-msgstr "armoursmithing"
+msgstr "armorsmithing"
 
 msgctxt "spell"
 msgid "itemcloak"
@@ -4374,14 +4378,14 @@ msgstr "aggressive"
 
 msgctxt "spellinfo"
 msgid "song_resist_magic"
-msgstr "This magical song, once performed with vigor, will propagate in the region by wandering from mouth to mouth. It will be heard everywhere. How long the song will last in the public perception depends on the bard's skill. Until it is gone it will give him and all his allies (HELP GUARD) a bonus of 15% to their natural resistance to magic."
+msgstr "This magical song, once performed with vigor, will propagate in the region by wandering from mouth to mouth. It will be heard everywhere. How long the song will last in the public perception depends on the bard's skill. Until it has faded away it will give their faction and all their allies (HELP GUARD) a bonus of 15% to their natural resistance to magic."
 
 msgctxt "keyword"
 msgid "contact"
 msgstr "CONTACT"
 
 msgid "dragonhead_p"
-msgstr "dragonheads"
+msgstr "dragon heads"
 
 msgctxt "spell"
 msgid "view_reality"
@@ -4394,9 +4398,6 @@ msgstr "PLANT"
 msgctxt "border"
 msgid "wisps"
 msgstr "wisps"
-
-msgid "wente_dress_p"
-msgstr "tuxedos"
 
 msgid "catapult"
 msgstr "catapult"
@@ -4411,7 +4412,7 @@ msgstr "Hangover"
 
 msgctxt "spellinfo"
 msgid "maelstrom"
-msgstr "This ritual summons a mighty water elemental from the depths of the ocean. The elemental creates an enormous maelstrom which damages any passing ships."
+msgstr "This ritual summons a mighty water elemental from the depths of the ocean. The elemental creates an enormous vortex, a maelstrom, which damages any passing ships."
 
 msgid "dolphin_p"
 msgstr "dolphins"
@@ -4449,9 +4450,10 @@ msgctxt "spell"
 msgid "earn_silver#draig"
 msgstr "Minor Curses"
 
+#, fuzzy
 msgctxt "race"
 msgid "catdragon_d"
-msgstr "catdragons"
+msgstr "cat dragons"
 
 msgctxt "spell"
 msgid "wolfhowl"
@@ -4478,14 +4480,14 @@ msgstr "Song of War"
 
 msgctxt "describe"
 msgid "ointment"
-msgstr "When one is severely wounded after a hard battle it is advisable to have some Ointment to hand. Applied to wounds, this magical paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hitpoints."
+msgstr "When one is severely wounded after a hard battle it is advisable to have some ointment to hand. Applied to wounds, this magic paste closes them in the blink of an eye. For the preparation the alchemist requires a cobalt fungus, tangy temerity, and white hemlock. A dose of the potion heals up to 400 hit points."
 
 msgid "section_none"
 msgstr "Miscellaneous"
 
 msgctxt "race"
 msgid "catdragon_p"
-msgstr "catdragons"
+msgstr "cat dragons"
 
 msgctxt "race"
 msgid "songdragon"
@@ -4499,7 +4501,7 @@ msgstr "unknown units"
 
 msgctxt "race"
 msgid "catdragon_x"
-msgstr "catdragon"
+msgstr "cat dragon"
 
 msgctxt "skill"
 msgid "alchemy"
@@ -4508,9 +4510,6 @@ msgstr "alchemy"
 msgctxt "race"
 msgid "owl_d"
 msgstr "owls"
-
-msgid "wente_dress"
-msgstr "tuxedo"
 
 msgid "BAEUME"
 msgstr "TREES"
@@ -4524,7 +4523,7 @@ msgstr "an attack causing structural damage to buildings"
 
 msgctxt "spell"
 msgid "antimagiczone"
-msgstr "Antimagic"
+msgstr "Antimagic Zone"
 
 msgid "boat"
 msgstr "boat"
@@ -4538,7 +4537,7 @@ msgstr "sacks of holding"
 
 msgctxt "spellinfo"
 msgid "magicstreet"
-msgstr "By performing these rituals the druid is able to summon a powerful earth elemental. As long as this elemental remains bound to a region, no rain can turn a path into mud and no river can destroy a bridge. All travelers in this region gain the same advantages as if they were travelling on a road. Even swamps and glaciers can be enchanted in this way. The more power the druid invests, the longer the roads remain intact."
+msgstr "By performing these rituals the druid is able to summon a powerful earth elemental. As long as this elemental remains bound to a region, no rain can turn a path into mud and no river can destroy a bridge. All travelers in this region gain the same advantages as if they were traveling on a road. Even swamps and glaciers can be enchanted in this way. The more power the druid invests, the longer the roads remain intact."
 
 msgctxt "skill"
 msgid "roadwork"
@@ -4557,7 +4556,7 @@ msgid "fish_shield"
 msgstr "Shield of the Fish"
 
 msgid "corridor1_trail"
-msgstr "a %s"
+msgstr "%s"
 
 msgctxt "race"
 msgid "dolphin_d"
@@ -4569,9 +4568,10 @@ msgstr "JOIN"
 msgid "lebkuchenherz_p"
 msgstr "gingerbread hearts"
 
+#, fuzzy
 msgctxt "spell"
 msgid "analysedream"
-msgstr "Analyse Dreams"
+msgstr "Analyze Dreams"
 
 msgctxt "prefix"
 msgid "Tal"
@@ -4585,7 +4585,7 @@ msgstr "West"
 
 msgctxt "spellinfo"
 msgid "dreamreading"
-msgstr "This spell enables the mentalist to penetrate the dreams of a target unit and gather information about that unit's surroundings. He will receive a report from the corresponding region."
+msgstr "This spell enables the mentalist to penetrate the dreams of a target unit and gather information about that unit's surroundings. They will receive a report from the corresponding region."
 
 msgid "roqf"
 msgstr "ring of quick fingers"
@@ -4607,7 +4607,7 @@ msgstr "Mental Death"
 
 msgctxt "spellinfo"
 msgid "analysedream"
-msgstr "With this spell the mentalist can attempt to detect enchantments on a target unit. He will get an idea of the effect of all spells that don't exceed his own abilities. If a spell is stronger, it takes a little luck for a successful analysis."
+msgstr "With this spell the mentalist can attempt to detect enchantments on a target unit. You will get an idea of the effect of all spells that don't exceed your own abilities. If a spell is stronger, it takes a little luck for a successful analysis."
 
 msgctxt "keyword"
 msgid "give"
@@ -4626,11 +4626,11 @@ msgstr "NE"
 
 msgctxt "spell"
 msgid "create_bagofholding"
-msgstr "Create A Bag of Holding"
+msgstr "Create a Bag of Holding"
 
 msgctxt "spellinfo"
 msgid "orkdream"
-msgstr "This spell - whose use is forbidden in most cultures - creates an uncontrollable desire for physical love in the victim. The affected persons will rush head over heels into a love affair, unable to think of anything else. Most of them will regret this a few months later..."
+msgstr "This spell - whose use is forbidden in most cultures - creates an uncontrollable desire for physical love in the victim. The affected persons will rush head over heels into a love affair, unable to think of anything else. Most of them will regret this a few months later ..."
 
 msgctxt "spell"
 msgid "hail"
@@ -4683,9 +4683,10 @@ msgctxt "spell"
 msgid "combatrust"
 msgstr "Winds of Rust"
 
+#, fuzzy
 msgctxt "race"
 msgid "mountainguard"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "tunnel"
 msgstr "tunnel"
@@ -4709,7 +4710,7 @@ msgstr "Death Cloud"
 
 msgctxt "spellinfo"
 msgid "reanimate"
-msgstr "When a warrior dies in a battle, his soul begins its long journey to the stars. With the help of this ritual, the mentalist can try to catch those escaping souls and bring them back to their bodies. The spell does not heal physical injuries, but an affected person will survive the battle."
+msgstr "When a warrior dies in battle, their soul begins its long journey to the stars. With the help of this ritual, the mentalist can try to catch those escaping souls and bring them back to their bodies. The spell does not heal physical injuries, but an affected person will survive the battle."
 
 msgid "monument"
 msgstr "monument"
@@ -4719,19 +4720,20 @@ msgstr "west"
 
 msgctxt "spellinfo"
 msgid "transfer_aura_song"
-msgstr "This spell enables the wizard to transfer aura at a rate of 2:1 to another sorcerer of the same school of magic."
+msgstr "This chant enables the wizard to transfer aura at a rate of 2:1 to another bard of the same school of magic."
 
 msgctxt "race"
 msgid "shadowdragon_p"
 msgstr "shadow dragons"
 
+#, fuzzy
 msgctxt "spell"
 msgid "create_firesword"
-msgstr "Create A Flamesword"
+msgstr "Create a Flaming Sword"
 
 msgctxt "iteminfo"
 msgid "roqf"
-msgstr "The magic in this ring makes the fingers ten times more nimble. a craftsman can produce ten times his normal quota, and other abilities might also be improved."
+msgstr "The magic in this ring makes the fingers ten times more nimble. Craftspeople can produce ten times their normal quota, and other abilities more shady in nature might also be improved."
 
 msgctxt "race"
 msgid "shadowdragon_x"
@@ -4746,7 +4748,7 @@ msgstr "claymore"
 
 msgctxt "spellinfo"
 msgid "show_astral"
-msgstr "The mage kann glance in the astral plane for a short time and perceives all units within an astral radius of level/5 regions."
+msgstr "The mage can glance into the astral plane for a short time and perceives all units within an astral radius of level/5 regions."
 
 msgctxt "race"
 msgid "demon_d"
@@ -4857,7 +4859,7 @@ msgid "trade"
 msgstr "trade"
 
 msgid "dragonblood"
-msgstr "dragonblood"
+msgstr "dragon blood"
 
 msgid "aog"
 msgstr "amulet of gathering"
@@ -4872,6 +4874,7 @@ msgstr "Calm Monster"
 msgid "activevolcano"
 msgstr "active volcano"
 
+#, fuzzy
 msgctxt "spell"
 msgid "auraleak"
 msgstr "Astral Leak"
@@ -4967,7 +4970,7 @@ msgstr "RESEARCH"
 
 msgctxt "spellinfo"
 msgid "song_of_healing"
-msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magic melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones and even regenerate lost lims."
+msgstr "The field medic isn't the only one capable of tending the wounds of battle. The bards know a number of magical melodies to enhance the natural healing process of the body. This song is able to close wounds, mend fractured bones, and even regenerate lost limbs."
 
 msgctxt "coast"
 msgid "nw"
@@ -4999,7 +5002,7 @@ msgstr "chaos "
 
 msgctxt "race"
 msgid "mountainguard_d"
-msgstr "mountainguards"
+msgstr "mountain guards"
 
 msgctxt "prefix"
 msgid "Licht"
@@ -5007,7 +5010,7 @@ msgstr "light "
 
 msgctxt "spellinfo"
 msgid "flee"
-msgstr "Before a battle the mentalist creates terrifying illusions of hideous creatures that will cause panic among the enemies. Those who believe in the illusions will try to flee from battle."
+msgstr "Before a battle the mentalist creates terrifying illusions of hideous creatures that will cause panic among enemies. Those who believe in the illusions will try to flee from battle."
 
 msgctxt "spell"
 msgid "ironkeeper"
@@ -5015,7 +5018,7 @@ msgstr "Mountain Guardian"
 
 msgctxt "spellinfo"
 msgid "enterastral"
-msgstr "Ancient arcane formulae permit the magician to transport himself or other units into the astral plane. The magician can transport (level-3) * 15 GE through the transient portal. If the magician is experienced enough to cast level 11 spells, he can also transport units against their will."
+msgstr "Ancient arcane formulae permit the magician to transport himself or other units into the astral plane. The magician can transport (level-3) * 15 WU through the transient portal. If the magician is experienced enough to cast level 11 spells, they can also transport units against their will."
 
 msgctxt "spell"
 msgid "flyingship"
@@ -5054,7 +5057,7 @@ msgstr "Astral Exit"
 
 msgctxt "race"
 msgid "mountainguard_p"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "clone_of"
 msgstr "Clone of %s"
@@ -5073,11 +5076,11 @@ msgid "soc"
 msgstr "sack of holding"
 
 msgid "hall1_trail"
-msgstr "the %s"
+msgstr "%s"
 
 msgctxt "spellinfo"
 msgid "treewalkenter"
-msgstr "A great power lies within those places that are pulsing with life. A druid can focus this power and thereby create a gate into the World of Spirits. He can then send level*5 weight units of living or dead matter through the gate."
+msgstr "A great power lies within those places that are pulsing with life. A druid can focus this power and thereby create a gate into the world of spirits. They can then send level*5 weight units of living or dead matter through the gate."
 
 msgctxt "spell"
 msgid "draigdestroymagic"
@@ -5095,7 +5098,7 @@ msgstr "dragonships"
 
 msgctxt "race"
 msgid "mountainguard_x"
-msgstr "mountainguard"
+msgstr "mountain guard"
 
 msgid "unitdefault"
 msgstr "Unit"
@@ -5148,7 +5151,7 @@ msgstr "ocean"
 
 msgctxt "spellinfo"
 msgid "headache"
-msgstr "Transcript to the lecture of Selen Ard'Ragorn in Bar'Glingal: 'It is said, this spell had its beginnings in the drinking holes of the Westgassen, but every other disreputable quarter is just as likely. Its most important ingredient is about a cask of terrible wine, the cheaper and more unbecoming, the more effective will be the essence. The art to distill this wine into pure essence is far more demanding than the simple brewery of an alchemist. Even more so to bind and conserve it, preventing its natural tendency to evaporate. This can only be accomplished by a master of Cerddor. Say, you manage to produce a vial of this ruby red, shimmering - well, not fluid, but also not exactly vapor - let's call it elixir. More challenges still lie ahead. The effective properties of the elixir are quick to dissipate. Therefore it has to be dribbled into the drink of the chosen victim within days. That is when you masters of infatuation and seduction can truly proof your worth. But take care not to drink of the concoction yourselves, for one taste will ensnare you to the tastes of wine and you will spend a full week on a bender. And as sure as day follows night, a dreadful agony will claim your head afterwards. You will lose knowledge of your best skill, two weeks worth of study just gone. Another word of warning: this spell is very complex. Should you try further spells during the same week, they will be far more difficult to perform.'"
+msgstr "Transcript to the lecture of Selen Ard'Ragorn in Bar'Glingal: 'It is said, this spell had its beginnings in the drinking holes of the Westgassen, but every other disreputable quarter is just as likely. Its most important ingredient is about a cask of terrible wine, the cheaper and more unbecoming, the more effective will be the essence. The art to distill this wine into pure essence is far more demanding than the simple craft of an alchemist. Even more so to bind and conserve it, preventing its natural tendency to evaporate. This can only be accomplished by a master of Cerddor. Say, you manage to produce a vial of this ruby red, shimmering - well, not fluid, but also not exactly vapor - let's call it elixir. More challenges still lie ahead. The effective properties of the elixir are quick to dissipate. Therefore it has to be dribbled into the drink of the chosen victim within days. That is when you masters of infatuation and seduction can truly prove your worth. But take care not to drink of the concoction yourselves, for one taste will ensnare you to the tastes of wine and you will spend a full week on a bender. And as sure as day follows night, a dreadful agony will claim your head afterwards. You will lose knowledge of your best skill, two weeks worth of study just gone. Another word of warning: This spell is very complex. Should you try further spells during the same week, they will be far more difficult to perform.'"
 
 msgctxt "keyword"
 msgid "sabotage"
@@ -5162,7 +5165,7 @@ msgstr "platemails"
 
 msgctxt "describe"
 msgid "truthpotion"
-msgstr "This simple but very potent brew sharpens the senses of anyone that drinks of it and makes him able to see through even the most complex illusions for one week."
+msgstr "This simple but very potent brew sharpens the senses of anyone that drinks of it and makes you able to see through even the most complex illusions for one week."
 
 msgid "tradepost"
 msgstr "tradepost"
@@ -5200,7 +5203,7 @@ msgid "status_flee"
 msgstr "fleeing"
 
 msgid "p10_p"
-msgstr "berserkers blood potions"
+msgstr "berserker blood potions"
 
 msgctxt "keyword"
 msgid "maketemp"
@@ -5216,7 +5219,7 @@ msgstr "Resurrection"
 
 msgctxt "spellinfo"
 msgid "create_bagofholding"
-msgstr "This bag encloses a dimensional rift in which up to 200 units of weight can be carries. Horses and other large objects cannot be put into the bag. The bag itself has a weight of 1."
+msgstr "This bag encloses a dimensional rift in which up to 200 units of weight can be carried. Living beings and large items, such as horses, other living beings, or carts, cannot be put into the bag. It is also not possible to place such a bag inside another one. The bag itself weighs 1 weight unit."
 
 msgid "questkey1"
 msgstr "agate key"
@@ -5229,7 +5232,7 @@ msgid "questkey2"
 msgstr "sapphire key"
 
 msgid "stat_cut"
-msgstr "Is hard to hit by slashing weapons."
+msgstr "Hard to hit by slashing weapons."
 
 msgid "BAUERN"
 msgstr "PEASANTS"
@@ -5252,7 +5255,7 @@ msgstr "elixirs of power"
 
 msgctxt "iteminfo"
 msgid "trollbelt"
-msgstr "This artifact grants its wearer the strength of a cavetroll. He will be able to carry fifty times as much as normal and also in combat his enhanced strength and tough troll skin will serve him well."
+msgstr "This artifact grants its wearer the strength of a cave troll. You will be able to carry fifty times as much as normal and in combat your enhanced strength and tough troll skin will serve you well, too."
 
 msgid "nr_owner"
 msgstr "Owner"
@@ -5276,7 +5279,7 @@ msgstr "Whirlwind"
 
 msgctxt "spellinfo"
 msgid "versteinern"
-msgstr "This complicated but effective spell uses the Elemental Spirits of Stone to turn a number of enemies to stone for the duration of combat. The affected persons won't be able to fight any more, but they can't be wounded either."
+msgstr "This complicated but effective spell uses the elemental spirits of stone to turn a number of enemies to stone for the duration of combat. The affected persons won't be able to fight any more, but they can't be wounded either."
 
 msgctxt "spellinfo"
 msgid "armor_shield"
@@ -5293,7 +5296,7 @@ msgstr "claymores"
 
 msgctxt "spellinfo"
 msgid "summondragon"
-msgstr "Performing this dark ritual, the sorcerer creates a bait that exhales an irresistable scent to dragons. It is not known whether the dragons come from surrounding regions or if they have their origin in the Sphere of Chaos. The bait will exist for about six weeks, but it must be placed in a tarrain that is suitable for dragons."
+msgstr "Performing this dark ritual, the sorcerer creates a bait that exhales an irresistible scent to dragons. It is not known whether the dragons come from surrounding regions or if they have their origin in the sphere of chaos. The bait will exist for about six weeks, but it must be placed in a terrain that is suitable for dragons."
 
 msgctxt "spell"
 msgid "icy_dragonbreath"
@@ -5337,7 +5340,7 @@ msgstr "laen"
 
 msgctxt "spellinfo"
 msgid "incite_riot"
-msgstr "By means of this magical chant the mage incites riots in a region. Rebelling peasant mobs prevent taxation and recruiting and almost noone will pay money for entertainment. After a few weeks the mob will calm down again."
+msgstr "By means of this magical chant the mage incites riots in a region. Rebelling peasant mobs prevent taxation and recruiting and almost nobody will pay money for entertainment. After a few weeks, the mob will calm down again."
 
 msgid "longboat"
 msgstr "longboat"
@@ -5401,7 +5404,7 @@ msgstr "oil"
 
 msgctxt "spellinfo"
 msgid "pull_astral"
-msgstr "A magician in the astral plane can summon units from the material world. The magician can bring (level-3)*15 GE through the temporary portal. If he is experienced enough to cast the spell at at least level 13, he can even summon units against their will."
+msgstr "A magician in the astral plane can summon units from the material world. The magician can bring (level-3)*15 WU through the temporary portal. If they are experienced enough to cast the spell at at least level 13, they can even summon units against their will."
 
 msgid "smod_far"
 msgstr "far"
@@ -5416,21 +5419,23 @@ msgstr "aquarians"
 
 msgctxt "iteminfo"
 msgid "fairyboot"
-msgstr "These leather boots are embroidered with unicorn hair and allow their wearer to walk at twice his normal speed."
+msgstr "These leather boots are embroidered with unicorn hair and allow their wearer to walk at twice their normal speed."
 
 msgctxt "spell"
 msgid "skillmod"
 msgstr "Unknown Effect"
 
+#, fuzzy
 msgctxt "race"
 msgid "dreamcat"
-msgstr "dreamcat"
+msgstr "dream cat"
 
 msgid "elfspoil_p"
 msgstr "elven ears"
 
+#, fuzzy
 msgid "moneychest"
-msgstr "silverchest"
+msgstr "silver chest"
 
 msgid "amulet"
 msgstr "amulet"
@@ -5454,10 +5459,6 @@ msgstr "fairy"
 msgctxt "spell"
 msgid "drain_skills"
 msgstr "Shadowbreath"
-
-msgctxt "race"
-msgid "sphinx_d"
-msgstr "sphinx"
 
 msgctxt "coast"
 msgid "se"
@@ -5493,11 +5494,7 @@ msgstr "spells"
 
 msgctxt "spellinfo"
 msgid "earthquake"
-msgstr "With this ritual the druid summons an Elemental Spirit of Earth that brings the ground to shake. This earthquake damages all buildings in the target region."
-
-msgctxt "race"
-msgid "sphinx_p"
-msgstr "sphinxs"
+msgstr "With this ritual the druid summons an elemental spirit of earth that makes the ground shake. This earthquake damages all buildings in the target region."
 
 msgid "east"
 msgstr "east"
@@ -5509,3 +5506,750 @@ msgctxt "race"
 msgid "wolf"
 msgstr "wolf"
 
+msgid "UM"
+msgstr "***UM"
+
+msgctxt "iteminfo"
+msgid "almond"
+msgstr "A delicious, sweet almond. Almonds are not true nuts, but the seeds of drupes."
+
+msgctxt "iteminfo"
+msgid "ao_healing"
+msgstr "This amulet is a great focus for all healing spells. A spell cast with this focus will have a greater likelyhood to succeed an will heal twice as many people."
+
+msgctxt "iteminfo"
+msgid "aots"
+msgstr "This amulet allows the bearer to discern even those units, that are protected by a ring of invisibility. Units that evade perception by their stealth skill alone, however, will remain hidden."
+
+msgctxt "iteminfo"
+msgid "aquarianspoil"
+msgstr "A small, turquoise scale that shines in the sun. It is surprisingly tough, though."
+
+msgctxt "shipinfo"
+msgid "balloon"
+msgstr "This swamp-gas filled balloon consists of a wicker basket providing enough room for 5 persons or 500 weight units and a big wyrm bladder filled with swamp gas. With favorable winds, the balloon can travel two regions a week. Controlling a balloon is not a simple task, requiring a sailing skill of at least 6 for the captain. This new development in Eressea is produced exclusively by the Xontormia Express and the construction plans are top secret. No one else has ever been able to construct one, so far."
+
+msgctxt "iteminfo"
+msgid "catspoil"
+msgstr "Like a short, soft furry rope."
+
+msgid "coal"
+msgstr "piece of coal"
+
+msgid "coal_p"
+msgstr "pieces of coal"
+
+msgctxt "iteminfo"
+msgid "cookie"
+msgstr "Sometimes called a biscuit, this is a baked or cooked food that is typically small, flat and sweet."
+
+msgctxt "spellinfo"
+msgid "create_chastitybelt"
+msgstr "This amulet, that takes the form of an orcish matron, suppresses the reproductive instincts of a single orc quite reliably. An orc carrying such an amulet will stop reproducing."
+
+msgctxt "iteminfo"
+msgid "demonspoil"
+msgstr "A venemous green liquid in a small vial. No humanoid race except demons dares to touch it."
+
+msgctxt "raceinfo"
+msgid "direwolf"
+msgstr "Not every one of these large wolves are is as evil and ferocious as legends have it. Some of them may join a good mages and make loyal familiars."
+
+msgid "dragon_postfix_0"
+msgstr "the Sage"
+
+msgid "dragon_postfix_1"
+msgstr "the All-Knowing"
+
+msgid "dragon_postfix_10"
+msgstr "the Golden"
+
+msgid "dragon_postfix_11"
+msgstr "the Gray"
+
+msgid "dragon_postfix_12"
+msgstr "the Stony"
+
+msgid "dragon_postfix_13"
+msgstr "the Old"
+
+msgid "dragon_postfix_14"
+msgstr "the Mighty"
+
+msgid "dragon_postfix_15"
+msgstr "the Golden"
+
+msgid "dragon_postfix_16"
+msgstr "the Cruel"
+
+msgid "dragon_postfix_17"
+msgstr "the Sand Dragon"
+
+msgid "dragon_postfix_18"
+msgstr "the Thirsty"
+
+msgid "dragon_postfix_19"
+msgstr "the Devouring"
+
+msgid "dragon_postfix_2"
+msgstr "the Mighty"
+
+msgid "dragon_postfix_20"
+msgstr "the Green"
+
+msgid "dragon_postfix_21"
+msgstr "the Red"
+
+msgid "dragon_postfix_22"
+msgstr "the Daring"
+
+msgid "dragon_postfix_23"
+msgstr "the Allmighty"
+
+msgid "dragon_postfix_24"
+msgstr "the Seer"
+
+msgid "dragon_postfix_25"
+msgstr "the White"
+
+msgid "dragon_postfix_26"
+msgstr "the Shining"
+
+msgid "dragon_postfix_27"
+msgstr "the Knowing"
+
+msgid "dragon_postfix_28"
+msgstr "the Relentless"
+
+msgid "dragon_postfix_29"
+msgstr "the Beautiful"
+
+msgid "dragon_postfix_3"
+msgstr "the Venerable"
+
+msgid "dragon_postfix_4"
+msgstr "the Cunning"
+
+msgid "dragon_postfix_5"
+msgstr "the Green"
+
+msgid "dragon_postfix_6"
+msgstr "the Punisher"
+
+msgid "dragon_postfix_7"
+msgstr "the Seer"
+
+msgid "dragon_postfix_8"
+msgstr "the Voyager"
+
+msgid "dragon_postfix_9"
+msgstr "the Knowing"
+
+msgctxt "spellinfo"
+msgid "drain_skills"
+msgstr "Drains power levels and damages like Great Odem."
+
+msgctxt "raceinfo"
+msgid "eagle"
+msgstr "Eagles are excellent scouts. They may even cross short straits of sea, but flying high they are very exposed making them easy targets sometimes."
+
+msgctxt "iteminfo"
+msgid "elfspoil"
+msgstr "These ears are pointy and almost trapezoid. How can they even hear with them?"
+
+msgctxt "iteminfo"
+msgid "elvenhorse"
+msgstr "An elven horse will very rarely join a humanoid. But once it has overcome its timidness, it is a very worthy companion. Faster than a horse it also helps its rider fight and enhances their magic. Black elven horses that have joined orcs are not unheard of."
+
+msgctxt "iteminfo"
+msgid "eyeofdragon"
+msgstr "Be aware that the eye of the dragon shows the way to the challenge. But the tales tell that only the innocent and unprepared one can use it. They also have it that they should have a bag with up to 2000 silver, but never more than a fifth of the number of their faction to be presented as a gift to the gate guardian. Five is right out."
+
+msgid "flyingcarpet_a"
+msgstr "a flying carpet"
+
+msgid "flyingcarpet_p"
+msgstr "flying carpets"
+
+msgid "ghoul_name_0"
+msgstr "ghouls"
+
+msgid "ghoul_name_1"
+msgstr "creatures"
+
+msgid "ghoul_name_2"
+msgstr "lost souls"
+
+msgid "ghoul_name_3"
+msgstr "slain"
+
+msgid "ghoul_name_4"
+msgstr "accursed"
+
+msgid "ghoul_name_5"
+msgstr "scuffling ghouls"
+
+msgid "ghoul_postfix_0"
+msgstr "of the night"
+
+msgid "ghoul_postfix_1"
+msgstr "from the shadows"
+
+msgid "ghoul_postfix_10"
+msgstr "in chains"
+
+msgid "ghoul_postfix_11"
+msgstr "of the netherworld"
+
+msgid "ghoul_postfix_12"
+msgstr "from the underworld"
+
+msgid "ghoul_postfix_2"
+msgstr "of the darkness"
+
+msgid "ghoul_postfix_3"
+msgstr "of evil"
+
+msgid "ghoul_postfix_4"
+msgstr "of death"
+
+msgid "ghoul_postfix_5"
+msgstr "from the purgatory"
+
+msgid "ghoul_postfix_6"
+msgstr "of the unresting"
+
+msgid "ghoul_postfix_7"
+msgstr "from the mists"
+
+msgid "ghoul_postfix_8"
+msgstr "from the blackness"
+
+msgid "ghoul_postfix_9"
+msgstr "from the depths"
+
+msgid "ghoul_prefix_0"
+msgstr "Rotting"
+
+msgid "ghoul_prefix_1"
+msgstr "Horrifying"
+
+msgid "ghoul_prefix_10"
+msgstr "Horrific"
+
+msgid "ghoul_prefix_11"
+msgstr "Dreadful"
+
+msgid "ghoul_prefix_12"
+msgstr "Fearsome"
+
+msgid "ghoul_prefix_13"
+msgstr "Frightening"
+
+msgid "ghoul_prefix_14"
+msgstr "Terrible"
+
+msgid "ghoul_prefix_15"
+msgstr "Sinister"
+
+msgid "ghoul_prefix_16"
+msgstr "Intimidating"
+
+msgid "ghoul_prefix_2"
+msgstr "Quiet"
+
+msgid "ghoul_prefix_3"
+msgstr "Child-eating"
+
+msgid "ghoul_prefix_4"
+msgstr "Man-eating"
+
+msgid "ghoul_prefix_5"
+msgstr "Insane"
+
+msgid "ghoul_prefix_6"
+msgstr "Brutal"
+
+msgid "ghoul_prefix_7"
+msgstr "Black"
+
+msgid "ghoul_prefix_8"
+msgstr "Dark"
+
+msgid "ghoul_prefix_9"
+msgstr "Monstrous"
+
+msgctxt "iteminfo"
+msgid "goblinspoil"
+msgstr "The grimacing face on this small head seems almost somewhat childish, but there is something sly about it."
+
+msgid "growl0"
+msgstr "Groaamm ..."
+
+msgid "growl3"
+msgstr "Roaarrr ..."
+
+msgid "growl4"
+msgstr "Chrrr ..."
+
+msgctxt "iteminfo"
+msgid "halflingspoil"
+msgstr "This hairy foot's sole is much thicker than normal, almost like a hoof."
+
+msgctxt "iteminfo"
+msgid "humanspoil"
+msgstr "Blond or brown, short or long, you are holding a tuft of hair with a piece of skin attached to it."
+
+msgctxt "iteminfo"
+msgid "insectspoil"
+msgstr "Paired appendages connected to the heads of most arthropods and used for sensing."
+
+msgctxt "raceinfo"
+msgid "lynx"
+msgstr "The lynx is known for its skills of hiding and watching. With a little patience you can train it to be an excellent scout. In combat it will defend using its sharp claws and knows how to use its agility."
+
+msgctxt "iteminfo"
+msgid "nut"
+msgstr ""
+"A nut is a fruit composed of an inedible hard shell and a seed, which is generally edible. In general usage, a wide variety of dried seeds are called nuts, but in a botanical context \"nut\" implies that the shell does not open to release the seed (indehiscent). The translation of \"nut\" in certain languages frequently requires paraphrases, as the word is ambiguous.\n"
+"Most seeds come from fruits that naturally free themselves from the shell, unlike nuts such as hazelnuts, chestnuts, and acorns, which have hard shell walls and originate from a compound ovary. The general and original usage of the term is less restrictive, and many nuts (in the culinary sense), such as almonds, pecans, pistachios, walnuts, and Brazil nuts, are not nuts in a botanical sense. Common usage of the term often refers to any hard-walled, edible kernel as a nut. Nuts are an energy-dense and nutrient-rich food source."
+
+msgctxt "iteminfo"
+msgid "orcspoil"
+msgstr "Large, pointy teeth. Whether they truly belonged to an orc is not easy to discern by a layman."
+
+msgctxt "iteminfo"
+msgid "ring_of_levitation"
+msgstr "Using this talisman, the captain of a ship can drain the magical energy from all mallorn seeds aboard a ship. The ship may then fly for up to two weeks."
+
+msgctxt "iteminfo"
+msgid "runesword"
+msgstr "The blade of this awe-inspiring magic weapon is covered with dark runes. Only the most experience sword artist may wield it, but in their hands nothing may resist the rune sword. Even magical armor is easily pierced and it fills the mind of its wielder with unwavering confidence."
+
+msgid "skeleton_name_0"
+msgstr "skeletons"
+
+msgid "skeleton_name_1"
+msgstr "creatures"
+
+msgid "skeleton_name_2"
+msgstr "warriors"
+
+msgid "skeleton_name_3"
+msgstr "fighters"
+
+msgid "skeleton_name_4"
+msgstr "avengers"
+
+msgid "skeleton_postfix_0"
+msgstr "of the night"
+
+msgid "skeleton_postfix_1"
+msgstr "from the shadows"
+
+msgid "skeleton_postfix_10"
+msgstr "from the deep"
+
+msgid "skeleton_postfix_11"
+msgstr "in chains"
+
+msgid "skeleton_postfix_12"
+msgstr "of the underworld"
+
+msgid "skeleton_postfix_13"
+msgstr "from hades"
+
+msgid "skeleton_postfix_2"
+msgstr "of darkness"
+
+msgid "skeleton_postfix_3"
+msgstr "from evil"
+
+msgid "skeleton_postfix_4"
+msgstr "of the slain"
+
+msgid "skeleton_postfix_5"
+msgstr "of the damned"
+
+msgid "skeleton_postfix_6"
+msgstr "of the tortured"
+
+msgid "skeleton_postfix_7"
+msgstr "of the restless"
+
+msgid "skeleton_postfix_8"
+msgstr "from the mists"
+
+msgid "skeleton_postfix_9"
+msgstr "of the blackness"
+
+msgid "skeleton_prefix_0"
+msgstr "Rattly"
+
+msgid "skeleton_prefix_1"
+msgstr "Moaning"
+
+msgid "skeleton_prefix_10"
+msgstr "Dreadful"
+
+msgid "skeleton_prefix_11"
+msgstr "Horrible"
+
+msgid "skeleton_prefix_12"
+msgstr "Awful"
+
+msgid "skeleton_prefix_13"
+msgstr "Horrid"
+
+msgid "skeleton_prefix_14"
+msgstr "Grisly"
+
+msgid "skeleton_prefix_15"
+msgstr "Monstrous"
+
+msgid "skeleton_prefix_16"
+msgstr "Dark"
+
+msgid "skeleton_prefix_17"
+msgstr "Nightmarish"
+
+msgid "skeleton_prefix_18"
+msgstr "Pitiless"
+
+msgid "skeleton_prefix_2"
+msgstr "Black-boned"
+
+msgid "skeleton_prefix_3"
+msgstr "Black-clad"
+
+msgid "skeleton_prefix_4"
+msgstr "Terrible"
+
+msgid "skeleton_prefix_5"
+msgstr "Howling"
+
+msgid "skeleton_prefix_6"
+msgstr "Beastly"
+
+msgid "skeleton_prefix_7"
+msgstr "Hideous"
+
+msgid "skeleton_prefix_8"
+msgstr "Black"
+
+msgid "skeleton_prefix_9"
+msgstr "Dark"
+
+msgid "spinx00"
+msgstr "Das Schiff des Elfen hat ein rotes Segel"
+
+msgid "spinx01"
+msgstr "Der Zwerg hat eine Nuss dabei"
+
+msgid "spinx02"
+msgstr "Die Katze führt eine Hellebarde"
+
+msgid "spinx03"
+msgstr "Das Schiff mit dem grünen Segel liegt links neben dem mit einem weißen Segel"
+
+msgid "spinx04"
+msgstr "Auf dem Schiff mit grünen Segeln kam der Speerkämpfer"
+
+msgid "spinx05"
+msgstr "Der Krieger mit dem Kreis im Wappen hat einen Keks"
+
+msgid "spinx06"
+msgstr "Der Krieger des mittleren Schiffs hat ein Schwert"
+
+msgid "spinx07"
+msgstr "Auf dem gelben Segel prangt ein Kreuz als Wappen"
+
+msgid "spinx08"
+msgstr "Der Mensch kam mit dem ersten Schiff"
+
+msgid "spinx10"
+msgstr "Das Schiff des Kriegers, der ein Apfel hat, liegt neben dem, der ein Kreuz als Wappen hat"
+
+msgid "spinx11"
+msgstr "Der Krieger mit dem Turm im Wappen trägt eine Axt"
+
+msgid "spinx12"
+msgstr "Das Schiff des Menschen liegt neben dem blauen Schiff"
+
+msgid "spinx13"
+msgstr "Das Insekt trägt einen Baum als Wappen"
+
+msgid "spinx14"
+msgstr "Das Schiff mit dem Stern im Wappen liegt neben dem des Kriegers, der einen Zweihänder führt"
+
+msgctxt "iteminfo"
+msgid "toad"
+msgstr "The toad is one of the rarest races of Eressea. It is said that it only appears by magical means. An ancient treatise of the arcane in the library of the academy of Xontormia theorizes that the toad is a manifestation of a collapsed arcane field transposed into the morphic field of a spell caster. Maybe it is for this reason that the toad is also much more resilient to magic than other races of Eressea. However, it is also much more un-magical. Owed by its size alone and also due to the lack of hands it can hardly perform normal actions. The only advantage of its smaller size is that it can hide more easily."
+
+msgctxt "iteminfo"
+msgid "toadslime"
+msgstr "This crucible contains the rarest alchemical substance in Eressea: toad slime. The substance is alleged to have an extraordinary high capacity of magical absorption and is therefore applied in obscure magical rituals."
+
+msgctxt "raceinfo"
+msgid "tunnelworm"
+msgstr "This gigantic creature comes from the depth of Eressea and is well-suited to the life underground. Blind, deaf and not very intelligent, but with tremendous physical power it can move mountains and uproot woods very well."
+
+msgid "undead_name_0"
+msgstr "ghosts"
+
+msgid "undead_name_1"
+msgstr "phantoms"
+
+msgid "undead_name_10"
+msgstr "ghouls"
+
+msgid "undead_name_11"
+msgstr "headless"
+
+msgid "undead_name_12"
+msgstr "wisps"
+
+msgid "undead_name_2"
+msgstr "vampires"
+
+msgid "undead_name_3"
+msgstr "zombies"
+
+msgid "undead_name_4"
+msgstr "specters"
+
+msgid "undead_name_5"
+msgstr "creatures"
+
+msgid "undead_name_6"
+msgstr "figures"
+
+msgid "undead_name_7"
+msgstr "schemes"
+
+msgid "undead_name_8"
+msgstr "monsters"
+
+msgid "undead_name_9"
+msgstr "warriors"
+
+msgid "undead_postfix_0"
+msgstr "of the night"
+
+msgid "undead_postfix_1"
+msgstr "from the shadows"
+
+msgid "undead_postfix_10"
+msgstr "from the depth"
+
+msgid "undead_postfix_11"
+msgstr "in chains"
+
+msgid "undead_postfix_12"
+msgstr "from the dead"
+
+msgid "undead_postfix_13"
+msgstr "from the underworld"
+
+msgid "undead_postfix_2"
+msgstr "of darkness"
+
+msgid "undead_postfix_3"
+msgstr "of evil"
+
+msgid "undead_postfix_4"
+msgstr "of the slain"
+
+msgid "undead_postfix_5"
+msgstr "of the damned"
+
+msgid "undead_postfix_6"
+msgstr "of the tortured"
+
+msgid "undead_postfix_7"
+msgstr "of the restless"
+
+msgid "undead_postfix_8"
+msgstr "from the mists"
+
+msgid "undead_postfix_9"
+msgstr "from obscurity"
+
+msgid "undead_prefix_0"
+msgstr "Horrible"
+
+msgid "undead_prefix_1"
+msgstr "Moaning"
+
+msgid "undead_prefix_10"
+msgstr "Dark"
+
+msgid "undead_prefix_11"
+msgstr "Dreadfule"
+
+msgid "undead_prefix_12"
+msgstr "Horrid"
+
+msgid "undead_prefix_13"
+msgstr "Fearsome"
+
+msgid "undead_prefix_14"
+msgstr "Loathsome"
+
+msgid "undead_prefix_15"
+msgstr "Sickening"
+
+msgid "undead_prefix_16"
+msgstr "Abominable"
+
+msgid "undead_prefix_17"
+msgstr "Phantasmal"
+
+msgid "undead_prefix_18"
+msgstr "Disgusting"
+
+msgid "undead_prefix_19"
+msgstr "Sinister"
+
+msgid "undead_prefix_2"
+msgstr "Crawling"
+
+msgid "undead_prefix_20"
+msgstr "Nightmarish"
+
+msgid "undead_prefix_21"
+msgstr "Relentless"
+
+msgid "undead_prefix_22"
+msgstr "Hungry"
+
+msgid "undead_prefix_3"
+msgstr "Black-clad"
+
+msgid "undead_prefix_4"
+msgstr "Rotting"
+
+msgid "undead_prefix_5"
+msgstr "Frightening"
+
+msgid "undead_prefix_6"
+msgstr "Howling"
+
+msgid "undead_prefix_7"
+msgstr "Silent"
+
+msgid "undead_prefix_8"
+msgstr "Growling"
+
+msgid "undead_prefix_9"
+msgstr "Black"
+
+msgctxt "raceinfo"
+msgid "unicorn"
+msgstr "This mystical beings prefer to live in the depth of the forest and knows how to hide from others. Very rarely a unicorn may bond with a mage, but when it happens it is a powerful ally that possesses its own magical powers."
+
+msgctxt "spellinfo"
+msgid "wyrm_transformation"
+msgstr "With this spell the wizard can permanently turn himself into to great wyrm. You retain your skills and abilities, but you get the combat and movement skills of a wyrm. Your breath weapon will improve with your magic skill. The spell is a very strenuous one and it will take a while to recover from it."
+
+msgid "zombie_name_0"
+msgstr "zombies"
+
+msgid "zombie_name_1"
+msgstr "creatures"
+
+msgid "zombie_name_2"
+msgstr "doomed"
+
+msgid "zombie_name_3"
+msgstr "massacred ones"
+
+msgid "zombie_name_4"
+msgstr "damned"
+
+msgid "zombie_postfix_0"
+msgstr "of the night"
+
+msgid "zombie_postfix_1"
+msgstr "from the shadows"
+
+msgid "zombie_postfix_10"
+msgstr "in chains"
+
+msgid "zombie_postfix_11"
+msgstr "from death"
+
+msgid "zombie_postfix_12"
+msgstr "from the underworld"
+
+msgid "zombie_postfix_2"
+msgstr "of the darkness"
+
+msgid "zombie_postfix_3"
+msgstr "of evil"
+
+msgid "zombie_postfix_4"
+msgstr "of the slain"
+
+msgid "zombie_postfix_5"
+msgstr "of the cursed"
+
+msgid "zombie_postfix_6"
+msgstr "of the restless"
+
+msgid "zombie_postfix_7"
+msgstr "from the mists"
+
+msgid "zombie_postfix_8"
+msgstr "from obscurity"
+
+msgid "zombie_postfix_9"
+msgstr "from the depth"
+
+msgid "zombie_prefix_0"
+msgstr "Rotting"
+
+msgid "zombie_prefix_1"
+msgstr "Maimed"
+
+msgid "zombie_prefix_10"
+msgstr "Horrible"
+
+msgid "zombie_prefix_11"
+msgstr "Dreadful"
+
+msgid "zombie_prefix_12"
+msgstr "Horrid"
+
+msgid "zombie_prefix_13"
+msgstr "Fearsome"
+
+msgid "zombie_prefix_14"
+msgstr "Sinister"
+
+msgid "zombie_prefix_15"
+msgstr "Appalling"
+
+msgid "zombie_prefix_2"
+msgstr "Tortured"
+
+msgid "zombie_prefix_3"
+msgstr "Frightening"
+
+msgid "zombie_prefix_4"
+msgstr "Silently shuffling"
+
+msgid "zombie_prefix_5"
+msgstr "Child-eating"
+
+msgid "zombie_prefix_6"
+msgstr "Black"
+
+msgid "zombie_prefix_7"
+msgstr "Dark"
+
+msgid "zombie_prefix_8"
+msgstr "Scary"
+
+msgid "zombie_prefix_9"
+msgstr "Grotesque"
