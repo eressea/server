@@ -497,7 +497,7 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 {
     int max_affinity = 0;
     region *max_region = NULL;
-    selist *ql, *rlist = regions_in_range(r, range, allowed_dragon);
+    selist *ql, *rlist = path_regions_in_range(r, range, allowed_dragon);
     int qi;
 
     for (qi = 0, ql = rlist; ql; selist_advance(&ql, &qi, 1)) {

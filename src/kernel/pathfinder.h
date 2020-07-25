@@ -8,15 +8,10 @@ extern "C" {
         const struct region *target, int maxlen,
         bool(*allowed) (const struct region *, const struct region *));
     extern bool path_exists(struct region *handle_start, const struct region *target,
-        int maxlen, bool(*allowed) (const struct region *,
-        const struct region *));
-    extern bool allowed_swim(const struct region *src,
-        const struct region *target);
-    extern bool allowed_fly(const struct region *src,
-        const struct region *target);
-    extern bool allowed_walk(const struct region *src,
-        const struct region *target);
-    extern struct selist *regions_in_range(struct region *src, int maxdist,
+        int maxlen, bool(*allowed) (const struct region *, const struct region *));
+    extern bool allowed_fly(const struct region *src, const struct region *target);
+    extern bool allowed_walk(const struct region *src, const struct region *target);
+    extern struct selist *path_regions_in_range(struct region *src, int maxdist,
         bool(*allowed) (const struct region *, const struct region *));
 
     extern void pathfinder_cleanup(void);

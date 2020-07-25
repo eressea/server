@@ -5423,19 +5423,22 @@ int sp_fetchastral(castorder * co)
     return cast_level;
 }
 
-#define SHOWASTRAL_IS_BORKED
+static bool cb_not_astral_blocked(const struct region *rt) {
+    return !is_cursed(rt->attribs, &ct_astralblock);
+}
+
+#undef SHOWASTRAL_IS_BORKED
 #ifndef SHOWASTRAL_IS_BORKED
+#define SHOWASTRAL_MAX_RADIUS 5
 int sp_showastral(castorder * co)
 {
-    unit *u;
     region *rt;
     int n = 0;
-    int c = 0;
-    region_list *rl, *rl2;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
-    double power = co->force;
+    int force = (int) co->force;
+    int radius = (force < SHOWASTRAL_MAX_RADIUS) ? force : SHOWASTRAL_MAX_RADIUS;
+    region *targets[4 * SHOWASTRAL_MAX_RADIUS * SHOWASTRAL_MAX_RADIUS];
 
     switch (getplaneid(r)) {
     case 0:
@@ -5455,62 +5458,21 @@ int sp_showastral(castorder * co)
         return 0;
     }
 
-    rl = all_in_range(rt, power / 5);
-
-    /* Erst Einheiten zaehlen, fuer die Grammatik. */
-
-    for (rl2 = rl; rl2; rl2 = rl2->next) {
-        region *r2 = rl2->data;
-        if (!is_cursed(r2->attribs, &ct_astralblock)) {
-            for (u = r2->units; u; u = u->next) {
-                n++;
-            }
-        }
-    }
-
+    n = regions_in_range(rt, radius, cb_not_astral_blocked, targets);
     if (n == 0) {
         /* sprintf(buf, "%s kann niemanden im astralen Nebel entdecken.",
            unitname(mage)); */
         cmistake(mage, co->order, 220, MSG_MAGIC);
     }
     else {
-
-        /* Ausgeben */
-
-        sprintf(buf, "%s hat eine Vision der astralen Ebene. Im astralen "
-            "Nebel zu erkennen sind ", unitname(mage));
-
-        for (rl2 = rl; rl2; rl2 = rl2->next) {
-            if (!is_cursed(rl2->data->attribs, &ct_astralblock)) {
-                for (u = rl2->data->units; u; u = u->next) {
-                    c++;
-                    scat(unitname(u));
-                    scat(" (");
-                    if (!fval(u, UFL_ANON_FACTION)) {
-                        scat(factionname(u->faction));
-                        scat(", ");
-                    }
-                    icat(u->number);
-                    scat(" ");
-                    scat(LOC(mage->faction->locale, rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)));
-                    scat(", Entfernung ");
-                    icat(distance(rl2->data, rt));
-                    scat(")");
-                    if (c == n - 1) {
-                        scat(" und ");
-                    }
-                    else if (c < n - 1) {
-                        scat(", ");
-                    }
-                }
-            }
+        int i;
+        for (i = 0; i != n; ++i) {
+            region *rt = targets[i];
+            set_observer(rt, mage->faction, (int)(co->force / 2), 2);
         }
-        scat(".");
-        addmessage(r, mage->faction, buf, MSG_MAGIC, ML_INFO);
     }
 
-    free_regionlist(rl);
-    return cast_level;
+    return co->level;
 }
 #endif
 
@@ -5519,7 +5481,7 @@ int sp_viewreality(castorder * co)
 {
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
+    int force = (int)co->force;
     message *m;
     region *rl[MAX_SCHEMES];
     int num;
@@ -5537,7 +5499,7 @@ int sp_viewreality(castorder * co)
         for (i = 0; i != num; ++i) {
             region *rt = rl[i];
             if (!is_cursed(rt->attribs, &ct_astralblock)) {
-                set_observer(rt, mage->faction, co->level / 2, 2);
+                set_observer(rt, mage->faction, force / 2, 2);
             }
         }
     }
@@ -5546,7 +5508,7 @@ int sp_viewreality(castorder * co)
     r_addmessage(r, mage->faction, m);
     msg_release(m);
 
-    return cast_level;
+    return co->level;
 }
 
 static void cb_disrupt_astral(region *r2, void *cbdata) {

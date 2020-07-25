@@ -43,32 +43,37 @@ static region *tpregion(const region * r)
     return rt;
 }
 
+int regions_in_range(const region * r, int radius, bool(*valid) (const region *), region *result[])
+{
+    int x, y, num = 0;
+    const struct plane *pl = rplane(r);
+    for (x = -radius; x <= +radius; ++x) {
+        for (y = -radius; y <= radius; ++y) {
+            int dist = koor_distance(0, 0, x, y);
+
+            if (dist <= radius) {
+                region *rn;
+                int nx = r->x + x, ny = r->y + y;
+                pnormalize(&nx, &ny, pl);
+                rn = findregion(nx, ny);
+                if (rn != NULL && (valid == NULL || valid(rn))) {
+                    if (result) {
+                        result[num] = rn;
+                    }
+                    ++num;
+                }
+            }
+        }
+    }
+    return num;
+}
 
 int get_astralregions(const region * r, bool(*valid) (const region *), region *result[])
 {
     assert(is_astral(r));
     r = r_astral_to_standard(r);
     if (r) {
-        int x, y, num = 0;
-        for (x = -TP_RADIUS; x <= +TP_RADIUS; ++x) {
-            for (y = -TP_RADIUS; y <= +TP_RADIUS; ++y) {
-                region *rn;
-                int dist = koor_distance(0, 0, x, y);
-
-                if (dist <= TP_RADIUS) {
-                    int nx = r->x + x, ny = r->y + y;
-                    pnormalize(&nx, &ny, rplane(r));
-                    rn = findregion(nx, ny);
-                    if (rn != NULL && (valid == NULL || valid(rn))) {
-                        if (result) {
-                            result[num] = rn;
-                        }
-                        ++num;
-                    }
-                }
-            }
-        }
-        return num;
+        return regions_in_range(r, TP_RADIUS, valid, result);
     }
     return 0;
 }
