@@ -79,7 +79,7 @@ static void free_nodes(node * root)
     }
 }
 
-struct selist *regions_in_range(struct region *handle_start, int maxdist,
+struct selist *path_regions_in_range(struct region *handle_start, int maxdist,
     bool(*allowed) (const struct region *, const struct region *))
 {
     selist * rlist = NULL;

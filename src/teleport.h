@@ -20,6 +20,7 @@ extern "C" {
     bool is_astral(const struct region *r);
     struct plane *get_astralplane(void);
     int get_astralregions(const struct region * r, bool(*valid) (const struct region *), struct region *result[]);
+    int regions_in_range(const struct region * r, int radius, bool(*valid) (const struct region *), struct region *result[]);
 
     void create_teleport_plane(void);
     void spawn_braineaters(float chance);
