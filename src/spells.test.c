@@ -116,7 +116,7 @@ static void test_bad_dreams(CuTest *tc) {
 }
 
 static void test_view_reality(CuTest *tc) {
-    region *r, *ra;
+    region *r, *ra, *rx;
     faction *f;
     unit *u;
     castorder co;
@@ -127,12 +127,13 @@ static void test_view_reality(CuTest *tc) {
     mt_create_va(mt_new("viewreality_effect", NULL),
         "unit:unit", MT_NEW_END);
     r = test_create_region(0, 0, NULL);
+    rx = test_create_region(0, TP_RADIUS+1, NULL);
     ra = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
     ra->_plane = get_astralplane();
     f = test_create_faction(NULL);
     u = test_create_unit(f, r);
 
-    test_create_castorder(&co, u, 10, 10., 0, NULL);
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_only"));
@@ -141,11 +142,12 @@ static void test_view_reality(CuTest *tc) {
     test_clear_messagelist(&f->msgs);
     move_unit(u, ra, NULL);
 
-    test_create_castorder(&co, u, 9, 10., 0, NULL);
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     CuAssertIntEquals(tc, 9, sp_viewreality(&co));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "spell_astral_only"));
-    CuAssertIntEquals(tc, 4, get_observer(r, f));
+    CuAssertIntEquals(tc, 5, get_observer(r, f));
+    CuAssertIntEquals(tc, -1, get_observer(rx, f));
     CuAssertPtrEquals(tc, f, (void *)ra->individual_messages->viewer);
     CuAssertPtrNotNull(tc, test_find_messagetype(ra->individual_messages->msgs, "viewreality_effect"));
     free_castorder(&co);
