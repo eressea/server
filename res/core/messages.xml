@@ -3485,6 +3485,13 @@
       <arg name="command" type="order"/>
     </type>
   </message>
+  <message name="spell_astral_forbidden" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
   <message name="spell_astral_only" section="errors">
     <type>
       <arg name="unit" type="unit"/>

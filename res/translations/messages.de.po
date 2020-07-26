@@ -641,6 +641,9 @@ msgstr "\"$unit($unit) vergisst $skill($skill).\""
 msgid "spell_astral_only"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nur im Astralraum gezaubert werden.\""
 
+msgid "spell_astral_forbidden"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht im Astralraum gezaubert werden.\""
+
 msgid "sp_movecastle_fail_0"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Elementar ist zu klein, um das Gebäude zu tragen.\""
 
