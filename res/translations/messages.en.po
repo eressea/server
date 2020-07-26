@@ -594,7 +594,7 @@ msgid "error206"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is alrady a spell on that building.\""
 
 msgid "error316"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Without ingredients an alchemist can not produce anything.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Without ingredients an alchemist cannot produce anything.\""
 
 msgid "error312"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Lycantropes may not be mixed with normal people.\""
@@ -638,6 +638,9 @@ msgstr "\"$unit($unit) in $region($region) damages the $ship($ship).\""
 msgid "forget"
 msgstr "\"$unit($unit) forgets $skill($skill).\""
 
+msgid "spell_astral_forbidden"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - This spell cannot be cast on the astral plane.\""
+
 msgid "spell_astral_only"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - This spell can only be cast on the astral plane.\""
 
@@ -653,7 +656,7 @@ msgstr "\"$unit($unit) drowns in $region($region).\""
 msgid "travel"
 msgstr "\"$unit($unit) $if($eq($mode,1),\"rides\", \"walks\") from $region($start) to $region($end)$if($isnull($regions),\"\",\" by way of $trail($regions)\").\""
 
-msgid "curseinfo::skill_1"
+msgid "curseinfo_skill_1"
 msgstr "\"$unit($unit) is incredibly skilled at $skill($skill). ($int36($id))\""
 
 msgid "error11"
@@ -864,7 +867,7 @@ msgid "curseinfo::shipnodrift_1"
 msgstr "\"The $ship($ship) is blessed with favourable winds$if($lt($duration,3),\", but the spell is starting to wear thin\",\"\"). ($int36($id))\""
 
 msgid "error105"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Empty units can not be handed over.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Empty units cannot be handed over.\""
 
 msgid "curseinfo::sparkle_7"
 msgstr "\"The women of the nearby village cast furtive looks at $unit($unit). ($int36($id))\""
@@ -1164,7 +1167,7 @@ msgid "error_max_magicians"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There may not be more than $int($amount) magicians in your faction.\""
 
 msgid "error304"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Units of a faction that can't be attacked may not guard.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Units of a faction that cannot be attacked may not guard.\""
 
 msgid "error300"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Invalid synonym.\""
@@ -1484,11 +1487,8 @@ msgstr "\"A magical shimmer lies on these walls. ($int36($id))\""
 msgid "changebanner"
 msgstr "\"Banner has been changed to '$value'.\""
 
-msgid "curseinfo::skill_2"
+msgid "curseinfo_skill_2"
 msgstr "\"$unit($unit) has some troubles with $skill($skill). ($int36($id))\""
-
-msgid "spellfail::noway"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is no route leading there.\""
 
 msgid "spellbuildingresists"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Building $int36($id) could not be charmed.\""
@@ -2301,7 +2301,7 @@ msgid "sailnolanding"
 msgstr "\"The $ship($ship) could not berth in $region($region). The coast is too dangerous for the vessel.\""
 
 msgid "error116"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Number can not be assigned.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Number cannot be assigned.\""
 
 msgid "error112"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Names may not contain parenthesis.\""
@@ -2516,6 +2516,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician de
 msgid "analyse_region_fail"
 msgstr "\"It appears to $unit($mage) that $region($region) is charmed, but no details have been revealed.\""
 
+msgid "showastral_effect"
+msgstr "\"$unit($unit) has a vision of the astral plane.\""
+
 msgid "viewreality_effect"
 msgstr "\"$unit($unit) manages to catch a glimpse of reality through the fog.\""
 
@@ -2634,7 +2637,7 @@ msgid "seduce_effect_0"
 msgstr "\"$unit($unit) gives $unit($mage) $resources($items).\""
 
 msgid "error311"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - This unit can not change shape.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - This unit cannot change shape.\""
 
 msgid "error201"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Race and target unit have not been supplied.\""

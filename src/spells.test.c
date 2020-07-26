@@ -120,37 +120,146 @@ static void test_view_reality(CuTest *tc) {
     faction *f;
     unit *u;
     castorder co;
+    curse *c;
 
     test_setup();
+    mt_create_error(216);
+    mt_create_error(220);
     mt_create_va(mt_new("spell_astral_only", NULL),
         "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("viewreality_effect", NULL),
         "unit:unit", MT_NEW_END);
-    r = test_create_region(0, 0, NULL);
-    rx = test_create_region(0, TP_RADIUS+1, NULL);
-    ra = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
-    ra->_plane = get_astralplane();
+    rx = test_create_region(0, TP_RADIUS + 1, NULL);
     f = test_create_faction(NULL);
-    u = test_create_unit(f, r);
+    u = test_create_unit(f, rx);
 
+    /* can only cast in astral space */
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
-    CuAssertIntEquals(tc, -1, get_observer(r, f));
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_only"));
     free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    ra->_plane = get_astralplane();
     move_unit(u, ra, NULL);
 
+    /* there is no connection from ra to rx */
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_viewreality(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertIntEquals(tc, -1, get_observer(rx, f));
+    free_castorder(&co);
+
+    test_clear_messagelist(&f->msgs);
+    r = test_create_region(0, 0, NULL);
+
+    test_clear_messagelist(&f->msgs);
+
+    /* units exist, r can be seen, but rx is out of range */
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
-    CuAssertIntEquals(tc, -1, get_observer(r, f));
     CuAssertIntEquals(tc, 9, sp_viewreality(&co));
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "spell_astral_only"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "viewreality_effect"));
     CuAssertIntEquals(tc, 5, get_observer(r, f));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
-    CuAssertPtrEquals(tc, f, (void *)ra->individual_messages->viewer);
-    CuAssertPtrNotNull(tc, test_find_messagetype(ra->individual_messages->msgs, "viewreality_effect"));
     free_castorder(&co);
+
+    set_observer(r, f, -1, -1);
+    CuAssertIntEquals(tc, -1, get_observer(r, f));
+
+    /* target region r exists, but astral space is blocked */
+    c = create_curse(NULL, &ra->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_viewreality(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertIntEquals(tc, -1, get_observer(r, f));
+    free_castorder(&co);
+    remove_curse(&ra->attribs, c);
+
+    /* target region r exists, but astral interference is blocked */
+    c = create_curse(NULL, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_viewreality(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertIntEquals(tc, -1, get_observer(r, f));
+    free_castorder(&co);
+
+    test_teardown();
+}
+
+static void test_show_astral(CuTest *tc) {
+    region *r, *ra, *rx;
+    faction *f;
+    unit *u;
+    castorder co;
+    curse * c;
+
+    test_setup();
+    mt_create_error(216);
+    mt_create_error(220);
+    mt_create_va(mt_new("spell_astral_forbidden", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("showastral_effect", NULL),
+        "unit:unit", MT_NEW_END);
+    ra = test_create_region(real2tp(0), real2tp(0) + 1 + SHOWASTRAL_MAX_RADIUS, NULL);
+    ra->_plane = get_astralplane();
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, ra);
+
+    /* error: unit is in astral space */
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_showastral(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_forbidden"));
+    free_castorder(&co);
+
+    test_clear_messagelist(&f->msgs);
+    r = test_create_region(0, 0, NULL);
+    move_unit(u, r, NULL);
+
+    /* error: no target region */
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_showastral(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertIntEquals(tc, -1, get_observer(ra, f));
+    free_castorder(&co);
+
+    rx = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
+    rx->_plane = ra->_plane;
+
+    /* rx is in range, but empty */
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_showastral(&co));
+    CuAssertIntEquals(tc, -1, get_observer(rx, f));
+    CuAssertIntEquals(tc, -1, get_observer(ra, f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "showastral_effect"));
+    free_castorder(&co);
+
+    test_create_unit(f, ra);
+    test_create_unit(f, rx);
+    /* rx is in range, but ra is not */
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 9, sp_showastral(&co));
+    CuAssertIntEquals(tc, 5, get_observer(rx, f));
+    CuAssertIntEquals(tc, -1, get_observer(ra, f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "showastral_effect"));
+    free_castorder(&co);
+
+    /* astral block on r */
+    c = create_curse(NULL, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_showastral(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    free_castorder(&co);
+    remove_curse(&r->attribs, c);
+
+    /* astral block on rx */
+    c = create_curse(NULL, &rx->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_showastral(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
+    free_castorder(&co);
+    remove_curse(&rx->attribs, c);
 
     test_teardown();
 }
@@ -176,6 +285,7 @@ CuSuite *get_spells_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
+    SUITE_ADD_TEST(suite, test_show_astral);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);

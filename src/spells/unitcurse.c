@@ -318,10 +318,10 @@ static message *cinfo_skillmod(const void *obj, objtype_t typ, const curse * c,
         unit *u = (unit *)obj;
         int sk = c->data.i;
         if (c->effect > 0) {
-            return msg_message("curseinfo::skill_1", "unit skill id", u, sk, c->no);
+            return msg_message("curseinfo_skill_1", "unit skill id", u, sk, c->no);
         }
         else if (c->effect < 0) {
-            return msg_message("curseinfo::skill_2", "unit skill id", u, sk, c->no);
+            return msg_message("curseinfo_skill_2", "unit skill id", u, sk, c->no);
         }
     }
     return NULL;

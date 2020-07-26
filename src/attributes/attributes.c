@@ -121,7 +121,7 @@ void set_observer(region *r, faction *f, int skill, int turns)
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {
             obs_data *od = (obs_data *)a->data.v;
-            if (od->f == f && od->skill < skill) {
+            if (od->f == f) {
                 od->skill = skill;
                 od->timer = turns;
                 return;
