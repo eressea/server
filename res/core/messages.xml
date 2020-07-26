@@ -4982,6 +4982,14 @@
       <arg name="resource" type="resource"/>
     </type>
   </message>
+  <message name="give_number_missing" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+      <arg name="resource" type="string"/>
+    </type>
+  </message>
   <message name="error35" section="errors">
     <type>
       <arg name="unit" type="unit"/>

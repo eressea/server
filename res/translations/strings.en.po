@@ -838,6 +838,12 @@ msgstr "a boat"
 msgid "boat_p"
 msgstr "boats"
 
+msgid "ship"
+msgstr "ship"
+
+msgid "ship_p"
+msgstr "ships"
+
 msgctxt "race"
 msgid "orc_p"
 msgstr "orcs"
