@@ -33,8 +33,46 @@ static void test_parse_token_bug_2381(CuTest *tc) {
     char token[64];
 
     stok = s;
-    stok = parse_token(&stok, token, sizeof(token));
+    parse_token(&stok, token, sizeof(token));
     CuAssertTrue(tc, strlen(token) < sizeof(token));
+}
+
+static void test_parse_token_quotes(CuTest *tc) {
+    const char *stok, *s = "There are 'exactly four' \"tokens\"";
+    char token[64], *tok;
+
+    stok = s;
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "There", token);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "are", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "exactly four", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "tokens", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertPtrEquals(tc, NULL, (void *)tok);
+    CuAssertStrEquals(tc, "", token);
+}
+
+static void test_parse_token_quote_bug_turn_1179(CuTest *tc) {
+    const char *stok, *s = "O'Leary and \"O'Hara\"  \"'nuff\" said'";
+    char token[64], *tok;
+
+    stok = s;
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "O'Leary", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "and", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "O'Hara", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "'nuff", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertStrEquals(tc, "said'", tok);
+    tok = parse_token(&stok, token, sizeof(token));
+    CuAssertPtrEquals(tc, NULL, (void *)tok);
+    CuAssertStrEquals(tc, "", token);
 }
 
 static void test_parse_token_limit(CuTest *tc) {
@@ -126,6 +164,8 @@ CuSuite *get_parser_suite(void)
     SUITE_ADD_TEST(suite, test_atoip);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_parse_token);
+    SUITE_ADD_TEST(suite, test_parse_token_quotes);
+    SUITE_ADD_TEST(suite, test_parse_token_quote_bug_turn_1179);
     SUITE_ADD_TEST(suite, test_parse_token_bug_2381);
     SUITE_ADD_TEST(suite, test_parse_token_limit);
     SUITE_ADD_TEST(suite, test_parse_token_limit_utf8);
