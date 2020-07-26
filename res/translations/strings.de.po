@@ -1029,6 +1029,12 @@ msgstr "ein Boot"
 msgid "boat_p"
 msgstr "Boote"
 
+msgid "ship"
+msgstr "Schiff"
+
+msgid "ship_p"
+msgstr "Schiffe"
+
 msgctxt "race"
 msgid "nymph"
 msgstr "Nymphe"

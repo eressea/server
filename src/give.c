@@ -836,6 +836,16 @@ void give_cmd(unit * u, order * ord)
         /* handled in give_control_cmd */
         return;
     }
+    else if (p == P_SHIP) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "give_number_missing", "resource", "ship_p"));
+        return;
+    }
+    else if (p == P_PERSON) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "give_number_missing", "resource", "person_p"));
+        return;
+    }
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
         ADDMSG(&u->faction->msgs,
