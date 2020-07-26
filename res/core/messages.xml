@@ -247,14 +247,14 @@
       <arg name="id" type="int"/>
     </type>
   </message>
-  <message name="curseinfo::skill_2" section="events">
+  <message name="curseinfo_skill_2" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="skill" type="skill"/>
       <arg name="id" type="int"/>
     </type>
   </message>
-  <message name="curseinfo::skill_1" section="events">
+  <message name="curseinfo_skill_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="skill" type="skill"/>
@@ -1119,6 +1119,12 @@
   </message>
 
   <message name="viewreality_effect" section="magic">
+    <type>
+      <arg name="unit" type="unit"/>
+    </type>
+  </message>
+
+  <message name="showastral_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
     </type>
@@ -5794,13 +5800,6 @@
   <message name="spellfail::nolevel" section="errors">
     <type>
       <arg name="mage" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="spellfail::noway" section="magic">
-    <type>
-      <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
