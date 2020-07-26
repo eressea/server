@@ -147,7 +147,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     char *cursor = lbuf;
     char quotechar = 0;
     bool escape = false;
-    const char *ctoken = *str;
+    const char *ctoken = *str, *cstart;
 
     if (!ctoken) {
         return 0;
@@ -159,6 +159,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         }
         return 0;
     }
+    cstart = ctoken;
     while (*ctoken) {
         wint_t wc;
         size_t len;
@@ -190,7 +191,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
                 ++ctoken;
                 break;
             }
-            else if (quotechar == 0) {
+            else if (quotechar == 0 && cstart == ctoken) {
                 quotechar = utf8_character;
                 ++ctoken;
             }
