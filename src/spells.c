@@ -5203,22 +5203,21 @@ int sp_leaveastral(castorder * co)
     case 1:
         rt = pa->param[0]->data.r;
         if (!rt || r_standard_to_astral(rt) != r || !inhabitable(rt)) {
-            ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-                "spellfail::noway", ""));
+            cmistake(mage, co->order, 216, MSG_MAGIC);
             return 0;
         }
         ro = r;
         break;
     default:
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-            "spell_astral_only", ""));
+            "spell_astral_only", NULL));
         return 0;
     }
 
     if (ro == NULL || is_cursed(ro->attribs, &ct_astralblock)
         || is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-            "spellfail_astralblock", ""));
+            "spellfail_astralblock", NULL));
         return 0;
     }
 
@@ -5423,13 +5422,10 @@ int sp_fetchastral(castorder * co)
     return cast_level;
 }
 
-static bool cb_not_astral_blocked(const struct region *rt) {
-    return !is_cursed(rt->attribs, &ct_astralblock);
+static bool cb_show_astral(const struct region *r) {
+    return r->units && !is_cursed(r->attribs, &ct_astralblock);
 }
 
-#undef SHOWASTRAL_IS_BORKED
-#ifndef SHOWASTRAL_IS_BORKED
-#define SHOWASTRAL_MAX_RADIUS 5
 int sp_showastral(castorder * co)
 {
     region *rt;
@@ -5440,29 +5436,24 @@ int sp_showastral(castorder * co)
     int radius = (force < SHOWASTRAL_MAX_RADIUS) ? force : SHOWASTRAL_MAX_RADIUS;
     region *targets[4 * SHOWASTRAL_MAX_RADIUS * SHOWASTRAL_MAX_RADIUS];
 
-    switch (getplaneid(r)) {
-    case 0:
-        rt = r_standard_to_astral(r);
-        if (!rt || fval(rt->terrain, FORBIDDEN_REGION)) {
-            /* Hier gibt es keine Verbindung zur astralen Welt */
-            cmistake(mage, co->order, 216, MSG_MAGIC);
-            return 0;
-        }
-        break;
-    case 1:
-        rt = r;
-        break;
-    default:
+    if (getplaneid(r) == 1) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+            "spell_astral_forbidden", NULL));
+        return 0;
+    }
+    rt = r_standard_to_astral(r);
+    if (rt == NULL || fval(rt->terrain, FORBIDDEN_REGION) || is_cursed(r->attribs, &ct_astralblock)) {
         /* Hier gibt es keine Verbindung zur astralen Welt */
         cmistake(mage, co->order, 216, MSG_MAGIC);
         return 0;
     }
 
-    n = regions_in_range(rt, radius, cb_not_astral_blocked, targets);
+    n = regions_in_range(rt, radius, cb_show_astral, targets);
     if (n == 0) {
         /* sprintf(buf, "%s kann niemanden im astralen Nebel entdecken.",
            unitname(mage)); */
         cmistake(mage, co->order, 220, MSG_MAGIC);
+        return 0;
     }
     else {
         int i;
@@ -5470,43 +5461,52 @@ int sp_showastral(castorder * co)
             region *rt = targets[i];
             set_observer(rt, mage->faction, (int)(co->force / 2), 2);
         }
+        ADDMSG(&mage->faction->msgs, msg_message("showastral_effect", "unit", mage));
     }
 
     return co->level;
 }
-#endif
 
 /* ------------------------------------------------------------- */
+
+static bool cb_view_reality(const struct region *r) {
+    return !is_cursed(r->attribs, &ct_astralblock);
+}
+
 int sp_viewreality(castorder * co)
 {
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int force = (int)co->force;
-    message *m;
     region *rl[MAX_SCHEMES];
     int num;
 
     if (getplaneid(r) != 1) {
         /* sprintf(buf, "Dieser Zauber kann nur im Astralraum gezaubert werden."); */
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-            "spell_astral_only", ""));
+            "spell_astral_only", NULL));
         return 0;
     }
 
-    num = get_astralregions(r, NULL, rl);
+    if (is_cursed(r->attribs, &ct_astralblock)) {
+        cmistake(mage, co->order, 216, MSG_MAGIC);
+        return 0;
+    }
+
+    num = get_astralregions(r, cb_view_reality, rl);
     if (num > 0) {
         int i;
         for (i = 0; i != num; ++i) {
             region *rt = rl[i];
-            if (!is_cursed(rt->attribs, &ct_astralblock)) {
-                set_observer(rt, mage->faction, force / 2, 2);
-            }
+            set_observer(rt, mage->faction, force / 2, 2);
         }
     }
+    else {
+        cmistake(mage, co->order, 216, MSG_MAGIC);
+        return 0;
+    }
 
-    m = msg_message("viewreality_effect", "unit", mage);
-    r_addmessage(r, mage->faction, m);
-    msg_release(m);
+    ADDMSG(&mage->faction->msgs, msg_message("viewreality_effect", "unit", mage));
 
     return co->level;
 }
@@ -6421,9 +6421,7 @@ static spelldata spell_functions[] = {
     { "analyze_magic", sp_analysemagic, 0 },
     { "concealing_aura", sp_itemcloak, 0 },
     { "tybiedfumbleshield", sp_fumbleshield, 0 },
-#ifndef SHOWASTRAL_IS_BORKED
     { "show_astral", sp_showastral, 0 },
-#endif
     { "resist_magic", sp_resist_magic_bonus, 0 },
     { "keeploot", sp_keeploot, 0 },
     { "enterastral", sp_enterastral, 0 },
