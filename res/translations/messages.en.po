@@ -656,7 +656,7 @@ msgstr "\"$unit($unit) drowns in $region($region).\""
 msgid "travel"
 msgstr "\"$unit($unit) $if($eq($mode,1),\"rides\", \"walks\") from $region($start) to $region($end)$if($isnull($regions),\"\",\" by way of $trail($regions)\").\""
 
-msgid "curseinfo::skill_1"
+msgid "curseinfo_skill_1"
 msgstr "\"$unit($unit) is incredibly skilled at $skill($skill). ($int36($id))\""
 
 msgid "error11"
@@ -1487,11 +1487,8 @@ msgstr "\"A magical shimmer lies on these walls. ($int36($id))\""
 msgid "changebanner"
 msgstr "\"Banner has been changed to '$value'.\""
 
-msgid "curseinfo::skill_2"
+msgid "curseinfo_skill_2"
 msgstr "\"$unit($unit) has some troubles with $skill($skill). ($int36($id))\""
-
-msgid "spellfail::noway"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is no route leading there.\""
 
 msgid "spellbuildingresists"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Building $int36($id) could not be charmed.\""
@@ -2518,6 +2515,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician de
 
 msgid "analyse_region_fail"
 msgstr "\"It appears to $unit($mage) that $region($region) is charmed, but no details have been revealed.\""
+
+msgid "showastral_effect"
+msgstr "\"$unit($unit) has a vision of the astral plane.\""
 
 msgid "viewreality_effect"
 msgstr "\"$unit($unit) manages to catch a glimpse of reality through the fog.\""

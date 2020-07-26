@@ -22,7 +22,6 @@
 #include <assert.h>
 
 #define TE_CENTER 1000
-#define TP_DISTANCE 4
 
 int real2tp(int rk)
 {

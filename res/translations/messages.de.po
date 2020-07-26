@@ -656,7 +656,7 @@ msgstr "\"$unit($unit) ertrinkt in $region($region).\""
 msgid "travel"
 msgstr "\"$unit($unit) $if($eq($mode,1),\"reitet\", \"wandert\") von $region($start) nach $region($end).$if($isnull($regions),\"\",\" Dabei wurde $trail($regions) durchquert.\")\""
 
-msgid "curseinfo::skill_1"
+msgid "curseinfo_skill_1"
 msgstr "\"$unit($unit) ist ungewöhnlich geschickt in $skill($skill). ($int36($id))\""
 
 msgid "error11"
@@ -1487,11 +1487,8 @@ msgstr "\"Ein magischer Schimmer liegt auf diesen Mauern. ($int36($id))\""
 msgid "changebanner"
 msgstr "\"Das Banner wurde auf '$value' geändert.\""
 
-msgid "curseinfo::skill_2"
+msgid "curseinfo_skill_2"
 msgstr "\"$unit($unit) ist ungewöhnlich ungeschickt in $skill($skill). ($int36($id))\""
-
-msgid "spellfail::noway"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin führt kein Weg.\""
 
 msgid "spellbuildingresists"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gebäude $int36($id) konnte nicht verzaubert werden.\""
@@ -2521,6 +2518,9 @@ msgstr "\"$unit($mage) meint, dass auf $region($region) ein Zauber liegt, konnte
 
 msgid "viewreality_effect"
 msgstr "\"$unit($unit) gelingt es, durch die Nebel auf die Realität zu blicken.\""
+
+msgid "showastral_effect"
+msgstr "\"$unit($unit) gelingt es, in die Nebel des Astralraums zu blicken.\""
 
 msgid "use_speedsail"
 msgstr "\"$unit($unit) setzt ein Sonnensegel. Die Geschwindigkeit des Schiffes erhöht um $int($speed).\""
