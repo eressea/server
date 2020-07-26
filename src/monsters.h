@@ -15,7 +15,8 @@ extern "C" {
     
     struct unit *spawn_seaserpent(struct region *r, struct faction *f);
     void spawn_dragons(void);
-    void monsters_desert(struct faction *monsters);
+    void monsters_desert(const struct faction *monsters);
+    void monster_cannibalism(struct unit *u);
     
     void monster_kills_peasants(struct unit *u);
     void make_zombie(struct unit * u);

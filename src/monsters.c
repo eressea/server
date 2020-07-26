@@ -205,8 +205,13 @@ void monsters_desert(struct faction *monsters)
         unit *u;
         
         for (u = r->units; u; u = u->next) {
-            if (u->faction != monsters
-                && (u_race(u)->flags & RCF_DESERT)) {
+            if (u->faction == monsters) {
+                const struct race * rc = u_race(u);
+                if (rc->splitsize < 10) {
+                    /* hermit-type monsters eat each other */
+                    monster_cannibalism(u);
+                }
+            } else if (u_race(u)->flags & RCF_DESERT) {
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
@@ -752,7 +757,8 @@ static order *plan_dragon(unit * u)
     return long_order;
 }
 
-static void monster_cannibalism(unit *u) {
+void monster_cannibalism(unit *u)
+{
     unit *u2;
 
     for (u2 = u->next; u2; u2 = u2->next) {
@@ -791,11 +797,6 @@ void plan_monsters(faction * f)
                 u->flags &= ~UFL_ANON_FACTION;
             }
             a_removeall(&u->attribs, &at_otherfaction);
-
-            if (rc->splitsize < 10) {
-                /* hermit-type monsters eat each other */
-                monster_cannibalism(u);
-            }
 
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
