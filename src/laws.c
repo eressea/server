@@ -681,8 +681,8 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         a = a_find(r->attribs, &at_germs);
         if (!a) {
             a = a_add(&r->attribs, a_new(&at_germs));
-            a->data.sa[0] = (short)cap_int(rtrees(r, 0), 0, SHRT_MAX);
-            a->data.sa[1] = (short)cap_int(rtrees(r, 1), 0, SHRT_MAX);
+            a->data.sa[0] = (short)cap_int(rtrees(r, 0) / 9, 0, SHRT_MAX);
+            a->data.sa[1] = (short)cap_int(rtrees(r, 1) / 9, 0, SHRT_MAX);
         }
         else if (a->data.sa[0] < 0 || a->data.sa[1] < 0) {
             a->data.sa[0] = (short)cap_int(a->data.sa[0], 0, SHRT_MAX);
@@ -692,9 +692,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* Baumwachstum */
         sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
-        grownup_trees = sprout / 6;
-        /* aus dem Sproesslingepool dieses Jahres abziehen */
-        a->data.sa[1] = (short)(sprout - grownup_trees);
+        grownup_trees = sprout;
         /* aus dem gesamt Sproesslingepool abziehen */
         rsettrees(r, 1, rtrees(r, 1) - grownup_trees);
         /* zu den Baeumen hinzufuegen */
@@ -703,13 +701,10 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* Samenwachstum */
         seeds = rtrees(r, 0);
         if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
-        sprout = seeds / 6;
-        /* aus dem Samenpool dieses Jahres abziehen */
-        a->data.sa[0] = (short)(seeds - sprout);
         /* aus dem gesamt Samenpool abziehen */
-        rsettrees(r, 0, rtrees(r, 0) - sprout);
+        rsettrees(r, 0, rtrees(r, 0) - seeds);
         /* zu den Sproesslinge hinzufuegen */
-        rsettrees(r, 1, rtrees(r, 1) + sprout);
+        rsettrees(r, 1, rtrees(r, 1) + seeds);
     }
 }
 
