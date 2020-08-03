@@ -34,6 +34,7 @@
 /* attributes includes */
 #include <attributes/attributes.h>
 #include <attributes/key.h>
+#include <attributes/racename.h>
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
 
@@ -381,6 +382,12 @@ unit *read_unit(gamedata *data)
     char obuf[DISPLAYSIZE];
     faction *f;
     char rname[32];
+    static const struct race * rc_demon;
+    static int config;
+
+    if (rc_changed(&config)) {
+        rc_demon = get_race(RC_DAEMON);
+    }
 
     READ_INT(data->store, &n);
     if (n <= 0) {
@@ -518,6 +525,18 @@ unit *read_unit(gamedata *data)
         u->hp = u->number;
     }
     read_attribs(data, &u->attribs, u);
+    if (rc_demon && data->version < FIX_SHAPESHIFT_VERSION) {
+        if (u_race(u) == rc_demon) {
+            const char *zRace = get_racename(u->attribs);
+            if (zRace) {
+                const struct race *rc = rc_find(zRace);
+                if (rc) {
+                    set_racename(&u->attribs, NULL);
+                    u->irace = rc;
+                }
+            }
+        }
+    }
     resolve_unit(u);
     return u;
 }
@@ -1322,7 +1341,7 @@ ship *read_ship(gamedata *data)
     }
     assert(sh->type || !"ship_type not registered!");
 
-    if (data->version < SHIP_NUMBER_VERISON) {
+    if (data->version < SHIP_NUMBER_VERSION) {
         sh->number = 1;
     }
     else {

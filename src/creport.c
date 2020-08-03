@@ -117,24 +117,26 @@ static translation *junkyard;
 
 static const char *translate(const char *key, const char *value)
 {
-    int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
-    translation *t = translation_table[kk];
-    while (t && strcmp(t->key, key) != 0)
-        t = t->next;
-    if (!t) {
-        if (junkyard) {
-            t = junkyard;
-            junkyard = junkyard->next;
+    if (value) {
+        int kk = ((key[0] << 5) + key[0]) % TRANSMAXHASH;
+        translation *t = translation_table[kk];
+        while (t && strcmp(t->key, key) != 0)
+            t = t->next;
+        if (!t) {
+            if (junkyard) {
+                t = junkyard;
+                junkyard = junkyard->next;
+            }
+            else {
+                t = malloc(sizeof(translation));
+                if (!t) abort();
+            }
+            t->key = str_strdup(key);
+            if (!t->key) abort();
+            t->value = value;
+            t->next = translation_table[kk];
+            translation_table[kk] = t;
         }
-        else {
-            t = malloc(sizeof(translation));
-            if (!t) abort();
-        }
-        t->key = str_strdup(key);
-        if (!t->key) abort();
-        t->value = value;
-        t->next = translation_table[kk];
-        translation_table[kk] = t;
     }
     return crtag(key);
 }
@@ -796,19 +798,18 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        const char *pzRace = locale_string(lang, mkname("race", pzTmp), false);
+        char buffer[64];
+        const char *key = rc_key(pzTmp, NAME_PLURAL, buffer, sizeof(buffer));
+        const char *pzRace = locale_string(lang, key, false);
         if (pzRace) {
+            /* ex: "Ritter von Go */
             pzTmp = pzRace;
         }
-        pzRace = translate(pzTmp, locale_string(lang, pzTmp, false));
+        pzRace = translate(key, pzTmp);
         if (!pzRace) {
             pzRace = pzTmp;
         }
         stream_printf(out, "\"%s\";Typ\n", pzRace);
-        if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
-            pzRace = rc_name_s(u_race(u), NAME_PLURAL);
-            stream_printf(out, "\"%s\";wahrerTyp\n", pzRace);
-        }
     }
     else {
         const race *irace = u_irace(u);

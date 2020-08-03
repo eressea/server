@@ -840,7 +840,7 @@
     <familiar race="tunnelworm"/>
     <familiar race="imp"/>
   </race>
-  <race name="demon" magres="15" maxaura="1" regaura="1.25" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" shapeshift="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
+  <race name="demon" magres="15" maxaura="1" regaura="1.25" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="alchemy" modifier="2"/>
     <skill name="trade" modifier="-3"/>
