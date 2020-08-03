@@ -207,7 +207,6 @@ extern "C" {
 #define RCF_NOHEAL         (1<<16)      /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)      /* Einheit kann keine Waffen benutzen */
 #define RCF_SHAPESHIFT     (1<<18)      /* Kann TARNE RASSE benutzen. */
-#define RCF_SHAPESHIFTANY  (1<<19)      /* Kann TARNE RASSE "string" benutzen. */
 #define RCF_UNDEAD         (1<<20)      /* Undead. */
 #define RCF_DRAGON         (1<<21)      /* Drachenart (fuer Zauber) */
 #define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Kueste sein */
