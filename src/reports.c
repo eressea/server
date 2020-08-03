@@ -698,7 +698,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
     if (pzTmp) {
         const char *name = locale_string(lang, mkname("race", pzTmp), false);
         sbs_strcat(sbp, name ? name : pzTmp);
-        if (u->faction == f && fval(u_race(u), RCF_SHAPESHIFTANY)) {
+        if (u->faction == f) {
             sbs_strcat(sbp, " (");
             sbs_strcat(sbp, racename(lang, u, u_race(u)));
             sbs_strcat(sbp, ")");

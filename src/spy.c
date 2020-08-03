@@ -195,6 +195,39 @@ void set_factionstealth(unit *u, faction *f) {
         a->data.v = f;
 }
 
+static void stealth_race(unit *u, const char *s) {
+    const race *trace;
+
+    trace = findrace(s, u->faction->locale);
+    if (trace) {
+        /* demons can cloak as other player-races */
+        if (u_race(u) == get_race(RC_DAEMON)) {
+            if (playerrace(trace)) {
+                u->irace = trace;
+            }
+        }
+        /* Singdrachen können sich nur als Drachen tarnen */
+        else if (u_race(u) == get_race(RC_SONGDRAGON)
+            || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
+            if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
+                || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
+                u->irace = trace;
+            }
+        }
+
+        /* Schablonen können sich als alles mögliche tarnen */
+        if (u_race(u)->flags & RCF_SHAPESHIFT) {
+            u->irace = trace;
+            set_racename(&u->attribs, NULL);
+        }
+    }
+    else {
+        if (u_race(u)->flags & RCF_SHAPESHIFT) {
+            set_racename(&u->attribs, s);
+        }
+    }
+}
+
 int setstealth_cmd(unit * u, struct order *ord)
 {
     char token[64];
@@ -207,111 +240,70 @@ int setstealth_cmd(unit * u, struct order *ord)
 
     if (s == NULL || *s == 0) {
         u_seteffstealth(u, -1);
-        return 0;
     }
-
-    if (isdigit(*(const unsigned char *)s)) {
+    else if (isdigit(*(const unsigned char *)s)) {
         /* Tarnungslevel setzen */
         int level = atoi((const char *)s);
         if (level > effskill(u, SK_STEALTH, NULL)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_lowstealth", ""));
-            return 0;
         }
-        u_seteffstealth(u, level);
-        return 0;
-    }
-
-    if (skill_enabled(SK_STEALTH)) { /* hack! E3 erlaubt keine Tarnung */
-        const race *trace;
-
-        trace = findrace(s, u->faction->locale);
-        if (trace) {
-            /* demons can cloak as other player-races */
-            if (u_race(u) == get_race(RC_DAEMON)) {
-                if (playerrace(trace)) {
-                    u->irace = trace;
-                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs)) {
-                        set_racename(&u->attribs, NULL);
-                    }
-                }
-                return 0;
-            }
-            /* Singdrachen koennen sich nur als Drachen tarnen */
-            else if (u_race(u) == get_race(RC_SONGDRAGON)
-                || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
-                if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
-                    || trace == get_race(RC_DRAGON) || trace == get_race(RC_WYRM)) {
-                    u->irace = trace;
-                    if (u_race(u)->flags & RCF_SHAPESHIFTANY && get_racename(u->attribs))
-                        set_racename(&u->attribs, NULL);
-                }
-                return 0;
-            }
-
-            /* Daemomen und Illusionsparteien koennen sich als andere race tarnen */
-            if (u_race(u)->flags & RCF_SHAPESHIFT) {
-                if (playerrace(trace)) {
-                    u->irace = trace;
-                    if ((u_race(u)->flags & RCF_SHAPESHIFTANY) && get_racename(u->attribs))
-                        set_racename(&u->attribs, NULL);
-                }
-            }
-            return 0;
+        else {
+            u_seteffstealth(u, level);
         }
     }
-
-    switch (findparam(s, u->faction->locale)) {
-    case P_FACTION:
-        /* TARNE PARTEI [NICHT|NUMMER abcd] */
-        s = gettoken(token, sizeof(token));
-        if (rule_stealth_anon()) {
-            if (!s || *s == 0) {
-                u->flags |= UFL_ANON_FACTION;
-                break;
-            }
-            else if (findparam(s, u->faction->locale) == P_NOT) {
-                u->flags &= ~UFL_ANON_FACTION;
-                break;
-            }
-        }
-        if (rule_stealth_other()) {
-            if (get_keyword(s, u->faction->locale) == K_NUMBER) {
-                int nr = -1;
-
-                s = gettoken(token, sizeof(token));
-                if (s) {
-                    nr = atoi36(s);
-                }
-                if (!s || *s == 0 || nr == u->faction->no) {
-                    a_removeall(&u->attribs, &at_otherfaction);
+    else {
+        switch (findparam(s, u->faction->locale)) {
+        case P_FACTION:
+            /* TARNE PARTEI [NICHT|NUMMER abcd] */
+            s = gettoken(token, sizeof(token));
+            if (rule_stealth_anon()) {
+                if (!s || *s == 0) {
+                    u->flags |= UFL_ANON_FACTION;
                     break;
                 }
-                else {
-                    struct faction *f = findfaction(nr);
-                    if (f == NULL || !can_set_factionstealth(u, f)) {
-                        cmistake(u, ord, 66, MSG_EVENT);
+                else if (findparam(s, u->faction->locale) == P_NOT) {
+                    u->flags &= ~UFL_ANON_FACTION;
+                    break;
+                }
+            }
+            if (rule_stealth_other()) {
+                if (get_keyword(s, u->faction->locale) == K_NUMBER) {
+                    int nr = -1;
+
+                    s = gettoken(token, sizeof(token));
+                    if (s) {
+                        nr = atoi36(s);
+                    }
+                    if (!s || *s == 0 || nr == u->faction->no) {
+                        a_removeall(&u->attribs, &at_otherfaction);
                         break;
                     }
                     else {
-                        set_factionstealth(u, f);
-                        break;
+                        struct faction *f = findfaction(nr);
+                        if (f == NULL || !can_set_factionstealth(u, f)) {
+                            cmistake(u, ord, 66, MSG_EVENT);
+                            break;
+                        }
+                        else {
+                            set_factionstealth(u, f);
+                            break;
+                        }
                     }
                 }
             }
-        }
-        cmistake(u, ord, 289, MSG_EVENT);
-        break;
-    case P_ANY:
-    case P_NOT:
-        /* TARNE ALLES (was nicht so alles geht?) */
-        u_seteffstealth(u, -1);
-        break;
-    default:
-        if (u_race(u)->flags & RCF_SHAPESHIFTANY) {
-            set_racename(&u->attribs, s);
-        }
-        else {
             cmistake(u, ord, 289, MSG_EVENT);
+            break;
+
+        case P_ANY:
+        case P_NOT:
+            /* TARNE ALLES (was nicht so alles geht?) */
+            u_seteffstealth(u, -1);
+            break;
+
+        default:
+            if (skill_enabled(SK_STEALTH)) { /* hack! E3 erlaubt keine Tarnung */
+                stealth_race(u, s);
+            }
         }
     }
     return 0;
