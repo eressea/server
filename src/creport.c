@@ -798,18 +798,15 @@ void cr_output_unit(stream *out, const faction * f,
 
     pzTmp = get_racename(u->attribs);
     if (pzTmp) {
-        char buffer[64];
-        const char *key = rc_key(pzTmp, NAME_PLURAL, buffer, sizeof(buffer));
-        const char *pzRace = locale_string(lang, key, false);
-        if (pzRace) {
-            /* ex: "Ritter von Go */
-            pzTmp = pzRace;
+        const race *irace = rc_find(pzTmp);
+        if (irace) {
+            const char *pzRace = rc_name_s(irace, NAME_PLURAL);
+            stream_printf(out, "\"%s\";Typ\n",
+                translate(pzRace, LOC(lang, pzRace)));
         }
-        pzRace = translate(key, pzTmp);
-        if (!pzRace) {
-            pzRace = pzTmp;
+        else {
+            stream_printf(out, "\"%s\";Typ\n", pzTmp);
         }
-        stream_printf(out, "\"%s\";Typ\n", pzRace);
     }
     else {
         const race *irace = u_irace(u);

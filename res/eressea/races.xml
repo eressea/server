@@ -689,7 +689,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="1" damage="1d5"/>
   </race>
-  <race name="catdragon" magres="90" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" shapeshift="yes" giveperson="yes" getitem="yes" dragon="yes">
+  <race name="catdragon" magres="90" maxaura="1.000000" regaura="1.000000" weight="20000" capacity="10000" speed="1.000000" hp="20" damage="2d40" unarmedattack="0" unarmeddefense="0" defensemodifier="50" fly="yes" walk="yes" teach="no" giveperson="yes" getitem="yes" dragon="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
     <attack type="4" damage="2d40"/>
@@ -840,7 +840,10 @@
     <familiar race="tunnelworm"/>
     <familiar race="imp"/>
   </race>
-  <race name="demon" magres="15" maxaura="1" regaura="1.25" recruitcost="150" maintenance="10" weight="1000" capacity="540" speed="1" hp="50" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
+  <race name="demon" magres="15" maxaura="1" regaura="1.25" recruitcost="150" 
+maintenance="10" weight="1000" capacity="540" speed="1" hp="50" ac="2" damage="1d5" 
+unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" 
+giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes" learn="yes"/>
     <skill name="alchemy" modifier="2"/>
     <skill name="trade" modifier="-3"/>

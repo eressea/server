@@ -299,15 +299,27 @@ static void test_cr_hiderace(CuTest *tc) {
 
     /* when we use racename, nobody can tell it's not the real deal */
     u->irace = NULL;
-    set_racename(&u->attribs, "Zwerge");
+    set_racename(&u->attribs, "human");
     mstream_init(&strm);
     cr_output_unit(&strm, f1, u, seen_unit);
-    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Zwerge"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Menschen"));
     CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
     mstream_done(&strm);
     mstream_init(&strm);
     cr_output_unit(&strm, f2, u, seen_unit);
-    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Zwerge"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Menschen"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+
+    set_racename(&u->attribs, "Ritter von Go");
+    mstream_init(&strm);
+    cr_output_unit(&strm, f1, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Ritter von Go"));
+    CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
+    mstream_done(&strm);
+    mstream_init(&strm);
+    cr_output_unit(&strm, f2, u, seen_unit);
+    CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Ritter von Go"));
     CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
     mstream_done(&strm);
 
