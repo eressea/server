@@ -974,6 +974,12 @@ void remove_skill(unit * u, skill_t sk)
     }
 }
 
+static void remove_skills(unit * u) {
+    free(u->skills);
+    u->skills = NULL;
+    u->skill_size = 0;
+}
+
 skill *add_skill(unit * u, skill_t sk)
 {
     skill *sv;
@@ -1588,10 +1594,7 @@ void scale_number(unit * u, int n)
         }
     }
     if (u->number == 0 || n == 0) {
-        skill_t sk;
-        for (sk = 0; sk < MAXSKILLS; sk++) {
-            remove_skill(u, sk);
-        }
+        remove_skills(u);
     }
 
     set_number(u, n);
