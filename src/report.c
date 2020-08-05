@@ -627,9 +627,6 @@ nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_
     bool isbattle = (mode == seen_battle);
     char buf[8192];
 
-    if (fval(u_race(u), RCF_INVISIBLE))
-        return;
-
     newline(out);
     dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
 
@@ -1231,7 +1228,7 @@ static void report_statistics(struct stream *out, const region * r, const factio
 
         /* count */
         for (number = 0, u = r->units; u; u = u->next) {
-            if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
+            if (u->faction == f) {
                 for (itm = u->items; itm; itm = itm->next) {
                     i_change(&items, itm->type, itm->number);
                 }
@@ -1321,7 +1318,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
             continue;
 
         for (u = r->units; u; u = u->next) {
-            if (u->faction == f && !fval(u_race(u), RCF_INVISIBLE)) {
+            if (u->faction == f) {
                 order *ord;
                 if (!dh) {
                     plane *pl = getplane(r);

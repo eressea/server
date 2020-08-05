@@ -675,10 +675,6 @@
     <skill name="weaponsmithing" modifier="14"/>
     <attack type="4" damage="2d8+4"/>
   </race>
-  <race name="spell" maxaura="1" regaura="0.100000" weight="0" capacity="0" speed="0" hp="1" damage="1d4" unarmedattack="-2" unarmeddefense="-2" learn="no" noheal="yes" noweapons="yes" illusionary="yes" invisible="yes" fly="yes" swim="yes" walk="yes">
-    <ai splitsize="1"/>
-    <attack type="1" damage="1d4"/>
-  </race>
   <race name="special" maxaura="0" regaura="0" weight="0" capacity="0" speed="0" hp="1" damage="1d4" unarmedattack="-2" unarmeddefense="-2">
     <ai splitsize="1"/>
     <attack type="1" damage="1d4"/>

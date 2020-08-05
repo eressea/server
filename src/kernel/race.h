@@ -212,11 +212,10 @@ extern "C" {
 #define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Kueste sein */
 #define RCF_UNARMEDGUARD   (1<<23)      /* kann ohne Waffen bewachen */
 #define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
-#define RCF_INVISIBLE      (1<<25)      /* not visible in any report */
+#define RCF_FAMILIAR       (1<<25)      /* may be a familiar */
 #define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
 #define RCF_ATTACK_MOVED   (1<<27)      /* may attack if it has moved */
 #define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
-#define RCF_FAMILIAR       (1<<29)      /* may be a familiar */
 
 #define RCF_DEFAULT RCF_CANSAIL
 
