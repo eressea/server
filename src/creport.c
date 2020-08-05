@@ -745,9 +745,6 @@ void cr_output_unit(stream *out, const faction * f,
 
     assert(u && u->number);
 
-    if (fval(u_race(u), RCF_INVISIBLE))
-        return;
-
     stream_printf(out, "EINHEIT %d\n", u->no);
     stream_printf(out, "\"%s\";Name\n", unit_getname(u));
     str = u_description(u, lang);

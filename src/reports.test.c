@@ -870,7 +870,8 @@ static void test_visible_unit(CuTest *tc) {
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse_land));
 
-    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u, f, -2, seen_lighthouse));
+    rc->weight = 11000;
     CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
 
     u->ship = sh = test_create_ship(u->region, NULL);

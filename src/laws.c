@@ -4068,31 +4068,30 @@ void turn_end(void)
     update_spells();
 }
 
-/** determine if unit can be seen by faction
+/**
+ * Determine if unit can be seen by faction.
+ *
  * @param f -- the observiong faction
  * @param u -- the unit that is observed
  * @param r -- the region that u is obesrved from (see below)
  * @param m -- terrain modifier to stealth
- * 
+ *
  * r kann != u->region sein, wenn es um Durchreisen geht,
  * oder Zauber (sp_generous, sp_fetchastral).
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
- * erblickt wird */
-bool
-cansee(const faction * f, const region * r, const unit * u, int modifier)
+ * erblickt wird.
+ */
+bool cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
     int stealth, rings;
 
     if (u->faction == f || omniscient(f)) {
         return true;
     }
-    else if (fval(u_race(u), RCF_INVISIBLE)) {
-        return false;
-    }
     else if (u->number == 0) {
         attrib *a = a_find(u->attribs, &at_creator);
-        if (a) {                    /* u is an empty temporary unit. In this special case
-                                    we look at the creating unit. */
+        if (a) {
+            /* u is an empty temporary unit. In this special case we look at the creating unit. */
             u = (unit *)a->data.v;
         }
         else {
@@ -4132,7 +4131,7 @@ cansee(const faction * f, const region * r, const unit * u, int modifier)
 bool cansee_unit(const unit * u, const unit * target, int modifier)
 /* target->region kann != u->region sein, wenn es um durchreisen geht */
 {
-    if (fval(u_race(target), RCF_INVISIBLE) || target->number == 0)
+    if (target->number == 0)
         return false;
     else if (target->faction == u->faction)
         return true;
@@ -4175,7 +4174,7 @@ cansee_durchgezogen(const faction * f, const region * r, const unit * u,
 {
     unit *u2;
 
-    if (fval(u_race(u), RCF_INVISIBLE) || u->number == 0)
+    if (u->number == 0)
         return false;
     else if (u->faction == f)
         return true;

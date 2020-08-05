@@ -937,9 +937,7 @@ void u_setfaction(unit * u, faction * f)
 
 bool count_unit(const unit *u)
 {
-    const race *rc = u_race(u);
-    /* spells are invisible. units we cannot see do not count to our limit */
-    return rc == NULL || (rc->flags & RCF_INVISIBLE) == 0;
+    return u_race(u) != NULL;
 }
 
 void set_number(unit * u, int count)
@@ -948,7 +946,7 @@ void set_number(unit * u, int count)
     assert(count <= UNIT_MAXSIZE);
 
     if (count == 0) {
-        u->flags &= ~(UFL_HERO);
+        u->flags &= ~UFL_HERO;
     }
     if (u->faction && count_unit(u)) {
         u->faction->num_people += count - u->number;
