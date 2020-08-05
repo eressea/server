@@ -2371,7 +2371,7 @@ bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mod
     else {
         if (stealthmod > INT_MIN) {
             if (mode == seen_lighthouse) {
-                return u_race(u)->weight > 10000;
+                return u_race(u)->weight >= 5000;
             } else if (mode > seen_travel || u->building || u->ship || is_guard(u)) {
                 return cansee(f, u->region, u, stealthmod);
             }
