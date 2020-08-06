@@ -4,6 +4,7 @@
             "plant": "PLANT",
 	    "grow": [ "GROW", "BREED" ],
             "promote": ["PROMOTE", "PROMOTION" ],
+            "locale": ["LANGUAGE", "LOCALE"],
             "combat": [ "COMBAT", "FIGHT" ]
         },
         "de": {
@@ -65,6 +66,7 @@
             "alliance": "ALLIANZ",
             "claim": ["BEANSPRUCHE", "BEANSPRUCHEN"],
             "promote": ["BEFÖRDERE", "BEFÖRDERUNG"],
+            "locale": ["SPRACHE", "LOCALE"],
             "pay": ["BEZAHLE", "BEZAHLEN"]
         }
     }

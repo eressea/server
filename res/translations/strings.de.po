@@ -4806,6 +4806,10 @@ msgctxt "keyword"
 msgid "promote"
 msgstr "BEFÖRDERE"
 
+msgctxt "keyword"
+msgid "locale"
+msgstr "SPRACHE"
+
 msgid "skeleton_prefix_0"
 msgstr "Klapperige"
 

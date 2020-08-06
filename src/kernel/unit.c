@@ -1849,3 +1849,46 @@ void unit_convert_race(unit *u, const race *rc, const char *rcname)
     }
 }
 
+
+void translate_orders(unit *u, const struct locale *lang, order **list)
+{
+    order **po = list;
+    (void)lang;
+    while (*po) {
+        order *ord = *po;
+        if (ord->id <= 0) {
+            /* we can keep these, they have no problematic arguments */
+            po = &ord->next;
+            continue;
+        }
+        switch (getkeyword(ord)) {
+        case K_ATTACK:
+        case K_BANNER:
+        case K_DRIVE:
+        case K_FOLLOW:
+        case K_GROUP:
+        case K_KOMMENTAR:
+        case K_MAIL:
+        case K_NUMBER:
+        case K_PASSWORD:
+        case K_PREFIX:
+        case K_RECRUIT:
+        case K_SPY:
+        case K_STEAL:
+        case K_TEACH:
+        case K_TRANSPORT:
+        case K_URSPRUNG:
+            /* we can keep these, they need no translation */
+            po = &ord->next;
+            break;
+        default:
+            /* we don't know what to do with these, drop them */
+            if (u->thisorder == ord) {
+                u->thisorder = NULL;
+            }
+            *po = ord->next;
+            ord->next = NULL;
+            free_order(ord);
+        }
+    }
+}

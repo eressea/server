@@ -155,5 +155,6 @@ const char *keywords[MAXKEYWORDS] = {
     "pay",
     "loot",
     "autostudy",
+    "locale",
 };
 

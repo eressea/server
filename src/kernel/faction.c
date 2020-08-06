@@ -835,3 +835,18 @@ faction *faction_create(int no)
     fhash(f);
     return f;
 }
+
+void change_locale(faction *f, const struct locale *lang) {
+    unit *ux;
+    for (ux = f->units; ux; ux = ux->nextF) {
+        translate_orders(ux, lang, &ux->orders);
+        if (ux->old_orders) {
+            translate_orders(ux, lang, &ux->old_orders);
+        }
+        if (ux->thisorder) {
+            translate_orders(ux, lang, &ux->thisorder);
+        }
+    }
+    f->locale = lang;
+}
+
