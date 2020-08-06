@@ -3990,6 +3990,7 @@ void init_processor(void)
         p += 10;
         add_proc_global(p, renumber_factions, "Neue Nummern");
     }
+    add_proc_order(p, K_LOCALE, locale_cmd, 0, "Sprache wechseln");
 }
 
 static void reset_game(void)
@@ -4208,4 +4209,21 @@ seefaction(const faction * f, const region * r, const unit * u, int modifier)
         && cansee(f, r, u, modifier))
         return true;
     return false;
+}
+
+int locale_cmd(unit * u, order * ord)
+{
+    char token[128];
+    const char * name;
+    faction *f = u->faction;
+
+    init_order(ord, f->locale);
+    name = gettoken(token, sizeof(token));
+    if (name) {
+        const struct locale *lang = get_locale(name);
+        if (lang && lang != f->locale) {
+            change_locale(f, lang);
+        }
+    }
+    return 0;
 }

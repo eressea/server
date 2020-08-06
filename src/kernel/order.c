@@ -213,7 +213,7 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
 void free_order(order * ord)
 {
     if (ord != NULL) {
-        assert(ord->next == 0);
+        assert(ord->next == NULL);
         free(ord);
     }
 }
@@ -641,4 +641,3 @@ void close_orders(void) {
         (void)init_order(NULL, NULL);
     }
 }
-

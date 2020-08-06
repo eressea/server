@@ -50,6 +50,7 @@ extern "C" {
     bool long_order_allowed(const struct unit *u);
     bool password_wellformed(const char *password);
 
+    int locale_cmd(struct unit *u, struct order *ord);
     int password_cmd(struct unit *u, struct order *ord);
     int banner_cmd(struct unit *u, struct order *ord);
     int email_cmd(struct unit *u, struct order *ord);

@@ -135,11 +135,59 @@ static void test_addfaction(CuTest *tc) {
 static void test_check_passwd(CuTest *tc) {
     faction *f;
     
+    test_setup();
     f = test_create_faction(NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     CuAssertTrue(tc, checkpasswd(f, "password"));
     CuAssertTrue(tc, !checkpasswd(f, "assword"));
     CuAssertTrue(tc, !checkpasswd(f, "PASSWORD"));
+    test_teardown();
+}
+
+static void test_change_locale(CuTest *tc) {
+    faction *f;
+    unit *u;
+    order *ord;
+    struct locale *lang;
+    
+    test_setup();
+    f = test_create_faction(NULL);
+    lang = get_or_create_locale("en");
+    u = test_create_unit(f, test_create_plain(0, 0));
+    u->thisorder = create_order(K_ENTERTAIN, f->locale, NULL);
+
+    u->old_orders = create_order(K_WORK, f->locale, NULL);
+    u->old_orders->next = ord = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ALCHEMY]);
+    CuAssertIntEquals(tc, SK_ALCHEMY - 100, ord->id);
+    ord->next = create_order(K_GIVE, f->locale, "abcd 1 Schwert");
+
+    unit_addorder(u, create_order(K_NAME, f->locale, "EINHEIT Hodor"));
+    unit_addorder(u, create_order(K_ENTERTAIN, f->locale, NULL));
+    unit_addorder(u, create_order(K_KOMMENTAR, f->locale, "ich bin kein Tintenfisch"));
+    unit_addorder(u, ord = create_order(K_STUDY, f->locale, skillnames[SK_ENTERTAINMENT]));
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT - 100, ord->id);
+
+    change_locale(f, lang);
+    CuAssertPtrEquals(tc, lang, (void *)f->locale);
+    CuAssertPtrNotNull(tc, u->thisorder);
+
+    CuAssertPtrNotNull(tc, ord = u->old_orders);
+    CuAssertIntEquals(tc, K_WORK, ord->command);
+    CuAssertPtrNotNull(tc, ord = ord->next);
+    CuAssertIntEquals(tc, K_AUTOSTUDY, ord->command);
+    CuAssertIntEquals(tc, SK_ALCHEMY - 100, ord->id);
+    CuAssertPtrEquals(tc, NULL, ord->next);
+
+    CuAssertPtrNotNull(tc, ord = u->orders);
+    CuAssertIntEquals(tc, K_ENTERTAIN, ord->command);
+    CuAssertPtrNotNull(tc, ord = ord->next);
+    CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);
+    CuAssertPtrNotNull(tc, ord = ord->next);
+    CuAssertIntEquals(tc, K_STUDY, ord->command);
+    CuAssertIntEquals(tc, SK_ENTERTAINMENT - 100, ord->id);
+    CuAssertPtrEquals(tc, NULL, ord->next);
+
+    test_teardown();
 }
 
 static void test_get_monsters(CuTest *tc) {
@@ -366,6 +414,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_set_origin);
     SUITE_ADD_TEST(suite, test_set_origin_bug);
     SUITE_ADD_TEST(suite, test_check_passwd);
+    SUITE_ADD_TEST(suite, test_change_locale);
     SUITE_ADD_TEST(suite, test_valid_race);
     SUITE_ADD_TEST(suite, test_set_email);
     SUITE_ADD_TEST(suite, test_dbstrings);

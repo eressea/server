@@ -155,6 +155,7 @@ extern "C" {
     int count_migrants(const struct faction * f);
     int count_maxmigrants(const struct faction * f);
     int max_magicians(const struct faction * f);
+    void change_locale(struct faction *f, const struct locale *lang);
 
 #define MONSTER_ID 666
     struct faction *getfaction(void);
