@@ -142,7 +142,7 @@ static void test_shipowner_goes_to_next_when_empty(CuTest * tc)
     u_set_ship(u, sh);
     u_set_ship(u2, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
-    u->number = 0;
+    leave_ship(u);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
 }
@@ -177,7 +177,7 @@ static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
     u_set_ship(u, sh);
     u_set_ship(u2, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
-    u->number = 0;
+    leave_ship(u);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
 }
@@ -215,9 +215,9 @@ static void test_shipowner_goes_to_same_faction_when_empty(CuTest * tc)
     u_set_ship(u2, sh);
     u_set_ship(u3, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
-    u->number = 0;
+    leave_ship(u);
     CuAssertPtrEquals(tc, u3, ship_owner(sh));
-    u3->number = 0;
+    leave_ship(u3);
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
 }
@@ -362,10 +362,8 @@ static void test_shipowner_resets_when_empty(CuTest * tc)
     CuAssertPtrNotNull(tc, u);
     u_set_ship(u, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
-    u->number = 0;
+    leave_ship(u);
     CuAssertPtrEquals(tc, NULL, ship_owner(sh));
-    u->number = 1;
-    CuAssertPtrEquals(tc, u, ship_owner(sh));
     test_teardown();
 }
 
@@ -401,12 +399,12 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     u_set_ship(u3, sh);
 
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
-    u2->number = 0;
+    leave_ship(u2);
     leave_ship(u1);
     CuAssertPtrEquals(tc, u3, ship_owner(sh));
     leave_ship(u3);
     CuAssertPtrEquals(tc, NULL, ship_owner(sh));
-    u2->number = 1;
+    u2->ship = sh;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
 }
