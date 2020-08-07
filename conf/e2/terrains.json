@@ -211,8 +211,6 @@
             }
         },
         "firewall": {
-            "size": 100,
-            "road": 250,
             "flags": [ "forbidden" ]
         },
         "fog": {
