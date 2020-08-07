@@ -514,9 +514,9 @@ unit *ship_owner(const ship * sh)
 {
     if (sh->number > 0) {
         unit *owner = sh->_owner;
-        if (!owner || (owner->ship != sh || owner->number <= 0)) {
-            unit * heir = ship_owner_ex(sh, owner ? owner->faction : 0);
-            return (heir && heir->number > 0) ? heir : 0;
+        if (!owner || owner->ship != sh) {
+            unit * heir = ship_owner_ex(sh, owner ? owner->faction : NULL);
+            return (heir && heir->number > 0) ? heir : NULL;
         }
         return owner;
     }
