@@ -2780,6 +2780,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is und
 msgid "error328"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - All ships of a convoy must be on the same coast.\""
 
+msgid "error329"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit has too few members to sail this convoi.\""
+
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Missign number of $localize($resource,0).\""
 

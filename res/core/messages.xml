@@ -2753,6 +2753,14 @@
     </type>
   </message>
 
+  <message name="error329" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
   <message name="error319" section="errors">
     <type>
       <arg name="unit" type="unit"/>

@@ -408,9 +408,12 @@ int crew_skill(const ship *sh) {
     return n;
 }
 
-bool ship_crewed(const ship *sh) {
-    unit *u, *cap = ship_owner(sh);
+bool ship_crewed(const ship *sh, const unit *cap) {
+    unit *u;
     int capskill = -1, sumskill = 0;
+    if (cap == NULL) {
+        return false;
+    }
     for (u = sh->region->units; u; u = u->next) {
         if (u->ship == sh) {
             int es = effskill(u, SK_SAILING, NULL);
