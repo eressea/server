@@ -819,7 +819,7 @@ static void drifting_ships(region * r)
             /* Kapitaen da? Beschaedigt? Genuegend Matrosen?
              * Genuegend leicht? Dann ist alles OK. */
 
-            if (ship_finished(sh) && ship_crewed(sh) && cansail(r, sh)) {
+            if (ship_finished(sh) && ship_crewed(sh, ship_owner(sh)) && cansail(r, sh)) {
                 shp = &sh->next;
                 continue;
             }
@@ -1630,7 +1630,8 @@ static const region_list *travel_route(unit * u,
 
 static bool ship_ready(const region * r, unit * u, order * ord)
 {
-    if (!u->ship || u != ship_owner(u->ship)) {
+    unit *cap = u->ship ? ship_owner(u->ship) : NULL;
+    if (u != cap) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
     }
@@ -1640,11 +1641,15 @@ static bool ship_ready(const region * r, unit * u, order * ord)
             u->ship));
         return false;
     }
+    if (u->number < u->ship->number) {
+        cmistake(u, ord, 329, MSG_MOVE);
+        return false;
+    }
     if (!ship_finished(u->ship)) {
         cmistake(u, ord, 15, MSG_MOVE);
         return false;
     }
-    if (!ship_crewed(u->ship)) {
+    if (!ship_crewed(u->ship, u)) {
         cmistake(u, ord, 1, MSG_MOVE);
         return false;
     }
