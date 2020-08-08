@@ -3,9 +3,9 @@
 <resources>
 <resource name="rustygreatsword">
 <!-- changes to the regular weapon:
-  1. you cannt use this with cavalry
+  1. you cannot use this with cavalry
 -->
-  <item weight="200" score="20">
+  <item weight="200" score="20" deny="goblin">
     <construction skill="weaponsmithing" minskill="4">
       <requirement type="iron" quantity="2"/>
     </construction>
@@ -112,7 +112,7 @@
 <!-- changes to the regular weapon:
   1. you cannt use this with cavalry
 -->
-  <item weight="200" score="30">
+  <item weight="200" score="30" deny="goblin">
     <construction skill="weaponsmithing" minskill="4">
       <requirement type="iron" quantity="2"/>
     </construction>
