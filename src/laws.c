@@ -880,7 +880,7 @@ int leave_cmd(unit * u, struct order *ord)
     }
 
     if (fval(r->terrain, SEA_REGION) && u->ship) {
-        if (!fval(u_race(u), RCF_SWIM)) {
+        if (!fval(u_race(u), RCF_SWIM|RCF_FLY)) {
             cmistake(u, ord, 11, MSG_MOVE);
             return 0;
         }
