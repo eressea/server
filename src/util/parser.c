@@ -173,8 +173,15 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         else {
             int ret = unicode_utf8_decode(&wc, ctoken, &len);
             if (ret != 0) {
-                log_warning("illegal character sequence in UTF8 string: %s\n", ctoken);
-                break;
+                log_info("falling back to ISO-8859-1: %s\n", cstart);
+                if (cursor - buflen < lbuf - 2) {
+                    size_t inlen = 1;
+                    len = 2;
+                    unicode_latin1_to_utf8(cursor, &len, ctoken, &inlen);
+                    cursor += len;
+                    ctoken += inlen;
+                    continue;
+                }
             }
         }
         if (escape) {
