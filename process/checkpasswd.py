@@ -28,3 +28,4 @@ elif not faction.check_passwd(mypasswd):
 else:
     log("password match: " + myfaction)
     sys.exit(0)
+sys.exit(-1)
