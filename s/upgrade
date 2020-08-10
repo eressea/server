@@ -7,7 +7,7 @@ while [ ! -d $ROOT/.git ]; do
 done
 
 cd $ROOT
-git pull
+git pull --rebase
 git submodule update
 s/build
 s/runtests
