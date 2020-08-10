@@ -14,19 +14,12 @@ def log(str):
     if not quiet:
         print(str)
 
-pw_data = EPasswd()
-try:
-    pw_data.load_database(filename)
-    log("loaded from db " + filename)
-except:
-    pw_data.load_file(filename)
-    log("loaded from file " + filename)
+pw_data = EPasswd.load_any(filename, log=log)
+faction = pw_data.get_faction(myfaction)
 
-if pw_data.fac_exists(myfaction):
-    print(pw_data.get_email(myfaction))
-    log("faction found: " + myfaction)
-    sys.exit(0)
-else:
+if not faction:
     log("faction missing: " + myfaction)
+    sys.exit(-1)
 
-sys.exit(-1)
+print(faction.email)
+log("faction found: " + myfaction)

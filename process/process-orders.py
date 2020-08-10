@@ -82,15 +82,13 @@ def check_pwd(filename, email, pw_data):
         if mo != None:
             fact_nr = str(mo.group(2))
             fact_pw = str(mo.group(3))
-            if pw_data.fac_exists(fact_nr):
-                if not pw_data.check(fact_nr, fact_pw):
-                    game_email = pw_data.get_email(fact_nr)
-                    results = results + [ (fact_nr, game_email, False, fact_pw) ]
-                else:
-                    game_email = pw_data.get_email(fact_nr)
-                    results = results + [ (fact_nr, game_email, True, fact_pw) ]
+            faction = pw_data.get_faction(fact_nr)
+
+            if not faction:
+                results.append((fact_nr, None, False, fact_pw))
             else:
-                results = results + [ (fact_nr, None, False, fact_pw) ]
+                results.append((fact_nr, faction.email, faction.check_passwd(fact_pw), fact_pw))
+
     return results
 
 def echeck(filename, locale, rules):
@@ -108,11 +106,10 @@ def echeck(filename, locale, rules):
     return mail
 
 #print "reading password file..."
-pw_data = EPasswd()
-try:
-    pw_data.load_database(os.path.join(game_dir, "eressea.db"))
-except:
-    pw_data.load_file(os.path.join(game_dir, "passwd"))
+pw_data = EPasswd.load_any(
+    os.path.join(game_dir, "eressea.db"),
+    os.path.join(game_dir, "passwd"),
+)
 
 #print "reading orders.queue..."
 # move the queue file to a safe space while locking it:

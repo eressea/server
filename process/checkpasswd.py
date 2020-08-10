@@ -18,20 +18,13 @@ def log(str):
 if mypasswd[0] == '"':
     mypasswd = mypasswd.strip('"')
 
-pw_data = EPasswd()
-try:
-    pw_data.load_database(filename)
-    log("loaded from db " + filename)
-except:
-    pw_data.load_file(filename)
-    log("loaded from file " + filename)
+pw_data = EPasswd.load_any(filename, log=log)
+faction = pw_data.get_faction(myfaction)
 
-if pw_data.fac_exists(myfaction):
-    if pw_data.check(myfaction, mypasswd):
-        log("password match: " + myfaction)
-        sys.exit(0)
+if not faction:
+    log("faction missing: " + myfaction)
+elif not faction.check_passwd(mypasswd):
     log("password mismatch: " + myfaction)
 else:
-    log("faction missing: " + myfaction)
-
-sys.exit(-1)
+    log("password match: " + myfaction)
+    sys.exit(0)
