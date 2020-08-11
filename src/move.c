@@ -884,7 +884,7 @@ static void caught_target(region * r, unit * u)
     if (a) {
         unit *target = (unit *)a->data.v;
 
-        if (!present(r, target)) {
+        if (target == u || !present(r, target)) {
             ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                 target, u));
         }
@@ -1945,9 +1945,10 @@ static void sail(unit * u, order * ord, bool drifting)
         /* Das Schiff und alle Einheiten darin werden nun von
          * starting_point nach current_point verschoben */
 
-         /* Verfolgungen melden */
-        if (fval(u, UFL_FOLLOWING))
+        /* Verfolgungen melden */
+        if (fval(u, UFL_FOLLOWING)) {
             caught_target(current_point, u);
+        }
 
         move_ship(sh, starting_point, current_point, route);
 
@@ -2304,7 +2305,7 @@ int follow_ship(unit * u, order * ord)
  * bewegen sich.
  * Following the trails of other ships.
  */
-static void move_hunters(void)
+static void move_followers(void)
 {
     region *r;
 
@@ -2482,7 +2483,7 @@ void movement(void)
         }
     }
 
-    move_hunters();
+    move_followers();
     move_pirates();
 }
 
@@ -2494,8 +2495,6 @@ void follow_unit(unit * u)
     region *r = u->region;
     attrib *a = NULL;
     order *ord;
-    unit *u2 = NULL;
-    int followship = false;
 
     if (fval(u, UFL_NOTMOVING) || LongHunger(u))
         return;
@@ -2510,6 +2509,11 @@ void follow_unit(unit * u)
             p = getparam(lang);
             if (p == P_UNIT) {
                 id = read_unitid(u->faction, r);
+                if (id == u->no) {
+                    ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
+                        u, u));
+                    continue;
+                }
                 if (a != NULL) {
                     a = a_find(u->attribs, &at_follow);
                 }
@@ -2528,73 +2532,29 @@ void follow_unit(unit * u)
                     a = NULL;
                 }
             }
-            else if (p == P_SHIP) {
-                id = getid();
-                if (id <= 0) {
-                    /*	cmistake(u, ord, 20, MSG_MOVE); */
-                }
-                else {
-                    ship *sh = findship(id);
-                    if (sh == NULL || (sh->region != r && hunted_dir(r->attribs, id) == NODIRECTION)) {
-                        cmistake(u, ord, 20, MSG_MOVE);
-                    }
-                    else if (!u->ship) {
-                        /*	cmistake(u, ord, 144, MSG_MOVE); */
-                    }
-                    else if (u != ship_owner(u->ship)) {
-                        /*	cmistake(u, ord, 146, MSG_MOVE); */
-                    }
-                    else if (!can_move(u)) {
-                        /*	cmistake(u, ord, 55, MSG_MOVE); */
-                    }
-                    else {
-                        u2 = ship_owner(sh);
-                        followship = true;
-                    }
-                }
-            }
         }
     }
 
-    if ((a || followship) && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
+    if (a && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
         bool follow = false;
-        if (!followship) {
-            u2 = a->data.v;
-        }
+        unit *u2 = a->data.v;
 
-        if (!u2 || (!followship && (u2->region != r || !cansee(u->faction, r, u2, 0)))) {
+        if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
             return;
         }
 
         switch (getkeyword(u2->thisorder)) {
         case K_MOVE:
         case K_ROUTE:
-            follow = true;
-            break;
         case K_DRIVE:
-            if (!followship) {
-                follow = true;
-            }
+            follow = true;
             break;
         default:
             for (ord = u2->orders; ord; ord = ord->next) {
-                switch (getkeyword(ord)) {
-                case K_FOLLOW:
+                if (K_FOLLOW == getkeyword(ord)) {
                     follow = true;
                     break;
-                case K_PIRACY:
-                    if (followship) {
-                        follow = true;
-                    }
-                    break;
-                default:
-                    if (followship && u2->region != r) {
-                        follow = true;
-                        break;
-                    }
-                    continue;
                 }
-                break;
             }
             break;
         }
