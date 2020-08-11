@@ -2233,15 +2233,17 @@ int follow_ship(unit * u, order * ord)
     if (fval(u, UFL_NOTMOVING)) {
         return 0;
     }
-    else if (!u->ship) {
-        cmistake(u, ord, 144, MSG_MOVE);
-        return 0;
+    if (!fval(u_race(u), RCF_FLY|RCF_SWIM)) {
+        if (!u->ship) {
+            cmistake(u, ord, 144, MSG_MOVE);
+            return 0;
+        }
     }
-    else if (u != ship_owner(u->ship)) {
+    else if (u->ship && u != ship_owner(u->ship)) {
         cmistake(u, ord, 146, MSG_MOVE);
         return 0;
     }
-    else if (!can_move(u)) {
+    if (!can_move(u)) {
         cmistake(u, ord, 55, MSG_MOVE);
         return 0;
     }
