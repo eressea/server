@@ -445,6 +445,25 @@ static void test_ship_damage_overload(CuTest *tc) {
     CuAssertDblEquals(tc, 0.37, damage_overload(5), ASSERT_DBL_DELTA);
 }
 
+static void test_follow_unit_self(CuTest *tc) {
+    unit *u;
+    order *ord;
+    faction *f;
+
+    test_setup();
+    mt_create_va(mt_new("followfail", NULL),
+        "unit:unit", "follower:unit", MT_NEW_END);
+
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_plain(0, 0));
+    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u->no));
+    unit_addorder(u, ord);
+    follow_unit(u);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "followfail"));
+    CuAssertIntEquals(tc, 0, fval(u, UFL_FOLLOWING | UFL_LONGACTION));
+    test_teardown();
+}
+
 typedef struct traveldir {
     int no;
     direction_t dir;
@@ -708,6 +727,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_bad);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
+    SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
     SUITE_ADD_TEST(suite, test_route_cycle);
