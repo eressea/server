@@ -1877,6 +1877,8 @@ bool translate_order(order *ord, const struct locale *from_lang, const struct lo
     case K_URSPRUNG:
         /* we can keep these, they do not use translated strings */
         return true;
+    default:
+        return false;
     }
 
     return false;
