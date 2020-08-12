@@ -836,15 +836,15 @@ faction *faction_create(int no)
     return f;
 }
 
-void change_locale(faction *f, const struct locale *lang) {
+void change_locale(faction *f, const struct locale *lang, bool del ) {
     unit *ux;
     for (ux = f->units; ux; ux = ux->nextF) {
-        translate_orders(ux, lang, &ux->orders);
+        translate_orders(ux, lang, &ux->orders, del);
         if (ux->old_orders) {
-            translate_orders(ux, lang, &ux->old_orders);
+            translate_orders(ux, lang, &ux->old_orders, del);
         }
         if (ux->thisorder) {
-            translate_orders(ux, lang, &ux->thisorder);
+            translate_orders(ux, lang, &ux->thisorder, del);
         }
     }
     f->locale = lang;

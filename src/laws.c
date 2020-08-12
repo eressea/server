@@ -4217,13 +4217,14 @@ int locale_cmd(unit * u, order * ord)
     char token[128];
     const char * name;
     faction *f = u->faction;
+    bool del = config_get_int("translate.delete_orders", 0) != 0;
 
     init_order(ord, f->locale);
     name = gettoken(token, sizeof(token));
     if (name) {
         const struct locale *lang = get_locale(name);
         if (lang && lang != f->locale) {
-            change_locale(f, lang);
+            change_locale(f, lang, del);
         }
     }
     return 0;
