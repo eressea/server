@@ -167,7 +167,7 @@ static void test_change_locale(CuTest *tc) {
     unit_addorder(u, ord = create_order(K_STUDY, f->locale, skillnames[SK_ENTERTAINMENT]));
     CuAssertIntEquals(tc, SK_ENTERTAINMENT - 100, ord->id);
 
-    change_locale(f, lang);
+    change_locale(f, lang, true);
     CuAssertPtrEquals(tc, lang, (void *)f->locale);
     CuAssertPtrNotNull(tc, u->thisorder);
 

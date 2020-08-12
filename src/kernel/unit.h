@@ -223,7 +223,7 @@ extern "C" {
     bool unit_name_equals_race(const struct unit *u);
 
     void unit_convert_race(struct unit *u, const struct race *rc, const char *rcname);
-    void translate_orders(struct unit *u, const struct locale *lang, struct order **list);
+    void translate_orders(struct unit *u, const struct locale *lang, struct order **list, bool del);
 
     /* getunit results: */
 #define GET_UNIT 0

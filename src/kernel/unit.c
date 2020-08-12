@@ -1849,46 +1849,58 @@ void unit_convert_race(unit *u, const race *rc, const char *rcname)
     }
 }
 
+bool translate_order(order *ord, const struct locale *from_lang, const struct locale *to_lang)
+{
+    (void)to_lang;
+    (void)from_lang;
 
-void translate_orders(unit *u, const struct locale *lang, order **list)
+    if (ord->id <= 0) {
+        /* no arguments, no translation needed */
+        return true;
+    }
+    switch (getkeyword(ord)) {
+    case NOKEYWORD:
+    case K_ATTACK:
+    case K_BANNER:
+    case K_DRIVE:
+    case K_FOLLOW:
+    case K_GROUP:
+    case K_KOMMENTAR:
+    case K_MAIL:
+    case K_NUMBER:
+    case K_PASSWORD:
+    case K_PREFIX:
+    case K_RECRUIT:
+    case K_SPY:
+    case K_STEAL:
+    case K_TEACH:
+    case K_TRANSPORT:
+    case K_URSPRUNG:
+        /* we can keep these, they do not use translated strings */
+        return true;
+    }
+
+    return false;
+}
+
+void translate_orders(unit *u, const struct locale *lang, order **list, bool del)
 {
     order **po = list;
     (void)lang;
     while (*po) {
         order *ord = *po;
-        if (ord->id <= 0) {
-            /* we can keep these, they have no problematic arguments */
-            po = &ord->next;
-            continue;
-        }
-        switch (getkeyword(ord)) {
-        case K_ATTACK:
-        case K_BANNER:
-        case K_DRIVE:
-        case K_FOLLOW:
-        case K_GROUP:
-        case K_KOMMENTAR:
-        case K_MAIL:
-        case K_NUMBER:
-        case K_PASSWORD:
-        case K_PREFIX:
-        case K_RECRUIT:
-        case K_SPY:
-        case K_STEAL:
-        case K_TEACH:
-        case K_TRANSPORT:
-        case K_URSPRUNG:
-            /* we can keep these, they need no translation */
-            po = &ord->next;
-            break;
-        default:
-            /* we don't know what to do with these, drop them */
-            if (u->thisorder == ord) {
-                u->thisorder = NULL;
+        if (!translate_order(ord, u->faction->locale, lang)) {
+            /* we don't know what to do with these, drop or keep them? */
+            if (del) {
+                if (u->thisorder == ord) {
+                    u->thisorder = NULL;
+                }
+                *po = ord->next;
+                ord->next = NULL;
+                free_order(ord);
+                continue;
             }
-            *po = ord->next;
-            ord->next = NULL;
-            free_order(ord);
         }
+        po = &ord->next;
     }
 }
