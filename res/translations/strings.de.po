@@ -4920,7 +4920,7 @@ msgstr "Dieses magische Lied wird, einmal mit Inbrunst gesungen, sich in der Reg
 
 msgctxt "keyword"
 msgid "contact"
-msgstr "KONTAKT"
+msgstr "KONTAKTIERE"
 
 msgctxt "spell"
 msgid "view_reality"

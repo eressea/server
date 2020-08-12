@@ -29,7 +29,7 @@
             "combat": [ "KÄMPFE", "KÄMPFEN" ],
             "ready" : "KAMPFZAUBER",
             "buy" : [ "KAUFE", "KAUFEN"],
-            "contact": [ "KONTAKT", "KONTAKTIEREN"],
+            "contact": [ "KONTAKTIERE", "KONTAKTIEREN"],
             "teach": ["LEHRE", "LEHREN"],
             "study": ["LERNE", "LERNEN"],
             "make": ["MACHE", "MACHEN"],
