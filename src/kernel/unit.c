@@ -1881,8 +1881,6 @@ bool translate_order(order *ord, const struct locale *from_lang, const struct lo
     default:
         return false;
     }
-
-    return false;
 }
 
 void translate_orders(unit *u, const struct locale *lang, order **list, bool del)

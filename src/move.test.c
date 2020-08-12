@@ -550,7 +550,7 @@ static void test_follow_ship_msg(CuTest * tc) {
         "unit:unit", "region:region", "command:order", MT_NEW_END);
 
     init_order_depr(ord);
-    getstrtoken();
+    skip_token();
 
     follow_ship(u, ord);
 
@@ -651,7 +651,6 @@ static void test_route_cycle(CuTest *tc) {
     CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
     u->orders = create_order(K_ROUTE, u->faction->locale, "WEST EAST NW");
     CuAssertStrEquals(tc, "route WEST EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
-    init_order(u->orders, u->faction->locale);
     move_cmd(u, u->orders);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "moveblocked"));
     CuAssertIntEquals(tc, 1, u->region->x);
@@ -700,7 +699,6 @@ static void test_route_pause(CuTest *tc) {
     CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
     u->orders = create_order(K_ROUTE, u->faction->locale, "PAUSE EAST NW");
     CuAssertStrEquals(tc, "route PAUSE EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));
-    init_order(u->orders, u->faction->locale);
     move_cmd(u, u->orders);
     CuAssertIntEquals(tc, 2, u->region->x);
     CuAssertStrEquals(tc, "route PAUSE EAST NW", get_command(u->orders, lang, buffer, sizeof(buffer)));

@@ -69,6 +69,7 @@ extern "C" {
         const struct region *dest);
     bool can_takeoff(const struct ship * sh, const struct region * from, const struct region * to);
     void move_cmd(struct unit * u, struct order * ord);
+    void move_cmd_ex(struct unit * u, struct order * ord, const char *directions);
     int follow_ship(struct unit * u, struct order * ord);
 
 #define SA_HARBOUR 1

@@ -114,7 +114,6 @@ direction_t find_piracy_target(unit *u, int *il) {
 
 void piracy_cmd(unit * u)
 {
-    order *ord;
     region *r = u->region;
     ship *sh = u->ship, *sh2;
     direction_t target_dir;
@@ -200,15 +199,7 @@ void piracy_cmd(unit * u)
     ADDMSG(&u->faction->msgs, msg_message("piratesawvictim",
         "ship unit region dir", sh, u, r, target_dir));
 
-    /* Befehl konstruieren */
-    /* TODO: why change u->thisorder? */
-    /* FIXME: when u->thisorder == ord, set_order calls free, destroys both. */
-    ord = create_order(K_MOVE, u->faction->locale, "%s", LOC(u->faction->locale, directions[target_dir]));
-
-    /* Bewegung ausfuehren */
-    init_order_depr(ord);
-    move_cmd(u, ord);
-    free_order(ord);
+    move_cmd_ex(u, u->thisorder, LOC(u->faction->locale, directions[target_dir]));
 }
 
 void age_piracy(region *r) {

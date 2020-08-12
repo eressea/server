@@ -2175,9 +2175,17 @@ static void travel(unit * u, order *ord)
     }
 }
 
-void move_cmd(unit * u, order * ord)
+void move_cmd_ex(unit * u, order * ord, const char *directions)
 {
     assert(u->number);
+
+    if (directions) {
+        /* Befehl ignorieren und Parsing vom String initialisieren. */
+        init_tokens_str(directions);
+    }
+    else {
+        init_order(ord, u->faction->locale);
+    }
     if (u->ship && u == ship_owner(u->ship)) {
         bool drifting = (getkeyword(ord) == K_MOVE);
         sail(u, ord, drifting);
@@ -2187,6 +2195,11 @@ void move_cmd(unit * u, order * ord)
     }
 
     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+}
+
+void move_cmd(unit * u, order * ord)
+{
+    move_cmd_ex(u, ord, NULL);
     set_order(&u->thisorder, NULL);
 }
 
@@ -2266,8 +2279,6 @@ int follow_ship(unit * u, order * ord)
     }
 
     sbs_init(&sbcmd, command, sizeof(command));
-    sbs_strcat(&sbcmd, LOC(u->faction->locale, keyword(K_MOVE)));
-    sbs_strcat(&sbcmd, " ");
     sbs_strcat(&sbcmd, LOC(u->faction->locale, directions[dir]));
 
     moves = 1;
@@ -2292,11 +2303,8 @@ int follow_ship(unit * u, order * ord)
 
     /* In command steht jetzt das NACH-Kommando. */
 
-    /* NACH ignorieren und Parsing initialisieren. */
-    init_tokens_str(command);
-    getstrtoken();
     /* NACH ausfuehren */
-    move_cmd(u, ord);
+    move_cmd_ex(u, ord, command);
     return 1;                     /* true -> Einheitenliste von vorne durchgehen */
 }
 
@@ -2446,13 +2454,11 @@ void movement(void)
                     else {
                         if (ships) {
                             if (u->ship && ship_owner(u->ship) == u) {
-                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
                         else {
                             if (!u->ship || ship_owner(u->ship) != u) {
-                                init_order_depr(u->thisorder);
                                 move_cmd(u, u->thisorder);
                             }
                         }
