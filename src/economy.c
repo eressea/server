@@ -277,7 +277,7 @@ static int forget_cmd(unit * u, order * ord)
         return 0;
     }
 
-    init_order_depr(ord);
+    (void)init_order(ord, u->faction->locale);
     s = gettoken(token, sizeof(token));
 
     sk = get_skill(s, u->faction->locale);
