@@ -5,24 +5,26 @@
 #include "contact.h"
 #include "lighthouse.h"
 
-#include <kernel/attrib.h>
-#include <kernel/ally.h>
-#include <kernel/building.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/item.h>
-#include <kernel/unit.h>
-#include <kernel/race.h>
-#include <kernel/order.h>
+#include "attributes/follow.h"
+
+#include "kernel/attrib.h"
+#include "kernel/ally.h"
+#include "kernel/building.h"
+#include "kernel/config.h"
+#include "kernel/faction.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/item.h"
+#include "kernel/unit.h"
+#include "kernel/race.h"
+#include "kernel/order.h"
 
 #include "util/keyword.h"
-#include <util/language.h>
-#include <util/message.h>
-#include <util/base36.h>
-#include <util/parser.h>
+#include "util/language.h"
+#include "util/message.h"
+#include "util/base36.h"
+#include "util/parser.h"
 
 #include <CuTest.h>
 #include <tests.h>
@@ -445,6 +447,42 @@ static void test_ship_damage_overload(CuTest *tc) {
     CuAssertDblEquals(tc, 0.37, damage_overload(5), ASSERT_DBL_DELTA);
 }
 
+static void test_follow_unit(CuTest *tc) {
+    unit *u, *u2;
+    order *ord;
+    faction *f;
+    region *r;
+
+    test_setup();
+
+    f = test_create_faction(NULL);
+    u = test_create_unit(f, test_create_plain(0, 0));
+    r = test_create_plain(1, 0);
+    u2 = test_create_unit(test_create_faction(NULL), u->region);
+    ord = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
+    unit_addorder(u2, ord);
+    u2->thisorder = copy_order(ord);
+    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u2->no));
+    unit_addorder(u, ord);
+    u->thisorder = copy_order(ord);
+
+    /* Verfolger müssen ihre Ziele finden, ehe diese sich bewegen */
+    follow_unit(u);
+    CuAssertPtrEquals(tc, &at_follow, (void *)u->attribs->type);
+    CuAssertPtrEquals(tc, u2, u->attribs->data.v);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+
+    movement();
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertIntEquals(tc, UFL_NOTMOVING | UFL_LONGACTION, fval(u2, UFL_NOTMOVING | UFL_LONGACTION));
+
+    CuAssertPtrEquals(tc, r, u->region);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "followdetect"));
+    CuAssertIntEquals(tc, UFL_FOLLOWING | UFL_LONGACTION, fval(u, UFL_FOLLOWING | UFL_LONGACTION));
+
+    test_teardown();
+}
+
 static void test_follow_unit_self(CuTest *tc) {
     unit *u;
     order *ord;
@@ -727,6 +765,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_bad);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
+    SUITE_ADD_TEST(suite, test_follow_unit);
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
