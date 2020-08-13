@@ -252,8 +252,7 @@ void free_orders(order ** olist)
 static int create_data(keyword_t kwd, const char *s,
     const struct locale *lang)
 {
-    order_data *data;
-    int id;
+    order_data data = { NULL, 0 };
 
     assert(kwd != NOKEYWORD);
 
@@ -267,12 +266,8 @@ static int create_data(keyword_t kwd, const char *s,
             return ((int)sk)-100;
         }
     }
-    /* TODO: between mkdata and odata_release, this object is very
-     * short-lived. */
-    odata_create(&data, strlen(s), s);
-    id = odata_save(data);
-    odata_release(data);
-    return id;
+    data._str = s;
+    return odata_save(&data);
 }
 
 static void create_order_i(order *ord, keyword_t kwd, const char *sptr, bool persistent,
