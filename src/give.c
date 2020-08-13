@@ -824,7 +824,7 @@ void give_cmd(unit * u, order * ord)
     message *msg;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_GIVE);
     err = getunit(r, u->faction, &u2);
     s = gettoken(token, sizeof(token));

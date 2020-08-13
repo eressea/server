@@ -84,7 +84,7 @@ int renumber_cmd(unit * u, order * ord)
     int i = 0;
     faction *f = u->faction;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
     switch (findparam_ex(s, u->faction->locale)) {
 

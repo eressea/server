@@ -33,28 +33,28 @@ static void test_read_unitid(CuTest *tc) {
     usetalias(u, atoi36("42"));
 
     ord = create_order(K_GIVE, lang, "TEMP 42");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, u->no, read_unitid(u->faction, u->region));
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, "8");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, 8, read_unitid(u->faction, u->region));
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, "");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, "TEMP");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
     /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
     free_order(ord);
 
@@ -79,42 +79,42 @@ static void test_getunit(CuTest *tc) {
     r = test_create_region(1, 0, t_plain);
 
     ord = create_order(K_GIVE, lang, itoa36(u->no));
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, u, u2);
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(r, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, itoa36(u->no + 1));
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, "0");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_PEASANTS, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
     /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "TEMP ##");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
     /* bug https://bugs.eressea.de/view.php?id=1685 */
     ord = create_order(K_GIVE, lang, "##");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, NULL, u2);
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, "TEMP 42");
-    init_order_depr(ord);
+    init_order(ord, NULL);
     CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, u, u2);
     free_order(ord);

@@ -218,7 +218,7 @@ int give_control_cmd(unit * u, order * ord)
     unit *u2;
     const char *s;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     getunit(r, u->faction, &u2);
 
     s = gettoken(token, sizeof(token));
@@ -921,7 +921,7 @@ int make_cmd(unit * u, struct order *ord)
     const struct locale *lang = u->faction->locale;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_MAKE);
     s = gettoken(token, sizeof(token));
 
@@ -1228,7 +1228,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon dafuer ausgeruestet, mehrere Produkte zu kaufen. */
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_BUY);
     n = getint();
     if (n <= 0) {
@@ -1525,7 +1525,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     /* sellorders sind KEIN array, weil fuer alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_SELL);
     s = gettoken(token, sizeof(token));
 
@@ -1811,7 +1811,7 @@ static void breed_cmd(unit * u, struct order *ord)
     }
 
     /* zuechte [<anzahl>] <parameter> */
-    (void)init_order_depr(ord);
+    (void)init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
 
     m = s ? atoip(s) : 0;
@@ -1878,7 +1878,7 @@ static void research_cmd(unit * u, struct order *ord)
     region *r = u->region;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_RESEARCH);
 
     if (effskill(u, SK_HERBALISM, NULL) < 7) {
@@ -1944,7 +1944,7 @@ static int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
     static int entertainperlevel = 0;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_ENTERTAIN);
     if (!entertainbase) {
         const char *str = config_get("entertain.base");
@@ -2149,7 +2149,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
         taxperlevel = config_get_int("taxing.perlevel", 0);
     }
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_TAX);
 
     if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
@@ -2217,7 +2217,7 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     econ_request *o;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_LOOT);
 
     if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {

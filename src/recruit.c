@@ -384,7 +384,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     int n;
     message *msg;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     n = getint();
     if (n <= 0) {
         syntax_error(u, ord);

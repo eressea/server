@@ -2546,7 +2546,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     }
     level = effskill(u, SK_MAGIC, NULL);
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
     param = findparam(s, u->faction->locale);
     /* fuer Syntax ' STUFE x REGION y z ' */

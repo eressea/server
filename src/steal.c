@@ -123,7 +123,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     message * msg;
     keyword_t kwd;
 
-    kwd = init_order_depr(ord);
+    kwd = init_order(ord, NULL);
     assert(kwd == K_STEAL);
 
     assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));

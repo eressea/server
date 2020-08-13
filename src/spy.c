@@ -112,7 +112,7 @@ int spy_cmd(unit * u, struct order *ord)
     double spychance, observechance;
     region *r = u->region;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     getunit(r, u->faction, &target);
 
     if (!target) {
@@ -233,7 +233,7 @@ int setstealth_cmd(unit * u, struct order *ord)
     char token[64];
     const char *s;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
 
     /* Tarne ohne Parameter: Setzt maximale Tarnung */
@@ -414,10 +414,10 @@ int sabotage_cmd(unit * u, struct order *ord)
     assert(u);
     assert(ord);
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     s = getstrtoken();
     p = findparam(s, u->faction->locale);
-    init_order_depr(NULL);
+    reset_order();
 
     switch (p) {
     case P_SHIP:

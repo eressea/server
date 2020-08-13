@@ -549,7 +549,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     mt_create_va(mt_new("error18", NULL),
         "unit:unit", "region:region", "command:order", MT_NEW_END);
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     skip_token();
 
     follow_ship(u, ord);

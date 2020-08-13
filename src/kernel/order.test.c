@@ -30,7 +30,7 @@ static void test_create_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MOVE, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MOVE, init_order(ord, NULL));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
     test_teardown();
@@ -50,7 +50,7 @@ static void test_parse_order(CuTest *tc) {
     CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
     CuAssertStrEquals(tc, "move NORTH", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MOVE, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MOVE, init_order(ord, NULL));
     CuAssertStrEquals(tc, "NORTH", getstrtoken());
     free_order(ord);
 
@@ -109,7 +109,7 @@ static void test_parse_make(CuTest *tc) {
     CuAssertIntEquals(tc, K_MAKE, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKE hurrdurr", get_command(ord, lang, cmd, sizeof(cmd)));
 
-    CuAssertIntEquals(tc, K_MAKE, init_order_depr(ord));
+    CuAssertIntEquals(tc, K_MAKE, init_order(ord, NULL));
     CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
     free_order(ord);
     test_teardown();

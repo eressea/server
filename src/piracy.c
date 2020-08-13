@@ -81,7 +81,7 @@ int *parse_ids(const order *ord) {
     const char *s;
     int *il = NULL;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
     s = getstrtoken();
     if (s != NULL && *s) {
         il = intlist_init();

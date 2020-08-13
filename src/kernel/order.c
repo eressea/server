@@ -622,17 +622,13 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
     }
 }
 
-keyword_t init_order_depr(const struct order *ord)
+void reset_order(void)
 {
-    if (ord) {
-        keyword_t kwd = ORD_KEYWORD(ord);
-        assert(kwd != K_STUDY && kwd != K_AUTOSTUDY && kwd != K_FORGET);
-    }
-    return init_order(ord, NULL);
+    (void)init_order(NULL, NULL);
 }
 
 void close_orders(void) {
     if (parser_od) {
-        (void)init_order(NULL, NULL);
+        reset_order();
     }
 }

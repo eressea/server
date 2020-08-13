@@ -258,7 +258,7 @@ int teach_cmd(unit * teacher, struct order *ord)
 
     count = 0;
 
-    init_order_depr(ord);
+    init_order(ord, NULL);
 
 #if TEACH_ALL
     if (getparam(teacher->faction->locale) == P_ANY) {
@@ -318,7 +318,7 @@ int teach_cmd(unit * teacher, struct order *ord)
         order *new_order;
 
         zOrder[0] = '\0';
-        init_order_depr(ord);
+        init_order(ord, NULL);
 
         while (!parser_end()) {
             skill_t sk;
@@ -336,7 +336,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                 const char *token;
                 /* Finde den string, der den Fehler verursacht hat */
                 parser_pushstate();
-                init_order_depr(ord);
+                init_order(ord, NULL);
 
                 for (j = 0; j != count - 1; ++j) {
                     /* skip over the first 'count' units */
@@ -424,7 +424,7 @@ int teach_cmd(unit * teacher, struct order *ord)
     if (academy_students > 0 && sk_academy!=NOSKILL) {
         academy_teaching_bonus(teacher, sk_academy, academy_students);
     }
-    init_order_depr(NULL);
+    reset_order();
     return 0;
 }
 
@@ -768,7 +768,7 @@ int study_cmd(unit * u, order * ord)
             show_potions(f, skill);
         }
     }
-    init_order(NULL, NULL);
+    reset_order();
     return 0;
 }
 
