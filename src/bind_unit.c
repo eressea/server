@@ -16,6 +16,7 @@
 #include <kernel/event.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include "util/strings.h"
 #include "util/variant.h"
 
 /*  kernel includes */
@@ -61,7 +62,9 @@ static int tolua_bufunit(lua_State * L) {
         if (f) {
             char buf[8192];
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
-            bufunit_depr(f, u, mode, buf, sizeof(buf));
+            sbstring sbs;
+            sbs_init(&sbs, buf, sizeof(buf));
+            bufunit(f, u, NULL, mode, u->flags & UFL_ANON_FACTION, &sbs);
             tolua_pushstring(L, buf);
             return 1;
         }
@@ -198,7 +201,7 @@ static int tolua_unit_set_id(lua_State * L)
 static int tolua_unit_get_auramax(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    lua_pushinteger(L, max_spellpoints_depr(u->region, u));
+    lua_pushinteger(L, max_spellpoints(u, u->region));
     return 1;
 }
 

@@ -447,7 +447,6 @@ static void test_max_spellpoints(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction(rc), test_create_plain(0, 0));
-    CuAssertIntEquals(tc, 0, max_spellpoints_depr(u->region, u));
     CuAssertIntEquals(tc, 0, max_spellpoints(u, u->region));
     CuAssertIntEquals(tc, 0, max_spellpoints(u, NULL));
     create_mage(u, M_GWYRRD);

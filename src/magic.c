@@ -652,11 +652,6 @@ int max_spellpoints(const struct unit *u, const region * r)
     return (msp > 0) ? (int)msp : 0;
 }
 
-int max_spellpoints_depr(const struct region *r, const struct unit *u)
-{
-    return max_spellpoints(u, r);
-}
-
 int change_maxspellpoints(unit * u, int csp)
 {
     sc_mage *m = get_mage(u);
@@ -664,7 +659,7 @@ int change_maxspellpoints(unit * u, int csp)
         return 0;
     }
     m->spchange += csp;
-    return max_spellpoints_depr(u->region, u);
+    return max_spellpoints(u, u->region);
 }
 
 /* ------------------------------------------------------------- */

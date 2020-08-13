@@ -52,7 +52,7 @@ static void do_shock(unit * u, const char *reason)
 
     /* Aura - Verlust */
     if (is_mage(u)) {
-        int aura = max_spellpoints_depr(u->region, u) / 10;
+        int aura = max_spellpoints(u, u->region) / 10;
         int now = get_spellpoints(u);
         if (now > aura) {
             set_spellpoints(u, aura);

@@ -235,7 +235,6 @@ extern "C" {
     /* setzt die Magiepunkte auf sp */
     int change_spellpoints(struct unit *u, int mp);
     /*      veraendert die Anzahl der Magiepunkte der Einheit um +mp */
-    int max_spellpoints_depr(const struct region *r, const struct unit *u);
     int max_spellpoints(const struct unit *u, const struct region *r);
     /*      gibt die aktuell maximal moeglichen Magiepunkte der Einheit zurueck */
     int change_maxspellpoints(struct unit *u, int csp);

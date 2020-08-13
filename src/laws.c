@@ -735,7 +735,6 @@ void immigration(void)
     for (r = regions; r; r = r->next) {
         if (r->land && r->land->newpeasants) {
             int rp = rpeasants(r) + r->land->newpeasants;
-            /* FIXME: kann ernsthaft abs(newpeasants) > rpeasants(r) sein? */
             if (rp < 0) rp = 0;
             rsetpeasants(r, rp);
             r->land->newpeasants = 0;
