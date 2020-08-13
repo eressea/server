@@ -48,8 +48,10 @@
 void spy_message(int spy, const unit * u, const unit * target)
 {
     char status[32];
+    sbstring sbs;
 
-    report_status_depr(target, u->faction->locale, status, sizeof(status));
+    sbs_init(&sbs, status, sizeof(status));
+    report_status(u, u->faction->locale, &sbs);
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
         target, status));

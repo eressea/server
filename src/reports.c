@@ -164,16 +164,6 @@ void report_status(const unit * u, const struct locale *lang, struct sbstring *s
     }
 }
 
-size_t report_status_depr(const unit * u, const struct locale *lang, char *fsbuf, size_t buflen)
-{
-    sbstring sbs;
-
-    sbs_init(&sbs, fsbuf, buflen);
-    report_status(u, lang, &sbs);
-    return sbs_length(&sbs);
-}
-
-
 const char *hp_status(const unit * u)
 {
     double p;
@@ -2274,13 +2264,6 @@ void report_race_skills(const race *rc, const struct locale *lang, sbstring *sbp
             sbs_strcat(sbp, skillname((skill_t)sk, lang));
         }
     }
-}
-
-void report_race_skills_depr(const race *rc, char *zText, size_t length, const struct locale *lang)
-{
-    sbstring sbs;
-    sbs_init(&sbs, zText, length);
-    report_race_skills(rc, lang, &sbs);
 }
 
 static void eval_direction(struct opstack **stack, const void *userdata)

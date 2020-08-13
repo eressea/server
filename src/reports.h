@@ -78,8 +78,6 @@ extern "C" {
 
     const char *trailinto(const struct region *r,
         const struct locale *lang);
-    size_t report_status_depr(const struct unit *u,
-        const struct locale *lang, char *buf, size_t siz);
     void report_battle_start(struct battle * b);
 
     void register_reports(void);
@@ -102,8 +100,9 @@ extern "C" {
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, int now);
+    void report_status(const struct unit * u, const struct locale *lang, struct sbstring *sbp);
     void report_raceinfo(const struct race *rc, const struct locale *lang, struct sbstring *sbp);
-    void report_race_skills_depr(const struct race *rc, char *zText, size_t length, const struct locale *lang);
+    void report_race_skills(const struct race *rc, const struct locale *lang, struct sbstring *sbp);
     void report_item(const struct unit *owner, const struct item *i,
         const struct faction *viewer, const char **name, const char **basename,
         int *number, bool singular);

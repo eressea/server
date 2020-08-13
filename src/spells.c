@@ -560,6 +560,7 @@ static int sp_summon_familiar(castorder * co)
     const race *rc;
     message *msg;
     char zText[2048];
+    sbstring sbs;
 
     if (get_familiar(caster) != NULL) {
         cmistake(caster, co->order, 199, MSG_MAGIC);
@@ -600,7 +601,8 @@ static int sp_summon_familiar(castorder * co)
     msg_release(msg);
     make_familiar(caster, r, rc, zText);
 
-    report_race_skills_depr(rc, zText, sizeof(zText), caster->faction->locale);
+    sbs_init(&sbs, zText, sizeof(zText));
+    report_race_skills(rc, caster->faction->locale, &sbs);
     ADDMSG(&caster->faction->msgs, msg_message("familiar_describe",
         "mage race skills", caster, rc, zText));
     return cast_level;
