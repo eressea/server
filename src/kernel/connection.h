@@ -29,6 +29,7 @@ extern "C" {
     typedef struct border_type {
         const char *_name;         /* internal use only */
         variant_type datatype;
+        int terrain_flags;
         bool(*transparent) (const connection *, const struct faction *);
         /* is it possible to see through this? */
         void(*init) (connection *);

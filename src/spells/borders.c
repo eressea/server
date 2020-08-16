@@ -157,7 +157,7 @@ static const char *b_namefirewall(const connection * b, const region * r,
 }
 
 border_type bt_firewall = {
-    "firewall", VAR_VOIDPTR,
+    "firewall", VAR_VOIDPTR, 0,
     b_transparent,                /* transparent */
     wall_init,                    /* init */
     wall_destroy,                 /* destroy */
@@ -185,7 +185,7 @@ void convert_firewall_timeouts(connection * b, attrib * a)
 }
 
 border_type bt_wisps = { /* only here for reading old data */
-    "wisps", VAR_VOIDPTR,
+    "wisps", VAR_VOIDPTR, 0,
     b_transparent,                /* transparent */
     0,                   /* init */
     wall_destroy,                 /* destroy */
@@ -225,7 +225,7 @@ static struct region *chaosgate_move(const connection * b, struct unit *u,
 }
 
 border_type bt_chaosgate = {
-    "chaosgate", VAR_NONE,
+    "chaosgate", VAR_NONE, 0,
     b_transparent,                /* transparent */
     NULL,                         /* init */
     NULL,                         /* destroy */

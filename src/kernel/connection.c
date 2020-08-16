@@ -349,7 +349,7 @@ static const char *b_namewall(const connection * b, const region * r,
 }
 
 border_type bt_wall = {
-    "wall", VAR_INT,
+    "wall", VAR_INT, LAND_REGION,
     b_opaque,
     NULL,                         /* init */
     NULL,                         /* destroy */
@@ -363,7 +363,7 @@ border_type bt_wall = {
 };
 
 border_type bt_noway = {
-    "noway", VAR_INT,
+    "noway", VAR_INT, 0,
     b_transparent,
     NULL,                         /* init */
     NULL,                         /* destroy */
@@ -400,7 +400,7 @@ b_blockfogwall(const connection * b, const unit * u, const region * r)
 
 /** Legacy type used in old Eressea games, no longer in use. */
 border_type bt_fogwall = {
-    "fogwall", VAR_INT,
+    "fogwall", VAR_INT, 0,
     b_transparent,                /* transparent */
     NULL,                         /* init */
     NULL,                         /* destroy */
@@ -430,7 +430,7 @@ static const char *b_nameillusionwall(const connection * b, const region * r,
 }
 
 border_type bt_illusionwall = {
-    "illusionwall", VAR_INT,
+    "illusionwall", VAR_INT, 0,
     b_opaque,
     NULL,                         /* init */
     NULL,                         /* destroy */
@@ -522,7 +522,7 @@ static bool b_rvisibleroad(const connection * b, const region * r)
 }
 
 border_type bt_road = {
-    "road", VAR_INT,
+    "road", VAR_INT, LAND_REGION,
     b_transparent,
     NULL,                         /* init */
     NULL,                         /* destroy */
@@ -568,6 +568,7 @@ int read_borders(gamedata *data)
         char zText[32];
         region *from, *to;
         border_type *type;
+        connection dummy;
 
         READ_TOK(store, zText, sizeof(zText));
         if (!strcmp(zText, "end")) {
@@ -588,7 +589,6 @@ int read_borders(gamedata *data)
             log_error("%s connection %d has missing regions", zText, bid);
             if (type->read) {
                 /* skip ahead */
-                connection dummy;
                 type->read(&dummy, data);
             }
             continue;
@@ -602,10 +602,21 @@ int read_borders(gamedata *data)
                 to = r;
         }
         if (type->read) {
-            connection *b = new_border(type, from, to);
-            nextborder--;               /* new_border erhoeht den Wert */
-            b->id = bid;
-            assert(bid <= nextborder);
+            connection *b = NULL;
+            
+            if (data->version < FIX_SEAROADS_VERSION) {
+                /* bug 2694: eliminate roads in oceans */
+                if (type->terrain_flags != 0 && type->terrain_flags != fval(from->terrain, type->terrain_flags)) {
+                    log_info("ignoring %s connection in %s", type->_name, from->terrain->_name);
+                    b = &dummy;
+                }
+            }
+            if (b == NULL) {
+                b = new_border(type, from, to);
+                nextborder--;               /* new_border erhoeht den Wert */
+                b->id = bid;
+                assert(bid <= nextborder);
+            }
             type->read(b, data);
             if (!type->write) {
                 log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));

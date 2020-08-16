@@ -46,9 +46,10 @@
 #define FIX_CLONES_VERSION 368 /* dissolve clones */
 #define FIX_MIGRANT_AURA_VERSION 369 /* bug 2585, migrants with aura */
 #define SHIP_NUMBER_VERSION 370 /* ships have a number */
-#define FIX_SHAPESHIFT_VERSION 371 /* ships have a number */
+#define FIX_SHAPESHIFT_VERSION 371 /* shapeshifting demons */
+#define FIX_SEAROADS_VERSION 372 /* removing roads in ocean regions */
 
-#define RELEASE_VERSION FIX_SHAPESHIFT_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_SEAROADS_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

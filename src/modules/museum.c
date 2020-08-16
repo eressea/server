@@ -253,7 +253,7 @@ static const char *b_namequestportal(const connection * b, const region * r,
 }
 
 border_type bt_questportal = {
-    "questportal", VAR_INT,
+    "questportal", VAR_INT, 0,
     b_opaque,
     NULL,                         /* init */
     NULL,                         /* destroy */
