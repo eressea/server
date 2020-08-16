@@ -1612,9 +1612,9 @@ static const region_list *travel_route(unit * u,
         /* Berichte ueber Durchreiseregionen */
 
         if (mode != TRAVEL_TRANSPORTED) {
+            arg_regions ar;
             arg_regions *arp = NULL;
             if (steps > 1) {
-                arg_regions ar;
                 arp = &ar;
                 var_create_regions(arp, route_begin, steps - 1);
             }
