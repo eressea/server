@@ -1360,8 +1360,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     if (creator) {
         attrib *a;
 
-        /* erbt Kampfstatus */
+        /* erbt Kampfstatus und Tarnung */
         unit_setstatus(u, creator->status);
+        u->irace = creator->irace;
 
         /* erbt Gebaeude/Schiff */
         if (creator->region == r) {
