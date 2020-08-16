@@ -938,7 +938,15 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                     hnow += u->number;
                 }
             }
-            if (give_unit_allowed(u) == 0 && !get_mage(u)) {
+            if (give_unit_allowed(u) == 0) {
+                if (fdst->magiegebiet != M_NONE) {
+                    struct sc_mage *m = get_mage(u);
+                    if (m && mage_get_type(m) != fdst->magiegebiet) {
+                        u = unext;
+                        continue;
+                    }
+                }
+
                 if (u->skills) {
                     int i;
                     for (i = 0; i != u->skill_size; ++i) {
@@ -950,7 +958,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                         }
                     }
                     if (i != u->skill_size) {
-                        u = u->nextF;
+                        u = unext;
                         continue;
                     }
                 }
@@ -3885,7 +3893,6 @@ void init_processor(void)
     p += 10;                      /* all claims must be done before we can USE */
     add_proc_region(p, enter_1, "Betreten (1. Versuch)");     /* for GIVE CONTROL */
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
-    add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
@@ -3916,6 +3923,7 @@ void init_processor(void)
     add_proc_region(p, economics, "Geben, Vergessen");
     add_proc_region(p+1, recruit, "Rekrutieren");
     add_proc_region(p+2, destroy, "Zerstoeren");
+    add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     /* all recruitment must be finished before we can calculate 
      * promotion cost of ability */
