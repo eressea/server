@@ -106,7 +106,7 @@ connection *get_borders(const region * r1, const region * r2)
     return *bp;
 }
 
-connection *new_border(border_type * type, region * from, region * to)
+connection *new_border(border_type * type, region * from, region * to, int id)
 {
     connection *b, **bp;
 
@@ -120,10 +120,11 @@ connection *new_border(border_type * type, region * from, region * to)
     b->type = type;
     b->from = from;
     b->to = to;
-    b->id = ++nextborder;
+    b->id = (id > 0) ? id : ++nextborder;
 
-    if (type->init)
+    if (type->init) {
         type->init(b);
+    }
     return b;
 }
 
@@ -612,9 +613,7 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-                b = new_border(type, from, to);
-                nextborder--;               /* new_border erhoeht den Wert */
-                b->id = bid;
+                b = new_border(type, from, to, bid);
                 assert(bid <= nextborder);
             }
             type->read(b, data);

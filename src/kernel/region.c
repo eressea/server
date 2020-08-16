@@ -539,7 +539,7 @@ void rsetroad(region * r, direction_t d, int val)
     }
     if (!b) {
         if (!val) return;
-        b = new_border(&bt_road, r, r2);
+        b = new_border(&bt_road, r, r2, 0);
     }
     if (r == b->from) {
         b->data.sa[0] = (short)val;

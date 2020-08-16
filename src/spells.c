@@ -2657,7 +2657,7 @@ static int sp_firewall(castorder * co)
         b = b->next;
     }
     if (b == NULL) {
-        b = new_border(&bt_firewall, r, r2);
+        b = new_border(&bt_firewall, r, r2, 0);
         fd = (wall_data *)b->data.v;
         fd->force = (int)(force / 2 + 0.5);
         fd->mage = caster;
@@ -3094,7 +3094,7 @@ static int sp_chaossuction(castorder * co)
     /* TODO: implement with a building */
     create_special_direction(r, rt, 2, "vortex_desc", "vortex", false);
     create_special_direction(rt, r, 2, "vortex_desc", "vortex", false);
-    new_border(&bt_chaosgate, r, rt);
+    new_border(&bt_chaosgate, r, rt, 0);
 
     ADDMSG(&r->msgs, msg_message("chaosgate_effect_1", "mage", caster));
     ADDMSG(&rt->msgs, msg_message("chaosgate_effect_2", ""));
