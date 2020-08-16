@@ -64,8 +64,8 @@ function test_force_leave_off()
 end
 
 function test_make_temp()
-    local r = region.create(0, 0, "plain")
     local f1 = faction.create("human", "temp@eressea.de", "de")
+    local r = region.create(0, 0, "plain")
     local u1 = unit.create(f1, r, 10)
     local u, u2
 

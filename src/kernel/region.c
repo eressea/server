@@ -1103,13 +1103,13 @@ void init_region(region *r)
     }
 }
 
-void terraform_region(region * r, const terrain_type * terrain)
-{
-    /* Resourcen, die nicht mehr vorkommen koennen, loeschen */
-    const terrain_type *oldterrain = r->terrain;
+/* Resourcen loeschen, die im aktuellen terrain nicht (mehr) vorkommen koennen */
+static void reset_rawmaterials(region *r) {
+    const terrain_type * terrain = r->terrain;
     rawmaterial **lrm = &r->resources;
 
     assert(terrain);
+
     while (*lrm) {
         rawmaterial *rm = *lrm;
         const resource_type *rtype = NULL;
@@ -1131,131 +1131,139 @@ void terraform_region(region * r, const terrain_type * terrain)
             lrm = &rm->next;
         }
     }
+}
+
+static void create_land(region *r) {
+    static struct surround {
+        struct surround *next;
+        const luxury_type *type;
+        int value;
+    } *trash = NULL, *nb = NULL;
+    const luxury_type *ltype = NULL;
+    direction_t d;
+    int mnr = 0;
+
+    assert(r);
+    assert(r->land);
+    assert(r->terrain);
+    assert(fval(r->terrain, LAND_REGION));
+
+    r->land->ownership = NULL;
+    region_set_morale(r, MORALE_DEFAULT, -1);
+    region_setname(r, makename());
+    fix_demand(r);
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+        region *nr = rconnect(r, d);
+        if (nr && nr->land) {
+            struct demand *sale = r->land->demands;
+            while (sale && sale->value != 0)
+                sale = sale->next;
+            if (sale) {
+                struct surround *sr = nb;
+                while (sr && sr->type != sale->type)
+                    sr = sr->next;
+                if (!sr) {
+                    if (trash) {
+                        sr = trash;
+                        trash = trash->next;
+                    }
+                    else {
+                        sr = calloc(1, sizeof(struct surround));
+                        if (!sr) abort();
+                    }
+                    sr->next = nb;
+                    sr->type = sale->type;
+                    sr->value = 1;
+                    nb = sr;
+                }
+                else {
+                    ++sr->value;
+                }
+                ++mnr;
+            }
+        }
+    }
+    if (!nb) {
+        /* TODO: this is really lame */
+        int i = get_maxluxuries();
+        if (i > 0) {
+            i = rng_int() % i;
+            ltype = luxurytypes;
+            while (i--)
+                ltype = ltype->next;
+        }
+    }
+    else {
+        int i = rng_int() % mnr;
+        struct surround *srd = nb;
+        while (i > srd->value) {
+            i -= srd->value;
+            srd = srd->next;
+        }
+        if (srd->type)
+            setluxuries(r, srd->type);
+        while (srd->next != NULL)
+            srd = srd->next;
+        srd->next = trash;
+        trash = nb;
+        nb = NULL;
+    }
+
+    const item_type *itype = NULL;
+    if (r->terrain->herbs) {
+        int len = 0;
+        while (r->terrain->herbs[len])
+            ++len;
+        if (len)
+            itype = r->terrain->herbs[rng_int() % len];
+    }
+    if (itype != NULL) {
+        rsetherbtype(r, itype);
+        rsetherbs(r, 50 + rng_int() % 31);
+    }
+    else {
+        rsetherbtype(r, NULL);
+    }
+
+    if (rng_int() % 100 < 3) {
+        fset(r, RF_MALLORN);
+    } 
+    else {
+        freset(r, RF_MALLORN);
+    }
+}
+
+void terraform_region(region * r, const terrain_type * terrain)
+{
+    assert(r);
+    assert(terrain);
 
     r->terrain = terrain;
+    reset_rawmaterials(r);
     terraform_resources(r);
 
     if (!fval(terrain, LAND_REGION)) {
         if (r->land) {
+            rsettrees(r, 0, 0);
+            rsettrees(r, 1, 0);
+            rsettrees(r, 2, 0);
+            rsethorses(r, 0);
+            rsetpeasants(r, 0);
+            rsetmoney(r, 0);
+            destroy_all_roads(r);
             free_land(r->land);
             r->land = NULL;
         }
-        rsettrees(r, 0, 0);
-        rsettrees(r, 1, 0);
-        rsettrees(r, 2, 0);
-        rsethorses(r, 0);
-        rsetpeasants(r, 0);
-        rsetmoney(r, 0);
         freset(r, RF_MALLORN);
-        return;
-    }
-
-    if (r->land) {
-        int d;
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            rsetroad(r, d, 0);
-        }
     }
     else {
-        static struct surround {
-            struct surround *next;
-            const luxury_type *type;
-            int value;
-        } *trash = NULL, *nb = NULL;
-        const luxury_type *ltype = NULL;
-        direction_t d;
-        int mnr = 0;
-
-        r->land = calloc(1, sizeof(land_region));
-        if (!r->land) abort();
-        r->land->ownership = NULL;
-        region_set_morale(r, MORALE_DEFAULT, -1);
-        region_setname(r, makename());
-        fix_demand(r);
-        for (d = 0; d != MAXDIRECTIONS; ++d) {
-            region *nr = rconnect(r, d);
-            if (nr && nr->land) {
-                struct demand *sale = r->land->demands;
-                while (sale && sale->value != 0)
-                    sale = sale->next;
-                if (sale) {
-                    struct surround *sr = nb;
-                    while (sr && sr->type != sale->type)
-                        sr = sr->next;
-                    if (!sr) {
-                        if (trash) {
-                            sr = trash;
-                            trash = trash->next;
-                        }
-                        else {
-                            sr = calloc(1, sizeof(struct surround));
-                            if (!sr) abort();
-                        }
-                        sr->next = nb;
-                        sr->type = sale->type;
-                        sr->value = 1;
-                        nb = sr;
-                    }
-                    else
-                        sr->value++;
-                    ++mnr;
-                }
-            }
+        if (!r->land) {
+            r->land = calloc(1, sizeof(land_region));
+            create_land(r);
         }
-        if (!nb) {
-            /* TODO: this is really lame */
-            int i = get_maxluxuries();
-            if (i > 0) {
-                i = rng_int() % i;
-                ltype = luxurytypes;
-                while (i--)
-                    ltype = ltype->next;
-            }
-        }
-        else {
-            int i = rng_int() % mnr;
-            struct surround *srd = nb;
-            while (i > srd->value) {
-                i -= srd->value;
-                srd = srd->next;
-            }
-            if (srd->type)
-                setluxuries(r, srd->type);
-            while (srd->next != NULL)
-                srd = srd->next;
-            srd->next = trash;
-            trash = nb;
-            nb = NULL;
-        }
+        init_region(r);
     }
 
-    if (fval(terrain, LAND_REGION)) {
-        const item_type *itype = NULL;
-
-        if (r->terrain->herbs) {
-            int len = 0;
-            while (r->terrain->herbs[len])
-                ++len;
-            if (len)
-                itype = r->terrain->herbs[rng_int() % len];
-        }
-        if (itype != NULL) {
-            rsetherbtype(r, itype);
-            rsetherbs(r, 50 + rng_int() % 31);
-        }
-        else {
-            rsetherbtype(r, NULL);
-        }
-        if (oldterrain == NULL || !fval(oldterrain, LAND_REGION)) {
-            if (rng_int() % 100 < 3)
-                fset(r, RF_MALLORN);
-            else
-                freset(r, RF_MALLORN);
-        }
-        if (oldterrain == NULL || terrain->size != oldterrain->size) {
-            init_region(r);
-        }
-    }
 }
 
 /** ENNO:
@@ -1510,3 +1518,13 @@ bool is_mourning(const region * r, int in_turn)
         r->land->ownership->last_owner && r->land->ownership->owner &&
         r->land->ownership->last_owner != r->land->ownership->owner);
 }
+
+void destroy_all_roads(region * r)
+{
+    int i;
+
+    for (i = 0; i < MAXDIRECTIONS; i++) {
+        rsetroad(r, (direction_t)i, 0);
+    }
+}
+

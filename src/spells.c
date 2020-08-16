@@ -1619,15 +1619,6 @@ static int sp_create_stonegolem(castorder * co)
  * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-static void destroy_all_roads(region * r)
-{
-    int i;
-
-    for (i = 0; i < MAXDIRECTIONS; i++) {
-        rsetroad(r, (direction_t)i, 0);
-    }
-}
-
 static int sp_great_drought(castorder * co)
 {
     unit *u;
