@@ -1434,24 +1434,17 @@ enum {
     TRAVEL_RUNNING
 };
 
-static arg_regions *var_copy_regions(const region_list * begin, int size)
+static void var_create_regions(arg_regions *dst, const region_list * begin, int size)
 {
     const region_list *rsrc;
+    int i;
 
-    if (size > 0) {
-        int i = 0;
-        arg_regions *dst;
-        assert(size > 0);
-        dst = (arg_regions *)malloc(sizeof(arg_regions) + sizeof(region *) * (size_t)size);
-        assert_alloc(dst);
-        dst->nregions = size;
-        dst->regions = (region **)(dst + 1);
-        for (rsrc = begin; i != size; rsrc = rsrc->next) {
-            dst->regions[i++] = rsrc->data;
-        }
-        return dst;
+    dst->nregions = size;
+    dst->regions = (region **) malloc(sizeof(region *) * (size_t)size);
+    assert_alloc(dst->regions);
+    for (i = 0, rsrc = begin; i != size; rsrc = rsrc->next, ++i) {
+        dst->regions[i] = rsrc->data;
     }
-    return NULL;
 }
 
 static const region_list *travel_route(unit * u,
@@ -1612,9 +1605,14 @@ static const region_list *travel_route(unit * u,
         /* Berichte ueber Durchreiseregionen */
 
         if (mode != TRAVEL_TRANSPORTED) {
-            arg_regions *ar = var_copy_regions(route_begin, steps - 1);
+            arg_regions *arp = NULL;
+            if (steps > 1) {
+                arg_regions ar;
+                arp = &ar;
+                var_create_regions(arp, route_begin, steps - 1);
+            }
             ADDMSG(&u->faction->msgs, msg_message("travel",
-                "unit mode start end regions", u, walkmode, r, current, ar));
+                "unit mode start end regions", u, walkmode, r, current, arp));
         }
 
         mark_travelthru(u, r, route_begin, iroute);

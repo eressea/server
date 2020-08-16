@@ -1761,9 +1761,27 @@ static void var_free_resources(variant x)
     x.v = 0;
 }
 
+static variant var_copy_regions(variant x)
+{
+    arg_regions *src = (arg_regions *)x.v;
+    if (src) {
+        arg_regions *dst;
+
+        x.v = dst = malloc(sizeof(arg_regions));
+        dst->nregions = src->nregions;
+        src->nregions = 0;
+        dst->regions = src->regions;
+        src->regions = NULL;
+    }
+    return x;
+}
+
 static void var_free_regions(variant x) /*-V524 */
 {
-    free(x.v);
+    arg_regions *arg = (arg_regions *)x.v;
+    if (arg) {
+        free(arg->regions);
+    }
 }
 
 const char *trailinto(const region * r, const struct locale *lang)
@@ -2388,7 +2406,7 @@ void register_reports(void)
     register_argtype("order", var_free_order, var_copy_order, VAR_VOIDPTR);
     register_argtype("resources", var_free_resources, var_copy_resources, VAR_VOIDPTR);
     register_argtype("items", var_free_resources, var_copy_items, VAR_VOIDPTR);
-    register_argtype("regions", var_free_regions, NULL, VAR_VOIDPTR);
+    register_argtype("regions", var_free_regions, var_copy_regions, VAR_VOIDPTR);
 
     /* register functions that turn message contents to readable strings */
     add_function("alliance", &eval_alliance);
