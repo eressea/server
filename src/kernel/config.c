@@ -504,9 +504,7 @@ order *default_order(const struct locale *lang)
         kwd = findkeyword(str);
     }
     if (kwd != NOKEYWORD) {
-        /* TODO: why is there a copy_order made here? */
-        order *result = create_order(kwd, lang, NULL);
-        return copy_order(result);
+        return create_order(kwd, lang, NULL);
     }
     return NULL;
 }
