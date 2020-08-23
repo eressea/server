@@ -298,35 +298,35 @@ static void cr_output_curses_compat(FILE *F, const faction * viewer, const void 
     cr_output_curses(&strm, viewer, obj, typ);
 }
 
-static int cr_unit(variant var, char *buffer, const void *userdata)
+static int cr_unit(variant var, const char *name, char *buffer, const void *userdata)
 {
     unit *u = (unit *)var.v;
-    sprintf(buffer, "%d", u ? u->no : -1);
+    sprintf(buffer, "%d;%s\n", u ? u->no : -1, name);
     return 0;
 }
 
-static int cr_ship(variant var, char *buffer, const void *userdata)
+static int cr_ship(variant var, const char *name, char *buffer, const void *userdata)
 {
     ship *u = (ship *)var.v;
-    sprintf(buffer, "%d", u ? u->no : -1);
+    sprintf(buffer, "%d;%s\n", u ? u->no : -1, name);
     return 0;
 }
 
-static int cr_building(variant var, char *buffer, const void *userdata)
+static int cr_building(variant var, const char *name, char *buffer, const void *userdata)
 {
     building *u = (building *)var.v;
-    sprintf(buffer, "%d", u ? u->no : -1);
+    sprintf(buffer, "%d;%s\n", u ? u->no : -1, name);
     return 0;
 }
 
-static int cr_faction(variant var, char *buffer, const void *userdata)
+static int cr_faction(variant var, const char *name, char *buffer, const void *userdata)
 {
     faction *f = (faction *)var.v;
-    sprintf(buffer, "%d", f ? f->no : -1);
+    sprintf(buffer, "%d;%s\n", f ? f->no : -1, name);
     return 0;
 }
 
-static int cr_region(variant var, char *buffer, const void *userdata)
+static int cr_region(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     region *r = (region *)var.v;
@@ -335,60 +335,60 @@ static int cr_region(variant var, char *buffer, const void *userdata)
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(report, &nx, &ny, pl);
-        sprintf(buffer, "%d %d %d", nx, ny, plane_id(pl));
+        sprintf(buffer, "%d;%s_id\n%d %d %d;%s\n", r->uid, name, nx, ny, plane_id(pl), name);
         return 0;
     }
     return -1;
 }
 
-static int cr_resource(variant var, char *buffer, const void *userdata)
+static int cr_resource(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     const resource_type *r = (const resource_type *)var.v;
     if (r) {
         const char *key = resourcename(r, 0);
-        sprintf(buffer, "\"%s\"",
-            translate(key, LOC(report->locale, key)));
+        sprintf(buffer, "\"%s\";%s\n",
+            translate(key, LOC(report->locale, key)), name);
         return 0;
     }
     return -1;
 }
 
-static int cr_race(variant var, char *buffer, const void *userdata)
+static int cr_race(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     const struct race *rc = (const race *)var.v;
     const char *key = rc_name_s(rc, NAME_SINGULAR);
-    sprintf(buffer, "\"%s\"",
-        translate(key, LOC(report->locale, key)));
+    sprintf(buffer, "\"%s\";%s\n",
+        translate(key, LOC(report->locale, key)), name);
     return 0;
 }
 
-static int cr_alliance(variant var, char *buffer, const void *userdata)
+static int cr_alliance(variant var, const char *name, char *buffer, const void *userdata)
 {
     const alliance *al = (const alliance *)var.v;
     UNUSED_ARG(userdata);
     if (al != NULL) {
-        sprintf(buffer, "%d", al->id);
+        sprintf(buffer, "%d;%s\n", al->id, name);
     }
     return 0;
 }
 
-static int cr_skill(variant var, char *buffer, const void *userdata)
+static int cr_skill(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *f = (const faction *)userdata;
     skill_t sk = (skill_t)var.i;
     UNUSED_ARG(userdata);
     if (sk != NOSKILL)
-        sprintf(buffer, "\"%s\"",
+        sprintf(buffer, "\"%s\";%s\n",
             translate(mkname("skill", skillnames[sk]), skillname(sk,
-                f->locale)));
+                f->locale)), name);
     else
-        strcpy(buffer, "\"\"");
+        sprintf(buffer, "\"\";%s\n", name);
     return 0;
 }
 
-static int cr_order(variant var, char *buffer, const void *userdata)
+static int cr_order(variant var, const char *name, char *buffer, const void *userdata)
 {
     order *ord = (order *)var.v;
     const faction *f = (const faction *)userdata;
@@ -408,15 +408,14 @@ static int cr_order(variant var, char *buffer, const void *userdata)
             }
             *wp++ = r;
         }
-        *wp++ = '\"';
-        *wp++ = 0;
+        sprintf(wp, "\";%s\n", name);
     }
     else
-        strcpy(buffer, "\"\"");
+        sprintf(buffer, "\"\";%s\n", name);
     return 0;
 }
 
-static int cr_resources(variant var, char *buffer, const void *userdata)
+static int cr_resources(variant var, const char *name, char *buffer, const void *userdata)
 {
     faction *f = (faction *)userdata;
     resource *rlist = (resource *)var.v;
@@ -437,12 +436,12 @@ static int cr_resources(variant var, char *buffer, const void *userdata)
                 sprintf(wp, ", %d %s", rlist->number, translate(name,
                     LOC(f->locale, name)));
         }
-        strcat(wp, "\"");
+        sprintf(wp, "\";%s\n", name);
     }
     return 0;
 }
 
-static int cr_regions(variant var, char *buffer, const void *userdata)
+static int cr_regions(variant var, const char *name, char *buffer, const void *userdata)
 {
     faction *f = (faction *)userdata;
     const arg_regions *rdata = (const arg_regions *)var.v;
@@ -463,36 +462,36 @@ static int cr_regions(variant var, char *buffer, const void *userdata)
             z = plane_id(pl);
             wp += sprintf(wp, ", %d %d %d", nx, ny, z);
         }
-        strcat(wp, "\"");
+        wp += sprintf(wp, "\"%s\n", name);
     }
     else {
-        strcpy(buffer, "\"\"");
+        sprintf(buffer, "\"\";%s\n", name);
     }
     return 0;
 }
 
-static int cr_spell(variant var, char *buffer, const void *userdata)
+static int cr_spell(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     spell *sp = (spell *)var.v;
     if (sp != NULL) {
-        sprintf(buffer, "\"%s\"", spell_name(mkname_spell(sp), report->locale));
+        sprintf(buffer, "\"%s\";%s\n", spell_name(mkname_spell(sp), report->locale), name);
     } 
     else {
-        strcpy(buffer, "\"\"");
+        sprintf(buffer, "\"\";%s\n", name);
     }
     return 0;
 }
 
-static int cr_curse(variant var, char *buffer, const void *userdata)
+static int cr_curse(variant var, const char *name, char *buffer, const void *userdata)
 {
     const faction *report = (const faction *)userdata;
     const curse_type *ctype = (const curse_type *)var.v;
     if (ctype != NULL) {
-        sprintf(buffer, "\"%s\"", curse_name(ctype, report->locale));
+        sprintf(buffer, "\"%s\";%s\n", curse_name(ctype, report->locale), name);
     }
     else
-        strcpy(buffer, "\"\"");
+        sprintf(buffer, "\"\";%s\n", name);
     return 0;
 }
 

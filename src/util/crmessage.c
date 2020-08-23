@@ -123,33 +123,32 @@ int cr_render(const message * msg, char *buffer, const void *userdata)
             continue;                 /* strcpy(c, (const char*)msg->locale_string(u->faction->locale, parameters[i])); */
         }
         else {
-            if (crt->renderers[i](msg->parameters[i], c, userdata) != 0)
+            if (crt->renderers[i](msg->parameters[i], msg->type->pnames[i], c, userdata) != 0)
                 continue;
         }
-        c += strlen(c);
-        sprintf(c, ";%s\n", msg->type->pnames[i]);
         c += strlen(c);
     }
     return 0;
 }
 
-int cr_string(variant var, char *buffer, const void *userdata)
+int cr_string(variant var, const char *name, char *buffer, const void *userdata)
 {
-    sprintf(buffer, "\"%s\"", (const char *)var.v);
+    sprintf(buffer, "\"%s\";%s", (const char *)var.v, name);
     UNUSED_ARG(userdata);
     return 0;
 }
 
-int cr_int(variant var, char *buffer, const void *userdata)
+int cr_int(variant var, const char *name, char *buffer, const void *userdata)
 {
-    sprintf(buffer, "%d", var.i);
+    sprintf(buffer, "%d;%s", var.i, name);
     UNUSED_ARG(userdata);
     return 0;
 }
 
-int cr_ignore(variant var, char *buffer, const void *userdata)
+int cr_ignore(variant var, const char *name, char *buffer, const void *userdata)
 {
     UNUSED_ARG(var);
+    UNUSED_ARG(name);
     UNUSED_ARG(buffer);
     UNUSED_ARG(userdata);
     return -1;
