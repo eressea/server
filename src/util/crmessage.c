@@ -133,14 +133,14 @@ int cr_render(const message * msg, char *buffer, const void *userdata)
 
 int cr_string(variant var, const char *name, char *buffer, const void *userdata)
 {
-    sprintf(buffer, "\"%s\";%s", (const char *)var.v, name);
+    sprintf(buffer, "\"%s\";%s\n", (const char *)var.v, name);
     UNUSED_ARG(userdata);
     return 0;
 }
 
 int cr_int(variant var, const char *name, char *buffer, const void *userdata)
 {
-    sprintf(buffer, "%d;%s", var.i, name);
+    sprintf(buffer, "%d;%s\n", var.i, name);
     UNUSED_ARG(userdata);
     return 0;
 }
