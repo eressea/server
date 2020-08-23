@@ -7,11 +7,10 @@
 #include "travelthru.h"
 
 /* tweakable features */
-#define RENDER_CRMESSAGES
 #define RESOURCECOMPAT
 
 #define BUFFERSIZE 32768
-/* riesig, wegen spionage-messages :-( */
+/* FIXME: riesig, wegen spionage-messages :-( */
 static char g_bigbuf[BUFFERSIZE];
 
 #include <spells/regioncurse.h>
@@ -84,7 +83,7 @@ static char g_bigbuf[BUFFERSIZE];
 bool opt_cr_absolute_coords = false;
 
 /* globals */
-#define C_REPORT_VERSION 68
+#define C_REPORT_VERSION 69
 
 struct locale *crtag_locale(void) {
     static struct locale * lang;
@@ -544,16 +543,17 @@ static void render_messages(FILE * F, faction * f, message_list * msgs)
         bool printed = false;
         const struct message_type *mtype = m->msg->type;
         unsigned int hash = mtype->key;
-#ifdef RENDER_CRMESSAGES
         g_bigbuf[0] = '\0';
         if (nr_render(m->msg, f->locale, g_bigbuf, sizeof(g_bigbuf), f) > 0) {
             fprintf(F, "MESSAGE %d\n", message_id(m->msg));
             fprintf(F, "%u;type\n", hash);
+            if (m->msg->type->section) {
+                fprintf(F, "\"%s\";section\n", m->msg->type->section);
+            }
             fwritestr(F, g_bigbuf);
             fputs(";rendered\n", F);
             printed = true;
         }
-#endif
         g_bigbuf[0] = '\0';
         if (cr_render(m->msg, g_bigbuf, (const void *)f) == 0) {
             if (g_bigbuf[0]) {
