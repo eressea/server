@@ -335,7 +335,7 @@ static int cr_region(variant var, const char *name, char *buffer, const void *us
         int nx = r->x, ny = r->y;
         pnormalize(&nx, &ny, pl);
         adjust_coordinates(report, &nx, &ny, pl);
-        sprintf(buffer, "%d;%s_id\n%d %d %d;%s\n", r->uid, name, nx, ny, plane_id(pl), name);
+        sprintf(buffer, "%d %d %d;%s\n", nx, ny, plane_id(pl), name);
         return 0;
     }
     return -1;
