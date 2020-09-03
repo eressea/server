@@ -143,12 +143,14 @@ int renumber_cmd(unit * u, order * ord)
             i = newcontainerid();
         }
         else {
+            ship *sh;
             i = atoi36((const char *)s);
             if (i <= 0 || i > MAX_CONTAINER_NR) {
                 cmistake(u, ord, 114, MSG_EVENT);
                 break;
             }
-            if (findship(i)) {
+            sh = findship(i);
+            if (sh && sh->number > 0) {
                 cmistake(u, ord, 115, MSG_EVENT);
                 break;
             }

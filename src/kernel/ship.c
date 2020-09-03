@@ -25,6 +25,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/param.h>
+#include <util/rng.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
 
@@ -150,7 +151,7 @@ static ship *sfindhash(int i)
 
     for (sh  = shiphash[i % MAXSHIPHASH]; sh; sh = sh->nexthash) {
         if (sh->no == i) {
-            return sh->number > 0 ? sh : NULL;
+            return sh;
         }
     }
     return NULL;
@@ -171,6 +172,25 @@ void damage_ship(ship * sh, double percent)
 /* Alte Schiffstypen: */
 static ship *deleted_ships;
 
+static int newshipid(void) {
+    int random_no;
+    int start_random_no;
+
+    random_no = 1 + (rng_int() % MAX_CONTAINER_NR);
+    start_random_no = random_no;
+
+    while (findship(random_no)) {
+        random_no++;
+        if (random_no == MAX_CONTAINER_NR + 1) {
+            random_no = 1;
+        }
+        if (random_no == start_random_no) {
+            random_no = (int)MAX_CONTAINER_NR + 1;
+        }
+    }
+    return random_no;
+}
+
 ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
     static char buffer[32];
@@ -179,7 +199,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 
     if (!sh) abort();
     assert(stype);
-    sh->no = newcontainerid();
+    sh->no = newshipid();
     sh->coast = NODIRECTION;
     sh->type = stype;
     sh->region = r;

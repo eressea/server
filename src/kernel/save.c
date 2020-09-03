@@ -466,7 +466,7 @@ unit *read_unit(gamedata *data)
 
     if (sn > 0) {
         ship * sh = findship(sn);
-        if (sh) {
+        if (sh && sh->number > 0) {
             u_set_ship(u, sh);
             if (fval(u, UFL_OWNER)) {
                 ship_set_owner(u);

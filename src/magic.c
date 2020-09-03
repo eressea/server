@@ -1499,12 +1499,12 @@ verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
     ship *sh = findship(spobj->data.i);
 
     if (sh != NULL && sh->region != r && (sp->sptyp & GLOBALTARGET) == 0) {
-        /* Burg muss in gleicher Region sein */
+        /* Schiff muss in gleicher Region sein */
         sh = NULL;
     }
 
-    if (sh == NULL) {
-        /* Burg nicht gefunden */
+    if (sh == NULL || sh->number < 1) {
+        /* Schiff nicht gefunden */
         spobj->flag = TARGET_NOTFOUND;
         ADDMSG(&mage->faction->msgs, msg_message("spellshipnotfound",
             "unit region command id", mage, mage->region, ord, spobj->data.i));

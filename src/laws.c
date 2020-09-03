@@ -1066,7 +1066,7 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
     }
 
     sh = findship(id);
-    if (sh == NULL || sh->region != r) {
+    if (sh == NULL || sh->number < 1 || sh->region != r) {
         if (report) {
             cmistake(u, ord, 20, MSG_MOVE);
         }
@@ -3914,7 +3914,6 @@ void init_processor(void)
     }
     add_proc_order(p, K_RESERVE, reserve_cmd, 0, "RESERVE (all)");
     add_proc_order(p, K_CLAIM, claim_cmd, 0, NULL);
-    add_proc_unit(p, follow_unit, "Folge auf Einheiten setzen");
 
     p += 10;                      /* rest rng again before economics */
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
@@ -3923,6 +3922,7 @@ void init_processor(void)
     add_proc_region(p, economics, "Geben, Vergessen");
     add_proc_region(p+1, recruit, "Rekrutieren");
     add_proc_region(p+2, destroy, "Zerstoeren");
+    add_proc_unit(p, follow_cmds, "Folge auf Einheiten setzen");
     add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
     /* all recruitment must be finished before we can calculate 

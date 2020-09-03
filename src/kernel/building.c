@@ -29,6 +29,7 @@
 #include <util/log.h>
 #include <util/param.h>
 #include <util/resolve.h>
+#include <util/rng.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
 
@@ -368,11 +369,30 @@ building *building_create(int id)
     return b;
 }
 
+static int newbuildingid(void) {
+    int random_no;
+    int start_random_no;
+
+    random_no = 1 + (rng_int() % MAX_CONTAINER_NR);
+    start_random_no = random_no;
+
+    while (findbuilding(random_no)) {
+        random_no++;
+        if (random_no == MAX_CONTAINER_NR + 1) {
+            random_no = 1;
+        }
+        if (random_no == start_random_no) {
+            random_no = (int)MAX_CONTAINER_NR + 1;
+        }
+    }
+    return random_no;
+}
+
 building *new_building(const struct building_type * btype, region * r,
     const struct locale * lang, int size)
 {
     building **bptr = &r->buildings;
-    int id = newcontainerid();
+    int id = newbuildingid();
     building *b = building_create(id);
     const char *bname;
     char buffer[32];

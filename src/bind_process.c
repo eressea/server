@@ -232,7 +232,7 @@ void process_follow(void) {
     for (r = regions; r; r = r->next) {
         unit *u;
         for (u = r->units; u; u = u->next) {
-            follow_unit(u);
+            follow_cmds(u);
         }
     }
 }

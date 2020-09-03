@@ -56,17 +56,17 @@
 struct building *getbuilding(const struct region *r)
 {
     building *b = findbuilding(getid());
-    if (b == NULL || r != b->region)
-        return NULL;
-    return b;
+    if (b != NULL && r == b->region) {
+        return b;
+    }
+    return NULL;
 }
 
 ship *getship(const struct region * r)
 {
-    ship *sh, *sx = findship(getid());
-    for (sh = r->ships; sh; sh = sh->next) {
-        if (sh == sx)
-            return sh;
+    ship *sh = findship(getid());
+    if (sh != NULL && sh->number > 0 && sh->region == r) {
+        return sh;
     }
     return NULL;
 }

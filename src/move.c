@@ -102,21 +102,28 @@ typedef struct follower {
 } follower;
 
 static void
-get_followers(unit * target, region * r, const region_list * route_end,
+get_followers(unit * u, region * r, const region_list * route_end,
     follower ** followers)
 {
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
             const attrib *a = a_find(uf->attribs, &at_follow);
-            if (a && a->data.v == target) {
-                follower *fnew = (follower *)malloc(sizeof(follower));
-                assert_alloc(fnew);
-                fnew->uf = uf;
-                fnew->ut = target;
-                fnew->route_end = route_end;
-                fnew->next = *followers;
-                *followers = fnew;
+            while (a) {
+                if (a->data.v == u) {
+                    follower *fnew = (follower *)malloc(sizeof(follower));
+                    assert_alloc(fnew);
+                    fnew->uf = uf;
+                    fnew->ut = u;
+                    fnew->route_end = route_end;
+                    fnew->next = *followers;
+                    *followers = fnew;
+                    break;
+                }
+                a = a->next;
+                if (a && a->type != &at_follow) {
+                    break;
+                }
             }
         }
     }
@@ -2270,7 +2277,7 @@ int follow_ship(unit * u, order * ord)
     dir = hunted_dir(rc->attribs, id);
 
     if (dir == NODIRECTION) {
-        if (sh == NULL || sh->region != rc) {
+        if (sh == NULL || sh->number < 1 || sh->region != rc) {
             cmistake(u, ord, 20, MSG_MOVE);
         }
         return 0;
@@ -2493,89 +2500,94 @@ void movement(void)
     move_pirates();
 }
 
-/** Overrides long orders with a FOLLOW order if the target is moving.
- * BUGS: http://bugs.eressea.de/view.php?id=1444 (A folgt B folgt C)
+/**
+ * Override long orders with a FOLLOW order if target seems to be moving.
  */
-void follow_unit(unit * u)
+void follow_cmds(unit * u)
 {
     region *r = u->region;
-    attrib *a = NULL;
-    order *ord;
+    order *ord, *o;
 
-    if (fval(u, UFL_NOTMOVING) || LongHunger(u))
+    if (fval(u, UFL_MOVED | UFL_NOTMOVING) || LongHunger(u)) {
         return;
+    }
 
     for (ord = u->orders; ord; ord = ord->next) {
         const struct locale *lang = u->faction->locale;
 
         if (getkeyword(ord) == K_FOLLOW) {
-            int id;
+            unit *u2 = NULL;
             param_t p;
             init_order(ord, NULL);
             p = getparam(lang);
             if (p == P_UNIT) {
-                id = read_unitid(u->faction, r);
+                int id = read_unitid(u->faction, r);
                 if (id == u->no) {
                     ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                         u, u));
                     continue;
                 }
-                if (a != NULL) {
-                    a = a_find(u->attribs, &at_follow);
-                }
 
                 if (id > 0) {
-                    unit *uf = findunit(id);
-                    if (!a) {
-                        a = a_add(&u->attribs, make_follow(uf));
+                    u2 = findunit(id);
+                }
+            }
+            else if (p == P_SHIP) {
+                int id = getid();
+                if (id <= 0) {
+                    cmistake(u, ord, 20, MSG_MOVE);
+                }
+                else {
+                    ship *sh = findship(id);
+                    if (sh == NULL || sh->number < 1 || (sh->region != r && hunted_dir(r->attribs, id) == NODIRECTION)) {
+                        cmistake(u, ord, 20, MSG_MOVE);
+                    }
+                    else if (!u->ship && !fval(u_race(u), RCF_FLY|RCF_SWIM)) {
+                        cmistake(u, ord, 144, MSG_MOVE);
+                    }
+                    else if (u->ship && u != ship_owner(u->ship)) {
+                        cmistake(u, ord, 146, MSG_MOVE);
+                    }
+                    else if (!can_move(u)) {
+                        cmistake(u, ord, 55, MSG_MOVE);
                     }
                     else {
-                        a->data.v = uf;
+                        u2 = ship_owner(sh);
                     }
                 }
-                else if (a) {
-                    a_remove(&u->attribs, a);
-                    a = NULL;
-                }
             }
-        }
-    }
+            if (u2) {
+                bool moving = false;
+                if (u2->region != r || !cansee(u->faction, r, u2, 0)) {
+                    /* FIXME: u2 sollte hier keine TEMP Einheit sein. */
+                    ADDMSG(&u->faction->msgs, msg_message("unitnotfound_id",
+                        "unit region command id", u, r, ord, itoa36(u2->no)));
+                    return;
+                }
 
-    if (a && !fval(u, UFL_MOVED | UFL_NOTMOVING)) {
-        bool follow = false;
-        unit *u2 = a->data.v;
-
-        if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
-            return;
-        }
-
-        switch (getkeyword(u2->thisorder)) {
-        case K_MOVE:
-        case K_ROUTE:
-        case K_DRIVE:
-            follow = true;
-            break;
-        default:
-            for (ord = u2->orders; ord; ord = ord->next) {
-                if (K_FOLLOW == getkeyword(ord)) {
-                    follow = true;
+                switch (getkeyword(u2->thisorder)) {
+                case K_MOVE:
+                case K_ROUTE:
+                case K_DRIVE:
+                    moving = true;
+                    break;
+                default:
+                    for (o = u2->orders; o; o = o->next) {
+                        if (K_FOLLOW == getkeyword(o)) {
+                            moving = true;
+                            break;
+                        }
+                    }
                     break;
                 }
+                if (moving) {
+                    a_add(&u->attribs, make_follow(u2));
+                    fset(u2, UFL_FOLLOWED);
+                    /* FOLLOW unit on a (potentially) moving unit prevents long orders */
+                    fset(u, UFL_FOLLOWING | UFL_LONGACTION);
+                    set_order(&u->thisorder, NULL);
+                }
             }
-            break;
-        }
-        if (!follow) {
-            attrib *a2 = a_find(u2->attribs, &at_follow);
-            if (a2 != NULL) {
-                unit *u3 = a2->data.v;
-                follow = (u3 && u2->region == u3->region);
-            }
-        }
-        if (follow) {
-            fset(u2, UFL_FOLLOWED);
-            /* FOLLOW unit on a (potentially) moving unit prevents long orders */
-            fset(u, UFL_FOLLOWING | UFL_LONGACTION);
-            set_order(&u->thisorder, NULL);
         }
     }
 }

@@ -467,7 +467,7 @@ static void test_follow_unit(CuTest *tc) {
     u->thisorder = copy_order(ord);
 
     /* Verfolger müssen ihre Ziele finden, ehe diese sich bewegen */
-    follow_unit(u);
+    follow_cmds(u);
     CuAssertPtrEquals(tc, &at_follow, (void *)u->attribs->type);
     CuAssertPtrEquals(tc, u2, u->attribs->data.v);
     CuAssertPtrEquals(tc, NULL, u->thisorder);
@@ -496,7 +496,7 @@ static void test_follow_unit_self(CuTest *tc) {
     u = test_create_unit(f, test_create_plain(0, 0));
     ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u->no));
     unit_addorder(u, ord);
-    follow_unit(u);
+    follow_cmds(u);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "followfail"));
     CuAssertIntEquals(tc, 0, fval(u, UFL_FOLLOWING | UFL_LONGACTION));
     test_teardown();
