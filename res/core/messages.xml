@@ -3797,13 +3797,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error184" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error183" section="errors">
     <type>
       <arg name="unit" type="unit"/>

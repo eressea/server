@@ -1244,9 +1244,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) 
 msgid "familiar_farcast"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($mage) kann Zauber, die durch $unit($unit) gewirkt werden, nicht zusätzlich in die Ferne richten.\""
 
-msgid "error184"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit bewegt sich nicht.\""
-
 msgid "income_entertainment"
 msgstr "\"$unit($unit) verdient in $region($region) $int($amount) Silber durch Unterhaltung.\""
 
