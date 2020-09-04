@@ -124,7 +124,7 @@ order * ord)
     UNUSED_ARG(amount);
 
     /* Pruefen ob in Eingangshalle */
-    if (u->region->x != 9525 || u->region->y != 9525) {
+    if (warden == NULL || u->region->x != 9525 || u->region->y != 9525) {
         cmistake(u, ord, 266, MSG_MAGIC);
         return 0;
     }
