@@ -462,7 +462,7 @@ static int cr_regions(variant var, const char *name, char *buffer, const void *u
             z = plane_id(pl);
             wp += sprintf(wp, ", %d %d %d", nx, ny, z);
         }
-        wp += sprintf(wp, "\"%s\n", name);
+        wp += sprintf(wp, "\";%s\n", name);
     }
     else {
         sprintf(buffer, "\"\";%s\n", name);

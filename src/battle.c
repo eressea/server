@@ -3986,6 +3986,7 @@ static void do_battle(region * r) {
     battle *b = NULL;
     bool fighting;
     ship *sh;
+    int i;
 
     fighting = start_battle(r, &b);
 
@@ -4006,6 +4007,18 @@ static void do_battle(region * r) {
     }
     join_allies(b);
     make_heroes(b);
+
+    /* statistics are fun */
+    for (i = 0; i != b->nsides; ++i) {
+        side *s = b->sides + i;
+        if (s->faction->flags & FFL_NPC) {
+            stats_count("battle.pve", 1);
+            break;
+        }
+    }
+    if (i == b->nsides) {
+        stats_count("battle.pvp", 1);
+    }
 
     /* make sure no ships are damaged initially */
     for (sh = r->ships; sh; sh = sh->next)
