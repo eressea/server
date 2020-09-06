@@ -25,11 +25,14 @@ except:
     print "%s: reports.txt file does not exist" % (argv[0], )
     exit(0)
 
-extras = [ '../wochenbericht.txt' ]
+extras = []
+stats = 'wochenbericht-%s.txt' % turn
+if os.path.isfile(stats):
+    os.symlink('../wochenbericht.txt, stats)
+    extras.append(stats)
 express='../express-%s.txt' % turn
 if os.path.isfile(express):
-    os.symlink(express, 'express.txt')
-    extras.append('express.txt')
+    extras.append(express)
 
 for line in infile.readlines():
     settings = line[:-1].split(":")
