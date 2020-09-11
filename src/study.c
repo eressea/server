@@ -8,7 +8,6 @@
 #include "move.h"
 #include "monsters.h"
 #include "alchemy.h"
-#include "academy.h"
 #include "kernel/calendar.h"
 
 #include <spells/regioncurse.h>
@@ -202,10 +201,8 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
         teach->students += students; 
 
         if (student->building) {
-            /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
-             * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
-            /* FIXME comment contradicts implementation */
-            if (academy_can_teach(teacher, student, sk)) {
+            const struct building_type *btype = bt_find("academy");
+            if (active_building(student, btype)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
                 teach->days += students * EXPERIENCEDAYS;  /* learning erhoehen */
                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
@@ -421,8 +418,8 @@ int teach_cmd(unit * teacher, struct order *ord)
         replace_order(&teacher->orders, ord, new_order);
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
-    if (academy_students > 0 && sk_academy!=NOSKILL) {
-        academy_teaching_bonus(teacher, sk_academy, academy_students);
+    if (academy_students > 0 && sk_academy != NOSKILL) {
+        change_skill_days(teacher, sk_academy, academy_students);
     }
     reset_order();
     return 0;
@@ -752,8 +749,6 @@ void produceexp(struct unit *u, skill_t sk, int n)
 {
     produceexp_ex(u, sk, n, increase_skill_days);
 }
-
-static int speed_rule;
 
 /** 
  * days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning
