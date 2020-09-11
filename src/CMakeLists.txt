@@ -92,7 +92,6 @@ set (PARSER_SRC
 
 set (ERESSEA_SRC
   vortex.c
-  academy.c
   alchemy.c
   automate.c
   battle.c
@@ -212,7 +211,6 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
-  academy.test.c
   alchemy.test.c
   automate.test.c
   battle.test.c
