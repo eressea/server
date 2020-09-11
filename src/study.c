@@ -154,37 +154,37 @@ const attrib_type at_learning = {
 
 #define EXPERIENCEDAYS 10
 
-static int study_days(unit * scholar, skill_t sk)
+static int study_days(unit * u, skill_t sk)
 {
     int speed = STUDYDAYS;
-    if (u_race(scholar)->study_speed) {
-        speed += u_race(scholar)->study_speed[sk];
+    if (u_race(u)->study_speed) {
+        speed += u_race(u)->study_speed[sk];
         if (speed < STUDYDAYS) {
-            skill *sv = unit_skill(scholar, sk);
+            skill *sv = unit_skill(u, sk);
             if (sv == 0) {
                 speed = STUDYDAYS;
             }
         }
     }
-    return scholar->number * speed;
+    return u->number * speed;
 }
 
 static int
-teach_unit(unit * teacher, unit * scholar, int nteaching, skill_t sk,
+teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     bool report, int *academy_students)
 {
     teaching_info *teach = NULL;
     attrib *a;
     int students;
 
-    if (magic_lowskill(scholar)) {
+    if (magic_lowskill(student)) {
         cmistake(teacher, teacher->thisorder, 292, MSG_EVENT);
         return 0;
     }
 
-    students = scholar->number;
+    students = student->number;
     /* subtract already taught students */
-    a = a_find(scholar->attribs, &at_learning);
+    a = a_find(student->attribs, &at_learning);
     if (a != NULL) {
         teach = (teaching_info *)a->data.v;
         students -= teach->students;
@@ -194,18 +194,18 @@ teach_unit(unit * teacher, unit * scholar, int nteaching, skill_t sk,
 
     if (students > 0) {
         if (teach == NULL) {
-            a = a_add(&scholar->attribs, a_new(&at_learning));
+            a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
         selist_push(&teach->teachers, teacher);
         teach->days += students * STUDYDAYS;
         teach->students += students; 
 
-        if (scholar->building) {
+        if (student->building) {
             /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
              * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
             /* FIXME comment contradicts implementation */
-            if (academy_can_teach(teacher, scholar, sk)) {
+            if (academy_can_teach(teacher, student, sk)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
                 teach->days += students * EXPERIENCEDAYS;  /* learning erhoehen */
                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
@@ -258,12 +258,12 @@ int teach_cmd(unit * teacher, struct order *ord)
 
     count = 0;
 
+#if TEACH_ALL
     init_order(ord, NULL);
 
-#if TEACH_ALL
     if (getparam(teacher->faction->locale) == P_ANY) {
         skill_t sk;
-        unit *scholar;
+        unit *student;
         skill_t teachskill[MAXSKILLS];
         int t = 0;
 
@@ -272,15 +272,15 @@ int teach_cmd(unit * teacher, struct order *ord)
             teachskill[t] = getskill(teacher->faction->locale);
         } while (sk != NOSKILL);
 
-        for (scholar = r->units; teaching > 0 && scholar; scholar = scholar->next) {
-            if (LongHunger(scholar)) {
+        for (student = r->units; teaching > 0 && student; student = student->next) {
+            if (LongHunger(student)) {
                 continue;
             }
-            else if (scholar->faction == teacher->faction) {
-                if (getkeyword(scholar->thisorder) == K_STUDY) {
+            else if (student->faction == teacher->faction) {
+                if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_order(scholar->thisorder, scholar->faction->locale);
-                    sk = getskill(scholar->faction->locale);
+                    init_order(student->thisorder, student->faction->locale);
+                    sk = getskill(student->faction->locale);
                     if (sk != NOSKILL && teachskill[0] != NOSKILL) {
                         for (t = 0; teachskill[t] != NOSKILL; ++t) {
                             if (sk == teachskill[t]) {
@@ -290,20 +290,20 @@ int teach_cmd(unit * teacher, struct order *ord)
                         sk = teachskill[t];
                     }
                     if (sk != NOSKILL
-                        && effskill_study(teacher, sk) - TEACHDIFFERENCE > effskill_study(scholar, sk)) {
-                        teaching -= teach_unit(teacher, scholar, teaching, sk, true, &academy_students);
+                        && effskill_study(teacher, sk) - TEACHDIFFERENCE > effskill_study(student, sk)) {
+                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
             }
 #ifdef TEACH_FRIENDS
-            else if (alliedunit(teacher, scholar->faction, HELP_GUARD)) {
-                if (getkeyword(scholar->thisorder) == K_STUDY) {
+            else if (alliedunit(teacher, student->faction, HELP_GUARD)) {
+                if (getkeyword(student->thisorder) == K_STUDY) {
                     /* Input ist nun von student->thisorder !! */
-                    init_order(scholar->thisorder, scholar->faction->locale);
-                    sk = getskill(scholar->faction->locale);
+                    init_order(student->thisorder, student->faction->locale);
+                    sk = getskill(student->faction->locale);
                     if (sk != NOSKILL
-                        && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(scholar, sk, NULL)) {
-                        teaching -= teach_unit(teacher, scholar, teaching, sk, true, &academy_students);
+                        && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk, NULL)) {
+                        teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
                 }
             }
@@ -322,15 +322,15 @@ int teach_cmd(unit * teacher, struct order *ord)
 
         while (!parser_end()) {
             skill_t sk;
-            unit *scholar;
+            unit *student;
             bool feedback;
 
-            getunit(r, teacher->faction, &scholar);
+            getunit(r, teacher->faction, &student);
             ++count;
 
             /* Falls die Unit nicht gefunden wird, Fehler melden */
 
-            if (!scholar) {
+            if (!student) {
                 char tbuf[20];
                 const char *uid;
                 const char *token;
@@ -362,8 +362,8 @@ int teach_cmd(unit * teacher, struct order *ord)
                 continue;
             }
 
-            feedback = teacher->faction == scholar->faction
-                || alliedunit(scholar, teacher->faction, HELP_GUARD);
+            feedback = teacher->faction == student->faction
+                || alliedunit(student, teacher->faction, HELP_GUARD);
 
             /* Neuen Befehl zusammenbauen. TEMP-Einheiten werden automatisch in
              * ihre neuen Nummern uebersetzt. */
@@ -371,51 +371,51 @@ int teach_cmd(unit * teacher, struct order *ord)
                 strncat(zOrder, " ", sz - 1);
                 --sz;
             }
-            sz -= str_strlcpy(zOrder + 4096 - sz, itoa36(scholar->no), sz);
+            sz -= str_strlcpy(zOrder + 4096 - sz, itoa36(student->no), sz);
 
-            if (getkeyword(scholar->thisorder) != K_STUDY) {
+            if (getkeyword(student->thisorder) != K_STUDY) {
                 ADDMSG(&teacher->faction->msgs,
-                    msg_feedback(teacher, ord, "teach_nolearn", "student", scholar));
+                    msg_feedback(teacher, ord, "teach_nolearn", "student", student));
                 continue;
             }
 
             /* Input ist nun von student->thisorder !! */
             parser_pushstate();
-            init_order(scholar->thisorder, scholar->faction->locale);
-            sk = getskill(scholar->faction->locale);
+            init_order(student->thisorder, student->faction->locale);
+            sk = getskill(student->faction->locale);
             parser_popstate();
 
             if (sk == NOSKILL) {
                 ADDMSG(&teacher->faction->msgs,
-                    msg_feedback(teacher, ord, "teach_nolearn", "student", scholar));
+                    msg_feedback(teacher, ord, "teach_nolearn", "student", student));
                 continue;
             }
 
-            if (effskill_study(scholar, sk) > effskill_study(teacher, sk)
+            if (effskill_study(student, sk) > effskill_study(teacher, sk)
                 - TEACHDIFFERENCE) {
                 if (feedback) {
                     ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord, "teach_asgood",
-                        "student", scholar));
+                        "student", student));
                 }
                 continue;
             }
             if (sk == SK_MAGIC) {
                 /* ist der Magier schon spezialisiert, so versteht er nur noch
                  * Lehrer seines Gebietes */
-                magic_t mage2 = unit_get_magic(scholar);
+                magic_t mage2 = unit_get_magic(student);
                 if (mage2 != M_GRAY) {
                     magic_t mage1 = unit_get_magic(teacher);
                     if (mage1 != mage2) {
                         if (feedback) {
                             ADDMSG(&teacher->faction->msgs, msg_feedback(teacher, ord,
-                                "error_different_magic", "target", scholar));
+                                "error_different_magic", "target", student));
                         }
                         continue;
                     }
                 }
             }
             sk_academy = sk;
-            teaching -= teach_unit(teacher, scholar, teaching, sk, false, &academy_students);
+            teaching -= teach_unit(teacher, student, teaching, sk, false, &academy_students);
         }
         new_order = create_order(K_TEACH, teacher->faction->locale, "%s", zOrder);
         replace_order(&teacher->orders, ord, new_order);
@@ -426,45 +426,6 @@ int teach_cmd(unit * teacher, struct order *ord)
     }
     reset_order();
     return 0;
-}
-
-typedef enum study_rule_t {
-    STUDY_DEFAULT = 0,
-    STUDY_FASTER = 1,
-    STUDY_AUTOTEACH = 2
-} study_rule_t;
-
-static double study_speedup(unit * u, skill_t s, study_rule_t rule)
-{
-#define MINTURN 16
-    if (turn > MINTURN) {
-        if (rule == STUDY_FASTER) {
-            double learnweeks = 0;
-            int i;
-            for (i = 0; i != u->skill_size; ++i) {
-                skill *sv = u->skills + i;
-                if (sv->id == s) {
-                    learnweeks = sv->level * (sv->level + 1) / 2.0;
-                    if (learnweeks < turn / 3.0) {
-                        return 2.0;
-                    }
-                }
-            }
-            return 2.0; /* If the skill was not found it is the first study. */
-        }
-        if (rule == STUDY_AUTOTEACH) {
-            double learnweeks = 0;
-            int i;
-            for (i = 0; i != u->skill_size; ++i) {
-                skill *sv = u->skills + i;
-                learnweeks += (sv->level * (sv->level + 1) / 2.0);
-            }
-            if (learnweeks < turn / 2.0) {
-                return 2.0;
-            }
-        }
-    }
-    return 1.0;
 }
 
 static bool ExpensiveMigrants(void)
@@ -552,17 +513,12 @@ bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
 
 int study_cmd(unit * u, order * ord)
 {
-    region *r = u->region;
-    int p;
-    int l;
     int studycost, days;
-    double multi = 1.0;
     attrib *a = NULL;
     teaching_info *teach = NULL;
     int money = 0;
     skill_t sk;
     int maxalchemy = 0;
-    int speed_rule = (study_rule_t)config_get_int("study.speedup", 0);
     static const race *rc_snotling;
     static int rc_cache;
 
@@ -585,7 +541,6 @@ int study_cmd(unit * u, order * ord)
         }
     }
 
-    p = studycost = study_cost(u, sk);
     a = a_find(u->attribs, &at_learning);
     if (a != NULL) {
         teach = (teaching_info *)a->data.v;
@@ -594,15 +549,12 @@ int study_cmd(unit * u, order * ord)
     /* keine kostenpflichtigen Talente fuer Migranten. Vertraute sind
      * keine Migranten, wird in is_migrant abgefangen. Vorsicht,
      * studycost darf hier noch nicht durch Akademie erhoeht sein */
+    studycost = study_cost(u, sk);
+
     if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn",
             ""));
         return -1;
-    }
-    /* Akademie: */
-    if (active_building(u, bt_find("academy"))) {
-        studycost = studycost * 2;
-        if (studycost < 50) studycost = 50;
     }
 
     if (sk == SK_MAGIC) {
@@ -684,71 +636,31 @@ int study_cmd(unit * u, order * ord)
             }
         }
     }
+
+    days = teach ? teach->days : 0;
+    days += study_days(u, sk);
+
     if (studycost) {
         int cost = studycost * u->number;
         money = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, cost);
         if (money > cost) money = cost;
-    }
-    if (money < studycost * u->number) {
-        studycost = p;              /* Ohne Univertreurung */
-        if (money > studycost) money = studycost;
-        if (p > 0 && money < studycost * u->number) {
-            cmistake(u, ord, 65, MSG_EVENT);
-            multi = money / (double)(studycost * u->number);
+        if (money < studycost * u->number) {
+            int cost = studycost * u->number;
+            if (money > studycost) money = studycost;
+            if (money < cost) {
+                /* we cannot afford everyone, but use as much as we have */
+                cmistake(u, ord, 65, MSG_EVENT);
+                days = days * money / cost;
+            }
         }
     }
+    money += learn_skill(u, sk, days, studycost);
 
-    if (teach == NULL) {
-        a = a_add(&u->attribs, a_new(&at_learning));
-        teach = (teaching_info *)a->data.v;
-        assert(teach);
-        teach->teachers = NULL;
-    }
     if (money > 0) {
         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);
         ADDMSG(&u->faction->msgs, msg_message("studycost",
             "unit region cost skill", u, u->region, money, sk));
     }
-
-    if (get_effect(u, oldpotiontype[P_WISE])) {
-        l = get_effect(u, oldpotiontype[P_WISE]);
-        if (l > u->number) l = u->number;
-        teach->days += l * EXPERIENCEDAYS;
-        change_effect(u, oldpotiontype[P_WISE], -l);
-    }
-    if (get_effect(u, oldpotiontype[P_FOOL])) {
-        l = get_effect(u, oldpotiontype[P_FOOL]);
-        if (l > u->number) l = u->number;
-        teach->days -= l * STUDYDAYS;
-        change_effect(u, oldpotiontype[P_FOOL], -l);
-    }
-
-    if (p != studycost) {
-        /* ist_in_gebaeude(r, u, BT_UNIVERSITAET) == 1) { */
-        /* p ist Kosten ohne Uni, studycost mit; wenn
-         * p!=studycost, ist die Einheit zwangsweise
-         * in einer Uni */
-        teach->days += u->number * EXPERIENCEDAYS;
-    }
-
-    if (is_cursed(r->attribs, &ct_badlearn)) {
-        teach->days -= u->number * EXPERIENCEDAYS;
-    }
-
-    multi *= study_speedup(u, sk, speed_rule);
-    days = study_days(u, sk);
-    days = (int)((days + teach->days) * multi);
-
-    /* the artacademy currently improves the learning of entertainment
-       of all units in the region, to be able to make it cumulative with
-       with an academy */
-
-    if (sk == SK_ENTERTAINMENT
-        && buildingtype_exists(r, bt_find("artacademy"), false)) {
-        days *= 2;
-    }
-
-    learn_skill(u, sk, days);
     if (a != NULL) {
         if (teach->teachers) {
             msg_teachers(teach->teachers, u, sk);
@@ -789,56 +701,136 @@ void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
     }
 }
 
-void produceexp(struct unit *u, skill_t sk, int n)
-{
-    produceexp_ex(u, sk, n, learn_skill);
-}
-
 static learn_fun inject_learn_fun = 0;
 
 void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
 
-/** days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning */
-void learn_skill(unit *u, skill_t sk, int days) {
-    int leveldays = STUDYDAYS * u->number;
-    int weeks = 0;
+static void increase_skill_days(unit *u, skill_t sk, int days) {
+    assert(sk >= 0 && sk < MAXSKILLS && days >= 0);
+    if (days > 0) {
+        int leveldays = STUDYDAYS * u->number;
+        int weeks = 0;
+        if (inject_learn_fun) {
+            inject_learn_fun(u, sk, days);
+            return;
+        }
+        while (days >= leveldays) {
+            ++weeks;
+            days -= leveldays;
+        }
+        if (days > 0 && rng_int() % leveldays < days) {
+            ++weeks;
+        }
+        if (weeks > 0) {
+            increase_skill(u, sk, weeks);
+        }
+    }
+}
+
+static void reduce_skill_days(unit *u, skill_t sk, int days) {
+    if (days > 0) {
+        skill *sv = unit_skill(u, sk);
+        if (sv) {
+            while (days > 0) {
+                if (days >= STUDYDAYS * u->number) {
+                    reduce_skill(u, sv, 1);
+                    days -= STUDYDAYS;
+                }
+                else {
+                    if (chance(days / ((double)STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
+                        reduce_skill(u, sv, 1);
+                    days = 0;
+                }
+            }
+        }
+    }
+}
+
+void produceexp(struct unit *u, skill_t sk, int n)
+{
+    produceexp_ex(u, sk, n, increase_skill_days);
+}
+
+static int speed_rule;
+
+/** 
+ * days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning
+ * @return int
+ *   The additional spend, i.e. from an academy.
+ */
+int learn_skill(unit *u, skill_t sk, int days, int studycost) {
+    region *r = u->region;
+    int cost = 0;
+
+    if (r->buildings) {
+        static const building_type *bt_artacademy;
+        static const building_type *bt_academy;
+        static int config;
+
+        if (bt_changed(&config)) {
+            bt_artacademy = bt_find("artacademy");
+            bt_academy = bt_find("academy");
+        }
+
+        /* Akademie: */
+        if (bt_academy && active_building(u, bt_academy)) {
+            int avail, n = u->number;
+            if (studycost < 50) studycost = 50;
+            cost = studycost * u->number;
+            avail = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, studycost * u->number);
+            if (avail < cost) {
+                /* not all students can afford the academy */
+                cost = avail;
+                n = n * avail / cost;
+                cost = n * studycost;
+            }
+            days += EXPERIENCEDAYS * n;
+        }
+
+        /* the artacademy currently improves the learning of entertainment
+           of all units in the region, to be able to make it cumulative with
+           with an academy */
+
+        if (bt_artacademy && sk == SK_ENTERTAINMENT
+            && buildingtype_exists(r, bt_artacademy, false)) {
+            days *= 2;
+        }
+    }
+
+    if (u->attribs) {
+        if (get_effect(u, oldpotiontype[P_WISE])) {
+            int effect = get_effect(u, oldpotiontype[P_WISE]);
+            if (effect > u->number) effect = u->number;
+            days += effect * EXPERIENCEDAYS;
+            change_effect(u, oldpotiontype[P_WISE], -effect);
+        }
+        if (get_effect(u, oldpotiontype[P_FOOL])) {
+            int effect = get_effect(u, oldpotiontype[P_FOOL]);
+            if (effect > u->number) effect = u->number;
+            days -= effect * STUDYDAYS;
+            change_effect(u, oldpotiontype[P_FOOL], -effect);
+        }
+    }
+
+    if (is_cursed(r->attribs, &ct_badlearn)) {
+        days -= EXPERIENCEDAYS * u->number;
+    }
 
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    assert(sk >= 0 && sk < MAXSKILLS);
-    if (inject_learn_fun) {
-        inject_learn_fun(u, sk, days);
-        return;
-    }
-    while (days >= leveldays) {
-        ++weeks;
-        days -= leveldays;
-    }
-    if (days > 0 && rng_int() % leveldays < days) {
-        ++weeks;
-    }
-    if (weeks > 0) {
-        increase_skill(u, sk, weeks);
-    }
+    increase_skill_days(u, sk, days);
+    return cost;
 }
 
-void reduce_skill_days(unit *u, skill_t sk, int days) {
-    skill *sv = unit_skill(u, sk);
-    if (sv) {
-        while (days > 0) {
-            if (days >=  STUDYDAYS * u->number) {
-                reduce_skill(u, sv, 1);
-                days -= STUDYDAYS;
-            }
-            else {
-                if (chance (days / ((double) STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
-                    reduce_skill(u, sv, 1);
-                days = 0;
-            }
-        }
+void change_skill_days(unit *u, skill_t sk, int days) {
+    if (days < 0) {
+        reduce_skill_days(u, sk, -days);
+    }
+    else {
+        increase_skill_days(u, sk, days);
     }
 }
 
@@ -885,7 +877,7 @@ void demon_skillchange(unit *u)
                 }
             }
             else {
-                learn_skill(u, sv->id, STUDYDAYS * u->number * weeks);
+                change_skill_days(u, sv->id, STUDYDAYS * u->number * weeks);
             }
         }
         ++sv;

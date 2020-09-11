@@ -37,7 +37,7 @@ struct order *ord)
         skill *sv = u->skills;
         while (sv != u->skills + u->skill_size) {
             /* only one person learns for 3 weeks */
-            learn_skill(u, (skill_t)sv->id, STUDYDAYS * 3);
+            change_skill_days(u, (skill_t)sv->id, STUDYDAYS * 3);
             ++sv;
         }
     }

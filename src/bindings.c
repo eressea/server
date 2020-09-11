@@ -310,18 +310,6 @@ static int tolua_create_curse(lua_State * L)
     return 1;
 }
 
-static int tolua_learn_skill(lua_State * L)
-{
-    unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    const char *skname = tolua_tostring(L, 2, 0);
-    int days = (int)tolua_tonumber(L, 3, 0);
-    skill_t sk = findskill(skname);
-    if (sk != NOSKILL) {
-        learn_skill(u, sk, days);
-    }
-    return 0;
-}
-
 static int tolua_update_scores(lua_State * L)
 {
     UNUSED_ARG(L);
@@ -973,7 +961,6 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, TOLUA_CAST "remove_empty_units", tolua_remove_empty_units);
         tolua_function(L, TOLUA_CAST "update_scores", tolua_update_scores);
         tolua_function(L, TOLUA_CAST "update_owners", tolua_update_owners);
-        tolua_function(L, TOLUA_CAST "learn_skill", tolua_learn_skill);
         tolua_function(L, TOLUA_CAST "create_curse", tolua_create_curse);
         tolua_function(L, TOLUA_CAST "translate", &tolua_translate);
         tolua_function(L, TOLUA_CAST "spells", tolua_get_spells);

@@ -6,6 +6,8 @@
 #include "kernel/order.h"
 #include "kernel/region.h"
 #include "kernel/unit.h"
+#include "kernel/pool.h"
+#include "kernel/item.h"
 
 #include "util/keyword.h"
 #include "util/log.h"
@@ -210,7 +212,12 @@ void do_autostudy(region *r)
                 autostudy_run(scholars, nscholars);
                 for (i = 0; i != nscholars; ++i) {
                     int days = STUDYDAYS * scholars[i].learn;
-                    learn_skill(scholars[i].u, skill, days);
+                    int money = learn_skill(scholars[i].u, skill, days, 0);
+                    if (money > 0) {
+                        use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);
+                        ADDMSG(&u->faction->msgs, msg_message("studycost",
+                            "unit region cost skill", u, u->region, money, skill));
+                    }
                 }
             }
         }
