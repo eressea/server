@@ -11,7 +11,7 @@
 void academy_teaching_bonus(struct unit *u, skill_t sk, int students) {
     if (students > 0 && sk != NOSKILL) {
         /* actually students * EXPERIENCEDAYS / MAX_STUDENTS */
-        learn_skill(u, sk, students);
+        change_skill_days(u, sk, students);
     }
 }
 

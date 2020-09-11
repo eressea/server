@@ -67,7 +67,6 @@
         "init_spells": 0,
         "recruit.allow_merge": true,
         "study.expensivemigrants": true,
-        "study.speedup": 2,
         "game.era": 3,
         "game.start": 1,
         "rules.reserve.twophase": true,

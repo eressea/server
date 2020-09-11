@@ -899,7 +899,7 @@ void drain_exp(struct unit *u, int n)
         }
     }
     if (sk != NOSKILL) {
-        reduce_skill_days(u, sk, n);
+        change_skill_days(u, sk, -n);
     }
 }
 
