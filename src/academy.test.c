@@ -41,10 +41,6 @@ static void test_academy(CuTest * tc)
     CuAssert(tc, "building must have capacity", !academy_can_teach(u, u2, SK_CROSSBOW));
     b->size = 2;
     CuAssertTrue(tc, academy_can_teach(u, u2, SK_CROSSBOW));
-
-    CuAssert(tc, "student must pay skillcost", !academy_can_teach(u, u2, SK_ALCHEMY));
-    i_change(&u2->items, it_silver, 150);
-    CuAssertTrue(tc, academy_can_teach(u, u2, SK_ALCHEMY));
     test_teardown();
 }
 

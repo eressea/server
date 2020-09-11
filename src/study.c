@@ -201,7 +201,7 @@ teach_unit(unit * teacher, unit * scholar, int nteaching, skill_t sk,
         teach->days += students * STUDYDAYS;
         teach->students += students; 
 
-        if (scholar->building && teacher->building == scholar->building) {
+        if (scholar->building) {
             /* Solange Akademien groessenbeschraenkt sind, sollte Lehrer und
              * Student auch in unterschiedlichen Gebaeuden stehen duerfen */
             /* FIXME comment contradicts implementation */
