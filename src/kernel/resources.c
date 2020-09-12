@@ -122,12 +122,13 @@ static int visible_default(const rawmaterial * res, int skilllevel)
  * plus current level of difficulty */
 {
     const struct item_type *itype = res->rtype->itype;
+    int level = res->level + itype->construction->minskill - 1;
     if (res->level <= 1
-        && res->level + itype->construction->minskill <= skilllevel + 1) {
+        && level <= skilllevel) {
         assert(res->amount > 0);
         return res->amount;
     }
-    else if (res->level + itype->construction->minskill <= skilllevel + 2) {
+    else if (level < skilllevel) {
         assert(res->amount > 0);
         return res->amount;
     }
@@ -138,7 +139,8 @@ static int visible_half_skill(const rawmaterial * res, int skilllevel)
 /* resources are visible if skill equals half as much as normal */
 {
     const struct item_type *itype = res->rtype->itype;
-    if (res->level + itype->construction->minskill < 2 * (skilllevel + 1)) {
+    int level = res->level + itype->construction->minskill - 1;
+    if (2 * skilllevel >= level) {
         return res->amount;
     }
     return -1;
