@@ -118,7 +118,7 @@ static void terraform_default(struct rawmaterial *res, const region * r)
 }
 
 static int visible_default(const rawmaterial * res, int skilllevel)
-/* resources are visible, if skill equals minimum skill to mine them
+/* resources are visible if skill equals minimum skill to mine them
  * plus current level of difficulty */
 {
     const struct item_type *itype = res->rtype->itype;
@@ -129,6 +129,16 @@ static int visible_default(const rawmaterial * res, int skilllevel)
     }
     else if (res->level + itype->construction->minskill <= skilllevel + 2) {
         assert(res->amount > 0);
+        return res->amount;
+    }
+    return -1;
+}
+
+static int visible_half_skill(const rawmaterial * res, int skilllevel)
+/* resources are visible if skill equals half as much as normal */
+{
+    const struct item_type *itype = res->rtype->itype;
+    if (res->level + itype->construction->minskill < 2 * (skilllevel + 1)) {
         return res->amount;
     }
     return -1;
@@ -171,13 +181,19 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
     if (!rtype->raw) {
+        int rule = config_get_int("resource.visibility.rule", 0);
         rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
         if (!rmtype) abort();
         rmtype->rtype = rtype;
         rmtype->terraform = terraform_default;
         rmtype->update = NULL;
         rmtype->use = use_default;
-        rmtype->visible = visible_default;
+        if (rule == 0) {
+            rmtype->visible = visible_default;
+        }
+        else {
+            rmtype->visible = visible_half_skill;
+        }
     }
     return rtype->raw;
 }
