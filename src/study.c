@@ -777,7 +777,6 @@ int learn_skill(unit *u, skill_t sk, int days, int studycost) {
             avail = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, studycost * u->number);
             if (avail < cost) {
                 /* not all students can afford the academy */
-                cost = avail;
                 n = n * avail / cost;
                 cost = n * studycost;
             }
