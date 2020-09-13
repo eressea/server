@@ -9,6 +9,8 @@
   - Rohstoffe koennen jetzt bereits gesehen werden, wenn eine Einheit nur
   die Haelfte des zum Abbau noetigen Talentes hat (statt bisher
   Talent-1)
+  - Materialkosten von Heiliger Boden, Mauern der Ewigkeit, Störe Astrale
+  Integrität steigen mit der Stude des Zaubers [2651]
 
 # 3.25
 
