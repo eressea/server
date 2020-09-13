@@ -344,8 +344,8 @@
   </spell>
   <spell name="holyground" rank="5">
     <!-- Heiliger Boden -->
-    <resource name="aura" amount="80" cost="level"/>
-    <resource name="permaura" amount="3" cost="level"/>
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="permaura" amount="3" cost="fixed"/>
   </spell>
   <spell name="summonent" rank="5" variable="true">
     <!-- Erwecke Ents -->
