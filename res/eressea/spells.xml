@@ -435,8 +435,8 @@
     <resource name="peasant" amount="5" cost="level"/>
   </spell>
   <spell name="holyground" rank="5">
-    <resource name="aura" amount="80" cost="level"/>
-    <resource name="permaura" amount="3" cost="level"/>
+    <resource name="aura" amount="80" cost="fixed"/>
+    <resource name="permaura" amount="3" cost="fixed"/>
   </spell>
   <spell name="bloodsacrifice" rank="1" ship="true">
     <resource name="hp" amount="16" cost="fixed"/>
