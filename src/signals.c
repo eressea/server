@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <bits/types/siginfo_t.h>
 static void *btrace[50];
 
 static void report_segfault(int signo, siginfo_t * sinf, void *arg)
