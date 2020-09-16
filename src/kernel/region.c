@@ -602,7 +602,7 @@ int rpeasants(const region * r)
     return value;
 }
 
-void rsetpeasants(region * r, int value)
+int rsetpeasants(region * r, int value)
 {
     assert(r->land || value==0);
     assert(value >= 0);
@@ -612,7 +612,9 @@ void rsetpeasants(region * r, int value)
             value = USHRT_MAX;
         }
         r->land->peasants = (unsigned short)value;
+        return r->land->peasants;
     }
+    return 0;
 }
 
 int rmoney(const region * r)
@@ -746,17 +748,16 @@ int rsettrees(const region * r, int ageclass, int value)
 {
     if (!r->land) {
         assert(value == 0);
+        return 0;
+    }
+    assert(value >= 0);
+    if (value < MAXTREES) {
+        r->land->trees[ageclass] = value;
     }
     else {
-        assert(value >= 0);
-        if (value <= MAXTREES) {
-            return r->land->trees[ageclass] = value;
-        }
-        else {
-            r->land->trees[ageclass] = MAXTREES;
-        }
+        r->land->trees[ageclass] = MAXTREES;
     }
-    return 0;
+    return r->land->trees[ageclass];
 }
 
 region *region_create(int uid)
@@ -1095,11 +1096,10 @@ void init_region(region *r)
 
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
+        int p_wage = 1 + peasant_wage(r, false) + rng_int() % 5;
         peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
         if (peasants < 100) peasants = 100;
-        rsetpeasants(r, peasants);
-        rsetmoney(r, rpeasants(r) * ((wage(r, NULL, NULL,
-            INT_MAX) + 1) + rng_int() % 5));
+        rsetmoney(r, rsetpeasants(r, peasants) * p_wage);
     }
 }
 

@@ -42,7 +42,7 @@ extern "C" {
     bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
-#define HARVEST_WORK  0x00
+#define HARVEST_WORK  0x02
 #define HARVEST_TAXES 0x01
     int rule_blessed_harvest(void);
 #define GIVE_SELF 1

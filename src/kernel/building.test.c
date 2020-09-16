@@ -434,6 +434,80 @@ static void test_cmp_castle_size(CuTest *tc) {
     test_teardown();
 }
 
+static void test_wage(CuTest *tc) {
+    region *r;
+    building *b;
+    building_type *btype;
+    struct building_stage *stage;
+    race *rc_orc, *rc_elf;
+    test_setup();
+    rc_orc = test_create_race("orc");
+    rc_elf = test_create_race("elf");
+    rc_elf->maintenance = 13;
+    btype = test_create_buildingtype("castle");
+    stage = btype->stages;
+    stage->construction->maxsize = 2; /* site */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 8; /* tradepost */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 40; /* fortification */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 200; /* fortification */
+    r = test_create_plain(0, 0);
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+
+    b = test_create_building(r, btype);
+    b->size = 1;
+    CuAssertIntEquals(tc, 0, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 2;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b, false));
+    b->size = 9;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 10;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    b->size = 49;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 11, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 11, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 12, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 50;
+    CuAssertIntEquals(tc, 3, buildingeffsize(b, false));
+    b->size = 249;
+    CuAssertIntEquals(tc, 3, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 12, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 11, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 13, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 250;
+    CuAssertIntEquals(tc, 4, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 13, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 12, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 14, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    config_set_int("rules.wage.function", 1);
+    CuAssertIntEquals(tc, 13, wage(r, rc_elf));
+    config_set_int("rules.wage.function", 0);
+    CuAssertIntEquals(tc, 0, wage(r, rc_elf));
+    config_set_int("rules.wage.function", 2);
+    CuAssertIntEquals(tc, rc_elf->maintenance, wage(r, rc_elf));
+    test_teardown();
+}
+
 static void test_cmp_wage(CuTest *tc) {
     region *r;
     building *b1, *b2;
@@ -619,6 +693,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_cmp_castle_size);
     SUITE_ADD_TEST(suite, test_cmp_taxes);
     SUITE_ADD_TEST(suite, test_cmp_wage);
+    SUITE_ADD_TEST(suite, test_wage);
     SUITE_ADD_TEST(suite, test_cmp_current_owner);
     SUITE_ADD_TEST(suite, test_register_building);
     SUITE_ADD_TEST(suite, test_btype_defaults);

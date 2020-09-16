@@ -495,19 +495,21 @@ extern struct attrib_type at_icastle;
 /** returns the building's build stage (NOT size in people).
  * only makes sense for castles or similar buildings with multiple
  * stages */
-int buildingeffsize(const building * b, int img)
+int buildingeffsize(const building * b, bool imaginary)
 {
     const struct building_type *btype = NULL;
 
     if (b == NULL)
         return 0;
 
-    btype = b->type;
-    if (img) {
+    if (imaginary) {
         const attrib *a = a_find(b->attribs, &at_icastle);
         if (a) {
             btype = (const struct building_type *)a->data.v;
         }
+    }
+    else {
+        btype = b->type;
     }
     return bt_effsize(btype, b, b->size);
 }
@@ -518,7 +520,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
         bsize = adjust_size(b, bsize);
     }
 
-    if (btype->stages) {
+    if (btype && btype->stages) {
         int n = 0;
         const building_stage *stage = btype->stages;
         do {
@@ -728,7 +730,7 @@ static const int wagetable[7][3] = {
 };
 
 static int
-default_wage(const region * r, const faction * f, const race * rc, int in_turn)
+default_wage(const region * r, const race * rc)
 {
     building *b = largestbuilding(r, cmp_wage, false);
     int esize = 0;
@@ -739,34 +741,32 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
         esize = buildingeffsize(b, false);
     }
 
-    if (f != NULL) {
+    if (rc != NULL) {
+        static const struct race *rc_orc, *rc_snotling;
+        static int rc_cache;
         int index = 0;
-        if (rc == get_race(RC_ORC) || rc == get_race(RC_SNOTLING)) {
+        if (rc_changed(&rc_cache)) {
+            rc_orc = get_race(RC_ORC);
+            rc_snotling = get_race(RC_SNOTLING);
+        }
+        if (rc == rc_orc || rc == rc_snotling) {
             index = 1;
         }
         wage = wagetable[esize][index];
     }
     else {
-        if (is_mourning(r, in_turn)) {
-            wage = 10;
-        }
-        else if (fval(r->terrain, SEA_REGION)) {
-            wage = 11;
-        }
-        else {
-            wage = wagetable[esize][2];
-        }
-        if (r->attribs && rule_blessed_harvest() == HARVEST_WORK) {
-            /* E1 rules */
-            wage += harvest_effect(r);
-        }
+        wage = wagetable[esize][2];
     }
 
     if (r->attribs) {
         attrib *a;
         curse *c;
         variant vm;
-
+     
+        if (rule_blessed_harvest() & HARVEST_WORK) {
+            /* In E3  */
+            wage += harvest_effect(r);
+        }
         /* Godcurse: Income -10 */
         vm = frac_make(wage, 1);
 
@@ -786,31 +786,37 @@ default_wage(const region * r, const faction * f, const race * rc, int in_turn)
 }
 
 static int
-minimum_wage(const region * r, const faction * f, const race * rc, int in_turn)
+minimum_wage(const region * r, const race * rc)
 {
-    if (f && rc) {
+    if (rc) {
         return rc->maintenance;
     }
-    return default_wage(r, f, rc, in_turn);
+    return default_wage(r, rc);
 }
 
 /**
  * Gibt Arbeitslohn fuer entsprechende Rasse zurueck, oder fuer
- * die Bauern wenn f == NULL. */
-int wage(const region * r, const faction * f, const race * rc, int in_turn)
+ * die Bauern wenn rc == NULL. */
+int wage(const region * r, const race * rc)
 {
     static int config;
     static int rule_wage;
     if (config_changed(&config)) {
         rule_wage = config_get_int("rules.wage.function", 1);
     }
-    if (rule_wage==0) {
+    if (rule_wage == 0) {
         return 0;
     }
-    if (rule_wage==1) {
-        return default_wage(r, f, rc, in_turn);
+
+    if (rule_wage == 1) {
+        return default_wage(r, rc);
     }
-    return minimum_wage(r, f, rc, in_turn);
+    return minimum_wage(r, rc);
+}
+
+int peasant_wage(const struct region *r, bool mourn)
+{
+    return mourn ? 10 : wage(r, NULL);
 }
 
 int cmp_wage(const struct building *b, const building * a)
