@@ -1993,7 +1993,8 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
     /* n: verbleibende Einnahmen */
     /* fishes: maximale Arbeiter */
     int jobs = maxwork;
-    int p_wage = wage(r, NULL, NULL, turn);
+    bool mourn = is_mourning(r, turn);
+    int p_wage = peasant_wage(r, mourn);
     int money = rmoney(r);
     if (total > 0 && !rule_autowork()) {
         econ_request *o;
@@ -2017,7 +2018,7 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
 
                 assert(workers >= 0);
 
-                u->n = workers * wage(u->region, u->faction, u_race(u), turn);
+                u->n = workers * wage(u->region, u_race(u));
 
                 jobs -= workers;
                 assert(jobs >= 0);
@@ -2061,7 +2062,7 @@ static int work_cmd(unit * u, order * ord, econ_request ** io_req)
             }
             return 0;
         }
-        w = wage(r, u->faction, u_race(u), turn);
+        w = wage(r, u_race(u));
         add_request(req++, ECON_WORK, u, ord, w * u->number);
         *io_req = req;
         return u->number;

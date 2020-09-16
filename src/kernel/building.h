@@ -116,8 +116,8 @@ extern "C" {
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
 
-    int wage(const struct region *r, const struct faction *f,
-        const struct race *rc, int in_turn);
+    int wage(const struct region *r, const struct race *rc);
+    int peasant_wage(const struct region *r, bool mourn);
 
     typedef int(*cmp_building_cb) (const struct building * b,
         const struct building * a);
@@ -130,7 +130,7 @@ extern "C" {
     int building_taxes(const building *b);
 
     /* old functions, still in build.c: */
-    int buildingeffsize(const building * b, int imaginary);
+    int buildingeffsize(const building * b, bool imaginary);
     void bhash(struct building *b);
     void bunhash(struct building *b);
     int buildingcapacity(const struct building *b);
