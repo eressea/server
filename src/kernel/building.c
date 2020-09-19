@@ -756,6 +756,10 @@ default_wage(const region * r, const race * rc)
     }
     else {
         wage = wagetable[esize][2];
+        if (rule_blessed_harvest() & HARVEST_WORK) {
+            /* Geändert in E3 */
+            wage += harvest_effect(r);
+        }
     }
 
     if (r->attribs) {
@@ -763,10 +767,6 @@ default_wage(const region * r, const race * rc)
         curse *c;
         variant vm;
      
-        if (rule_blessed_harvest() & HARVEST_WORK) {
-            /* In E3  */
-            wage += harvest_effect(r);
-        }
         /* Godcurse: Income -10 */
         vm = frac_make(wage, 1);
 
