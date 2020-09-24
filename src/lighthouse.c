@@ -21,7 +21,12 @@ attrib_type at_lighthouse = {
 
 bool is_lighthouse(const building_type *btype)
 {
-    return is_building_type(btype, "lighthouse");
+    static int config;
+    static const building_type *bt_lighthouse;
+    if (bt_changed(&config)) {
+        bt_lighthouse = bt_find("lighthouse");
+    }
+    return btype == bt_lighthouse;
 }
 
 /* update_lighthouse: call this function whenever the size of a lighthouse changes
@@ -81,7 +86,7 @@ void remove_lighthouse(const building *lh) {
 
 int lighthouse_range(const building * b)
 {
-    if (b->size >= 10 && (b->flags & BLD_MAINTAINED)) {
+    if (b->size >= 10) {
         return (int)log10(b->size) + 1;
     }
     return 0;
@@ -112,13 +117,19 @@ bool lighthouse_guarded(const region * r)
     for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
         a = a->next) {
         building *b = (building *)a->data.v;
-
-        assert(is_building_type(b->type, "lighthouse"));
-        if ((b->flags & BLD_MAINTAINED) && b->size >= 10) {
-            int maxd = (int)log10(b->size) + 1;
-            int d = distance(r, b->region);
-            assert(maxd >= d);
-            return true;
+        if (b->flags & BLD_MAINTAINED) {
+            if (r == b->region) {
+                return true;
+            }
+            else {
+                int maxd = lighthouse_range(b);
+                if (maxd > 0) {
+                    int d = distance(r, b->region);
+                    if (maxd >= d) {
+                        return true;
+                    }
+                }
+            }
         }
     }
 

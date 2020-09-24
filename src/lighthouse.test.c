@@ -30,8 +30,6 @@ static void test_lighthouse_range(CuTest * tc)
     b->size = 9;
     CuAssertIntEquals(tc, 0, lighthouse_range(b));
     b->size = 10;
-    CuAssertIntEquals(tc, 0, lighthouse_range(b));
-    b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, 2, lighthouse_range(b));
     u1->building = b;
     u2->building = b;
@@ -39,6 +37,8 @@ static void test_lighthouse_range(CuTest * tc)
     set_level(u1, SK_PERCEPTION, 3);
     set_level(u2, SK_PERCEPTION, 3);
 
+    CuAssertIntEquals(tc, 0, lighthouse_view_distance(b, u1));
+    b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
     set_level(u1, SK_PERCEPTION, 6);
     CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u2));
@@ -126,6 +126,7 @@ static void test_lighthouse_guard(CuTest * tc) {
     CuAssertIntEquals(tc, true, lighthouse_guarded(r3));
     CuAssertIntEquals(tc, false, lighthouse_guarded(r4));
     b->size = 1; /* size can go down in destroy_cmd */
+    update_lighthouse(b);
     CuAssertIntEquals(tc, false, lighthouse_guarded(r2));
     CuAssertIntEquals(tc, false, lighthouse_guarded(r3));
     test_teardown();
