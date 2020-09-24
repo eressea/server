@@ -3898,9 +3898,6 @@ void init_processor(void)
     add_proc_order(p, K_USE, use_cmd, 0, "Benutzen");
 
     p += 10;                      /* in case it has any effects on alliance victories */
-    add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
-
-    p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_LEAVE, leave_cmd, 0, "Verlassen");
 
     p += 10;
@@ -3918,7 +3915,10 @@ void init_processor(void)
     add_proc_order(p, K_RESERVE, reserve_cmd, 0, "RESERVE (all)");
     add_proc_order(p, K_CLAIM, claim_cmd, 0, NULL);
 
-    p += 10;                      /* rest rng again before economics */
+    p += 10;                      /* in case it has any effects on alliance victories */
+    add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
+
+    p += 10;                      /* reset rng again before economics */
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
