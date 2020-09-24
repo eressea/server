@@ -2192,8 +2192,8 @@ void move_cmd_ex(unit * u, order * ord, const char *directions)
         init_order(ord, u->faction->locale);
     }
     if (u->ship && u == ship_owner(u->ship)) {
-        bool drifting = (getkeyword(ord) == K_MOVE);
-        sail(u, ord, drifting);
+        keyword_t kwd = getkeyword(ord);
+        sail(u, ord, (kwd == K_MOVE || kwd == K_ROUTE));
     }
     else {
         travel(u, ord);
