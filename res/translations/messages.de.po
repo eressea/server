@@ -1161,7 +1161,7 @@ msgid "spyreport_faction"
 msgstr "\"$unit($target) gehört der Partei $faction($faction) an.\""
 
 msgid "ship_drift"
-msgstr "\"Die $ship($ship) treibt nach $direction($dir).\""
+msgstr "\"Die $ship($ship) hat zu wenig Segler und treibt nach $direction($dir).\""
 
 msgid "error_max_magicians"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es kann maximal $int($amount) Magier pro Partei geben.\""
