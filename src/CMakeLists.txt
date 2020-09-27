@@ -179,7 +179,7 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
-find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+#find_program(IWYU_PATH NAMES include-what-you-use iwyu)
 if(IWYU_PATH)
   #  set(C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH} -Xiwyu --no_fwd_decls")
 else(IWYU_PATH)
