@@ -503,7 +503,6 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     u1 = test_create_unit(test_create_faction(), r1);
@@ -561,7 +560,6 @@ static void test_prepare_lighthouse(CuTest *tc) {
     r4 = test_create_region(0, 1, t_plain);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     u = test_create_unit(f, r1);
@@ -605,7 +603,6 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     test_create_unit(f, r1);

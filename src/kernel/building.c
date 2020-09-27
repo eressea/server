@@ -410,9 +410,6 @@ building *new_building(const struct building_type * btype, region * r,
         bptr = &(*bptr)->next;
     *bptr = b;
 
-    if (is_lighthouse(b->type)) {
-        update_lighthouse(b);
-    }
     bname = LOC(lang, btype->_name);
     if (!bname) {
         bname = LOC(lang, parameters[P_GEBAEUDE]);
@@ -451,9 +448,6 @@ void remove_building(building ** blist, building * b)
         if (u->building == b) leave(u, true);
     }
 
-    if (is_lighthouse(b->type)) {
-        remove_lighthouse(b);
-    }
     b->size = 0;
     bunhash(b);
 
@@ -655,7 +649,7 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && (!working || fval(b, BLD_MAINTAINED)) && building_finished(b)) {
+        if (b->type == bt && !(working && fval(b, BLD_UNMAINTAINED)) && building_finished(b)) {
             return true;
         }
     }
@@ -668,7 +662,7 @@ bool building_finished(const struct building *b) {
 }
 
 bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_MAINTAINED) && building_finished(b);
+    return b && !fval(b, BLD_UNMAINTAINED) && building_finished(b);
 }
 
 building *active_building(const unit *u, const struct building_type *btype) {

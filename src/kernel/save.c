@@ -1625,18 +1625,6 @@ static void read_regions(gamedata *data) {
             }
         }
     }
-
-    log_debug("updating area information for lighthouses.");
-    for (r = regions; r; r = r->next) {
-        if (r->flags & RF_LIGHTHOUSE) {
-            building *b;
-            for (b = r->buildings; b; b = b->next) {
-                if (is_lighthouse(b->type)) {
-                    update_lighthouse(b);
-                }
-            }
-        }
-    }
 }
 
 static void init_factions(int data_version)

@@ -1651,9 +1651,13 @@ static void check_messages_exist(void) {
 int init_reports(void)
 {
     region *r;
+    bool update = true;
     check_messages_exist();
     create_directories();
     for (r = regions; r; r = r->next) {
+        if (update) {
+            update = update_lighthouses(r);
+        }
         reorder_units(r);
     }
     return 0;

@@ -84,7 +84,6 @@ static void setup_harbor(move_fixture *mf) {
     r = test_create_region(0, 0, ttype);
 
     b = test_create_building(r, btype);
-    b->flags |= BLD_MAINTAINED;
 
     u = test_create_unit(test_create_faction(), r);
     u->ship = sh;
