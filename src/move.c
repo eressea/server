@@ -1157,12 +1157,19 @@ static bool can_move(const unit * u)
     return true;
 }
 
-static void init_transportation(void)
+static void init_movement(void)
 {
     region *r;
 
     for (r = regions; r; r = r->next) {
         unit *u;
+        building *b;
+
+        for (b = r->buildings; b; b = b->next) {
+            if (is_lighthouse(b->type)) {
+                update_lighthouse(b);
+            }
+        }
 
         /* This is just a simple check for non-corresponding K_TRANSPORT/
          * K_DRIVE. This is time consuming for an error check, but there
@@ -2409,8 +2416,8 @@ void movement(void)
 {
     int ships;
 
-    /* Initialize the additional encumbrance by transported units */
-    init_transportation();
+    /* Initialize lighthouses and additional encumbrance by transported units */
+    init_movement();
 
     /* Move ships in last phase, others first
      * This is to make sure you can't land someplace and then get off the ship

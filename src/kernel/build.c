@@ -829,7 +829,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         /* build a new building */
         b = new_building(btype, r, lang, built);
         b->type = btype;
-        fset(b, BLD_MAINTAINED);
 
         /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
         if (u->number && leave(u, false)) {
@@ -878,10 +877,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
     }
     fset(b, BLD_EXPANDED);
-
-    if (is_lighthouse(btype)) {
-        update_lighthouse(b);
-    }
 
     return built;
 }

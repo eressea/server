@@ -79,7 +79,7 @@ extern "C" {
     bool in_safe_building(struct unit *u1, struct unit *u2);
 
 #define BFL_NONE           0x00
-#define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
+#define BLD_UNMAINTAINED     0x01 /* vital maintenance not paid for */
 #define BLD_DONTPAY        0x02 /* PAY NOT */
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
 #define BLD_EXPANDED       0x08 /* has been expanded this turn */
