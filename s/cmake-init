@@ -6,7 +6,9 @@ pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 GETOPT=getopt
 GETOPT_LONG=1
 
-luarocks install lunitx --local
+if [ -z "$(luarocks which lunitx)" ] ; then
+  luarocks install lunitx --local
+fi
 if [ "Darwin" = "$(uname)" ] ; then
   if [ -x "/usr/local/opt/gnu-getopt/bin/getopt" ] ; then
     GETOPT="/usr/local/opt/gnu-getopt/bin/getopt"
