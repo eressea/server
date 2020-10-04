@@ -974,7 +974,7 @@ void spawn_undead(void)
 {
     region *r;
     faction *monsters = get_monsters();
-    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 10;
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 100;
 
     if (spawn_chance <= 0) {
         return;
