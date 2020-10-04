@@ -21,7 +21,9 @@
         "config://res/eressea/spellbooks/tybied.xml"
     ],
     "disabled": [
-			  "number",
+        "destroy",
+        "steal",
+        "number",
         "jsreport"
     ],
     "settings": {

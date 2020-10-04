@@ -4,3 +4,5 @@
 - NUMMER Befehl abgeschafft.
 - Ebene und Hochland haben 20%, alle anderen Regionen 10% der Arbeitsplätze von E2.
 - Keine Zufallsmonster
+- ZERSTÖRE Befehl abgeschafft.
+- BEKLAUE Befehl abgeschafft.
