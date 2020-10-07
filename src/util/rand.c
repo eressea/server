@@ -64,7 +64,7 @@ bool chance(double x)
 {
     if (x >= 1.0)
         return true;
-    return (1-rng_double()) < x;
+    return rng_double() < x;
 }
 
 typedef struct random_source {

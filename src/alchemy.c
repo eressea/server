@@ -73,7 +73,6 @@ void herbsearch(unit * u, int max_take)
     int herbsfound;
     const item_type *whichherb;
     int effsk = effskill(u, SK_HERBALISM, NULL);
-    int herbs = rherbs(r);
 
     if (effsk == 0) {
         cmistake(u, u->thisorder, 59, MSG_PRODUCE);
@@ -91,13 +90,10 @@ void herbsearch(unit * u, int max_take)
         return;
     }
 
-    if (max_take < herbs) {
-        herbs = max_take;
-    }
     herbsfound = ntimespprob(effsk * u->number,
         (double)rherbs(r) / 100.0F, -0.01F);
 
-    if (herbsfound > herbs) herbsfound = herbs;
+    if (herbsfound > max_take) herbsfound = max_take;
     rsetherbs(r, rherbs(r) - herbsfound);
 
     if (herbsfound) {
