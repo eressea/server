@@ -97,7 +97,7 @@ end
 function test_lighthouse()
     eressea.free_game()
     local r = region.create(0, 0, "mountain")
-    local f = faction.create("human", "human@example.com")
+    local f = faction.create("human", "lighthouse@example.com")
     local f2 = faction.create("dwarf")
     local r2 = region.create(1, 0, "mountain")
     unit.create(f2, r2, 1).name = 'The Babadook'
@@ -108,7 +108,6 @@ function test_lighthouse()
     local u = unit.create(f, r, 1)
     local b = building.create(r, "lighthouse")
     b.size = 100
-    b.working = true
     u.building = b
     u:set_skill("perception", 9)
     u:add_item("money", 1000)

@@ -34,8 +34,9 @@ function test_laen_needs_mine()
     assert_equal(1, f:count_msg_type("building_needed")) -- requires building
 
     u.building = building.create(u.region, "mine")
-    u.building.working = true
     u.building.size = 10
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
     turn_process()
     assert_equal(1, u:get_item('laen'))
     assert_equal(99, r:get_resource('laen'))
@@ -56,15 +57,19 @@ function test_mine_laen_bonus()
     u:add_order("MACHE Laen")
     u:set_skill('mining', 6)
     u.building = building.create(u.region, "mine")
-    u.building.working = true
+
     u.building.size = 10
     u.number = 2
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
     turn_process() -- T6 is not enough for laen
     assert_equal(0, u:get_item('laen'))
     assert_equal(100, r:get_resource('laen'))
     assert_equal(1, f:count_msg_type("manufacture_skills"))
 
     u:set_skill('mining', 13)
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
     turn_process() -- T13 is enough, the +1 produces one extra Laen
     assert_equal(4, u:get_item('laen')) -- FAIL (3)
     assert_equal(96, r:get_resource('laen'))
@@ -86,13 +91,14 @@ function test_mine_iron_bonus()
     u:add_order("MACHE Eisen")
     u:set_skill('mining', 1)
     u.building = building.create(u.region, "mine")
-    u.building.working = false
+
     u.building.size = 10
     u.number = 2
     turn_process() -- iron can be made without a working mine
     assert_equal(2, u:get_item('iron'))
     assert_equal(98, r:get_resource('iron'))
 
+    u:add_item('money', 500) -- Unterhalt Bergwerk
     u.building.working = true
     turn_process()
     assert_equal(6, u:get_item('iron'))
@@ -115,12 +121,13 @@ function test_quarry_bonus()
     u:set_skill('quarrying', 1)
     u.number = 2
     u.building = building.create(u.region, 'quarry')
-    u.building.working = false
+
     u.building.size = 10
     turn_process()
     assert_equal(2, u:get_item('stone'))
     assert_equal(98, r:get_resource('stone'))
 
+    u:add_item('money', 250) -- Unterhalt Steinbruch
     u.building.working = true
     turn_process()
     assert_equal(6, u:get_item('stone'))
@@ -138,16 +145,18 @@ function test_smithy_no_bonus()
 
     turn_begin()
     u.building = building.create(u.region, 'smithy')
-    u.building.working = false
+
     u.building.size = 10
     u.number = 5
     u:set_skill('cartmaking', 1) -- needs 1 min
     u:add_item('log', 100)
     u:add_order("MACHE Wagen")
-    turn_process() -- building disabled
+    turn_process() -- building disabled, money is missing 
     assert_equal(5, u:get_item('cart'))
     assert_equal(75, u:get_item('log'))
 
+    u:add_item('money', 300) -- Unterhalt Schmiede
+    u:add_item('log', 1)
     u.building.working = true
     turn_process() -- building active
     assert_equal(10, u:get_item('cart'))
@@ -164,7 +173,7 @@ function test_smithy_bonus_iron()
 
     turn_begin()
     u.building = building.create(u.region, 'smithy')
-    u.building.working = false
+
     u.building.size = 10
     u:set_skill('weaponsmithing', 5) -- needs 3
     u:add_item('iron', 100)
@@ -173,6 +182,8 @@ function test_smithy_bonus_iron()
     assert_equal(1, u:get_item('sword'))
     assert_equal(99, u:get_item('iron'))
 
+    u:add_item('log', 1) -- Unterhalt Schmiede
+    u:add_item('money', 300) -- Unterhalt Schmiede
     u.building.working = true
     turn_process() -- building active
     assert_equal(3, u:get_item('sword'))
@@ -190,7 +201,7 @@ function test_smithy_bonus_mixed()
 
     turn_begin()
     u.building = building.create(u.region, 'smithy')
-    u.building.working = false
+
     u.building.size = 10
     u:set_skill('weaponsmithing', 5) -- needs 3
     u:add_item('iron', 100)
@@ -201,6 +212,8 @@ function test_smithy_bonus_mixed()
     assert_equal(99, u:get_item('iron'))
     assert_equal(99, u:get_item('log'))
 
+    u:add_item('money', 300) -- Unterhalt Schmiede
+    u:add_item('log', 1) -- Unterhalt Schmiede
     u.building.working = true
     turn_process() -- building active
     assert_equal(3, u:get_item('axe'))

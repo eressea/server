@@ -204,7 +204,6 @@ static void test_study_bug_2194(CuTest *tc) {
     u_set_building(u2, b);
     i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 50);
     i_change(&u2->items, get_resourcetype(R_SILVER)->itype, 50);
-    b->flags = BLD_MAINTAINED;
     learn_inject();
     teach_cmd(u, u->thisorder);
     learn_reset();
@@ -280,7 +279,6 @@ static void test_academy_building(CuTest *tc) {
     u_set_building(u2, b);
     i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 50);
     i_change(&u2->items, get_resourcetype(R_SILVER)->itype, 50);
-    b->flags = BLD_MAINTAINED;
     learn_inject();
     teach_cmd(u, u->thisorder);
     learn_reset();
@@ -335,7 +333,6 @@ static void test_academy_bonus(CuTest *tc) {
     scale_number(u1, 9);
     scale_number(u3, 2);
     i_change(&u1->items, get_resourcetype(R_SILVER)->itype, 5000);
-    b->flags = BLD_MAINTAINED;
 
     learn_inject();
     teach_cmd(u0, u0->thisorder);

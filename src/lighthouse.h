@@ -20,7 +20,7 @@ extern "C" {
     bool is_lighthouse(const struct building_type *btype);
     bool lighthouse_guarded(const struct region *r);
     void update_lighthouse(struct building *b);
-    void remove_lighthouse(const struct building *lh);
+    bool update_lighthouses(struct region *r);
     int lighthouse_range(const struct building *b);
     int lighthouse_view_distance(const struct building *b, const struct unit *u);
 

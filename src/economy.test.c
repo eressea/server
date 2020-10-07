@@ -497,7 +497,7 @@ static void test_maintain_buildings(CuTest *tc) {
     /* this building has no upkeep, it just works: */
     b->flags = 0;
     maintain_buildings(r);
-    CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
     CuAssertPtrEquals(tc, NULL, r->msgs);
 
@@ -509,7 +509,7 @@ static void test_maintain_buildings(CuTest *tc) {
     /* we cannot afford to pay: */
     b->flags = 0;
     maintain_buildings(r);
-    CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+    CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
     test_clear_messagelist(&f->msgs);
@@ -519,7 +519,7 @@ static void test_maintain_buildings(CuTest *tc) {
     i_change(&u->items, itype, 100);
     b->flags = 0;
     maintain_buildings(r);
-    CuAssertIntEquals(tc, BLD_MAINTAINED, fval(b, BLD_MAINTAINED));
+    CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertPtrEquals(tc, NULL, r->msgs);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance_nowork"));
@@ -530,7 +530,7 @@ static void test_maintain_buildings(CuTest *tc) {
     u_set_building(u, NULL);
     b->flags = 0;
     maintain_buildings(r);
-    CuAssertIntEquals(tc, 0, fval(b, BLD_MAINTAINED));
+    CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
     test_clear_messagelist(&r->msgs);
