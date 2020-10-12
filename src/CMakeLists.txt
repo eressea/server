@@ -179,10 +179,10 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
-find_program(IWYU_PATH NAMES include-what-you-use iwyu)
-if(NOT IWYU_PATH)
-	message(STATUS "Could not find the program include-what-you-use")
-endif()
+#find_program(IWYU_PATH NAMES include-what-you-use iwyu)
+#if(NOT IWYU_PATH)
+#	message(STATUS "Could not find the program include-what-you-use")
+#endif()
 
 add_library(version STATIC ${VERSION_SRC})
 add_library(parser ${PARSER_SRC})
