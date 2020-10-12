@@ -810,7 +810,9 @@ void demographics(void)
     season_t last_weeks_season = calendar_season(turn - 1);
 
     for (r = regions; r; r = r->next) {
-        ++r->age; /* also oceans. no idea why we didn't always do that */
+        if (r->age>0 || r->units || r->attribs) {
+            ++r->age; /* also oceans. no idea why we didn't always do that */
+        }
         live(r);
 
         if (!fval(r->terrain, SEA_REGION)) {

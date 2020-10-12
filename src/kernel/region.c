@@ -791,7 +791,7 @@ region *new_region(int x, int y, struct plane *pl, int uid)
 {
     region *r;
     r = region_create(uid);
-    r->age = 1;
+    r->age = 0;
     add_region(r, x, y);
     assert(pl == r->_plane);
     return r;
