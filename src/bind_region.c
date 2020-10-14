@@ -519,6 +519,16 @@ static int tolua_region_get_ships(lua_State * L)
     return 1;
 }
 
+static int tolua_region_set_age(lua_State * L)
+{
+    region *self = (region *)tolua_tousertype(L, 1, NULL);
+
+    if (self) {
+	self->age = lua_tointeger(L, 2);
+    }
+    return 0;
+}
+
 static int tolua_region_get_age(lua_State * L)
 {
     region *self = (region *)tolua_tousertype(L, 1, NULL);
@@ -787,7 +797,7 @@ void tolua_region_open(lua_State * L)
                 tolua_region_set_info);
             tolua_variable(L, TOLUA_CAST "units", tolua_region_get_units, NULL);
             tolua_variable(L, TOLUA_CAST "ships", tolua_region_get_ships, NULL);
-            tolua_variable(L, TOLUA_CAST "age", tolua_region_get_age, NULL);
+            tolua_variable(L, TOLUA_CAST "age", tolua_region_get_age, tolua_region_set_age);
             tolua_variable(L, TOLUA_CAST "buildings", tolua_region_get_buildings,
                 NULL);
             tolua_variable(L, TOLUA_CAST "peasants", tolua_region_get_peasants,
