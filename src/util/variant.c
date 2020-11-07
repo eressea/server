@@ -59,6 +59,12 @@ variant frac_make(int num, int den)
 variant frac_add(variant a, variant b)
 {
     int num, den;
+    if (a.sa[0] == 0) {
+      return b;
+    }
+    if (b.sa[0] == 0) {
+      return a;
+    }
     den = lcm(a.sa[1], b.sa[1]);
     num = a.sa[0] * den / a.sa[1] + b.sa[0] * den / b.sa[1];
     return frac_make(num, den);
