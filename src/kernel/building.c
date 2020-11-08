@@ -126,6 +126,7 @@ building_type *bt_get_or_create(const char *name)
             btype->maxsize = -1;
             btype->capacity = 1;
             btype->maxcapacity = -1;
+            btype->magres = frac_zero;
             bt_register(btype);
         }
         return btype;
