@@ -524,7 +524,7 @@ static int tolua_region_set_age(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, NULL);
 
     if (self) {
-	self->age = lua_tointeger(L, 2);
+        self->age = (unsigned short)lua_tointeger(L, 2);
     }
     return 0;
 }
