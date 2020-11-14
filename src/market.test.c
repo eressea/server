@@ -68,7 +68,7 @@ static void test_market_curse(CuTest * tc)
     b->flags |= BLD_MAINTAINED;
     b->size = b->type->maxsize;
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, r);
     u_set_building(u, b);
 

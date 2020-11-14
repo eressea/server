@@ -173,8 +173,8 @@ static void test_racename(CuTest *tc) {
     unit *u;
     struct locale * lang;
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u->faction->locale = lang = test_create_locale();
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u->faction->locale = lang = get_or_create_locale(__FUNCTION__);
     locale_setstring(lang, "race::human_p", "Menschen");
     locale_setstring(lang, "race::human", "Mensch");
     locale_setstring(lang, "prefix::dark", "Dunkel");

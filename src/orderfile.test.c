@@ -27,7 +27,7 @@ static void test_unit_orders(CuTest *tc) {
     FILE *F = tmpfile();
 
     test_setup();
-    u = test_create_unit(f = test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     f->locale = test_create_locale();
     u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
@@ -53,7 +53,7 @@ static void test_faction_password_okay(CuTest *tc) {
     FILE *F;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     renumber_faction(f, 1);
     CuAssertIntEquals(tc, 1, f->no);
     faction_setpassword(f, "password");
@@ -74,7 +74,7 @@ static void test_faction_password_bad(CuTest *tc) {
     test_setup();
     mt_create_va(mt_new("wrongpasswd", NULL), "password:string", MT_NEW_END);
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     renumber_faction(f, 1);
     CuAssertIntEquals(tc, 1, f->no);
     faction_setpassword(f, "patzword");

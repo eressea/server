@@ -84,7 +84,7 @@ static void test_wormhole_transfer(CuTest *tc) {
     r2 = test_create_plain(1, 0);
     b = test_create_building(r1, NULL);
     b->size = 4;
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r1);
     u1->number = 2;
     u_set_building(u1, b);

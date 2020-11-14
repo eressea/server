@@ -37,7 +37,7 @@ static void test_flyingship(CuTest * tc)
     par_data.flag = 0;
 
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(test_create_race("human"));
+    f = test_create_faction();
     u = test_create_unit(f, r);
 
     shipType1 = test_create_shiptype("boot");

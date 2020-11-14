@@ -556,7 +556,7 @@ static int tolua_region_set_peasants(lua_State * L)
     region *self = (region *)tolua_tousertype(L, 1, NULL);
 
     if (self && self->land) {
-        rsetpeasants(self, lua_tointeger(L, 2));
+        rsetpeasants(self, (int)lua_tointeger(L, 2));
     }
     return 0;
 }

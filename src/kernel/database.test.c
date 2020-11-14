@@ -52,7 +52,7 @@ static void test_update_faction(CuTest *tc) {
 
     test_setup();
     db_driver_open(DB_GAME, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     CuAssertIntEquals(tc, 0, f->uid);
     id = 0;
     err = db_driver_faction_save(&id, f->no,

@@ -19,10 +19,10 @@ static void test_contact(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
-    u3 = test_create_unit(test_create_faction(NULL), r);
+    u3 = test_create_unit(test_create_faction(), r);
     CuAssertTrue(tc, ucontact(u1, u1));
     CuAssertTrue(tc, ucontact(u1, u2));
     CuAssertTrue(tc, !ucontact(u1, u3));
@@ -40,30 +40,30 @@ static void test_contact_cmd(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     lang = u->faction->locale;
 
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
         LOC(lang, parameters[P_UNIT]), u2->no);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
     free_order(ord);
 
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
         LOC(lang, parameters[P_FACTION]), u2->faction->no);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
     free_order(ord);
 
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     ord = create_order(K_CONTACT, u->faction->locale, "%i", u2->no);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
     free_order(ord);
 
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     usetalias(u2, 42);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
         LOC(lang, parameters[P_TEMP]), ualias(u2));
@@ -82,7 +82,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     lang = u->faction->locale;
 
     /* KONTAKTIERE EINHEIT <not-found> */

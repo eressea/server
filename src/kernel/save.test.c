@@ -60,7 +60,7 @@ static void test_readwrite_unit(CuTest * tc)
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     fno = f->no;
     u = test_create_unit(f, r);
     unit_setname(u, "  Hodor  ");
@@ -77,7 +77,7 @@ static void test_readwrite_unit(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     free_gamedata();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_region(0, 0, NULL);
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -101,7 +101,7 @@ static void test_readwrite_faction(CuTest * tc)
     faction *f;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     free(f->name);
     f->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", f->name);
@@ -258,11 +258,11 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     gamedata_init(&data, &store, RELEASE_VERSION);
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
     CuAssertPtrEquals(tc, NULL, f->next);
-    f2 = test_create_faction(NULL);
+    f2 = test_create_faction();
     CuAssertPtrEquals(tc, f2, factions->next);
     u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
@@ -303,7 +303,7 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     gamedata_init(&data, &store, RELEASE_VERSION);
 
     config_set("rules.region_owners", "1");
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     test_create_unit(f, r = test_create_region(0, 0, NULL));
     region_set_owner(r, f, 0);
     destroyfaction(&factions);
@@ -331,8 +331,8 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     unit * u;
 
     test_setup();
-    f = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f = test_create_faction();
+    f2 = test_create_faction();
     u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
     tr = trigger_changefaction(u, f);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
@@ -368,8 +368,8 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     unit * u;
 
     test_setup();
-    f = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f = test_create_faction();
+    f2 = test_create_faction();
     u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
     tr = trigger_createunit(r, f, f->race, 1);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
@@ -402,7 +402,7 @@ static void test_read_password(CuTest *tc) {
     faction *f;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -426,7 +426,7 @@ static void test_read_password_external(CuTest *tc) {
     if (remove(pwfile) != 0) {
         errno = 0;
     }
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     CuAssertPtrNotNull(tc, faction_getpassword(f));
     mstream_init(&data.strm);

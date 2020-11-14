@@ -39,7 +39,7 @@ static void test_cr_unit(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_region(0, 0, NULL);
     u = test_create_unit(f, r);
     renumber_unit(u, 1234);
@@ -93,7 +93,7 @@ static void test_cr_resources(CuTest *tc) {
 
     setup_resources();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_region(0, 0, NULL);
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
@@ -171,7 +171,7 @@ static void test_cr_mallorn(CuTest *tc) {
     
     setup_resources();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_region(0, 0, NULL);
     r->land->horses = 1;
     r->land->peasants = 200;
@@ -253,7 +253,7 @@ static void test_cr_hiderace(CuTest *tc) {
     struct locale * lang;
 
     test_setup();
-    default_locale = test_create_locale();
+    default_locale = get_or_create_locale(__FUNCTION__);
     locale_setstring(default_locale, "race::elf_p", "Elfen");
     locale_setstring(default_locale, "race::elf", "elf");
     locale_setstring(default_locale, "race::human_p", "Menschen");
@@ -263,8 +263,8 @@ static void test_cr_hiderace(CuTest *tc) {
     locale_setstring(lang, "race::human", "human");
     locale_setstring(lang, "race::elf_p", "elves");
     locale_setstring(lang, "race::elf", "elf");
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction_ex(NULL, default_locale);
+    f2 = test_create_faction_ex(NULL, default_locale);
     r = test_create_region(0, 0, NULL);
     u = test_create_unit(f1, r);
 
@@ -333,8 +333,8 @@ static void test_cr_factionstealth(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     r = test_create_region(0, 0, NULL);
     u = test_create_unit(f1, r);
 

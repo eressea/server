@@ -56,7 +56,7 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     setup_piracy();
     vterrain = get_or_create_terrain("terrain1");
     fset(vterrain, v_r_flags);
-    *victim = test_create_unit(test_create_faction(NULL), test_create_region(1, 0, vterrain));
+    *victim = test_create_unit(test_create_faction(), test_create_region(1, 0, vterrain));
     assert(*victim);
 
     if (v_shiptype) {
@@ -68,7 +68,7 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
         st_boat->coasts[1] = 0;
     }
 
-    *pirate = create_unit(test_create_region(0, 0, get_or_create_terrain("terrain2")), f = test_create_faction(NULL), 1, rc = rc_get_or_create("pirate"), 0, 0, 0);
+    *pirate = create_unit(test_create_region(0, 0, get_or_create_terrain("terrain2")), f = test_create_faction(), 1, rc = rc_get_or_create("pirate"), 0, 0, 0);
     fset(rc, p_rc_flags);
     assert(f && *pirate);
 
@@ -97,10 +97,10 @@ static void test_piracy_cmd(CuTest * tc) {
 
     t_ocean = get_or_create_terrain("ocean");
     st_boat = st_get_or_create("boat");
-    u2 = test_create_unit(test_create_faction(NULL), test_create_region(1, 0, t_ocean));
+    u2 = test_create_unit(test_create_faction(), test_create_region(1, 0, t_ocean));
     assert(u2);
     u_set_ship(u2, test_create_ship(u2->region, st_boat));
-    u = test_create_unit(f = test_create_faction(NULL), r = test_create_region(0, 0, t_ocean));
+    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, t_ocean));
     assert(f && u);
     set_level(u, SK_SAILING, st_boat->sumskill);
     u_set_ship(u, test_create_ship(u->region, st_boat));
@@ -130,8 +130,7 @@ static void test_piracy_cmd_errors(CuTest * tc) {
 
     st_boat = st_get_or_create("boat");
     r = test_create_race("pirates");
-    u = test_create_unit(f = test_create_faction(r), test_create_region(0, 0, get_or_create_terrain("ocean")));
-    f->locale = test_create_locale();
+    u = test_create_unit(f = test_create_faction_ex(r, NULL), test_create_region(0, 0, get_or_create_terrain("ocean")));
     u->thisorder = create_order(K_PIRACY, f->locale, "");
     assert(u && u->thisorder);
 
@@ -199,14 +198,14 @@ static void test_piracy_cmd_land_to_land(CuTest * tc) {
 
     /* create a target: */
     r = test_create_region(0, 0, t_plain);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, r);
     u->ship = test_create_ship(r, stype);
     target = f->no;
 
     /* create a pirate: */
     r = test_create_region(1, 0, t_plain);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, r);
     u->ship = test_create_ship(r, stype);
     set_level(u, SK_SAILING, u->ship->type->sumskill);

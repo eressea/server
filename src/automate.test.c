@@ -29,7 +29,7 @@ static void test_autostudy_init(CuTest *tc) {
     mt_create_error(771);
 
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     test_create_unit(f, r);
@@ -40,7 +40,7 @@ static void test_autostudy_init(CuTest *tc) {
     u4->thisorder = create_order(K_AUTOSTUDY, f->locale, "Dudelidu");
     u3 = test_create_unit(f, r);
     u3->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
-    u5 = test_create_unit(test_create_faction(NULL), r);
+    u5 = test_create_unit(test_create_faction(), r);
     u5->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
     scholars[2].u = NULL;
 
@@ -82,7 +82,7 @@ static void test_autostudy_run_twoteachers(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     set_level(u1, SK_ENTERTAINMENT, 2);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
@@ -123,7 +123,7 @@ static void test_autostudy_run_bigunit(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     set_number(u1, 20);
     set_level(u1, SK_ENTERTAINMENT, 16);
@@ -154,7 +154,7 @@ static void test_autostudy_run_few_teachers(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     set_number(u1, 20);
     set_level(u1, SK_ENTERTAINMENT, 16);
@@ -190,7 +190,7 @@ static void test_autostudy_run_few_teachers_reverse(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     set_number(u1, 20);
     set_level(u1, SK_ENTERTAINMENT, 16);
@@ -224,7 +224,7 @@ static void test_autostudy_run(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     set_number(u1, 2);
@@ -268,7 +268,7 @@ static void test_autostudy_run_noteachers(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     set_number(u1, 5);
@@ -303,7 +303,7 @@ static void test_autostudy_run_teachers_learn(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     set_number(u1, 2);
@@ -332,7 +332,7 @@ static void test_autostudy_run_skilldiff(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
     set_number(u1, 1);
@@ -364,7 +364,7 @@ static void test_autostudy_batches(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
     set_number(u1, 1);
@@ -396,7 +396,7 @@ static void test_do_autostudy(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_PERCEPTION]);
     set_number(u1, 1);
@@ -406,7 +406,7 @@ static void test_do_autostudy(CuTest *tc) {
     set_number(u2, 10);
     u3 = test_create_unit(f, r);
     u3->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
-    u4 = test_create_unit(test_create_faction(NULL), r);
+    u4 = test_create_unit(test_create_faction(), r);
     u4->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     do_autostudy(r);
     CuAssertIntEquals(tc, 2, get_level(u1, SK_PERCEPTION));

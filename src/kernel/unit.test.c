@@ -36,7 +36,7 @@ static void test_remove_empty_units(CuTest *tc) {
     test_setup();
     test_create_world();
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     uid = u->no;
     remove_empty_units();
     CuAssertPtrNotNull(tc, findunit(uid));
@@ -53,7 +53,7 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     test_setup();
     test_create_world();
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     u = test_create_unit(u->faction, u->region);
     CuAssertPtrNotNull(tc, u->nextF);
     uid = u->no;
@@ -74,7 +74,7 @@ static void test_remove_units_without_faction(CuTest *tc) {
     test_setup();
     test_create_world();
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     uid = u->no;
     u_setfaction(u, 0);
     remove_empty_units_in_region(u->region);
@@ -90,7 +90,7 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
     test_setup();
     test_create_world();
 
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     uid = u->no;
     u->faction->_alive = false;
     remove_empty_units_in_region(u->region);
@@ -106,7 +106,7 @@ static void test_scale_number(CuTest *tc) {
     test_setup();
     test_create_world();
     ptype = it_get_or_create(rt_get_or_create("hodor"));
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     change_effect(u, ptype, 1);
     u->hp = 35;
     CuAssertIntEquals(tc, 1, u->number);
@@ -135,7 +135,7 @@ static void test_unit_name(CuTest *tc) {
 
     test_setup();
     test_create_world();
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
     renumber_unit(u, 666);
     unit_setname(u, "Hodor");
     CuAssertStrEquals(tc, "Hodor (ii)", unitname(u));
@@ -146,7 +146,7 @@ static void test_unit_name_from_race(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(test_create_race("human")), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     renumber_unit(u, 666);
     unit_setname(u, NULL);
 
@@ -166,7 +166,7 @@ static void test_update_monster_name(CuTest *tc) {
 
     test_setup();
     rc = test_create_race("human");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
 
     unit_setname(u, "Hodor");
     CuAssertTrue(tc, !unit_name_equals_race(u));
@@ -191,7 +191,7 @@ static void test_names(CuTest *tc) {
 
     test_setup();
     test_create_world();
-    u = test_create_unit(test_create_faction(test_create_race("human")), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), findregion(0, 0));
 
     unit_setname(u, "Hodor");
     unit_setid(u, 5);
@@ -207,10 +207,10 @@ static void test_default_name(CuTest *tc) {
 
     test_setup();
 
-    lang = test_create_locale();
+    lang = get_or_create_locale(__FUNCTION__);
     locale_setstring(lang, "unitdefault", "Zweiheit");
 
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction_ex(NULL, lang), test_create_plain(0, 0));
 
     default_name(u, buf, sizeof(buf));
 
@@ -232,7 +232,7 @@ static void test_skillmod(CuTest *tc) {
     attrib *a;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     set_level(u, SK_ARMORER, 5);
     CuAssertIntEquals(tc, 5, effskill(u, SK_ARMORER, NULL));
 
@@ -259,7 +259,7 @@ static void test_skill_hunger(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     set_level(u, SK_ARMORER, 6);
     set_level(u, SK_SAILING, 6);
     fset(u, UFL_HUNGER);
@@ -277,7 +277,7 @@ static void test_skill_familiar(CuTest *tc) {
     test_setup();
 
     /* setup two units */
-    mag = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    mag = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     fam = test_create_unit(mag->faction, test_create_region(0, 0, NULL));
     set_level(fam, SK_PERCEPTION, 6);
     CuAssertIntEquals(tc, 6, effskill(fam, SK_PERCEPTION, NULL));
@@ -303,7 +303,7 @@ static void test_inside_building(CuTest *tc) {
     building *b;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     b = test_create_building(u->region, NULL);
 
     b->size = 1;
@@ -327,7 +327,7 @@ static void test_skills(CuTest *tc) {
     unit *u;
     skill *sv;
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     sv = add_skill(u, SK_ALCHEMY);
     CuAssertPtrNotNull(tc, sv);
     CuAssertPtrEquals(tc, sv, u->skills);
@@ -368,7 +368,7 @@ static void test_limited_skills(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, false, has_limited_skills(u));
     set_level(u, SK_ENTERTAINMENT, 1);
     CuAssertIntEquals(tc, false, has_limited_skills(u));
@@ -395,7 +395,7 @@ static void test_unit_description(CuTest *tc) {
     test_setup();
     lang = test_create_locale();
     rc = test_create_race("hodor");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
 
     CuAssertStrEquals(tc, NULL, unit_getinfo(u));
     CuAssertStrEquals(tc, NULL, u_description(u, lang));
@@ -421,7 +421,7 @@ static void test_remove_unit(CuTest *tc) {
     init_resources();
     rtype = get_resourcetype(R_SILVER);
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u2 = test_create_unit(f, r);
     u1 = test_create_unit(f, r);
     CuAssertPtrEquals(tc, u1, f->units);
@@ -465,7 +465,7 @@ static void test_renumber_unit(CuTest *tc) {
     unit *u1, *u2;
 
     test_setup();
-    u1 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u1 = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u2 = test_create_unit(u1->faction, u1->region);
     rng_init(0);
     renumber_unit(u1, 0);
@@ -486,7 +486,7 @@ static void test_name_unit(CuTest *tc) {
 
     test_setup();
     rc = test_create_race("skeleton");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
     rc->name_unit = gen_name;
     name_unit(u);
     CuAssertStrEquals(tc, "Hodor", unit_getname(u));
@@ -502,7 +502,7 @@ static void test_heal_factor(CuTest *tc) {
     test_setup();
     t_plain = test_create_terrain("plain", LAND_REGION|FOREST_REGION);
     rc = rc_get_or_create("human");
-    u = test_create_unit(test_create_faction(rc), r = test_create_region(0, 0, t_plain));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), r = test_create_region(0, 0, t_plain));
     rsettrees(r, 1, r->terrain->size / TREESIZE);
     rsettrees(r, 2, 0);
     CuAssertTrue(tc, r_isforest(r));
@@ -524,7 +524,7 @@ static void test_unlimited_units(CuTest *tc) {
     unit *u;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     CuAssertIntEquals(tc, 0, f->num_units);
     CuAssertIntEquals(tc, 0, f->num_people);
     u = test_create_unit(f, test_create_region(0, 0, NULL));
@@ -553,7 +553,7 @@ static void test_clone_men_bug_2386(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     scale_number(u1, 8237);
     u1->hp = 39 * u1->number;
@@ -572,7 +572,7 @@ static void test_clone_men(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     scale_number(u1, 10);
     u2 = test_create_unit(f, r);
@@ -596,7 +596,7 @@ static void test_transfermen(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     scale_number(u1, 3500);
     u2 = test_create_unit(f, r);
@@ -624,7 +624,7 @@ static void test_get_modifier(CuTest *tc) {
     rc->bonus[SK_ARMORER] = 1;
     rc->bonus[SK_TAXING] = 0;
     rc->bonus[SK_TRADE] = -1;
-    u = test_create_unit(test_create_faction(rc), r = test_create_region(0, 0, t_plain));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), r = test_create_region(0, 0, t_plain));
 
     /* no effects for insects in plains: */
     CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 0, r, true));
@@ -649,7 +649,7 @@ static void test_gift_items(CuTest *tc) {
     test_setup();
     init_resources();
     r = test_create_plain(0, 0);
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     rtype = get_resourcetype(R_SILVER);
     region_setresource(r, rtype, 0);
     i_change(&u->items, rtype->itype, 10);
@@ -661,7 +661,7 @@ static void test_gift_items(CuTest *tc) {
     region_setresource(r, rtype, 0);
     i_change(&u->items, rtype->itype, 10);
     i_change(&u->items, get_resourcetype(R_HORSE)->itype, 20);
-    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(u1->faction, r);
     gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS | GIFT_SELF);
     CuAssertIntEquals(tc, 20, region_getresource(r, get_resourcetype(R_HORSE)));
@@ -682,7 +682,7 @@ static void test_gift_items(CuTest *tc) {
     i_change(&u1->items, rtype->itype, -10);
 
     set_number(u1, 2);
-    u_setfaction(u2, test_create_faction(NULL));
+    u_setfaction(u2, test_create_faction());
     ally_set(&u->faction->allies, u2->faction, HELP_MONEY);
     ally_set(&u2->faction->allies, u->faction, HELP_GIVE);
     region_setresource(r, rtype, 0);

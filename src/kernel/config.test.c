@@ -29,7 +29,7 @@ static void test_read_unitid(CuTest *tc) {
     lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, t_plain));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, t_plain));
     usetalias(u, atoi36("42"));
 
     ord = create_order(K_GIVE, lang, "TEMP 42");
@@ -72,7 +72,7 @@ static void test_getunit(CuTest *tc) {
     lang = test_create_locale();
     /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
     t_plain = test_create_terrain("plain", LAND_REGION);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, t_plain));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, t_plain));
     /* This unit is also TEMP 42: */
     usetalias(u, atoi36("42"));
 

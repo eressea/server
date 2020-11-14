@@ -86,7 +86,7 @@ static void setup_harbor(move_fixture *mf) {
     b = test_create_building(r, btype);
     b->flags |= BLD_MAINTAINED;
 
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     u->ship = sh;
     ship_set_owner(u);
 
@@ -114,7 +114,7 @@ static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(NULL), mf.r);
+    u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
     building_set_owner(u);
 
@@ -129,7 +129,7 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(NULL), mf.r);
+    u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
     building_set_owner(u);
     contact_unit(mf.b->_owner, mf.sh->_owner);
@@ -160,7 +160,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     test_setup();
     setup_harbor(&mf);
 
-    u = test_create_unit(test_create_faction(NULL), mf.r);
+    u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
     building_set_owner(u);
     ally_set(&u->faction->allies, mf.u->faction, HELP_GUARD);
@@ -177,7 +177,7 @@ static void test_walkingcapacity(CuTest *tc) {
     test_setup();
     init_resources();
 
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     cap = u->number * (u->_race->capacity + u->_race->weight);
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
     scale_number(u, 2);
@@ -282,7 +282,7 @@ void setup_drift (struct drift_fixture *fix) {
     fix->st_boat->cabins = 20000;
 
     test_create_ocean(0, 0);
-    fix->u = test_create_unit(fix->f = test_create_faction(NULL), fix->r = test_create_ocean(-1, 0));
+    fix->u = test_create_unit(fix->f = test_create_faction(), fix->r = test_create_ocean(-1, 0));
     assert(fix->r && fix->u && fix->f);
     set_level(fix->u, SK_SAILING, fix->st_boat->sumskill);
     u_set_ship(fix->u, fix->sh = test_create_ship(fix->u->region, fix->st_boat));
@@ -455,10 +455,10 @@ static void test_follow_unit(CuTest *tc) {
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
     r = test_create_plain(1, 0);
-    u2 = test_create_unit(test_create_faction(NULL), u->region);
+    u2 = test_create_unit(test_create_faction(), u->region);
     ord = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
     unit_addorder(u2, ord);
     u2->thisorder = copy_order(ord);
@@ -492,7 +492,7 @@ static void test_follow_unit_self(CuTest *tc) {
     mt_create_va(mt_new("followfail", NULL),
         "unit:unit", "follower:unit", MT_NEW_END);
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
     ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u->no));
     unit_addorder(u, ord);
@@ -523,7 +523,7 @@ static void test_follow_ship_msg(CuTest * tc) {
     test_setup();
     init_resources();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
     test_create_ocean(-1, 1); /* D_NORTHWEST */
 
@@ -619,7 +619,7 @@ static void test_movement_speed(CuTest *tc) {
     test_setup();
     it_horse = test_create_horse();
     rc = test_create_race(NULL);
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
 
     rc->speed = 1.0;
     CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
@@ -646,7 +646,7 @@ static void test_route_cycle(CuTest *tc) {
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
     CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     u->faction->locale = lang;
     CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
     u->orders = create_order(K_ROUTE, u->faction->locale, "WEST EAST NW");
@@ -694,7 +694,7 @@ static void test_route_pause(CuTest *tc) {
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
     CuAssertPtrNotNull(tc, LOC(lang, shortdirections[D_WEST]));
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     u->faction->locale = lang;
     CuAssertIntEquals(tc, RCF_WALK, u->_race->flags & RCF_WALK);
     u->orders = create_order(K_ROUTE, u->faction->locale, "PAUSE EAST NW");
@@ -713,7 +713,7 @@ static void test_movement_speed_dragon(CuTest *tc) {
     rc = test_create_race("dragon");
     rc->flags |= RCF_DRAGON;
     rc->speed = 1.5;
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, 6, movement_speed(u));
     test_teardown();
 }

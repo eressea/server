@@ -53,7 +53,7 @@ static void test_volcano_outbreak(CuTest *tc) {
     t_active = test_create_terrain("activevolcano", LAND_REGION);
     r = test_create_region(0, 0, t_active);
     rn = test_create_region(1, 0, t_volcano);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->hp = u1->number;
     u2 = test_create_unit(f, rn);

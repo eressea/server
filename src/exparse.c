@@ -1577,7 +1577,7 @@ int exparse_readfile(const char * filename) {
     XML_SetUserData(xp, &pi);
     memset(&pi, 0, sizeof(pi));
     for (;;) {
-        size_t len = (int)fread(buf, 1, sizeof(buf), F);
+        int len = (int)fread(buf, 1, sizeof(buf), F);
         int done;
 
         if (ferror(F)) {

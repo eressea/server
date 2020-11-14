@@ -46,7 +46,7 @@ static void test_origin(CuTest *tc) {
     int x, y;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     x = 0;
     y = 0;
     adjust_coordinates(f, &x, &y, 0);

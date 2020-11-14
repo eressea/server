@@ -106,8 +106,7 @@ static void test_report_region(CuTest *tc) {
     rsettrees(r, 0, 1);
     rsettrees(r, 1, 2);
     rsettrees(r, 2, 3);
-    f = test_create_faction(NULL);
-    f->locale = lang;
+    f = test_create_faction_ex(NULL, lang);
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
 
@@ -187,11 +186,10 @@ static void test_report_allies(CuTest *tc) {
     lang = test_create_locale();
     locale_setstring(lang, "list_and", " und ");
     mstream_init(&out);
-    f = test_create_faction(NULL);
-    f->locale = lang;
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
-    f3 = test_create_faction(NULL);
+    f = test_create_faction_ex(NULL, lang);
+    f1 = test_create_faction_ex(NULL, lang);
+    f2 = test_create_faction_ex(NULL, lang);
+    f3 = test_create_faction_ex(NULL, lang);
     snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n\n",
         factionname(f1),
         LOC(lang, parameters[P_GUARD]));
@@ -242,7 +240,7 @@ static void test_report_travelthru(CuTest *tc) {
     mstream_init(&out);
     r = test_create_region(0, 0, NULL);
     r->flags |= RF_TRAVELUNIT;
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     f->locale = lang;
     u = test_create_unit(f, test_create_region(0, 1, NULL));
     unit_setname(u, "Hodor");
@@ -282,7 +280,7 @@ typedef struct {
 } spell_fixture;
 
 static void setup_spell_fixture(spell_fixture * spf) {
-    spf->lang = test_create_locale();
+    spf->lang = get_or_create_locale(__FUNCTION__);
     locale_setstring(spf->lang, mkname("spell", "testspell"), "Testzauber");
     locale_setstring(spf->lang, "nr_spell_type", "Typ:");
     locale_setstring(spf->lang, "sptype_normal", "Normal");

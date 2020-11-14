@@ -15,7 +15,7 @@ static void test_skills(CuTest * tc)
 
     test_setup();
     config_set_int("study.random_progress", 0);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     CuAssertPtrEquals(tc, NULL, u->skills);
     CuAssertIntEquals(tc, 0, u->skill_size);
     CuAssertIntEquals(tc, 0, get_level(u, SK_CROSSBOW));

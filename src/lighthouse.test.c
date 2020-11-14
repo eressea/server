@@ -23,8 +23,8 @@ static void test_lighthouse_range(CuTest * tc)
     test_setup();
     r = test_create_region(0, 0, NULL);
     test_create_region(1, 0, 0);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     b = test_create_building(r, test_create_buildingtype("lighthouse"));
     CuAssertIntEquals(tc, 0, lighthouse_range(b));
     b->size = 9;

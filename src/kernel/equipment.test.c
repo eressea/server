@@ -29,7 +29,7 @@ static void test_equipment(CuTest * tc)
     test_setup();
     callbacks.equip_unit = equip_callback;
 
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, true, equip_unit_mask(u, "hodor", EQUIP_ALL));
     CuAssertIntEquals(tc, EQUIP_ALL, eq_mask);
     CuAssertPtrEquals(tc, u, eq_unit);

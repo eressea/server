@@ -29,10 +29,10 @@ static void test_herbsearch(CuTest * tc)
     r = test_create_region(0, 0, NULL);
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
-    u2 = test_create_unit(test_create_faction(rc), r);
+    u2 = test_create_unit(test_create_faction_ex(rc, NULL), r);
     setguard(u2, true);
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, r);
     itype = test_create_itemtype("rosemary");
 

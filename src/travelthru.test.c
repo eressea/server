@@ -33,7 +33,7 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     while (r->attribs) {
         a_remove(&r->attribs, r->attribs);
     }
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     while (nunits--) {
         unit *u = test_create_unit(f, test_create_region(1, 0, NULL));
         travelthru_add(r, u);

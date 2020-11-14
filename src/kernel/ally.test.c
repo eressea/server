@@ -12,7 +12,7 @@ static void test_allies_clone(CuTest * tc)
     struct faction * f;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     CuAssertPtrEquals(tc, NULL, allies_clone(NULL));
     
     ally_set(&al, f, HELP_GUARD);
@@ -31,7 +31,7 @@ static void test_allies(CuTest *tc) {
     struct faction * f;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
 
     CuAssertIntEquals(tc, 0, ally_get(al, f));
     ally_set(&al, f, 42);
@@ -47,8 +47,8 @@ static void test_allies_set(CuTest *tc) {
     struct allies * al = NULL;
 
     test_setup();
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
 
     CuAssertPtrEquals(tc, NULL, al);
     ally_set(&al, f1, HELP_ALL);

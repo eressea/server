@@ -63,7 +63,7 @@ static void test_make_fighter(CuTest * tc)
     test_setup();
     test_create_horse();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     au = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
     enable_skill(SK_RIDING, true);
@@ -103,7 +103,7 @@ static void test_select_weapon_restricted(CuTest *tc) {
     race * rc;
 
     test_setup();
-    au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    au = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     itype = test_create_itemtype("halberd");
     wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&au->items, itype, 1);
@@ -160,7 +160,7 @@ static void test_select_armor(CuTest *tc) {
     battle *b;
 
     test_setup();
-    au = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    au = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     itype = test_create_itemtype("plate");
     new_armortype(itype, 0.0, frac_zero, 1, 0);
     i_change(&au->items, itype, 2);
@@ -215,8 +215,8 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     r = test_create_region(0, 0, NULL);
     bld = test_create_building(r, btype);
 
-    du = test_create_unit(test_create_faction(NULL), r);
-    au = test_create_unit(test_create_faction(NULL), r);
+    du = test_create_unit(test_create_faction(), r);
+    au = test_create_unit(test_create_faction(), r);
     u_set_building(du, bld);
 
     b = make_battle(r);
@@ -264,7 +264,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     bld = test_create_building(r, btype);
     bld->size = 10;
 
-    au = test_create_unit(test_create_faction(NULL), r);
+    au = test_create_unit(test_create_faction(), r);
     u_set_building(au, bld);
 
     b = make_battle(r);
@@ -294,7 +294,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     bld = test_create_building(r, btype);
     bld->size = 10;
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     au = test_create_unit(f, r);
     scale_number(au, 9);
     u_set_building(au, bld);
@@ -355,7 +355,7 @@ static void test_natural_armor(CuTest * tc)
 
     test_setup();
     rc = test_create_race("human");
-    u = test_create_unit(test_create_faction(rc), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
     set_level(u, SK_STAMINA, 2);
     CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
@@ -399,7 +399,7 @@ static void test_calculate_armor(CuTest * tc)
     achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
     wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE);
     rc = test_create_race("human");
-    du = test_create_unit(test_create_faction(rc), r);
+    du = test_create_unit(test_create_faction_ex(rc, NULL), r);
     dt.index = 0;
 
     dt.fighter = setup_fighter(&b, du);
@@ -472,7 +472,7 @@ static void test_magic_resistance(CuTest *tc)
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
     achain = new_armortype(ichain, 0.0, v50p, 3, ATF_NONE);
     rc = test_create_race("human");
-    du = test_create_unit(test_create_faction(rc), r);
+    du = test_create_unit(test_create_faction_ex(rc, NULL), r);
     dt.index = 0;
 
     i_change(&du->items, ishield, 1);
@@ -543,7 +543,7 @@ static void test_projectile_armor(CuTest * tc)
     wtype = new_weapontype(it_get_or_create(rt_get_or_create("sword")), 0, v50p, 0, 0, 0, 0, SK_MELEE);
     rc = test_create_race("human");
     rc->battle_flags |= BF_EQUIPMENT;
-    du = test_create_unit(test_create_faction(rc), r);
+    du = test_create_unit(test_create_faction_ex(rc, NULL), r);
     dt.index = 0;
 
     i_change(&du->items, ishield, 1);
@@ -571,8 +571,8 @@ static void test_battle_skilldiff(CuTest *tc)
     test_setup();
 
     r = test_create_region(0, 0, NULL);
-    ud = test_create_unit(test_create_faction(NULL), r);
-    ua = test_create_unit(test_create_faction(NULL), r);
+    ud = test_create_unit(test_create_faction(), r);
+    ua = test_create_unit(test_create_faction(), r);
     td.fighter = setup_fighter(&b, ud);
     td.index = 0;
     ta.fighter = setup_fighter(&b, ua);
@@ -606,8 +606,8 @@ static void test_terminate(CuTest * tc)
     r = test_create_region(0, 0, NULL);
 
     rc = test_create_race("human");
-    au = test_create_unit(test_create_faction(rc), r);
-    du = test_create_unit(test_create_faction(rc), r);
+    au = test_create_unit(test_create_faction_ex(rc, NULL), r);
+    du = test_create_unit(test_create_faction_ex(rc, NULL), r);
     dt.index = 0;
     at.index = 0;
 
@@ -638,8 +638,8 @@ static void test_battle_report_one(CuTest *tc)
     test_setup();
     setup_messages();
     r = test_create_plain(0, 0);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     b = make_battle(r);
     join_battle(b, u1, true, &fig);
     join_battle(b, u2, false, &fig);
@@ -669,9 +669,8 @@ static void test_battle_report_two(CuTest *tc)
     locale_setstring(lang, "and", "and");
     setup_messages();
     r = test_create_plain(0, 0);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u1->faction->locale = lang;
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction_ex(NULL, lang), r);
+    u2 = test_create_unit(test_create_faction_ex(NULL, lang), r);
     u2->faction->locale = lang;
 
     str_slprintf(expect, sizeof(expect), "%s and %s", factionname(u1->faction), factionname(u2->faction));
@@ -702,11 +701,11 @@ static void test_battle_report_three(CuTest *tc)
     locale_setstring(lang, "and", "and");
     setup_messages();
     r = test_create_plain(0, 0);
-    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
     u1->faction->locale = lang;
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     u2->faction->locale = lang;
-    u3 = test_create_unit(test_create_faction(NULL), r);
+    u3 = test_create_unit(test_create_faction(), r);
     u3->faction->locale = lang;
 
     str_slprintf(expect, sizeof(expect), "%s, %s and %s", factionname(u1->faction), factionname(u2->faction), factionname(u3->faction));
@@ -735,9 +734,9 @@ static void test_battle_skilldiff_building(CuTest *tc)
     btype = setup_castle();
 
     r = test_create_region(0, 0, NULL);
-    ud = test_create_unit(test_create_faction(NULL), r);
+    ud = test_create_unit(test_create_faction(), r);
     ud->building = test_create_building(ud->region, btype);
-    ua = test_create_unit(test_create_faction(NULL), r);
+    ua = test_create_unit(test_create_faction(), r);
     td.fighter = setup_fighter(&b, ud);
     td.index = 0;
     ta.fighter = setup_fighter(&b, ua);
@@ -784,7 +783,7 @@ static void test_drain_exp(CuTest *tc)
 
     test_setup();
     config_set("study.random_progress", "0");
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     set_level(u, SK_STAMINA, 3);
 
     CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);
@@ -842,7 +841,7 @@ static void test_tactics_chance(CuTest *tc) {
     ship_type *stype;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_ocean(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_ocean(0, 0));
     CuAssertDblEquals(tc, 0.1, tactics_chance(u, 1), 0.01);
     CuAssertDblEquals(tc, 0.3, tactics_chance(u, 3), 0.01);
     stype = test_create_shiptype("brot");
@@ -859,8 +858,8 @@ static void test_battle_fleeing(CuTest *tc) {
     test_setup();
     setup_messages();
     r = test_create_plain(0, 0);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     u1->status = ST_FLEE;
     u2->status = ST_AGGRO;
 #if 0
