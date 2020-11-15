@@ -661,6 +661,24 @@ static void test_familiar_set(CuTest *tc) {
     test_teardown();
 }
 
+static void test_familiar_skillmod(CuTest* tc) {
+    unit* mag, * fam;
+
+    test_setup();
+
+    mag = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    fam = test_create_unit(mag->faction, test_create_plain(0, 0));
+    set_level(mag, SK_STAMINA, 5);
+    set_familiar(mag, fam);
+    set_level(mag, SK_STAMINA, 5);
+    CuAssertIntEquals(tc, 5, effskill(mag, SK_STAMINA, mag->region));
+    set_level(fam, SK_STAMINA, 6);
+    CuAssertIntEquals(tc, 8, effskill(mag, SK_STAMINA, mag->region));
+    remove_familiar(mag);
+    CuAssertIntEquals(tc, 5, effskill(mag, SK_STAMINA, mag->region));
+    test_teardown();
+}
+
 static void test_familiar_age(CuTest *tc) {
     unit *mag, *fam;
 
@@ -715,6 +733,7 @@ CuSuite *get_familiar_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_familiar_equip);
+    SUITE_ADD_TEST(suite, test_familiar_skillmod);
     SUITE_ADD_TEST(suite, test_familiar_set);
     SUITE_ADD_TEST(suite, test_familiar_age);
     return suite;
