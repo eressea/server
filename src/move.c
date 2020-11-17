@@ -624,9 +624,6 @@ mark_travelthru(unit * u, region * r, const region_list * route,
 
 void move_ship(ship * sh, region * from, region * to, region_list * route)
 {
-    unit **iunit = &from->units;
-    unit **ulist = &to->units;
-
     assert(sh);
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
@@ -636,25 +633,38 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(sh, from, route);
     }
 
-    while (*iunit != NULL) {
-        unit *u = *iunit;
-        assert(u->region == from);
+    if (route != NULL) {
+        unit** iunit = &from->units;
+        unit** ulist = &to->units;
+        unit* ufirst = NULL;
 
-        if (u->ship == sh) {
-            if (route != NULL)
+        do {
+            unit *u = *iunit;
+
+            if (u->ship == sh) {
+                *iunit = u->next;
+                if (!ufirst) {
+                    ufirst = u;
+                }
                 mark_travelthru(u, from, route, NULL);
-            if (from != to) {
-                u->ship = 0;  /* temporary trick -- do not use u_set_ship here */
+                u->ship = NULL;  /* temporary trick -- do not use u_set_ship here */
+                leave_region(u);
+                u->region = NULL;
+                u->next = NULL;
                 move_unit(u, to, ulist);
                 ulist = &u->next;
                 u->ship = sh; /* undo the trick -- do not use u_set_ship here */
+                if (effskill(u, SK_SAILING, from) >= 1) {
+                    produceexp(u, SK_SAILING, u->number);
+                }
             }
-            if (route && effskill(u, SK_SAILING, from) >= 1) {
-                produceexp(u, SK_SAILING, u->number);
+            else if (ufirst) {
+                break;
             }
-        }
-        if (*iunit == u)
-            iunit = &u->next;
+            else {
+                iunit = &u->next;
+            }
+        } while (*iunit && (ufirst == NULL || ufirst != *iunit));
     }
 }
 

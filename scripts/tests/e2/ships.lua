@@ -529,8 +529,6 @@ function test_ship_crew_stops_guarding()
     local sh = ship.create(r1, "longboat")
     u1.ship = sh
     u2.ship = sh
-    u1.name = 'Bolgrim'
-    u1.name = 'Bolle'
     u1:clear_orders()
     u1:add_order("NACH O W")
     u1:set_skill("sailing", 1) -- cptskill = 1
