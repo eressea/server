@@ -519,3 +519,31 @@ function test_build_convoy_max()
     assert_equal(100, sh.size)
     assert_equal(25, u:get_item('log'))
 end
+
+function test_ship_crew_stops_guarding()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "ocean")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f, r1, 1)
+    local sh = ship.create(r1, "longboat")
+    u1.ship = sh
+    u2.ship = sh
+    u1.name = 'Bolgrim'
+    u1.name = 'Bolle'
+    u1:clear_orders()
+    u1:add_order("NACH O W")
+    u1:set_skill("sailing", 1) -- cptskill = 1
+    u2:set_skill("sailing", 9) -- sumskill = 10
+    u2:add_item("sword", 1)
+    u2:set_skill("melee", 2)
+    u2:add_order("BEWACHE")
+    u2.guard = true
+    process_orders()
+    assert_false(u2.guard)
+    assert_equal(sh, u1.ship)
+    assert_equal(sh, u2.ship)
+    assert_equal(r1, sh.region)
+    assert_equal(r1, u1.region)
+    assert_equal(r1, u2.region)
+end

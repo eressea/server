@@ -143,6 +143,7 @@ extern "C" {
     int get_modifier(const struct unit *u, skill_t sk, int level,
         const struct region *r, bool noitem);
     int remove_unit(struct unit **ulist, struct unit *u);
+    void leave_region(struct unit* u);
 
     /* looking up dead units' factions: */
     struct faction *dfindhash(int no);
