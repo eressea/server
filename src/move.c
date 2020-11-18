@@ -633,7 +633,7 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(sh, from, route);
     }
 
-    if (route != NULL) {
+    if (route != NULL && from->units) {
         unit** iunit = &from->units;
         unit** ulist = &to->units;
         unit* ufirst = NULL;
@@ -657,9 +657,6 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
                 if (effskill(u, SK_SAILING, from) >= 1) {
                     produceexp(u, SK_SAILING, u->number);
                 }
-            }
-            else if (ufirst) {
-                break;
             }
             else {
                 iunit = &u->next;
