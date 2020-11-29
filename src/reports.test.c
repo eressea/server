@@ -960,14 +960,18 @@ static void test_reports_genpassword(CuTest *tc) {
     CuAssertIntEquals(tc, 0, f->lastorders);
     CuAssertIntEquals(tc, 0, f->password_id);
     f->options = 0;
-    write_reports(f);
+    /* writing the report does not change the password */
+    write_reports(f, NULL);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
+    /* but the main reporting function does */
+    reports();
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
     CuAssertTrue(tc, f->password_id != 0);
     test_clear_messagelist(&f->msgs);
     f->lastorders = 1;
     f->age = 2;
     pwid = f->password_id;
-    write_reports(f);
+    reports();
     CuAssertIntEquals(tc, pwid, f->password_id);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
     test_teardown();
