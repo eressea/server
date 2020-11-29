@@ -1569,20 +1569,14 @@ void finish_reports(report_context *ctx) {
     }
 }
 
-int write_reports(faction * f)
+int write_reports(faction * f, const char *password)
 {
     bool gotit = false;
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
-    char buffer[PASSWORD_MAXSIZE], *password = NULL;
     if (noreports) {
         return false;
-    }
-    if (f->lastorders == 0 || f->age <= 1) {
-        /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
-         * kriegen ein neues Passwort: */
-        password = faction_genpassword(f, buffer);
     }
     prepare_report(&ctx, f, password);
     get_addresses(&ctx);
@@ -1666,7 +1660,8 @@ int reports(void)
     FILE *mailit;
     int retval = 0;
     char path[PATH_MAX];
-    const char * rpath = reportpath();
+    char buffer[PASSWORD_MAXSIZE];
+    const char* rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
@@ -1680,7 +1675,13 @@ int reports(void)
 
     for (f = factions; f; f = f->next) {
         if (f->email && !fval(f, FFL_NPC)) {
-            int error = write_reports(f);
+            char* password = NULL;
+            if (f->lastorders == 0 || f->age <= 1) {
+                /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
+                 * kriegen ein neues Passwort: */
+                password = faction_genpassword(f, buffer);
+            }
+            int error = write_reports(f, password);
             if (error)
                 retval = error;
             if (mailit)

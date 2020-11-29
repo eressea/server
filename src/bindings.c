@@ -378,7 +378,7 @@ static int tolua_write_report(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, 0);
     if (f) {
-        int result = write_reports(f);
+        int result = write_reports(f, NULL);
         lua_pushinteger(L, result);
     }
     else {
