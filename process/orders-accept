@@ -8,14 +8,9 @@ lang="$2"
 SCRIPT=$(readlink -f "$0")
 BIN=$(dirname "$SCRIPT")
 
-LOCKFILE="$ERESSEA/game-$game/orders.queue.lock"
-set -e
-trap 'rm -f "$LOCKFILE"' EXIT
-
 cd "$ERESSEA/game-$game"
 mkdir -p orders.dir
 cd orders.dir
-lockfile -r3 -l120 "$LOCKFILE"
 eval "$(python "$BIN/accept-orders.py" "$@")"
 if [ -e "$ACCEPT_FILE" ]
 then

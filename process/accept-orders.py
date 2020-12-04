@@ -327,11 +327,6 @@ def accept(game, locale, stream, extend=None):
         print text_ok, fail, email
         print filename
 
-    if not fail:
-        queue = open(gamedir + "/orders.queue", "a")
-        queue.write("email=%s file=%s locale=%s game=%s\n" % (email, filename, locale, game))
-        queue.close()
-
     logger.info("done - accepted orders from " + email)
 
     return 0
