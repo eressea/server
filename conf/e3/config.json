@@ -110,6 +110,7 @@
         "rules.lighthouse.unit_capacity": true,
         "movement.shipspeed.skillbonus": 6,
         "alliance.auto": "fight",
-        "alliance.restricted": "fight"
+        "alliance.restricted": "fight",
+        "resource.visibility.rule": 0
     }
 }
